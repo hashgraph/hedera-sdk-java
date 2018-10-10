@@ -1,0 +1,17 @@
+# node network details
+nodeaddress=localhost
+nodeport=50211
+
+# node account
+nodeAccountShard=0
+nodeAccountRealm=0
+nodeAccountNum=2
+
+# your public/private keys
+pubkey=
+privkey=
+
+# your account details
+payingAccountShard=0
+payingAccountRealm=0
+payingAccountNum=1
