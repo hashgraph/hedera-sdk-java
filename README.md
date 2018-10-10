@@ -10,22 +10,23 @@ This project was developed with Java version 10.0.2 (java -version returns build
 
 # Project install in Eclipse
 
-this project is built with Maven, import into eclipse as a Maven project
+This project is built with [Maven](https://maven.apache.org/), import into [Eclipse](https://www.eclipse.org/ide/) as a Maven project
 
 # Prerequisites
 
-## Right click on pom.xml and choose Run As->Maven Install 
+## Right click on `pom.xml` and choose `Run As` -> `Maven Install` 
 
-Note that the .proto files are compiled with Maven, so the project may initially look full of errors, this is normal.
+Note that the `.proto`-files are compiled with Maven, so the project may initially look full of errors, this is normal.
+
 If there are still some project issues, try a Maven project update and project clean followed by a Maven install.
 
 ## Javadocs 
 
-Javadocs are generated automatically as part of the maven build (if run from Eclipse, make sure your JAVA HOME is set otherwise the build will fail).
-They are generated as a JAR file which is compiled into the target/ folder.
+Javadocs are generated automatically as part of the Maven build (if run from Eclipse, make sure your `JAVA HOME` is set otherwise the build will fail).
+They are generated as a `JAR` file which is compiled into the target/ folder.
 
 ## Running the examples
 
-A node.properties.sample is provided, copy the file to node.properties and update with your account details, the details of the node you want to communicate to and finally, your private and public keys (as hex strings).
+A `node.properties.sample` is provided, copy the file `to node.properties` and update with your account details, the details of the node you want to communicate to and finally, your private and public keys (as hex strings).
 This file is ignored by git so all changes will remain local.
 
