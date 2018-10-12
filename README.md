@@ -71,7 +71,7 @@ Code snippets used in this document are excerpt from the full examples included 
 #### Access to the Hedera mainnet or a Hedera testnet
 In order to be able to use the Hedera SDK for Java you must have access to a testnet or to the Hedera mainnet. Access to mainnet and testnets are currently restricted to Hedera Hashgraph Council members and partners.
 
-Hackathon attendees will also gain temporary access to a Hedera testnet. If you wish to participate in a Hedera hackathon, please register on the [Hedera18](https://www.hedera18.com/) page.
+Hackathon attendees will also gain temporary access to a Hedera testnet.
 
 ##### Addresses of testnet nodes
 
