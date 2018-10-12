@@ -394,6 +394,8 @@ public class HederaFile implements Serializable {
 		transaction.signatureList = sigsForTransaction;
 
 		// issue the transaction
+		Utilities.throwIfNull("Node", this.node);
+		
 		HederaTransactionResult hederaTransactionResult = this.node.fileCreate(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 		// return
@@ -438,6 +440,8 @@ public class HederaFile implements Serializable {
 		transaction.signatureList = sigsForTransaction;
 
 		// issue the transaction
+		Utilities.throwIfNull("Node", this.node);
+
 		HederaTransactionResult hederaTransactionResult = this.node.fileDelete(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 		logger.trace("End - delete");
@@ -482,6 +486,8 @@ public class HederaFile implements Serializable {
 		transaction.signatureList = sigsForTransaction;
 
 		// issue the transaction
+		Utilities.throwIfNull("Node", this.node);
+
 		HederaTransactionResult hederaTransactionResult = this.node.fileUpdate(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 
@@ -526,6 +532,8 @@ public class HederaFile implements Serializable {
 		transaction.signatureList = sigsForTransaction;
 
 		// issue the transaction
+		Utilities.throwIfNull("Node", this.node);
+
 		HederaTransactionResult hederaTransactionResult = this.node.fileAppend(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 
@@ -696,6 +704,8 @@ public class HederaFile implements Serializable {
 		query.queryData = fileGetContents.build();
 
 		// query now set, send to network
+		Utilities.throwIfNull("Node", this.node);
+
 		Response response = this.node.getFileContents(query);
 
 		FileGetContentsResponse.Builder fileContentsResponse = response.getFileGetContents().toBuilder();
@@ -814,6 +824,8 @@ public class HederaFile implements Serializable {
 		query.queryData = fileGetInfoQuery.build();
 
 		// query now set, send to network
+		Utilities.throwIfNull("Node", this.node);
+
 		Response response = this.node.getFileInfo(query);
 
 		FileGetInfoResponse.Builder fileGetInfoResponse = response.getFileGetInfo().toBuilder();
@@ -1212,6 +1224,13 @@ public class HederaFile implements Serializable {
 		this.realmNum = realmNum;
 		this.contents = contents.clone();
 
+		// validate inputs
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
+		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingKeyPair);
+		Utilities.throwIfAccountIDInvalid("Node", this.txQueryDefaults.node.getAccountID());
+		Utilities.throwIfAccountIDInvalid("txQueryDefaults.payingAccountID", this.txQueryDefaults.payingAccountID);
+
 		// set transport
 		this.node = this.txQueryDefaults.node;
 
@@ -1276,6 +1295,13 @@ public class HederaFile implements Serializable {
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
 		transactionResult.setError();
+
+		// validate inputs
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
+		Utilities.throwIfAccountIDInvalid("Node", this.txQueryDefaults.node.getAccountID());
+		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingKeyPair);
+		Utilities.throwIfAccountIDInvalid("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingAccountID);
 
 		// set transport
 		this.node = this.txQueryDefaults.node;
@@ -1354,6 +1380,13 @@ public class HederaFile implements Serializable {
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
 		transactionResult.setError();
 
+		// validate inputs
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
+		Utilities.throwIfAccountIDInvalid("Node", this.txQueryDefaults.node.getAccountID());
+		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingKeyPair);
+		Utilities.throwIfAccountIDInvalid("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingAccountID);
+		
 		// set transport
 		this.node = this.txQueryDefaults.node;
 
@@ -1463,6 +1496,13 @@ public class HederaFile implements Serializable {
 			this.contents = null;
 		}
 
+		// validate inputs
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
+		Utilities.throwIfAccountIDInvalid("Node", this.txQueryDefaults.node.getAccountID());
+		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingKeyPair);
+		Utilities.throwIfAccountIDInvalid("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingAccountID);
+
 		// set transport
 		this.node = this.txQueryDefaults.node;
 
@@ -1545,9 +1585,14 @@ public class HederaFile implements Serializable {
 	 */
 	public byte[] getContents() throws InterruptedException {
 		logger.trace("Start - getContents");
+		
+		// validate inputs
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
+		
 		// set transport
 		this.node = this.txQueryDefaults.node;
-
+		
 		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults,
 				this.node.fileGetContentsQueryFee);
 
@@ -1591,8 +1636,13 @@ public class HederaFile implements Serializable {
 	 */
 	public boolean getInfo() throws InterruptedException {
 		logger.trace("Start - getInfo");
+		// validate inputs
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
+		
 		// set transport
 		this.node = this.txQueryDefaults.node;
+
 		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults, this.node.fileGetInfoQueryFee);
 		logger.trace("End - getInfo");
 		return this.getInfoAnswerOnly(transferTransaction);

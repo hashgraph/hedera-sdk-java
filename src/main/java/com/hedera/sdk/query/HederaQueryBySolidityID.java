@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaContractID;
 import com.hedera.sdk.common.HederaPrecheckResult;
+import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.node.HederaNode;
 import com.hedera.sdk.query.HederaQuery.QueryType;
 import com.hedera.sdk.query.HederaQueryHeader.QueryResponseType;
@@ -110,6 +111,7 @@ public class HederaQueryBySolidityID implements Serializable {
 		query.queryData = getBySolidityIDQuery.build();
 		
 		// query now set, send to network
+		Utilities.throwIfNull("Node", this.node);
 		Response response = this.node.getContractBySolidityId(query);
 
 		GetBySolidityIDResponse.Builder getBySolidityIDResponse = response.getGetBySolidityID().toBuilder();

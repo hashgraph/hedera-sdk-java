@@ -489,6 +489,7 @@ public class HederaAccount implements Serializable {
 		transaction.keySignatureList = sigsForTransaction;
 		
 		// issue the transaction
+		Utilities.throwIfNull("Node", this.node);
 		HederaTransactionResult hederaTransactionResult = this.node.accountCreate(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 		// return
@@ -529,6 +530,7 @@ public class HederaAccount implements Serializable {
 		transaction.keySignatureList = sigsForTransaction;
 		
 		// issue the transaction
+		Utilities.throwIfNull("Node", this.node);
 		HederaTransactionResult hederaTransactionResult = this.node.accountTransfer(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 		// return
@@ -569,6 +571,7 @@ public class HederaAccount implements Serializable {
 		transaction.keySignatureList = sigsForTransaction;
 		
 		// issue the transaction
+		Utilities.throwIfNull("Node", this.node);
 		HederaTransactionResult hederaTransactionResult = this.node.accountUpdate(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 
@@ -610,6 +613,7 @@ public class HederaAccount implements Serializable {
 		transaction.keySignatureList = sigsForTransaction;
 		
 		// issue the transaction
+		Utilities.throwIfNull("Node", this.node);
 		HederaTransactionResult hederaTransactionResult = this.node.addClaim(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 
@@ -650,6 +654,7 @@ public class HederaAccount implements Serializable {
 		query.queryData = queryBalance.build();
 		
 		// query now set, send to network
+		Utilities.throwIfNull("Node", this.node);
 		Response response = this.node.getAccountBalance(query);
 
 		if (response == null) {
@@ -666,9 +671,7 @@ public class HederaAccount implements Serializable {
 
 		if (this.precheckResult == HederaPrecheckResult.OK) {
 			this.balance = queryResponse.getBalance();
-			// cost
 			this.cost = responseHeader.getCost();
-			//state proof
 			this.stateProof = responseHeader.getStateProof().toByteArray();
 		} else {
 			result = false;
@@ -764,6 +767,7 @@ public class HederaAccount implements Serializable {
 		query.queryData = queryRecords.build();
 		
 		// query now set, send to network
+		Utilities.throwIfNull("Node", this.node);
 		Response response = this.node.getAccountRecords(query);
 		if (response == null) {
 			Utilities.printResponseFailure("HederaAccount.getRecords");
@@ -867,6 +871,7 @@ public class HederaAccount implements Serializable {
 		query.queryData = accountGetInfoQuery.build();
 		
 		// query now set, send to network
+		Utilities.throwIfNull("Node", this.node);
 		Response response = this.node.getAccountInfo(query);
 
 		if (response == null) {
@@ -1185,12 +1190,19 @@ public class HederaAccount implements Serializable {
 		this.accountKey = new HederaKey(keyType, publicKey);
 		this.initialBalance = initialBalance;
 
+		// validate inputs
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
+		Utilities.throwIfAccountIDInvalid("txQueryDefaults.payingAccountID", this.txQueryDefaults.payingAccountID);
+		Utilities.throwIfAccountIDInvalid("txQueryDefaults.node.AccountID", this.txQueryDefaults.node.getAccountID());
+		
 		// set transport
 		this.node = this.txQueryDefaults.node;
 		
 		// create a transaction ID (starts now with accountID of the paying account id)
 		this.hederaTransactionID = new HederaTransactionID(this.txQueryDefaults.payingAccountID);
 		
+
 		// get the body for the transaction so we can sign it
 		TransactionBody createBody = this.bodyToSignForCreate(
 				this.hederaTransactionID
@@ -1218,6 +1230,9 @@ public class HederaAccount implements Serializable {
 	
 	private HederaKeySignatureList signBody(byte[] message) {
 		// get the signature for the body
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingKeyPair);
+		
 		byte[] signedBody = this.txQueryDefaults.payingKeyPair.signMessage(message);
 		// create a Hedera Signature for it
 		HederaSignature payingSignature = new HederaSignature(this.txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
@@ -1252,9 +1267,16 @@ public class HederaAccount implements Serializable {
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
 		transactionResult.setError();
 		
+		// validate inputs
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
+		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingKeyPair);
+		Utilities.throwIfAccountIDInvalid("txQueryDefaults.payingAccountID", this.txQueryDefaults.payingAccountID);
+		Utilities.throwIfAccountIDInvalid("node.AccountID", this.node.getAccountID());
+
 		// set transport
 		this.node = this.txQueryDefaults.node;
-		
+
 		// create a transaction ID (starts now with accountID of the paying account id)
 		this.hederaTransactionID = new HederaTransactionID(this.txQueryDefaults.payingAccountID);
 
@@ -1269,6 +1291,8 @@ public class HederaAccount implements Serializable {
 		
 		accountAmounts.add(fromAccountAmount);
 		accountAmounts.add(toAccountAmount);
+
+		Utilities.throwIfAccountIDInvalid("Node", this.node.getAccountID());
 		
 		// get the body for the transaction so we can sign it
 		TransactionBody transferBody = this.bodyToSignForTransfer(
@@ -1335,11 +1359,19 @@ public class HederaAccount implements Serializable {
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
 		transactionResult.setError();
 		
+		// validate inputs
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
+		Utilities.throwIfAccountIDInvalid("txQueryDefaults.payingAccountID", this.txQueryDefaults.payingAccountID);
+		Utilities.throwIfAccountIDInvalid("node.AccountID", this.node.getAccountID());
+
 		// set transport
 		this.node = this.txQueryDefaults.node;
 		
 		// create a transaction ID (starts now with accountID of the paying account id)
 		this.hederaTransactionID = new HederaTransactionID(this.txQueryDefaults.payingAccountID);
+
+		Utilities.throwIfAccountIDInvalid("Node", this.node.getAccountID());
 
 		// get the body for the transaction so we can sign it
 		TransactionBody claimBody = this.bodyToSignForAddClaim(
@@ -1398,6 +1430,8 @@ public class HederaAccount implements Serializable {
 	public long getBalance() throws InterruptedException {
 	   	logger.trace("Start - getBalance");
 		// set transport
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
 		this.node = this.txQueryDefaults.node;
 		
 		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults,this.node.accountBalanceQueryFee);
@@ -1444,7 +1478,10 @@ public class HederaAccount implements Serializable {
 	public boolean getInfo() throws InterruptedException {
 	   	logger.trace("Start - getInfo");
 		// set transport
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
 		this.node = this.txQueryDefaults.node;
+
 		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults, this.node.accountInfoQueryFee);
 	   	logger.trace("End - getInfo");
 		return this.getInfoAnswerOnly(transferTransaction);
@@ -1514,11 +1551,20 @@ public class HederaAccount implements Serializable {
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
 		transactionResult.setError();
 		
+		// validate inputs
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
+		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingKeyPair);
+		Utilities.throwIfAccountIDInvalid("txQueryDefaults.payingAccountID", this.txQueryDefaults.payingAccountID);
+		Utilities.throwIfAccountIDInvalid("node.AccountID", this.node.getAccountID());
+
 		// set transport
 		this.node = this.txQueryDefaults.node;
 		
 		// create a transaction ID (starts now with accountID of the paying account id)
 		this.hederaTransactionID = new HederaTransactionID(this.txQueryDefaults.payingAccountID);
+
+		Utilities.throwIfAccountIDInvalid("Node", this.node.getAccountID());
 
 		// build body
 		// get the body for the transaction so we can sign it
@@ -1609,7 +1655,10 @@ public class HederaAccount implements Serializable {
 	public List<HederaTransactionRecord> getRecords() throws InterruptedException {
 	   	logger.trace("Start - getRecords");
 		// set transport
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
 		this.node = this.txQueryDefaults.node;
+		
 		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults, this.node.accountGetRecordsQueryFee);
 		getRecordsAnswerOnly(transferTransaction);
 	   	logger.trace("End - getRecords");
@@ -1627,6 +1676,9 @@ public class HederaAccount implements Serializable {
 	 */
 	public List<HederaTransactionRecord> getRecords(long shardNum, long realmNum, long accountNum) throws InterruptedException {
 		HederaAccount recordAccount = new HederaAccount(shardNum, realmNum, accountNum);
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("node", this.node);
+		
 		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults, this.node.accountGetRecordsQueryFee);
 		if (getRecords(transferTransaction, QueryResponseType.ANSWER_ONLY, recordAccount.getHederaAccountID())) {
 			return this.records;

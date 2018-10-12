@@ -306,6 +306,7 @@ public class HederaContract implements Serializable {
 		transaction.signatureList = sigsForTransaction;
 		
 		// issue the transaction
+		Utilities.throwIfNull("Node", this.node);
 		HederaTransactionResult hederaTransactionResult = this.node.contractCall(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 		// return
@@ -395,6 +396,7 @@ public class HederaContract implements Serializable {
 		transaction.signatureList = sigsForTransaction;
 		
 		// issue the transaction
+		Utilities.throwIfNull("Node", this.node);
 		HederaTransactionResult hederaTransactionResult = this.node.contractCreate(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 		// return
@@ -501,6 +503,7 @@ public class HederaContract implements Serializable {
 		transaction.keySignatureList = sigsForTransaction;
 		
 		// issue the transaction
+		Utilities.throwIfNull("Node", this.node);
 		HederaTransactionResult hederaTransactionResult = this.node.contractUpdate(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 		// return
@@ -599,6 +602,7 @@ public class HederaContract implements Serializable {
 		query.queryData = getInfoQuery.build();
 		
 		// query now set, send to network
+		Utilities.throwIfNull("Node", this.node);
 		Response response = this.node.getContractByteCode(query);
 		if (response == null) {
 			Utilities.printResponseFailure("HederaContrat.getByteCode");
@@ -702,6 +706,7 @@ public class HederaContract implements Serializable {
 		query.queryData = getInfoQuery.build();
 		
 		// query now set, send to network
+		Utilities.throwIfNull("Node", this.node);
 		Response response = this.node.getContractInfo(query);
 		if (response == null) {
 			Utilities.printResponseFailure("HederaContrat.getInfo");
@@ -830,6 +835,7 @@ public class HederaContract implements Serializable {
 		query.queryData = callLocalQuery.build();
 		
 		// query now set, send to network
+		Utilities.throwIfNull("Node", this.node);
 		Response response = this.node.contractCallLocal(query);
 		if (response == null) {
 			Utilities.printResponseFailure("HederaContrat.callLocal");
@@ -993,9 +999,16 @@ public class HederaContract implements Serializable {
 		this.constructionParameters = constructorParameters;
 		this.autoRenewPeriod = autoRenewPeriod;
 		
+		// validate inputs
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
+		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingKeyPair);
+		Utilities.throwIfAccountIDInvalid("txQueryDefaults.payingAccountID", this.txQueryDefaults.payingAccountID);
+		Utilities.throwIfAccountIDInvalid("txQueryDefaults.node.AccountID", this.txQueryDefaults.node.getAccountID());
+
 		// set transport
 		this.node = this.txQueryDefaults.node;
-		
+
 		// create a transaction ID (starts now with accountID of the paying account id)
 		this.hederaTransactionID = new HederaTransactionID(this.txQueryDefaults.payingAccountID);
 
@@ -1066,6 +1079,12 @@ public class HederaContract implements Serializable {
 		this.expirationTime = expirationTime;
 		this.autoRenewPeriod = autoRenewPeriod;
 		
+		// validate inputs
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
+		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingKeyPair);
+		Utilities.throwIfAccountIDInvalid("node.AccountID", this.node.getAccountID());
+
 		// set transport
 		this.node = this.txQueryDefaults.node;
 		
@@ -1141,9 +1160,16 @@ public class HederaContract implements Serializable {
 		this.amount = amount;
 		this.functionParameters = functionParameters.clone();
 				
+		// validate inputs
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
+		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingKeyPair);
+		Utilities.throwIfAccountIDInvalid("txQueryDefaults.payingAccountID", this.txQueryDefaults.payingAccountID);
+		Utilities.throwIfAccountIDInvalid("node.AccountID", this.node.getAccountID());
+
 		// set transport
 		this.node = this.txQueryDefaults.node;
-		
+
 		// create a transaction ID (starts now with accountID of the paying account id)
 		this.hederaTransactionID = new HederaTransactionID(this.txQueryDefaults.payingAccountID);
 
@@ -1226,7 +1252,10 @@ public class HederaContract implements Serializable {
 	public boolean getInfo() throws InterruptedException {
 	  logger.trace("Start - getInfo");
 		// set transport
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("Node", this.txQueryDefaults.node);
 		this.node = this.txQueryDefaults.node;
+		Utilities.throwIfNull("Node", this.node);
 		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults, this.node.contractGetInfoQueryFee);
 	  logger.trace("End - getInfo");
 		return this.getInfoAnswerOnly(transferTransaction);
@@ -1263,6 +1292,8 @@ public class HederaContract implements Serializable {
 	public byte[] getByteCode() throws InterruptedException {
 	  logger.trace("Start - getByteCode");
 		// set transport
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("Node", this.txQueryDefaults.node);
 		this.node = this.txQueryDefaults.node;
 		
 		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults,this.node.contractGetByteCodeQueryFee);
@@ -1306,6 +1337,11 @@ public class HederaContract implements Serializable {
 	 */
 	public HederaContractFunctionResult callLocal(long gas, byte[] functionParameters, long maxResultSize) throws InterruptedException {
 	  logger.trace("Start - callLocal");
+
+		// validate inputs
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
+
 		// set transport
 		this.node = this.txQueryDefaults.node;
 		
