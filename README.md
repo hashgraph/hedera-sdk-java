@@ -73,6 +73,10 @@ In order to be able to use the Hedera SDK for Java you must have access to a tes
 
 Hackathon attendees will also gain temporary access to a Hedera testnet.
 
+When using mainnet, it is necessary to buy *hbars* with fiat currency or other cryptocurrency. This can be achieved through an online exchange, or a friend who already has a Hedera account. That exchange or friend will implicitly create a Hedera account for you transferring in the appropriate quantity of *hbars* as part of the account-creation process and providing you with a Hedera account ID.
+
+On testnets, the Hedera portal will simulate this process, creating your testnet account using a public key you supply. The [Hedera Portal](https://portal.hedera.com) will also inform you of your Account ID on the testnet.
+
 ##### Addresses of testnet nodes
 
 The administrator who gives you access to a testnet will also provide you with the following details associated with at least one node:
