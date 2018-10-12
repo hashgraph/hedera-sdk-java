@@ -85,7 +85,7 @@ __NOTE__: This information should be added to your `node.properties` file (see a
 
 #### Public/Private Key Pairs
 
-Hedera accounts must be associated with cryptographic keys. A complete explanation of the ED25519 key pairs can be generated using the [Hedera Keygen utility](https://github.com/hashgraph/hedera-keygen-java). A complete explanation of the key generation process is documented in the [readme](https://github.com/hashgraph/hedera-keygen-java/blob/master/README.md) file in that repo. A minimal version of that process will be shown below.
+Hedera accounts must be associated with cryptographic keys. ED25519 key pairs can be generated using the [Hedera Keygen utility](https://github.com/hashgraph/hedera-keygen-java). A complete explanation of the key generation process is documented in the [readme](https://github.com/hashgraph/hedera-keygen-java/blob/master/README.md) file in that repo. A minimal version of that process will be shown below.
 
 __NOTE__: This information should be added to your `node.properties` file (see above) if you wish to run the example code provided.
 
@@ -129,7 +129,7 @@ Once the maven install has been completed, you should be able to locate a new ja
 Once you have added that jar file to your project, you should be able to import classes from the SDK for use within your application.
 
 #### Create a Hedera account
-In the interest of clarify, these examples assume a sunny-day scenario and do not include exception-handling logic. Refer to the main [examples](https://github.com/hashgraph/hedera-sdk-java/tree/master/examples/main/java/com/hedera) folder for more resilient code.
+In the interest of clarity, these examples assume a sunny-day scenario and do not include exception-handling logic. Refer to the main [examples](https://github.com/hashgraph/hedera-sdk-java/tree/master/examples/main/java/com/hedera) folder for more resilient code.
 
 This is the definition of the simple version of the `create` method in the `HederaAccount` class:
 
