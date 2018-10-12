@@ -5,6 +5,7 @@ import com.hedera.sdk.common.HederaKey.KeyType;
 
 import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,8 +29,9 @@ public class HederaCryptoKeyPair implements Serializable {
 	/**
 	 * sets the public key as a byte[]
 	 * @param publicKey the public key
+	 * @throws InvalidKeySpecException 
 	 */
-	public void setPublicKey(byte[] publicKey) {
+	public void setPublicKey(byte[] publicKey) throws InvalidKeySpecException {
 		logger.trace("Start - setPublicKey publicKey {}", publicKey);
 		keyPair.setPublicKey(publicKey);
 		logger.trace("End - setPublicKey");
@@ -101,8 +103,9 @@ public class HederaCryptoKeyPair implements Serializable {
 	/**
 	 * sets the secret key as a byte[]
 	 * @param secretKey the secret key
+	 * @throws InvalidKeySpecException 
 	 */
-	public void setSecretKey(byte[] secretKey) {
+	public void setSecretKey(byte[] secretKey) throws InvalidKeySpecException {
 		logger.trace("Start - setSecretKey secretKey {}", secretKey);
 		keyPair.setSecretKey(secretKey);  	
 		logger.trace("End - setSecretKey");
@@ -247,8 +250,9 @@ public class HederaCryptoKeyPair implements Serializable {
 	 * @param keyType {@link HederaKey.KeyType}
 	 * @param publicKey {@link byte} array
 	 * @param secretKey {@link byte} array
+	 * @throws InvalidKeySpecException 
 	 */
-	public HederaCryptoKeyPair(HederaKey.KeyType keyType, byte[] publicKey, byte[] secretKey) {
+	public HederaCryptoKeyPair(HederaKey.KeyType keyType, byte[] publicKey, byte[] secretKey) throws InvalidKeySpecException {
 		logger.trace("Start - Object init keyType {}, publicKey {}, secretKey {}", keyType, publicKey, secretKey);
 		this.keyType = keyType;
 		logger.trace("End - Object init");
@@ -272,8 +276,9 @@ public class HederaCryptoKeyPair implements Serializable {
 	 * @param keyType {@link HederaKey.KeyType}
 	 * @param publicKey {@link String} as a hex encoded string
 	 * @param secretKey {@link String} as a hex encoded string
+	 * @throws InvalidKeySpecException 
 	 */
-	public HederaCryptoKeyPair(HederaKey.KeyType keyType, String publicKey, String secretKey) {
+	public HederaCryptoKeyPair(HederaKey.KeyType keyType, String publicKey, String secretKey) throws InvalidKeySpecException {
 		logger.trace("Start - Object init keyType {}, publicKey {}, secretKey {}", keyType, publicKey, secretKey);
 		this.keyType = keyType;
 		
@@ -367,8 +372,9 @@ public class HederaCryptoKeyPair implements Serializable {
 	 * signs a message with the private key
 	 * @param message byte[]
 	 * @return byte[]
+	 * @throws Exception 
 	 */
-	public byte[] signMessage(byte[] message) {
+	public byte[] signMessage(byte[] message) throws Exception {
 		logger.trace("Start - signMessage message {}", message);
 		logger.trace("End - signMessage");
 		return keyPair.signMessage(message);
@@ -379,8 +385,9 @@ public class HederaCryptoKeyPair implements Serializable {
 	 * @param message byte[]
 	 * @param signature byte[]
 	 * @return {@link Boolean}
+	 * @throws Exception 
 	 */
-	public boolean verifySignature(byte[] message, byte[] signature) {
+	public boolean verifySignature(byte[] message, byte[] signature) throws Exception {
 		logger.trace("Start - verifySignature message {}, signature {}", message, signature);
 		logger.trace("End - verifySignature");
 		return keyPair.verifySignature(message, signature);

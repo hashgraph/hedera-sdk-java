@@ -3,6 +3,7 @@ package com.hedera.sdk.cryptography;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 
 import org.spongycastle.asn1.ASN1InputStream;
 import org.spongycastle.asn1.ASN1Integer;
@@ -44,7 +45,7 @@ public class ECKeyPair extends AbstractKeyPair {
     }
 
     @Override
-    public byte[] signMessage(byte[] message) {
+    public byte[] signMessage(byte[] message) throws NoSuchAlgorithmException, IOException {
         byte[] digest = CryptoUtils.sha384Digest(message);
         SHA384Digest dig = new SHA384Digest();
         HMacDSAKCalculator calc = new HMacDSAKCalculator((Digest) dig);
@@ -57,7 +58,7 @@ public class ECKeyPair extends AbstractKeyPair {
     }
 
     @Override
-    public boolean verifySignature(byte[] message, byte[] signature) {
+    public boolean verifySignature(byte[] message, byte[] signature) throws NoSuchAlgorithmException {
         ECDSASignature ecdsa = ECDSASignature.decodeFromDER(signature);
         byte[] data = CryptoUtils.sha384Digest(message);
         return ECKeyPair.verify(data,ecdsa, getPublicKey());
@@ -145,12 +146,8 @@ public class ECKeyPair extends AbstractKeyPair {
          * It's somewhat like protocol buffers but less convenient. This method returns a standard DER encoding
          * of the signature, as recognized by OpenSSL and other libraries.
          */
-        public byte[] encodeToDER() {
-            try {
-                return derByteStream().toByteArray();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        public byte[] encodeToDER() throws IOException {
+            return derByteStream().toByteArray();
         }
 
         public static ECDSASignature decodeFromDER(byte[] bytes) {
@@ -161,12 +158,8 @@ public class ECKeyPair extends AbstractKeyPair {
                 if (seq == null)
                     throw new RuntimeException("Reached past end of ASN.1 stream.");
                 ASN1Integer r, s;
-                try {
-                    r = (ASN1Integer) seq.getObjectAt(0);
-                    s = (ASN1Integer) seq.getObjectAt(1);
-                } catch (ClassCastException e) {
-                    throw new IllegalArgumentException(e);
-                }
+                r = (ASN1Integer) seq.getObjectAt(0);
+                s = (ASN1Integer) seq.getObjectAt(1);
                 // OpenSSL deviates from the DER spec by interpreting these values as unsigned, though they should not be
                 // Thus, we always use the positive versions. See: http://r6.ca/blog/20111119T211504Z.html
                 return new ECDSASignature(r.getPositiveValue(), s.getPositiveValue());

@@ -273,8 +273,9 @@ public class HederaNode implements Serializable {
 	 * @param transaction the {@link HederaTransaction} to send
 	 * @return {@link HederaTransactionResult} the result of the transaction
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public HederaTransactionResult accountCreate(HederaTransaction transaction) throws InterruptedException {
+	public HederaTransactionResult accountCreate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - accountCreate protobuf {}", transaction.getProtobuf().toString());
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
@@ -283,15 +284,9 @@ public class HederaNode implements Serializable {
 		HederaTransactionResult transResult = new HederaTransactionResult();
 		
 		if (transaction.getProtobuf().getBody().hasCryptoCreateAccount()) {
-			try {
-				openChannel();
-				CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.createAccount(transaction.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed: {}", e.getStatus());
-				transResult.setError();
-				logger.trace("End - accountCreate");
-			}
+			openChannel();
+			CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.createAccount(transaction.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -310,8 +305,9 @@ public class HederaNode implements Serializable {
 	 * @param transaction the {@link HederaTransaction} to send
 	 * @return {@link HederaTransactionResult} the result of the transaction
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public HederaTransactionResult addClaim(HederaTransaction transaction) throws InterruptedException {
+	public HederaTransactionResult addClaim(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - addClaim protobuf {}", transaction.getProtobuf().toString());
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
@@ -320,15 +316,9 @@ public class HederaNode implements Serializable {
 		HederaTransactionResult transResult = new HederaTransactionResult();
 		
 		if (transaction.getProtobuf().getBody().hasCryptoAddClaim()) {
-			try {
-				openChannel();
-				CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.addClaim(transaction.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed: {}", e.getStatus());
-				transResult.setError();
-				logger.trace("End - addClaim");
-			}
+			openChannel();
+			CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.addClaim(transaction.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -346,8 +336,9 @@ public class HederaNode implements Serializable {
 	 * @param transaction the {@link HederaTransaction} to send
 	 * @return {@link HederaTransactionResult} the result of the transaction
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public HederaTransactionResult accountTransfer(HederaTransaction transaction) throws InterruptedException {
+	public HederaTransactionResult accountTransfer(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - accountTransfer protobuf {}", transaction.getProtobuf().toString());
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
@@ -356,15 +347,9 @@ public class HederaNode implements Serializable {
 		HederaTransactionResult transResult = new HederaTransactionResult();
 		
 		if (transaction.getProtobuf().getBody().hasCryptoTransfer()) {
-			try {
-				openChannel();
-				CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.cryptoTransfer(transaction.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed: {}", e.getStatus());
-				transResult.setError();
-				logger.trace("End - accountTransfer");
-			}
+			openChannel();
+			CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.cryptoTransfer(transaction.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -382,8 +367,9 @@ public class HederaNode implements Serializable {
 	 * @param transaction the {@link HederaTransaction} to send
 	 * @return {@link HederaTransactionResult} the result of the transaction
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public HederaTransactionResult accountUpdate(HederaTransaction transaction) throws InterruptedException {
+	public HederaTransactionResult accountUpdate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - accountUpdate protobuf {}", transaction.getProtobuf().toString());
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
@@ -392,15 +378,9 @@ public class HederaNode implements Serializable {
 		HederaTransactionResult transResult = new HederaTransactionResult();
 		
 		if (transaction.getProtobuf().getBody().hasCryptoUpdateAccount()) {
-			try {
-				openChannel();
-				CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.updateAccount(transaction.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed: {}", e.getStatus());
-				transResult.setError();
-				logger.trace("End - accountUpdate");
-			}
+			openChannel();
+			CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.updateAccount(transaction.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -418,8 +398,9 @@ public class HederaNode implements Serializable {
 	 * @param transaction the {@link HederaTransaction} to send
 	 * @return {@link HederaTransactionResult} the result of the transaction
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public HederaTransactionResult fileAppend(HederaTransaction transaction) throws InterruptedException {
+	public HederaTransactionResult fileAppend(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - fileAppend protobuf {}", transaction.getProtobuf().toString());
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
@@ -428,15 +409,9 @@ public class HederaNode implements Serializable {
 		HederaTransactionResult transResult = new HederaTransactionResult();
 		
 		if (transaction.getProtobuf().getBody().hasFileAppend()) {
-			try {
-				openChannel();
-				FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.appendContent(transaction.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed: {}", e.getStatus());
-				transResult.setError();
-				logger.trace("End - fileAppend");
-			}
+			openChannel();
+			FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.appendContent(transaction.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -454,8 +429,9 @@ public class HederaNode implements Serializable {
 	 * @param transaction the {@link HederaTransaction} to send
 	 * @return {@link HederaTransactionResult} the result of the transaction
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public HederaTransactionResult fileCreate(HederaTransaction transaction) throws InterruptedException {
+	public HederaTransactionResult fileCreate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - fileCreate protobuf {}", transaction.getProtobuf().toString());
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
@@ -464,15 +440,9 @@ public class HederaNode implements Serializable {
 		HederaTransactionResult transResult = new HederaTransactionResult();
 		
 		if (transaction.getProtobuf().getBody().hasFileCreate()) {
-			try {
-				openChannel();
-				FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.createFile(transaction.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed: {}", e.getStatus());
-				transResult.setError();
-				logger.trace("End - fileCreate");
-			}
+			openChannel();
+			FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.createFile(transaction.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -491,8 +461,9 @@ public class HederaNode implements Serializable {
 	 * @param transaction the {@link HederaTransaction} to send
 	 * @return {@link HederaTransactionResult} the result of the transaction
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public HederaTransactionResult fileDelete(HederaTransaction transaction) throws InterruptedException {
+	public HederaTransactionResult fileDelete(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - fileDelete protobuf {}", transaction.getProtobuf().toString());
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
@@ -501,15 +472,9 @@ public class HederaNode implements Serializable {
 		HederaTransactionResult transResult = new HederaTransactionResult();
 		
 		if (transaction.getProtobuf().getBody().hasFileDelete()) {
-			try {
-				openChannel();
-				FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.deleteFile(transaction.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed: {}", e.getStatus());
-				transResult.setError();
-				logger.trace("End - fileDelete");
-			}
+			openChannel();
+			FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.deleteFile(transaction.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -528,8 +493,9 @@ public class HederaNode implements Serializable {
 	 * @param transaction the {@link HederaTransaction} to send
 	 * @return {@link HederaTransactionResult} the result of the transaction
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public HederaTransactionResult fileUpdate(HederaTransaction transaction) throws InterruptedException {
+	public HederaTransactionResult fileUpdate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - fileUpdate protobuf {}", transaction.getProtobuf().toString());
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
@@ -538,15 +504,9 @@ public class HederaNode implements Serializable {
 		HederaTransactionResult transResult = new HederaTransactionResult();
 		
 		if (transaction.getProtobuf().getBody().hasFileUpdate()) {
-			try {
-				openChannel();
-				FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.updateFile(transaction.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed: {}", e.getStatus());
-				transResult.setError();
-				logger.trace("End - fileUpdate");
-			}
+			openChannel();
+			FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.updateFile(transaction.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -565,8 +525,9 @@ public class HederaNode implements Serializable {
 	 * @param transaction the {@link HederaTransaction} to send
 	 * @return {@link HederaTransactionResult} the result of the transaction
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public HederaTransactionResult contractCall(HederaTransaction transaction) throws InterruptedException {
+	public HederaTransactionResult contractCall(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - contractCall protobuf {}", transaction.getProtobuf().toString());
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
@@ -575,15 +536,9 @@ public class HederaNode implements Serializable {
 		HederaTransactionResult transResult = new HederaTransactionResult();
 		
 		if (transaction.getProtobuf().getBody().hasContractCall()) {
-			try {
-				openChannel();
-				SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.contractCallMethod(transaction.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed: {}", e.getStatus());
-				transResult.setError();
-				logger.trace("End - contractCall");
-			}
+			openChannel();
+			SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.contractCallMethod(transaction.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -602,8 +557,9 @@ public class HederaNode implements Serializable {
 	 * @param transaction the {@link HederaTransaction} to send
 	 * @return {@link HederaTransactionResult} the result of the transaction
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public HederaTransactionResult contractCreate(HederaTransaction transaction) throws InterruptedException {
+	public HederaTransactionResult contractCreate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - contractCreate protobuf {}", transaction.getProtobuf().toString());
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
@@ -612,15 +568,9 @@ public class HederaNode implements Serializable {
 		HederaTransactionResult transResult = new HederaTransactionResult();
 		
 		if (transaction.getProtobuf().getBody().hasContractCreateInstance()) {
-			try {
-				openChannel();
-				SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.createContract(transaction.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed: {}", e.getStatus());
-				transResult.setError();
-				logger.trace("End - contractCreate");
-			}
+			openChannel();
+			SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.createContract(transaction.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -639,8 +589,9 @@ public class HederaNode implements Serializable {
 	 * @param transaction the {@link HederaTransaction} to send
 	 * @return {@link HederaTransactionResult} the result of the transaction
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public HederaTransactionResult contractUpdate(HederaTransaction transaction) throws InterruptedException {
+	public HederaTransactionResult contractUpdate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - contractUpdate protobuf {}", transaction.getProtobuf().toString());
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
@@ -649,15 +600,9 @@ public class HederaNode implements Serializable {
 		HederaTransactionResult transResult = new HederaTransactionResult();
 		
 		if (transaction.getProtobuf().getBody().hasContractUpdateInstance()) {
-			try {
-				openChannel();
-				SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.updateContract(transaction.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed: {}", e.getStatus());
-				transResult.setError();
-				logger.trace("End - contractUpdate");
-			}
+			openChannel();
+			SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.updateContract(transaction.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -676,8 +621,9 @@ public class HederaNode implements Serializable {
 	 * @param query the {@link HederaQuery} to send
 	 * @return {@link Response} the result of the query
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public Response contractCallLocal(HederaQuery query) throws InterruptedException {
+	public Response contractCallLocal(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - contractCallLocal query {}", query);
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
@@ -685,15 +631,9 @@ public class HederaNode implements Serializable {
 		Response response = null;
 
 		if (query.getProtobuf().hasContractCallLocal()) {
-			try {
-				openChannel();
-				SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.contractCallLocalMethod(query.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed:{}", e.getStatus());
-				logger.trace("End - contractCallLocal");
-				return null;
-			}
+			openChannel();
+			SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.contractCallLocalMethod(query.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}
@@ -709,8 +649,9 @@ public class HederaNode implements Serializable {
 	 * @param query the {@link HederaQuery} to send
 	 * @return {@link Response} the result of the query
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public Response getContractByteCode(HederaQuery query) throws InterruptedException {
+	public Response getContractByteCode(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - getContractByteCode query {}", query);
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
@@ -718,15 +659,9 @@ public class HederaNode implements Serializable {
 		Response response = null;
 
 		if (query.getProtobuf().hasContractGetBytecode()) {
-			try {
-				openChannel();
-				SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.contractGetBytecode(query.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed:{}", e.getStatus());
-				logger.trace("End - getContractByteCode");
-				return null;
-			}
+			openChannel();
+			SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.contractGetBytecode(query.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}
@@ -742,23 +677,18 @@ public class HederaNode implements Serializable {
 	 * @param query the {@link HederaQuery} to send
 	 * @return {@link Response} the result of the query
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public Response getContractBySolidityId(HederaQuery query) throws InterruptedException {
+	public Response getContractBySolidityId(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - getContractBySolidityId query {}", query);
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
 		Response response = null;
 		if (query.getProtobuf().hasGetBySolidityID()) {
-			try {
-				openChannel();
-				SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.getBySolidityID(query.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed:{}", e.getStatus());
-				logger.trace("End - getContractBySolidityId");
-				return null;
-			}
+			openChannel();
+			SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.getBySolidityID(query.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}
@@ -774,8 +704,9 @@ public class HederaNode implements Serializable {
 	 * @param query the {@link HederaQuery} to send
 	 * @return {@link Response} the result of the query
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public Response getContractInfo(HederaQuery query) throws InterruptedException {
+	public Response getContractInfo(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - getContractInfo query {}", query);
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
@@ -783,15 +714,9 @@ public class HederaNode implements Serializable {
 		Response response = null;
 
 		if (query.getProtobuf().hasContractGetInfo()) {
-			try {
-				openChannel();
-				SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.getContractInfo(query.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed:{}", e.getStatus());
-				logger.trace("End - getContractInfo");
-				return null;
-			}
+			openChannel();
+			SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.getContractInfo(query.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}
@@ -807,8 +732,9 @@ public class HederaNode implements Serializable {
 	 * @param query the {@link HederaQuery} to send
 	 * @return {@link Response} the result of the query
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public Response getAccountBalance(HederaQuery query) throws InterruptedException {
+	public Response getAccountBalance(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - getAccountBalance query {}", query);
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
@@ -816,15 +742,9 @@ public class HederaNode implements Serializable {
 		Response response = null;
 
 		if (query.getProtobuf().hasCryptogetAccountBalance()) {
-			try {
-				openChannel();
-				CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.cryptoGetBalance(query.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed:{}", e.getStatus());
-				logger.trace("End - getAccountBalance");
-				return null;
-			}
+			openChannel();
+			CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.cryptoGetBalance(query.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}
@@ -840,8 +760,9 @@ public class HederaNode implements Serializable {
 	 * @param query the {@link HederaQuery} to send
 	 * @return {@link Response} the result of the query
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public Response getAccountRecords(HederaQuery query) throws InterruptedException {
+	public Response getAccountRecords(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - getAccountRecords query {}", query);
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
@@ -849,15 +770,9 @@ public class HederaNode implements Serializable {
 		Response response = null;
 
 		if (query.getProtobuf().hasCryptoGetAccountRecords()) {
-			try {
-				openChannel();
-				CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.getAccountRecords(query.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed:{}", e.getStatus());
-				logger.trace("End - getAccountRecords");
-				return null;
-			}
+			openChannel();
+			CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.getAccountRecords(query.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}
@@ -873,8 +788,9 @@ public class HederaNode implements Serializable {
 	 * @param query the {@link HederaQuery} to send
 	 * @return {@link Response} the result of the query
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public Response getAccountInfo(HederaQuery query) throws InterruptedException {
+	public Response getAccountInfo(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - getAccountInfo query {}", query);
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
@@ -882,15 +798,9 @@ public class HederaNode implements Serializable {
 		Response response = null;
 
 		if (query.getProtobuf().hasCryptoGetInfo()) {
-			try {
-				openChannel();
-				CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.getAccountInfo(query.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed:{}", e.getStatus());
-				logger.trace("End - getAccountInfo");
-				return null;
-			}
+			openChannel();
+			CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.getAccountInfo(query.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}
@@ -906,21 +816,16 @@ public class HederaNode implements Serializable {
 	 * @param query the {@link HederaQuery} to send
 	 * @return {@link Response} the result of the query
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public Response getTransactionReceipt(HederaQuery query) throws InterruptedException {
+	public Response getTransactionReceipt(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - getTransactionReceipt query {}", query);
 
 		Response response = null;
 		if (query.getProtobuf().hasTransactionGetReceipt()) {
-			try {
-				openChannel();
-				CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.getTransactionReceipts(query.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed:{}", e.getStatus());
-				logger.trace("End - getTransactionReceipt");
-				return null;
-			}
+			openChannel();
+			CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.getTransactionReceipts(query.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}
@@ -934,23 +839,18 @@ public class HederaNode implements Serializable {
 	 * @param query the {@link HederaQuery} to send
 	 * @return {@link Response} the result of the query
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public Response getTransactionRecord(HederaQuery query) throws InterruptedException {
+	public Response getTransactionRecord(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - getTransactionRecord query {}", query);
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
 		Response response = null;
 		if (query.getProtobuf().hasTransactionGetRecord()) {
-			try {
-				openChannel();
-				CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.getTxRecordByTxID(query.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed:{}", e.getStatus());
-				logger.trace("End - getTransactionRecord");
-				return null;
-			}
+			openChannel();
+			CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.getTxRecordByTxID(query.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}
@@ -966,23 +866,18 @@ public class HederaNode implements Serializable {
 	 * @param query the {@link HederaQuery} to send
 	 * @return {@link Response} the result of the query
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public Response getFileContents(HederaQuery query) throws InterruptedException {
+	public Response getFileContents(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - getFileContents query {}", query);
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
 		Response response = null;
 		if (query.getProtobuf().hasFileGetContents()) {
-			try {
-				openChannel();
-				FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.getFileContent(query.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed:{}", e.getStatus());
-				logger.trace("End - getFileContents");
-				return null;
-			}
+			openChannel();
+			FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.getFileContent(query.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}
@@ -998,23 +893,18 @@ public class HederaNode implements Serializable {
 	 * @param query the {@link HederaQuery} to send
 	 * @return {@link Response} the result of the query
 	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
-	public Response getFileInfo(HederaQuery query) throws InterruptedException {
+	public Response getFileInfo(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 		logger.trace("Start - fileGetInfo query {}", query);
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
 		Response response = null;
 		if (query.getProtobuf().hasFileGetInfo()) {
-			try {
-				openChannel();
-				FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
-				response = blockingStub.getFileInfo(query.getProtobuf());
-			} catch (StatusRuntimeException e) {
-				logger.warn("RPC failed:{}", e.getStatus());
-				logger.trace("End - getFileInfo");
-				return null;
-			}
+			openChannel();
+			FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
+			response = blockingStub.getFileInfo(query.getProtobuf());
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}

@@ -973,9 +973,9 @@ public class HederaContract implements Serializable {
 	 * @param constructorParameters, a byte array containing the parameters for the construction of the smart contract
 	 * @param autoRenewPeriod, a {@link HederaDuration} to specify how often the smart contract should renew itself
 	 * @return {@link HederaTransactionResult}
-	 * @throws InterruptedException in the event of a node communication failure 
+	 * @throws Exception 
 	 */
-	public HederaTransactionResult create(long shardNum, long realmNum, HederaFileID fileID, long initialBalance, long gas, byte[] constructorParameters, HederaDuration autoRenewPeriod) throws InterruptedException {
+	public HederaTransactionResult create(long shardNum, long realmNum, HederaFileID fileID, long initialBalance, long gas, byte[] constructorParameters, HederaDuration autoRenewPeriod) throws Exception {
 	   	logger.trace("Start - create shardNum {}, realmNum {}, fileID {}, initialBalance {}, gas {}, constructorParameters{}, autoRenewPeriod {}"
 	   			, shardNum, realmNum, fileID, initialBalance, gas, constructorParameters, autoRenewPeriod);
 		// setup defaults if necessary
@@ -1051,9 +1051,9 @@ public class HederaContract implements Serializable {
 	 * @param expirationTime, a {@link HederaTimeStamp} update the expiration time of the smart contract
 	 * @param autoRenewPeriod, a {@link HederaDuration} to specify how often the smart contract should renew itself
 	 * @return {@link HederaTransactionResult}
-	 * @throws InterruptedException in the event of a node communication error 
+	 * @throws Exception 
 	 */
-	public HederaTransactionResult update(HederaTimeStamp expirationTime, HederaDuration autoRenewPeriod) throws InterruptedException {
+	public HederaTransactionResult update(HederaTimeStamp expirationTime, HederaDuration autoRenewPeriod) throws Exception {
 	   	logger.trace("Start - update expirationTime {}, autoRenewPeriod {}"
 	   			, expirationTime, autoRenewPeriod);
 		// setup defaults if necessary
@@ -1110,9 +1110,9 @@ public class HederaContract implements Serializable {
 	 * @param expirationTime, a {@link HederaTimeStamp} update the expiration time of the smart contract
 	 * @param autoRenewPeriod, a {@link HederaDuration} to specify how often the smart contract should renew itself
 	 * @return {@link HederaTransactionResult}
-	 * @throws InterruptedException in the event of a node communication error 
+	 * @throws Exception 
 	 */
-	public HederaTransactionResult update(long shardNum, long realmNum, long contractNum, HederaTimeStamp expirationTime, HederaDuration autoRenewPeriod) throws InterruptedException {
+	public HederaTransactionResult update(long shardNum, long realmNum, long contractNum, HederaTimeStamp expirationTime, HederaDuration autoRenewPeriod) throws Exception {
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.contractNum = contractNum;
@@ -1125,9 +1125,9 @@ public class HederaContract implements Serializable {
 	 * @param amount, number of tinybars sent (the function must be payable if this is nonzero)
 	 * @param functionParameters, which function to call, and the parameters to pass to the function
 	 * @return {@link HederaTransactionResult}
-	 * @throws InterruptedException in the event of a node communication error 
+	 * @throws Exception 
 	 */
-	public HederaTransactionResult call(long gas, long amount, byte[] functionParameters) throws InterruptedException {
+	public HederaTransactionResult call(long gas, long amount, byte[] functionParameters) throws Exception {
 		logger.trace("Start - call gas {}, amount {}, functionParameters {}", 
 			gas, amount, functionParameters);
 		// setup defaults if necessary
@@ -1203,9 +1203,9 @@ public class HederaContract implements Serializable {
 	 * @param amount, number of tinybars sent (the function must be payable if this is nonzero)
 	 * @param functionParameters, which function to call, and the parameters to pass to the function
 	 * @return {@link HederaTransactionResult}
-	 * @throws InterruptedException in the event of a node communication error 
+	 * @throws Exception 
 	 */
-	public HederaTransactionResult call(long shardNum, long realmNum, long contractNum, long gas, long amount, byte[] functionParameters) throws InterruptedException {
+	public HederaTransactionResult call(long shardNum, long realmNum, long contractNum, long gas, long amount, byte[] functionParameters) throws Exception {
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.contractNum = contractNum;
@@ -1221,9 +1221,9 @@ public class HederaContract implements Serializable {
 	 * The cost could be cached and refreshed from time to time, there is no need to look it up 
 	 * before each getInfo query
 	 * @return {@link boolean}
-	 * @throws InterruptedException in the event of a node communication error 
+	 * @throws Exception 
 	 */
-	public boolean getInfo() throws InterruptedException {
+	public boolean getInfo() throws Exception {
 	  logger.trace("Start - getInfo");
 		// set transport
 		this.node = this.txQueryDefaults.node;
@@ -1243,9 +1243,9 @@ public class HederaContract implements Serializable {
 	 * @param realmNum, the realm number of the smart contract
 	 * @param contractNum, the account number of the smart contract
 	 * @return {@link boolean}
-	 * @throws InterruptedException in the event of a node communication error 
+	 * @throws Exception 
 	 */
-	public boolean getInfo(long shardNum, long realmNum, long contractNum) throws InterruptedException {
+	public boolean getInfo(long shardNum, long realmNum, long contractNum) throws Exception {
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.contractNum = contractNum;
@@ -1258,9 +1258,9 @@ public class HederaContract implements Serializable {
 	 * in the event of an error, check the value of this.precheckResult to determine the 
 	 * cause of the error
 	 * @return {@link byte} array
-	 * @throws InterruptedException in the event of a node communication error 
+	 * @throws Exception 
 	 */
-	public byte[] getByteCode() throws InterruptedException {
+	public byte[] getByteCode() throws Exception {
 	  logger.trace("Start - getByteCode");
 		// set transport
 		this.node = this.txQueryDefaults.node;
@@ -1285,9 +1285,9 @@ public class HederaContract implements Serializable {
 	 * @param realmNum, the realm number of the smart contract
 	 * @param contractNum, the account number of the smart contract
 	 * @return {@link byte} array
-	 * @throws InterruptedException in the event of a node communication error 
+	 * @throws Exception 
 	 */
-	public byte[] getByteCode(long shardNum, long realmNum, long contractNum) throws InterruptedException {
+	public byte[] getByteCode(long shardNum, long realmNum, long contractNum) throws Exception {
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.contractNum = contractNum;
@@ -1302,9 +1302,9 @@ public class HederaContract implements Serializable {
 	 * @param functionParameters, parameters for running the function
 	 * @param maxResultSize, max number of bytes that the result might include. The run will fail if it would have returned more than this number of bytes.
 	 * @return {@link HederaContractFunctionResult}
-	 * @throws InterruptedException in the event of a node communication error 
+	 * @throws Exception 
 	 */
-	public HederaContractFunctionResult callLocal(long gas, byte[] functionParameters, long maxResultSize) throws InterruptedException {
+	public HederaContractFunctionResult callLocal(long gas, byte[] functionParameters, long maxResultSize) throws Exception {
 	  logger.trace("Start - callLocal");
 		// set transport
 		this.node = this.txQueryDefaults.node;
@@ -1335,9 +1335,9 @@ public class HederaContract implements Serializable {
 	 * @param functionParameters, parameters for running the function
 	 * @param maxResultSize, max number of bytes that the result might include. The run will fail if it would have returned more than this number of bytes.
 	 * @return {@link HederaContractFunctionResult}
-	 * @throws InterruptedException in the event of a node communication error 
+	 * @throws Exception 
 	 */
-	public HederaContractFunctionResult callLocal(long shardNum, long realmNum, long contractNum, long gas, byte[] functionParameters, long maxResultSize) throws InterruptedException {
+	public HederaContractFunctionResult callLocal(long shardNum, long realmNum, long contractNum, long gas, byte[] functionParameters, long maxResultSize) throws Exception {
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.contractNum = contractNum;

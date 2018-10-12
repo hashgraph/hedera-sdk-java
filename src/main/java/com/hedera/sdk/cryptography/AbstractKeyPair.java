@@ -1,5 +1,7 @@
 package com.hedera.sdk.cryptography;
 
+import java.security.spec.InvalidKeySpecException;
+
 abstract class AbstractKeyPair implements KeyPair {
 	
 	 protected Seed seed = null;
@@ -9,7 +11,7 @@ abstract class AbstractKeyPair implements KeyPair {
 	 protected byte[] privateKey = new byte[0];
 	 
 	 
-	 public void setPublicKey(byte[] publicKey) {
+	 public void setPublicKey(byte[] publicKey)  throws InvalidKeySpecException {
 		 this.publicKey = publicKey;
 	 }
 
@@ -17,7 +19,7 @@ abstract class AbstractKeyPair implements KeyPair {
 		 this.publicKeyEncoded = encodedPublicKey;
 	 }
 	 
-	 public void setSecretKey(byte[] secretKey) {
+	 public void setSecretKey(byte[] secretKey) throws InvalidKeySpecException {
 		 this.privateKey = secretKey;
 	 }
 
@@ -36,9 +38,9 @@ abstract class AbstractKeyPair implements KeyPair {
 	}
 
 	@Override
-	abstract public byte[] signMessage(byte[] message);
+	abstract public byte[] signMessage(byte[] message) throws Exception;
 
 	@Override
-	abstract public boolean verifySignature(byte[] message, byte[] signature);
+	abstract public boolean verifySignature(byte[] message, byte[] signature) throws Exception;
 
 }

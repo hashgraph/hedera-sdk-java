@@ -12,7 +12,7 @@ import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 
 public final class AccountCreate {
-	public static HederaAccount create(HederaAccount account, HederaCryptoKeyPair newAccountKey, long initialBalance) {
+	public static HederaAccount create(HederaAccount account, HederaCryptoKeyPair newAccountKey, long initialBalance) throws Exception {
 		final Logger logger = LoggerFactory.getLogger(AccountCreate.class);
 		// new account properties
 		long shardNum = 0;
@@ -23,29 +23,24 @@ public final class AccountCreate {
 		logger.info("");
 
 		// create the new account
-		try {
-			// account creation transaction
-			HederaTransactionResult createResult = account.create(shardNum, realmNum, newAccountKey.getPublicKey(), newAccountKey.getKeyType(), initialBalance, null);
-			// was it successful ?
-			if (createResult.getPrecheckResult() == HederaPrecheckResult.OK) {
-				// yes, get a receipt for the transaction
-				HederaTransactionReceipt receipt = Utilities.getReceipt(account.hederaTransactionID, account.txQueryDefaults.node, 10, 0, 1);
-				// was that successful ?
-				if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
-					// yes, get the new account number from the receipt
-					account.accountNum = receipt.accountID.accountNum;
-					// and print it out
-					logger.info(String.format("===>Your new account number is %d", account.accountNum));
-				} else {
-					logger.info("transactionStatus not SUCCESS: " + receipt.transactionStatus.name());
-					return null;
-				}
+		// account creation transaction
+		HederaTransactionResult createResult = account.create(shardNum, realmNum, newAccountKey.getPublicKey(), newAccountKey.getKeyType(), initialBalance, null);
+		// was it successful ?
+		if (createResult.getPrecheckResult() == HederaPrecheckResult.OK) {
+			// yes, get a receipt for the transaction
+			HederaTransactionReceipt receipt = Utilities.getReceipt(account.hederaTransactionID, account.txQueryDefaults.node, 10, 0, 1);
+			// was that successful ?
+			if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
+				// yes, get the new account number from the receipt
+				account.accountNum = receipt.accountID.accountNum;
+				// and print it out
+				logger.info(String.format("===>Your new account number is %d", account.accountNum));
 			} else {
-				logger.info("getPrecheckResult not OK: " + createResult.getPrecheckResult().name());
+				logger.info("transactionStatus not SUCCESS: " + receipt.transactionStatus.name());
 				return null;
 			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		} else {
+			logger.info("getPrecheckResult not OK: " + createResult.getPrecheckResult().name());
 			return null;
 		}
 		return account;

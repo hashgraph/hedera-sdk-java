@@ -79,8 +79,9 @@ public class Utilities {
 	 * @param payload the payload to sign
 	 * @param keyPair the keypair to use for signing
 	 * @return {@link HederaKeySignature}
+	 * @throws Exception 
 	 */
-	public static HederaKeySignature getKeySignature(byte[] payload, HederaCryptoKeyPair keyPair) {
+	public static HederaKeySignature getKeySignature(byte[] payload, HederaCryptoKeyPair keyPair) throws Exception {
 		logger.trace("Start - getSignature payload {}, keyPair {}", payload, keyPair);
 		byte[] signedBody = keyPair.signMessage(payload);
 		// create a Hedera Signature for it
@@ -96,8 +97,9 @@ public class Utilities {
 	 * @param publicKey the public key
 	 * @param privateKey the private key
 	 * @return {@link HederaKeySignature}
+	 * @throws Exception 
 	 */
-	public static HederaKeySignature getKeySignature(byte[] payload, KeyType keyType, byte[] publicKey, byte[] privateKey) {
+	public static HederaKeySignature getKeySignature(byte[] payload, KeyType keyType, byte[] publicKey, byte[] privateKey) throws Exception {
 		// create new keypair
 		HederaCryptoKeyPair keyPair = new HederaCryptoKeyPair(keyType, publicKey, privateKey);
 		return getKeySignature(payload, keyPair);
@@ -108,8 +110,9 @@ public class Utilities {
 	 * @param payload the payload to sign
 	 * @param keyPair the keypair to use for the signature
 	 * @return {@link HederaSignature}
+	 * @throws Exception 
 	 */
-	public static HederaSignature getSignature(byte[] payload, HederaCryptoKeyPair keyPair) {
+	public static HederaSignature getSignature(byte[] payload, HederaCryptoKeyPair keyPair) throws Exception {
 		logger.trace("Start - getSignature payload {}, keyPair {}", payload, keyPair);
 		byte[] signedBody = keyPair.signMessage(payload);
 		// create a Hedera Signature for it
@@ -125,8 +128,9 @@ public class Utilities {
 	 * @param publicKey the public key
 	 * @param privateKey the private key
 	 * @return {@link HederaSignature}
+	 * @throws Exception 
 	 */
-	public static HederaSignature getSignature(byte[] payload, KeyType keyType, byte[] publicKey, byte[] privateKey) {
+	public static HederaSignature getSignature(byte[] payload, KeyType keyType, byte[] publicKey, byte[] privateKey) throws Exception {
 		// create new keypair
 		HederaCryptoKeyPair keyPair = new HederaCryptoKeyPair(keyType, publicKey, privateKey);
 		return getSignature(payload, keyPair);
@@ -160,8 +164,9 @@ public class Utilities {
 	 * @param hederaTransactionID the transaction id to get a receipt for
 	 * @param node the node to communicate with
 	 * @return {@link HederaTransactionReceipt}
+	 * @throws InterruptedException 
 	 */
-	public static HederaTransactionReceipt getReceipt (HederaTransactionID hederaTransactionID, HederaNode node) {
+	public static HederaTransactionReceipt getReceipt (HederaTransactionID hederaTransactionID, HederaNode node) throws InterruptedException {
 
 		final int MAX_CALL_COUNT = 500;
 		final int DELAY_BASE = 50; // base delay in milliseconds
@@ -180,8 +185,9 @@ public class Utilities {
 	 * @param firstDelay the time in milliseconds before the first getReceipt is sent
 	 * @param increaseDelay the time in milliseconds to increase the delay by between each retry
 	 * @return {@link HederaTransactionReceipt}
+	 * @throws InterruptedException 
 	 */
-	public static HederaTransactionReceipt getReceipt (HederaTransactionID hederaTransactionID, HederaNode node, int maxRetries, int firstDelay, int increaseDelay) {
+	public static HederaTransactionReceipt getReceipt (HederaTransactionID hederaTransactionID, HederaNode node, int maxRetries, int firstDelay, int increaseDelay) throws InterruptedException {
 		final Logger logger = LoggerFactory.getLogger(HederaTransactionReceipt.class);
 
 		long sleepTime = firstDelay;
@@ -189,32 +195,28 @@ public class Utilities {
 		int callCount = 1;
 		HederaTransactionReceipt receipt = new HederaTransactionReceipt();
 		receipt.transactionStatus = HederaTransactionStatus.UNKNOWN;
-		try {
-			while (callCount <= maxRetries) {
-				
-				Thread.sleep(sleepTime);
-				sleepTime += increaseDelay;
-						
-				receipt = new HederaTransactionReceipt(hederaTransactionID, node);
-				// was that successful ?
-				callCount += 1;
-				if (receipt.nodePrecheck == HederaPrecheckResult.INVALID_TRANSACTION) {
-					// do nothing
-				} else if (receipt.transactionStatus == HederaTransactionStatus.FAIL_INVALID) {
-					// force exit out of loop
+		while (callCount <= maxRetries) {
+			
+			Thread.sleep(sleepTime);
+			sleepTime += increaseDelay;
+					
+			receipt = new HederaTransactionReceipt(hederaTransactionID, node);
+			// was that successful ?
+			callCount += 1;
+			if (receipt.nodePrecheck == HederaPrecheckResult.INVALID_TRANSACTION) {
+				// do nothing
+			} else if (receipt.transactionStatus == HederaTransactionStatus.FAIL_INVALID) {
+				// force exit out of loop
+				break;
+			} else if (receipt.transactionStatus == HederaTransactionStatus.FAIL_BALANCE) {
+				// force exit out of loop
+				break;
+			} else if (receipt.nodePrecheck == HederaPrecheckResult.OK) {
+				if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
+					logger.info("took " + callCount + " call, about " + sleepTime * callCount + " milliseconds");
 					break;
-				} else if (receipt.transactionStatus == HederaTransactionStatus.FAIL_BALANCE) {
-					// force exit out of loop
-					break;
-				} else if (receipt.nodePrecheck == HederaPrecheckResult.OK) {
-					if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
-						logger.info("took " + callCount + " call, about " + sleepTime * callCount + " milliseconds");
-						break;
-					}
 				}
 			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 		return receipt;
 	}

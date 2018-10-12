@@ -3,6 +3,7 @@ package com.hedera.utilities;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -73,7 +74,7 @@ public class ExampleUtilities {
 		}
 	}
 	
-	public static HederaTransactionAndQueryDefaults getTxQueryDefaults() {
+	public static HederaTransactionAndQueryDefaults getTxQueryDefaults() throws InvalidKeySpecException {
 		// Get node details 
 		ExampleUtilities.getNodeDetails();
 		
