@@ -48,7 +48,7 @@ If there are still some project issues, try a Maven project update and project c
 #### Running the examples
 A `node.properties.sample` is provided, copy the file to `node.properties` and update with your account details, the details of the node you want to communicate to and finally, your private and public keys (as hex strings).
 
-This file is ignored by git so all changes will remain local.
+   This file is ignored by git so all changes will remain local.
 
 ##### Example location within this repo
 There is a main Demo file in each of the three main example folders:
@@ -129,13 +129,117 @@ Once the maven install has been completed, you should be able to locate a new ja
 Once you have added that jar file to your project, you should be able to import classes from the SDK for use within your application.
 
 #### Create a Hedera account
-Documented walk-through to follow shortly.
+In the interest of clarify, these examples assume a sunny-day scenario and do not include exception-handling logic. Refer to the main [examples](https://github.com/hashgraph/hedera-sdk-java/tree/master/examples/main/java/com/hedera) folder for more resilient code.
+
+This is the definition of the simple version of the `create` method in the `HederaAccount` class:
+
+```java
+public HederaTransactionResult create(long shardNum,
+                                      long realmNum,
+                                      byte[] publicKey,
+                                      KeyType keyType,
+                                      long initialBalance,
+                                      HederaAccountCreateDefaults defaults
+                                      )
+                                      throws InterruptedException
+```
+
+The purpose of each of the parameters is as follows:
+
+`shardNum` - the shard number for the new account. Note that this is not currently used, and should be set to 0 at present.
+
+`realmNum` - the realm number for the new account. Note that this is not currently used, and should be set to 0 at present.
+
+`publicKey` - the public key for the new account. This should be set to the __Public Key__ generated using the Hedera Key Generation Tool (see above).
+
+`keyType` - The type of cryptographic key used by this account. In future, a variety of standards will be supported; at present only ED25519 keys are supported.
+
+`initialBalance` - A Hedera account must contain *hbars*  on creation. This parameter describes that opening balance.
+
+`defaults` - The Hedera SDK for Java makes extensive use of defaults parameters to maximise reuse and readability. These defaults help new developers to get started without the need to understand all of the necessary parameters in detail. Once you are familiar with basic functionality of each method, additional behaviour can be unlocked by modifying these defaults.
+
+##### Using HederaAccount.create
+
+Utility functions have been provided within the examples. The first of these that we should use configures default settings for all transactions and queries.
+
+__Note__: For these example steps to function as expected, you must have updated the `node.properties` file as described above. The `pubkey` + `privkey` and `payingAccount...` parameters are used to determine the account from which *hbars* are transferred.
+
+```java
+// setup a set of defaults for query and transactions
+HederaTransactionAndQueryDefaults txQueryDefaults = new HederaTransactionAndQueryDefaults();
+txQueryDefaults = ExampleUtilities.getTxQueryDefaults();
+```
+
+In order to create a Hedera account, an initial balance must be transferred into the new account from an existing account. The `exampleUtilities.java` package retrieves details of the "source" or paying account from the `node.properties` file.
+
+A `HederaAccount` variable must be defined and associated with the `txQueryDefaults` we just created.
+
+```java
+HederaAccount account1 = new HederaAccount();
+
+// setup transaction/query defaults (durations, etc...)
+account1.txQueryDefaults = txQueryDefaults;
+```
+
+To keep things simple in this example, a cryptographic record of the transaction is not required. In the following code-snippet, a new cryptographic private/public key pair is generated for the new account, specifying a `KeyType` of ED25519. This is equivalent to generating a key pair using the Hedera Key Generation utility. It is worth making a note of those public and private keys.
+
+```java
+account1.txQueryDefaults.generateRecord = false;
+HederaCryptoKeyPair account1Key = new HederaCryptoKeyPair(KeyType.ED25519);
+```
+
+Now that everything is set up correctly, the following statement should create a Hedera account by transferring 100,000 *TinyBars* from the paying account defined in `node.properties` into the new account.
+
+__Note__:  100,000,000 *TinyBars* is equivalent to 1 *hbar*.
+
+```java
+account1 = AccountCreate.create(account1, account1Key, 100000);
+```
 
 #### Retrieve the balance of a Hedera account
-Documented walk-through to follow shortly.
+Assuming that you have completed the steps above, the following statement will retrieve the balance of the account.
+
+```java
+long balance1 = account1.getBalance();
+```
 
 #### Transfer *hbars* between Hedera accounts
-Documented walk-through to follow shortly.
+To transfer *hbars* from one account to another, a second account is required. The following code snippet replicates the steps undertaken above to create a second account, and assumes that this code will be added to the steps above.
+
+```java
+HederaAccount account2 = new HederaAccount();
+
+// setup transaction/query defaults (durations, etc...)
+account2.txQueryDefaults = txQueryDefaults;
+
+account2.txQueryDefaults.generateRecord = false;
+HederaCryptoKeyPair account2Key = new HederaCryptoKeyPair(KeyType.ED25519);
+
+result2 = AccountCreate.create(account2, account1Key, 100000);
+```
+
+At this stage, two accounts: `account1` and `account2` – each holding 100,000 *TinyBars* – have been created.
+
+In the supplied examples, the `txQueryDefaults` object contains details of the original paying account used to fund the opening of both accounts; these defaults were read from the `node.properties` file.
+
+In order to transfer *TinyBars* from `account1` to `account2` we must override that behaviour. This code snippet sets the default paying account to `account1`.
+
+```java
+account2.txQueryDefaults.payingAccountID = account1.getHederaAccountID();
+account2.txQueryDefaults.payingKeyPair = account1Key;
+```
+
+To send the transfer transaction to Hedera, transferring 10,000 *TinyBars* from `account1` to `account2` the following code should be used:
+
+```java
+AccountSend.send(account1, account2, 100000);
+```
+To verify that `account1` now contains 90,000 *TinyBars* and `account2` contains 110,000 *TinyBars* the following instructions should suffice.
+
+```java
+long balance1 = account1.getBalance();
+long balance2 = account2.getBalance();
+```
 
 ## More information
 
