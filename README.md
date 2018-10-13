@@ -158,7 +158,8 @@ The purpose of each of the parameters is as follows:
 
 `keyType` - The type of cryptographic key used by this account. In future, a variety of standards will be supported; at present only ED25519 keys are supported.
 
-`initialBalance` - A Hedera account must contain *hbars*  on creation. This parameter describes that opening balance.
+`initialBalance` - A Hedera account must contain *hbars*  on creation. This parameter describes that opening balance in *TinyBars*.
+__Note__:  100,000,000 *TinyBars* is equivalent to 1 *hbar*.
 
 `defaults` - The Hedera SDK for Java makes extensive use of defaults parameters to maximise reuse and readability. These defaults help new developers to get started without the need to understand all of the necessary parameters in detail. Once you are familiar with basic functionality of each method, additional behaviour can be unlocked by modifying these defaults.
 
@@ -194,14 +195,12 @@ HederaCryptoKeyPair account1Key = new HederaCryptoKeyPair(KeyType.ED25519);
 
 Now that everything is set up correctly, the following statement should create a Hedera account by transferring 100,000 *TinyBars* from the paying account defined in `node.properties` into the new account.
 
-__Note__:  100,000,000 *TinyBars* is equivalent to 1 *hbar*.
-
 ```java
 account1 = AccountCreate.create(account1, account1Key, 100000);
 ```
 
 #### Retrieve the balance of a Hedera account
-Assuming that you have completed the steps above, the following statement will retrieve the balance of the account.
+Assuming that you have completed the steps above, the following statement will retrieve the balance of the account by querying the network.
 
 ```java
 long balance1 = account1.getBalance();
@@ -229,14 +228,14 @@ In the supplied examples, the `txQueryDefaults` object contains details of the o
 In order to transfer *TinyBars* from `account1` to `account2` we must override that behaviour. This code snippet sets the default paying account to `account1`.
 
 ```java
-account2.txQueryDefaults.payingAccountID = account1.getHederaAccountID();
-account2.txQueryDefaults.payingKeyPair = account1Key;
+account1.txQueryDefaults.payingAccountID = account1.getHederaAccountID();
+account1.txQueryDefaults.payingKeyPair = account1Key;
 ```
 
 To send the transfer transaction to Hedera, transferring 10,000 *TinyBars* from `account1` to `account2` the following code should be used:
 
 ```java
-AccountSend.send(account1, account2, 100000);
+AccountSend.send(account1, account2, 10000);
 ```
 To verify that `account1` now contains 90,000 *TinyBars* and `account2` contains 110,000 *TinyBars* the following instructions should suffice.
 
@@ -244,6 +243,7 @@ To verify that `account1` now contains 90,000 *TinyBars* and `account2` contains
 long balance1 = account1.getBalance();
 long balance2 = account2.getBalance();
 ```
+__Note__: In the event you're not waiting for consensus on the transfer transaction, it's possible that the balances will initially show no change. Adding a small delay between the transfer and the balance queries will ensure the correct values are returned. Ideally, you would ask for a receipt and check transaction status following the transfer transaction before querying the updated balances. This is shown in the examples contained within the SDK.
 
 ## More information
 
