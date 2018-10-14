@@ -13,7 +13,7 @@ import com.hedera.sdk.file.HederaFile;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 
 public final class FileCreate {
-	public static HederaFile create(HederaFile file, byte[] contents) {
+	public static HederaFile create(HederaFile file, byte[] contents) throws Exception {
 		final Logger logger = LoggerFactory.getLogger(FileCreate.class);
 		// new file
 		long shardNum = 0;
@@ -31,44 +31,39 @@ public final class FileCreate {
 		logger.info("fileChunk:" + Math.min(fileChunkSize, contents.length));
 						
 		// create the new file
-		try {
-			// file creation transaction
-			HederaTransactionResult createResult = file.create(shardNum, realmNum, fileChunk, null);
-			// was it successful ?
-			if (createResult.getPrecheckResult() == HederaPrecheckResult.OK) {
-				// yes, get a receipt for the transaction
-				HederaTransactionReceipt receipt  = Utilities.getReceipt(file.hederaTransactionID,  file.txQueryDefaults.node);
-				// was that successful ?
-				if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
-					// yes, get the new account number from the receipt
-					file.fileNum = receipt.fileID.fileNum;
-					// and print it out
-					logger.info("===>Your new file number is " + file.fileNum);
+		// file creation transaction
+		HederaTransactionResult createResult = file.create(shardNum, realmNum, fileChunk, null);
+		// was it successful ?
+		if (createResult.getPrecheckResult() == HederaPrecheckResult.OK) {
+			// yes, get a receipt for the transaction
+			HederaTransactionReceipt receipt  = Utilities.getReceipt(file.hederaTransactionID,  file.txQueryDefaults.node);
+			// was that successful ?
+			if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
+				// yes, get the new account number from the receipt
+				file.fileNum = receipt.fileID.fileNum;
+				// and print it out
+				logger.info("===>Your new file number is " + file.fileNum);
+				
+				while (position <= contents.length) {
 					
-					while (position <= contents.length) {
-						
-						int toPosition = Math.min(position + fileChunkSize, contents.length + 1);
-						byte[] appendChunk = Arrays.copyOfRange(contents, position, toPosition);
+					int toPosition = Math.min(position + fileChunkSize, contents.length + 1);
+					byte[] appendChunk = Arrays.copyOfRange(contents, position, toPosition);
 
-						logger.info("Appending remaining data");
-						if (file.append(appendChunk) != null) {
-							position += fileChunkSize;
-						}
-						else {
-							System.err.println("Appending Failure");
-							System.exit(0);
-						}
+					logger.info("Appending remaining data");
+					if (file.append(appendChunk) != null) {
+						position += fileChunkSize;
 					}
-				} else {
-					logger.info("Failed with transactionStatus:" + receipt.transactionStatus);
-					return null;
+					else {
+						System.err.println("Appending Failure");
+						System.exit(0);
+					}
 				}
 			} else {
-				logger.info("Failed with getPrecheckResult:" + createResult.getPrecheckResult());
+				logger.info("Failed with transactionStatus:" + receipt.transactionStatus);
 				return null;
 			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		} else {
+			logger.info("Failed with getPrecheckResult:" + createResult.getPrecheckResult());
 			return null;
 		}
 		return file;

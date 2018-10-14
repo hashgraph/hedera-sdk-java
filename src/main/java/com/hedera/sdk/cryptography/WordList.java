@@ -21,9 +21,9 @@ import java.util.List;
  * without spaces between them. These should be displayed with the given capitalization, but case
  * insensitive matching should be used when they are entered by the user.
  */
-class WordList {
+public class WordList {
 	/** the list of 4096 words */
-	static List<String> words = Arrays.asList("aback", "abbey", "abbot",
+	public static List<String> words = Arrays.asList("aback", "abbey", "abbot",
 			"abide", "ablaze", "able", "aboard", "abode", "abort", "abound",
 			"about", "above", "abroad", "abrupt", "absent", "absorb", "absurd",
 			"abuse", "accent", "accept", "access", "accord", "accuse", "ace",

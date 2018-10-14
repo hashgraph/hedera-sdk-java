@@ -13,35 +13,30 @@ import com.hedera.sdk.contract.HederaContract;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 
 public final class ContractUpdate {
-	public static HederaContract update(HederaContract contract, HederaTimeStamp expirationTime, HederaDuration autoRenewDuration) {
+	public static HederaContract update(HederaContract contract, HederaTimeStamp expirationTime, HederaDuration autoRenewDuration) throws Exception {
 		final Logger logger = LoggerFactory.getLogger(ContractUpdate.class);
 		logger.info("");
 		logger.info("CONTRACT UPDATE");
 		logger.info("");
 
 		// update the smart contract
-		try {
-			// smart contract update transaction
-			HederaTransactionResult updateResult = contract.update(expirationTime, autoRenewDuration);
-			// was it successful ?
-			if (updateResult.getPrecheckResult() == HederaPrecheckResult.OK) {
-				// yes, get a receipt for the transaction
-				HederaTransactionReceipt receipt = Utilities.getReceipt(contract.hederaTransactionID,
-						contract.txQueryDefaults.node);
-				// was that successful ?
-				if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
-					// and print it out
-					logger.info(String.format("===>Smart Contract update success"));
-				} else {
-					logger.info("Failed with transactionStatus:" + receipt.transactionStatus);
-					return null;
-				}
+		// smart contract update transaction
+		HederaTransactionResult updateResult = contract.update(expirationTime, autoRenewDuration);
+		// was it successful ?
+		if (updateResult.getPrecheckResult() == HederaPrecheckResult.OK) {
+			// yes, get a receipt for the transaction
+			HederaTransactionReceipt receipt = Utilities.getReceipt(contract.hederaTransactionID,
+					contract.txQueryDefaults.node);
+			// was that successful ?
+			if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
+				// and print it out
+				logger.info(String.format("===>Smart Contract update success"));
 			} else {
-				logger.info("getPrecheckResult not OK: " + updateResult.getPrecheckResult().name());
+				logger.info("Failed with transactionStatus:" + receipt.transactionStatus);
 				return null;
 			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		} else {
+			logger.info("getPrecheckResult not OK: " + updateResult.getPrecheckResult().name());
 			return null;
 		}
 		return contract;

@@ -226,11 +226,7 @@ public class HederaKey implements Serializable {
 		switch (protobuf.getKeyCase()) {
 		case ED25519:
 			this.key = protobuf.getEd25519().toByteArray();
-			try {
-				this.key = Hex.decode(this.key);
-			} catch (org.spongycastle.util.encoders.DecoderException e) {
-				// do nothing 
-			}
+//			this.key = Hex.decode(this.key);
 			this.keyType = KeyType.ED25519;
 			break;
 		case RSA_3072:

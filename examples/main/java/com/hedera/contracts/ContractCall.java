@@ -11,31 +11,27 @@ import com.hedera.sdk.contract.HederaContract;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 
 public final class ContractCall {
-	public static void call(HederaContract contract, long gas, long amount, byte[] functionParameters) {
+	public static void call(HederaContract contract, long gas, long amount, byte[] functionParameters) throws Exception {
 		final Logger logger = LoggerFactory.getLogger(ContractCall.class);
 		logger.info("");
 		logger.info("CONTRACT CALL");
 		logger.info("");
 
 		// call the smart contract
-		try {
-			// smart contract call transaction
-			HederaTransactionResult callResult = contract.call(gas, amount, functionParameters);
-			// was it successful ?
-			if (callResult.getPrecheckResult() == HederaPrecheckResult.OK) {
-				// yes, get a receipt for the transaction
-				HederaTransactionReceipt receipt = Utilities.getReceipt(contract.hederaTransactionID,
-						contract.txQueryDefaults.node);
-				// was that successful ?
-				if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
-					// and print it out
-					logger.info(String.format("===>Smart Contract call success"));
-				} else {
-					logger.info("Failed with transactionStatus:" + receipt.transactionStatus.toString());
-				}
+		// smart contract call transaction
+		HederaTransactionResult callResult = contract.call(gas, amount, functionParameters);
+		// was it successful ?
+		if (callResult.getPrecheckResult() == HederaPrecheckResult.OK) {
+			// yes, get a receipt for the transaction
+			HederaTransactionReceipt receipt = Utilities.getReceipt(contract.hederaTransactionID,
+					contract.txQueryDefaults.node);
+			// was that successful ?
+			if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
+				// and print it out
+				logger.info(String.format("===>Smart Contract call success"));
+			} else {
+				logger.info("Failed with transactionStatus:" + receipt.transactionStatus.toString());
 			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 	}
 

@@ -1163,9 +1163,9 @@ public class HederaAccount implements Serializable {
 	 * @param initialBalance the initial balance for the new account
 	 * @param defaults the defaults for the account creation (can be null)
 	 * @return {@link HederaTransactionResult}
-	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws Exception 
 	 */
-	public HederaTransactionResult create(long shardNum, long realmNum, byte[] publicKey, KeyType keyType, long initialBalance, HederaAccountCreateDefaults defaults) throws InterruptedException {
+	public HederaTransactionResult create(long shardNum, long realmNum, byte[] publicKey, KeyType keyType, long initialBalance, HederaAccountCreateDefaults defaults) throws Exception {
 	   	logger.trace("Start - createAccount shardNum {}, realmNum {}, publicKey {}, keyType {}, initialBalance {}, defaults {}"
 	   			, shardNum, realmNum, publicKey, keyType, initialBalance, defaults);
 		// setup defaults if necessary
@@ -1228,7 +1228,7 @@ public class HederaAccount implements Serializable {
 		return transactionResult;
 	}
 	
-	private HederaKeySignatureList signBody(byte[] message) {
+	private HederaKeySignatureList signBody(byte[] message) throws Exception {
 		// get the signature for the body
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingKeyPair);
@@ -1243,7 +1243,7 @@ public class HederaAccount implements Serializable {
 		return sigsForTransaction;
 	}
 	
-	private void signClaim(HederaCryptoKeyPair claimKeyPair, byte[] message, HederaKeySignatureList sigList) {
+	private void signClaim(HederaCryptoKeyPair claimKeyPair, byte[] message, HederaKeySignatureList sigList) throws Exception {
 		// sign as the claim owner
 		byte[] signedBody = claimKeyPair.signMessage(message);
 		// create a Hedera Signature for it
@@ -1257,9 +1257,9 @@ public class HederaAccount implements Serializable {
 	 * @param toAccountID, the accountID receiving the funds
 	 * @param amount, the amount to transfer
 	 * @return {@link HederaTransactionResult}
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
-	public HederaTransactionResult send(HederaAccountID toAccountID, long amount) throws InterruptedException {
+	public HederaTransactionResult send(HederaAccountID toAccountID, long amount) throws Exception {
 	   	logger.trace("Start - send toAccountID {}, amount {}"
 	   			, toAccountID, amount);
 		
@@ -1336,9 +1336,9 @@ public class HederaAccount implements Serializable {
 	 * @param toAccountID, the accountID receiving the funds
 	 * @param amount, the amount to transfer
 	 * @return {@link HederaTransactionResult}
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
-	public HederaTransactionResult send(long fromAccountShardNum, long fromAccountRealmNum, long fromAccountAccountNum, HederaAccountID toAccountID, long amount) throws InterruptedException {
+	public HederaTransactionResult send(long fromAccountShardNum, long fromAccountRealmNum, long fromAccountAccountNum, HederaAccountID toAccountID, long amount) throws Exception {
 		this.shardNum = fromAccountAccountNum;
 		this.realmNum = fromAccountRealmNum;
 		this.accountNum = fromAccountAccountNum;
@@ -1349,9 +1349,9 @@ public class HederaAccount implements Serializable {
 	 * @param claimToAdd the {@link HederaClaim} to add to the account
 	 * @param claimKeyPair the keypair for the claim
 	 * @return {@link HederaTransactionResult}
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
-	public HederaTransactionResult addClaim(HederaClaim claimToAdd, HederaCryptoKeyPair claimKeyPair) throws InterruptedException {
+	public HederaTransactionResult addClaim(HederaClaim claimToAdd, HederaCryptoKeyPair claimKeyPair) throws Exception {
 	   	logger.trace("Start - addClaim claimToAdd {}, claimKeyPair {}"
 	   			, claimToAdd, claimKeyPair);
 		
@@ -1408,9 +1408,9 @@ public class HederaAccount implements Serializable {
 	 * @param claimToAdd the {@link HederaClaim} to add to the account
 	 * @param claimKeyPair the keypair for the claim
 	 * @return {@link HederaTransactionResult}
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
-	public HederaTransactionResult addClaim(long shardNum, long realmNum, long accountNum, HederaClaim claimToAdd, HederaCryptoKeyPair claimKeyPair) throws InterruptedException {
+	public HederaTransactionResult addClaim(long shardNum, long realmNum, long accountNum, HederaClaim claimToAdd, HederaCryptoKeyPair claimKeyPair) throws Exception {
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.accountNum = accountNum;
@@ -1425,9 +1425,9 @@ public class HederaAccount implements Serializable {
 	 * The cost could be cached and refreshed from time to time, there is no need to look it up 
 	 * before each getBalance query
 	 * @return {@link Long}
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
-	public long getBalance() throws InterruptedException {
+	public long getBalance() throws Exception {
 	   	logger.trace("Start - getBalance");
 		// set transport
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
@@ -1455,9 +1455,9 @@ public class HederaAccount implements Serializable {
 	 * @param realmNum, the realm number of the account remove the claim from
 	 * @param accountNum, the account number of the account
 	 * @return {@link Long} 
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
-	public long getBalance(long shardNum, long realmNum, long accountNum) throws InterruptedException {
+	public long getBalance(long shardNum, long realmNum, long accountNum) throws Exception {
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.accountNum = accountNum;
@@ -1473,9 +1473,9 @@ public class HederaAccount implements Serializable {
 	 * The cost could be cached and refreshed from time to time, there is no need to look it up 
 	 * before each getInfo query
 	 * @return boolean
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
-	public boolean getInfo() throws InterruptedException {
+	public boolean getInfo() throws Exception {
 	   	logger.trace("Start - getInfo");
 		// set transport
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
@@ -1498,9 +1498,9 @@ public class HederaAccount implements Serializable {
 	 * @param realmNum, the realm number of the account remove the claim from
 	 * @param accountNum, the account number of the account 
 	 * @return boolean
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
-	public boolean getInfo(long shardNum, long realmNum, long accountNum) throws InterruptedException {
+	public boolean getInfo(long shardNum, long realmNum, long accountNum) throws Exception {
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.accountNum = accountNum;
@@ -1514,9 +1514,9 @@ public class HederaAccount implements Serializable {
 	 * used to update this account's properties
 	 * @param updates the updates to apply to the account
 	 * @return {@link HederaTransactionResult}
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
-	public HederaTransactionResult update(HederaAccountUpdateValues updates) throws InterruptedException {
+	public HederaTransactionResult update(HederaAccountUpdateValues updates) throws Exception {
 	   	logger.trace("Start - getInfo updates {}", updates);
 		// init
 		// setup defaults if necessary
@@ -1636,9 +1636,9 @@ public class HederaAccount implements Serializable {
 	 * @param accountNum, the account number of the account
 	 * @param updates, a set of {@link HederaAccountUpdateValues} to update the account with
 	 * @return {@link HederaTransactionResult} 
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
-	public HederaTransactionResult update(long shardNum, long realmNum, long accountNum, HederaAccountUpdateValues updates) throws InterruptedException {
+	public HederaTransactionResult update(long shardNum, long realmNum, long accountNum, HederaAccountUpdateValues updates) throws Exception {
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.accountNum = accountNum;
@@ -1650,9 +1650,9 @@ public class HederaAccount implements Serializable {
 	 * Note: If no records are found, the function returns an empty array
 	 * if however an error occurred, it will return null
 	 * @return {@link List} of {@link HederaTransactionRecord}
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
-	public List<HederaTransactionRecord> getRecords() throws InterruptedException {
+	public List<HederaTransactionRecord> getRecords() throws Exception {
 	   	logger.trace("Start - getRecords");
 		// set transport
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
@@ -1672,9 +1672,9 @@ public class HederaAccount implements Serializable {
 	 * @param realmNum, the realm number of the account remove the claim from
 	 * @param accountNum, the account number of the account
 	 * @return {@link List} of {@link HederaTransactionRecord}
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
-	public List<HederaTransactionRecord> getRecords(long shardNum, long realmNum, long accountNum) throws InterruptedException {
+	public List<HederaTransactionRecord> getRecords(long shardNum, long realmNum, long accountNum) throws Exception {
 		HederaAccount recordAccount = new HederaAccount(shardNum, realmNum, accountNum);
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("node", this.node);

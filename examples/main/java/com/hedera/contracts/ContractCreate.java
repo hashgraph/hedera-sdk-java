@@ -14,11 +14,11 @@ import com.hedera.sdk.contract.HederaContract;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 
 public final class ContractCreate {
-	public static HederaContract create(HederaContract contract, HederaFileID fileID, long initialBalance) {
+	public static HederaContract create(HederaContract contract, HederaFileID fileID, long initialBalance) throws Exception {
 		return create(contract, fileID, initialBalance, new byte[0]); 
 	}
 	
-	public static HederaContract create(HederaContract contract, HederaFileID fileID, long initialBalance, byte[] constParams) {
+	public static HederaContract create(HederaContract contract, HederaFileID fileID, long initialBalance, byte[] constParams) throws Exception {
 		final Logger logger = LoggerFactory.getLogger(HederaContract.class);
 		// new contract
 		long shardNum = 0;
@@ -36,31 +36,26 @@ public final class ContractCreate {
 		logger.info("");
 
 		// create the new contract
-		try {
-			// contract creation transaction
-			HederaTransactionResult createResult = contract.create(shardNum, realmNum, fileID, initialBalance, gas,
-					constructorParameters, autoRenewPeriod);
-			// was it successful ?
-			if (createResult.getPrecheckResult() == HederaPrecheckResult.OK) {
-				// yes, get a receipt for the transaction
-				HederaTransactionReceipt receipt = Utilities.getReceipt(contract.hederaTransactionID,
-						contract.txQueryDefaults.node);
-				// was that successful ?
-				if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
-					contract.contractNum = receipt.contractID.contractNum;
-					// and print it out
-					logger.info(String.format("===>Your new contract number is %d", contract.contractNum));
-					HederaTransactionRecord record = new HederaTransactionRecord(contract.hederaTransactionID, contract.txQueryDefaults.node.contractGetRecordsQueryFee, contract.txQueryDefaults);
-				} else {
-					logger.info("Failed with transactionStatus:" + receipt.transactionStatus.toString());
-					return null;
-				}
+		// contract creation transaction
+		HederaTransactionResult createResult = contract.create(shardNum, realmNum, fileID, initialBalance, gas,
+				constructorParameters, autoRenewPeriod);
+		// was it successful ?
+		if (createResult.getPrecheckResult() == HederaPrecheckResult.OK) {
+			// yes, get a receipt for the transaction
+			HederaTransactionReceipt receipt = Utilities.getReceipt(contract.hederaTransactionID,
+					contract.txQueryDefaults.node);
+			// was that successful ?
+			if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
+				contract.contractNum = receipt.contractID.contractNum;
+				// and print it out
+				logger.info(String.format("===>Your new contract number is %d", contract.contractNum));
+				HederaTransactionRecord record = new HederaTransactionRecord(contract.hederaTransactionID, contract.txQueryDefaults.node.contractGetRecordsQueryFee, contract.txQueryDefaults);
 			} else {
-				logger.info("getPrecheckResult not OK: " + createResult.getPrecheckResult().name());
+				logger.info("Failed with transactionStatus:" + receipt.transactionStatus.toString());
 				return null;
 			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		} else {
+			logger.info("getPrecheckResult not OK: " + createResult.getPrecheckResult().name());
 			return null;
 		}
 		return contract;
