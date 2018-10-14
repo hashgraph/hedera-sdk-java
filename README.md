@@ -3,7 +3,7 @@
 [![CircleCI](https://circleci.com/gh/swirlds/hedera-sdk-java.svg?style=shield&circle-token=d288d5d093d2529ad8fbd5d2e8b3e26be22dcaf7)](https://circleci.com/gh/swirlds/hedera-sdk-java)
 [![Discord](https://img.shields.io/discord/373889138199494658.svg)](https://hashgraph.com/discord/)
 
-The official Java SDK for interacting with [Hedera Hashgraph](https://hedera.com): the official distributed consensus platform built using the hashgraph consensus algorithm for fast, fair and secure transactions. Hedera enables and empowers developers to build an entirely new class of decentralized applications.
+The Java SDK for interacting with [Hedera Hashgraph](https://hedera.com): the official distributed consensus platform built using the hashgraph consensus algorithm for fast, fair and secure transactions. Hedera enables and empowers developers to build an entirely new class of decentralized applications.
 
 #### Version is 0.1.0
 
@@ -46,7 +46,7 @@ Note that the `.proto` files are compiled with Maven, so the project may initial
 If there are still some project issues, try a Maven project update and project clean followed by a Maven install.
 
 #### Running the examples
-A `node.properties.sample` is provided, copy the file to `node.properties` and update with your account details, the details of the node you want to communicate to and finally, your private and public keys (as hex strings).
+A `node.properties.sample` is provided, copy the file to `node.properties` and update with your account details, the details of the node you want to communicate to, and your private/public keys (as hex strings).
 
    This file is ignored by git so all changes will remain local.
 
@@ -69,17 +69,15 @@ Code snippets used in this document are excerpt from the full examples included 
 ### Prerequisites for using the SDK
 
 #### Access to the Hedera mainnet or a Hedera testnet
-In order to be able to use the Hedera SDK for Java you must have access to a testnet or to the Hedera mainnet. Access to mainnet and testnets are currently restricted to Hedera Hashgraph Council members and partners.
+In order to be able to use the Hedera SDK for Java you must have access to a testnet or to the Hedera mainnet. Access to mainnet and testnets are currently restricted.
 
-Hackathon attendees will also gain temporary access to a Hedera testnet.
+Temporary testnets (or "Flashnets") may become available for specific events and engagements such as hackathons.
 
-When using mainnet, it is necessary to buy *hbars* with fiat currency or other cryptocurrency. This can be achieved through an online exchange, or a friend who already has a Hedera account. That exchange or friend will implicitly create a Hedera account for you transferring in the appropriate quantity of *hbars* as part of the account-creation process and providing you with a Hedera account ID.
-
-On testnets, the Hedera portal will simulate this process, creating your testnet account using a public key you supply. The [Hedera Portal](https://portal.hedera.com) will also inform you of your Account ID on the testnet.
+To get access to any Hedera network you must first create a Hedera Profile in the [Hedera Portal](https://portal.hedera.com), then enter an access or promo code that was received from the Hedera team.
 
 ##### Addresses of testnet nodes
 
-The administrator who gives you access to a testnet will also provide you with the following details associated with at least one node:
+After you join a network through the Hedera Portal, you will be provided information required connect to that network, specifically:
 
 * __IP address__ and/or __DNS name__ – providing IP connectivity to that node
 * __Port number__ – The specific port on the node to which queries and transactions must be sent
