@@ -28,7 +28,7 @@ public final class AccountCreate {
 		// was it successful ?
 		if (createResult.getPrecheckResult() == HederaPrecheckResult.OK) {
 			// yes, get a receipt for the transaction
-			HederaTransactionReceipt receipt = Utilities.getReceipt(account.hederaTransactionID, account.txQueryDefaults.node, 10, 0, 1);
+			HederaTransactionReceipt receipt = Utilities.getReceipt(account.hederaTransactionID, account.txQueryDefaults.node);
 			// was that successful ?
 			if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
 				// yes, get the new account number from the receipt
