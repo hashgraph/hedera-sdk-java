@@ -153,16 +153,12 @@ public final class DemoAccount {
 			
 					// Create a new claim object
 					HederaClaim claim;
-					try {
-						claim = new HederaClaim(account.shardNum, account.realmNum, account.accountNum, "ClaimHash".getBytes("UTF-8"));
-						// add a key to the claim
-						claim.addKey(claimKey);
-				        // add a claim
-				        if (AccountAddClaim.addClaim(account,claim, claimKeyPair)) {
-				        }
-					} catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
-					}
+					claim = new HederaClaim(account.shardNum, account.realmNum, account.accountNum, "ClaimHash".getBytes("UTF-8"));
+					// add a key to the claim
+					claim.addKey(claimKey);
+			        // add a claim
+			        if (AccountAddClaim.addClaim(account,claim, claimKeyPair)) {
+			        }
 		    	} else if (account == null) {
 	    			logger.info("*******************************************");
 	    			logger.info("ACCOUNT object is null, skipping claim tests");

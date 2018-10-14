@@ -32,14 +32,10 @@ public class CryptoUtils {
         return bytes;
     }
 
-    public static byte[] sha384Digest(byte[] message) {
+    public static byte[] sha384Digest(byte[] message) throws NoSuchAlgorithmException {
     	logger.trace("Start - sha384Digest message {}", message);
         MessageDigest digest = null;
-        try {
-            digest = MessageDigest.getInstance("SHA-384");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        digest = MessageDigest.getInstance("SHA-384");
         byte[] hash = digest.digest(message);
     	logger.trace("End - sha384Digest message {}", message);
         return hash;

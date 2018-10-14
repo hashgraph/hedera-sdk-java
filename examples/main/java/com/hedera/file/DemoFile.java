@@ -1,5 +1,7 @@
 package com.hedera.file;
 
+import java.security.spec.InvalidKeySpecException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.hedera.account.*;
@@ -14,7 +16,7 @@ import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
 public final class DemoFile {
 	final static Logger logger = LoggerFactory.getLogger(DemoFile.class);
 	
-	public static void main (String... arguments) {
+	public static void main (String... arguments) throws Exception {
 
 		boolean doCreate = false;
 		boolean doGetInfo = false;

@@ -62,7 +62,12 @@ public final class DemoAccountAsync {
     	    public void run() 
     	    {
     	    	while (true) {
-    	    		transactionState.refresh();
+    	    		try {
+						transactionState.refresh();
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
     	    		try {
 						Thread.sleep(2000);
 					} catch (InterruptedException e) {
@@ -84,17 +89,13 @@ public final class DemoAccountAsync {
         logger.info("************************************");
         
         for (int i=1; i <= 20; i++) {
-    		try {
-    			// make the transfer
-    			HederaTransactionResult transferResult = account.send(accountXferTo.getHederaAccountID(), 20 * i);
-    			// was it successful ?
-    			if (transferResult.getPrecheckResult() == HederaPrecheckResult.OK) {
-    				// yes, add Transaction to state for receipt collection
-    				transactionState.setTransaction(account.hederaTransactionID, account.txQueryDefaults.node);
-    			}
-    		} catch (InterruptedException e) {
-    			e.printStackTrace();
-    		}
+			// make the transfer
+			HederaTransactionResult transferResult = account.send(accountXferTo.getHederaAccountID(), 20 * i);
+			// was it successful ?
+			if (transferResult.getPrecheckResult() == HederaPrecheckResult.OK) {
+				// yes, add Transaction to state for receipt collection
+				transactionState.setTransaction(account.hederaTransactionID, account.txQueryDefaults.node);
+			}
         }
         
         logger.info("************************************");

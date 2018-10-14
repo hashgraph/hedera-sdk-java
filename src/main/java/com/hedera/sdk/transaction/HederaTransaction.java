@@ -371,8 +371,9 @@ public class HederaTransaction implements Serializable {
 	 * Generates a transfer transaction to enable payments for queries
 	 * @param txQueryDefaults the defaults for transactions and queries
 	 * @param queryFee the fee paid for the query
+	 * @throws Exception 
 	 */
-	public HederaTransaction(HederaTransactionAndQueryDefaults txQueryDefaults, long queryFee) {
+	public HederaTransaction(HederaTransactionAndQueryDefaults txQueryDefaults, long queryFee) throws Exception {
 	   	logger.trace("Start - init txQueryDefaults {}, queryFee {}", txQueryDefaults, queryFee);
 		
 		// create a transaction ID (starts now with accountID of the paying account id)

@@ -1202,10 +1202,10 @@ public class HederaFile implements Serializable {
 	 *                 setting up a file, if null the {@link HederaFile} class
 	 *                 defaults will be used
 	 * @return {@link HederaTransactionResult}
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
 	public HederaTransactionResult create(long shardNum, long realmNum, byte[] contents,
-			HederaFileCreateDefaults defaults) throws InterruptedException {
+			HederaFileCreateDefaults defaults) throws Exception {
 		logger.trace("Start - create shardNum {}, realmNum {}, contents {}, defaults {}", shardNum, realmNum, contents,
 				defaults);
 		// setup defaults if necessary
@@ -1287,9 +1287,9 @@ public class HederaFile implements Serializable {
 	 * Deletes a file in the simplest possible way
 	 * 
 	 * @return {@link HederaTransactionResult}
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
-	public HederaTransactionResult delete() throws InterruptedException {
+	public HederaTransactionResult delete() throws Exception {
 		logger.trace("Start - delete");
 
 		// initialise the result
@@ -1357,9 +1357,9 @@ public class HederaFile implements Serializable {
 	 * @param realmNum, the realm in which the file exists
 	 * @param fileNum, the file number
 	 * @return {@link HederaTransactionResult}
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
-	public HederaTransactionResult delete(long shardNum, long realmNum, long fileNum) throws InterruptedException {
+	public HederaTransactionResult delete(long shardNum, long realmNum, long fileNum) throws Exception {
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.fileNum = fileNum;
@@ -1371,9 +1371,9 @@ public class HederaFile implements Serializable {
 	 * 
 	 * @param contents the file contents in bytes to append
 	 * @return {@link HederaTransactionResult}
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
-	public HederaTransactionResult append(byte[] contents) throws InterruptedException {
+	public HederaTransactionResult append(byte[] contents) throws Exception {
 		logger.trace("Start - append contents {}", contents);
 
 		// initialise the result
@@ -1445,10 +1445,10 @@ public class HederaFile implements Serializable {
 	 * @param fileNum, the file number
 	 * @param contents, the contents to add to the file
 	 * @return {@link HederaTransactionResult}
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
 	public HederaTransactionResult append(long shardNum, long realmNum, long fileNum, byte[] contents)
-			throws InterruptedException {
+			throws Exception {
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.fileNum = fileNum;
@@ -1467,10 +1467,10 @@ public class HederaFile implements Serializable {
 	 *                              no change)
 	 * @param contents              the file contents in bytes to append
 	 * @return {@link HederaTransactionResult}
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
 	public HederaTransactionResult update(long expirationTimeSeconds, int expirationTimeNanos, byte[] contents)
-			throws InterruptedException {
+			throws Exception {
 		logger.trace("Start - update expirationTimeSeconds {}, expirationTimeNanos {}, contents {}", expirationTimeSeconds,
 				expirationTimeNanos, contents);
 
@@ -1565,10 +1565,10 @@ public class HederaFile implements Serializable {
 	 *                              no change)
 	 * @param contents              the file contents in bytes to append
 	 * @return {@link HederaTransactionResult}
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
 	public HederaTransactionResult update(long shardNum, long realmNum, long fileNum, long expirationTimeSeconds,
-			int expirationTimeNanos, byte[] contents) throws InterruptedException {
+			int expirationTimeNanos, byte[] contents) throws Exception {
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.fileNum = fileNum;
@@ -1581,9 +1581,9 @@ public class HederaFile implements Serializable {
 	 * the error
 	 * 
 	 * @return {@link byte} array
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
-	public byte[] getContents() throws InterruptedException {
+	public byte[] getContents() throws Exception {
 		logger.trace("Start - getContents");
 		
 		// validate inputs
@@ -1614,9 +1614,9 @@ public class HederaFile implements Serializable {
 	 * @param realmNum, the realm in which the file exists
 	 * @param fileNum, the file number
 	 * @return {@link byte} array
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
-	public byte[] getContents(long shardNum, long realmNum, long fileNum) throws InterruptedException {
+	public byte[] getContents(long shardNum, long realmNum, long fileNum) throws Exception {
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.fileNum = fileNum;
@@ -1632,9 +1632,9 @@ public class HederaFile implements Serializable {
 	 * look it up before each getInfo query
 	 * 
 	 * @return {@link boolean}
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
-	public boolean getInfo() throws InterruptedException {
+	public boolean getInfo() throws Exception {
 		logger.trace("Start - getInfo");
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
@@ -1656,9 +1656,9 @@ public class HederaFile implements Serializable {
 	 * @param realmNum, the realm in which the file exists
 	 * @param fileNum, the file number
 	 * @return {@link boolean}
-	 * @throws InterruptedException in the event of a node communication error
+	 * @throws Exception 
 	 */
-	public boolean getInfo(long shardNum, long realmNum, long fileNum) throws InterruptedException {
+	public boolean getInfo(long shardNum, long realmNum, long fileNum) throws Exception {
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.fileNum = fileNum;

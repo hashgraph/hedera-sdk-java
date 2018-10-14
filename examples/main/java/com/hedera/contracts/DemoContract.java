@@ -3,6 +3,8 @@ package com.hedera.contracts;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.spec.InvalidKeySpecException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.hedera.account.AccountCreate;
@@ -21,7 +23,7 @@ import com.hedera.utilities.ExampleUtilities;
 public final class DemoContract {
 	final static Logger logger = LoggerFactory.getLogger(DemoContract.class);
 
-	public static void main(String... arguments) {
+	public static void main(String... arguments) throws Exception {
 
 		// setup a set of defaults for query and transactions
 		HederaTransactionAndQueryDefaults txQueryDefaults = new HederaTransactionAndQueryDefaults();
@@ -50,61 +52,57 @@ public final class DemoContract {
 			file.txQueryDefaults = txQueryDefaults;
 
 			// get file contents
-			try {
-				InputStream is = DemoContract.class.getResourceAsStream("/main/resources/simpleStorage.bin");
-			    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-			    int nRead;
-			    byte[] data = new byte[4096];
-			    while ((nRead = is.read(data, 0, data.length)) != -1) {
-			        buffer.write(data, 0, nRead);
-			    }
-			 
-			    buffer.flush();
-			    byte[] fileContents = buffer.toByteArray();
-			    
-				// create a file with contents
-				file = FileCreate.create(file, fileContents);
+			InputStream is = DemoContract.class.getResourceAsStream("/main/resources/simpleStorage.bin");
+		    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		    int nRead;
+		    byte[] data = new byte[4096];
+		    while ((nRead = is.read(data, 0, data.length)) != -1) {
+		        buffer.write(data, 0, nRead);
+		    }
+		 
+		    buffer.flush();
+		    byte[] fileContents = buffer.toByteArray();
+		    
+			// create a file with contents
+			file = FileCreate.create(file, fileContents);
 
-				// new contract object
-				HederaContract contract = new HederaContract();
-				// setup transaction/query defaults (durations, etc...)
-				contract.txQueryDefaults = txQueryDefaults;
+			// new contract object
+			HederaContract contract = new HederaContract();
+			// setup transaction/query defaults (durations, etc...)
+			contract.txQueryDefaults = txQueryDefaults;
 
-				// create a contract
-				contract = ContractCreate.create(contract, file.getFileID(), 0);
-				//contract = create(contract, file.getFileID(), 1);
+			// create a contract
+			contract = ContractCreate.create(contract, file.getFileID(), 0);
+			//contract = create(contract, file.getFileID(), 1);
+			if (contract != null) {
+				// update the contract
+				HederaTimeStamp expirationTime = new HederaTimeStamp(100, 10);
+				HederaDuration autoRenewDuration = new HederaDuration(10, 20);
+				
+				contract = ContractUpdate.update(contract, expirationTime, autoRenewDuration);
+				
 				if (contract != null) {
-					// update the contract
-					HederaTimeStamp expirationTime = new HederaTimeStamp(100, 10);
-					HederaDuration autoRenewDuration = new HederaDuration(10, 20);
+					// getinfo
+					ContractGetInfo.getInfo(contract);
+					// get bytecode
+					ContractGetBytecode.getByteCode(contract);
+					// call
+					final String SC_SET_ABI = "{\"constant\":false,\"inputs\":[{\"name\":\"x\",\"type\":\"uint256\"}],\"name\":\"set\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}";
+					long gas = 250000;
+					long amount = 14;
+					byte[] functionParameters = SoliditySupport.encodeSet(10,SC_SET_ABI);
 					
-					contract = ContractUpdate.update(contract, expirationTime, autoRenewDuration);
+					ContractCall.call(contract, gas, amount, functionParameters);
+					// call local
+					String SC_GET_ABI = "{\"constant\":true,\"inputs\":[],\"name\":\"get\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}";
 					
-					if (contract != null) {
-						// getinfo
-						ContractGetInfo.getInfo(contract);
-						// get bytecode
-						ContractGetBytecode.getByteCode(contract);
-						// call
-						final String SC_SET_ABI = "{\"constant\":false,\"inputs\":[{\"name\":\"x\",\"type\":\"uint256\"}],\"name\":\"set\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}";
-						long gas = 250000;
-						long amount = 14;
-						byte[] functionParameters = SoliditySupport.encodeSet(10,SC_SET_ABI);
-						
-						ContractCall.call(contract, gas, amount, functionParameters);
-						// call local
-						String SC_GET_ABI = "{\"constant\":true,\"inputs\":[],\"name\":\"get\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}";
-						
-						byte[] function = SoliditySupport.encodeGetValue(SC_GET_ABI);
-						long localGas = 250000;
-						long maxResultSize = 5000;
-						HederaContractFunctionResult functionResult = ContractRunLocal.runLocal(contract, localGas, maxResultSize, function);
-						int decodeResult = SoliditySupport.decodeGetValueResult(functionResult.contractCallResult(),SC_GET_ABI);
-						logger.info(String.format("===>Decoded functionResult= %d", decodeResult));
-					}
+					byte[] function = SoliditySupport.encodeGetValue(SC_GET_ABI);
+					long localGas = 250000;
+					long maxResultSize = 5000;
+					HederaContractFunctionResult functionResult = ContractRunLocal.runLocal(contract, localGas, maxResultSize, function);
+					int decodeResult = SoliditySupport.decodeGetValueResult(functionResult.contractCallResult(),SC_GET_ABI);
+					logger.info(String.format("===>Decoded functionResult= %d", decodeResult));
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
 		}
 	}

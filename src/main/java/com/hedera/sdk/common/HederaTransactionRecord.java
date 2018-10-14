@@ -167,9 +167,9 @@ public class HederaTransactionRecord implements Serializable {
 	 * @param transactionID the transaction ID against which to get the record
 	 * @param queryFee - the fee paid to run the query
 	 * @param txQueryDefaults - default parameters for running the query (inc. node)
-	 * @throws InterruptedException in the event of a node communication error 
+	 * @throws Exception 
 	 */
-	public HederaTransactionRecord(HederaTransactionID transactionID, long queryFee, HederaTransactionAndQueryDefaults txQueryDefaults) throws InterruptedException {
+	public HederaTransactionRecord(HederaTransactionID transactionID, long queryFee, HederaTransactionAndQueryDefaults txQueryDefaults) throws Exception {
 		HederaTransaction transaction = new HederaTransaction();
 		HederaTransaction payment = new HederaTransaction(txQueryDefaults, queryFee);
 		
