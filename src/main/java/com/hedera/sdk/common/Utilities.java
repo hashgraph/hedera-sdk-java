@@ -274,4 +274,39 @@ public class Utilities {
 	public static void printResponseFailure(String location) {
 		logger.error("***** " + location + " FAILED to get response *****");
 	}
+	/**
+	 * Throws an exception if the supplied node object is null
+	 * @param objectType a string describing the object being checked which will be included in the error message
+	 * @param object the object to check
+	 * @throws IllegalStateException thrown if the object is null
+	 */
+	public static void throwIfNull(String objectType, Object object) {
+		if (object == null) {
+		   	logger.trace("throwIfNull");
+		   	String error = objectType + " is null";
+		   	logger.error(error);
+			throw new IllegalStateException(error);
+		}
+	}
+	/**
+	 * Throws an exception if the supplied accountID object is invalid
+	 * @param accountType a string describing the accountID being checked which will be included in the error message
+	 * @param accountID {@link HederaAccountID} to check
+	 * @throws IllegalStateException thrown if the accountID is invalid
+	 */
+	public static void throwIfAccountIDInvalid(String accountType, HederaAccountID accountID) {
+		if (accountID == null) {
+		   	logger.trace("throwIfAccountIDInvalid");
+		   	String error = accountType + " AccountID is null.";
+		   	logger.error(error);
+			throw new IllegalStateException(error);
+		} else {
+			if ((accountID.shardNum < 0) || (accountID.realmNum < 0) || (accountID.accountNum <= 0)) {
+			   	logger.trace("throwIfAccountIDInvalid");
+			   	String error = accountType + " AccountID shard and realm must be greater or equal to 0 and accountNum greater than 0.";
+			   	logger.error(error);
+				throw new IllegalStateException(error);
+			}
+		}
+	}
 }

@@ -9,6 +9,7 @@ import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.common.HederaKeySignatureList;
 import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.common.HederaTransactionRecord;
+import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.node.HederaNode;
 import com.hedera.sdk.common.HederaSignature;
 import com.hedera.sdk.common.HederaSignatureList;
@@ -202,6 +203,7 @@ public class HederaTransaction implements Serializable {
 			query.queryData = getReceiptQuery.build();
 			
 			// query now set, send to network
+			Utilities.throwIfNull("Node", this.node);
 			response = this.node.getTransactionReceipt(query);
 			if (response != null &&  response.getTransactionGetReceipt() != null ) {
 				break;
@@ -249,6 +251,7 @@ public class HederaTransaction implements Serializable {
 		query.queryData = getQuery.build();
 		
 		// query now set, send to network
+		Utilities.throwIfNull("Node", this.node);
 		Response response = this.node.getTransactionRecord(query);
 		TransactionGetRecordResponse getResponse = response.getTransactionGetRecord();
 
@@ -387,6 +390,12 @@ public class HederaTransaction implements Serializable {
 		accountAmounts.add(toAccountAmount);
 		
 		HederaAccount account = new HederaAccount();
+		// validate inputs
+		Utilities.throwIfNull("txQueryDefaults", txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.node", txQueryDefaults.node);
+		Utilities.throwIfAccountIDInvalid("txQueryDefaults.node.getAccountID()", txQueryDefaults.node.getAccountID());
+		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", txQueryDefaults.payingKeyPair);
+		
 		account.txQueryDefaults = txQueryDefaults;
 		account.setNode(txQueryDefaults.node);
 		
