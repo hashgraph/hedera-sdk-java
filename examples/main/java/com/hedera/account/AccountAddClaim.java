@@ -29,14 +29,17 @@ public final class AccountAddClaim {
 			if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
 				// if query successful, print it
 				logger.info("===>Claim addition successful");
+				return true;
 			} else {
 				logger.info("Failed with transactionStatus:" + receipt.transactionStatus);
 				return false;
 			}
+		} else if (account.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+			logger.info("system busy, try again later");
+			return false;
 		} else {
 			logger.info("Failed with getPrecheckResult:" + claimAddResult.getPrecheckResult());
 			return false;
 		}
-		return true;
 	}
 }

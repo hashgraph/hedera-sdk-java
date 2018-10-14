@@ -52,8 +52,10 @@ public final class FileCreate {
 					logger.info("Appending remaining data");
 					if (file.append(appendChunk) != null) {
 						position += fileChunkSize;
-					}
-					else {
+					} else if (file.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+						logger.info("system busy, try again later");
+						return null;
+					} else {
 						System.err.println("Appending Failure");
 						System.exit(0);
 					}
@@ -62,6 +64,9 @@ public final class FileCreate {
 				logger.info("Failed with transactionStatus:" + receipt.transactionStatus);
 				return null;
 			}
+		} else if (file.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+			logger.info("system busy, try again later");
+			return null;
 		} else {
 			logger.info("Failed with getPrecheckResult:" + createResult.getPrecheckResult());
 			return null;

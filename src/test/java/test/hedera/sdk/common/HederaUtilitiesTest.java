@@ -64,8 +64,8 @@ public class HederaUtilitiesTest {
 		assertEquals(HederaPrecheckResult.INVALID_TRANSACTION, result);
 		result = Utilities.setPrecheckResult(NodeTransactionPrecheckCode.OK);
 		assertEquals(HederaPrecheckResult.OK, result);
-		result = Utilities.setPrecheckResult(NodeTransactionPrecheckCode.UNRECOGNIZED);
-		assertEquals(HederaPrecheckResult.UNRECOGNIZED, result);
+		result = Utilities.setPrecheckResult(NodeTransactionPrecheckCode.BUSY);
+		assertEquals(HederaPrecheckResult.BUSY, result);
 
 	}
 }
