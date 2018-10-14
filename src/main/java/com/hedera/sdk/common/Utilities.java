@@ -150,8 +150,10 @@ public class Utilities {
 			return HederaPrecheckResult.INVALID_TRANSACTION;
 		case OK:
 			return HederaPrecheckResult.OK;
-		case UNRECOGNIZED:
-			return HederaPrecheckResult.UNRECOGNIZED;
+		case BUSY:
+			return HederaPrecheckResult.BUSY;
+		case NOT_SUPPORTED:
+			return HederaPrecheckResult.NOT_SUPPORTED;
 		default:
 			return HederaPrecheckResult.NOTSET;
 				

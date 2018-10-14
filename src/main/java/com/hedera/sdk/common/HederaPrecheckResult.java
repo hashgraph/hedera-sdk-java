@@ -12,7 +12,8 @@ public enum HederaPrecheckResult implements Serializable {
 	,INSUFFICIENT_FEE
 	,INSUFFICIENT_BALANCE
 	,DUPLICATE
-	,UNRECOGNIZED
+	,BUSY
+	,NOT_SUPPORTED
 	,NOTSET
 	,ERROR
 }
