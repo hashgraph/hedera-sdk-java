@@ -17,7 +17,7 @@ public class HederaTimeStamp implements Serializable {
 	/**
 	 * Time value, defaults to Now
 	 */
-	public Instant time = Instant.now();
+	public Instant time = Instant.now().minusSeconds(5);
 	/**
 	 * Default constructor
 	 */
