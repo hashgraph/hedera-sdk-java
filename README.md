@@ -28,8 +28,18 @@ Features supported include:
    Java: `java -version`
 
    Maven: `mvn --version`
+   
+   
 
 #### Installing
+
+Maven
+
+   Open terminal
+   ```>brew update
+   ```
+
+
 
 From [Eclipse](https://www.eclipse.org/downloads/) or [IntelliJ](https://www.jetbrains.com/idea/):
 
