@@ -36,7 +36,9 @@ Features supported include:
 Maven
 
    Open terminal
-   ```>brew update
+   ```
+   >brew update
+   
    ```
 
 
