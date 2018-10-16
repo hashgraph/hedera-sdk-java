@@ -33,12 +33,23 @@ Features supported include:
 
 #### Installing
 
-Maven
+Maven Installation MAC
 
    Open terminal
    ```
    >brew update
-   
+   >brew install maven
+      ==> Downloading https://www.apache.org/dyn/closer.cgi?path=maven/maven-3/3.5.4/b
+      ==> Downloading from http://mirrors.sonic.net/apache/maven/maven-3/3.5.4/binarie
+          ######################################################################## 100.0%
+   >which mvn
+		/usr/local/bin/mvn
+   >mvn -v
+      Apache Maven 3.5.4 (1edded0938998edf8bf061f1ceb3cfdeccf443fe; 2018-06-17T13:33:14-05:00)
+      Maven home: /usr/local/Cellar/maven/3.5.4/libexec
+      Java version: 10.0.2, vendor: Oracle Corporation, runtime: 
+      /Library/Java/JavaVirtualMachines/jdk-10.0.2.jdk/Contents/Home
+      Default locale: en_US, platform encoding: UTF-8 OS name: "mac os x", version: "10.11.6", arch: "x86_64", family: "mac"
    ```
 
 
