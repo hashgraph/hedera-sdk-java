@@ -35,9 +35,9 @@ Features supported include:
 
 Maven Installation MAC
 
-   Open terminal
+   * Open terminal
    
-   Complete the commands below in your terminal
+   * Complete the commands below in your terminal
    ```
    >brew update
    >brew install maven
