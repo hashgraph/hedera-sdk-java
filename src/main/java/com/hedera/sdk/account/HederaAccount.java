@@ -147,11 +147,11 @@ public class HederaAccount implements Serializable {
 	/**
 	 * create an account record for any transaction withdrawing more than this many tinybars
 	 */
-	public long sendRecordThreshold = 10000l;
+	public long sendRecordThreshold = Long.MAX_VALUE;
 	/**
 	 * create an account record for any transaction depositing more than this many tinybars
 	 */
-	public long receiveRecordThreshold = 10000l;
+	public long receiveRecordThreshold = Long.MAX_VALUE;
 	/**
 	 * if true, this account's key must sign any transaction depositing into this account (in addition to all withdrawals). 
 	 * This field is immutable; it cannot be changed by a CryptoUpdate transaction.
