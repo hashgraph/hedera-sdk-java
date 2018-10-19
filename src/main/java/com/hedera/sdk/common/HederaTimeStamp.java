@@ -15,10 +15,10 @@ public class HederaTimeStamp implements Serializable {
 	final Logger logger = LoggerFactory.getLogger(HederaTimeStamp.class);
 	private static final long serialVersionUID = 1;
 	/**
-	 * Time value, defaults to Now -5s to account for possible minor time differences between client and node.
+	 * Time value, defaults to Now -10s to account for possible minor time differences between client and node.
 	 * An earlier time is better than a later one.
 	 */
-	public Instant time = Instant.now().minusSeconds(5); 
+	public Instant time = Instant.now().minusSeconds(10); 
 	/**
 	 * Default constructor
 	 */
