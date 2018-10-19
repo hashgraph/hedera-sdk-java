@@ -241,7 +241,7 @@ account2.txQueryDefaults = txQueryDefaults;
 account2.txQueryDefaults.generateRecord = false;
 HederaCryptoKeyPair account2Key = new HederaCryptoKeyPair(KeyType.ED25519);
 
-result2 = AccountCreate.create(account2, account1Key, 100000);
+account2 = AccountCreate.create(account2, account1Key, 100000);
 ```
 
 At this stage, two accounts: `account1` and `account2` – each holding 100,000 *TinyBars* – have been created.
