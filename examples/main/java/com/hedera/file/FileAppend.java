@@ -11,7 +11,7 @@ import com.hedera.sdk.file.HederaFile;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 
 public final class FileAppend {
-	public static void append(HederaFile file, byte[] newContents) throws Exception {
+	public static boolean append(HederaFile file, byte[] newContents) throws Exception {
 		final Logger logger = LoggerFactory.getLogger(FileAppend.class);
 		logger.info("");
 		logger.info("FILE APPEND");
@@ -28,11 +28,17 @@ public final class FileAppend {
 			if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
 				// and print it out
 				logger.info(String.format("===>File append success"));
+				return true;
 			} else {
 				logger.info("Failed with transactionStatus:" + receipt.transactionStatus);
+				return false;
 			}
+		} else if (file.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+			logger.info("system busy, try again later");
+			return false;
 		} else {
 			logger.info("Failed with getPrecheckResult:" + appendResult.getPrecheckResult().toString());
+			return false;
 		}
 	}
 

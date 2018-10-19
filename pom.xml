@@ -330,7 +330,7 @@
         <dependency>
             <groupId>com.opencrowd</groupId>
             <artifactId>hapi-proto</artifactId>
-            <version>1.1</version>
+            <version>1.2</version>
         </dependency>
         <dependency>
 			<groupId>org.ethereum</groupId>

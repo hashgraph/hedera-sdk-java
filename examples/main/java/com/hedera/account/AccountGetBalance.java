@@ -4,9 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.account.HederaAccount;
+import com.hedera.sdk.common.HederaPrecheckResult;
 
 public final class AccountGetBalance {
-	public static void getBalance(HederaAccount account) throws Exception {
+	public static boolean getBalance(HederaAccount account) throws Exception {
 		final Logger logger = LoggerFactory.getLogger(AccountGetBalance.class);
 		
 		logger.info("");
@@ -18,10 +19,15 @@ public final class AccountGetBalance {
 		if (balance != -1) {
 			// it was successful, print it
 			logger.info(String.format("===>Got balance=%d", balance));
+			return true;
+		} else if (account.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+			logger.info("system busy, try again later");
+			return false;
 		} else {
 			// an error occurred
 			logger.info("===>Getting balance - precheck ERROR");
 			logger.info(account.getPrecheckResult().toString());
+			return false;
 		}
 	}
 }

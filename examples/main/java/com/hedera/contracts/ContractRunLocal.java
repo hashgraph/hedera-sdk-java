@@ -3,6 +3,7 @@ package com.hedera.contracts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.contract.HederaContract;
 import com.hedera.sdk.contract.HederaContractFunctionResult;
 
@@ -22,6 +23,9 @@ public final class ContractRunLocal {
 			logger.info("===>Got gas used=" + functionResult.gasUsed());
 			logger.info("===>Got bloom=" + functionResult.bloom());
 			logger.info("===>Got contract num=" + functionResult.contractID().contractNum);
+		} else if (contract.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+			logger.info("system busy, try again later");
+			return null;
 		} else {
 			// an error occurred
 			logger.info("===>Running local function - precheck ERROR " + contract.getPrecheckResult());

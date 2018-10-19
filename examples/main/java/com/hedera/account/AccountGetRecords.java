@@ -7,10 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.account.HederaAccount;
+import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.common.HederaTransactionRecord;
 
 public final class AccountGetRecords {
-	public static void getRecords(HederaAccount account) throws Exception {
+	public static boolean getRecords(HederaAccount account) throws Exception {
 		final Logger logger = LoggerFactory.getLogger(AccountGetRecords.class);
 		
 		logger.info("");
@@ -27,8 +28,13 @@ public final class AccountGetRecords {
 				logger.info("Record transaction hash");
 				logger.info(record.transactionHash.toString());
 			}
+			return true;
+		} else if (account.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+			logger.info("system busy, try again later");
+			return false;
 		} else {
 			logger.info("===>Getting records - precheck ERROR" + account.getPrecheckResult().toString());
+			return false;
 		}
 		
 	}

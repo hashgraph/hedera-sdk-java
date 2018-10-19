@@ -150,8 +150,10 @@ public class Utilities {
 			return HederaPrecheckResult.INVALID_TRANSACTION;
 		case OK:
 			return HederaPrecheckResult.OK;
-		case UNRECOGNIZED:
-			return HederaPrecheckResult.UNRECOGNIZED;
+		case BUSY:
+			return HederaPrecheckResult.BUSY;
+		case NOT_SUPPORTED:
+			return HederaPrecheckResult.NOT_SUPPORTED;
 		default:
 			return HederaPrecheckResult.NOTSET;
 				
@@ -168,8 +170,8 @@ public class Utilities {
 	 */
 	public static HederaTransactionReceipt getReceipt (HederaTransactionID hederaTransactionID, HederaNode node) throws InterruptedException {
 
-		final int MAX_CALL_COUNT = 500;
-		final int DELAY_BASE = 50; // base delay in milliseconds
+		final int MAX_CALL_COUNT = 50;
+		final int DELAY_BASE = 550; // base delay in milliseconds
 		final int DELAY_INCREASE = 0; // this determines how delay increases between calls. It is simply added to sleepTime between each call
 
 		
@@ -200,21 +202,28 @@ public class Utilities {
 			Thread.sleep(sleepTime);
 			sleepTime += increaseDelay;
 					
+			logger.info("Fetching receipt");
 			receipt = new HederaTransactionReceipt(hederaTransactionID, node);
 			// was that successful ?
 			callCount += 1;
 			if (receipt.nodePrecheck == HederaPrecheckResult.INVALID_TRANSACTION) {
 				// do nothing
+				logger.info("precheck=INVALID_TRANSACTION");
 			} else if (receipt.transactionStatus == HederaTransactionStatus.FAIL_INVALID) {
 				// force exit out of loop
+				logger.info("precheck=FAIL_INVALID");
 				break;
 			} else if (receipt.transactionStatus == HederaTransactionStatus.FAIL_BALANCE) {
 				// force exit out of loop
+				logger.info("precheck=FAIL_BALANCE");
 				break;
 			} else if (receipt.nodePrecheck == HederaPrecheckResult.OK) {
+				logger.info("precheck=OK");
 				if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
 					logger.info("took " + callCount + " call, about " + sleepTime * callCount + " milliseconds");
 					break;
+				} else {
+					logger.info("Transaction status=" + receipt.transactionStatus.name());
 				}
 			}
 		}

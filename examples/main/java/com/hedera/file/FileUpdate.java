@@ -32,6 +32,9 @@ public final class FileUpdate {
 				logger.info("Failed with transactionStatus:" + receipt.transactionStatus);
 				return null;
 			}
+		} else if (updateResult.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+			logger.info("system busy, try again later");
+			return null;
 		} else {
 			logger.info("Failed with getPrecheckResult:" + updateResult.getPrecheckResult());
 			return null;

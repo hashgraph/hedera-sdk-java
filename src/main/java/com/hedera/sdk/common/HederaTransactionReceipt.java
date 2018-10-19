@@ -109,8 +109,11 @@ public class HederaTransactionReceipt implements Serializable {
 		case OK:
 			this.nodePrecheck = HederaPrecheckResult.OK;
 			break;
-		case UNRECOGNIZED:
-			this.nodePrecheck = HederaPrecheckResult.UNRECOGNIZED;
+		case BUSY:
+			this.nodePrecheck = HederaPrecheckResult.BUSY;
+			break;
+		case NOT_SUPPORTED:
+			this.nodePrecheck = HederaPrecheckResult.NOT_SUPPORTED;
 			break;
 		default:
 			this.nodePrecheck = HederaPrecheckResult.NOTSET;
