@@ -1272,7 +1272,7 @@ public class HederaAccount implements Serializable {
 		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
 		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingKeyPair);
 		Utilities.throwIfAccountIDInvalid("txQueryDefaults.payingAccountID", this.txQueryDefaults.payingAccountID);
-		Utilities.throwIfAccountIDInvalid("node.AccountID", this.node.getAccountID());
+		Utilities.throwIfAccountIDInvalid("txQueryDefaults.node.AccountID", this.txQueryDefaults.node.getAccountID());
 
 		// set transport
 		this.node = this.txQueryDefaults.node;
@@ -1363,7 +1363,7 @@ public class HederaAccount implements Serializable {
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
 		Utilities.throwIfAccountIDInvalid("txQueryDefaults.payingAccountID", this.txQueryDefaults.payingAccountID);
-		Utilities.throwIfAccountIDInvalid("node.AccountID", this.node.getAccountID());
+		Utilities.throwIfAccountIDInvalid("txQueryDefaults.node.AccountID", this.txQueryDefaults.node.getAccountID());
 
 		// set transport
 		this.node = this.txQueryDefaults.node;
@@ -1556,7 +1556,7 @@ public class HederaAccount implements Serializable {
 		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
 		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingKeyPair);
 		Utilities.throwIfAccountIDInvalid("txQueryDefaults.payingAccountID", this.txQueryDefaults.payingAccountID);
-		Utilities.throwIfAccountIDInvalid("node.AccountID", this.node.getAccountID());
+		Utilities.throwIfAccountIDInvalid("txQueryDefaults.node.AccountID", this.txQueryDefaults.node.getAccountID());
 
 		// set transport
 		this.node = this.txQueryDefaults.node;

@@ -35,6 +35,9 @@ public final class ContractUpdate {
 				logger.info("Failed with transactionStatus:" + receipt.transactionStatus);
 				return null;
 			}
+		} else if (contract.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+			logger.info("system busy, try again later");
+			return null;
 		} else {
 			logger.info("getPrecheckResult not OK: " + updateResult.getPrecheckResult().name());
 			return null;

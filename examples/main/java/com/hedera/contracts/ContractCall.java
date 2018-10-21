@@ -11,7 +11,7 @@ import com.hedera.sdk.contract.HederaContract;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 
 public final class ContractCall {
-	public static void call(HederaContract contract, long gas, long amount, byte[] functionParameters) throws Exception {
+	public static boolean call(HederaContract contract, long gas, long amount, byte[] functionParameters) throws Exception {
 		final Logger logger = LoggerFactory.getLogger(ContractCall.class);
 		logger.info("");
 		logger.info("CONTRACT CALL");
@@ -29,9 +29,17 @@ public final class ContractCall {
 			if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
 				// and print it out
 				logger.info(String.format("===>Smart Contract call success"));
+				return true;
 			} else {
 				logger.info("Failed with transactionStatus:" + receipt.transactionStatus.toString());
+				return false;
 			}
+		} else if (contract.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+			logger.info("system busy, try again later");
+			return false;
+		} else {
+			logger.info("Failed with getPrecheckResult:" + contract.getPrecheckResult());
+			return false;
 		}
 	}
 

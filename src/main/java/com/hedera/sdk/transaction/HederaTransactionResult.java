@@ -49,7 +49,10 @@ public class HederaTransactionResult implements Serializable {
 		case OK:
 			this.precheckResult = HederaPrecheckResult.OK;
 			break;
-		case UNRECOGNIZED:
+		case BUSY:
+			this.precheckResult = HederaPrecheckResult.BUSY;
+			break;
+		case NOT_SUPPORTED:
 		   	logger.trace("End - setPrecheckResult");
             throw new IllegalArgumentException("Precheck Response not recognized. You may be using an old sdk.");			
 		}

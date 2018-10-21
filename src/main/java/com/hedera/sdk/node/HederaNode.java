@@ -6,6 +6,7 @@ import com.hedera.sdk.query.HederaQuery;
 import com.hedera.sdk.transaction.HederaTransaction;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 import com.hederahashgraph.api.proto.java.AccountID;
+import com.hederahashgraph.api.proto.java.NodeTransactionPrecheckCode;
 import com.hederahashgraph.api.proto.java.Response;
 import com.hederahashgraph.api.proto.java.TransactionResponse;
 import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
@@ -30,7 +31,11 @@ public class HederaNode implements Serializable {
     private HederaAccountID accountID = null;
 	// GRPC
 	private ManagedChannel grpcChannel = null; 
-    
+    // BUSY network handling
+	private int busyRetryCount = 2;
+	private int waitMillisLong = 510;
+	private int waitMillisShort = 11;
+	
 	/**
 	 * The default fee associated with running an account create transaction
 	 */
@@ -286,7 +291,16 @@ public class HederaNode implements Serializable {
 		if (transaction.getProtobuf().getBody().hasCryptoCreateAccount()) {
 			openChannel();
 			CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.createAccount(transaction.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.createAccount(transaction.getProtobuf());
+				// retry if busy
+				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -318,7 +332,16 @@ public class HederaNode implements Serializable {
 		if (transaction.getProtobuf().getBody().hasCryptoAddClaim()) {
 			openChannel();
 			CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.addClaim(transaction.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.addClaim(transaction.getProtobuf());
+				// retry if busy
+				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -349,7 +372,23 @@ public class HederaNode implements Serializable {
 		if (transaction.getProtobuf().getBody().hasCryptoTransfer()) {
 			openChannel();
 			CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.cryptoTransfer(transaction.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.cryptoTransfer(transaction.getProtobuf());
+				// retry if busy
+				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					if (transaction.getProtobuf().getBody().getGenerateRecord() == true) {
+						// wait longer
+						logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+						Thread.sleep(waitMillisLong);
+					} else {
+						// wait short time
+						logger.info("System busy - sleeping for " + waitMillisShort + "ms");
+						Thread.sleep(waitMillisShort);
+					}
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -380,7 +419,16 @@ public class HederaNode implements Serializable {
 		if (transaction.getProtobuf().getBody().hasCryptoUpdateAccount()) {
 			openChannel();
 			CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.updateAccount(transaction.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.updateAccount(transaction.getProtobuf());
+				// retry if busy
+				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -411,7 +459,16 @@ public class HederaNode implements Serializable {
 		if (transaction.getProtobuf().getBody().hasFileAppend()) {
 			openChannel();
 			FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.appendContent(transaction.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.appendContent(transaction.getProtobuf());
+				// retry if busy
+				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -442,7 +499,16 @@ public class HederaNode implements Serializable {
 		if (transaction.getProtobuf().getBody().hasFileCreate()) {
 			openChannel();
 			FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.createFile(transaction.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.createFile(transaction.getProtobuf());
+				// retry if busy
+				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -474,7 +540,16 @@ public class HederaNode implements Serializable {
 		if (transaction.getProtobuf().getBody().hasFileDelete()) {
 			openChannel();
 			FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.deleteFile(transaction.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.deleteFile(transaction.getProtobuf());
+				// retry if busy
+				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -506,7 +581,16 @@ public class HederaNode implements Serializable {
 		if (transaction.getProtobuf().getBody().hasFileUpdate()) {
 			openChannel();
 			FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.updateFile(transaction.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.updateFile(transaction.getProtobuf());
+				// retry if busy
+				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -538,7 +622,16 @@ public class HederaNode implements Serializable {
 		if (transaction.getProtobuf().getBody().hasContractCall()) {
 			openChannel();
 			SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.contractCallMethod(transaction.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.contractCallMethod(transaction.getProtobuf());
+				// retry if busy
+				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -570,7 +663,16 @@ public class HederaNode implements Serializable {
 		if (transaction.getProtobuf().getBody().hasContractCreateInstance()) {
 			openChannel();
 			SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.createContract(transaction.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.createContract(transaction.getProtobuf());
+				// retry if busy
+				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -602,7 +704,16 @@ public class HederaNode implements Serializable {
 		if (transaction.getProtobuf().getBody().hasContractUpdateInstance()) {
 			openChannel();
 			SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.updateContract(transaction.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.updateContract(transaction.getProtobuf());
+				// retry if busy
+				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid transaction type.");
 		}
@@ -633,7 +744,16 @@ public class HederaNode implements Serializable {
 		if (query.getProtobuf().hasContractCallLocal()) {
 			openChannel();
 			SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.contractCallLocalMethod(query.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.contractCallLocalMethod(query.getProtobuf());
+				// retry if busy
+				if (response.getContractCallLocal().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}
@@ -661,7 +781,16 @@ public class HederaNode implements Serializable {
 		if (query.getProtobuf().hasContractGetBytecode()) {
 			openChannel();
 			SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.contractGetBytecode(query.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.contractGetBytecode(query.getProtobuf());
+				// retry if busy
+				if (response.getContractGetBytecodeResponse().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}
@@ -688,7 +817,16 @@ public class HederaNode implements Serializable {
 		if (query.getProtobuf().hasGetBySolidityID()) {
 			openChannel();
 			SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.getBySolidityID(query.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.getBySolidityID(query.getProtobuf());
+				// retry if busy
+				if (response.getGetBySolidityID().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}
@@ -716,7 +854,16 @@ public class HederaNode implements Serializable {
 		if (query.getProtobuf().hasContractGetInfo()) {
 			openChannel();
 			SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.getContractInfo(query.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.getContractInfo(query.getProtobuf());
+				// retry if busy
+				if (response.getContractGetInfo().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}
@@ -744,7 +891,16 @@ public class HederaNode implements Serializable {
 		if (query.getProtobuf().hasCryptogetAccountBalance()) {
 			openChannel();
 			CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.cryptoGetBalance(query.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.cryptoGetBalance(query.getProtobuf());
+				// retry if busy
+				if (response.getCryptogetAccountBalance().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}
@@ -772,7 +928,16 @@ public class HederaNode implements Serializable {
 		if (query.getProtobuf().hasCryptoGetAccountRecords()) {
 			openChannel();
 			CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.getAccountRecords(query.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.getAccountRecords(query.getProtobuf());
+				// retry if busy
+				if (response.getCryptoGetAccountRecords().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}
@@ -800,7 +965,16 @@ public class HederaNode implements Serializable {
 		if (query.getProtobuf().hasCryptoGetInfo()) {
 			openChannel();
 			CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.getAccountInfo(query.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.getAccountInfo(query.getProtobuf());
+				// retry if busy
+				if (response.getCryptoGetInfo().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}
@@ -825,7 +999,16 @@ public class HederaNode implements Serializable {
 		if (query.getProtobuf().hasTransactionGetReceipt()) {
 			openChannel();
 			CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.getTransactionReceipts(query.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.getTransactionReceipts(query.getProtobuf());
+				// retry if busy
+				if (response.getTransactionGetReceipt().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}
@@ -850,7 +1033,16 @@ public class HederaNode implements Serializable {
 		if (query.getProtobuf().hasTransactionGetRecord()) {
 			openChannel();
 			CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.getTxRecordByTxID(query.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.getTxRecordByTxID(query.getProtobuf());
+				// retry if busy
+				if (response.getTransactionGetRecord().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}
@@ -877,7 +1069,16 @@ public class HederaNode implements Serializable {
 		if (query.getProtobuf().hasFileGetContents()) {
 			openChannel();
 			FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.getFileContent(query.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.getFileContent(query.getProtobuf());
+				// retry if busy
+				if (response.getFileGetContents().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}
@@ -904,7 +1105,16 @@ public class HederaNode implements Serializable {
 		if (query.getProtobuf().hasFileGetInfo()) {
 			openChannel();
 			FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
-			response = blockingStub.getFileInfo(query.getProtobuf());
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.getFileInfo(query.getProtobuf());
+				// retry if busy
+				if (response.getFileGetInfo().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid Query Type");
 		}

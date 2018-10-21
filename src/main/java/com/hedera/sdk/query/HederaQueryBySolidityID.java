@@ -208,8 +208,11 @@ public class HederaQueryBySolidityID implements Serializable {
 		case OK:
 			this.precheckResult = HederaPrecheckResult.OK;
 			break;
-		case UNRECOGNIZED:
-			this.precheckResult = HederaPrecheckResult.UNRECOGNIZED;
+		case BUSY:
+			this.precheckResult = HederaPrecheckResult.BUSY;
+			break;
+		case NOT_SUPPORTED:
+			this.precheckResult = HederaPrecheckResult.NOT_SUPPORTED;
 			break;
 		default:
 			this.precheckResult = HederaPrecheckResult.NOTSET;

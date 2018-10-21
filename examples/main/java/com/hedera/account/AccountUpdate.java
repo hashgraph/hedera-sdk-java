@@ -40,6 +40,9 @@ public final class AccountUpdate {
 				logger.info("Failed with transactionStatus:" + receipt.transactionStatus.toString());
 				return null;
 			}
+		} else if (updateResult.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+			logger.info("system busy, try again later");
+			return null;
 		} else {
 			logger.info("Failed with getPrecheckResult:" + updateResult.getPrecheckResult().toString());
 			return null;

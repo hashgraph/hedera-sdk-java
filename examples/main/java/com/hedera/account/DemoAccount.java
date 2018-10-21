@@ -1,6 +1,7 @@
 package com.hedera.account;
 
 import java.io.UnsupportedEncodingException;
+import java.time.Instant;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,12 +44,12 @@ public final class DemoAccount {
     	accountXferTo.txQueryDefaults = txQueryDefaults;
     	
     	create = true;
-    	balance = true;
+//    	balance = true;
     	send = true;
-    	info = true;
-    	update = true;
+//    	info = true;
+//    	update = true;
 //    	doAddClaim = true; -- not implemented ?
-    	getTXRecord = true;
+//    	getTXRecord = true;
     	
 		// create an account
     	if (create) {
@@ -80,7 +81,7 @@ public final class DemoAccount {
 	    		}
 	    	}
 
-	        if (send) {
+	    	if (send) {
 		    	accountXferTo = AccountCreate.create(accountXferTo, accountXferToKey, 10000);
 		    	if (accountXferTo == null) {
 	    			logger.info("*******************************************");
@@ -99,7 +100,9 @@ public final class DemoAccount {
 		
 				// send some crypto
 		    	if (send) {
+		    		logger.info("Start Time" + Instant.now());
 		    		AccountSend.send(account, accountXferTo, 100);
+		    		logger.info("End Time" + Instant.now());
 		    	}
 				// get balance for the account
 		    	if (balance) {
