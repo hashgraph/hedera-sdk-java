@@ -79,7 +79,7 @@ public class Utilities {
 	 * @param payload the payload to sign
 	 * @param keyPair the keypair to use for signing
 	 * @return {@link HederaKeySignature}
-	 * @throws Exception 
+	 * @throws Exception In the event of an error
 	 */
 	public static HederaKeySignature getKeySignature(byte[] payload, HederaCryptoKeyPair keyPair) throws Exception {
 		logger.trace("Start - getSignature payload {}, keyPair {}", payload, keyPair);
@@ -97,7 +97,7 @@ public class Utilities {
 	 * @param publicKey the public key
 	 * @param privateKey the private key
 	 * @return {@link HederaKeySignature}
-	 * @throws Exception 
+	 * @throws Exception In the event of an error
 	 */
 	public static HederaKeySignature getKeySignature(byte[] payload, KeyType keyType, byte[] publicKey, byte[] privateKey) throws Exception {
 		// create new keypair
@@ -110,7 +110,7 @@ public class Utilities {
 	 * @param payload the payload to sign
 	 * @param keyPair the keypair to use for the signature
 	 * @return {@link HederaSignature}
-	 * @throws Exception 
+	 * @throws Exception In the event of an error
 	 */
 	public static HederaSignature getSignature(byte[] payload, HederaCryptoKeyPair keyPair) throws Exception {
 		logger.trace("Start - getSignature payload {}, keyPair {}", payload, keyPair);
@@ -128,7 +128,7 @@ public class Utilities {
 	 * @param publicKey the public key
 	 * @param privateKey the private key
 	 * @return {@link HederaSignature}
-	 * @throws Exception 
+	 * @throws Exception In the event of an error
 	 */
 	public static HederaSignature getSignature(byte[] payload, KeyType keyType, byte[] publicKey, byte[] privateKey) throws Exception {
 		// create new keypair
@@ -166,7 +166,7 @@ public class Utilities {
 	 * @param hederaTransactionID the transaction id to get a receipt for
 	 * @param node the node to communicate with
 	 * @return {@link HederaTransactionReceipt}
-	 * @throws InterruptedException 
+	 * @throws InterruptedException In the event of an error
 	 */
 	public static HederaTransactionReceipt getReceipt (HederaTransactionID hederaTransactionID, HederaNode node) throws InterruptedException {
 
@@ -187,7 +187,7 @@ public class Utilities {
 	 * @param firstDelay the time in milliseconds before the first getReceipt is sent
 	 * @param increaseDelay the time in milliseconds to increase the delay by between each retry
 	 * @return {@link HederaTransactionReceipt}
-	 * @throws InterruptedException 
+	 * @throws InterruptedException In the event of an error
 	 */
 	public static HederaTransactionReceipt getReceipt (HederaTransactionID hederaTransactionID, HederaNode node, int maxRetries, int firstDelay, int increaseDelay) throws InterruptedException {
 		final Logger logger = LoggerFactory.getLogger(HederaTransactionReceipt.class);

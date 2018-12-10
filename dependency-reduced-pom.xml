@@ -27,6 +27,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-source-plugin</artifactId>
+        <version>3.0.1</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -67,6 +68,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.0.1</version>
         <executions>
           <execution>
             <id>attach-javadocs</id>
@@ -81,6 +83,8 @@
           <excludePackageNames>test.com.hedera.*</excludePackageNames>
           <excludePackageNames>net.i2p.*</excludePackageNames>
           <excludePackageNames>org.json.*</excludePackageNames>
+          <failOnError>false</failOnError>
+          <additionalOptions>-html5</additionalOptions>
         </configuration>
       </plugin>
       <plugin>

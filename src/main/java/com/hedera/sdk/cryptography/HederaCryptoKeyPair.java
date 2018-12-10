@@ -29,7 +29,7 @@ public class HederaCryptoKeyPair implements Serializable {
 	/**
 	 * sets the public key as a byte[]
 	 * @param publicKey the public key
-	 * @throws InvalidKeySpecException 
+	 * @throws InvalidKeySpecException In the event of an error
 	 */
 	public void setPublicKey(byte[] publicKey) throws InvalidKeySpecException {
 		logger.trace("Start - setPublicKey publicKey {}", publicKey);
@@ -103,7 +103,7 @@ public class HederaCryptoKeyPair implements Serializable {
 	/**
 	 * sets the secret key as a byte[]
 	 * @param secretKey the secret key
-	 * @throws InvalidKeySpecException 
+	 * @throws InvalidKeySpecException In the event of an error
 	 */
 	public void setSecretKey(byte[] secretKey) throws InvalidKeySpecException {
 		logger.trace("Start - setSecretKey secretKey {}", secretKey);
@@ -250,7 +250,7 @@ public class HederaCryptoKeyPair implements Serializable {
 	 * @param keyType {@link HederaKey.KeyType}
 	 * @param publicKey {@link byte} array
 	 * @param secretKey {@link byte} array
-	 * @throws InvalidKeySpecException 
+	 * @throws InvalidKeySpecException In the event of an error
 	 */
 	public HederaCryptoKeyPair(HederaKey.KeyType keyType, byte[] publicKey, byte[] secretKey) throws InvalidKeySpecException {
 		logger.trace("Start - Object init keyType {}, publicKey {}, secretKey {}", keyType, publicKey, secretKey);
@@ -276,7 +276,7 @@ public class HederaCryptoKeyPair implements Serializable {
 	 * @param keyType {@link HederaKey.KeyType}
 	 * @param publicKey {@link String} as a hex encoded string
 	 * @param secretKey {@link String} as a hex encoded string
-	 * @throws InvalidKeySpecException 
+	 * @throws InvalidKeySpecException In the event of an error
 	 */
 	public HederaCryptoKeyPair(HederaKey.KeyType keyType, String publicKey, String secretKey) throws InvalidKeySpecException {
 		logger.trace("Start - Object init keyType {}, publicKey {}, secretKey {}", keyType, publicKey, secretKey);
@@ -372,7 +372,7 @@ public class HederaCryptoKeyPair implements Serializable {
 	 * signs a message with the private key
 	 * @param message byte[]
 	 * @return byte[]
-	 * @throws Exception 
+	 * @throws Exception In the event of an error
 	 */
 	public byte[] signMessage(byte[] message) throws Exception {
 		logger.trace("Start - signMessage message {}", message);
@@ -385,7 +385,7 @@ public class HederaCryptoKeyPair implements Serializable {
 	 * @param message byte[]
 	 * @param signature byte[]
 	 * @return {@link Boolean}
-	 * @throws Exception 
+	 * @throws Exception In the event of an error
 	 */
 	public boolean verifySignature(byte[] message, byte[] signature) throws Exception {
 		logger.trace("Start - verifySignature message {}, signature {}", message, signature);

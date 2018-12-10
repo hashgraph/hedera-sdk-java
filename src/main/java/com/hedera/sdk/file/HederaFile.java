@@ -1202,7 +1202,7 @@ public class HederaFile implements Serializable {
 	 *                 setting up a file, if null the {@link HederaFile} class
 	 *                 defaults will be used
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception In the event of an error
 	 */
 	public HederaTransactionResult create(long shardNum, long realmNum, byte[] contents,
 			HederaFileCreateDefaults defaults) throws Exception {
@@ -1287,7 +1287,7 @@ public class HederaFile implements Serializable {
 	 * Deletes a file in the simplest possible way
 	 * 
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception In the event of an error
 	 */
 	public HederaTransactionResult delete() throws Exception {
 		logger.trace("Start - delete");
@@ -1357,7 +1357,7 @@ public class HederaFile implements Serializable {
 	 * @param realmNum, the realm in which the file exists
 	 * @param fileNum, the file number
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception In the event of an error
 	 */
 	public HederaTransactionResult delete(long shardNum, long realmNum, long fileNum) throws Exception {
 		this.shardNum = shardNum;
@@ -1371,7 +1371,7 @@ public class HederaFile implements Serializable {
 	 * 
 	 * @param contents the file contents in bytes to append
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception In the event of an error
 	 */
 	public HederaTransactionResult append(byte[] contents) throws Exception {
 		logger.trace("Start - append contents {}", contents);
@@ -1445,7 +1445,7 @@ public class HederaFile implements Serializable {
 	 * @param fileNum, the file number
 	 * @param contents, the contents to add to the file
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception In the event of an error
 	 */
 	public HederaTransactionResult append(long shardNum, long realmNum, long fileNum, byte[] contents)
 			throws Exception {
@@ -1467,7 +1467,7 @@ public class HederaFile implements Serializable {
 	 *                              no change)
 	 * @param contents              the file contents in bytes to append
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception In the event of an error
 	 */
 	public HederaTransactionResult update(long expirationTimeSeconds, int expirationTimeNanos, byte[] contents)
 			throws Exception {
@@ -1565,7 +1565,7 @@ public class HederaFile implements Serializable {
 	 *                              no change)
 	 * @param contents              the file contents in bytes to append
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception In the event of an error
 	 */
 	public HederaTransactionResult update(long shardNum, long realmNum, long fileNum, long expirationTimeSeconds,
 			int expirationTimeNanos, byte[] contents) throws Exception {
@@ -1581,7 +1581,7 @@ public class HederaFile implements Serializable {
 	 * the error
 	 * 
 	 * @return {@link byte} array
-	 * @throws Exception 
+	 * @throws Exception In the event of an error
 	 */
 	public byte[] getContents() throws Exception {
 		logger.trace("Start - getContents");
@@ -1614,7 +1614,7 @@ public class HederaFile implements Serializable {
 	 * @param realmNum, the realm in which the file exists
 	 * @param fileNum, the file number
 	 * @return {@link byte} array
-	 * @throws Exception 
+	 * @throws Exception In the event of an error
 	 */
 	public byte[] getContents(long shardNum, long realmNum, long fileNum) throws Exception {
 		this.shardNum = shardNum;
@@ -1632,7 +1632,7 @@ public class HederaFile implements Serializable {
 	 * look it up before each getInfo query
 	 * 
 	 * @return {@link boolean}
-	 * @throws Exception 
+	 * @throws Exception In the event of an error
 	 */
 	public boolean getInfo() throws Exception {
 		logger.trace("Start - getInfo");
@@ -1656,7 +1656,7 @@ public class HederaFile implements Serializable {
 	 * @param realmNum, the realm in which the file exists
 	 * @param fileNum, the file number
 	 * @return {@link boolean}
-	 * @throws Exception 
+	 * @throws Exception In the event of an error
 	 */
 	public boolean getInfo(long shardNum, long realmNum, long fileNum) throws Exception {
 		this.shardNum = shardNum;

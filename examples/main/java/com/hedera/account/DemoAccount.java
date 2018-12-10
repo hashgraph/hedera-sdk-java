@@ -44,10 +44,10 @@ public final class DemoAccount {
     	accountXferTo.txQueryDefaults = txQueryDefaults;
     	
     	create = true;
-//    	balance = true;
+    	balance = true;
     	send = true;
-//    	info = true;
-//    	update = true;
+    	info = true;
+    	update = true;
 //    	doAddClaim = true; -- not implemented ?
 //    	getTXRecord = true;
     	
@@ -56,8 +56,13 @@ public final class DemoAccount {
     		account.txQueryDefaults.generateRecord = getTXRecord;
 	    	HederaCryptoKeyPair newAccountKey = new HederaCryptoKeyPair(KeyType.ED25519);
 	    	HederaCryptoKeyPair accountXferToKey = new HederaCryptoKeyPair(KeyType.ED25519);
+
+	    	System.out.print("PUBLIC:");
+	    	System.out.println(newAccountKey.getPublicKeyEncodedHex());
+	    	System.out.print("PRIVATE:");
+	    	System.out.println(newAccountKey.getSecretKeyHex());
 	    	
-	    	account = AccountCreate.create(account, newAccountKey,100000);
+	    	account = AccountCreate.create(account, newAccountKey,1000000);
 	    	if (account == null) {
     			logger.info("*******************************************");
     			logger.info("FIRST ACCOUNT CREATE FAILED");

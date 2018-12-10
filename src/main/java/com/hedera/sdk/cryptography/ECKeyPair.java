@@ -100,8 +100,8 @@ public class ECKeyPair extends AbstractKeyPair {
     }
 
     /**
-     * Returns public key bytes from the given private key. To convert a byte array into a BigInteger, use <tt>
-     * new BigInteger(1, bytes);</tt>
+     * Returns public key bytes from the given private key. To convert a byte array into a BigInteger, use 
+     * new BigInteger(1, bytes);
      * @param privKey the private key
      * @return {@link Byte} array
      * @param compressed compressed key or not
@@ -112,8 +112,8 @@ public class ECKeyPair extends AbstractKeyPair {
     }
 
     /**
-     * Returns public key point from the given private key. To convert a byte array into a BigInteger, use <tt>
-     * new BigInteger(1, bytes);</tt>
+     * Returns public key point from the given private key. To convert a byte array into a BigInteger, use
+     * new BigInteger(1, bytes);
      * @param privKey the private key
      * @return {@link ECPoint}
      */
