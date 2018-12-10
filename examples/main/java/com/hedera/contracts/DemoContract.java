@@ -37,7 +37,7 @@ public final class DemoContract {
 
 		// create an account
 		HederaCryptoKeyPair newAccountKey = new HederaCryptoKeyPair(KeyType.ED25519);
-		account = AccountCreate.create(account, newAccountKey, 550000000000l);
+		account = AccountCreate.create(account, newAccountKey, 60000);
 		
 		if (account != null) {
 			// the paying account is now the new account
@@ -85,7 +85,7 @@ public final class DemoContract {
 					// getinfo
 					ContractGetInfo.getInfo(contract);
 					// get bytecode
-					ContractGetBytecode.getByteCode(contract);
+//					ContractGetBytecode.getByteCode(contract);
 					// call
 					final String SC_SET_ABI = "{\"constant\":false,\"inputs\":[{\"name\":\"x\",\"type\":\"uint256\"}],\"name\":\"set\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}";
 					long gas = 250000;
@@ -102,6 +102,9 @@ public final class DemoContract {
 					HederaContractFunctionResult functionResult = ContractRunLocal.runLocal(contract, localGas, maxResultSize, function);
 					int decodeResult = SoliditySupport.decodeGetValueResult(functionResult.contractCallResult(),SC_GET_ABI);
 					logger.info(String.format("===>Decoded functionResult= %d", decodeResult));
+					
+					long balance = account.getBalance();
+					logger.info(String.format("Account balance is %d", balance));
 				}
 			}
 		}

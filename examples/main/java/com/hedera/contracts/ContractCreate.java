@@ -23,12 +23,12 @@ public final class ContractCreate {
 		// new contract
 		long shardNum = 0;
 		long realmNum = 0;
-		long gas = 250000000l;
+		long gas = 34000;
 		byte[] constructorParameters = constParams; 
 		HederaDuration autoRenewPeriod = new HederaDuration(60, 10);
 
 		//fee 100
-		contract.txQueryDefaults.node.contractCreateTransactionFee = 100;
+		contract.txQueryDefaults.node.contractCreateTransactionFee = 10;
 		contract.txQueryDefaults.generateRecord = true;
 		
 		logger.info("");
