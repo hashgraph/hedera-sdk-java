@@ -57,7 +57,7 @@ public final class DemoAccount {
 	    	HederaCryptoKeyPair newAccountKey = new HederaCryptoKeyPair(KeyType.ED25519);
 	    	HederaCryptoKeyPair accountXferToKey = new HederaCryptoKeyPair(KeyType.ED25519);
 	    	
-	    	account = AccountCreate.create(account, newAccountKey,100000);
+	    	account = AccountCreate.create(account, newAccountKey,100);
 	    	if (account == null) {
     			logger.info("*******************************************");
     			logger.info("FIRST ACCOUNT CREATE FAILED");
@@ -82,7 +82,7 @@ public final class DemoAccount {
 	    	}
 
 	    	if (send) {
-		    	accountXferTo = AccountCreate.create(accountXferTo, accountXferToKey, 10000);
+		    	accountXferTo = AccountCreate.create(accountXferTo, accountXferToKey, 10);
 		    	if (accountXferTo == null) {
 	    			logger.info("*******************************************");
 	    			logger.info("SECOND ACCOUNT CREATE FAILED");
@@ -101,7 +101,7 @@ public final class DemoAccount {
 				// send some crypto
 		    	if (send) {
 		    		logger.info("Start Time" + Instant.now());
-		    		AccountSend.send(account, accountXferTo, 100);
+		    		AccountSend.send(account, accountXferTo, 2);
 		    		logger.info("End Time" + Instant.now());
 		    	}
 				// get balance for the account
