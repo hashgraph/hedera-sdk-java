@@ -37,7 +37,7 @@ public final class DemoFile {
 
     	HederaCryptoKeyPair newAccountKey = new HederaCryptoKeyPair(KeyType.ED25519);
     	
-    	account = AccountCreate.create(account, newAccountKey, 1000);
+    	account = AccountCreate.create(account, newAccountKey, 100);
 
         // the paying account is now the new account
         txQueryDefaults.payingAccountID = account.getHederaAccountID();
