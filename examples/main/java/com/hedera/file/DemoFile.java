@@ -1,12 +1,7 @@
 package com.hedera.file;
 
-import java.security.spec.InvalidKeySpecException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.hedera.account.*;
-import com.hedera.sdk.account.HederaAccount;
-import com.hedera.sdk.common.HederaDuration;
 import com.hedera.sdk.common.HederaKey.KeyType;
 import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
 import com.hedera.sdk.file.HederaFile;
@@ -29,21 +24,10 @@ public final class DemoFile {
 		HederaTransactionAndQueryDefaults txQueryDefaults = new HederaTransactionAndQueryDefaults();
 		txQueryDefaults = ExampleUtilities.getTxQueryDefaults();
 
-    	HederaAccount account = new HederaAccount();
     	// setup transaction/query defaults (durations, etc...)
-    	txQueryDefaults.generateRecord = true;
-    	account.txQueryDefaults = txQueryDefaults;
-    	account.autoRenewPeriod = new HederaDuration(31536000, 0);
+    	txQueryDefaults.generateRecord = false;
+    	txQueryDefaults.memo = "File Demo";
 
-    	HederaCryptoKeyPair newAccountKey = new HederaCryptoKeyPair(KeyType.ED25519);
-    	
-    	account = AccountCreate.create(account, newAccountKey, 100);
-
-        // the paying account is now the new account
-        txQueryDefaults.payingAccountID = account.getHederaAccountID();
-        txQueryDefaults.payingKeyPair = newAccountKey;
-        txQueryDefaults.memo = "File Tests";
-		
     	// new file object
     	HederaFile file = new HederaFile();
     	// setup transaction/query defaults (durations, etc...)
