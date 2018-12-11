@@ -30,8 +30,8 @@ public final class DemoFile {
 
     	// new file object
     	HederaFile file = new HederaFile();
-    	// setup transaction/query defaults (durations, etc...)
-    	txQueryDefaults.fileWacl = new HederaCryptoKeyPair(KeyType.ED25519);
+    	// setup file ACL to the paying account's keypair
+    	txQueryDefaults.fileWacl = txQueryDefaults.payingKeyPair;
     	file.txQueryDefaults = txQueryDefaults;
 
     	doCreate = true; //OK
