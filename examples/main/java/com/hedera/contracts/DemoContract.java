@@ -11,6 +11,7 @@ import com.hedera.account.AccountCreate;
 import com.hedera.file.FileCreate;
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.common.HederaDuration;
+import com.hedera.sdk.common.HederaFileID;
 import com.hedera.sdk.common.HederaKey.KeyType;
 import com.hedera.sdk.common.HederaTimeStamp;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
@@ -59,8 +60,9 @@ public final class DemoContract {
 		contract.txQueryDefaults = txQueryDefaults;
 
 		// create a contract
-		contract = ContractCreate.create(contract, file.getFileID(), 0);
-		//contract = create(contract, file.getFileID(), 1);
+		long gas = 71000;
+		contract = ContractCreate.create(contract, new HederaFileID(0, 0, 1011), 0, gas);
+
 		if (contract != null) {
 			// update the contract
 			HederaTimeStamp expirationTime = new HederaTimeStamp(100, 10);
@@ -72,11 +74,11 @@ public final class DemoContract {
 				// getinfo
 				ContractGetInfo.getInfo(contract);
 				// get bytecode
-//					ContractGetBytecode.getByteCode(contract);
+				ContractGetBytecode.getByteCode(contract);
 				// call
 				final String SC_SET_ABI = "{\"constant\":false,\"inputs\":[{\"name\":\"x\",\"type\":\"uint256\"}],\"name\":\"set\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}";
-				long gas = 250000;
-				long amount = 14;
+				gas = 42000;
+				long amount = 0;
 				byte[] functionParameters = SoliditySupport.encodeSet(10,SC_SET_ABI);
 				
 				ContractCall.call(contract, gas, amount, functionParameters);
@@ -84,7 +86,7 @@ public final class DemoContract {
 				String SC_GET_ABI = "{\"constant\":true,\"inputs\":[],\"name\":\"get\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}";
 				
 				byte[] function = SoliditySupport.encodeGetValue(SC_GET_ABI);
-				long localGas = 250000;
+				long localGas = 25000;
 				long maxResultSize = 5000;
 				HederaContractFunctionResult functionResult = ContractRunLocal.runLocal(contract, localGas, maxResultSize, function);
 				int decodeResult = SoliditySupport.decodeGetValueResult(functionResult.contractCallResult(),SC_GET_ABI);
