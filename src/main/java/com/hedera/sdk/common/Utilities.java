@@ -16,7 +16,7 @@ import com.hedera.sdk.common.HederaKey.KeyType;
 import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
 import com.hedera.sdk.node.HederaNode;
 import com.hederahashgraph.api.proto.java.KeyList;
-import com.hederahashgraph.api.proto.java.NodeTransactionPrecheckCode;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hederahashgraph.api.proto.java.SignatureList;
 
 public class Utilities {
@@ -135,30 +135,6 @@ public class Utilities {
 		HederaCryptoKeyPair keyPair = new HederaCryptoKeyPair(keyType, publicKey, privateKey);
 		return getSignature(payload, keyPair);
 	}
-	public static HederaPrecheckResult setPrecheckResult(NodeTransactionPrecheckCode nodeTransactionPrecheckCode) {
-	   	logger.trace("setPrecheckResult nodeTransactionPrecheckCode {}", nodeTransactionPrecheckCode);
-		switch (nodeTransactionPrecheckCode) {
-		case DUPLICATE:
-			return HederaPrecheckResult.DUPLICATE;
-		case INSUFFICIENT_BALANCE:
-			return HederaPrecheckResult.INSUFFICIENT_BALANCE;
-		case INSUFFICIENT_FEE:
-			return HederaPrecheckResult.INSUFFICIENT_FEE;
-		case INVALID_ACCOUNT:
-			return HederaPrecheckResult.INVALID_ACCOUNT;
-		case INVALID_TRANSACTION:
-			return HederaPrecheckResult.INVALID_TRANSACTION;
-		case OK:
-			return HederaPrecheckResult.OK;
-		case BUSY:
-			return HederaPrecheckResult.BUSY;
-		case NOT_SUPPORTED:
-			return HederaPrecheckResult.NOT_SUPPORTED;
-		default:
-			return HederaPrecheckResult.NOTSET;
-				
-		}
-	}
 	/**
 	 * retrieves a receipt for a transaction, sleeps 1 second between attempts
 	 * returns the last {@link HederaTransactionReceipt} received.
@@ -193,38 +169,237 @@ public class Utilities {
 		final Logger logger = LoggerFactory.getLogger(HederaTransactionReceipt.class);
 
 		long sleepTime = firstDelay;
+		boolean keepGoing = true;
 		
 		int callCount = 1;
 		HederaTransactionReceipt receipt = new HederaTransactionReceipt();
-		receipt.transactionStatus = HederaTransactionStatus.UNKNOWN;
-		while (callCount <= maxRetries) {
+		receipt.transactionStatus = ResponseCodeEnum.UNKNOWN;
+		while ((callCount <= maxRetries) && keepGoing) {
 			
 			Thread.sleep(sleepTime);
 			sleepTime += increaseDelay;
-					
 			logger.info("Fetching receipt");
 			receipt = new HederaTransactionReceipt(hederaTransactionID, node);
 			// was that successful ?
 			callCount += 1;
-			if (receipt.nodePrecheck == HederaPrecheckResult.INVALID_TRANSACTION) {
-				// do nothing
-				logger.info("precheck=INVALID_TRANSACTION");
-			} else if (receipt.transactionStatus == HederaTransactionStatus.FAIL_INVALID) {
-				// force exit out of loop
-				logger.info("precheck=FAIL_INVALID");
-				break;
-			} else if (receipt.transactionStatus == HederaTransactionStatus.FAIL_BALANCE) {
-				// force exit out of loop
-				logger.info("precheck=FAIL_BALANCE");
-				break;
-			} else if (receipt.nodePrecheck == HederaPrecheckResult.OK) {
-				logger.info("precheck=OK");
-				if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
-					logger.info("took " + callCount + " call, about " + sleepTime * callCount + " milliseconds");
+			switch (receipt.nodePrecheck) {
+				case ACCOUNT_UPDATE_FAILED:
+					logger.info("precheck=ACCOUNT_UPDATE_FAILED");
+					keepGoing = false;
 					break;
-				} else {
-					logger.info("Transaction status=" + receipt.transactionStatus.name());
-				}
+				case BAD_ENCODING:
+					logger.info("precheck=BAD_ENCODING");
+					keepGoing = false;
+					break;
+				case BUSY:
+					logger.info("precheck=BUSY");
+					break;
+				case CONTRACT_EXECUTION_EXCEPTION:
+					logger.info("precheck=CONTRACT_EXECUTION_EXCEPTION");
+					keepGoing = false;
+					break;
+				case CONTRACT_REVERT_EXECUTED:
+					logger.info("precheck=CONTRACT_REVERT_EXECUTED");
+					keepGoing = false;
+					break;
+				case CONTRACT_SIZE_LIMIT_EXCEEDED:
+					logger.info("precheck=CONTRACT_SIZE_LIMIT_EXCEEDED");
+					keepGoing = false;
+					break;
+				case CONTRACT_UPDATE_FAILED:
+					logger.info("precheck=CONTRACT_UPDATE_FAILED");
+					keepGoing = false;
+					break;
+				case DUPLICATE_TRANSACTION:
+					logger.info("precheck=DUPLICATE_TRANSACTION");
+					keepGoing = false;
+					break;
+				case EMPTY_TRANSACTION_BODY:
+					logger.info("precheck=EMPTY_TRANSACTION_BODY");
+					keepGoing = false;
+					break;
+				case FAIL_BALANCE:
+					logger.info("precheck=FAIL_BALANCE");
+					keepGoing = false;
+					break;
+				case FAIL_FEE:
+					logger.info("precheck=FAIL_FEE");
+					keepGoing = false;
+					break;
+				case FAIL_INVALID:
+					logger.info("precheck=FAIL_INVALID");
+					keepGoing = false;
+					break;
+				case FILE_CONTENT_EMPTY:
+					logger.info("precheck=FILE_CONTENT_EMPTY");
+					keepGoing = false;
+					break;
+				case INSUFFICIENT_ACCOUNT_BALANCE:
+					logger.info("precheck=INSUFFICIENT_ACCOUNT_BALANCE");
+					keepGoing = false;
+					break;
+				case INSUFFICIENT_GAS:
+					logger.info("precheck=INSUFFICIENT_GAS");
+					keepGoing = false;
+					break;
+				case INSUFFICIENT_PAYER_BALANCE:
+					logger.info("precheck=INSUFFICIENT_PAYER_BALANCE");
+					keepGoing = false;
+					break;
+				case INSUFFICIENT_TX_FEE:
+					logger.info("precheck=INSUFFICIENT_TX_FEE");
+					keepGoing = false;
+					break;
+				case INVALID_ACCOUNT_AMOUNTS:
+					logger.info("precheck=INVALID_ACCOUNT_AMOUNTS");
+					keepGoing = false;
+					break;
+				case INVALID_ACCOUNT_ID:
+					logger.info("precheck=INVALID_ACCOUNT_ID");
+					keepGoing = false;
+					break;
+				case INVALID_CONTRACT_ID:
+					logger.info("precheck=INVALID_CONTRACT_ID");
+					keepGoing = false;
+					break;
+				case INVALID_EXPIRATION_TIME:
+					logger.info("precheck=INVALID_EXPIRATION_TIME");
+					keepGoing = false;
+					break;
+				case INVALID_FEE_SUBMITTED:
+					logger.info("precheck=INVALID_FEE_SUBMITTED");
+					keepGoing = false;
+					break;
+				case INVALID_FILE_ID:
+					logger.info("precheck=INVALID_FILE_ID");
+					keepGoing = false;
+					break;
+				case INVALID_KEY_ENCODING:
+					logger.info("precheck=INVALID_KEY_ENCODING");
+					keepGoing = false;
+					break;
+				case INVALID_NODE_ACCOUNT:
+					logger.info("precheck=INVALID_NODE_ACCOUNT");
+					keepGoing = false;
+					break;
+				case INVALID_PAYER_SIGNATURE:
+					logger.info("precheck=INVALID_PAYER_SIGNATURE");
+					keepGoing = false;
+					break;
+				case INVALID_QUERY_HEADER:
+					logger.info("precheck=INVALID_QUERY_HEADER");
+					keepGoing = false;
+					break;
+				case INVALID_RECEIVING_NODE_ACCOUNT:
+					logger.info("precheck=INVALID_RECEIVING_NODE_ACCOUNT");
+					keepGoing = false;
+					break;
+				case INVALID_SIGNATURE:
+					logger.info("precheck=INVALID_SIGNATURE");
+					keepGoing = false;
+					break;
+				case INVALID_SOLIDITY_ADDRESS:
+					logger.info("precheck=INVALID_SOLIDITY_ADDRESS");
+					keepGoing = false;
+					break;
+				case INVALID_SOLIDITY_ID:
+					logger.info("precheck=INVALID_SOLIDITY_ID");
+					keepGoing = false;
+					break;
+				case INVALID_TRANSACTION: 
+					// do nothing
+					logger.info("precheck=INVALID_TRANSACTION");
+					break;
+				case INVALID_TRANSACTION_BODY:
+					logger.info("precheck=INVALID_TRANSACTION_BODY");
+					keepGoing = false;
+					break;
+				case INVALID_TRANSACTION_DURATION:
+					logger.info("precheck=INVALID_TRANSACTION_DURATION");
+					keepGoing = false;
+					break;
+				case INVALID_TRANSACTION_ID:
+					logger.info("precheck=INVALID_TRANSACTION_ID");
+					keepGoing = false;
+					break;
+				case INVALID_TRANSACTION_START:
+					logger.info("precheck=INVALID_TRANSACTION_START");
+					keepGoing = false;
+					break;
+				case KEY_NOT_PROVIDED:
+					logger.info("precheck=KEY_NOT_PROVIDED");
+					keepGoing = false;
+					break;
+				case KEY_REQUIRED: 
+					logger.info("precheck=KEY_REQUIRED");
+					keepGoing = false;
+					break;
+				case LOCAL_CALL_MODIFICATION_EXCEPTION:
+					logger.info("precheck=LOCAL_CALL_MODIFICATION_EXCEPTION");
+					keepGoing = false;
+					break;
+				case MEMO_TOO_LONG: 
+					logger.info("precheck=MEMO_TOO_LONG");
+					keepGoing = false;
+					break;
+				case MISSING_QUERY_HEADER:
+					logger.info("precheck=MISSING_QUERY_HEADER");
+					keepGoing = false;
+					break;
+				case NO_WACL_KEY:
+					logger.info("precheck=NO_WACL_KEY");
+					keepGoing = false;
+					break;
+				case NOT_SUPPORTED:
+					logger.info("precheck=NOT_SUPPORTED");
+					keepGoing = false;
+					break;
+				case NULL_SOLIDITY_ADDRESS:
+					logger.info("precheck=NULL_SOLIDITY_ADDRESS");
+					keepGoing = false;
+					break;
+				case OK:
+					logger.info("precheck=OK");
+					if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
+						logger.info("took " + callCount + " call, about " + sleepTime * callCount + " milliseconds");
+						keepGoing = false;
+						break;
+					} else {
+						logger.info("Transaction status=" + receipt.transactionStatus.name());
+					}
+				case PAYER_ACCOUNT_NOT_FOUND:
+					logger.info("precheck=PAYER_ACCOUNT_NOT_FOUND");
+					keepGoing = false;
+					break;
+				case RECEIPT_NOT_FOUND:
+					logger.info("precheck=RECEIPT_NOT_FOUND");
+					keepGoing = false;
+					break;
+				case RECORD_NOT_FOUND: 
+					logger.info("precheck=RECORD_NOT_FOUND");
+					keepGoing = false;
+					break;
+				case SUCCESS:
+					logger.info("precheck=SUCCESS");
+					if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
+						logger.info("took " + callCount + " call, about " + sleepTime * callCount + " milliseconds");
+						keepGoing = false;
+						break;
+					} else {
+						logger.info("Transaction status=" + receipt.transactionStatus.name());
+					}
+				case TRANSACTION_EXPIRED:
+					logger.info("precheck=TRANSACTION_EXPIRED");
+					keepGoing = false;
+					break;
+				case UNKNOWN:
+					logger.info("precheck=UNKNOWN");
+					keepGoing = false;
+					break;
+				case UNRECOGNIZED: 
+					logger.info("precheck=UNRECOGNIZED");
+					keepGoing = false;
+					break;
 			}
 		}
 		return receipt;

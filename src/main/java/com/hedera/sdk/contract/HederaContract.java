@@ -15,7 +15,6 @@ import com.hedera.sdk.common.HederaFileID;
 import com.hedera.sdk.common.HederaKey;
 import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.common.HederaKeySignatureList;
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.common.HederaRealmID;
 import com.hedera.sdk.common.HederaTransactionRecord;
 import com.hedera.sdk.common.Utilities;
@@ -44,6 +43,7 @@ import com.hederahashgraph.api.proto.java.ContractGetInfoQuery;
 import com.hederahashgraph.api.proto.java.ContractGetInfoResponse;
 import com.hederahashgraph.api.proto.java.ContractUpdateTransactionBody;
 import com.hederahashgraph.api.proto.java.Response;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hederahashgraph.api.proto.java.ResponseHeader;
 import com.hederahashgraph.api.proto.java.TransactionBody;
 import com.hederahashgraph.api.proto.java.ContractGetInfoResponse.ContractInfo;
@@ -55,7 +55,7 @@ public class HederaContract implements Serializable {
 	final Logger logger = LoggerFactory.getLogger(HederaContract.class);
 	private static final long serialVersionUID = 1;
 	private HederaNode node = null;
-	private HederaPrecheckResult precheckResult = HederaPrecheckResult.NOTSET;
+	private ResponseCodeEnum precheckResult = ResponseCodeEnum.UNKNOWN;
 	private byte[] stateProof = new byte[0];
 	// keys for signatures
 	private List<HederaKeySignature> keySignature = new ArrayList<HederaKeySignature>();
@@ -252,10 +252,10 @@ public class HederaContract implements Serializable {
 	   	logger.trace("End - Object init");
 	}
 	/**
-	 * The precheck result {@link HederaPrecheckResult} of a transaction
-	 * @return {@link HederaPrecheckResult}
+	 * The precheck result {@link ResponseCodeEnum} of a transaction
+	 * @return {@link ResponseCodeEnum}
 	 */
-	public HederaPrecheckResult getPrecheckResult() {
+	public ResponseCodeEnum getPrecheckResult() {
 		return this.precheckResult;
 	}
 	/**
@@ -613,9 +613,9 @@ public class HederaContract implements Serializable {
 		// check response header first
 		ResponseHeader responseHeader = getInfoResponse.getHeader();
 
-		this.precheckResult = Utilities.setPrecheckResult(responseHeader.getNodeTransactionPrecheckCode());
+		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
 				
-		if (this.precheckResult == HederaPrecheckResult.OK) {
+		if (this.precheckResult == ResponseCodeEnum.OK) {
 			// cost
 			this.cost = responseHeader.getCost();
 			//state proof
@@ -717,9 +717,9 @@ public class HederaContract implements Serializable {
 		// check response header first
 		ResponseHeader.Builder responseHeader = getInfoResponse.getHeaderBuilder();
 
-		this.precheckResult = Utilities.setPrecheckResult(responseHeader.getNodeTransactionPrecheckCode());
+		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
 				
-		if (this.precheckResult == HederaPrecheckResult.OK) {
+		if (this.precheckResult == ResponseCodeEnum.OK) {
 			ContractInfo info = getInfoResponse.getContractInfo();
 			// cost
 			this.cost = responseHeader.getCost();
@@ -846,10 +846,10 @@ public class HederaContract implements Serializable {
 		// check response header first
 		ResponseHeader.Builder responseHeader = getCallLocalResponse.getHeaderBuilder();
 
-		this.precheckResult = Utilities.setPrecheckResult(responseHeader.getNodeTransactionPrecheckCode());
+		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
 		this.hederaContractFunctionResult = null;		
 		
-		if (this.precheckResult == HederaPrecheckResult.OK) {
+		if (this.precheckResult == ResponseCodeEnum.OK) {
 			// result of function call
 			this.hederaContractFunctionResult = new HederaContractFunctionResult(getCallLocalResponse.getFunctionResult());
 			// cost
@@ -988,7 +988,6 @@ public class HederaContract implements Serializable {
 		
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
-		transactionResult.setError();
 
 		// required
 		this.shardNum = shardNum;
@@ -1073,7 +1072,6 @@ public class HederaContract implements Serializable {
 		
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
-		transactionResult.setError();
 
 		// required
 		this.expirationTime = expirationTime;
@@ -1153,7 +1151,6 @@ public class HederaContract implements Serializable {
 		
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
-		transactionResult.setError();
 
 		// required
 		this.gas = gas;

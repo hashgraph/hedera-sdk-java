@@ -6,11 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.account.HederaAccount;
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.common.HederaTransactionReceipt;
-import com.hedera.sdk.common.HederaTransactionStatus;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.transaction.HederaTransactionResult;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class AccountSend {
 	public static boolean send(HederaAccount account, HederaAccount toAccount, long amount) throws Exception {
@@ -24,10 +23,10 @@ public final class AccountSend {
 		HederaTransactionResult transferResult = account.send(toAccount.getHederaAccountID(), amount);
 		logger.info("TX Sent Time" + Instant.now());
 		// was it successful ?
-		if (transferResult.getPrecheckResult() == HederaPrecheckResult.OK) {
+		if (transferResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 			// yes, get a receipt for the transaction
 			HederaTransactionReceipt receipt  = Utilities.getReceipt(account.hederaTransactionID,  account.txQueryDefaults.node);
-			if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
+			if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
 				// if query successful, print it
 				logger.info("===>Transfer successful");
 				return true;
@@ -35,7 +34,7 @@ public final class AccountSend {
 				logger.info("Failed with transactionStatus:" + receipt.transactionStatus.toString());
 				return false;
 			}
-		} else if (transferResult.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+		} else if (transferResult.getPrecheckResult() == ResponseCodeEnum.BUSY) {
 			logger.info("system busy, try again later");
 			return false;
 		} else {

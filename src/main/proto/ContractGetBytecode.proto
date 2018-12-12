@@ -11,13 +11,13 @@ import "ResponseHeader.proto";
 
 /* Get the bytecode for a smart contract instance */
 message ContractGetBytecodeQuery {
-    QueryHeader         header = 1; // standard info sent from client to node, including the signed payment, and what kind of response is requested (cost, state proof, both, or neither).
-    ContractID          contractID = 2; // the contract for which information is requested
+    QueryHeader header = 1; // standard info sent from client to node, including the signed payment, and what kind of response is requested (cost, state proof, both, or neither).
+    ContractID contractID = 2; // the contract for which information is requested
 }
 
 /* Response when the client sends the node ContractGetBytecodeQuery */
 message ContractGetBytecodeResponse {
-	ResponseHeader header = 1; //standard response from node to client, including the requested fields: cost, or state proof, or both, or neither
-	bytes bytecode = 6; // the bytecode
+    ResponseHeader header = 1; //standard response from node to client, including the requested fields: cost, or state proof, or both, or neither
+    bytes bytecode = 6; // the bytecode
 }
 

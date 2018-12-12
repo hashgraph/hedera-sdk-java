@@ -5,14 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaContractID;
 import com.hedera.sdk.common.HederaFileID;
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.common.HederaTransactionReceipt;
-import com.hedera.sdk.common.HederaTransactionStatus;
-import com.hederahashgraph.api.proto.java.NodeTransactionPrecheckCode;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hederahashgraph.api.proto.java.ResponseHeader;
 import com.hederahashgraph.api.proto.java.TransactionGetReceiptResponse;
 import com.hederahashgraph.api.proto.java.TransactionReceipt;
-import com.hederahashgraph.api.proto.java.TransactionStatus;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +24,7 @@ class HederaTransactionReceiptTest {
 		masterReceipt.contractID = new HederaContractID(4, 5, 6);
 		masterReceipt.fileID = new HederaFileID(7, 8, 9);
 		
-		masterReceipt.transactionStatus = HederaTransactionStatus.SUCCESS;
+		masterReceipt.transactionStatus = ResponseCodeEnum.SUCCESS;
 		
 		assertEquals(1, masterReceipt.accountID.shardNum);
 		assertEquals(2, masterReceipt.accountID.realmNum);
@@ -41,7 +38,7 @@ class HederaTransactionReceiptTest {
 		assertEquals(8, masterReceipt.fileID.realmNum);
 		assertEquals(9, masterReceipt.fileID.fileNum);
 		
-		assertEquals(HederaTransactionStatus.SUCCESS, masterReceipt.transactionStatus);
+		assertEquals(ResponseCodeEnum.SUCCESS, masterReceipt.transactionStatus);
 		
 		// build one from protobuf
 		HederaTransactionReceipt receipt = new HederaTransactionReceipt(masterReceipt.getProtobuf());
@@ -58,75 +55,45 @@ class HederaTransactionReceiptTest {
 		assertEquals(8, receipt.fileID.realmNum);
 		assertEquals(9, receipt.fileID.fileNum);
 		
-		assertEquals(HederaTransactionStatus.SUCCESS, receipt.transactionStatus);
+		assertEquals(ResponseCodeEnum.SUCCESS, receipt.transactionStatus);
 		
 		TransactionGetReceiptResponse.Builder receiptResponse = TransactionGetReceiptResponse.newBuilder();
-		receiptResponse.setHeader(ResponseHeader.newBuilder().setNodeTransactionPrecheckCode(NodeTransactionPrecheckCode.DUPLICATE));
+		receiptResponse.setHeader(ResponseHeader.newBuilder().setNodeTransactionPrecheckCode(ResponseCodeEnum.ACCOUNT_UPDATE_FAILED));
 		receiptResponse.setReceipt(TransactionReceipt.newBuilder().setAccountID(new HederaAccountID(1, 2, 3).getProtobuf()));
 		receipt = new HederaTransactionReceipt(receiptResponse.build());
-		assertEquals(HederaPrecheckResult.DUPLICATE, receipt.nodePrecheck);
+		assertEquals(ResponseCodeEnum.ACCOUNT_UPDATE_FAILED, receipt.nodePrecheck);
 
-		receiptResponse.setHeader(ResponseHeader.newBuilder().setNodeTransactionPrecheckCode(NodeTransactionPrecheckCode.INSUFFICIENT_BALANCE));
-		receiptResponse.setReceipt(TransactionReceipt.newBuilder().setStatus(TransactionStatus.FAIL_BALANCE).setFileID(new HederaFileID(1, 2, 3).getProtobuf()));
-		receipt = new HederaTransactionReceipt(receiptResponse.build());
-		assertEquals(HederaPrecheckResult.INSUFFICIENT_BALANCE, receipt.nodePrecheck);
-		assertEquals(HederaTransactionStatus.FAIL_BALANCE, receipt.transactionStatus);
-
-		receiptResponse.setHeader(ResponseHeader.newBuilder().setNodeTransactionPrecheckCode(NodeTransactionPrecheckCode.INSUFFICIENT_FEE));
-		receiptResponse.setReceipt(TransactionReceipt.newBuilder().setStatus(TransactionStatus.FAIL_FEE).setContractID(new HederaContractID(1, 2, 3).getProtobuf()));
-		receipt = new HederaTransactionReceipt(receiptResponse.build());
-		assertEquals(HederaPrecheckResult.INSUFFICIENT_FEE, receipt.nodePrecheck);
-		assertEquals(HederaTransactionStatus.FAIL_FEE, receipt.transactionStatus);
-
-		receiptResponse.setHeader(ResponseHeader.newBuilder().setNodeTransactionPrecheckCode(NodeTransactionPrecheckCode.INVALID_ACCOUNT));
-		receiptResponse.setReceipt(TransactionReceipt.newBuilder().setStatus(TransactionStatus.FAIL_INVALID));
-		receipt = new HederaTransactionReceipt(receiptResponse.build());
-		assertEquals(HederaPrecheckResult.INVALID_ACCOUNT, receipt.nodePrecheck);
-		assertEquals(HederaTransactionStatus.FAIL_INVALID, receipt.transactionStatus);
-
-		receiptResponse.setHeader(ResponseHeader.newBuilder().setNodeTransactionPrecheckCode(NodeTransactionPrecheckCode.INVALID_TRANSACTION));
-		receiptResponse.setReceipt(TransactionReceipt.newBuilder().setStatus(TransactionStatus.SUCCESS));
-		receipt = new HederaTransactionReceipt(receiptResponse.build());
-		assertEquals(HederaPrecheckResult.INVALID_TRANSACTION, receipt.nodePrecheck);
-		assertEquals(HederaTransactionStatus.SUCCESS, receipt.transactionStatus);
-		
 
 		TransactionReceipt.Builder receiptProto = TransactionReceipt.newBuilder();
-		receiptProto.setStatus(TransactionStatus.FAIL_BALANCE);
+		receiptProto.setStatus(ResponseCodeEnum.FAIL_BALANCE);
 		receipt = new HederaTransactionReceipt(receiptProto.build());
-		assertEquals(HederaTransactionStatus.FAIL_BALANCE, receipt.transactionStatus);
+		assertEquals(ResponseCodeEnum.FAIL_BALANCE, receipt.transactionStatus);
 		TransactionReceipt receiptP = receipt.getProtobuf();
 		assertEquals(receiptP.getStatus(), receiptProto.getStatus());
 
-		receiptProto = TransactionReceipt.newBuilder();
-		receiptProto.setStatus(TransactionStatus.FAIL_FEE);
-		receipt = new HederaTransactionReceipt(receiptProto.build());
-		assertEquals(HederaTransactionStatus.FAIL_FEE, receipt.transactionStatus);
-		receiptP = receipt.getProtobuf();
-		assertEquals(receiptP.getStatus(), receiptProto.getStatus());
 
 		receiptProto = TransactionReceipt.newBuilder();
-		receiptProto.setStatus(TransactionStatus.FAIL_INVALID);
+		receiptProto.setStatus(ResponseCodeEnum.FAIL_INVALID);
 		receipt = new HederaTransactionReceipt(receiptProto.build());
-		assertEquals(HederaTransactionStatus.FAIL_INVALID, receipt.transactionStatus);
+		assertEquals(ResponseCodeEnum.FAIL_INVALID, receipt.transactionStatus);
 		receiptP = receipt.getProtobuf();
 		assertEquals(receiptP.getStatus(), receiptProto.getStatus());
 		
 		receiptProto = TransactionReceipt.newBuilder();
-		receiptProto.setStatus(TransactionStatus.SUCCESS);
+		receiptProto.setStatus(ResponseCodeEnum.SUCCESS);
 		receipt = new HederaTransactionReceipt(receiptProto.build());
-		assertEquals(HederaTransactionStatus.SUCCESS, receipt.transactionStatus);
+		assertEquals(ResponseCodeEnum.SUCCESS, receipt.transactionStatus);
 		receiptP = receipt.getProtobuf();
 		assertEquals(receiptP.getStatus(), receiptProto.getStatus());
 
 		receiptProto = TransactionReceipt.newBuilder();
-		receiptProto.setStatus(TransactionStatus.UNKNOWN);
+		receiptProto.setStatus(ResponseCodeEnum.UNKNOWN);
 		receipt = new HederaTransactionReceipt(receiptProto.build());
-		assertEquals(HederaTransactionStatus.UNKNOWN, receipt.transactionStatus);
+		assertEquals(ResponseCodeEnum.UNKNOWN, receipt.transactionStatus);
 		receiptP = receipt.getProtobuf();
 		assertEquals(receiptP.getStatus(), receiptProto.getStatus());
 		
-		HederaTransactionStatus status = HederaTransactionStatus.SUCCESS;
+		ResponseCodeEnum status = ResponseCodeEnum.SUCCESS;
 		HederaAccountID account = new HederaAccountID(1, 2, 3);
 		HederaFileID file = new HederaFileID(4, 5, 6);
 		HederaContractID contract = new HederaContractID(7, 8, 9);

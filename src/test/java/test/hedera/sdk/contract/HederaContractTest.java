@@ -11,8 +11,8 @@ import com.hedera.sdk.common.HederaFileID;
 import com.hedera.sdk.common.HederaKey;
 import com.hedera.sdk.common.HederaKey.KeyType;
 import com.hedera.sdk.contract.HederaContract;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hedera.sdk.common.HederaKeySignature;
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.common.HederaTimeStamp;
 import com.hedera.sdk.common.HederaTransactionID;
 
@@ -62,7 +62,7 @@ class HederaContractTest {
 		assertArrayEquals(new byte[0], masterContract.byteCode());
 		assertNotNull(masterContract.getTransactionRecords());
 		assertNull(masterContract.hederaContractFunctionResult());
-		assertEquals(HederaPrecheckResult.NOTSET, masterContract.getPrecheckResult());
+		assertEquals(ResponseCodeEnum.UNKNOWN, masterContract.getPrecheckResult());
 		assertEquals(0, masterContract.getCost());
 		assertArrayEquals(new byte[0], masterContract.getStateProof());
 

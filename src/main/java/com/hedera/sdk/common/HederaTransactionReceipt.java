@@ -4,9 +4,9 @@ import java.io.Serializable;
 
 import com.hedera.sdk.node.HederaNode;
 import com.hedera.sdk.transaction.HederaTransaction;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hederahashgraph.api.proto.java.TransactionGetReceiptResponse;
 import com.hederahashgraph.api.proto.java.TransactionReceipt;
-import com.hederahashgraph.api.proto.java.TransactionStatus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,13 +19,13 @@ public class HederaTransactionReceipt implements Serializable {
 	private static final long serialVersionUID = 1;
 
 	/**
-	 * The status of the transaction - {@link HederaTransactionStatus}
+	 * The status of the transaction - {@link ResponseCodeEnum}
 	 */
-	public HederaTransactionStatus transactionStatus = HederaTransactionStatus.NOTSET;
+	public ResponseCodeEnum transactionStatus = ResponseCodeEnum.UNKNOWN;
 	/**
 	 * The node precheckCode for this transaction
 	 */
-	public HederaPrecheckResult nodePrecheck = HederaPrecheckResult.NOTSET;
+	public ResponseCodeEnum nodePrecheck = ResponseCodeEnum.UNKNOWN;
 	/**
 	 * The {@link HederaAccountID} for this receipt
 	 * initially null
@@ -57,7 +57,7 @@ public class HederaTransactionReceipt implements Serializable {
 	 * @param fileID a {@link HederaFileID}
 	 * @param contractID a {@link HederaContractID}
 	 */
-	public HederaTransactionReceipt(HederaPrecheckResult nodePrecheck, HederaTransactionStatus transactionStatus, HederaAccountID accountID, HederaFileID fileID, HederaContractID contractID) { 
+	public HederaTransactionReceipt(ResponseCodeEnum nodePrecheck, ResponseCodeEnum transactionStatus, HederaAccountID accountID, HederaFileID fileID, HederaContractID contractID) { 
 	   	logger.trace("Start - Object init transactionStatus {}, accountID {}, fileID {}, contractID {}", transactionStatus, accountID, fileID, contractID);
 	   	this.transactionStatus = transactionStatus;
 	   	this.nodePrecheck = nodePrecheck;
@@ -74,7 +74,7 @@ public class HederaTransactionReceipt implements Serializable {
 	 * @param fileID a {@link HederaFileID}
 	 * @param contractID a {@link HederaContractID}
 	 */
-	public HederaTransactionReceipt(HederaTransactionStatus transactionStatus, HederaAccountID accountID, HederaFileID fileID, HederaContractID contractID) { 
+	public HederaTransactionReceipt(ResponseCodeEnum transactionStatus, HederaAccountID accountID, HederaFileID fileID, HederaContractID contractID) { 
 	   	logger.trace("Start - Object init transactionStatus {}, accountID {}, fileID {}, contractID {}", transactionStatus, accountID, fileID, contractID);
 	   	this.transactionStatus = transactionStatus;
 	   	this.accountID = accountID;
@@ -90,54 +90,9 @@ public class HederaTransactionReceipt implements Serializable {
 	public HederaTransactionReceipt(TransactionGetReceiptResponse receiptResponse) {
 	   	logger.trace("Start - Object init in transactionRecipt receiptResponse {}", receiptResponse);
 	   	
-		switch (receiptResponse.getHeader().getNodeTransactionPrecheckCode()) {
-		case DUPLICATE:
-			this.nodePrecheck = HederaPrecheckResult.DUPLICATE;
-			break;
-		case INSUFFICIENT_BALANCE:
-			this.nodePrecheck = HederaPrecheckResult.INSUFFICIENT_BALANCE;
-			break;
-		case INSUFFICIENT_FEE:
-			this.nodePrecheck = HederaPrecheckResult.INSUFFICIENT_FEE;
-			break;
-		case INVALID_ACCOUNT:
-			this.nodePrecheck = HederaPrecheckResult.INVALID_ACCOUNT;
-			break;
-		case INVALID_TRANSACTION:
-			this.nodePrecheck = HederaPrecheckResult.INVALID_TRANSACTION;
-			break;
-		case OK:
-			this.nodePrecheck = HederaPrecheckResult.OK;
-			break;
-		case BUSY:
-			this.nodePrecheck = HederaPrecheckResult.BUSY;
-			break;
-		case NOT_SUPPORTED:
-			this.nodePrecheck = HederaPrecheckResult.NOT_SUPPORTED;
-			break;
-		default:
-			this.nodePrecheck = HederaPrecheckResult.NOTSET;
-		}
+		this.nodePrecheck = receiptResponse.getHeader().getNodeTransactionPrecheckCode();
+		this.transactionStatus = receiptResponse.getReceipt().getStatus();
 		   	
-	   	switch (receiptResponse.getReceipt().getStatus()) {
-		   	case FAIL_BALANCE:
-		   		this.transactionStatus = HederaTransactionStatus.FAIL_BALANCE;
-		   		break;
-		   	case FAIL_FEE:
-		   		this.transactionStatus = HederaTransactionStatus.FAIL_FEE;
-		   		break;
-		   	case FAIL_INVALID:
-		   		this.transactionStatus = HederaTransactionStatus.FAIL_INVALID;
-		   		break;
-		   	case SUCCESS:
-		   		this.transactionStatus = HederaTransactionStatus.SUCCESS;
-		   		break;
-		   	case UNKNOWN:
-		   		this.transactionStatus = HederaTransactionStatus.UNKNOWN;
-		   		break;
-		   	case UNRECOGNIZED:
-	            throw new IllegalArgumentException("Transaction status not recognized. You may be using an old sdk.");			
-	   	}
 	   	if (receiptResponse.getReceipt().hasAccountID()) {
 		   	this.accountID = new HederaAccountID(receiptResponse.getReceipt().getAccountID());
 	   	} else {
@@ -160,25 +115,8 @@ public class HederaTransactionReceipt implements Serializable {
 	public HederaTransactionReceipt(TransactionReceipt receipt) {
 	   	logger.trace("Start - Object init in transactionRecipt receipt {}", receipt);
 	   	
-	   	switch (receipt.getStatus()) {
-		   	case FAIL_BALANCE:
-		   		this.transactionStatus = HederaTransactionStatus.FAIL_BALANCE;
-		   		break;
-		   	case FAIL_FEE:
-		   		this.transactionStatus = HederaTransactionStatus.FAIL_FEE;
-		   		break;
-		   	case FAIL_INVALID:
-		   		this.transactionStatus = HederaTransactionStatus.FAIL_INVALID;
-		   		break;
-		   	case SUCCESS:
-		   		this.transactionStatus = HederaTransactionStatus.SUCCESS;
-		   		break;
-		   	case UNKNOWN:
-		   		this.transactionStatus = HederaTransactionStatus.UNKNOWN;
-		   		break;
-		   	case UNRECOGNIZED:
-	            throw new IllegalArgumentException("Transaction status not recognized. You may be using an old sdk.");			
-	   	}
+	   	this.transactionStatus = receipt.getStatus();
+	   	
 	   	if (receipt.hasAccountID()) {
 		   	this.accountID = new HederaAccountID(receipt.getAccountID());
 	   	} else {
@@ -214,25 +152,7 @@ public class HederaTransactionReceipt implements Serializable {
 			transactionReceipt.setFileID(this.fileID.getProtobuf());
 		}
 
-	   	switch (this.transactionStatus) {
-		   	case FAIL_BALANCE:
-		   		transactionReceipt.setStatus(TransactionStatus.FAIL_BALANCE);
-		   		break;
-		   	case FAIL_FEE:
-		   		transactionReceipt.setStatus(TransactionStatus.FAIL_FEE);
-		   		break;
-		   	case FAIL_INVALID:
-		   		transactionReceipt.setStatus(TransactionStatus.FAIL_INVALID);
-		   		break;
-		   	case NOTSET:
-		   		break;
-		   	case SUCCESS:
-		   		transactionReceipt.setStatus(TransactionStatus.SUCCESS);
-		   		break;
-		   	case UNKNOWN:
-		   		transactionReceipt.setStatus(TransactionStatus.UNKNOWN);
-		   		break;
-		}
+   		transactionReceipt.setStatus(this.transactionStatus);
 		
 	   	logger.trace("End - getProtobuf");
 
@@ -255,7 +175,7 @@ public class HederaTransactionReceipt implements Serializable {
 			this.transactionStatus = transaction.transactionReceipt().transactionStatus;
 			this.nodePrecheck = transaction.transactionReceipt().nodePrecheck;
 		} else {
-			this.transactionStatus = HederaTransactionStatus.FAIL_INVALID;
+			this.transactionStatus = ResponseCodeEnum.UNKNOWN;
 		}
 	}
 }

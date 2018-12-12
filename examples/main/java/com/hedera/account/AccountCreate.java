@@ -4,12 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.account.HederaAccount;
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.common.HederaTransactionReceipt;
-import com.hedera.sdk.common.HederaTransactionStatus;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
 import com.hedera.sdk.transaction.HederaTransactionResult;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class AccountCreate {
 	public static HederaAccount create(HederaAccount account, HederaCryptoKeyPair newAccountKey, long initialBalance) throws Exception {
@@ -26,11 +25,11 @@ public final class AccountCreate {
 		// account creation transaction
 		HederaTransactionResult createResult = account.create(shardNum, realmNum, newAccountKey.getPublicKey(), newAccountKey.getKeyType(), initialBalance, null);
 		// was it successful ?
-		if (createResult.getPrecheckResult() == HederaPrecheckResult.OK) {
+		if (createResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 			// yes, get a receipt for the transaction
 			HederaTransactionReceipt receipt = Utilities.getReceipt(account.hederaTransactionID, account.txQueryDefaults.node);
 			// was that successful ?
-			if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
+			if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
 				// yes, get the new account number from the receipt
 				account.accountNum = receipt.accountID.accountNum;
 				// and print it out
@@ -39,7 +38,7 @@ public final class AccountCreate {
 				logger.info("transactionStatus not SUCCESS: " + receipt.transactionStatus.name());
 				return null;
 			}
-		} else if (createResult.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+		} else if (createResult.getPrecheckResult() == ResponseCodeEnum.BUSY) {
 			logger.info("system busy, try again later");
 			return null;
 		} else {
