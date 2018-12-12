@@ -61,7 +61,7 @@ public final class DemoContract {
 
 		// create a contract
 		long gas = 71000;
-		contract = ContractCreate.create(contract, new HederaFileID(0, 0, 1011), 0, gas);
+		contract = ContractCreate.create(contract, file.getFileID(), 0, gas);
 
 		if (contract != null) {
 			// update the contract
