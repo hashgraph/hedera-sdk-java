@@ -39,101 +39,105 @@ public class HederaNode implements Serializable {
 	/**
 	 * The default fee associated with running an account create transaction
 	 */
-	public long accountCreateTransactionFee = 10;
+	public long accountCreateTransactionFee = 100000;
 	/**
 	 * The default fee associated with running a token transaction
 	 */
-	public long accountTransferTransactionFee = 10;
+	public long accountTransferTransactionFee = 100000;
 	/**
 	 * The default fee associated with running an update transaction
 	 */
-	public long accountUpdateTransactionFee = 10;
+	public long accountUpdateTransactionFee = 100000;
 	/**
 	 * The default fee associated with deleting an account
 	 */
-	public long accountDeleteTransactionFee = 10;
+	public long accountDeleteTransactionFee = 100000;
 	/**
 	 * The default fee associated with adding a claim to an account
 	 */
-	public long accountAddClaimTransactionFee = 10;
+	public long accountAddClaimTransactionFee = 100000;
 	/**
 	 * The default fee associated with deleting a claim from an account
 	 */
-	public long accountDeleteClaimTransactionFee = 10;
+	public long accountDeleteClaimTransactionFee = 100000;
 	/**
 	 * The default fee associated with querying an account balance
 	 */
-	public long accountBalanceQueryFee = 10;
+	public long accountBalanceQueryFee = 100000;
 	/**
 	 * The default fee associated with an account info query
 	 */
-	public long accountInfoQueryFee = 10;
+	public long accountInfoQueryFee = 100000;
 	/**
 	 * The default fee associated with an get records query against an account
 	 */
-	public long accountGetRecordsQueryFee = 10;
+	public long accountGetRecordsQueryFee = 100000;
 	
 	/**
 	 * The default fee associated with creating a file
 	 */
-	public long fileCreateTransactionFee = 10;
+	public long fileCreateTransactionFee = 100000;
 	/**
 	 * The default fee associated with deleting a file
 	 */
-	public long fileDeleteTransactionFee = 10;
+	public long fileDeleteTransactionFee = 100000;
 	/**
 	 * The default fee associated with updating a file
 	 */
-	public long fileUpdateTransactionFee = 10;
+	public long fileUpdateTransactionFee = 100000;
 	/**
 	 * The default fee associated with appending to a file
 	 */
-	public long fileAppendTransactionFee = 10;
+	public long fileAppendTransactionFee = 100000;
 	/**
 	 * The default fee associated with getting file contents
 	 */
-	public long fileGetContentsQueryFee = 10;
+	public long fileGetContentsQueryFee = 100000;
 	/**
 	 * The default fee associated with getting file information
 	 */
-	public long fileGetInfoQueryFee = 10;
+	public long fileGetInfoQueryFee = 100000;
 	/**
 	 * The default fee associated with a get records query against a file
 	 */
-	public long fileGetRecordsQueryFee = 10;
+	public long fileGetRecordsQueryFee = 100000;
 	
 	/**
 	 * The default fee associated with creating a smart contract
 	 */
-	public long contractCreateTransactionFee = 10;
+	public long contractCreateTransactionFee = 100000;
 	/**
 	 * The default fee associated with updating a smart contract
 	 */
-	public long contractUpdateTransactionFee = 10;
+	public long contractUpdateTransactionFee = 100000;
 	/**
 	 * The default fee associated with getting a smart contract's byte code
 	 */
-	public long contractGetByteCodeQueryFee = 10;
+	public long contractGetByteCodeQueryFee = 100000;
 	/**
 	 * The default fee associated with calling a smart contract function
 	 */
-	public long contractCallTransactionFee = 10;
+	public long contractCallTransactionFee = 100000;
 	/**
 	 * The default fee associated with getting smart contract information
 	 */
-	public long contractGetInfoQueryFee = 10;
+	public long contractGetInfoQueryFee = 100000;
 	/**
 	 * The default fee associated with running a local call function
 	 */
-	public long contractCallLocalQueryFee = 10;
+	public long contractCallLocalQueryFee = 100000;
 	/**
 	 * The default fee associated with querying by solidityID
 	 */
-	public long contractGetBySolidityId = 10;
+	public long contractGetBySolidityId = 100000;
 	/**
 	 * The default fee associated with a get records query against a smart contract
 	 */
-	public long contractGetRecordsQueryFee = 10;
+	public long contractGetRecordsQueryFee = 100000;
+	/**
+	 * The default fee associated with a get records query against a transaction
+	 */
+	public long transactionGetRecordsQueryFee = 100000;
 
 	/**
 	 * Default Constructor

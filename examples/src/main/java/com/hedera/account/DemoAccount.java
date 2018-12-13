@@ -42,14 +42,17 @@ public final class DemoAccount {
     	// setup transaction/query defaults (durations, etc...)
     	account.txQueryDefaults = txQueryDefaults;
     	accountXferTo.txQueryDefaults = txQueryDefaults;
+
+//    	account.accountNum = txQueryDefaults.payingAccountID.accountNum;
+//		AccountGetBalance.getBalance(account);
     	
     	create = true;
-//    	balance = true;
+    	balance = true;
     	send = true;
-//    	info = true;
-//    	update = true;
-//    	doAddClaim = true; -- not implemented ?
-//    	getTXRecord = true;
+    	info = true;
+    	update = true;
+    	doAddClaim = true; //-- not implemented ?
+    	getTXRecord = true;
     	
 		// create an account
     	if (create) {
@@ -57,7 +60,7 @@ public final class DemoAccount {
 	    	HederaCryptoKeyPair newAccountKey = new HederaCryptoKeyPair(KeyType.ED25519);
 	    	HederaCryptoKeyPair accountXferToKey = new HederaCryptoKeyPair(KeyType.ED25519);
 	    	
-	    	account = AccountCreate.create(account, newAccountKey,100000);
+	    	account = AccountCreate.create(account, newAccountKey,10000000);
 	    	if (account == null) {
     			logger.info("*******************************************");
     			logger.info("FIRST ACCOUNT CREATE FAILED");
@@ -66,14 +69,14 @@ public final class DemoAccount {
 	    	} else {
 	    		if (getTXRecord) {
 	    			  HederaTransactionID txID = account.hederaTransactionID;
-	    			  HederaTransactionRecord txRecord = new HederaTransactionRecord(txID, 10, txQueryDefaults);
+	    			  HederaTransactionRecord txRecord = new HederaTransactionRecord(txID, txQueryDefaults.node.transactionGetRecordsQueryFee, txQueryDefaults);
     			}
 	    	}
     		account.txQueryDefaults.generateRecord = false;
 	    	if (account != null) {
 	    		// the paying account is now the new account
-	    		txQueryDefaults.payingAccountID = account.getHederaAccountID();
-	    		txQueryDefaults.payingKeyPair = newAccountKey;
+//	    		txQueryDefaults.payingAccountID = account.getHederaAccountID();
+//	    		txQueryDefaults.payingKeyPair = newAccountKey;
 
 	    		// get balance for the account
 	    		if (balance) {

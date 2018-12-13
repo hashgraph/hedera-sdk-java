@@ -386,11 +386,15 @@ public class HederaTransaction implements Serializable {
 
 		// create a Hedera Signature for it
 		HederaSignature payingSignature = new HederaSignature(txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
+		// put the signature in a signature list
+		HederaSignatureList sigList = new HederaSignatureList();
+		sigList.addSignature(payingSignature);
+		// put the list in a signature
+		HederaSignature sigForList = new HederaSignature(sigList);
+		
 		// put the signatures in a signature list
-		HederaKeySignatureList sigsForTransaction = new HederaKeySignatureList();
-		sigsForTransaction.addKeySignaturePair(txQueryDefaults.payingKeyPair.getKeyType(), txQueryDefaults.payingKeyPair.getPublicKey(), payingSignature.getSignature());
-		// add a second for good measure
-		sigsForTransaction.addKeySignaturePair(txQueryDefaults.payingKeyPair.getKeyType(), txQueryDefaults.payingKeyPair.getPublicKey(), payingSignature.getSignature());
+		HederaSignatureList sigsForTransaction = new HederaSignatureList();
+		sigsForTransaction.addSignature(sigForList);
 
 		this.body = new HederaTransactionBody(
 				TransactionType.CRYPTOTRANSFER
@@ -403,7 +407,7 @@ public class HederaTransaction implements Serializable {
 				, account.getTransferTransactionBody(accountAmounts));
 		
 		// add the signatures
-		this.keySignatureList = sigsForTransaction;
+		this.signatureList = sigsForTransaction;
 	   	logger.trace("End - init");
 	}
 }

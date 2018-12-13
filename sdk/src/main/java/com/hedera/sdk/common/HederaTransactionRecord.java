@@ -165,12 +165,13 @@ public class HederaTransactionRecord implements Serializable {
 	/** 
 	 * Gets a record for a transaction
 	 * @param transactionID the transaction ID against which to get the record
-	 * @param queryFee - the fee paid to run the query
 	 * @param txQueryDefaults - default parameters for running the query (inc. node)
 	 * @throws Exception 
 	 */
-	public HederaTransactionRecord(HederaTransactionID transactionID, long queryFee, HederaTransactionAndQueryDefaults txQueryDefaults) throws Exception {
+	public HederaTransactionRecord(HederaTransactionID transactionID, Long queryFee, HederaTransactionAndQueryDefaults txQueryDefaults) throws Exception {
 		HederaTransaction transaction = new HederaTransaction();
+		Utilities.throwIfNull("txQueryDefaults", txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.node", txQueryDefaults.node);
 		HederaTransaction payment = new HederaTransaction(txQueryDefaults, queryFee);
 		
 		transaction.setNode(txQueryDefaults.node);
