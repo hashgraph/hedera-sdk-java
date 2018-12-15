@@ -381,20 +381,26 @@ public class HederaTransaction implements Serializable {
 				, txQueryDefaults.memo
 				, accountAmounts);
 
-		// get the signature for the body
-		byte[] signedBody = txQueryDefaults.payingKeyPair.signMessage(transferBody.toByteArray());
+//		// get the signature for the body
+//		byte[] signedBody = txQueryDefaults.payingKeyPair.signMessage(transferBody.toByteArray());
+//
+//		// create a Hedera Signature for it
+//		HederaSignature payingSignature = new HederaSignature(txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
+//		// put the signature in a signature list
+//		HederaSignatureList sigList = new HederaSignatureList();
+//		sigList.addSignature(payingSignature);
+//		// put the list in a signature
+//		HederaSignature sigForList = new HederaSignature(sigList);
+//		
+//		// put the signatures in a signature list
+//		HederaSignatureList sigsForTransaction = new HederaSignatureList();
+//		sigsForTransaction.addSignature(sigForList);
 
-		// create a Hedera Signature for it
-		HederaSignature payingSignature = new HederaSignature(txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
-		// put the signature in a signature list
-		HederaSignatureList sigList = new HederaSignatureList();
-		sigList.addSignature(payingSignature);
-		// put the list in a signature
-		HederaSignature sigForList = new HederaSignature(sigList);
-		
-		// put the signatures in a signature list
+		// new self-generating signatures
 		HederaSignatureList sigsForTransaction = new HederaSignatureList();
-		sigsForTransaction.addSignature(sigForList);
+		//paying signature
+		sigsForTransaction.addSignature(txQueryDefaults.payingKeyPair.getSignature(transferBody.toByteArray()));
+		sigsForTransaction.addSignature(txQueryDefaults.payingKeyPair.getSignature(transferBody.toByteArray()));
 
 		this.body = new HederaTransactionBody(
 				TransactionType.CRYPTOTRANSFER

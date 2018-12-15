@@ -12,7 +12,7 @@ import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.common.HederaSignature;
 import com.hedera.sdk.common.Utilities;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 

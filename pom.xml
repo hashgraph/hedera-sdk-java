@@ -311,14 +311,19 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>1.60</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk15on</artifactId>
+			<version>1.60</version>
+		</dependency>
+		<dependency>
 			<groupId>net.i2p.crypto</groupId>
 			<artifactId>eddsa</artifactId>
 			<version>0.3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.madgag.spongycastle</groupId>
-			<artifactId>core</artifactId>
-			<version>1.58.0.0</version>
 		</dependency>
 		<dependency> <groupId>com.opencrowd</groupId> <artifactId>hapi-proto</artifactId> 
 			<version>1.0-SNAPSHOT</version> </dependency>

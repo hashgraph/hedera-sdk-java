@@ -1,7 +1,6 @@
 package com.hedera.sdk.account;
 
-import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
-
+import com.hedera.sdk.common.HederaKeyPair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
@@ -13,7 +12,7 @@ public class HederaAccountUpdateValues {
 	/**
 	 * the details of the new public/private key if an update is required
 	 */
-	public HederaCryptoKeyPair newKey = null;
+	public HederaKeyPair newKey = null;
 	/**
 	 * the shard number of the account to proxy to
 	 * note: you must also supply the new realm and account numbers

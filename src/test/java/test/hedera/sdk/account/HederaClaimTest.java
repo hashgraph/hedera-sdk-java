@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 
 import com.hedera.sdk.account.HederaClaim;
 import com.hedera.sdk.common.HederaAccountID;
-import com.hedera.sdk.common.HederaKey;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
 import com.hederahashgraph.api.proto.java.Claim;
@@ -54,9 +54,9 @@ class HederaClaimTest {
 		assertEquals(claim.keySignatures.size(),  claim2.keySignatures.size());
 		
 		HederaCryptoKeyPair keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
-		HederaKey key = new HederaKey(KeyType.ED25519, keyPair.getPublicKeyEncoded());
+		HederaKeyPair key = new HederaKeyPair(KeyType.ED25519, keyPair.getPublicKeyEncoded());
 		keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
-		HederaKey key2 = new HederaKey(KeyType.ED25519, keyPair.getPublicKeyEncoded());
+		HederaKeyPair key2 = new HederaKeyPair(KeyType.ED25519, keyPair.getPublicKeyEncoded());
 		
 		claim.addKey(key);
 		claim.addKey(key2);
@@ -100,8 +100,8 @@ class HederaClaimTest {
 		assertArrayEquals(key2.getKey(), claimWithSig.keySignatures.get(1).getKey());
 
 		claim = new HederaClaim();
-		claim.addKey(new HederaKey(KeyType.ED25519, key.getKey()));
-		claim.addKey(new HederaKey(KeyType.ED25519, key2.getKey()));
+		claim.addKey(new HederaKeyPair(KeyType.ED25519, key.getKey()));
+		claim.addKey(new HederaKeyPair(KeyType.ED25519, key2.getKey()));
 		claimProto = claim.getProtobuf();
 
 		claimWithSig = new HederaClaim(claimProto);

@@ -6,7 +6,7 @@ import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.cryptography.CryptoUtils;
 import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
 
