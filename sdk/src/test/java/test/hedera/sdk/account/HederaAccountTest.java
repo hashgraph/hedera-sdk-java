@@ -12,11 +12,11 @@ import org.junit.jupiter.api.Test;
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaDuration;
-import com.hedera.sdk.common.HederaKey;
+import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.common.HederaTimeStamp;
 import com.hedera.sdk.common.HederaTransactionID;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hederahashgraph.api.proto.java.TransactionBody;
 
 class HederaAccountTest {
@@ -85,8 +85,8 @@ class HederaAccountTest {
 		assertArrayEquals(new byte[0], account.getStateProof());
 
 		account = new HederaAccount();
-		HederaKey key = new HederaKey(KeyType.ED25519, "key".getBytes());
-		HederaKey key2 = new HederaKey(KeyType.ED25519, "key2".getBytes());
+		HederaKeyPair key = new HederaKeyPair(KeyType.ED25519, "key".getBytes());
+		HederaKeyPair key2 = new HederaKeyPair(KeyType.ED25519, "key2".getBytes());
 		
 		account.addKey(key);
 		account.addKey(key2);

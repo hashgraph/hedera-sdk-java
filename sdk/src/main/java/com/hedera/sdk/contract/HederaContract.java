@@ -12,7 +12,7 @@ import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaContractID;
 import com.hedera.sdk.common.HederaDuration;
 import com.hedera.sdk.common.HederaFileID;
-import com.hedera.sdk.common.HederaKey;
+import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.common.HederaKeySignatureList;
 import com.hedera.sdk.common.HederaRealmID;
@@ -59,7 +59,7 @@ public class HederaContract implements Serializable {
 	private byte[] stateProof = new byte[0];
 	// keys for signatures
 	private List<HederaKeySignature> keySignature = new ArrayList<HederaKeySignature>();
-	private List<HederaKey> keys = new ArrayList<HederaKey>();
+	private List<HederaKeyPair> keys = new ArrayList<HederaKeyPair>();
 	private String solidityContractAccountID = "";
 	private long storage = 0;
 	private byte[] byteCode = new byte[0];
@@ -100,11 +100,11 @@ public class HederaContract implements Serializable {
 	 */
 	public long contractAccountAccountNum = 0;
 	/**
-	 * The {@link HederaKey} representing the realm's administration key
+	 * The {@link HederaKeyPair} representing the realm's administration key
 	 * initially null
 	 * if realmID is null, then this the admin key for the new realm that will be created
 	 */
-	public HederaKey newRealmAdminKey = null;
+	public HederaKeyPair newRealmAdminKey = null;
 	/**
 	 * The {@link HederaKeySignature} for the realm's administration key
 	 * initially null
@@ -112,14 +112,14 @@ public class HederaContract implements Serializable {
 	 */
 	public HederaKeySignature newRealmAdminKeySig = null;
 	/**
-	 * The {@link HederaKey} representing the contract's administration key
+	 * The {@link HederaKeyPair} representing the contract's administration key
 	 * initially null
 	 * the state of the instance and its fields can be modified arbitrarily if this key signs a transaction to modify it. 
 	 * If this is null, then such modifications are not possible, and there is no administrator that can override the normal 
 	 * operation of this smart contract instance. Note that if it is created with no admin keys, then there is no administrator to 
 	 * authorize changing the admin keys, so there can never be any admin keys for that instance.
 	 */
-	public HederaKey adminKey = null;
+	public HederaKeyPair adminKey = null;
 	/**
 	 * The {@link HederaKeySignature} for the contract's administration key
 	 * initially null
@@ -735,8 +735,8 @@ public class HederaContract implements Serializable {
 			this.contractAccountAccountNum = info.getAccountID().getAccountNum();
 			
 			if (info.hasAdminKey()) {
-				this.adminKey = new HederaKey(info.getAdminKey());
-				this.adminKeySignature = new HederaKeySignature(this.adminKey.getKeyType(), this.adminKey.getKey(), new byte[0],"");
+				this.adminKey = new HederaKeyPair(info.getAdminKey());
+				this.adminKeySignature = new HederaKeySignature(this.adminKey.getKeyType(), this.adminKey.getPublicKeyEncoded(), new byte[0],"");
 			} else {
 				this.adminKey = null;
 				this.adminKeySignature = null;
@@ -912,10 +912,10 @@ public class HederaContract implements Serializable {
 	
 
 	/**
-	 * Adds a {@link HederaKey} to this object
+	 * Adds a {@link HederaKeyPair} to this object
 	 * @param key the key to add
 	 */
-	public void addKey(HederaKey key) {
+	public void addKey(HederaKeyPair key) {
 	  logger.trace("Start - addKey key {}", key);
 		this.keys.add(key);
 	  logger.trace("End - addKey");
@@ -932,11 +932,11 @@ public class HederaContract implements Serializable {
 	}
 
 	/**
-	 * Deletes a {@link HederaKey} from this object
+	 * Deletes a {@link HederaKeyPair} from this object
 	 * @param key the key to delete
 	 * @return true if successfully deleted
 	 */
-	public boolean deleteKey(HederaKey key) {
+	public boolean deleteKey(HederaKeyPair key) {
 	  logger.trace("deleteKey key {}", key);
 		return this.keys.remove(key);
 	}
@@ -952,10 +952,10 @@ public class HederaContract implements Serializable {
 	}
 
 	/**
-	 * Gets a list of {@link HederaKey}
-	 * @return List of {@link HederaKey}
+	 * Gets a list of {@link HederaKeyPair}
+	 * @return List of {@link HederaKeyPair}
 	 */
-	public List<HederaKey> getKeys() {
+	public List<HederaKeyPair> getKeys() {
 	  logger.trace("getKeys");
 		return this.keys;
 	}
@@ -1104,7 +1104,7 @@ public class HederaContract implements Serializable {
 		HederaSignature payingSignature = new HederaSignature(this.txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
 		// put the signatures in a signature list
 		HederaKeySignatureList sigsForTransaction = new HederaKeySignatureList();
-		sigsForTransaction.addKeySignaturePair(this.txQueryDefaults.payingKeyPair.getKeyType(), this.txQueryDefaults.payingKeyPair.getPublicKey(), payingSignature.getSignature());
+		sigsForTransaction.addKeySignaturePair(this.txQueryDefaults.payingKeyPair.getKeyType(), this.txQueryDefaults.payingKeyPair.getPublicKeyEncoded(), payingSignature.getSignature());
 		// create the file
 		transactionResult = this.update(
 			this.hederaTransactionID

@@ -1,12 +1,14 @@
 package com.hedera.sdk.account;
 
+import java.security.spec.InvalidKeySpecException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 
 import com.hedera.sdk.common.HederaAccountID;
-import com.hedera.sdk.common.HederaKey;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 /**
  * This class holds default values for an account creation
  * You can optionally create an instance of this class to set different default values
@@ -17,7 +19,7 @@ public class HederaAccountCreateDefaults {
 	final Logger logger = LoggerFactory.getLogger(HederaAccountCreateDefaults.class);
 	private HederaAccount accountDefaultsFromClass = new HederaAccount();
 
-	private HederaKey newRealmAdminPublicKey = accountDefaultsFromClass.newRealmAdminKey;
+	private HederaKeyPair newRealmAdminPublicKey = accountDefaultsFromClass.newRealmAdminKey;
 	private HederaAccountID proxyAccountID = accountDefaultsFromClass.proxyAccountID;
 	/**
 	 * The number of seconds before an account will auto renew
@@ -75,29 +77,29 @@ public class HederaAccountCreateDefaults {
 	 * if realmID is -1, then this the admin key for the new realm that will be created
 	 * it is ignored otherwise
 	 * @param keyType the type of key
-	 * @param newRealmAdminKey the new key
+	 * @param newPublicRealmAdminKey the new public key
+	 * @param newPrivateRealmAdminKey the new private key
+	 * @throws InvalidKeySpecException if the key pair cannot be created
 	 */
-	public void setNewRealmAdminPublicKey(KeyType keyType,byte[] newRealmAdminKey) {
-	   	logger.trace("Start - setNewRealmAdminPublicKey keyType {}, newRealmAdminKey {}", keyType, newRealmAdminKey);
-		this.newRealmAdminPublicKey = new HederaKey(keyType, newRealmAdminKey);
-	   	logger.trace("End - setNewRealmAdminPublicKey");
+	public void setNewRealmAdminPublicKey(KeyType keyType,byte[] newPublicRealmAdminKey,byte[] newPrivateRealmAdminKey) throws InvalidKeySpecException {
+		this.newRealmAdminPublicKey = new HederaKeyPair(keyType, newPublicRealmAdminKey, newPrivateRealmAdminKey);
 	}
 	/**
 	 * if realmID is -1, then this the admin key for the new realm that will be created
 	 * it is ignored otherwise
 	 * @param keyType the type of key
-	 * @param newRealmAdminKeyHex the new key
+	 * @param newPublicRealmAdminKey the new public key
+	 * @param newPrivateRealmAdminKey the new private key
+	 * @throws InvalidKeySpecException if the key pair cannot be created
 	 */
-	public void setNewRealmAdminPublicKey(KeyType keyType,String newRealmAdminKeyHex) {
-	   	logger.trace("Start - setNewRealmAdminPublicKey keyType {}, newRealmAdminKeyHex {}", keyType, newRealmAdminKeyHex);
-		this.newRealmAdminPublicKey = new HederaKey(keyType, Hex.decode(newRealmAdminKeyHex));
-	   	logger.trace("End - setNewRealmAdminPublicKey");
+	public void setNewRealmAdminPublicKey(KeyType keyType,String newPublicRealmAdminKey,byte[] newPrivateRealmAdminKey) throws InvalidKeySpecException {
+		this.newRealmAdminPublicKey = new HederaKeyPair(keyType, Hex.decode(newPublicRealmAdminKey), newPrivateRealmAdminKey);
 	}
 	/**
 	 * gets the new realm admin public key
-	 * @return {@link HederaKey}
+	 * @return {@link HederaKeyPair}
 	 */
-	public HederaKey getNewRealmAdminPublicKey() {
+	public HederaKeyPair getNewRealmAdminPublicKey() {
 	   	logger.trace("Start - getNewRealmAdminPublicKey");
 	   	logger.trace("End - getNewRealmAdminPublicKey");
 		return this.newRealmAdminPublicKey;

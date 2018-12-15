@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.protobuf.ByteString;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hederahashgraph.api.proto.java.Signature;
 /**
  * A Signature corresponding to a Key. It is a sequence of bytes holding a public key signature from one of the three supported 
@@ -92,14 +92,14 @@ public class HederaSignature implements Serializable {
 			this.signature = signature.getEd25519().toByteArray();
 			this.signatureType = KeyType.ED25519;
 			break;
-		case RSA_3072:
-			this.signature = signature.getRSA3072().toByteArray();
-			this.signatureType = KeyType.RSA3072;
-			break;
-		case ECDSA_384:
-			this.signature = signature.getECDSA384().toByteArray();
-			this.signatureType = KeyType.ECDSA384;
-			break;
+//		case RSA_3072:
+//			this.signature = signature.getRSA3072().toByteArray();
+//			this.signatureType = KeyType.RSA3072;
+//			break;
+//		case ECDSA_384:
+//			this.signature = signature.getECDSA384().toByteArray();
+//			this.signatureType = KeyType.ECDSA384;
+//			break;
 		case THRESHOLDSIGNATURE:
 			this.thresholdSignature = new HederaSignatureThreshold(signature.getThresholdSignature());
 			this.signatureType = KeyType.THRESHOLD;
@@ -167,20 +167,20 @@ public class HederaSignature implements Serializable {
 				signatureProtobuf.setEd25519(ByteString.copyFrom(new byte[0]));
 			}
 			break;
-		case RSA3072:
-			if (this.signature != null) {
-				signatureProtobuf.setRSA3072(ByteString.copyFrom(this.signature));
-			} else {
-				signatureProtobuf.setRSA3072(ByteString.copyFrom(new byte[0]));
-			}
-			break;
-		case ECDSA384:
-			if (this.signature != null) {
-				signatureProtobuf.setECDSA384(ByteString.copyFrom(this.signature));
-			} else {
-				signatureProtobuf.setECDSA384(ByteString.copyFrom(new byte[0]));
-			}
-			break;
+//		case RSA3072:
+//			if (this.signature != null) {
+//				signatureProtobuf.setRSA3072(ByteString.copyFrom(this.signature));
+//			} else {
+//				signatureProtobuf.setRSA3072(ByteString.copyFrom(new byte[0]));
+//			}
+//			break;
+//		case ECDSA384:
+//			if (this.signature != null) {
+//				signatureProtobuf.setECDSA384(ByteString.copyFrom(this.signature));
+//			} else {
+//				signatureProtobuf.setECDSA384(ByteString.copyFrom(new byte[0]));
+//			}
+//			break;
 		case CONTRACT:
 			signatureProtobuf.setContract(ByteString.copyFrom(new byte[0]));
 			break;

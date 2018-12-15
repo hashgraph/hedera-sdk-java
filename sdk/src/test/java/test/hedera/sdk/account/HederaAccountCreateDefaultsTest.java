@@ -8,7 +8,7 @@ import org.spongycastle.util.encoders.Hex;
 
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.account.HederaAccountCreateDefaults;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 
 class HederaAccountCreateDefaultsTest {
 

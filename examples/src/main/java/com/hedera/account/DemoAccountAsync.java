@@ -4,9 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.account.HederaAccount;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
-import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
 import com.hedera.sdk.common.HederaTransactionState;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 import com.hedera.utilities.ExampleUtilities;
@@ -30,10 +30,10 @@ public final class DemoAccountAsync {
     	accountXferTo.txQueryDefaults = txQueryDefaults;
     	
 		// create an account
-    	HederaCryptoKeyPair newAccountKey = new HederaCryptoKeyPair(KeyType.ED25519);
-    	HederaCryptoKeyPair accountXferToKey = new HederaCryptoKeyPair(KeyType.ED25519);
+    	HederaKeyPair newAccountKey = new HederaKeyPair(KeyType.ED25519);
+    	HederaKeyPair accountXferToKey = new HederaKeyPair(KeyType.ED25519);
     	
-    	account = AccountCreate.create(account, newAccountKey,100000);
+    	account = AccountCreate.create(account, newAccountKey.getPublicKeyHex(), newAccountKey.getKeyType(), 1000000);
     	if (account == null) {
 			logger.info("*******************************************");
 			logger.info("FIRST ACCOUNT CREATE FAILED");
@@ -46,7 +46,7 @@ public final class DemoAccountAsync {
 		txQueryDefaults.payingKeyPair = newAccountKey;
 		
 		// create a new account to transfer funds to
-    	accountXferTo = AccountCreate.create(accountXferTo, accountXferToKey, 10000);
+    	accountXferTo = AccountCreate.create(accountXferTo, accountXferToKey.getPublicKeyHex(), newAccountKey.getKeyType(), 10000);
     	if (accountXferTo == null) {
 			logger.info("*******************************************");
 			logger.info("SECOND ACCOUNT CREATE FAILED");

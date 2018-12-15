@@ -9,7 +9,7 @@ import com.google.protobuf.ByteString;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaDuration;
 import com.hedera.sdk.common.HederaFileID;
-import com.hedera.sdk.common.HederaKey;
+import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeyList;
 import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.common.HederaRealmID;
@@ -20,7 +20,6 @@ import com.hedera.sdk.common.HederaTimeStamp;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
 import com.hedera.sdk.common.HederaTransactionID;
 import com.hedera.sdk.common.Utilities;
-import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
 import com.hedera.sdk.node.HederaNode;
 import com.hedera.sdk.query.HederaQuery;
 import com.hedera.sdk.query.HederaQuery.QueryType;
@@ -72,7 +71,7 @@ public class HederaFile implements Serializable {
 	 * new keys to manage the file with note: if newKeySignatures is set, it will take
 	 * priority over newKeys
 	 */
-	private List<HederaKey> newKeys = new ArrayList<HederaKey>();
+	private List<HederaKeyPair> newKeys = new ArrayList<HederaKeyPair>();
 	/**
 	 * new keys and signatures to manage the file with note: newKeySignatures overrides
 	 * newKeys
@@ -82,7 +81,7 @@ public class HederaFile implements Serializable {
 	 * keys to manage the file with note: if keySignatures is set, it will take
 	 * priority over keys
 	 */
-	private List<HederaKey> keys = new ArrayList<HederaKey>();
+	private List<HederaKeyPair> keys = new ArrayList<HederaKeyPair>();
 	/**
 	 * keys and signatures to manage the file with note: keySignatures overrides
 	 * keys
@@ -120,10 +119,10 @@ public class HederaFile implements Serializable {
 	 */
 	public long fileNum = 0;
 	/**
-	 * The new realm administration key {@link HederaKey} for the account note: if a
+	 * The new realm administration key {@link HederaKeyPair} for the account note: if a
 	 * newRealmAdminKeySig is specified, this will be ignored
 	 */
-	public HederaKey newRealmAdminKey = null;
+	public HederaKeyPair newRealmAdminKey = null;
 	/**
 	 * The new realm administration key {@link HederaKeySignature} and signature
 	 * pair for the account note: this takes priority over a newRealmAdminKey
@@ -566,7 +565,7 @@ public class HederaFile implements Serializable {
 	 */
 	public HederaTransactionResult createWithRecord(long accountShardNum, long accountRealmNum, long accountNum,
 			long nodeShardNum, long nodeRealmNum, long nodeAccountNum, long transactionFee, String memo,
-			Instant expirationTime, byte[] contents, HederaCryptoKeyPair keyPair) throws Exception {
+			Instant expirationTime, byte[] contents, HederaKeyPair keyPair) throws Exception {
 		logger.trace(
 				"Start - createWithRecord accountShardNum {}, accountRealmNum {}, accountNum {}, nodeShardNum {}, nodeRealmNum {}, nodeAccountNum {}, transactionFee {}, memo {}, expirationTime {}, contents {}, keyPair {}",
 				accountShardNum, accountRealmNum, accountNum, nodeShardNum, nodeRealmNum, nodeAccountNum, transactionFee, memo,
@@ -600,7 +599,7 @@ public class HederaFile implements Serializable {
 	 */
 	public HederaTransactionResult createNoRecord(long accountShardNum, long accountRealmNum, long accountNum,
 			long nodeShardNum, long nodeRealmNum, long nodeAccountNum, long transactionFee, String memo,
-			Instant expirationTime, byte[] contents, HederaCryptoKeyPair keyPair) throws Exception {
+			Instant expirationTime, byte[] contents, HederaKeyPair keyPair) throws Exception {
 		logger.trace(
 				"Start - createNoRecord accountShardNum {}, accountRealmNum {}, accountNum {}, nodeShardNum {}, nodeRealmNum {}, nodeAccountNum {}, transactionFee {}, memo {}, expirationTime {}, contents {}, keyPair {}",
 				accountShardNum, accountRealmNum, accountNum, nodeShardNum, nodeRealmNum, nodeAccountNum, transactionFee, memo,
@@ -613,7 +612,7 @@ public class HederaFile implements Serializable {
 
 	private HederaTransactionResult createSimple(long accountShardNum, long accountRealmNum, long accountNum,
 			long nodeShardNum, long nodeRealmNum, long nodeAccountNum, long transactionFee, boolean generateRecord,
-			String memo, Instant expirationTime, byte[] contents, HederaCryptoKeyPair keyPair) throws Exception {
+			String memo, Instant expirationTime, byte[] contents, HederaKeyPair keyPair) throws Exception {
 		logger.trace(
 				"Start - createSimple accountShardNum {}, accountRealmNum {}, accountNum {}, nodeShardNum {}, nodeRealmNum {}, nodeAccountNum {}, transactionFee {}, generateRecord {}, memo {}, expirationTime {}, contents {}, keyPair {}",
 				accountShardNum, accountRealmNum, accountNum, nodeShardNum, nodeRealmNum, nodeAccountNum, transactionFee,
@@ -851,10 +850,10 @@ public class HederaFile implements Serializable {
 			KeyList protoKeys = fileInfo.getKeys();
 
 			for (int i = 0; i < protoKeys.getKeysCount(); i++) {
-				HederaKey key = new HederaKey(protoKeys.getKeys(i));
+				HederaKeyPair key = new HederaKeyPair(protoKeys.getKeys(i));
 				this.addKey(key);
 				// add a key signature pair (signature is obviously blank)
-				HederaKeySignature keySig = new HederaKeySignature(key.getKeyType(), key.getKey(), new byte[0], "");
+				HederaKeySignature keySig = new HederaKeySignature(key.getKeyType(), key.getPublicKey(), new byte[0], "");
 				this.addKeySignaturePair(keySig);
 			}
 		} else {
@@ -988,12 +987,12 @@ public class HederaFile implements Serializable {
 
 		if (this.newKeySignatures.size() > 0) {
 			for (HederaKeySignature keySignature : this.newKeySignatures) {
-				HederaKey hederaKey = new HederaKey(keySignature.getKeyProtobuf());
+				HederaKeyPair hederaKey = new HederaKeyPair(keySignature.getKeyProtobuf());
 				hederaKeyList.addKey(hederaKey);
 			}
 			fileUpdateTransaction.setKeys(hederaKeyList.getProtobuf());
 		} else if (this.newKeys.size() > 0) {
-			for (HederaKey key : this.newKeys) {
+			for (HederaKeyPair key : this.newKeys) {
 				hederaKeyList.addKey(key);
 			}
 			fileUpdateTransaction.setKeys(hederaKeyList.getProtobuf());
@@ -1064,11 +1063,11 @@ public class HederaFile implements Serializable {
 	}
 
 	/**
-	 * Adds a {@link HederaKey} to the list
+	 * Adds a {@link HederaKeyPair} to the list
 	 * 
 	 * @param key the key to add to the list
 	 */
-	public void addKey(HederaKey key) {
+	public void addKey(HederaKeyPair key) {
 		logger.trace("Start - addKey key {}", key);
 		this.keys.add(key);
 		logger.trace("End - addKey");
@@ -1086,11 +1085,11 @@ public class HederaFile implements Serializable {
 	}
 
 	/**
-	 * Adds a {@link HederaKey} to the list of new keys
+	 * Adds a {@link HederaKeyPair} to the list of new keys
 	 * 
 	 * @param key the key to add to the list
 	 */
-	public void addNewKey(HederaKey key) {
+	public void addNewKey(HederaKeyPair key) {
 		logger.trace("Start - addNewKey key {}", key);
 		this.newKeys.add(key);
 		logger.trace("End - addNewKey");
@@ -1108,12 +1107,12 @@ public class HederaFile implements Serializable {
 	}
 
 	/**
-	 * Deletes a {@link HederaKey} from the list
+	 * Deletes a {@link HederaKeyPair} from the list
 	 * 
 	 * @param key the key to delete
 	 * @return {@link Boolean} true if successful
 	 */
-	public boolean deleteKey(HederaKey key) {
+	public boolean deleteKey(HederaKeyPair key) {
 		logger.trace("deleteKey key {}", key);
 		return this.keys.remove(key);
 	}
@@ -1130,12 +1129,12 @@ public class HederaFile implements Serializable {
 	}
 
 	/**
-	 * Deletes a {@link HederaKey} from the list
+	 * Deletes a {@link HederaKeyPair} from the list
 	 * 
 	 * @param key the key to remove
 	 * @return {@link Boolean} true if successful
 	 */
-	public boolean deleteNewKey(HederaKey key) {
+	public boolean deleteNewKey(HederaKeyPair key) {
 		logger.trace("deleteNewKey key {}", key);
 		return this.newKeys.remove(key);
 	}
@@ -1162,21 +1161,21 @@ public class HederaFile implements Serializable {
 	}
 
 	/**
-	 * returns the list of {@link HederaKey}
+	 * returns the list of {@link HederaKeyPair}
 	 * 
-	 * @return {@link List} of {@link HederaKey}
+	 * @return {@link List} of {@link HederaKeyPair}
 	 */
-	public List<HederaKey> getNewKeys() {
+	public List<HederaKeyPair> getNewKeys() {
 		logger.trace("getNewKeys");
 		return this.newKeys;
 	}
 
 	/**
-	 * returns the list of {@link HederaKey}
+	 * returns the list of {@link HederaKeyPair}
 	 * 
-	 * @return {@link List} of {@link HederaKey}
+	 * @return {@link List} of {@link HederaKeyPair}
 	 */
-	public List<HederaKey> getKeys() {
+	public List<HederaKeyPair> getKeys() {
 		logger.trace("getKeys");
 		return this.keys;
 	}
@@ -1241,7 +1240,7 @@ public class HederaFile implements Serializable {
 			this.txQueryDefaults.fileWacl = txQueryDefaults.payingKeyPair;
 		}
 		HederaKeySignature fileKey = new HederaKeySignature(this.txQueryDefaults.fileWacl.getKeyType(),
-				this.txQueryDefaults.fileWacl.getPublicKey(), new byte[0]);
+				this.txQueryDefaults.fileWacl.getPublicKeyEncoded(), new byte[0]);
 		this.addKeySignaturePair(fileKey);
 		
 		// get the body for the transaction so we can sign it

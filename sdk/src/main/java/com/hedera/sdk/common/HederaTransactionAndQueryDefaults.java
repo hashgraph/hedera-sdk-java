@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaDuration;
-import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
 import com.hedera.sdk.node.HederaNode;
 
 public class HederaTransactionAndQueryDefaults {
@@ -16,6 +15,6 @@ public class HederaTransactionAndQueryDefaults {
 	public HederaDuration transactionValidDuration = new HederaDuration();
 	public boolean generateRecord = false;
 	public String memo = "";
-	public HederaCryptoKeyPair payingKeyPair = null;
-	public HederaCryptoKeyPair fileWacl = null;
+	public HederaKeyPair payingKeyPair = null;
+	public HederaKeyPair fileWacl = null;
 }

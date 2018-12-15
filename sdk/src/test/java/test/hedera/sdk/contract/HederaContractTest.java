@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaDuration;
 import com.hedera.sdk.common.HederaFileID;
-import com.hedera.sdk.common.HederaKey;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.contract.HederaContract;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hedera.sdk.common.HederaKeySignature;
@@ -25,7 +25,7 @@ class HederaContractTest {
 	@DisplayName("TestHederaContract")
 	void test() {
 		HederaContract masterContract = new HederaContract();
-		masterContract.adminKey = new HederaKey(KeyType.ECDSA384, "adminkey".getBytes());
+		masterContract.adminKey = new HederaKeyPair(KeyType.ECDSA384, "adminkey".getBytes());
 		masterContract.adminKeySignature = new HederaKeySignature(KeyType.ED25519, "key".getBytes(), "signature".getBytes(), "keyDescription");
 		masterContract.amount = 10;
 		masterContract.autoRenewPeriod = new HederaDuration(60, 10);
