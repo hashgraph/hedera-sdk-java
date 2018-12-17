@@ -24,9 +24,12 @@ class HederaContractTest {
 	@Test
 	@DisplayName("TestHederaContract")
 	void test() {
+		HederaKeyPair testKey = new HederaKeyPair(KeyType.ED25519);
+		HederaKeyPair adminKey = new HederaKeyPair(KeyType.ED25519);
+		
 		HederaContract masterContract = new HederaContract();
-		masterContract.adminKey = new HederaKeyPair(KeyType.ECDSA384, "adminkey".getBytes());
-		masterContract.adminKeySignature = new HederaKeySignature(KeyType.ED25519, "key".getBytes(), "signature".getBytes(), "keyDescription");
+		masterContract.adminKey = adminKey;
+		masterContract.adminKeySignature = new HederaKeySignature(KeyType.ED25519, testKey.getPublicKey(), "signature".getBytes(), "keyDescription");
 		masterContract.amount = 10;
 		masterContract.autoRenewPeriod = new HederaDuration(60, 10);
 		masterContract.constructionParameters = "construct".getBytes();
@@ -37,10 +40,10 @@ class HederaContractTest {
 		masterContract.shardNum = 4;
 		masterContract.realmNum = 5;
 		
-		assertEquals(KeyType.ECDSA384, masterContract.adminKey.getKeyType());
-		assertArrayEquals("adminkey".getBytes(), masterContract.adminKey.getKey());
+		assertEquals(KeyType.ED25519, masterContract.adminKey.getKeyType());
+		assertArrayEquals(adminKey.getPublicKey(), masterContract.adminKey.getPublicKey());
 		assertEquals(KeyType.ED25519, masterContract.adminKeySignature.getKeyType());
-		assertArrayEquals("key".getBytes(), masterContract.adminKeySignature.getKey());
+		assertArrayEquals(testKey.getPublicKey(), masterContract.adminKeySignature.getKey());
 		assertArrayEquals("signature".getBytes(), masterContract.adminKeySignature.getSignature());
 		assertEquals("keyDescription", masterContract.adminKeySignature.keyDescription);
 		assertEquals(10,  masterContract.amount);

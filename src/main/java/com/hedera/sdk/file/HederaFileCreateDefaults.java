@@ -31,7 +31,7 @@ public class HederaFileCreateDefaults {
 	 * @param newRealmAdminKey the new realm admin key
 	 */
 	public void setNewRealmAdminPublicKey(KeyType keyType,byte[] newRealmAdminKey) {
-		this.newRealmAdminPublicKey = new HederaKeyPair(keyType, newRealmAdminKey);
+		this.newRealmAdminPublicKey = new HederaKeyPair(keyType, newRealmAdminKey, null);
 	}
 	/**
 	 * if realmID is -1, then this the admin key for the new realm that will be created

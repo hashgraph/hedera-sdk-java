@@ -436,7 +436,6 @@ public class HederaKeyPair implements Serializable {
 		case ED25519:
 			byte[] pubKeyBytes = protobuf.getEd25519().toByteArray();
 			String pubKeyHex = Hex.toHexString(pubKeyBytes); // good ?
-//
 			this.keyPair = new EDKeyPair(pubKeyBytes, null);
 			this.keyType = KeyType.ED25519;
 			break;
