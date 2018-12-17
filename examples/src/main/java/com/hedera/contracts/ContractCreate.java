@@ -13,21 +13,18 @@ import com.hedera.sdk.transaction.HederaTransactionResult;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class ContractCreate {
-	public static HederaContract create(HederaContract contract, HederaFileID fileID, long initialBalance) throws Exception {
-		return create(contract, fileID, initialBalance, new byte[0]); 
+	public static HederaContract create(HederaContract contract, HederaFileID fileID, long gas, long initialBalance) throws Exception {
+		return create(contract, fileID, gas, initialBalance, new byte[0]); 
 	}
 	
-	public static HederaContract create(HederaContract contract, HederaFileID fileID, long initialBalance, byte[] constParams) throws Exception {
+	public static HederaContract create(HederaContract contract, HederaFileID fileID, long gas, long initialBalance, byte[] constParams) throws Exception {
 		final Logger logger = LoggerFactory.getLogger(HederaContract.class);
 		// new contract
 		long shardNum = 0;
 		long realmNum = 0;
-		long gas = 250000000l;
 		byte[] constructorParameters = constParams; 
 		HederaDuration autoRenewPeriod = new HederaDuration(60, 10);
 
-		//fee 100
-		contract.txQueryDefaults.node.contractCreateTransactionFee = 100;
 		contract.txQueryDefaults.generateRecord = true;
 		
 		logger.info("");
