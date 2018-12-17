@@ -29,23 +29,21 @@ class HederaTransactionTest {
 		body.memo = "body memo";
 		body.data = new HederaContract().getCallTransactionBody();
 		
-		HederaKeySignatureList keySigs = new HederaKeySignatureList();
-		keySigs.addKeySignaturePair(KeyType.ED25519, "key1".getBytes(), "signature1".getBytes());
-		keySigs.addKeySignaturePair(KeyType.ED25519, "key2".getBytes(), "signature2".getBytes());
+		HederaSignatureList keySigs = new HederaSignatureList();
+		keySigs.addSignature(new HederaSignature(KeyType.ED25519, "signature1".getBytes()));
+		keySigs.addSignature(new HederaSignature(KeyType.ED25519, "signature2".getBytes()));
 		
 		HederaTransaction transaction = new HederaTransaction(body, keySigs);
 		
-		assertEquals(2, transaction.keySignatureList.keySigPairs.size());
+		assertEquals(2, transaction.signatureList.signatures.size());
 		assertEquals("body memo", transaction.body.memo);
 		assertEquals(2, transaction.signatureList.signatures.size());
 		
-		assertEquals(KeyType.ED25519, transaction.keySignatureList.keySigPairs.get(0).getKeyType());
-		assertArrayEquals("key1".getBytes(), transaction.keySignatureList.keySigPairs.get(0).getKey());
-		assertArrayEquals("signature1".getBytes(), transaction.keySignatureList.keySigPairs.get(0).getSignature());
+		assertEquals(KeyType.ED25519, transaction.signatureList.signatures.get(0).getSignatureType());
+		assertArrayEquals("signature1".getBytes(), transaction.signatureList.signatures.get(0).getSignature());
 
-		assertEquals(KeyType.ED25519, transaction.keySignatureList.keySigPairs.get(1).getKeyType());
-		assertArrayEquals("key2".getBytes(), transaction.keySignatureList.keySigPairs.get(1).getKey());
-		assertArrayEquals("signature2".getBytes(), transaction.keySignatureList.keySigPairs.get(1).getSignature());
+		assertEquals(KeyType.ED25519, transaction.signatureList.signatures.get(1).getSignatureType());
+		assertArrayEquals("signature2".getBytes(), transaction.signatureList.signatures.get(1).getSignature());
 
 		assertEquals(KeyType.ED25519, transaction.signatureList.signatures.get(0).getSignatureType());
 		assertArrayEquals("signature1".getBytes(), transaction.signatureList.signatures.get(0).getSignature());
@@ -53,12 +51,10 @@ class HederaTransactionTest {
 		assertEquals(KeyType.ED25519, transaction.signatureList.signatures.get(1).getSignatureType());
 		assertArrayEquals("signature2".getBytes(), transaction.signatureList.signatures.get(1).getSignature());
 
-		transaction.addSignature(new HederaKeySignature(KeyType.ED25519, "key3".getBytes(), "signature3".getBytes()));
-		assertEquals(3, transaction.keySignatureList.keySigPairs.size());
+		transaction.addSignature(new HederaSignature(KeyType.ED25519, "signature3".getBytes()));
 		assertEquals(3, transaction.signatureList.signatures.size());
-		assertEquals(KeyType.ED25519, transaction.keySignatureList.keySigPairs.get(2).getKeyType());
-		assertArrayEquals("key3".getBytes(), transaction.keySignatureList.keySigPairs.get(2).getKey());
-		assertArrayEquals("signature3".getBytes(), transaction.keySignatureList.keySigPairs.get(2).getSignature());
+		assertEquals(KeyType.ED25519, transaction.signatureList.signatures.get(2).getSignatureType());
+		assertArrayEquals("signature3".getBytes(), transaction.signatureList.signatures.get(2).getSignature());
 
 		transaction.addSignature(new HederaSignature(KeyType.ED25519, "signature4".getBytes()));
 		assertEquals(4, transaction.signatureList.signatures.size());
@@ -66,7 +62,7 @@ class HederaTransactionTest {
 		assertArrayEquals("signature4".getBytes(), transaction.signatureList.signatures.get(3).getSignature());
 
 		Transaction trans = transaction.getProtobuf();
-		assertEquals(3,  trans.getSigs().getSigsCount());
+		assertEquals(4,  trans.getSigs().getSigsCount());
 		assertEquals("body memo", trans.getBody().getMemo());
 	}
 
@@ -85,7 +81,6 @@ class HederaTransactionTest {
 		
 		HederaTransaction transaction = new HederaTransaction(body, sigs);
 		
-		assertNull(transaction.keySignatureList);
 		assertEquals(2, transaction.signatureList.signatures.size());
 		assertEquals("body memo", transaction.body.memo);
 		

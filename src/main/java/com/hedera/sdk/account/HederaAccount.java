@@ -12,20 +12,16 @@ import com.google.protobuf.ByteString;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaDuration;
 import com.hedera.sdk.common.HederaKeyPair;
-import com.hedera.sdk.common.HederaKeySignature;
-import com.hedera.sdk.common.HederaKeySignatureList;
 import com.hedera.sdk.common.HederaRealmID;
 import com.hedera.sdk.common.HederaTransactionRecord;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.common.HederaShardID;
-import com.hedera.sdk.common.HederaSignature;
 import com.hedera.sdk.common.HederaSignatureList;
 import com.hedera.sdk.common.HederaTimeStamp;
 import com.hedera.sdk.common.HederaTransactionID;
 import com.hedera.sdk.node.HederaNode;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
-import com.hedera.sdk.common.HederaKeyList;
 import com.hedera.sdk.query.HederaQuery;
 import com.hedera.sdk.query.HederaQueryHeader;
 import com.hedera.sdk.query.HederaQuery.QueryType;
@@ -59,7 +55,6 @@ public class HederaAccount implements Serializable {
 	private static final long serialVersionUID = 1;
 	private HederaNode node = null;
 	// keys for signatures
-	private List<HederaKeySignature> keySignatures = new ArrayList<HederaKeySignature>();
 	private List<HederaKeyPair> keyPairs = new ArrayList<HederaKeyPair>();
 	private List<HederaTransactionRecord> records = null;
 	private ResponseCodeEnum precheckResult = ResponseCodeEnum.UNKNOWN;
@@ -97,22 +92,10 @@ public class HederaAccount implements Serializable {
 	 */
 	public HederaKeyPair newRealmAdminKey = null;
 	/**
-	 * The new realm administration key {@link HederaKeySignature} and signature pair for the account
-	 * note: this takes priority over a newRealmAdminKey
-	 */
-	public HederaKeySignature newRealmAdminKeySig = null;
-	/**
 	 * The {@link HederaKeyPair} for the account
-	 * note: if an accountKeySig is specified, this will be ignored
 	 * the key that must sign each transfer out of the account. If receiverSigRequired is true, then it must also sign any transfer into the account.
 	 */
 	public HederaKeyPair accountKey = null;
-	/**
-	 * The {@link HederaKeySignature} for the account
-	 * note: this takes priority over an accountKey 
-	 * the key that must sign each transfer out of the account. If receiverSigRequired is true, then it must also sign any transfer into the account.
-	 */
-	public HederaKeySignature accountKeySig = null;
 	/**
 	 * The new {@link HederaKeyPair} for the account
 	 * the key that must sign each transfer out of the account. If receiverSigRequired is true, then it must also sign any transfer into the account.
@@ -465,7 +448,7 @@ public class HederaAccount implements Serializable {
 	 * @param transactionValidDuration the duration of the transaction's validity as {@link HederaDuration}
 	 * @param generateRecord boolean to indicate if a record should be generated as a result of this transaction
 	 * @param memo String memo to include in the transaction
-	 * @param sigsForTransaction The signatures for the transaction as a {@link HederaKeySignatureList}
+	 * @param sigsForTransaction The signatures for the transaction as a {@link HederaSignatureList}
 	 * @return {@link HederaTransactionResult}
 	 * @throws InterruptedException in the event that communication to the node resulted in an error
 	 */
@@ -505,7 +488,7 @@ public class HederaAccount implements Serializable {
 	 * @param transactionValidDuration the duration of the transaction's validity as {@link HederaDuration}
 	 * @param generateRecord boolean to indicate if a record should be generated as a result of this transaction
 	 * @param memo String memo to include in the transaction
-	 * @param sigsForTransaction The signatures for the transaction as a {@link HederaKeySignatureList}
+	 * @param sigsForTransaction The signatures for the transaction as a {@link HederaSignatureList}
 	 * @param accountAmounts the accounts and amounts to transfer currency to and from
 	 * @return {@link HederaTransactionResult}
 	 * @throws InterruptedException in the event that communication to the node resulted in an error
@@ -547,7 +530,7 @@ public class HederaAccount implements Serializable {
 	 * @param transactionValidDuration the duration of the transaction's validity as {@link HederaDuration}
 	 * @param generateRecord boolean to indicate if a record should be generated as a result of this transaction
 	 * @param memo String memo to include in the transaction
-	 * @param sigsForTransaction The signatures for the transaction as a {@link HederaKeySignatureList}
+	 * @param sigsForTransaction The signatures for the transaction as a {@link HederaSignatureList}
 	 * @return {@link HederaTransactionResult}
 	 * @throws InterruptedException in the event that communication to the node resulted in an error
 	 */
@@ -588,7 +571,7 @@ public class HederaAccount implements Serializable {
 	 * @param transactionValidDuration the duration of the transaction's validity as {@link HederaDuration}
 	 * @param generateRecord boolean to indicate if a record should be generated as a result of this transaction
 	 * @param memo String memo to include in the transaction
-	 * @param sigsForTransaction The signatures for the transaction as a {@link HederaKeySignatureList}
+	 * @param sigsForTransaction The signatures for the transaction as a {@link HederaSignatureList}
 	 * @param claim the {@link HederaClaim} to add to the account
 	 * @return {@link HederaTransactionResult}
 	 * @throws InterruptedException in the event that communication to the node resulted in an error
@@ -975,18 +958,14 @@ public class HederaAccount implements Serializable {
    		transactionBody.setReceiveRecordThreshold(this.receiveRecordThreshold);
    		transactionBody.setSendRecordThreshold(this.sendRecordThreshold);
 	   	
-	   	if (this.accountKeySig != null) {
-	   		transactionBody.setKey(this.accountKeySig.getKeyProtobuf());
-	   	} else if (this.accountKey != null) {
+	   	if (this.accountKey != null) {
 	   		transactionBody.setKey(this.accountKey.getProtobuf());
 	   	}
 	   	
 	   	if (this.realmNum > 0) {
 	   		transactionBody.setRealmID(new HederaRealmID(this.shardNum, this.realmNum).getProtobuf());
 	   	} else if (this.realmNum == -1) {
-		   	if (this.newRealmAdminKeySig != null) {
-		   		transactionBody.setNewRealmAdminKey(newRealmAdminKeySig.getKeyProtobuf());
-		   	} else if (this.newRealmAdminKey != null) {
+		   	if (this.newRealmAdminKey != null) {
 		   		transactionBody.setNewRealmAdminKey(newRealmAdminKey.getProtobuf());
 		   	}
 	   	}
@@ -1112,15 +1091,6 @@ public class HederaAccount implements Serializable {
 	   	logger.trace("End - addKey");
 	}
 	/**
-	 * Adds a {@link HederaKeySignature} to the list
-	 * @param keySigPair the key signature pair to add
-	 */
-	public void addKeySignaturePair(HederaKeySignature keySigPair) {
-	   	logger.trace("addKey keySigPair {}", keySigPair);
-		this.keySignatures.add(keySigPair);
-	   	logger.trace("End - addKey");
-	}
-	/**
 	 * Deletes a {@link HederaKeyPair} from the list
 	 * @param key the key to remove
 	 * @return boolean true if successful
@@ -1130,29 +1100,12 @@ public class HederaAccount implements Serializable {
 		return this.keyPairs.remove(key);
 	}
 	/**
-	 * Deletes a {@link HederaKeySignature} from the list
-	 * @param keySigPair the key signature pair to remove
-	 * @return boolean true if successful
-	 */
-	public boolean deleteKeySignaturePair(HederaKeySignature keySigPair) {
-	   	logger.trace("deleteKeySignaturePair {}", keySigPair);
-		return this.keySignatures.remove(keySigPair);
-	}
-	/**
 	 * returns the list of {@link HederaKeyPair}
 	 * @return List {@link HederaKeyPair}
 	 */
 	public List<HederaKeyPair> getKeys() {
 	   	logger.trace("getKeys");
 		return this.keyPairs;
-	}
-	/**
-	 * returns the list of {@link HederaKeySignature}
-	 * @return List {@link HederaKeySignature}
-	 */
-	public List<HederaKeySignature> getKeySignatures() {
-	   	logger.trace("getKeySignatures");
-		return this.keySignatures;
 	}
 
 	/**
@@ -1212,40 +1165,13 @@ public class HederaAccount implements Serializable {
 				, this.txQueryDefaults.generateRecord
 				, this.txQueryDefaults.memo);
 
-//		// PAYING ACCOUNT
-//		// get the signature for the body
-//		byte[] signedBody;
-//		signedBody = this.txQueryDefaults.payingKeyPair.signMessage(createBody.toByteArray());
-//		
-//		// create a Hedera Signature for it
-//		HederaSignature signature = new HederaSignature(this.txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
-//
-//		HederaSignatureList sigList = new HederaSignatureList();
-//		sigList.addSignature(signature);
-//		
-//		HederaSignature signatureAsList = new HederaSignature(sigList);
-//		
-//		// put the signatures in a signature list
-//		HederaSignatureList sigsForTransaction = new HederaSignatureList();
-//		sigsForTransaction.addSignature(signatureAsList);
-
-		// new self-generating signatures
 		HederaSignatureList sigsForTransaction = new HederaSignatureList();
 		//paying signature
 		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getSignature(createBody.toByteArray()));
-		
-
-//		sigsForTransaction.addSignature(sigsForTransaction);
-		
-//		sigs {
-//			  sigs {
-//			    signatureList {
-//			      sigs {
-//			        ed25519: "\2320\377knj\275\270\266]/\346{\000\251l\201\035\273\345\225\224\212\367\024k\320\266\374\213S\256\3577w\022\'8\271\332\036\034f\267\b\213\315\277\341\354\367\253\364+\261\"|\a\355W(W\256\a"
-//			      }
-//			    }
-//			  }
-//			}
+		// new realm admin if necessary
+		if (this.newRealmAdminKey != null) {
+			sigsForTransaction.addSignature(this.newRealmAdminKey.getSignature(createBody.toByteArray()));
+		}
 		
 		// create the account
 		transactionResult = this.create(
@@ -1260,30 +1186,6 @@ public class HederaAccount implements Serializable {
 	   	logger.trace("End - createAccount");
 		return transactionResult;
 	}
-	
-//	private HederaKeySignatureList signBody(byte[] message) throws Exception {
-//		// get the signature for the body
-//		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
-//		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingKeyPair);
-//		
-//		byte[] signedBody = this.txQueryDefaults.payingKeyPair.signMessage(message);
-//		// create a Hedera Signature for it
-//		HederaSignature payingSignature = new HederaSignature(this.txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
-//		// put the signatures in a signature list
-//		HederaKeySignatureList sigsForTransaction = new HederaKeySignatureList();
-//		sigsForTransaction.addKeySignaturePair(this.txQueryDefaults.payingKeyPair.getKeyType(), this.txQueryDefaults.payingKeyPair.getPublicKeyEncoded(), payingSignature.getSignature());
-//		
-//		return sigsForTransaction;
-//	}
-	
-//	private void signClaim(HederaKeyPair claimKeyPair, byte[] message, HederaKeySignatureList sigList) throws Exception {
-//		// sign as the claim owner
-//		byte[] signedBody = claimKeyPair.signMessage(message);
-//		// create a Hedera Signature for it
-//		HederaSignature claimSignature = new HederaSignature(claimKeyPair.getKeyType(), signedBody);
-//		// put the signature in a signature list
-//		sigList.addKeySignaturePair(claimKeyPair.getKeyType(), claimKeyPair.getPublicKeyEncoded(), claimSignature.getSignature());
-//	}
 	
 	/** Send an amount of crypto currency to an account
 	 * The paying account is the same as the one paying for the transaction
@@ -1336,17 +1238,6 @@ public class HederaAccount implements Serializable {
 				, this.txQueryDefaults.memo
 				, accountAmounts);
 		
-//		// create a Hedera Signature for it
-//		HederaSignature payingSignature = new HederaSignature(this.txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
-//		HederaSignatureList sigList = new HederaSignatureList();
-//		sigList.addSignature(payingSignature);
-//		sigList.addSignature(payingSignature);
-//		HederaSignature sigForList = new HederaSignature(sigList);
-//		
-//		// put the signatures in a signature list
-//		sigsForTransaction.addSignature(sigForList);// .addKeySignaturePair(this.txQueryDefaults.payingKeyPair.getKeyType(), this.txQueryDefaults.payingKeyPair.getPublicKey(), payingSignature.getSignature());
-		
-		// new self-generating signatures
 		HederaSignatureList sigsForTransaction = new HederaSignatureList();
 		//paying signature
 		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getSignature(transferBody.toByteArray()));
@@ -1617,11 +1508,9 @@ public class HederaAccount implements Serializable {
 				, this.txQueryDefaults.memo
 		);
 
-		// new self-generating signatures
 		HederaSignatureList sigsForTransaction = new HederaSignatureList();
 		//paying signature
 		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getSignature(updateBody.toByteArray()));
-
 		//old key for change
 		sigsForTransaction.addSignature(this.accountKey.getSignature(updateBody.toByteArray()));
 
