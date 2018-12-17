@@ -46,8 +46,8 @@ public class HederaTransactionReceipt implements Serializable {
 	 * Default constructor
 	 */
 	public HederaTransactionReceipt() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
+
+
 	}
 	/**
 	 * Constructs from a transaction status, account id, file id and contract id
@@ -58,13 +58,13 @@ public class HederaTransactionReceipt implements Serializable {
 	 * @param contractID a {@link HederaContractID}
 	 */
 	public HederaTransactionReceipt(ResponseCodeEnum nodePrecheck, ResponseCodeEnum transactionStatus, HederaAccountID accountID, HederaFileID fileID, HederaContractID contractID) { 
-	   	logger.trace("Start - Object init transactionStatus {}, accountID {}, fileID {}, contractID {}", transactionStatus, accountID, fileID, contractID);
+
 	   	this.transactionStatus = transactionStatus;
 	   	this.nodePrecheck = nodePrecheck;
 	   	this.accountID = accountID;
 	   	this.fileID = fileID;
 	   	this.contractID = contractID;
-	   	logger.trace("End - Object init");
+
 	}
 
 	/**
@@ -75,12 +75,12 @@ public class HederaTransactionReceipt implements Serializable {
 	 * @param contractID a {@link HederaContractID}
 	 */
 	public HederaTransactionReceipt(ResponseCodeEnum transactionStatus, HederaAccountID accountID, HederaFileID fileID, HederaContractID contractID) { 
-	   	logger.trace("Start - Object init transactionStatus {}, accountID {}, fileID {}, contractID {}", transactionStatus, accountID, fileID, contractID);
+
 	   	this.transactionStatus = transactionStatus;
 	   	this.accountID = accountID;
 	   	this.fileID = fileID;
 	   	this.contractID = contractID;
-	   	logger.trace("End - Object init");
+
 	}
 	
 	/**
@@ -88,7 +88,7 @@ public class HederaTransactionReceipt implements Serializable {
 	 * @param receiptResponse the {@link TransactionGetReceiptResponse}
 	 */
 	public HederaTransactionReceipt(TransactionGetReceiptResponse receiptResponse) {
-	   	logger.trace("Start - Object init in transactionRecipt receiptResponse {}", receiptResponse);
+
 	   	
 		this.nodePrecheck = receiptResponse.getHeader().getNodeTransactionPrecheckCode();
 		this.transactionStatus = receiptResponse.getReceipt().getStatus();
@@ -106,14 +106,14 @@ public class HederaTransactionReceipt implements Serializable {
 	   	if (receiptResponse.getReceipt().hasContractID()) {
 	   		this.contractID = new HederaContractID(receiptResponse.getReceipt().getContractID());
 	   	}
-	   	logger.trace("End - Object init");
+
 	}
 	/**
 	 * Construct from a {@link TransactionReceipt} protobuf stream
 	 * @param receipt the {@link TransactionReceipt}
 	 */
 	public HederaTransactionReceipt(TransactionReceipt receipt) {
-	   	logger.trace("Start - Object init in transactionRecipt receipt {}", receipt);
+
 	   	
 	   	this.transactionStatus = receipt.getStatus();
 	   	
@@ -130,7 +130,7 @@ public class HederaTransactionReceipt implements Serializable {
 	   	if (receipt.hasContractID()) {
 	   		this.contractID = new HederaContractID(receipt.getContractID());
 	   	}
-	   	logger.trace("End - Object init");
+
 	}
 
 	/**
@@ -138,7 +138,7 @@ public class HederaTransactionReceipt implements Serializable {
 	 * @return {@link TransactionReceipt}  
 	 */
 	public TransactionReceipt getProtobuf() {
-	   	logger.trace("Start - getProtobuf");
+
 		
 		TransactionReceipt.Builder transactionReceipt = TransactionReceipt.newBuilder();
 		
@@ -154,7 +154,7 @@ public class HederaTransactionReceipt implements Serializable {
 
    		transactionReceipt.setStatus(this.transactionStatus);
 		
-	   	logger.trace("End - getProtobuf");
+
 
 		return transactionReceipt.build();
 	}

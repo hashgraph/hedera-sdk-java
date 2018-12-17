@@ -27,7 +27,7 @@ public class Utilities {
 	 * @throws IOException in the event of an error
 	 */
 	public static byte[] serialize(Object object) throws IOException {
-		logger.trace("Start - serialize");
+
 		
 		byte[] serialData = new byte[0];
 		// Serialise
@@ -36,7 +36,7 @@ public class Utilities {
 	    os.writeObject(object);
 	    serialData = bos.toByteArray();
 	    os.close();
-		logger.trace("End - serialize");
+
 		return serialData;
 	}
 	/**
@@ -47,7 +47,7 @@ public class Utilities {
 	 * @throws ClassNotFoundException in the event of an error
 	 */
 	public static Object deserialize(byte[] serialData) throws IOException, ClassNotFoundException {
-		logger.trace("Start - deserialize");
+
 		Object returnObject = new Object();
 	
 	    // de-serialise
@@ -55,7 +55,7 @@ public class Utilities {
 	    ObjectInputStream oInputStream = new ObjectInputStream(bis);
 	    returnObject = oInputStream.readObject();
 	    oInputStream.close();
-		logger.trace("End - deserialize");
+
 	    return returnObject;
 	}
 
@@ -65,11 +65,11 @@ public class Utilities {
 	 * @return {@link Long}
 	 */
 	public static long getLongRandom() {
-		logger.trace("Start - getLongRandom");
+
 		Random random = new SecureRandom();
 		byte[] randomInt64 = new byte[16]; // 16 bytes = 64 bits = Int64 
 		random.nextBytes(randomInt64);
-		logger.trace("End - getLongRandom");
+
 		return random.nextLong();
 	}
 	/**
@@ -81,11 +81,11 @@ public class Utilities {
 	 * @throws Exception 
 	 */
 	public static HederaKeySignature getKeySignature(byte[] payload, HederaKeyPair keyPair) throws Exception {
-		logger.trace("Start - getSignature payload {}, keyPair {}", payload, keyPair);
+
 		byte[] signedBody = keyPair.signMessage(payload);
 		// create a Hedera Signature for it
 		HederaSignature signature = new HederaSignature(keyPair.getKeyType(), signedBody);
-		logger.trace("End - getSignature");
+
 		return new HederaKeySignature(keyPair.getKeyType(), keyPair.getPublicKeyEncoded(), signature.getSignature());
 	}
 	/**
@@ -112,11 +112,11 @@ public class Utilities {
 	 * @throws Exception 
 	 */
 	public static HederaSignature getSignature(byte[] payload, HederaKeyPair keyPair) throws Exception {
-		logger.trace("Start - getSignature payload {}, keyPair {}", payload, keyPair);
+
 		byte[] signedBody = keyPair.signMessage(payload);
 		// create a Hedera Signature for it
 		HederaSignature signature = new HederaSignature(keyPair.getKeyType(), signedBody);
-		logger.trace("End - getSignature");
+
 		return new HederaSignature(keyPair.getKeyType(), signature.getSignature());
 	}
 	/**
@@ -469,7 +469,7 @@ public class Utilities {
 	 */
 	public static void throwIfNull(String objectType, Object object) {
 		if (object == null) {
-		   	logger.trace("throwIfNull");
+
 		   	String error = objectType + " is null";
 		   	logger.error(error);
 			throw new IllegalStateException(error);
@@ -483,13 +483,13 @@ public class Utilities {
 	 */
 	public static void throwIfAccountIDInvalid(String accountType, HederaAccountID accountID) {
 		if (accountID == null) {
-		   	logger.trace("throwIfAccountIDInvalid");
+
 		   	String error = accountType + " AccountID is null.";
 		   	logger.error(error);
 			throw new IllegalStateException(error);
 		} else {
 			if ((accountID.shardNum < 0) || (accountID.realmNum < 0) || (accountID.accountNum <= 0)) {
-			   	logger.trace("throwIfAccountIDInvalid");
+
 			   	String error = accountType + " AccountID shard and realm must be greater or equal to 0 and accountNum greater than 0.";
 			   	logger.error(error);
 				throw new IllegalStateException(error);

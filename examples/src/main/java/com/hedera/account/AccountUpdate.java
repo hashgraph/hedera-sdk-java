@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.account.HederaAccountUpdateValues;
-import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaTransactionReceipt;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.transaction.HederaTransactionResult;

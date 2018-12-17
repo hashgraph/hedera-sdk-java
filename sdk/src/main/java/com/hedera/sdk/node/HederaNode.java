@@ -139,8 +139,8 @@ public class HederaNode implements Serializable {
 	 * Default Constructor
 	 */
 	public HederaNode() {
-		logger.trace("Start - init:");
-		logger.trace("End - init");
+
+
 	}
 	/**
 	 * Constructor with host and port
@@ -148,11 +148,11 @@ public class HederaNode implements Serializable {
 	 * @param port the port to use for communication
 	 */
 	public HederaNode(String host, int port) {
-		logger.trace("Start - init: host {}, port {}", host, port);
+
 		this.host = host;
 		this.port = port;
 		openChannel();
-		logger.trace("End - init");
+
 	}
 	/**
 	 * Constructor with host, port and accountID
@@ -161,12 +161,12 @@ public class HederaNode implements Serializable {
 	 * @param accountID the node's {@link AccountID}
 	 */
 	public HederaNode(String host, int port, HederaAccountID accountID) {
-		logger.trace("Start - init: host {}, port {}, accountID {}", host, port, accountID);
+
 		this.host = host;
 		this.port = port;
 		this.accountID = accountID;
 		openChannel();
-		logger.trace("End - init");
+
 	}
 	/**
 	 * Sets the host and port of the specified node
@@ -175,7 +175,7 @@ public class HederaNode implements Serializable {
 	 * @throws InterruptedException in the event of a node communication error 
 	 */
 	public void setHostPort(String host, int port) throws InterruptedException {
-		logger.trace("Start - setHostPort: host {}, port {}", host, port);
+
 		if ((!host.equals(this.host)) || (port != this.port)) {
 			// close the current connection if open
 			shutdown();
@@ -183,7 +183,7 @@ public class HederaNode implements Serializable {
 			this.port = port;
 			openChannel();
 		}
-		logger.trace("End - setHostPort");
+
     }
     
     /**
@@ -191,8 +191,8 @@ public class HederaNode implements Serializable {
 	 * @return {@link String}
      */
     public String getHost() {
-		logger.trace("Start - getHost");
-		logger.trace("End - getHost");
+
+
         return this.host;
     }
 
@@ -201,8 +201,8 @@ public class HederaNode implements Serializable {
 	 * @return {@link Integer}
      */
     public int getPort() {
-		logger.trace("Start - getPort");
-		logger.trace("End - getPort");
+
+
         return this.port;
     }
 
@@ -212,14 +212,14 @@ public class HederaNode implements Serializable {
 	 * @throws InterruptedException in the event of a node communication error 
      */
     public void setHost(String host) throws InterruptedException {
-		logger.trace("Start - setHost: host {}", host);
+
 		if (!host.equals(this.host)) {
 			// close the current connection if open
 			shutdown();
 			this.host = host;
 			openChannel();
 		}
-		logger.trace("End - setHost");
+
     }
 
     /**
@@ -228,7 +228,7 @@ public class HederaNode implements Serializable {
 	 * @throws InterruptedException in the event of a node communication error 
      */
     public void setPort(int port) throws InterruptedException {
-		logger.trace("Start - setPort: port {}", port);
+
 		this.port = port;
 		if (port != this.port) {
 			// close the current connection if open
@@ -236,7 +236,7 @@ public class HederaNode implements Serializable {
 			this.port = port;
 			openChannel();
 		}
-		logger.trace("End - setPort");
+
     }
 
     /**
@@ -244,9 +244,9 @@ public class HederaNode implements Serializable {
 	 * @param accountID {@link HederaAccountID}
 	 */
 	public void setAccountID(HederaAccountID accountID) {
-		logger.trace("Start - setAccountID: accountID {}", accountID);
+
 		this.accountID = accountID;
-		logger.trace("End - setAccountID");
+
     }
     
     /**
@@ -256,10 +256,10 @@ public class HederaNode implements Serializable {
 	 * @param accountNum {@link Long}
 	 */
 	public void setAccountID(long shardNum, long realmNum, long accountNum) {
-		logger.trace("Start - setAccountID: shardNum {}, realmNum {}, accountNum {}", shardNum, realmNum, accountNum);
+
 		HederaAccountID accountID = new HederaAccountID(shardNum, realmNum, accountNum);
 		this.accountID = accountID;
-		logger.trace("End - setAccountID");
+
     }
     
     /**
@@ -267,8 +267,8 @@ public class HederaNode implements Serializable {
 	 * @return {@link HederaAccountID}
 	 */
 	public HederaAccountID getAccountID() {
-		logger.trace("Start - getAccountID");
-		logger.trace("End - getAccountID");
+
+
 
 		return this.accountID;
     }
@@ -281,7 +281,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult accountCreate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - accountCreate protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -308,7 +308,7 @@ public class HederaNode implements Serializable {
 		if (transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
 		}
-		logger.trace("End - accountCreate");
+
 		return transResult;
 	}	
 
@@ -320,7 +320,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult addClaim(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - addClaim protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -346,7 +346,7 @@ public class HederaNode implements Serializable {
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
 		}
-		logger.trace("End - addClaim");
+
 		return transResult;
 	}	
 
@@ -358,7 +358,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult accountTransfer(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - accountTransfer protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -391,7 +391,7 @@ public class HederaNode implements Serializable {
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
 		}
-		logger.trace("End - accountTransfer");
+
 		return transResult;
 	}	
 
@@ -403,7 +403,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult accountUpdate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - accountUpdate protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -429,7 +429,7 @@ public class HederaNode implements Serializable {
 		if(transResult != null && response != null) {		
 		    transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
 		}
-		logger.trace("End - accountUpdate");
+
 		return transResult;
 	}	
 	
@@ -441,7 +441,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult fileAppend(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - fileAppend protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -467,7 +467,7 @@ public class HederaNode implements Serializable {
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
 		}
-		logger.trace("End - fileAppend");
+
 		return transResult;
 	}	
 	
@@ -479,7 +479,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult fileCreate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - fileCreate protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -506,7 +506,7 @@ public class HederaNode implements Serializable {
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
 		}
-		logger.trace("End - fileCreate");
+
 		return transResult;
 	}	
 
@@ -518,7 +518,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult fileDelete(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - fileDelete protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -545,7 +545,7 @@ public class HederaNode implements Serializable {
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
 		}
-		logger.trace("End - fileDelete");
+
 		return transResult;
 	}	
 
@@ -557,7 +557,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult fileUpdate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - fileUpdate protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -584,7 +584,7 @@ public class HederaNode implements Serializable {
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
 		}
-		logger.trace("End - fileUpdate");
+
 		return transResult;
 	}	
 
@@ -596,7 +596,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult contractCall(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - contractCall protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -623,7 +623,7 @@ public class HederaNode implements Serializable {
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
 		}
-		logger.trace("End - contractCall");
+
 		return transResult;
 	}	
 
@@ -635,7 +635,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult contractCreate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - contractCreate protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -662,7 +662,7 @@ public class HederaNode implements Serializable {
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
 		}
-		logger.trace("End - contractCreate");
+
 		return transResult;
 	}	
 
@@ -674,7 +674,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult contractUpdate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - contractUpdate protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -701,7 +701,7 @@ public class HederaNode implements Serializable {
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
 		}
-		logger.trace("End - contractUpdate");
+
 		return transResult;
 	}	
 
@@ -713,7 +713,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response contractCallLocal(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - contractCallLocal query {}", query);
+
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
@@ -738,7 +738,7 @@ public class HederaNode implements Serializable {
 
 		logger.info("--->QUERY RESPONSE");
 		logger.info(response.toString());
-		logger.trace("End - contractCallLocal");
+
 		return response;
 	}
 	
@@ -750,7 +750,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response getContractByteCode(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - getContractByteCode query {}", query);
+
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
@@ -775,7 +775,7 @@ public class HederaNode implements Serializable {
 
 		logger.info("--->QUERY RESPONSE");
 		logger.info(response.toString());
-		logger.trace("End - getContractByteCode");
+
 		return response;
 	}
 
@@ -787,7 +787,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response getContractBySolidityId(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - getContractBySolidityId query {}", query);
+
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
@@ -811,7 +811,7 @@ public class HederaNode implements Serializable {
 
 		logger.info("--->QUERY RESPONSE");
 		logger.info(response.toString());
-		logger.trace("End - getContractBySolidityId");
+
 		return response;
 	}
 
@@ -823,7 +823,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response getContractInfo(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - getContractInfo query {}", query);
+
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
@@ -848,7 +848,7 @@ public class HederaNode implements Serializable {
 
 		logger.info("--->QUERY RESPONSE");
 		logger.info(response.toString());
-		logger.trace("End - getContractInfo");
+
 		return response;
 	}
 
@@ -860,7 +860,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response getAccountBalance(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - getAccountBalance query {}", query);
+
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
@@ -885,7 +885,7 @@ public class HederaNode implements Serializable {
 
 		logger.info("--->QUERY RESPONSE");
 		logger.info(response.toString());
-		logger.trace("End - getAccountBalance");
+
 		return response;
 	}
 
@@ -897,7 +897,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response getAccountRecords(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - getAccountRecords query {}", query);
+
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
@@ -922,7 +922,7 @@ public class HederaNode implements Serializable {
 
 		logger.info("--->QUERY RESPONSE");
 		logger.info(response.toString());
-		logger.trace("End - getAccountRecords");
+
 		return response;
 	}
 
@@ -934,7 +934,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response getAccountInfo(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - getAccountInfo query {}", query);
+
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
@@ -959,7 +959,7 @@ public class HederaNode implements Serializable {
 
 		logger.info("--->QUERY RESPONSE");
 		logger.info(response.toString());
-		logger.trace("End - getAccountInfo");
+
 		return response;
 	}
 
@@ -971,7 +971,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response getTransactionReceipt(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - getTransactionReceipt query {}", query);
+
 
 		Response response = null;
 		if (query.getProtobuf().hasTransactionGetReceipt()) {
@@ -991,7 +991,7 @@ public class HederaNode implements Serializable {
 			throw new IllegalStateException("Invalid Query Type");
 		}
 
-		logger.trace("End - getTransactionReceipt");
+
 		return response;
 	}
 
@@ -1003,7 +1003,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response getTransactionRecord(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - getTransactionRecord query {}", query);
+
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
@@ -1027,7 +1027,7 @@ public class HederaNode implements Serializable {
 
 		logger.info("--->QUERY RESPONSE");
 		logger.info(response.toString());
-		logger.trace("End - getTransactionRecord");
+
 		return response;
 	}
 
@@ -1039,7 +1039,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response getFileContents(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - getFileContents query {}", query);
+
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
@@ -1063,7 +1063,7 @@ public class HederaNode implements Serializable {
 
 		logger.info("--->QUERY RESPONSE");
 		logger.info(response.toString());
-		logger.trace("End - getFileContents");
+
 		return response;
 	}
 
@@ -1075,7 +1075,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response getFileInfo(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - fileGetInfo query {}", query);
+
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
@@ -1099,12 +1099,12 @@ public class HederaNode implements Serializable {
 
 		logger.info("--->QUERY RESPONSE");
 		logger.info(response.toString());
-		logger.trace("End - getFileInfo");
+
 		return response;
 	}
 	
 	private void shutdown() throws InterruptedException {
-		logger.trace("Start - shutdown");
+
 		if (this.grpcChannel != null) {
 			this.grpcChannel.shutdownNow();
 			do {
@@ -1112,7 +1112,7 @@ public class HederaNode implements Serializable {
 			} while (!this.grpcChannel.isTerminated());
 			this.grpcChannel = null;
 		}
-		logger.trace("End - shutdown");
+
 	}
 	
 	private void openChannel() {

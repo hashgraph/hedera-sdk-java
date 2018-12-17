@@ -229,8 +229,6 @@ public class HederaAccount implements Serializable {
 	 * Default constructor
 	 */
 	public HederaAccount() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
 	}
 	/**
 	 * Constructor from shard, realm and account number
@@ -239,23 +237,19 @@ public class HederaAccount implements Serializable {
 	 * @param accountNum the account number for the account
 	 */
 	public HederaAccount(long shardNum, long realmNum, long accountNum) {
-	   	logger.trace("Start - Object init shardNum {}, realmNum {}, accountNum {}", shardNum, realmNum, accountNum);
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.accountNum = accountNum;
-	   	logger.trace("End - Object init");
 	}
 	/**
 	 * Constructor from a {@link HederaTransactionID} protobuf object
 	 * @param transactionID the transactionID to construct the object from
 	 */
 	public HederaAccount(HederaTransactionID transactionID) {
-	   	logger.trace("Start - Object init transactionID {}", transactionID);
 		this.hederaTransactionID = transactionID;
 		this.shardNum = transactionID.accountID.shardNum;
 		this.realmNum = transactionID.accountID.realmNum;
 		this.accountNum = transactionID.accountID.accountNum;
-	   	logger.trace("End - Object init");
 	}
 	/**
 	 * gets the {@link ResponseCodeEnum} as a result of a transaction
@@ -291,8 +285,6 @@ public class HederaAccount implements Serializable {
 	public TransactionBody bodyToSignForCreate(HederaTransactionID transactionID, HederaAccountID nodeAccount, 
 			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, 
 			String memo) {
-	   	logger.trace("Start - bodyToSignForCreate transactionID {}, nodeAccount {}, transactionFee {}, transactionValidDuration {}, generateRecord {}, memo {}"
-	   			, transactionID, nodeAccount, transactionFee, transactionValidDuration, generateRecord,	memo);
 		
 		HederaTransactionBody transactionBody = new HederaTransactionBody(
 				TransactionType.CRYPTOCREATEACCOUNT
@@ -304,7 +296,6 @@ public class HederaAccount implements Serializable {
 				, memo
 				, this.getCreateTransactionBody());
 
-	   	logger.trace("End - bodyToSignForCreate");
 		return transactionBody.getProtobuf();
 	}
 	/**
@@ -321,8 +312,6 @@ public class HederaAccount implements Serializable {
 	public TransactionBody bodyToSignForTransfer(HederaTransactionID transactionID, HederaAccountID nodeAccount, 
 			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, 
 			String memo, ArrayList<HederaAccountAmount> accountAmounts) {
-	   	logger.trace("Start - bodyToSignForTransfer transactionID {}, nodeAccount {}, transactionFee {}, transactionValidDuration {}, generateRecord {}, memo {}"
-	   			, transactionID, nodeAccount, transactionFee, transactionValidDuration, generateRecord,	memo);
 		
 		HederaTransactionBody transactionBody = new HederaTransactionBody(
 				TransactionType.CRYPTOTRANSFER
@@ -334,7 +323,6 @@ public class HederaAccount implements Serializable {
 				, memo
 				, this.getTransferTransactionBody(accountAmounts));
 
-	   	logger.trace("End - bodyToSignForTransfer");
 		return transactionBody.getProtobuf();
 	}
 	/**
@@ -351,8 +339,6 @@ public class HederaAccount implements Serializable {
 	public TransactionBody bodyToSignForDelete(HederaTransactionID transactionID, HederaAccountID nodeAccount, 
 			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, 
 			String memo, HederaAccountID transferAccountID) {
-	   	logger.trace("Start - bodyToSignForDelete transactionID {}, nodeAccount {}, transactionFee {}, transactionValidDuration {}, generateRecord {}, memo {}, transferAccountID {}"
-	   			, transactionID, nodeAccount, transactionFee, transactionValidDuration, generateRecord,	memo, transferAccountID);
 		
 		HederaTransactionBody transactionBody = new HederaTransactionBody(
 				TransactionType.CRYPTODELETE
@@ -364,7 +350,6 @@ public class HederaAccount implements Serializable {
 				, memo
 				, this.getDeleteTransactionBody(transferAccountID));
 
-	   	logger.trace("End - bodyToSignForDelete");
 		return transactionBody.getProtobuf();
 	}
 	/**
@@ -380,8 +365,6 @@ public class HederaAccount implements Serializable {
 	public TransactionBody bodyToSignForUpdate(HederaTransactionID transactionID, HederaAccountID nodeAccount, 
 			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, 
 			String memo) {
-	   	logger.trace("Start - bodyToSignForUpdate transactionID {}, nodeAccount {}, transactionFee {}, transactionValidDuration {}, generateRecord {}, memo {}"
-	   			, transactionID, nodeAccount, transactionFee, transactionValidDuration, generateRecord,	memo);
 		
 		HederaTransactionBody transactionBody = new HederaTransactionBody(
 				TransactionType.CRYPTOUPDATEACCOUNT
@@ -393,7 +376,6 @@ public class HederaAccount implements Serializable {
 				, memo
 				, this.getUpdateTransactionBody());
 
-	   	logger.trace("End - bodyToSignForUpdate");
 		return transactionBody.getProtobuf();
 	}
 	/**
@@ -410,8 +392,6 @@ public class HederaAccount implements Serializable {
 	public TransactionBody bodyToSignForAddClaim(HederaTransactionID transactionID, HederaAccountID nodeAccount, 
 			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, 
 			String memo, HederaClaim claim) {
-	   	logger.trace("Start - bodyToSignForAddClaim transactionID {}, nodeAccount {}, transactionFee {}, transactionValidDuration {}, generateRecord {}, memo {}, claim {}"
-	   			, transactionID, nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo, claim);
 		
 		HederaTransactionBody transactionBody = new HederaTransactionBody(
 				TransactionType.CRYPTOADDCLAIM
@@ -423,7 +403,6 @@ public class HederaAccount implements Serializable {
 				, memo
 				, this.getAddClaimTransactionBody(claim));
 
-	   	logger.trace("End - bodyToSignForAppend");
 		return transactionBody.getProtobuf();
 	}
 	/**
@@ -440,8 +419,6 @@ public class HederaAccount implements Serializable {
 	public TransactionBody bodyToSignForDeleteClaim(HederaTransactionID transactionID, HederaAccountID nodeAccount, 
 			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, 
 			String memo, HederaClaim claim) {
-	   	logger.trace("Start - bodyToSignForDeleteClaim transactionID {}, nodeAccount {}, transactionFee {}, transactionValidDuration {}, generateRecord {}, memo {}, claim {}"
-	   			, transactionID, nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo, claim);
 		
 		HederaTransactionBody transactionBody = new HederaTransactionBody(
 				TransactionType.CRYPTODELETECLAIM
@@ -453,7 +430,6 @@ public class HederaAccount implements Serializable {
 				, memo
 				, this.getDeleteClaimTransactionBody(claim));
 
-	   	logger.trace("End - bodyToSignForDeleteClaim");
 		return transactionBody.getProtobuf();
 	}
 	/**
@@ -470,9 +446,13 @@ public class HederaAccount implements Serializable {
 	 */
 	public HederaTransactionResult create(HederaTransactionID transactionID, HederaAccountID nodeAccount
 			, long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord
+<<<<<<< HEAD:sdk/src/main/java/com/hedera/sdk/account/HederaAccount.java
 			, String memo, HederaKeySignatureList sigsForTransaction) throws InterruptedException {
 	   	logger.trace("Start - create transactionID {}, nodeAccounttransactionFee {}, transactionValidDuration {}, generateRecord {}, memo {}, sigsForTransaction {}"
 	   			, transactionID, nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo, sigsForTransaction);
+=======
+			, String memo, HederaSignatureList sigsForTransaction) throws InterruptedException {
+>>>>>>> 959a7d6... Removed trace logging. Updated pom.xml to ignore errors on javadocs:src/main/java/com/hedera/sdk/account/HederaAccount.java
 		
 		// build the body
 		HederaTransaction transaction = new HederaTransaction();
@@ -493,7 +473,6 @@ public class HederaAccount implements Serializable {
 		HederaTransactionResult hederaTransactionResult = this.node.accountCreate(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 		// return
-	   	logger.trace("End - create");
 		return hederaTransactionResult;
 	}
 	/**
@@ -511,9 +490,13 @@ public class HederaAccount implements Serializable {
 	 */
 	public HederaTransactionResult transfer(HederaTransactionID transactionID, HederaAccountID nodeAccount
 			, long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord
+<<<<<<< HEAD:sdk/src/main/java/com/hedera/sdk/account/HederaAccount.java
 			, String memo, HederaKeySignatureList sigsForTransaction, ArrayList<HederaAccountAmount> accountAmounts) throws InterruptedException {
 	   	logger.trace("Start - transfer transactionID {}, nodeAccounttransactionFee {}, transactionValidDuration {}, generateRecord {}, memo {}, sigsForTransaction {}, accountAmounts {}"
 	   			, transactionID, nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo, sigsForTransaction, accountAmounts);
+=======
+			, String memo, HederaSignatureList sigsForTransaction, ArrayList<HederaAccountAmount> accountAmounts) throws InterruptedException {
+>>>>>>> 959a7d6... Removed trace logging. Updated pom.xml to ignore errors on javadocs:src/main/java/com/hedera/sdk/account/HederaAccount.java
 		
 		// build the body
 		HederaTransaction transaction = new HederaTransaction();
@@ -534,7 +517,6 @@ public class HederaAccount implements Serializable {
 		HederaTransactionResult hederaTransactionResult = this.node.accountTransfer(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 		// return
-	   	logger.trace("End - transfer");
 		return hederaTransactionResult;
 	}
 
@@ -552,9 +534,13 @@ public class HederaAccount implements Serializable {
 	 */
 	public HederaTransactionResult update(HederaTransactionID transactionID, HederaAccountID nodeAccount
 			, long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord
+<<<<<<< HEAD:sdk/src/main/java/com/hedera/sdk/account/HederaAccount.java
 			, String memo, HederaKeySignatureList sigsForTransaction) throws InterruptedException {
 	   	logger.trace("Start - update transactionID {}, nodeAccount {}, transactionFee {}, transactionValidDuration {}, generateRecord {}, memo {}, sigsForTransaction {}"
 	   			, transactionID, nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo, sigsForTransaction);
+=======
+			, String memo, HederaSignatureList sigsForTransaction) throws InterruptedException {
+>>>>>>> 959a7d6... Removed trace logging. Updated pom.xml to ignore errors on javadocs:src/main/java/com/hedera/sdk/account/HederaAccount.java
 		
 		// build the body
 		HederaTransaction transaction = new HederaTransaction();
@@ -575,7 +561,6 @@ public class HederaAccount implements Serializable {
 		HederaTransactionResult hederaTransactionResult = this.node.accountUpdate(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 
-	   	logger.trace("End - update");
 		// return
 		return hederaTransactionResult;
 	}
@@ -595,8 +580,6 @@ public class HederaAccount implements Serializable {
 	public HederaTransactionResult addClaim(HederaTransactionID transactionID, HederaAccountID nodeAccount
 			, long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord
 			, String memo, HederaSignatureList sigsForTransaction, HederaClaim claim) throws InterruptedException {
-	   	logger.trace("Start - addClaim transactionID {}, nodeAccount {}, transactionFee {}, transactionValidDuration {}, generateRecord {}, memo {}, sigsForTransaction {}"
-	   			, transactionID, nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo, sigsForTransaction);
 		
 		// build the body
 		HederaTransaction transaction = new HederaTransaction();
@@ -617,7 +600,6 @@ public class HederaAccount implements Serializable {
 		HederaTransactionResult hederaTransactionResult = this.node.addClaim(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 
-	   	logger.trace("End - addClaim");
 		// return
 		return hederaTransactionResult;
 	}
@@ -633,7 +615,6 @@ public class HederaAccount implements Serializable {
 	public boolean getBalance(HederaTransaction payment, HederaQueryHeader.QueryResponseType responseType) throws InterruptedException {
 		boolean result = true;
 		
-	   	logger.trace("Start - getBalance payment {}, responseType {}", payment, responseType);
 		// build the query
 	   	// Header
 		HederaQueryHeader queryHeader = new HederaQueryHeader();
@@ -677,7 +658,6 @@ public class HederaAccount implements Serializable {
 			result = false;
 		}
 		
-	   	logger.trace("End - getBalance");
 	   	return result;
 	}
 	/**
@@ -688,7 +668,6 @@ public class HederaAccount implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getBalanceAnswerOnly(HederaTransaction payment) throws InterruptedException {
-	   	logger.trace("Start - getBalanceAnswerOnly");
 	   	return getBalance(payment, QueryResponseType.ANSWER_ONLY);
 	}
 	/**
@@ -699,7 +678,6 @@ public class HederaAccount implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getBalanceStateProof(HederaTransaction payment) throws InterruptedException {
-	   	logger.trace("getBalanceStateProof");
 		return getBalance(payment, HederaQueryHeader.QueryResponseType.ANSWER_STATE_PROOF);
 	}
 	/**
@@ -709,7 +687,6 @@ public class HederaAccount implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getBalanceCostAnswer() throws InterruptedException {
-	   	logger.trace("getBalanceCostAnswer");
 		return getBalance(null, HederaQueryHeader.QueryResponseType.COST_ANSWER);
 	}
 	/**
@@ -719,7 +696,6 @@ public class HederaAccount implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getBalanceAnswerStateProof() throws InterruptedException {
-	   	logger.trace("getBalanceAnswerStateProof");
 		return getBalance(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
 	}
 	
@@ -746,7 +722,6 @@ public class HederaAccount implements Serializable {
 	public boolean getRecords(HederaTransaction payment, HederaQueryHeader.QueryResponseType responseType, HederaAccountID accountID) throws InterruptedException {
 		boolean result = true;
 		
-	   	logger.trace("Start - getRecords payment {}, responseType {}", payment, responseType);
 		// build the query
 	   	// Header
 		HederaQueryHeader queryHeader = new HederaQueryHeader();
@@ -795,7 +770,6 @@ public class HederaAccount implements Serializable {
 			result = false;
 		}
 		
-	   	logger.trace("End - getRecords");
 	   	return result;
 	}
 	/**
@@ -806,7 +780,6 @@ public class HederaAccount implements Serializable {
 	 * @throws InterruptedException should an exception occur during communication with the node
 	 */
 	public boolean getRecordsAnswerOnly(HederaTransaction payment) throws InterruptedException {
-	   	logger.trace("Start - getRecordsAnswerOnly");
 	   	return getRecords(payment, QueryResponseType.ANSWER_ONLY);
 	}
 	/**
@@ -817,7 +790,6 @@ public class HederaAccount implements Serializable {
 	 * @throws InterruptedException should an exception occur during communication with the node
 	 */
 	public boolean getRecordsStateProof(HederaTransaction payment) throws InterruptedException {
-	   	logger.trace("getRecordsStateProof");
 		return getRecords(payment, HederaQueryHeader.QueryResponseType.ANSWER_STATE_PROOF);
 	}
 	/**
@@ -827,7 +799,6 @@ public class HederaAccount implements Serializable {
 	 * @throws InterruptedException should an exception occur during communication with the node
 	 */
 	public boolean getRecordsCostAnswer() throws InterruptedException {
-	   	logger.trace("getRecordsCostAnswer");
 		return getRecords(null, HederaQueryHeader.QueryResponseType.COST_ANSWER);
 	}
 	/**
@@ -837,7 +808,6 @@ public class HederaAccount implements Serializable {
 	 * @throws InterruptedException should an exception occur during communication with the node
 	 */
 	public boolean getRecordsAnswerStateProof() throws InterruptedException {
-	   	logger.trace("getRecordsAnswerStateProof");
 		return getRecords(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
 	}
 	/**
@@ -851,7 +821,6 @@ public class HederaAccount implements Serializable {
 	public boolean getInfo(HederaTransaction payment, HederaQueryHeader.QueryResponseType responseType) throws InterruptedException {
 		boolean result = true;
 		
-	   	logger.trace("Start - getInfo payment {}, responseType {}", payment, responseType);
 		// build the query
 	   	// Header
 		HederaQueryHeader queryHeader = new HederaQueryHeader();
@@ -914,7 +883,6 @@ public class HederaAccount implements Serializable {
 			result = false;
 		}
 		
-	   	logger.trace("End - getInfo");
 	   	return result;
 	}
 	/**
@@ -925,7 +893,6 @@ public class HederaAccount implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getInfoAnswerOnly(HederaTransaction payment) throws InterruptedException {
-	   	logger.trace("Start - getInfoAnswerOnly");
 	   	return getInfo(payment, QueryResponseType.ANSWER_ONLY);
 	}
 	/**
@@ -936,7 +903,6 @@ public class HederaAccount implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getInfoStateProof(HederaTransaction payment) throws InterruptedException {
-	   	logger.trace("getInfoStateProof");
 		return getInfo(payment, HederaQueryHeader.QueryResponseType.ANSWER_STATE_PROOF);
 	}
 	/**
@@ -946,7 +912,6 @@ public class HederaAccount implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getInfoCostAnswer() throws InterruptedException {
-	   	logger.trace("getInfoCostAnswer");
 		return getInfo(null, HederaQueryHeader.QueryResponseType.COST_ANSWER);
 	}
 	/**
@@ -956,7 +921,6 @@ public class HederaAccount implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getInfoCostAnswerStateProof() throws InterruptedException {
-	   	logger.trace("getInfoCostAnswerStateProof");
 		return getInfo(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
 	}
 	/**
@@ -964,7 +928,6 @@ public class HederaAccount implements Serializable {
 	 * @return {@link CryptoCreateTransactionBody}
 	 */
 	public CryptoCreateTransactionBody getCreateTransactionBody() {
-	   	logger.trace("Start - getCreateTransactionBody");
 	   	
 	   	CryptoCreateTransactionBody.Builder transactionBody = CryptoCreateTransactionBody.newBuilder();
 	   	transactionBody.setAutoRenewPeriod(this.autoRenewPeriod.getProtobuf());
@@ -996,7 +959,6 @@ public class HederaAccount implements Serializable {
 	   		transactionBody.setShardID(new HederaShardID(this.shardNum).getProtobuf());
 	   	}
 
-	   	logger.trace("End - getCreateTransactionBody");
 		return transactionBody.build();
 	}
 
@@ -1006,7 +968,6 @@ public class HederaAccount implements Serializable {
 	 * @return {@link CryptoTransferTransactionBody}
 	 */
 	public CryptoTransferTransactionBody getTransferTransactionBody(ArrayList<HederaAccountAmount>accountAmounts) {
-	   	logger.trace("Start - getTransferTransactionBody");
 	   	
 	   	CryptoTransferTransactionBody.Builder transactionBody = CryptoTransferTransactionBody.newBuilder();
 	   	TransferList.Builder transferList = TransferList.newBuilder();
@@ -1016,7 +977,6 @@ public class HederaAccount implements Serializable {
 	   	
 	   	transactionBody.setTransfers(transferList);
 
-	   	logger.trace("End - getTransferTransactionBody");
 		return transactionBody.build();
 	}
 	/**
@@ -1024,7 +984,6 @@ public class HederaAccount implements Serializable {
 	 * @return {@link CryptoUpdateTransactionBody}
 	 */
 	public CryptoUpdateTransactionBody getUpdateTransactionBody() {
-	   	logger.trace("Start - getUpdateTransactionBody");
 		CryptoUpdateTransactionBody.Builder updateTransaction = CryptoUpdateTransactionBody.newBuilder();
 		
 		updateTransaction.setAccountIDToUpdate(this.getHederaAccountID().getProtobuf());
@@ -1050,7 +1009,6 @@ public class HederaAccount implements Serializable {
 			updateTransaction.setSendRecordThreshold(this.sendRecordThreshold);
 		}
 		
-	   	logger.trace("End - getUpdateTransactionBody");
 		return updateTransaction.build();
 	}
 	/**
@@ -1059,7 +1017,6 @@ public class HederaAccount implements Serializable {
 	 * @return {@link CryptoDeleteTransactionBody}
 	 */
 	public CryptoDeleteTransactionBody getDeleteTransactionBody(HederaAccountID transferAccountID) {
-	   	logger.trace("Start - getDeleteTransactionBody");
 		// Generates the protobuf payload for this class
 	   	CryptoDeleteTransactionBody.Builder transactionBody = CryptoDeleteTransactionBody.newBuilder();
 		
@@ -1068,7 +1025,6 @@ public class HederaAccount implements Serializable {
 	   		transactionBody.setTransferAccountID(transferAccountID.getProtobuf());
 	   	}
 	   	
-	   	logger.trace("End - getDeleteTransactionBody");
 		return transactionBody.build();
 	}
 	/**
@@ -1077,13 +1033,11 @@ public class HederaAccount implements Serializable {
 	 * @return {@link CryptoAddClaimTransactionBody}
 	 */
 	public CryptoAddClaimTransactionBody getAddClaimTransactionBody(HederaClaim claim) {
-	   	logger.trace("Start - getAddClaimTransactionBody");
 		CryptoAddClaimTransactionBody.Builder transaction = CryptoAddClaimTransactionBody.newBuilder();
 		
 		transaction.setAccountID(this.getHederaAccountID().getProtobuf());
 		transaction.setClaim(claim.getProtobuf());
 		
-	   	logger.trace("End - getAddClaimTransactionBody");
 		return transaction.build();
 	}
 	/**
@@ -1092,13 +1046,11 @@ public class HederaAccount implements Serializable {
 	 * @return {@link CryptoDeleteClaimTransactionBody}
 	 */
 	public CryptoDeleteClaimTransactionBody getDeleteClaimTransactionBody(HederaClaim claim) {
-	   	logger.trace("Start - getDeleteClaimTransactionBody");
 	   	CryptoDeleteClaimTransactionBody.Builder transaction = CryptoDeleteClaimTransactionBody.newBuilder();
 		
 		transaction.setAccountIDToDeleteFrom(this.getHederaAccountID().getProtobuf());
 		transaction.setHashToDelete(ByteString.copyFrom(claim.hash));
 		
-	   	logger.trace("End - getDeleteClaimTransactionBody");
 		return transaction.build();
 	}
 	/**
@@ -1106,9 +1058,7 @@ public class HederaAccount implements Serializable {
 	 * @param key the key to add
 	 */
 	public void addKey(HederaKeyPair key) {
-	   	logger.trace("Start - addKey key {}", key);
 		this.keyPairs.add(key);
-	   	logger.trace("End - addKey");
 	}
 	/**
 	 * Adds a {@link HederaKeySignature} to the list
@@ -1125,7 +1075,6 @@ public class HederaAccount implements Serializable {
 	 * @return boolean true if successful
 	 */
 	public boolean deleteKey(HederaKeyPair key) {
-	   	logger.trace("deleteKey key {}", key);
 		return this.keyPairs.remove(key);
 	}
 	/**
@@ -1142,7 +1091,6 @@ public class HederaAccount implements Serializable {
 	 * @return List {@link HederaKeyPair}
 	 */
 	public List<HederaKeyPair> getKeys() {
-	   	logger.trace("getKeys");
 		return this.keyPairs;
 	}
 	/**
@@ -1166,8 +1114,6 @@ public class HederaAccount implements Serializable {
 	 * @throws Exception 
 	 */
 	public HederaTransactionResult create(long shardNum, long realmNum, String publicKey, KeyType keyType, long initialBalance, HederaAccountCreateDefaults defaults) throws Exception {
-	   	logger.trace("Start - createAccount shardNum {}, realmNum {}, publicKey {}, keyType {}, initialBalance {}, defaults {}"
-	   			, shardNum, realmNum, publicKey, keyType, initialBalance, defaults);
 		// setup defaults if necessary
 		if (defaults != null) {
 			this.proxyAccountID = defaults.getProxyAccountID();
@@ -1249,7 +1195,6 @@ public class HederaAccount implements Serializable {
 				, this.txQueryDefaults.memo
 				, sigsForTransaction);
 		
-	   	logger.trace("End - createAccount");
 		return transactionResult;
 	}
 	
@@ -1285,8 +1230,6 @@ public class HederaAccount implements Serializable {
 	 * @throws Exception 
 	 */
 	public HederaTransactionResult send(HederaAccountID toAccountID, long amount) throws Exception {
-	   	logger.trace("Start - send toAccountID {}, amount {}"
-	   			, toAccountID, amount);
 		
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
@@ -1366,8 +1309,6 @@ public class HederaAccount implements Serializable {
 				, sigsForTransaction
 				, accountAmounts);
 
-	   	logger.trace("End - send");
-		
 		return transactionResult;
 	}
 
@@ -1395,8 +1336,6 @@ public class HederaAccount implements Serializable {
 	 * @throws Exception 
 	 */
 	public HederaTransactionResult addClaim(HederaClaim claimToAdd, HederaKeyPair claimKeyPair) throws Exception {
-	   	logger.trace("Start - addClaim claimToAdd {}, claimKeyPair {}"
-	   			, claimToAdd, claimKeyPair);
 		
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
@@ -1441,7 +1380,6 @@ public class HederaAccount implements Serializable {
 				, sigsForTransaction
 				, claimToAdd);
 		
-	   	logger.trace("End - addClaim");
 		return transactionResult;
 	}
 
@@ -1472,7 +1410,6 @@ public class HederaAccount implements Serializable {
 	 * @throws Exception 
 	 */
 	public long getBalance() throws Exception {
-	   	logger.trace("Start - getBalance");
 		// set transport
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
@@ -1481,10 +1418,8 @@ public class HederaAccount implements Serializable {
 		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults,this.node.accountBalanceQueryFee);
 
 		if (this.getBalanceAnswerOnly(transferTransaction)) {
-		   	logger.trace("End - getBalance");
 			return this.balance;
 		} else {
-		   	logger.trace("End - getBalance");
 			return -1;
 		}
 	}
@@ -1520,14 +1455,12 @@ public class HederaAccount implements Serializable {
 	 * @throws Exception 
 	 */
 	public boolean getInfo() throws Exception {
-	   	logger.trace("Start - getInfo");
 		// set transport
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
 		this.node = this.txQueryDefaults.node;
 
 		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults, this.node.accountInfoQueryFee);
-	   	logger.trace("End - getInfo");
 		return this.getInfoAnswerOnly(transferTransaction);
 	}
 
@@ -1561,7 +1494,6 @@ public class HederaAccount implements Serializable {
 	 * @throws Exception 
 	 */
 	public HederaTransactionResult update(HederaAccountUpdateValues updates) throws Exception {
-	   	logger.trace("Start - getInfo updates {}", updates);
 		// init
 		// setup defaults if necessary
 		if (updates == null) {
@@ -1681,7 +1613,6 @@ public class HederaAccount implements Serializable {
 				, this.txQueryDefaults.memo
 				, sigsForTransaction);
 		
-	   	logger.trace("End - Update");
 		return transactionResult;
 	}
 
@@ -1712,7 +1643,6 @@ public class HederaAccount implements Serializable {
 	 * @throws Exception 
 	 */
 	public List<HederaTransactionRecord> getRecords() throws Exception {
-	   	logger.trace("Start - getRecords");
 		// set transport
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
@@ -1720,7 +1650,6 @@ public class HederaAccount implements Serializable {
 		
 		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults, this.node.accountGetRecordsQueryFee);
 		getRecordsAnswerOnly(transferTransaction);
-	   	logger.trace("End - getRecords");
 		return this.records;
 	}	
 	/**

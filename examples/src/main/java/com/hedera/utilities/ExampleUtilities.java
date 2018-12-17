@@ -3,15 +3,12 @@ package com.hedera.utilities;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Properties;
 
 import org.apache.commons.codec.DecoderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spongycastle.util.encoders.Hex;
-
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaDuration;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
@@ -96,7 +93,9 @@ public class ExampleUtilities {
 		HederaAccountID payingAccountID = new HederaAccountID(ExampleUtilities.payAccountShard, ExampleUtilities.payAccountRealm, ExampleUtilities.payAccountNum);
 		
 		// setup paying keypair
-		
+		if (keyType ==  null) {
+			keyType = "SINGLE";
+		}
 		if (keyType.equals("LIST")) {
 			// create a new key list
 			HederaKeyPair payingKeyPair = new HederaKeyPair(KeyType.ED25519, ExampleUtilities.pubKey, ExampleUtilities.privKey);

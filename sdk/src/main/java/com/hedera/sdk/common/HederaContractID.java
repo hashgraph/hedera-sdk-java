@@ -40,8 +40,6 @@ public class HederaContractID implements Serializable {
 	 * Default constructor, creates a HederaContractID with default values
 	 */
 	public HederaContractID() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
 	}
 
 	/**
@@ -51,11 +49,9 @@ public class HederaContractID implements Serializable {
 	 * @param contractNum the contract number (non negative and unique within its realm)
 	 */
 	public HederaContractID(long shardNum, long realmNum, long contractNum) {
-	   	logger.trace("Start - Object init in shard {}, realm {}. Contract number {}", shardNum, realmNum, contractNum);
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.contractNum = contractNum;
-	   	logger.trace("End - Object init");
 	}
 
 	/**
@@ -63,11 +59,9 @@ public class HederaContractID implements Serializable {
 	 * @param contractIDProtobuf the protobuf from which to create the contract ID
 	 */
 	public HederaContractID(ContractID contractIDProtobuf) {
-	   	logger.trace("Start - Object init in shard {}, realm {}. Contract number {}", shardNum, realmNum, contractNum);
 		this.shardNum = contractIDProtobuf.getShardNum();
 		this.realmNum = contractIDProtobuf.getRealmNum();
 		this.contractNum = contractIDProtobuf.getContractNum();
-	   	logger.trace("End - Object init");
 	}
 
 	/**
@@ -75,7 +69,6 @@ public class HederaContractID implements Serializable {
 	 * @return a protobuf ContractID 
 	 */
 	public ContractID getProtobuf() {
-		logger.trace("Start - getProtobuf");
 		
 		ContractID.Builder contractID = ContractID.newBuilder();
 		
@@ -84,7 +77,6 @@ public class HederaContractID implements Serializable {
 			contractID.setRealmNum(this.realmNum);
 		}
 		contractID.setContractNum(this.contractNum);
-	   	logger.trace("End - getProtobuf");
 
 		return contractID.build();
 	}
@@ -95,15 +87,12 @@ public class HederaContractID implements Serializable {
 	 */
 	@SuppressWarnings("unchecked")
 	public JSONObject JSON() {
-	   	logger.trace("Start - JSON");
-	   	
 	   	JSONObject jsonContract = new JSONObject();
 
 	   	jsonContract.put(JSON_SHARDNUM, this.shardNum);
 	   	jsonContract.put(JSON_REALMNUM, this.realmNum);
 	   	jsonContract.put(JSON_CONTRACTNUM, this.contractNum);
 
-	   	logger.trace("End - JSON");
 		return jsonContract;
 	}
 	
@@ -112,7 +101,6 @@ public class HederaContractID implements Serializable {
 	 * @return a String
 	 */
 	public String JSONString() {
-	   	logger.trace("JSONString");
 		return JSON().toJSONString();
 	}
 
@@ -121,7 +109,6 @@ public class HederaContractID implements Serializable {
 	 * @param jsonContract JSONObject representing a HederaContractID
 	 */
 	public void fromJSON(JSONObject jsonContract) {
-	   	logger.trace("Start - fromJSON");
 		
 		if (jsonContract.containsKey(JSON_SHARDNUM)) {
 			this.shardNum = (Long) jsonContract.get(JSON_SHARDNUM);
@@ -138,6 +125,5 @@ public class HederaContractID implements Serializable {
 		} else {
 			this.contractNum = 1;
 		}
-	   	logger.trace("End - fromJSON");
 	}
 }

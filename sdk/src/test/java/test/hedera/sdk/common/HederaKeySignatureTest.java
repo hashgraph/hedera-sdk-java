@@ -225,7 +225,7 @@ class HederaKeySignatureTest {
 		// threshold key
 		HederaKeySignature pair1 = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		HederaKeySignature pair2 = new HederaKeySignature(KeyType.ED25519, aKey, null);
-		List<HederaKeySignature> list = new ArrayList();
+		List<HederaKeySignature> list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureThreshold keySig = new HederaKeySignatureThreshold(1, list);
@@ -240,7 +240,7 @@ class HederaKeySignatureTest {
 		// now try both
 		pair1 = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		pair2 = new HederaKeySignature(KeyType.ED25519, aKey, null);
-		list = new ArrayList();
+		list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		keySig = new HederaKeySignatureThreshold(1, list);
@@ -255,7 +255,7 @@ class HederaKeySignatureTest {
 		// reset keys
 		pair1 = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		pair2 = new HederaKeySignature(KeyType.ED25519, aKey, null);
-		list = new ArrayList();
+		list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureList keySigList = new HederaKeySignatureList(list);
@@ -269,7 +269,7 @@ class HederaKeySignatureTest {
 		// reset keys
 		pair1 = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		pair2 = new HederaKeySignature(KeyType.ED25519, aKey, null);
-		list = new ArrayList();
+		list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		keySigList = new HederaKeySignatureList(list);
@@ -310,7 +310,7 @@ class HederaKeySignatureTest {
 		// threshold key
 		HederaKeySignature pair1 = new HederaKeySignature(KeyType.ED25519, aKey1, null);
 		HederaKeySignature pair2 = new HederaKeySignature(KeyType.ED25519, aKey2, null);
-		List<HederaKeySignature> list = new ArrayList();
+		List<HederaKeySignature> list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureThreshold keySig = new HederaKeySignatureThreshold(1, list);
@@ -325,7 +325,7 @@ class HederaKeySignatureTest {
 		// reset keys
 		pair1 = new HederaKeySignature(KeyType.ED25519, aKey1, null);
 		pair2 = new HederaKeySignature(KeyType.ED25519, aKey2, null);
-		list = new ArrayList();
+		list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureList keySigList = new HederaKeySignatureList(list);
@@ -356,7 +356,7 @@ class HederaKeySignatureTest {
 		// threshold key
 		HederaKeySignature pair1 = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		HederaKeySignature pair2 = new HederaKeySignature(KeyType.ED25519, aKey, null);
-		List<HederaKeySignature> list = new ArrayList();
+		List<HederaKeySignature> list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureThreshold keySig = new HederaKeySignatureThreshold(1, list);
@@ -377,7 +377,7 @@ class HederaKeySignatureTest {
 		// reset keys
 		pair1 = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		pair2 = new HederaKeySignature(KeyType.ED25519, aKey, null);
-		list = new ArrayList();
+		list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureList keySigList = new HederaKeySignatureList(list);
@@ -399,35 +399,34 @@ class HederaKeySignatureTest {
 	@DisplayName("HederaKeySignature Get Key UUIDs")
 	void HederaKeySignatureGetKeyUUID() { 
 		// create key with empty signature
-		byte[] aSignature = "signature".getBytes();
 		byte[] aKey = "key".getBytes();
 		byte[] aKey2 = "key2".getBytes();
 		
 		// standard keys
 		HederaKeySignature keySignature = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		
-		List<HederaKeyUUIDDescription> uuids = new ArrayList();
+		List<HederaKeyUUIDDescription> uuids = new ArrayList<HederaKeyUUIDDescription>();
 		keySignature.getKeyUUIDs(uuids, aKey);
 		assertEquals(1, uuids.size());
 
-		uuids = new ArrayList();
+		uuids = new ArrayList<HederaKeyUUIDDescription>();
 		keySignature.getKeyUUIDs(uuids, "dummmy".getBytes());
 		assertEquals(0, uuids.size());
 		
 		// threshold key
 		HederaKeySignature pair1 = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		HederaKeySignature pair2 = new HederaKeySignature(KeyType.ED25519, aKey2, null);
-		List<HederaKeySignature> list = new ArrayList();
+		List<HederaKeySignature> list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureThreshold keySig = new HederaKeySignatureThreshold(1, list);
 		keySignature = new HederaKeySignature(keySig);
 
-		uuids = new ArrayList();
+		uuids = new ArrayList<HederaKeyUUIDDescription>();
 		keySignature.getKeyUUIDs(uuids, aKey);
 		assertEquals(1, uuids.size());
 
-		uuids = new ArrayList();
+		uuids = new ArrayList<HederaKeyUUIDDescription>();
 		keySignature.getKeyUUIDs(uuids, "dummmy".getBytes());
 		assertEquals(0, uuids.size());
 		
@@ -435,17 +434,17 @@ class HederaKeySignatureTest {
 		// reset keys
 		pair1 = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		pair2 = new HederaKeySignature(KeyType.ED25519, aKey2, null);
-		list = new ArrayList();
+		list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureList keySigList = new HederaKeySignatureList(list);
 		keySignature = new HederaKeySignature(keySigList);
 
-		uuids = new ArrayList();
+		uuids = new ArrayList<HederaKeyUUIDDescription>();
 		keySignature.getKeyUUIDs(uuids, aKey);
 		assertEquals(1, uuids.size());
 
-		uuids = new ArrayList();
+		uuids = new ArrayList<HederaKeyUUIDDescription>();
 		keySignature.getKeyUUIDs(uuids, "dummmy".getBytes());
 		assertEquals(0, uuids.size());
 	}
@@ -478,7 +477,7 @@ class HederaKeySignatureTest {
 		// threshold key
 		HederaKeySignature pair1 = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		HederaKeySignature pair2 = new HederaKeySignature(KeyType.ED25519, aKey, null);
-		List<HederaKeySignature> list = new ArrayList();
+		List<HederaKeySignature> list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 
@@ -502,7 +501,7 @@ class HederaKeySignatureTest {
 		// reset keys
 		pair1 = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		pair2 = new HederaKeySignature(KeyType.ED25519, aKey, null);
-		list = new ArrayList();
+		list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureList keySigList = new HederaKeySignatureList(list);
@@ -549,7 +548,7 @@ class HederaKeySignatureTest {
 		// threshold key
 		HederaKeySignature pair1 = new HederaKeySignature(KeyType.ED25519, aKey1, "sig".getBytes());
 		HederaKeySignature pair2 = new HederaKeySignature(KeyType.ED25519, aKey2, "sig".getBytes());
-		List<HederaKeySignature> list = new ArrayList();
+		List<HederaKeySignature> list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureThreshold keySig = new HederaKeySignatureThreshold(1, list);
@@ -564,7 +563,7 @@ class HederaKeySignatureTest {
 		// reset keys
 		pair1 = new HederaKeySignature(KeyType.ED25519, aKey1, "sig".getBytes());
 		pair2 = new HederaKeySignature(KeyType.ED25519, aKey2, "sig".getBytes());
-		list = new ArrayList();
+		list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureList keySigList = new HederaKeySignatureList(list);
@@ -609,7 +608,7 @@ class HederaKeySignatureTest {
 		// threshold key
 		HederaKeySignature pair1 = new HederaKeySignature(KeyType.ED25519, aKey1, "sig".getBytes());
 		HederaKeySignature pair2 = new HederaKeySignature(KeyType.ED25519, aKey2, "sig".getBytes());
-		List<HederaKeySignature> list = new ArrayList();
+		List<HederaKeySignature> list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureThreshold keySig = new HederaKeySignatureThreshold(1, list);
@@ -633,7 +632,7 @@ class HederaKeySignatureTest {
 		// reset keys
 		pair1 = new HederaKeySignature(KeyType.ED25519, aKey1, "sig".getBytes());
 		pair2 = new HederaKeySignature(KeyType.ED25519, aKey2, "sig".getBytes());
-		list = new ArrayList();
+		list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureList keySigList = new HederaKeySignatureList(list);

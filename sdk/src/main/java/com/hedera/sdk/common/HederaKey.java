@@ -159,12 +159,17 @@ public class HederaKey implements Serializable {
 	 * @param contractKey the HederaContractID used for this key
 	 * @param keyDescription the description of the key
 	 */
+<<<<<<< HEAD:sdk/src/main/java/com/hedera/sdk/common/HederaKey.java
 	public HederaKey(HederaContractID contractKey, String keyDescription) {
 	   	logger.trace("Start - Object init key {}, type CONTRACT, description {}", contractKey, keyDescription);
+=======
+	public HederaKeyPair(HederaContractID contractKey, String keyDescription) {
+
+>>>>>>> 959a7d6... Removed trace logging. Updated pom.xml to ignore errors on javadocs:src/main/java/com/hedera/sdk/common/HederaKeyPair.java
 		this.keyType = KeyType.CONTRACT;
 		this.contractIDKey = contractKey;
 		this.keyDescription = keyDescription;
-	   	logger.trace("End - Object init");
+
 	}
 	/**
 	 * Constructs a HederaKey from a HederaContractID
@@ -178,12 +183,17 @@ public class HederaKey implements Serializable {
 	 * @param thresholdKey the HederaContractID used for this key
 	 * @param keyDescription the description for the key
 	 */
+<<<<<<< HEAD:sdk/src/main/java/com/hedera/sdk/common/HederaKey.java
 	public HederaKey(HederaKeyThreshold thresholdKey, String keyDescription) {
 	   	logger.trace("Start - Object init key {}, type THRESHOLD, description {}", thresholdKey, keyDescription);
+=======
+	public HederaKeyPair(HederaKeyThreshold thresholdKey, String keyDescription) {
+
+>>>>>>> 959a7d6... Removed trace logging. Updated pom.xml to ignore errors on javadocs:src/main/java/com/hedera/sdk/common/HederaKeyPair.java
 		this.keyType = KeyType.THRESHOLD;
 		this.thresholdKey = thresholdKey;
 		this.keyDescription = keyDescription;
-	   	logger.trace("End - Object init");
+
 	}
 	/**
 	 * Constructs a HederaKey from a HederaKeyThreshold
@@ -197,12 +207,17 @@ public class HederaKey implements Serializable {
 	 * @param keyList the HederaKeyList to use for this key
 	 * @param keyDescription the description for the key
 	 */
+<<<<<<< HEAD:sdk/src/main/java/com/hedera/sdk/common/HederaKey.java
 	public HederaKey(HederaKeyList keyList, String keyDescription) {
 	   	logger.trace("Start - Object init key {}, type LIST, description {}", keyList, keyDescription);
+=======
+	public HederaKeyPair(HederaKeyList keyList, String keyDescription) {
+
+>>>>>>> 959a7d6... Removed trace logging. Updated pom.xml to ignore errors on javadocs:src/main/java/com/hedera/sdk/common/HederaKeyPair.java
 		this.keyType = KeyType.LIST;
 		this.keyList = keyList;
 		this.keyDescription = keyDescription;
-	   	logger.trace("End - Object init");
+
 	}
 	/**
 	 * Constructs a HederaKey from a HederaKeyList
@@ -218,7 +233,7 @@ public class HederaKey implements Serializable {
 	 */
 	public HederaKey(Key protobuf, String keyDescription) {
 		// convert a protobuf payload into class data
-	   	logger.trace("Start - Object init key from protobuf {}, description {}", protobuf, keyDescription);
+
 		// reset  key just in case
 		this.thresholdKey = null;
 		this.contractIDKey = null;
@@ -228,7 +243,6 @@ public class HederaKey implements Serializable {
 		switch (protobuf.getKeyCase()) {
 		case ED25519:
 			byte[] pubKeyBytes = protobuf.getEd25519().toByteArray();
-			String pubKeyHex = Hex.toHexString(pubKeyBytes); // good ?
 			this.keyPair = new EDKeyPair(pubKeyBytes, null);
 			this.keyType = KeyType.ED25519;
 			break;
@@ -259,7 +273,7 @@ public class HederaKey implements Serializable {
             throw new IllegalArgumentException("Key Type not recognized. You may be using an old sdk.");			
 		}
 		this.keyDescription = keyDescription;
-	   	logger.trace("End - Object init");
+
 	}
 	/**
 	 * Constructs a HederaKey from a protobuf 
@@ -274,7 +288,7 @@ public class HederaKey implements Serializable {
 	 */
 	public KeyType getKeyType() {
 	
-	   	logger.trace("getKeyType");
+
 		return this.keyType;
 	}
 	/**
@@ -292,7 +306,7 @@ public class HederaKey implements Serializable {
 	 * @return {@link HederaContractID}
 	 */
 	public HederaContractID getContractIDKey() {
-	   	logger.trace("getContractIDKey");
+
 		return this.contractIDKey;
 	}
 	/**
@@ -301,7 +315,7 @@ public class HederaKey implements Serializable {
 	 * @return {@link HederaKeyThreshold}
 	 */
 	public HederaKeyThreshold getThresholdKey() {
-	   	logger.trace("getThresholdKey");
+
 		return this.thresholdKey;
 	}
 	/**
@@ -310,7 +324,7 @@ public class HederaKey implements Serializable {
 	 * @return {@link HederaKeyList}
 	 */
 	public HederaKeyList getKeyList() {
-	   	logger.trace("getKeyList");
+
 		return this.keyList;
 	}
 	/** 
@@ -318,7 +332,7 @@ public class HederaKey implements Serializable {
 	 * @return {@link Key} protobuf
 	 */
 	public Key getProtobuf() {
-	   	logger.trace("Start - getProtobuf");
+
 		// Generates the protobuf payload for this class
 		Key.Builder keyProtobuf = Key.newBuilder();
 		
@@ -357,7 +371,7 @@ public class HederaKey implements Serializable {
             throw new IllegalArgumentException("Key type not set, unable to generate data.");			
 		}
 		
-	   	logger.trace("End - getProtobuf");
+
 		return keyProtobuf.build();
 	}
 	
@@ -367,7 +381,7 @@ public class HederaKey implements Serializable {
 	 */
 	@SuppressWarnings("unchecked")
 	public JSONObject JSON() {
-	   	logger.trace("Start - JSON");
+
 
 	   	JSONObject jsonKey = new JSONObject();
 	   	jsonKey.put(JSON_DESCRIPTION, this.keyDescription);
@@ -402,7 +416,7 @@ public class HederaKey implements Serializable {
 			jsonKey.put(JSON_TYPE, "NOTSET");
 			break;
 		}
-	   	logger.trace("End - JSON");
+
 		
 		return jsonKey;
 	}
@@ -411,8 +425,8 @@ public class HederaKey implements Serializable {
 	 * @return {@link String}
 	 */
 	public String JSONString() {
-	   	logger.trace("Start - JSONString");
-	   	logger.trace("End - JSONString");
+
+
 		return JSON().toJSONString();
 	}
 	/**
@@ -420,7 +434,7 @@ public class HederaKey implements Serializable {
 	 * @param jsonKey the {@link JSONObject} from which to set key values
 	 */
 	public void fromJSON(JSONObject jsonKey) {
-	   	logger.trace("Start - fromJSON");
+
 		
 		if (jsonKey.containsKey(JSON_DESCRIPTION)) {
 			this.keyDescription = (String) jsonKey.get(JSON_DESCRIPTION);
@@ -480,7 +494,7 @@ public class HederaKey implements Serializable {
 		} else {
 			throw new IllegalStateException("Key type isn't set in JSON.");
 		}
-	   	logger.trace("End - fromJSON");
+
 	}
 
 	/**
@@ -494,7 +508,7 @@ public class HederaKey implements Serializable {
 	public boolean getEntities(HederaTransaction payment, HederaQueryHeader.QueryResponseType responseType) throws InterruptedException {
 		boolean result = true;
 		
-	   	logger.trace("Start - getEntities payment {}, responseType {}", payment, responseType);
+
 		// build the query
 	   	// Header
 		HederaQueryHeader queryHeader = new HederaQueryHeader();
@@ -538,7 +552,7 @@ public class HederaKey implements Serializable {
 			result = false;
 		}
 		
-	   	logger.trace("End - getEntities");
+
 	   	return result;
 	}
 	/**
@@ -549,7 +563,7 @@ public class HederaKey implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getEntitiesAnswerOnly(HederaTransaction payment) throws InterruptedException {
-	   	logger.trace("Start - getEntitiesAnswerOnly");
+
 	   	return getEntities(payment, QueryResponseType.ANSWER_ONLY);
 	}
 	/**
@@ -560,7 +574,7 @@ public class HederaKey implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getEntitiesStateProof(HederaTransaction payment) throws InterruptedException {
-	   	logger.trace("getEntitiesStateProof");
+
 		return getEntities(payment, HederaQueryHeader.QueryResponseType.ANSWER_STATE_PROOF);
 	}
 	/**
@@ -570,7 +584,7 @@ public class HederaKey implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getEntitiesCostAnswer() throws InterruptedException {
-	   	logger.trace("getEntitiesCostAnswer");
+
 		return getEntities(null, HederaQueryHeader.QueryResponseType.COST_ANSWER);
 	}
 	/**
@@ -580,7 +594,7 @@ public class HederaKey implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getEntitiesCostAnswerStateProof() throws InterruptedException {
-	   	logger.trace("getEntitiesCostAnswerStateProof");
+
 		return getEntities(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
 	}
 }

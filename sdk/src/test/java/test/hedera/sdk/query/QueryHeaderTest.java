@@ -6,7 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
+<<<<<<< HEAD:sdk/src/test/java/test/hedera/sdk/query/QueryHeaderTest.java
 import com.hedera.sdk.common.HederaKeySignatureList;
+=======
+import com.hedera.sdk.common.HederaSignature;
+import com.hedera.sdk.common.HederaSignatureList;
+>>>>>>> 959a7d6... Removed trace logging. Updated pom.xml to ignore errors on javadocs:src/test/java/test/hedera/sdk/query/QueryHeaderTest.java
 import com.hedera.sdk.contract.HederaContract;
 import com.hedera.sdk.query.HederaQueryHeader;
 import com.hedera.sdk.transaction.HederaTransaction;

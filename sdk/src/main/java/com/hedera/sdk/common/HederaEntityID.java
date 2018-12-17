@@ -38,15 +38,15 @@ public class HederaEntityID implements Serializable {
 	 * with default values
 	 */
 	public HederaEntityID() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
+
+
 	}
 	/**
 	 * Construct from an EntityID protobuf stream
 	 * @param entityIDProtobuf the protofbuf to generate the object from
 	 */
 	public HederaEntityID(EntityID entityIDProtobuf) {
-	   	logger.trace("Start - Object init in entityIDProtobuf {}", entityIDProtobuf);
+
 	   	
 	   	this.accountID = null;
 	   	this.claim = null;
@@ -66,6 +66,6 @@ public class HederaEntityID implements Serializable {
 	   		this.fileID = new HederaFileID(entityIDProtobuf.getFileID());
 	   	}
 
-	   	logger.trace("End - Object init");
+
 	}
 }
