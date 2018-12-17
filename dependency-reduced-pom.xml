@@ -81,6 +81,8 @@
           <excludePackageNames>test.com.hedera.*</excludePackageNames>
           <excludePackageNames>net.i2p.*</excludePackageNames>
           <excludePackageNames>org.json.*</excludePackageNames>
+          <failOnError>false</failOnError>
+          <additionalOptions>-html5</additionalOptions>
         </configuration>
       </plugin>
       <plugin>

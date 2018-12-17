@@ -302,7 +302,7 @@ public class HederaTransaction implements Serializable {
 	 * Generates a transfer transaction to enable payments for queries
 	 * @param txQueryDefaults the defaults for transactions and queries
 	 * @param queryFee the fee paid for the query
-	 * @throws Exception 
+	 * @throws Exception in the event of an error 
 	 */
 	public HederaTransaction(HederaTransactionAndQueryDefaults txQueryDefaults, long queryFee) throws Exception {
 

@@ -208,7 +208,6 @@ public class HederaKeyPair implements Serializable {
 	 * @param keyType the type of key
 	 * @param publicKey a byte array containing the value of the public key
 	 * @param privateKey a byte array containing the value of the private key
-	 * @param keyDescription a description for the key
 	 */
 	public HederaKeyPair(KeyType keyType, byte[] publicKey, byte[] privateKey) {
 		this(keyType, publicKey, privateKey, "");
@@ -248,7 +247,8 @@ public class HederaKeyPair implements Serializable {
 	 * @param publicKey {@link String} as a hex encoded string
 	 * @param secretKey {@link String} as a hex encoded string
 	 * @throws DecoderException if the keys can't be decoded
-	 * @throws IllegalStateException if the key type is invalid 
+	 * @throws IllegalStateException if the key type is invalid
+	 * @throws InvalidKeySpecException in the event of a key specification error 
 	 */
 	public HederaKeyPair(HederaKeyPair.KeyType keyType, String publicKey, String secretKey) throws InvalidKeySpecException, DecoderException {
 		this(keyType, publicKey, secretKey, "");
@@ -262,6 +262,7 @@ public class HederaKeyPair implements Serializable {
 	 * @param description the description of the key
 	 * @throws DecoderException if the keys can't be decoded
 	 * @throws IllegalStateException if the key type is invalid 
+	 * @throws InvalidKeySpecException in the event of a key specification error 
 	 */
 	public HederaKeyPair(HederaKeyPair.KeyType keyType, String publicKey, String secretKey, String description) throws InvalidKeySpecException, DecoderException {
 		this.keyType = keyType;
@@ -356,7 +357,7 @@ public class HederaKeyPair implements Serializable {
 	 * @param message byte[]
 	 * @param signature byte[]
 	 * @return {@link Boolean}
-	 * @throws Exception 
+	 * @throws Exception in the event of an error 
 	 */
 	public boolean verifySignature(byte[] message, byte[] signature) throws Exception {
 		return this.keyPair.verifySignature(message, signature);
