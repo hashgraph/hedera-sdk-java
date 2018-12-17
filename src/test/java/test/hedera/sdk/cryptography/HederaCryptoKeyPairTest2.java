@@ -40,8 +40,6 @@ class HederaCryptoKeyPairTest2 {
         byte[] seed = seed01;
         long index = 0;
         int length = seed.length;
-        System.out.println(Arrays.toString(seed));
-        System.out.println(length); //32
 		byte[] deriveKey = CryptoUtils.deriveKey(seed, index, length);
 	}
 

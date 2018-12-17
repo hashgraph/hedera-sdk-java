@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
@@ -38,8 +37,6 @@ class KeyTestED25519 {
 			String seedHex = "cf831ccb83f7d1d6a0261e2a6f69552dbd452d7b3a8fb4f5f960e8aafcf0d32f";
 			byte[] seed = Hex.decode(seedHex);
 			ed25519KeyFromPrivate = new HederaKeyPair(KeyType.ED25519, seed);
-			System.out.println("From here");
-			System.out.println(Arrays.toString(ed25519KeyFromPrivate.getSecretKey()));
 			ed25519PublicKey = Hex.toHexString(ed25519KeyFromPrivate.getPublicKey());
 
 		} catch (NoSuchAlgorithmException e) {
@@ -51,8 +48,6 @@ class KeyTestED25519 {
 	@DisplayName("ED25519 Check word recovery")
 	void testED25519() {
 		Assert.assertArrayEquals(keyPaired1.getPublicKey(), keyPaired2.getPublicKey());
-		System.out.println(Arrays.toString(keyPaired1.getSecretKey()));
-		System.out.println(Arrays.toString(keyPaired2.getSecretKey()));
 		Assert.assertArrayEquals(keyPaired1.getSecretKey(), keyPaired2.getSecretKey());
 	}
 

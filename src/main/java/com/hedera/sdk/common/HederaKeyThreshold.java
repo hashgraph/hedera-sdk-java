@@ -35,8 +35,8 @@ public class HederaKeyThreshold implements Serializable {
 	 * Default constructor
 	 */
 	public HederaKeyThreshold() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
+
+
 	}
 	/**
 	 * Constructs from a threshold and List of {@link HederaKeyPair}
@@ -44,7 +44,7 @@ public class HederaKeyThreshold implements Serializable {
 	 * @param keys the List of {@link HederaKeyPair}
 	 */
 	public HederaKeyThreshold(int threshold, List<HederaKeyPair> keys) {
-	   	logger.trace("Start - Object init threshold {}, keys {}", threshold, keys);
+
 
 	   	if (keys != null) {
 		   	for (HederaKeyPair hederaKey : keys) {
@@ -52,14 +52,14 @@ public class HederaKeyThreshold implements Serializable {
 			}
 	   	}
 		this.threshold = threshold;
-	   	logger.trace("End - Object init");
+
 	}
 	/**
 	 * Constructs from a {@link ThresholdKey} protobuf 
 	 * @param protobufKey the keys
 	 */
 	public HederaKeyThreshold(ThresholdKey protobufKey) {
-	   	logger.trace("Start - Object init protobuf {}", protobufKey);
+
 
 	   	// convert a protobuf payload into class data
 		this.threshold = protobufKey.getThreshold();
@@ -69,14 +69,14 @@ public class HederaKeyThreshold implements Serializable {
 		for (Key key : protoKeys.getKeysList()) {
 			this.keys.add(new HederaKeyPair(key));
 		}
-	   	logger.trace("End - Object init");
+
 	}
 	/**
 	 * Gets the protobuf {@link ThresholdKey} for the key 
 	 * @return {@link ThresholdKey}
 	 */
 	public ThresholdKey getProtobuf() {
-	   	logger.trace("Start - getProtobuf");
+
 		// Generates the protobuf payload for this class
 		ThresholdKey.Builder keysProtobuf = ThresholdKey.newBuilder();
 		keysProtobuf.setThreshold(this.threshold);
@@ -88,10 +88,10 @@ public class HederaKeyThreshold implements Serializable {
 			keysProtobuf.setKeys(protoKeyList);
 		}
 		else {
-			logger.trace("End - getKeyProtobuf: return NULL");
+
 			return null;
 		}
-	   	logger.trace("End - getProtobuf");
+
 		return keysProtobuf.build();
 	}
 	/**
@@ -99,9 +99,9 @@ public class HederaKeyThreshold implements Serializable {
 	 * @param key a {@link HederaKeyPair}
 	 */
 	public void addKey(HederaKeyPair key) {
-	   	logger.trace("Start - addKey key {}", key);
+
 		this.keys.add(key);
-	   	logger.trace("End - addKey");
+
 	}
 	/**
 	 * Deletes a key from the list
@@ -109,8 +109,8 @@ public class HederaKeyThreshold implements Serializable {
 	 * @return true if found and successfully deleted
 	 */
 	public boolean deleteKey(HederaKeyPair key) {
-	   	logger.trace("Start - deleteKey key {}", key);
-	   	logger.trace("End - deleteKey");
+
+
 		return this.keys.remove(key);
 	}
 	/**
@@ -119,7 +119,7 @@ public class HederaKeyThreshold implements Serializable {
 	 */
 	@SuppressWarnings("unchecked")
 	public JSONObject JSON() {
-	   	logger.trace("Start - JSON");
+
 
 	   	JSONObject jsonKey = new JSONObject();
 	   	jsonKey.put(JSON_THRESHOLD, this.threshold);
@@ -131,7 +131,7 @@ public class HederaKeyThreshold implements Serializable {
 	   	
 		jsonKey.put(JSON_KEYS, jsonKeys);
 	   	
-		logger.trace("End - JSON");
+
 		
 		return jsonKey;
 	}
@@ -140,8 +140,8 @@ public class HederaKeyThreshold implements Serializable {
 	 * @return {@link String}
 	 */
 	public String JSONString() {
-	   	logger.trace("Start - JSONString");
-	   	logger.trace("End - JSONString");
+
+
 		return JSON().toJSONString();
 	}
 	/**
@@ -149,7 +149,7 @@ public class HederaKeyThreshold implements Serializable {
 	 * @param jsonKey the {@link JSONObject} to populate this object with
 	 */
 	public void fromJSON(JSONObject jsonKey) {
-	   	logger.trace("Start - fromJSON");
+
 		// delete all keys
 		this.keys.clear();
 		// add keys from json array
@@ -173,6 +173,6 @@ public class HederaKeyThreshold implements Serializable {
 				this.addKey(key);
 			}
 		}
-	   	logger.trace("End - fromJSON");
+
 	}
 }

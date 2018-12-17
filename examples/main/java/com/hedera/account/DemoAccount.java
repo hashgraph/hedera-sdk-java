@@ -4,8 +4,6 @@ import java.time.Instant;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.validation.DefaultMessageCodesResolver.Format;
-
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.account.HederaAccountUpdateValues;
 import com.hedera.sdk.account.HederaClaim;
@@ -29,11 +27,11 @@ public final class DemoAccount {
     	boolean doAddClaim = false;//OK
 		boolean getTXRecord = false;
 
-    	create = true;
+//    	create = true;
     	getBalance = true;
-    	send = true;
-    	getInfo = true;
-    	update = true;
+//    	send = true;
+//    	getInfo = true;
+//    	update = true;
 //    	doAddClaim = true; //-- not implemented ?
 //    	getTXRecord = true; //-- records not supported
 		
@@ -51,6 +49,7 @@ public final class DemoAccount {
     	
     		AccountGetBalance.getBalance(myAccount);
     		System.out.println(String.format("My balance=%d tinybar", myAccount.balance()));
+    		System.exit(0);
     	}
     	
     	/*
@@ -112,7 +111,7 @@ public final class DemoAccount {
     			}
 	    		
 		    	if (send) {
-					// send some crypto form my account to the new account
+					// send some crypto from my account to the new account
 		    		// setup my account
 		        	HederaAccount myAccount = new HederaAccount();
 		        	// setup transaction/query defaults (durations, etc...)
@@ -130,6 +129,9 @@ public final class DemoAccount {
 			    	}
 					// get balance for the new account
 			    	if (getBalance) {
+			    		// let's make the account pay for it's own transactions and queries
+			    		newAccount.txQueryDefaults.payingAccountID = newAccount.getHederaAccountID();
+			    		newAccount.txQueryDefaults.payingKeyPair = newAccountKey;
 			    		AccountGetBalance.getBalance(newAccount);
 			    		System.out.println(String.format("New account balance=%d tinybar", newAccount.balance()));
 			    	}
@@ -169,6 +171,8 @@ public final class DemoAccount {
 	    		
 		    		newAccount = AccountUpdate.update(newAccount, updates);
 		    		if (newAccount != null) {
+		    			// need to update the paying key pair to be the new account's key
+		    			newAccount.txQueryDefaults.payingKeyPair = ed25519Key;
 		    			AccountGetInfo.getInfo(newAccount);
 		    		} else {
 		    			logger.info("*******************************************");

@@ -78,15 +78,15 @@ public class HederaTransactionRecord implements Serializable {
 	 * Default constructor
 	 */
 	public HederaTransactionRecord() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
+
+
 	}
 	/**
 	 * Constructor from a {@link TransactionRecord} protobuf
 	 * @param transactionRecordProtobuf the transaction record
 	 */
 	public HederaTransactionRecord(TransactionRecord transactionRecordProtobuf) {
-	   	logger.trace("Start - Object init transactionRecordProtobuf {}", transactionRecordProtobuf);
+
 	   	if (transactionRecordProtobuf.hasReceipt()) {
 	   		this.transactionReceipt = new HederaTransactionReceipt(transactionRecordProtobuf.getReceipt());
 	   	} else {
@@ -122,7 +122,7 @@ public class HederaTransactionRecord implements Serializable {
 			} 
 	   	}
 	   	
-	   	logger.trace("End - Object init");
+
 		
 	}
 
@@ -131,7 +131,7 @@ public class HederaTransactionRecord implements Serializable {
 	 * @return {@link TransactionRecord}
 	 */
 	public TransactionRecord getProtobuf() {
-	   	logger.trace("Start - getProtobuf");
+
 		
 		TransactionRecord.Builder transactionRecord = TransactionRecord.newBuilder();
 		if (this.consensusTimeStamp != null) {

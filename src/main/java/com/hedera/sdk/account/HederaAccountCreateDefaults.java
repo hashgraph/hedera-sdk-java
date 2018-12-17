@@ -100,8 +100,6 @@ public class HederaAccountCreateDefaults {
 	 * @return {@link HederaKeyPair}
 	 */
 	public HederaKeyPair getNewRealmAdminPublicKey() {
-	   	logger.trace("Start - getNewRealmAdminPublicKey");
-	   	logger.trace("End - getNewRealmAdminPublicKey");
 		return this.newRealmAdminPublicKey;
 	}
 }

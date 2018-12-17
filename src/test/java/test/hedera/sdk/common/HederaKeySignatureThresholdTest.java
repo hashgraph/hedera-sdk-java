@@ -103,7 +103,7 @@ class HederaKeySignatureThresholdTest {
 		
 		// standard keys
 		HederaKeySignature keySignature = new HederaKeySignature(KeyType.NOTSET, aKey, null);
-		List keySigs = new ArrayList<HederaKeySignature>();
+		List<HederaKeySignature> keySigs = new ArrayList<HederaKeySignature>();
 		keySigs.add(keySignature);
 		HederaKeySignatureThreshold threshold = new HederaKeySignatureThreshold(10, keySigs);
 
@@ -125,21 +125,19 @@ class HederaKeySignatureThresholdTest {
 	@DisplayName("HederaKeySignatureThreshold Get Key UUIDs")
 	void HederaKeySignatureThresholdGetKeyUUIDs() { 
 		// create key with empty signature
-		byte[] aSignature = "signature".getBytes();
 		byte[] aKey = "key".getBytes();
-		byte[] aKey2 = "key2".getBytes();
 		
 		// standard keys
 		HederaKeySignature keySignature = new HederaKeySignature(KeyType.ED25519, aKey, null);
-		List keySigs = new ArrayList<HederaKeySignature>();
+		List<HederaKeySignature> keySigs = new ArrayList<HederaKeySignature>();
 		keySigs.add(keySignature);
 		HederaKeySignatureThreshold threshold = new HederaKeySignatureThreshold(10, keySigs);
 		
-		List<HederaKeyUUIDDescription> uuids = new ArrayList();
+		List<HederaKeyUUIDDescription> uuids = new ArrayList<HederaKeyUUIDDescription>();
 		threshold.getKeyUUIDs(uuids, aKey);
 		assertEquals(1, uuids.size());
 
-		uuids = new ArrayList();
+		uuids = new ArrayList<HederaKeyUUIDDescription>();
 		threshold.getKeyUUIDs(uuids, "dummmy".getBytes());
 		assertEquals(0, uuids.size());
 		
@@ -161,7 +159,7 @@ class HederaKeySignatureThresholdTest {
 		uuids[1] = "dummy2";
 		
 		HederaKeySignature keySignature = new HederaKeySignature(KeyType.ED25519, aKey, null);
-		List keySigs = new ArrayList<HederaKeySignature>();
+		List<HederaKeySignature> keySigs = new ArrayList<HederaKeySignature>();
 		keySigs.add(keySignature);
 		HederaKeySignatureThreshold threshold = new HederaKeySignatureThreshold(10, keySigs);
 
@@ -183,11 +181,10 @@ class HederaKeySignatureThresholdTest {
 		byte[] aSignature1 = "signature1".getBytes();
 		byte[] aSignature2 = "signature2".getBytes();
 		byte[] aKey1 = "key1".getBytes();
-		byte[] aKey2 = "key2".getBytes();
 		
 		// standard keys
 		HederaKeySignature keySignature = new HederaKeySignature(KeyType.NOTSET, aKey1, "sig".getBytes());
-		List keySigs = new ArrayList<HederaKeySignature>();
+		List<HederaKeySignature> keySigs = new ArrayList<HederaKeySignature>();
 		keySigs.add(keySignature);
 		HederaKeySignatureThreshold threshold = new HederaKeySignatureThreshold(10, keySigs);
 
@@ -225,7 +222,7 @@ class HederaKeySignatureThresholdTest {
 		
 		// standard keys
 		HederaKeySignature keySignature = new HederaKeySignature(KeyType.NOTSET, aKey1, aSignature1);
-		List keySigs = new ArrayList<HederaKeySignature>();
+		List<HederaKeySignature> keySigs = new ArrayList<HederaKeySignature>();
 		keySigs.add(keySignature);
 		HederaKeySignatureThreshold threshold = new HederaKeySignatureThreshold(10, keySigs);
 

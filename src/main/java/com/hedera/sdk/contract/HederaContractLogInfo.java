@@ -56,8 +56,8 @@ public class HederaContractLogInfo implements Serializable {
 	 * Default constructor
 	 */
 	public HederaContractLogInfo() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
+
+
 	}
 
 	/**
@@ -65,7 +65,7 @@ public class HederaContractLogInfo implements Serializable {
 	 * @param contractLogInfoProtobuf the contract log information in protobuf
 	 */
 	public HederaContractLogInfo(ContractLoginfo contractLogInfoProtobuf) {
-		logger.trace("Start - Object init in contractLogInfoProtobuf {}", contractLogInfoProtobuf);
+
 		this.contractID = new HederaContractID(contractLogInfoProtobuf.getContractID());
 		this.bloom = contractLogInfoProtobuf.getBloom().toByteArray();
 		this.data = contractLogInfoProtobuf.getData().toByteArray();
@@ -73,7 +73,7 @@ public class HederaContractLogInfo implements Serializable {
 		for (int i=0; i < contractLogInfoProtobuf.getTopicCount(); i++) {
 			this.topics[i] = contractLogInfoProtobuf.getTopic(i).toByteArray();
 		}
-		logger.trace("End - Object init");
+
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class HederaContractLogInfo implements Serializable {
 	 * @return {@link ContractLoginfo} 
 	 */
 	public ContractLoginfo getProtobuf() {
-		logger.trace("Start - getProtobuf");
+
 	
 		ContractLoginfo.Builder contractLogInfo = ContractLoginfo.newBuilder();
 		

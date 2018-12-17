@@ -12,7 +12,6 @@ import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.contract.HederaContract;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
-import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.common.HederaTimeStamp;
 import com.hedera.sdk.common.HederaTransactionID;
 

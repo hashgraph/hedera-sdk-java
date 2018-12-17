@@ -87,7 +87,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- GREG PROTO -->
 <!-- 			<plugin>
 				<groupId>com.github.os72</groupId>
 				<artifactId>protoc-jar-maven-plugin</artifactId>
@@ -133,6 +132,8 @@
 					<excludePackageNames>test.com.hedera.*</excludePackageNames>
 					<excludePackageNames>net.i2p.*</excludePackageNames>
 					<excludePackageNames>org.json.*</excludePackageNames>
+					<failOnError>false</failOnError>
+					<additionalOptions>-html5</additionalOptions>
 				</configuration>
 				<executions>
 					<execution>
@@ -143,11 +144,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-javadoc-plugin</artifactId> 
-				<version>3.0.1</version> <configuration> <excludePackageNames>com.hedera.sdk.api.proto.*</excludePackageNames> 
-				<excludePackageNames>com.hedera.sdk.muquit.*</excludePackageNames> <excludePackageNames>test.com.hedera.*</excludePackageNames> 
-				<excludePackageNames>net.i2p.*</excludePackageNames> <excludePackageNames>org.json.*</excludePackageNames> 
-				</configuration> </plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>

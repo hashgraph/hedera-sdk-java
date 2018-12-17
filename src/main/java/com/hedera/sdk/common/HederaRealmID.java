@@ -29,8 +29,8 @@ public class HederaRealmID implements Serializable {
 	 * Default constructor
 	 */
 	public HederaRealmID() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
+
+
 	}
 	/**
 	 * Constructor from a shard number and realm number
@@ -38,27 +38,27 @@ public class HederaRealmID implements Serializable {
 	 * @param realmNum the realm's number
 	 */
 	public HederaRealmID(long shardNum, long realmNum) {
-	   	logger.trace("Start - Object init in shard {}, realm {}", shardNum, realmNum);
+
  		this.shardNum = shardNum;
  		this.realmNum = realmNum;
-	   	logger.trace("End - Object init");
+
 	}
 	/**
 	 * Constructor from a protobuf {@link RealmID}
 	 * @param realmIDProtobuf a protobuf expression of a RealmID
 	 */
 	public HederaRealmID(RealmID realmIDProtobuf) {
-	   	logger.trace("Start - Object init realmIDProtobuf {}", realmIDProtobuf);
+
 		this.shardNum = realmIDProtobuf.getShardNum();
 		this.realmNum = realmIDProtobuf.getRealmNum();
-	   	logger.trace("End - Object init");
+
 	}
 	/**
 	 * Gets a {@link RealmID} protobuf for this object
 	 * @return {@link RealmID}
 	 */
 	public RealmID getProtobuf() {
-	   	logger.trace("Start - getProtobuf");
+
 		
 	   	RealmID.Builder realmID = RealmID.newBuilder();
 		if (this.shardNum > 0) {
@@ -67,7 +67,7 @@ public class HederaRealmID implements Serializable {
 	   	if (this.realmNum > 0) {
 	   		realmID.setRealmNum(this.realmNum);
 	   	}
-		logger.trace("End - getProtobuf");
+
 
 		return realmID.build();
 	}

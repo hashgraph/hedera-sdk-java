@@ -39,8 +39,6 @@ public class HederaProxyStakers implements Serializable {
 	 * Default constructor
 	 */
 	public HederaProxyStakers() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
 	}
 	/**
 	 * Construct from shard, realm and account number
@@ -49,19 +47,15 @@ public class HederaProxyStakers implements Serializable {
 	 * @param accountNum the account number for the proxy stakers
 	 */
 	public HederaProxyStakers(long shardNum, long realmNum, long accountNum) {
-	   	logger.trace("Start - Object init in shard {}, realm {}. Account number {}", shardNum, realmNum, accountNum);
  		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.accountNum = accountNum;
-		
-	   	logger.trace("End - Object init");
 	}
 	/**
 	 * Construct from a {@link AllProxyStakers} protobuf stream
 	 * @param allProxyStakers protobuf
 	 */
 	public HederaProxyStakers(AllProxyStakers allProxyStakers) {
-	   	logger.trace("Start - Object init in allProxyStakers {}", allProxyStakers);
 		this.shardNum = allProxyStakers.getAccountID().getShardNum();
 		this.realmNum = allProxyStakers.getAccountID().getRealmNum();
 		this.accountNum = allProxyStakers.getAccountID().getAccountNum();
@@ -70,8 +64,6 @@ public class HederaProxyStakers implements Serializable {
 		for (int i=0; i < allProxyStakers.getProxyStakerCount(); i++) {
 			proxyStakers.add(new HederaProxyStaker(allProxyStakers.getProxyStaker(i)));
 		}
-		
-	   	logger.trace("End - Object init");
 	}
 
 	/**
@@ -79,7 +71,6 @@ public class HederaProxyStakers implements Serializable {
 	 * @return {@link AllProxyStakers} 
 	 */
 	public AllProxyStakers getProtobuf() {
-	   	logger.trace("Start - getProtobuf");
 		
 	   	AllProxyStakers.Builder allProxyStakers = AllProxyStakers.newBuilder();
 		AccountID.Builder accountID = AccountID.newBuilder();
@@ -93,8 +84,6 @@ public class HederaProxyStakers implements Serializable {
 			allProxyStakers.addProxyStaker(proxyStaker.getProtobuf());
 		}
 	   	
-	   	logger.trace("End - getProtobuf");
-
 		return allProxyStakers.build();
 	}
 	/**

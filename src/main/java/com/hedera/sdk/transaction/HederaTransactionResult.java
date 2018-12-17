@@ -29,7 +29,7 @@ public class HederaTransactionResult implements Serializable {
 	 * @return {@link ResponseCodeEnum} 
 	 */
 	public ResponseCodeEnum getPrecheckResult() {
-	   	logger.trace("getPrecheckResult");
+
 		return this.precheckResult;
 	}
 	/**
@@ -37,7 +37,7 @@ public class HederaTransactionResult implements Serializable {
 	 * @param precheckResult the responseCode value to set
 	 */
 	public void setPrecheckResult(ResponseCodeEnum precheckResult) {
-	   	logger.trace("setPrecheckResult");
+
 		this.precheckResult = precheckResult;
 	}
 	/**
@@ -47,7 +47,7 @@ public class HederaTransactionResult implements Serializable {
 	 * @return {@link Boolean}
 	 */
 	public boolean success() {
-	   	logger.trace("success");
+
 		return (this.precheckResult == ResponseCodeEnum.OK);
 	}
 }
