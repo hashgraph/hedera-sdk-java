@@ -31,7 +31,11 @@ public class HederaFileCreateDefaults {
 	 * @param newRealmAdminKey the new realm admin key
 	 */
 	public void setNewRealmAdminPublicKey(KeyType keyType,byte[] newRealmAdminKey) {
+<<<<<<< HEAD:sdk/src/main/java/com/hedera/sdk/file/HederaFileCreateDefaults.java
 		this.newRealmAdminPublicKey = new HederaKey(keyType, newRealmAdminKey);
+=======
+		this.newRealmAdminPublicKey = new HederaKeyPair(keyType, newRealmAdminKey, null);
+>>>>>>> f76e9c4... Unit tests pass:src/main/java/com/hedera/sdk/file/HederaFileCreateDefaults.java
 	}
 	/**
 	 * if realmID is -1, then this the admin key for the new realm that will be created

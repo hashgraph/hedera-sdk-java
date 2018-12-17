@@ -31,9 +31,13 @@ public final class AccountUpdate {
 				logger.info("===>Update successful");
 				// update acount keys if necessary
 				if (updates.newKey != null) {
+<<<<<<< HEAD:examples/src/main/java/com/hedera/account/AccountUpdate.java
 					account.accountKey = new HederaKey(updates.newKey.getKeyType(), updates.newKey.getPublicKey());
 			        // the paying account is now the new account
 			        account.txQueryDefaults.payingKeyPair = updates.newKey;
+=======
+					account.accountKey = updates.newKey;
+>>>>>>> f76e9c4... Unit tests pass:examples/main/java/com/hedera/account/AccountUpdate.java
 				}
 			} else {
 				logger.info("Failed with transactionStatus:" + receipt.transactionStatus.toString());

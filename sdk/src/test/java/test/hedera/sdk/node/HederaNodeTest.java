@@ -13,30 +13,6 @@ class HederaNodeTest {
 	@DisplayName("HederaNodeTest")
 	void test() {
 		HederaNode node = new HederaNode();
-		assertEquals(10, node.accountCreateTransactionFee);
-		assertEquals(10, node.accountTransferTransactionFee);
-		assertEquals(10, node.accountUpdateTransactionFee);
-		assertEquals(10, node.accountDeleteTransactionFee);
-		assertEquals(10, node.accountAddClaimTransactionFee);
-		assertEquals(10, node.accountDeleteClaimTransactionFee);
-		assertEquals(10, node.accountBalanceQueryFee);
-		assertEquals(10, node.accountInfoQueryFee);
-		assertEquals(10, node.accountGetRecordsQueryFee);
-		assertEquals(10, node.fileCreateTransactionFee);
-		assertEquals(10, node.fileDeleteTransactionFee);
-		assertEquals(10, node.fileUpdateTransactionFee);
-		assertEquals(10, node.fileAppendTransactionFee);
-		assertEquals(10, node.fileGetContentsQueryFee);
-		assertEquals(10, node.fileGetInfoQueryFee);
-		assertEquals(10, node.fileGetRecordsQueryFee);
-		assertEquals(10, node.contractCreateTransactionFee);
-		assertEquals(10, node.contractUpdateTransactionFee);
-		assertEquals(10, node.contractGetByteCodeQueryFee);
-		assertEquals(10, node.contractCallTransactionFee);
-		assertEquals(10, node.contractGetInfoQueryFee);
-		assertEquals(10, node.contractCallLocalQueryFee);
-		assertEquals(10, node.contractGetBySolidityId);
-		assertEquals(10, node.contractGetRecordsQueryFee);
 		
 		assertEquals("", node.getHost());
 		assertEquals(0, node.getPort());

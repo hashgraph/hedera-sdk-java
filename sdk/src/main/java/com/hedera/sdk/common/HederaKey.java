@@ -225,8 +225,14 @@ public class HederaKey implements Serializable {
 
 		switch (protobuf.getKeyCase()) {
 		case ED25519:
+<<<<<<< HEAD:sdk/src/main/java/com/hedera/sdk/common/HederaKey.java
 			this.key = protobuf.getEd25519().toByteArray();
 //			this.key = Hex.decode(this.key);
+=======
+			byte[] pubKeyBytes = protobuf.getEd25519().toByteArray();
+			String pubKeyHex = Hex.toHexString(pubKeyBytes); // good ?
+			this.keyPair = new EDKeyPair(pubKeyBytes, null);
+>>>>>>> f76e9c4... Unit tests pass:src/main/java/com/hedera/sdk/common/HederaKeyPair.java
 			this.keyType = KeyType.ED25519;
 			break;
 		case RSA_3072:

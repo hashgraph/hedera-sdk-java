@@ -55,26 +55,26 @@ public class HederaKeySignatureThreshold implements Serializable {
 		this.threshold = threshold;
 	   	logger.trace("End - Object init");
 	}
-	/**
-	 * Constructs from a {@link ThresholdKey} protobuf and associated {@link ThresholdSignature} protobuf
-	 * Note: it is assumed that keys and signatures match in both protobuf objects
-	 * @param protobufKey the keys
-	 * @param protobufSig the signatures
-	 */
-	public HederaKeySignatureThreshold(ThresholdKey protobufKey, ThresholdSignature protobufSig) {
-	   	logger.trace("Start - Object init protobufKey {}, protobufSig {}", protobufKey, protobufSig);
-		// convert a protobuf payload into class data
-		this.threshold = protobufKey.getThreshold();
-		this.keySigPairs.clear();
-		
-		KeyList protoKeys = protobufKey.getKeys();
-		SignatureList protoSigs = protobufSig.getSigs();
-		
-		for (int index = 0; index < protoKeys.getKeysCount(); index++) {
-			this.keySigPairs.add(new HederaKeySignature(protoKeys.getKeys(index), protoSigs.getSigs(index)));
-		}
-	   	logger.trace("End - Object init");
-	}
+//	/**
+//	 * Constructs from a {@link ThresholdKey} protobuf and associated {@link ThresholdSignature} protobuf
+//	 * Note: it is assumed that keys and signatures match in both protobuf objects
+//	 * @param protobufKey the keys
+//	 * @param protobufSig the signatures
+//	 */
+//	public HederaKeySignatureThreshold(ThresholdKey protobufKey, ThresholdSignature protobufSig) {
+//	   	logger.trace("Start - Object init protobufKey {}, protobufSig {}", protobufKey, protobufSig);
+//		// convert a protobuf payload into class data
+//		this.threshold = protobufKey.getThreshold();
+//		this.keySigPairs.clear();
+//		
+//		KeyList protoKeys = protobufKey.getKeys();
+//		SignatureList protoSigs = protobufSig.getSigs();
+//		
+//		for (int index = 0; index < protoKeys.getKeysCount(); index++) {
+//			this.keySigPairs.add(new HederaKeySignature(protoKeys.getKeys(index), protoSigs.getSigs(index)));
+//		}
+//	   	logger.trace("End - Object init");
+//	}
 	/**
 	 * Gets the protobuf {@link ThresholdKey} for the key 
 	 * @return {@link ThresholdKey}

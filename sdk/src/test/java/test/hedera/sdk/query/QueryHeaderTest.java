@@ -38,7 +38,7 @@ class QueryHeaderTest {
 		
 		HederaKeySignatureList keySigs = new HederaKeySignatureList();
 		keySigs.addKeySignaturePair(KeyType.ED25519, "key1".getBytes(), "signature1".getBytes());
-		keySigs.addKeySignaturePair(KeyType.ECDSA384, "key2".getBytes(), "signature2".getBytes());
+//		keySigs.addKeySignaturePair(KeyType.ECDSA384, "key2".getBytes(), "signature2".getBytes());
 		
 		HederaTransaction transaction = new HederaTransaction(body, keySigs);
 		

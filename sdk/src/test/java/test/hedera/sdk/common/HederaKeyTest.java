@@ -23,7 +23,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class HederaKeyTest {
-	protected static byte[] keyBytes = new byte[] {12};
+	protected static byte[] keyBytes;
 	protected static String description = "A Description";
 	protected static HederaContractID contractID = new HederaContractID(1,2,3);
 	protected static List<HederaKey> keyList = new ArrayList<HederaKey>();
@@ -33,9 +33,17 @@ class HederaKeyTest {
 
 	@BeforeAll
 	static void initAll() {
+<<<<<<< HEAD:sdk/src/test/java/test/hedera/sdk/common/HederaKeyTest.java
 		keyList.add(new HederaKey(KeyType.ED25519, keyBytes));
 		thresholdKey = new HederaKeyThreshold(threshold, keyList);
 		hederaKeyList.addKey(new HederaKey(KeyType.ED25519, keyBytes));
+=======
+		HederaKeyPair key = new HederaKeyPair(KeyType.ED25519);
+		keyBytes = key.getPublicKey();
+		keyList.add(key);
+		thresholdKey = new HederaKeyThreshold(threshold, keyList);
+		hederaKeyList.addKey(key);
+>>>>>>> f76e9c4... Unit tests pass:src/test/java/test/hedera/sdk/common/HederaKeyTest.java
 	}
 	
 	@ParameterizedTest
@@ -43,30 +51,39 @@ class HederaKeyTest {
 	@MethodSource("keyInit")
 	void testKeyInit(HederaKey masterKey, KeyType keyType, String description) { 
 		assertEquals(keyType, masterKey.getKeyType());
-		assertArrayEquals(keyBytes, masterKey.getKey());
+		assertArrayEquals(keyBytes, masterKey.getPublicKey());
 		assertEquals(description, masterKey.keyDescription);
 		assertNotEquals(null, masterKey.uuid);
 
 		HederaKey protobufKey = new HederaKey(masterKey.getProtobuf());
 		assertEquals(masterKey.getKeyType(), protobufKey.getKeyType());
-		assertArrayEquals(masterKey.getKey(), protobufKey.getKey());
+		assertArrayEquals(masterKey.getPublicKey(), protobufKey.getPublicKey());
 
 		HederaKey jsonKey = new HederaKey();
 		jsonKey.fromJSON(masterKey.JSON());
 		assertEquals(masterKey.getKeyType(), jsonKey.getKeyType());
 		assertEquals(masterKey.uuid, jsonKey.uuid);
 		assertEquals(masterKey.keyDescription, jsonKey.keyDescription);
-		assertArrayEquals(masterKey.getKey(), jsonKey.getKey());
+		assertArrayEquals(masterKey.getPublicKey(), jsonKey.getPublicKey());
 	}
 	 
 	private static Stream<Arguments> keyInit() {
 		return Stream.of(
+<<<<<<< HEAD:sdk/src/test/java/test/hedera/sdk/common/HederaKeyTest.java
 			Arguments.of(new HederaKey(KeyType.ECDSA384, keyBytes), KeyType.ECDSA384, ""),
 			Arguments.of(new HederaKey(KeyType.RSA3072, keyBytes), KeyType.RSA3072, ""),
 			Arguments.of(new HederaKey(KeyType.ED25519, keyBytes), KeyType.ED25519, ""),
 			Arguments.of(new HederaKey(KeyType.ECDSA384, keyBytes, description), KeyType.ECDSA384, description),
 			Arguments.of(new HederaKey(KeyType.RSA3072, keyBytes, description), KeyType.RSA3072, description),
 			Arguments.of(new HederaKey(KeyType.ED25519, keyBytes, description), KeyType.ED25519, description)
+=======
+			Arguments.of(new HederaKeyPair(KeyType.ED25519, keyBytes, null), KeyType.ED25519, ""),
+			Arguments.of(new HederaKeyPair(KeyType.ED25519, keyBytes, null), KeyType.ED25519, ""),
+			Arguments.of(new HederaKeyPair(KeyType.ED25519, keyBytes, null), KeyType.ED25519, ""),
+			Arguments.of(new HederaKeyPair(KeyType.ED25519, keyBytes, null, description), KeyType.ED25519, description),
+			Arguments.of(new HederaKeyPair(KeyType.ED25519, keyBytes, null, description), KeyType.ED25519, description),
+			Arguments.of(new HederaKeyPair(KeyType.ED25519, keyBytes, null, description), KeyType.ED25519, description)
+>>>>>>> f76e9c4... Unit tests pass:src/test/java/test/hedera/sdk/common/HederaKeyTest.java
 		);
 	}
 	
@@ -75,15 +92,20 @@ class HederaKeyTest {
 	@MethodSource("keyInitCONTRACTID")
 	void testKeyInitContractID(HederaKey masterKey, String description) { 
 		assertEquals(KeyType.CONTRACT, masterKey.getKeyType());
-		assertEquals(null, masterKey.getKey());
+		assertEquals(null, masterKey.getPublicKey());
 		assertEquals(contractID.contractNum, masterKey.getContractIDKey().contractNum);
 		assertEquals(contractID.shardNum, masterKey.getContractIDKey().shardNum);
 		assertEquals(contractID.realmNum, masterKey.getContractIDKey().realmNum);
 		assertEquals(description, masterKey.keyDescription);
 		assertNotEquals(null, masterKey.uuid);
 
+<<<<<<< HEAD:sdk/src/test/java/test/hedera/sdk/common/HederaKeyTest.java
 		HederaKey protobufKey = new HederaKey(masterKey.getProtobuf());
 		assertEquals(null, protobufKey.getKey());
+=======
+		HederaKeyPair protobufKey = new HederaKeyPair(masterKey.getProtobuf());
+		assertEquals(null, protobufKey.getPublicKey());
+>>>>>>> f76e9c4... Unit tests pass:src/test/java/test/hedera/sdk/common/HederaKeyTest.java
 		assertEquals(KeyType.CONTRACT, protobufKey.getKeyType());
 		assertEquals(contractID.contractNum, protobufKey.getContractIDKey().contractNum);
 		assertEquals(contractID.shardNum, protobufKey.getContractIDKey().shardNum);
@@ -91,7 +113,7 @@ class HederaKeyTest {
 
 		HederaKey jsonKey = new HederaKey();
 		jsonKey.fromJSON(masterKey.JSON());
-		assertEquals(jsonKey.getKey(), null);
+		assertEquals(jsonKey.getPublicKey(), null);
 		assertEquals(KeyType.CONTRACT, jsonKey.getKeyType());
 		assertEquals(contractID.contractNum, jsonKey.getContractIDKey().contractNum);
 		assertEquals(contractID.shardNum, jsonKey.getContractIDKey().shardNum);
@@ -114,36 +136,36 @@ class HederaKeyTest {
 		assertEquals(KeyType.THRESHOLD, masterKey.getKeyType());
 		assertEquals(description,  masterKey.keyDescription);
 		assertEquals(threshold, masterKey.getThresholdKey().threshold);
-		assertEquals(null, masterKey.getKey());
+		assertEquals(null, masterKey.getPublicKey());
 		assertEquals(masterKey.getThresholdKey().keys.get(0).keyDescription, thresholdKey.keys.get(0).keyDescription);
 		assertEquals(masterKey.getThresholdKey().keys.get(0).getKeyType(), thresholdKey.keys.get(0).getKeyType());
 		assertEquals(masterKey.getThresholdKey().keys.get(0).uuid, thresholdKey.keys.get(0).uuid);
 		assertNotEquals(null, masterKey.uuid);
 
 		// compare keys
-		assertEquals(masterKey.getKey(), null);
-		assertArrayEquals(keyBytes, masterKey.getThresholdKey().keys.get(0).getKey());
+		assertEquals(masterKey.getPublicKey(), null);
+		assertArrayEquals(keyBytes, masterKey.getThresholdKey().keys.get(0).getPublicKey());
 
 		HederaKey protobufKey = new HederaKey(masterKey.getProtobuf());
 		assertEquals(masterKey.getKeyType(), protobufKey.getKeyType());
-		assertArrayEquals(masterKey.getKey(), protobufKey.getKey());
+		assertArrayEquals(masterKey.getPublicKey(), protobufKey.getPublicKey());
 		assertEquals(masterKey.getThresholdKey().threshold, thresholdKey.threshold);
 		assertEquals(thresholdKey.keys.get(0).getKeyType(), protobufKey.getThresholdKey().keys.get(0).getKeyType());
-		assertEquals(null, protobufKey.getKey());
-		assertArrayEquals(keyBytes, protobufKey.getThresholdKey().keys.get(0).getKey());
+		assertEquals(null, protobufKey.getPublicKey());
+		assertArrayEquals(keyBytes, protobufKey.getThresholdKey().keys.get(0).getPublicKey());
 
 		HederaKey jsonKey = new HederaKey();
 		jsonKey.fromJSON(masterKey.JSON());
 		assertEquals(masterKey.getKeyType(), jsonKey.getKeyType());
-		assertArrayEquals(masterKey.getKey(), jsonKey.getKey());
+		assertArrayEquals(masterKey.getPublicKey(), jsonKey.getPublicKey());
 		assertEquals(description,  jsonKey.keyDescription);
 		// compare threshold key
 		assertEquals(threshold, jsonKey.getThresholdKey().threshold);
 		assertEquals(thresholdKey.keys.get(0).keyDescription, jsonKey.getThresholdKey().keys.get(0).keyDescription);
 		assertEquals(thresholdKey.keys.get(0).getKeyType(), jsonKey.getThresholdKey().keys.get(0).getKeyType());
 		// compare keys
-		assertEquals(null, jsonKey.getKey());
-		assertArrayEquals(keyBytes, jsonKey.getThresholdKey().keys.get(0).getKey());
+		assertEquals(null, jsonKey.getPublicKey());
+		assertArrayEquals(keyBytes, jsonKey.getThresholdKey().keys.get(0).getPublicKey());
 		assertEquals(thresholdKey.keys.get(0).uuid, jsonKey.getThresholdKey().keys.get(0).uuid);
 	}
 	 
@@ -161,7 +183,7 @@ class HederaKeyTest {
 		// check key type
 		assertEquals(KeyType.LIST, masterKey.getKeyType());
 		assertEquals(description,  masterKey.keyDescription);
-		assertEquals(null, masterKey.getKey());
+		assertEquals(null, masterKey.getPublicKey());
 		assertNotEquals(null, masterKey.uuid);
 		assertEquals(description, masterKey.keyDescription);
 
@@ -169,22 +191,26 @@ class HederaKeyTest {
 		assertEquals(masterKey.getKeyList().keys.get(0).getKeyType(), hederaKeyList.keys.get(0).getKeyType());
 		
 		// compare keys
-		assertEquals(null, masterKey.getKey());
-		assertArrayEquals(masterKey.getKeyList().keys.get(0).getKey(), hederaKeyList.keys.get(0).getKey());
+		assertEquals(null, masterKey.getPublicKey());
+		assertArrayEquals(masterKey.getKeyList().keys.get(0).getPublicKey(), hederaKeyList.keys.get(0).getPublicKey());
 
 		HederaKey protobufKey = new HederaKey(masterKey.getProtobuf());
 		assertEquals(masterKey.getKeyType(), protobufKey.getKeyType());
-		assertArrayEquals(masterKey.getKey(), protobufKey.getKey());
+		assertArrayEquals(masterKey.getPublicKey(), protobufKey.getPublicKey());
 		// compare keylist
 		assertEquals(hederaKeyList.keys.get(0).getKeyType(), protobufKey.getKeyList().keys.get(0).getKeyType());
-		assertArrayEquals(hederaKeyList.keys.get(0).getKey(), protobufKey.getKeyList().keys.get(0).getKey());
+		assertArrayEquals(hederaKeyList.keys.get(0).getPublicKey(), protobufKey.getKeyList().keys.get(0).getPublicKey());
 
+<<<<<<< HEAD:sdk/src/test/java/test/hedera/sdk/common/HederaKeyTest.java
 		HederaKey jsonKey = new HederaKey();
+=======
+		HederaKeyPair jsonKey = new HederaKeyPair(KeyType.ED25519);
+>>>>>>> f76e9c4... Unit tests pass:src/test/java/test/hedera/sdk/common/HederaKeyTest.java
 		jsonKey.fromJSON(masterKey.JSON());
 		assertEquals(masterKey.getKeyType(), jsonKey.getKeyType());
 		assertEquals(hederaKeyList.keys.get(0).getKeyType(), jsonKey.getKeyList().keys.get(0).getKeyType());
-		assertEquals(null, jsonKey.getKey());
-		assertArrayEquals(hederaKeyList.keys.get(0).getKey(), jsonKey.getKeyList().keys.get(0).getKey());
+		assertEquals(null, jsonKey.getPublicKey());
+		assertArrayEquals(hederaKeyList.keys.get(0).getPublicKey(), jsonKey.getKeyList().keys.get(0).getPublicKey());
 		assertEquals(description, masterKey.keyDescription);
 	}
 	 
