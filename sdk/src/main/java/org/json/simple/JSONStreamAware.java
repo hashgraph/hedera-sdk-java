@@ -10,6 +10,7 @@ import java.io.Writer;
 public interface JSONStreamAware {
 	/**
 	 * write JSON string to out.
+	 * @param out {@link Writer}
 	 */
 	void writeJSONString(Writer out) throws IOException;
 }

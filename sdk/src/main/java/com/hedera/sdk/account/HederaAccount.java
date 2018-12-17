@@ -1117,7 +1117,7 @@ public class HederaAccount implements Serializable {
 	 * @param initialBalance the initial balance for the new account
 	 * @param defaults the defaults for the account creation (can be null)
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception in the event of an error
 	 */
 	public HederaTransactionResult create(long shardNum, long realmNum, String publicKey, KeyType keyType, long initialBalance, HederaAccountCreateDefaults defaults) throws Exception {
 	   	logger.trace("Start - createAccount shardNum {}, realmNum {}, publicKey {}, keyType {}, initialBalance {}, defaults {}"
@@ -1192,7 +1192,7 @@ public class HederaAccount implements Serializable {
 	 * @param toAccountID, the accountID receiving the funds
 	 * @param amount, the amount to transfer
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception in the event of an error
 	 */
 	public HederaTransactionResult send(HederaAccountID toAccountID, long amount) throws Exception {
 	   	logger.trace("Start - send toAccountID {}, amount {}"
@@ -1267,7 +1267,7 @@ public class HederaAccount implements Serializable {
 	 * @param toAccountID, the accountID receiving the funds
 	 * @param amount, the amount to transfer
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception in the event of an error
 	 */
 	public HederaTransactionResult send(long fromAccountShardNum, long fromAccountRealmNum, long fromAccountAccountNum, HederaAccountID toAccountID, long amount) throws Exception {
 		this.shardNum = fromAccountAccountNum;
@@ -1280,7 +1280,7 @@ public class HederaAccount implements Serializable {
 	 * @param claimToAdd the {@link HederaClaim} to add to the account
 	 * @param claimKeyPair the keypair for the claim
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception in the event of an error
 	 */
 	public HederaTransactionResult addClaim(HederaClaim claimToAdd, HederaKeyPair claimKeyPair) throws Exception {
 	   	logger.trace("Start - addClaim claimToAdd {}, claimKeyPair {}"
@@ -1340,7 +1340,7 @@ public class HederaAccount implements Serializable {
 	 * @param claimToAdd the {@link HederaClaim} to add to the account
 	 * @param claimKeyPair the keypair for the claim
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception in the event of an error
 	 */
 	public HederaTransactionResult addClaim(long shardNum, long realmNum, long accountNum, HederaClaim claimToAdd, HederaKeyPair claimKeyPair) throws Exception {
 		this.shardNum = shardNum;
@@ -1357,7 +1357,7 @@ public class HederaAccount implements Serializable {
 	 * The cost could be cached and refreshed from time to time, there is no need to look it up 
 	 * before each getBalance query
 	 * @return {@link Long}
-	 * @throws Exception 
+	 * @throws Exception in the event of an error
 	 */
 	public long getBalance() throws Exception {
 	   	logger.trace("Start - getBalance");
@@ -1387,7 +1387,7 @@ public class HederaAccount implements Serializable {
 	 * @param realmNum, the realm number of the account remove the claim from
 	 * @param accountNum, the account number of the account
 	 * @return {@link Long} 
-	 * @throws Exception 
+	 * @throws Exception in the event of an error
 	 */
 	public long getBalance(long shardNum, long realmNum, long accountNum) throws Exception {
 		this.shardNum = shardNum;
@@ -1405,7 +1405,7 @@ public class HederaAccount implements Serializable {
 	 * The cost could be cached and refreshed from time to time, there is no need to look it up 
 	 * before each getInfo query
 	 * @return boolean
-	 * @throws Exception 
+	 * @throws Exception in the event of an error
 	 */
 	public boolean getInfo() throws Exception {
 	   	logger.trace("Start - getInfo");
@@ -1430,7 +1430,7 @@ public class HederaAccount implements Serializable {
 	 * @param realmNum, the realm number of the account remove the claim from
 	 * @param accountNum, the account number of the account 
 	 * @return boolean
-	 * @throws Exception 
+	 * @throws Exception in the event of an error
 	 */
 	public boolean getInfo(long shardNum, long realmNum, long accountNum) throws Exception {
 		this.shardNum = shardNum;
@@ -1446,7 +1446,7 @@ public class HederaAccount implements Serializable {
 	 * used to update this account's properties
 	 * @param updates the updates to apply to the account
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception in the event of an error
 	 */
 	public HederaTransactionResult update(HederaAccountUpdateValues updates) throws Exception {
 	   	logger.trace("Start - getInfo updates {}", updates);
@@ -1543,7 +1543,7 @@ public class HederaAccount implements Serializable {
 	 * @param accountNum, the account number of the account
 	 * @param updates, a set of {@link HederaAccountUpdateValues} to update the account with
 	 * @return {@link HederaTransactionResult} 
-	 * @throws Exception 
+	 * @throws Exception in the event of an error
 	 */
 	public HederaTransactionResult update(long shardNum, long realmNum, long accountNum, HederaAccountUpdateValues updates) throws Exception {
 		this.shardNum = shardNum;
@@ -1557,7 +1557,7 @@ public class HederaAccount implements Serializable {
 	 * Note: If no records are found, the function returns an empty array
 	 * if however an error occurred, it will return null
 	 * @return {@link List} of {@link HederaTransactionRecord}
-	 * @throws Exception 
+	 * @throws Exception in the event of an error
 	 */
 	public List<HederaTransactionRecord> getRecords() throws Exception {
 	   	logger.trace("Start - getRecords");
@@ -1579,7 +1579,7 @@ public class HederaAccount implements Serializable {
 	 * @param realmNum, the realm number of the account remove the claim from
 	 * @param accountNum, the account number of the account
 	 * @return {@link List} of {@link HederaTransactionRecord}
-	 * @throws Exception 
+	 * @throws Exception in the event of an error
 	 */
 	public List<HederaTransactionRecord> getRecords(long shardNum, long realmNum, long accountNum) throws Exception {
 		HederaAccount recordAccount = new HederaAccount(shardNum, realmNum, accountNum);

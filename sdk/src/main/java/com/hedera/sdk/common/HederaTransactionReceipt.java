@@ -51,8 +51,8 @@ public class HederaTransactionReceipt implements Serializable {
 	}
 	/**
 	 * Constructs from a transaction status, account id, file id and contract id
-	 * @param nodePrecheck a {@link HederaPrecheckResult} 
-	 * @param transactionStatus a {@link HederaTransactionStatus}
+	 * @param nodePrecheck a {@link ResponseCodeEnum} 
+	 * @param transactionStatus a {@link ResponseCodeEnum}
 	 * @param accountID a {@link HederaAccountID}
 	 * @param fileID a {@link HederaFileID}
 	 * @param contractID a {@link HederaContractID}
@@ -69,7 +69,7 @@ public class HederaTransactionReceipt implements Serializable {
 
 	/**
 	 * Constructs from a transaction status, account id, file id and contract id
-	 * @param transactionStatus a {@link HederaTransactionStatus}
+	 * @param transactionStatus a {@link ResponseCodeEnum}
 	 * @param accountID a {@link HederaAccountID}
 	 * @param fileID a {@link HederaFileID}
 	 * @param contractID a {@link HederaContractID}
