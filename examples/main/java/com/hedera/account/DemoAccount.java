@@ -35,7 +35,7 @@ public final class DemoAccount {
     	getInfo = true;
     	update = true;
 //    	doAddClaim = true; //-- not implemented ?
-    	getTXRecord = true;
+//    	getTXRecord = true; //-- records not supported
 		
     	/* 
     	 * check my balance
@@ -192,9 +192,5 @@ public final class DemoAccount {
 		        }
 	    	}
     	}
-    	
-    	
-    	
-    	
 	}
 }
