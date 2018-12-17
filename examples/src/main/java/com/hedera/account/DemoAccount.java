@@ -33,8 +33,8 @@ public final class DemoAccount {
     	send = true;
     	getInfo = true;
     	update = true;
-    	doAddClaim = false; //-- not implemented ?
-    	getTXRecord = true;
+//    	doAddClaim = true; //-- not implemented ?
+//    	getTXRecord = true; //-- records not supported
 		
     	/* 
     	 * check my balance
@@ -163,7 +163,7 @@ public final class DemoAccount {
 		    		updates.expirationTimeSeconds = 200;
 		    		updates.expirationTimeNanos = 100;
 
-            newAccount = AccountUpdate.update(newAccount, updates);
+		    		newAccount = AccountUpdate.update(newAccount, updates);
 		    		if (newAccount != null) {
 		    			AccountGetInfo.getInfo(newAccount);
 		    		} else {
@@ -174,33 +174,5 @@ public final class DemoAccount {
 		    	}
 	    	}
     	}
-    	
-    	
-    	
-    	
-//	    	
-//	    	if (myAccount != null) {
-//
-//				// update the account
-//		
-//		    	if ((myAccount != null) && (doAddClaim)) {
-//		    		HederaKeyPair claimKeyPair = new HederaKeyPair(KeyType.ED25519);
-//			        HederaKeyPair claimKey = new HederaKeyPair(claimKeyPair.getKeyType(), claimKeyPair.getPublicKey());
-//			
-//					// Create a new claim object
-//					HederaClaim claim;
-//					claim = new HederaClaim(myAccount.shardNum, myAccount.realmNum, myAccount.accountNum, "ClaimHash".getBytes("UTF-8"));
-//					// add a key to the claim
-//					claim.addKey(claimKey);
-//			        // add a claim
-//			        if (AccountAddClaim.addClaim(myAccount,claim, claimKeyPair)) {
-//			        }
-//		    	} else if (myAccount == null) {
-//	    			logger.info("*******************************************");
-//	    			logger.info("ACCOUNT object is null, skipping claim tests");
-//	    			logger.info("*******************************************");
-//		    	}
-//	    	}
-//    	}	    	
 	}
 }
