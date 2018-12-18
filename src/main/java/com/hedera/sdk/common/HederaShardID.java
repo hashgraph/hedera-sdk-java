@@ -1,10 +1,7 @@
 package com.hedera.sdk.common;
 
 import java.io.Serializable;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.hederahashgraph.api.proto.java.ShardID;
 
 /**
@@ -19,7 +16,7 @@ import com.hederahashgraph.api.proto.java.ShardID;
  * So realms allow Solidity to be parallelized somewhat, even though the language itself assumes everything is serial.
  */
 public class HederaShardID implements Serializable {
-	final static Logger logger = LoggerFactory.getLogger(HederaShardID.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaShardID.class);
 	private static final long serialVersionUID = 1;
 
 	/**

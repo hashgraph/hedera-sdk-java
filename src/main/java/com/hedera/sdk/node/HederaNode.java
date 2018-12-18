@@ -12,10 +12,7 @@ import com.hederahashgraph.api.proto.java.TransactionResponse;
 import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
 import com.hederahashgraph.service.proto.java.FileServiceGrpc;
 import com.hederahashgraph.service.proto.java.SmartContractServiceGrpc;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
@@ -25,7 +22,7 @@ public class HederaNode implements Serializable {
 	 * Class to manage information associated with a Hedera Node 
 	 */
 	private static final long serialVersionUID = 1L;
-	final static Logger logger = LoggerFactory.getLogger(HederaNode.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaNode.class);
 	private String host = "";
     private int port = 0;
     private HederaAccountID accountID = null;
@@ -1035,6 +1032,42 @@ public class HederaNode implements Serializable {
 		return response;
 	}
 
+	/**
+	 * Sends a query to a node to get a fast transaction record and returns the result of the request
+	 * @param query the {@link HederaQuery} to send
+	 * @return {@link Response} the result of the query
+	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
+	 */
+	public Response getTransactionFastRecord(HederaQuery query) throws InterruptedException, StatusRuntimeException {
+
+		logger.info("RUNNING QUERY TO NODE");
+		logger.info(query.getProtobuf().toString());
+
+		Response response = null;
+		if (query.getProtobuf().hasTransactionGetFastRecord()) {
+			openChannel();
+			CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.getFastTransactionRecord(query.getProtobuf());
+				// retry if busy
+				if (response.getTransactionGetFastRecord().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
+		} else {
+			throw new IllegalStateException("Invalid Query Type");
+		}
+
+		logger.info("--->QUERY RESPONSE");
+		logger.info(response.toString());
+
+		return response;
+	}
+	
 	/**
 	 * Sends a query to a node to get file contents and returns the result of the request
 	 * @param query the {@link HederaQuery} to send

@@ -175,6 +175,60 @@ public class HederaTransaction implements Serializable {
 	   	return true;
 	}
 	/**
+	 * Get a fast record for a transaction. These only last 180s and are free 
+	 * If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created. 
+	 * If the transaction called a smart contract function, then the record contains the result of that call. 
+	 * If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer. 
+	 * If the transaction didn't return anything that should be in the record, then the results field will be set to nothing.
+	 * @param transactionID the {@link HederaTransactionID} for which the record is requested
+	 * @param responseType the type of response required
+	 * @return true if successful
+	 * @throws InterruptedException in the event of a node communication error
+	 */
+	public boolean getFastRecord(HederaTransactionID transactionID, HederaQueryHeader.QueryResponseType responseType) throws InterruptedException {
+		boolean result = true;
+		
+
+		// build the query
+	   	// Header
+		HederaQueryHeader queryHeader = new HederaQueryHeader();
+		
+		TransactionGetFastRecordQuery.Builder getQuery = TransactionGetFastRecordQuery.newBuilder();
+		getQuery.setTransactionID(transactionID.getProtobuf());
+		getQuery.setHeader(queryHeader.getProtobuf());
+		
+		// the query itself
+		HederaQuery query = new HederaQuery();
+		query.queryType = QueryType.TRANSACTIONGETFASTRECORD;
+		query.queryData = getQuery.build();
+		
+		// query now set, send to network
+		Utilities.throwIfNull("Node", this.node);
+		Response response = this.node.getTransactionFastRecord(query);
+		TransactionGetFastRecordResponse getResponse = response.getTransactionGetFastRecord();
+
+		// check response header first
+		ResponseHeader responseHeader = getResponse.getHeader();
+
+		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
+				
+		if (this.precheckResult == ResponseCodeEnum.OK) {
+
+			// cost
+			this.cost = responseHeader.getCost();
+			//state proof
+			this.stateProof = responseHeader.getStateProof().toByteArray();
+			
+			this.transactionRecord = new HederaTransactionRecord(getResponse.getTransactionRecord());
+			
+		} else {
+			result = false;
+		}
+		
+
+	   	return result;
+	}
+	/**
 	 * Get the record for a transaction. 
 	 * If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it. 
 	 * If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created. 

@@ -17,6 +17,7 @@ import com.hederahashgraph.api.proto.java.FileGetInfoQuery;
 import com.hederahashgraph.api.proto.java.GetByKeyQuery;
 import com.hederahashgraph.api.proto.java.GetBySolidityIDQuery;
 import com.hederahashgraph.api.proto.java.Query;
+import com.hederahashgraph.api.proto.java.TransactionGetFastRecordQuery;
 import com.hederahashgraph.api.proto.java.TransactionGetReceiptQuery;
 import com.hederahashgraph.api.proto.java.TransactionGetRecordQuery;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,7 @@ public class HederaQuery implements Serializable {
 		GETBYSOLIDITYID,
 		TRANSACTIONGETRECEIPT,
 		TRANSACTIONGETRECORD,
+		TRANSACTIONGETFASTRECORD,
 		NOTSET
 	}
 	/**
@@ -123,6 +125,9 @@ public class HederaQuery implements Serializable {
 				break;
 			case TRANSACTIONGETRECORD:
 				query.setTransactionGetRecord((TransactionGetRecordQuery)this.queryData);
+				break;
+			case TRANSACTIONGETFASTRECORD:
+				query.setTransactionGetFastRecord((TransactionGetFastRecordQuery)this.queryData);
 				break;
 			case NOTSET:
 

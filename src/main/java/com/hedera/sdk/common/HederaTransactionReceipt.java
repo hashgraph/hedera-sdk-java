@@ -1,21 +1,18 @@
 package com.hedera.sdk.common;
 
 import java.io.Serializable;
-
 import com.hedera.sdk.node.HederaNode;
 import com.hedera.sdk.transaction.HederaTransaction;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hederahashgraph.api.proto.java.TransactionGetReceiptResponse;
 import com.hederahashgraph.api.proto.java.TransactionReceipt;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * The consensus result for a transaction, which might not be currently known, or may succeed or fail.
  */
 public class HederaTransactionReceipt implements Serializable {
-	final static Logger logger = LoggerFactory.getLogger(HederaTransactionReceipt.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaTransactionReceipt.class);
 	private static final long serialVersionUID = 1;
 
 	/**

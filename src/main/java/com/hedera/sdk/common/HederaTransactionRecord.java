@@ -3,10 +3,7 @@ package com.hedera.sdk.common;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.account.HederaAccountAmount;
 import com.hedera.sdk.contract.HederaContractFunctionResult;
@@ -19,7 +16,7 @@ import com.hederahashgraph.api.proto.java.TransferList;
  * Hedera Record for a transaction
  */
 public class HederaTransactionRecord implements Serializable {
-	final static Logger logger = LoggerFactory.getLogger(HederaTransactionRecord.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaTransactionRecord.class);
 	private static final long serialVersionUID = 1;
 	private BodyType bodyType = null;
 	private enum BodyType {
@@ -121,9 +118,6 @@ public class HederaTransactionRecord implements Serializable {
 				this.transferList.add(accountAmount);
 			} 
 	   	}
-	   	
-
-		
 	}
 
 	/**
@@ -178,6 +172,31 @@ public class HederaTransactionRecord implements Serializable {
 		transaction.setNode(txQueryDefaults.node);
 		
 		if (transaction.getRecord(payment, transactionID, QueryResponseType.ANSWER_ONLY)) {
+			this.consensusTimeStamp = transaction.transactionRecord().consensusTimeStamp;
+			this.contractCallResult = transaction.transactionRecord().contractCallResult;
+			this.contractCreateResult = transaction.transactionRecord().contractCreateResult;
+			this.memo = transaction.transactionRecord().memo;
+			this.transactionFee = transaction.transactionRecord().transactionFee;
+			this.transactionHash = transaction.transactionRecord().transactionHash;
+			this.transactionId = transaction.transactionRecord().transactionId;
+			this.transactionReceipt = transaction.transactionRecord().transactionReceipt;
+		}
+	}
+	//
+	/** 
+	 * Gets a fast (free) record for a transaction (lasts 180 seconds)
+	 * @param transactionID the transaction ID against which to get the record
+	 * @param txQueryDefaults - default parameters for running the query (inc. node)
+	 * @throws Exception in the event of an error 
+	 */
+	public HederaTransactionRecord(HederaTransactionID transactionID, HederaTransactionAndQueryDefaults txQueryDefaults) throws Exception {
+		HederaTransaction transaction = new HederaTransaction();
+		Utilities.throwIfNull("txQueryDefaults", txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.node", txQueryDefaults.node);
+		
+		transaction.setNode(txQueryDefaults.node);
+		
+		if (transaction.getFastRecord(transactionID, QueryResponseType.ANSWER_ONLY)) {
 			this.consensusTimeStamp = transaction.transactionRecord().consensusTimeStamp;
 			this.contractCallResult = transaction.transactionRecord().contractCallResult;
 			this.contractCreateResult = transaction.transactionRecord().contractCreateResult;

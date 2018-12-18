@@ -1,10 +1,7 @@
 package com.hedera.sdk.contract;
 
 import java.io.Serializable;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.common.HederaContractID;
 import com.hederahashgraph.api.proto.java.ContractLoginfo;
@@ -13,7 +10,7 @@ import com.hederahashgraph.api.proto.java.ContractLoginfo;
  * The log information for an event returned by a smart contract function call. One function call may return several such events
  */
 public class HederaContractLogInfo implements Serializable {
-	final static Logger logger = LoggerFactory.getLogger(HederaContractLogInfo.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaContractLogInfo.class);
 	private static final long serialVersionUID = 1;
 	private HederaContractID contractID = new HederaContractID();
 	private byte[] bloom = new byte[0];

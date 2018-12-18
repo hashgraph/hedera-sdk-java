@@ -3,10 +3,7 @@ package com.hedera.sdk.account;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.hederahashgraph.api.proto.java.AccountID;
 import com.hederahashgraph.api.proto.java.AllProxyStakers;
 /**
@@ -14,7 +11,7 @@ import com.hederahashgraph.api.proto.java.AllProxyStakers;
  *
  */
 public class HederaProxyStakers implements Serializable {
-	final static Logger logger = LoggerFactory.getLogger(HederaProxyStakers.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaProxyStakers.class);
 	private static final long serialVersionUID = 1;
 
 	/**

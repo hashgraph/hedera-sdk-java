@@ -1,10 +1,7 @@
 package com.hedera.sdk.common;
 
 import java.io.Serializable;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.hedera.sdk.account.HederaClaim;
 import com.hederahashgraph.api.proto.java.EntityID;
 
@@ -13,7 +10,7 @@ import com.hederahashgraph.api.proto.java.EntityID;
  * either one of accountID, claim, fileID or contractID will be set, others will be null
  */
 public class HederaEntityID implements Serializable {
-	final static Logger logger = LoggerFactory.getLogger(EntityID.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(EntityID.class);
 	private static final long serialVersionUID = 1;
 
 	/**

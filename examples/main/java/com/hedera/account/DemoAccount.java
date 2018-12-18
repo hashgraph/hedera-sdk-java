@@ -26,6 +26,7 @@ public final class DemoAccount {
     	boolean update = false; //OK
     	boolean doAddClaim = false;//OK
 		boolean getTXRecord = false;
+		boolean getFastRecord = false;
 
     	create = true;
     	getBalance = true;
@@ -33,7 +34,8 @@ public final class DemoAccount {
     	getInfo = true;
     	update = true;
 //    	doAddClaim = true; //-- not implemented ?
-//    	getTXRecord = true; //-- records not supported
+    	getTXRecord = true; //-- records temporarily disabled
+    	getFastRecord = true;
 		
     	/* 
     	 * check my balance
@@ -94,6 +96,11 @@ public final class DemoAccount {
 	    		// new account number is a separate (and asynchronous) operation
 	    		// the newly created account had its
 
+	    		// get a fast record
+	    		if (getFastRecord) {
+	    			  HederaTransactionID txID = newAccount.hederaTransactionID;
+	    			  HederaTransactionRecord txRecord = new HederaTransactionRecord(txID, newAccount.txQueryDefaults);
+	    		}
     			// get info for the newly created account
 	    		if (getInfo) {
 	    			AccountGetInfo.getInfo(newAccount);
