@@ -2,8 +2,8 @@ package com.hedera.account;
 
 import java.time.Instant;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.account.HederaAccountUpdateValues;
 import com.hedera.sdk.account.HederaClaim;
@@ -13,11 +13,12 @@ import com.hedera.sdk.common.HederaTransactionID;
 import com.hedera.sdk.common.HederaTransactionRecord;
 import com.hedera.utilities.ExampleUtilities;
 
+import ch.qos.logback.classic.Logger;
+
 public final class DemoAccount {
 	
 	public static void main (String... arguments) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(DemoAccount.class);
-		
+	   final org.slf4j.Logger logger = LoggerFactory.getLogger(DemoAccount.class);		
 		//DO NOT CHANGE THESE, CHANGE BELOW INSTEAD
 		boolean create = false; //OK
     	boolean getBalance = false; //OK

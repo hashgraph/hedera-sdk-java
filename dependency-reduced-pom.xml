@@ -19,7 +19,7 @@
         <targetPath>${project.build.directory}</targetPath>
         <directory>${basedir}/src/main/resources</directory>
         <includes>
-          <include>log4j.xml</include>
+          <include>logback.xml</include>
           <include>simpleStorage.bin</include>
         </includes>
       </resource>
