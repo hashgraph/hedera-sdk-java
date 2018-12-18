@@ -2,7 +2,6 @@ package com.hedera.sdk.common;
 
 import java.io.Serializable;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hederahashgraph.api.proto.java.Duration;
@@ -13,7 +12,7 @@ import com.hederahashgraph.api.proto.java.Duration;
  * (see the comments in https://github.com/google/protobuf/blob/master/src/google/protobuf/duration.proto)
  */
 public class HederaDuration implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaDuration.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaDuration.class);
 	private static final long serialVersionUID = 1;
 
 	/**

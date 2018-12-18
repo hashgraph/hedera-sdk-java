@@ -8,10 +8,7 @@ import java.io.ObjectOutputStream;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Random;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.node.HederaNode;
 import com.hederahashgraph.api.proto.java.KeyList;
@@ -19,7 +16,7 @@ import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hederahashgraph.api.proto.java.SignatureList;
 
 public class Utilities {
-	final static Logger logger = LoggerFactory.getLogger(Utilities.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(Utilities.class);
 	/**
 	 * Serializes an object into a byte array
 	 * @param object any object which is serializable
@@ -28,7 +25,6 @@ public class Utilities {
 	 */
 	public static byte[] serialize(Object object) throws IOException {
 
-		
 		byte[] serialData = new byte[0];
 		// Serialise
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -165,7 +161,7 @@ public class Utilities {
 	 * @throws InterruptedException in the event of a node communication issue 
 	 */
 	public static HederaTransactionReceipt getReceipt (HederaTransactionID hederaTransactionID, HederaNode node, int maxRetries, int firstDelay, int increaseDelay) throws InterruptedException {
-		final Logger logger = LoggerFactory.getLogger(HederaTransactionReceipt.class);
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaTransactionReceipt.class);
 
 		long sleepTime = firstDelay;
 		boolean keepGoing = true;
@@ -459,6 +455,7 @@ public class Utilities {
 	}
 	
 	public static void printResponseFailure(String location) {
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(Utilities.class);
 		logger.error("***** " + location + " FAILED to get response *****");
 	}
 	/**
@@ -468,8 +465,9 @@ public class Utilities {
 	 * @throws IllegalStateException thrown if the object is null
 	 */
 	public static void throwIfNull(String objectType, Object object) {
-		if (object == null) {
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(Utilities.class);
 
+		if (object == null) {
 		   	String error = objectType + " is null";
 		   	logger.error(error);
 			throw new IllegalStateException(error);
@@ -482,8 +480,9 @@ public class Utilities {
 	 * @throws IllegalStateException thrown if the accountID is invalid
 	 */
 	public static void throwIfAccountIDInvalid(String accountType, HederaAccountID accountID) {
-		if (accountID == null) {
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(Utilities.class);
 
+		if (accountID == null) {
 		   	String error = accountType + " AccountID is null.";
 		   	logger.error(error);
 			throw new IllegalStateException(error);

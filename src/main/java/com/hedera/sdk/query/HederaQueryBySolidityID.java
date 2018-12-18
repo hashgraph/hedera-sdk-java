@@ -1,9 +1,7 @@
 package com.hedera.sdk.query;
 
 import java.io.Serializable;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaContractID;
 import com.hedera.sdk.common.Utilities;
@@ -17,7 +15,7 @@ import com.hederahashgraph.api.proto.java.*;
  *
  */
 public class HederaQueryBySolidityID implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaQueryBySolidityID.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaQueryBySolidityID.class);
 	private static final long serialVersionUID = 1;
 	private ResponseCodeEnum precheckResult = ResponseCodeEnum.UNKNOWN;
 	private long cost = 0;

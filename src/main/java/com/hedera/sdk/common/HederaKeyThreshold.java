@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
  * A set of public keys that are used together to form a threshold signature. 
@@ -18,7 +17,7 @@ import org.slf4j.LoggerFactory;
  * where at most M-N of them are blank, and the other at least N of them are valid signatures corresponding to at least N of the public keys listed here.
  */
 public class HederaKeyThreshold implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaKeyThreshold.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaKeyThreshold.class);
 	private static String JSON_KEYS = "keys";
 	private static String JSON_THRESHOLD = "threshold";
 	private static final long serialVersionUID = 1;

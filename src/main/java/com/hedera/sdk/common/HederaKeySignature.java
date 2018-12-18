@@ -5,14 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-
 import javax.xml.bind.DatatypeConverter;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.common.HederaContractID;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
@@ -34,7 +30,7 @@ import com.hederahashgraph.api.proto.java.Signature;
  * This class is a helper for managing keys and signatures in tandem. Each instance of the object can store a {@link HederaKeyPair} and its corresponding {@link HederaSignature}
  */
 public class HederaKeySignature implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaKeySignature.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaKeySignature.class);
 	private static final long serialVersionUID = 1;
 
 	private static String JSON_DESCRIPTION = "description";

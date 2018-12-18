@@ -1,6 +1,5 @@
 package com.hedera.file;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.common.HederaTransactionReceipt;
@@ -11,7 +10,7 @@ import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class FileUpdate {
 	public static HederaFile update(HederaFile file, long expireSeconds, int expireNanos, byte[] newContents) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(FileUpdate.class);
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(FileUpdate.class);
 		logger.info("");
 		logger.info("FILE UPDATE");
 		logger.info("");

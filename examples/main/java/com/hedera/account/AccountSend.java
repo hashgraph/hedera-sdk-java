@@ -2,7 +2,6 @@ package com.hedera.account;
 
 import java.time.Instant;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.account.HederaAccount;
@@ -13,7 +12,7 @@ import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class AccountSend {
 	public static boolean send(HederaAccount account, HederaAccount toAccount, long amount) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(AccountSend.class);
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(AccountSend.class);
 		
 		logger.info("");
 		logger.info("CRYPTO TRANSFER");

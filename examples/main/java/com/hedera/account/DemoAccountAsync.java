@@ -1,6 +1,5 @@
 package com.hedera.account;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.account.HederaAccount;
@@ -15,7 +14,7 @@ import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 public final class DemoAccountAsync {
 	
 	public static void main (String... arguments) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(DemoAccountAsync.class);
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(DemoAccountAsync.class);
 
 		// setup a set of defaults for query and transactions
 		HederaTransactionAndQueryDefaults txQueryDefaults = new HederaTransactionAndQueryDefaults();
@@ -35,9 +34,7 @@ public final class DemoAccountAsync {
     	
     	account = AccountCreate.create(account, newAccountKey.getPublicKeyHex(), newAccountKey.getKeyType(), 1000000);
     	if (account == null) {
-			logger.info("*******************************************");
-			logger.info("FIRST ACCOUNT CREATE FAILED");
-			logger.info("*******************************************");
+			ExampleUtilities.showResult("FIRST ACCOUNT CREATE FAILED");
 			throw new Exception("Account create failure");
     	} 
 	
@@ -48,9 +45,7 @@ public final class DemoAccountAsync {
 		// create a new account to transfer funds to
     	accountXferTo = AccountCreate.create(accountXferTo, accountXferToKey.getPublicKeyHex(), newAccountKey.getKeyType(), 10000);
     	if (accountXferTo == null) {
-			logger.info("*******************************************");
-			logger.info("SECOND ACCOUNT CREATE FAILED");
-			logger.info("*******************************************");
+			ExampleUtilities.showResult("SECOND ACCOUNT CREATE FAILED");
 			throw new Exception("Account create failure");
     	}
     	

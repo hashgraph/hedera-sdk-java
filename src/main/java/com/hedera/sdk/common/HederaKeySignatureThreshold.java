@@ -3,12 +3,9 @@ package com.hedera.sdk.common;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.hederahashgraph.api.proto.java.KeyList;
 import com.hederahashgraph.api.proto.java.SignatureList;
 import com.hederahashgraph.api.proto.java.ThresholdKey;
@@ -18,7 +15,7 @@ import com.hederahashgraph.api.proto.java.ThresholdSignature;
  * Each instance of the object stores a threshold and List of {@link HederaKeySignature}
  */
 public class HederaKeySignatureThreshold implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaKeySignatureThreshold.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaKeySignatureThreshold.class);
 	private static final long serialVersionUID = 1;
 	private static String JSON_KEYS = "keys";
 	private static String JSON_THRESHOLD = "threshold";

@@ -2,8 +2,8 @@ package com.hedera.sdk.query;
 /**
  * This class handles the generation of protobuf for Queries to Hedera Hashgraph
  */
-import java.io.Serializable;
 
+import java.io.Serializable;
 import com.hederahashgraph.api.proto.java.ContractCallLocalQuery;
 import com.hederahashgraph.api.proto.java.ContractGetBytecodeQuery;
 import com.hederahashgraph.api.proto.java.ContractGetInfoQuery;
@@ -19,12 +19,10 @@ import com.hederahashgraph.api.proto.java.GetBySolidityIDQuery;
 import com.hederahashgraph.api.proto.java.Query;
 import com.hederahashgraph.api.proto.java.TransactionGetReceiptQuery;
 import com.hederahashgraph.api.proto.java.TransactionGetRecordQuery;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HederaQuery implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaQuery.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaQuery.class);
 	private static final long serialVersionUID = 1;
 	
 	/* 

@@ -4,12 +4,9 @@ import com.hedera.sdk.common.HederaSignature;
 import com.hederahashgraph.api.proto.java.Signature;
 import com.hederahashgraph.api.proto.java.SignatureList;
 import com.hederahashgraph.api.proto.java.ThresholdSignature;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -18,7 +15,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class HederaSignatureThreshold implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaSignatureThreshold.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaSignatureThreshold.class);
 	private static final long serialVersionUID = 1;
 	/**
 	 * The list of {@link HederaSignature} initially empty

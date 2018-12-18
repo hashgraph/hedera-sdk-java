@@ -1,6 +1,5 @@
 package com.hedera.file;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.common.HederaTransactionReceipt;
@@ -11,7 +10,7 @@ import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class FileDelete {
 	public static boolean delete(HederaFile file) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(FileDelete.class);
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(FileDelete.class);
 		logger.info("");
 		logger.info("DELETE FILE");
 		logger.info("");

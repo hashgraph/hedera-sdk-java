@@ -2,9 +2,7 @@ package com.hedera.sdk.common;
 
 import java.io.Serializable;
 import java.time.Instant;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.hederahashgraph.api.proto.java.Timestamp;
 
 /**
@@ -12,7 +10,7 @@ import com.hederahashgraph.api.proto.java.Timestamp;
  * (see the comments in https://github.com/google/protobuf/blob/master/src/google/protobuf/timestamp.proto)
  */
 public class HederaTimeStamp implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaTimeStamp.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaTimeStamp.class);
 	private static final long serialVersionUID = 1;
 	/**
 	 * Time value, defaults to Now -10s to account for possible minor time differences between client and node.

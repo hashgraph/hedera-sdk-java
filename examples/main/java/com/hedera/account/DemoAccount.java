@@ -2,8 +2,8 @@ package com.hedera.account;
 
 import java.time.Instant;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.account.HederaAccountUpdateValues;
 import com.hedera.sdk.account.HederaClaim;
@@ -16,8 +16,8 @@ import com.hedera.utilities.ExampleUtilities;
 public final class DemoAccount {
 	
 	public static void main (String... arguments) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(DemoAccount.class);
-		
+	   final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(DemoAccount.class);
+	   
 		//DO NOT CHANGE THESE, CHANGE BELOW INSTEAD
 		boolean create = false; //OK
     	boolean getBalance = false; //OK
@@ -27,11 +27,11 @@ public final class DemoAccount {
     	boolean doAddClaim = false;//OK
 		boolean getTXRecord = false;
 
-//    	create = true;
+    	create = true;
     	getBalance = true;
-//    	send = true;
-//    	getInfo = true;
-//    	update = true;
+    	send = true;
+    	getInfo = true;
+    	update = true;
 //    	doAddClaim = true; //-- not implemented ?
 //    	getTXRecord = true; //-- records not supported
 		
@@ -48,8 +48,7 @@ public final class DemoAccount {
 	    	myAccount.accountNum = myAccount.txQueryDefaults.payingAccountID.accountNum;
     	
     		AccountGetBalance.getBalance(myAccount);
-    		System.out.println(String.format("My balance=%d tinybar", myAccount.balance()));
-    		System.exit(0);
+    		ExampleUtilities.showResult(String.format("My balance=%d tinybar", myAccount.balance()));
     	}
     	
     	/*
@@ -80,15 +79,13 @@ public final class DemoAccount {
         	newAccount.txQueryDefaults.generateRecord = getTXRecord;
         	// create a new keypair
     		HederaKeyPair newAccountKey = new HederaKeyPair(KeyType.ED25519);
-    		System.out.println(String.format("New account public key %s=",newAccountKey.getPublicKeyHex()));
-    		System.out.println(String.format("New account private/secret key %s=",newAccountKey.getSecretKeyHex()));
+    		ExampleUtilities.showResult(String.format("New account public key = %s\nNew account private/secret key %s=",newAccountKey.getPublicKeyHex(), newAccountKey.getSecretKeyHex()));
+
     		// create a new account with a balance of 10000000 tinybar, using the above generated public key
     		newAccount = AccountCreate.create(newAccount, newAccountKey.getPublicKeyHex(), newAccountKey.getKeyType(), 10000000);
 
 	    	if (newAccount == null) {
-    			logger.info("*******************************************");
-    			logger.info("ACCOUNT CREATE FAILED");
-    			logger.info("*******************************************");
+	    		ExampleUtilities.showResult("ACCOUNT CREATE FAILED");
     			throw new Exception("Account create failure");
 	    	} else {
 	    		// the helper function (AccountCreate) populated the newAccount object's accountNum from the transaction receipt it 
@@ -119,13 +116,12 @@ public final class DemoAccount {
 			    	// setup my account number from properties file
 			    	myAccount.accountNum = myAccount.txQueryDefaults.payingAccountID.accountNum;
 
-			    	logger.info("Start Time" + Instant.now());
 		    		AccountSend.send(myAccount, newAccount, 100);
-		    		logger.info("End Time" + Instant.now());
-					// get balance for my account
+
+		    		// get balance for my account
 			    	if (getBalance) {
 			    		AccountGetBalance.getBalance(myAccount);
-			    		System.out.println(String.format("My balance=%d tinybar", myAccount.balance()));
+			    		ExampleUtilities.showResult(String.format("My balance=%d tinybar", myAccount.balance()));
 			    	}
 					// get balance for the new account
 			    	if (getBalance) {
@@ -133,7 +129,7 @@ public final class DemoAccount {
 			    		newAccount.txQueryDefaults.payingAccountID = newAccount.getHederaAccountID();
 			    		newAccount.txQueryDefaults.payingKeyPair = newAccountKey;
 			    		AccountGetBalance.getBalance(newAccount);
-			    		System.out.println(String.format("New account balance=%d tinybar", newAccount.balance()));
+			    		ExampleUtilities.showResult(String.format("New account balance=%d tinybar", newAccount.balance()));
 			    	}
 		    	}
 		    	
@@ -175,9 +171,7 @@ public final class DemoAccount {
 		    			newAccount.txQueryDefaults.payingKeyPair = ed25519Key;
 		    			AccountGetInfo.getInfo(newAccount);
 		    		} else {
-		    			logger.info("*******************************************");
-		    			logger.info("ACCOUNT UPDATE FAILED - account is now null");
-		    			logger.info("*******************************************");
+		    			ExampleUtilities.showResult("ACCOUNT UPDATE FAILED - account is now null");
 		    		}
 		    	}
 		    	if (doAddClaim) {

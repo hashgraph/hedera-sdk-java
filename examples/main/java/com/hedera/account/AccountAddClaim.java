@@ -1,6 +1,5 @@
 package com.hedera.account;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.account.HederaAccount;
@@ -13,7 +12,7 @@ import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class AccountAddClaim {
 	public static boolean addClaim(HederaAccount account, HederaClaim claim, HederaKeyPair claimKeyPair) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(AccountAddClaim.class);
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(AccountAddClaim.class);
 
 		logger.info("");
 		logger.info("# CRYPTO ADD CLAIM");

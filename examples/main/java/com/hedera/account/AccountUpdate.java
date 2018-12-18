@@ -1,6 +1,5 @@
 package com.hedera.account;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.account.HederaAccount;
@@ -12,7 +11,7 @@ import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class AccountUpdate {
 	public static HederaAccount update(HederaAccount account, HederaAccountUpdateValues updates) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(AccountUpdate.class);
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(AccountUpdate.class);
 
 		logger.info("");
 		logger.info("CRYPTO UPDATE ACCOUNT");

@@ -1,6 +1,5 @@
 package com.hedera.contracts;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.contract.HederaContract;
@@ -9,7 +8,7 @@ import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class ContractRunLocal {
 	public static HederaContractFunctionResult runLocal(HederaContract contract, long gas, long maxResultSize, byte[] function) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(ContractRunLocal.class);
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(ContractRunLocal.class);
 		logger.info("");
 		logger.info("CONTRACT RUN LOCAL");
 		logger.info("");

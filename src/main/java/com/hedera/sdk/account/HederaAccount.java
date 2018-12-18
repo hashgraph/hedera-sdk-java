@@ -4,10 +4,7 @@ import java.io.Serializable;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaDuration;
@@ -51,7 +48,7 @@ import com.hederahashgraph.api.proto.java.TransferList;
  * Class to manage a cryptocurrency account
  */
 public class HederaAccount implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaAccount.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaAccount.class);
 	private static final long serialVersionUID = 1;
 	private HederaNode node = null;
 	// keys for signatures
