@@ -28,47 +28,47 @@ public class HederaKeyList implements Serializable {
 	 * Default constructor for the {@link HederaKeyList} with an empty set of {@link HederaKeyPair}
 	 */
 	public HederaKeyList() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
+	   	
+	   	
 	}
 	/**
 	 * Constructs a {@link HederaKeyList} from a List of {@link HederaKeyPair}
 	 * @param keys a {@link List} of {@link HederaKeyPair}
 	 */
 	public HederaKeyList(List<HederaKeyPair> keys) {
-	   	logger.trace("Start - Object init keyList {}", keys);
+	   	
 		
 		for (HederaKeyPair hederaKey : keys) {
 			this.keys.add(hederaKey);
 		}
-	   	logger.trace("End - Object init");
+	   	
 	}
 	/**
 	 * Constructor from a protobuf {@link KeyList}
 	 * @param protobuf the {@link KeyList} protobuf to construct this object from
 	 */
 	public HederaKeyList(KeyList protobuf) {
-	   	logger.trace("Start - Object init protobuf");
+	   	
 		// convert a protobuf payload into class data
 		this.keys.clear();
 		
 		for (Key key : protobuf.getKeysList()) {
 			this.keys.add(new HederaKeyPair(key));
 		}
-	   	logger.trace("End - Object init");
+	   	
 	}
 	/**
 	 * Returns a protobuf {@link KeyList} representation of this object
 	 * @return {@link KeyList}
 	 */
 	public KeyList getProtobuf() {
-	   	logger.trace("Start - getProtobuf");
+	   	
 		// Generates the protobuf payload for this class
 		KeyList.Builder keyListProtobuf = KeyList.newBuilder();
 		for (HederaKeyPair key : this.keys) {
 			keyListProtobuf.addKeys(key.getProtobuf());
 		}
-	   	logger.trace("End - getProtobuf");
+	   	
 		
 		return keyListProtobuf.build();
 	}
@@ -80,19 +80,19 @@ public class HederaKeyList implements Serializable {
 	 * @throws InvalidKeySpecException if the keypair cannot be created
 	 */
 	public void addKey(HederaKeyPair.KeyType keyType, byte[] publicKey, byte[] privateKey) throws InvalidKeySpecException {
-	   	logger.trace("Start - addKey keyType {}, key {}", keyType, publicKey, privateKey);
+	   	
 		HederaKeyPair hederaKey = new HederaKeyPair(keyType, publicKey, privateKey);
 		addKey(hederaKey);
-	   	logger.trace("End - addKey");
+	   	
 	}
 	/**
 	 * Adds a {@link HederaKeyPair} to the list of keys
 	 * @param key a {@link HederaKeyPair} to add to the list
 	 */
 	public void addKey(HederaKeyPair key) {
-	   	logger.trace("Start - addKey key {}", key);
+	   	
 		this.keys.add(key);
-	   	logger.trace("End - addKey");
+	   	
 	}
 	/**
 	 * Deletes a {@link HederaKeyPair} from the list
@@ -100,7 +100,7 @@ public class HederaKeyList implements Serializable {
 	 * @return boolean if successful
 	 */
 	public boolean deleteKey(HederaKeyPair key) {
-	   	logger.trace("deleteKey key {}", key);
+	   	
 		return this.keys.remove(key);
 	}
 	/** 
@@ -109,7 +109,7 @@ public class HederaKeyList implements Serializable {
 	 */
 	@SuppressWarnings("unchecked")
 	public JSONArray JSON() {
-	   	logger.trace("Start - JSON");
+	   	
 	   	
 		JSONArray jsonKeys =new JSONArray();
 
@@ -117,7 +117,7 @@ public class HederaKeyList implements Serializable {
 			jsonKeys.add(hederaKey.JSON());
 		}
 	   	
-		logger.trace("End - JSON");
+		
 		
 		return jsonKeys;
 	}
@@ -126,7 +126,7 @@ public class HederaKeyList implements Serializable {
 	 * @return {@link String}
 	 */
 	public String JSONString() {
-	   	logger.trace("JSONString");
+	   	
 		return JSON().toJSONString();
 	}
 	/**
@@ -135,7 +135,7 @@ public class HederaKeyList implements Serializable {
 	 * @param jsonKeys a {@link JSONArray} of keys
 	 */
 	public void fromJSON(JSONArray jsonKeys) {
-	   	logger.trace("Start - fromJSON");
+	   	
 		
 		// delete all keys
 		this.keys.clear();
@@ -147,6 +147,6 @@ public class HederaKeyList implements Serializable {
 			key.fromJSON(jsonKey);
 			this.addKey(key);
 		}
-	   	logger.trace("End - fromJSON");
+	   	
 	}
 }

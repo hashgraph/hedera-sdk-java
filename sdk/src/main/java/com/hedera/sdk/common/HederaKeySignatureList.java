@@ -29,19 +29,19 @@ public class HederaKeySignatureList implements Serializable {
 	 * Default constructor
 	 */
 	public HederaKeySignatureList() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
+	   	
+	   	
 	}
 	/**
 	 * Constructs from a list of {@link HederaKeySignature}
 	 * @param keySigPairs the list of {@link HederaKeySignature}
 	 */
 	public HederaKeySignatureList(List<HederaKeySignature> keySigPairs) {
-	   	logger.trace("Start - Object init keySigPairs {}", keySigPairs);
+	   	
 		for (HederaKeySignature keySigPair : keySigPairs) {
 			this.keySigPairs.add(keySigPair);
 		}
-	   	logger.trace("End - Object init");
+	   	
 	}
 //	/**
 //	 * Constructs from a {@link KeyList} protobuf and matching {@link SignatureList}
@@ -50,7 +50,7 @@ public class HederaKeySignatureList implements Serializable {
 //	 * @param protobufSignatures the protobuf for the signatures
 //	 */
 //	public HederaKeySignatureList(KeyList protobufKeys, SignatureList protobufSignatures) {
-//	   	logger.trace("Start - Object init protobufKeys {}, protobufSignatures {}", protobufKeys, protobufSignatures);
+//	   	
 //		// convert a protobuf payload into class data
 //		this.keySigPairs.clear();
 //		
@@ -59,20 +59,20 @@ public class HederaKeySignatureList implements Serializable {
 //			Signature sig = protobufSignatures.getSigs(index);
 //			this.keySigPairs.add(new HederaKeySignature(key, sig));
 //		}
-//	   	logger.trace("End - Object init");
+//	   	
 //	}
 	/**
 	 * Gets the protobuf for the keys in this list
 	 * @return {@link KeyList}
 	 */
 	public KeyList getProtobufKeys() {
-	   	logger.trace("Start - getProtobufKeys");
+	   	
 		// Generates the protobuf payload for this class
 		KeyList.Builder keyListProtobuf = KeyList.newBuilder();
 		for (HederaKeySignature key : this.keySigPairs) {
 			keyListProtobuf.addKeys(key.getKeyProtobuf());
 		}
-	   	logger.trace("End - getProtobufKeys");
+	   	
 		
 		return keyListProtobuf.build();
 	}
@@ -81,13 +81,13 @@ public class HederaKeySignatureList implements Serializable {
 	 * @return {@link SignatureList}
 	 */
 	public SignatureList getProtobufSignatures() {
-	   	logger.trace("Start - getProtobufSignatures");
+	   	
 		// Generates the protobuf payload for this class
 		SignatureList.Builder sigListProtobuf = SignatureList.newBuilder();
 		for (HederaKeySignature sig : this.keySigPairs) {
 			sigListProtobuf.addSigs(sig.getSignatureProtobuf());
 		}
-	   	logger.trace("End - getProtobufSignatures");
+	   	
 		
 		return sigListProtobuf.build();
 	}
@@ -98,19 +98,19 @@ public class HederaKeySignatureList implements Serializable {
 	 * @param signature the signature as a byte array 
 	 */
 	public void addKeySignaturePair(HederaKeyPair.KeyType keyType, byte[] key, byte[] signature) {
-	   	logger.trace("Start - addKeySignaturePair keyType {}, key {}, signature {}", keyType, key, signature);
+	   	
 		HederaKeySignature hederaKeySigPair = new HederaKeySignature(keyType, key, signature);
 		addKeySignaturePair(hederaKeySigPair);
-	   	logger.trace("End - addKeySignaturePair");
+	   	
 	}
 	/**
 	 * Adds a {@link HederaKeySignature} to the list
 	 * @param keySigPair a {@link HederaKeySignature} object
 	 */
 	public void addKeySignaturePair(HederaKeySignature keySigPair) {
-	   	logger.trace("Start - addKey keySigPair {}", keySigPair);
+	   	
 		this.keySigPairs.add(keySigPair);
-	   	logger.trace("End - addKey");
+	   	
 	}
 	/**
 	 * Deletes a matching {@link HederaKeySignature} from the list
@@ -118,7 +118,7 @@ public class HederaKeySignatureList implements Serializable {
 	 * @return true if successfully found and removed
 	 */
 	public boolean deleteKeySigPair(HederaKeySignature keySigPair) {
-	   	logger.trace("deleteKeySigPair keySigPair {}", keySigPair);
+	   	
 		return this.keySigPairs.remove(keySigPair);
 	}
 	/**
@@ -132,19 +132,19 @@ public class HederaKeySignatureList implements Serializable {
 	 * @return boolean true if a signature was set
 	 */
 	public boolean setSignatureForKey(byte[] key, byte[] signature, boolean stopAtFirst) {
-	   	logger.trace("Start - setSignatureForKey key {}, signature {}, stopAtFirst {}", key, signature, stopAtFirst);
+	   	
 		boolean foundOne = false;
 
 		for (HederaKeySignature keySigPair : keySigPairs) {
 			if (keySigPair.setSignatureForKey(key, signature, stopAtFirst)) {
 				foundOne = true;
 				if (stopAtFirst) {
-				   	logger.trace("End - setSignatureForKey");
+				   	
 					return true;
 				}
 			}
 		}
-	   	logger.trace("End - setSignatureForKey");
+	   	
 		return foundOne;
 	}
 	/**
@@ -158,7 +158,7 @@ public class HederaKeySignatureList implements Serializable {
 	 * @return boolean true if a signature was set
 	 */
 	public boolean setSignatureForKeys(byte[][] keys, byte[][] signatures, boolean stopAtFirst) {
-	   	logger.trace("Start - setSignatureForKeys keys {}, signatures {}, stopAtFirst {}", keys, signatures, stopAtFirst);
+	   	
 	   	boolean foundOne = false;
 
 	   	for (int i=0; i < keys.length; i++) {
@@ -166,7 +166,7 @@ public class HederaKeySignatureList implements Serializable {
 				foundOne = true;
 			}
 	   	}
-	   	logger.trace("End - setSignatureForKeys");
+	   	
 
 		return foundOne;
 	}
@@ -178,15 +178,15 @@ public class HederaKeySignatureList implements Serializable {
 	 * @return boolean true if key was found
 	 */
 	public boolean setSignatureForKeyUUID(String uuid, byte[] signature) {
-	   	logger.trace("Start - setSignatureForKeyUUID uuid {}, signature {}", uuid, signature);
+	   	
 
 		for (HederaKeySignature keySigPair : keySigPairs) {
 			if (keySigPair.setSignatureForKeyUUID(uuid, signature)) {
-			   	logger.trace("End - setSignatureForKeyUUID");
+			   	
 				return true;
 			}
 		}
-	   	logger.trace("End - setSignatureForKeyUUID");
+	   	
 		return false;
 	}
 	/**
@@ -197,7 +197,7 @@ public class HederaKeySignatureList implements Serializable {
 	 * @return boolean true if a signature was set
 	 */
 	public boolean setSignatureForKeyUUIDs(String[] uuids, byte[][] signatures) {
-	   	logger.trace("Start - setSignatureForKeyUUIDs uuids {}, signatures {}", uuids, signatures);
+	   	
 		boolean foundOne = false;
 
 		for (int i=0; i < uuids.length; i++) {
@@ -205,7 +205,7 @@ public class HederaKeySignatureList implements Serializable {
 				foundOne = true;
 			}
 		}
-	   	logger.trace("End - setSignatureForKeyUUIDs");
+	   	
 		return foundOne;
 	}
 	/**
@@ -216,7 +216,7 @@ public class HederaKeySignatureList implements Serializable {
 	 * @return true if a signature was updated
 	 */
 	public boolean updateSignatureForKey(byte[] key, byte[] signature) {
-	   	logger.trace("Start - updateSignatureForKey key {}, signature {}", key, signature);
+	   	
 		boolean foundOne = false;
 
 		for (HederaKeySignature keySigPair : keySigPairs) {
@@ -224,7 +224,7 @@ public class HederaKeySignatureList implements Serializable {
 				foundOne = true;
 			}
 		}
-	   	logger.trace("End - updateSignatureForKey");
+	   	
 		return foundOne;
 	}
 	/**
@@ -235,7 +235,7 @@ public class HederaKeySignatureList implements Serializable {
 	 * @return true if a signature was updated
 	 */
 	public boolean updateSignatureForKeys(byte[][] keys, byte[][] signatures) {
-	   	logger.trace("Start - updateSignatureForKeys keys {}, signatures {}", keys, signatures);
+	   	
 		boolean foundOne = false;
 		
 		for (int i=0; i < keys.length; i++) {
@@ -243,7 +243,7 @@ public class HederaKeySignatureList implements Serializable {
 				foundOne = true;
 			}
 		}
-	   	logger.trace("End - updateSignatureForKeys");
+	   	
 		
 		return foundOne;
 	}
@@ -256,12 +256,12 @@ public class HederaKeySignatureList implements Serializable {
 	 * @param publicKey the public key to look for
 	 */
 	public void getKeyUUIDs(List<HederaKeyUUIDDescription> hederaKeyUUIDDescriptions, byte[] publicKey) {
-	   	logger.trace("Start - getKeyUUIDs hederaKeyUUIDDescriptions {}, publicKey {}", hederaKeyUUIDDescriptions, publicKey);
+	   	
 
 		for (HederaKeySignature keySigPair : keySigPairs) {
 			keySigPair.getKeyUUIDs(hederaKeyUUIDDescriptions, publicKey);
 		}
-	   	logger.trace("End - getKeyUUIDs");
+	   	
 	}	
 
 	/**
@@ -270,14 +270,14 @@ public class HederaKeySignatureList implements Serializable {
 	 */
 	@SuppressWarnings("unchecked")
 	public JSONArray JSON() {
-	   	logger.trace("Start - JSON");
+	   	
 
 		JSONArray jsonKeys = new JSONArray();
 		for (HederaKeySignature hederaKeySignature : this.keySigPairs) {
 			jsonKeys.add(hederaKeySignature.JSON());
 		}
 
-		logger.trace("End - JSON");
+		
 		
 		return jsonKeys;
 	}
@@ -286,8 +286,8 @@ public class HederaKeySignatureList implements Serializable {
 	 * @return {@link String}
 	 */
 	public String JSONString() {
-	   	logger.trace("Start - JSONString");
-	   	logger.trace("End - JSONString");
+	   	
+	   	
 		return JSON().toJSONString();
 	}
 	/**
@@ -295,7 +295,7 @@ public class HederaKeySignatureList implements Serializable {
 	 * @param jsonKeys the {@link JSONArray} to populate this object with
 	 */
 	public void fromJSON(JSONArray jsonKeys) {
-	   	logger.trace("Start - fromJSON");
+	   	
 		
 		// delete all keys
 		this.keySigPairs.clear();
@@ -307,6 +307,6 @@ public class HederaKeySignatureList implements Serializable {
 			key.fromJSON(jsonKey);
 			this.addKeySignaturePair(key);
 		}
-	   	logger.trace("End - fromJSON");
+	   	
 	}
 }

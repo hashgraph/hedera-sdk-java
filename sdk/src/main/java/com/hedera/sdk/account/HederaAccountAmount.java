@@ -1,10 +1,7 @@
 package com.hedera.sdk.account;
 
 import java.io.Serializable;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.hedera.sdk.common.HederaAccountID;
 import com.hederahashgraph.api.proto.java.AccountAmount;
 import com.hederahashgraph.api.proto.java.AccountID;
@@ -14,7 +11,7 @@ import com.hederahashgraph.api.proto.java.AccountID;
  */
 
 public class HederaAccountAmount implements Serializable {
-	final static Logger logger = LoggerFactory.getLogger(HederaAccountAmount.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaAccountAmount.class);
 	private static final long serialVersionUID = 1;
 
 	/**
@@ -37,8 +34,6 @@ public class HederaAccountAmount implements Serializable {
 	 * Default constructor
 	 */
 	public HederaAccountAmount() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
 	}
 	/**
 	 * Constructor from shard, realm, account numbers and amount
@@ -48,13 +43,11 @@ public class HederaAccountAmount implements Serializable {
 	 * @param amount the amount to transfer
 	 */
 	public HederaAccountAmount(long shardNum, long realmNum, long accountNum, long amount) {
-	   	logger.trace("Start - Object init in shard {}, realm {}. Account number {}, amount {}", shardNum, realmNum, accountNum, amount);
  		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.accountNum = accountNum;
 		this.amount = amount;
 		
-	   	logger.trace("End - Object init");
 	}
 	/**
 	 * Constructor from HederaAccountID and amount
@@ -62,25 +55,21 @@ public class HederaAccountAmount implements Serializable {
 	 * @param amount the amount
 	 */
 	public HederaAccountAmount(HederaAccountID accountID, long amount) {
-	   	logger.trace("Start - Object init in shard {}, realm {}. Account number {}, amount {}", shardNum, realmNum, accountNum, amount);
  		this.shardNum = accountID.shardNum;
 		this.realmNum = accountID.realmNum;
 		this.accountNum = accountID.accountNum;
 		this.amount = amount;
 		
-	   	logger.trace("End - Object init");
 	}
 	/**
 	 * Construct from a {@link AccountAmount} protobuf stream
 	 * @param accountAmount the account amount
 	 */
 	public HederaAccountAmount(AccountAmount accountAmount) {
-	   	logger.trace("Start - Object init in protobuf {}", accountAmount);
 		this.shardNum = accountAmount.getAccountID().getShardNum();
 		this.realmNum = accountAmount.getAccountID().getRealmNum();
 		this.accountNum = accountAmount.getAccountID().getAccountNum();
 		this.amount = accountAmount.getAmount();
-	   	logger.trace("End - Object init");
 	}
 
 	/**
@@ -88,7 +77,6 @@ public class HederaAccountAmount implements Serializable {
 	 * @return {@link AccountAmount}
 	 */
 	public AccountAmount getProtobuf() {
-	   	logger.trace("Start - getProtobuf");
 		
 	   	AccountAmount.Builder accountAmount = AccountAmount.newBuilder();
 		AccountID.Builder accountID = AccountID.newBuilder();
@@ -100,8 +88,6 @@ public class HederaAccountAmount implements Serializable {
 		accountAmount.setAccountID(accountID);
 		accountAmount.setAmount(this.amount);
 	   	
-	   	logger.trace("End - getProtobuf");
-
 		return accountAmount.build();
 	}
 }

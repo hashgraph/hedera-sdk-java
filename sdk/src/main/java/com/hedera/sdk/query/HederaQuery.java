@@ -17,6 +17,7 @@ import com.hederahashgraph.api.proto.java.FileGetInfoQuery;
 import com.hederahashgraph.api.proto.java.GetByKeyQuery;
 import com.hederahashgraph.api.proto.java.GetBySolidityIDQuery;
 import com.hederahashgraph.api.proto.java.Query;
+import com.hederahashgraph.api.proto.java.TransactionGetFastRecordQuery;
 import com.hederahashgraph.api.proto.java.TransactionGetReceiptQuery;
 import com.hederahashgraph.api.proto.java.TransactionGetRecordQuery;
 
@@ -46,6 +47,7 @@ public class HederaQuery implements Serializable {
 		GETBYSOLIDITYID,
 		TRANSACTIONGETRECEIPT,
 		TRANSACTIONGETRECORD,
+		TRANSACTIONGETFASTRECORD,
 		NOTSET
 	}
 	/**
@@ -61,8 +63,8 @@ public class HederaQuery implements Serializable {
 	 * Default constructor
 	 */
 	public HederaQuery() {
-		logger.trace("Start - Object init");
-		logger.trace("End - Object init");
+		
+		
 	}
 	/**
 	 * Constructor with query type and data
@@ -70,18 +72,16 @@ public class HederaQuery implements Serializable {
 	 * @param queryData the query data
 	 */
 	public HederaQuery(QueryType queryType, Object queryData) {
-	   	logger.trace("Start - Object init queryType {}, data {}"
-	   			, queryType, queryData);
 		this.queryType = queryType;
 		this.queryData = queryData;
-		logger.trace("End - Object init");
+		
 	}
 	/**
 	 * Returns a {@link Query} object containing the protobuf data for this query object
 	 * @return {@link Query}
 	 */
 	public Query getProtobuf() {
-		logger.trace("Start - getProtobuf");
+		
 		// Generates the protobuf payload for this class
 		Query.Builder query = Query.newBuilder();
 		switch (this.queryType) {
@@ -127,11 +127,14 @@ public class HederaQuery implements Serializable {
 			case TRANSACTIONGETRECORD:
 				query.setTransactionGetRecord((TransactionGetRecordQuery)this.queryData);
 				break;
+			case TRANSACTIONGETFASTRECORD:
+				query.setTransactionGetFastRecord((TransactionGetFastRecordQuery)this.queryData);
+				break;
 			case NOTSET:
-				logger.trace("End - getProtobuf");
+				
 	            throw new IllegalArgumentException("Query type not set. Unable to generate data.");			
 		}
-		logger.trace("End - getProtobuf");
+		
 		
 		return query.build();
 	}

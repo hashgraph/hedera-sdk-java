@@ -34,8 +34,8 @@ public class HederaFileID implements Serializable {
 	 * Default constructor with default values
 	 */
 	public HederaFileID() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
+	   	
+	   	
 	}
 
 	/**
@@ -45,11 +45,11 @@ public class HederaFileID implements Serializable {
 	 * @param fileNum the file number
 	 */
 	public HederaFileID(long shardNum, long realmNum, long fileNum) {
-	   	logger.trace("Start - Object init shardNum {}, realmNum {}, fileNum {}", shardNum, realmNum, fileNum);
+	   	
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.fileNum = fileNum;
-	   	logger.trace("End - Object init");
+	   	
 	}
 
 	/**
@@ -57,11 +57,11 @@ public class HederaFileID implements Serializable {
 	 * @param fileIDProtobuf the protobuf to generate the HederaFileId from
 	 */
 	public HederaFileID(FileID fileIDProtobuf) {
-	   	logger.trace("Start - Object from fileIDProtobuf {}", fileIDProtobuf);
+	   	
 		this.shardNum = fileIDProtobuf.getShardNum();
 		this.realmNum = fileIDProtobuf.getRealmNum();
 		this.fileNum = fileIDProtobuf.getFileNum();
-	   	logger.trace("End - Object init");
+	   	
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class HederaFileID implements Serializable {
 	 * @return FileID protobuf
 	 */
 	public FileID getProtobuf() {
-	   	logger.trace("Start - getProtobuf");
+	   	
 		FileID.Builder fileID = FileID.newBuilder();
 		
 		fileID.setShardNum(this.shardNum);
@@ -79,7 +79,7 @@ public class HederaFileID implements Serializable {
 		}
 		fileID.setFileNum(this.fileNum);
 		
-	   	logger.trace("End - getProtobuf");
+	   	
 		return fileID.build();
 	}
 }

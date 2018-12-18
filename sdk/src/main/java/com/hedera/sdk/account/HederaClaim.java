@@ -62,8 +62,6 @@ public class HederaClaim implements Serializable {
 	 * Default constructor.
 	 */
 	public HederaClaim() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
 	}
 	/**
 	 * Constructor from shard, realm, account numbers and hash
@@ -73,12 +71,10 @@ public class HederaClaim implements Serializable {
 	 * @param hash the claim hash
 	 */
 	public HederaClaim(long shardNum, long realmNum, long accountNum, byte[] hash) {
-	   	logger.trace("Start - Object init shardNum {}, realmNum {}, accountNum {}, hash {}", shardNum, realmNum, accountNum, hash);
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.accountNum = accountNum;
 		this.hash = hash;
-	   	logger.trace("End - Object init");
 	}
 	/**
 	 * Constructor from {@link HederaAccountID} and hash
@@ -86,12 +82,10 @@ public class HederaClaim implements Serializable {
 	 * @param hash the claim hash
 	 */
 	public HederaClaim(HederaAccountID accountID, byte[] hash) {
-	   	logger.trace("Start - Object init shardNum {}, realmNum {}, accountNum {}, hash {}", shardNum, realmNum, accountNum, hash);
 		this.shardNum = accountID.shardNum;
 		this.realmNum = accountID.realmNum;
 		this.accountNum = accountID.accountNum;
 		this.hash = hash;
-	   	logger.trace("End - Object init");
 	}
 
 	/**
@@ -99,7 +93,6 @@ public class HederaClaim implements Serializable {
 	 * @param claim the claim
 	 */
 	public HederaClaim(Claim claim) {
-	   	logger.trace("Start - Object init in claim", claim);
 		this.shardNum = claim.getAccountID().getShardNum();
 		this.realmNum = claim.getAccountID().getRealmNum();
 		this.accountNum = claim.getAccountID().getAccountNum();
@@ -118,7 +111,6 @@ public class HederaClaim implements Serializable {
 			this.keySignatures.add(keySig);
 		}
 		
-	   	logger.trace("End - Object init");
 	}
 
 	/**
@@ -126,7 +118,6 @@ public class HederaClaim implements Serializable {
 	 * @return {@link Claim}
 	 */
 	public Claim getProtobuf() {
-	   	logger.trace("Start - getProtobuf");
 		
 	   	Claim.Builder protobuf = Claim.newBuilder();
 		HederaAccountID accountID = new HederaAccountID(this.shardNum, this.realmNum, this.accountNum);
@@ -142,8 +133,6 @@ public class HederaClaim implements Serializable {
 		}
 		protobuf.setKeys(protoKeyList);
 		
-	   	logger.trace("End - getProtobuf");
-
 		return protobuf.build();
 	}
 	/**
@@ -151,18 +140,14 @@ public class HederaClaim implements Serializable {
 	 * @param key the key to add
 	 */
 	public void addKey(HederaKeyPair key) {
-	   	logger.trace("Start - addKey key {}", key);
 		this.keys.add(key);
-	   	logger.trace("End - addKey");
 	}
 	/**
 	 * Adds a {@link HederaKeySignature} to the list
 	 * @param keySigPair the key signature pair to add
 	 */
 	public void addKeySignaturePair(HederaKeySignature keySigPair) {
-	   	logger.trace("Start - addKey keySigPair {}", keySigPair);
 		this.keySignatures.add(keySigPair);
-	   	logger.trace("End - addKey");
 	}
 	/**
 	 * Deletes a {@link HederaKeyPair} from the list
@@ -170,7 +155,6 @@ public class HederaClaim implements Serializable {
 	 * @return true if successful
 	 */
 	public boolean deleteKey(HederaKeyPair key) {
-	   	logger.trace("deleteKey key {}", key);
 		return this.keys.remove(key);
 	}
 	/**
@@ -179,7 +163,6 @@ public class HederaClaim implements Serializable {
 	 * @return true if successful
 	 */
 	public boolean deleteKeySignaturePair(HederaKeySignature keySigPair) {
-	   	logger.trace("deleteKeySignaturePair {}", keySigPair);
 		return this.keySignatures.remove(keySigPair);
 	}
 	/**
@@ -187,7 +170,6 @@ public class HederaClaim implements Serializable {
 	 * @return List {@link HederaKeyPair}
 	 */
 	public List<HederaKeyPair> getKeys() {
-	   	logger.trace("getKeys");
 		return this.keys;
 	}
 	/**
@@ -195,7 +177,6 @@ public class HederaClaim implements Serializable {
 	 * @return List {@link HederaKeySignature}
 	 */
 	public List<HederaKeySignature> getKeySignatures() {
-	   	logger.trace("getKeySignatures");
 		return this.keySignatures;
 	}
 }

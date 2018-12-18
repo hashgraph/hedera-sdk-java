@@ -34,8 +34,8 @@ public class HederaTransactionID implements Serializable {
 	 * Default constructor
 	 */
 	public HederaTransactionID() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
+	   	
+	   	
 	}
 	/**
 	 * Constructs from a {@link HederaAccountID}
@@ -43,11 +43,11 @@ public class HederaTransactionID implements Serializable {
 	 * @param accountID the account ID to initialise the object with
 	 */
 	public HederaTransactionID(HederaAccountID accountID) {
-	   	logger.trace("Start - Object init accountID {}", accountID);
+	   	
 		this.accountID = accountID;
 		// timestamp defaults to now if not specified
 		this.transactionValidStart = new HederaTimeStamp();
-	   	logger.trace("End - Object init");
+	   	
 	}
 	/**
 	 * Constructs from a {@link HederaAccountID} and {@link HederaTimeStamp}
@@ -55,10 +55,10 @@ public class HederaTransactionID implements Serializable {
 	 * @param transactionValidStart the transaction valid start date/time
 	 */
 	public HederaTransactionID(HederaAccountID accountID, HederaTimeStamp transactionValidStart) {
-	   	logger.trace("Start - Object init accountID {}, transactionValidStart {}", accountID, transactionValidStart);
+	   	
 		this.accountID = accountID;
 		this.transactionValidStart = transactionValidStart;
-	   	logger.trace("End - Object init");
+	   	
 	}
 
 	/**
@@ -66,10 +66,10 @@ public class HederaTransactionID implements Serializable {
 	 * @param transactionIDProtobuf the transactinID in protobuf format
 	 */
 	public HederaTransactionID(TransactionID transactionIDProtobuf) {
-	   	logger.trace("Start - Object init transactionIDProtobuf {}", transactionIDProtobuf);
+	   	
 		this.transactionValidStart = new HederaTimeStamp(transactionIDProtobuf.getTransactionValidStart());
 		this.accountID = new HederaAccountID(transactionIDProtobuf.getAccountID());
-	   	logger.trace("End - Object init");
+	   	
 	}
 
 	/**
@@ -77,13 +77,13 @@ public class HederaTransactionID implements Serializable {
 	 * @return {@link TransactionID}
 	 */
 	public TransactionID getProtobuf() {
-	   	logger.trace("Start - getProtobuf");
+	   	
 		TransactionID.Builder transactionID = TransactionID.newBuilder();
 		
 		transactionID.setAccountID(this.accountID.getProtobuf());
 		transactionID.setTransactionValidStart(this.transactionValidStart.getProtobuf());
 		
-	   	logger.trace("End - getProtobuf");
+	   	
 		return transactionID.build();
 	}
 }

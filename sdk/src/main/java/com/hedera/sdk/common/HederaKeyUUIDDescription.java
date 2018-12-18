@@ -33,9 +33,9 @@ public class HederaKeyUUIDDescription implements Serializable {
 	 * @param description the description
 	 */
 	public HederaKeyUUIDDescription (String uuid, String description) {
-		logger.trace("Start - HederaKeyUUIDDescription uuid {}, description {}", uuid, description);
+		
 		this.description = description;
 		this.uuid = uuid;
-		logger.trace("End - HederaKeyUUIDDescription");
+		
 	}
 }

@@ -30,8 +30,8 @@ public class HederaDuration implements Serializable {
 	 * Constructor with default values 
 	 */
 	public HederaDuration() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
+	   	
+	   	
 	}
 
 	/**
@@ -40,10 +40,10 @@ public class HederaDuration implements Serializable {
 	 * @param nanos the number of nanoseconds 
 	 */
 	public HederaDuration(long seconds, int nanos) {
-	   	logger.trace("Start - Object init seconds {}, nanos {}", seconds, nanos);
+	   	
 		this.seconds = seconds;
 		this.nanos = nanos;
-	   	logger.trace("End - Object init");
+	   	
 	}
 
 	/**
@@ -51,10 +51,10 @@ public class HederaDuration implements Serializable {
 	 * @param durationProtobuf the protobuf for the duration
 	 */
 	public HederaDuration(Duration durationProtobuf) {
-	   	logger.trace("Start - Object init durationProtobuf {}", durationProtobuf);
+	   	
 		this.seconds = durationProtobuf.getSeconds();
 		this.nanos = durationProtobuf.getNanos();
-	   	logger.trace("End - Object init");
+	   	
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class HederaDuration implements Serializable {
 	 * @return Duration protobuf object
 	 */
 	public Duration getProtobuf() {
-	   	logger.trace("getProtobuf");
+	   	
 		return Duration.newBuilder().setSeconds(this.seconds)
 			    .setNanos(this.nanos).build();
 	}

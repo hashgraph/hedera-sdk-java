@@ -53,8 +53,8 @@ public class HederaQueryBySolidityID implements Serializable {
 	 * Default constructor
 	 */
 	public HederaQueryBySolidityID() {
-		logger.trace("Start - Object init");
-		logger.trace("End - Object init");
+		
+		
 	}
 	/**
 	 * Returns the precheck result for a query
@@ -90,7 +90,7 @@ public class HederaQueryBySolidityID implements Serializable {
 	public boolean query(HederaTransaction payment, HederaQueryHeader.QueryResponseType responseType, String solidityID) throws InterruptedException {
 		boolean result = true;
 		
-	   	logger.trace("Start - query payment {}, responseType {}, solidityID {}", payment, responseType, solidityID);
+	   	
 		// build the query
 	   	// Header
 		HederaQueryHeader queryHeader = new HederaQueryHeader();
@@ -137,7 +137,7 @@ public class HederaQueryBySolidityID implements Serializable {
 			result = false;
 		}
 		
-	   	logger.trace("End - getInfo");
+	   	
 	   	return result;
 	}
 	/**
@@ -149,7 +149,7 @@ public class HederaQueryBySolidityID implements Serializable {
 	 * @throws InterruptedException should an exception occur during communication with the node
 	 */
 	public boolean queryAnswerOnly(HederaTransaction payment, String solidityID) throws InterruptedException {
-	   	logger.trace("Start - queryAnswerOnly");
+	   	
 	   	return query(payment, QueryResponseType.ANSWER_ONLY, solidityID);
 	}
 	/**
@@ -161,7 +161,7 @@ public class HederaQueryBySolidityID implements Serializable {
 	 * @throws InterruptedException should an exception occur during communication with the node
 	 */
 	public boolean queryStateProof(HederaTransaction payment, String solidityID) throws InterruptedException {
-	   	logger.trace("queryStateProof");
+	   	
 		return query(payment, HederaQueryHeader.QueryResponseType.ANSWER_STATE_PROOF, solidityID);
 	}
 	/**
@@ -172,7 +172,7 @@ public class HederaQueryBySolidityID implements Serializable {
 	 * @throws InterruptedException should an exception occur during communication with the node
 	 */
 	public boolean queryCostAnswer(String solidityID) throws InterruptedException {
-	   	logger.trace("queryCostAnswer");
+	   	
 		return query(null, HederaQueryHeader.QueryResponseType.COST_ANSWER, solidityID);
 	}
 	/**
@@ -183,7 +183,7 @@ public class HederaQueryBySolidityID implements Serializable {
 	 * @throws InterruptedException should an exception occur during communication with the node
 	 */
 	public boolean queryCostAnswerStateProof(String solidityID) throws InterruptedException {
-	   	logger.trace("queryCostAnswerStateProof");
+	   	
 		return query(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF, solidityID);
 	}
 	

@@ -85,8 +85,8 @@ public class HederaTransaction implements Serializable {
 	 * Default constructor
 	 */
 	public HederaTransaction() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
+	   	
+	   	
 	}
 	/**
 	 * Constructs from a {@link HederaTransactionBody} body and {@link HederaSignatureList} signatures
@@ -94,24 +94,24 @@ public class HederaTransaction implements Serializable {
 	 * @param sigs {@link HederaSignatureList}
 	 */
 	public HederaTransaction(HederaTransactionBody body, HederaSignatureList sigs) {
-	   	logger.trace("Start - Object init body {}, sigs {}",body, sigs);
+	   	
 		this.body = body;
 		this.signatureList = sigs;
-	   	logger.trace("End - Object init");
+	   	
 	}
 	/**
 	 * returns the protobuf for this transaction
 	 * @return {@link Transaction}
 	 */
 	public Transaction getProtobuf() {
-	   	logger.trace("Start - getProtobuf");
+	   	
 		// Generates the protobuf payload for this class
 		Transaction.Builder transactionProtobuf = Transaction.newBuilder();
 		
 		transactionProtobuf.setBody(this.body.getProtobuf());
 		// if we have key signature pairs, use these\
 		transactionProtobuf.setSigs(this.signatureList.getProtobuf());
-	   	logger.trace("End - getProtobuf");
+	   	
 		
 		return transactionProtobuf.build();
 	}
@@ -120,10 +120,10 @@ public class HederaTransaction implements Serializable {
 	 * @param signature {@link HederaSignature}
 	 */
 	public void addSignature(HederaSignature signature) {
-	   	logger.trace("Start - addSignature signature {}", signature);
+	   	
 		this.signatureList.addSignature(signature);
 		// can't do anything to keysignatureList here, we don't have a key
-	   	logger.trace("End - addSignature");
+	   	
 	}
 
 	/**
@@ -144,7 +144,7 @@ public class HederaTransaction implements Serializable {
 
 		Response response = null;
 		while(!result) {
-		   	logger.trace("Start - getReceipt {}", transactionID);
+		   	
 			// build the query
 		   	// Header
 			HederaQueryHeader queryHeader = new HederaQueryHeader();
@@ -171,8 +171,62 @@ public class HederaTransaction implements Serializable {
 		}
 		this.transactionReceipt = new HederaTransactionReceipt(response.getTransactionGetReceipt());
 
-	   	logger.trace("End - getReceipt");
+	   	
 	   	return true;
+	}
+	/**
+	 * Get a fast record for a transaction. These only last 180s and are free 
+	 * If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created. 
+	 * If the transaction called a smart contract function, then the record contains the result of that call. 
+	 * If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer. 
+	 * If the transaction didn't return anything that should be in the record, then the results field will be set to nothing.
+	 * @param transactionID the {@link HederaTransactionID} for which the record is requested
+	 * @param responseType the type of response required
+	 * @return true if successful
+	 * @throws InterruptedException in the event of a node communication error
+	 */
+	public boolean getFastRecord(HederaTransactionID transactionID, HederaQueryHeader.QueryResponseType responseType) throws InterruptedException {
+		boolean result = true;
+		
+
+		// build the query
+	   	// Header
+		HederaQueryHeader queryHeader = new HederaQueryHeader();
+		
+		TransactionGetFastRecordQuery.Builder getQuery = TransactionGetFastRecordQuery.newBuilder();
+		getQuery.setTransactionID(transactionID.getProtobuf());
+		getQuery.setHeader(queryHeader.getProtobuf());
+		
+		// the query itself
+		HederaQuery query = new HederaQuery();
+		query.queryType = QueryType.TRANSACTIONGETFASTRECORD;
+		query.queryData = getQuery.build();
+		
+		// query now set, send to network
+		Utilities.throwIfNull("Node", this.node);
+		Response response = this.node.getTransactionFastRecord(query);
+		TransactionGetFastRecordResponse getResponse = response.getTransactionGetFastRecord();
+
+		// check response header first
+		ResponseHeader responseHeader = getResponse.getHeader();
+
+		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
+				
+		if (this.precheckResult == ResponseCodeEnum.OK) {
+
+			// cost
+			this.cost = responseHeader.getCost();
+			//state proof
+			this.stateProof = responseHeader.getStateProof().toByteArray();
+			
+			this.transactionRecord = new HederaTransactionRecord(getResponse.getTransactionRecord());
+			
+		} else {
+			result = false;
+		}
+		
+
+	   	return result;
 	}
 	/**
 	 * Get the record for a transaction. 
@@ -190,7 +244,7 @@ public class HederaTransaction implements Serializable {
 	public boolean getRecord(HederaTransaction payment, HederaTransactionID transactionID, HederaQueryHeader.QueryResponseType responseType) throws InterruptedException {
 		boolean result = true;
 		
-	   	logger.trace("Start - getRecord payment {}, transactionID {}, responseType {}", payment, transactionID, responseType);
+	   	
 		// build the query
 	   	// Header
 		HederaQueryHeader queryHeader = new HederaQueryHeader();
@@ -232,7 +286,7 @@ public class HederaTransaction implements Serializable {
 			result = false;
 		}
 		
-	   	logger.trace("End - getRecord");
+	   	
 	   	return result;
 	}
 	/**
@@ -248,7 +302,7 @@ public class HederaTransaction implements Serializable {
 	 * @throws InterruptedException in the event of a node communication error
 	 */
 	public boolean getRecordAnswerOnly(HederaTransaction payment, HederaTransactionID transactionID) throws InterruptedException {
-	   	logger.trace("Start - getRecordAnswerOnly");
+	   	
 	   	return getRecord(payment, transactionID, QueryResponseType.ANSWER_ONLY);
 	}
 	/**
@@ -264,7 +318,7 @@ public class HederaTransaction implements Serializable {
 	 * @throws InterruptedException in the event of a node communication error
 	 */
 	public boolean getRecordStateProof(HederaTransaction payment, HederaTransactionID transactionID) throws InterruptedException {
-	   	logger.trace("getRecordStateProof");
+	   	
 		return getRecord(payment, transactionID, HederaQueryHeader.QueryResponseType.ANSWER_STATE_PROOF);
 	}
 	/**
@@ -279,7 +333,7 @@ public class HederaTransaction implements Serializable {
 	 * @throws InterruptedException in the event of a node communication error
 	 */
 	public boolean getRecordCostAnswer(HederaTransactionID transactionID) throws InterruptedException {
-	   	logger.trace("getRecordCostAnswer");
+	   	
 		return getRecord(null, transactionID, HederaQueryHeader.QueryResponseType.COST_ANSWER);
 	}
 	/**
@@ -294,7 +348,7 @@ public class HederaTransaction implements Serializable {
 	 * @throws InterruptedException in the event of a node communication error
 	 */
 	public boolean getRecordCostAnswerStateProof(HederaTransactionID transactionID) throws InterruptedException {
-	   	logger.trace("getRecordCostAnswerStateProof");
+	   	
 		return getRecord(null, transactionID, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
 	}
 	
@@ -305,7 +359,7 @@ public class HederaTransaction implements Serializable {
 	 * @throws Exception 
 	 */
 	public HederaTransaction(HederaTransactionAndQueryDefaults txQueryDefaults, long queryFee) throws Exception {
-	   	logger.trace("Start - init txQueryDefaults {}, queryFee {}", txQueryDefaults, queryFee);
+	   	
 		
 		// create a transaction ID (starts now with accountID of the paying account id)
 		HederaTransactionID hederaTransactionID = new HederaTransactionID(txQueryDefaults.payingAccountID);
@@ -374,6 +428,6 @@ public class HederaTransaction implements Serializable {
 		
 		// add the signatures
 		this.keySignatureList = sigsForTransaction;
-	   	logger.trace("End - init");
+	   	
 	}
 }

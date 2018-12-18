@@ -3,10 +3,7 @@ package com.hedera.sdk.contract;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.common.HederaContractID;
 import com.hederahashgraph.api.proto.java.ContractFunctionResult;
@@ -17,7 +14,7 @@ import com.hederahashgraph.api.proto.java.ContractFunctionResult;
  * The ContractCreateInstance transaction record has the results of the call to the constructor.
  */
 public class HederaContractFunctionResult implements Serializable {
-	final static Logger logger = LoggerFactory.getLogger(HederaContractFunctionResult.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaContractFunctionResult.class);
 	private static final long serialVersionUID = 1;
 	private HederaContractID contractID = new HederaContractID();
 	private byte[] contractCallResult = new byte[0];
@@ -78,8 +75,8 @@ public class HederaContractFunctionResult implements Serializable {
 	 * Default constructor
 	 */
 	public HederaContractFunctionResult() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
+	   	
+	   	
 	}
 
 	/**
@@ -87,7 +84,7 @@ public class HederaContractFunctionResult implements Serializable {
 	 * @param contractFunctionResultProtobuf the result of a contract function execution
 	 */
 	public HederaContractFunctionResult(ContractFunctionResult contractFunctionResultProtobuf) {
-		logger.trace("Start - Object init in contractFunctionResultProtobuf {}", contractFunctionResultProtobuf);
+		
 		this.contractID = new HederaContractID(contractFunctionResultProtobuf.getContractID());
 		this.contractCallResult = contractFunctionResultProtobuf.getContractCallResult().toByteArray();
 		this.errorMessage = contractFunctionResultProtobuf.getErrorMessage();
@@ -98,7 +95,7 @@ public class HederaContractFunctionResult implements Serializable {
 			HederaContractLogInfo contractLogInfo = new HederaContractLogInfo(contractFunctionResultProtobuf.getLogInfo(i));
 			this.contractLogInfo.add(contractLogInfo);
 		}
-		logger.trace("End - Object init");
+		
 	}
 
 	/**
@@ -106,7 +103,7 @@ public class HederaContractFunctionResult implements Serializable {
 	 * @return {@link ContractFunctionResult} 
 	 */
 	public ContractFunctionResult getProtobuf() {
-		logger.trace("Start - getProtobuf");
+		
 	
 		ContractFunctionResult.Builder contractFunctionResultProtobuf = ContractFunctionResult.newBuilder();
 		

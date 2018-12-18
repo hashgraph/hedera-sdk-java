@@ -1,10 +1,7 @@
 package com.hedera.sdk.common;
 
 import java.io.Serializable;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.hederahashgraph.api.proto.java.ShardID;
 
 /**
@@ -19,7 +16,7 @@ import com.hederahashgraph.api.proto.java.ShardID;
  * So realms allow Solidity to be parallelized somewhat, even though the language itself assumes everything is serial.
  */
 public class HederaShardID implements Serializable {
-	final static Logger logger = LoggerFactory.getLogger(HederaShardID.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaShardID.class);
 	private static final long serialVersionUID = 1;
 
 	/**
@@ -31,17 +28,17 @@ public class HederaShardID implements Serializable {
 	 * Default constructor
 	 */
 	public HederaShardID() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
+	   	
+	   	
 	}
 	/**
 	 * Constructor from a shardNum
 	 * @param shardNum the shard number for the shard
 	 */
 	public HederaShardID(long shardNum) {
-	   	logger.trace("Start - Object init in shard {}", shardNum);
+	   	
  		this.shardNum = shardNum;
-	   	logger.trace("End - Object init");
+	   	
 	}
 
 	/**
@@ -49,9 +46,9 @@ public class HederaShardID implements Serializable {
 	 * @param shardIDProtobuf the protobuf expression of a ShardID
 	 */
 	public HederaShardID(ShardID shardIDProtobuf) {
-	   	logger.trace("Start - Object init shardIDProtobuf {}", shardIDProtobuf);
+	   	
 		this.shardNum = shardIDProtobuf.getShardNum();
-	   	logger.trace("End - Object init");
+	   	
 	}
 
 	/**
@@ -59,13 +56,13 @@ public class HederaShardID implements Serializable {
 	 * @return {@link ShardID} 
 	 */
 	public ShardID getProtobuf() {
-	   	logger.trace("Start - getProtobuf");
+	   	
 		
 	   	ShardID.Builder shardID = ShardID.newBuilder();
 		if (this.shardNum > 0) {
 			shardID.setShardNum(this.shardNum);
 		}
-		logger.trace("End - getProtobuf");
+		
 
 		return shardID.build();
 	}
