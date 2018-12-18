@@ -1,10 +1,7 @@
 package com.hedera.sdk.common;
 
 import java.io.Serializable;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.hederahashgraph.api.proto.java.TransactionID;
 
 /**
@@ -17,7 +14,7 @@ import com.hederahashgraph.api.proto.java.TransactionID;
  * is sent to N nodes.
  */
 public class HederaTransactionID implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaTimeStamp.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaTimeStamp.class);
 	private static final long serialVersionUID = 1;
 
 	/**

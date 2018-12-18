@@ -1,6 +1,5 @@
 package com.hedera.account;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.account.HederaAccount;
@@ -12,7 +11,7 @@ import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class AccountCreate {
 	public static HederaAccount create(HederaAccount account, String newAccountKey, KeyType keyType, long initialBalance) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(AccountCreate.class);
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(AccountCreate.class);
 		// new account properties
 		long shardNum = 0;
 		long realmNum = 0;

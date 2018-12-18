@@ -3,10 +3,7 @@ package com.hedera.sdk.account;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaKeyPair;
@@ -26,7 +23,7 @@ import com.hederahashgraph.api.proto.java.KeyList;
  *
  */
 public class HederaClaim implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaClaim.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaClaim.class);
 	private static final long serialVersionUID = 1;
 
 	/**

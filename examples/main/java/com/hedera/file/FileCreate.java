@@ -1,10 +1,7 @@
 package com.hedera.file;
 
 import java.util.Arrays;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.hedera.sdk.common.HederaTransactionReceipt;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.file.HederaFile;
@@ -13,7 +10,7 @@ import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class FileCreate {
 	public static HederaFile create(HederaFile file, byte[] contents) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(FileCreate.class);
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(FileCreate.class);
 		// new file
 		long shardNum = 0;
 		long realmNum = 0;

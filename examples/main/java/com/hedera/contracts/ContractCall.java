@@ -1,6 +1,5 @@
 package com.hedera.contracts;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.common.HederaTransactionReceipt;
@@ -11,7 +10,7 @@ import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class ContractCall {
 	public static boolean call(HederaContract contract, long gas, long amount, byte[] functionParameters) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(ContractCall.class);
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(ContractCall.class);
 		logger.info("");
 		logger.info("CONTRACT CALL");
 		logger.info("");

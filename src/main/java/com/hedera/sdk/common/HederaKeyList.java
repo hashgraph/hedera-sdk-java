@@ -4,10 +4,8 @@ import java.io.Serializable;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hederahashgraph.api.proto.java.Key;
@@ -16,7 +14,7 @@ import com.hederahashgraph.api.proto.java.KeyList;
  * A HederaKeyList is a list of {@link HederaKeyPair}
  */
 public class HederaKeyList implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaKeyList.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaKeyList.class);
 	private static final long serialVersionUID = 1;
 
 	/**

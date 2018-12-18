@@ -1,6 +1,5 @@
 package com.hedera.file;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.file.HederaFile;
@@ -8,7 +7,7 @@ import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class FileGetInfo {
 	public static boolean getInfo(HederaFile file) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(FileGetInfo.class);
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(FileGetInfo.class);
 		
 		logger.info("");
 		logger.info("FILE GET INFO");

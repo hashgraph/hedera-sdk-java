@@ -1,6 +1,5 @@
 package com.hedera.contracts;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.common.HederaDuration;
@@ -13,7 +12,7 @@ import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class ContractUpdate {
 	public static HederaContract update(HederaContract contract, HederaTimeStamp expirationTime, HederaDuration autoRenewDuration) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(ContractUpdate.class);
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(ContractUpdate.class);
 		logger.info("");
 		logger.info("CONTRACT UPDATE");
 		logger.info("");

@@ -1,10 +1,7 @@
 package com.hedera.sdk.transaction;
 
 import java.io.Serializable;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.hedera.sdk.common.HederaTransactionID;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
@@ -17,7 +14,7 @@ public class HederaTransactionResult implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	final Logger logger = LoggerFactory.getLogger(HederaTransactionResult.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaTransactionResult.class);
 	private ResponseCodeEnum precheckResult = ResponseCodeEnum.OK;
 	/**
 	 * the {@link HederaTransactionID} for this transaction 

@@ -3,10 +3,8 @@ package com.hedera.sdk.common;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hederahashgraph.api.proto.java.KeyList;
@@ -16,7 +14,7 @@ import com.hederahashgraph.api.proto.java.SignatureList;
  */
 
 public class HederaKeySignatureList implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaKeySignatureList.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaKeySignatureList.class);
 	private static final long serialVersionUID = 1;
 	/**
 	 * The list of key signature pairs {@link HederaKeySignature}

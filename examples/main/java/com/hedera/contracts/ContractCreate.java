@@ -1,6 +1,5 @@
 package com.hedera.contracts;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.common.HederaDuration;
@@ -18,7 +17,7 @@ public final class ContractCreate {
 	}
 	
 	public static HederaContract create(HederaContract contract, HederaFileID fileID, long gas, long initialBalance, byte[] constParams) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(HederaContract.class);
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaContract.class);
 		// new contract
 		long shardNum = 0;
 		long realmNum = 0;

@@ -2,8 +2,6 @@ package com.hedera.contracts;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.hedera.file.FileCreate;
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.common.HederaDuration;
@@ -15,7 +13,6 @@ import com.hedera.sdk.file.HederaFile;
 import com.hedera.utilities.ExampleUtilities;
 
 public final class DemoContract {
-	final static Logger logger = LoggerFactory.getLogger(DemoContract.class);
 
 	public static void main(String... arguments) throws Exception {
 
@@ -87,7 +84,7 @@ public final class DemoContract {
 				long maxResultSize = 5000;
 				HederaContractFunctionResult functionResult = ContractRunLocal.runLocal(contract, localGas, maxResultSize, function);
 				int decodeResult = SoliditySupport.decodeGetValueResult(functionResult.contractCallResult(),SC_GET_ABI);
-				logger.info(String.format("===>Decoded functionResult= %d", decodeResult));
+	    		ExampleUtilities.showResult(String.format("===>Decoded functionResult= %d", decodeResult));
 			}
 		}
 	}

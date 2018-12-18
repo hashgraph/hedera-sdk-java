@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaDuration;
@@ -43,8 +42,6 @@ import com.hederahashgraph.api.proto.java.Response;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hederahashgraph.api.proto.java.ResponseHeader;
 import com.hederahashgraph.api.proto.java.TransactionBody;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -52,7 +49,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class HederaFile implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaFile.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaFile.class);
 	private static final long serialVersionUID = 1;
 	// default file duration set to 1 day (60 seconds x 60 minutes x 24h)
 	private static final long EXPIRATIONDEFAULT = 86400;

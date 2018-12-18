@@ -1,7 +1,5 @@
 package com.hedera.file;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
@@ -10,7 +8,6 @@ import com.hedera.utilities.*;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
 
 public final class DemoFile {
-	final static Logger logger = LoggerFactory.getLogger(DemoFile.class);
 	
 	public static void main (String... arguments) throws Exception {
 

@@ -1,6 +1,5 @@
 package com.hedera.file;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.common.HederaTransactionReceipt;
@@ -11,7 +10,7 @@ import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class FileAppend {
 	public static boolean append(HederaFile file, byte[] newContents) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(FileAppend.class);
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(FileAppend.class);
 		logger.info("");
 		logger.info("FILE APPEND");
 		logger.info("");

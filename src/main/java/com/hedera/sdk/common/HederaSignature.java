@@ -1,10 +1,7 @@
 package com.hedera.sdk.common;
 
 import java.io.Serializable;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hederahashgraph.api.proto.java.Signature;
@@ -27,7 +24,7 @@ import com.hederahashgraph.api.proto.java.Signature;
  * This restriction may be relaxed in future versions of the API, to allow deeper nesting. 
  */
 public class HederaSignature implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaSignature.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaSignature.class);
 	private static final long serialVersionUID = 1;
 	private byte[] signature = new byte[0];
 	private KeyType signatureType = KeyType.NOTSET;

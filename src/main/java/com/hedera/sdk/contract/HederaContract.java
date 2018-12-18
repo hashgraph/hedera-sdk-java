@@ -3,10 +3,7 @@ package com.hedera.sdk.contract;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaContractID;
@@ -49,7 +46,7 @@ import com.hederahashgraph.api.proto.java.ContractGetInfoResponse.ContractInfo;
  * This class manages all aspects of interacting with a Smart Contract on Hedera Hashgraph 
  */
 public class HederaContract implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaContract.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaContract.class);
 	private static final long serialVersionUID = 1;
 	private HederaNode node = null;
 	private ResponseCodeEnum precheckResult = ResponseCodeEnum.UNKNOWN;

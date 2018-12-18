@@ -7,12 +7,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-
 import javax.xml.bind.DatatypeConverter;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.codec.DecoderException;
 import org.bouncycastle.util.encoders.Hex;
@@ -55,7 +52,7 @@ import com.hederahashgraph.api.proto.java.ResponseHeader;
  * In the future, this requirement may be relaxed, to allow deeper nesting.
  */
 public class HederaKeyPair implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaKeyPair.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaKeyPair.class);
 	private static String JSON_DESCRIPTION = "description";
 	private static String JSON_UUID = "uuid";
 	private static String JSON_TYPE = "type";

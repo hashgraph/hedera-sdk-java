@@ -7,7 +7,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Properties;
 
 import org.apache.commons.codec.DecoderException;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaDuration;
@@ -18,7 +17,7 @@ import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.node.HederaNode;
 
 public class ExampleUtilities {
-	final Logger logger = LoggerFactory.getLogger(ExampleUtilities.class);
+	final static ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(ExampleUtilities.class);
 	public static String nodeAddress = "";
 	public static int nodePort = 0;
 
@@ -112,6 +111,12 @@ public class ExampleUtilities {
 		txQueryDefaults.transactionValidDuration = new HederaDuration(120, 0);
 		
 		return txQueryDefaults;
+	}
+	
+	public static void showResult(String result) {
+		String stars = "***********************************************************************************************";
+		String log = String.format("%s\n%s\n**     %s\n%s\n%s", "", stars, result, stars, "");
+		logger.info(log);
 	}
 	
 }
