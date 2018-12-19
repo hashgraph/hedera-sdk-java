@@ -1,15 +1,17 @@
 package com.hedera.account;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.account.HederaAccount;
-import com.hedera.sdk.common.HederaPrecheckResult;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
+
+import ch.qos.logback.classic.Logger;
 
 public final class AccountGetBalance {
 	public static boolean getBalance(HederaAccount account) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(AccountGetBalance.class);
-		
+		final ch.qos.logback.classic.Logger logger = (Logger) LoggerFactory.getLogger(AccountGetBalance.class);
+
+		logger.debug("DEBUG");
 		logger.info("");
 		logger.info("CRYPTO GET BALANCE");
 		logger.info("");
@@ -20,7 +22,7 @@ public final class AccountGetBalance {
 			// it was successful, print it
 			logger.info(String.format("===>Got balance=%d", balance));
 			return true;
-		} else if (account.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+		} else if (account.getPrecheckResult() == ResponseCodeEnum.BUSY) {
 			logger.info("system busy, try again later");
 			return false;
 		} else {

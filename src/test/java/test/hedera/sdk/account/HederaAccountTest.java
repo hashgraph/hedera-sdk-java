@@ -12,11 +12,10 @@ import org.junit.jupiter.api.Test;
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaDuration;
-import com.hedera.sdk.common.HederaKey;
-import com.hedera.sdk.common.HederaKeySignature;
+import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaTimeStamp;
 import com.hedera.sdk.common.HederaTransactionID;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hederahashgraph.api.proto.java.TransactionBody;
 
 class HederaAccountTest {
@@ -34,10 +33,8 @@ class HederaAccountTest {
 
 		assertNull(account.hederaTransactionID);
 		assertNull(account.newRealmAdminKey);
-		assertNull(account.newRealmAdminKeySig);
 
 		assertNull(account.accountKey);
-		assertNull(account.accountKeySig);
 
 		assertEquals(0, account.initialBalance);
 
@@ -85,8 +82,8 @@ class HederaAccountTest {
 		assertArrayEquals(new byte[0], account.getStateProof());
 
 		account = new HederaAccount();
-		HederaKey key = new HederaKey(KeyType.ED25519, "key".getBytes());
-		HederaKey key2 = new HederaKey(KeyType.ED25519, "key2".getBytes());
+		HederaKeyPair key = new HederaKeyPair(KeyType.ED25519, "key".getBytes(), null);
+		HederaKeyPair key2 = new HederaKeyPair(KeyType.ED25519, "key2".getBytes(), null);
 		
 		account.addKey(key);
 		account.addKey(key2);
@@ -95,18 +92,6 @@ class HederaAccountTest {
 		assertEquals(1, account.getKeys().size());
 		account.deleteKey(key2);
 		assertEquals(0, account.getKeys().size());
-		
-		HederaKeySignature keySig = new HederaKeySignature(KeyType.ED25519, "key".getBytes(), "sig".getBytes());
-		HederaKeySignature keySig2 = new HederaKeySignature(KeyType.ED25519, "key2".getBytes(), "sig2".getBytes());
-		
-		account.addKeySignaturePair(keySig);
-		account.addKeySignaturePair(keySig2);
-		assertEquals(2, account.getKeySignatures().size());
-		account.deleteKeySignaturePair(keySig);
-		assertEquals(1, account.getKeySignatures().size());
-		account.deleteKeySignaturePair(keySig2);
-		assertEquals(0, account.getKeySignatures().size());
-
 	}
 
 	@Test

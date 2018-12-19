@@ -6,17 +6,17 @@ import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.cryptography.CryptoUtils;
-import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class HederaCryptoKeyPairTest2 {
 
-	HederaCryptoKeyPair firstPair;
-	HederaCryptoKeyPair secondPair;
+	HederaKeyPair firstPair;
+	HederaKeyPair secondPair;
 	KeyPair thirdPair;
 	byte[] seed01;
 	SecureRandom secure01;
@@ -26,12 +26,12 @@ class HederaCryptoKeyPairTest2 {
 		seed01 = new String("firstStringfirstStringfirstStrin").getBytes();
 		secure01 = new SecureRandom(seed01);
 
-		firstPair = new HederaCryptoKeyPair(KeyType.ED25519, seed01);
+		firstPair = new HederaKeyPair(KeyType.ED25519, seed01);
 	}
 
 	@Test
 	final void testKeyGenBasedOnSeed() {
-		secondPair = new HederaCryptoKeyPair(KeyType.ED25519, seed01);
+		secondPair = new HederaKeyPair(KeyType.ED25519, seed01);
 		assertEquals(Arrays.toString(firstPair.getPublicKey()), Arrays.toString(secondPair.getPublicKey()));
 	}
 
@@ -40,8 +40,6 @@ class HederaCryptoKeyPairTest2 {
         byte[] seed = seed01;
         long index = 0;
         int length = seed.length;
-        System.out.println(Arrays.toString(seed));
-        System.out.println(length); //32
 		byte[] deriveKey = CryptoUtils.deriveKey(seed, index, length);
 	}
 

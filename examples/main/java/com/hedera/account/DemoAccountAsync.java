@@ -1,21 +1,20 @@
 package com.hedera.account;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.account.HederaAccount;
-import com.hedera.sdk.common.HederaPrecheckResult;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
-import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
 import com.hedera.sdk.common.HederaTransactionState;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 import com.hedera.utilities.ExampleUtilities;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class DemoAccountAsync {
 	
 	public static void main (String... arguments) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(DemoAccountAsync.class);
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(DemoAccountAsync.class);
 
 		// setup a set of defaults for query and transactions
 		HederaTransactionAndQueryDefaults txQueryDefaults = new HederaTransactionAndQueryDefaults();
@@ -30,14 +29,12 @@ public final class DemoAccountAsync {
     	accountXferTo.txQueryDefaults = txQueryDefaults;
     	
 		// create an account
-    	HederaCryptoKeyPair newAccountKey = new HederaCryptoKeyPair(KeyType.ED25519);
-    	HederaCryptoKeyPair accountXferToKey = new HederaCryptoKeyPair(KeyType.ED25519);
+    	HederaKeyPair newAccountKey = new HederaKeyPair(KeyType.ED25519);
+    	HederaKeyPair accountXferToKey = new HederaKeyPair(KeyType.ED25519);
     	
-    	account = AccountCreate.create(account, newAccountKey,100000);
+    	account = AccountCreate.create(account, newAccountKey.getPublicKeyHex(), newAccountKey.getKeyType(), 1000000);
     	if (account == null) {
-			logger.info("*******************************************");
-			logger.info("FIRST ACCOUNT CREATE FAILED");
-			logger.info("*******************************************");
+			ExampleUtilities.showResult("FIRST ACCOUNT CREATE FAILED");
 			throw new Exception("Account create failure");
     	} 
 	
@@ -46,11 +43,9 @@ public final class DemoAccountAsync {
 		txQueryDefaults.payingKeyPair = newAccountKey;
 		
 		// create a new account to transfer funds to
-    	accountXferTo = AccountCreate.create(accountXferTo, accountXferToKey, 10000);
+    	accountXferTo = AccountCreate.create(accountXferTo, accountXferToKey.getPublicKeyHex(), newAccountKey.getKeyType(), 10000);
     	if (accountXferTo == null) {
-			logger.info("*******************************************");
-			logger.info("SECOND ACCOUNT CREATE FAILED");
-			logger.info("*******************************************");
+			ExampleUtilities.showResult("SECOND ACCOUNT CREATE FAILED");
 			throw new Exception("Account create failure");
     	}
     	
@@ -92,7 +87,7 @@ public final class DemoAccountAsync {
 			// make the transfer
 			HederaTransactionResult transferResult = account.send(accountXferTo.getHederaAccountID(), 20 * i);
 			// was it successful ?
-			if (transferResult.getPrecheckResult() == HederaPrecheckResult.OK) {
+			if (transferResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 				// yes, add Transaction to state for receipt collection
 				transactionState.setTransaction(account.hederaTransactionID, account.txQueryDefaults.node);
 			}

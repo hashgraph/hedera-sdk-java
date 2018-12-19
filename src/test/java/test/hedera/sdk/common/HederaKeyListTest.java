@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.hedera.sdk.common.HederaKey;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaKeyList;
 
 import org.junit.jupiter.api.DisplayName;
@@ -19,9 +19,11 @@ class TestHederaKeyList {
 	@Test
 	@DisplayName("Checking key init")
 	void testKeyListInit() {
-		HederaKey key1 = new HederaKey(KeyType.ECDSA384, new byte[] {12,34,56}, "ECDSA");
-		HederaKey key2 = new HederaKey(KeyType.ED25519, new byte[] {78,90,12}, "ED25519");
-		List<HederaKey> keys = new ArrayList<HederaKey>();
+		HederaKeyPair key1 = new HederaKeyPair(KeyType.ED25519);
+		key1.keyDescription = "ECDSA";
+		HederaKeyPair key2 = new HederaKeyPair(KeyType.ED25519);
+		key2.keyDescription = "ED25519";
+		List<HederaKeyPair> keys = new ArrayList<HederaKeyPair>();
 		keys.add(key1);
 		keys.add(key2);
 		
@@ -33,7 +35,7 @@ class TestHederaKeyList {
 		
 		masterKeyList.addKey(key1);
 		masterKeyList.addKey(key2);
-		masterKeyList.addKey(KeyType.RSA3072, new byte[] {23, 45, 22});
+		masterKeyList.addKey(new HederaKeyPair(KeyType.ED25519));
 
 		assertEquals(5, masterKeyList.keys.size());
 
@@ -44,9 +46,9 @@ class TestHederaKeyList {
 		
 		HederaKeyList protobufList = new HederaKeyList(masterKeyList.getProtobuf());
 		assertEquals(masterKeyList.keys.size(), protobufList.keys.size());
-		assertArrayEquals(masterKeyList.keys.get(0).getKey(), protobufList.keys.get(0).getKey());
-		assertArrayEquals(masterKeyList.keys.get(1).getKey(), protobufList.keys.get(1).getKey());
-		assertArrayEquals(masterKeyList.keys.get(2).getKey(), protobufList.keys.get(2).getKey());
+		assertArrayEquals(masterKeyList.keys.get(0).getPublicKeyEncoded(), protobufList.keys.get(0).getPublicKeyEncoded());
+		assertArrayEquals(masterKeyList.keys.get(1).getPublicKeyEncoded(), protobufList.keys.get(1).getPublicKeyEncoded());
+		assertArrayEquals(masterKeyList.keys.get(2).getPublicKeyEncoded(), protobufList.keys.get(2).getPublicKeyEncoded());
 
 		HederaKeyList jsonList = new HederaKeyList();
 		jsonList.fromJSON(masterKeyList.JSON());
@@ -54,9 +56,9 @@ class TestHederaKeyList {
 		assertEquals(masterKeyList.keys.get(0).uuid, jsonList.keys.get(0).uuid);
 		assertEquals(masterKeyList.keys.get(1).uuid, jsonList.keys.get(1).uuid);
 		assertEquals(masterKeyList.keys.get(2).uuid, jsonList.keys.get(2).uuid);
-		assertArrayEquals(masterKeyList.keys.get(0).getKey(), jsonList.keys.get(0).getKey());
-		assertArrayEquals(masterKeyList.keys.get(1).getKey(), jsonList.keys.get(1).getKey());
-		assertArrayEquals(masterKeyList.keys.get(2).getKey(), jsonList.keys.get(2).getKey());
+		assertArrayEquals(masterKeyList.keys.get(0).getPublicKeyEncoded(), jsonList.keys.get(0).getPublicKeyEncoded());
+		assertArrayEquals(masterKeyList.keys.get(1).getPublicKeyEncoded(), jsonList.keys.get(1).getPublicKeyEncoded());
+		assertArrayEquals(masterKeyList.keys.get(2).getPublicKeyEncoded(), jsonList.keys.get(2).getPublicKeyEncoded());
 		
 		assertNotNull(masterKeyList.JSONString());
 	}

@@ -1,14 +1,13 @@
 package com.hedera.contracts;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.contract.HederaContract;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class ContractGetBytecode {
 	public static boolean getByteCode(HederaContract contract) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(ContractGetBytecode.class);
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ContractGetBytecode.class);
 
 		logger.info("");
 		logger.info("CONTRACT GET BYTECODE");
@@ -20,7 +19,7 @@ public final class ContractGetBytecode {
 			// it was successful, print it
 			logger.info("===>Got bytecode=" + bytecode.toString());
 			return true;
-		} else if (contract.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+		} else if (contract.getPrecheckResult() == ResponseCodeEnum.BUSY) {
 			logger.info("system busy, try again later");
 			return false;
 		} else {

@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaSignature;
 import com.hedera.sdk.common.HederaSignatureThreshold;
 
@@ -18,7 +18,7 @@ class HederaSignatureThresholdTest {
 	@Test
 	@DisplayName("Checking siglist init")
 	void testSigListInit() {
-		HederaSignature sig1 = new HederaSignature(KeyType.ECDSA384, new byte[] {12,34,56});
+		HederaSignature sig1 = new HederaSignature(KeyType.ED25519, new byte[] {12,34,56});
 		HederaSignature sig2 = new HederaSignature(KeyType.ED25519, new byte[] {78,90,12});
 		List<HederaSignature> sigs = new ArrayList<HederaSignature>();
 		sigs.add(sig1);

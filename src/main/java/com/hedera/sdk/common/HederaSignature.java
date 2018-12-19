@@ -1,12 +1,9 @@
 package com.hedera.sdk.common;
 
 import java.io.Serializable;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.protobuf.ByteString;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hederahashgraph.api.proto.java.Signature;
 /**
  * A Signature corresponding to a Key. It is a sequence of bytes holding a public key signature from one of the three supported 
@@ -27,7 +24,7 @@ import com.hederahashgraph.api.proto.java.Signature;
  * This restriction may be relaxed in future versions of the API, to allow deeper nesting. 
  */
 public class HederaSignature implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaSignature.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaSignature.class);
 	private static final long serialVersionUID = 1;
 	private byte[] signature = new byte[0];
 	private KeyType signatureType = KeyType.NOTSET;
@@ -38,8 +35,8 @@ public class HederaSignature implements Serializable {
 	 * Default constructor
 	 */
 	public HederaSignature() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
+
+
 	}
 	/**
 	 * Constructor from a {@link KeyType} and signature
@@ -47,41 +44,41 @@ public class HederaSignature implements Serializable {
 	 * @param signature a byte[] containing the signature
 	 */
 	public HederaSignature(KeyType signatureType, byte[] signature) {
-	   	logger.trace("Start - Object init signatureType {}, signature {}", signatureType, signature);
+
 		this.signatureType = signatureType;
 		if (signatureType == KeyType.CONTRACT) {
 			this.signature = new byte[0];
 		} else {
 			this.signature = signature.clone();
 		}
-	   	logger.trace("End - Object init");
+
 	}
 	/**
 	 * Constructor from a {@link HederaSignatureThreshold}
 	 * @param thresholdSignature the threshold signature to create the signature from 
 	 */
 	public HederaSignature(HederaSignatureThreshold thresholdSignature) {
-	   	logger.trace("Start - Object init signatureType THRESHOLD, thresholdSignature {}", thresholdSignature);
+
 		this.signatureType = KeyType.THRESHOLD;
 		this.thresholdSignature = thresholdSignature;
-	   	logger.trace("End - Object init");
+
 	}
 	/**
 	 * Constructor from a {@link HederaSignatureList}
 	 * @param signatureList the signature list to create the signature from 
 	 */
 	public HederaSignature(HederaSignatureList signatureList) {
-	   	logger.trace("Start - Object init signatureType SIGLIST, signatureList {}", signatureList);
+
 		this.signatureType = KeyType.LIST;
 		this.signatureList = signatureList;
-	   	logger.trace("End - Object init");
+
 	}
 	/**
 	 * Constructor from a {@link Signature} protobuf
 	 * @param signature signature to create the signature from 
 	 */
 	public HederaSignature(Signature signature) {
-	   	logger.trace("Start - Object init protobuf {}", signature);
+
 		// convert a protobuf payload into class data
 		switch (signature.getSignatureCase()) {
 		case CONTRACT:
@@ -92,14 +89,14 @@ public class HederaSignature implements Serializable {
 			this.signature = signature.getEd25519().toByteArray();
 			this.signatureType = KeyType.ED25519;
 			break;
-		case RSA_3072:
-			this.signature = signature.getRSA3072().toByteArray();
-			this.signatureType = KeyType.RSA3072;
-			break;
-		case ECDSA_384:
-			this.signature = signature.getECDSA384().toByteArray();
-			this.signatureType = KeyType.ECDSA384;
-			break;
+//		case RSA_3072:
+//			this.signature = signature.getRSA3072().toByteArray();
+//			this.signatureType = KeyType.RSA3072;
+//			break;
+//		case ECDSA_384:
+//			this.signature = signature.getECDSA384().toByteArray();
+//			this.signatureType = KeyType.ECDSA384;
+//			break;
 		case THRESHOLDSIGNATURE:
 			this.thresholdSignature = new HederaSignatureThreshold(signature.getThresholdSignature());
 			this.signatureType = KeyType.THRESHOLD;
@@ -113,14 +110,14 @@ public class HederaSignature implements Serializable {
 		default:
             throw new IllegalArgumentException("Signature type unrecognized, you may be using an old sdk.");			
 		}
-	   	logger.trace("End - Object init");
+
 	}
 	/**
 	 * Get the type of signature
 	 * @return {@link KeyType}
 	 */
 	public KeyType getSignatureType() {
-	   	logger.trace("getSignatureType");
+
 		return this.signatureType;
 	}
 	/** 
@@ -129,7 +126,7 @@ public class HederaSignature implements Serializable {
 	 * @return byte[]
 	 */
 	public byte[] getSignature() {
-	   	logger.trace("getSignature");
+
 		return this.signature;
 	}
 	/**
@@ -138,7 +135,7 @@ public class HederaSignature implements Serializable {
 	 * @return {@link HederaSignatureThreshold}
 	 */
 	public HederaSignatureThreshold getThresholdSignature() {
-	   	logger.trace("getThresholdSignature");
+
 		return this.thresholdSignature;
 	}
 	/**
@@ -147,7 +144,7 @@ public class HederaSignature implements Serializable {
 	 * @return {@link HederaSignatureList}
 	 */
 	public HederaSignatureList getSignatureList() {
-	   	logger.trace("getSignatureList");
+
 		return this.signatureList;
 	}
 	/**
@@ -155,7 +152,7 @@ public class HederaSignature implements Serializable {
 	 * @return {@link Signature}
 	 */
 	public Signature getProtobuf() {
-	   	logger.trace("Start - getProtobuf");
+
 		// Generates the protobuf payload for this class
 		Signature.Builder signatureProtobuf = Signature.newBuilder();
 		
@@ -167,20 +164,20 @@ public class HederaSignature implements Serializable {
 				signatureProtobuf.setEd25519(ByteString.copyFrom(new byte[0]));
 			}
 			break;
-		case RSA3072:
-			if (this.signature != null) {
-				signatureProtobuf.setRSA3072(ByteString.copyFrom(this.signature));
-			} else {
-				signatureProtobuf.setRSA3072(ByteString.copyFrom(new byte[0]));
-			}
-			break;
-		case ECDSA384:
-			if (this.signature != null) {
-				signatureProtobuf.setECDSA384(ByteString.copyFrom(this.signature));
-			} else {
-				signatureProtobuf.setECDSA384(ByteString.copyFrom(new byte[0]));
-			}
-			break;
+//		case RSA3072:
+//			if (this.signature != null) {
+//				signatureProtobuf.setRSA3072(ByteString.copyFrom(this.signature));
+//			} else {
+//				signatureProtobuf.setRSA3072(ByteString.copyFrom(new byte[0]));
+//			}
+//			break;
+//		case ECDSA384:
+//			if (this.signature != null) {
+//				signatureProtobuf.setECDSA384(ByteString.copyFrom(this.signature));
+//			} else {
+//				signatureProtobuf.setECDSA384(ByteString.copyFrom(new byte[0]));
+//			}
+//			break;
 		case CONTRACT:
 			signatureProtobuf.setContract(ByteString.copyFrom(new byte[0]));
 			break;
@@ -197,7 +194,7 @@ public class HederaSignature implements Serializable {
 		case NOTSET:
             throw new IllegalArgumentException("Signature type not set, unable to generate data.");			
 		}
-	   	logger.trace("End - getProtobuf");
+
 		return signatureProtobuf.build();
 	}
 }

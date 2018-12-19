@@ -1,54 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.hedera</groupId>
-    <artifactId>sdk</artifactId>
-    <version>0.1.2</version>
-    <packaging>jar</packaging>
+	<groupId>com.hedera</groupId>
+	<artifactId>sdk</artifactId>
+	<version>0.2.0</version>
+	<packaging>jar</packaging>
 
-    <name>hedera-sdk-java</name>
-    <url>http://maven.apache.org</url>
+	<name>hedera-sdk-java</name>
+	<url>http://maven.apache.org</url>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <grpc.version>1.14.0</grpc.version>        <!-- CURRENT_GRPC_VERSION -->
-        <proto.version>3.6.1</proto.version>
-    </properties>
-    <repositories>
-        <repository>
-            <id>artifactory-central</id>
-            <name>Swirlds Artifactory-releases</name>
-            <url>https://art.swirlds.com/artifactory/swirlds</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-	    </repository>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<grpc.version>1.14.0</grpc.version>        <!-- CURRENT_GRPC_VERSION -->
+		<proto.version>3.6.1</proto.version>
+	</properties>
+	<repositories>
 		<repository>
-            <id>Ethereum</id>
-            <name>Ethereum</name>
-            <url>https://dl.bintray.com/ethereum/maven/</url>
-        </repository>
-    </repositories>
-    <build>
-        <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
-        <resources>
-            <resource>
-                <directory>src</directory>
-                <excludes>
-                    <exclude>**/*.java</exclude>
-                </excludes>
-            </resource>
-            <resource>
-                <directory>${basedir}/src/main/resources</directory>
-                <targetPath>${project.build.directory}</targetPath>
-                <includes>
-                    <include>log4j.xml</include>
-                    <include>simpleStorage.bin</include>
-                </includes>
-            </resource>
-        </resources>
+			<id>artifactory-central</id>
+			<name>Swirlds Artifactory-releases</name>
+			<url>https://art.swirlds.com/artifactory/swirlds</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>Ethereum</id>
+			<name>Ethereum</name>
+			<url>https://dl.bintray.com/ethereum/maven/</url>
+		</repository>
+	</repositories>
+	<build>
+		<sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+		<resources>
+			<resource>
+				<directory>src</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<directory>${basedir}/src/main/resources</directory>
+				<targetPath>${project.build.directory}</targetPath>
+				<includes>
+					<include>logback.xml</include>
+					<include>simpleStorage.bin</include>
+				</includes>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
         <plugins>
             <plugin>
@@ -333,6 +348,7 @@
             <version>1.2</version>
         </dependency>
         <dependency>
+
 			<groupId>org.ethereum</groupId>
 			<artifactId>ethereumj-core</artifactId>
 			<version>1.6.3-RELEASE</version>
@@ -341,7 +357,32 @@
 					<groupId>ch.qos.logback</groupId>
 					<artifactId>logback-classic</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
 			</exclusions>
-        </dependency>
-    </dependencies>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.2.3</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+ 		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.25</version>
+		</dependency>
+	</dependencies>
 </project>

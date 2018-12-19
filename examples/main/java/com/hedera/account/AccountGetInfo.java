@@ -1,14 +1,13 @@
 package com.hedera.account;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.account.HederaAccount;
-import com.hedera.sdk.common.HederaPrecheckResult;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class AccountGetInfo {
 	public static boolean getInfo(HederaAccount account) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(AccountGetInfo.class);
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(AccountGetInfo.class);
 		
 		logger.info("");
 		logger.info("CRYPTO GET INFO");
@@ -18,7 +17,7 @@ public final class AccountGetInfo {
 		if (account.getInfo()) {
 			logger.info("===>Got info");
 			return true;
-		} else if (account.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+		} else if (account.getPrecheckResult() == ResponseCodeEnum.BUSY) {
 			logger.info("system busy, try again later");
 			return false;
 		} else {

@@ -1,13 +1,10 @@
 package com.hedera.sdk.transaction;
+
 import java.io.Serializable;
 import java.util.ArrayList;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.account.HederaAccountAmount;
-import com.hedera.sdk.common.HederaKeySignature;
-import com.hedera.sdk.common.HederaKeySignatureList;
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.common.HederaTransactionRecord;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.node.HederaNode;
@@ -27,9 +24,9 @@ import com.hederahashgraph.api.proto.java.*;
  *
  */
 public class HederaTransaction implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaTransaction.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaTransaction.class);
 	private static final long serialVersionUID = 1;
-	private HederaPrecheckResult precheckResult = HederaPrecheckResult.NOTSET;
+	private ResponseCodeEnum precheckResult = ResponseCodeEnum.UNKNOWN;
 	private long cost = 0;
 	private byte[] stateProof = new byte[0];
 	private HederaNode node = null;
@@ -45,11 +42,6 @@ public class HederaTransaction implements Serializable {
 	 * note: if keySignatureList is not null, this signatureList will be ignored, keySignatureList takes priority
 	 */
 	public HederaSignatureList signatureList = null;
-	/**
-	 * get or set the keys and signatures for this transaction as a {@link HederaKeySignatureList}
-	 * note: this keySignatureList takes priority over signatureList
-	 */
-	public HederaKeySignatureList keySignatureList = null;
 
 	/**
 	 * sets the node object to use for communication with the node
@@ -93,24 +85,8 @@ public class HederaTransaction implements Serializable {
 	 * Default constructor
 	 */
 	public HederaTransaction() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
-	}
-	/**
-	 * Constructs from a {@link HederaTransactionBody} body and {@link HederaKeySignatureList} keys and signatures
-	 * @param body {@link HederaTransactionBody}
-	 * @param sigs {@link HederaKeySignatureList}
-	 */
-	public HederaTransaction(HederaTransactionBody body, HederaKeySignatureList sigs) {
-	   	logger.trace("Start - Object init body {}, sigs {}",body, sigs);
-		this.body = body;
-		this.keySignatureList = sigs;
-		this.signatureList = new HederaSignatureList();
-		for (HederaKeySignature keySig : sigs.keySigPairs ) {
-			HederaSignature oneSig = new HederaSignature(keySig.getSignatureProtobuf());
-			this.signatureList.addSignature(oneSig);
-		}
-	   	logger.trace("End - Object init");
+
+
 	}
 	/**
 	 * Constructs from a {@link HederaTransactionBody} body and {@link HederaSignatureList} signatures
@@ -118,30 +94,24 @@ public class HederaTransaction implements Serializable {
 	 * @param sigs {@link HederaSignatureList}
 	 */
 	public HederaTransaction(HederaTransactionBody body, HederaSignatureList sigs) {
-	   	logger.trace("Start - Object init body {}, sigs {}",body, sigs);
+
 		this.body = body;
 		this.signatureList = sigs;
-		// only signatures available here, can't populate keys
-		this.keySignatureList = null;
-	   	logger.trace("End - Object init");
+
 	}
 	/**
 	 * returns the protobuf for this transaction
 	 * @return {@link Transaction}
 	 */
 	public Transaction getProtobuf() {
-	   	logger.trace("Start - getProtobuf");
+
 		// Generates the protobuf payload for this class
 		Transaction.Builder transactionProtobuf = Transaction.newBuilder();
 		
 		transactionProtobuf.setBody(this.body.getProtobuf());
 		// if we have key signature pairs, use these\
-		if (keySignatureList != null) {
-			transactionProtobuf.setSigs(this.keySignatureList.getProtobufSignatures());
-		} else {
-			transactionProtobuf.setSigs(this.signatureList.getProtobuf());
-		}
-	   	logger.trace("End - getProtobuf");
+		transactionProtobuf.setSigs(this.signatureList.getProtobuf());
+
 		
 		return transactionProtobuf.build();
 	}
@@ -150,21 +120,10 @@ public class HederaTransaction implements Serializable {
 	 * @param signature {@link HederaSignature}
 	 */
 	public void addSignature(HederaSignature signature) {
-	   	logger.trace("Start - addSignature signature {}", signature);
+
 		this.signatureList.addSignature(signature);
 		// can't do anything to keysignatureList here, we don't have a key
-	   	logger.trace("End - addSignature");
-	}
-	/**
-	 * Adds a signature to the list from a {@link HederaKeySignature}
-	 * @param keySignaturePair {@link HederaKeySignature}
-	 */
-	public void addSignature(HederaKeySignature keySignaturePair) {
-	   	logger.trace("Start - addSignature keySignaturePair {}", keySignaturePair);
-		this.keySignatureList.addKeySignaturePair(keySignaturePair);
-		HederaSignature oneSig = new HederaSignature(keySignaturePair.getSignatureProtobuf());
-		this.signatureList.addSignature(oneSig);
-	   	logger.trace("End - addSignature");
+
 	}
 
 	/**
@@ -185,7 +144,7 @@ public class HederaTransaction implements Serializable {
 
 		Response response = null;
 		while(!result) {
-		   	logger.trace("Start - getReceipt {}", transactionID);
+
 			// build the query
 		   	// Header
 			HederaQueryHeader queryHeader = new HederaQueryHeader();
@@ -212,8 +171,62 @@ public class HederaTransaction implements Serializable {
 		}
 		this.transactionReceipt = new HederaTransactionReceipt(response.getTransactionGetReceipt());
 
-	   	logger.trace("End - getReceipt");
+
 	   	return true;
+	}
+	/**
+	 * Get a fast record for a transaction. These only last 180s and are free 
+	 * If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created. 
+	 * If the transaction called a smart contract function, then the record contains the result of that call. 
+	 * If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer. 
+	 * If the transaction didn't return anything that should be in the record, then the results field will be set to nothing.
+	 * @param transactionID the {@link HederaTransactionID} for which the record is requested
+	 * @param responseType the type of response required
+	 * @return true if successful
+	 * @throws InterruptedException in the event of a node communication error
+	 */
+	public boolean getFastRecord(HederaTransactionID transactionID, HederaQueryHeader.QueryResponseType responseType) throws InterruptedException {
+		boolean result = true;
+		
+
+		// build the query
+	   	// Header
+		HederaQueryHeader queryHeader = new HederaQueryHeader();
+		
+		TransactionGetFastRecordQuery.Builder getQuery = TransactionGetFastRecordQuery.newBuilder();
+		getQuery.setTransactionID(transactionID.getProtobuf());
+		getQuery.setHeader(queryHeader.getProtobuf());
+		
+		// the query itself
+		HederaQuery query = new HederaQuery();
+		query.queryType = QueryType.TRANSACTIONGETFASTRECORD;
+		query.queryData = getQuery.build();
+		
+		// query now set, send to network
+		Utilities.throwIfNull("Node", this.node);
+		Response response = this.node.getTransactionFastRecord(query);
+		TransactionGetFastRecordResponse getResponse = response.getTransactionGetFastRecord();
+
+		// check response header first
+		ResponseHeader responseHeader = getResponse.getHeader();
+
+		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
+				
+		if (this.precheckResult == ResponseCodeEnum.OK) {
+
+			// cost
+			this.cost = responseHeader.getCost();
+			//state proof
+			this.stateProof = responseHeader.getStateProof().toByteArray();
+			
+			this.transactionRecord = new HederaTransactionRecord(getResponse.getTransactionRecord());
+			
+		} else {
+			result = false;
+		}
+		
+
+	   	return result;
 	}
 	/**
 	 * Get the record for a transaction. 
@@ -231,7 +244,7 @@ public class HederaTransaction implements Serializable {
 	public boolean getRecord(HederaTransaction payment, HederaTransactionID transactionID, HederaQueryHeader.QueryResponseType responseType) throws InterruptedException {
 		boolean result = true;
 		
-	   	logger.trace("Start - getRecord payment {}, transactionID {}, responseType {}", payment, transactionID, responseType);
+
 		// build the query
 	   	// Header
 		HederaQueryHeader queryHeader = new HederaQueryHeader();
@@ -258,9 +271,9 @@ public class HederaTransaction implements Serializable {
 		// check response header first
 		ResponseHeader responseHeader = getResponse.getHeader();
 
-		setPrecheckResult(responseHeader.getNodeTransactionPrecheckCode());
+		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
 				
-		if (this.precheckResult == HederaPrecheckResult.OK) {
+		if (this.precheckResult == ResponseCodeEnum.OK) {
 
 			// cost
 			this.cost = responseHeader.getCost();
@@ -273,7 +286,7 @@ public class HederaTransaction implements Serializable {
 			result = false;
 		}
 		
-	   	logger.trace("End - getRecord");
+
 	   	return result;
 	}
 	/**
@@ -289,7 +302,7 @@ public class HederaTransaction implements Serializable {
 	 * @throws InterruptedException in the event of a node communication error
 	 */
 	public boolean getRecordAnswerOnly(HederaTransaction payment, HederaTransactionID transactionID) throws InterruptedException {
-	   	logger.trace("Start - getRecordAnswerOnly");
+
 	   	return getRecord(payment, transactionID, QueryResponseType.ANSWER_ONLY);
 	}
 	/**
@@ -305,7 +318,7 @@ public class HederaTransaction implements Serializable {
 	 * @throws InterruptedException in the event of a node communication error
 	 */
 	public boolean getRecordStateProof(HederaTransaction payment, HederaTransactionID transactionID) throws InterruptedException {
-	   	logger.trace("getRecordStateProof");
+
 		return getRecord(payment, transactionID, HederaQueryHeader.QueryResponseType.ANSWER_STATE_PROOF);
 	}
 	/**
@@ -320,7 +333,7 @@ public class HederaTransaction implements Serializable {
 	 * @throws InterruptedException in the event of a node communication error
 	 */
 	public boolean getRecordCostAnswer(HederaTransactionID transactionID) throws InterruptedException {
-	   	logger.trace("getRecordCostAnswer");
+
 		return getRecord(null, transactionID, HederaQueryHeader.QueryResponseType.COST_ANSWER);
 	}
 	/**
@@ -335,49 +348,18 @@ public class HederaTransaction implements Serializable {
 	 * @throws InterruptedException in the event of a node communication error
 	 */
 	public boolean getRecordCostAnswerStateProof(HederaTransactionID transactionID) throws InterruptedException {
-	   	logger.trace("getRecordCostAnswerStateProof");
+
 		return getRecord(null, transactionID, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
 	}
 	
-	private void setPrecheckResult(NodeTransactionPrecheckCode nodeTransactionPrecheckCode) {
-		switch (nodeTransactionPrecheckCode) {
-		case DUPLICATE:
-			this.precheckResult = HederaPrecheckResult.DUPLICATE;
-			break;
-		case INSUFFICIENT_BALANCE:
-			this.precheckResult = HederaPrecheckResult.INSUFFICIENT_BALANCE;
-			break;
-		case INSUFFICIENT_FEE:
-			this.precheckResult = HederaPrecheckResult.INSUFFICIENT_FEE;
-			break;
-		case INVALID_ACCOUNT:
-			this.precheckResult = HederaPrecheckResult.INVALID_ACCOUNT;
-			break;
-		case INVALID_TRANSACTION:
-			this.precheckResult = HederaPrecheckResult.INVALID_TRANSACTION;
-			break;
-		case OK:
-			this.precheckResult = HederaPrecheckResult.OK;
-			break;
-		case BUSY:
-			this.precheckResult = HederaPrecheckResult.BUSY;
-			break;
-		case NOT_SUPPORTED:
-			this.precheckResult = HederaPrecheckResult.NOT_SUPPORTED;
-			break;
-		default:
-			this.precheckResult = HederaPrecheckResult.NOTSET;
-				
-		}
-	}
 	/**
 	 * Generates a transfer transaction to enable payments for queries
 	 * @param txQueryDefaults the defaults for transactions and queries
 	 * @param queryFee the fee paid for the query
-	 * @throws Exception 
+	 * @throws Exception in the event of an error 
 	 */
 	public HederaTransaction(HederaTransactionAndQueryDefaults txQueryDefaults, long queryFee) throws Exception {
-	   	logger.trace("Start - init txQueryDefaults {}, queryFee {}", txQueryDefaults, queryFee);
+
 		
 		// create a transaction ID (starts now with accountID of the paying account id)
 		HederaTransactionID hederaTransactionID = new HederaTransactionID(txQueryDefaults.payingAccountID);
@@ -413,16 +395,10 @@ public class HederaTransaction implements Serializable {
 				, txQueryDefaults.memo
 				, accountAmounts);
 
-		// get the signature for the body
-		byte[] signedBody = txQueryDefaults.payingKeyPair.signMessage(transferBody.toByteArray());
-
-		// create a Hedera Signature for it
-		HederaSignature payingSignature = new HederaSignature(txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
-		// put the signatures in a signature list
-		HederaKeySignatureList sigsForTransaction = new HederaKeySignatureList();
-		sigsForTransaction.addKeySignaturePair(txQueryDefaults.payingKeyPair.getKeyType(), txQueryDefaults.payingKeyPair.getPublicKey(), payingSignature.getSignature());
-		// add a second for good measure
-		sigsForTransaction.addKeySignaturePair(txQueryDefaults.payingKeyPair.getKeyType(), txQueryDefaults.payingKeyPair.getPublicKey(), payingSignature.getSignature());
+		HederaSignatureList sigsForTransaction = new HederaSignatureList();
+		//paying signature
+		sigsForTransaction.addSignature(txQueryDefaults.payingKeyPair.getSignature(transferBody.toByteArray()));
+		sigsForTransaction.addSignature(txQueryDefaults.payingKeyPair.getSignature(transferBody.toByteArray()));
 
 		this.body = new HederaTransactionBody(
 				TransactionType.CRYPTOTRANSFER
@@ -435,7 +411,7 @@ public class HederaTransaction implements Serializable {
 				, account.getTransferTransactionBody(accountAmounts));
 		
 		// add the signatures
-		this.keySignatureList = sigsForTransaction;
-	   	logger.trace("End - init");
+		this.signatureList = sigsForTransaction;
+
 	}
 }

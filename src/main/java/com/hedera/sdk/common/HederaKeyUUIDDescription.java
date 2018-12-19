@@ -1,8 +1,6 @@
 package com.hedera.sdk.common;
 
 import java.io.Serializable;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
  * Description and UUID for a key
@@ -10,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 public class HederaKeyUUIDDescription implements Serializable {
 	private static final long serialVersionUID = 1L;
-	final Logger logger = LoggerFactory.getLogger(HederaKeyUUIDDescription.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaKeyUUIDDescription.class);
 
 	/**
 	 * Description of the key
@@ -33,9 +31,9 @@ public class HederaKeyUUIDDescription implements Serializable {
 	 * @param description the description
 	 */
 	public HederaKeyUUIDDescription (String uuid, String description) {
-		logger.trace("Start - HederaKeyUUIDDescription uuid {}, description {}", uuid, description);
+
 		this.description = description;
 		this.uuid = uuid;
-		logger.trace("End - HederaKeyUUIDDescription");
+
 	}
 }

@@ -1,18 +1,16 @@
 package com.hedera.file;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.common.HederaTransactionReceipt;
-import com.hedera.sdk.common.HederaTransactionStatus;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.file.HederaFile;
 import com.hedera.sdk.transaction.HederaTransactionResult;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class FileDelete {
 	public static boolean delete(HederaFile file) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(FileDelete.class);
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(FileDelete.class);
 		logger.info("");
 		logger.info("DELETE FILE");
 		logger.info("");
@@ -20,10 +18,10 @@ public final class FileDelete {
 		// delete the file
 		HederaTransactionResult deleteResult = file.delete();
 		// was it successful ?
-		if (deleteResult.getPrecheckResult() == HederaPrecheckResult.OK) {
+		if (deleteResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 			// yes, get a receipt for the transaction
 			HederaTransactionReceipt receipt  = Utilities.getReceipt(file.hederaTransactionID,  file.txQueryDefaults.node);
-			if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
+			if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
 				// if query successful, print it
 				logger.info("===>Deletion successful");
 				return true;
@@ -31,7 +29,7 @@ public final class FileDelete {
 				logger.info("Failed with transactionStatus:" + receipt.transactionStatus);
 				return false;
 			}
-		} else if (file.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+		} else if (file.getPrecheckResult() == ResponseCodeEnum.BUSY) {
 			logger.info("system busy, try again later");
 			return false;
 		} else {

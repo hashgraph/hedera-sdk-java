@@ -1,19 +1,17 @@
 package com.hedera.sdk.account;
 
-import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
-
-import org.slf4j.Logger;
+import com.hedera.sdk.common.HederaKeyPair;
 import org.slf4j.LoggerFactory;
 /**
  * This class enables you to easily identify which parameters can be updated on an account
  * and send to an account.update method
  */
 public class HederaAccountUpdateValues {
-	final Logger logger = LoggerFactory.getLogger(HederaAccountUpdateValues.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaAccountUpdateValues.class);
 	/**
 	 * the details of the new public/private key if an update is required
 	 */
-	public HederaCryptoKeyPair newKey = null;
+	public HederaKeyPair newKey = null;
 	/**
 	 * the shard number of the account to proxy to
 	 * note: you must also supply the new realm and account numbers

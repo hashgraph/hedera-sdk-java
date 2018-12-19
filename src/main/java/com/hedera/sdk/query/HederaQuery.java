@@ -2,8 +2,8 @@ package com.hedera.sdk.query;
 /**
  * This class handles the generation of protobuf for Queries to Hedera Hashgraph
  */
-import java.io.Serializable;
 
+import java.io.Serializable;
 import com.hederahashgraph.api.proto.java.ContractCallLocalQuery;
 import com.hederahashgraph.api.proto.java.ContractGetBytecodeQuery;
 import com.hederahashgraph.api.proto.java.ContractGetInfoQuery;
@@ -17,14 +17,13 @@ import com.hederahashgraph.api.proto.java.FileGetInfoQuery;
 import com.hederahashgraph.api.proto.java.GetByKeyQuery;
 import com.hederahashgraph.api.proto.java.GetBySolidityIDQuery;
 import com.hederahashgraph.api.proto.java.Query;
+import com.hederahashgraph.api.proto.java.TransactionGetFastRecordQuery;
 import com.hederahashgraph.api.proto.java.TransactionGetReceiptQuery;
 import com.hederahashgraph.api.proto.java.TransactionGetRecordQuery;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HederaQuery implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaQuery.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaQuery.class);
 	private static final long serialVersionUID = 1;
 	
 	/* 
@@ -46,6 +45,7 @@ public class HederaQuery implements Serializable {
 		GETBYSOLIDITYID,
 		TRANSACTIONGETRECEIPT,
 		TRANSACTIONGETRECORD,
+		TRANSACTIONGETFASTRECORD,
 		NOTSET
 	}
 	/**
@@ -61,8 +61,8 @@ public class HederaQuery implements Serializable {
 	 * Default constructor
 	 */
 	public HederaQuery() {
-		logger.trace("Start - Object init");
-		logger.trace("End - Object init");
+
+
 	}
 	/**
 	 * Constructor with query type and data
@@ -70,18 +70,17 @@ public class HederaQuery implements Serializable {
 	 * @param queryData the query data
 	 */
 	public HederaQuery(QueryType queryType, Object queryData) {
-	   	logger.trace("Start - Object init queryType {}, data {}"
-	   			, queryType, queryData);
+
 		this.queryType = queryType;
 		this.queryData = queryData;
-		logger.trace("End - Object init");
+
 	}
 	/**
 	 * Returns a {@link Query} object containing the protobuf data for this query object
 	 * @return {@link Query}
 	 */
 	public Query getProtobuf() {
-		logger.trace("Start - getProtobuf");
+
 		// Generates the protobuf payload for this class
 		Query.Builder query = Query.newBuilder();
 		switch (this.queryType) {
@@ -127,11 +126,14 @@ public class HederaQuery implements Serializable {
 			case TRANSACTIONGETRECORD:
 				query.setTransactionGetRecord((TransactionGetRecordQuery)this.queryData);
 				break;
+			case TRANSACTIONGETFASTRECORD:
+				query.setTransactionGetFastRecord((TransactionGetFastRecordQuery)this.queryData);
+				break;
 			case NOTSET:
-				logger.trace("End - getProtobuf");
+
 	            throw new IllegalArgumentException("Query type not set. Unable to generate data.");			
 		}
-		logger.trace("End - getProtobuf");
+
 		
 		return query.build();
 	}

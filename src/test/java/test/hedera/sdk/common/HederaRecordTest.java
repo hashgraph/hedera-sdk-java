@@ -8,15 +8,14 @@ import com.hedera.sdk.account.HederaAccountAmount;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaContractID;
 import com.hedera.sdk.common.HederaFileID;
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.common.HederaTimeStamp;
 import com.hedera.sdk.common.HederaTransactionID;
 import com.hedera.sdk.common.HederaTransactionReceipt;
 import com.hedera.sdk.common.HederaTransactionRecord;
-import com.hedera.sdk.common.HederaTransactionStatus;
 import com.hedera.sdk.contract.HederaContractFunctionResult;
 import com.hederahashgraph.api.proto.java.ContractFunctionResult;
 import com.hederahashgraph.api.proto.java.ContractLoginfo;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,8 +35,8 @@ class HederaRecordTest {
 		masterRecord.memo = "memo";
 		masterRecord.transactionFee = 10;
 		masterRecord.transactionReceipt = new HederaTransactionReceipt(
-			HederaPrecheckResult.OK,
-			HederaTransactionStatus.SUCCESS, 
+				ResponseCodeEnum.OK,
+				ResponseCodeEnum.SUCCESS, 
 			new HederaAccountID(1, 2, 3), 
 			new HederaFileID(4, 5, 6), 
 			new HederaContractID(7, 8, 9));
@@ -87,7 +86,7 @@ class HederaRecordTest {
 		assertEquals("memo", masterRecord.memo);
 		assertEquals(10, masterRecord.transactionFee);
 
-		assertEquals(HederaTransactionStatus.SUCCESS, masterRecord.transactionReceipt.transactionStatus);
+		assertEquals(ResponseCodeEnum.SUCCESS, masterRecord.transactionReceipt.transactionStatus);
 		assertEquals(1, masterRecord.transactionReceipt.accountID.shardNum);
 		assertEquals(2, masterRecord.transactionReceipt.accountID.realmNum);
 		assertEquals(3, masterRecord.transactionReceipt.accountID.accountNum);
@@ -139,7 +138,7 @@ class HederaRecordTest {
 		assertEquals("memo", protoRecord.memo);
 		assertEquals(10, protoRecord.transactionFee);
 
-		assertEquals(HederaTransactionStatus.SUCCESS, protoRecord.transactionReceipt.transactionStatus);
+		assertEquals(ResponseCodeEnum.SUCCESS, protoRecord.transactionReceipt.transactionStatus);
 		assertEquals(1, protoRecord.transactionReceipt.accountID.shardNum);
 		assertEquals(2, protoRecord.transactionReceipt.accountID.realmNum);
 		assertEquals(3, protoRecord.transactionReceipt.accountID.accountNum);
@@ -191,8 +190,8 @@ class HederaRecordTest {
 		masterRecord.memo = "memo";
 		masterRecord.transactionFee = 10;
 		masterRecord.transactionReceipt = new HederaTransactionReceipt(
-			HederaPrecheckResult.OK,
-			HederaTransactionStatus.SUCCESS, 
+				ResponseCodeEnum.OK,
+				ResponseCodeEnum.SUCCESS, 
 			new HederaAccountID(1, 2, 3), 
 			new HederaFileID(4, 5, 6), 
 			new HederaContractID(7, 8, 9));
@@ -242,7 +241,7 @@ class HederaRecordTest {
 		assertEquals("memo", masterRecord.memo);
 		assertEquals(10, masterRecord.transactionFee);
 
-		assertEquals(HederaTransactionStatus.SUCCESS, masterRecord.transactionReceipt.transactionStatus);
+		assertEquals(ResponseCodeEnum.SUCCESS, masterRecord.transactionReceipt.transactionStatus);
 		assertEquals(1, masterRecord.transactionReceipt.accountID.shardNum);
 		assertEquals(2, masterRecord.transactionReceipt.accountID.realmNum);
 		assertEquals(3, masterRecord.transactionReceipt.accountID.accountNum);
@@ -294,7 +293,7 @@ class HederaRecordTest {
 		assertEquals("memo", protoRecord.memo);
 		assertEquals(10, protoRecord.transactionFee);
 
-		assertEquals(HederaTransactionStatus.SUCCESS, protoRecord.transactionReceipt.transactionStatus);
+		assertEquals(ResponseCodeEnum.SUCCESS, protoRecord.transactionReceipt.transactionStatus);
 		assertEquals(1, protoRecord.transactionReceipt.accountID.shardNum);
 		assertEquals(2, protoRecord.transactionReceipt.accountID.realmNum);
 		assertEquals(3, protoRecord.transactionReceipt.accountID.accountNum);
@@ -345,8 +344,8 @@ class HederaRecordTest {
 		masterRecord.memo = "memo";
 		masterRecord.transactionFee = 10;
 		masterRecord.transactionReceipt = new HederaTransactionReceipt(
-			HederaPrecheckResult.OK,
-			HederaTransactionStatus.SUCCESS, 
+				ResponseCodeEnum.OK,
+			ResponseCodeEnum.SUCCESS, 
 			new HederaAccountID(1, 2, 3), 
 			new HederaFileID(4, 5, 6), 
 			new HederaContractID(7, 8, 9));
@@ -380,7 +379,7 @@ class HederaRecordTest {
 		assertEquals("memo", masterRecord.memo);
 		assertEquals(10, masterRecord.transactionFee);
 
-		assertEquals(HederaTransactionStatus.SUCCESS, masterRecord.transactionReceipt.transactionStatus);
+		assertEquals(ResponseCodeEnum.SUCCESS, masterRecord.transactionReceipt.transactionStatus);
 		assertEquals(1, masterRecord.transactionReceipt.accountID.shardNum);
 		assertEquals(2, masterRecord.transactionReceipt.accountID.realmNum);
 		assertEquals(3, masterRecord.transactionReceipt.accountID.accountNum);
@@ -416,7 +415,7 @@ class HederaRecordTest {
 		assertEquals("memo", protoRecord.memo);
 		assertEquals(10, protoRecord.transactionFee);
 
-		assertEquals(HederaTransactionStatus.SUCCESS, protoRecord.transactionReceipt.transactionStatus);
+		assertEquals(ResponseCodeEnum.SUCCESS, protoRecord.transactionReceipt.transactionStatus);
 		assertEquals(1, protoRecord.transactionReceipt.accountID.shardNum);
 		assertEquals(2, protoRecord.transactionReceipt.accountID.realmNum);
 		assertEquals(3, protoRecord.transactionReceipt.accountID.accountNum);

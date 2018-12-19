@@ -2,7 +2,6 @@ package com.hedera.sdk.common;
 
 import java.io.Serializable;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hederahashgraph.api.proto.java.Duration;
@@ -13,7 +12,7 @@ import com.hederahashgraph.api.proto.java.Duration;
  * (see the comments in https://github.com/google/protobuf/blob/master/src/google/protobuf/duration.proto)
  */
 public class HederaDuration implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaDuration.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaDuration.class);
 	private static final long serialVersionUID = 1;
 
 	/**
@@ -30,8 +29,6 @@ public class HederaDuration implements Serializable {
 	 * Constructor with default values 
 	 */
 	public HederaDuration() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
 	}
 
 	/**
@@ -40,10 +37,9 @@ public class HederaDuration implements Serializable {
 	 * @param nanos the number of nanoseconds 
 	 */
 	public HederaDuration(long seconds, int nanos) {
-	   	logger.trace("Start - Object init seconds {}, nanos {}", seconds, nanos);
+
 		this.seconds = seconds;
 		this.nanos = nanos;
-	   	logger.trace("End - Object init");
 	}
 
 	/**
@@ -51,10 +47,9 @@ public class HederaDuration implements Serializable {
 	 * @param durationProtobuf the protobuf for the duration
 	 */
 	public HederaDuration(Duration durationProtobuf) {
-	   	logger.trace("Start - Object init durationProtobuf {}", durationProtobuf);
+
 		this.seconds = durationProtobuf.getSeconds();
 		this.nanos = durationProtobuf.getNanos();
-	   	logger.trace("End - Object init");
 	}
 
 	/**
@@ -62,7 +57,7 @@ public class HederaDuration implements Serializable {
 	 * @return Duration protobuf object
 	 */
 	public Duration getProtobuf() {
-	   	logger.trace("getProtobuf");
+
 		return Duration.newBuilder().setSeconds(this.seconds)
 			    .setNanos(this.nanos).build();
 	}

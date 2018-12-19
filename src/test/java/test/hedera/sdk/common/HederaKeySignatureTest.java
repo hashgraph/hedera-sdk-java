@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import com.hedera.sdk.common.HederaContractID;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.node.HederaNode;
 import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.common.HederaKeySignatureList;
@@ -43,7 +43,7 @@ class HederaKeySignatureTest {
 		keySigList.add(new HederaKeySignature(KeyType.ED25519, keyBytes, sigBytes));
 		thresholdKeySig = new HederaKeySignatureThreshold(threshold, keySigList);
 		hederaKeySigList.addKeySignaturePair(new HederaKeySignature(KeyType.ED25519, keyBytes, sigBytes));
-		hederaKeySigList.addKeySignaturePair(KeyType.ECDSA384, keyBytes, sigBytes);
+		hederaKeySigList.addKeySignaturePair(KeyType.ED25519, keyBytes, sigBytes);
 	}
 	
 	@ParameterizedTest
@@ -56,11 +56,6 @@ class HederaKeySignatureTest {
 		assertEquals(description, masterKey.keyDescription);
 		assertNotEquals(null, masterKey.uuid);
 
-		HederaKeySignature protobufKey = new HederaKeySignature(masterKey.getKeyProtobuf(), masterKey.getSignatureProtobuf());
-		assertEquals(masterKey.getKeyType(), protobufKey.getKeyType());
-		assertArrayEquals(masterKey.getKey(), protobufKey.getKey());
-		assertArrayEquals(masterKey.getSignature(), protobufKey.getSignature());
-
 		HederaKeySignature jsonKey = new HederaKeySignature();
 		jsonKey.fromJSON(masterKey.JSON());
 		assertEquals(masterKey.getKeyType(), jsonKey.getKeyType());
@@ -72,11 +67,11 @@ class HederaKeySignatureTest {
 	 
 	private static Stream<Arguments> keyInit() {
 		return Stream.of(
-			Arguments.of(new HederaKeySignature(KeyType.ECDSA384, keyBytes, sigBytes), KeyType.ECDSA384, ""),
-			Arguments.of(new HederaKeySignature(KeyType.RSA3072, keyBytes, sigBytes), KeyType.RSA3072, ""),
 			Arguments.of(new HederaKeySignature(KeyType.ED25519, keyBytes, sigBytes), KeyType.ED25519, ""),
-			Arguments.of(new HederaKeySignature(KeyType.ECDSA384, keyBytes, sigBytes, description), KeyType.ECDSA384, description),
-			Arguments.of(new HederaKeySignature(KeyType.RSA3072, keyBytes, sigBytes, description), KeyType.RSA3072, description),
+			Arguments.of(new HederaKeySignature(KeyType.ED25519, keyBytes, sigBytes), KeyType.ED25519, ""),
+			Arguments.of(new HederaKeySignature(KeyType.ED25519, keyBytes, sigBytes), KeyType.ED25519, ""),
+			Arguments.of(new HederaKeySignature(KeyType.ED25519, keyBytes, sigBytes, description), KeyType.ED25519, description),
+			Arguments.of(new HederaKeySignature(KeyType.ED25519, keyBytes, sigBytes, description), KeyType.ED25519, description),
 			Arguments.of(new HederaKeySignature(KeyType.ED25519, keyBytes, sigBytes, description), KeyType.ED25519, description)
 		);
 	}
@@ -93,14 +88,6 @@ class HederaKeySignatureTest {
 		assertEquals(contractID.realmNum, masterKey.getContractIDKey().realmNum);
 		assertEquals(description, masterKey.keyDescription);
 		assertNotEquals(null, masterKey.uuid);
-
-		HederaKeySignature protobufKey = new HederaKeySignature(masterKey.getKeyProtobuf(), masterKey.getSignatureProtobuf());
-		assertEquals(null, protobufKey.getKey());
-		assertEquals(null, protobufKey.getSignature());
-		assertEquals(KeyType.CONTRACT, protobufKey.getKeyType());
-		assertEquals(contractID.contractNum, protobufKey.getContractIDKey().contractNum);
-		assertEquals(contractID.shardNum, protobufKey.getContractIDKey().shardNum);
-		assertEquals(contractID.realmNum, protobufKey.getContractIDKey().realmNum);
 
 		HederaKeySignature jsonKey = new HederaKeySignature();
 		jsonKey.fromJSON(masterKey.JSON());
@@ -139,17 +126,6 @@ class HederaKeySignatureTest {
 		// compare keys
 		assertEquals(masterKey.getKey(), null);
 		assertArrayEquals(keyBytes, masterKey.getThresholdKeySignaturePair().keySigPairs.get(0).getKey());
-
-		HederaKeySignature protobufKey = new HederaKeySignature(masterKey.getKeyProtobuf(), masterKey.getSignatureProtobuf());
-		assertEquals(masterKey.getKeyType(), protobufKey.getKeyType());
-		assertArrayEquals(masterKey.getKey(), protobufKey.getKey());
-		assertArrayEquals(masterKey.getSignature(), protobufKey.getSignature());
-		assertEquals(masterKey.getThresholdKeySignaturePair().threshold, thresholdKeySig.threshold);
-		assertEquals(thresholdKeySig.keySigPairs.get(0).getKeyType(), protobufKey.getThresholdKeySignaturePair().keySigPairs.get(0).getKeyType());
-		assertEquals(null, protobufKey.getKey());
-		assertEquals(null, protobufKey.getSignature());
-		assertArrayEquals(keyBytes, protobufKey.getThresholdKeySignaturePair().keySigPairs.get(0).getKey());
-		assertArrayEquals(sigBytes, protobufKey.getThresholdKeySignaturePair().keySigPairs.get(0).getSignature());
 
 		HederaKeySignature jsonKey = new HederaKeySignature();
 		jsonKey.fromJSON(masterKey.JSON());
@@ -195,14 +171,6 @@ class HederaKeySignatureTest {
 		assertEquals(null, masterKey.getSignature());
 		assertArrayEquals(masterKey.getKeySignaturePairList().keySigPairs.get(0).getKey(), hederaKeySigList.keySigPairs.get(0).getKey());
 		assertArrayEquals(masterKey.getKeySignaturePairList().keySigPairs.get(0).getSignature(), hederaKeySigList.keySigPairs.get(0).getSignature());
-		HederaKeySignature protobufKey = new HederaKeySignature(masterKey.getKeyProtobuf(), masterKey.getSignatureProtobuf());
-		assertEquals(masterKey.getKeyType(), protobufKey.getKeyType());
-		assertArrayEquals(masterKey.getKey(), protobufKey.getKey());
-		assertArrayEquals(masterKey.getSignature(), protobufKey.getSignature());
-//		 compare keylist
-		assertEquals(hederaKeySigList.keySigPairs.get(0).getKeyType(), protobufKey.getKeySignaturePairList().keySigPairs.get(0).getKeyType());
-		assertArrayEquals(hederaKeySigList.keySigPairs.get(0).getKey(), protobufKey.getKeySignaturePairList().keySigPairs.get(0).getKey());
-		assertArrayEquals(hederaKeySigList.keySigPairs.get(0).getSignature(), protobufKey.getKeySignaturePairList().keySigPairs.get(0).getSignature());
 
 		HederaKeySignature jsonKey = new HederaKeySignature();
 		jsonKey.fromJSON(masterKey.JSON());
@@ -244,20 +212,20 @@ class HederaKeySignatureTest {
 		assertFalse(keySignature.setSignatureForKey("dummy".getBytes(), aSignature, true));
 		assertNull(keySignature.getSignature());
 		
-		keySignature = new HederaKeySignature(KeyType.ECDSA384, aKey, null);
+		keySignature = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		assertFalse(keySignature.setSignatureForKey("dummy".getBytes(), aSignature, true));
 		assertTrue(keySignature.setSignatureForKey(aKey, aSignature, false));
 		assertEquals(aSignature, keySignature.getSignature());
 
 		// false positive, if the signature is set, the "set" method shouldn't update
-		keySignature = new HederaKeySignature(KeyType.ECDSA384, aKey, "dummy".getBytes());
+		keySignature = new HederaKeySignature(KeyType.ED25519, aKey, "dummy".getBytes());
 		assertFalse(keySignature.setSignatureForKey(aKey, aSignature, false));
 		assertNotEquals(aSignature, keySignature.getSignature());
 
 		// threshold key
 		HederaKeySignature pair1 = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		HederaKeySignature pair2 = new HederaKeySignature(KeyType.ED25519, aKey, null);
-		List<HederaKeySignature> list = new ArrayList();
+		List<HederaKeySignature> list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureThreshold keySig = new HederaKeySignatureThreshold(1, list);
@@ -272,7 +240,7 @@ class HederaKeySignatureTest {
 		// now try both
 		pair1 = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		pair2 = new HederaKeySignature(KeyType.ED25519, aKey, null);
-		list = new ArrayList();
+		list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		keySig = new HederaKeySignatureThreshold(1, list);
@@ -287,7 +255,7 @@ class HederaKeySignatureTest {
 		// reset keys
 		pair1 = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		pair2 = new HederaKeySignature(KeyType.ED25519, aKey, null);
-		list = new ArrayList();
+		list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureList keySigList = new HederaKeySignatureList(list);
@@ -301,7 +269,7 @@ class HederaKeySignatureTest {
 		// reset keys
 		pair1 = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		pair2 = new HederaKeySignature(KeyType.ED25519, aKey, null);
-		list = new ArrayList();
+		list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		keySigList = new HederaKeySignatureList(list);
@@ -329,12 +297,12 @@ class HederaKeySignatureTest {
 		signatures[1] = aSignature2;
 		
 		// standard keys
-		HederaKeySignature keySignature = new HederaKeySignature(KeyType.ECDSA384, aKey0, null);
+		HederaKeySignature keySignature = new HederaKeySignature(KeyType.ED25519, aKey0, null);
 		// shouldn't update anything, signature key doesn't match array
 		assertFalse(keySignature.setSignatureForKeys(keys, signatures, false));
 		assertNull(keySignature.getSignature());
 
-		keySignature = new HederaKeySignature(KeyType.ECDSA384, aKey1, null);
+		keySignature = new HederaKeySignature(KeyType.ED25519, aKey1, null);
 		// shouldn't update anything, signature key doesn't match array
 		assertTrue(keySignature.setSignatureForKeys(keys, signatures, false));
 		assertArrayEquals(aSignature1, keySignature.getSignature());
@@ -342,7 +310,7 @@ class HederaKeySignatureTest {
 		// threshold key
 		HederaKeySignature pair1 = new HederaKeySignature(KeyType.ED25519, aKey1, null);
 		HederaKeySignature pair2 = new HederaKeySignature(KeyType.ED25519, aKey2, null);
-		List<HederaKeySignature> list = new ArrayList();
+		List<HederaKeySignature> list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureThreshold keySig = new HederaKeySignatureThreshold(1, list);
@@ -357,7 +325,7 @@ class HederaKeySignatureTest {
 		// reset keys
 		pair1 = new HederaKeySignature(KeyType.ED25519, aKey1, null);
 		pair2 = new HederaKeySignature(KeyType.ED25519, aKey2, null);
-		list = new ArrayList();
+		list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureList keySigList = new HederaKeySignatureList(list);
@@ -380,7 +348,7 @@ class HederaKeySignatureTest {
 		assertFalse(keySignature.setSignatureForKeyUUID("dummy", aSignature));
 		assertNull(keySignature.getSignature());
 		
-		keySignature = new HederaKeySignature(KeyType.ECDSA384, aKey, null);
+		keySignature = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		assertFalse(keySignature.setSignatureForKeyUUID("dummy", aSignature));
 		assertTrue(keySignature.setSignatureForKeyUUID(keySignature.uuid, aSignature));
 		assertEquals(aSignature, keySignature.getSignature());
@@ -388,7 +356,7 @@ class HederaKeySignatureTest {
 		// threshold key
 		HederaKeySignature pair1 = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		HederaKeySignature pair2 = new HederaKeySignature(KeyType.ED25519, aKey, null);
-		List<HederaKeySignature> list = new ArrayList();
+		List<HederaKeySignature> list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureThreshold keySig = new HederaKeySignatureThreshold(1, list);
@@ -409,7 +377,7 @@ class HederaKeySignatureTest {
 		// reset keys
 		pair1 = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		pair2 = new HederaKeySignature(KeyType.ED25519, aKey, null);
-		list = new ArrayList();
+		list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureList keySigList = new HederaKeySignatureList(list);
@@ -431,35 +399,34 @@ class HederaKeySignatureTest {
 	@DisplayName("HederaKeySignature Get Key UUIDs")
 	void HederaKeySignatureGetKeyUUID() { 
 		// create key with empty signature
-		byte[] aSignature = "signature".getBytes();
 		byte[] aKey = "key".getBytes();
 		byte[] aKey2 = "key2".getBytes();
 		
 		// standard keys
-		HederaKeySignature keySignature = new HederaKeySignature(KeyType.ECDSA384, aKey, null);
+		HederaKeySignature keySignature = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		
-		List<HederaKeyUUIDDescription> uuids = new ArrayList();
+		List<HederaKeyUUIDDescription> uuids = new ArrayList<HederaKeyUUIDDescription>();
 		keySignature.getKeyUUIDs(uuids, aKey);
 		assertEquals(1, uuids.size());
 
-		uuids = new ArrayList();
+		uuids = new ArrayList<HederaKeyUUIDDescription>();
 		keySignature.getKeyUUIDs(uuids, "dummmy".getBytes());
 		assertEquals(0, uuids.size());
 		
 		// threshold key
 		HederaKeySignature pair1 = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		HederaKeySignature pair2 = new HederaKeySignature(KeyType.ED25519, aKey2, null);
-		List<HederaKeySignature> list = new ArrayList();
+		List<HederaKeySignature> list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureThreshold keySig = new HederaKeySignatureThreshold(1, list);
 		keySignature = new HederaKeySignature(keySig);
 
-		uuids = new ArrayList();
+		uuids = new ArrayList<HederaKeyUUIDDescription>();
 		keySignature.getKeyUUIDs(uuids, aKey);
 		assertEquals(1, uuids.size());
 
-		uuids = new ArrayList();
+		uuids = new ArrayList<HederaKeyUUIDDescription>();
 		keySignature.getKeyUUIDs(uuids, "dummmy".getBytes());
 		assertEquals(0, uuids.size());
 		
@@ -467,17 +434,17 @@ class HederaKeySignatureTest {
 		// reset keys
 		pair1 = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		pair2 = new HederaKeySignature(KeyType.ED25519, aKey2, null);
-		list = new ArrayList();
+		list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureList keySigList = new HederaKeySignatureList(list);
 		keySignature = new HederaKeySignature(keySigList);
 
-		uuids = new ArrayList();
+		uuids = new ArrayList<HederaKeyUUIDDescription>();
 		keySignature.getKeyUUIDs(uuids, aKey);
 		assertEquals(1, uuids.size());
 
-		uuids = new ArrayList();
+		uuids = new ArrayList<HederaKeyUUIDDescription>();
 		keySignature.getKeyUUIDs(uuids, "dummmy".getBytes());
 		assertEquals(0, uuids.size());
 	}
@@ -497,7 +464,7 @@ class HederaKeySignatureTest {
 		uuids[0] = "dummy1";
 		uuids[1] = "dummy2";
 		
-		HederaKeySignature keySignature = new HederaKeySignature(KeyType.ECDSA384, aKey, null);
+		HederaKeySignature keySignature = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		// uuids are dummy, should not update
 		assertFalse(keySignature.setSignatureForKeyUUIDs(uuids, signatures));
 		assertNull(keySignature.getSignature());
@@ -510,7 +477,7 @@ class HederaKeySignatureTest {
 		// threshold key
 		HederaKeySignature pair1 = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		HederaKeySignature pair2 = new HederaKeySignature(KeyType.ED25519, aKey, null);
-		List<HederaKeySignature> list = new ArrayList();
+		List<HederaKeySignature> list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 
@@ -534,7 +501,7 @@ class HederaKeySignatureTest {
 		// reset keys
 		pair1 = new HederaKeySignature(KeyType.ED25519, aKey, null);
 		pair2 = new HederaKeySignature(KeyType.ED25519, aKey, null);
-		list = new ArrayList();
+		list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureList keySigList = new HederaKeySignatureList(list);
@@ -572,7 +539,7 @@ class HederaKeySignatureTest {
 		assertFalse(keySignature.updateSignatureForKey("dummy".getBytes(), aSignature1));
 		assertArrayEquals("sig".getBytes(), keySignature.getSignature());
 		
-		keySignature = new HederaKeySignature(KeyType.ECDSA384, aKey1, aSignature1);
+		keySignature = new HederaKeySignature(KeyType.ED25519, aKey1, aSignature1);
 		assertFalse(keySignature.updateSignatureForKey("dummy".getBytes(), aSignature2));
 		assertArrayEquals(aSignature1, keySignature.getSignature());
 		assertTrue(keySignature.updateSignatureForKey(aKey1, aSignature2));
@@ -581,7 +548,7 @@ class HederaKeySignatureTest {
 		// threshold key
 		HederaKeySignature pair1 = new HederaKeySignature(KeyType.ED25519, aKey1, "sig".getBytes());
 		HederaKeySignature pair2 = new HederaKeySignature(KeyType.ED25519, aKey2, "sig".getBytes());
-		List<HederaKeySignature> list = new ArrayList();
+		List<HederaKeySignature> list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureThreshold keySig = new HederaKeySignatureThreshold(1, list);
@@ -596,7 +563,7 @@ class HederaKeySignatureTest {
 		// reset keys
 		pair1 = new HederaKeySignature(KeyType.ED25519, aKey1, "sig".getBytes());
 		pair2 = new HederaKeySignature(KeyType.ED25519, aKey2, "sig".getBytes());
-		list = new ArrayList();
+		list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureList keySigList = new HederaKeySignatureList(list);
@@ -632,7 +599,7 @@ class HederaKeySignatureTest {
 		assertFalse(keySignature.updateSignatureForKeys(keys, signatures));
 		assertArrayEquals(aSignature1, keySignature.getSignature());
 		
-		keySignature = new HederaKeySignature(KeyType.ECDSA384, aKey1, aSignature2);
+		keySignature = new HederaKeySignature(KeyType.ED25519, aKey1, aSignature2);
 		keys[0] = aKey1;
 		keys[1] = "someBytes".getBytes();
 		assertTrue(keySignature.updateSignatureForKeys(keys, signatures));
@@ -641,7 +608,7 @@ class HederaKeySignatureTest {
 		// threshold key
 		HederaKeySignature pair1 = new HederaKeySignature(KeyType.ED25519, aKey1, "sig".getBytes());
 		HederaKeySignature pair2 = new HederaKeySignature(KeyType.ED25519, aKey2, "sig".getBytes());
-		List<HederaKeySignature> list = new ArrayList();
+		List<HederaKeySignature> list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureThreshold keySig = new HederaKeySignatureThreshold(1, list);
@@ -665,7 +632,7 @@ class HederaKeySignatureTest {
 		// reset keys
 		pair1 = new HederaKeySignature(KeyType.ED25519, aKey1, "sig".getBytes());
 		pair2 = new HederaKeySignature(KeyType.ED25519, aKey2, "sig".getBytes());
-		list = new ArrayList();
+		list = new ArrayList<HederaKeySignature>();
 		list.add(pair1);
 		list.add(pair2);
 		HederaKeySignatureList keySigList = new HederaKeySignatureList(list);

@@ -4,7 +4,7 @@
   <groupId>com.hedera</groupId>
   <artifactId>sdk</artifactId>
   <name>hedera-sdk-java</name>
-  <version>0.1.2</version>
+  <version>0.2.0</version>
   <url>http://maven.apache.org</url>
   <build>
     <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
@@ -19,7 +19,7 @@
         <targetPath>${project.build.directory}</targetPath>
         <directory>${basedir}/src/main/resources</directory>
         <includes>
-          <include>log4j.xml</include>
+          <include>logback.xml</include>
           <include>simpleStorage.bin</include>
         </includes>
       </resource>
@@ -80,6 +80,8 @@
           <excludePackageNames>test.com.hedera.*</excludePackageNames>
           <excludePackageNames>net.i2p.*</excludePackageNames>
           <excludePackageNames>org.json.*</excludePackageNames>
+          <failOnError>false</failOnError>
+          <additionalOptions>-html5</additionalOptions>
         </configuration>
       </plugin>
       <plugin>

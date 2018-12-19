@@ -1,20 +1,18 @@
 package com.hedera.account;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.account.HederaClaim;
-import com.hedera.sdk.common.HederaPrecheckResult;
+import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaTransactionReceipt;
-import com.hedera.sdk.common.HederaTransactionStatus;
 import com.hedera.sdk.common.Utilities;
-import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
 import com.hedera.sdk.transaction.HederaTransactionResult;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class AccountAddClaim {
-	public static boolean addClaim(HederaAccount account, HederaClaim claim, HederaCryptoKeyPair claimKeyPair) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(AccountAddClaim.class);
+	public static boolean addClaim(HederaAccount account, HederaClaim claim, HederaKeyPair claimKeyPair) throws Exception {
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(AccountAddClaim.class);
 
 		logger.info("");
 		logger.info("# CRYPTO ADD CLAIM");
@@ -23,10 +21,10 @@ public final class AccountAddClaim {
     	// add the claim
 		HederaTransactionResult claimAddResult = account.addClaim(claim, claimKeyPair);
 		// was it successful ?
-		if (claimAddResult.getPrecheckResult() == HederaPrecheckResult.OK) {
+		if (claimAddResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 			// yes, get a receipt for the transaction
 			HederaTransactionReceipt receipt  = Utilities.getReceipt(account.hederaTransactionID,  account.txQueryDefaults.node);
-			if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
+			if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
 				// if query successful, print it
 				logger.info("===>Claim addition successful");
 				return true;
@@ -34,7 +32,7 @@ public final class AccountAddClaim {
 				logger.info("Failed with transactionStatus:" + receipt.transactionStatus);
 				return false;
 			}
-		} else if (account.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+		} else if (account.getPrecheckResult() == ResponseCodeEnum.BUSY) {
 			logger.info("system busy, try again later");
 			return false;
 		} else {

@@ -11,11 +11,11 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.common.HederaKeySignatureList;
 import com.hedera.sdk.common.HederaKeyUUIDDescription;
-import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,9 +25,9 @@ class HederaKeySignatureListTest {
 	@Test
 	@DisplayName("Checking matching account details")
 	void testKeyListInit() {
-		HederaCryptoKeyPair keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
+		HederaKeyPair keyPair = new HederaKeyPair(KeyType.ED25519);
 		HederaKeySignature key1 = new HederaKeySignature(KeyType.ED25519, keyPair.getPublicKeyEncoded(), new byte[] {12,34}, "ED25519");
-		keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
+		keyPair = new HederaKeyPair(KeyType.ED25519);
 		HederaKeySignature key2 = new HederaKeySignature(KeyType.ED25519,  keyPair.getPublicKeyEncoded(), new byte[] {12,34}, "ED25519");
 		List<HederaKeySignature> keys = new ArrayList<HederaKeySignature>();
 		keys.add(key1);
@@ -41,7 +41,7 @@ class HederaKeySignatureListTest {
 		
 		masterKeyList.addKeySignaturePair(key1);
 		masterKeyList.addKeySignaturePair(key2);
-		keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
+		keyPair = new HederaKeyPair(KeyType.ED25519);
 		masterKeyList.addKeySignaturePair(KeyType.ED25519, keyPair.getPublicKeyEncoded(), new byte[] {12,34});
 
 		assertEquals(5, masterKeyList.keySigPairs.size());
@@ -51,15 +51,6 @@ class HederaKeySignatureListTest {
 
 		assertEquals(3, masterKeyList.keySigPairs.size());
 		
-		HederaKeySignatureList protobufList = new HederaKeySignatureList(masterKeyList.getProtobufKeys(), masterKeyList.getProtobufSignatures());
-		assertEquals(masterKeyList.keySigPairs.size(), protobufList.keySigPairs.size());
-		assertArrayEquals(masterKeyList.keySigPairs.get(0).getKey(), protobufList.keySigPairs.get(0).getKey());
-		assertArrayEquals(masterKeyList.keySigPairs.get(0).getSignature(), protobufList.keySigPairs.get(0).getSignature());
-		assertArrayEquals(masterKeyList.keySigPairs.get(1).getKey(), protobufList.keySigPairs.get(1).getKey());
-		assertArrayEquals(masterKeyList.keySigPairs.get(1).getSignature(), protobufList.keySigPairs.get(1).getSignature());
-		assertArrayEquals(masterKeyList.keySigPairs.get(2).getKey(), protobufList.keySigPairs.get(2).getKey());
-		assertArrayEquals(masterKeyList.keySigPairs.get(2).getSignature(), protobufList.keySigPairs.get(2).getSignature());
-
 		HederaKeySignatureList jsonList = new HederaKeySignatureList();
 		jsonList.fromJSON(masterKeyList.JSON());
 		assertEquals(masterKeyList.keySigPairs.size(), jsonList.keySigPairs.size());
@@ -80,7 +71,7 @@ class HederaKeySignatureListTest {
 		// create key with empty signature
 		byte[] aSignature = "signature".getBytes();
 		byte[] aSignature2 = "signature2".getBytes();
-		HederaCryptoKeyPair keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
+		HederaKeyPair keyPair = new HederaKeyPair(KeyType.ED25519);
 		byte[] aKey = keyPair.getPublicKey();
 		
 		// standard keys
@@ -106,11 +97,11 @@ class HederaKeySignatureListTest {
 	void HederaKeySignatureListSetArrays() { 
 		byte[] aSignature1 = "signature".getBytes();
 		byte[] aSignature2 = "signature2".getBytes();
-		HederaCryptoKeyPair keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
+		HederaKeyPair keyPair = new HederaKeyPair(KeyType.ED25519);
 		byte[] aKey0 = keyPair.getPublicKey();
-		keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
+		keyPair = new HederaKeyPair(KeyType.ED25519);
 		byte[] aKey1 = keyPair.getPublicKey();
-		keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
+		keyPair = new HederaKeyPair(KeyType.ED25519);
 		byte[] aKey2 = keyPair.getPublicKey();
 		
 		byte[][] keys = new byte[2][];
@@ -141,7 +132,7 @@ class HederaKeySignatureListTest {
 	void HederaKeySignatureListTestUUID() { 
 		// create key with empty signature
 		byte[] aSignature = "signature".getBytes();
-		HederaCryptoKeyPair keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
+		HederaKeyPair keyPair = new HederaKeyPair(KeyType.ED25519);
 		byte[] aKey = keyPair.getPublicKey();
 		
 		// standard keys
@@ -166,12 +157,10 @@ class HederaKeySignatureListTest {
 	@DisplayName("HederaKeySignatureListTest Get Key UUIDs")
 	void HederaKeySignatureListTestGetKeyUUIDs() { 
 		// create key with empty signature
-		byte[] aSignature = "signature".getBytes();
 
-		HederaCryptoKeyPair keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
+		HederaKeyPair keyPair = new HederaKeyPair(KeyType.ED25519);
 		byte[] aKey = keyPair.getPublicKey();
-		keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
-		byte[] aKey2 = keyPair.getPublicKey();
+		keyPair = new HederaKeyPair(KeyType.ED25519);
 		
 		// standard keys
 		HederaKeySignature keySignature = new HederaKeySignature(KeyType.ED25519, aKey, null);
@@ -194,7 +183,7 @@ class HederaKeySignatureListTest {
 		// create key with empty signature
 		byte[] aSignature1 = "signature1".getBytes();
 		byte[] aSignature2 = "signature2".getBytes();
-		HederaCryptoKeyPair keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
+		HederaKeyPair keyPair = new HederaKeyPair(KeyType.ED25519);
 		byte[] aKey = keyPair.getPublicKey();
 		byte[][] signatures = new byte[2][];
 		signatures[0] = aSignature1;
@@ -224,10 +213,9 @@ class HederaKeySignatureListTest {
 		// create key with empty signature
 		byte[] aSignature1 = "signature1".getBytes();
 		byte[] aSignature2 = "signature2".getBytes();
-		HederaCryptoKeyPair keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
+		HederaKeyPair keyPair = new HederaKeyPair(KeyType.ED25519);
 		byte[] aKey1 = keyPair.getPublicKey();
-		keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
-		byte[] aKey2 = keyPair.getPublicKey();
+		keyPair = new HederaKeyPair(KeyType.ED25519);
 
 		// standard keys
 		HederaKeySignature keySignature = new HederaKeySignature(KeyType.NOTSET, aKey1, "sig".getBytes());
@@ -253,9 +241,9 @@ class HederaKeySignatureListTest {
 		// create key with empty signature
 		byte[] aSignature1 = "signature1".getBytes();
 		byte[] aSignature2 = "signature2".getBytes();
-		HederaCryptoKeyPair keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
+		HederaKeyPair keyPair = new HederaKeyPair(KeyType.ED25519);
 		byte[] aKey1 = keyPair.getPublicKey();
-		keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
+		keyPair = new HederaKeyPair(KeyType.ED25519);
 		byte[] aKey2 = keyPair.getPublicKey();
 		
 		byte[][] signatures = new byte[2][];

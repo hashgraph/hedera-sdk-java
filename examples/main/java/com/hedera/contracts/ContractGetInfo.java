@@ -1,14 +1,13 @@
 package com.hedera.contracts;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.contract.HederaContract;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class ContractGetInfo {
 	public static boolean getInfo(HederaContract contract) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(ContractGetInfo.class);
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(ContractGetInfo.class);
 		
 		logger.info("");
 		logger.info("CONTRACT GET INFO");
@@ -18,7 +17,7 @@ public final class ContractGetInfo {
 		if (contract.getInfo()) {
 			logger.info("===>Got info");
 			return true;
-		} else if (contract.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+		} else if (contract.getPrecheckResult() == ResponseCodeEnum.BUSY) {
 			logger.info("system busy, try again later");
 			return false;
 		} else {

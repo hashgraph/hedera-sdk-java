@@ -1,14 +1,13 @@
 package com.hedera.file;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.file.HederaFile;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class FileGetContents {
 	public static boolean getContents(HederaFile file) throws Exception {
-		final Logger logger = LoggerFactory.getLogger(FileGetContents.class);
+		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(FileGetContents.class);
 		
 		logger.info("");
 		logger.info("FILE GET CONTENTS");
@@ -21,7 +20,7 @@ public final class FileGetContents {
 			logger.info("===>Got contents=");
 			logger.info(new String(contents,"UTF-8"));
 			return true;
-		} else if (file.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+		} else if (file.getPrecheckResult() == ResponseCodeEnum.BUSY) {
 			logger.info("system busy, try again later");
 			return false;
 		} else {

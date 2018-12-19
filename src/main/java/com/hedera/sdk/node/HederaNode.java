@@ -6,16 +6,13 @@ import com.hedera.sdk.query.HederaQuery;
 import com.hedera.sdk.transaction.HederaTransaction;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 import com.hederahashgraph.api.proto.java.AccountID;
-import com.hederahashgraph.api.proto.java.NodeTransactionPrecheckCode;
 import com.hederahashgraph.api.proto.java.Response;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hederahashgraph.api.proto.java.TransactionResponse;
 import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
 import com.hederahashgraph.service.proto.java.FileServiceGrpc;
 import com.hederahashgraph.service.proto.java.SmartContractServiceGrpc;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
@@ -25,7 +22,7 @@ public class HederaNode implements Serializable {
 	 * Class to manage information associated with a Hedera Node 
 	 */
 	private static final long serialVersionUID = 1L;
-	final static Logger logger = LoggerFactory.getLogger(HederaNode.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaNode.class);
 	private String host = "";
     private int port = 0;
     private HederaAccountID accountID = null;
@@ -39,108 +36,112 @@ public class HederaNode implements Serializable {
 	/**
 	 * The default fee associated with running an account create transaction
 	 */
-	public long accountCreateTransactionFee = 10;
+	public long accountCreateTransactionFee = 100000;
 	/**
 	 * The default fee associated with running a token transaction
 	 */
-	public long accountTransferTransactionFee = 10;
+	public long accountTransferTransactionFee = 100000;
 	/**
 	 * The default fee associated with running an update transaction
 	 */
-	public long accountUpdateTransactionFee = 10;
+	public long accountUpdateTransactionFee = 100000;
 	/**
 	 * The default fee associated with deleting an account
 	 */
-	public long accountDeleteTransactionFee = 10;
+	public long accountDeleteTransactionFee = 100000;
 	/**
 	 * The default fee associated with adding a claim to an account
 	 */
-	public long accountAddClaimTransactionFee = 10;
+	public long accountAddClaimTransactionFee = 100000;
 	/**
 	 * The default fee associated with deleting a claim from an account
 	 */
-	public long accountDeleteClaimTransactionFee = 10;
+	public long accountDeleteClaimTransactionFee = 100000;
 	/**
 	 * The default fee associated with querying an account balance
 	 */
-	public long accountBalanceQueryFee = 10;
+	public long accountBalanceQueryFee = 100000;
 	/**
 	 * The default fee associated with an account info query
 	 */
-	public long accountInfoQueryFee = 10;
+	public long accountInfoQueryFee = 100000;
 	/**
 	 * The default fee associated with an get records query against an account
 	 */
-	public long accountGetRecordsQueryFee = 10;
+	public long accountGetRecordsQueryFee = 100000;
 	
 	/**
 	 * The default fee associated with creating a file
 	 */
-	public long fileCreateTransactionFee = 10;
+	public long fileCreateTransactionFee = 100000;
 	/**
 	 * The default fee associated with deleting a file
 	 */
-	public long fileDeleteTransactionFee = 10;
+	public long fileDeleteTransactionFee = 100000;
 	/**
 	 * The default fee associated with updating a file
 	 */
-	public long fileUpdateTransactionFee = 10;
+	public long fileUpdateTransactionFee = 100000;
 	/**
 	 * The default fee associated with appending to a file
 	 */
-	public long fileAppendTransactionFee = 10;
+	public long fileAppendTransactionFee = 100000;
 	/**
 	 * The default fee associated with getting file contents
 	 */
-	public long fileGetContentsQueryFee = 10;
+	public long fileGetContentsQueryFee = 100000;
 	/**
 	 * The default fee associated with getting file information
 	 */
-	public long fileGetInfoQueryFee = 10;
+	public long fileGetInfoQueryFee = 100000;
 	/**
 	 * The default fee associated with a get records query against a file
 	 */
-	public long fileGetRecordsQueryFee = 10;
+	public long fileGetRecordsQueryFee = 100000;
 	
 	/**
 	 * The default fee associated with creating a smart contract
 	 */
-	public long contractCreateTransactionFee = 10;
+	public long contractCreateTransactionFee = 100000;
 	/**
 	 * The default fee associated with updating a smart contract
 	 */
-	public long contractUpdateTransactionFee = 10;
+	public long contractUpdateTransactionFee = 100000;
 	/**
 	 * The default fee associated with getting a smart contract's byte code
 	 */
-	public long contractGetByteCodeQueryFee = 10;
+	public long contractGetByteCodeQueryFee = 100000;
 	/**
 	 * The default fee associated with calling a smart contract function
 	 */
-	public long contractCallTransactionFee = 10;
+	public long contractCallTransactionFee = 100000;
 	/**
 	 * The default fee associated with getting smart contract information
 	 */
-	public long contractGetInfoQueryFee = 10;
+	public long contractGetInfoQueryFee = 100000;
 	/**
 	 * The default fee associated with running a local call function
 	 */
-	public long contractCallLocalQueryFee = 10;
+	public long contractCallLocalQueryFee = 100000;
 	/**
 	 * The default fee associated with querying by solidityID
 	 */
-	public long contractGetBySolidityId = 10;
+	public long contractGetBySolidityId = 100000;
 	/**
 	 * The default fee associated with a get records query against a smart contract
 	 */
-	public long contractGetRecordsQueryFee = 10;
+	public long contractGetRecordsQueryFee = 100000;
+	/**
+	 * The default fee associated with a get records query against a transaction
+	 */
+	public long transactionGetRecordsQueryFee = 100000;
 
 	/**
 	 * Default Constructor
 	 */
 	public HederaNode() {
-		logger.trace("Start - init:");
-		logger.trace("End - init");
+
+
 	}
 	/**
 	 * Constructor with host and port
@@ -148,11 +149,11 @@ public class HederaNode implements Serializable {
 	 * @param port the port to use for communication
 	 */
 	public HederaNode(String host, int port) {
-		logger.trace("Start - init: host {}, port {}", host, port);
+
 		this.host = host;
 		this.port = port;
 		openChannel();
-		logger.trace("End - init");
+
 	}
 	/**
 	 * Constructor with host, port and accountID
@@ -161,12 +162,12 @@ public class HederaNode implements Serializable {
 	 * @param accountID the node's {@link AccountID}
 	 */
 	public HederaNode(String host, int port, HederaAccountID accountID) {
-		logger.trace("Start - init: host {}, port {}, accountID {}", host, port, accountID);
+
 		this.host = host;
 		this.port = port;
 		this.accountID = accountID;
 		openChannel();
-		logger.trace("End - init");
+
 	}
 	/**
 	 * Sets the host and port of the specified node
@@ -175,7 +176,7 @@ public class HederaNode implements Serializable {
 	 * @throws InterruptedException in the event of a node communication error 
 	 */
 	public void setHostPort(String host, int port) throws InterruptedException {
-		logger.trace("Start - setHostPort: host {}, port {}", host, port);
+
 		if ((!host.equals(this.host)) || (port != this.port)) {
 			// close the current connection if open
 			shutdown();
@@ -183,7 +184,7 @@ public class HederaNode implements Serializable {
 			this.port = port;
 			openChannel();
 		}
-		logger.trace("End - setHostPort");
+
     }
     
     /**
@@ -191,8 +192,8 @@ public class HederaNode implements Serializable {
 	 * @return {@link String}
      */
     public String getHost() {
-		logger.trace("Start - getHost");
-		logger.trace("End - getHost");
+
+
         return this.host;
     }
 
@@ -201,8 +202,8 @@ public class HederaNode implements Serializable {
 	 * @return {@link Integer}
      */
     public int getPort() {
-		logger.trace("Start - getPort");
-		logger.trace("End - getPort");
+
+
         return this.port;
     }
 
@@ -212,14 +213,14 @@ public class HederaNode implements Serializable {
 	 * @throws InterruptedException in the event of a node communication error 
      */
     public void setHost(String host) throws InterruptedException {
-		logger.trace("Start - setHost: host {}", host);
+
 		if (!host.equals(this.host)) {
 			// close the current connection if open
 			shutdown();
 			this.host = host;
 			openChannel();
 		}
-		logger.trace("End - setHost");
+
     }
 
     /**
@@ -228,7 +229,7 @@ public class HederaNode implements Serializable {
 	 * @throws InterruptedException in the event of a node communication error 
      */
     public void setPort(int port) throws InterruptedException {
-		logger.trace("Start - setPort: port {}", port);
+
 		this.port = port;
 		if (port != this.port) {
 			// close the current connection if open
@@ -236,7 +237,7 @@ public class HederaNode implements Serializable {
 			this.port = port;
 			openChannel();
 		}
-		logger.trace("End - setPort");
+
     }
 
     /**
@@ -244,9 +245,9 @@ public class HederaNode implements Serializable {
 	 * @param accountID {@link HederaAccountID}
 	 */
 	public void setAccountID(HederaAccountID accountID) {
-		logger.trace("Start - setAccountID: accountID {}", accountID);
+
 		this.accountID = accountID;
-		logger.trace("End - setAccountID");
+
     }
     
     /**
@@ -256,10 +257,10 @@ public class HederaNode implements Serializable {
 	 * @param accountNum {@link Long}
 	 */
 	public void setAccountID(long shardNum, long realmNum, long accountNum) {
-		logger.trace("Start - setAccountID: shardNum {}, realmNum {}, accountNum {}", shardNum, realmNum, accountNum);
+
 		HederaAccountID accountID = new HederaAccountID(shardNum, realmNum, accountNum);
 		this.accountID = accountID;
-		logger.trace("End - setAccountID");
+
     }
     
     /**
@@ -267,8 +268,8 @@ public class HederaNode implements Serializable {
 	 * @return {@link HederaAccountID}
 	 */
 	public HederaAccountID getAccountID() {
-		logger.trace("Start - getAccountID");
-		logger.trace("End - getAccountID");
+
+
 
 		return this.accountID;
     }
@@ -281,7 +282,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult accountCreate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - accountCreate protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -294,7 +295,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.createAccount(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -307,10 +308,8 @@ public class HederaNode implements Serializable {
 
 		if (transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
-		logger.trace("End - accountCreate");
+
 		return transResult;
 	}	
 
@@ -322,7 +321,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult addClaim(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - addClaim protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -335,7 +334,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.addClaim(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -347,10 +346,8 @@ public class HederaNode implements Serializable {
 		}
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
-		logger.trace("End - addClaim");
+
 		return transResult;
 	}	
 
@@ -362,7 +359,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult accountTransfer(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - accountTransfer protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -375,7 +372,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.cryptoTransfer(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					if (transaction.getProtobuf().getBody().getGenerateRecord() == true) {
 						// wait longer
 						logger.info("System busy - sleeping for " + waitMillisLong + "ms");
@@ -394,10 +391,8 @@ public class HederaNode implements Serializable {
 		}
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
-		logger.trace("End - accountTransfer");
+
 		return transResult;
 	}	
 
@@ -409,7 +404,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult accountUpdate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - accountUpdate protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -422,7 +417,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.updateAccount(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -434,10 +429,8 @@ public class HederaNode implements Serializable {
 		}
 		if(transResult != null && response != null) {		
 		    transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
-		logger.trace("End - accountUpdate");
+
 		return transResult;
 	}	
 	
@@ -449,7 +442,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult fileAppend(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - fileAppend protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -462,7 +455,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.appendContent(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -474,10 +467,8 @@ public class HederaNode implements Serializable {
 		}
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
-		logger.trace("End - fileAppend");
+
 		return transResult;
 	}	
 	
@@ -489,7 +480,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult fileCreate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - fileCreate protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -502,7 +493,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.createFile(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -515,10 +506,8 @@ public class HederaNode implements Serializable {
 
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
-		logger.trace("End - fileCreate");
+
 		return transResult;
 	}	
 
@@ -530,7 +519,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult fileDelete(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - fileDelete protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -543,7 +532,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.deleteFile(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -556,10 +545,8 @@ public class HederaNode implements Serializable {
 
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
-		logger.trace("End - fileDelete");
+
 		return transResult;
 	}	
 
@@ -571,7 +558,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult fileUpdate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - fileUpdate protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -584,7 +571,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.updateFile(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -597,10 +584,8 @@ public class HederaNode implements Serializable {
 
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
-		logger.trace("End - fileUpdate");
+
 		return transResult;
 	}	
 
@@ -612,7 +597,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult contractCall(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - contractCall protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -625,7 +610,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.contractCallMethod(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -638,10 +623,8 @@ public class HederaNode implements Serializable {
 
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
-		logger.trace("End - contractCall");
+
 		return transResult;
 	}	
 
@@ -653,7 +636,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult contractCreate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - contractCreate protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -666,7 +649,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.createContract(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -679,10 +662,8 @@ public class HederaNode implements Serializable {
 
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
-		logger.trace("End - contractCreate");
+
 		return transResult;
 	}	
 
@@ -694,7 +675,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public HederaTransactionResult contractUpdate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - contractUpdate protobuf {}", transaction.getProtobuf().toString());
+
 		logger.info("SENDING TRANSACTION");
 		logger.info(transaction.getProtobuf().toString());
 
@@ -707,7 +688,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.updateContract(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -720,10 +701,8 @@ public class HederaNode implements Serializable {
 
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
-		logger.trace("End - contractUpdate");
+
 		return transResult;
 	}	
 
@@ -735,7 +714,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response contractCallLocal(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - contractCallLocal query {}", query);
+
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
@@ -747,7 +726,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.contractCallLocalMethod(query.getProtobuf());
 				// retry if busy
-				if (response.getContractCallLocal().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getContractCallLocal().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -760,7 +739,7 @@ public class HederaNode implements Serializable {
 
 		logger.info("--->QUERY RESPONSE");
 		logger.info(response.toString());
-		logger.trace("End - contractCallLocal");
+
 		return response;
 	}
 	
@@ -772,7 +751,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response getContractByteCode(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - getContractByteCode query {}", query);
+
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
@@ -784,7 +763,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.contractGetBytecode(query.getProtobuf());
 				// retry if busy
-				if (response.getContractGetBytecodeResponse().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getContractGetBytecodeResponse().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -797,7 +776,7 @@ public class HederaNode implements Serializable {
 
 		logger.info("--->QUERY RESPONSE");
 		logger.info(response.toString());
-		logger.trace("End - getContractByteCode");
+
 		return response;
 	}
 
@@ -809,7 +788,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response getContractBySolidityId(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - getContractBySolidityId query {}", query);
+
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
@@ -820,7 +799,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.getBySolidityID(query.getProtobuf());
 				// retry if busy
-				if (response.getGetBySolidityID().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getGetBySolidityID().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -833,7 +812,7 @@ public class HederaNode implements Serializable {
 
 		logger.info("--->QUERY RESPONSE");
 		logger.info(response.toString());
-		logger.trace("End - getContractBySolidityId");
+
 		return response;
 	}
 
@@ -845,7 +824,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response getContractInfo(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - getContractInfo query {}", query);
+
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
@@ -857,7 +836,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.getContractInfo(query.getProtobuf());
 				// retry if busy
-				if (response.getContractGetInfo().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getContractGetInfo().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -870,7 +849,7 @@ public class HederaNode implements Serializable {
 
 		logger.info("--->QUERY RESPONSE");
 		logger.info(response.toString());
-		logger.trace("End - getContractInfo");
+
 		return response;
 	}
 
@@ -882,7 +861,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response getAccountBalance(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - getAccountBalance query {}", query);
+
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
@@ -894,7 +873,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.cryptoGetBalance(query.getProtobuf());
 				// retry if busy
-				if (response.getCryptogetAccountBalance().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getCryptogetAccountBalance().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -907,7 +886,7 @@ public class HederaNode implements Serializable {
 
 		logger.info("--->QUERY RESPONSE");
 		logger.info(response.toString());
-		logger.trace("End - getAccountBalance");
+
 		return response;
 	}
 
@@ -919,7 +898,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response getAccountRecords(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - getAccountRecords query {}", query);
+
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
@@ -931,7 +910,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.getAccountRecords(query.getProtobuf());
 				// retry if busy
-				if (response.getCryptoGetAccountRecords().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getCryptoGetAccountRecords().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -944,7 +923,7 @@ public class HederaNode implements Serializable {
 
 		logger.info("--->QUERY RESPONSE");
 		logger.info(response.toString());
-		logger.trace("End - getAccountRecords");
+
 		return response;
 	}
 
@@ -956,7 +935,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response getAccountInfo(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - getAccountInfo query {}", query);
+
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
@@ -968,7 +947,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.getAccountInfo(query.getProtobuf());
 				// retry if busy
-				if (response.getCryptoGetInfo().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getCryptoGetInfo().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -981,7 +960,7 @@ public class HederaNode implements Serializable {
 
 		logger.info("--->QUERY RESPONSE");
 		logger.info(response.toString());
-		logger.trace("End - getAccountInfo");
+
 		return response;
 	}
 
@@ -993,7 +972,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response getTransactionReceipt(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - getTransactionReceipt query {}", query);
+
 
 		Response response = null;
 		if (query.getProtobuf().hasTransactionGetReceipt()) {
@@ -1002,7 +981,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.getTransactionReceipts(query.getProtobuf());
 				// retry if busy
-				if (response.getTransactionGetReceipt().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getTransactionGetReceipt().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -1013,7 +992,7 @@ public class HederaNode implements Serializable {
 			throw new IllegalStateException("Invalid Query Type");
 		}
 
-		logger.trace("End - getTransactionReceipt");
+
 		return response;
 	}
 
@@ -1025,7 +1004,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response getTransactionRecord(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - getTransactionRecord query {}", query);
+
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
@@ -1036,7 +1015,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.getTxRecordByTxID(query.getProtobuf());
 				// retry if busy
-				if (response.getTransactionGetRecord().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getTransactionGetRecord().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -1049,10 +1028,46 @@ public class HederaNode implements Serializable {
 
 		logger.info("--->QUERY RESPONSE");
 		logger.info(response.toString());
-		logger.trace("End - getTransactionRecord");
+
 		return response;
 	}
 
+	/**
+	 * Sends a query to a node to get a fast transaction record and returns the result of the request
+	 * @param query the {@link HederaQuery} to send
+	 * @return {@link Response} the result of the query
+	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
+	 */
+	public Response getTransactionFastRecord(HederaQuery query) throws InterruptedException, StatusRuntimeException {
+
+		logger.info("RUNNING QUERY TO NODE");
+		logger.info(query.getProtobuf().toString());
+
+		Response response = null;
+		if (query.getProtobuf().hasTransactionGetFastRecord()) {
+			openChannel();
+			CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.getFastTransactionRecord(query.getProtobuf());
+				// retry if busy
+				if (response.getTransactionGetFastRecord().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
+					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
+		} else {
+			throw new IllegalStateException("Invalid Query Type");
+		}
+
+		logger.info("--->QUERY RESPONSE");
+		logger.info(response.toString());
+
+		return response;
+	}
+	
 	/**
 	 * Sends a query to a node to get file contents and returns the result of the request
 	 * @param query the {@link HederaQuery} to send
@@ -1061,7 +1076,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response getFileContents(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - getFileContents query {}", query);
+
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
@@ -1072,7 +1087,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.getFileContent(query.getProtobuf());
 				// retry if busy
-				if (response.getFileGetContents().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getFileGetContents().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -1085,7 +1100,7 @@ public class HederaNode implements Serializable {
 
 		logger.info("--->QUERY RESPONSE");
 		logger.info(response.toString());
-		logger.trace("End - getFileContents");
+
 		return response;
 	}
 
@@ -1097,7 +1112,7 @@ public class HederaNode implements Serializable {
 	 * @throws StatusRuntimeException in the event of a node communication failure
 	 */
 	public Response getFileInfo(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-		logger.trace("Start - fileGetInfo query {}", query);
+
 		logger.info("RUNNING QUERY TO NODE");
 		logger.info(query.getProtobuf().toString());
 
@@ -1108,7 +1123,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.getFileInfo(query.getProtobuf());
 				// retry if busy
-				if (response.getFileGetInfo().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getFileGetInfo().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -1121,12 +1136,12 @@ public class HederaNode implements Serializable {
 
 		logger.info("--->QUERY RESPONSE");
 		logger.info(response.toString());
-		logger.trace("End - getFileInfo");
+
 		return response;
 	}
 	
 	private void shutdown() throws InterruptedException {
-		logger.trace("Start - shutdown");
+
 		if (this.grpcChannel != null) {
 			this.grpcChannel.shutdownNow();
 			do {
@@ -1134,7 +1149,7 @@ public class HederaNode implements Serializable {
 			} while (!this.grpcChannel.isTerminated());
 			this.grpcChannel = null;
 		}
-		logger.trace("End - shutdown");
+
 	}
 	
 	private void openChannel() {
