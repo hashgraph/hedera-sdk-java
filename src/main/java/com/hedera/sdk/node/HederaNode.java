@@ -1156,6 +1156,7 @@ public class HederaNode implements Serializable {
 		if (this.grpcChannel == null) {
 			if (!host.equals("") && (port != 0)) {
 				// open a grpcChannel
+				logger.info("Connecting to node:" + this.host);
 				grpcChannel = ManagedChannelBuilder.forAddress(this.host, this.port).usePlaintext().build();
 			} else {
 				throw new IllegalStateException("Invalid Node IP or Port");
