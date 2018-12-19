@@ -4,7 +4,7 @@
   <groupId>com.hedera</groupId>
   <artifactId>sdk</artifactId>
   <name>hedera-sdk-java</name>
-  <version>0.1.0</version>
+  <version>0.1.2</version>
   <url>http://maven.apache.org</url>
   <build>
     <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
