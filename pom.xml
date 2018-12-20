@@ -314,22 +314,6 @@
             <artifactId>hapi-proto</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-        <dependency>
-
-			<groupId>org.ethereum</groupId>
-			<artifactId>ethereumj-core</artifactId>
-			<version>1.6.3-RELEASE</version>
-			<exclusions>
-				<exclusion>
-					<groupId>ch.qos.logback</groupId>
-					<artifactId>logback-classic</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
