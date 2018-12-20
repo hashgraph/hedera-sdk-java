@@ -115,7 +115,7 @@ public class ExampleUtilities {
 	
 	public static void showResult(String result) {
 		String stars = "***********************************************************************************************";
-		String log = String.format("%s\n%s\n**     %s\n%s\n%s", "", stars, result, stars, "");
+		String log = String.format("%s\n%s\n%s\n%s\n%s", "", stars, result, stars, "");
 		logger.info(log);
 	}
 	
