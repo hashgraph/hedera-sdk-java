@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.hedera</groupId>
-  <artifactId>sdk</artifactId>
+  <groupId>com.hedera.hashgraph</groupId>
+  <artifactId>java-sdk</artifactId>
   <name>hedera-sdk-java</name>
+<<<<<<< HEAD
   <version>0.1.0</version>
   <url>http://maven.apache.org</url>
+=======
+  <version>0.2.0</version>
+  <description>Java SDK for interacting with the Hedera API</description>
+  <url>http://www.hedera.com</url>
+  <developers>
+    <developer>
+      <organization>Hedera Hashgraph</organization>
+      <organizationUrl>http://www.hedera.com</organizationUrl>
+    </developer>
+  </developers>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <connection>scm:git:git://github.com/hashgraph/hedera-sdk-java.git</connection>
+    <developerConnection>scm:git:ssh://github.com:hashgraph/hedera-sdk-java.git</developerConnection>
+    <url>http://github.com/hashgraph/hedera-sdk-java</url>
+  </scm>
+>>>>>>> 073dd1c... Merge pull request #30 from hashgraph/vnext-noexamples
   <build>
     <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
     <resources>
@@ -19,12 +43,43 @@
         <targetPath>${project.build.directory}</targetPath>
         <directory>${basedir}/src/main/resources</directory>
         <includes>
+<<<<<<< HEAD
           <include>log4j.xml</include>
           <include>simpleStorage.bin</include>
+=======
+          <include>logback.xml</include>
+>>>>>>> 073dd1c... Merge pull request #30 from hashgraph/vnext-noexamples
         </includes>
       </resource>
     </resources>
     <plugins>
+      <plugin>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.5</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.7</version>
+        <extensions>true</extensions>
+        <configuration>
+          <serverId>ossrh</serverId>
+          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>false</autoReleaseAfterClose>
+        </configuration>
+      </plugin>
       <plugin>
         <artifactId>maven-source-plugin</artifactId>
         <executions>
@@ -45,6 +100,9 @@
             <goals>
               <goal>shade</goal>
             </goals>
+            <configuration>
+              <minimizeJar>true</minimizeJar>
+            </configuration>
           </execution>
         </executions>
         <configuration>
@@ -118,6 +176,7 @@
           <excludePackageNames>test.com.hedera.*</excludePackageNames>
           <excludePackageNames>net.i2p.*</excludePackageNames>
           <excludePackageNames>org.json.*</excludePackageNames>
+          <additionalOptions>-html5</additionalOptions>
         </configuration>
       </plugin>
       <plugin>
@@ -160,11 +219,6 @@
       <id>artifactory-central</id>
       <name>Swirlds Artifactory-releases</name>
       <url>https://art.swirlds.com/artifactory/swirlds</url>
-    </repository>
-    <repository>
-      <id>Ethereum</id>
-      <name>Ethereum</name>
-      <url>https://dl.bintray.com/ethereum/maven/</url>
     </repository>
   </repositories>
   <dependencies>
@@ -286,10 +340,13 @@
   </reporting>
   <distributionManagement>
     <repository>
-      <id>internal.repo</id>
-      <name>Temporary Staging Repository</name>
-      <url>file://${project.build.directory}/mvn-repo</url>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
   </distributionManagement>
   <properties>
     <proto.version>3.6.1</proto.version>
