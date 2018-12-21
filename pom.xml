@@ -84,7 +84,7 @@
 				<artifactId>maven-gpg-plugin</artifactId>
 				<version>1.5</version>
 				<configuration>
-					<!-- skip to enable mvn install without GPG passphrase -->
+					<!-- skip = true to enable mvn install without GPG passphrase, false to enable deployment to maven repo -->
 					<skip>true</skip>
 				</configuration>
 				<executions>
