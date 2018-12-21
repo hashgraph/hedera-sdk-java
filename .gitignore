@@ -175,5 +175,6 @@ fabric.properties
 
 # End of https://www.gitignore.io/api/intellij
 node.properties
+examples/node.properties
 
 *.iml
