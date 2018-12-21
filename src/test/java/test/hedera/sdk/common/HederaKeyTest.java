@@ -201,13 +201,9 @@ class HederaKeyTest {
 	@DisplayName("HederaKey init tests")
 	void HederaKeyInit() {
 		HederaKeyPair key = new HederaKeyPair();
-		HederaNode node = new HederaNode("localhost",10);
-		key.setNode(node);
 		
 		assertEquals(0, key.getCost());
 		assertArrayEquals(new byte[0], key.getStateProof());
-		assertEquals(node.getHost(), key.getNode().getHost());
-		assertEquals(node.getPort(), key.getNode().getPort());
 		
 	}	
 }
