@@ -1,0 +1,23 @@
+
+syntax = "proto3";
+
+package proto;
+
+option java_package = "com.hederahashgraph.api.proto.java";
+option java_multiple_files = true;
+
+import "src/main/proto/Transaction.proto";
+import "src/main/proto/TransactionResponse.proto";
+import "Query.proto";
+import "src/main/proto/Response.proto";
+
+service HederaService {
+    // Transaction and TransactionResponse
+
+    rpc SubmitTransaction(Transaction) returns (TransactionResponse) {}
+
+    // Query and Response (alternative 1)
+
+    rpc SubmitQuery(Query) returns (Response) {}
+
+}

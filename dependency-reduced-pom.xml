@@ -10,7 +10,7 @@
     <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
     <resources>
       <resource>
-        <directory>src</directory>
+        <directory>sdk/src</directory>
         <excludes>
           <exclude>**/*.java</exclude>
         </excludes>
