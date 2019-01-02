@@ -67,7 +67,7 @@
             <groupId>com.opencrowd</groupId>
             <artifactId>hapi-proto</artifactId>
         </dependency>
-        <dependency>
+<!--         <dependency>
             <groupId>org.ethereum</groupId>
             <artifactId>ethereumj-core</artifactId>
             <exclusions>
@@ -77,7 +77,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- logging -->
+ -->        <!-- logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>

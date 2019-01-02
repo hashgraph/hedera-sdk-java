@@ -41,11 +41,6 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-        <repository>
-            <id>Ethereum</id>
-            <name>Ethereum</name>
-            <url>https://dl.bintray.com/ethereum/maven/</url>
-        </repository>
     </repositories>
     <dependencyManagement>
         <dependencies>
@@ -158,11 +153,6 @@
                 <groupId>com.opencrowd</groupId>
                 <artifactId>hapi-proto</artifactId>
                 <version>1.2</version>
-            </dependency>
-            <dependency>
-                <groupId>org.ethereum</groupId>
-                <artifactId>ethereumj-core</artifactId>
-                <version>1.6.3-RELEASE</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

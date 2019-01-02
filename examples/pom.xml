@@ -10,12 +10,31 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>examples</artifactId>
-
+    <repositories>
+        <repository>
+            <id>artifactory-central</id>
+            <name>Swirlds Artifactory-releases</name>
+            <url>https://art.swirlds.com/artifactory/swirlds</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>Ethereum</id>
+            <name>Ethereum</name>
+            <url>https://dl.bintray.com/ethereum/maven/</url>
+        </repository>
+    </repositories>
     <dependencies>
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>sdk</artifactId>
             <version>0.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ethereum</groupId>
+            <artifactId>ethereumj-core</artifactId>
+            <version>1.6.3-RELEASE</version>
         </dependency>
     </dependencies>
 
