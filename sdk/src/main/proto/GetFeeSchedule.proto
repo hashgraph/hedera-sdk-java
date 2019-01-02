@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "com.hederahashgraph.api.proto.java";
+option java_multiple_files = true;
+
+
+import "src/main/proto/BasicTypes.proto";
+import "src/main/proto/QueryHeader.proto";
+import "src/main/proto/ResponseHeader.proto";
+
+/* Get all the information about an account, including the balance. This does not get the list of account records. */
+message GetFeeScheduleQuery {
+    QueryHeader header = 1; // standard info sent from client to node, including the signed payment, and what kind of response is requested (cost, state proof, both, or neither).
+}
+
+
+/* Response when the client sends the node CryptoGetInfoQuery */
+message GetFeeScheduleResponse {
+    ResponseHeader header = 1; //standard response from node to client, including the requested fields: cost, or state proof, or both, or neither
+	FeeSchedule feeSchedule = 2; // info about the Nodes Fee Schedule
+}

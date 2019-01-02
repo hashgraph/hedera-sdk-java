@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "com.hederahashgraph.service.proto.java";
+
+import "Query.proto";
+import "src/main/proto/Response.proto";
+import "src/main/proto/TransactionResponse.proto";
+import "src/main/proto/Transaction.proto";
+
+
+service CryptoService {
+
+    rpc createAccount (Transaction) returns (TransactionResponse);
+
+    rpc updateAccount (Transaction) returns (TransactionResponse);
+
+    rpc cryptoTransfer (Transaction) returns (TransactionResponse);
+
+    rpc addClaim (Transaction) returns (TransactionResponse);
+
+    rpc deleteClaim (Transaction) returns (TransactionResponse);
+
+    rpc getAccountRecords (Query) returns (Response);
+
+    rpc cryptoGetBalance (Query) returns (Response);
+
+    rpc getAccountInfo (Query) returns (Response);
+
+    rpc getTransactionReceipts (Query) returns (Response);
+
+    rpc getTransactionRecord (Query) returns (Response);
+}
