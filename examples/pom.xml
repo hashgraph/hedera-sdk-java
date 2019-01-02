@@ -1,22 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <groupId>com.hedera</groupId>
-        <artifactId>hedera-sdk-java</artifactId>
-        <version>0.1.0</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<groupId>com.hedera</groupId>
+		<artifactId>hedera-sdk-java</artifactId>
+		<version>0.1.0</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
 
-    <artifactId>examples</artifactId>
+	<artifactId>examples</artifactId>
+	<repositories>
+		<repository>
+			<id>artifactory-central</id>
+			<name>Swirlds Artifactory-releases</name>
+			<url>https://art.swirlds.com/artifactory/swirlds</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>Ethereum</id>
+			<name>Ethereum</name>
+			<url>https://dl.bintray.com/ethereum/maven/</url>
+		</repository>
+	</repositories>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.hedera</groupId>
-            <artifactId>sdk</artifactId>
-            <version>0.1.0</version>
-        </dependency>
-    </dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>com.hedera</groupId>
+			<artifactId>sdk</artifactId>
+			<version>0.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.ethereum</groupId>
+			<artifactId>ethereumj-core</artifactId>
+			<version>1.6.3-RELEASE</version>
+		</dependency>
+	</dependencies>
 
 </project>
