@@ -1,12 +1,9 @@
 package com.hedera.sdk.query;
 
 import java.io.Serializable;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaContractID;
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.node.HederaNode;
 import com.hedera.sdk.query.HederaQuery.QueryType;
@@ -18,9 +15,9 @@ import com.hederahashgraph.api.proto.java.*;
  *
  */
 public class HederaQueryBySolidityID implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaQueryBySolidityID.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaQueryBySolidityID.class);
 	private static final long serialVersionUID = 1;
-	private HederaPrecheckResult precheckResult = HederaPrecheckResult.NOTSET;
+	private ResponseCodeEnum precheckResult = ResponseCodeEnum.UNKNOWN;
 	private long cost = 0;
 	private byte[] stateProof = new byte[0];
 	private HederaNode node = null;
@@ -54,14 +51,14 @@ public class HederaQueryBySolidityID implements Serializable {
 	 * Default constructor
 	 */
 	public HederaQueryBySolidityID() {
-		logger.trace("Start - Object init");
-		logger.trace("End - Object init");
+
+
 	}
 	/**
 	 * Returns the precheck result for a query
-	 * @return {@link HederaPrecheckResult}
+	 * @return {@link ResponseCodeEnum}
 	 */
-	public HederaPrecheckResult getPrecheckResult() {
+	public ResponseCodeEnum getPrecheckResult() {
 		return this.precheckResult;
 	}
 	/**
@@ -91,7 +88,7 @@ public class HederaQueryBySolidityID implements Serializable {
 	public boolean query(HederaTransaction payment, HederaQueryHeader.QueryResponseType responseType, String solidityID) throws InterruptedException {
 		boolean result = true;
 		
-	   	logger.trace("Start - query payment {}, responseType {}, solidityID {}", payment, responseType, solidityID);
+
 		// build the query
 	   	// Header
 		HederaQueryHeader queryHeader = new HederaQueryHeader();
@@ -119,9 +116,9 @@ public class HederaQueryBySolidityID implements Serializable {
 		// check response header first
 		ResponseHeader.Builder responseHeader = getBySolidityIDResponse.getHeaderBuilder();
 		
-		setPrecheckResult(responseHeader.getNodeTransactionPrecheckCode());
+		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
 
-		if (this.precheckResult == HederaPrecheckResult.OK) {
+		if (this.precheckResult == ResponseCodeEnum.OK) {
 
 			this.cost = responseHeader.getCost();
 			this.stateProof = responseHeader.getStateProof().toByteArray();
@@ -138,7 +135,7 @@ public class HederaQueryBySolidityID implements Serializable {
 			result = false;
 		}
 		
-	   	logger.trace("End - getInfo");
+
 	   	return result;
 	}
 	/**
@@ -150,7 +147,7 @@ public class HederaQueryBySolidityID implements Serializable {
 	 * @throws InterruptedException should an exception occur during communication with the node
 	 */
 	public boolean queryAnswerOnly(HederaTransaction payment, String solidityID) throws InterruptedException {
-	   	logger.trace("Start - queryAnswerOnly");
+
 	   	return query(payment, QueryResponseType.ANSWER_ONLY, solidityID);
 	}
 	/**
@@ -162,7 +159,7 @@ public class HederaQueryBySolidityID implements Serializable {
 	 * @throws InterruptedException should an exception occur during communication with the node
 	 */
 	public boolean queryStateProof(HederaTransaction payment, String solidityID) throws InterruptedException {
-	   	logger.trace("queryStateProof");
+
 		return query(payment, HederaQueryHeader.QueryResponseType.ANSWER_STATE_PROOF, solidityID);
 	}
 	/**
@@ -173,7 +170,7 @@ public class HederaQueryBySolidityID implements Serializable {
 	 * @throws InterruptedException should an exception occur during communication with the node
 	 */
 	public boolean queryCostAnswer(String solidityID) throws InterruptedException {
-	   	logger.trace("queryCostAnswer");
+
 		return query(null, HederaQueryHeader.QueryResponseType.COST_ANSWER, solidityID);
 	}
 	/**
@@ -184,39 +181,8 @@ public class HederaQueryBySolidityID implements Serializable {
 	 * @throws InterruptedException should an exception occur during communication with the node
 	 */
 	public boolean queryCostAnswerStateProof(String solidityID) throws InterruptedException {
-	   	logger.trace("queryCostAnswerStateProof");
+
 		return query(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF, solidityID);
 	}
 	
-	private void setPrecheckResult(NodeTransactionPrecheckCode nodeTransactionPrecheckCode) {
-		switch (nodeTransactionPrecheckCode) {
-		case DUPLICATE:
-			this.precheckResult = HederaPrecheckResult.DUPLICATE;
-			break;
-		case INSUFFICIENT_BALANCE:
-			this.precheckResult = HederaPrecheckResult.INSUFFICIENT_BALANCE;
-			break;
-		case INSUFFICIENT_FEE:
-			this.precheckResult = HederaPrecheckResult.INSUFFICIENT_FEE;
-			break;
-		case INVALID_ACCOUNT:
-			this.precheckResult = HederaPrecheckResult.INVALID_ACCOUNT;
-			break;
-		case INVALID_TRANSACTION:
-			this.precheckResult = HederaPrecheckResult.INVALID_TRANSACTION;
-			break;
-		case OK:
-			this.precheckResult = HederaPrecheckResult.OK;
-			break;
-		case BUSY:
-			this.precheckResult = HederaPrecheckResult.BUSY;
-			break;
-		case NOT_SUPPORTED:
-			this.precheckResult = HederaPrecheckResult.NOT_SUPPORTED;
-			break;
-		default:
-			this.precheckResult = HederaPrecheckResult.NOTSET;
-				
-		}
-	}
 }

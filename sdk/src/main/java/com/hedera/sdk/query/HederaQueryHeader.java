@@ -1,10 +1,7 @@
 package com.hedera.sdk.query;
 
 import java.io.Serializable;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.hedera.sdk.transaction.HederaTransaction;
 import com.hederahashgraph.api.proto.java.*;
 /**
@@ -12,7 +9,7 @@ import com.hederahashgraph.api.proto.java.*;
  *
  */
 public class HederaQueryHeader implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaQuery.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaQuery.class);
 	private static final long serialVersionUID = 1;
 	/**
 	 * Allowed types of responses required by the query
@@ -37,8 +34,8 @@ public class HederaQueryHeader implements Serializable {
 	 * Default constructor 
 	 */
 	public HederaQueryHeader() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
+
+
 	}
 	/**
 	 * Constructor with payment and response type
@@ -46,17 +43,17 @@ public class HederaQueryHeader implements Serializable {
 	 * @param responseType {@link QueryResponseType}
 	 */
 	public HederaQueryHeader(HederaTransaction payment, QueryResponseType responseType) {
-	   	logger.trace("Start - Object init payment {}, responseType {}", payment, responseType);
+
 		this.payment = payment;
 		this.responseType = responseType;
-	   	logger.trace("End - Object init");
+
 	}
 	/**
 	 * returns the protobuf for a {@link QueryHeader}
 	 * @return {@link QueryHeader}
 	 */
 	public QueryHeader getProtobuf() {
-	   	logger.trace("Start - getProtobuf");
+
 		// Generates the protobuf payload for this class
 		QueryHeader.Builder queryHeader = QueryHeader.newBuilder();
 
@@ -77,10 +74,10 @@ public class HederaQueryHeader implements Serializable {
 				queryHeader.setResponseType(ResponseType.COST_ANSWER_STATE_PROOF);
 				break;
 			case NOTSET:
-	    	   	logger.trace("End - getProtobuf");
+
 	            throw new IllegalArgumentException("Response type not set. Unable to generate data.");			
 		}
-	   	logger.trace("End - getProtobuf");
+
 		
 		return queryHeader.build();
 	}

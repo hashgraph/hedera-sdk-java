@@ -3,13 +3,10 @@ package com.hedera.sdk.account;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.common.HederaAccountID;
-import com.hedera.sdk.common.HederaKey;
+import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.common.Utilities;
 import com.hederahashgraph.api.proto.java.Claim;
@@ -26,7 +23,7 @@ import com.hederahashgraph.api.proto.java.KeyList;
  *
  */
 public class HederaClaim implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaClaim.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaClaim.class);
 	private static final long serialVersionUID = 1;
 
 	/**
@@ -46,11 +43,11 @@ public class HederaClaim implements Serializable {
 	 */
 	public byte[] hash = new byte[0];
 	/**
-	 * List of {@link HederaKey} to attach to this claim
+	 * List of {@link HederaKeyPair} to attach to this claim
 	 * Note, these are mutually exclusive with keySignatures.
 	 * If keySignatures exist, keys will be ignored in any processing
 	 */
-	public List<HederaKey> keys = new ArrayList<HederaKey>();
+	public List<HederaKeyPair> keys = new ArrayList<HederaKeyPair>();
 	/**
 	 * List of {@link HederaKeySignature} to attach to this claim
 	 * Note, these are mutually exclusive with keys.
@@ -62,8 +59,6 @@ public class HederaClaim implements Serializable {
 	 * Default constructor.
 	 */
 	public HederaClaim() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
 	}
 	/**
 	 * Constructor from shard, realm, account numbers and hash
@@ -73,12 +68,10 @@ public class HederaClaim implements Serializable {
 	 * @param hash the claim hash
 	 */
 	public HederaClaim(long shardNum, long realmNum, long accountNum, byte[] hash) {
-	   	logger.trace("Start - Object init shardNum {}, realmNum {}, accountNum {}, hash {}", shardNum, realmNum, accountNum, hash);
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.accountNum = accountNum;
 		this.hash = hash;
-	   	logger.trace("End - Object init");
 	}
 	/**
 	 * Constructor from {@link HederaAccountID} and hash
@@ -86,12 +79,10 @@ public class HederaClaim implements Serializable {
 	 * @param hash the claim hash
 	 */
 	public HederaClaim(HederaAccountID accountID, byte[] hash) {
-	   	logger.trace("Start - Object init shardNum {}, realmNum {}, accountNum {}, hash {}", shardNum, realmNum, accountNum, hash);
 		this.shardNum = accountID.shardNum;
 		this.realmNum = accountID.realmNum;
 		this.accountNum = accountID.accountNum;
 		this.hash = hash;
-	   	logger.trace("End - Object init");
 	}
 
 	/**
@@ -99,7 +90,6 @@ public class HederaClaim implements Serializable {
 	 * @param claim the claim
 	 */
 	public HederaClaim(Claim claim) {
-	   	logger.trace("Start - Object init in claim", claim);
 		this.shardNum = claim.getAccountID().getShardNum();
 		this.realmNum = claim.getAccountID().getRealmNum();
 		this.accountNum = claim.getAccountID().getAccountNum();
@@ -112,13 +102,11 @@ public class HederaClaim implements Serializable {
 		this.keySignatures.clear();
 		
 		for (int i=0; i < claim.getKeys().getKeysCount(); i++) {
-			HederaKey key = new HederaKey(claim.getKeys().getKeys(i));
-			HederaKeySignature keySig = new HederaKeySignature(key.getKeyType(), key.getKey(), new byte[0]);
+			HederaKeyPair key = new HederaKeyPair(claim.getKeys().getKeys(i));
+			HederaKeySignature keySig = new HederaKeySignature(key.getKeyType(), key.getPublicKeyEncoded(), new byte[0]);
 			this.keys.add(key);
 			this.keySignatures.add(keySig);
 		}
-		
-	   	logger.trace("End - Object init");
 	}
 
 	/**
@@ -126,7 +114,6 @@ public class HederaClaim implements Serializable {
 	 * @return {@link Claim}
 	 */
 	public Claim getProtobuf() {
-	   	logger.trace("Start - getProtobuf");
 		
 	   	Claim.Builder protobuf = Claim.newBuilder();
 		HederaAccountID accountID = new HederaAccountID(this.shardNum, this.realmNum, this.accountNum);
@@ -142,35 +129,28 @@ public class HederaClaim implements Serializable {
 		}
 		protobuf.setKeys(protoKeyList);
 		
-	   	logger.trace("End - getProtobuf");
-
 		return protobuf.build();
 	}
 	/**
-	 * Adds a {@link HederaKey} to the list
+	 * Adds a {@link HederaKeyPair} to the list
 	 * @param key the key to add
 	 */
-	public void addKey(HederaKey key) {
-	   	logger.trace("Start - addKey key {}", key);
+	public void addKey(HederaKeyPair key) {
 		this.keys.add(key);
-	   	logger.trace("End - addKey");
 	}
 	/**
 	 * Adds a {@link HederaKeySignature} to the list
 	 * @param keySigPair the key signature pair to add
 	 */
 	public void addKeySignaturePair(HederaKeySignature keySigPair) {
-	   	logger.trace("Start - addKey keySigPair {}", keySigPair);
 		this.keySignatures.add(keySigPair);
-	   	logger.trace("End - addKey");
 	}
 	/**
-	 * Deletes a {@link HederaKey} from the list
+	 * Deletes a {@link HederaKeyPair} from the list
 	 * @param key the key to delete
 	 * @return true if successful
 	 */
-	public boolean deleteKey(HederaKey key) {
-	   	logger.trace("deleteKey key {}", key);
+	public boolean deleteKey(HederaKeyPair key) {
 		return this.keys.remove(key);
 	}
 	/**
@@ -179,15 +159,13 @@ public class HederaClaim implements Serializable {
 	 * @return true if successful
 	 */
 	public boolean deleteKeySignaturePair(HederaKeySignature keySigPair) {
-	   	logger.trace("deleteKeySignaturePair {}", keySigPair);
 		return this.keySignatures.remove(keySigPair);
 	}
 	/**
-	 * Gets the list of {@link HederaKey}
-	 * @return List {@link HederaKey}
+	 * Gets the list of {@link HederaKeyPair}
+	 * @return List {@link HederaKeyPair}
 	 */
-	public List<HederaKey> getKeys() {
-	   	logger.trace("getKeys");
+	public List<HederaKeyPair> getKeys() {
 		return this.keys;
 	}
 	/**
@@ -195,7 +173,6 @@ public class HederaClaim implements Serializable {
 	 * @return List {@link HederaKeySignature}
 	 */
 	public List<HederaKeySignature> getKeySignatures() {
-	   	logger.trace("getKeySignatures");
 		return this.keySignatures;
 	}
 }

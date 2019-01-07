@@ -1,10 +1,7 @@
 package com.hedera.sdk.account;
 
 import java.io.Serializable;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.hederahashgraph.api.proto.java.AccountID;
 import com.hederahashgraph.api.proto.java.ProxyStaker;
 /**
@@ -12,7 +9,7 @@ import com.hederahashgraph.api.proto.java.ProxyStaker;
  *
  */
 public class HederaProxyStaker implements Serializable {
-	final static Logger logger = LoggerFactory.getLogger(HederaProxyStaker.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaProxyStaker.class);
 	private static final long serialVersionUID = 1;
 
 	/**
@@ -37,8 +34,6 @@ public class HederaProxyStaker implements Serializable {
 	 * Default constructor
 	 */
 	public HederaProxyStaker() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
 	}
 	/**
 	 * Constructor from a shard, real, account and amount
@@ -48,13 +43,10 @@ public class HederaProxyStaker implements Serializable {
 	 * @param amount the amount to proxy
 	 */
 	public HederaProxyStaker(long shardNum, long realmNum, long accountNum, long amount) {
-	   	logger.trace("Start - Object init in shard {}, realm {}. Account number {}, amount {}", shardNum, realmNum, accountNum, amount);
  		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.accountNum = accountNum;
 		this.amount = amount;
-		
-	   	logger.trace("End - Object init");
 	}
 
 	/**
@@ -62,12 +54,10 @@ public class HederaProxyStaker implements Serializable {
 	 * @param proxyStaker a proxy staker protobuf
 	 */
 	public HederaProxyStaker(ProxyStaker proxyStaker) {
-	   	logger.trace("Start - Object init in proxyStaker {}", proxyStaker);
 		this.shardNum = proxyStaker.getAccountID().getShardNum();
 		this.realmNum = proxyStaker.getAccountID().getRealmNum();
 		this.accountNum = proxyStaker.getAccountID().getAccountNum();
 		this.amount = proxyStaker.getAmount();
-	   	logger.trace("End - Object init");
 	}
 
 	/**
@@ -75,8 +65,6 @@ public class HederaProxyStaker implements Serializable {
 	 * @return {@link ProxyStaker} 
 	 */
 	public ProxyStaker getProtobuf() {
-	   	logger.trace("Start - getProtobuf");
-		
 	   	ProxyStaker.Builder accountAmount = ProxyStaker.newBuilder();
 		AccountID.Builder accountID = AccountID.newBuilder();
 		
@@ -86,8 +74,6 @@ public class HederaProxyStaker implements Serializable {
 		
 		accountAmount.setAccountID(accountID);
 		accountAmount.setAmount(this.amount);
-	   	
-	   	logger.trace("End - getProtobuf");
 
 		return accountAmount.build();
 	}

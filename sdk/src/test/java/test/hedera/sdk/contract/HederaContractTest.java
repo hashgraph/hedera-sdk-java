@@ -8,11 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaDuration;
 import com.hedera.sdk.common.HederaFileID;
-import com.hedera.sdk.common.HederaKey;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.contract.HederaContract;
-import com.hedera.sdk.common.HederaKeySignature;
-import com.hedera.sdk.common.HederaPrecheckResult;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hedera.sdk.common.HederaTimeStamp;
 import com.hedera.sdk.common.HederaTransactionID;
 
@@ -24,9 +23,10 @@ class HederaContractTest {
 	@Test
 	@DisplayName("TestHederaContract")
 	void test() {
+		HederaKeyPair adminKey = new HederaKeyPair(KeyType.ED25519);
+		
 		HederaContract masterContract = new HederaContract();
-		masterContract.adminKey = new HederaKey(KeyType.ECDSA384, "adminkey".getBytes());
-		masterContract.adminKeySignature = new HederaKeySignature(KeyType.ED25519, "key".getBytes(), "signature".getBytes(), "keyDescription");
+		masterContract.adminKey = adminKey;
 		masterContract.amount = 10;
 		masterContract.autoRenewPeriod = new HederaDuration(60, 10);
 		masterContract.constructionParameters = "construct".getBytes();
@@ -37,12 +37,8 @@ class HederaContractTest {
 		masterContract.shardNum = 4;
 		masterContract.realmNum = 5;
 		
-		assertEquals(KeyType.ECDSA384, masterContract.adminKey.getKeyType());
-		assertArrayEquals("adminkey".getBytes(), masterContract.adminKey.getKey());
-		assertEquals(KeyType.ED25519, masterContract.adminKeySignature.getKeyType());
-		assertArrayEquals("key".getBytes(), masterContract.adminKeySignature.getKey());
-		assertArrayEquals("signature".getBytes(), masterContract.adminKeySignature.getSignature());
-		assertEquals("keyDescription", masterContract.adminKeySignature.keyDescription);
+		assertEquals(KeyType.ED25519, masterContract.adminKey.getKeyType());
+		assertArrayEquals(adminKey.getPublicKey(), masterContract.adminKey.getPublicKey());
 		assertEquals(10,  masterContract.amount);
 		assertEquals(60, masterContract.autoRenewPeriod.seconds);
 		assertEquals(10, masterContract.autoRenewPeriod.nanos);
@@ -62,7 +58,7 @@ class HederaContractTest {
 		assertArrayEquals(new byte[0], masterContract.byteCode());
 		assertNotNull(masterContract.getTransactionRecords());
 		assertNull(masterContract.hederaContractFunctionResult());
-		assertEquals(HederaPrecheckResult.NOTSET, masterContract.getPrecheckResult());
+		assertEquals(ResponseCodeEnum.UNKNOWN, masterContract.getPrecheckResult());
 		assertEquals(0, masterContract.getCost());
 		assertArrayEquals(new byte[0], masterContract.getStateProof());
 

@@ -19,14 +19,11 @@ import java.util.Arrays;
 class ReferenceTest {
 
   private String seedHex;
-  private String ecdsaSeedHex;
 
   @BeforeAll
   void setup() {
     // this belongs to ED25519 seedHex
     seedHex = "cf831ccb83f7d1d6a0261e2a6f69552dbd452d7b3a8fb4f5f960e8aafcf0d32f";
-    ecdsaSeedHex = "a5c5f697c872703ae5a046772f13ae5fa2501e348e35e992598017851bcc6170af487a3a8e94be6a26f6c6e15cee407d";
-    // int[] ecdsaRecoveryWordsIndices = new int[] {1338, 495, 3159, 4036, 390, 936, 1822, 1652, 3747, 3472, 2069, 3769, 2236, 2943, 1620, 3995, 3440, 1847, 266, 3359, 2840, 3313};
     
   }
 
@@ -35,8 +32,6 @@ class ReferenceTest {
     // Instantiate a reference object, reference1, given a private key, for example
     byte[] seed = Hex.decode(seedHex);
     Reference reference1 = new Reference(seed);
-    System.out.println("WHat is the refence1 that comes out from here?");
-    System.out.println(reference1);
     // Return a recovery word list from this reference object
     List<String> wordList = reference1.toWordsList();
     String recoveryWords = "";
@@ -46,8 +41,6 @@ class ReferenceTest {
     }
     // Instantiate another reference object (reference2) from the recovery words from reference1
     Reference reference2 = new Reference(recoveryWords);
-    System.out.println("WHat is the refence2 that comes out from here?");
-    System.out.println(reference2);
     List<String> recoveryWordList = reference2.toWordsList();
     String recoveryWords2 = "";
     for (int i=0; i < recoveryWordList.size(); i++) {
@@ -178,6 +171,5 @@ class ReferenceTest {
     byte[] seed = Hex.decode(seedHex);
     Reference reference = new Reference(seed);
     byte[] result = reference.toBytes();
-    System.out.println(Arrays.toString(result));
   }
 }

@@ -2,19 +2,22 @@ package test.hedera.sdk.account;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.security.spec.InvalidKeySpecException;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.spongycastle.util.encoders.Hex;
 
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.account.HederaAccountCreateDefaults;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 
 class HederaAccountCreateDefaultsTest {
 
 	@Test
 	@DisplayName("HederaAccountCreateDefaultsTest")
-	void test() {
+	void test() throws InvalidKeySpecException {
 		HederaAccountCreateDefaults values = new HederaAccountCreateDefaults();
 		HederaAccount accountDefaultsFromClass = new HederaAccount();
 
@@ -37,14 +40,15 @@ class HederaAccountCreateDefaultsTest {
 		values.resetProxyAccountID();
 		assertNull(values.getProxyAccountID());
 
-		values.setNewRealmAdminPublicKey(KeyType.ED25519, "newKey".getBytes());
+		HederaKeyPair key = new HederaKeyPair(KeyType.ED25519);
+		values.setNewRealmAdminPublicKey(KeyType.ED25519, key.getPublicKey(), null);
 		assertEquals(KeyType.ED25519, values.getNewRealmAdminPublicKey().getKeyType());
-		assertArrayEquals("newKey".getBytes(), values.getNewRealmAdminPublicKey().getKey());
+		assertArrayEquals(key.getPublicKey(), values.getNewRealmAdminPublicKey().getPublicKey());
 
-		values.setNewRealmAdminPublicKey(KeyType.ED25519, "302a300506032b6570032100af0cff0d2d603e21c2fb7b8747d08990dde88e1f6f9dd9df55af09f77a991f60");
+		values.setNewRealmAdminPublicKey(KeyType.ED25519, "302a300506032b6570032100af0cff0d2d603e21c2fb7b8747d08990dde88e1f6f9dd9df55af09f77a991f60", null);
 		byte[] hexKey = Hex.decode("302a300506032b6570032100af0cff0d2d603e21c2fb7b8747d08990dde88e1f6f9dd9df55af09f77a991f60");
 		assertEquals(KeyType.ED25519, values.getNewRealmAdminPublicKey().getKeyType());
-		assertArrayEquals(hexKey, values.getNewRealmAdminPublicKey().getKey());
+		assertArrayEquals(hexKey, values.getNewRealmAdminPublicKey().getPublicKeyEncoded());
 		
 	}
 }

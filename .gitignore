@@ -276,3 +276,5 @@ $RECYCLE.BIN/
 .idea/misc.xml
 .idea/modules.xml
 .idea/vcs.xml
+sdk/examples/node.properties
+examples/node.properties

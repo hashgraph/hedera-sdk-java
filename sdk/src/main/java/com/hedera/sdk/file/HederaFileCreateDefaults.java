@@ -2,8 +2,8 @@ package com.hedera.sdk.file;
 
 import org.spongycastle.util.encoders.Hex;
 
-import com.hedera.sdk.common.HederaKey;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 /**
  * This class holds default values for an account creation
  * You can optionally create an instance of this class to set different default values
@@ -13,7 +13,7 @@ import com.hedera.sdk.common.HederaKey.KeyType;
 public class HederaFileCreateDefaults {
 	private HederaFile fileDefaultsFromClass = new HederaFile();
 
-	private HederaKey newRealmAdminPublicKey = fileDefaultsFromClass.newRealmAdminKey;
+	private HederaKeyPair newRealmAdminPublicKey = fileDefaultsFromClass.newRealmAdminKey;
 	/**
 	 * The expiration time for a file in seconds
 	 */
@@ -31,7 +31,7 @@ public class HederaFileCreateDefaults {
 	 * @param newRealmAdminKey the new realm admin key
 	 */
 	public void setNewRealmAdminPublicKey(KeyType keyType,byte[] newRealmAdminKey) {
-		this.newRealmAdminPublicKey = new HederaKey(keyType, newRealmAdminKey);
+		this.newRealmAdminPublicKey = new HederaKeyPair(keyType, newRealmAdminKey, null);
 	}
 	/**
 	 * if realmID is -1, then this the admin key for the new realm that will be created
@@ -40,13 +40,13 @@ public class HederaFileCreateDefaults {
 	 * @param newRealmAdminKeyHex the new realm admin key in string hex format
 	 */
 	public void setNewRealmAdminPublicKey(KeyType keyType,String newRealmAdminKeyHex) {
-		this.newRealmAdminPublicKey = new HederaKey(keyType, Hex.decode(newRealmAdminKeyHex));
+		this.newRealmAdminPublicKey = new HederaKeyPair(keyType, Hex.decode(newRealmAdminKeyHex));
 	}
 	/**
 	 * Gets the new realm admin key
-	 * @return {@link HederaKey}
+	 * @return {@link HederaKeyPair}
 	 */
-	public HederaKey getNewRealmAdminPublicKey() {
+	public HederaKeyPair getNewRealmAdminPublicKey() {
 		return this.newRealmAdminPublicKey;
 	}
 }

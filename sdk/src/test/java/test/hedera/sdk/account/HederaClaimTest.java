@@ -7,10 +7,9 @@ import org.junit.jupiter.api.Test;
 
 import com.hedera.sdk.account.HederaClaim;
 import com.hedera.sdk.common.HederaAccountID;
-import com.hedera.sdk.common.HederaKey;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaKeySignature;
-import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
 import com.hederahashgraph.api.proto.java.Claim;
 
 class HederaClaimTest {
@@ -53,10 +52,8 @@ class HederaClaimTest {
 		assertEquals(claim.keys.size(),  claim2.keys.size());
 		assertEquals(claim.keySignatures.size(),  claim2.keySignatures.size());
 		
-		HederaCryptoKeyPair keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
-		HederaKey key = new HederaKey(KeyType.ED25519, keyPair.getPublicKeyEncoded());
-		keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
-		HederaKey key2 = new HederaKey(KeyType.ED25519, keyPair.getPublicKeyEncoded());
+		HederaKeyPair key = new HederaKeyPair(KeyType.ED25519);
+		HederaKeyPair key2 = new HederaKeyPair(KeyType.ED25519);
 		
 		claim.addKey(key);
 		claim.addKey(key2);
@@ -68,8 +65,8 @@ class HederaClaimTest {
 		claim.deleteKey(key2);
 		assertEquals(0, claim.keys.size());
 		
-		HederaKeySignature sig1 = new HederaKeySignature(KeyType.ED25519, key.getKey(), "signature".getBytes());
-		HederaKeySignature sig2 = new HederaKeySignature(KeyType.ED25519, key.getKey(), "signature2".getBytes());
+		HederaKeySignature sig1 = new HederaKeySignature(KeyType.ED25519, key.getSecretKey(), "signature".getBytes());
+		HederaKeySignature sig2 = new HederaKeySignature(KeyType.ED25519, key.getSecretKey(), "signature2".getBytes());
 		claim.addKeySignaturePair(sig1);
 		claim.addKeySignaturePair(sig2);
 		assertEquals(2, claim.keySignatures.size());
@@ -80,28 +77,28 @@ class HederaClaimTest {
 		claim.deleteKeySignaturePair(sig2);
 		assertEquals(0,  claim.keySignatures.size());
 		
-		claim.addKeySignaturePair(new HederaKeySignature(KeyType.ED25519, key.getKey(), "signature".getBytes()));
-		claim.addKeySignaturePair(new HederaKeySignature(KeyType.ED25519, key2.getKey(), "signature2".getBytes()));
+		claim.addKeySignaturePair(new HederaKeySignature(KeyType.ED25519, key.getPublicKey(), "signature".getBytes()));
+		claim.addKeySignaturePair(new HederaKeySignature(KeyType.ED25519, key2.getPublicKey(), "signature2".getBytes()));
 		claimProto = claim.getProtobuf();
 
 		HederaClaim claimWithSig = new HederaClaim(claimProto);
 		assertEquals(2, claimWithSig.keys.size());
 		assertEquals(2, claimWithSig.keys.size());
 		assertEquals(KeyType.ED25519, claimWithSig.keys.get(0).getKeyType());
-		assertArrayEquals(key.getKey(), claimWithSig.keys.get(0).getKey());
+		assertArrayEquals(key.getPublicKey(), claimWithSig.keys.get(0).getPublicKey());
 		assertEquals(KeyType.ED25519, claimWithSig.keys.get(1).getKeyType());
-		assertArrayEquals(key2.getKey(), claimWithSig.keys.get(1).getKey());
+		assertArrayEquals(key2.getPublicKey(), claimWithSig.keys.get(1).getPublicKey());
 		
 		assertEquals(2, claimWithSig.keySignatures.size());
 		assertEquals(2, claimWithSig.keySignatures.size());
 		assertEquals(KeyType.ED25519, claimWithSig.keySignatures.get(0).getKeyType());
-		assertArrayEquals(key.getKey(), claimWithSig.keySignatures.get(0).getKey());
+		assertArrayEquals(key.getPublicKeyEncoded(), claimWithSig.keySignatures.get(0).getKey());
 		assertEquals(KeyType.ED25519, claimWithSig.keySignatures.get(1).getKeyType());
-		assertArrayEquals(key2.getKey(), claimWithSig.keySignatures.get(1).getKey());
+		assertArrayEquals(key2.getPublicKeyEncoded(), claimWithSig.keySignatures.get(1).getKey());
 
 		claim = new HederaClaim();
-		claim.addKey(new HederaKey(KeyType.ED25519, key.getKey()));
-		claim.addKey(new HederaKey(KeyType.ED25519, key2.getKey()));
+		claim.addKey(new HederaKeyPair(KeyType.ED25519, key.getPublicKey(), null));
+		claim.addKey(new HederaKeyPair(KeyType.ED25519, key2.getPublicKey(), null));
 		claimProto = claim.getProtobuf();
 
 		claimWithSig = new HederaClaim(claimProto);
@@ -109,16 +106,16 @@ class HederaClaimTest {
 		assertEquals(2, claimWithSig.keys.size());
 		assertEquals(2, claimWithSig.keys.size());
 		assertEquals(KeyType.ED25519, claimWithSig.keys.get(0).getKeyType());
-		assertArrayEquals(key.getKey(), claimWithSig.keys.get(0).getKey());
+		assertArrayEquals(key.getPublicKey(), claimWithSig.keys.get(0).getPublicKey());
 		assertEquals(KeyType.ED25519, claimWithSig.keys.get(1).getKeyType());
-		assertArrayEquals(key2.getKey(), claimWithSig.keys.get(1).getKey());
+		assertArrayEquals(key2.getPublicKey(), claimWithSig.keys.get(1).getPublicKey());
 		
 		assertEquals(2, claimWithSig.keySignatures.size());
 		assertEquals(2, claimWithSig.keySignatures.size());
 		assertEquals(KeyType.ED25519, claimWithSig.keySignatures.get(0).getKeyType());
-		assertArrayEquals(key.getKey(), claimWithSig.keySignatures.get(0).getKey());
+		assertArrayEquals(key.getPublicKeyEncoded(), claimWithSig.keySignatures.get(0).getKey());
 		assertEquals(KeyType.ED25519, claimWithSig.keySignatures.get(1).getKeyType());
-		assertArrayEquals(key2.getKey(), claimWithSig.keySignatures.get(1).getKey());
+		assertArrayEquals(key2.getPublicKeyEncoded(), claimWithSig.keySignatures.get(1).getKey());
 	}
 }
 
