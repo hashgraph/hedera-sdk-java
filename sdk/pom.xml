@@ -4,12 +4,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.hedera.hashgraph</groupId>
-        <artifactId>java-sdk-full</artifactId>
-        <version>0.2.0</version>
-    </parent>
-    
+	<parent>
+		<groupId>com.hedera.hashgraph</groupId>
+		<artifactId>java-sdk-full</artifactId>
+		<version>0.2.0</version>
+	</parent>
+
 	<groupId>com.hedera.hashgraph</groupId>
 	<artifactId>java-sdk</artifactId>
 	<version>0.2.0</version>
@@ -50,7 +50,7 @@
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 	</distributionManagement>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
@@ -195,55 +195,58 @@
 		</dependency>
 	</dependencies>
 
-    <build>
-        <resources>
-            <resource>
-                <directory>src</directory>
-                <excludes>
-                    <exclude>**/*.java</exclude>
-                </excludes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <targetPath>${project.build.directory}</targetPath>
-                <includes>
+	<build>
+		<resources>
+			<resource>
+				<directory>src</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<targetPath>${project.build.directory}</targetPath>
+				<includes>
 					<include>logback.xml</include>
-                </includes>
-            </resource>
-        </resources>
+				</includes>
+			</resource>
+		</resources>
 
-        <!-- definition of the used plugins and their version -->
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.0.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.19.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.7</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>3.0.1</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+		<!-- definition of the used plugins and their version -->
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.8.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>3.0.1</version>
+					<configuration>
+						<additionalOptions>-html5</additionalOptions>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.19.1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>2.7</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>3.0.1</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 
-        <!-- applying the plugins to the maven build: -->
+		<!-- applying the plugins to the maven build: -->
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -262,9 +265,9 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                </configuration>
+					<source>${maven.compiler.source}</source>
+					<target>${maven.compiler.target}</target>
+				</configuration>
 			</plugin>
 
 			<plugin>
@@ -337,11 +340,12 @@
 		</plugins>
 	</reporting>
 
-    <profiles>
-        <!-- Depploy profile which adds the possibility to distribute the .jar to a remote repository
-        Call "mvn clean deploy -Pdeploy" to invoke this additional plugin in the maven build -->
-        <profile>
-            <id>deploy</id>
+	<profiles>
+		<!-- Depploy profile which adds the possibility to distribute the .jar 
+			to a remote repository Call "mvn clean deploy -Pdeploy" to invoke this additional 
+			plugin in the maven build -->
+		<profile>
+			<id>deploy</id>
 			<properties>
 				<gpg.executable>gpg2</gpg.executable>
 			</properties>
@@ -376,7 +380,7 @@
 						</configuration>
 					</plugin>
 				</plugins>
-			</build>		
-        </profile>
-    </profiles>
+			</build>
+		</profile>
+	</profiles>
 </project>
