@@ -7,7 +7,6 @@ import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.account.HederaAccountAmount;
 import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.common.HederaKeySignatureList;
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.common.HederaTransactionRecord;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.node.HederaNode;
@@ -29,7 +28,7 @@ import com.hederahashgraph.api.proto.java.*;
 public class HederaTransaction implements Serializable {
 	final Logger logger = LoggerFactory.getLogger(HederaTransaction.class);
 	private static final long serialVersionUID = 1;
-	private HederaPrecheckResult precheckResult = HederaPrecheckResult.NOTSET;
+	private ResponseCodeEnum precheckResult = ResponseCodeEnum.UNKNOWN;
 	private long cost = 0;
 	private byte[] stateProof = new byte[0];
 	private HederaNode node = null;
@@ -258,9 +257,9 @@ public class HederaTransaction implements Serializable {
 		// check response header first
 		ResponseHeader responseHeader = getResponse.getHeader();
 
-		setPrecheckResult(responseHeader.getNodeTransactionPrecheckCode());
+		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
 				
-		if (this.precheckResult == HederaPrecheckResult.OK) {
+		if (this.precheckResult == ResponseCodeEnum.OK) {
 
 			// cost
 			this.cost = responseHeader.getCost();
@@ -339,37 +338,6 @@ public class HederaTransaction implements Serializable {
 		return getRecord(null, transactionID, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
 	}
 	
-	private void setPrecheckResult(NodeTransactionPrecheckCode nodeTransactionPrecheckCode) {
-		switch (nodeTransactionPrecheckCode) {
-		case DUPLICATE:
-			this.precheckResult = HederaPrecheckResult.DUPLICATE;
-			break;
-		case INSUFFICIENT_BALANCE:
-			this.precheckResult = HederaPrecheckResult.INSUFFICIENT_BALANCE;
-			break;
-		case INSUFFICIENT_FEE:
-			this.precheckResult = HederaPrecheckResult.INSUFFICIENT_FEE;
-			break;
-		case INVALID_ACCOUNT:
-			this.precheckResult = HederaPrecheckResult.INVALID_ACCOUNT;
-			break;
-		case INVALID_TRANSACTION:
-			this.precheckResult = HederaPrecheckResult.INVALID_TRANSACTION;
-			break;
-		case OK:
-			this.precheckResult = HederaPrecheckResult.OK;
-			break;
-		case BUSY:
-			this.precheckResult = HederaPrecheckResult.BUSY;
-			break;
-		case NOT_SUPPORTED:
-			this.precheckResult = HederaPrecheckResult.NOT_SUPPORTED;
-			break;
-		default:
-			this.precheckResult = HederaPrecheckResult.NOTSET;
-				
-		}
-	}
 	/**
 	 * Generates a transfer transaction to enable payments for queries
 	 * @param txQueryDefaults the defaults for transactions and queries

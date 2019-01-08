@@ -14,7 +14,6 @@ import com.hedera.sdk.common.HederaDuration;
 import com.hedera.sdk.common.HederaKey;
 import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.common.HederaKeySignatureList;
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.common.HederaRealmID;
 import com.hedera.sdk.common.HederaTransactionRecord;
 import com.hedera.sdk.common.Utilities;
@@ -47,6 +46,7 @@ import com.hederahashgraph.api.proto.java.CryptoGetInfoResponse;
 import com.hederahashgraph.api.proto.java.CryptoTransferTransactionBody;
 import com.hederahashgraph.api.proto.java.CryptoUpdateTransactionBody;
 import com.hederahashgraph.api.proto.java.Response;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hederahashgraph.api.proto.java.ResponseHeader;
 import com.hederahashgraph.api.proto.java.TransactionBody;
 import com.hederahashgraph.api.proto.java.TransferList;
@@ -61,7 +61,7 @@ public class HederaAccount implements Serializable {
 	private List<HederaKeySignature> keySignatures = new ArrayList<HederaKeySignature>();
 	private List<HederaKey> keys = new ArrayList<HederaKey>();
 	private List<HederaTransactionRecord> records = null;
-	private HederaPrecheckResult precheckResult = HederaPrecheckResult.NOTSET;
+	private ResponseCodeEnum precheckResult = ResponseCodeEnum.UNKNOWN;
 	private String solidityContractAccountID = "";
 	private boolean deleted = false;
 	private long proxyReceived = 0;
@@ -258,10 +258,10 @@ public class HederaAccount implements Serializable {
 	   	logger.trace("End - Object init");
 	}
 	/**
-	 * gets the {@link HederaPrecheckResult} as a result of a transaction
-	 * @return {@link HederaPrecheckResult} 
+	 * gets the {@link ResponseCodeEnum} as a result of a transaction
+	 * @return {@link ResponseCodeEnum} 
 	 */
-	public HederaPrecheckResult getPrecheckResult() {
+	public ResponseCodeEnum getPrecheckResult() {
 		return this.precheckResult;
 	}
 	/**
@@ -667,9 +667,9 @@ public class HederaAccount implements Serializable {
 		// check response header first
 		ResponseHeader.Builder responseHeader = queryResponse.getHeaderBuilder();
 
-		this.precheckResult = Utilities.setPrecheckResult(responseHeader.getNodeTransactionPrecheckCode());
+		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
 
-		if (this.precheckResult == HederaPrecheckResult.OK) {
+		if (this.precheckResult == ResponseCodeEnum.OK) {
 			this.balance = queryResponse.getBalance();
 			this.cost = responseHeader.getCost();
 			this.stateProof = responseHeader.getStateProof().toByteArray();
@@ -778,9 +778,9 @@ public class HederaAccount implements Serializable {
 		// check response header first
 		ResponseHeader.Builder responseHeader = queryResponse.getHeaderBuilder();
 
-		this.precheckResult = Utilities.setPrecheckResult(responseHeader.getNodeTransactionPrecheckCode());
+		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
 
-		if (this.precheckResult == HederaPrecheckResult.OK) {
+		if (this.precheckResult == ResponseCodeEnum.OK) {
 			this.records = new ArrayList<HederaTransactionRecord>();
 			
 			for (int i=0; i < queryResponse.getRecordsCount(); i++) {
@@ -884,9 +884,9 @@ public class HederaAccount implements Serializable {
 		// check response header first
 		ResponseHeader.Builder responseHeader = accountGetInfoResponse.getHeaderBuilder();
 		
-		this.precheckResult = Utilities.setPrecheckResult(responseHeader.getNodeTransactionPrecheckCode());
+		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
 
-		if (this.precheckResult == HederaPrecheckResult.OK) {
+		if (this.precheckResult == ResponseCodeEnum.OK) {
 
 			this.solidityContractAccountID = accountGetInfoResponse.getAccountInfo().getContractAccountID();
 			this.deleted = accountGetInfoResponse.getAccountInfo().getDeleted();
@@ -1182,7 +1182,6 @@ public class HederaAccount implements Serializable {
 		
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
-		transactionResult.setError();
 
 		// required
 		this.shardNum = shardNum;
@@ -1265,7 +1264,6 @@ public class HederaAccount implements Serializable {
 		
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
-		transactionResult.setError();
 		
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
@@ -1357,7 +1355,6 @@ public class HederaAccount implements Serializable {
 		
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
-		transactionResult.setError();
 		
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
@@ -1549,7 +1546,6 @@ public class HederaAccount implements Serializable {
 		}
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
-		transactionResult.setError();
 		
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);

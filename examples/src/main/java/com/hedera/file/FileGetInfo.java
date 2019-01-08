@@ -3,8 +3,8 @@ package com.hedera.file;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.file.HederaFile;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class FileGetInfo {
 	public static boolean getInfo(HederaFile file) throws Exception {
@@ -18,7 +18,7 @@ public final class FileGetInfo {
 		if (file.getInfo()) {
 			logger.info("===>Got info");
 			return true;
-		} else if (file.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+		} else if (file.getPrecheckResult() == ResponseCodeEnum.BUSY) {
 			logger.info("system busy, try again later");
 			return false;
 		} else {

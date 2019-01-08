@@ -12,7 +12,6 @@ import com.hedera.sdk.common.HederaFileID;
 import com.hedera.sdk.common.HederaKey;
 import com.hedera.sdk.common.HederaKeyList;
 import com.hedera.sdk.common.HederaKeySignature;
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.common.HederaRealmID;
 import com.hedera.sdk.common.HederaShardID;
 import com.hedera.sdk.common.HederaSignature;
@@ -43,6 +42,7 @@ import com.hederahashgraph.api.proto.java.FileID;
 import com.hederahashgraph.api.proto.java.FileUpdateTransactionBody;
 import com.hederahashgraph.api.proto.java.KeyList;
 import com.hederahashgraph.api.proto.java.Response;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hederahashgraph.api.proto.java.ResponseHeader;
 import com.hederahashgraph.api.proto.java.TransactionBody;
 
@@ -61,7 +61,7 @@ public class HederaFile implements Serializable {
 	private HederaNode node = null;
 	private long size = 0;
 	private boolean deleted = false;
-	private HederaPrecheckResult precheckResult = HederaPrecheckResult.NOTSET;
+	private ResponseCodeEnum precheckResult = ResponseCodeEnum.UNKNOWN;
 	private long cost = 0;
 	private byte[] stateProof = new byte[0];
 	/**
@@ -210,9 +210,9 @@ public class HederaFile implements Serializable {
 	/**
 	 * results of the Transaction
 	 * 
-	 * @return {@link HederaPrecheckResult}
+	 * @return {@link ResponseCodeEnum}
 	 */
-	public HederaPrecheckResult getPrecheckResult() {
+	public ResponseCodeEnum getPrecheckResult() {
 		return this.precheckResult;
 	}
 
@@ -713,9 +713,9 @@ public class HederaFile implements Serializable {
 		// check response header first
 		ResponseHeader.Builder responseHeader = fileContentsResponse.getHeaderBuilder();
 
-		this.precheckResult = Utilities.setPrecheckResult(responseHeader.getNodeTransactionPrecheckCode());
+		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
 
-		if (this.precheckResult == HederaPrecheckResult.OK) {
+		if (this.precheckResult == ResponseCodeEnum.OK) {
 			// contents
 			this.contents = fileContentsResponse.getFileContents().getContents().toByteArray();
 			// cost
@@ -833,9 +833,9 @@ public class HederaFile implements Serializable {
 		// check response header first
 		ResponseHeader.Builder responseHeader = fileGetInfoResponse.getHeaderBuilder();
 
-		this.precheckResult = Utilities.setPrecheckResult(responseHeader.getNodeTransactionPrecheckCode());
+		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
 
-		if (this.precheckResult == HederaPrecheckResult.OK) {
+		if (this.precheckResult == ResponseCodeEnum.OK) {
 			FileInfo fileInfo = fileGetInfoResponse.getFileInfo();
 			// fileID
 			// no need to set, it is what we used to issue the query in the first place
@@ -1217,7 +1217,6 @@ public class HederaFile implements Serializable {
 
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
-		transactionResult.setError();
 
 		// required
 		this.shardNum = shardNum;
@@ -1294,7 +1293,6 @@ public class HederaFile implements Serializable {
 
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
-		transactionResult.setError();
 
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
@@ -1378,7 +1376,6 @@ public class HederaFile implements Serializable {
 
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
-		transactionResult.setError();
 
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
@@ -1476,7 +1473,6 @@ public class HederaFile implements Serializable {
 
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
-		transactionResult.setError();
 
 		if ((expirationTimeSeconds != -1) || (expirationTimeNanos != -1)) {
 			if (expirationTimeNanos == -1) {

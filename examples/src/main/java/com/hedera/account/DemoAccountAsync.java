@@ -4,13 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.account.HederaAccount;
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.common.HederaKey.KeyType;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
 import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
 import com.hedera.sdk.common.HederaTransactionState;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 import com.hedera.utilities.ExampleUtilities;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class DemoAccountAsync {
 	
@@ -92,7 +92,7 @@ public final class DemoAccountAsync {
 			// make the transfer
 			HederaTransactionResult transferResult = account.send(accountXferTo.getHederaAccountID(), 20 * i);
 			// was it successful ?
-			if (transferResult.getPrecheckResult() == HederaPrecheckResult.OK) {
+			if (transferResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 				// yes, add Transaction to state for receipt collection
 				transactionState.setTransaction(account.hederaTransactionID, account.txQueryDefaults.node);
 			}

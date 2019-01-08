@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "com.hederahashgraph.api.proto.java";
+option java_multiple_files = true;
+
+enum ResponseCodeEnum {
+    // response codes for pre check validation
+    OK = 0; // the transaction passed the precheck
+    INVALID_TRANSACTION = 1; // For any error not handled by specific error codes listed below.
+    PAYER_ACCOUNT_NOT_FOUND  = 2; //Payer account does not exist.
+    INVALID_NODE_ACCOUNT=3; //Node Account provided does not match the node account of the node the transaction was submitted to.
+    TRANSACTION_EXPIRED = 4; // Pre-Check TransactionValidStart + transactionValidDuration is less than current consensus time.
+    INVALID_TRANSACTION_START = 5;// Transaction start time is greater than current consensus time
+    INVALID_TRANSACTION_DURATION=6;//valid transaction duration is a positive non zero number that does not exceed 120 seconds
+    INVALID_SIGNATURE = 7;//the transaction signature is not valid
+    MEMO_TOO_LONG =8;//Transaction memo size exceeded 100 bytes
+    INSUFFICIENT_TX_FEE  = 9; // the transaction fee is insufficient for this type of transaction
+    INSUFFICIENT_PAYER_BALANCE  = 10; // the payer account has insufficient cryptocurrency to pay the transaction fee
+    DUPLICATE_TRANSACTION = 11; // this transaction ID is a duplicate of one that was submitted to this node or reached consensus in the last 180 seconds (receipt period)
+    BUSY = 12; //If API is throttled out
+    NOT_SUPPORTED = 13; //not supported API
+    /*response codes used in queries */
+    INVALID_FILE_ID = 14;//the file id is invalid or does not exist
+    INVALID_ACCOUNT_ID = 15;//the account id is invalid or does not exist
+    INVALID_CONTRACT_ID = 16;//the contract id is invalid or does ont exist
+    INVALID_TRANSACTION_ID =17;//transaction id is not valid
+    RECEIPT_NOT_FOUND = 18;//receipt for given transaction id does not exist
+    RECORD_NOT_FOUND = 19;//record for given transaction id does not exist
+    INVALID_SOLIDITY_ID=20;//the solidity id is invalid or entity with this solidity id does not exist
+
+    // response code for Transaction receipt
+    UNKNOWN = 21; // hasn't yet reached consensus, or has already expired
+    SUCCESS = 22; // the transaction succeeded
+    FAIL_INVALID = 23; // the transaction failed because it is invalid
+    FAIL_FEE = 24; // the transaction fee was insufficient
+    FAIL_BALANCE = 25; // the paying account had insufficient cryptocurrency
+
+    //Crypto Response codes
+    KEY_REQUIRED = 26; //Key not provided in the transaction body
+    BAD_ENCODING = 27; //Unsupported algorithm/encoding used for keys in the transaction
+    INSUFFICIENT_ACCOUNT_BALANCE=28; //When the account balance is not sufficient for the transfer
+    INVALID_SOLIDITY_ADDRESS=29; //During an update transaction when the system is not able to find the Users Solidity address
+
+    //Smart contract creation or execution
+	INSUFFICIENT_GAS =30; //Not enough gas was supplied to execute tranasction
+	CONTRACT_SIZE_LIMIT_EXCEEDED =31; //contract byte code size is over the limit
+	LOCAL_CALL_MODIFICATION_EXCEPTION=32;//local execution (query) is requested for a function which changes state
+	CONTRACT_REVERT_EXECUTED=33; //Contract REVERT OPCODE executed
+	CONTRACT_EXECUTION_EXCEPTION=34;//For any contract execution related error not handled by specific error codes listed above.
+    INVALID_RECEIVING_NODE_ACCOUNT = 35; //In Query validation, account with +ve(amount) value should be Receiving node account, the receiver account should be only one account in the list 
+	MISSING_QUERY_HEADER = 36; // Header is missing in Query request
+
+
+
+    ACCOUNT_UPDATE_FAILED = 37; // the update of the account failed
+	INVALID_KEY_ENCODING = 38;
+    NULL_SOLIDITY_ADDRESS = 39; // null solidity address
+
+    CONTRACT_UPDATE_FAILED = 40; // update of the contract failed
+    INVALID_QUERY_HEADER = 41; // the query header is invalid
+
+    INVALID_FEE_SUBMITTED = 42; // Invalid fee submitted*/
+    INVALID_PAYER_SIGNATURE = 43; //  payer signature is invalid
+    
+    
+    KEY_NOT_PROVIDED = 44;
+    INVALID_EXPIRATION_TIME = 45;
+    NO_WACL_KEY = 46;
+    FILE_CONTENT_EMPTY = 47;
+    INVALID_ACCOUNT_AMOUNTS = 48; // The crypto transfer credit and debit don't equal to 0
+        // new response codes to be added
+    EMPTY_TRANSACTION_BODY = 49; // transaction body is empty
+    INVALID_TRANSACTION_BODY = 50; // invalid transaction body
+	
+}

@@ -3,12 +3,11 @@ package com.hedera.contracts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.common.HederaTransactionReceipt;
-import com.hedera.sdk.common.HederaTransactionStatus;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.contract.HederaContract;
 import com.hedera.sdk.transaction.HederaTransactionResult;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class ContractCall {
 	public static boolean call(HederaContract contract, long gas, long amount, byte[] functionParameters) throws Exception {
@@ -21,12 +20,12 @@ public final class ContractCall {
 		// smart contract call transaction
 		HederaTransactionResult callResult = contract.call(gas, amount, functionParameters);
 		// was it successful ?
-		if (callResult.getPrecheckResult() == HederaPrecheckResult.OK) {
+		if (callResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 			// yes, get a receipt for the transaction
 			HederaTransactionReceipt receipt = Utilities.getReceipt(contract.hederaTransactionID,
 					contract.txQueryDefaults.node);
 			// was that successful ?
-			if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
+			if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
 				// and print it out
 				logger.info(String.format("===>Smart Contract call success"));
 				return true;
@@ -34,7 +33,7 @@ public final class ContractCall {
 				logger.info("Failed with transactionStatus:" + receipt.transactionStatus.toString());
 				return false;
 			}
-		} else if (contract.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+		} else if (contract.getPrecheckResult() == ResponseCodeEnum.BUSY) {
 			logger.info("system busy, try again later");
 			return false;
 		} else {
