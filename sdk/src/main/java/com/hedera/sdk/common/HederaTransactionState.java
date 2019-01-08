@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import com.hedera.sdk.node.HederaNode;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 /**
  * This class exists in order to enable asynchronous handling of Transaction Receipts
  * It is fully synchronised and therefore thread safe
@@ -102,21 +103,217 @@ public class HederaTransactionState {
                 HederaTransactionReceipt receipt = Utilities.getReceipt(transactionID, state.node, 1, 0, 0);
                 
                 it.remove(); // avoids a ConcurrentModificationException
-                
-				if (receipt.nodePrecheck == HederaPrecheckResult.INVALID_TRANSACTION) {
-					// a callback would be implemented here to deal with the operation
-					stateMap.remove(transactionID);
-				} else if (receipt.transactionStatus == HederaTransactionStatus.FAIL_INVALID) {
-					// a callback would be implemented here to deal with the operation
-					stateMap.remove(transactionID);
-				} else if (receipt.transactionStatus == HederaTransactionStatus.FAIL_BALANCE) {
-					// a callback would be implemented here to deal with the operation
-					stateMap.remove(transactionID);
-				} else if (receipt.nodePrecheck == HederaPrecheckResult.OK) {
-					if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
+
+				switch (receipt.nodePrecheck) {
+					case ACCOUNT_UPDATE_FAILED:
 						// a callback would be implemented here to deal with the operation
 						stateMap.remove(transactionID);
-					}
+						break;
+					case BAD_ENCODING:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case BUSY:
+						break;
+					case CONTRACT_EXECUTION_EXCEPTION:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case CONTRACT_REVERT_EXECUTED:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case CONTRACT_SIZE_LIMIT_EXCEEDED:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case CONTRACT_UPDATE_FAILED:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case DUPLICATE_TRANSACTION:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case EMPTY_TRANSACTION_BODY:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case FAIL_BALANCE:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case FAIL_FEE:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case FAIL_INVALID:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case FILE_CONTENT_EMPTY:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INSUFFICIENT_ACCOUNT_BALANCE:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INSUFFICIENT_GAS:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INSUFFICIENT_PAYER_BALANCE:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INSUFFICIENT_TX_FEE:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INVALID_ACCOUNT_AMOUNTS:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INVALID_ACCOUNT_ID:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INVALID_CONTRACT_ID:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INVALID_EXPIRATION_TIME:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INVALID_FEE_SUBMITTED:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INVALID_FILE_ID:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INVALID_KEY_ENCODING:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INVALID_NODE_ACCOUNT:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INVALID_PAYER_SIGNATURE:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INVALID_QUERY_HEADER:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INVALID_RECEIVING_NODE_ACCOUNT:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INVALID_SIGNATURE:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INVALID_SOLIDITY_ADDRESS:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INVALID_SOLIDITY_ID:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INVALID_TRANSACTION: 
+						// do nothing
+						break;
+					case INVALID_TRANSACTION_BODY:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INVALID_TRANSACTION_DURATION:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INVALID_TRANSACTION_ID:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INVALID_TRANSACTION_START:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case KEY_NOT_PROVIDED:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case KEY_REQUIRED: 
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case LOCAL_CALL_MODIFICATION_EXCEPTION:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case MEMO_TOO_LONG: 
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case MISSING_QUERY_HEADER:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case NO_WACL_KEY:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case NOT_SUPPORTED:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case NULL_SOLIDITY_ADDRESS:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case OK:
+						if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
+							// a callback would be implemented here to deal with the operation
+							stateMap.remove(transactionID);
+						}
+						break;
+					case PAYER_ACCOUNT_NOT_FOUND:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case RECEIPT_NOT_FOUND:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case RECORD_NOT_FOUND: 
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case SUCCESS:
+						if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
+							// a callback would be implemented here to deal with the operation
+							stateMap.remove(transactionID);
+						}
+						break;
+					case TRANSACTION_EXPIRED:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case UNKNOWN:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case UNRECOGNIZED: 
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
 				}
             }
         } 

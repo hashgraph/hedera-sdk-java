@@ -26,8 +26,8 @@ import com.hederahashgraph.api.proto.java.FileGetInfoResponse;
 import com.hederahashgraph.api.proto.java.GetByKeyQuery;
 import com.hederahashgraph.api.proto.java.GetByKeyResponse;
 import com.hederahashgraph.api.proto.java.Key;
-import com.hederahashgraph.api.proto.java.NodeTransactionPrecheckCode;
 import com.hederahashgraph.api.proto.java.Response;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hederahashgraph.api.proto.java.ResponseHeader;
 import com.hederahashgraph.api.proto.java.Signature;
 /**
@@ -50,7 +50,7 @@ public class HederaKeySignature implements Serializable {
 	private HederaKeySignatureList keySigList = null;
 	private HederaKeySignatureThreshold keySigThreshold = null;
 	private HederaContractID contractIDKey = null;
-	private HederaPrecheckResult precheckResult = HederaPrecheckResult.NOTSET;
+	private ResponseCodeEnum precheckResult = ResponseCodeEnum.UNKNOWN;
 	private long cost = 0;
 	private byte[] stateProof = null;
 	private HederaNode node = null;
@@ -802,9 +802,9 @@ public class HederaKeySignature implements Serializable {
 		// check response header first
 		ResponseHeader.Builder responseHeader = fileGetInfoResponse.getHeaderBuilder();
 		
-		setPrecheckResult(responseHeader.getNodeTransactionPrecheckCode());
+		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
 
-		if (this.precheckResult == HederaPrecheckResult.OK) {
+		if (this.precheckResult == ResponseCodeEnum.OK) {
 			GetByKeyResponse queryResponse = response.getGetByKey();
 			// cost
 			this.cost = responseHeader.getCost();
@@ -864,36 +864,5 @@ public class HederaKeySignature implements Serializable {
 	public boolean getEntitiesCostAnswerStateProof() throws InterruptedException {
 	   	logger.trace("getEntitiesCostAnswerStateProof");
 		return getEntities(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
-	}
-	private void setPrecheckResult(NodeTransactionPrecheckCode nodeTransactionPrecheckCode) {
-		switch (nodeTransactionPrecheckCode) {
-		case DUPLICATE:
-			this.precheckResult = HederaPrecheckResult.DUPLICATE;
-			break;
-		case INSUFFICIENT_BALANCE:
-			this.precheckResult = HederaPrecheckResult.INSUFFICIENT_BALANCE;
-			break;
-		case INSUFFICIENT_FEE:
-			this.precheckResult = HederaPrecheckResult.INSUFFICIENT_FEE;
-			break;
-		case INVALID_ACCOUNT:
-			this.precheckResult = HederaPrecheckResult.INVALID_ACCOUNT;
-			break;
-		case INVALID_TRANSACTION:
-			this.precheckResult = HederaPrecheckResult.INVALID_TRANSACTION;
-			break;
-		case OK:
-			this.precheckResult = HederaPrecheckResult.OK;
-			break;
-		case BUSY:
-			this.precheckResult = HederaPrecheckResult.BUSY;
-			break;
-		case NOT_SUPPORTED:
-			this.precheckResult = HederaPrecheckResult.NOT_SUPPORTED;
-			break;
-		default:
-			this.precheckResult = HederaPrecheckResult.NOTSET;
-				
-		}
 	}
 }

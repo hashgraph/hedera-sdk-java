@@ -6,8 +6,8 @@ import com.hedera.sdk.query.HederaQuery;
 import com.hedera.sdk.transaction.HederaTransaction;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 import com.hederahashgraph.api.proto.java.AccountID;
-import com.hederahashgraph.api.proto.java.NodeTransactionPrecheckCode;
 import com.hederahashgraph.api.proto.java.Response;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hederahashgraph.api.proto.java.TransactionResponse;
 import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
 import com.hederahashgraph.service.proto.java.FileServiceGrpc;
@@ -294,7 +294,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.createAccount(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -307,8 +307,6 @@ public class HederaNode implements Serializable {
 
 		if (transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
 		logger.trace("End - accountCreate");
 		return transResult;
@@ -335,7 +333,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.addClaim(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -347,8 +345,6 @@ public class HederaNode implements Serializable {
 		}
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
 		logger.trace("End - addClaim");
 		return transResult;
@@ -375,7 +371,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.cryptoTransfer(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					if (transaction.getProtobuf().getBody().getGenerateRecord() == true) {
 						// wait longer
 						logger.info("System busy - sleeping for " + waitMillisLong + "ms");
@@ -394,8 +390,6 @@ public class HederaNode implements Serializable {
 		}
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
 		logger.trace("End - accountTransfer");
 		return transResult;
@@ -422,7 +416,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.updateAccount(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -434,8 +428,6 @@ public class HederaNode implements Serializable {
 		}
 		if(transResult != null && response != null) {		
 		    transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
 		logger.trace("End - accountUpdate");
 		return transResult;
@@ -462,7 +454,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.appendContent(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -474,8 +466,6 @@ public class HederaNode implements Serializable {
 		}
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
 		logger.trace("End - fileAppend");
 		return transResult;
@@ -502,7 +492,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.createFile(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -515,8 +505,6 @@ public class HederaNode implements Serializable {
 
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
 		logger.trace("End - fileCreate");
 		return transResult;
@@ -543,7 +531,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.deleteFile(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -556,8 +544,6 @@ public class HederaNode implements Serializable {
 
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
 		logger.trace("End - fileDelete");
 		return transResult;
@@ -584,7 +570,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.updateFile(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -597,8 +583,6 @@ public class HederaNode implements Serializable {
 
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
 		logger.trace("End - fileUpdate");
 		return transResult;
@@ -625,7 +609,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.contractCallMethod(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -638,8 +622,6 @@ public class HederaNode implements Serializable {
 
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
 		logger.trace("End - contractCall");
 		return transResult;
@@ -666,7 +648,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.createContract(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -679,8 +661,6 @@ public class HederaNode implements Serializable {
 
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
 		logger.trace("End - contractCreate");
 		return transResult;
@@ -707,7 +687,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.updateContract(transaction.getProtobuf());
 				// retry if busy
-				if (response.getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -720,8 +700,6 @@ public class HederaNode implements Serializable {
 
 		if(transResult != null && response != null) {		
 			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
-		} else {
-			transResult.setError();
 		}
 		logger.trace("End - contractUpdate");
 		return transResult;
@@ -747,7 +725,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.contractCallLocalMethod(query.getProtobuf());
 				// retry if busy
-				if (response.getContractCallLocal().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getContractCallLocal().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -784,7 +762,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.contractGetBytecode(query.getProtobuf());
 				// retry if busy
-				if (response.getContractGetBytecodeResponse().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getContractGetBytecodeResponse().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -820,7 +798,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.getBySolidityID(query.getProtobuf());
 				// retry if busy
-				if (response.getGetBySolidityID().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getGetBySolidityID().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -857,7 +835,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.getContractInfo(query.getProtobuf());
 				// retry if busy
-				if (response.getContractGetInfo().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getContractGetInfo().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -894,7 +872,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.cryptoGetBalance(query.getProtobuf());
 				// retry if busy
-				if (response.getCryptogetAccountBalance().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getCryptogetAccountBalance().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -931,7 +909,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.getAccountRecords(query.getProtobuf());
 				// retry if busy
-				if (response.getCryptoGetAccountRecords().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getCryptoGetAccountRecords().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -968,7 +946,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.getAccountInfo(query.getProtobuf());
 				// retry if busy
-				if (response.getCryptoGetInfo().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getCryptoGetInfo().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -1002,7 +980,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.getTransactionReceipts(query.getProtobuf());
 				// retry if busy
-				if (response.getTransactionGetReceipt().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getTransactionGetReceipt().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -1036,7 +1014,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.getTxRecordByTxID(query.getProtobuf());
 				// retry if busy
-				if (response.getTransactionGetRecord().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getTransactionGetRecord().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -1072,7 +1050,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.getFileContent(query.getProtobuf());
 				// retry if busy
-				if (response.getFileGetContents().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getFileGetContents().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
@@ -1108,7 +1086,7 @@ public class HederaNode implements Serializable {
 			for (int i=0; i < busyRetryCount; i++) {
 				response = blockingStub.getFileInfo(query.getProtobuf());
 				// retry if busy
-				if (response.getFileGetInfo().getHeader().getNodeTransactionPrecheckCode() == NodeTransactionPrecheckCode.BUSY) {
+				if (response.getFileGetInfo().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {

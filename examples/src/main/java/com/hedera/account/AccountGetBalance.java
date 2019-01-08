@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.account.HederaAccount;
-import com.hedera.sdk.common.HederaPrecheckResult;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class AccountGetBalance {
 	public static boolean getBalance(HederaAccount account) throws Exception {
@@ -20,7 +20,7 @@ public final class AccountGetBalance {
 			// it was successful, print it
 			logger.info(String.format("===>Got balance=%d", balance));
 			return true;
-		} else if (account.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+		} else if (account.getPrecheckResult() == ResponseCodeEnum.BUSY) {
 			logger.info("system busy, try again later");
 			return false;
 		} else {

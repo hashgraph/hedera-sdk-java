@@ -3,9 +3,9 @@ package com.hedera.contracts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.contract.HederaContract;
 import com.hedera.sdk.contract.HederaContractFunctionResult;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class ContractRunLocal {
 	public static HederaContractFunctionResult runLocal(HederaContract contract, long gas, long maxResultSize, byte[] function) throws Exception {
@@ -23,7 +23,7 @@ public final class ContractRunLocal {
 			logger.info("===>Got gas used=" + functionResult.gasUsed());
 			logger.info("===>Got bloom=" + functionResult.bloom());
 			logger.info("===>Got contract num=" + functionResult.contractID().contractNum);
-		} else if (contract.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+		} else if (contract.getPrecheckResult() == ResponseCodeEnum.BUSY) {
 			logger.info("system busy, try again later");
 			return null;
 		} else {

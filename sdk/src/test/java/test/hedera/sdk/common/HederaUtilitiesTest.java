@@ -10,12 +10,11 @@ import org.junit.jupiter.api.Test;
 
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaKeySignature;
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.common.HederaSignature;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.common.HederaKey.KeyType;
 import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
-import com.hederahashgraph.api.proto.java.NodeTransactionPrecheckCode;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public class HederaUtilitiesTest {
 
@@ -51,21 +50,6 @@ public class HederaUtilitiesTest {
 		
 		sig = Utilities.getSignature("Payload".getBytes(), KeyType.ED25519, keyPair.getPublicKeyEncoded(), keyPair.getSecretKey());
 		assertNotNull(sig.getSignature());
-		
-		HederaPrecheckResult result = Utilities.setPrecheckResult(NodeTransactionPrecheckCode.DUPLICATE);
-		assertEquals(HederaPrecheckResult.DUPLICATE, result);
-		result = Utilities.setPrecheckResult(NodeTransactionPrecheckCode.INSUFFICIENT_BALANCE);
-		assertEquals(HederaPrecheckResult.INSUFFICIENT_BALANCE, result);
-		result = Utilities.setPrecheckResult(NodeTransactionPrecheckCode.INSUFFICIENT_FEE);
-		assertEquals(HederaPrecheckResult.INSUFFICIENT_FEE, result);
-		result = Utilities.setPrecheckResult(NodeTransactionPrecheckCode.INVALID_ACCOUNT);
-		assertEquals(HederaPrecheckResult.INVALID_ACCOUNT, result);
-		result = Utilities.setPrecheckResult(NodeTransactionPrecheckCode.INVALID_TRANSACTION);
-		assertEquals(HederaPrecheckResult.INVALID_TRANSACTION, result);
-		result = Utilities.setPrecheckResult(NodeTransactionPrecheckCode.OK);
-		assertEquals(HederaPrecheckResult.OK, result);
-		result = Utilities.setPrecheckResult(NodeTransactionPrecheckCode.BUSY);
-		assertEquals(HederaPrecheckResult.BUSY, result);
 
 	}
 }

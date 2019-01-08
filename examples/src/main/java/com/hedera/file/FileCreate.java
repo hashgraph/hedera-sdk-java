@@ -5,12 +5,11 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.common.HederaTransactionReceipt;
-import com.hedera.sdk.common.HederaTransactionStatus;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.file.HederaFile;
 import com.hedera.sdk.transaction.HederaTransactionResult;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class FileCreate {
 	public static HederaFile create(HederaFile file, byte[] contents) throws Exception {
@@ -34,11 +33,11 @@ public final class FileCreate {
 		// file creation transaction
 		HederaTransactionResult createResult = file.create(shardNum, realmNum, fileChunk, null);
 		// was it successful ?
-		if (createResult.getPrecheckResult() == HederaPrecheckResult.OK) {
+		if (createResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 			// yes, get a receipt for the transaction
 			HederaTransactionReceipt receipt  = Utilities.getReceipt(file.hederaTransactionID,  file.txQueryDefaults.node);
 			// was that successful ?
-			if (receipt.transactionStatus == HederaTransactionStatus.SUCCESS) {
+			if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
 				// yes, get the new account number from the receipt
 				file.fileNum = receipt.fileID.fileNum;
 				// and print it out
@@ -52,7 +51,7 @@ public final class FileCreate {
 					logger.info("Appending remaining data");
 					if (file.append(appendChunk) != null) {
 						position += fileChunkSize;
-					} else if (file.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+					} else if (file.getPrecheckResult() == ResponseCodeEnum.BUSY) {
 						logger.info("system busy, try again later");
 						return null;
 					} else {
@@ -64,7 +63,7 @@ public final class FileCreate {
 				logger.info("Failed with transactionStatus:" + receipt.transactionStatus);
 				return null;
 			}
-		} else if (file.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+		} else if (file.getPrecheckResult() == ResponseCodeEnum.BUSY) {
 			logger.info("system busy, try again later");
 			return null;
 		} else {

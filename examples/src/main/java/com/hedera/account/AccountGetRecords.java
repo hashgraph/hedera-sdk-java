@@ -7,8 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.account.HederaAccount;
-import com.hedera.sdk.common.HederaPrecheckResult;
 import com.hedera.sdk.common.HederaTransactionRecord;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class AccountGetRecords {
 	public static boolean getRecords(HederaAccount account) throws Exception {
@@ -29,7 +29,7 @@ public final class AccountGetRecords {
 				logger.info(record.transactionHash.toString());
 			}
 			return true;
-		} else if (account.getPrecheckResult() == HederaPrecheckResult.BUSY) {
+		} else if (account.getPrecheckResult() == ResponseCodeEnum.BUSY) {
 			logger.info("system busy, try again later");
 			return false;
 		} else {
