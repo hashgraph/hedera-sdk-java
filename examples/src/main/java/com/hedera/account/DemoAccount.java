@@ -4,6 +4,7 @@ import java.time.Instant;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.validation.DefaultMessageCodesResolver.Format;
 
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.account.HederaAccountUpdateValues;
@@ -21,133 +22,128 @@ public final class DemoAccount {
 		
 		//DO NOT CHANGE THESE, CHANGE BELOW INSTEAD
 		boolean create = false; //OK
-    	boolean balance = false; //OK
+    	boolean getBalance = false; //OK
     	boolean send = false; //NOK
-    	boolean info = false; //OK
+    	boolean getInfo = false; //OK
     	boolean update = false; //OK
     	boolean doAddClaim = false;//OK
 		boolean getTXRecord = false;
-		
-    	// new account objects
-    	HederaAccount newAccount = new HederaAccount();
-    	HederaAccount accountXferTo = new HederaAccount();
-    	
-    	// setup transaction/query defaults (durations, etc...)
-<<<<<<< HEAD:examples/src/main/java/com/hedera/account/DemoAccount.java
-    	account.txQueryDefaults = txQueryDefaults;
-    	accountXferTo.txQueryDefaults = txQueryDefaults;
-=======
-    	newAccount.txQueryDefaults = ExampleUtilities.getTxQueryDefaults();
-    	accountXferTo.txQueryDefaults = ExampleUtilities.getTxQueryDefaults();
->>>>>>> 2582df2... AccountDemo works except for claims.:examples/main/java/com/hedera/account/DemoAccount.java
-    	
     	create = true;
-//    	balance = true;
+    	getBalance = true;
     	send = true;
-<<<<<<< HEAD:examples/src/main/java/com/hedera/account/DemoAccount.java
-//    	info = true;
-//    	update = true;
-//    	doAddClaim = true; -- not implemented ?
-//    	getTXRecord = true;
-=======
-    	info = true;
+    	getInfo = true;
     	update = true;
     	doAddClaim = false; //-- not implemented ?
     	getTXRecord = true;
->>>>>>> 2582df2... AccountDemo works except for claims.:examples/main/java/com/hedera/account/DemoAccount.java
+		
+    	/* 
+    	 * check my balance
+    	 * This populates the account object's balance property 
+    	 */
+    	if (getBalance) {
+    		// setup my account
+        	HederaAccount myAccount = new HederaAccount();
+        	// setup transaction/query defaults (durations, etc...)
+        	myAccount.txQueryDefaults = ExampleUtilities.getTxQueryDefaults();
+	    	// setup my account number from properties file
+	    	myAccount.accountNum = myAccount.txQueryDefaults.payingAccountID.accountNum;
     	
-		// create an account
+    		AccountGetBalance.getBalance(myAccount);
+    		System.out.println(String.format("My balance=%d tinybar", myAccount.balance()));
+    	}
+    	
+    	/*
+    	 * get my account info
+    	 * This populates the account object's properties from network information
+    	 */
+    	if (getInfo) {
+    		// setup my account
+        	HederaAccount myAccount = new HederaAccount();
+        	// setup transaction/query defaults (durations, etc...)
+        	myAccount.txQueryDefaults = ExampleUtilities.getTxQueryDefaults();
+	    	// setup my account number from properties file
+	    	myAccount.accountNum = myAccount.txQueryDefaults.payingAccountID.accountNum;
+    		AccountGetInfo.getInfo(myAccount);
+    	}
+
+    	/* 
+    	 * create a new account
+    	 */
     	if (create) {
-    		newAccount.txQueryDefaults.generateRecord = getTXRecord;
+    		// setup new account object
+        	HederaAccount newAccount = new HederaAccount();
+        	// setup transaction/query defaults (durations, etc...)
+        	// note: This txQueryDefaults contains a payingAccountID which is the account paying for the transaction
+        	newAccount.txQueryDefaults = ExampleUtilities.getTxQueryDefaults();
+
+        	// optionally generate a record for this transaction
+        	newAccount.txQueryDefaults.generateRecord = getTXRecord;
+        	// create a new keypair
     		HederaKeyPair newAccountKey = new HederaKeyPair(KeyType.ED25519);
-    		newAccount.accountKey = newAccountKey;
-    		HederaKeyPair accountXferToKey = new HederaKeyPair(KeyType.ED25519);
-    		
-    		System.out.println(newAccount.txQueryDefaults.payingKeyPair.getKeyList().keys.get(0).getProtobuf().toString());
-    		
-	    	newAccount = AccountCreate.create(newAccount, newAccountKey.getPublicKeyHex(), newAccountKey.getKeyType(), 10000000);
-	    	
-<<<<<<< HEAD:examples/src/main/java/com/hedera/account/DemoAccount.java
-	    	account = AccountCreate.create(account, newAccountKey,100000);
-	    	if (account == null) {
-=======
+    		System.out.println(String.format("New account public key %s=",newAccountKey.getPublicKeyHex()));
+    		System.out.println(String.format("New account private/secret key %s=",newAccountKey.getSecretKeyHex()));
+    		// create a new account with a balance of 10000000 tinybar, using the above generated public key
+    		newAccount = AccountCreate.create(newAccount, newAccountKey.getPublicKeyHex(), newAccountKey.getKeyType(), 10000000);
+
 	    	if (newAccount == null) {
->>>>>>> 2582df2... AccountDemo works except for claims.:examples/main/java/com/hedera/account/DemoAccount.java
     			logger.info("*******************************************");
-    			logger.info("FIRST ACCOUNT CREATE FAILED");
+    			logger.info("ACCOUNT CREATE FAILED");
     			logger.info("*******************************************");
     			throw new Exception("Account create failure");
 	    	} else {
-	    		AccountGetInfo.getInfo(newAccount);
+	    		// the helper function (AccountCreate) populated the newAccount object's accountNum from the transaction receipt it 
+	    		// obtained. 
+	    		// Note: The HederaAccount.create only sends the transaction to the network, obtaining a receipt/record to recover the
+	    		// new account number is a separate (and asynchronous) operation
+	    		// the newly created account had its
+
+    			// get info for the newly created account
+	    		if (getInfo) {
+	    			AccountGetInfo.getInfo(newAccount);
+	    		}
 	    		
+    			// optionally retrieve a record for the transaction
 	    		if (getTXRecord) {
-<<<<<<< HEAD:examples/src/main/java/com/hedera/account/DemoAccount.java
-	    			  HederaTransactionID txID = account.hederaTransactionID;
-	    			  HederaTransactionRecord txRecord = new HederaTransactionRecord(txID, 10, txQueryDefaults);
-=======
 	    			  HederaTransactionID txID = newAccount.hederaTransactionID;
 	    			  HederaTransactionRecord txRecord = new HederaTransactionRecord(txID, newAccount.txQueryDefaults.node.transactionGetRecordsQueryFee, newAccount.txQueryDefaults);
->>>>>>> 2582df2... AccountDemo works except for claims.:examples/main/java/com/hedera/account/DemoAccount.java
     			}
-	    	}
-    		newAccount.txQueryDefaults.generateRecord = false;
-	    	if (newAccount != null) {
-	    		// the paying account is now the new account
-<<<<<<< HEAD:examples/src/main/java/com/hedera/account/DemoAccount.java
-	    		txQueryDefaults.payingAccountID = account.getHederaAccountID();
-	    		txQueryDefaults.payingKeyPair = newAccountKey;
-
-=======
-	    		newAccount.txQueryDefaults.payingAccountID = newAccount.getHederaAccountID();
-	    		newAccount.txQueryDefaults.payingKeyPair = newAccountKey;
 	    		
->>>>>>> 2582df2... AccountDemo works except for claims.:examples/main/java/com/hedera/account/DemoAccount.java
-	    		// get balance for the account
-	    		if (balance) {
-	    			AccountGetBalance.getBalance(newAccount);
-	    		}
-	    	}
-
-	    	if (send) {
-		    	accountXferTo = AccountCreate.create(newAccount, accountXferToKey.getPublicKeyHex(), newAccountKey.getKeyType(), 100000);
-		    	if (accountXferTo == null) {
-	    			logger.info("*******************************************");
-	    			logger.info("SECOND ACCOUNT CREATE FAILED");
-	    			logger.info("*******************************************");
-	    			throw new Exception("Account create failure");
-		    	}
-	    	}
-	    	
-	    	if (newAccount != null) {
-
-		        // get balance for the account
-		    	if (balance) {
-		    		AccountGetBalance.getBalance(newAccount);
-		    	}
-		
-				// send some crypto
 		    	if (send) {
-		    		logger.info("Start Time" + Instant.now());
-		    		AccountSend.send(newAccount, accountXferTo, 100);
+					// send some crypto form my account to the new account
+		    		// setup my account
+		        	HederaAccount myAccount = new HederaAccount();
+		        	// setup transaction/query defaults (durations, etc...)
+		        	myAccount.txQueryDefaults = ExampleUtilities.getTxQueryDefaults();
+			    	// setup my account number from properties file
+			    	myAccount.accountNum = myAccount.txQueryDefaults.payingAccountID.accountNum;
+
+			    	logger.info("Start Time" + Instant.now());
+		    		AccountSend.send(myAccount, newAccount, 100);
+
 		    		logger.info("End Time" + Instant.now());
+					// get balance for my account
+			    	if (getBalance) {
+			    		AccountGetBalance.getBalance(myAccount);
+			    		System.out.println(String.format("My balance=%d tinybar", myAccount.balance()));
+			    	}
+					// get balance for the new account
+			    	if (getBalance) {
+			    		AccountGetBalance.getBalance(newAccount);
+			    		System.out.println(String.format("New account balance=%d tinybar", newAccount.balance()));
+			    	}
 		    	}
-				// get balance for the account
-		    	if (balance) {
-		    		AccountGetBalance.getBalance(newAccount);
-		    	}
-				// get account info
-		    	if (info) {
-		    		AccountGetInfo.getInfo(newAccount);
-		    	}
-		
-				// update the account
 		    	if (update) {
+		    		// update the new account with some changes properties
+		    		// note: the original keypair for the newAccount object needs to be reset
+		    		// get information only recovers the public key, and the private/secret key
+		    		// is necessary here to sign for and therefore approve the change
+		    		newAccount.accountKey = newAccountKey;
+		    		
 		    		// setup an object to contain values to update
 		    		HederaAccountUpdateValues updates = new HederaAccountUpdateValues();
-		    		
+	    		
 		    		// create a new key
 		    		HederaKeyPair ed25519Key = new HederaKeyPair(KeyType.ED25519);
-		    	    			
 		    	    // set the new key for the account
 		    		updates.newKey = ed25519Key;
 		    		// new proxy account details
@@ -166,13 +162,8 @@ public final class DemoAccount {
 		    		// new expiration time
 		    		updates.expirationTimeSeconds = 200;
 		    		updates.expirationTimeNanos = 100;
-		    		
-		    		// set the current key pair for the account
-		    		// Note: This was partially overwritten earlier with getInfo which only retrieves a public key from the network
-		    		newAccount.accountKey = newAccountKey;
-		    		// reset Account ID (this was overwritten by the creation of the transfer to account)
-		    		newAccount.accountNum = newAccount.txQueryDefaults.payingAccountID.accountNum;
-		    		newAccount = AccountUpdate.update(newAccount, updates);
+
+            newAccount = AccountUpdate.update(newAccount, updates);
 		    		if (newAccount != null) {
 		    			AccountGetInfo.getInfo(newAccount);
 		    		} else {
@@ -181,25 +172,35 @@ public final class DemoAccount {
 		    			logger.info("*******************************************");
 		    		}
 		    	}
-		
-		    	if ((newAccount != null) && (doAddClaim)) {
-		    		HederaKeyPair claimKeyPair = new HederaKeyPair(KeyType.ED25519);
-			        HederaKeyPair claimKey = new HederaKeyPair(claimKeyPair.getKeyType(), claimKeyPair.getPublicKey());
-			
-					// Create a new claim object
-					HederaClaim claim;
-					claim = new HederaClaim(newAccount.shardNum, newAccount.realmNum, newAccount.accountNum, "ClaimHash".getBytes("UTF-8"));
-					// add a key to the claim
-					claim.addKey(claimKey);
-			        // add a claim
-			        if (AccountAddClaim.addClaim(newAccount,claim, claimKeyPair)) {
-			        }
-		    	} else if (newAccount == null) {
-	    			logger.info("*******************************************");
-	    			logger.info("ACCOUNT object is null, skipping claim tests");
-	    			logger.info("*******************************************");
-		    	}
 	    	}
-    	}	    	
+    	}
+    	
+    	
+    	
+    	
+//	    	
+//	    	if (myAccount != null) {
+//
+//				// update the account
+//		
+//		    	if ((myAccount != null) && (doAddClaim)) {
+//		    		HederaKeyPair claimKeyPair = new HederaKeyPair(KeyType.ED25519);
+//			        HederaKeyPair claimKey = new HederaKeyPair(claimKeyPair.getKeyType(), claimKeyPair.getPublicKey());
+//			
+//					// Create a new claim object
+//					HederaClaim claim;
+//					claim = new HederaClaim(myAccount.shardNum, myAccount.realmNum, myAccount.accountNum, "ClaimHash".getBytes("UTF-8"));
+//					// add a key to the claim
+//					claim.addKey(claimKey);
+//			        // add a claim
+//			        if (AccountAddClaim.addClaim(myAccount,claim, claimKeyPair)) {
+//			        }
+//		    	} else if (myAccount == null) {
+//	    			logger.info("*******************************************");
+//	    			logger.info("ACCOUNT object is null, skipping claim tests");
+//	    			logger.info("*******************************************");
+//		    	}
+//	    	}
+//    	}	    	
 	}
 }

@@ -9,11 +9,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.hedera.sdk.common.HederaAccountID;
+import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.common.HederaSignature;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
-import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public class HederaUtilitiesTest {
@@ -37,19 +37,6 @@ public class HederaUtilitiesTest {
 		long testRandom = -1;
 		testRandom = Utilities.getLongRandom();
 		assertNotEquals(-1, testRandom);
-
-		HederaCryptoKeyPair keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
-		HederaKeySignature signature = Utilities.getKeySignature("Payload".getBytes(), keyPair);
-		assertNotNull(signature.getSignature());
-		
-		signature = Utilities.getKeySignature("Payload".getBytes(), KeyType.ED25519, keyPair.getPublicKeyEncoded(), keyPair.getSecretKey());
-		assertNotNull(signature.getSignature());
-		
-		HederaSignature sig = Utilities.getSignature("Payload".getBytes(), keyPair);
-		assertNotNull(sig.getSignature());
-		
-		sig = Utilities.getSignature("Payload".getBytes(), KeyType.ED25519, keyPair.getPublicKeyEncoded(), keyPair.getSecretKey());
-		assertNotNull(sig.getSignature());
 
 	}
 }

@@ -16,7 +16,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 public class HederaKeyThresholdTest {
-	protected static byte[] keyBytes = new byte[] {12};
+	protected static byte[] keyBytes;
 	protected static String description = "A Description";
 	protected static List<HederaKeyPair> keyList = new ArrayList<HederaKeyPair>();
 	protected static HederaKeyThreshold masterKey;
@@ -26,8 +26,10 @@ public class HederaKeyThresholdTest {
 
 	@BeforeAll
 	static void initAll() {
-		keyList.add(new HederaKeyPair(KeyType.ED25519, keyBytes));
-		keyList.add(new HederaKeyPair(KeyType.RSA3072, keyBytes));
+		HederaKeyPair key = new HederaKeyPair(KeyType.ED25519);
+		keyBytes = key.getPublicKey();
+		keyList.add(new HederaKeyPair(KeyType.ED25519, keyBytes, null));
+		keyList.add(new HederaKeyPair(KeyType.ED25519, keyBytes, null));
 	}
 	
 	@Test
@@ -39,8 +41,8 @@ public class HederaKeyThresholdTest {
 
 		assertEquals(keyList.size(), masterKey.keys.size());
 		assertEquals(threshold, masterKey.threshold);
-		assertArrayEquals(keyList.get(0).getKey(), masterKey.keys.get(0).getKey());
-		assertArrayEquals(keyList.get(1).getKey(), masterKey.keys.get(1).getKey());
+		assertArrayEquals(keyList.get(0).getPublicKey(), masterKey.keys.get(0).getPublicKey());
+		assertArrayEquals(keyList.get(1).getPublicKey(), masterKey.keys.get(1).getPublicKey());
 	}
 	
 	@Test
@@ -63,8 +65,8 @@ public class HederaKeyThresholdTest {
 		protoKey = new HederaKeyThreshold(masterKey.getProtobuf());
 		assertEquals(keyList.size(), protoKey.keys.size());
 		assertEquals(threshold, protoKey.threshold);
-		assertArrayEquals(keyList.get(0).getKey(), protoKey.keys.get(0).getKey());
-		assertArrayEquals(keyList.get(1).getKey(), protoKey.keys.get(1).getKey());
+		assertArrayEquals(keyList.get(0).getPublicKey(), protoKey.keys.get(0).getPublicKey());
+		assertArrayEquals(keyList.get(1).getPublicKey(), protoKey.keys.get(1).getPublicKey());
 	}
 
 	@Test
@@ -75,8 +77,8 @@ public class HederaKeyThresholdTest {
 
 		assertEquals(keyList.size(), jsonKey.keys.size());
 		assertEquals(threshold, jsonKey.threshold);
-		assertArrayEquals(keyList.get(0).getKey(), jsonKey.keys.get(0).getKey());
-		assertArrayEquals(keyList.get(1).getKey(), jsonKey.keys.get(1).getKey());
+		assertArrayEquals(keyList.get(0).getPublicKey(), jsonKey.keys.get(0).getPublicKey());
+		assertArrayEquals(keyList.get(1).getPublicKey(), jsonKey.keys.get(1).getPublicKey());
 		
 		assertNotNull(masterKey.JSONString());
 	}

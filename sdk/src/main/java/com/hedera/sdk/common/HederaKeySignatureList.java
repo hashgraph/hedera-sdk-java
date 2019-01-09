@@ -43,24 +43,24 @@ public class HederaKeySignatureList implements Serializable {
 		}
 	   	logger.trace("End - Object init");
 	}
-	/**
-	 * Constructs from a {@link KeyList} protobuf and matching {@link SignatureList}
-	 * Note: It is assumed the two protobuf structures are exact matches
-	 * @param protobufKeys the protobuf for the keys
-	 * @param protobufSignatures the protobuf for the signatures
-	 */
-	public HederaKeySignatureList(KeyList protobufKeys, SignatureList protobufSignatures) {
-	   	logger.trace("Start - Object init protobufKeys {}, protobufSignatures {}", protobufKeys, protobufSignatures);
-		// convert a protobuf payload into class data
-		this.keySigPairs.clear();
-		
-		for (int index=0; index < protobufKeys.getKeysCount(); index++) {
-			Key key = protobufKeys.getKeys(index);
-			Signature sig = protobufSignatures.getSigs(index);
-			this.keySigPairs.add(new HederaKeySignature(key, sig));
-		}
-	   	logger.trace("End - Object init");
-	}
+//	/**
+//	 * Constructs from a {@link KeyList} protobuf and matching {@link SignatureList}
+//	 * Note: It is assumed the two protobuf structures are exact matches
+//	 * @param protobufKeys the protobuf for the keys
+//	 * @param protobufSignatures the protobuf for the signatures
+//	 */
+//	public HederaKeySignatureList(KeyList protobufKeys, SignatureList protobufSignatures) {
+//	   	logger.trace("Start - Object init protobufKeys {}, protobufSignatures {}", protobufKeys, protobufSignatures);
+//		// convert a protobuf payload into class data
+//		this.keySigPairs.clear();
+//		
+//		for (int index=0; index < protobufKeys.getKeysCount(); index++) {
+//			Key key = protobufKeys.getKeys(index);
+//			Signature sig = protobufSignatures.getSigs(index);
+//			this.keySigPairs.add(new HederaKeySignature(key, sig));
+//		}
+//	   	logger.trace("End - Object init");
+//	}
 	/**
 	 * Gets the protobuf for the keys in this list
 	 * @return {@link KeyList}

@@ -32,8 +32,6 @@ public final class AccountUpdate {
 				// update acount keys if necessary
 				if (updates.newKey != null) {
 					account.accountKey = updates.newKey;
-			        // the paying account is now the new account
-			        account.txQueryDefaults.payingKeyPair = updates.newKey;
 				}
 			} else {
 				logger.info("Failed with transactionStatus:" + receipt.transactionStatus.toString());

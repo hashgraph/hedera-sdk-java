@@ -15,6 +15,7 @@ import org.spongycastle.util.encoders.Hex;
 
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.common.HederaContractID;
+import com.hedera.sdk.cryptography.EDKeyPair;
 import com.hedera.sdk.node.HederaNode;
 import com.hedera.sdk.query.HederaQuery;
 import com.hedera.sdk.query.HederaQueryHeader;
@@ -93,6 +94,7 @@ public class HederaKey implements Serializable {
 	 * for this key
 	 */
 	public List<HederaEntityID> entityIDs = new ArrayList<HederaEntityID>();
+	private EDKeyPair keyPair;
 
 	/**
 	 * Method to set the node object to be used to communicate
@@ -225,8 +227,9 @@ public class HederaKey implements Serializable {
 
 		switch (protobuf.getKeyCase()) {
 		case ED25519:
-			this.key = protobuf.getEd25519().toByteArray();
-//			this.key = Hex.decode(this.key);
+			byte[] pubKeyBytes = protobuf.getEd25519().toByteArray();
+			String pubKeyHex = Hex.toHexString(pubKeyBytes); // good ?
+			this.keyPair = new EDKeyPair(pubKeyBytes, null);
 			this.keyType = KeyType.ED25519;
 			break;
 		case RSA_3072:

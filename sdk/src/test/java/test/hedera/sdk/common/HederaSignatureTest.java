@@ -47,8 +47,8 @@ class HederaSignatureTest {
 	 
 	private static Stream<Arguments> sigInit() {
 		return Stream.of(
-			Arguments.of(new HederaSignature(KeyType.ECDSA384, sigBytes), KeyType.ECDSA384, sigBytes),
-			Arguments.of(new HederaSignature(KeyType.RSA3072, sigBytes), KeyType.RSA3072, sigBytes),
+			Arguments.of(new HederaSignature(KeyType.ED25519, sigBytes), KeyType.ED25519, sigBytes),
+			Arguments.of(new HederaSignature(KeyType.ED25519, sigBytes), KeyType.ED25519, sigBytes),
 			Arguments.of(new HederaSignature(KeyType.ED25519, sigBytes), KeyType.ED25519, sigBytes),
 			Arguments.of(new HederaSignature(KeyType.CONTRACT, new byte[0]), KeyType.CONTRACT, new byte[0])
 		);
