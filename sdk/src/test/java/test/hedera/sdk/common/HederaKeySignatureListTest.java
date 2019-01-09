@@ -157,12 +157,10 @@ class HederaKeySignatureListTest {
 	@DisplayName("HederaKeySignatureListTest Get Key UUIDs")
 	void HederaKeySignatureListTestGetKeyUUIDs() { 
 		// create key with empty signature
-		byte[] aSignature = "signature".getBytes();
 
 		HederaKeyPair keyPair = new HederaKeyPair(KeyType.ED25519);
 		byte[] aKey = keyPair.getPublicKey();
 		keyPair = new HederaKeyPair(KeyType.ED25519);
-		byte[] aKey2 = keyPair.getPublicKey();
 		
 		// standard keys
 		HederaKeySignature keySignature = new HederaKeySignature(KeyType.ED25519, aKey, null);
@@ -218,7 +216,6 @@ class HederaKeySignatureListTest {
 		HederaKeyPair keyPair = new HederaKeyPair(KeyType.ED25519);
 		byte[] aKey1 = keyPair.getPublicKey();
 		keyPair = new HederaKeyPair(KeyType.ED25519);
-		byte[] aKey2 = keyPair.getPublicKey();
 
 		// standard keys
 		HederaKeySignature keySignature = new HederaKeySignature(KeyType.NOTSET, aKey1, "sig".getBytes());

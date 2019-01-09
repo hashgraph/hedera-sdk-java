@@ -122,8 +122,8 @@ public class HederaFile implements Serializable {
 	 * Default constructor, this returns a blank file object.
 	 */
 	public HederaFile() {
-		logger.trace("Start - Object init");
-		logger.trace("End - Object init");
+
+
 	}
 
 	/**
@@ -134,11 +134,11 @@ public class HederaFile implements Serializable {
 	 * @param fileNum the file number for the file
 	 */
 	public HederaFile(long shardNum, long realmNum, long fileNum) {
-		logger.trace("Start - Object init shardNum {}, realmNum {}, fileNum {}", shardNum, realmNum, fileNum);
+
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.fileNum = fileNum;
-		logger.trace("End - Object init");
+
 	}
 
 	/**
@@ -147,9 +147,9 @@ public class HederaFile implements Serializable {
 	 * @param transactionID the transaction ID to create the file from
 	 */
 	public HederaFile(HederaTransactionID transactionID) {
-		logger.trace("Start - Object init transactionID {}", transactionID);
+
 		this.hederaTransactionID = transactionID;
-		logger.trace("End - Object init");
+
 	}
 
 	/**
@@ -233,14 +233,11 @@ public class HederaFile implements Serializable {
 	 */
 	public TransactionBody bodyToSignForCreate(HederaTransactionID transactionID, HederaAccountID nodeAccount,
 			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, String memo) {
-		logger.trace(
-				"Start - bodyToSignForCreate transactionID {}, nodeAccount {}, transactionFee {}, transactionValidDuration {}, generateRecord {}, memo {}",
-				transactionID, nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo);
 
 		HederaTransactionBody transactionBody = new HederaTransactionBody(TransactionType.FILECREATE, transactionID,
 				nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo, this.getCreateTransactionBody());
 
-		logger.trace("End - bodyToSignForCreate");
+
 		return transactionBody.getProtobuf();
 	}
 
@@ -264,14 +261,11 @@ public class HederaFile implements Serializable {
 	 */
 	public TransactionBody bodyToSignForDelete(HederaTransactionID transactionID, HederaAccountID nodeAccount,
 			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, String memo) {
-		logger.trace(
-				"Start - bodyToSignForDelete transactionID {}, nodeAccount {}, transactionFee {}, transactionValidDuration {}, generateRecord {}, memo {}",
-				transactionID, nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo);
 
 		HederaTransactionBody transactionBody = new HederaTransactionBody(TransactionType.FILEDELETE, transactionID,
 				nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo, this.getDeleteTransactionBody());
 
-		logger.trace("End - bodyToSignForDelete");
+
 		return transactionBody.getProtobuf();
 	}
 
@@ -295,14 +289,11 @@ public class HederaFile implements Serializable {
 	 */
 	public TransactionBody bodyToSignForUpdate(HederaTransactionID transactionID, HederaAccountID nodeAccount,
 			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, String memo) {
-		logger.trace(
-				"Start - bodyToSignForUpdate transactionID {}, nodeAccount {}, transactionFee {}, transactionValidDuration {}, generateRecord {}, memo {}",
-				transactionID, nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo);
 
 		HederaTransactionBody transactionBody = new HederaTransactionBody(TransactionType.FILEUPDATE, transactionID,
 				nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo, this.getUpdateTransactionBody());
 
-		logger.trace("End - bodyToSignForUpdate");
+
 		return transactionBody.getProtobuf();
 	}
 
@@ -326,14 +317,11 @@ public class HederaFile implements Serializable {
 	 */
 	public TransactionBody bodyToSignForAppend(HederaTransactionID transactionID, HederaAccountID nodeAccount,
 			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, String memo) {
-		logger.trace(
-				"Start - bodyToSignForAppend transactionID {}, nodeAccount {}, transactionFee {}, transactionValidDuration {}, generateRecord {}, memo {}",
-				transactionID, nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo);
 
 		HederaTransactionBody transactionBody = new HederaTransactionBody(TransactionType.FILEAPPEND, transactionID,
 				nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo, this.getAppendTransactionBody());
 
-		logger.trace("End - bodyToSignForAppend");
+
 		return transactionBody.getProtobuf();
 	}
 
@@ -361,9 +349,6 @@ public class HederaFile implements Serializable {
 	public HederaTransactionResult create(HederaTransactionID transactionID, HederaAccountID nodeAccount,
 			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, String memo,
 			HederaSignatureList sigsForTransaction) throws InterruptedException {
-		logger.trace(
-				"Start - create transactionID {}, nodeAccounttransactionFee {}, transactionValidDuration {}, generateRecord {}, memo {}, sigsForTransaction {}",
-				transactionID, nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo, sigsForTransaction);
 
 		// build the body
 		HederaTransaction transaction = new HederaTransaction();
@@ -378,7 +363,7 @@ public class HederaFile implements Serializable {
 		HederaTransactionResult hederaTransactionResult = this.node.fileCreate(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 		// return
-		logger.trace("End - create");
+
 		return hederaTransactionResult;
 
 	}
@@ -407,9 +392,6 @@ public class HederaFile implements Serializable {
 	public HederaTransactionResult delete(HederaTransactionID transactionID, HederaAccountID nodeAccount,
 			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, String memo,
 			HederaSignatureList sigsForTransaction) throws InterruptedException {
-		logger.trace(
-				"Start - delete transactionID {}, nodeAccount {}, transactionFee {}, transactionValidDuration {}, generateRecord {}, memo {}, sigsForTransaction {}",
-				transactionID, nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo, sigsForTransaction);
 
 		// build the body
 		HederaTransaction transaction = new HederaTransaction();
@@ -423,7 +405,7 @@ public class HederaFile implements Serializable {
 
 		HederaTransactionResult hederaTransactionResult = this.node.fileDelete(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
-		logger.trace("End - delete");
+
 
 		// return
 		return hederaTransactionResult;
@@ -453,9 +435,6 @@ public class HederaFile implements Serializable {
 	public HederaTransactionResult update(HederaTransactionID transactionID, HederaAccountID nodeAccount,
 			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, String memo,
 			HederaSignatureList sigsForTransaction) throws InterruptedException {
-		logger.trace(
-				"Start - update transactionID {}, nodeAccount {}, transactionFee {}, transactionValidDuration {}, generateRecord {}, memo {}, sigsForTransaction {}",
-				transactionID, nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo, sigsForTransaction);
 
 		// build the body
 		HederaTransaction transaction = new HederaTransaction();
@@ -470,7 +449,7 @@ public class HederaFile implements Serializable {
 		HederaTransactionResult hederaTransactionResult = this.node.fileUpdate(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 
-		logger.trace("End - update");
+
 		// return
 		return hederaTransactionResult;
 	}
@@ -499,9 +478,6 @@ public class HederaFile implements Serializable {
 	public HederaTransactionResult append(HederaTransactionID transactionID, HederaAccountID nodeAccount,
 			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, String memo,
 			HederaSignatureList sigsForTransaction) throws InterruptedException {
-		logger.trace(
-				"Start - append transactionID {}, nodeAccount {}, transactionFee {}, transactionValidDuration {}, generateRecord {}, memo {}, sigsForTransaction {}",
-				transactionID, nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo, sigsForTransaction);
 
 		// build the body
 		HederaTransaction transaction = new HederaTransaction();
@@ -516,7 +492,7 @@ public class HederaFile implements Serializable {
 		HederaTransactionResult hederaTransactionResult = this.node.fileAppend(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 
-		logger.trace("End - append");
+
 		// return
 		return hederaTransactionResult;
 
@@ -546,12 +522,7 @@ public class HederaFile implements Serializable {
 	public HederaTransactionResult createWithRecord(long accountShardNum, long accountRealmNum, long accountNum,
 			long nodeShardNum, long nodeRealmNum, long nodeAccountNum, long transactionFee, String memo,
 			Instant expirationTime, byte[] contents, HederaKeyPair keyPair) throws Exception {
-		logger.trace(
-				"Start - createWithRecord accountShardNum {}, accountRealmNum {}, accountNum {}, nodeShardNum {}, nodeRealmNum {}, nodeAccountNum {}, transactionFee {}, memo {}, expirationTime {}, contents {}, keyPair {}",
-				accountShardNum, accountRealmNum, accountNum, nodeShardNum, nodeRealmNum, nodeAccountNum, transactionFee, memo,
-				expirationTime, contents, keyPair);
 
-		logger.trace("End - createWithRecord");
 		return createSimple(accountShardNum, accountRealmNum, accountNum, nodeShardNum, nodeRealmNum, nodeAccountNum,
 				transactionFee, true, memo, expirationTime, contents, keyPair);
 	}
@@ -580,12 +551,7 @@ public class HederaFile implements Serializable {
 	public HederaTransactionResult createNoRecord(long accountShardNum, long accountRealmNum, long accountNum,
 			long nodeShardNum, long nodeRealmNum, long nodeAccountNum, long transactionFee, String memo,
 			Instant expirationTime, byte[] contents, HederaKeyPair keyPair) throws Exception {
-		logger.trace(
-				"Start - createNoRecord accountShardNum {}, accountRealmNum {}, accountNum {}, nodeShardNum {}, nodeRealmNum {}, nodeAccountNum {}, transactionFee {}, memo {}, expirationTime {}, contents {}, keyPair {}",
-				accountShardNum, accountRealmNum, accountNum, nodeShardNum, nodeRealmNum, nodeAccountNum, transactionFee, memo,
-				expirationTime, contents, keyPair);
 
-		logger.trace("End - createNoRecord");
 		return createSimple(accountShardNum, accountRealmNum, accountNum, nodeShardNum, nodeRealmNum, nodeAccountNum,
 				transactionFee, false, memo, expirationTime, contents, keyPair);
 	}
@@ -593,10 +559,6 @@ public class HederaFile implements Serializable {
 	private HederaTransactionResult createSimple(long accountShardNum, long accountRealmNum, long accountNum,
 			long nodeShardNum, long nodeRealmNum, long nodeAccountNum, long transactionFee, boolean generateRecord,
 			String memo, Instant expirationTime, byte[] contents, HederaKeyPair keyPair) throws Exception {
-		logger.trace(
-				"Start - createSimple accountShardNum {}, accountRealmNum {}, accountNum {}, nodeShardNum {}, nodeRealmNum {}, nodeAccountNum {}, transactionFee {}, generateRecord {}, memo {}, expirationTime {}, contents {}, keyPair {}",
-				accountShardNum, accountRealmNum, accountNum, nodeShardNum, nodeRealmNum, nodeAccountNum, transactionFee,
-				generateRecord, memo, expirationTime, contents, keyPair);
 
 		// create a node account id
 		HederaAccountID nodeAccount = new HederaAccountID(nodeShardNum, nodeRealmNum, nodeAccountNum);
@@ -641,7 +603,7 @@ public class HederaFile implements Serializable {
 
 		hederaTransactionResult.hederaTransactionID = transactionId;
 
-		logger.trace("End - createSimple");
+
 		return hederaTransactionResult;
 	}
 
@@ -661,7 +623,7 @@ public class HederaFile implements Serializable {
 			throws InterruptedException {
 		boolean result = true;
 
-		logger.trace("Start - getContents payment {}, responseType {}", payment, responseType);
+
 		// build the query
 		// Header
 		HederaQueryHeader queryHeader = new HederaQueryHeader();
@@ -703,7 +665,7 @@ public class HederaFile implements Serializable {
 			result = false;
 		}
 
-		logger.trace("End - getContents");
+
 		return result;
 	}
 
@@ -718,7 +680,7 @@ public class HederaFile implements Serializable {
 	 *                              with the node
 	 */
 	public boolean getContentsAnswerOnly(HederaTransaction payment) throws InterruptedException {
-		logger.trace("Start - getContents");
+
 		return getContents(payment, QueryResponseType.ANSWER_ONLY);
 	}
 
@@ -734,7 +696,7 @@ public class HederaFile implements Serializable {
 	 *                              with the node
 	 */
 	public boolean getContentsStateProof(HederaTransaction payment) throws InterruptedException {
-		logger.trace("getContentsStateProof");
+
 		return getContents(payment, HederaQueryHeader.QueryResponseType.ANSWER_STATE_PROOF);
 	}
 
@@ -748,7 +710,7 @@ public class HederaFile implements Serializable {
 	 *                              with the node
 	 */
 	public boolean getContentsCostAnswer() throws InterruptedException {
-		logger.trace("getContentsCostAnswer");
+
 		return getContents(null, HederaQueryHeader.QueryResponseType.COST_ANSWER);
 	}
 
@@ -761,7 +723,7 @@ public class HederaFile implements Serializable {
 	 *                              with the node
 	 */
 	public boolean getContentsAnswerStateProof() throws InterruptedException {
-		logger.trace("getContentsAnswerStateProof");
+
 		return getContents(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
 	}
 
@@ -781,7 +743,7 @@ public class HederaFile implements Serializable {
 			throws InterruptedException {
 		boolean result = true;
 
-		logger.trace("Start - getInfo payment {}, responseType {}", payment, responseType);
+
 		// build the query
 		// Header
 		HederaQueryHeader queryHeader = new HederaQueryHeader();
@@ -834,7 +796,7 @@ public class HederaFile implements Serializable {
 			result = false;
 		}
 
-		logger.trace("End - getInfo");
+
 		return result;
 	}
 
@@ -849,7 +811,7 @@ public class HederaFile implements Serializable {
 	 *                              with the node
 	 */
 	public boolean getInfoAnswerOnly(HederaTransaction payment) throws InterruptedException {
-		logger.trace("Start - getInfoAnswerOnly");
+
 		return getInfo(payment, QueryResponseType.ANSWER_ONLY);
 	}
 
@@ -864,7 +826,7 @@ public class HederaFile implements Serializable {
 	 *                              with the node
 	 */
 	public boolean getInfoStateProof(HederaTransaction payment) throws InterruptedException {
-		logger.trace("getInfoStateProof");
+
 		return getInfo(payment, HederaQueryHeader.QueryResponseType.ANSWER_STATE_PROOF);
 	}
 
@@ -878,7 +840,7 @@ public class HederaFile implements Serializable {
 	 *                              with the node
 	 */
 	public boolean getInfoCostAnswer() throws InterruptedException {
-		logger.trace("getInfoCostAnswer");
+
 		return getInfo(null, HederaQueryHeader.QueryResponseType.COST_ANSWER);
 	}
 
@@ -892,7 +854,7 @@ public class HederaFile implements Serializable {
 	 *                              with the node
 	 */
 	public boolean getInfoCostAnswerStateProof() throws InterruptedException {
-		logger.trace("getInfoCostAnswerStateProof");
+
 		return getInfo(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
 	}
 
@@ -903,7 +865,7 @@ public class HederaFile implements Serializable {
 	 * @return {@link FileCreateTransactionBody}
 	 */
 	public FileCreateTransactionBody getCreateTransactionBody() {
-		logger.trace("Start - getCreateTransactionBody");
+
 
 		FileCreateTransactionBody.Builder fileCreateTransaction = FileCreateTransactionBody.newBuilder();
 
@@ -933,7 +895,7 @@ public class HederaFile implements Serializable {
 			fileCreateTransaction.setNewRealmAdminKey(newRealmAdminKey.getProtobuf());
 		}
 
-		logger.trace("End - getCreateTransactionBody");
+
 		return fileCreateTransaction.build();
 	}
 
@@ -944,7 +906,7 @@ public class HederaFile implements Serializable {
 	 * @return {@link FileUpdateTransactionBody}
 	 */
 	public FileUpdateTransactionBody getUpdateTransactionBody() {
-		logger.trace("Start - getUpdateTransactionBody");
+
 		FileUpdateTransactionBody.Builder fileUpdateTransaction = FileUpdateTransactionBody.newBuilder();
 		
 		fileUpdateTransaction.setFileID(this.getFileID().getProtobuf());
@@ -967,7 +929,7 @@ public class HederaFile implements Serializable {
 			fileUpdateTransaction.setContents(fileContents);
 		}
 
-		logger.trace("End - getUpdateTransactionBody");
+
 		return fileUpdateTransaction.build();
 	}
 
@@ -978,7 +940,7 @@ public class HederaFile implements Serializable {
 	 * @return {@link FileDeleteTransactionBody}
 	 */
 	public FileDeleteTransactionBody getDeleteTransactionBody() {
-		logger.trace("Start - getDeleteTransactionBody");
+
 		// Generates the protobuf payload for this class
 		FileDeleteTransactionBody.Builder fileDeleteTransactionBody = FileDeleteTransactionBody.newBuilder();
 
@@ -992,7 +954,7 @@ public class HederaFile implements Serializable {
 
 		fileDeleteTransactionBody.setFileID(fileId);
 
-		logger.trace("End - getDeleteTransactionBody");
+
 		return fileDeleteTransactionBody.build();
 	}
 
@@ -1003,7 +965,7 @@ public class HederaFile implements Serializable {
 	 * @return {@link FileAppendTransactionBody}
 	 */
 	public FileAppendTransactionBody getAppendTransactionBody() {
-		logger.trace("Start - getAppendTransactionBody");
+
 		FileAppendTransactionBody.Builder fileAppendTransaction = FileAppendTransactionBody.newBuilder();
 
 		// file Id or transactionId
@@ -1022,7 +984,7 @@ public class HederaFile implements Serializable {
 			fileAppendTransaction.setContents(fileContents);
 		}
 
-		logger.trace("End - getAppendTransactionBody");
+
 		return fileAppendTransaction.build();
 	}
 
@@ -1032,9 +994,9 @@ public class HederaFile implements Serializable {
 	 * @param key the key to add to the list
 	 */
 	public void addKey(HederaKeyPair key) {
-		logger.trace("Start - addKey key {}", key);
+
 		this.keys.add(key);
-		logger.trace("End - addKey");
+
 	}
 
 	/**
@@ -1043,9 +1005,9 @@ public class HederaFile implements Serializable {
 	 * @param key the key to add to the list
 	 */
 	public void addNewKey(HederaKeyPair key) {
-		logger.trace("Start - addNewKey key {}", key);
+
 		this.newKeys.add(key);
-		logger.trace("End - addNewKey");
+
 	}
 
 	/**
@@ -1055,7 +1017,7 @@ public class HederaFile implements Serializable {
 	 * @return {@link Boolean} true if successful
 	 */
 	public boolean deleteKey(HederaKeyPair key) {
-		logger.trace("deleteKey key {}", key);
+
 		return this.keys.remove(key);
 	}
 
@@ -1066,7 +1028,7 @@ public class HederaFile implements Serializable {
 	 * @return {@link Boolean} true if successful
 	 */
 	public boolean deleteNewKey(HederaKeyPair key) {
-		logger.trace("deleteNewKey key {}", key);
+
 		return this.newKeys.remove(key);
 	}
 
@@ -1076,7 +1038,7 @@ public class HederaFile implements Serializable {
 	 * @return {@link List} of {@link HederaKeyPair}
 	 */
 	public List<HederaKeyPair> getNewKeys() {
-		logger.trace("getNewKeys");
+
 		return this.newKeys;
 	}
 
@@ -1086,7 +1048,7 @@ public class HederaFile implements Serializable {
 	 * @return {@link List} of {@link HederaKeyPair}
 	 */
 	public List<HederaKeyPair> getKeys() {
-		logger.trace("getKeys");
+
 		return this.keys;
 	}
 
@@ -1105,8 +1067,7 @@ public class HederaFile implements Serializable {
 	 */
 	public HederaTransactionResult create(long shardNum, long realmNum, byte[] contents,
 			HederaFileCreateDefaults defaults) throws Exception {
-		logger.trace("Start - create shardNum {}, realmNum {}, contents {}, defaults {}", shardNum, realmNum, contents,
-				defaults);
+
 		// setup defaults if necessary
 		if (defaults != null) {
 			this.expirationTime = Instant.now().plusSeconds(defaults.expirationTimeSeconds)
@@ -1162,7 +1123,7 @@ public class HederaFile implements Serializable {
 				this.txQueryDefaults.transactionValidDuration, this.txQueryDefaults.generateRecord, this.txQueryDefaults.memo,
 				sigsForTransaction);
 
-		logger.trace("End - create");
+
 		return transactionResult;
 	}
 
@@ -1173,7 +1134,7 @@ public class HederaFile implements Serializable {
 	 * @throws Exception 
 	 */
 	public HederaTransactionResult delete() throws Exception {
-		logger.trace("Start - delete");
+
 
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
@@ -1210,7 +1171,7 @@ public class HederaFile implements Serializable {
 				this.txQueryDefaults.transactionValidDuration, this.txQueryDefaults.generateRecord, this.txQueryDefaults.memo,
 				sigsForTransaction);
 
-		logger.trace("End - delete");
+
 		return transactionResult;
 	}
 
@@ -1238,7 +1199,7 @@ public class HederaFile implements Serializable {
 	 * @throws Exception 
 	 */
 	public HederaTransactionResult append(byte[] contents) throws Exception {
-		logger.trace("Start - append contents {}", contents);
+
 
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
@@ -1278,7 +1239,7 @@ public class HederaFile implements Serializable {
 				this.txQueryDefaults.transactionValidDuration, this.txQueryDefaults.generateRecord, this.txQueryDefaults.memo,
 				sigsForTransaction);
 
-		logger.trace("End - append");
+
 		return transactionResult;
 	}
 
@@ -1316,8 +1277,6 @@ public class HederaFile implements Serializable {
 	 */
 	public HederaTransactionResult update(long expirationTimeSeconds, int expirationTimeNanos, byte[] contents)
 			throws Exception {
-		logger.trace("Start - update expirationTimeSeconds {}, expirationTimeNanos {}, contents {}", expirationTimeSeconds,
-				expirationTimeNanos, contents);
 
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
@@ -1372,7 +1331,7 @@ public class HederaFile implements Serializable {
 				this.txQueryDefaults.transactionValidDuration, this.txQueryDefaults.generateRecord, this.txQueryDefaults.memo,
 				sigsForTransaction);
 
-		logger.trace("End - update");
+
 		return transactionResult;
 	}
 
@@ -1410,7 +1369,7 @@ public class HederaFile implements Serializable {
 	 * @throws Exception 
 	 */
 	public byte[] getContents() throws Exception {
-		logger.trace("Start - getContents");
+
 		
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
@@ -1423,10 +1382,10 @@ public class HederaFile implements Serializable {
 				this.node.fileGetContentsQueryFee);
 
 		if (this.getContentsAnswerOnly(transferTransaction)) {
-			logger.trace("End - getContents");
+
 			return this.contents;
 		} else {
-			logger.trace("End - getContents");
+
 			return null;
 		}
 	}
@@ -1461,7 +1420,7 @@ public class HederaFile implements Serializable {
 	 * @throws Exception 
 	 */
 	public boolean getInfo() throws Exception {
-		logger.trace("Start - getInfo");
+
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
@@ -1470,7 +1429,7 @@ public class HederaFile implements Serializable {
 		this.node = this.txQueryDefaults.node;
 
 		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults, this.node.fileGetInfoQueryFee);
-		logger.trace("End - getInfo");
+
 		return this.getInfoAnswerOnly(transferTransaction);
 	}
 

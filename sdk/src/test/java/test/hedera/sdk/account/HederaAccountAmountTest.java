@@ -2,7 +2,6 @@ package test.hedera.sdk.account;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.apache.log4j.BasicConfigurator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

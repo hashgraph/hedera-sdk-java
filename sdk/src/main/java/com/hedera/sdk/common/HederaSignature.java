@@ -38,8 +38,8 @@ public class HederaSignature implements Serializable {
 	 * Default constructor
 	 */
 	public HederaSignature() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
+
+
 	}
 	/**
 	 * Constructor from a {@link KeyType} and signature
@@ -47,41 +47,41 @@ public class HederaSignature implements Serializable {
 	 * @param signature a byte[] containing the signature
 	 */
 	public HederaSignature(KeyType signatureType, byte[] signature) {
-	   	logger.trace("Start - Object init signatureType {}, signature {}", signatureType, signature);
+
 		this.signatureType = signatureType;
 		if (signatureType == KeyType.CONTRACT) {
 			this.signature = new byte[0];
 		} else {
 			this.signature = signature.clone();
 		}
-	   	logger.trace("End - Object init");
+
 	}
 	/**
 	 * Constructor from a {@link HederaSignatureThreshold}
 	 * @param thresholdSignature the threshold signature to create the signature from 
 	 */
 	public HederaSignature(HederaSignatureThreshold thresholdSignature) {
-	   	logger.trace("Start - Object init signatureType THRESHOLD, thresholdSignature {}", thresholdSignature);
+
 		this.signatureType = KeyType.THRESHOLD;
 		this.thresholdSignature = thresholdSignature;
-	   	logger.trace("End - Object init");
+
 	}
 	/**
 	 * Constructor from a {@link HederaSignatureList}
 	 * @param signatureList the signature list to create the signature from 
 	 */
 	public HederaSignature(HederaSignatureList signatureList) {
-	   	logger.trace("Start - Object init signatureType SIGLIST, signatureList {}", signatureList);
+
 		this.signatureType = KeyType.LIST;
 		this.signatureList = signatureList;
-	   	logger.trace("End - Object init");
+
 	}
 	/**
 	 * Constructor from a {@link Signature} protobuf
 	 * @param signature signature to create the signature from 
 	 */
 	public HederaSignature(Signature signature) {
-	   	logger.trace("Start - Object init protobuf {}", signature);
+
 		// convert a protobuf payload into class data
 		switch (signature.getSignatureCase()) {
 		case CONTRACT:
@@ -113,14 +113,14 @@ public class HederaSignature implements Serializable {
 		default:
             throw new IllegalArgumentException("Signature type unrecognized, you may be using an old sdk.");			
 		}
-	   	logger.trace("End - Object init");
+
 	}
 	/**
 	 * Get the type of signature
 	 * @return {@link KeyType}
 	 */
 	public KeyType getSignatureType() {
-	   	logger.trace("getSignatureType");
+
 		return this.signatureType;
 	}
 	/** 
@@ -129,7 +129,7 @@ public class HederaSignature implements Serializable {
 	 * @return byte[]
 	 */
 	public byte[] getSignature() {
-	   	logger.trace("getSignature");
+
 		return this.signature;
 	}
 	/**
@@ -138,7 +138,7 @@ public class HederaSignature implements Serializable {
 	 * @return {@link HederaSignatureThreshold}
 	 */
 	public HederaSignatureThreshold getThresholdSignature() {
-	   	logger.trace("getThresholdSignature");
+
 		return this.thresholdSignature;
 	}
 	/**
@@ -147,7 +147,7 @@ public class HederaSignature implements Serializable {
 	 * @return {@link HederaSignatureList}
 	 */
 	public HederaSignatureList getSignatureList() {
-	   	logger.trace("getSignatureList");
+
 		return this.signatureList;
 	}
 	/**
@@ -155,7 +155,7 @@ public class HederaSignature implements Serializable {
 	 * @return {@link Signature}
 	 */
 	public Signature getProtobuf() {
-	   	logger.trace("Start - getProtobuf");
+
 		// Generates the protobuf payload for this class
 		Signature.Builder signatureProtobuf = Signature.newBuilder();
 		
@@ -197,7 +197,7 @@ public class HederaSignature implements Serializable {
 		case NOTSET:
             throw new IllegalArgumentException("Signature type not set, unable to generate data.");			
 		}
-	   	logger.trace("End - getProtobuf");
+
 		return signatureProtobuf.build();
 	}
 }

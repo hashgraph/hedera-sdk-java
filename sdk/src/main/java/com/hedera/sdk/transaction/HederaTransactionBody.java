@@ -69,8 +69,8 @@ public class HederaTransactionBody implements Serializable {
 	 * Default constructor
 	 */
 	public HederaTransactionBody() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
+
+
 	}
 	/**
 	 * Constructor from all necessary information
@@ -86,8 +86,7 @@ public class HederaTransactionBody implements Serializable {
 	public HederaTransactionBody(TransactionType transactionType, HederaTransactionID transactionID, HederaAccountID nodeAccount
 			, long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, String memo
 			, Object data) {
-	   	logger.trace("Start - Object init transactionType {}, transactionID {}, nodeAccount {}, transactionFee {}, transactionValidDuration {}, generateRecord {}, memo {}, data {}"
-	   			, transactionType, transactionID, nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo, data);
+
 		this.transactionType = transactionType;
 		this.transactionId = transactionID;
 		this.nodeAccount = nodeAccount;
@@ -96,14 +95,14 @@ public class HederaTransactionBody implements Serializable {
 		this.generateRecord = generateRecord;
 		this.memo = memo;
 		this.data = data;
-	   	logger.trace("End - Object init");
+
 	}
 	/**
 	 * returns the {@link TransactionBody} protobuf for this transaction
 	 * @return {@link TransactionBody}
 	 */
 	public TransactionBody getProtobuf() {
-	   	logger.trace("Start - getProtobuf");
+
 		// Generates the protobuf payload for this class
 		TransactionBody.Builder transactionBodyProtobuf = TransactionBody.newBuilder();
 		transactionBodyProtobuf.setTransactionID(this.transactionId.getProtobuf());
@@ -153,10 +152,10 @@ public class HederaTransactionBody implements Serializable {
 				transactionBodyProtobuf.setFileUpdate((FileUpdateTransactionBody)this.data);
 				break;
 			case NOTSET:
-	    	   	logger.trace("End - getProtobuf");
+
 	            throw new IllegalArgumentException("Transaction type not set. Unable to generate data.");			
 		}
-	   	logger.trace("End - getProtobuf");
+
 		
 		return transactionBodyProtobuf.build();
 	}

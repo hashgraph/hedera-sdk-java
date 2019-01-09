@@ -32,8 +32,6 @@ class ReferenceTest {
     // Instantiate a reference object, reference1, given a private key, for example
     byte[] seed = Hex.decode(seedHex);
     Reference reference1 = new Reference(seed);
-    System.out.println("WHat is the refence1 that comes out from here?");
-    System.out.println(reference1);
     // Return a recovery word list from this reference object
     List<String> wordList = reference1.toWordsList();
     String recoveryWords = "";
@@ -43,8 +41,6 @@ class ReferenceTest {
     }
     // Instantiate another reference object (reference2) from the recovery words from reference1
     Reference reference2 = new Reference(recoveryWords);
-    System.out.println("WHat is the refence2 that comes out from here?");
-    System.out.println(reference2);
     List<String> recoveryWordList = reference2.toWordsList();
     String recoveryWords2 = "";
     for (int i=0; i < recoveryWordList.size(); i++) {
@@ -175,6 +171,5 @@ class ReferenceTest {
     byte[] seed = Hex.decode(seedHex);
     Reference reference = new Reference(seed);
     byte[] result = reference.toBytes();
-    System.out.println(Arrays.toString(result));
   }
 }

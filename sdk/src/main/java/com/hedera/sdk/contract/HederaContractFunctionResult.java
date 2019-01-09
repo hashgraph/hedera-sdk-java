@@ -78,8 +78,8 @@ public class HederaContractFunctionResult implements Serializable {
 	 * Default constructor
 	 */
 	public HederaContractFunctionResult() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
+
+
 	}
 
 	/**
@@ -87,7 +87,7 @@ public class HederaContractFunctionResult implements Serializable {
 	 * @param contractFunctionResultProtobuf the result of a contract function execution
 	 */
 	public HederaContractFunctionResult(ContractFunctionResult contractFunctionResultProtobuf) {
-		logger.trace("Start - Object init in contractFunctionResultProtobuf {}", contractFunctionResultProtobuf);
+
 		this.contractID = new HederaContractID(contractFunctionResultProtobuf.getContractID());
 		this.contractCallResult = contractFunctionResultProtobuf.getContractCallResult().toByteArray();
 		this.errorMessage = contractFunctionResultProtobuf.getErrorMessage();
@@ -98,7 +98,7 @@ public class HederaContractFunctionResult implements Serializable {
 			HederaContractLogInfo contractLogInfo = new HederaContractLogInfo(contractFunctionResultProtobuf.getLogInfo(i));
 			this.contractLogInfo.add(contractLogInfo);
 		}
-		logger.trace("End - Object init");
+
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class HederaContractFunctionResult implements Serializable {
 	 * @return {@link ContractFunctionResult} 
 	 */
 	public ContractFunctionResult getProtobuf() {
-		logger.trace("Start - getProtobuf");
+
 	
 		ContractFunctionResult.Builder contractFunctionResultProtobuf = ContractFunctionResult.newBuilder();
 		
