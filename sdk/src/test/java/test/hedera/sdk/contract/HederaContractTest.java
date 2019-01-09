@@ -23,12 +23,10 @@ class HederaContractTest {
 	@Test
 	@DisplayName("TestHederaContract")
 	void test() {
-		HederaKeyPair testKey = new HederaKeyPair(KeyType.ED25519);
 		HederaKeyPair adminKey = new HederaKeyPair(KeyType.ED25519);
 		
 		HederaContract masterContract = new HederaContract();
 		masterContract.adminKey = adminKey;
-		masterContract.adminKeySignature = new HederaKeySignature(KeyType.ED25519, testKey.getPublicKey(), "signature".getBytes(), "keyDescription");
 		masterContract.amount = 10;
 		masterContract.autoRenewPeriod = new HederaDuration(60, 10);
 		masterContract.constructionParameters = "construct".getBytes();
@@ -41,10 +39,6 @@ class HederaContractTest {
 		
 		assertEquals(KeyType.ED25519, masterContract.adminKey.getKeyType());
 		assertArrayEquals(adminKey.getPublicKey(), masterContract.adminKey.getPublicKey());
-		assertEquals(KeyType.ED25519, masterContract.adminKeySignature.getKeyType());
-		assertArrayEquals(testKey.getPublicKey(), masterContract.adminKeySignature.getKey());
-		assertArrayEquals("signature".getBytes(), masterContract.adminKeySignature.getSignature());
-		assertEquals("keyDescription", masterContract.adminKeySignature.keyDescription);
 		assertEquals(10,  masterContract.amount);
 		assertEquals(60, masterContract.autoRenewPeriod.seconds);
 		assertEquals(10, masterContract.autoRenewPeriod.nanos);

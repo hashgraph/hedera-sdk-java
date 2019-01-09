@@ -11,7 +11,6 @@ import com.hedera.sdk.common.HederaDuration;
 import com.hedera.sdk.common.HederaFileID;
 import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeyList;
-import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.common.HederaRealmID;
 import com.hedera.sdk.common.HederaShardID;
 import com.hedera.sdk.common.HederaSignature;
@@ -68,25 +67,13 @@ public class HederaFile implements Serializable {
 	 */
 	public HederaTransactionAndQueryDefaults txQueryDefaults = new HederaTransactionAndQueryDefaults();
 	/**
-	 * new keys to manage the file with note: if newKeySignatures is set, it will take
-	 * priority over newKeys
+	 * new keys to manage the file with
 	 */
 	private List<HederaKeyPair> newKeys = new ArrayList<HederaKeyPair>();
 	/**
-	 * new keys and signatures to manage the file with note: newKeySignatures overrides
-	 * newKeys
-	 */
-	private List<HederaKeySignature> newKeySignatures = new ArrayList<HederaKeySignature>();
-	/**
-	 * keys to manage the file with note: if keySignatures is set, it will take
-	 * priority over keys
+	 * keys to manage the file with 
 	 */
 	private List<HederaKeyPair> keys = new ArrayList<HederaKeyPair>();
-	/**
-	 * keys and signatures to manage the file with note: keySignatures overrides
-	 * keys
-	 */
-	private List<HederaKeySignature> keySignatures = new ArrayList<HederaKeySignature>();
 	// the time at which this file should expire (unless updated before then to
 	// extend its life)
 	// value is defaulted to now + EXPIRATIONDEFAULT
@@ -119,16 +106,9 @@ public class HederaFile implements Serializable {
 	 */
 	public long fileNum = 0;
 	/**
-	 * The new realm administration key {@link HederaKeyPair} for the account note: if a
-	 * newRealmAdminKeySig is specified, this will be ignored
+	 * The new realm administration key {@link HederaKeyPair} for the file
 	 */
 	public HederaKeyPair newRealmAdminKey = null;
-	/**
-	 * The new realm administration key {@link HederaKeySignature} and signature
-	 * pair for the account note: this takes priority over a newRealmAdminKey
-	 */
-	public HederaKeySignature newRealmAdminKeySig = null;
-
 	/**
 	 * sets the object to use for communication with the node
 	 * 
@@ -591,11 +571,9 @@ public class HederaFile implements Serializable {
 
 		// duration defaults to 3 minutes if not set
 		HederaDuration transactionValidDuration = new HederaDuration();
-
-		// build a key signature so we can generate the body
-		HederaKeySignature fileKey = new HederaKeySignature(keyPair.getKeyType(), keyPair.getSecretKey(), new byte[0]);
-		// add the wACL keys to the file
-		this.addKeySignaturePair(fileKey);
+		
+		// add the wACL keys
+		this.addKey(keyPair);
 
 		// set file contents
 		this.contents = contents;
@@ -807,16 +785,12 @@ public class HederaFile implements Serializable {
 			this.expirationTime = timestamp.time;
 			this.deleted = fileInfo.getDeleted();
 			this.keys.clear();
-			this.keySignatures.clear();
 			
 			KeyList protoKeys = fileInfo.getKeys();
 
 			for (int i = 0; i < protoKeys.getKeysCount(); i++) {
 				HederaKeyPair key = new HederaKeyPair(protoKeys.getKeys(i));
 				this.addKey(key);
-				// add a key signature pair (signature is obviously blank)
-				HederaKeySignature keySig = new HederaKeySignature(key.getKeyType(), key.getPublicKey(), new byte[0], "");
-				this.addKeySignaturePair(keySig);
 			}
 		} else {
 			result = false;
@@ -900,9 +874,7 @@ public class HederaFile implements Serializable {
 			fileCreateTransaction.setExpirationTime(timestamp.getProtobuf());
 		}
 		
-		if (this.keySignatures.size() > 0) {
-			fileCreateTransaction.setKeys(Utilities.getProtoKeyFromKeySigList(this.keySignatures));
-		} else if (this.keys.size() > 0) {
+		if (this.keys.size() > 0) {
 			fileCreateTransaction.setKeys(Utilities.getProtoKeyList(this.keys));
 		}
 
@@ -919,9 +891,7 @@ public class HederaFile implements Serializable {
 			fileCreateTransaction.setRealmID(new HederaRealmID(this.shardNum, this.realmNum).getProtobuf());
 		}
 
-		if (this.newRealmAdminKeySig != null) {
-			fileCreateTransaction.setNewRealmAdminKey(newRealmAdminKeySig.getKeyProtobuf());
-		} else if (this.newRealmAdminKey != null) {
+		if (this.newRealmAdminKey != null) {
 			fileCreateTransaction.setNewRealmAdminKey(newRealmAdminKey.getProtobuf());
 		}
 
@@ -947,13 +917,7 @@ public class HederaFile implements Serializable {
 		}
 		HederaKeyList hederaKeyList = new HederaKeyList();
 
-		if (this.newKeySignatures.size() > 0) {
-			for (HederaKeySignature keySignature : this.newKeySignatures) {
-				HederaKeyPair hederaKey = new HederaKeyPair(keySignature.getKeyProtobuf());
-				hederaKeyList.addKey(hederaKey);
-			}
-			fileUpdateTransaction.setKeys(hederaKeyList.getProtobuf());
-		} else if (this.newKeys.size() > 0) {
+		if (this.newKeys.size() > 0) {
 			for (HederaKeyPair key : this.newKeys) {
 				hederaKeyList.addKey(key);
 			}
@@ -1036,17 +1000,6 @@ public class HederaFile implements Serializable {
 	}
 
 	/**
-	 * Adds a {@link HederaKeySignature} to the new list
-	 * 
-	 * @param keySigPair the key signature pair to add to the list
-	 */
-	public void addNewKeySignaturePair(HederaKeySignature keySigPair) {
-		logger.trace("Start - addNewKeySignaturePair keySigPair {}", keySigPair);
-		this.newKeySignatures.add(keySigPair);
-		logger.trace("End - addNewKeySignaturePair");
-	}
-
-	/**
 	 * Adds a {@link HederaKeyPair} to the list of new keys
 	 * 
 	 * @param key the key to add to the list
@@ -1055,17 +1008,6 @@ public class HederaFile implements Serializable {
 
 		this.newKeys.add(key);
 
-	}
-
-	/**
-	 * Adds a {@link HederaKeySignature} to the list
-	 * 
-	 * @param keySigPair the key signature pair to add to the list
-	 */
-	public void addKeySignaturePair(HederaKeySignature keySigPair) {
-		logger.trace("Start - addKeySignaturePair keySigPair {}", keySigPair);
-		this.keySignatures.add(keySigPair);
-		logger.trace("End - addKeySignaturePair");
 	}
 
 	/**
@@ -1080,17 +1022,6 @@ public class HederaFile implements Serializable {
 	}
 
 	/**
-	 * Deletes a {@link HederaKeySignature} from the list
-	 * 
-	 * @param keySigPair the key signature pair to remove
-	 * @return {@link Boolean} true if successful
-	 */
-	public boolean deleteKeySignaturePair(HederaKeySignature keySigPair) {
-		logger.trace("deleteKeySignaturePair {}", keySigPair);
-		return this.keySignatures.remove(keySigPair);
-	}
-
-	/**
 	 * Deletes a {@link HederaKeyPair} from the list
 	 * 
 	 * @param key the key to remove
@@ -1099,27 +1030,6 @@ public class HederaFile implements Serializable {
 	public boolean deleteNewKey(HederaKeyPair key) {
 
 		return this.newKeys.remove(key);
-	}
-
-	/**
-	 * Deletes a {@link HederaKeySignature} from the list of new key signatures
-	 * 
-	 * @param keySigPair the key signature pair to remove
-	 * @return {@link Boolean} true if successful
-	 */
-	public boolean deleteNewKeySignaturePair(HederaKeySignature keySigPair) {
-		logger.trace("deleteNewKeySignaturePair {}", keySigPair);
-		return this.newKeySignatures.remove(keySigPair);
-	}
-
-	/**
-	 * returns the list of {@link HederaKeySignature}
-	 * 
-	 * @return {@link List} of {@link HederaKeySignature}
-	 */
-	public List<HederaKeySignature> getNewKeySignatures() {
-		logger.trace("getNewKeySignatures");
-		return this.newKeySignatures;
 	}
 
 	/**
@@ -1140,16 +1050,6 @@ public class HederaFile implements Serializable {
 	public List<HederaKeyPair> getKeys() {
 
 		return this.keys;
-	}
-
-	/**
-	 * returns the list of {@link HederaKeySignature}
-	 * 
-	 * @return {@link List} of {@link HederaKeySignature}
-	 */
-	public List<HederaKeySignature> getKeySignatures() {
-		logger.trace("getKeySignatures");
-		return this.keySignatures;
 	}
 
 	// SIMPLIFICATION
@@ -1196,13 +1096,9 @@ public class HederaFile implements Serializable {
 		// create a transaction ID (starts now with accountID of the paying account id)
 		this.hederaTransactionID = new HederaTransactionID(this.txQueryDefaults.payingAccountID);
 
-		// we need to associate a key to the file for acl
-		if (this.txQueryDefaults.fileWacl == null) {
-			this.txQueryDefaults.fileWacl = txQueryDefaults.payingKeyPair;
+		if (this.txQueryDefaults.fileWacl != null) {
+			this.addKey(this.txQueryDefaults.fileWacl);
 		}
-		HederaKeySignature fileKey = new HederaKeySignature(this.txQueryDefaults.fileWacl.getKeyType(),
-				this.txQueryDefaults.fileWacl.getPublicKeyEncoded(), new byte[0]);
-		this.addKeySignaturePair(fileKey);
 		
 		// get the body for the transaction so we can sign it
 		TransactionBody createBody = this.bodyToSignForCreate(hederaTransactionID, this.node.getAccountID(),
@@ -1211,28 +1107,17 @@ public class HederaFile implements Serializable {
 
 		// Signatures
 		HederaSignatureList sigsForTransaction = new HederaSignatureList();
-		byte[] signedBody;
-		HederaSignature signature = new HederaSignature();
-		
-		// PAYING ACCOUNT
-		// get the signature for the body
-		signedBody = this.txQueryDefaults.payingKeyPair.signMessage(createBody.toByteArray());
-		// create a Hedera Signature for it
-		signature = new HederaSignature(this.txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
-		// put the signatures in a signature list
-		sigsForTransaction.addSignature(signature);
-
+		//paying signature
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getSignature(createBody.toByteArray()));
+		// new realm if set
+		if (this.newRealmAdminKey != null) {
+			sigsForTransaction.addSignature(this.newRealmAdminKey.getSignature(createBody.toByteArray()));
+		}
 		// FILE WACL
-		// get the signature for the body
-		signedBody = this.txQueryDefaults.fileWacl.signMessage(createBody.toByteArray());
-		// create a Hedera Signature for it
-		signature = new HederaSignature(this.txQueryDefaults.fileWacl.getKeyType(), signedBody);
-		
-		HederaSignatureList sigList = new HederaSignatureList();
-		sigList.addSignature(signature);
-		HederaSignature sigForList = new HederaSignature(sigList);
-		sigsForTransaction.addSignature(sigForList);
-		
+		if (this.txQueryDefaults.fileWacl != null) {
+			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getSignature(createBody.toByteArray()));
+		}
+
 		// create the file
 		transactionResult = this.create(hederaTransactionID, this.node.getAccountID(), this.node.fileCreateTransactionFee,
 				this.txQueryDefaults.transactionValidDuration, this.txQueryDefaults.generateRecord, this.txQueryDefaults.memo,
@@ -1274,31 +1159,13 @@ public class HederaFile implements Serializable {
 
 		// Signatures
 		HederaSignatureList sigsForTransaction = new HederaSignatureList();
-		byte[] signedBody;
-		HederaSignature signature = new HederaSignature();
-		
-		// PAYING ACCOUNT
-		// get the signature for the body
-		signedBody = this.txQueryDefaults.payingKeyPair.signMessage(deleteBody.toByteArray());
-		// create a Hedera Signature for it
-		signature = new HederaSignature(this.txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
-		// put the signatures in a signature list
-		sigsForTransaction.addSignature(signature);
-
+		//paying signature
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getSignature(deleteBody.toByteArray()));
 		// FILE WACL
-		if (this.txQueryDefaults.fileWacl == null) {
-			this.txQueryDefaults.fileWacl = txQueryDefaults.payingKeyPair;
+		if (this.txQueryDefaults.fileWacl != null) {
+			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getSignature(deleteBody.toByteArray()));
 		}
-		// get the signature for the body
-		signedBody = this.txQueryDefaults.fileWacl.signMessage(deleteBody.toByteArray());
-		// create a Hedera Signature for it
-		signature = new HederaSignature(this.txQueryDefaults.fileWacl.getKeyType(), signedBody);
 		
-		HederaSignatureList sigList = new HederaSignatureList();
-		sigList.addSignature(signature);
-		HederaSignature sigForList = new HederaSignature(sigList);
-		sigsForTransaction.addSignature(sigForList);
-
 		// delete the file
 		transactionResult = this.delete(hederaTransactionID, this.node.getAccountID(), this.node.fileDeleteTransactionFee,
 				this.txQueryDefaults.transactionValidDuration, this.txQueryDefaults.generateRecord, this.txQueryDefaults.memo,
@@ -1360,30 +1227,12 @@ public class HederaFile implements Serializable {
 
 		// Signatures
 		HederaSignatureList sigsForTransaction = new HederaSignatureList();
-		byte[] signedBody;
-		HederaSignature signature = new HederaSignature();
-		
-		// PAYING ACCOUNT
-		// get the signature for the body
-		signedBody = this.txQueryDefaults.payingKeyPair.signMessage(appendBody.toByteArray());
-		// create a Hedera Signature for it
-		signature = new HederaSignature(this.txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
-		// put the signatures in a signature list
-		sigsForTransaction.addSignature(signature);
-
+		//paying signature
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getSignature(appendBody.toByteArray()));
 		// FILE WACL
-		// get the signature for the body
-		if (this.txQueryDefaults.fileWacl == null) {
-			this.txQueryDefaults.fileWacl = txQueryDefaults.payingKeyPair;
+		if (this.txQueryDefaults.fileWacl != null) {
+			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getSignature(appendBody.toByteArray()));
 		}
-		signedBody = this.txQueryDefaults.fileWacl.signMessage(appendBody.toByteArray());
-		// create a Hedera Signature for it
-		signature = new HederaSignature(this.txQueryDefaults.fileWacl.getKeyType(), signedBody);
-		
-		HederaSignatureList sigList = new HederaSignatureList();
-		sigList.addSignature(signature);
-		HederaSignature sigForList = new HederaSignature(sigList);
-		sigsForTransaction.addSignature(sigForList);
 		
 		// add to the file
 		transactionResult = this.append(hederaTransactionID, this.node.getAccountID(), this.node.fileAppendTransactionFee,
@@ -1470,30 +1319,12 @@ public class HederaFile implements Serializable {
 
 		// Signatures
 		HederaSignatureList sigsForTransaction = new HederaSignatureList();
-		byte[] signedBody;
-		HederaSignature signature = new HederaSignature();
-		
-		// PAYING ACCOUNT
-		// get the signature for the body
-		signedBody = this.txQueryDefaults.payingKeyPair.signMessage(updateBody.toByteArray());
-		// create a Hedera Signature for it
-		signature = new HederaSignature(this.txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
-		// put the signatures in a signature list
-		sigsForTransaction.addSignature(signature);
-
+		//paying signature
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getSignature(updateBody.toByteArray()));
 		// FILE WACL
-		// get the signature for the body
-		if (this.txQueryDefaults.fileWacl == null) {
-			this.txQueryDefaults.fileWacl = txQueryDefaults.payingKeyPair;
+		if (this.txQueryDefaults.fileWacl != null) {
+			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getSignature(updateBody.toByteArray()));
 		}
-		signedBody = this.txQueryDefaults.fileWacl.signMessage(updateBody.toByteArray());
-		// create a Hedera Signature for it
-		signature = new HederaSignature(this.txQueryDefaults.fileWacl.getKeyType(), signedBody);
-		
-		HederaSignatureList sigList = new HederaSignatureList();
-		sigList.addSignature(signature);
-		HederaSignature sigForList = new HederaSignature(sigList);
-		sigsForTransaction.addSignature(sigForList);
 		
 		// update the file
 		transactionResult = this.update(hederaTransactionID, this.node.getAccountID(), this.node.fileUpdateTransactionFee,

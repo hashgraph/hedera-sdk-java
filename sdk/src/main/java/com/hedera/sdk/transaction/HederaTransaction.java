@@ -5,8 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.account.HederaAccountAmount;
-import com.hedera.sdk.common.HederaKeySignature;
-import com.hedera.sdk.common.HederaKeySignatureList;
 import com.hedera.sdk.common.HederaTransactionRecord;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.node.HederaNode;
@@ -44,11 +42,6 @@ public class HederaTransaction implements Serializable {
 	 * note: if keySignatureList is not null, this signatureList will be ignored, keySignatureList takes priority
 	 */
 	public HederaSignatureList signatureList = null;
-	/**
-	 * get or set the keys and signatures for this transaction as a {@link HederaKeySignatureList}
-	 * note: this keySignatureList takes priority over signatureList
-	 */
-	public HederaKeySignatureList keySignatureList = null;
 
 	/**
 	 * sets the node object to use for communication with the node
@@ -96,22 +89,6 @@ public class HederaTransaction implements Serializable {
 
 	}
 	/**
-	 * Constructs from a {@link HederaTransactionBody} body and {@link HederaKeySignatureList} keys and signatures
-	 * @param body {@link HederaTransactionBody}
-	 * @param sigs {@link HederaKeySignatureList}
-	 */
-	public HederaTransaction(HederaTransactionBody body, HederaKeySignatureList sigs) {
-	   	logger.trace("Start - Object init body {}, sigs {}",body, sigs);
-		this.body = body;
-		this.keySignatureList = sigs;
-		this.signatureList = new HederaSignatureList();
-		for (HederaKeySignature keySig : sigs.keySigPairs ) {
-			HederaSignature oneSig = new HederaSignature(keySig.getSignatureProtobuf());
-			this.signatureList.addSignature(oneSig);
-		}
-	   	logger.trace("End - Object init");
-	}
-	/**
 	 * Constructs from a {@link HederaTransactionBody} body and {@link HederaSignatureList} signatures
 	 * @param body {@link HederaTransactionBody}
 	 * @param sigs {@link HederaSignatureList}
@@ -120,13 +97,6 @@ public class HederaTransaction implements Serializable {
 
 		this.body = body;
 		this.signatureList = sigs;
-<<<<<<< HEAD:sdk/src/main/java/com/hedera/sdk/transaction/HederaTransaction.java
-		// only signatures available here, can't populate keys
-		this.keySignatureList = null;
-	   	logger.trace("End - Object init");
-=======
-
->>>>>>> 959a7d6... Removed trace logging. Updated pom.xml to ignore errors on javadocs:src/main/java/com/hedera/sdk/transaction/HederaTransaction.java
 	}
 	/**
 	 * returns the protobuf for this transaction
@@ -139,17 +109,7 @@ public class HederaTransaction implements Serializable {
 		
 		transactionProtobuf.setBody(this.body.getProtobuf());
 		// if we have key signature pairs, use these\
-<<<<<<< HEAD:sdk/src/main/java/com/hedera/sdk/transaction/HederaTransaction.java
-		if (keySignatureList != null) {
-			transactionProtobuf.setSigs(this.keySignatureList.getProtobufSignatures());
-		} else {
-			transactionProtobuf.setSigs(this.signatureList.getProtobuf());
-		}
-	   	logger.trace("End - getProtobuf");
-=======
 		transactionProtobuf.setSigs(this.signatureList.getProtobuf());
-
->>>>>>> 959a7d6... Removed trace logging. Updated pom.xml to ignore errors on javadocs:src/main/java/com/hedera/sdk/transaction/HederaTransaction.java
 		
 		return transactionProtobuf.build();
 	}
@@ -162,17 +122,6 @@ public class HederaTransaction implements Serializable {
 		this.signatureList.addSignature(signature);
 		// can't do anything to keysignatureList here, we don't have a key
 
-	}
-	/**
-	 * Adds a signature to the list from a {@link HederaKeySignature}
-	 * @param keySignaturePair {@link HederaKeySignature}
-	 */
-	public void addSignature(HederaKeySignature keySignaturePair) {
-	   	logger.trace("Start - addSignature keySignaturePair {}", keySignaturePair);
-		this.keySignatureList.addKeySignaturePair(keySignaturePair);
-		HederaSignature oneSig = new HederaSignature(keySignaturePair.getSignatureProtobuf());
-		this.signatureList.addSignature(oneSig);
-	   	logger.trace("End - addSignature");
 	}
 
 	/**
@@ -390,39 +339,10 @@ public class HederaTransaction implements Serializable {
 				, txQueryDefaults.memo
 				, accountAmounts);
 
-<<<<<<< HEAD:sdk/src/main/java/com/hedera/sdk/transaction/HederaTransaction.java
-//		// get the signature for the body
-//		byte[] signedBody = txQueryDefaults.payingKeyPair.signMessage(transferBody.toByteArray());
-//
-//		// create a Hedera Signature for it
-//		HederaSignature payingSignature = new HederaSignature(txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
-//		// put the signature in a signature list
-//		HederaSignatureList sigList = new HederaSignatureList();
-//		sigList.addSignature(payingSignature);
-//		// put the list in a signature
-//		HederaSignature sigForList = new HederaSignature(sigList);
-//		
-//		// put the signatures in a signature list
-//		HederaSignatureList sigsForTransaction = new HederaSignatureList();
-//		sigsForTransaction.addSignature(sigForList);
-
-<<<<<<< HEAD:sdk/src/main/java/com/hedera/sdk/transaction/HederaTransaction.java
-		// create a Hedera Signature for it
-		HederaSignature payingSignature = new HederaSignature(txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
-		// put the signatures in a signature list
-		HederaKeySignatureList sigsForTransaction = new HederaKeySignatureList();
-		sigsForTransaction.addKeySignaturePair(txQueryDefaults.payingKeyPair.getKeyType(), txQueryDefaults.payingKeyPair.getPublicKey(), payingSignature.getSignature());
-		// add a second for good measure
-		sigsForTransaction.addKeySignaturePair(txQueryDefaults.payingKeyPair.getKeyType(), txQueryDefaults.payingKeyPair.getPublicKey(), payingSignature.getSignature());
-=======
-		// new self-generating signatures
-=======
->>>>>>> 959a7d6... Removed trace logging. Updated pom.xml to ignore errors on javadocs:src/main/java/com/hedera/sdk/transaction/HederaTransaction.java
 		HederaSignatureList sigsForTransaction = new HederaSignatureList();
 		//paying signature
 		sigsForTransaction.addSignature(txQueryDefaults.payingKeyPair.getSignature(transferBody.toByteArray()));
 		sigsForTransaction.addSignature(txQueryDefaults.payingKeyPair.getSignature(transferBody.toByteArray()));
->>>>>>> 2582df2... AccountDemo works except for claims.:src/main/java/com/hedera/sdk/transaction/HederaTransaction.java
 
 		this.body = new HederaTransactionBody(
 				TransactionType.CRYPTOTRANSFER
@@ -435,12 +355,6 @@ public class HederaTransaction implements Serializable {
 				, account.getTransferTransactionBody(accountAmounts));
 		
 		// add the signatures
-<<<<<<< HEAD:sdk/src/main/java/com/hedera/sdk/transaction/HederaTransaction.java
-		this.keySignatureList = sigsForTransaction;
-	   	logger.trace("End - init");
-=======
 		this.signatureList = sigsForTransaction;
-
->>>>>>> 959a7d6... Removed trace logging. Updated pom.xml to ignore errors on javadocs:src/main/java/com/hedera/sdk/transaction/HederaTransaction.java
 	}
 }

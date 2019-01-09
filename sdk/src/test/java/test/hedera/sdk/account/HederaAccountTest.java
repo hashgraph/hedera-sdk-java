@@ -33,10 +33,8 @@ class HederaAccountTest {
 
 		assertNull(account.hederaTransactionID);
 		assertNull(account.newRealmAdminKey);
-		assertNull(account.newRealmAdminKeySig);
 
 		assertNull(account.accountKey);
-		assertNull(account.accountKeySig);
 
 		assertEquals(0, account.initialBalance);
 
@@ -94,18 +92,6 @@ class HederaAccountTest {
 		assertEquals(1, account.getKeys().size());
 		account.deleteKey(key2);
 		assertEquals(0, account.getKeys().size());
-		
-		HederaKeySignature keySig = new HederaKeySignature(KeyType.ED25519, "key".getBytes(), "sig".getBytes());
-		HederaKeySignature keySig2 = new HederaKeySignature(KeyType.ED25519, "key2".getBytes(), "sig2".getBytes());
-		
-		account.addKeySignaturePair(keySig);
-		account.addKeySignaturePair(keySig2);
-		assertEquals(2, account.getKeySignatures().size());
-		account.deleteKeySignaturePair(keySig);
-		assertEquals(1, account.getKeySignatures().size());
-		account.deleteKeySignaturePair(keySig2);
-		assertEquals(0, account.getKeySignatures().size());
-
 	}
 
 	@Test

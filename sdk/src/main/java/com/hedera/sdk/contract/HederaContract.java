@@ -13,14 +13,11 @@ import com.hedera.sdk.common.HederaContractID;
 import com.hedera.sdk.common.HederaDuration;
 import com.hedera.sdk.common.HederaFileID;
 import com.hedera.sdk.common.HederaKeyPair;
-import com.hedera.sdk.common.HederaKeySignature;
-import com.hedera.sdk.common.HederaKeySignatureList;
 import com.hedera.sdk.common.HederaRealmID;
 import com.hedera.sdk.common.HederaTransactionRecord;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.node.HederaNode;
 import com.hedera.sdk.common.HederaShardID;
-import com.hedera.sdk.common.HederaSignature;
 import com.hedera.sdk.common.HederaSignatureList;
 import com.hedera.sdk.common.HederaTimeStamp;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
@@ -58,7 +55,6 @@ public class HederaContract implements Serializable {
 	private ResponseCodeEnum precheckResult = ResponseCodeEnum.UNKNOWN;
 	private byte[] stateProof = new byte[0];
 	// keys for signatures
-	private List<HederaKeySignature> keySignature = new ArrayList<HederaKeySignature>();
 	private List<HederaKeyPair> keys = new ArrayList<HederaKeyPair>();
 	private String solidityContractAccountID = "";
 	private long storage = 0;
@@ -106,12 +102,6 @@ public class HederaContract implements Serializable {
 	 */
 	public HederaKeyPair newRealmAdminKey = null;
 	/**
-	 * The {@link HederaKeySignature} for the realm's administration key
-	 * initially null
-	 * if realmID is null, then this the admin key for the new realm that will be created
-	 */
-	public HederaKeySignature newRealmAdminKeySig = null;
-	/**
 	 * The {@link HederaKeyPair} representing the contract's administration key
 	 * initially null
 	 * the state of the instance and its fields can be modified arbitrarily if this key signs a transaction to modify it. 
@@ -120,15 +110,6 @@ public class HederaContract implements Serializable {
 	 * authorize changing the admin keys, so there can never be any admin keys for that instance.
 	 */
 	public HederaKeyPair adminKey = null;
-	/**
-	 * The {@link HederaKeySignature} for the contract's administration key
-	 * initially null
-	 * the state of the instance and its fields can be modified arbitrarily if this key signs a transaction to modify it. 
-	 * If this is null, then such modifications are not possible, and there is no administrator that can override the normal 
-	 * operation of this smart contract instance. Note that if it is created with no admin keys, then there is no administrator to 
-	 * authorize changing the admin keys, so there can never be any admin keys for that instance.
-	 */
-	public HederaKeySignature adminKeySignature = null;
 	/**
 	 * the gas to pay to run a smart contract or smart contract function
 	 */
@@ -435,9 +416,7 @@ public class HederaContract implements Serializable {
 		
 		ContractCreateTransactionBody.Builder transactionBody = ContractCreateTransactionBody.newBuilder();
 
-		if (this.adminKeySignature != null) {
-			transactionBody.setAdminKey(adminKeySignature.getKeyProtobuf());
-		} else if (this.adminKey != null) {
+		if (this.adminKey != null) {
 			transactionBody.setAdminKey(adminKey.getProtobuf());
 		}
 		transactionBody.setAutoRenewPeriod(this.autoRenewPeriod.getProtobuf());
@@ -476,9 +455,7 @@ public class HederaContract implements Serializable {
 	 */
 	public HederaTransactionResult update(HederaTransactionID transactionID, HederaAccountID nodeAccount
 			, long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord
-			, String memo, HederaKeySignatureList sigsForTransaction) throws InterruptedException {
-	   	logger.trace("Start - update transactionID {}, nodeAccounttransactionFee {}, transactionValidDuration {}, generateRecord {}, memo {}, sigsForTransaction {}"
-	   			, transactionID, nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo, sigsForTransaction);
+			, String memo, HederaSignatureList sigsForTransaction) throws InterruptedException {
 		
 		// build the body
 		HederaTransaction transaction = new HederaTransaction();
@@ -492,7 +469,7 @@ public class HederaContract implements Serializable {
 			, memo
 			, this.getUpdateTransactionBody());
 		// add the signatures
-		transaction.keySignatureList = sigsForTransaction;
+		transaction.signatureList = sigsForTransaction;
 		
 		// issue the transaction
 		Utilities.throwIfNull("Node", this.node);
@@ -541,9 +518,7 @@ public class HederaContract implements Serializable {
 
 		transactionBody.setContractID(new HederaContractID(this.shardNum, this.realmNum, this.contractNum).getProtobuf());
 
-		if (this.adminKeySignature != null) {
-			transactionBody.setAdminKey(adminKeySignature.getKeyProtobuf());
-		} else if (this.adminKey != null) {
+		if (this.adminKey != null) {
 			transactionBody.setAdminKey(adminKey.getProtobuf());
 		}
 		if (this.autoRenewPeriod != null) {
@@ -726,10 +701,8 @@ public class HederaContract implements Serializable {
 			
 			if (info.hasAdminKey()) {
 				this.adminKey = new HederaKeyPair(info.getAdminKey());
-				this.adminKeySignature = new HederaKeySignature(this.adminKey.getKeyType(), this.adminKey.getPublicKeyEncoded(), new byte[0],"");
 			} else {
 				this.adminKey = null;
-				this.adminKeySignature = null;
 			}
 			
 			this.autoRenewPeriod = new HederaDuration(info.getAutoRenewPeriod());
@@ -912,16 +885,6 @@ public class HederaContract implements Serializable {
 	}
 
 	/**
-	 * Adds keys and signature pairs {@link HederaKeySignature} to this object
-	 * @param keySigPair the key signature pair to add
-	 */
-	public void addKeySignaturePair(HederaKeySignature keySigPair) {
-	  logger.trace("Start - addKey keySigPair {}", keySigPair);
-		this.keySignature.add(keySigPair);
-	  logger.trace("End - addKey");
-	}
-
-	/**
 	 * Deletes a {@link HederaKeyPair} from this object
 	 * @param key the key to delete
 	 * @return true if successfully deleted
@@ -932,31 +895,12 @@ public class HederaContract implements Serializable {
 	}
 
 	/**
-	 * Deletes a {@link HederaKeySignature} from this object
-	 * @param keySigPair the key signature pair to delete
-	 * @return true if successfully deleted
-	 */
-	public boolean deleteKeySignaturePair(HederaKeySignature keySigPair) {
-	  logger.trace("deleteKeySignaturePair {}", keySigPair);
-		return this.keySignature.remove(keySigPair);
-	}
-
-	/**
 	 * Gets a list of {@link HederaKeyPair}
 	 * @return List of {@link HederaKeyPair}
 	 */
 	public List<HederaKeyPair> getKeys() {
 
 		return this.keys;
-	}
-
-	/**
-	 * Gets a list of {@link HederaKeySignature}
-	 * @return List of {@link HederaKeySignature}
-	 */
-	public List<HederaKeySignature> getKeySignatures() {
-	  logger.trace("getKeySignatures");
-		return this.keySignature;
 	}
 
 	/**
@@ -1009,29 +953,17 @@ public class HederaContract implements Serializable {
 			, this.txQueryDefaults.generateRecord
 			, this.txQueryDefaults.memo);
 
-		// Signatures
 		HederaSignatureList sigsForTransaction = new HederaSignatureList();
-		byte[] signedBody;
-		HederaSignature signature = new HederaSignature();
-		
-		// PAYING ACCOUNT
-		// get the signature for the body
-		signedBody = this.txQueryDefaults.payingKeyPair.signMessage(createBody.toByteArray());
-		// create a Hedera Signature for it
-		signature = new HederaSignature(this.txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
-		// put the signatures in a signature list
-		sigsForTransaction.addSignature(signature);
-
-		// CONTRACT
-		// get the signature for the body
-		signedBody = this.txQueryDefaults.payingKeyPair.signMessage(createBody.toByteArray());
-		// create a Hedera Signature for it
-		signature = new HederaSignature(this.txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
-		
-		HederaSignatureList sigList = new HederaSignatureList();
-		sigList.addSignature(signature);
-		HederaSignature sigForList = new HederaSignature(sigList);
-		sigsForTransaction.addSignature(sigForList);
+		//paying signature
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getSignature(createBody.toByteArray()));
+		// new realm admin key
+		if (this.newRealmAdminKey != null) {
+			sigsForTransaction.addSignature(this.newRealmAdminKey.getSignature(createBody.toByteArray()));
+		}
+		// admin key 
+		if (this.adminKey != null) {
+			sigsForTransaction.addSignature(this.adminKey.getSignature(createBody.toByteArray()));
+		}
 		
 		// create the contract
 		transactionResult = this.create(
@@ -1078,7 +1010,7 @@ public class HederaContract implements Serializable {
 		this.hederaTransactionID = new HederaTransactionID(this.txQueryDefaults.payingAccountID);
 
 		// get the body for the transaction so we can sign it
-		TransactionBody createBody = this.bodyToSignForUpdate(
+		TransactionBody updateBody = this.bodyToSignForUpdate(
 			this.hederaTransactionID
 			, this.node.getAccountID()
 			, this.node.contractUpdateTransactionFee
@@ -1086,14 +1018,15 @@ public class HederaContract implements Serializable {
 			, this.txQueryDefaults.generateRecord
 			, this.txQueryDefaults.memo);
 
-		// get the signature for the body
-		byte[] signedBody = this.txQueryDefaults.payingKeyPair.signMessage(createBody.toByteArray());
-		// create a Hedera Signature for it
-		HederaSignature payingSignature = new HederaSignature(this.txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
-		// put the signatures in a signature list
-		HederaKeySignatureList sigsForTransaction = new HederaKeySignatureList();
-		sigsForTransaction.addKeySignaturePair(this.txQueryDefaults.payingKeyPair.getKeyType(), this.txQueryDefaults.payingKeyPair.getPublicKeyEncoded(), payingSignature.getSignature());
-		// create the file
+		HederaSignatureList sigsForTransaction = new HederaSignatureList();
+		//paying signature
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getSignature(updateBody.toByteArray()));
+		// admin key for change
+		if (this.adminKey != null) {
+			sigsForTransaction.addSignature(this.adminKey.getSignature(updateBody.toByteArray()));
+		}
+
+		// update the contract
 		transactionResult = this.update(
 			this.hederaTransactionID
 			, this.node.getAccountID()
@@ -1166,29 +1099,9 @@ public class HederaContract implements Serializable {
 			, this.txQueryDefaults.generateRecord
 			, this.txQueryDefaults.memo);
 
-		// Signatures
 		HederaSignatureList sigsForTransaction = new HederaSignatureList();
-		byte[] signedBody;
-		HederaSignature signature = new HederaSignature();
-		
-		// PAYING ACCOUNT
-		// get the signature for the body
-		signedBody = this.txQueryDefaults.payingKeyPair.signMessage(callBody.toByteArray());
-		// create a Hedera Signature for it
-		signature = new HederaSignature(this.txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
-		// put the signatures in a signature list
-		sigsForTransaction.addSignature(signature);
-
-		// CONTRACT
-		// get the signature for the body
-		signedBody = this.txQueryDefaults.payingKeyPair.signMessage(callBody.toByteArray());
-		// create a Hedera Signature for it
-		signature = new HederaSignature(this.txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
-		
-		HederaSignatureList sigList = new HederaSignatureList();
-		sigList.addSignature(signature);
-		HederaSignature sigForList = new HederaSignature(sigList);
-		sigsForTransaction.addSignature(sigForList);
+		//paying signature
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getSignature(callBody.toByteArray()));
 		
 		// call the contract function
 		transactionResult = this.call(
