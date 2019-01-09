@@ -106,6 +106,8 @@ public final class DemoAccount {
 	    		if (getTXRecord) {
 	    			  HederaTransactionID txID = newAccount.hederaTransactionID;
 	    			  HederaTransactionRecord txRecord = new HederaTransactionRecord(txID, newAccount.txQueryDefaults.node.transactionGetRecordsQueryFee, newAccount.txQueryDefaults);
+	    			  // stop getting records unnecessarily
+	    			  getTXRecord = false;
     			}
 	    		
 		    	if (send) {
@@ -172,6 +174,20 @@ public final class DemoAccount {
 		    			logger.info("*******************************************");
 		    		}
 		    	}
+		    	if (doAddClaim) {
+		    		HederaKeyPair claimKeyPair = new HederaKeyPair(KeyType.ED25519);
+		    		HederaKeyPair claimKey = new HederaKeyPair(claimKeyPair.getKeyType(), claimKeyPair.getPublicKey());
+		
+					// Create a new claim object
+					HederaClaim claim;
+					claim = new HederaClaim(newAccount.shardNum, newAccount.realmNum, newAccount.accountNum, "ClaimHash".getBytes("UTF-8"));
+					// add a key to the claim
+					claim.addKey(claimKey);
+			        // add a claim
+			        if (AccountAddClaim.addClaim(newAccount,claim, claimKeyPair)) {
+			        	
+			        }
+		        }
 	    	}
     	}
 	}
