@@ -33,7 +33,7 @@ public final class DemoAccount {
     	send = true;
     	getInfo = true;
     	update = true;
-    	doAddClaim = false; //-- not implemented ?
+//    	doAddClaim = true; //-- not implemented ?
     	getTXRecord = true;
 		
     	/* 
@@ -106,6 +106,8 @@ public final class DemoAccount {
 	    		if (getTXRecord) {
 	    			  HederaTransactionID txID = newAccount.hederaTransactionID;
 	    			  HederaTransactionRecord txRecord = new HederaTransactionRecord(txID, newAccount.txQueryDefaults.node.transactionGetRecordsQueryFee, newAccount.txQueryDefaults);
+	    			  // stop getting records unnecessarily
+	    			  getTXRecord = false;
     			}
 	    		
 		    	if (send) {
@@ -172,35 +174,25 @@ public final class DemoAccount {
 		    			logger.info("*******************************************");
 		    		}
 		    	}
+		    	if (doAddClaim) {
+		    		HederaKeyPair claimKeyPair = new HederaKeyPair(KeyType.ED25519);
+		    		HederaKeyPair claimKey = new HederaKeyPair(claimKeyPair.getKeyType(), claimKeyPair.getPublicKey());
+		
+					// Create a new claim object
+					HederaClaim claim;
+					claim = new HederaClaim(newAccount.shardNum, newAccount.realmNum, newAccount.accountNum, "ClaimHash".getBytes("UTF-8"));
+					// add a key to the claim
+					claim.addKey(claimKey);
+			        // add a claim
+			        if (AccountAddClaim.addClaim(newAccount,claim, claimKeyPair)) {
+			        	
+			        }
+		        }
 	    	}
     	}
     	
     	
     	
     	
-//	    	
-//	    	if (myAccount != null) {
-//
-//				// update the account
-//		
-//		    	if ((myAccount != null) && (doAddClaim)) {
-//		    		HederaKeyPair claimKeyPair = new HederaKeyPair(KeyType.ED25519);
-//			        HederaKeyPair claimKey = new HederaKeyPair(claimKeyPair.getKeyType(), claimKeyPair.getPublicKey());
-//			
-//					// Create a new claim object
-//					HederaClaim claim;
-//					claim = new HederaClaim(myAccount.shardNum, myAccount.realmNum, myAccount.accountNum, "ClaimHash".getBytes("UTF-8"));
-//					// add a key to the claim
-//					claim.addKey(claimKey);
-//			        // add a claim
-//			        if (AccountAddClaim.addClaim(myAccount,claim, claimKeyPair)) {
-//			        }
-//		    	} else if (myAccount == null) {
-//	    			logger.info("*******************************************");
-//	    			logger.info("ACCOUNT object is null, skipping claim tests");
-//	    			logger.info("*******************************************");
-//		    	}
-//	    	}
-//    	}	    	
 	}
 }
