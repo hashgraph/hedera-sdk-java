@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.common.HederaAccountID;
-import com.hedera.sdk.common.HederaKey;
+import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.common.Utilities;
 import com.hederahashgraph.api.proto.java.Claim;
@@ -46,11 +46,11 @@ public class HederaClaim implements Serializable {
 	 */
 	public byte[] hash = new byte[0];
 	/**
-	 * List of {@link HederaKey} to attach to this claim
+	 * List of {@link HederaKeyPair} to attach to this claim
 	 * Note, these are mutually exclusive with keySignatures.
 	 * If keySignatures exist, keys will be ignored in any processing
 	 */
-	public List<HederaKey> keys = new ArrayList<HederaKey>();
+	public List<HederaKeyPair> keys = new ArrayList<HederaKeyPair>();
 	/**
 	 * List of {@link HederaKeySignature} to attach to this claim
 	 * Note, these are mutually exclusive with keys.
@@ -112,8 +112,8 @@ public class HederaClaim implements Serializable {
 		this.keySignatures.clear();
 		
 		for (int i=0; i < claim.getKeys().getKeysCount(); i++) {
-			HederaKey key = new HederaKey(claim.getKeys().getKeys(i));
-			HederaKeySignature keySig = new HederaKeySignature(key.getKeyType(), key.getKey(), new byte[0]);
+			HederaKeyPair key = new HederaKeyPair(claim.getKeys().getKeys(i));
+			HederaKeySignature keySig = new HederaKeySignature(key.getKeyType(), key.getPublicKeyEncoded(), new byte[0]);
 			this.keys.add(key);
 			this.keySignatures.add(keySig);
 		}
@@ -147,10 +147,10 @@ public class HederaClaim implements Serializable {
 		return protobuf.build();
 	}
 	/**
-	 * Adds a {@link HederaKey} to the list
+	 * Adds a {@link HederaKeyPair} to the list
 	 * @param key the key to add
 	 */
-	public void addKey(HederaKey key) {
+	public void addKey(HederaKeyPair key) {
 	   	logger.trace("Start - addKey key {}", key);
 		this.keys.add(key);
 	   	logger.trace("End - addKey");
@@ -165,11 +165,11 @@ public class HederaClaim implements Serializable {
 	   	logger.trace("End - addKey");
 	}
 	/**
-	 * Deletes a {@link HederaKey} from the list
+	 * Deletes a {@link HederaKeyPair} from the list
 	 * @param key the key to delete
 	 * @return true if successful
 	 */
-	public boolean deleteKey(HederaKey key) {
+	public boolean deleteKey(HederaKeyPair key) {
 	   	logger.trace("deleteKey key {}", key);
 		return this.keys.remove(key);
 	}
@@ -183,10 +183,10 @@ public class HederaClaim implements Serializable {
 		return this.keySignatures.remove(keySigPair);
 	}
 	/**
-	 * Gets the list of {@link HederaKey}
-	 * @return List {@link HederaKey}
+	 * Gets the list of {@link HederaKeyPair}
+	 * @return List {@link HederaKeyPair}
 	 */
-	public List<HederaKey> getKeys() {
+	public List<HederaKeyPair> getKeys() {
 	   	logger.trace("getKeys");
 		return this.keys;
 	}

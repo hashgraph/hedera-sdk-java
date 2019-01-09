@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.account.HederaAccountUpdateValues;
-import com.hedera.sdk.common.HederaKey;
+import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaTransactionReceipt;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.transaction.HederaTransactionResult;
@@ -31,7 +31,7 @@ public final class AccountUpdate {
 				logger.info("===>Update successful");
 				// update acount keys if necessary
 				if (updates.newKey != null) {
-					account.accountKey = new HederaKey(updates.newKey.getKeyType(), updates.newKey.getPublicKey());
+					account.accountKey = updates.newKey;
 			        // the paying account is now the new account
 			        account.txQueryDefaults.payingKeyPair = updates.newKey;
 				}

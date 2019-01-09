@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.hedera.sdk.common.HederaKey;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaKeyList;
 
 import org.junit.jupiter.api.DisplayName;
@@ -19,9 +19,9 @@ class TestHederaKeyList {
 	@Test
 	@DisplayName("Checking key init")
 	void testKeyListInit() {
-		HederaKey key1 = new HederaKey(KeyType.ECDSA384, new byte[] {12,34,56}, "ECDSA");
-		HederaKey key2 = new HederaKey(KeyType.ED25519, new byte[] {78,90,12}, "ED25519");
-		List<HederaKey> keys = new ArrayList<HederaKey>();
+		HederaKeyPair key1 = new HederaKeyPair(KeyType.ECDSA384, new byte[] {12,34,56}, "ECDSA");
+		HederaKeyPair key2 = new HederaKeyPair(KeyType.ED25519, new byte[] {78,90,12}, "ED25519");
+		List<HederaKeyPair> keys = new ArrayList<HederaKeyPair>();
 		keys.add(key1);
 		keys.add(key2);
 		

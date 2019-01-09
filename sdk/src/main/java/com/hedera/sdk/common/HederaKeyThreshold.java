@@ -1,6 +1,6 @@
 package com.hedera.sdk.common;
 
-import com.hedera.sdk.common.HederaKey;
+import com.hedera.sdk.common.HederaKeyPair;
 import com.hederahashgraph.api.proto.java.Key;
 import com.hederahashgraph.api.proto.java.KeyList;
 import com.hederahashgraph.api.proto.java.ThresholdKey;
@@ -27,10 +27,10 @@ public class HederaKeyThreshold implements Serializable {
 	 */
 	public int threshold;
 	/**
-	 * The List of {@link HederaKey}
+	 * The List of {@link HederaKeyPair}
 	 * initially empty 
 	 */
-	public List<HederaKey> keys  = new ArrayList<HederaKey>();
+	public List<HederaKeyPair> keys  = new ArrayList<HederaKeyPair>();
 	/**
 	 * Default constructor
 	 */
@@ -39,15 +39,15 @@ public class HederaKeyThreshold implements Serializable {
 	   	logger.trace("End - Object init");
 	}
 	/**
-	 * Constructs from a threshold and List of {@link HederaKey}
+	 * Constructs from a threshold and List of {@link HederaKeyPair}
 	 * @param threshold the integer threshold value
-	 * @param keys the List of {@link HederaKey}
+	 * @param keys the List of {@link HederaKeyPair}
 	 */
-	public HederaKeyThreshold(int threshold, List<HederaKey> keys) {
+	public HederaKeyThreshold(int threshold, List<HederaKeyPair> keys) {
 	   	logger.trace("Start - Object init threshold {}, keys {}", threshold, keys);
 
 	   	if (keys != null) {
-		   	for (HederaKey hederaKey : keys) {
+		   	for (HederaKeyPair hederaKey : keys) {
 				this.keys.add(hederaKey);
 			}
 	   	}
@@ -67,7 +67,7 @@ public class HederaKeyThreshold implements Serializable {
 		KeyList protoKeys = protobufKey.getKeys();
 		
 		for (Key key : protoKeys.getKeysList()) {
-			this.keys.add(new HederaKey(key));
+			this.keys.add(new HederaKeyPair(key));
 		}
 	   	logger.trace("End - Object init");
 	}
@@ -96,19 +96,19 @@ public class HederaKeyThreshold implements Serializable {
 	}
 	/**
 	 * Adds a key to the list
-	 * @param key a {@link HederaKey}
+	 * @param key a {@link HederaKeyPair}
 	 */
-	public void addKey(HederaKey key) {
+	public void addKey(HederaKeyPair key) {
 	   	logger.trace("Start - addKey key {}", key);
 		this.keys.add(key);
 	   	logger.trace("End - addKey");
 	}
 	/**
 	 * Deletes a key from the list
-	 * @param key a {@link HederaKey}
+	 * @param key a {@link HederaKeyPair}
 	 * @return true if found and successfully deleted
 	 */
-	public boolean deleteKey(HederaKey key) {
+	public boolean deleteKey(HederaKeyPair key) {
 	   	logger.trace("Start - deleteKey key {}", key);
 	   	logger.trace("End - deleteKey");
 		return this.keys.remove(key);
@@ -125,7 +125,7 @@ public class HederaKeyThreshold implements Serializable {
 	   	jsonKey.put(JSON_THRESHOLD, this.threshold);
 
 		JSONArray jsonKeys = new JSONArray();
-		for (HederaKey hederaKey : this.keys) {
+		for (HederaKeyPair hederaKey : this.keys) {
 			jsonKeys.add(hederaKey.JSON());
 		}
 	   	
@@ -166,7 +166,7 @@ public class HederaKeyThreshold implements Serializable {
 			keys = (JSONArray) jsonKey.get(JSON_KEYS);
 			
 			for (int i=0; i < keys.size(); i++) {
-				HederaKey key = new HederaKey();
+				HederaKeyPair key = new HederaKeyPair();
 				JSONObject oneKey = new JSONObject();
 				oneKey = (JSONObject) keys.get(i);
 				key.fromJSON(oneKey);

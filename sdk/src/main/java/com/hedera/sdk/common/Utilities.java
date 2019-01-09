@@ -12,8 +12,7 @@ import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hedera.sdk.common.HederaKey.KeyType;
-import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.node.HederaNode;
 import com.hederahashgraph.api.proto.java.KeyList;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
@@ -81,13 +80,13 @@ public class Utilities {
 	 * @return {@link HederaKeySignature}
 	 * @throws Exception 
 	 */
-	public static HederaKeySignature getKeySignature(byte[] payload, HederaCryptoKeyPair keyPair) throws Exception {
+	public static HederaKeySignature getKeySignature(byte[] payload, HederaKeyPair keyPair) throws Exception {
 		logger.trace("Start - getSignature payload {}, keyPair {}", payload, keyPair);
 		byte[] signedBody = keyPair.signMessage(payload);
 		// create a Hedera Signature for it
 		HederaSignature signature = new HederaSignature(keyPair.getKeyType(), signedBody);
 		logger.trace("End - getSignature");
-		return new HederaKeySignature(keyPair.getKeyType(), keyPair.getPublicKey(), signature.getSignature());
+		return new HederaKeySignature(keyPair.getKeyType(), keyPair.getPublicKeyEncoded(), signature.getSignature());
 	}
 	/**
 	 * Helper function to generate a {@link HederaKeySignature} for a given 
@@ -101,7 +100,7 @@ public class Utilities {
 	 */
 	public static HederaKeySignature getKeySignature(byte[] payload, KeyType keyType, byte[] publicKey, byte[] privateKey) throws Exception {
 		// create new keypair
-		HederaCryptoKeyPair keyPair = new HederaCryptoKeyPair(keyType, publicKey, privateKey);
+		HederaKeyPair keyPair = new HederaKeyPair(keyType, publicKey, privateKey);
 		return getKeySignature(payload, keyPair);
 	}
 	/**
@@ -112,7 +111,7 @@ public class Utilities {
 	 * @return {@link HederaSignature}
 	 * @throws Exception 
 	 */
-	public static HederaSignature getSignature(byte[] payload, HederaCryptoKeyPair keyPair) throws Exception {
+	public static HederaSignature getSignature(byte[] payload, HederaKeyPair keyPair) throws Exception {
 		logger.trace("Start - getSignature payload {}, keyPair {}", payload, keyPair);
 		byte[] signedBody = keyPair.signMessage(payload);
 		// create a Hedera Signature for it
@@ -132,7 +131,7 @@ public class Utilities {
 	 */
 	public static HederaSignature getSignature(byte[] payload, KeyType keyType, byte[] publicKey, byte[] privateKey) throws Exception {
 		// create new keypair
-		HederaCryptoKeyPair keyPair = new HederaCryptoKeyPair(keyType, publicKey, privateKey);
+		HederaKeyPair keyPair = new HederaKeyPair(keyType, publicKey, privateKey);
 		return getSignature(payload, keyPair);
 	}
 	/**
@@ -360,12 +359,13 @@ public class Utilities {
 					break;
 				case OK:
 					logger.info("precheck=OK");
-					if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
+					if (receipt.transactionStatus != ResponseCodeEnum.UNKNOWN) {
 						logger.info("took " + callCount + " call, about " + sleepTime * callCount + " milliseconds");
 						keepGoing = false;
 						break;
 					} else {
 						logger.info("Transaction status=" + receipt.transactionStatus.name());
+						break;
 					}
 				case PAYER_ACCOUNT_NOT_FOUND:
 					logger.info("precheck=PAYER_ACCOUNT_NOT_FOUND");
@@ -387,6 +387,7 @@ public class Utilities {
 						break;
 					} else {
 						logger.info("Transaction status=" + receipt.transactionStatus.name());
+						break;
 					}
 				case TRANSACTION_EXPIRED:
 					logger.info("precheck=TRANSACTION_EXPIRED");
@@ -405,12 +406,12 @@ public class Utilities {
 		return receipt;
 	}
 
-	public static KeyList getProtoKeyList(List<HederaKey> keys) {
+	public static KeyList getProtoKeyList(List<HederaKeyPair> keys) {
 		
 		com.hederahashgraph.api.proto.java.KeyList.Builder keyListBuilder = KeyList.newBuilder();
 		
 		if (!keys.isEmpty()) {
-			for (HederaKey key : keys) {
+			for (HederaKeyPair key : keys) {
 				keyListBuilder.addKeys(key.getProtobuf());
 			}
 		}

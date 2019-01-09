@@ -3,24 +3,6 @@ package com.hedera.sdk.cryptography;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * A list of 4096 words, suitable for encoding keys and other binary values. This class has no methods, and
- * has only a single, static variable, named words.
- * 
- * We need at least 2581 words in order to encode 128+8 bits into at most 12 words. RFC 1751 gives only 2048
- * words, all very short, many obscure, some being prefixes of others. So the following list was created
- * from a word list purchased by Swirlds, whose author said it was acceptable to use it in this way, and
- * even to release the list itself (as long as there are no frequency counts released).
- * 
- * The list is the most common 4096 in English, after excluding words that aren't one of {noun, verb,
- * adjective}, or are too long, too short, prefixes of others, rude, or otherwise non-ideal. It also ensures
- * no two have a long common prefix, and that no word is a prefix of another, and that no two words differ
- * only in capitalization.
- * 
- * Because no word on the list is a prefix of another, it is easy to parse a list of words that is typed
- * without spaces between them. These should be displayed with the given capitalization, but case
- * insensitive matching should be used when they are entered by the user.
- */
 public class WordList {
 	/** the list of 4096 words */
 	public static List<String> words = Arrays.asList("aback", "abbey", "abbot",
