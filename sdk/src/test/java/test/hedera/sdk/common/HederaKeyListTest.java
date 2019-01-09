@@ -19,17 +19,11 @@ class TestHederaKeyList {
 	@Test
 	@DisplayName("Checking key init")
 	void testKeyListInit() {
-<<<<<<< HEAD:sdk/src/test/java/test/hedera/sdk/common/HederaKeyListTest.java
-		HederaKey key1 = new HederaKey(KeyType.ECDSA384, new byte[] {12,34,56}, "ECDSA");
-		HederaKey key2 = new HederaKey(KeyType.ED25519, new byte[] {78,90,12}, "ED25519");
-		List<HederaKey> keys = new ArrayList<HederaKey>();
-=======
 		HederaKeyPair key1 = new HederaKeyPair(KeyType.ED25519);
 		key1.keyDescription = "ECDSA";
 		HederaKeyPair key2 = new HederaKeyPair(KeyType.ED25519);
 		key2.keyDescription = "ED25519";
 		List<HederaKeyPair> keys = new ArrayList<HederaKeyPair>();
->>>>>>> f76e9c4... Unit tests pass:src/test/java/test/hedera/sdk/common/HederaKeyListTest.java
 		keys.add(key1);
 		keys.add(key2);
 		

@@ -284,7 +284,7 @@
   </distributionManagement>
   <properties>
     <proto.version>3.6.1</proto.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <grpc.version>1.14.0</grpc.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 </project>

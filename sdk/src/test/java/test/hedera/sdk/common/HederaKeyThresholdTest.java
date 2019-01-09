@@ -26,15 +26,10 @@ public class HederaKeyThresholdTest {
 
 	@BeforeAll
 	static void initAll() {
-<<<<<<< HEAD:sdk/src/test/java/test/hedera/sdk/common/HederaKeyThresholdTest.java
-		keyList.add(new HederaKey(KeyType.ED25519, keyBytes));
-		keyList.add(new HederaKey(KeyType.RSA3072, keyBytes));
-=======
 		HederaKeyPair key = new HederaKeyPair(KeyType.ED25519);
 		keyBytes = key.getPublicKey();
 		keyList.add(new HederaKeyPair(KeyType.ED25519, keyBytes, null));
 		keyList.add(new HederaKeyPair(KeyType.ED25519, keyBytes, null));
->>>>>>> f76e9c4... Unit tests pass:src/test/java/test/hedera/sdk/common/HederaKeyThresholdTest.java
 	}
 	
 	@Test

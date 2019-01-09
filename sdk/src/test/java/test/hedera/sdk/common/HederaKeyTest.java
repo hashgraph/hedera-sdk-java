@@ -33,17 +33,11 @@ class HederaKeyTest {
 
 	@BeforeAll
 	static void initAll() {
-<<<<<<< HEAD:sdk/src/test/java/test/hedera/sdk/common/HederaKeyTest.java
-		keyList.add(new HederaKey(KeyType.ED25519, keyBytes));
-		thresholdKey = new HederaKeyThreshold(threshold, keyList);
-		hederaKeyList.addKey(new HederaKey(KeyType.ED25519, keyBytes));
-=======
 		HederaKeyPair key = new HederaKeyPair(KeyType.ED25519);
 		keyBytes = key.getPublicKey();
 		keyList.add(key);
 		thresholdKey = new HederaKeyThreshold(threshold, keyList);
 		hederaKeyList.addKey(key);
->>>>>>> f76e9c4... Unit tests pass:src/test/java/test/hedera/sdk/common/HederaKeyTest.java
 	}
 	
 	@ParameterizedTest
@@ -69,21 +63,12 @@ class HederaKeyTest {
 	 
 	private static Stream<Arguments> keyInit() {
 		return Stream.of(
-<<<<<<< HEAD:sdk/src/test/java/test/hedera/sdk/common/HederaKeyTest.java
-			Arguments.of(new HederaKey(KeyType.ECDSA384, keyBytes), KeyType.ECDSA384, ""),
-			Arguments.of(new HederaKey(KeyType.RSA3072, keyBytes), KeyType.RSA3072, ""),
-			Arguments.of(new HederaKey(KeyType.ED25519, keyBytes), KeyType.ED25519, ""),
-			Arguments.of(new HederaKey(KeyType.ECDSA384, keyBytes, description), KeyType.ECDSA384, description),
-			Arguments.of(new HederaKey(KeyType.RSA3072, keyBytes, description), KeyType.RSA3072, description),
-			Arguments.of(new HederaKey(KeyType.ED25519, keyBytes, description), KeyType.ED25519, description)
-=======
 			Arguments.of(new HederaKeyPair(KeyType.ED25519, keyBytes, null), KeyType.ED25519, ""),
 			Arguments.of(new HederaKeyPair(KeyType.ED25519, keyBytes, null), KeyType.ED25519, ""),
 			Arguments.of(new HederaKeyPair(KeyType.ED25519, keyBytes, null), KeyType.ED25519, ""),
 			Arguments.of(new HederaKeyPair(KeyType.ED25519, keyBytes, null, description), KeyType.ED25519, description),
 			Arguments.of(new HederaKeyPair(KeyType.ED25519, keyBytes, null, description), KeyType.ED25519, description),
 			Arguments.of(new HederaKeyPair(KeyType.ED25519, keyBytes, null, description), KeyType.ED25519, description)
->>>>>>> f76e9c4... Unit tests pass:src/test/java/test/hedera/sdk/common/HederaKeyTest.java
 		);
 	}
 	
@@ -99,13 +84,8 @@ class HederaKeyTest {
 		assertEquals(description, masterKey.keyDescription);
 		assertNotEquals(null, masterKey.uuid);
 
-<<<<<<< HEAD:sdk/src/test/java/test/hedera/sdk/common/HederaKeyTest.java
-		HederaKey protobufKey = new HederaKey(masterKey.getProtobuf());
-		assertEquals(null, protobufKey.getKey());
-=======
 		HederaKeyPair protobufKey = new HederaKeyPair(masterKey.getProtobuf());
 		assertEquals(null, protobufKey.getPublicKey());
->>>>>>> f76e9c4... Unit tests pass:src/test/java/test/hedera/sdk/common/HederaKeyTest.java
 		assertEquals(KeyType.CONTRACT, protobufKey.getKeyType());
 		assertEquals(contractID.contractNum, protobufKey.getContractIDKey().contractNum);
 		assertEquals(contractID.shardNum, protobufKey.getContractIDKey().shardNum);
@@ -201,11 +181,7 @@ class HederaKeyTest {
 		assertEquals(hederaKeyList.keys.get(0).getKeyType(), protobufKey.getKeyList().keys.get(0).getKeyType());
 		assertArrayEquals(hederaKeyList.keys.get(0).getPublicKey(), protobufKey.getKeyList().keys.get(0).getPublicKey());
 
-<<<<<<< HEAD:sdk/src/test/java/test/hedera/sdk/common/HederaKeyTest.java
-		HederaKey jsonKey = new HederaKey();
-=======
 		HederaKeyPair jsonKey = new HederaKeyPair(KeyType.ED25519);
->>>>>>> f76e9c4... Unit tests pass:src/test/java/test/hedera/sdk/common/HederaKeyTest.java
 		jsonKey.fromJSON(masterKey.JSON());
 		assertEquals(masterKey.getKeyType(), jsonKey.getKeyType());
 		assertEquals(hederaKeyList.keys.get(0).getKeyType(), jsonKey.getKeyList().keys.get(0).getKeyType());

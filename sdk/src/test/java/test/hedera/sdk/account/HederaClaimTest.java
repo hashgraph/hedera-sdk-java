@@ -52,15 +52,8 @@ class HederaClaimTest {
 		assertEquals(claim.keys.size(),  claim2.keys.size());
 		assertEquals(claim.keySignatures.size(),  claim2.keySignatures.size());
 		
-<<<<<<< HEAD:sdk/src/test/java/test/hedera/sdk/account/HederaClaimTest.java
-		HederaCryptoKeyPair keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
-		HederaKey key = new HederaKey(KeyType.ED25519, keyPair.getPublicKeyEncoded());
-		keyPair = new HederaCryptoKeyPair(KeyType.ED25519);
-		HederaKey key2 = new HederaKey(KeyType.ED25519, keyPair.getPublicKeyEncoded());
-=======
 		HederaKeyPair key = new HederaKeyPair(KeyType.ED25519);
 		HederaKeyPair key2 = new HederaKeyPair(KeyType.ED25519);
->>>>>>> f76e9c4... Unit tests pass:src/test/java/test/hedera/sdk/account/HederaClaimTest.java
 		
 		claim.addKey(key);
 		claim.addKey(key2);
@@ -104,13 +97,8 @@ class HederaClaimTest {
 		assertArrayEquals(key2.getPublicKeyEncoded(), claimWithSig.keySignatures.get(1).getKey());
 
 		claim = new HederaClaim();
-<<<<<<< HEAD:sdk/src/test/java/test/hedera/sdk/account/HederaClaimTest.java
-		claim.addKey(new HederaKey(KeyType.ED25519, key.getKey()));
-		claim.addKey(new HederaKey(KeyType.ED25519, key2.getKey()));
-=======
 		claim.addKey(new HederaKeyPair(KeyType.ED25519, key.getPublicKey(), null));
 		claim.addKey(new HederaKeyPair(KeyType.ED25519, key2.getPublicKey(), null));
->>>>>>> f76e9c4... Unit tests pass:src/test/java/test/hedera/sdk/account/HederaClaimTest.java
 		claimProto = claim.getProtobuf();
 
 		claimWithSig = new HederaClaim(claimProto);

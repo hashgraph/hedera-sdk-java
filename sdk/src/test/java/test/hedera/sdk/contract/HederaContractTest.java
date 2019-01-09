@@ -28,13 +28,8 @@ class HederaContractTest {
 		HederaKeyPair adminKey = new HederaKeyPair(KeyType.ED25519);
 		
 		HederaContract masterContract = new HederaContract();
-<<<<<<< HEAD:sdk/src/test/java/test/hedera/sdk/contract/HederaContractTest.java
-		masterContract.adminKey = new HederaKey(KeyType.ECDSA384, "adminkey".getBytes());
-		masterContract.adminKeySignature = new HederaKeySignature(KeyType.ED25519, "key".getBytes(), "signature".getBytes(), "keyDescription");
-=======
 		masterContract.adminKey = adminKey;
 		masterContract.adminKeySignature = new HederaKeySignature(KeyType.ED25519, testKey.getPublicKey(), "signature".getBytes(), "keyDescription");
->>>>>>> f76e9c4... Unit tests pass:src/test/java/test/hedera/sdk/contract/HederaContractTest.java
 		masterContract.amount = 10;
 		masterContract.autoRenewPeriod = new HederaDuration(60, 10);
 		masterContract.constructionParameters = "construct".getBytes();

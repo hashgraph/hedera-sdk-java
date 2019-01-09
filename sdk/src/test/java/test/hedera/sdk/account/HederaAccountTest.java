@@ -85,13 +85,8 @@ class HederaAccountTest {
 		assertArrayEquals(new byte[0], account.getStateProof());
 
 		account = new HederaAccount();
-<<<<<<< HEAD:sdk/src/test/java/test/hedera/sdk/account/HederaAccountTest.java
-		HederaKey key = new HederaKey(KeyType.ED25519, "key".getBytes());
-		HederaKey key2 = new HederaKey(KeyType.ED25519, "key2".getBytes());
-=======
 		HederaKeyPair key = new HederaKeyPair(KeyType.ED25519, "key".getBytes(), null);
 		HederaKeyPair key2 = new HederaKeyPair(KeyType.ED25519, "key2".getBytes(), null);
->>>>>>> f76e9c4... Unit tests pass:src/test/java/test/hedera/sdk/account/HederaAccountTest.java
 		
 		account.addKey(key);
 		account.addKey(key2);

@@ -198,48 +198,6 @@ public class HederaKeySignature implements Serializable {
 	 * @param protobufSig a {@link Signature} protobug
 	 * @param keyDescription the description for the key
 	 */
-<<<<<<< HEAD:sdk/src/main/java/com/hedera/sdk/common/HederaKeySignature.java
-	public HederaKeySignature(Key protobufKey, Signature protobufSig, String keyDescription) {
-	   	logger.trace("Start - Object init from protobuf {}, signature {}, keyDescription {}", protobufKey, protobufSig, keyDescription);
-		
-		HederaKey hederaKey = new HederaKey(protobufKey);
-		HederaSignature hederaSignature = new HederaSignature(protobufSig);
-
-		switch (protobufKey.getKeyCase()) {
-		case KEYLIST:
-			this.keyType = hederaKey.getKeyType();
-			this.keySigList = new HederaKeySignatureList(protobufKey.getKeyList(), protobufSig.getSignatureList());
-			break;
-		case THRESHOLDKEY:
-			this.keyType = hederaKey.getKeyType();
-			this.keySigThreshold = new HederaKeySignatureThreshold(protobufKey.getThresholdKey(), protobufSig.getThresholdSignature());
-			break;
-		case KEY_NOT_SET:
-            throw new IllegalArgumentException("Key not set in protobuf data.");			
-		case CONTRACTID:
-			this.keyType = hederaKey.getKeyType();
-			this.contractIDKey = hederaKey.getContractIDKey();
-			this.publicKey = null;
-			this.signature = null;
-			break;
-		default: //ECDSA_384, ED25519, RSA_3072
-			this.keyType = hederaKey.getKeyType();
-			this.publicKey = hederaKey.getKey();
-			this.signature = hederaSignature.getSignature();
-		}
-		this.keyDescription = keyDescription;
-	   	logger.trace("End - Object init");
-	}
-	/**
-	 * Constructor for a {@link Key} protobuf and associated {@link Signature} protobuf 
-	 * Note: It is assumed that keys and signatures are matching in both protobuf objects
-	 * @param protobufKey a {@link Key} protobuf
-	 * @param protobufSig a {@link Signature} protobug
-	 */
-	public HederaKeySignature(Key protobufKey, Signature protobufSig) {
-		this(protobufKey, protobufSig, "");
-	}
-=======
 //	public HederaKeySignature(Key protobufKey, Signature protobufSig, String keyDescription) {
 //	   	logger.trace("Start - Object init from protobuf {}, signature {}, keyDescription {}", protobufKey, protobufSig, keyDescription);
 //		
@@ -280,7 +238,6 @@ public class HederaKeySignature implements Serializable {
 //	public HederaKeySignature(Key protobufKey, Signature protobufSig) {
 //		this(protobufKey, protobufSig, "");
 //	}
->>>>>>> f76e9c4... Unit tests pass:src/main/java/com/hedera/sdk/common/HederaKeySignature.java
 	/**
 	 * Gets the type of the key stored in this object
 	 * @return {@link KeyType}
