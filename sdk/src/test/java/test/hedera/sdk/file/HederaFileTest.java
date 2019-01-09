@@ -33,7 +33,6 @@ class HederaFileTest {
 		assertEquals(0, file.realmNum);
 		assertEquals(0, file.fileNum);
 		assertNull(file.newRealmAdminKey);
-		assertNull(file.newRealmAdminKeySig);
 
 		file = new HederaFile(1, 2, 3);
 		assertNotNull(file.txQueryDefaults);
@@ -45,7 +44,6 @@ class HederaFileTest {
 		assertEquals(2, file.realmNum);
 		assertEquals(3, file.fileNum);
 		assertNull(file.newRealmAdminKey);
-		assertNull(file.newRealmAdminKeySig);
 
 		HederaTransactionID txId = new HederaTransactionID(new HederaAccountID(2, 3, 4));
 		txId.transactionValidStart = new HederaTimeStamp(10, 100);
