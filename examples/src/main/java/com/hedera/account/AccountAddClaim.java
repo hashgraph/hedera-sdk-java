@@ -5,14 +5,14 @@ import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.account.HederaClaim;
+import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaTransactionReceipt;
 import com.hedera.sdk.common.Utilities;
-import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class AccountAddClaim {
-	public static boolean addClaim(HederaAccount account, HederaClaim claim, HederaCryptoKeyPair claimKeyPair) throws Exception {
+	public static boolean addClaim(HederaAccount account, HederaClaim claim, HederaKeyPair claimKeyPair) throws Exception {
 		final Logger logger = LoggerFactory.getLogger(AccountAddClaim.class);
 
 		logger.info("");

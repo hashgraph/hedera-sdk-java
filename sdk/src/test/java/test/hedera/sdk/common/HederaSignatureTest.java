@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaSignature;
 import com.hedera.sdk.common.HederaSignatureList;
 import com.hedera.sdk.common.HederaSignatureThreshold;

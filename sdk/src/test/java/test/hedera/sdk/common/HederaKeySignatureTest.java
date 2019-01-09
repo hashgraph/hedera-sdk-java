@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import com.hedera.sdk.common.HederaContractID;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.node.HederaNode;
 import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.common.HederaKeySignatureList;

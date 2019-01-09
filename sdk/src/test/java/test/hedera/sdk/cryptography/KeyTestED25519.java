@@ -13,13 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.spongycastle.util.encoders.Hex;
 
-<<<<<<< HEAD:sdk/src/test/java/test/hedera/sdk/cryptography/KeyTestED25519.java
 import com.hedera.sdk.common.HederaKey.KeyType;
-import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
-=======
-import com.hedera.sdk.common.HederaKeyPair;
-import com.hedera.sdk.common.HederaKeyPair.KeyType;
->>>>>>> f76e9c4... Unit tests pass:src/test/java/test/hedera/sdk/cryptography/KeyTestED25519.java
 
 @Disabled
 class KeyTestED25519 {

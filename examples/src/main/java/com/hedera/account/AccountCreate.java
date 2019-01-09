@@ -4,14 +4,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedera.sdk.account.HederaAccount;
+import com.hedera.sdk.common.HederaKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaTransactionReceipt;
 import com.hedera.sdk.common.Utilities;
-import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class AccountCreate {
-	public static HederaAccount create(HederaAccount account, HederaCryptoKeyPair newAccountKey, long initialBalance) throws Exception {
+	public static HederaAccount create(HederaAccount account, String newAccountKey, KeyType keyType, long initialBalance) throws Exception {
 		final Logger logger = LoggerFactory.getLogger(AccountCreate.class);
 		// new account properties
 		long shardNum = 0;
@@ -23,7 +24,7 @@ public final class AccountCreate {
 
 		// create the new account
 		// account creation transaction
-		HederaTransactionResult createResult = account.create(shardNum, realmNum, newAccountKey.getPublicKey(), newAccountKey.getKeyType(), initialBalance, null);
+		HederaTransactionResult createResult = account.create(shardNum, realmNum, newAccountKey, keyType, initialBalance, null);
 		// was it successful ?
 		if (createResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 			// yes, get a receipt for the transaction

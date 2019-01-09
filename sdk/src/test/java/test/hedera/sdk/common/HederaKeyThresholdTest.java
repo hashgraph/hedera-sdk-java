@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.hedera.sdk.common.HederaKey;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaKeyThreshold;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 public class HederaKeyThresholdTest {
 	protected static byte[] keyBytes;
 	protected static String description = "A Description";
-	protected static List<HederaKey> keyList = new ArrayList<HederaKey>();
+	protected static List<HederaKeyPair> keyList = new ArrayList<HederaKeyPair>();
 	protected static HederaKeyThreshold masterKey;
 	protected static HederaKeyThreshold protoKey;
 	protected static HederaKeyThreshold jsonKey = new HederaKeyThreshold();
@@ -50,7 +50,7 @@ public class HederaKeyThresholdTest {
 	void testKeyAddRemove() {
 		HederaKeyThreshold masterKey = new HederaKeyThreshold(threshold, keyList);
 
-		HederaKey key = new HederaKey(KeyType.ED25519, keyBytes);
+		HederaKeyPair key = new HederaKeyPair(KeyType.ED25519, keyBytes);
 		masterKey.addKey(key);
 		assertEquals(keyList.size() + 1, masterKey.keys.size());
 		

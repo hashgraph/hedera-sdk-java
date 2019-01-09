@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 import com.hedera.account.*;
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.common.HederaDuration;
-import com.hedera.sdk.common.HederaKey.KeyType;
-import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
+import com.hedera.sdk.common.HederaKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.file.HederaFile;
 import com.hedera.utilities.*;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
@@ -35,9 +35,9 @@ public final class DemoFile {
     	account.txQueryDefaults = txQueryDefaults;
     	account.autoRenewPeriod = new HederaDuration(31536000, 0);
 
-    	HederaCryptoKeyPair newAccountKey = new HederaCryptoKeyPair(KeyType.ED25519);
+    	HederaKeyPair newAccountKey = new HederaKeyPair(KeyType.ED25519);
     	
-    	account = AccountCreate.create(account, newAccountKey, 1000);
+		account = AccountCreate.create(account, newAccountKey.getPublicKeyHex(), newAccountKey.getKeyType(), 1000);
 
         // the paying account is now the new account
         txQueryDefaults.payingAccountID = account.getHederaAccountID();
@@ -47,7 +47,7 @@ public final class DemoFile {
     	// new file object
     	HederaFile file = new HederaFile();
     	// setup transaction/query defaults (durations, etc...)
-    	txQueryDefaults.fileWacl = new HederaCryptoKeyPair(KeyType.ED25519);
+    	txQueryDefaults.fileWacl = new HederaKeyPair(KeyType.ED25519);
     	file.txQueryDefaults = txQueryDefaults;
 
     	doCreate = true; //OK

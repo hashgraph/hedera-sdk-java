@@ -1,6 +1,5 @@
 package com.hedera.account;
 
-import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 
 import org.slf4j.Logger;
@@ -10,12 +9,10 @@ import org.springframework.validation.DefaultMessageCodesResolver.Format;
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.account.HederaAccountUpdateValues;
 import com.hedera.sdk.account.HederaClaim;
-import com.hedera.sdk.common.HederaKey;
-import com.hedera.sdk.common.HederaKey.KeyType;
-import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
+import com.hedera.sdk.common.HederaKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaTransactionID;
 import com.hedera.sdk.common.HederaTransactionRecord;
-import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
 import com.hedera.utilities.ExampleUtilities;
 
 public final class DemoAccount {
@@ -31,7 +28,6 @@ public final class DemoAccount {
     	boolean update = false; //OK
     	boolean doAddClaim = false;//OK
 		boolean getTXRecord = false;
-
     	create = true;
     	getBalance = true;
     	send = true;
@@ -108,8 +104,8 @@ public final class DemoAccount {
 	    		
     			// optionally retrieve a record for the transaction
 	    		if (getTXRecord) {
-	    			  HederaTransactionID txID = account.hederaTransactionID;
-	    			  HederaTransactionRecord txRecord = new HederaTransactionRecord(txID, 10, txQueryDefaults);
+	    			  HederaTransactionID txID = newAccount.hederaTransactionID;
+	    			  HederaTransactionRecord txRecord = new HederaTransactionRecord(txID, newAccount.txQueryDefaults.node.transactionGetRecordsQueryFee, newAccount.txQueryDefaults);
     			}
 	    		
 		    	if (send) {
@@ -148,7 +144,6 @@ public final class DemoAccount {
 	    		
 		    		// create a new key
 		    		HederaKeyPair ed25519Key = new HederaKeyPair(KeyType.ED25519);
-	    	    			
 		    	    // set the new key for the account
 		    		updates.newKey = ed25519Key;
 		    		// new proxy account details
@@ -167,8 +162,8 @@ public final class DemoAccount {
 		    		// new expiration time
 		    		updates.expirationTimeSeconds = 200;
 		    		updates.expirationTimeNanos = 100;
-	    		
-		    		newAccount = AccountUpdate.update(newAccount, updates);
+
+            newAccount = AccountUpdate.update(newAccount, updates);
 		    		if (newAccount != null) {
 		    			AccountGetInfo.getInfo(newAccount);
 		    		} else {

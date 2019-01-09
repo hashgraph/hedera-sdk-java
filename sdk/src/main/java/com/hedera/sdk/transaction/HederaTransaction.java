@@ -381,9 +381,22 @@ public class HederaTransaction implements Serializable {
 				, txQueryDefaults.memo
 				, accountAmounts);
 
-		// get the signature for the body
-		byte[] signedBody = txQueryDefaults.payingKeyPair.signMessage(transferBody.toByteArray());
+//		// get the signature for the body
+//		byte[] signedBody = txQueryDefaults.payingKeyPair.signMessage(transferBody.toByteArray());
+//
+//		// create a Hedera Signature for it
+//		HederaSignature payingSignature = new HederaSignature(txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
+//		// put the signature in a signature list
+//		HederaSignatureList sigList = new HederaSignatureList();
+//		sigList.addSignature(payingSignature);
+//		// put the list in a signature
+//		HederaSignature sigForList = new HederaSignature(sigList);
+//		
+//		// put the signatures in a signature list
+//		HederaSignatureList sigsForTransaction = new HederaSignatureList();
+//		sigsForTransaction.addSignature(sigForList);
 
+<<<<<<< HEAD:sdk/src/main/java/com/hedera/sdk/transaction/HederaTransaction.java
 		// create a Hedera Signature for it
 		HederaSignature payingSignature = new HederaSignature(txQueryDefaults.payingKeyPair.getKeyType(), signedBody);
 		// put the signatures in a signature list
@@ -391,6 +404,13 @@ public class HederaTransaction implements Serializable {
 		sigsForTransaction.addKeySignaturePair(txQueryDefaults.payingKeyPair.getKeyType(), txQueryDefaults.payingKeyPair.getPublicKey(), payingSignature.getSignature());
 		// add a second for good measure
 		sigsForTransaction.addKeySignaturePair(txQueryDefaults.payingKeyPair.getKeyType(), txQueryDefaults.payingKeyPair.getPublicKey(), payingSignature.getSignature());
+=======
+		// new self-generating signatures
+		HederaSignatureList sigsForTransaction = new HederaSignatureList();
+		//paying signature
+		sigsForTransaction.addSignature(txQueryDefaults.payingKeyPair.getSignature(transferBody.toByteArray()));
+		sigsForTransaction.addSignature(txQueryDefaults.payingKeyPair.getSignature(transferBody.toByteArray()));
+>>>>>>> 2582df2... AccountDemo works except for claims.:src/main/java/com/hedera/sdk/transaction/HederaTransaction.java
 
 		this.body = new HederaTransactionBody(
 				TransactionType.CRYPTOTRANSFER

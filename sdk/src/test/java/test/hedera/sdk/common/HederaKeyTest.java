@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import com.hedera.sdk.common.HederaContractID;
-import com.hedera.sdk.common.HederaKey;
+import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeyList;
 import com.hedera.sdk.common.HederaKeyThreshold;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.node.HederaNode;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -26,7 +26,7 @@ class HederaKeyTest {
 	protected static byte[] keyBytes;
 	protected static String description = "A Description";
 	protected static HederaContractID contractID = new HederaContractID(1,2,3);
-	protected static List<HederaKey> keyList = new ArrayList<HederaKey>();
+	protected static List<HederaKeyPair> keyList = new ArrayList<HederaKeyPair>();
 	protected static HederaKeyThreshold thresholdKey;
 	protected static int threshold = 10;
 	protected static HederaKeyList hederaKeyList = new HederaKeyList();
@@ -43,17 +43,17 @@ class HederaKeyTest {
 	@ParameterizedTest
 	@DisplayName("Checking RSA, ED and EC key init")
 	@MethodSource("keyInit")
-	void testKeyInit(HederaKey masterKey, KeyType keyType, String description) { 
+	void testKeyInit(HederaKeyPair masterKey, KeyType keyType, String description) { 
 		assertEquals(keyType, masterKey.getKeyType());
 		assertArrayEquals(keyBytes, masterKey.getPublicKey());
 		assertEquals(description, masterKey.keyDescription);
 		assertNotEquals(null, masterKey.uuid);
 
-		HederaKey protobufKey = new HederaKey(masterKey.getProtobuf());
+		HederaKeyPair protobufKey = new HederaKeyPair(masterKey.getProtobuf());
 		assertEquals(masterKey.getKeyType(), protobufKey.getKeyType());
 		assertArrayEquals(masterKey.getPublicKey(), protobufKey.getPublicKey());
 
-		HederaKey jsonKey = new HederaKey();
+		HederaKeyPair jsonKey = new HederaKeyPair();
 		jsonKey.fromJSON(masterKey.JSON());
 		assertEquals(masterKey.getKeyType(), jsonKey.getKeyType());
 		assertEquals(masterKey.uuid, jsonKey.uuid);
@@ -75,7 +75,7 @@ class HederaKeyTest {
 	@ParameterizedTest
 	@DisplayName("Checking CONTRACTID key init")
 	@MethodSource("keyInitCONTRACTID")
-	void testKeyInitContractID(HederaKey masterKey, String description) { 
+	void testKeyInitContractID(HederaKeyPair masterKey, String description) { 
 		assertEquals(KeyType.CONTRACT, masterKey.getKeyType());
 		assertEquals(null, masterKey.getPublicKey());
 		assertEquals(contractID.contractNum, masterKey.getContractIDKey().contractNum);
@@ -91,7 +91,7 @@ class HederaKeyTest {
 		assertEquals(contractID.shardNum, protobufKey.getContractIDKey().shardNum);
 		assertEquals(contractID.realmNum, protobufKey.getContractIDKey().realmNum);
 
-		HederaKey jsonKey = new HederaKey();
+		HederaKeyPair jsonKey = new HederaKeyPair();
 		jsonKey.fromJSON(masterKey.JSON());
 		assertEquals(jsonKey.getPublicKey(), null);
 		assertEquals(KeyType.CONTRACT, jsonKey.getKeyType());
@@ -104,15 +104,15 @@ class HederaKeyTest {
 	 
 	private static Stream<Arguments> keyInitCONTRACTID() {
 		return Stream.of(
-			Arguments.of(new HederaKey(contractID), ""),
-			Arguments.of(new HederaKey(contractID, description), description)
+			Arguments.of(new HederaKeyPair(contractID), ""),
+			Arguments.of(new HederaKeyPair(contractID, description), description)
 		);
 	}
 
 	@ParameterizedTest
 	@DisplayName("Checking THRESHOLD key init")
 	@MethodSource("keyInitTHRESHOLD")
-	void testKeyInitThreshold(HederaKey masterKey, String description) { 
+	void testKeyInitThreshold(HederaKeyPair masterKey, String description) { 
 		assertEquals(KeyType.THRESHOLD, masterKey.getKeyType());
 		assertEquals(description,  masterKey.keyDescription);
 		assertEquals(threshold, masterKey.getThresholdKey().threshold);
@@ -126,7 +126,7 @@ class HederaKeyTest {
 		assertEquals(masterKey.getPublicKey(), null);
 		assertArrayEquals(keyBytes, masterKey.getThresholdKey().keys.get(0).getPublicKey());
 
-		HederaKey protobufKey = new HederaKey(masterKey.getProtobuf());
+		HederaKeyPair protobufKey = new HederaKeyPair(masterKey.getProtobuf());
 		assertEquals(masterKey.getKeyType(), protobufKey.getKeyType());
 		assertArrayEquals(masterKey.getPublicKey(), protobufKey.getPublicKey());
 		assertEquals(masterKey.getThresholdKey().threshold, thresholdKey.threshold);
@@ -134,7 +134,7 @@ class HederaKeyTest {
 		assertEquals(null, protobufKey.getPublicKey());
 		assertArrayEquals(keyBytes, protobufKey.getThresholdKey().keys.get(0).getPublicKey());
 
-		HederaKey jsonKey = new HederaKey();
+		HederaKeyPair jsonKey = new HederaKeyPair();
 		jsonKey.fromJSON(masterKey.JSON());
 		assertEquals(masterKey.getKeyType(), jsonKey.getKeyType());
 		assertArrayEquals(masterKey.getPublicKey(), jsonKey.getPublicKey());
@@ -151,15 +151,15 @@ class HederaKeyTest {
 	 
 	private static Stream<Arguments> keyInitTHRESHOLD() {
 		return Stream.of(
-			Arguments.of(new HederaKey(thresholdKey), ""),
-			Arguments.of(new HederaKey(thresholdKey, description), description)
+			Arguments.of(new HederaKeyPair(thresholdKey), ""),
+			Arguments.of(new HederaKeyPair(thresholdKey, description), description)
 		);
 	}
 
 	@ParameterizedTest
 	@DisplayName("Checking KEYLIST key init")
 	@MethodSource("keyInitKEYLIST")
-	void testKeyInitList(HederaKey masterKey, String description) { 
+	void testKeyInitList(HederaKeyPair masterKey, String description) { 
 		// check key type
 		assertEquals(KeyType.LIST, masterKey.getKeyType());
 		assertEquals(description,  masterKey.keyDescription);
@@ -174,7 +174,7 @@ class HederaKeyTest {
 		assertEquals(null, masterKey.getPublicKey());
 		assertArrayEquals(masterKey.getKeyList().keys.get(0).getPublicKey(), hederaKeyList.keys.get(0).getPublicKey());
 
-		HederaKey protobufKey = new HederaKey(masterKey.getProtobuf());
+		HederaKeyPair protobufKey = new HederaKeyPair(masterKey.getProtobuf());
 		assertEquals(masterKey.getKeyType(), protobufKey.getKeyType());
 		assertArrayEquals(masterKey.getPublicKey(), protobufKey.getPublicKey());
 		// compare keylist
@@ -192,15 +192,15 @@ class HederaKeyTest {
 	 
 	private static Stream<Arguments> keyInitKEYLIST() {
 		return Stream.of(
-			Arguments.of(new HederaKey(hederaKeyList), ""),
-			Arguments.of(new HederaKey(hederaKeyList, description), description)
+			Arguments.of(new HederaKeyPair(hederaKeyList), ""),
+			Arguments.of(new HederaKeyPair(hederaKeyList, description), description)
 		);
 	}
 	
 	@Test
 	@DisplayName("HederaKey init tests")
 	void HederaKeyInit() {
-		HederaKey key = new HederaKey();
+		HederaKeyPair key = new HederaKeyPair();
 		HederaNode node = new HederaNode("localhost",10);
 		key.setNode(node);
 		

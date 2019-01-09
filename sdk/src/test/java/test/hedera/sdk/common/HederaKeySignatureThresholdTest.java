@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.common.HederaKeySignatureThreshold;
 import com.hedera.sdk.common.HederaKeyUUIDDescription;

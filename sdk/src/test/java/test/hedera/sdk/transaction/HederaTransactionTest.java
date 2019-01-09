@@ -4,7 +4,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.common.HederaKeySignatureList;
 import com.hedera.sdk.common.HederaSignature;

@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 
 import com.hedera.sdk.account.HederaClaim;
 import com.hedera.sdk.common.HederaAccountID;
-import com.hedera.sdk.common.HederaKey;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaKeySignature;
 import com.hederahashgraph.api.proto.java.Claim;
 

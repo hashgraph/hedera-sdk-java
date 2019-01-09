@@ -97,7 +97,7 @@ public class HederaKeySignatureList implements Serializable {
 	 * @param key the key as a byte array 
 	 * @param signature the signature as a byte array 
 	 */
-	public void addKeySignaturePair(HederaKey.KeyType keyType, byte[] key, byte[] signature) {
+	public void addKeySignaturePair(HederaKeyPair.KeyType keyType, byte[] key, byte[] signature) {
 	   	logger.trace("Start - addKeySignaturePair keyType {}, key {}, signature {}", keyType, key, signature);
 		HederaKeySignature hederaKeySigPair = new HederaKeySignature(keyType, key, signature);
 		addKeySignaturePair(hederaKeySigPair);

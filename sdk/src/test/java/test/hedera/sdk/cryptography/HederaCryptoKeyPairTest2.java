@@ -6,12 +6,7 @@ import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
-<<<<<<< HEAD:sdk/src/test/java/test/hedera/sdk/cryptography/HederaCryptoKeyPairTest2.java
 import com.hedera.sdk.common.HederaKey.KeyType;
-=======
-import com.hedera.sdk.common.HederaKeyPair;
-import com.hedera.sdk.common.HederaKeyPair.KeyType;
->>>>>>> f76e9c4... Unit tests pass:src/test/java/test/hedera/sdk/cryptography/HederaCryptoKeyPairTest2.java
 import com.hedera.sdk.cryptography.CryptoUtils;
 
 import org.junit.jupiter.api.BeforeEach;

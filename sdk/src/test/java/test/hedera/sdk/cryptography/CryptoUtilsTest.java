@@ -9,12 +9,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import java.util.List;
 
-<<<<<<< HEAD:sdk/src/test/java/test/hedera/sdk/cryptography/CryptoUtilsTest.java
 import com.hedera.sdk.common.HederaKey.KeyType;
-=======
-import com.hedera.sdk.common.HederaKeyPair;
-import com.hedera.sdk.common.HederaKeyPair.KeyType;
->>>>>>> f76e9c4... Unit tests pass:src/test/java/test/hedera/sdk/cryptography/CryptoUtilsTest.java
 import com.hedera.sdk.cryptography.CryptoUtils;
 import com.hedera.sdk.cryptography.Reference;
 import com.hedera.sdk.cryptography.Seed;

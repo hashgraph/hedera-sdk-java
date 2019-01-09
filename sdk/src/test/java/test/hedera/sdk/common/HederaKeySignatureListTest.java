@@ -11,12 +11,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-<<<<<<< HEAD:sdk/src/test/java/test/hedera/sdk/common/HederaKeySignatureListTest.java
-import com.hedera.sdk.common.HederaKey.KeyType;
-=======
 import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
->>>>>>> f76e9c4... Unit tests pass:src/test/java/test/hedera/sdk/common/HederaKeySignatureListTest.java
 import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.common.HederaKeySignatureList;
 import com.hedera.sdk.common.HederaKeyUUIDDescription;

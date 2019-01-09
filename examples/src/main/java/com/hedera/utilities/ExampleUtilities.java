@@ -3,17 +3,21 @@ package com.hedera.utilities;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Properties;
 
+import org.apache.commons.codec.DecoderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongycastle.util.encoders.Hex;
 
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaDuration;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
-import com.hedera.sdk.common.HederaKey.KeyType;
-import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
+import com.hedera.sdk.common.HederaKeyList;
+import com.hedera.sdk.common.HederaKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.node.HederaNode;
 
 public class ExampleUtilities {
@@ -27,6 +31,7 @@ public class ExampleUtilities {
 	
 	public static String pubKey = "";
 	public static String privKey = "";
+	public static String keyType = "";
 	
 	public static long payAccountShard = 0;
 	public static long payAccountRealm = 0;
@@ -55,6 +60,7 @@ public class ExampleUtilities {
 			
 			pubKey = applicationProperties.getProperty("pubkey");
 			privKey = applicationProperties.getProperty("privkey");
+			keyType = applicationProperties.getProperty("keyType");
 			
 			payAccountShard = Long.parseLong(applicationProperties.getProperty("payingAccountShard"));
 			payAccountRealm = Long.parseLong(applicationProperties.getProperty("payingAccountRealm"));
@@ -74,7 +80,10 @@ public class ExampleUtilities {
 		}
 	}
 	
-	public static HederaTransactionAndQueryDefaults getTxQueryDefaults() throws InvalidKeySpecException {
+	public static HederaTransactionAndQueryDefaults getTxQueryDefaults() throws InvalidKeySpecException, DecoderException {
+		// setup a set of defaults for query and transactions
+		HederaTransactionAndQueryDefaults txQueryDefaults = new HederaTransactionAndQueryDefaults();
+
 		// Get node details 
 		ExampleUtilities.getNodeDetails();
 		
@@ -87,15 +96,20 @@ public class ExampleUtilities {
 		HederaAccountID payingAccountID = new HederaAccountID(ExampleUtilities.payAccountShard, ExampleUtilities.payAccountRealm, ExampleUtilities.payAccountNum);
 		
 		// setup paying keypair
-		HederaCryptoKeyPair payingKeyPair = new HederaCryptoKeyPair(KeyType.ED25519, ExampleUtilities.pubKey, ExampleUtilities.privKey);
 		
-		// setup a set of defaults for query and transactions
-		HederaTransactionAndQueryDefaults txQueryDefaults = new HederaTransactionAndQueryDefaults();
+		if (keyType.equals("LIST")) {
+			// create a new key list
+			HederaKeyPair payingKeyPair = new HederaKeyPair(KeyType.ED25519, ExampleUtilities.pubKey, ExampleUtilities.privKey);
+			HederaKeyList keyList = new HederaKeyList();
+			keyList.addKey(payingKeyPair);
+			txQueryDefaults.payingKeyPair = new HederaKeyPair(keyList);
+		} else {
+			txQueryDefaults.payingKeyPair = new HederaKeyPair(KeyType.ED25519, ExampleUtilities.pubKey, ExampleUtilities.privKey);
+		}
 		
 		txQueryDefaults.memo = "Demo memo";
 		txQueryDefaults.node = node;
 		txQueryDefaults.payingAccountID = payingAccountID;
-		txQueryDefaults.payingKeyPair = payingKeyPair;
 		txQueryDefaults.transactionValidDuration = new HederaDuration(120, 0);
 		
 		return txQueryDefaults;

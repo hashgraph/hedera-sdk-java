@@ -19,14 +19,11 @@ import java.util.Arrays;
 class ReferenceTest {
 
   private String seedHex;
-  private String ecdsaSeedHex;
 
   @BeforeAll
   void setup() {
     // this belongs to ED25519 seedHex
     seedHex = "cf831ccb83f7d1d6a0261e2a6f69552dbd452d7b3a8fb4f5f960e8aafcf0d32f";
-    ecdsaSeedHex = "a5c5f697c872703ae5a046772f13ae5fa2501e348e35e992598017851bcc6170af487a3a8e94be6a26f6c6e15cee407d";
-    // int[] ecdsaRecoveryWordsIndices = new int[] {1338, 495, 3159, 4036, 390, 936, 1822, 1652, 3747, 3472, 2069, 3769, 2236, 2943, 1620, 3995, 3440, 1847, 266, 3359, 2840, 3313};
     
   }
 

@@ -10,12 +10,8 @@ import org.spongycastle.util.encoders.Hex;
 
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.account.HederaAccountCreateDefaults;
-<<<<<<< HEAD:sdk/src/test/java/test/hedera/sdk/account/HederaAccountCreateDefaultsTest.java
-import com.hedera.sdk.common.HederaKey.KeyType;
-=======
 import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
->>>>>>> f76e9c4... Unit tests pass:src/test/java/test/hedera/sdk/account/HederaAccountCreateDefaultsTest.java
 
 class HederaAccountCreateDefaultsTest {
 

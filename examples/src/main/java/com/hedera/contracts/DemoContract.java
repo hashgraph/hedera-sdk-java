@@ -11,12 +11,12 @@ import com.hedera.account.AccountCreate;
 import com.hedera.file.FileCreate;
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.common.HederaDuration;
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaTimeStamp;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
 import com.hedera.sdk.contract.HederaContract;
 import com.hedera.sdk.contract.HederaContractFunctionResult;
-import com.hedera.sdk.cryptography.HederaCryptoKeyPair;
 import com.hedera.sdk.file.HederaFile;
 import com.hedera.utilities.ExampleUtilities;
 
@@ -36,8 +36,8 @@ public final class DemoContract {
 		account.txQueryDefaults = txQueryDefaults;
 
 		// create an account
-		HederaCryptoKeyPair newAccountKey = new HederaCryptoKeyPair(KeyType.ED25519);
-		account = AccountCreate.create(account, newAccountKey, 550000000000l);
+		HederaKeyPair newAccountKey = new HederaKeyPair(KeyType.ED25519);
+		account = AccountCreate.create(account, newAccountKey.getPublicKeyHex(), newAccountKey.getKeyType(), 550000000000l);
 		
 		if (account != null) {
 			// the paying account is now the new account
