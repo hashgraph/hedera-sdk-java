@@ -1,10 +1,7 @@
 package com.hedera.sdk.common;
 
 import java.io.Serializable;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.slf4j.
 import com.hederahashgraph.api.proto.java.AccountID;
 
 /**
@@ -12,7 +9,7 @@ import com.hederahashgraph.api.proto.java.AccountID;
  * of a shard number, a realm number and an account number
  */
 public class HederaAccountID implements Serializable {
-	final static Logger logger = LoggerFactory.getLogger(HederaAccountID.class);
+	final ch.qos.logback.classic.
 
 	private static final long serialVersionUID = 1;
 
@@ -31,7 +28,7 @@ public class HederaAccountID implements Serializable {
 	 * the account number (nonnegative and unique within its realm)
 	 */
 	public long accountNum = 1;
-	
+
 	/**
 	 * Default constructor, creates a HederaAccountID with default values
 	 */
@@ -62,11 +59,11 @@ public class HederaAccountID implements Serializable {
 
 	/**
 	 * Generate a protobuf payload for this object
-	 * @return a protobuf AccountID 
+	 * @return a protobuf AccountID
 	 */
 	public AccountID getProtobuf() {
 		AccountID.Builder accountID = AccountID.newBuilder();
-		
+
 		if (this.realmNum != -1) {
 			accountID.setRealmNum(this.realmNum);
 		}

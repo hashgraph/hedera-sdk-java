@@ -64,7 +64,7 @@ public class HederaTransactionBody implements Serializable {
 	 * get or set the type of transaction
 	 */
 	public TransactionType transactionType = TransactionType.NOTSET;
-	
+
 	/**
 	 * Default constructor
 	 */
@@ -153,10 +153,10 @@ public class HederaTransactionBody implements Serializable {
 				break;
 			case NOTSET:
 
-	            throw new IllegalArgumentException("Transaction type not set. Unable to generate data.");			
+	            throw new IllegalArgumentException("Transaction type not set. Unable to generate data.");
 		}
 
-		
+
 		return transactionBodyProtobuf.build();
 	}
 }

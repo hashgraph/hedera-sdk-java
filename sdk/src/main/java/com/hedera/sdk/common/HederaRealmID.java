@@ -1,17 +1,14 @@
 package com.hedera.sdk.common;
 
 import java.io.Serializable;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.hederahashgraph.api.proto.java.RealmID;
 
 /**
  * The ID for a realm. Within a given shard, every realm has a unique ID. Each account, file, and contract instance belongs to exactly one realm.
  */
 public class HederaRealmID implements Serializable {
-	final static Logger logger = LoggerFactory.getLogger(HederaRealmID.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaRealmID.class);
 
 	private static final long serialVersionUID = 1;
 
@@ -59,7 +56,7 @@ public class HederaRealmID implements Serializable {
 	 */
 	public RealmID getProtobuf() {
 
-		
+
 	   	RealmID.Builder realmID = RealmID.newBuilder();
 		if (this.shardNum > 0) {
 			realmID.setShardNum(this.shardNum);

@@ -3,21 +3,18 @@ package com.hedera.sdk.contract;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.common.HederaContractID;
 import com.hederahashgraph.api.proto.java.ContractFunctionResult;
 
 /**
- * The result returned by a call to a smart contract function. This is part of the response to a ContractCallLocal query, 
- * and is in the record for a ContractCall or ContractCreateInstance transaction. 
+ * The result returned by a call to a smart contract function. This is part of the response to a ContractCallLocal query,
+ * and is in the record for a ContractCall or ContractCreateInstance transaction.
  * The ContractCreateInstance transaction record has the results of the call to the constructor.
  */
 public class HederaContractFunctionResult implements Serializable {
-	final static Logger logger = LoggerFactory.getLogger(HederaContractFunctionResult.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaContractFunctionResult.class);
 	private static final long serialVersionUID = 1;
 	private HederaContractID contractID = new HederaContractID();
 	private byte[] contractCallResult = new byte[0];
@@ -103,13 +100,13 @@ public class HederaContractFunctionResult implements Serializable {
 
 	/**
 	 * Generate a {@link ContractFunctionResult} protobuf payload for this object
-	 * @return {@link ContractFunctionResult} 
+	 * @return {@link ContractFunctionResult}
 	 */
 	public ContractFunctionResult getProtobuf() {
 
-	
+
 		ContractFunctionResult.Builder contractFunctionResultProtobuf = ContractFunctionResult.newBuilder();
-		
+
 		contractFunctionResultProtobuf.setContractID(this.contractID.getProtobuf());
 		contractFunctionResultProtobuf.setContractCallResult(ByteString.copyFrom(this.contractCallResult));
 		contractFunctionResultProtobuf.setErrorMessage(this.errorMessage);
@@ -119,7 +116,7 @@ public class HederaContractFunctionResult implements Serializable {
 		for (int i=0; i < this.contractLogInfo.size(); i++) {
 			contractFunctionResultProtobuf.addLogInfo(this.contractLogInfo.get(i).getProtobuf());
 		}
-		
+
 		return contractFunctionResultProtobuf.build();
 	}
 }

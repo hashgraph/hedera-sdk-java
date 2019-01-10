@@ -1,21 +1,18 @@
 package com.hedera.sdk.common;
 
 import java.io.Serializable;
-
 import com.hedera.sdk.node.HederaNode;
 import com.hedera.sdk.transaction.HederaTransaction;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hederahashgraph.api.proto.java.TransactionGetReceiptResponse;
 import com.hederahashgraph.api.proto.java.TransactionReceipt;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * The consensus result for a transaction, which might not be currently known, or may succeed or fail.
  */
 public class HederaTransactionReceipt implements Serializable {
-	final static Logger logger = LoggerFactory.getLogger(HederaTransactionReceipt.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaTransactionReceipt.class);
 	private static final long serialVersionUID = 1;
 
 	/**
@@ -41,7 +38,7 @@ public class HederaTransactionReceipt implements Serializable {
 	 * initially null
 	 */
 	public HederaContractID contractID = null;
-	
+
 	/**
 	 * Default constructor
 	 */
@@ -57,7 +54,7 @@ public class HederaTransactionReceipt implements Serializable {
 	 * @param fileID a {@link HederaFileID}
 	 * @param contractID a {@link HederaContractID}
 	 */
-	public HederaTransactionReceipt(ResponseCodeEnum nodePrecheck, ResponseCodeEnum transactionStatus, HederaAccountID accountID, HederaFileID fileID, HederaContractID contractID) { 
+	public HederaTransactionReceipt(ResponseCodeEnum nodePrecheck, ResponseCodeEnum transactionStatus, HederaAccountID accountID, HederaFileID fileID, HederaContractID contractID) {
 
 	   	this.transactionStatus = transactionStatus;
 	   	this.nodePrecheck = nodePrecheck;
@@ -74,7 +71,7 @@ public class HederaTransactionReceipt implements Serializable {
 	 * @param fileID a {@link HederaFileID}
 	 * @param contractID a {@link HederaContractID}
 	 */
-	public HederaTransactionReceipt(ResponseCodeEnum transactionStatus, HederaAccountID accountID, HederaFileID fileID, HederaContractID contractID) { 
+	public HederaTransactionReceipt(ResponseCodeEnum transactionStatus, HederaAccountID accountID, HederaFileID fileID, HederaContractID contractID) {
 
 	   	this.transactionStatus = transactionStatus;
 	   	this.accountID = accountID;
@@ -82,17 +79,17 @@ public class HederaTransactionReceipt implements Serializable {
 	   	this.contractID = contractID;
 
 	}
-	
+
 	/**
 	 * Construct from a {@link TransactionGetReceiptResponse} protobuf stream
 	 * @param receiptResponse the {@link TransactionGetReceiptResponse}
 	 */
 	public HederaTransactionReceipt(TransactionGetReceiptResponse receiptResponse) {
 
-	   	
+
 		this.nodePrecheck = receiptResponse.getHeader().getNodeTransactionPrecheckCode();
 		this.transactionStatus = receiptResponse.getReceipt().getStatus();
-		   	
+
 	   	if (receiptResponse.getReceipt().hasAccountID()) {
 		   	this.accountID = new HederaAccountID(receiptResponse.getReceipt().getAccountID());
 	   	} else {
@@ -114,9 +111,9 @@ public class HederaTransactionReceipt implements Serializable {
 	 */
 	public HederaTransactionReceipt(TransactionReceipt receipt) {
 
-	   	
+
 	   	this.transactionStatus = receipt.getStatus();
-	   	
+
 	   	if (receipt.hasAccountID()) {
 		   	this.accountID = new HederaAccountID(receipt.getAccountID());
 	   	} else {
@@ -135,13 +132,13 @@ public class HederaTransactionReceipt implements Serializable {
 
 	/**
 	 * Generate a {@link TransactionReceipt} protobuf payload for this object
-	 * @return {@link TransactionReceipt}  
+	 * @return {@link TransactionReceipt}
 	 */
 	public TransactionReceipt getProtobuf() {
 
-		
+
 		TransactionReceipt.Builder transactionReceipt = TransactionReceipt.newBuilder();
-		
+
 		if (this.accountID != null) {
 			transactionReceipt.setAccountID(this.accountID.getProtobuf());
 		}
@@ -153,16 +150,16 @@ public class HederaTransactionReceipt implements Serializable {
 		}
 
    		transactionReceipt.setStatus(this.transactionStatus);
-		
+
 
 
 		return transactionReceipt.build();
 	}
-	/** 
+	/**
 	 * Gets a receipt for a given transaction ID
 	 * @param transactionID the transactionID
 	 * @param node the node
-	 * @throws InterruptedException in the event of a node communication failure 
+	 * @throws InterruptedException in the event of a node communication failure
 	 */
 	public HederaTransactionReceipt(HederaTransactionID transactionID, HederaNode node) throws InterruptedException {
 

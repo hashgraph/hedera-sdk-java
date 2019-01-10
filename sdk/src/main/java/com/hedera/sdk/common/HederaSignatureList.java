@@ -47,7 +47,7 @@ public class HederaSignatureList implements Serializable {
 
 		// convert a protobuf payload into class data
 		this.signatures.clear();
-		
+
 		for (Signature signature : protobuf.getSigsList()) {
 			this.signatures.add(new HederaSignature(signature));
 		}
@@ -76,7 +76,7 @@ public class HederaSignatureList implements Serializable {
 		this.signatures.add(signature);
 
 	}
-	/** 
+	/**
 	 * Delete a {@link HederaSignature} from the list
 	 * @param signature {@link HederaSignature}
 	 * @return true if found and deleted

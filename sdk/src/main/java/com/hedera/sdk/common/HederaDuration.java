@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 import com.hederahashgraph.api.proto.java.Duration;
 
 /**
- * The length of a period of time. 
- * This is an identical data structure to the protobuf Duration.proto 
+ * The length of a period of time.
+ * This is an identical data structure to the protobuf Duration.proto
  * (see the comments in https://github.com/google/protobuf/blob/master/src/google/protobuf/duration.proto)
  */
 public class HederaDuration implements Serializable {
@@ -27,7 +27,7 @@ public class HederaDuration implements Serializable {
 	public int nanos = 0;
 
 	/**
-	 * Constructor with default values 
+	 * Constructor with default values
 	 */
 	public HederaDuration() {
 	}
@@ -35,7 +35,7 @@ public class HederaDuration implements Serializable {
 	/**
 	 * Constructor with specific values
 	 * @param seconds the number of seconds
-	 * @param nanos the number of nanoseconds 
+	 * @param nanos the number of nanoseconds
 	 */
 	public HederaDuration(long seconds, int nanos) {
 

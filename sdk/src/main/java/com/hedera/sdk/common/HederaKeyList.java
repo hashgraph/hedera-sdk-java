@@ -23,7 +23,7 @@ public class HederaKeyList implements Serializable {
 	 * an {@link ArrayList} of {@link HederaKeyPair}, initially empty
 	 */
 	public List<HederaKeyPair> keys  = new ArrayList<HederaKeyPair>();
-	
+
 	/**
 	 * Default constructor for the {@link HederaKeyList} with an empty set of {@link HederaKeyPair}
 	 */
@@ -37,7 +37,7 @@ public class HederaKeyList implements Serializable {
 	 */
 	public HederaKeyList(List<HederaKeyPair> keys) {
 
-		
+
 		for (HederaKeyPair hederaKey : keys) {
 			this.keys.add(hederaKey);
 		}
@@ -51,7 +51,7 @@ public class HederaKeyList implements Serializable {
 
 		// convert a protobuf payload into class data
 		this.keys.clear();
-		
+
 		for (Key key : protobuf.getKeysList()) {
 			this.keys.add(new HederaKeyPair(key));
 		}
@@ -69,7 +69,7 @@ public class HederaKeyList implements Serializable {
 			keyListProtobuf.addKeys(key.getProtobuf());
 		}
 
-		
+
 		return keyListProtobuf.build();
 	}
 	/**
@@ -103,20 +103,20 @@ public class HederaKeyList implements Serializable {
 
 		return this.keys.remove(key);
 	}
-	/** 
-	 * Generates a {@link JSONArray} for the list of keys 
+	/**
+	 * Generates a {@link JSONArray} for the list of keys
 	 * @return {@link JSONArray}
 	 */
 	@SuppressWarnings("unchecked")
 	public JSONArray JSON() {
 
-	   	
+
 		JSONArray jsonKeys =new JSONArray();
 
 		for (HederaKeyPair hederaKey : this.keys) {
 			jsonKeys.add(hederaKey.JSON());
 		}
-	   	
+
 		return jsonKeys;
 	}
 	/**
@@ -134,11 +134,11 @@ public class HederaKeyList implements Serializable {
 	 */
 	public void fromJSON(JSONArray jsonKeys) {
 
-		
+
 		// delete all keys
 		this.keys.clear();
 		// add keys from json array
-		
+
 		for (int i=0; i < jsonKeys.size(); i++) {
 			JSONObject jsonKey = (JSONObject) jsonKeys.get(i);
 			HederaKeyPair key = new HederaKeyPair();

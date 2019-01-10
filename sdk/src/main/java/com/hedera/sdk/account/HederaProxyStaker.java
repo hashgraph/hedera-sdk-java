@@ -1,10 +1,7 @@
 package com.hedera.sdk.account;
 
 import java.io.Serializable;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.hederahashgraph.api.proto.java.AccountID;
 import com.hederahashgraph.api.proto.java.ProxyStaker;
 /**
@@ -12,7 +9,7 @@ import com.hederahashgraph.api.proto.java.ProxyStaker;
  *
  */
 public class HederaProxyStaker implements Serializable {
-	final static Logger logger = LoggerFactory.getLogger(HederaProxyStaker.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaProxyStaker.class);
 	private static final long serialVersionUID = 1;
 
 	/**
@@ -65,16 +62,16 @@ public class HederaProxyStaker implements Serializable {
 
 	/**
 	 * Generate a {@link ProxyStaker} protobuf stream for this object
-	 * @return {@link ProxyStaker} 
+	 * @return {@link ProxyStaker}
 	 */
 	public ProxyStaker getProtobuf() {
 	   	ProxyStaker.Builder accountAmount = ProxyStaker.newBuilder();
 		AccountID.Builder accountID = AccountID.newBuilder();
-		
+
 		accountID.setAccountNum(this.accountNum);
 		accountID.setRealmNum(this.realmNum);
 		accountID.setShardNum(this.shardNum);
-		
+
 		accountAmount.setAccountID(accountID);
 		accountAmount.setAmount(this.amount);
 

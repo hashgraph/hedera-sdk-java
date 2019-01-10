@@ -17,6 +17,7 @@ import com.hederahashgraph.api.proto.java.FileGetInfoQuery;
 import com.hederahashgraph.api.proto.java.GetByKeyQuery;
 import com.hederahashgraph.api.proto.java.GetBySolidityIDQuery;
 import com.hederahashgraph.api.proto.java.Query;
+import com.hederahashgraph.api.proto.java.TransactionGetFastRecordQuery;
 import com.hederahashgraph.api.proto.java.TransactionGetReceiptQuery;
 import com.hederahashgraph.api.proto.java.TransactionGetRecordQuery;
 
@@ -26,8 +27,8 @@ import org.slf4j.LoggerFactory;
 public class HederaQuery implements Serializable {
 	final Logger logger = LoggerFactory.getLogger(HederaQuery.class);
 	private static final long serialVersionUID = 1;
-	
-	/* 
+
+	/*
 	 * list of allowed types of query being handled by the instance of this object
 	 */
 	public enum QueryType {
@@ -46,6 +47,7 @@ public class HederaQuery implements Serializable {
 		GETBYSOLIDITYID,
 		TRANSACTIONGETRECEIPT,
 		TRANSACTIONGETRECORD,
+		TRANSACTIONGETFASTRECORD,
 		NOTSET
 	}
 	/**
@@ -56,7 +58,7 @@ public class HederaQuery implements Serializable {
 	 * Generic query data object
 	 */
 	public Object queryData = null;
-	
+
 	/**
 	 * Default constructor
 	 */
@@ -126,12 +128,15 @@ public class HederaQuery implements Serializable {
 			case TRANSACTIONGETRECORD:
 				query.setTransactionGetRecord((TransactionGetRecordQuery)this.queryData);
 				break;
+			case TRANSACTIONGETFASTRECORD:
+				query.setTransactionGetFastRecord((TransactionGetFastRecordQuery)this.queryData);
+				break;
 			case NOTSET:
 
-	            throw new IllegalArgumentException("Query type not set. Unable to generate data.");			
+	            throw new IllegalArgumentException("Query type not set. Unable to generate data.");
 		}
 
-		
+
 		return query.build();
 	}
 }

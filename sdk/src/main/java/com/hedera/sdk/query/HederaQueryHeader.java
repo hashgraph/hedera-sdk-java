@@ -34,7 +34,7 @@ public class HederaQueryHeader implements Serializable {
 	public QueryResponseType responseType = QueryResponseType.ANSWER_ONLY;
 
 	/**
-	 * Default constructor 
+	 * Default constructor
 	 */
 	public HederaQueryHeader() {
 
@@ -78,11 +78,10 @@ public class HederaQueryHeader implements Serializable {
 				break;
 			case NOTSET:
 
-	            throw new IllegalArgumentException("Response type not set. Unable to generate data.");			
+	            throw new IllegalArgumentException("Response type not set. Unable to generate data.");
 		}
 
-		
+
 		return queryHeader.build();
 	}
 }
-	

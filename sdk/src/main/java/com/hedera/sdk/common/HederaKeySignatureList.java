@@ -51,7 +51,7 @@ public class HederaKeySignatureList implements Serializable {
 //
 //		// convert a protobuf payload into class data
 //		this.keySigPairs.clear();
-//		
+//
 //		for (int index=0; index < protobufKeys.getKeysCount(); index++) {
 //			Key key = protobufKeys.getKeys(index);
 //			Signature sig = protobufSignatures.getSigs(index);
@@ -71,7 +71,7 @@ public class HederaKeySignatureList implements Serializable {
 			keyListProtobuf.addKeys(key.getKeyProtobuf());
 		}
 
-		
+
 		return keyListProtobuf.build();
 	}
 	/**
@@ -86,14 +86,14 @@ public class HederaKeySignatureList implements Serializable {
 			sigListProtobuf.addSigs(sig.getSignatureProtobuf());
 		}
 
-		
+
 		return sigListProtobuf.build();
 	}
 	/**
 	 * Adds a key/signature pair to the list
 	 * @param keyType the type of key to add
-	 * @param key the key as a byte array 
-	 * @param signature the signature as a byte array 
+	 * @param key the key as a byte array
+	 * @param signature the signature as a byte array
 	 */
 	public void addKeySignaturePair(HederaKeyPair.KeyType keyType, byte[] key, byte[] signature) {
 
@@ -137,7 +137,7 @@ public class HederaKeySignatureList implements Serializable {
 			if (keySigPair.setSignatureForKey(key, signature, stopAtFirst)) {
 				foundOne = true;
 				if (stopAtFirst) {
-			
+
 					return true;
 				}
 			}
@@ -160,9 +160,9 @@ public class HederaKeySignatureList implements Serializable {
 	   	boolean foundOne = false;
 
 	   	for (int i=0; i < keys.length; i++) {
-			if (setSignatureForKey(keys[i], signatures[i], stopAtFirst)) {
-				foundOne = true;
-			}
+				if (setSignatureForKey(keys[i], signatures[i], stopAtFirst)) {
+					foundOne = true;
+				}
 	   	}
 
 
@@ -180,7 +180,7 @@ public class HederaKeySignatureList implements Serializable {
 
 		for (HederaKeySignature keySigPair : keySigPairs) {
 			if (keySigPair.setSignatureForKeyUUID(uuid, signature)) {
-		
+
 				return true;
 			}
 		}
@@ -235,22 +235,22 @@ public class HederaKeySignatureList implements Serializable {
 	public boolean updateSignatureForKeys(byte[][] keys, byte[][] signatures) {
 
 		boolean foundOne = false;
-		
+
 		for (int i=0; i < keys.length; i++) {
 			if (updateSignatureForKey(keys[i], signatures[i])) {
 				foundOne = true;
 			}
 		}
 
-		
+
 		return foundOne;
 	}
 	/**
 	 * Gets an array of keys and UUIDS {@link HederaKeyUUIDDescription} for a given public key
-	 * 
+	 *
 	 * @param hederaKeyUUIDDescriptions a List of {@link HederaKeyUUIDDescription} containing the result
 	 * Note: Due to the recursive nature of this method, you must initialise this List before calling the method.
-	 * The result will be in the same parameter  
+	 * The result will be in the same parameter
 	 * @param publicKey the public key to look for
 	 */
 	public void getKeyUUIDs(List<HederaKeyUUIDDescription> hederaKeyUUIDDescriptions, byte[] publicKey) {
@@ -260,7 +260,7 @@ public class HederaKeySignatureList implements Serializable {
 			keySigPair.getKeyUUIDs(hederaKeyUUIDDescriptions, publicKey);
 		}
 
-	}	
+	}
 
 	/**
 	 *  Gets a {@link JSONObject} representation of this {@link HederaKeySignatureList}
@@ -292,11 +292,11 @@ public class HederaKeySignatureList implements Serializable {
 	 */
 	public void fromJSON(JSONArray jsonKeys) {
 
-		
+
 		// delete all keys
 		this.keySigPairs.clear();
 		// add keys from json array
-		
+
 		for (int i=0; i < jsonKeys.size(); i++) {
 			JSONObject jsonKey = (JSONObject) jsonKeys.get(i);
 			HederaKeySignature key = new HederaKeySignature();

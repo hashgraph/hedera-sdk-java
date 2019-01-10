@@ -31,22 +31,22 @@ import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hederahashgraph.api.proto.java.ResponseHeader;
 
 /**
- * A Key can be a public key from one of the three supported systems (ed25519, RSA-3072, ECDSA with p384). 
- * Or, it can be the ID of a smart contract instance, which is authorized to act as if it had a key. 
- * If an account has an ed25519 key associated with it, then the corresponding private key must sign any transaction to transfer cryptocurrency out of it. 
+ * A Key can be a public key from one of the three supported systems (ed25519, RSA-3072, ECDSA with p384).
+ * Or, it can be the ID of a smart contract instance, which is authorized to act as if it had a key.
+ * If an account has an ed25519 key associated with it, then the corresponding private key must sign any transaction to transfer cryptocurrency out of it.
  * And similarly for RSA and ECDSA.
- * A Key can be a smart contract ID, which means that smart contract is to authorize operations as if it had signed with a key that it owned. 
- * The smart contract doesn't actually have a key, and doesn't actually sign a transaction. 
+ * A Key can be a smart contract ID, which means that smart contract is to authorize operations as if it had signed with a key that it owned.
+ * The smart contract doesn't actually have a key, and doesn't actually sign a transaction.
  * But it's as if a virtual transaction were created, and the smart contract signed it with a private key.
- * A key can be a "threshold key", which means a list of M keys, any N of which must sign in order for the threshold signature to be considered valid. 
+ * A key can be a "threshold key", which means a list of M keys, any N of which must sign in order for the threshold signature to be considered valid.
  * The keys within a threshold signature may themselves be threshold signatures, to allow complex signature requirements.
- * A Key can be a list of keys. Their use is dependent on context. 
- * For example, a Hedera file is created with a list of keys, where all of them must sign a transaction to create or modify the file, 
- * but only one of them is needed to sign a transaction to delete the file. So it's a single list that sometimes acts as a 1-of-M threshold key, 
+ * A Key can be a list of keys. Their use is dependent on context.
+ * For example, a Hedera file is created with a list of keys, where all of them must sign a transaction to create or modify the file,
+ * but only one of them is needed to sign a transaction to delete the file. So it's a single list that sometimes acts as a 1-of-M threshold key,
  * and sometimes acts as an M-of-M threshold key.
- * A Key can contain a ThresholdKey or KeyList, which in turn contain a Key, so this mutual recursion would allow nesting arbitrarily deep. 
- * The current API only allows the nesting to a depth of 3 levels, such as the key being a list of threshold keys, 
- * each of which contains a list of primitive keys (e.g., ed25519). 
+ * A Key can contain a ThresholdKey or KeyList, which in turn contain a Key, so this mutual recursion would allow nesting arbitrarily deep.
+ * The current API only allows the nesting to a depth of 3 levels, such as the key being a list of threshold keys,
+ * each of which contains a list of primitive keys (e.g., ed25519).
  * In the future, this requirement may be relaxed, to allow deeper nesting.
  */
 public class HederaKey implements Serializable {
@@ -75,7 +75,7 @@ public class HederaKey implements Serializable {
 	    ED25519,
 	    RSA3072,
 	    ECDSA384,
-	    THRESHOLD, 
+	    THRESHOLD,
 	    LIST,
 	    NOTSET
 	}
@@ -130,8 +130,8 @@ public class HederaKey implements Serializable {
 	 * Default constructor
 	 */
 	public HederaKey() {
-	   	logger.trace("Start - Object init");
-	   	logger.trace("End - Object init");
+
+
 	}
 	/**
 	 * Constructs a HederaKey from type, key bytes
@@ -151,11 +151,11 @@ public class HederaKey implements Serializable {
 	 * @param keyDescription a description for the key
 	 */
 	public HederaKey(KeyType keyType, byte[] key, String keyDescription) {
-	   	logger.trace("Start - Object init key {}, type {}, description", key, keyType, keyDescription);
+
 		this.key = key.clone();
 		this.keyType = keyType;
 		this.keyDescription = keyDescription;
-	   	logger.trace("End - Object init");
+
 	}
 	/**
 	 * Constructs from a known pair of public and private key
@@ -284,17 +284,11 @@ public class HederaKey implements Serializable {
 	 * @param contractKey the HederaContractID used for this key
 	 * @param keyDescription the description of the key
 	 */
-<<<<<<< HEAD:sdk/src/main/java/com/hedera/sdk/common/HederaKey.java
-	public HederaKey(HederaContractID contractKey, String keyDescription) {
-	   	logger.trace("Start - Object init key {}, type CONTRACT, description {}", contractKey, keyDescription);
-=======
 	public HederaKeyPair(HederaContractID contractKey, String keyDescription) {
 
->>>>>>> 959a7d6... Removed trace logging. Updated pom.xml to ignore errors on javadocs:src/main/java/com/hedera/sdk/common/HederaKeyPair.java
 		this.keyType = KeyType.CONTRACT;
 		this.contractIDKey = contractKey;
 		this.keyDescription = keyDescription;
-
 	}
 	/**
 	 * Constructs a HederaKey from a HederaContractID
@@ -308,17 +302,11 @@ public class HederaKey implements Serializable {
 	 * @param thresholdKey the HederaContractID used for this key
 	 * @param keyDescription the description for the key
 	 */
-<<<<<<< HEAD:sdk/src/main/java/com/hedera/sdk/common/HederaKey.java
-	public HederaKey(HederaKeyThreshold thresholdKey, String keyDescription) {
-	   	logger.trace("Start - Object init key {}, type THRESHOLD, description {}", thresholdKey, keyDescription);
-=======
 	public HederaKeyPair(HederaKeyThreshold thresholdKey, String keyDescription) {
 
->>>>>>> 959a7d6... Removed trace logging. Updated pom.xml to ignore errors on javadocs:src/main/java/com/hedera/sdk/common/HederaKeyPair.java
 		this.keyType = KeyType.THRESHOLD;
 		this.thresholdKey = thresholdKey;
 		this.keyDescription = keyDescription;
-
 	}
 	/**
 	 * Constructs a HederaKey from a HederaKeyThreshold
@@ -332,17 +320,11 @@ public class HederaKey implements Serializable {
 	 * @param keyList the HederaKeyList to use for this key
 	 * @param keyDescription the description for the key
 	 */
-<<<<<<< HEAD:sdk/src/main/java/com/hedera/sdk/common/HederaKey.java
-	public HederaKey(HederaKeyList keyList, String keyDescription) {
-	   	logger.trace("Start - Object init key {}, type LIST, description {}", keyList, keyDescription);
-=======
 	public HederaKeyPair(HederaKeyList keyList, String keyDescription) {
 
->>>>>>> 959a7d6... Removed trace logging. Updated pom.xml to ignore errors on javadocs:src/main/java/com/hedera/sdk/common/HederaKeyPair.java
 		this.keyType = KeyType.LIST;
 		this.keyList = keyList;
 		this.keyDescription = keyDescription;
-
 	}
 	/**
 	 * Constructs a HederaKey from a HederaKeyList
@@ -393,15 +375,15 @@ public class HederaKey implements Serializable {
 			break;
 		case KEY_NOT_SET:
 			this.keyType = KeyType.NOTSET;
-            throw new IllegalArgumentException("Key not set in protobuf data.");			
+            throw new IllegalArgumentException("Key not set in protobuf data.");
 		default:
-            throw new IllegalArgumentException("Key Type not recognized. You may be using an old sdk.");			
+            throw new IllegalArgumentException("Key Type not recognized. You may be using an old sdk.");
 		}
 		this.keyDescription = keyDescription;
 
 	}
 	/**
-	 * Constructs a HederaKey from a protobuf 
+	 * Constructs a HederaKey from a protobuf
 	 * @param protobuf the protobuf to build the key with
 	 */
 	public HederaKey(Key protobuf) {
@@ -412,7 +394,7 @@ public class HederaKey implements Serializable {
 	 * @return KeyType
 	 */
 	public KeyType getKeyType() {
-	
+
 
 		return this.keyType;
 	}
@@ -422,7 +404,7 @@ public class HederaKey implements Serializable {
 	 * @return byte array (byte[])
 	 */
 	public byte[] getKey() {
-		logger.trace("getKey");
+
 		return this.key;
 	}
 	/**
@@ -452,15 +434,15 @@ public class HederaKey implements Serializable {
 
 		return this.keyList;
 	}
-	/** 
-	 * Gets the protobuf representation of this key object 
+	/**
+	 * Gets the protobuf representation of this key object
 	 * @return {@link Key} protobuf
 	 */
 	public Key getProtobuf() {
 
 		// Generates the protobuf payload for this class
 		Key.Builder keyProtobuf = Key.newBuilder();
-		
+
 		switch (this.keyType) {
 		case ED25519:
 			if (this.key != null) {
@@ -493,14 +475,14 @@ public class HederaKey implements Serializable {
 			}
 			break;
 		case NOTSET:
-            throw new IllegalArgumentException("Key type not set, unable to generate data.");			
+            throw new IllegalArgumentException("Key type not set, unable to generate data.");
 		}
-		
+
 
 		return keyProtobuf.build();
 	}
-	
-	/** 
+
+	/**
 	 * Generates a {@link JSONObject} representation of this key object
 	 * @return {@link JSONObject}
 	 */
@@ -542,7 +524,7 @@ public class HederaKey implements Serializable {
 			break;
 		}
 
-		
+
 		return jsonKey;
 	}
 	/**
@@ -560,7 +542,7 @@ public class HederaKey implements Serializable {
 	 */
 	public void fromJSON(JSONObject jsonKey) {
 
-		
+
 		if (jsonKey.containsKey(JSON_DESCRIPTION)) {
 			this.keyDescription = (String) jsonKey.get(JSON_DESCRIPTION);
 		} else {
@@ -577,9 +559,9 @@ public class HederaKey implements Serializable {
 			this.contractIDKey = null;
 			this.keyList = null;
 			this.key = null;
-			
+
 			JSONObject oneKey = new JSONObject();
-			
+
 			switch ((String) jsonKey.get(JSON_TYPE)) {
 			case  "CONTRACT":
 				this.keyType = KeyType.CONTRACT;
@@ -632,7 +614,7 @@ public class HederaKey implements Serializable {
 	 */
 	public boolean getEntities(HederaTransaction payment, HederaQueryHeader.QueryResponseType responseType) throws InterruptedException {
 		boolean result = true;
-		
+
 
 		// build the query
 	   	// Header
@@ -641,25 +623,25 @@ public class HederaKey implements Serializable {
 			queryHeader.payment = payment;
 			queryHeader.responseType = responseType;
 		}
-		
+
 		// get by key query
 		GetByKeyQuery.Builder getByKeyQuery = GetByKeyQuery.newBuilder();
 		getByKeyQuery.setKey(this.getProtobuf());
 		getByKeyQuery.setHeader(queryHeader.getProtobuf());
-		
+
 		// the query itself
 		HederaQuery query = new HederaQuery();
 		query.queryType = QueryType.FILEGETINFO;
 		query.queryData = getByKeyQuery.build();
-		
+
 		// query now set, send to network
 		Response response = this.node.getFileInfo(query);
 
 		FileGetInfoResponse.Builder fileGetInfoResponse = response.getFileGetInfo().toBuilder();
-		
+
 		// check response header first
 		ResponseHeader.Builder responseHeader = fileGetInfoResponse.getHeaderBuilder();
-		
+
 		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
 
 		if (this.precheckResult == ResponseCodeEnum.OK) {
@@ -676,7 +658,7 @@ public class HederaKey implements Serializable {
 		} else {
 			result = false;
 		}
-		
+
 
 	   	return result;
 	}

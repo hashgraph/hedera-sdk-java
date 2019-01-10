@@ -35,7 +35,7 @@ public class HederaContractID implements Serializable {
 	 * contract number (a nonnegative number unique within its realm)
 	 */
 	public long contractNum = 0;
-	
+
 	/**
 	 * Default constructor, creates a HederaContractID with default values
 	 */
@@ -66,12 +66,12 @@ public class HederaContractID implements Serializable {
 
 	/**
 	 * Generate a protobuf payload for this object
-	 * @return a protobuf ContractID 
+	 * @return a protobuf ContractID
 	 */
 	public ContractID getProtobuf() {
-		
+
 		ContractID.Builder contractID = ContractID.newBuilder();
-		
+
 		contractID.setShardNum(this.shardNum);
 		if (this.realmNum != -1) {
 			contractID.setRealmNum(this.realmNum);
@@ -95,7 +95,7 @@ public class HederaContractID implements Serializable {
 
 		return jsonContract;
 	}
-	
+
 	/**
 	 * Gets a JSON representation of the HederaContractID as a string
 	 * @return a String
@@ -109,7 +109,7 @@ public class HederaContractID implements Serializable {
 	 * @param jsonContract JSONObject representing a HederaContractID
 	 */
 	public void fromJSON(JSONObject jsonContract) {
-		
+
 		if (jsonContract.containsKey(JSON_SHARDNUM)) {
 			this.shardNum = (Long) jsonContract.get(JSON_SHARDNUM);
 		} else {

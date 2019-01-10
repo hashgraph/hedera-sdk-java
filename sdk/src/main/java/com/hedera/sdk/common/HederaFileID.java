@@ -29,7 +29,7 @@ public class HederaFileID implements Serializable {
 	 * file number a nonnegative number unique within its realm
 	 */
 	public long fileNum = 0;
-	
+
 	/**
 	 * Default constructor with default values
 	 */
@@ -71,14 +71,14 @@ public class HederaFileID implements Serializable {
 	public FileID getProtobuf() {
 
 		FileID.Builder fileID = FileID.newBuilder();
-		
+
 		fileID.setShardNum(this.shardNum);
 		if (this.realmNum != -1) {
 			// if realmnum is -1, create a new realm
 			fileID.setRealmNum(this.realmNum);
 		}
 		fileID.setFileNum(this.fileNum);
-		
+
 
 		return fileID.build();
 	}

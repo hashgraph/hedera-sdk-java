@@ -38,7 +38,7 @@ public class HederaSignatureThreshold implements Serializable {
 	public HederaSignatureThreshold(List<HederaSignature> signatures) {
 
 
-		
+
 		for (HederaSignature hederaSignature : signatures) {
 			this.signatures.add(hederaSignature);
 		}
@@ -52,7 +52,7 @@ public class HederaSignatureThreshold implements Serializable {
 
 		// convert a protobuf payload into class data
 		this.signatures.clear();
-		
+
 		SignatureList protoSigs = thresholdSignature.getSigs();
 
 		for (Signature signature : protoSigs.getSigsList()) {
@@ -69,7 +69,7 @@ public class HederaSignatureThreshold implements Serializable {
 		// Generates the protobuf payload for this class
 		ThresholdSignature.Builder signaturesProtobuf = ThresholdSignature.newBuilder();
 		SignatureList protoKeyList;
-		
+
 		if (!this.signatures.isEmpty()) {
 			protoKeyList = Utilities.getProtoSignatureList(this.signatures);
 			signaturesProtobuf.setSigs(protoKeyList);
@@ -77,7 +77,7 @@ public class HederaSignatureThreshold implements Serializable {
 
 			return null;
 		}
-		
+
 
 		return signaturesProtobuf.build();
 	}
