@@ -53,8 +53,8 @@ public class HederaContractLogInfo implements Serializable {
 	 * Default constructor
 	 */
 	public HederaContractLogInfo() {
-	   	
-	   	
+
+
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class HederaContractLogInfo implements Serializable {
 	 * @param contractLogInfoProtobuf the contract log information in protobuf
 	 */
 	public HederaContractLogInfo(ContractLoginfo contractLogInfoProtobuf) {
-		
+
 		this.contractID = new HederaContractID(contractLogInfoProtobuf.getContractID());
 		this.bloom = contractLogInfoProtobuf.getBloom().toByteArray();
 		this.data = contractLogInfoProtobuf.getData().toByteArray();
@@ -70,25 +70,25 @@ public class HederaContractLogInfo implements Serializable {
 		for (int i=0; i < contractLogInfoProtobuf.getTopicCount(); i++) {
 			this.topics[i] = contractLogInfoProtobuf.getTopic(i).toByteArray();
 		}
-		
+
 	}
 
 	/**
 	 * Generate a {@link ContractLoginfo} protobuf payload for this object
-	 * @return {@link ContractLoginfo} 
+	 * @return {@link ContractLoginfo}
 	 */
 	public ContractLoginfo getProtobuf() {
-		
-	
+
+
 		ContractLoginfo.Builder contractLogInfo = ContractLoginfo.newBuilder();
-		
+
 		contractLogInfo.setContractID(this.contractID.getProtobuf());
 		contractLogInfo.setBloom(ByteString.copyFrom(this.bloom));
 		contractLogInfo.setData(ByteString.copyFrom(this.data));
 		for (int i=0; i < this.topics.length; i++) {
 			contractLogInfo.addTopic(ByteString.copyFrom(this.topics[i]));
 		}
-		
+
 		return contractLogInfo.build();
 	}
 }

@@ -20,12 +20,12 @@ public class HederaKeyUUIDDescription implements Serializable {
 	 * UUID for the key
 	 */
 	public String uuid = "";
-	
+
 	/**
 	 * Default constructor
 	 */
 	public HederaKeyUUIDDescription () {
-		
+
 	}
 	/**
 	 * Constructs from a uuid and description
@@ -33,9 +33,9 @@ public class HederaKeyUUIDDescription implements Serializable {
 	 * @param description the description
 	 */
 	public HederaKeyUUIDDescription (String uuid, String description) {
-		
+
 		this.description = description;
 		this.uuid = uuid;
-		
+
 	}
 }

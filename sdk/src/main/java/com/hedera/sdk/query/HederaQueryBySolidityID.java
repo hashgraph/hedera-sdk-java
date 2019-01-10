@@ -48,13 +48,13 @@ public class HederaQueryBySolidityID implements Serializable {
 	public void setNode (HederaNode node) {
 		this.node = node;
 	}
-	
+
 	/**
 	 * Default constructor
 	 */
 	public HederaQueryBySolidityID() {
-		
-		
+
+
 	}
 	/**
 	 * Returns the precheck result for a query
@@ -79,7 +79,7 @@ public class HederaQueryBySolidityID implements Serializable {
 	}
 
 	/**
-	 * Runs the query to get results from a solidityIDQuery 
+	 * Runs the query to get results from a solidityIDQuery
 	 * If successful, the method populates the properties this object depending on the type of answer requested
 	 * @param payment a {@link HederaTransaction} message to indicate how this query will be paid for, this can be null for Cost queries
 	 * @param responseType the type of response requested from the query
@@ -89,8 +89,8 @@ public class HederaQueryBySolidityID implements Serializable {
 	 */
 	public boolean query(HederaTransaction payment, HederaQueryHeader.QueryResponseType responseType, String solidityID) throws InterruptedException {
 		boolean result = true;
-		
-	   	
+
+
 		// build the query
 	   	// Header
 		HederaQueryHeader queryHeader = new HederaQueryHeader();
@@ -98,26 +98,26 @@ public class HederaQueryBySolidityID implements Serializable {
 			queryHeader.payment = payment;
 			queryHeader.responseType = responseType;
 		}
-		
+
 		// get solidity id query
 		GetBySolidityIDQuery.Builder getBySolidityIDQuery = GetBySolidityIDQuery.newBuilder();
 		getBySolidityIDQuery.setSolidityID(solidityID);
 		getBySolidityIDQuery.setHeader(queryHeader.getProtobuf());
-		
+
 		// the query itself
 		HederaQuery query = new HederaQuery();
 		query.queryType = QueryType.GETBYSOLIDITYID;
 		query.queryData = getBySolidityIDQuery.build();
-		
+
 		// query now set, send to network
 		Utilities.throwIfNull("Node", this.node);
 		Response response = this.node.getContractBySolidityId(query);
 
 		GetBySolidityIDResponse.Builder getBySolidityIDResponse = response.getGetBySolidityID().toBuilder();
-		
+
 		// check response header first
 		ResponseHeader.Builder responseHeader = getBySolidityIDResponse.getHeaderBuilder();
-		
+
 		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
 
 		if (this.precheckResult == ResponseCodeEnum.OK) {
@@ -126,7 +126,7 @@ public class HederaQueryBySolidityID implements Serializable {
 			this.stateProof = responseHeader.getStateProof().toByteArray();
 			this.contractID = null;
 			this.accountID = null;
-			
+
 			if (getBySolidityIDResponse.hasAccountID()) {
 				this.accountID = new HederaAccountID(getBySolidityIDResponse.getAccountID());
 			}
@@ -136,8 +136,8 @@ public class HederaQueryBySolidityID implements Serializable {
 		} else {
 			result = false;
 		}
-		
-	   	
+
+
 	   	return result;
 	}
 	/**
@@ -149,7 +149,7 @@ public class HederaQueryBySolidityID implements Serializable {
 	 * @throws InterruptedException should an exception occur during communication with the node
 	 */
 	public boolean queryAnswerOnly(HederaTransaction payment, String solidityID) throws InterruptedException {
-	   	
+
 	   	return query(payment, QueryResponseType.ANSWER_ONLY, solidityID);
 	}
 	/**
@@ -161,7 +161,7 @@ public class HederaQueryBySolidityID implements Serializable {
 	 * @throws InterruptedException should an exception occur during communication with the node
 	 */
 	public boolean queryStateProof(HederaTransaction payment, String solidityID) throws InterruptedException {
-	   	
+
 		return query(payment, HederaQueryHeader.QueryResponseType.ANSWER_STATE_PROOF, solidityID);
 	}
 	/**
@@ -172,7 +172,7 @@ public class HederaQueryBySolidityID implements Serializable {
 	 * @throws InterruptedException should an exception occur during communication with the node
 	 */
 	public boolean queryCostAnswer(String solidityID) throws InterruptedException {
-	   	
+
 		return query(null, HederaQueryHeader.QueryResponseType.COST_ANSWER, solidityID);
 	}
 	/**
@@ -183,8 +183,8 @@ public class HederaQueryBySolidityID implements Serializable {
 	 * @throws InterruptedException should an exception occur during communication with the node
 	 */
 	public boolean queryCostAnswerStateProof(String solidityID) throws InterruptedException {
-	   	
+
 		return query(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF, solidityID);
 	}
-	
+
 }

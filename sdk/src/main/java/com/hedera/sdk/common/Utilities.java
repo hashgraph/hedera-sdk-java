@@ -27,8 +27,8 @@ public class Utilities {
 	 * @throws IOException in the event of an error
 	 */
 	public static byte[] serialize(Object object) throws IOException {
-		
-		
+
+
 		byte[] serialData = new byte[0];
 		// Serialise
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -36,7 +36,7 @@ public class Utilities {
 	    os.writeObject(object);
 	    serialData = bos.toByteArray();
 	    os.close();
-		
+
 		return serialData;
 	}
 	/**
@@ -47,15 +47,15 @@ public class Utilities {
 	 * @throws ClassNotFoundException in the event of an error
 	 */
 	public static Object deserialize(byte[] serialData) throws IOException, ClassNotFoundException {
-		
+
 		Object returnObject = new Object();
-	
+
 	    // de-serialise
 	    ByteArrayInputStream bis = new ByteArrayInputStream(serialData);
 	    ObjectInputStream oInputStream = new ObjectInputStream(bis);
 	    returnObject = oInputStream.readObject();
 	    oInputStream.close();
-		
+
 	    return returnObject;
 	}
 
@@ -65,38 +65,38 @@ public class Utilities {
 	 * @return {@link Long}
 	 */
 	public static long getLongRandom() {
-		
+
 		Random random = new SecureRandom();
-		byte[] randomInt64 = new byte[16]; // 16 bytes = 64 bits = Int64 
+		byte[] randomInt64 = new byte[16]; // 16 bytes = 64 bits = Int64
 		random.nextBytes(randomInt64);
-		
+
 		return random.nextLong();
 	}
 	/**
-	 * Helper function to generate a {@link HederaKeySignature} for a given 
+	 * Helper function to generate a {@link HederaKeySignature} for a given
 	 * payload (body) and keypair
 	 * @param payload the payload to sign
 	 * @param keyPair the keypair to use for signing
 	 * @return {@link HederaKeySignature}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public static HederaKeySignature getKeySignature(byte[] payload, HederaKeyPair keyPair) throws Exception {
-		
+
 		byte[] signedBody = keyPair.signMessage(payload);
 		// create a Hedera Signature for it
 		HederaSignature signature = new HederaSignature(keyPair.getKeyType(), signedBody);
-		
+
 		return new HederaKeySignature(keyPair.getKeyType(), keyPair.getPublicKeyEncoded(), signature.getSignature());
 	}
 	/**
-	 * Helper function to generate a {@link HederaKeySignature} for a given 
+	 * Helper function to generate a {@link HederaKeySignature} for a given
 	 * payload (body) key type, private and public key
 	 * @param payload the payload to sign
 	 * @param keyType the type of key
 	 * @param publicKey the public key
 	 * @param privateKey the private key
 	 * @return {@link HederaKeySignature}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public static HederaKeySignature getKeySignature(byte[] payload, KeyType keyType, byte[] publicKey, byte[] privateKey) throws Exception {
 		// create new keypair
@@ -104,30 +104,30 @@ public class Utilities {
 		return getKeySignature(payload, keyPair);
 	}
 	/**
-	 * Helper function to generate a {@link HederaSignature} for a given 
+	 * Helper function to generate a {@link HederaSignature} for a given
 	 * payload (body) and keypair
 	 * @param payload the payload to sign
 	 * @param keyPair the keypair to use for the signature
 	 * @return {@link HederaSignature}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public static HederaSignature getSignature(byte[] payload, HederaKeyPair keyPair) throws Exception {
-		
+
 		byte[] signedBody = keyPair.signMessage(payload);
 		// create a Hedera Signature for it
 		HederaSignature signature = new HederaSignature(keyPair.getKeyType(), signedBody);
-		
+
 		return new HederaSignature(keyPair.getKeyType(), signature.getSignature());
 	}
 	/**
-	 * Helper function to generate a {@link HederaSignature} for a given 
+	 * Helper function to generate a {@link HederaSignature} for a given
 	 * payload (body) key type and private key
 	 * @param payload the payload to sign
 	 * @param keyType the type of key
 	 * @param publicKey the public key
 	 * @param privateKey the private key
 	 * @return {@link HederaSignature}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public static HederaSignature getSignature(byte[] payload, KeyType keyType, byte[] publicKey, byte[] privateKey) throws Exception {
 		// create new keypair
@@ -141,7 +141,7 @@ public class Utilities {
 	 * @param hederaTransactionID the transaction id to get a receipt for
 	 * @param node the node to communicate with
 	 * @return {@link HederaTransactionReceipt}
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	public static HederaTransactionReceipt getReceipt (HederaTransactionID hederaTransactionID, HederaNode node) throws InterruptedException {
 
@@ -149,10 +149,10 @@ public class Utilities {
 		final int DELAY_BASE = 550; // base delay in milliseconds
 		final int DELAY_INCREASE = 0; // this determines how delay increases between calls. It is simply added to sleepTime between each call
 
-		
+
 		return getReceipt(hederaTransactionID, node, MAX_CALL_COUNT, DELAY_BASE, DELAY_INCREASE);
 	}
-	
+
 	/**
 	 * retrieves a receipt for a transaction
 	 * returns the last {@link HederaTransactionReceipt} received.
@@ -162,19 +162,19 @@ public class Utilities {
 	 * @param firstDelay the time in milliseconds before the first getReceipt is sent
 	 * @param increaseDelay the time in milliseconds to increase the delay by between each retry
 	 * @return {@link HederaTransactionReceipt}
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	public static HederaTransactionReceipt getReceipt (HederaTransactionID hederaTransactionID, HederaNode node, int maxRetries, int firstDelay, int increaseDelay) throws InterruptedException {
 		final Logger logger = LoggerFactory.getLogger(HederaTransactionReceipt.class);
 
 		long sleepTime = firstDelay;
 		boolean keepGoing = true;
-		
+
 		int callCount = 1;
 		HederaTransactionReceipt receipt = new HederaTransactionReceipt();
 		receipt.transactionStatus = ResponseCodeEnum.UNKNOWN;
 		while ((callCount <= maxRetries) && keepGoing) {
-			
+
 			Thread.sleep(sleepTime);
 			sleepTime += increaseDelay;
 			logger.info("Fetching receipt");
@@ -305,7 +305,7 @@ public class Utilities {
 					logger.info("precheck=INVALID_SOLIDITY_ID");
 					keepGoing = false;
 					break;
-				case INVALID_TRANSACTION: 
+				case INVALID_TRANSACTION:
 					// do nothing
 					logger.info("precheck=INVALID_TRANSACTION");
 					break;
@@ -329,7 +329,7 @@ public class Utilities {
 					logger.info("precheck=KEY_NOT_PROVIDED");
 					keepGoing = false;
 					break;
-				case KEY_REQUIRED: 
+				case KEY_REQUIRED:
 					logger.info("precheck=KEY_REQUIRED");
 					keepGoing = false;
 					break;
@@ -337,7 +337,7 @@ public class Utilities {
 					logger.info("precheck=LOCAL_CALL_MODIFICATION_EXCEPTION");
 					keepGoing = false;
 					break;
-				case MEMO_TOO_LONG: 
+				case MEMO_TOO_LONG:
 					logger.info("precheck=MEMO_TOO_LONG");
 					keepGoing = false;
 					break;
@@ -375,7 +375,7 @@ public class Utilities {
 					logger.info("precheck=RECEIPT_NOT_FOUND");
 					keepGoing = false;
 					break;
-				case RECORD_NOT_FOUND: 
+				case RECORD_NOT_FOUND:
 					logger.info("precheck=RECORD_NOT_FOUND");
 					keepGoing = false;
 					break;
@@ -397,7 +397,7 @@ public class Utilities {
 					logger.info("precheck=UNKNOWN");
 					keepGoing = false;
 					break;
-				case UNRECOGNIZED: 
+				case UNRECOGNIZED:
 					logger.info("precheck=UNRECOGNIZED");
 					keepGoing = false;
 					break;
@@ -407,57 +407,57 @@ public class Utilities {
 	}
 
 	public static KeyList getProtoKeyList(List<HederaKeyPair> keys) {
-		
+
 		com.hederahashgraph.api.proto.java.KeyList.Builder keyListBuilder = KeyList.newBuilder();
-		
+
 		if (!keys.isEmpty()) {
 			for (HederaKeyPair key : keys) {
 				keyListBuilder.addKeys(key.getProtobuf());
 			}
 		}
 		return keyListBuilder.build();
-		
+
 	}
-	
+
 	public static KeyList getProtoKeyFromKeySigList(List<HederaKeySignature> keySignatures) {
-		
+
 		com.hederahashgraph.api.proto.java.KeyList.Builder keyListBuilder = KeyList.newBuilder();
-		
+
 		if (!keySignatures.isEmpty()) {
 			for (HederaKeySignature keySig : keySignatures) {
 				keyListBuilder.addKeys(keySig.getKeyProtobuf());
 			}
 		}
-		
+
 		return keyListBuilder.build();
-		
+
 	}
-	
+
 	public static SignatureList getProtoSignatureFromKeySigList(List<HederaKeySignature> keySignatures) {
-		
+
 		com.hederahashgraph.api.proto.java.SignatureList.Builder sigListBuilder = SignatureList.newBuilder();
-		
+
 		if (!keySignatures.isEmpty()) {
 			for (HederaKeySignature keySig : keySignatures) {
 				sigListBuilder.addSigs(keySig.getSignatureProtobuf());
 			}
 		}
-		
+
 		return sigListBuilder.build();
-		
+
 	}
 	public static SignatureList getProtoSignatureList(List<HederaSignature> signatures) {
 		com.hederahashgraph.api.proto.java.SignatureList.Builder sigListBuilder = SignatureList.newBuilder();
-		
+
 		if (!signatures.isEmpty()) {
 			for (HederaSignature sig : signatures) {
 				sigListBuilder.addSigs(sig.getProtobuf());
 			}
 		}
-		
+
 		return sigListBuilder.build();
 	}
-	
+
 	public static void printResponseFailure(String location) {
 		logger.error("***** " + location + " FAILED to get response *****");
 	}
@@ -469,7 +469,7 @@ public class Utilities {
 	 */
 	public static void throwIfNull(String objectType, Object object) {
 		if (object == null) {
-		   	
+
 		   	String error = objectType + " is null";
 		   	logger.error(error);
 			throw new IllegalStateException(error);
@@ -483,13 +483,13 @@ public class Utilities {
 	 */
 	public static void throwIfAccountIDInvalid(String accountType, HederaAccountID accountID) {
 		if (accountID == null) {
-		   	
+
 		   	String error = accountType + " AccountID is null.";
 		   	logger.error(error);
 			throw new IllegalStateException(error);
 		} else {
 			if ((accountID.shardNum < 0) || (accountID.realmNum < 0) || (accountID.accountNum <= 0)) {
-			   	
+
 			   	String error = accountType + " AccountID shard and realm must be greater or equal to 0 and accountNum greater than 0.";
 			   	logger.error(error);
 				throw new IllegalStateException(error);

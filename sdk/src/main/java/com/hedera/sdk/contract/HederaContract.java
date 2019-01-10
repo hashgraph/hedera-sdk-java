@@ -46,7 +46,7 @@ import com.hederahashgraph.api.proto.java.TransactionBody;
 import com.hederahashgraph.api.proto.java.ContractGetInfoResponse.ContractInfo;
 
 /**
- * This class manages all aspects of interacting with a Smart Contract on Hedera Hashgraph 
+ * This class manages all aspects of interacting with a Smart Contract on Hedera Hashgraph
  */
 public class HederaContract implements Serializable {
 	final Logger logger = LoggerFactory.getLogger(HederaContract.class);
@@ -70,7 +70,7 @@ public class HederaContract implements Serializable {
 	 * The {@link HederaTransactionID} of the last transaction to be run here
 	 */
 	public HederaTransactionID hederaTransactionID = null;
-	/** 
+	/**
 	 * the shard number for the smart contract
 	 */
 	public long shardNum = 0;
@@ -104,9 +104,9 @@ public class HederaContract implements Serializable {
 	/**
 	 * The {@link HederaKeyPair} representing the contract's administration key
 	 * initially null
-	 * the state of the instance and its fields can be modified arbitrarily if this key signs a transaction to modify it. 
-	 * If this is null, then such modifications are not possible, and there is no administrator that can override the normal 
-	 * operation of this smart contract instance. Note that if it is created with no admin keys, then there is no administrator to 
+	 * the state of the instance and its fields can be modified arbitrarily if this key signs a transaction to modify it.
+	 * If this is null, then such modifications are not possible, and there is no administrator that can override the normal
+	 * operation of this smart contract instance. Note that if it is created with no admin keys, then there is no administrator to
 	 * authorize changing the admin keys, so there can never be any admin keys for that instance.
 	 */
 	public HederaKeyPair adminKey = null;
@@ -119,7 +119,7 @@ public class HederaContract implements Serializable {
 	 */
 	public long amount = 0;
 	/**
-	 * Parameters supplied when running a function 
+	 * Parameters supplied when running a function
 	 * (in the solidity format)
 	 */
 	public byte[] functionParameters = new byte[0];
@@ -134,10 +134,10 @@ public class HederaContract implements Serializable {
 	 */
 	public long initialBalance = 0;
 	/**
-	 * ID of the account to which this account is proxy staked. If proxyAccountID is null, or is an invalid account, 
-	 * or is an account that isn't a node, then this account is automatically proxy staked to a node chosen by the network, 
-	 * but without earning payments. If the proxyAccountID account refuses to accept proxy staking at the given fraction, 
-	 * or if it is not currently running a node, then it will behave as if both proxyAccountID and proxyFraction were null.	 
+	 * ID of the account to which this account is proxy staked. If proxyAccountID is null, or is an invalid account,
+	 * or is an account that isn't a node, then this account is automatically proxy staked to a node chosen by the network,
+	 * but without earning payments. If the proxyAccountID account refuses to accept proxy staking at the given fraction,
+	 * or if it is not currently running a node, then it will behave as if both proxyAccountID and proxyFraction were null.
 	 * initially null
 	 */
 	public HederaAccountID proxyAccountID = null;
@@ -158,7 +158,7 @@ public class HederaContract implements Serializable {
 	 */
 	public HederaTimeStamp expirationTime = null;
 	/**
-	 * Parameters supplied when creating a smart contract 
+	 * Parameters supplied when creating a smart contract
 	 * (in the solidity format)
 	 */
 	public byte[] constructionParameters = new byte[0];
@@ -180,7 +180,7 @@ public class HederaContract implements Serializable {
 	public long getStorage() {
 		return this.storage;
 	}
-	/** 
+	/**
 	 * Gets the bytecode for the smart contract
 	 * @return byte[]
 	 */
@@ -195,7 +195,7 @@ public class HederaContract implements Serializable {
 		return transactionRecords;
 	}
 	/**
-	 * The last result of running a local smart contract function 
+	 * The last result of running a local smart contract function
 	 * Note: May be null
 	 * @return {@link HederaContractFunctionResult}
 	 */
@@ -207,8 +207,8 @@ public class HederaContract implements Serializable {
 	 * Default constructor, this returns a blank contract object with default values set.
 	 */
 	public HederaContract() {
-	   	
-	   	
+
+
 	}
 	/**
 	 * Constructor from shard, realm and contract numbers
@@ -217,20 +217,20 @@ public class HederaContract implements Serializable {
 	 * @param contractNum the contract number
 	 */
 	public HederaContract(long shardNum, long realmNum, long contractNum) {
-	   	
+
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.contractNum = contractNum;
-	   	
+
 	}
 	/**
 	 * Constructor from a {@link HederaTransactionID}
 	 * @param transactionID the HederaTransactionID
 	 */
 	public HederaContract(HederaTransactionID transactionID) {
-	   	
+
 		this.hederaTransactionID = transactionID;
-	   	
+
 	}
 	/**
 	 * The precheck result {@link ResponseCodeEnum} of a transaction
@@ -269,7 +269,7 @@ public class HederaContract implements Serializable {
 	public HederaTransactionResult call(HederaTransactionID transactionID, HederaAccountID nodeAccount
 			, long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord
 			, String memo, HederaSignatureList sigsForTransaction) throws InterruptedException {
-		
+
 		// build the body
 		HederaTransaction transaction = new HederaTransaction();
 		transaction.body = new HederaTransactionBody(
@@ -283,13 +283,13 @@ public class HederaContract implements Serializable {
 				, this.getCallTransactionBody());
 		// add the signatures
 		transaction.signatureList = sigsForTransaction;
-		
+
 		// issue the transaction
 		Utilities.throwIfNull("Node", this.node);
 		HederaTransactionResult hederaTransactionResult = this.node.contractCall(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 		// return
-	  
+
 		return hederaTransactionResult;
 	}
 
@@ -303,10 +303,10 @@ public class HederaContract implements Serializable {
 	 * @param memo String memo to include in the transaction
 	 * @return {@link TransactionBody}
 	 */
-	public TransactionBody bodyToSignForCall(HederaTransactionID transactionID, HederaAccountID nodeAccount, 
-		long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, 
+	public TransactionBody bodyToSignForCall(HederaTransactionID transactionID, HederaAccountID nodeAccount,
+		long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord,
 		String memo) {
-		
+
 		HederaTransactionBody transactionBody = new HederaTransactionBody(
 				TransactionType.CONTRACTCALL
 				, transactionID
@@ -317,7 +317,7 @@ public class HederaContract implements Serializable {
 				, memo
 				, this.getCallTransactionBody());
 
-	  
+
 		return transactionBody.getProtobuf();
 	}
 
@@ -326,8 +326,8 @@ public class HederaContract implements Serializable {
 	 * @return {@link ContractCallTransactionBody}
 	 */
 	public ContractCallTransactionBody getCallTransactionBody() {
-		
-		
+
+
 		ContractCallTransactionBody.Builder transactionBody = ContractCallTransactionBody.newBuilder();
 
 		transactionBody.setAmount(this.amount);
@@ -335,13 +335,13 @@ public class HederaContract implements Serializable {
 		ByteString parameters = ByteString.copyFrom(this.functionParameters);
 		transactionBody.setFunctionParameters(parameters);
 		transactionBody.setGas(this.gas);
-	
-		
+
+
 		return transactionBody.build();
 	}
 
 	/**
-	 * This method runs a transaction to create a smart contract instance 
+	 * This method runs a transaction to create a smart contract instance
 	 * @param transactionID the {@link HederaTransactionID} for the transaction
 	 * @param nodeAccount the {@link HederaAccountID} of the account of the node to which the transaction is submitted
 	 * @param transactionFee the fee paid by the client to run the transaction
@@ -355,7 +355,7 @@ public class HederaContract implements Serializable {
 	public HederaTransactionResult create(HederaTransactionID transactionID, HederaAccountID nodeAccount
 			, long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord
 			, String memo, HederaSignatureList sigsForTransaction) throws InterruptedException {
-		
+
 		// build the body
 		HederaTransaction transaction = new HederaTransaction();
 		transaction.body = new HederaTransactionBody(
@@ -369,13 +369,13 @@ public class HederaContract implements Serializable {
 				, this.getCreateTransactionBody());
 		// add the signatures
 		transaction.signatureList = sigsForTransaction;
-		
+
 		// issue the transaction
 		Utilities.throwIfNull("Node", this.node);
 		HederaTransactionResult hederaTransactionResult = this.node.contractCreate(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 		// return
-	  
+
 		return hederaTransactionResult;
 	}
 
@@ -389,10 +389,10 @@ public class HederaContract implements Serializable {
 	 * @param memo String memo to include in the transaction
 	 * @return {@link TransactionBody}
 	 */
-	public TransactionBody bodyToSignForCreate(HederaTransactionID transactionID, HederaAccountID nodeAccount, 
-		long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, 
+	public TransactionBody bodyToSignForCreate(HederaTransactionID transactionID, HederaAccountID nodeAccount,
+		long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord,
 		String memo) {
-	
+
 		HederaTransactionBody transactionBody = new HederaTransactionBody(
 				TransactionType.CONTRACTCREATEINSTANCE
 				, transactionID
@@ -403,7 +403,7 @@ public class HederaContract implements Serializable {
 				, memo
 				, this.getCreateTransactionBody());
 
-	  
+
 		return transactionBody.getProtobuf();
 	}
 
@@ -412,8 +412,8 @@ public class HederaContract implements Serializable {
 	 * @return {@link ContractCreateTransactionBody}
 	 */
 	public ContractCreateTransactionBody getCreateTransactionBody() {
-		
-		
+
+
 		ContractCreateTransactionBody.Builder transactionBody = ContractCreateTransactionBody.newBuilder();
 
 		if (this.adminKey != null) {
@@ -434,15 +434,15 @@ public class HederaContract implements Serializable {
 		if (this.realmNum != -1) {
 			transactionBody.setRealmID(new HederaRealmID(this.shardNum, this.realmNum).getProtobuf());
 		}
-		transactionBody.setShardID(new HederaShardID(this.shardNum).getProtobuf());	   	
-		
-	
-		
+		transactionBody.setShardID(new HederaShardID(this.shardNum).getProtobuf());
+
+
+
 		return transactionBody.build();
 	}
 
 	/**
-	 * This method runs a transaction to update an existing smart contract instance 
+	 * This method runs a transaction to update an existing smart contract instance
 	 * @param transactionID the {@link HederaTransactionID} for the transaction
 	 * @param nodeAccount the {@link HederaAccountID} of the account of the node to which the transaction is submitted
 	 * @param transactionFee the fee paid by the client to run the transaction
@@ -456,7 +456,7 @@ public class HederaContract implements Serializable {
 	public HederaTransactionResult update(HederaTransactionID transactionID, HederaAccountID nodeAccount
 			, long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord
 			, String memo, HederaSignatureList sigsForTransaction) throws InterruptedException {
-		
+
 		// build the body
 		HederaTransaction transaction = new HederaTransaction();
 		transaction.body = new HederaTransactionBody(
@@ -470,13 +470,13 @@ public class HederaContract implements Serializable {
 			, this.getUpdateTransactionBody());
 		// add the signatures
 		transaction.signatureList = sigsForTransaction;
-		
+
 		// issue the transaction
 		Utilities.throwIfNull("Node", this.node);
 		HederaTransactionResult hederaTransactionResult = this.node.contractUpdate(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 		// return
-		
+
 		return hederaTransactionResult;
 	}
 
@@ -490,10 +490,10 @@ public class HederaContract implements Serializable {
 	 * @param memo String memo to include in the transaction
 	 * @return {@link TransactionBody}
 	 */
-	public TransactionBody bodyToSignForUpdate(HederaTransactionID transactionID, HederaAccountID nodeAccount, 
-			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, 
+	public TransactionBody bodyToSignForUpdate(HederaTransactionID transactionID, HederaAccountID nodeAccount,
+			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord,
 			String memo) {
-		
+
 		HederaTransactionBody transactionBody = new HederaTransactionBody(
 			TransactionType.CONTRACTUPDATEINSTANCE
 			, transactionID
@@ -504,7 +504,7 @@ public class HederaContract implements Serializable {
 			, memo
 			, this.getUpdateTransactionBody());
 
-		
+
 		return transactionBody.getProtobuf();
 	}
 	/**
@@ -512,8 +512,8 @@ public class HederaContract implements Serializable {
 	 * @return {@link ContractUpdateTransactionBody}
 	 */
 	public ContractUpdateTransactionBody getUpdateTransactionBody() {
-		
-		
+
+
 		ContractUpdateTransactionBody.Builder transactionBody = ContractUpdateTransactionBody.newBuilder();
 
 		transactionBody.setContractID(new HederaContractID(this.shardNum, this.realmNum, this.contractNum).getProtobuf());
@@ -530,13 +530,13 @@ public class HederaContract implements Serializable {
 		if (this.proxyAccountID != null) {
 			transactionBody.setProxyAccountID(this.proxyAccountID.getProtobuf());
 		}
-	
-		
+
+
 		return transactionBody.build();
 	}
 
 	/**
-	 * Runs a query to get the bytecode for a given smart contract 
+	 * Runs a query to get the bytecode for a given smart contract
 	 * If successful, the method populates the bytecode, cost and stateProof for this object depending on the type of answer requested
 	 * @param payment a {@link HederaTransaction} message to indicate how this query will be paid for, this can be null for Cost queries
 	 * @param responseType the type of response requested from the query
@@ -545,8 +545,8 @@ public class HederaContract implements Serializable {
 	 */
 	public boolean getByteCode(HederaTransaction payment, HederaQueryHeader.QueryResponseType responseType) throws InterruptedException {
 		boolean result = true;
-		
-	  
+
+
 		// build the query
 	  // Header
 		HederaQueryHeader queryHeader = new HederaQueryHeader();
@@ -554,18 +554,18 @@ public class HederaContract implements Serializable {
 			queryHeader.payment = payment;
 			queryHeader.responseType = responseType;
 		}
-		
+
 		// get bytecode query
 		ContractGetBytecodeQuery.Builder getInfoQuery = ContractGetBytecodeQuery.newBuilder();
 		getInfoQuery.setContractID(new HederaContractID(this.shardNum, this.realmNum, this.contractNum).getProtobuf());
 		getInfoQuery.setHeader(queryHeader.getProtobuf());
-		
-		
+
+
 		// the query itself
 		HederaQuery query = new HederaQuery();
 		query.queryType = QueryType.CONTRACTGETBYTECODE;
 		query.queryData = getInfoQuery.build();
-		
+
 		// query now set, send to network
 		Utilities.throwIfNull("Node", this.node);
 		Response response = this.node.getContractByteCode(query);
@@ -579,18 +579,18 @@ public class HederaContract implements Serializable {
 		ResponseHeader responseHeader = getInfoResponse.getHeader();
 
 		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
-				
+
 		if (this.precheckResult == ResponseCodeEnum.OK) {
 			// cost
 			this.cost = responseHeader.getCost();
 			//state proof
 			this.stateProof = responseHeader.getStateProof().toByteArray();
-			
+
 			this.byteCode = getInfoResponse.getBytecode().toByteArray();
 		} else {
 			result = false;
 		}
-	   	
+
 	   	return result;
 	}
 
@@ -602,7 +602,7 @@ public class HederaContract implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getByteCodeAnswerOnly(HederaTransaction payment) throws InterruptedException {
-	   	
+
 	   	return getByteCode(payment, QueryResponseType.ANSWER_ONLY);
 	}
 
@@ -614,7 +614,7 @@ public class HederaContract implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getByteCodeStateProof(HederaTransaction payment) throws InterruptedException {
-	  
+
 		return getByteCode(payment, HederaQueryHeader.QueryResponseType.ANSWER_STATE_PROOF);
 	}
 
@@ -625,7 +625,7 @@ public class HederaContract implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getByteCodeCostAnswer() throws InterruptedException {
-	  
+
 		return getByteCode(null, HederaQueryHeader.QueryResponseType.COST_ANSWER);
 	}
 
@@ -636,12 +636,12 @@ public class HederaContract implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getByteCodeCostAnswerStateProof() throws InterruptedException {
-	  
+
 		return getByteCode(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
 	}
 
 	/**
-	 * Runs a query to get information for a given smart contract 
+	 * Runs a query to get information for a given smart contract
 	 * If successful, the method populates the properties this object depending on the type of answer requested
 	 * @param payment a {@link HederaTransaction} message to indicate how this query will be paid for, this can be null for Cost queries
 	 * @param responseType the type of response requested from the query
@@ -650,26 +650,26 @@ public class HederaContract implements Serializable {
 	 */
 	public boolean getInfo(HederaTransaction payment, HederaQueryHeader.QueryResponseType responseType) throws InterruptedException {
 		boolean result = true;
-		
-	  
+
+
 		// build the query
 	  // Header
-		HederaQueryHeader queryHeader = new HederaQueryHeader(); 
+		HederaQueryHeader queryHeader = new HederaQueryHeader();
 		if (payment != null) {
 			queryHeader.payment = payment;
 			queryHeader.responseType = responseType;
 		}
-		
+
 		// get info query
 		ContractGetInfoQuery.Builder getInfoQuery = ContractGetInfoQuery.newBuilder();
 		getInfoQuery.setContractID(new HederaContractID(this.shardNum, this.realmNum, this.contractNum).getProtobuf());
 		getInfoQuery.setHeader(queryHeader.getProtobuf());
-		
+
 		// the query itself
 		HederaQuery query = new HederaQuery();
 		query.queryType = QueryType.CONTRACTGETINFO;
 		query.queryData = getInfoQuery.build();
-		
+
 		// query now set, send to network
 		Utilities.throwIfNull("Node", this.node);
 		Response response = this.node.getContractInfo(query);
@@ -678,19 +678,19 @@ public class HederaContract implements Serializable {
 			return false;
 		}
 		ContractGetInfoResponse.Builder getInfoResponse = response.getContractGetInfo().toBuilder();
-		
+
 		// check response header first
 		ResponseHeader.Builder responseHeader = getInfoResponse.getHeaderBuilder();
 
 		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
-				
+
 		if (this.precheckResult == ResponseCodeEnum.OK) {
 			ContractInfo info = getInfoResponse.getContractInfo();
 			// cost
 			this.cost = responseHeader.getCost();
 			//state proof
 			this.stateProof = responseHeader.getStateProof().toByteArray();
-			
+
 			this.realmNum = info.getContractID().getRealmNum();
 			this.shardNum = info.getContractID().getShardNum();
 			this.contractNum = info.getContractID().getContractNum();
@@ -698,13 +698,13 @@ public class HederaContract implements Serializable {
 			this.contractAccountShardNum = info.getAccountID().getShardNum();
 			this.contractAccountRealmNum = info.getAccountID().getRealmNum();
 			this.contractAccountAccountNum = info.getAccountID().getAccountNum();
-			
+
 			if (info.hasAdminKey()) {
 				this.adminKey = new HederaKeyPair(info.getAdminKey());
 			} else {
 				this.adminKey = null;
 			}
-			
+
 			this.autoRenewPeriod = new HederaDuration(info.getAutoRenewPeriod());
 			this.solidityContractAccountID = info.getContractAccountID();
 			this.expirationTime = new HederaTimeStamp(info.getExpirationTime());
@@ -712,8 +712,8 @@ public class HederaContract implements Serializable {
 		} else {
 			result = false;
 		}
-		
-	   	
+
+
 	   	return result;
 	}
 
@@ -725,7 +725,7 @@ public class HederaContract implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getInfoAnswerOnly(HederaTransaction payment) throws InterruptedException {
-		
+
 		return getInfo(payment, QueryResponseType.ANSWER_ONLY);
 	}
 
@@ -737,7 +737,7 @@ public class HederaContract implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getInfoStateProof(HederaTransaction payment) throws InterruptedException {
-	  
+
 		return getInfo(payment, HederaQueryHeader.QueryResponseType.ANSWER_STATE_PROOF);
 	}
 
@@ -748,7 +748,7 @@ public class HederaContract implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getInfoCostAnswer() throws InterruptedException {
-	  
+
 		return getInfo(null, HederaQueryHeader.QueryResponseType.COST_ANSWER);
 	}
 
@@ -759,7 +759,7 @@ public class HederaContract implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getInfoCostAnswerStateProof() throws InterruptedException {
-	  
+
 		return getInfo(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
 	}
 
@@ -774,15 +774,15 @@ public class HederaContract implements Serializable {
 	public boolean callLocal(HederaTransaction payment, HederaQueryHeader.QueryResponseType responseType) throws InterruptedException {
 		boolean result = true;
 
-		
+
 		// build the query
 	  // Header
-		HederaQueryHeader queryHeader = new HederaQueryHeader(); 
+		HederaQueryHeader queryHeader = new HederaQueryHeader();
 		if (payment != null) {
 			queryHeader.payment = payment;
 			queryHeader.responseType = responseType;
 		}
-		
+
 		// call local query
 		ContractCallLocalQuery.Builder callLocalQuery = ContractCallLocalQuery.newBuilder();
 		callLocalQuery.setHeader(queryHeader.getProtobuf());
@@ -791,12 +791,12 @@ public class HederaContract implements Serializable {
 		callLocalQuery.setGas(this.gas);
 		callLocalQuery.setFunctionParameters(ByteString.copyFrom(this.functionParameters));
 		callLocalQuery.setMaxResultSize(this.maxResultSize);
-		
+
 		// the query itself
 		HederaQuery query = new HederaQuery();
 		query.queryType = QueryType.CONTRACTCALLLOCAL;
 		query.queryData = callLocalQuery.build();
-		
+
 		// query now set, send to network
 		Utilities.throwIfNull("Node", this.node);
 		Response response = this.node.contractCallLocal(query);
@@ -805,13 +805,13 @@ public class HederaContract implements Serializable {
 			return false;
 		}
 		ContractCallLocalResponse.Builder getCallLocalResponse = response.getContractCallLocal().toBuilder();
-		
+
 		// check response header first
 		ResponseHeader.Builder responseHeader = getCallLocalResponse.getHeaderBuilder();
 
 		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
-		this.hederaContractFunctionResult = null;		
-		
+		this.hederaContractFunctionResult = null;
+
 		if (this.precheckResult == ResponseCodeEnum.OK) {
 			// result of function call
 			this.hederaContractFunctionResult = new HederaContractFunctionResult(getCallLocalResponse.getFunctionResult());
@@ -822,8 +822,8 @@ public class HederaContract implements Serializable {
 		} else {
 			result = false;
 		}
-		
-		
+
+
 		return result;
 	}
 
@@ -835,7 +835,7 @@ public class HederaContract implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean callLocalAnswerOnly(HederaTransaction payment) throws InterruptedException {
-		
+
 		return callLocal(payment, QueryResponseType.ANSWER_ONLY);
 	}
 
@@ -847,7 +847,7 @@ public class HederaContract implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean callLocalStateProof(HederaTransaction payment) throws InterruptedException {
-	  
+
 		return callLocal(payment, HederaQueryHeader.QueryResponseType.ANSWER_STATE_PROOF);
 	}
 
@@ -858,7 +858,7 @@ public class HederaContract implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean callLocalCostAnswer() throws InterruptedException {
-	  
+
 		return callLocal(null, HederaQueryHeader.QueryResponseType.COST_ANSWER);
 	}
 
@@ -869,19 +869,19 @@ public class HederaContract implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean callLocalCostAnswerStateProof() throws InterruptedException {
-	  
+
 		return callLocal(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
 	}
-	
+
 
 	/**
 	 * Adds a {@link HederaKeyPair} to this object
 	 * @param key the key to add
 	 */
 	public void addKey(HederaKeyPair key) {
-	  
+
 		this.keys.add(key);
-	  
+
 	}
 
 	/**
@@ -890,7 +890,7 @@ public class HederaContract implements Serializable {
 	 * @return true if successfully deleted
 	 */
 	public boolean deleteKey(HederaKeyPair key) {
-	  
+
 		return this.keys.remove(key);
 	}
 
@@ -899,7 +899,7 @@ public class HederaContract implements Serializable {
 	 * @return List of {@link HederaKeyPair}
 	 */
 	public List<HederaKeyPair> getKeys() {
-	  
+
 		return this.keys;
 	}
 
@@ -913,11 +913,12 @@ public class HederaContract implements Serializable {
 	 * @param constructorParameters, a byte array containing the parameters for the construction of the smart contract
 	 * @param autoRenewPeriod, a {@link HederaDuration} to specify how often the smart contract should renew itself
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public HederaTransactionResult create(long shardNum, long realmNum, HederaFileID fileID, long initialBalance, long gas, byte[] constructorParameters, HederaDuration autoRenewPeriod) throws Exception {
+
 		// setup defaults if necessary
-		
+
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
 
@@ -929,7 +930,7 @@ public class HederaContract implements Serializable {
 		this.fileID = fileID;
 		this.constructionParameters = constructorParameters;
 		this.autoRenewPeriod = autoRenewPeriod;
-		
+
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
@@ -959,11 +960,11 @@ public class HederaContract implements Serializable {
 		if (this.newRealmAdminKey != null) {
 			sigsForTransaction.addSignature(this.newRealmAdminKey.getSignature(createBody.toByteArray()));
 		}
-		// admin key 
+		// admin key
 		if (this.adminKey != null) {
 			sigsForTransaction.addSignature(this.adminKey.getSignature(createBody.toByteArray()));
 		}
-		
+
 		// create the contract
 		transactionResult = this.create(
 			this.hederaTransactionID
@@ -973,8 +974,8 @@ public class HederaContract implements Serializable {
 			, this.txQueryDefaults.generateRecord
 			, this.txQueryDefaults.memo
 			, sigsForTransaction);
-		
-	  
+
+
 		return transactionResult;
 	}
 
@@ -983,18 +984,19 @@ public class HederaContract implements Serializable {
 	 * @param expirationTime, a {@link HederaTimeStamp} update the expiration time of the smart contract
 	 * @param autoRenewPeriod, a {@link HederaDuration} to specify how often the smart contract should renew itself
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public HederaTransactionResult update(HederaTimeStamp expirationTime, HederaDuration autoRenewPeriod) throws Exception {
+
 		// setup defaults if necessary
-		
+
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
 
 		// required
 		this.expirationTime = expirationTime;
 		this.autoRenewPeriod = autoRenewPeriod;
-		
+
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
@@ -1003,7 +1005,7 @@ public class HederaContract implements Serializable {
 
 		// set transport
 		this.node = this.txQueryDefaults.node;
-		
+
 		// create a transaction ID (starts now with accountID of the paying account id)
 		this.hederaTransactionID = new HederaTransactionID(this.txQueryDefaults.payingAccountID);
 
@@ -1033,20 +1035,20 @@ public class HederaContract implements Serializable {
 			, this.txQueryDefaults.generateRecord
 			, this.txQueryDefaults.memo
 			, sigsForTransaction);
-		
-	  
+
+
 		return transactionResult;
 	}
 
 	/**
 	 * Updates a smart contract in the simplest possible way
-	 * @param shardNum, the shard number of the smart contract 
+	 * @param shardNum, the shard number of the smart contract
 	 * @param realmNum, the realm number of the smart contract
 	 * @param contractNum, the account number of the smart contract
 	 * @param expirationTime, a {@link HederaTimeStamp} update the expiration time of the smart contract
 	 * @param autoRenewPeriod, a {@link HederaDuration} to specify how often the smart contract should renew itself
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public HederaTransactionResult update(long shardNum, long realmNum, long contractNum, HederaTimeStamp expirationTime, HederaDuration autoRenewPeriod) throws Exception {
 		this.shardNum = shardNum;
@@ -1061,11 +1063,12 @@ public class HederaContract implements Serializable {
 	 * @param amount, number of tinybars sent (the function must be payable if this is nonzero)
 	 * @param functionParameters, which function to call, and the parameters to pass to the function
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public HederaTransactionResult call(long gas, long amount, byte[] functionParameters) throws Exception {
+
 		// setup defaults if necessary
-		
+
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
 
@@ -1073,7 +1076,7 @@ public class HederaContract implements Serializable {
 		this.gas = gas;
 		this.amount = amount;
 		this.functionParameters = functionParameters.clone();
-				
+
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
@@ -1099,7 +1102,7 @@ public class HederaContract implements Serializable {
 		HederaSignatureList sigsForTransaction = new HederaSignatureList();
 		//paying signature
 		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getSignature(callBody.toByteArray()));
-		
+
 		// call the contract function
 		transactionResult = this.call(
 			this.hederaTransactionID
@@ -1109,21 +1112,21 @@ public class HederaContract implements Serializable {
 			, this.txQueryDefaults.generateRecord
 			, this.txQueryDefaults.memo
 			, sigsForTransaction);
-	
-		
+
+
 		return transactionResult;
 	}
 
 	/**
 	 * Calls a smart contract function in the simplest possible way
-	 * @param shardNum, the shard number of the smart contract 
+	 * @param shardNum, the shard number of the smart contract
 	 * @param realmNum, the realm number of the smart contract
 	 * @param contractNum, the account number of the smart contract
 	 * @param gas, the maximum amount of gas to use for the call
 	 * @param amount, number of tinybars sent (the function must be payable if this is nonzero)
 	 * @param functionParameters, which function to call, and the parameters to pass to the function
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public HederaTransactionResult call(long shardNum, long realmNum, long contractNum, long gas, long amount, byte[] functionParameters) throws Exception {
 		this.shardNum = shardNum;
@@ -1135,82 +1138,82 @@ public class HederaContract implements Serializable {
 	/**
 	 * Get info for the contract which is specified by the
 	 * shardNum, realmNum and contractNum properties of this class
-	 * in the event of an error, check the value of this.precheckResult to determine the 
+	 * in the event of an error, check the value of this.precheckResult to determine the
 	 * cause of the error
 	 * Note: You may perform a "getInfoCostAnswer" in order to ascertain the cost of the query first
-	 * The cost could be cached and refreshed from time to time, there is no need to look it up 
+	 * The cost could be cached and refreshed from time to time, there is no need to look it up
 	 * before each getInfo query
 	 * @return {@link boolean}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public boolean getInfo() throws Exception {
-	  
+
 		// set transport
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("Node", this.txQueryDefaults.node);
 		this.node = this.txQueryDefaults.node;
 		Utilities.throwIfNull("Node", this.node);
 		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults, this.node.contractGetInfoQueryFee);
-	  
+
 		return this.getInfoAnswerOnly(transferTransaction);
 	}
 
 	/**
-	 * Get info for a smart contract 
-	 * in the event of an error, check the value of this.precheckResult to determine the 
+	 * Get info for a smart contract
+	 * in the event of an error, check the value of this.precheckResult to determine the
 	 * cause of the error
 	 * Note: You may perform a "getInfoCostAnswer" in order to ascertain the cost of the query first
-	 * The cost could be cached and refreshed from time to time, there is no need to look it up 
+	 * The cost could be cached and refreshed from time to time, there is no need to look it up
 	 * before each getInfo query
-	 * @param shardNum, the shard number of the smart contract 
+	 * @param shardNum, the shard number of the smart contract
 	 * @param realmNum, the realm number of the smart contract
 	 * @param contractNum, the account number of the smart contract
 	 * @return {@link boolean}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public boolean getInfo(long shardNum, long realmNum, long contractNum) throws Exception {
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.contractNum = contractNum;
 		return getInfo();
-	}	
+	}
 
-	/** 
-	 * Gets the bytecode of the smart contract specified by the shardNum, realmNum and contractNum properties of this class, 
+	/**
+	 * Gets the bytecode of the smart contract specified by the shardNum, realmNum and contractNum properties of this class,
 	 * returns null if an error occurred.
-	 * in the event of an error, check the value of this.precheckResult to determine the 
+	 * in the event of an error, check the value of this.precheckResult to determine the
 	 * cause of the error
 	 * @return {@link byte} array
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public byte[] getByteCode() throws Exception {
-	  
+
 		// set transport
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("Node", this.txQueryDefaults.node);
 		this.node = this.txQueryDefaults.node;
-		
+
 		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults,this.node.contractGetByteCodeQueryFee);
 
 		if (this.getByteCodeAnswerOnly(transferTransaction)) {
-		   	
+
 			return this.byteCode;
 		} else {
-		   	
+
 			return null;
 		}
 	}
 
-	/** 
-	 * Gets the bytecode of a smart contract  
+	/**
+	 * Gets the bytecode of a smart contract
 	 * returns null if an error occurred.
-	 * in the event of an error, check the value of this.precheckResult to determine the 
+	 * in the event of an error, check the value of this.precheckResult to determine the
 	 * cause of the error
-	 * @param shardNum, the shard number of the smart contract 
+	 * @param shardNum, the shard number of the smart contract
 	 * @param realmNum, the realm number of the smart contract
 	 * @param contractNum, the account number of the smart contract
 	 * @return {@link byte} array
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public byte[] getByteCode(long shardNum, long realmNum, long contractNum) throws Exception {
 		this.shardNum = shardNum;
@@ -1219,18 +1222,18 @@ public class HederaContract implements Serializable {
 		return getByteCode();
 	}
 
-	/** 
-	 * Runs a smart contract function on a single node and returns the result as a {@link HederaContractFunctionResult} object 
+	/**
+	 * Runs a smart contract function on a single node and returns the result as a {@link HederaContractFunctionResult} object
 	 * returns null if an error occurred
 	 * in the event of an error, check the value of this.precheckResult to determine the cause of the error
 	 * @param gas, the maximum amount of gas to pay for this function execution
 	 * @param functionParameters, parameters for running the function
 	 * @param maxResultSize, max number of bytes that the result might include. The run will fail if it would have returned more than this number of bytes.
 	 * @return {@link HederaContractFunctionResult}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public HederaContractFunctionResult callLocal(long gas, byte[] functionParameters, long maxResultSize) throws Exception {
-	  
+
 
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
@@ -1238,7 +1241,7 @@ public class HederaContract implements Serializable {
 
 		// set transport
 		this.node = this.txQueryDefaults.node;
-		
+
 		this.gas = gas;
 		this.functionParameters = functionParameters;
 		this.maxResultSize = maxResultSize;
@@ -1246,26 +1249,26 @@ public class HederaContract implements Serializable {
 		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults,this.node.contractCallLocalQueryFee);
 
 		if (this.callLocalAnswerOnly(transferTransaction)) {
-		   	
+
 			return this.hederaContractFunctionResult;
 		} else {
-		   	
+
 			return null;
 		}
 	}
-	
-	/** 
-	 * Runs a smart contract function on a single node and returns the result as a {@link HederaContractFunctionResult} object 
+
+	/**
+	 * Runs a smart contract function on a single node and returns the result as a {@link HederaContractFunctionResult} object
 	 * returns null if an error occurred
 	 * in the event of an error, check the value of this.precheckResult to determine the cause of the error
-	 * @param shardNum, the shard number of the smart contract 
+	 * @param shardNum, the shard number of the smart contract
 	 * @param realmNum, the realm number of the smart contract
 	 * @param contractNum, the account number of the smart contract
 	 * @param gas, the maximum amount of gas to pay for this function execution
 	 * @param functionParameters, parameters for running the function
 	 * @param maxResultSize, max number of bytes that the result might include. The run will fail if it would have returned more than this number of bytes.
 	 * @return {@link HederaContractFunctionResult}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public HederaContractFunctionResult callLocal(long shardNum, long realmNum, long contractNum, long gas, byte[] functionParameters, long maxResultSize) throws Exception {
 		this.shardNum = shardNum;

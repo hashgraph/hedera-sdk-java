@@ -34,11 +34,11 @@ public class HederaQueryHeader implements Serializable {
 	public QueryResponseType responseType = QueryResponseType.ANSWER_ONLY;
 
 	/**
-	 * Default constructor 
+	 * Default constructor
 	 */
 	public HederaQueryHeader() {
-	   	
-	   	
+
+
 	}
 	/**
 	 * Constructor with payment and response type
@@ -46,17 +46,17 @@ public class HederaQueryHeader implements Serializable {
 	 * @param responseType {@link QueryResponseType}
 	 */
 	public HederaQueryHeader(HederaTransaction payment, QueryResponseType responseType) {
-	   	
+
 		this.payment = payment;
 		this.responseType = responseType;
-	   	
+
 	}
 	/**
 	 * returns the protobuf for a {@link QueryHeader}
 	 * @return {@link QueryHeader}
 	 */
 	public QueryHeader getProtobuf() {
-	   	
+
 		// Generates the protobuf payload for this class
 		QueryHeader.Builder queryHeader = QueryHeader.newBuilder();
 
@@ -77,12 +77,11 @@ public class HederaQueryHeader implements Serializable {
 				queryHeader.setResponseType(ResponseType.COST_ANSWER_STATE_PROOF);
 				break;
 			case NOTSET:
-	    	   	
-	            throw new IllegalArgumentException("Response type not set. Unable to generate data.");			
+
+	            throw new IllegalArgumentException("Response type not set. Unable to generate data.");
 		}
-	   	
-		
+
+
 		return queryHeader.build();
 	}
 }
-	

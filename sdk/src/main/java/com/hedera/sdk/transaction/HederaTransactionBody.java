@@ -64,13 +64,13 @@ public class HederaTransactionBody implements Serializable {
 	 * get or set the type of transaction
 	 */
 	public TransactionType transactionType = TransactionType.NOTSET;
-	
+
 	/**
 	 * Default constructor
 	 */
 	public HederaTransactionBody() {
-	   	
-	   	
+
+
 	}
 	/**
 	 * Constructor from all necessary information
@@ -86,6 +86,7 @@ public class HederaTransactionBody implements Serializable {
 	public HederaTransactionBody(TransactionType transactionType, HederaTransactionID transactionID, HederaAccountID nodeAccount
 			, long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, String memo
 			, Object data) {
+
 		this.transactionType = transactionType;
 		this.transactionId = transactionID;
 		this.nodeAccount = nodeAccount;
@@ -94,14 +95,14 @@ public class HederaTransactionBody implements Serializable {
 		this.generateRecord = generateRecord;
 		this.memo = memo;
 		this.data = data;
-	   	
+
 	}
 	/**
 	 * returns the {@link TransactionBody} protobuf for this transaction
 	 * @return {@link TransactionBody}
 	 */
 	public TransactionBody getProtobuf() {
-	   	
+
 		// Generates the protobuf payload for this class
 		TransactionBody.Builder transactionBodyProtobuf = TransactionBody.newBuilder();
 		transactionBodyProtobuf.setTransactionID(this.transactionId.getProtobuf());
@@ -151,11 +152,11 @@ public class HederaTransactionBody implements Serializable {
 				transactionBodyProtobuf.setFileUpdate((FileUpdateTransactionBody)this.data);
 				break;
 			case NOTSET:
-	    	   	
-	            throw new IllegalArgumentException("Transaction type not set. Unable to generate data.");			
+
+	            throw new IllegalArgumentException("Transaction type not set. Unable to generate data.");
 		}
-	   	
-		
+
+
 		return transactionBodyProtobuf.build();
 	}
 }

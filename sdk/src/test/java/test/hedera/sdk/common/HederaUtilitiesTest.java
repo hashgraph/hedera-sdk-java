@@ -1,7 +1,6 @@
 package test.hedera.sdk.common;
 
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
@@ -9,12 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.hedera.sdk.common.HederaAccountID;
-import com.hedera.sdk.common.HederaKeyPair;
-import com.hedera.sdk.common.HederaKeySignature;
-import com.hedera.sdk.common.HederaSignature;
 import com.hedera.sdk.common.Utilities;
-import com.hedera.sdk.common.HederaKeyPair.KeyType;
-import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public class HederaUtilitiesTest {
 

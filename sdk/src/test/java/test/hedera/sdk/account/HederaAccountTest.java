@@ -13,7 +13,6 @@ import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaDuration;
 import com.hedera.sdk.common.HederaKeyPair;
-import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.common.HederaTimeStamp;
 import com.hedera.sdk.common.HederaTransactionID;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;

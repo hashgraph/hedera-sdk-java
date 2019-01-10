@@ -14,7 +14,7 @@ import com.hederahashgraph.api.proto.java.SignatureList;
 import com.hederahashgraph.api.proto.java.ThresholdKey;
 import com.hederahashgraph.api.proto.java.ThresholdSignature;
 /**
- * This class is a helper for managing keys and signatures in tandem. 
+ * This class is a helper for managing keys and signatures in tandem.
  * Each instance of the object stores a threshold and List of {@link HederaKeySignature}
  */
 public class HederaKeySignatureThreshold implements Serializable {
@@ -29,15 +29,15 @@ public class HederaKeySignatureThreshold implements Serializable {
 	public int threshold;
 	/**
 	 * The List of {@link HederaKeySignature}
-	 * initially empty 
+	 * initially empty
 	 */
 	public List<HederaKeySignature> keySigPairs  = new ArrayList<HederaKeySignature>();
 	/**
 	 * Default constructor
 	 */
 	public HederaKeySignatureThreshold() {
-	   	
-	   	
+
+
 	}
 	/**
 	 * Constructs from a threshold and List of {@link HederaKeySignature}
@@ -45,15 +45,15 @@ public class HederaKeySignatureThreshold implements Serializable {
 	 * @param keySigPairs the List of {@link HederaKeySignature}
 	 */
 	public HederaKeySignatureThreshold(int threshold, List<HederaKeySignature> keySigPairs) {
-	   	
+
 		if (keySigPairs != null) {
 			for (HederaKeySignature keySigPair : keySigPairs) {
 				this.keySigPairs.add(keySigPair);
 			}
 		}
-		
+
 		this.threshold = threshold;
-	   	
+
 	}
 //	/**
 //	 * Constructs from a {@link ThresholdKey} protobuf and associated {@link ThresholdSignature} protobuf
@@ -62,41 +62,40 @@ public class HederaKeySignatureThreshold implements Serializable {
 //	 * @param protobufSig the signatures
 //	 */
 //	public HederaKeySignatureThreshold(ThresholdKey protobufKey, ThresholdSignature protobufSig) {
-//	   	
+//
 //		// convert a protobuf payload into class data
 //		this.threshold = protobufKey.getThreshold();
 //		this.keySigPairs.clear();
-//		
+//
 //		KeyList protoKeys = protobufKey.getKeys();
 //		SignatureList protoSigs = protobufSig.getSigs();
-//		
+//
 //		for (int index = 0; index < protoKeys.getKeysCount(); index++) {
 //			this.keySigPairs.add(new HederaKeySignature(protoKeys.getKeys(index), protoSigs.getSigs(index)));
 //		}
-//	   	
+//
 //	}
 	/**
-	 * Gets the protobuf {@link ThresholdKey} for the key 
+	 * Gets the protobuf {@link ThresholdKey} for the key
 	 * @return {@link ThresholdKey}
 	 */
 	public ThresholdKey getKeyProtobuf() {
-	   	
+
 		// Generates the protobuf payload for this class
 		ThresholdKey.Builder keysProtobuf = ThresholdKey.newBuilder();
 		keysProtobuf.setThreshold(this.threshold);
-		
+
 		KeyList protoKeyList;
-		
+
 		if (!this.keySigPairs.isEmpty()) {
 			protoKeyList = Utilities.getProtoKeyFromKeySigList(this.keySigPairs);
 			keysProtobuf.setKeys(protoKeyList);
 		}
 		else {
-			
 			return null;
-		}		
-	
-	   	
+		}
+
+
 		return keysProtobuf.build();
 	}
 	/**
@@ -104,21 +103,20 @@ public class HederaKeySignatureThreshold implements Serializable {
 	 * @return {@link ThresholdSignature}
 	 */
 	public ThresholdSignature getSignatureProtobuf() {
-	   	
+
 		// Generates the protobuf payload for this class
 		ThresholdSignature.Builder sigProtobuf = ThresholdSignature.newBuilder();
-		
+
 		SignatureList protoKeyList;
-		
+
 		if (!this.keySigPairs.isEmpty()) {
 			protoKeyList = Utilities.getProtoSignatureFromKeySigList(this.keySigPairs);
 			sigProtobuf.setSigs(protoKeyList);
 		} else {
-			
 			return null;
 		}
-		
-	   	
+
+
 		return sigProtobuf.build();
 	}
 	/**
@@ -126,9 +124,9 @@ public class HederaKeySignatureThreshold implements Serializable {
 	 * @param keySigPair a {@link HederaKeySignature}
 	 */
 	public void addKeySigPair(HederaKeySignature keySigPair) {
-	   	
+
 		this.keySigPairs.add(keySigPair);
-	   	
+
 	}
 	/**
 	 * Deletes a key/signature pair from the list
@@ -136,8 +134,8 @@ public class HederaKeySignatureThreshold implements Serializable {
 	 * @return true if found and deleted successfully
 	 */
 	public boolean deleteKey(HederaKeySignature keySigPair) {
-	   	
-	   	
+
+
 		return this.keySigPairs.remove(keySigPair);
 	}
 	/**
@@ -151,9 +149,9 @@ public class HederaKeySignatureThreshold implements Serializable {
 	 * @return boolean true if a signature was set
 	 */
 	public boolean setSignatureForKey(byte[] key, byte[] signature, boolean stopAtFirst) {
-	   	
+
 		boolean foundOne = false;
-	
+
 		for (HederaKeySignature keySigPair : keySigPairs) {
 			if (keySigPair.setSignatureForKey(key, signature, stopAtFirst)) {
 				foundOne = true;
@@ -162,7 +160,7 @@ public class HederaKeySignatureThreshold implements Serializable {
 				}
 			}
 		}
-	   	
+
 		return foundOne;
 	}
 	/**
@@ -176,15 +174,15 @@ public class HederaKeySignatureThreshold implements Serializable {
 	 * @return boolean true if a signature was set
 	 */
 	public boolean setSignatureForKeys(byte[][] keys, byte[][] signatures, boolean stopAtFirst) {
-	   	
+
 		boolean foundOne = false;
-	
+
 		for (int i=0; i < keys.length; i++) {
 			if (setSignatureForKey(keys[i], signatures[i], stopAtFirst)) {
 				foundOne = true;
 			}
 		}
-	   	
+
 		return foundOne;
 	}
 	/**
@@ -195,14 +193,14 @@ public class HederaKeySignatureThreshold implements Serializable {
 	 * @return boolean true if key was found
 	 */
 	public boolean setSignatureForKeyUUID(String uuid, byte[] signature) {
-	   	
-	
+
+
 		for (HederaKeySignature keySigPair : keySigPairs) {
 			if (keySigPair.setSignatureForKeyUUID(uuid, signature)) {
 				return true;
 			}
 		}
-	   	
+
 		return false;
 	}
 	/**
@@ -213,15 +211,15 @@ public class HederaKeySignatureThreshold implements Serializable {
 	 * @return boolean true if a signature was set
 	 */
 	public boolean setSignatureForKeyUUIDs(String[] uuids, byte[][] signatures) {
-	   	
+
 		boolean foundOne = false;
-	
+
 		for (int i=0; i < uuids.length; i++) {
 			if (setSignatureForKeyUUID(uuids[i], signatures[i])) {
 				foundOne = true;
 			}
 		}
-	   	
+
 		return foundOne;
 	}
 	/**
@@ -232,15 +230,15 @@ public class HederaKeySignatureThreshold implements Serializable {
 	 * @return true if a signature was updated
 	 */
 	public boolean updateSignatureForKey(byte[] key, byte[] signature) {
-	   	
+
 		boolean foundOne = false;
-	
+
 		for (HederaKeySignature keySigPair : keySigPairs) {
 			if (keySigPair.updateSignatureForKey(key, signature)) {
 				foundOne = true;
 			}
 		}
-	   	
+
 		return foundOne;
 	}
 	/**
@@ -251,42 +249,42 @@ public class HederaKeySignatureThreshold implements Serializable {
 	 * @return true if a signature was updated
 	 */
 	public boolean updateSignatureForKeys(byte[][] keys, byte[][] signatures) {
-	   	
+
 		boolean foundOne = false;
-		
+
 		for (int i=0; i < keys.length; i++) {
 			if (updateSignatureForKey(keys[i], signatures[i])) {
 				foundOne = true;
 			}
 		}
-	   	
+
 		return foundOne;
 	}
 	/**
 	 * Gets an array of keys and UUIDS {@link HederaKeyUUIDDescription} for a given public key
-	 * 
+	 *
 	 * @param hederaKeyUUIDDescriptions a List of {@link HederaKeyUUIDDescription} containing the result
 	 * Note: Due to the recursive nature of this method, you must initialise this List before calling the method.
-	 * The result will be in the same parameter  
+	 * The result will be in the same parameter
 	 * @param publicKey the public key to look for
 	 */
 	public void getKeyUUIDs(List<HederaKeyUUIDDescription> hederaKeyUUIDDescriptions, byte[] publicKey) {
-	   	
+
 		for (HederaKeySignature keySigPair : keySigPairs) {
 			keySigPair.getKeyUUIDs(hederaKeyUUIDDescriptions, publicKey);
 		}
-	   	
-	}	
+
+	}
 	/**
 	 *  Gets a {@link JSONObject} representation of this {@link HederaKeySignatureThreshold}
 	 * @return {@link JSONObject}
 	 */
 	@SuppressWarnings("unchecked")
 	public JSONObject JSON() {
-	   	
-	   	
+
+
 	   	JSONObject jsonKey = new JSONObject();
-  	   	
+
 	   	jsonKey.put(JSON_THRESHOLD, this.threshold);
 
 		JSONArray jsonKeys = new JSONArray();
@@ -295,7 +293,7 @@ public class HederaKeySignatureThreshold implements Serializable {
 		}
 		jsonKey.put(JSON_KEYS, jsonKeys);
 
-	   	
+
 		return jsonKey;
 	}
 	/**
@@ -303,7 +301,7 @@ public class HederaKeySignatureThreshold implements Serializable {
 	 * @return {@link JSONObject}
 	 */
 	public String JSONString() {
-	   	
+
 		return JSON().toJSONString();
 	}
 	/**
@@ -311,21 +309,21 @@ public class HederaKeySignatureThreshold implements Serializable {
 	 * @param jsonKey the {@link JSONObject} to populate this object with
 	 */
 	public void fromJSON(JSONObject jsonKey) {
-	   	
+
 		// delete all keys
 		this.keySigPairs.clear();
 		// add keys from json array
-		
+
 		if (jsonKey.containsKey(JSON_THRESHOLD)) {
 			this.threshold = (int)jsonKey.get(JSON_THRESHOLD);
 		} else {
 			this.threshold = 0;
 		}
-		
+
 		if (jsonKey.containsKey(JSON_KEYS)) {
 			JSONArray keys = new JSONArray();
 			keys = (JSONArray) jsonKey.get(JSON_KEYS);
-			
+
 			for (int i=0; i < keys.size(); i++) {
 				HederaKeySignature key = new HederaKeySignature();
 				JSONObject oneKey = new JSONObject();
@@ -334,6 +332,6 @@ public class HederaKeySignatureThreshold implements Serializable {
 				this.addKeySigPair(key);
 			}
 		}
-	   	
+
 	}
 }

@@ -26,8 +26,8 @@ public class HederaRealmID implements Serializable {
 	 * Default constructor
 	 */
 	public HederaRealmID() {
-	   	
-	   	
+
+
 	}
 	/**
 	 * Constructor from a shard number and realm number
@@ -35,28 +35,28 @@ public class HederaRealmID implements Serializable {
 	 * @param realmNum the realm's number
 	 */
 	public HederaRealmID(long shardNum, long realmNum) {
-	   	
+
  		this.shardNum = shardNum;
  		this.realmNum = realmNum;
-	   	
+
 	}
 	/**
 	 * Constructor from a protobuf {@link RealmID}
 	 * @param realmIDProtobuf a protobuf expression of a RealmID
 	 */
 	public HederaRealmID(RealmID realmIDProtobuf) {
-	   	
+
 		this.shardNum = realmIDProtobuf.getShardNum();
 		this.realmNum = realmIDProtobuf.getRealmNum();
-	   	
+
 	}
 	/**
 	 * Gets a {@link RealmID} protobuf for this object
 	 * @return {@link RealmID}
 	 */
 	public RealmID getProtobuf() {
-	   	
-		
+
+
 	   	RealmID.Builder realmID = RealmID.newBuilder();
 		if (this.shardNum > 0) {
 			realmID.setShardNum(this.shardNum);
@@ -64,7 +64,7 @@ public class HederaRealmID implements Serializable {
 	   	if (this.realmNum > 0) {
 	   		realmID.setRealmNum(this.realmNum);
 	   	}
-		
+
 
 		return realmID.build();
 	}

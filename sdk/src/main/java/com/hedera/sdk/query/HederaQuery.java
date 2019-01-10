@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
 public class HederaQuery implements Serializable {
 	final Logger logger = LoggerFactory.getLogger(HederaQuery.class);
 	private static final long serialVersionUID = 1;
-	
-	/* 
+
+	/*
 	 * list of allowed types of query being handled by the instance of this object
 	 */
 	public enum QueryType {
@@ -58,13 +58,13 @@ public class HederaQuery implements Serializable {
 	 * Generic query data object
 	 */
 	public Object queryData = null;
-	
+
 	/**
 	 * Default constructor
 	 */
 	public HederaQuery() {
-		
-		
+
+
 	}
 	/**
 	 * Constructor with query type and data
@@ -72,16 +72,17 @@ public class HederaQuery implements Serializable {
 	 * @param queryData the query data
 	 */
 	public HederaQuery(QueryType queryType, Object queryData) {
+
 		this.queryType = queryType;
 		this.queryData = queryData;
-		
+
 	}
 	/**
 	 * Returns a {@link Query} object containing the protobuf data for this query object
 	 * @return {@link Query}
 	 */
 	public Query getProtobuf() {
-		
+
 		// Generates the protobuf payload for this class
 		Query.Builder query = Query.newBuilder();
 		switch (this.queryType) {
@@ -131,11 +132,11 @@ public class HederaQuery implements Serializable {
 				query.setTransactionGetFastRecord((TransactionGetFastRecordQuery)this.queryData);
 				break;
 			case NOTSET:
-				
-	            throw new IllegalArgumentException("Query type not set. Unable to generate data.");			
+
+	            throw new IllegalArgumentException("Query type not set. Unable to generate data.");
 		}
-		
-		
+
+
 		return query.build();
 	}
 }

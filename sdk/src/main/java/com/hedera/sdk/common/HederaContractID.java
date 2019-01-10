@@ -35,13 +35,11 @@ public class HederaContractID implements Serializable {
 	 * contract number (a nonnegative number unique within its realm)
 	 */
 	public long contractNum = 0;
-	
+
 	/**
 	 * Default constructor, creates a HederaContractID with default values
 	 */
 	public HederaContractID() {
-	   	
-	   	
 	}
 
 	/**
@@ -51,11 +49,9 @@ public class HederaContractID implements Serializable {
 	 * @param contractNum the contract number (non negative and unique within its realm)
 	 */
 	public HederaContractID(long shardNum, long realmNum, long contractNum) {
-	   	
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.contractNum = contractNum;
-	   	
 	}
 
 	/**
@@ -63,28 +59,24 @@ public class HederaContractID implements Serializable {
 	 * @param contractIDProtobuf the protobuf from which to create the contract ID
 	 */
 	public HederaContractID(ContractID contractIDProtobuf) {
-	   	
 		this.shardNum = contractIDProtobuf.getShardNum();
 		this.realmNum = contractIDProtobuf.getRealmNum();
 		this.contractNum = contractIDProtobuf.getContractNum();
-	   	
 	}
 
 	/**
 	 * Generate a protobuf payload for this object
-	 * @return a protobuf ContractID 
+	 * @return a protobuf ContractID
 	 */
 	public ContractID getProtobuf() {
-		
-		
+
 		ContractID.Builder contractID = ContractID.newBuilder();
-		
+
 		contractID.setShardNum(this.shardNum);
 		if (this.realmNum != -1) {
 			contractID.setRealmNum(this.realmNum);
 		}
 		contractID.setContractNum(this.contractNum);
-	   	
 
 		return contractID.build();
 	}
@@ -95,24 +87,20 @@ public class HederaContractID implements Serializable {
 	 */
 	@SuppressWarnings("unchecked")
 	public JSONObject JSON() {
-	   	
-	   	
 	   	JSONObject jsonContract = new JSONObject();
 
 	   	jsonContract.put(JSON_SHARDNUM, this.shardNum);
 	   	jsonContract.put(JSON_REALMNUM, this.realmNum);
 	   	jsonContract.put(JSON_CONTRACTNUM, this.contractNum);
 
-	   	
 		return jsonContract;
 	}
-	
+
 	/**
 	 * Gets a JSON representation of the HederaContractID as a string
 	 * @return a String
 	 */
 	public String JSONString() {
-	   	
 		return JSON().toJSONString();
 	}
 
@@ -121,8 +109,7 @@ public class HederaContractID implements Serializable {
 	 * @param jsonContract JSONObject representing a HederaContractID
 	 */
 	public void fromJSON(JSONObject jsonContract) {
-	   	
-		
+
 		if (jsonContract.containsKey(JSON_SHARDNUM)) {
 			this.shardNum = (Long) jsonContract.get(JSON_SHARDNUM);
 		} else {
@@ -138,6 +125,5 @@ public class HederaContractID implements Serializable {
 		} else {
 			this.contractNum = 1;
 		}
-	   	
 	}
 }

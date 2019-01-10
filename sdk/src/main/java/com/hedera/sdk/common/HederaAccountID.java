@@ -28,7 +28,7 @@ public class HederaAccountID implements Serializable {
 	 * the account number (nonnegative and unique within its realm)
 	 */
 	public long accountNum = 1;
-	
+
 	/**
 	 * Default constructor, creates a HederaAccountID with default values
 	 */
@@ -42,11 +42,9 @@ public class HederaAccountID implements Serializable {
 	 * @param accountNum the account number (unique within its realm)
 	 */
 	public HederaAccountID(long shardNum, long realmNum, long accountNum) {
-	   	
  		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.accountNum = accountNum;
-	   	
 	}
 
 	/**
@@ -54,22 +52,18 @@ public class HederaAccountID implements Serializable {
 	 * @param accountIDProtobuf the protobuf from which to create the account ID
 	 */
 	public HederaAccountID(AccountID accountIDProtobuf) {
-	   	
 		this.shardNum = accountIDProtobuf.getShardNum();
 		this.realmNum = accountIDProtobuf.getRealmNum();
 		this.accountNum = accountIDProtobuf.getAccountNum();
-	   	
 	}
 
 	/**
 	 * Generate a protobuf payload for this object
-	 * @return a protobuf AccountID 
+	 * @return a protobuf AccountID
 	 */
 	public AccountID getProtobuf() {
-	   	
-		
 		AccountID.Builder accountID = AccountID.newBuilder();
-		
+
 		if (this.realmNum != -1) {
 			accountID.setRealmNum(this.realmNum);
 		}
@@ -78,7 +72,6 @@ public class HederaAccountID implements Serializable {
 			accountID.setRealmNum(this.realmNum);
 		}
 		accountID.setAccountNum(this.accountNum);
-	   	
 
 		return accountID.build();
 	}

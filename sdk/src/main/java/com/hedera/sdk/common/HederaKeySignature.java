@@ -56,7 +56,7 @@ public class HederaKeySignature implements Serializable {
 	private HederaNode node = null;
 
 	/**
-	 * A description for the key 
+	 * A description for the key
 	 */
 	public String keyDescription = "";
 	/**
@@ -99,18 +99,18 @@ public class HederaKeySignature implements Serializable {
 	 * Default constructor
 	 */
 	public HederaKeySignature() {
-	   	
-	   	
+
+
 	}
 	/**
 	 * Constructor from key type, key, signature and description
-	 * @param keyType the type of key 
+	 * @param keyType the type of key
 	 * @param publicKey the key as a byte array (byte[])
 	 * @param signature the signature as a byte array (byte[])
 	 * @param keyDescription the description of the key
 	 */
 	public HederaKeySignature(KeyType keyType, byte[] publicKey, byte[] signature, String keyDescription) {
-	   	
+
 		this.publicKey = publicKey.clone();
 		if (signature != null) {
 			this.signature = signature.clone();
@@ -119,11 +119,11 @@ public class HederaKeySignature implements Serializable {
 		}
 		this.keyType = keyType;
 		this.keyDescription = keyDescription;
-	   	
+
 	}
 	/**
-	 * Constructor from key type, key and signature 
-	 * @param keyType the type of key 
+	 * Constructor from key type, key and signature
+	 * @param keyType the type of key
 	 * @param publicKey the key as a byte array (byte[])
 	 * @param signature the signature as a byte array (byte[])
 	 */
@@ -137,16 +137,16 @@ public class HederaKeySignature implements Serializable {
 	 * @param keyDescription the description for the key
 	 */
 	public HederaKeySignature(HederaContractID contractKey, String keyDescription) {
-	   	
+
 		this.keyType = KeyType.CONTRACT;
 		this.contractIDKey = contractKey;
 		// contract signatures are 0 byte by default
 		this.signature = null;
 		this.keyDescription = keyDescription;
-	   	
+
 	}
 	/**
-	 * Constructor from a {@link HederaContractID} 
+	 * Constructor from a {@link HederaContractID}
 	 * Note: The signature will be set to null
 	 * @param contractKey the {@link HederaContractID} key
 	 */
@@ -159,14 +159,14 @@ public class HederaKeySignature implements Serializable {
 	 * @param keyDescription the description for the key
 	 */
 	public HederaKeySignature(HederaKeySignatureThreshold thresholdKeySigPair, String keyDescription) {
-	   	
+
 		this.keyType = KeyType.THRESHOLD;
 		this.keySigThreshold = thresholdKeySigPair;
 		this.keyDescription = keyDescription;
-	   	
+
 	}
 	/**
-	 * Constructor from a {@link HederaKeySignatureThreshold} object 
+	 * Constructor from a {@link HederaKeySignatureThreshold} object
 	 * @param thresholdKeySigPair a {@link HederaKeySignatureThreshold}
 	 */
 	public HederaKeySignature(HederaKeySignatureThreshold thresholdKeySigPair) {
@@ -178,14 +178,14 @@ public class HederaKeySignature implements Serializable {
 	 * @param keyDescription the description for the key
 	 */
 	public HederaKeySignature(HederaKeySignatureList keySigList, String keyDescription) {
-	   	
+
 		this.keyType = KeyType.LIST;
 		this.keySigList = keySigList;
 		this.keyDescription = keyDescription;
-	   	
+
 	}
 	/**
-	 * Constructor from a {@link HederaKeySignatureList} 
+	 * Constructor from a {@link HederaKeySignatureList}
 	 * @param keySigList a {@link HederaKeySignatureList}
 	 */
 	public HederaKeySignature(HederaKeySignatureList keySigList) {
@@ -199,8 +199,8 @@ public class HederaKeySignature implements Serializable {
 	 * @param keyDescription the description for the key
 	 */
 //	public HederaKeySignature(Key protobufKey, Signature protobufSig, String keyDescription) {
-//	   	
-//		
+//
+//
 //		HederaKeyPair hederaKey = new HederaKeyPair(protobufKey);
 //		HederaSignature hederaSignature = new HederaSignature(protobufSig);
 //
@@ -214,7 +214,7 @@ public class HederaKeySignature implements Serializable {
 //			this.keySigThreshold = new HederaKeySignatureThreshold(protobufKey.getThresholdKey(), protobufSig.getThresholdSignature());
 //			break;
 //		case KEY_NOT_SET:
-//            throw new IllegalArgumentException("Key not set in protobuf data.");			
+//            throw new IllegalArgumentException("Key not set in protobuf data.");
 //		case CONTRACTID:
 //			this.keyType = hederaKey.getKeyType();
 //			this.contractIDKey = hederaKey.getContractIDKey();
@@ -227,10 +227,10 @@ public class HederaKeySignature implements Serializable {
 //			this.signature = hederaSignature.getSignature();
 //		}
 //		this.keyDescription = keyDescription;
-//	   	
+//
 //	}
 //	/**
-//	 * Constructor for a {@link Key} protobuf and associated {@link Signature} protobuf 
+//	 * Constructor for a {@link Key} protobuf and associated {@link Signature} protobuf
 //	 * Note: It is assumed that keys and signatures are matching in both protobuf objects
 //	 * @param protobufKey a {@link Key} protobuf
 //	 * @param protobufSig a {@link Signature} protobug
@@ -243,16 +243,16 @@ public class HederaKeySignature implements Serializable {
 	 * @return {@link KeyType}
 	 */
 	public KeyType getKeyType() {
-	   	
+
 		return this.keyType;
 	}
-	/** 
+	/**
 	 * Gets the key held in this object
 	 * Note: this will be null if not set
 	 * @return byte[]
 	 */
 	public byte[] getKey() {
-	   	
+
 		return this.publicKey;
 	}
 	/**
@@ -261,7 +261,7 @@ public class HederaKeySignature implements Serializable {
 	 * @return byte[]
 	 */
 	public byte[] getSignature() {
-	   	
+
 		return this.signature;
 	}
 	/**
@@ -270,7 +270,7 @@ public class HederaKeySignature implements Serializable {
 	 * @return {@link HederaContractID}
 	 */
 	public HederaContractID getContractIDKey() {
-	   	
+
 		return this.contractIDKey;
 	}
 	/**
@@ -279,16 +279,16 @@ public class HederaKeySignature implements Serializable {
 	 * @return byte[0]
 	 */
 	public byte[] getContractIDSignature() {
-	   	
+
 		return new byte[0]; //this.signature;
 	}
 	/**
 	 * Gets the {@link HederaKeySignatureThreshold} held in this object
-	 * Note: Returns null if not set 
+	 * Note: Returns null if not set
 	 * @return {@link HederaKeySignatureThreshold}
 	 */
 	public HederaKeySignatureThreshold getThresholdKeySignaturePair() {
-	   	
+
 		return this.keySigThreshold;
 	}
 	/**
@@ -296,7 +296,7 @@ public class HederaKeySignature implements Serializable {
 	 * @return {@link HederaKeySignatureList}
 	 */
 	public HederaKeySignatureList getKeySignaturePairList() {
-	   	
+
 		return this.keySigList;
 	}
 	/**
@@ -304,10 +304,10 @@ public class HederaKeySignature implements Serializable {
 	 * @return {@link Key}
 	 */
 	public Key getKeyProtobuf() {
-	   	
+
 		// Generates the protobuf payload for this class
 		Key.Builder keyProtobuf = Key.newBuilder();
-		
+
 		switch (this.keyType) {
 		case ED25519:
 			if (this.publicKey != null) {
@@ -340,21 +340,21 @@ public class HederaKeySignature implements Serializable {
 			}
 			break;
 		case NOTSET:
-            throw new IllegalArgumentException("Key type not set, unable to generate data.");			
+            throw new IllegalArgumentException("Key type not set, unable to generate data.");
 		}
-	   	
-		
+
+
 		return keyProtobuf.build();
 	}
-	/** 
+	/**
 	 * Returns the {@link Signature} protobuf for the signature held in this object
 	 * @return {@link Signature}
 	 */
 	public Signature getSignatureProtobuf() {
-	   	
+
 		// Generates the protobuf payload for this class
 		Signature.Builder signatureProtobuf = Signature.newBuilder();
-		
+
 		switch (this.keyType) {
 		case ED25519:
 			if (this.signature != null) {
@@ -385,10 +385,10 @@ public class HederaKeySignature implements Serializable {
 			}
 			break;
 		case NOTSET:
-            throw new IllegalArgumentException("Signature type not set, unable to generate data.");			
+            throw new IllegalArgumentException("Signature type not set, unable to generate data.");
 		}
-	   	
-		
+
+
 		return signatureProtobuf.build();
 	}
 	/**
@@ -402,9 +402,9 @@ public class HederaKeySignature implements Serializable {
 	 * @return boolean true if a signature was set
 	 */
 	public boolean setSignatureForKey(byte[] key, byte[] signature, boolean stopAtFirst) {
-	   	
+
 		boolean foundOne = false;
-		
+
 		// exit if key type is not set
 		if (this.keyType == KeyType.NOTSET) {
 			return false;
@@ -421,7 +421,7 @@ public class HederaKeySignature implements Serializable {
 					foundOne = true;
 					this.signature = signature;
 					if (stopAtFirst) {
-					   	
+
 						return true;
 					}
 				}
@@ -432,8 +432,8 @@ public class HederaKeySignature implements Serializable {
 		} else if (this.keyType == KeyType.LIST) {
 			foundOne = keySigList.setSignatureForKey(key, signature, stopAtFirst);
 		}
-	   	
-		
+
+
 		return foundOne;
 	}
 	/**
@@ -447,19 +447,19 @@ public class HederaKeySignature implements Serializable {
 	 * @return boolean true if a signature was set
 	 */
 	public boolean setSignatureForKeys(byte[][] keys, byte[][] signatures, boolean stopAtFirst) {
-	   	
+
 		boolean foundOne = false;
-		
+
 		for (int i=0; i < keys.length; i++) {
 			if (setSignatureForKey(keys[i], signatures[i], stopAtFirst)) {
 				foundOne = true;
 			}
 		}
-	   	
-		
+
+
 		return foundOne;
 	}
-	
+
 	/**
 	 * Sets the signature against a key matching the supplied UUID
 	 * if the signature is already set, it will be overwritten
@@ -468,12 +468,12 @@ public class HederaKeySignature implements Serializable {
 	 * @return boolean true if key was found
 	 */
 	public boolean setSignatureForKeyUUID(String uuid, byte[] signature) {
-	   	
+
 		boolean foundOne = false;
-		
+
 		// exit if key type is not set
 		if (this.keyType == KeyType.NOTSET) {
-		   	
+
 			return false;
 		}
 
@@ -483,7 +483,7 @@ public class HederaKeySignature implements Serializable {
 			if (this.uuid.equals(uuid)) {
 				// it's a match, set the signature
 				this.signature = signature;
-			   	
+
 				return true;
 			}
 		}
@@ -492,8 +492,8 @@ public class HederaKeySignature implements Serializable {
 		} else if (this.keyType == KeyType.LIST) {
 			foundOne = keySigList.setSignatureForKeyUUID(uuid, signature);
 		}
-	   	
-		
+
+
 		return foundOne;
 	}
 	/**
@@ -504,7 +504,7 @@ public class HederaKeySignature implements Serializable {
 	 * @return boolean true if a signature was set
 	 */
 	public boolean setSignatureForKeyUUIDs(String[] uuids, byte[][] signatures) {
-	   	
+
 		boolean foundOne = false;
 
 		for (int i=0; i < uuids.length; i++) {
@@ -512,7 +512,7 @@ public class HederaKeySignature implements Serializable {
 				foundOne = true;
 			}
 		}
-	   	
+
 		return foundOne;
 	}
 	/**
@@ -523,12 +523,12 @@ public class HederaKeySignature implements Serializable {
 	 * @return true if a signature was updated
 	 */
 	public boolean updateSignatureForKey(byte[] key, byte[] signature) {
-	   	
+
 		boolean foundOne = false;
-		
+
 		// exit if key type is not set
 		if (this.keyType == KeyType.NOTSET) {
-		   	
+
 			return false;
 		}
 
@@ -549,8 +549,8 @@ public class HederaKeySignature implements Serializable {
 		} else if (this.keyType == KeyType.LIST) {
 			foundOne = keySigList.updateSignatureForKey(key, signature);
 		}
-	   	
-		
+
+
 		return foundOne;
 	}
 	/**
@@ -561,28 +561,28 @@ public class HederaKeySignature implements Serializable {
 	 * @return true if a signature was updated
 	 */
 	public boolean updateSignatureForKeys(byte[][] keys, byte[][] signatures) {
-	   	
+
 		boolean foundOne = false;
-		
+
 		for (int i=0; i < keys.length; i++) {
 			if (updateSignatureForKey(keys[i], signatures[i])) {
 				foundOne = true;
 			}
 		}
-	   	
-		
+
+
 		return foundOne;
 	}
 	/**
 	 * Gets an array of keys and UUIDS {@link HederaKeyUUIDDescription} for a given public key
-	 * 
+	 *
 	 * @param hederaKeyUUIDDescriptions a List of {@link HederaKeyUUIDDescription} containing the result
 	 * Note: Due to the recursive nature of this method, you must initialise this List before calling the method.
-	 * The result will be in the same parameter  
+	 * The result will be in the same parameter
 	 * @param publicKey the public key to look for
 	 */
 	public void getKeyUUIDs(List<HederaKeyUUIDDescription> hederaKeyUUIDDescriptions, byte[] publicKey) {
-	   	
+
 		// exit if key type is not set
 		if (this.keyType != KeyType.NOTSET) {
 
@@ -599,8 +599,8 @@ public class HederaKeySignature implements Serializable {
 			} else if (this.keyType == KeyType.LIST) {
 				keySigList.getKeyUUIDs(hederaKeyUUIDDescriptions, publicKey);
 			}
-		}		
-	   	
+		}
+
 	}
 
 	/**
@@ -609,10 +609,10 @@ public class HederaKeySignature implements Serializable {
 	 */
 	@SuppressWarnings("unchecked")
 	public JSONObject JSON() {
-	   	
-		
+
+
 	   	JSONObject jsonKey = new JSONObject();
-	   	
+
 	   	jsonKey.put(JSON_DESCRIPTION, this.keyDescription);
 	   	jsonKey.put(JSON_UUID, this.uuid);
 	   	if (this.signature != null) {
@@ -655,8 +655,8 @@ public class HederaKeySignature implements Serializable {
 			jsonKey.put(JSON_SIGNATURE_TYPE, "NOTSET");
 			break;
 		}
-	   	
-		
+
+
 		return jsonKey;
 	}
 	/**
@@ -664,8 +664,8 @@ public class HederaKeySignature implements Serializable {
 	 * @return {@link String}
 	 */
 	public String JSONString() {
-	   	
-	   	
+
+
 		return JSON().toJSONString();
 	}
 
@@ -674,8 +674,8 @@ public class HederaKeySignature implements Serializable {
 	 * @param jsonKey the {@link JSONObject} to populate this object with
 	 */
 	public void fromJSON(JSONObject jsonKey) {
-	   	
-		
+
+
 		if (jsonKey.containsKey(JSON_DESCRIPTION)) {
 			this.keyDescription = (String) jsonKey.get(JSON_DESCRIPTION);
 		} else {
@@ -693,9 +693,9 @@ public class HederaKeySignature implements Serializable {
 			this.keySigList = null;
 			this.publicKey = null;
 			this.signature = null;
-			
+
 			JSONObject oneKey = new JSONObject();
-			
+
 			switch ((String) jsonKey.get(JSON_TYPE)) {
 			case  "CONTRACT":
 				this.keyType = KeyType.CONTRACT;
@@ -765,9 +765,9 @@ public class HederaKeySignature implements Serializable {
 		} else {
 			throw new IllegalStateException("Key type isn't set in JSON.");
 		}
-	   	
+
 	}
-	
+
 	/**
 	 * Runs a query to get entities related to this key from the Hedera Network
 	 * If successful, the method populates the entityIDs, cost and stateProof for this object depending on the type of answer requested
@@ -778,8 +778,8 @@ public class HederaKeySignature implements Serializable {
 	 */
 	public boolean getEntities(HederaTransaction payment, HederaQueryHeader.QueryResponseType responseType) throws InterruptedException {
 		boolean result = true;
-		
-	   	
+
+
 		// build the query
 	   	// Header
 		HederaQueryHeader queryHeader = new HederaQueryHeader();
@@ -787,25 +787,25 @@ public class HederaKeySignature implements Serializable {
 			queryHeader.payment = payment;
 			queryHeader.responseType = responseType;
 		}
-		
+
 		// get by key query
 		GetByKeyQuery.Builder getByKeyQuery = GetByKeyQuery.newBuilder();
 		getByKeyQuery.setKey(this.getKeyProtobuf());
 		getByKeyQuery.setHeader(queryHeader.getProtobuf());
-		
+
 		// the query itself
 		HederaQuery query = new HederaQuery();
 		query.queryType = QueryType.FILEGETINFO;
 		query.queryData = getByKeyQuery.build();
-		
+
 		// query now set, send to network
 		Response response = this.node.getFileInfo(query);
 
 		FileGetInfoResponse.Builder fileGetInfoResponse = response.getFileGetInfo().toBuilder();
-		
+
 		// check response header first
 		ResponseHeader.Builder responseHeader = fileGetInfoResponse.getHeaderBuilder();
-		
+
 		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
 
 		if (this.precheckResult == ResponseCodeEnum.OK) {
@@ -814,7 +814,7 @@ public class HederaKeySignature implements Serializable {
 			this.cost = responseHeader.getCost();
 			//state proof
 			this.stateProof = responseHeader.getStateProof().toByteArray();
-			
+
 			this.entityIDs.clear();
 			for (int i=0; i < queryResponse.getEntitiesCount(); i++) {
 				HederaEntityID entity = new HederaEntityID(queryResponse.getEntities(i));
@@ -823,8 +823,8 @@ public class HederaKeySignature implements Serializable {
 		} else {
 			result = false;
 		}
-		
-	   	
+
+
 	   	return result;
 	}
 	/**
@@ -835,7 +835,7 @@ public class HederaKeySignature implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getEntitiesAnswerOnly(HederaTransaction payment) throws InterruptedException {
-	   	
+
 	   	return getEntities(payment, QueryResponseType.ANSWER_ONLY);
 	}
 	/**
@@ -846,7 +846,7 @@ public class HederaKeySignature implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getEntitiesStateProof(HederaTransaction payment) throws InterruptedException {
-	   	
+
 		return getEntities(payment, HederaQueryHeader.QueryResponseType.ANSWER_STATE_PROOF);
 	}
 	/**
@@ -856,7 +856,7 @@ public class HederaKeySignature implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getEntitiesCostAnswer() throws InterruptedException {
-	   	
+
 		return getEntities(null, HederaQueryHeader.QueryResponseType.COST_ANSWER);
 	}
 	/**
@@ -866,7 +866,7 @@ public class HederaKeySignature implements Serializable {
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getEntitiesCostAnswerStateProof() throws InterruptedException {
-	   	
+
 		return getEntities(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
 	}
 }

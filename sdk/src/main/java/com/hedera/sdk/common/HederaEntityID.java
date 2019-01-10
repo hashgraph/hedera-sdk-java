@@ -21,7 +21,7 @@ public class HederaEntityID implements Serializable {
 	 * the HederaClaim, initialises with null
 	 */
 	public HederaClaim claim = null;
-	/** 
+	/**
 	 * the HederaFileId, initialises with null
 	 */
 	public HederaFileID fileID = null;
@@ -35,21 +35,21 @@ public class HederaEntityID implements Serializable {
 	 * with default values
 	 */
 	public HederaEntityID() {
-	   	
-	   	
+
+
 	}
 	/**
 	 * Construct from an EntityID protobuf stream
 	 * @param entityIDProtobuf the protofbuf to generate the object from
 	 */
 	public HederaEntityID(EntityID entityIDProtobuf) {
-	   	
-	   	
+
+
 	   	this.accountID = null;
 	   	this.claim = null;
 	   	this.contractID = null;
 	   	this.fileID = null;
-	   	
+
 	   	if (entityIDProtobuf.hasAccountID()) {
 	   		this.accountID = new HederaAccountID(entityIDProtobuf.getAccountID());
 	   	}
@@ -63,6 +63,6 @@ public class HederaEntityID implements Serializable {
 	   		this.fileID = new HederaFileID(entityIDProtobuf.getFileID());
 	   	}
 
-	   	
+
 	}
 }

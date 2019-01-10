@@ -71,7 +71,7 @@ public class HederaFile implements Serializable {
 	 */
 	private List<HederaKeyPair> newKeys = new ArrayList<HederaKeyPair>();
 	/**
-	 * keys to manage the file with 
+	 * keys to manage the file with
 	 */
 	private List<HederaKeyPair> keys = new ArrayList<HederaKeyPair>();
 	// the time at which this file should expire (unless updated before then to
@@ -111,7 +111,7 @@ public class HederaFile implements Serializable {
 	public HederaKeyPair newRealmAdminKey = null;
 	/**
 	 * sets the object to use for communication with the node
-	 * 
+	 *
 	 * @param node the node to use for communication
 	 */
 	public void setNode(HederaNode node) {
@@ -122,39 +122,39 @@ public class HederaFile implements Serializable {
 	 * Default constructor, this returns a blank file object.
 	 */
 	public HederaFile() {
-		
-		
+
+
 	}
 
 	/**
 	 * Constructor from shard, realm and file number
-	 * 
+	 *
 	 * @param shardNum the shard number for the file
 	 * @param realmNum the realm number for the file
 	 * @param fileNum the file number for the file
 	 */
 	public HederaFile(long shardNum, long realmNum, long fileNum) {
-		
+
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.fileNum = fileNum;
-		
+
 	}
 
 	/**
 	 * Constructor from a {@link HederaTransactionID}
-	 * 
+	 *
 	 * @param transactionID the transaction ID to create the file from
 	 */
 	public HederaFile(HederaTransactionID transactionID) {
-		
+
 		this.hederaTransactionID = transactionID;
-		
+
 	}
 
 	/**
 	 * returns the size of the file as reported (result of a get info query)
-	 * 
+	 *
 	 * @return long
 	 */
 	public long getSize() {
@@ -165,7 +165,7 @@ public class HederaFile implements Serializable {
 	 * @return {@link HederaFileID}
 	 */
 	public HederaFileID getFileID() {
-		
+
 		return new HederaFileID(this.shardNum, this.realmNum,  this.fileNum);
 	}
 	/**
@@ -179,7 +179,7 @@ public class HederaFile implements Serializable {
 	}
 	/**
 	 * returns file was deleted (result of a get info query)
-	 * 
+	 *
 	 * @return boolean
 	 */
 	public boolean getDeleted() {
@@ -188,7 +188,7 @@ public class HederaFile implements Serializable {
 
 	/**
 	 * results of the Transaction
-	 * 
+	 *
 	 * @return {@link ResponseCodeEnum}
 	 */
 	public ResponseCodeEnum getPrecheckResult() {
@@ -197,7 +197,7 @@ public class HederaFile implements Serializable {
 
 	/**
 	 * cost of a query
-	 * 
+	 *
 	 * @return long
 	 */
 	public long getCost() {
@@ -206,7 +206,7 @@ public class HederaFile implements Serializable {
 
 	/**
 	 * state proof if requested
-	 * 
+	 *
 	 * @return byte[]
 	 */
 	public byte[] getStateProof() {
@@ -216,7 +216,7 @@ public class HederaFile implements Serializable {
 	/**
 	 * This method returns the body of a transaction to create a file so that it can
 	 * be signed
-	 * 
+	 *
 	 * @param transactionID            the {@link HederaTransactionID} for the
 	 *                                 transaction
 	 * @param nodeAccount              the {@link HederaAccountID} of the account of
@@ -237,14 +237,14 @@ public class HederaFile implements Serializable {
 		HederaTransactionBody transactionBody = new HederaTransactionBody(TransactionType.FILECREATE, transactionID,
 				nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo, this.getCreateTransactionBody());
 
-		
+
 		return transactionBody.getProtobuf();
 	}
 
 	/**
 	 * This method returns the body of a transaction to delete a file so that it can
 	 * be signed
-	 * 
+	 *
 	 * @param transactionID            the {@link HederaTransactionID} for the
 	 *                                 transaction
 	 * @param nodeAccount              the {@link HederaAccountID} of the account of
@@ -265,14 +265,14 @@ public class HederaFile implements Serializable {
 		HederaTransactionBody transactionBody = new HederaTransactionBody(TransactionType.FILEDELETE, transactionID,
 				nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo, this.getDeleteTransactionBody());
 
-		
+
 		return transactionBody.getProtobuf();
 	}
 
 	/**
 	 * This method returns the body of a transaction to update a file so that it can
 	 * be signed
-	 * 
+	 *
 	 * @param transactionID            the {@link HederaTransactionID} for the
 	 *                                 transaction
 	 * @param nodeAccount              the {@link HederaAccountID} of the account of
@@ -293,14 +293,14 @@ public class HederaFile implements Serializable {
 		HederaTransactionBody transactionBody = new HederaTransactionBody(TransactionType.FILEUPDATE, transactionID,
 				nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo, this.getUpdateTransactionBody());
 
-		
+
 		return transactionBody.getProtobuf();
 	}
 
 	/**
 	 * This method returns the body of a transaction to append to a file so that it
 	 * can be signed
-	 * 
+	 *
 	 * @param transactionID            the {@link HederaTransactionID} for the
 	 *                                 transaction
 	 * @param nodeAccount              the {@link HederaAccountID} of the account of
@@ -321,13 +321,13 @@ public class HederaFile implements Serializable {
 		HederaTransactionBody transactionBody = new HederaTransactionBody(TransactionType.FILEAPPEND, transactionID,
 				nodeAccount, transactionFee, transactionValidDuration, generateRecord, memo, this.getAppendTransactionBody());
 
-		
+
 		return transactionBody.getProtobuf();
 	}
 
 	/**
 	 * This method runs a transaction to create a file
-	 * 
+	 *
 	 * @param transactionID            the {@link HederaTransactionID} for the
 	 *                                 transaction
 	 * @param nodeAccount              the {@link HederaAccountID} of the account of
@@ -359,18 +359,18 @@ public class HederaFile implements Serializable {
 
 		// issue the transaction
 		Utilities.throwIfNull("Node", this.node);
-		
+
 		HederaTransactionResult hederaTransactionResult = this.node.fileCreate(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 		// return
-		
+
 		return hederaTransactionResult;
 
 	}
 
 	/**
 	 * This method runs a transaction to delete a file
-	 * 
+	 *
 	 * @param transactionID            the {@link HederaTransactionID} for the
 	 *                                 transaction
 	 * @param nodeAccount              the {@link HederaAccountID} of the account of
@@ -405,7 +405,7 @@ public class HederaFile implements Serializable {
 
 		HederaTransactionResult hederaTransactionResult = this.node.fileDelete(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
-		
+
 
 		// return
 		return hederaTransactionResult;
@@ -413,7 +413,7 @@ public class HederaFile implements Serializable {
 
 	/**
 	 * This method runs a transaction to update a file
-	 * 
+	 *
 	 * @param transactionID            the {@link HederaTransactionID} for the
 	 *                                 transaction
 	 * @param nodeAccount              the {@link HederaAccountID} of the account of
@@ -449,14 +449,14 @@ public class HederaFile implements Serializable {
 		HederaTransactionResult hederaTransactionResult = this.node.fileUpdate(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 
-		
+
 		// return
 		return hederaTransactionResult;
 	}
 
 	/**
 	 * This method runs a transaction to append to a file
-	 * 
+	 *
 	 * @param transactionID            the {@link HederaTransactionID} for the
 	 *                                 transaction
 	 * @param nodeAccount              the {@link HederaAccountID} of the account of
@@ -492,7 +492,7 @@ public class HederaFile implements Serializable {
 		HederaTransactionResult hederaTransactionResult = this.node.fileAppend(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
 
-		
+
 		// return
 		return hederaTransactionResult;
 
@@ -501,7 +501,7 @@ public class HederaFile implements Serializable {
 	/**
 	 * This method runs a transaction to create a file with a record, default values
 	 * are used to create the file with
-	 * 
+	 *
 	 * @param accountShardNum the shard of the account paying for the file creation
 	 * @param accountRealmNum the realm of the account paying for the file creation
 	 * @param accountNum      the account number of the account paying for the file
@@ -522,7 +522,7 @@ public class HederaFile implements Serializable {
 	public HederaTransactionResult createWithRecord(long accountShardNum, long accountRealmNum, long accountNum,
 			long nodeShardNum, long nodeRealmNum, long nodeAccountNum, long transactionFee, String memo,
 			Instant expirationTime, byte[] contents, HederaKeyPair keyPair) throws Exception {
-		
+
 		return createSimple(accountShardNum, accountRealmNum, accountNum, nodeShardNum, nodeRealmNum, nodeAccountNum,
 				transactionFee, true, memo, expirationTime, contents, keyPair);
 	}
@@ -530,7 +530,7 @@ public class HederaFile implements Serializable {
 	/**
 	 * This method runs a transaction to create a file without a record, default
 	 * values are used to create the file with
-	 * 
+	 *
 	 * @param accountShardNum the shard of the account paying for the file creation
 	 * @param accountRealmNum the realm of the account paying for the file creation
 	 * @param accountNum      the account number of the account paying for the file
@@ -552,7 +552,6 @@ public class HederaFile implements Serializable {
 			long nodeShardNum, long nodeRealmNum, long nodeAccountNum, long transactionFee, String memo,
 			Instant expirationTime, byte[] contents, HederaKeyPair keyPair) throws Exception {
 
-		
 		return createSimple(accountShardNum, accountRealmNum, accountNum, nodeShardNum, nodeRealmNum, nodeAccountNum,
 				transactionFee, false, memo, expirationTime, contents, keyPair);
 	}
@@ -572,7 +571,7 @@ public class HederaFile implements Serializable {
 
 		// duration defaults to 3 minutes if not set
 		HederaDuration transactionValidDuration = new HederaDuration();
-		
+
 		// add the wACL keys
 		this.addKey(keyPair);
 
@@ -604,7 +603,7 @@ public class HederaFile implements Serializable {
 
 		hederaTransactionResult.hederaTransactionID = transactionId;
 
-		
+
 		return hederaTransactionResult;
 	}
 
@@ -612,7 +611,7 @@ public class HederaFile implements Serializable {
 	 * Runs a query to get the contents of a given file If successful, the method
 	 * populates the properties this object depending on the type of answer
 	 * requested
-	 * 
+	 *
 	 * @param payment      a {@link HederaTransaction} message to indicate how this
 	 *                     query will be paid for, this can be null for Cost queries
 	 * @param responseType the type of response requested from the query
@@ -624,7 +623,7 @@ public class HederaFile implements Serializable {
 			throws InterruptedException {
 		boolean result = true;
 
-		
+
 		// build the query
 		// Header
 		HederaQueryHeader queryHeader = new HederaQueryHeader();
@@ -666,14 +665,14 @@ public class HederaFile implements Serializable {
 			result = false;
 		}
 
-		
+
 		return result;
 	}
 
 	/**
 	 * Runs a query to get the contents of a given file without a state proof If
 	 * successful, the method populates the cost and contents of this object
-	 * 
+	 *
 	 * @param payment      a {@link HederaTransaction} message to indicate how this
 	 *                     query will be paid for, this can be null for Cost queries
 	 * @return {@link Boolean} indicating success or failure of the query
@@ -681,7 +680,7 @@ public class HederaFile implements Serializable {
 	 *                              with the node
 	 */
 	public boolean getContentsAnswerOnly(HederaTransaction payment) throws InterruptedException {
-		
+
 		return getContents(payment, QueryResponseType.ANSWER_ONLY);
 	}
 
@@ -689,7 +688,7 @@ public class HederaFile implements Serializable {
 	 * Runs a query to get the contents of a given file with a state proof If
 	 * successful, the method populates the cost, stateproof and contents of this
 	 * object
-	 * 
+	 *
 	 * @param payment      a {@link HederaTransaction} message to indicate how this
 	 *                     query will be paid for, this can be null for Cost queries
 	 * @return {@link Boolean} indicating success or failure of the query
@@ -697,7 +696,7 @@ public class HederaFile implements Serializable {
 	 *                              with the node
 	 */
 	public boolean getContentsStateProof(HederaTransaction payment) throws InterruptedException {
-		
+
 		return getContents(payment, HederaQueryHeader.QueryResponseType.ANSWER_STATE_PROOF);
 	}
 
@@ -705,26 +704,26 @@ public class HederaFile implements Serializable {
 	 * Runs a query to get cost of getting the contents of a given file without a
 	 * state proof If successful, the method populates the cost property of this
 	 * object
-	 * 
+	 *
 	 * @return {@link Boolean} indicating success or failure of the query
 	 * @throws InterruptedException should an exception occur during communication
 	 *                              with the node
 	 */
 	public boolean getContentsCostAnswer() throws InterruptedException {
-		
+
 		return getContents(null, HederaQueryHeader.QueryResponseType.COST_ANSWER);
 	}
 
 	/**
 	 * Runs a query to get cost of getting the contents of a given file with a state
 	 * proof If successful, the method populates the cost property of this object
-	 * 
+	 *
 	 * @return {@link Boolean} indicating success or failure of the query
 	 * @throws InterruptedException should an exception occur during communication
 	 *                              with the node
 	 */
 	public boolean getContentsAnswerStateProof() throws InterruptedException {
-		
+
 		return getContents(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
 	}
 
@@ -732,7 +731,7 @@ public class HederaFile implements Serializable {
 	 * Runs a query to get the information about a given file If successful, the
 	 * method populates the properties this object depending on the type of answer
 	 * requested
-	 * 
+	 *
 	 * @param payment      a {@link HederaTransaction} message to indicate how this
 	 *                     query will be paid for, this can be null for Cost queries
 	 * @param responseType the type of response requested from the query
@@ -744,7 +743,7 @@ public class HederaFile implements Serializable {
 			throws InterruptedException {
 		boolean result = true;
 
-		
+
 		// build the query
 		// Header
 		HederaQueryHeader queryHeader = new HederaQueryHeader();
@@ -786,7 +785,7 @@ public class HederaFile implements Serializable {
 			this.expirationTime = timestamp.time;
 			this.deleted = fileInfo.getDeleted();
 			this.keys.clear();
-			
+
 			KeyList protoKeys = fileInfo.getKeys();
 
 			for (int i = 0; i < protoKeys.getKeysCount(); i++) {
@@ -797,14 +796,14 @@ public class HederaFile implements Serializable {
 			result = false;
 		}
 
-		
+
 		return result;
 	}
 
 	/**
 	 * Runs a query to get the contents of a given file without a state proof If
 	 * successful, the method populates the properties of this object
-	 * 
+	 *
 	 * @param payment      a {@link HederaTransaction} message to indicate how this
 	 *                     query will be paid for, this can be null for Cost queries
 	 * @return {@link Boolean} indicating success or failure of the query
@@ -812,14 +811,14 @@ public class HederaFile implements Serializable {
 	 *                              with the node
 	 */
 	public boolean getInfoAnswerOnly(HederaTransaction payment) throws InterruptedException {
-		
+
 		return getInfo(payment, QueryResponseType.ANSWER_ONLY);
 	}
 
 	/**
 	 * Runs a query to get the contents of a given file with a state proof If
 	 * successful, the method populates the properties of this object
-	 * 
+	 *
 	 * @param payment      a {@link HederaTransaction} message to indicate how this
 	 *                     query will be paid for, this can be null for Cost queries
 	 * @return {@link Boolean} indicating success or failure of the query
@@ -827,7 +826,7 @@ public class HederaFile implements Serializable {
 	 *                              with the node
 	 */
 	public boolean getInfoStateProof(HederaTransaction payment) throws InterruptedException {
-		
+
 		return getInfo(payment, HederaQueryHeader.QueryResponseType.ANSWER_STATE_PROOF);
 	}
 
@@ -835,13 +834,13 @@ public class HederaFile implements Serializable {
 	 * Runs a query to get the cost of getting the contents of a given file without
 	 * a state proof If successful, the method populates the cost property of this
 	 * object
-	 * 
+	 *
 	 * @return {@link Boolean} indicating success or failure of the query
 	 * @throws InterruptedException should an exception occur during communication
 	 *                              with the node
 	 */
 	public boolean getInfoCostAnswer() throws InterruptedException {
-		
+
 		return getInfo(null, HederaQueryHeader.QueryResponseType.COST_ANSWER);
 	}
 
@@ -849,24 +848,24 @@ public class HederaFile implements Serializable {
 	 * Runs a query to get the cost of getting the contents of a given file with a
 	 * state proof If successful, the method populates the cost property of this
 	 * object
-	 * 
+	 *
 	 * @return {@link Boolean} indicating success or failure of the query
 	 * @throws InterruptedException should an exception occur during communication
 	 *                              with the node
 	 */
 	public boolean getInfoCostAnswerStateProof() throws InterruptedException {
-		
+
 		return getInfo(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
 	}
 
 	/**
 	 * This method returns the {FileCreateTransactionBody} body for a transaction to
 	 * create a file
-	 * 
+	 *
 	 * @return {@link FileCreateTransactionBody}
 	 */
 	public FileCreateTransactionBody getCreateTransactionBody() {
-		
+
 
 		FileCreateTransactionBody.Builder fileCreateTransaction = FileCreateTransactionBody.newBuilder();
 
@@ -874,7 +873,7 @@ public class HederaFile implements Serializable {
 			HederaTimeStamp timestamp = new HederaTimeStamp(this.expirationTime);
 			fileCreateTransaction.setExpirationTime(timestamp.getProtobuf());
 		}
-		
+
 		if (this.keys.size() > 0) {
 			fileCreateTransaction.setKeys(Utilities.getProtoKeyList(this.keys));
 		}
@@ -896,20 +895,20 @@ public class HederaFile implements Serializable {
 			fileCreateTransaction.setNewRealmAdminKey(newRealmAdminKey.getProtobuf());
 		}
 
-		
+
 		return fileCreateTransaction.build();
 	}
 
 	/**
 	 * This method returns the {FileUpdateTransactionBody} body for a transaction to
 	 * update a file
-	 * 
+	 *
 	 * @return {@link FileUpdateTransactionBody}
 	 */
 	public FileUpdateTransactionBody getUpdateTransactionBody() {
-		
+
 		FileUpdateTransactionBody.Builder fileUpdateTransaction = FileUpdateTransactionBody.newBuilder();
-		
+
 		fileUpdateTransaction.setFileID(this.getFileID().getProtobuf());
 
 		if (this.expirationTime != null) {
@@ -930,18 +929,18 @@ public class HederaFile implements Serializable {
 			fileUpdateTransaction.setContents(fileContents);
 		}
 
-		
+
 		return fileUpdateTransaction.build();
 	}
 
 	/**
 	 * This method returns the {FileDeleteTransactionBody} body for a transaction to
 	 * delete a file
-	 * 
+	 *
 	 * @return {@link FileDeleteTransactionBody}
 	 */
 	public FileDeleteTransactionBody getDeleteTransactionBody() {
-		
+
 		// Generates the protobuf payload for this class
 		FileDeleteTransactionBody.Builder fileDeleteTransactionBody = FileDeleteTransactionBody.newBuilder();
 
@@ -955,18 +954,18 @@ public class HederaFile implements Serializable {
 
 		fileDeleteTransactionBody.setFileID(fileId);
 
-		
+
 		return fileDeleteTransactionBody.build();
 	}
 
 	/**
 	 * This method returns the {FileAppendTransactionBody} body for a transaction to
 	 * append to a file
-	 * 
+	 *
 	 * @return {@link FileAppendTransactionBody}
 	 */
 	public FileAppendTransactionBody getAppendTransactionBody() {
-		
+
 		FileAppendTransactionBody.Builder fileAppendTransaction = FileAppendTransactionBody.newBuilder();
 
 		// file Id or transactionId
@@ -985,78 +984,78 @@ public class HederaFile implements Serializable {
 			fileAppendTransaction.setContents(fileContents);
 		}
 
-		
+
 		return fileAppendTransaction.build();
 	}
 
 	/**
 	 * Adds a {@link HederaKeyPair} to the list
-	 * 
+	 *
 	 * @param key the key to add to the list
 	 */
 	public void addKey(HederaKeyPair key) {
-		
+
 		this.keys.add(key);
-		
+
 	}
 
 	/**
 	 * Adds a {@link HederaKeyPair} to the list of new keys
-	 * 
+	 *
 	 * @param key the key to add to the list
 	 */
 	public void addNewKey(HederaKeyPair key) {
-		
+
 		this.newKeys.add(key);
-		
+
 	}
 
 	/**
 	 * Deletes a {@link HederaKeyPair} from the list
-	 * 
+	 *
 	 * @param key the key to delete
 	 * @return {@link Boolean} true if successful
 	 */
 	public boolean deleteKey(HederaKeyPair key) {
-		
+
 		return this.keys.remove(key);
 	}
 
 	/**
 	 * Deletes a {@link HederaKeyPair} from the list
-	 * 
+	 *
 	 * @param key the key to remove
 	 * @return {@link Boolean} true if successful
 	 */
 	public boolean deleteNewKey(HederaKeyPair key) {
-		
+
 		return this.newKeys.remove(key);
 	}
 
 	/**
 	 * returns the list of {@link HederaKeyPair}
-	 * 
+	 *
 	 * @return {@link List} of {@link HederaKeyPair}
 	 */
 	public List<HederaKeyPair> getNewKeys() {
-		
+
 		return this.newKeys;
 	}
 
 	/**
 	 * returns the list of {@link HederaKeyPair}
-	 * 
+	 *
 	 * @return {@link List} of {@link HederaKeyPair}
 	 */
 	public List<HederaKeyPair> getKeys() {
-		
+
 		return this.keys;
 	}
 
 	// SIMPLIFICATION
 	/**
 	 * Creates a file in the simplest possible way
-	 * 
+	 *
 	 * @param shardNum the shard in which to create the file
 	 * @param realmNum the realm in which to create the file
 	 * @param contents the file contents in bytes
@@ -1064,10 +1063,11 @@ public class HederaFile implements Serializable {
 	 *                 setting up a file, if null the {@link HederaFile} class
 	 *                 defaults will be used
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public HederaTransactionResult create(long shardNum, long realmNum, byte[] contents,
 			HederaFileCreateDefaults defaults) throws Exception {
+
 		// setup defaults if necessary
 		if (defaults != null) {
 			this.expirationTime = Instant.now().plusSeconds(defaults.expirationTimeSeconds)
@@ -1099,7 +1099,7 @@ public class HederaFile implements Serializable {
 		if (this.txQueryDefaults.fileWacl != null) {
 			this.addKey(this.txQueryDefaults.fileWacl);
 		}
-		
+
 		// get the body for the transaction so we can sign it
 		TransactionBody createBody = this.bodyToSignForCreate(hederaTransactionID, this.node.getAccountID(),
 				this.node.fileCreateTransactionFee, this.txQueryDefaults.transactionValidDuration,
@@ -1123,18 +1123,18 @@ public class HederaFile implements Serializable {
 				this.txQueryDefaults.transactionValidDuration, this.txQueryDefaults.generateRecord, this.txQueryDefaults.memo,
 				sigsForTransaction);
 
-		
+
 		return transactionResult;
 	}
 
 	/**
 	 * Deletes a file in the simplest possible way
-	 * 
+	 *
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public HederaTransactionResult delete() throws Exception {
-		
+
 
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
@@ -1165,24 +1165,24 @@ public class HederaFile implements Serializable {
 		if (this.txQueryDefaults.fileWacl != null) {
 			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getSignature(deleteBody.toByteArray()));
 		}
-		
+
 		// delete the file
 		transactionResult = this.delete(hederaTransactionID, this.node.getAccountID(), this.node.fileDeleteTransactionFee,
 				this.txQueryDefaults.transactionValidDuration, this.txQueryDefaults.generateRecord, this.txQueryDefaults.memo,
 				sigsForTransaction);
 
-		
+
 		return transactionResult;
 	}
 
 	/**
 	 * Deletes a file in the simplest possible way
-	 * 
+	 *
 	 * @param shardNum, the shard in which the file exists
 	 * @param realmNum, the realm in which the file exists
 	 * @param fileNum, the file number
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public HederaTransactionResult delete(long shardNum, long realmNum, long fileNum) throws Exception {
 		this.shardNum = shardNum;
@@ -1193,13 +1193,13 @@ public class HederaFile implements Serializable {
 
 	/**
 	 * Appends to a file in the simplest possible way
-	 * 
+	 *
 	 * @param contents the file contents in bytes to append
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public HederaTransactionResult append(byte[] contents) throws Exception {
-		
+
 
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
@@ -1210,7 +1210,7 @@ public class HederaFile implements Serializable {
 		Utilities.throwIfAccountIDInvalid("Node", this.txQueryDefaults.node.getAccountID());
 		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingKeyPair);
 		Utilities.throwIfAccountIDInvalid("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingAccountID);
-		
+
 		// set transport
 		this.node = this.txQueryDefaults.node;
 
@@ -1233,25 +1233,25 @@ public class HederaFile implements Serializable {
 		if (this.txQueryDefaults.fileWacl != null) {
 			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getSignature(appendBody.toByteArray()));
 		}
-		
+
 		// add to the file
 		transactionResult = this.append(hederaTransactionID, this.node.getAccountID(), this.node.fileAppendTransactionFee,
 				this.txQueryDefaults.transactionValidDuration, this.txQueryDefaults.generateRecord, this.txQueryDefaults.memo,
 				sigsForTransaction);
 
-		
+
 		return transactionResult;
 	}
 
 	/**
 	 * Appends to a file in the simplest possible way
-	 * 
+	 *
 	 * @param shardNum, the shard in which the file exists
 	 * @param realmNum, the realm in which the file exists
 	 * @param fileNum, the file number
 	 * @param contents, the contents to add to the file
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public HederaTransactionResult append(long shardNum, long realmNum, long fileNum, byte[] contents)
 			throws Exception {
@@ -1266,14 +1266,14 @@ public class HederaFile implements Serializable {
 	 * you don't wish to update them Note: if seconds or nanos are supplied and the
 	 * other set to -1, it will be set to 0 likewise, leave the contents null if you
 	 * don't wish to update them
-	 * 
+	 *
 	 * @param expirationTimeSeconds the new file expiration seconds (leave null for
 	 *                              no change)
 	 * @param expirationTimeNanos   the file expiration time nanos (leave null for
 	 *                              no change)
 	 * @param contents              the file contents in bytes to append
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public HederaTransactionResult update(long expirationTimeSeconds, int expirationTimeNanos, byte[] contents)
 			throws Exception {
@@ -1325,13 +1325,13 @@ public class HederaFile implements Serializable {
 		if (this.txQueryDefaults.fileWacl != null) {
 			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getSignature(updateBody.toByteArray()));
 		}
-		
+
 		// update the file
 		transactionResult = this.update(hederaTransactionID, this.node.getAccountID(), this.node.fileUpdateTransactionFee,
 				this.txQueryDefaults.transactionValidDuration, this.txQueryDefaults.generateRecord, this.txQueryDefaults.memo,
 				sigsForTransaction);
 
-		
+
 		return transactionResult;
 	}
 
@@ -1340,7 +1340,7 @@ public class HederaFile implements Serializable {
 	 * you don't wish to update them Note: if seconds or nanos are supplied and the
 	 * other set to -1, it will be set to 0 likewise, leave the contents null if you
 	 * don't wish to update them
-	 * 
+	 *
 	 * @param                       shardNum, the shard in which the file exists
 	 * @param                       realmNum, the realm in which the file exists
 	 * @param                       fileNum, the file number
@@ -1350,7 +1350,7 @@ public class HederaFile implements Serializable {
 	 *                              no change)
 	 * @param contents              the file contents in bytes to append
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public HederaTransactionResult update(long shardNum, long realmNum, long fileNum, long expirationTimeSeconds,
 			int expirationTimeNanos, byte[] contents) throws Exception {
@@ -1364,28 +1364,28 @@ public class HederaFile implements Serializable {
 	 * Gets the contents of the file, returns null if an error occurred in the event
 	 * of an error, check the value of this.precheckResult to determine the cause of
 	 * the error
-	 * 
+	 *
 	 * @return {@link byte} array
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public byte[] getContents() throws Exception {
-		
-		
+
+
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
-		
+
 		// set transport
 		this.node = this.txQueryDefaults.node;
-		
+
 		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults,
 				this.node.fileGetContentsQueryFee);
 
 		if (this.getContentsAnswerOnly(transferTransaction)) {
-			
+
 			return this.contents;
 		} else {
-			
+
 			return null;
 		}
 	}
@@ -1394,12 +1394,12 @@ public class HederaFile implements Serializable {
 	 * Gets the contents of the file, returns null if an error occurred in the event
 	 * of an error, check the value of this.precheckResult to determine the cause of
 	 * the error
-	 * 
+	 *
 	 * @param shardNum, the shard in which the file exists
 	 * @param realmNum, the realm in which the file exists
 	 * @param fileNum, the file number
 	 * @return {@link byte} array
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public byte[] getContents(long shardNum, long realmNum, long fileNum) throws Exception {
 		this.shardNum = shardNum;
@@ -1415,33 +1415,33 @@ public class HederaFile implements Serializable {
 	 * a "getInfoCostAnswer" in order to ascertain the cost of the query first The
 	 * cost could be cached and refreshed from time to time, there is no need to
 	 * look it up before each getInfo query
-	 * 
+	 *
 	 * @return {@link boolean}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public boolean getInfo() throws Exception {
-		
+
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
-		
+
 		// set transport
 		this.node = this.txQueryDefaults.node;
 
 		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults, this.node.fileGetInfoQueryFee);
-		
+
 		return this.getInfoAnswerOnly(transferTransaction);
 	}
 
 	/**
 	 * Get info for the file in the event of an error, check the value of
 	 * this.precheckResult to determine the cause of the error
-	 * 
+	 *
 	 * @param shardNum, the shard in which the file exists
 	 * @param realmNum, the realm in which the file exists
 	 * @param fileNum, the file number
 	 * @return {@link boolean}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public boolean getInfo(long shardNum, long realmNum, long fileNum) throws Exception {
 		this.shardNum = shardNum;

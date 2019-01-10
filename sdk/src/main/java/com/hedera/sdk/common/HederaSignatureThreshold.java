@@ -28,8 +28,8 @@ public class HederaSignatureThreshold implements Serializable {
 	 * Default constructor
 	 */
 	public HederaSignatureThreshold() {
-		
-		
+
+
 	}
 	/**
 	 * Constructs from a List of {@link HederaSignature}
@@ -37,48 +37,48 @@ public class HederaSignatureThreshold implements Serializable {
 	 */
 	public HederaSignatureThreshold(List<HederaSignature> signatures) {
 
-   	
-		
+
+
 		for (HederaSignature hederaSignature : signatures) {
 			this.signatures.add(hederaSignature);
 		}
-		
+
 	}
 	/**
 	 * Constructs from a {@link ThresholdSignature} protobuf
 	 * @param thresholdSignature threshold signature in protobuf
 	 */
 	public HederaSignatureThreshold(ThresholdSignature thresholdSignature) {
-		
+
 		// convert a protobuf payload into class data
 		this.signatures.clear();
-		
+
 		SignatureList protoSigs = thresholdSignature.getSigs();
 
 		for (Signature signature : protoSigs.getSigsList()) {
 			this.signatures.add(new HederaSignature(signature));
 		}
-		
+
 	}
 	/**
 	 * Gets the {@link ThresholdSignature} protobuf for this object
 	 * @return {@link ThresholdSignature}
 	 */
 	public ThresholdSignature getProtobuf() {
-		
+
 		// Generates the protobuf payload for this class
 		ThresholdSignature.Builder signaturesProtobuf = ThresholdSignature.newBuilder();
 		SignatureList protoKeyList;
-		
+
 		if (!this.signatures.isEmpty()) {
 			protoKeyList = Utilities.getProtoSignatureList(this.signatures);
 			signaturesProtobuf.setSigs(protoKeyList);
 		} else {
-			
+
 			return null;
 		}
-		
-		
+
+
 		return signaturesProtobuf.build();
 	}
 	/**
@@ -86,9 +86,9 @@ public class HederaSignatureThreshold implements Serializable {
 	 * @param signature the signature to delete
 	 */
 	public void addSignature(HederaSignature signature) {
-		
+
 		this.signatures.add(signature);
-		
+
 	}
 	/**
 	 * Deletes a {@link HederaSignature} from the list
@@ -96,7 +96,7 @@ public class HederaSignatureThreshold implements Serializable {
 	 * @return true if found and deleted
 	 */
 	public boolean deleteSignature(HederaSignature signature) {
-		
+
 		return this.signatures.remove(signature);
 	}
 }

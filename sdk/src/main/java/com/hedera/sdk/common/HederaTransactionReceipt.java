@@ -38,30 +38,30 @@ public class HederaTransactionReceipt implements Serializable {
 	 * initially null
 	 */
 	public HederaContractID contractID = null;
-	
+
 	/**
 	 * Default constructor
 	 */
 	public HederaTransactionReceipt() {
-	   	
-	   	
+
+
 	}
 	/**
 	 * Constructs from a transaction status, account id, file id and contract id
-	 * @param nodePrecheck a {@link HederaPrecheckResult} 
+	 * @param nodePrecheck a {@link HederaPrecheckResult}
 	 * @param transactionStatus a {@link HederaTransactionStatus}
 	 * @param accountID a {@link HederaAccountID}
 	 * @param fileID a {@link HederaFileID}
 	 * @param contractID a {@link HederaContractID}
 	 */
-	public HederaTransactionReceipt(ResponseCodeEnum nodePrecheck, ResponseCodeEnum transactionStatus, HederaAccountID accountID, HederaFileID fileID, HederaContractID contractID) { 
-	   	
+	public HederaTransactionReceipt(ResponseCodeEnum nodePrecheck, ResponseCodeEnum transactionStatus, HederaAccountID accountID, HederaFileID fileID, HederaContractID contractID) {
+
 	   	this.transactionStatus = transactionStatus;
 	   	this.nodePrecheck = nodePrecheck;
 	   	this.accountID = accountID;
 	   	this.fileID = fileID;
 	   	this.contractID = contractID;
-	   	
+
 	}
 
 	/**
@@ -71,25 +71,25 @@ public class HederaTransactionReceipt implements Serializable {
 	 * @param fileID a {@link HederaFileID}
 	 * @param contractID a {@link HederaContractID}
 	 */
-	public HederaTransactionReceipt(ResponseCodeEnum transactionStatus, HederaAccountID accountID, HederaFileID fileID, HederaContractID contractID) { 
-	   	
+	public HederaTransactionReceipt(ResponseCodeEnum transactionStatus, HederaAccountID accountID, HederaFileID fileID, HederaContractID contractID) {
+
 	   	this.transactionStatus = transactionStatus;
 	   	this.accountID = accountID;
 	   	this.fileID = fileID;
 	   	this.contractID = contractID;
-	   	
+
 	}
-	
+
 	/**
 	 * Construct from a {@link TransactionGetReceiptResponse} protobuf stream
 	 * @param receiptResponse the {@link TransactionGetReceiptResponse}
 	 */
 	public HederaTransactionReceipt(TransactionGetReceiptResponse receiptResponse) {
-	   	
-	   	
+
+
 		this.nodePrecheck = receiptResponse.getHeader().getNodeTransactionPrecheckCode();
 		this.transactionStatus = receiptResponse.getReceipt().getStatus();
-		   	
+
 	   	if (receiptResponse.getReceipt().hasAccountID()) {
 		   	this.accountID = new HederaAccountID(receiptResponse.getReceipt().getAccountID());
 	   	} else {
@@ -103,17 +103,17 @@ public class HederaTransactionReceipt implements Serializable {
 	   	if (receiptResponse.getReceipt().hasContractID()) {
 	   		this.contractID = new HederaContractID(receiptResponse.getReceipt().getContractID());
 	   	}
-	   	
+
 	}
 	/**
 	 * Construct from a {@link TransactionReceipt} protobuf stream
 	 * @param receipt the {@link TransactionReceipt}
 	 */
 	public HederaTransactionReceipt(TransactionReceipt receipt) {
-	   	
-	   	
+
+
 	   	this.transactionStatus = receipt.getStatus();
-	   	
+
 	   	if (receipt.hasAccountID()) {
 		   	this.accountID = new HederaAccountID(receipt.getAccountID());
 	   	} else {
@@ -127,18 +127,18 @@ public class HederaTransactionReceipt implements Serializable {
 	   	if (receipt.hasContractID()) {
 	   		this.contractID = new HederaContractID(receipt.getContractID());
 	   	}
-	   	
+
 	}
 
 	/**
 	 * Generate a {@link TransactionReceipt} protobuf payload for this object
-	 * @return {@link TransactionReceipt}  
+	 * @return {@link TransactionReceipt}
 	 */
 	public TransactionReceipt getProtobuf() {
-	   	
-		
+
+
 		TransactionReceipt.Builder transactionReceipt = TransactionReceipt.newBuilder();
-		
+
 		if (this.accountID != null) {
 			transactionReceipt.setAccountID(this.accountID.getProtobuf());
 		}
@@ -150,16 +150,16 @@ public class HederaTransactionReceipt implements Serializable {
 		}
 
    		transactionReceipt.setStatus(this.transactionStatus);
-		
-	   	
+
+
 
 		return transactionReceipt.build();
 	}
-	/** 
+	/**
 	 * Gets a receipt for a given transaction ID
 	 * @param transactionID the transactionID
 	 * @param node the node
-	 * @throws InterruptedException in the event of a node communication failure 
+	 * @throws InterruptedException in the event of a node communication failure
 	 */
 	public HederaTransactionReceipt(HederaTransactionID transactionID, HederaNode node) throws InterruptedException {
 

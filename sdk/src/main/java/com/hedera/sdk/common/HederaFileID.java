@@ -29,13 +29,13 @@ public class HederaFileID implements Serializable {
 	 * file number a nonnegative number unique within its realm
 	 */
 	public long fileNum = 0;
-	
+
 	/**
 	 * Default constructor with default values
 	 */
 	public HederaFileID() {
-	   	
-	   	
+
+
 	}
 
 	/**
@@ -45,11 +45,11 @@ public class HederaFileID implements Serializable {
 	 * @param fileNum the file number
 	 */
 	public HederaFileID(long shardNum, long realmNum, long fileNum) {
-	   	
+
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.fileNum = fileNum;
-	   	
+
 	}
 
 	/**
@@ -57,11 +57,11 @@ public class HederaFileID implements Serializable {
 	 * @param fileIDProtobuf the protobuf to generate the HederaFileId from
 	 */
 	public HederaFileID(FileID fileIDProtobuf) {
-	   	
+
 		this.shardNum = fileIDProtobuf.getShardNum();
 		this.realmNum = fileIDProtobuf.getRealmNum();
 		this.fileNum = fileIDProtobuf.getFileNum();
-	   	
+
 	}
 
 	/**
@@ -69,17 +69,17 @@ public class HederaFileID implements Serializable {
 	 * @return FileID protobuf
 	 */
 	public FileID getProtobuf() {
-	   	
+
 		FileID.Builder fileID = FileID.newBuilder();
-		
+
 		fileID.setShardNum(this.shardNum);
 		if (this.realmNum != -1) {
 			// if realmnum is -1, create a new realm
 			fileID.setRealmNum(this.realmNum);
 		}
 		fileID.setFileNum(this.fileNum);
-		
-	   	
+
+
 		return fileID.build();
 	}
 }

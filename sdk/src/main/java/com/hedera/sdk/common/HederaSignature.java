@@ -9,22 +9,22 @@ import com.google.protobuf.ByteString;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hederahashgraph.api.proto.java.Signature;
 /**
- * A Signature corresponding to a Key. It is a sequence of bytes holding a public key signature from one of the three supported 
- * systems (ed25519, RSA-3072, ECDSA with p384). Or, it can be a list of signatures corresponding to a single threshold key. 
- * Or, it can be the ID of a smart contract instance, which is authorized to act as if it had a key. If an account has an ed25519 key associated with it, 
- * then the corresponding private key must sign any transaction to transfer cryptocurrency out of it. 
- * If it has a smart contract ID associated with it, then that smart contract is allowed to transfer cryptocurrency out of it. 
- * The smart contract doesn't actually have a key, and doesn't actually sign a transaction. 
- * But it's as if a virtual transaction were created, and the smart contract signed it with a private key. 
- * A key can also be a "threshold key", which means a list of M keys, any N of which must sign in order for the threshold signature to be considered valid. 
- * The keys within a threshold signature may themselves be threshold signatures, to allow complex signature requirements 
- * (this nesting is not supported in the currently, but will be supported in a future version of API). 
- * If a Signature message is missing the "signature" field, then this is considered to be a null signature. 
- * That is useful in cases such as threshold signatures, where some of the signatures can be null. 
- * The definition of Key uses mutual recursion, so it allows nesting that is arbitrarily deep. 
- * But the current API only accepts Key messages up to 3 levels deep, such as a list of threshold keys, 
- * each of which is a list of primitive keys. Therefore, the matching Signature will have the same limitation. 
- * This restriction may be relaxed in future versions of the API, to allow deeper nesting. 
+ * A Signature corresponding to a Key. It is a sequence of bytes holding a public key signature from one of the three supported
+ * systems (ed25519, RSA-3072, ECDSA with p384). Or, it can be a list of signatures corresponding to a single threshold key.
+ * Or, it can be the ID of a smart contract instance, which is authorized to act as if it had a key. If an account has an ed25519 key associated with it,
+ * then the corresponding private key must sign any transaction to transfer cryptocurrency out of it.
+ * If it has a smart contract ID associated with it, then that smart contract is allowed to transfer cryptocurrency out of it.
+ * The smart contract doesn't actually have a key, and doesn't actually sign a transaction.
+ * But it's as if a virtual transaction were created, and the smart contract signed it with a private key.
+ * A key can also be a "threshold key", which means a list of M keys, any N of which must sign in order for the threshold signature to be considered valid.
+ * The keys within a threshold signature may themselves be threshold signatures, to allow complex signature requirements
+ * (this nesting is not supported in the currently, but will be supported in a future version of API).
+ * If a Signature message is missing the "signature" field, then this is considered to be a null signature.
+ * That is useful in cases such as threshold signatures, where some of the signatures can be null.
+ * The definition of Key uses mutual recursion, so it allows nesting that is arbitrarily deep.
+ * But the current API only accepts Key messages up to 3 levels deep, such as a list of threshold keys,
+ * each of which is a list of primitive keys. Therefore, the matching Signature will have the same limitation.
+ * This restriction may be relaxed in future versions of the API, to allow deeper nesting.
  */
 public class HederaSignature implements Serializable {
 	final Logger logger = LoggerFactory.getLogger(HederaSignature.class);
@@ -33,13 +33,13 @@ public class HederaSignature implements Serializable {
 	private KeyType signatureType = KeyType.NOTSET;
 	private HederaSignatureThreshold thresholdSignature = null;
 	private HederaSignatureList signatureList = null;
-	
+
 	/**
 	 * Default constructor
 	 */
 	public HederaSignature() {
-	   	
-	   	
+
+
 	}
 	/**
 	 * Constructor from a {@link KeyType} and signature
@@ -47,41 +47,41 @@ public class HederaSignature implements Serializable {
 	 * @param signature a byte[] containing the signature
 	 */
 	public HederaSignature(KeyType signatureType, byte[] signature) {
-	   	
+
 		this.signatureType = signatureType;
 		if (signatureType == KeyType.CONTRACT) {
 			this.signature = new byte[0];
 		} else {
 			this.signature = signature.clone();
 		}
-	   	
+
 	}
 	/**
 	 * Constructor from a {@link HederaSignatureThreshold}
-	 * @param thresholdSignature the threshold signature to create the signature from 
+	 * @param thresholdSignature the threshold signature to create the signature from
 	 */
 	public HederaSignature(HederaSignatureThreshold thresholdSignature) {
-	   	
+
 		this.signatureType = KeyType.THRESHOLD;
 		this.thresholdSignature = thresholdSignature;
-	   	
+
 	}
 	/**
 	 * Constructor from a {@link HederaSignatureList}
-	 * @param signatureList the signature list to create the signature from 
+	 * @param signatureList the signature list to create the signature from
 	 */
 	public HederaSignature(HederaSignatureList signatureList) {
-	   	
+
 		this.signatureType = KeyType.LIST;
 		this.signatureList = signatureList;
-	   	
+
 	}
 	/**
 	 * Constructor from a {@link Signature} protobuf
-	 * @param signature signature to create the signature from 
+	 * @param signature signature to create the signature from
 	 */
 	public HederaSignature(Signature signature) {
-	   	
+
 		// convert a protobuf payload into class data
 		switch (signature.getSignatureCase()) {
 		case CONTRACT:
@@ -109,27 +109,27 @@ public class HederaSignature implements Serializable {
 			this.signatureType = KeyType.LIST;
 			break;
 		case SIGNATURE_NOT_SET:
-            throw new IllegalArgumentException("Signature not set in protobuf data.");			
+            throw new IllegalArgumentException("Signature not set in protobuf data.");
 		default:
-            throw new IllegalArgumentException("Signature type unrecognized, you may be using an old sdk.");			
+            throw new IllegalArgumentException("Signature type unrecognized, you may be using an old sdk.");
 		}
-	   	
+
 	}
 	/**
 	 * Get the type of signature
 	 * @return {@link KeyType}
 	 */
 	public KeyType getSignatureType() {
-	   	
+
 		return this.signatureType;
 	}
-	/** 
+	/**
 	 * Get the signature
 	 * note: this may be null
 	 * @return byte[]
 	 */
 	public byte[] getSignature() {
-	   	
+
 		return this.signature;
 	}
 	/**
@@ -138,7 +138,7 @@ public class HederaSignature implements Serializable {
 	 * @return {@link HederaSignatureThreshold}
 	 */
 	public HederaSignatureThreshold getThresholdSignature() {
-	   	
+
 		return this.thresholdSignature;
 	}
 	/**
@@ -147,7 +147,7 @@ public class HederaSignature implements Serializable {
 	 * @return {@link HederaSignatureList}
 	 */
 	public HederaSignatureList getSignatureList() {
-	   	
+
 		return this.signatureList;
 	}
 	/**
@@ -155,10 +155,10 @@ public class HederaSignature implements Serializable {
 	 * @return {@link Signature}
 	 */
 	public Signature getProtobuf() {
-	   	
+
 		// Generates the protobuf payload for this class
 		Signature.Builder signatureProtobuf = Signature.newBuilder();
-		
+
 		switch (this.signatureType) {
 		case ED25519:
 			if (this.signature != null) {
@@ -195,9 +195,9 @@ public class HederaSignature implements Serializable {
 			}
 			break;
 		case NOTSET:
-            throw new IllegalArgumentException("Signature type not set, unable to generate data.");			
+            throw new IllegalArgumentException("Signature type not set, unable to generate data.");
 		}
-	   	
+
 		return signatureProtobuf.build();
 	}
 }
