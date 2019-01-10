@@ -449,7 +449,7 @@ public class HederaContract implements Serializable {
 	 * @param transactionValidDuration the duration of the transaction's validity as {@link HederaDuration}
 	 * @param generateRecord boolean to indicate if a record should be generated as a result of this transaction
 	 * @param memo String memo to include in the transaction
-	 * @param sigsForTransaction The signatures for the transaction as a {@link HederaKeySignatureList}
+	 * @param sigsForTransaction The signatures for the transaction as a {@link HederaSignatureList}
 	 * @return {@link HederaTransactionResult}
 	 * @throws InterruptedException in the event that communication to the node resulted in an error
 	 */
@@ -913,7 +913,7 @@ public class HederaContract implements Serializable {
 	 * @param constructorParameters, a byte array containing the parameters for the construction of the smart contract
 	 * @param autoRenewPeriod, a {@link HederaDuration} to specify how often the smart contract should renew itself
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception
+	 * @throws Exception in the event of an error 
 	 */
 	public HederaTransactionResult create(long shardNum, long realmNum, HederaFileID fileID, long initialBalance, long gas, byte[] constructorParameters, HederaDuration autoRenewPeriod) throws Exception {
 
@@ -984,7 +984,7 @@ public class HederaContract implements Serializable {
 	 * @param expirationTime, a {@link HederaTimeStamp} update the expiration time of the smart contract
 	 * @param autoRenewPeriod, a {@link HederaDuration} to specify how often the smart contract should renew itself
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception
+	 * @throws Exception in the event of an error 
 	 */
 	public HederaTransactionResult update(HederaTimeStamp expirationTime, HederaDuration autoRenewPeriod) throws Exception {
 
@@ -1048,7 +1048,7 @@ public class HederaContract implements Serializable {
 	 * @param expirationTime, a {@link HederaTimeStamp} update the expiration time of the smart contract
 	 * @param autoRenewPeriod, a {@link HederaDuration} to specify how often the smart contract should renew itself
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception
+	 * @throws Exception in the event of an error 
 	 */
 	public HederaTransactionResult update(long shardNum, long realmNum, long contractNum, HederaTimeStamp expirationTime, HederaDuration autoRenewPeriod) throws Exception {
 		this.shardNum = shardNum;
@@ -1063,7 +1063,7 @@ public class HederaContract implements Serializable {
 	 * @param amount, number of tinybars sent (the function must be payable if this is nonzero)
 	 * @param functionParameters, which function to call, and the parameters to pass to the function
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception
+	 * @throws Exception in the event of an error 
 	 */
 	public HederaTransactionResult call(long gas, long amount, byte[] functionParameters) throws Exception {
 
@@ -1126,7 +1126,7 @@ public class HederaContract implements Serializable {
 	 * @param amount, number of tinybars sent (the function must be payable if this is nonzero)
 	 * @param functionParameters, which function to call, and the parameters to pass to the function
 	 * @return {@link HederaTransactionResult}
-	 * @throws Exception
+	 * @throws Exception in the event of an error 
 	 */
 	public HederaTransactionResult call(long shardNum, long realmNum, long contractNum, long gas, long amount, byte[] functionParameters) throws Exception {
 		this.shardNum = shardNum;
@@ -1144,7 +1144,7 @@ public class HederaContract implements Serializable {
 	 * The cost could be cached and refreshed from time to time, there is no need to look it up
 	 * before each getInfo query
 	 * @return {@link boolean}
-	 * @throws Exception
+	 * @throws Exception in the event of an error 
 	 */
 	public boolean getInfo() throws Exception {
 
@@ -1169,7 +1169,7 @@ public class HederaContract implements Serializable {
 	 * @param realmNum, the realm number of the smart contract
 	 * @param contractNum, the account number of the smart contract
 	 * @return {@link boolean}
-	 * @throws Exception
+	 * @throws Exception in the event of an error 
 	 */
 	public boolean getInfo(long shardNum, long realmNum, long contractNum) throws Exception {
 		this.shardNum = shardNum;
@@ -1184,7 +1184,7 @@ public class HederaContract implements Serializable {
 	 * in the event of an error, check the value of this.precheckResult to determine the
 	 * cause of the error
 	 * @return {@link byte} array
-	 * @throws Exception
+	 * @throws Exception in the event of an error 
 	 */
 	public byte[] getByteCode() throws Exception {
 
@@ -1213,7 +1213,7 @@ public class HederaContract implements Serializable {
 	 * @param realmNum, the realm number of the smart contract
 	 * @param contractNum, the account number of the smart contract
 	 * @return {@link byte} array
-	 * @throws Exception
+	 * @throws Exception in the event of an error 
 	 */
 	public byte[] getByteCode(long shardNum, long realmNum, long contractNum) throws Exception {
 		this.shardNum = shardNum;
@@ -1230,7 +1230,7 @@ public class HederaContract implements Serializable {
 	 * @param functionParameters, parameters for running the function
 	 * @param maxResultSize, max number of bytes that the result might include. The run will fail if it would have returned more than this number of bytes.
 	 * @return {@link HederaContractFunctionResult}
-	 * @throws Exception
+	 * @throws Exception in the event of an error 
 	 */
 	public HederaContractFunctionResult callLocal(long gas, byte[] functionParameters, long maxResultSize) throws Exception {
 
@@ -1268,7 +1268,7 @@ public class HederaContract implements Serializable {
 	 * @param functionParameters, parameters for running the function
 	 * @param maxResultSize, max number of bytes that the result might include. The run will fail if it would have returned more than this number of bytes.
 	 * @return {@link HederaContractFunctionResult}
-	 * @throws Exception
+	 * @throws Exception in the event of an error 
 	 */
 	public HederaContractFunctionResult callLocal(long shardNum, long realmNum, long contractNum, long gas, byte[] functionParameters, long maxResultSize) throws Exception {
 		this.shardNum = shardNum;

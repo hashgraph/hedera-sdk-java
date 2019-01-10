@@ -134,6 +134,17 @@ public class HederaKey implements Serializable {
 
 	}
 	/**
+	 * Constructs a HederaKey from type, key bytes
+	 * If the private key is either null or an empty string, only a public key is created
+	 * @param keyType the type of key
+	 * @param publicKey a byte array containing the value of the public key
+	 * @param privateKey a byte array containing the value of the private key
+	 */
+	public HederaKeyPair(KeyType keyType, byte[] publicKey, byte[] privateKey) {
+		this(keyType, publicKey, privateKey, "");
+	}
+
+		/**
 	 * Constructs a HederaKey from type, key bytes and description
 	 * @param keyType the type of key
 	 * @param key a byte array containing the value of the key
@@ -147,12 +158,126 @@ public class HederaKey implements Serializable {
 
 	}
 	/**
-	 * Constructs a HederaKey from type, key bytes
-	 * @param keyType the type of key
-	 * @param key a byte array containing the value of the key
+	 * Constructs from a known pair of public and private key
+	 * If the secretKey is null or empty, only a public key is created
+	 * @param keyType {@link HederaKeyPair.KeyType}
+	 * @param publicKey {@link String} as a hex encoded string
+	 * @param secretKey {@link String} as a hex encoded string
+	 * @throws DecoderException if the keys can't be decoded
+	 * @throws IllegalStateException if the key type is invalid
+	 * @throws InvalidKeySpecException in the event of a key specification error 
 	 */
-	public HederaKey(KeyType keyType, byte[] key) {
-		this(keyType, key, "");
+	public HederaKeyPair(HederaKeyPair.KeyType keyType, String publicKey, String secretKey) throws InvalidKeySpecException, DecoderException {
+		this(keyType, publicKey, secretKey, "");
+	}	
+	/**
+	 * Constructs from a known pair of public and private key
+	 * If the secretKey is null or empty, only a public key is created
+	 * @param keyType {@link HederaKeyPair.KeyType}
+	 * @param publicKey {@link String} as a hex encoded string
+	 * @param secretKey {@link String} as a hex encoded string
+	 * @param description the description of the key
+	 * @throws DecoderException if the keys can't be decoded
+	 * @throws IllegalStateException if the key type is invalid 
+	 * @throws InvalidKeySpecException in the event of a key specification error 
+	 */
+	public HederaKeyPair(HederaKeyPair.KeyType keyType, String publicKey, String secretKey, String description) throws InvalidKeySpecException, DecoderException {
+		this.keyType = keyType;
+		this.keyDescription = description;
+		
+		switch (this.keyType) {
+//			case ECDSA384:
+//				throw new IllegalStateException("ECDSA384 keys are not supported");
+//			case RSA3072:
+//				throw new IllegalStateException("RSA3072 keys are not supported");
+			case ED25519:
+				byte[] pub = Hex.decode(publicKey);
+				byte[] secret = null;
+				if (secretKey != null) {
+					if (!secretKey.isEmpty()) {
+						secret = Hex.decode(secretKey);
+					}
+				}
+
+				this.keyPair = new EDKeyPair(pub, secret);
+				
+				//byte [] pubKeybytes = HexUtils.hexToBytes(ed25519PublicKeyHex);    
+//				X509EncodedKeySpec pencoded = new X509EncodedKeySpec(pubKeybytes);
+//		        EdDSAPublicKey pubKey = new EdDSAPublicKey(pencoded);
+//				byte[] abyte = pubKey.getAbyte();
+				//
+				
+				break;
+			default:
+				throw new IllegalStateException("Invalid key type not set, only ED25519 supported");
+		}
+	} 
+    
+	/**
+	 * Returns the list of recoveryWords for a key pair
+	 * @return list of Strings
+	 * @throws IllegalStateException if the key type is invalid
+	 */
+	public List<String> recoveryWordsList() {
+		
+		switch (this.keyType) {
+//			case ECDSA384:
+//				throw new IllegalStateException("ECDSA384 keys are not supported");
+			case ED25519:
+				if (this.seed != null) {
+					return this.seed.toWords();
+				} else {
+					return new ArrayList<String>();
+				}
+//			case RSA3072:
+//				throw new IllegalStateException("RSA3072 keys are not supported");
+			default:
+				throw new IllegalStateException("Invalid key type not set, only ED25519 supported");
+		}
+	}
+
+	/**
+	 * Returns the list of recoveryWords for a key pair
+	 * @return String[]
+	 * @throws IllegalStateException if the key type is invalid
+	 */
+	public String[] recoveryWordsArray() {
+		switch (this.keyType) {
+//			case ECDSA384:
+//				throw new IllegalStateException("ECDSA384 keys are not supported");
+			case ED25519:
+				List<String> wordList = new ArrayList<String>();
+				if (this.seed != null) {
+					wordList = this.seed.toWords();
+					return wordList.toArray(new String[0]);
+				} else {
+					return new String[0];
+				}
+//			case RSA3072:
+//				throw new IllegalStateException("RSA3072 keys are not supported");
+			default:
+				throw new IllegalStateException("Invalid key type not set, only ED25519 supported");
+		}
+	}
+
+	/**
+	 * signs a message with the private key
+	 * @param message byte[]
+	 * @return byte[]
+	 */
+	public byte[] signMessage(byte[] message)  {
+		return this.keyPair.signMessage(message);
+	}
+
+	/**
+	 * verifies a message against a signature
+	 * @param message byte[]
+	 * @param signature byte[]
+	 * @return {@link Boolean}
+	 * @throws Exception in the event of an error 
+	 */
+	public boolean verifySignature(byte[] message, byte[] signature) throws Exception {
+		return this.keyPair.verifySignature(message, signature);
 	}
 	/**
 	 * Constructs a HederaKey from a HederaContractID and description
