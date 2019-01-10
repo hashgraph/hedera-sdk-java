@@ -69,6 +69,16 @@
 				<artifactId>maven-shade-plugin</artifactId>
 				<version>3.2.0</version>
 				<configuration>
+					<filters>
+						<filter>
+							<artifact>*:*</artifact>
+							<excludes>
+								<exclude>META-INF/*.SF</exclude>
+								<exclude>META-INF/*.DSA</exclude>
+								<exclude>META-INF/*.RSA</exclude>
+							</excludes>
+						</filter>
+					</filters>
 					<artifactSet>
 						<excludes>
 							<exclude>junit:junit</exclude>
@@ -86,14 +96,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- <plugin> <groupId>com.github.os72</groupId> <artifactId>protoc-jar-maven-plugin</artifactId> 
-				<version>3.6.0.1</version> <executions> <execution> <phase>generate-sources</phase> 
-				<goals> <goal>run</goal> </goals> <configuration> <protocArtifact>com.google.protobuf:protoc:3.6.1</protocArtifact> 
-				<inputDirectories> <include>${basedir}/src/main/proto</include> </inputDirectories> 
-				<outputTargets> <outputTarget> <type>java</type> </outputTarget> <outputTarget> 
-				<type>grpc-java</type> <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.14.0</pluginArtifact> 
-				</outputTarget> </outputTargets> </configuration> </execution> </executions> 
-				</plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -121,11 +123,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-javadoc-plugin</artifactId> 
-				<version>3.0.1</version> <configuration> <excludePackageNames>com.hedera.sdk.api.proto.*</excludePackageNames> 
-				<excludePackageNames>com.hedera.sdk.muquit.*</excludePackageNames> <excludePackageNames>test.com.hedera.*</excludePackageNames> 
-				<excludePackageNames>net.i2p.*</excludePackageNames> <excludePackageNames>org.json.*</excludePackageNames> 
-				</configuration> </plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -314,5 +311,31 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-	</dependencies>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.2.3</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+ 		<dependency>
+ 			<groupId>org.bouncycastle</groupId>
+ 			<artifactId>bcpkix-jdk15on</artifactId>
+ 			<version>1.60</version>
+ 		</dependency>
+ 		<dependency>
+ 			<groupId>org.slf4j</groupId>
+ 			<artifactId>slf4j-api</artifactId>
+ 			<version>1.7.25</version>
+ 		</dependency>
+    </dependencies>
 </project>
