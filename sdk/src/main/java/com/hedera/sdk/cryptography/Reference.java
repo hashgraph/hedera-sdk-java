@@ -70,7 +70,7 @@ public class Reference {
 
 	/**
 	 * Pass to the constructor a string representing the data. If the string starts
-	 * and ends in <> and contains only letters and digits in between, then it is
+	 * and ends in "less than greater than" and contains only letters and digits in between, then it is
 	 * considered a base62 encoding. Otherwise, it is considered a list of words.
 	 *
 	 * @param dataString
@@ -198,7 +198,7 @@ public class Reference {
 	}
 
 	/**
-	 * Return the base-62 encoding, inside of <brackets>.
+	 * Return the base-62 encoding, inside of brackets
 	 */
 	@Override
 	public String toString() {
@@ -223,7 +223,7 @@ public class Reference {
 	 * Return the first few characters of the string representing the reference,
 	 * encoded in base 62
 	 *
-	 * @return
+	 * @return String 
 	 */
 	public String to62Prefix() {
 		return to62().substring(0, 6) + "...>";
@@ -232,7 +232,7 @@ public class Reference {
 	/**
 	 * Return a string representing the reference, encoded in base 62
 	 *
-	 * @return
+	 * @return String
 	 */
 	public String to62() {
 		int len = (int) Math.ceil(data.length * 8 / log2(digits.length()));
@@ -266,8 +266,8 @@ public class Reference {
 	 * words each, broken into groups of 4 lines. The last group may have fewer
 	 * lines, and its last line may have fewer words.
 	 *
+	 * @param indent a string inserted at the start of each line
 	 * @return the result as one string
-	 * @indent a string inserted at the start of each line
 	 */
 	public String toWords(String indent) {
 		return toWords( //

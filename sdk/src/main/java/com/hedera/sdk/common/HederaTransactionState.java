@@ -87,7 +87,7 @@ public class HederaTransactionState {
 	/**
 	 * refreshes the hashmap by querying node(s) for a receipt for each TransactionID
 	 * Note: This implementation removes receipts once they have reached a logical conclusion
-	 * @throws InterruptedException 
+	 * @throws InterruptedException in the event of an error 
 	 */
 	public void refresh() throws InterruptedException 
     { 

@@ -44,8 +44,9 @@ public class JSONArray extends ArrayList implements JSONAware, JSONStreamAware {
      * 
      * @see org.json.simple.JSONValue#writeJSONString(Object, Writer)
      * 
-     * @param collection
-     * @param out
+     * @param collection {@link Collection}
+     * @param out {@link Writer}
+     * @throws IOException in the event of a JSON parsing error
      */
 	public static void writeJSONString(Collection collection, Writer out) throws IOException{
 		if(collection == null){
@@ -84,8 +85,8 @@ public class JSONArray extends ArrayList implements JSONAware, JSONStreamAware {
 	 * 
 	 * @see org.json.simple.JSONValue#toJSONString(Object)
 	 * 
-	 * @param collection
-	 * @return JSON text, or "null" if list is null.
+	 * @param collection {@link Collection}
+	 * @return String JSON text, or "null" if list is null.
 	 */
 	public static String toJSONString(Collection collection){
 		final StringWriter writer = new StringWriter();
