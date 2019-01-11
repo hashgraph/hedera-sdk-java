@@ -7,8 +7,6 @@ import org.slf4j.LoggerFactory;
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.account.HederaAccountUpdateValues;
 import com.hedera.sdk.account.HederaClaim;
-import com.hedera.sdk.common.HederaKeyPair;
-import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaTransactionID;
 import com.hedera.sdk.common.HederaTransactionRecord;
 import com.hedera.utilities.ExampleUtilities;
@@ -49,8 +47,7 @@ public final class DemoAccount {
 	    	myAccount.accountNum = myAccount.txQueryDefaults.payingAccountID.accountNum;
 
     		AccountGetBalance.getBalance(myAccount);
-    		System.out.println(String.format("My balance=%d tinybar", myAccount.balance()));
-    		System.exit(0);
+    		ExampleUtilities.showResult(String.format("**   My balance=%d tinybar", myAccount.balance()));
     	}
 
     	/*
@@ -81,15 +78,12 @@ public final class DemoAccount {
         	newAccount.txQueryDefaults.generateRecord = getTXRecord;
         	// create a new keypair
     		HederaKeyPair newAccountKey = new HederaKeyPair(KeyType.ED25519);
-    		System.out.println(String.format("New account public key %s=",newAccountKey.getPublicKeyHex()));
-    		System.out.println(String.format("New account private/secret key %s=",newAccountKey.getSecretKeyHex()));
+    		ExampleUtilities.showResult(String.format("**   New account public key = %s\n**   New account private/secret key %s=",newAccountKey.getPublicKeyHex(), newAccountKey.getSecretKeyHex()));
     		// create a new account with a balance of 10000000 tinybar, using the above generated public key
     		newAccount = AccountCreate.create(newAccount, newAccountKey.getPublicKeyHex(), newAccountKey.getKeyType(), 10000000);
 
 	    	if (newAccount == null) {
-    			logger.info("*******************************************");
-    			logger.info("ACCOUNT CREATE FAILED");
-    			logger.info("*******************************************");
+	    		ExampleUtilities.showResult("**   ACCOUNT CREATE FAILED");
     			throw new Exception("Account create failure");
 	    	} else {
 	    		// the helper function (AccountCreate) populated the newAccount object's accountNum from the transaction receipt it
@@ -132,7 +126,7 @@ public final class DemoAccount {
 					// get balance for my account
 			    	if (getBalance) {
 			    		AccountGetBalance.getBalance(myAccount);
-			    		System.out.println(String.format("My balance=%d tinybar", myAccount.balance()));
+			    		ExampleUtilities.showResult(String.format("**   My balance=%d tinybar", myAccount.balance()));
 			    	}
 					// get balance for the new account
 			    	if (getBalance) {
@@ -140,7 +134,7 @@ public final class DemoAccount {
 			    		newAccount.txQueryDefaults.payingAccountID = newAccount.getHederaAccountID();
 			    		newAccount.txQueryDefaults.payingKeyPair = newAccountKey;
 			    		AccountGetBalance.getBalance(newAccount);
-			    		System.out.println(String.format("New account balance=%d tinybar", newAccount.balance()));
+			    		ExampleUtilities.showResult(String.format("**   New account balance=%d tinybar", newAccount.balance()));
 			    	}
 		    	}
 		    	if (update) {
@@ -180,9 +174,7 @@ public final class DemoAccount {
 		    			newAccount.txQueryDefaults.payingKeyPair = ed25519Key;
 		    			AccountGetInfo.getInfo(newAccount);
 		    		} else {
-		    			logger.info("*******************************************");
-		    			logger.info("ACCOUNT UPDATE FAILED - account is now null");
-		    			logger.info("*******************************************");
+		    			ExampleUtilities.showResult("**   ACCOUNT UPDATE FAILED - account is now null");
 		    		}
 		    	}
 		    	if (doAddClaim) {
