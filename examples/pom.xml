@@ -1,33 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <groupId>com.hedera</groupId>
-        <artifactId>hedera-sdk-java</artifactId>
-        <version>0.1.0</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-<<<<<<< HEAD
-    <artifactId>examples</artifactId>
-
-    <dependencies>
-        <dependency>
-            <groupId>com.hedera</groupId>
-            <artifactId>sdk</artifactId>
-            <version>0.1.0</version>
-        </dependency>
-    </dependencies>
-
-</project>
-=======
 	<groupId>com.hedera.hashgraph</groupId>
-	<artifactId>hedera-sdk-java-examples</artifactId>
+	<artifactId>java-sdk-examples</artifactId>
 	<version>0.2.0</version>
 	<packaging>jar</packaging>
 
-	<name>examples</name>
+	<name>hedera-sdk-java-examples</name>
 	<description>Example usage of the java SDK for interacting with the Hedera API</description>
 	<url>http://www.hedera.com</url>
 
@@ -65,22 +47,5 @@
 			<artifactId>java-sdk</artifactId>
 			<version>0.2.0</version>
         </dependency>
-
-		<dependency>
-			<groupId>org.ethereum</groupId>
-			<artifactId>ethereumj-core</artifactId>
-			<version>1.6.3-RELEASE</version>
-			<exclusions>
-				<exclusion>
-					<groupId>ch.qos.logback</groupId>
-					<artifactId>logback-classic</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 	</dependencies>
 </project>
->>>>>>> 0de3041... Merge pull request #36 from hashgraph/profile-deploy

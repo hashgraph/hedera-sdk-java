@@ -167,11 +167,11 @@ class HederaKeySignatureListTest {
 		HederaKeySignatureList sigList = new HederaKeySignatureList();
 		sigList.addKeySignaturePair(keySignature);
 		
-		List<HederaKeyUUIDDescription> uuids = new ArrayList();
+		List<HederaKeyUUIDDescription> uuids = new ArrayList<HederaKeyUUIDDescription>();
 		sigList.getKeyUUIDs(uuids, aKey);
 		assertEquals(1, uuids.size());
 
-		uuids = new ArrayList();
+		uuids = new ArrayList<HederaKeyUUIDDescription>();
 		sigList.getKeyUUIDs(uuids, "dummmy".getBytes());
 		assertEquals(0, uuids.size());
 		
