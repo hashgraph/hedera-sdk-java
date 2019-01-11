@@ -56,7 +56,7 @@ public class HederaRealmID implements Serializable {
 	 */
 	public RealmID getProtobuf() {
 
-
+		
 	   	RealmID.Builder realmID = RealmID.newBuilder();
 		if (this.shardNum > 0) {
 			realmID.setShardNum(this.shardNum);

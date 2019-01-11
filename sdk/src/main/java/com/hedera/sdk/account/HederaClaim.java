@@ -3,10 +3,7 @@ package com.hedera.sdk.account;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaKeyPair;
@@ -15,18 +12,18 @@ import com.hedera.sdk.common.Utilities;
 import com.hederahashgraph.api.proto.java.Claim;
 import com.hederahashgraph.api.proto.java.KeyList;
 /**
- * A hash (presumably of some kind of credential or certificate), along with a list of threshold keys.
- * Each of them must reach its threshold when signing the transaction, to attach this claim to this account.
- * At least one of them must reach its threshold to delete this Claim from this account.
- * This is intended to provide a revocation service: all the authorities agree to attach the hash,
- * to attest to the fact that the credential or certificate is valid.
- * Any one of the authorities can later delete the hash, to indicate that the credential has been revoked.
- * In this way, any client can prove to a third party that any particular account has certain credentials,
+ * A hash (presumably of some kind of credential or certificate), along with a list of threshold keys. 
+ * Each of them must reach its threshold when signing the transaction, to attach this claim to this account. 
+ * At least one of them must reach its threshold to delete this Claim from this account. 
+ * This is intended to provide a revocation service: all the authorities agree to attach the hash, 
+ * to attest to the fact that the credential or certificate is valid. 
+ * Any one of the authorities can later delete the hash, to indicate that the credential has been revoked. 
+ * In this way, any client can prove to a third party that any particular account has certain credentials, 
  * or to identity facts proved about it, and that none of them have been revoked yet.
  *
  */
 public class HederaClaim implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaClaim.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaClaim.class);
 	private static final long serialVersionUID = 1;
 
 	/**
@@ -57,7 +54,7 @@ public class HederaClaim implements Serializable {
 	 * If keySignatures exist, they will have priority over keys
 	 */
 	public List<HederaKeySignature> keySignatures = new ArrayList<HederaKeySignature>();
-
+	
 	/**
 	 * Default constructor.
 	 */
@@ -99,11 +96,11 @@ public class HederaClaim implements Serializable {
 
 		// hash
 		this.hash = claim.getHash().toByteArray();
-
+		
 		// keys
 		this.keys.clear();
 		this.keySignatures.clear();
-
+		
 		for (int i=0; i < claim.getKeys().getKeysCount(); i++) {
 			HederaKeyPair key = new HederaKeyPair(claim.getKeys().getKeys(i));
 			HederaKeySignature keySig = new HederaKeySignature(key.getKeyType(), key.getPublicKeyEncoded(), new byte[0]);
@@ -113,25 +110,25 @@ public class HederaClaim implements Serializable {
 	}
 
 	/**
-	 * Generate a {@link Claim} protobuf payload for this object
+	 * Generate a {@link Claim} protobuf payload for this object 
 	 * @return {@link Claim}
 	 */
 	public Claim getProtobuf() {
-
+		
 	   	Claim.Builder protobuf = Claim.newBuilder();
 		HederaAccountID accountID = new HederaAccountID(this.shardNum, this.realmNum, this.accountNum);
 		protobuf.setAccountID(accountID.getProtobuf());
 		protobuf.setHash(ByteString.copyFrom(this.hash));
-
+		
 		KeyList protoKeyList;
-
+		
 		if (!this.keySignatures.isEmpty()) {
 			protoKeyList = Utilities.getProtoKeyFromKeySigList(this.keySignatures);
 		} else {
 			protoKeyList = Utilities.getProtoKeyList(this.keys);
 		}
 		protobuf.setKeys(protoKeyList);
-
+		
 		return protobuf.build();
 	}
 	/**

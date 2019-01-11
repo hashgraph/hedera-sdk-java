@@ -9,7 +9,8 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import java.util.List;
 
-import com.hedera.sdk.common.HederaKey.KeyType;
+import com.hedera.sdk.common.HederaKeyPair;
+import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.cryptography.CryptoUtils;
 import com.hedera.sdk.cryptography.Reference;
 import com.hedera.sdk.cryptography.Seed;

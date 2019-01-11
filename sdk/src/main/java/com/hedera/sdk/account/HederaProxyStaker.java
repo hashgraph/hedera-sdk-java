@@ -62,16 +62,16 @@ public class HederaProxyStaker implements Serializable {
 
 	/**
 	 * Generate a {@link ProxyStaker} protobuf stream for this object
-	 * @return {@link ProxyStaker}
+	 * @return {@link ProxyStaker} 
 	 */
 	public ProxyStaker getProtobuf() {
 	   	ProxyStaker.Builder accountAmount = ProxyStaker.newBuilder();
 		AccountID.Builder accountID = AccountID.newBuilder();
-
+		
 		accountID.setAccountNum(this.accountNum);
 		accountID.setRealmNum(this.realmNum);
 		accountID.setShardNum(this.shardNum);
-
+		
 		accountAmount.setAccountID(accountID);
 		accountAmount.setAmount(this.amount);
 

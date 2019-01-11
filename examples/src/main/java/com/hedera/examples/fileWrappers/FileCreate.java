@@ -19,7 +19,7 @@ public final class FileCreate {
 		
 		ExampleUtilities.showResult("**    FILE CREATE");
 
-		int fileChunkSize = 3000;
+		int fileChunkSize = 1000;
 		int position = fileChunkSize;
 						
 		byte[] fileChunk = Arrays.copyOfRange(contents, 0, Math.min(fileChunkSize, contents.length));

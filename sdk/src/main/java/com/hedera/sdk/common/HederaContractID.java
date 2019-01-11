@@ -1,9 +1,7 @@
 package com.hedera.sdk.common;
 
 import java.io.Serializable;
-
 import org.json.simple.JSONObject;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hederahashgraph.api.proto.java.ContractID;
@@ -14,7 +12,7 @@ import com.hederahashgraph.api.proto.java.ContractID;
  * of a shard number, a realm number and a contract number
  */
 public class HederaContractID implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaContractID.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaContractID.class);
 	private static String JSON_SHARDNUM = "shardNum";
 	private static String JSON_REALMNUM = "realmNum";
 	private static String JSON_CONTRACTNUM = "contractNum";
@@ -35,7 +33,7 @@ public class HederaContractID implements Serializable {
 	 * contract number (a nonnegative number unique within its realm)
 	 */
 	public long contractNum = 0;
-
+	
 	/**
 	 * Default constructor, creates a HederaContractID with default values
 	 */
@@ -66,12 +64,12 @@ public class HederaContractID implements Serializable {
 
 	/**
 	 * Generate a protobuf payload for this object
-	 * @return a protobuf ContractID
+	 * @return a protobuf ContractID 
 	 */
 	public ContractID getProtobuf() {
-
+		
 		ContractID.Builder contractID = ContractID.newBuilder();
-
+		
 		contractID.setShardNum(this.shardNum);
 		if (this.realmNum != -1) {
 			contractID.setRealmNum(this.realmNum);
@@ -95,7 +93,7 @@ public class HederaContractID implements Serializable {
 
 		return jsonContract;
 	}
-
+	
 	/**
 	 * Gets a JSON representation of the HederaContractID as a string
 	 * @return a String
@@ -109,7 +107,7 @@ public class HederaContractID implements Serializable {
 	 * @param jsonContract JSONObject representing a HederaContractID
 	 */
 	public void fromJSON(JSONObject jsonContract) {
-
+		
 		if (jsonContract.containsKey(JSON_SHARDNUM)) {
 			this.shardNum = (Long) jsonContract.get(JSON_SHARDNUM);
 		} else {

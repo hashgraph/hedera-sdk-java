@@ -2,23 +2,21 @@ package com.hedera.sdk.common;
 
 import java.io.Serializable;
 import java.time.Instant;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.hederahashgraph.api.proto.java.Timestamp;
 
 /**
- * An exact date and time. This is the same data structure as the protobuf Timestamp.proto
+ * An exact date and time. This is the same data structure as the protobuf Timestamp.proto 
  * (see the comments in https://github.com/google/protobuf/blob/master/src/google/protobuf/timestamp.proto)
  */
 public class HederaTimeStamp implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaTimeStamp.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaTimeStamp.class);
 	private static final long serialVersionUID = 1;
 	/**
 	 * Time value, defaults to Now -10s to account for possible minor time differences between client and node.
 	 * An earlier time is better than a later one.
 	 */
-	public Instant time = Instant.now().minusSeconds(10);
+	public Instant time = Instant.now().minusSeconds(10); 
 	/**
 	 * Default constructor
 	 */
@@ -35,7 +33,7 @@ public class HederaTimeStamp implements Serializable {
 		this.time = time;
 
 	}
-	/**
+	/** 
 	 * Constructor from seconds and nanos
 	 * @param seconds the seconds to construct from
 	 * @param nanos the nanos to construct from
@@ -47,7 +45,7 @@ public class HederaTimeStamp implements Serializable {
 		this.time = this.time.plusNanos(nanos);
 
 	}
-
+	
 	/**
 	 * Construct from a {@link Timestamp} protobuf
 	 * @param timestampProtobuf the timestamp in protobuf format
@@ -61,7 +59,7 @@ public class HederaTimeStamp implements Serializable {
 	}
 
 	/**
-	 * Generate a {@link Timestamp} protobuf payload for this object
+	 * Generate a {@link Timestamp} protobuf payload for this object 
 	 * @return {@link Timestamp}
 	 */
 	public Timestamp getProtobuf() {
@@ -71,14 +69,14 @@ public class HederaTimeStamp implements Serializable {
 			    .setNanos(this.time.getNano()).build();
 	}
 	/**
-	 * Returns the seconds element of the timestamp
+	 * Returns the seconds element of the timestamp 
 	 * @return {@link Long} the number of seconds
 	 */
 	public long seconds() {
 		return this.time.getEpochSecond();
 	}
 	/**
-	 * Returns the nanos element of the timestamp
+	 * Returns the nanos element of the timestamp 
 	 * @return {@link int} the number of nanos
 	 */
 	public int nanos() {

@@ -9,16 +9,15 @@ import java.util.ArrayList;
 import java.util.List;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
- * A set of public keys that are used together to form a threshold signature.
- * If the threshold is N and there are M keys, then this is an N of M threshold signature.
- * If an account is associated with ThresholdKeys, then a transaction to move cryptocurrency out of it must be signed by a list of M signatures,
+ * A set of public keys that are used together to form a threshold signature. 
+ * If the threshold is N and there are M keys, then this is an N of M threshold signature. 
+ * If an account is associated with ThresholdKeys, then a transaction to move cryptocurrency out of it must be signed by a list of M signatures, 
  * where at most M-N of them are blank, and the other at least N of them are valid signatures corresponding to at least N of the public keys listed here.
  */
 public class HederaKeyThreshold implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaKeyThreshold.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaKeyThreshold.class);
 	private static String JSON_KEYS = "keys";
 	private static String JSON_THRESHOLD = "threshold";
 	private static final long serialVersionUID = 1;
@@ -28,7 +27,7 @@ public class HederaKeyThreshold implements Serializable {
 	public int threshold;
 	/**
 	 * The List of {@link HederaKeyPair}
-	 * initially empty
+	 * initially empty 
 	 */
 	public List<HederaKeyPair> keys  = new ArrayList<HederaKeyPair>();
 	/**
@@ -55,7 +54,7 @@ public class HederaKeyThreshold implements Serializable {
 
 	}
 	/**
-	 * Constructs from a {@link ThresholdKey} protobuf
+	 * Constructs from a {@link ThresholdKey} protobuf 
 	 * @param protobufKey the keys
 	 */
 	public HederaKeyThreshold(ThresholdKey protobufKey) {
@@ -65,14 +64,14 @@ public class HederaKeyThreshold implements Serializable {
 		this.threshold = protobufKey.getThreshold();
 		this.keys.clear();
 		KeyList protoKeys = protobufKey.getKeys();
-
+		
 		for (Key key : protoKeys.getKeysList()) {
 			this.keys.add(new HederaKeyPair(key));
 		}
 
 	}
 	/**
-	 * Gets the protobuf {@link ThresholdKey} for the key
+	 * Gets the protobuf {@link ThresholdKey} for the key 
 	 * @return {@link ThresholdKey}
 	 */
 	public ThresholdKey getProtobuf() {
@@ -80,9 +79,9 @@ public class HederaKeyThreshold implements Serializable {
 		// Generates the protobuf payload for this class
 		ThresholdKey.Builder keysProtobuf = ThresholdKey.newBuilder();
 		keysProtobuf.setThreshold(this.threshold);
-
+		
 		KeyList protoKeyList;
-
+		
 		if (!this.keys.isEmpty()) {
 			protoKeyList = Utilities.getProtoKeyList(this.keys);
 			keysProtobuf.setKeys(protoKeyList);
@@ -128,11 +127,11 @@ public class HederaKeyThreshold implements Serializable {
 		for (HederaKeyPair hederaKey : this.keys) {
 			jsonKeys.add(hederaKey.JSON());
 		}
-
+	   	
 		jsonKey.put(JSON_KEYS, jsonKeys);
+	   	
 
-
-
+		
 		return jsonKey;
 	}
 	/**
@@ -153,18 +152,18 @@ public class HederaKeyThreshold implements Serializable {
 		// delete all keys
 		this.keys.clear();
 		// add keys from json array
-
+		
 		if (jsonKey.containsKey(JSON_THRESHOLD)) {
 			//long tempThreshold = (long) ;
 			this.threshold = (int) jsonKey.get(JSON_THRESHOLD); //oIntExact(tempThreshold);
 		} else {
 			this.threshold = 0;
 		}
-
+		
 		if (jsonKey.containsKey(JSON_KEYS)) {
 			JSONArray keys = new JSONArray();
 			keys = (JSONArray) jsonKey.get(JSON_KEYS);
-
+			
 			for (int i=0; i < keys.size(); i++) {
 				HederaKeyPair key = new HederaKeyPair();
 				JSONObject oneKey = new JSONObject();

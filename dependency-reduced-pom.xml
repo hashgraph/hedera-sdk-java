@@ -4,10 +4,6 @@
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>java-sdk</artifactId>
   <name>hedera-sdk-java</name>
-<<<<<<< HEAD
-  <version>0.1.0</version>
-  <url>http://maven.apache.org</url>
-=======
   <version>0.2.0</version>
   <description>Java SDK for interacting with the Hedera API</description>
   <url>http://www.hedera.com</url>
@@ -29,7 +25,6 @@
     <developerConnection>scm:git:ssh://github.com:hashgraph/hedera-sdk-java.git</developerConnection>
     <url>http://github.com/hashgraph/hedera-sdk-java</url>
   </scm>
->>>>>>> 073dd1c... Merge pull request #30 from hashgraph/vnext-noexamples
   <build>
     <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
     <resources>
@@ -43,12 +38,7 @@
         <targetPath>${project.build.directory}</targetPath>
         <directory>${basedir}/src/main/resources</directory>
         <includes>
-<<<<<<< HEAD
-          <include>log4j.xml</include>
-          <include>simpleStorage.bin</include>
-=======
           <include>logback.xml</include>
->>>>>>> 073dd1c... Merge pull request #30 from hashgraph/vnext-noexamples
         </includes>
       </resource>
     </resources>
@@ -124,34 +114,6 @@
             </excludes>
           </artifactSet>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>com.github.os72</groupId>
-        <artifactId>protoc-jar-maven-plugin</artifactId>
-        <version>3.6.0.1</version>
-        <executions>
-          <execution>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <protocArtifact>com.google.protobuf:protoc:3.6.1</protocArtifact>
-              <inputDirectories>
-                <include>${basedir}/src/main/proto</include>
-              </inputDirectories>
-              <outputTargets>
-                <outputTarget>
-                  <type>java</type>
-                </outputTarget>
-                <outputTarget>
-                  <type>grpc-java</type>
-                  <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.14.0</pluginArtifact>
-                </outputTarget>
-              </outputTargets>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -350,7 +312,7 @@
   </distributionManagement>
   <properties>
     <proto.version>3.6.1</proto.version>
-    <grpc.version>1.14.0</grpc.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <grpc.version>1.14.0</grpc.version>
   </properties>
 </project>

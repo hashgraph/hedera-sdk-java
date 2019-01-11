@@ -5,11 +5,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.hedera.hashgraph</groupId>
-	<artifactId>java-sdk-examples</artifactId>
+	<artifactId>hedera-sdk-java-examples</artifactId>
 	<version>0.2.0</version>
 	<packaging>jar</packaging>
 
-	<name>hedera-sdk-java-examples</name>
+	<name>examples</name>
 	<description>Example usage of the java SDK for interacting with the Hedera API</description>
 	<url>http://www.hedera.com</url>
 
@@ -47,5 +47,21 @@
 			<artifactId>java-sdk</artifactId>
 			<version>0.2.0</version>
         </dependency>
+
+		<dependency>
+			<groupId>org.ethereum</groupId>
+			<artifactId>ethereumj-core</artifactId>
+			<version>1.6.3-RELEASE</version>
+			<exclusions>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 </project>

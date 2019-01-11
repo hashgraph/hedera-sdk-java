@@ -4,79 +4,48 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.hedera.hashgraph</groupId>
-	<artifactId>java-sdk</artifactId>
-	<version>0.2.0</version>
-	<packaging>jar</packaging>
+    <groupId>com.hedera.hashgraph</groupId>
+    <artifactId>java-sdk-full</artifactId>
+    <version>0.2.0</version>
+    <packaging>pom</packaging>
 
-	<name>hedera-sdk-java</name>
-	<description>Java SDK for interacting with the Hedera API</description>
-	<url>http://www.hedera.com</url>
+    <modules>
+        <module>sdk</module>
+        <module>examples</module>
+    </modules>
 
-	<licenses>
-		<license>
-			<name>Apache License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
+    <name>hedera-sdk-java-full</name>
+    <description>Java SDK for interacting with the Hedera API</description>
+  	<url>http://www.hedera.com</url>
 
-	<developers>
-		<developer>
-			<organization>Hedera Hashgraph</organization>
-			<organizationUrl>http://www.hedera.com</organizationUrl>
-		</developer>
-	</developers>
+  	<licenses>
+  		<license>
+  			<name>Apache License, Version 2.0</name>
+  			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+  			<distribution>repo</distribution>
+  		</license>
+  	</licenses>
 
-	<scm>
-		<connection>scm:git:git://github.com/hashgraph/hedera-sdk-java.git</connection>
-		<developerConnection>scm:git:ssh://github.com:hashgraph/hedera-sdk-java.git</developerConnection>
-		<url>http://github.com/hashgraph/hedera-sdk-java</url>
-	</scm>
+    <developers>
+  		<developer>
+  			<organization>Hedera Hashgraph</organization>
+  			<organizationUrl>http://www.hedera.com</organizationUrl>
+  		</developer>
+  	</developers>
 
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
+  	<scm>
+  		<connection>scm:git:git://github.com/hashgraph/hedera-sdk-java.git</connection>
+  		<developerConnection>scm:git:ssh://github.com:hashgraph/hedera-sdk-java.git</developerConnection>
+  		<url>http://github.com/hashgraph/hedera-sdk-java</url>
+  	</scm>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<grpc.version>1.14.0</grpc.version>        <!-- CURRENT_GRPC_VERSION -->
-		<proto.version>3.6.1</proto.version>
-	</properties>
-	<repositories>
-		<repository>
-			<id>artifactory-central</id>
-			<name>Swirlds Artifactory-releases</name>
-			<url>https://art.swirlds.com/artifactory/swirlds</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-	<build>
-		<sourceDirectory>${basedir}/src/main/java</sourceDirectory>
-		<resources>
-			<resource>
-				<directory>src</directory>
-				<excludes>
-					<exclude>**/*.java</exclude>
-				</excludes>
-			</resource>
-			<resource>
-				<directory>${basedir}/src/main/resources</directory>
-				<targetPath>${project.build.directory}</targetPath>
-				<includes>
-					<include>logback.xml</include>
-				</includes>
-			</resource>
-		</resources>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <grpc.version>1.14.0</grpc.version><!-- CURRENT_GRPC_VERSION -->
+        <proto.version>3.6.1</proto.version>
+        <maven.compiler.source>10</maven.compiler.source>
+        <maven.compiler.target>10</maven.compiler.target>
+    </properties>
 
     <distributionManagement>
         <repository>
