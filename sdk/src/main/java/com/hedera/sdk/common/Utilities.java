@@ -62,11 +62,7 @@ public class Utilities {
 	 */
 	public static long getLongRandom() {
 
-		Random random = new SecureRandom();
-		byte[] randomInt64 = new byte[16]; // 16 bytes = 64 bits = Int64 
-		random.nextBytes(randomInt64);
-
-		return random.nextLong();
+		return new SecureRandom().nextLong();
 	}
 	/**
 	 * Helper function to generate a {@link HederaKeySignature} for a given 
