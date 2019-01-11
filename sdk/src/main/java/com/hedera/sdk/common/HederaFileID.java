@@ -2,7 +2,6 @@ package com.hedera.sdk.common;
 
 import java.io.Serializable;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hederahashgraph.api.proto.java.FileID;
@@ -11,7 +10,7 @@ import com.hederahashgraph.api.proto.java.FileID;
  * The ID for a Hedera File which is made of a shard number, realm number and file number
  */
 public class HederaFileID implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaFileID.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaFileID.class);
 	private static final long serialVersionUID = 1;
 
 	/**
@@ -29,7 +28,7 @@ public class HederaFileID implements Serializable {
 	 * file number a nonnegative number unique within its realm
 	 */
 	public long fileNum = 0;
-
+	
 	/**
 	 * Default constructor with default values
 	 */
@@ -71,14 +70,14 @@ public class HederaFileID implements Serializable {
 	public FileID getProtobuf() {
 
 		FileID.Builder fileID = FileID.newBuilder();
-
+		
 		fileID.setShardNum(this.shardNum);
 		if (this.realmNum != -1) {
 			// if realmnum is -1, create a new realm
 			fileID.setRealmNum(this.realmNum);
 		}
 		fileID.setFileNum(this.fileNum);
-
+		
 
 		return fileID.build();
 	}

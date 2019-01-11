@@ -21,7 +21,7 @@ public class HederaEntityID implements Serializable {
 	 * the HederaClaim, initialises with null
 	 */
 	public HederaClaim claim = null;
-	/**
+	/** 
 	 * the HederaFileId, initialises with null
 	 */
 	public HederaFileID fileID = null;
@@ -44,12 +44,12 @@ public class HederaEntityID implements Serializable {
 	 */
 	public HederaEntityID(EntityID entityIDProtobuf) {
 
-
+	   	
 	   	this.accountID = null;
 	   	this.claim = null;
 	   	this.contractID = null;
 	   	this.fileID = null;
-
+	   	
 	   	if (entityIDProtobuf.hasAccountID()) {
 	   		this.accountID = new HederaAccountID(entityIDProtobuf.getAccountID());
 	   	}

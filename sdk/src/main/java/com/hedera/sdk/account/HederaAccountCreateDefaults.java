@@ -1,11 +1,8 @@
 package com.hedera.sdk.account;
 
 import java.security.spec.InvalidKeySpecException;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
-
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
@@ -16,7 +13,7 @@ import com.hedera.sdk.common.HederaKeyPair.KeyType;
  * method for the account to override defaults
  */
 public class HederaAccountCreateDefaults {
-	final Logger logger = LoggerFactory.getLogger(HederaAccountCreateDefaults.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaAccountCreateDefaults.class);
 	private HederaAccount accountDefaultsFromClass = new HederaAccount();
 
 	private HederaKeyPair newRealmAdminPublicKey = accountDefaultsFromClass.newRealmAdminKey;

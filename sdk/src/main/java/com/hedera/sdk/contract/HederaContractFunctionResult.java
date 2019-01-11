@@ -9,8 +9,8 @@ import com.hedera.sdk.common.HederaContractID;
 import com.hederahashgraph.api.proto.java.ContractFunctionResult;
 
 /**
- * The result returned by a call to a smart contract function. This is part of the response to a ContractCallLocal query,
- * and is in the record for a ContractCall or ContractCreateInstance transaction.
+ * The result returned by a call to a smart contract function. This is part of the response to a ContractCallLocal query, 
+ * and is in the record for a ContractCall or ContractCreateInstance transaction. 
  * The ContractCreateInstance transaction record has the results of the call to the constructor.
  */
 public class HederaContractFunctionResult implements Serializable {
@@ -100,13 +100,13 @@ public class HederaContractFunctionResult implements Serializable {
 
 	/**
 	 * Generate a {@link ContractFunctionResult} protobuf payload for this object
-	 * @return {@link ContractFunctionResult}
+	 * @return {@link ContractFunctionResult} 
 	 */
 	public ContractFunctionResult getProtobuf() {
 
-
+	
 		ContractFunctionResult.Builder contractFunctionResultProtobuf = ContractFunctionResult.newBuilder();
-
+		
 		contractFunctionResultProtobuf.setContractID(this.contractID.getProtobuf());
 		contractFunctionResultProtobuf.setContractCallResult(ByteString.copyFrom(this.contractCallResult));
 		contractFunctionResultProtobuf.setErrorMessage(this.errorMessage);
@@ -116,7 +116,7 @@ public class HederaContractFunctionResult implements Serializable {
 		for (int i=0; i < this.contractLogInfo.size(); i++) {
 			contractFunctionResultProtobuf.addLogInfo(this.contractLogInfo.get(i).getProtobuf());
 		}
-
+		
 		return contractFunctionResultProtobuf.build();
 	}
 }

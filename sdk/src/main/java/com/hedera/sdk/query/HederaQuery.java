@@ -2,8 +2,8 @@ package com.hedera.sdk.query;
 /**
  * This class handles the generation of protobuf for Queries to Hedera Hashgraph
  */
-import java.io.Serializable;
 
+import java.io.Serializable;
 import com.hederahashgraph.api.proto.java.ContractCallLocalQuery;
 import com.hederahashgraph.api.proto.java.ContractGetBytecodeQuery;
 import com.hederahashgraph.api.proto.java.ContractGetInfoQuery;
@@ -20,15 +20,13 @@ import com.hederahashgraph.api.proto.java.Query;
 import com.hederahashgraph.api.proto.java.TransactionGetFastRecordQuery;
 import com.hederahashgraph.api.proto.java.TransactionGetReceiptQuery;
 import com.hederahashgraph.api.proto.java.TransactionGetRecordQuery;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HederaQuery implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaQuery.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaQuery.class);
 	private static final long serialVersionUID = 1;
-
-	/*
+	
+	/* 
 	 * list of allowed types of query being handled by the instance of this object
 	 */
 	public enum QueryType {
@@ -58,7 +56,7 @@ public class HederaQuery implements Serializable {
 	 * Generic query data object
 	 */
 	public Object queryData = null;
-
+	
 	/**
 	 * Default constructor
 	 */
@@ -133,10 +131,10 @@ public class HederaQuery implements Serializable {
 				break;
 			case NOTSET:
 
-	            throw new IllegalArgumentException("Query type not set. Unable to generate data.");
+	            throw new IllegalArgumentException("Query type not set. Unable to generate data.");			
 		}
 
-
+		
 		return query.build();
 	}
 }

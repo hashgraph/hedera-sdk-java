@@ -1,10 +1,7 @@
 package com.hedera.sdk.query;
 
 import java.io.Serializable;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.hedera.sdk.transaction.HederaTransaction;
 import com.hederahashgraph.api.proto.java.*;
 /**
@@ -12,7 +9,7 @@ import com.hederahashgraph.api.proto.java.*;
  *
  */
 public class HederaQueryHeader implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaQuery.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaQuery.class);
 	private static final long serialVersionUID = 1;
 	/**
 	 * Allowed types of responses required by the query
@@ -34,7 +31,7 @@ public class HederaQueryHeader implements Serializable {
 	public QueryResponseType responseType = QueryResponseType.ANSWER_ONLY;
 
 	/**
-	 * Default constructor
+	 * Default constructor 
 	 */
 	public HederaQueryHeader() {
 
@@ -78,10 +75,11 @@ public class HederaQueryHeader implements Serializable {
 				break;
 			case NOTSET:
 
-	            throw new IllegalArgumentException("Response type not set. Unable to generate data.");
+	            throw new IllegalArgumentException("Response type not set. Unable to generate data.");			
 		}
 
-
+		
 		return queryHeader.build();
 	}
 }
+	

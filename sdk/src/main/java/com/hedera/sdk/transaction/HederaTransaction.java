@@ -1,7 +1,7 @@
 package com.hedera.sdk.transaction;
+
 import java.io.Serializable;
 import java.util.ArrayList;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.account.HederaAccountAmount;
@@ -24,7 +24,7 @@ import com.hederahashgraph.api.proto.java.*;
  *
  */
 public class HederaTransaction implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaTransaction.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaTransaction.class);
 	private static final long serialVersionUID = 1;
 	private ResponseCodeEnum precheckResult = ResponseCodeEnum.UNKNOWN;
 	private long cost = 0;
@@ -32,7 +32,7 @@ public class HederaTransaction implements Serializable {
 	private HederaNode node = null;
 	private HederaTransactionReceipt transactionReceipt = null;
 	private HederaTransactionRecord transactionRecord = null;
-
+	
 	/**
 	 * get or set the body ({@link HederaTransactionBody} of the transaction
 	 */
@@ -80,7 +80,7 @@ public class HederaTransaction implements Serializable {
 	public byte[] getStateProof() {
 		return this.stateProof;
 	}
-
+	
 	/**
 	 * Default constructor
 	 */
@@ -97,6 +97,7 @@ public class HederaTransaction implements Serializable {
 
 		this.body = body;
 		this.signatureList = sigs;
+
 	}
 	/**
 	 * returns the protobuf for this transaction
@@ -106,11 +107,12 @@ public class HederaTransaction implements Serializable {
 
 		// Generates the protobuf payload for this class
 		Transaction.Builder transactionProtobuf = Transaction.newBuilder();
-
+		
 		transactionProtobuf.setBody(this.body.getProtobuf());
 		// if we have key signature pairs, use these\
 		transactionProtobuf.setSigs(this.signatureList.getProtobuf());
 
+		
 		return transactionProtobuf.build();
 	}
 	/**
@@ -126,9 +128,9 @@ public class HederaTransaction implements Serializable {
 
 	/**
 	 * Gets a receipt for a transaction
-	 * Get the receipt of a transaction, given its transaction ID. Once a transaction reaches consensus,
-	 * then information about whether it succeeded or failed will be available until the end of the receipt period.
-	 * Before and after the receipt period, and for a transaction that was never submitted, the receipt is unknown.
+	 * Get the receipt of a transaction, given its transaction ID. Once a transaction reaches consensus, 
+	 * then information about whether it succeeded or failed will be available until the end of the receipt period. 
+	 * Before and after the receipt period, and for a transaction that was never submitted, the receipt is unknown. 
 	 * This query is free (the payment field is left empty).
 	 * @param transactionID the transactionID the receipt is requested for
 	 * @return true if successful
@@ -147,18 +149,18 @@ public class HederaTransaction implements Serializable {
 		   	// Header
 			HederaQueryHeader queryHeader = new HederaQueryHeader();
 			queryHeader.responseType = QueryResponseType.ANSWER_ONLY;
-
+	
 			// get receipt query
 			TransactionGetReceiptQuery.Builder getReceiptQuery = TransactionGetReceiptQuery.newBuilder();
 			getReceiptQuery.setTransactionID(transactionID.getProtobuf());
-
+	
 			getReceiptQuery.setHeader(queryHeader.getProtobuf());
-
+			
 			// the query itself
 			HederaQuery query = new HederaQuery();
 			query.queryType = QueryType.TRANSACTIONGETRECEIPT;
 			query.queryData = getReceiptQuery.build();
-
+			
 			// query now set, send to network
 			Utilities.throwIfNull("Node", this.node);
 			response = this.node.getTransactionReceipt(query);
@@ -173,10 +175,10 @@ public class HederaTransaction implements Serializable {
 	   	return true;
 	}
 	/**
-	 * Get a fast record for a transaction. These only last 180s and are free
-	 * If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created.
-	 * If the transaction called a smart contract function, then the record contains the result of that call.
-	 * If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer.
+	 * Get a fast record for a transaction. These only last 180s and are free 
+	 * If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created. 
+	 * If the transaction called a smart contract function, then the record contains the result of that call. 
+	 * If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer. 
 	 * If the transaction didn't return anything that should be in the record, then the results field will be set to nothing.
 	 * @param transactionID the {@link HederaTransactionID} for which the record is requested
 	 * @param responseType the type of response required
@@ -185,21 +187,21 @@ public class HederaTransaction implements Serializable {
 	 */
 	public boolean getFastRecord(HederaTransactionID transactionID, HederaQueryHeader.QueryResponseType responseType) throws InterruptedException {
 		boolean result = true;
-
+		
 
 		// build the query
 	   	// Header
 		HederaQueryHeader queryHeader = new HederaQueryHeader();
-
+		
 		TransactionGetFastRecordQuery.Builder getQuery = TransactionGetFastRecordQuery.newBuilder();
 		getQuery.setTransactionID(transactionID.getProtobuf());
 		getQuery.setHeader(queryHeader.getProtobuf());
-
+		
 		// the query itself
 		HederaQuery query = new HederaQuery();
 		query.queryType = QueryType.TRANSACTIONGETFASTRECORD;
 		query.queryData = getQuery.build();
-
+		
 		// query now set, send to network
 		Utilities.throwIfNull("Node", this.node);
 		Response response = this.node.getTransactionFastRecord(query);
@@ -209,29 +211,29 @@ public class HederaTransaction implements Serializable {
 		ResponseHeader responseHeader = getResponse.getHeader();
 
 		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
-
+				
 		if (this.precheckResult == ResponseCodeEnum.OK) {
 
 			// cost
 			this.cost = responseHeader.getCost();
 			//state proof
 			this.stateProof = responseHeader.getStateProof().toByteArray();
-
+			
 			this.transactionRecord = new HederaTransactionRecord(getResponse.getTransactionRecord());
-
+			
 		} else {
 			result = false;
 		}
-
+		
 
 	   	return result;
 	}
 	/**
-	 * Get the record for a transaction.
-	 * If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it.
-	 * If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created.
-	 * If the transaction called a smart contract function, then the record contains the result of that call.
-	 * If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer.
+	 * Get the record for a transaction. 
+	 * If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it. 
+	 * If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created. 
+	 * If the transaction called a smart contract function, then the record contains the result of that call. 
+	 * If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer. 
 	 * If the transaction didn't return anything that should be in the record, then the results field will be set to nothing.
 	 * @param payment the {@link HederaTransaction} payment for requesting the record
 	 * @param transactionID the {@link HederaTransactionID} for which the record is requested
@@ -241,7 +243,7 @@ public class HederaTransaction implements Serializable {
 	 */
 	public boolean getRecord(HederaTransaction payment, HederaTransactionID transactionID, HederaQueryHeader.QueryResponseType responseType) throws InterruptedException {
 		boolean result = true;
-
+		
 
 		// build the query
 	   	// Header
@@ -250,17 +252,17 @@ public class HederaTransaction implements Serializable {
 			queryHeader.payment = payment;
 			queryHeader.responseType = responseType;
 		}
-
+		
 		TransactionGetRecordQuery.Builder getQuery = TransactionGetRecordQuery.newBuilder();
 		getQuery.setTransactionID(transactionID.getProtobuf());
 		getQuery.setHeader(queryHeader.getProtobuf());
-
-
+		
+		
 		// the query itself
 		HederaQuery query = new HederaQuery();
 		query.queryType = QueryType.TRANSACTIONGETRECORD;
 		query.queryData = getQuery.build();
-
+		
 		// query now set, send to network
 		Utilities.throwIfNull("Node", this.node);
 		Response response = this.node.getTransactionRecord(query);
@@ -270,29 +272,29 @@ public class HederaTransaction implements Serializable {
 		ResponseHeader responseHeader = getResponse.getHeader();
 
 		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
-
+				
 		if (this.precheckResult == ResponseCodeEnum.OK) {
 
 			// cost
 			this.cost = responseHeader.getCost();
 			//state proof
 			this.stateProof = responseHeader.getStateProof().toByteArray();
-
+			
 			this.transactionRecord = new HederaTransactionRecord(getResponse.getTransactionRecord());
-
+			
 		} else {
 			result = false;
 		}
-
+		
 
 	   	return result;
 	}
 	/**
-	 * Get the record for a transaction without a state proof
-	 * If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it.
-	 * If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created.
-	 * If the transaction called a smart contract function, then the record contains the result of that call.
-	 * If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer.
+	 * Get the record for a transaction without a state proof 
+	 * If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it. 
+	 * If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created. 
+	 * If the transaction called a smart contract function, then the record contains the result of that call. 
+	 * If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer. 
 	 * If the transaction didn't return anything that should be in the record, then the results field will be set to nothing.
 	 * @param payment the {@link HederaTransaction} payment for requesting the record
 	 * @param transactionID the {@link HederaTransactionID} for which the record is requested
@@ -304,11 +306,11 @@ public class HederaTransaction implements Serializable {
 	   	return getRecord(payment, transactionID, QueryResponseType.ANSWER_ONLY);
 	}
 	/**
-	 * Get the record for a transaction with a state proof
-	 * If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it.
-	 * If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created.
-	 * If the transaction called a smart contract function, then the record contains the result of that call.
-	 * If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer.
+	 * Get the record for a transaction with a state proof 
+	 * If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it. 
+	 * If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created. 
+	 * If the transaction called a smart contract function, then the record contains the result of that call. 
+	 * If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer. 
 	 * If the transaction didn't return anything that should be in the record, then the results field will be set to nothing.
 	 * @param payment the {@link HederaTransaction} payment for requesting the record
 	 * @param transactionID the {@link HederaTransactionID} for which the record is requested
@@ -320,11 +322,11 @@ public class HederaTransaction implements Serializable {
 		return getRecord(payment, transactionID, HederaQueryHeader.QueryResponseType.ANSWER_STATE_PROOF);
 	}
 	/**
-	 * Get cost of obtaining a record for a transaction without a state proof
-	 * If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it.
-	 * If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created.
-	 * If the transaction called a smart contract function, then the record contains the result of that call.
-	 * If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer.
+	 * Get cost of obtaining a record for a transaction without a state proof 
+	 * If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it. 
+	 * If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created. 
+	 * If the transaction called a smart contract function, then the record contains the result of that call. 
+	 * If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer. 
 	 * If the transaction didn't return anything that should be in the record, then the results field will be set to nothing.
 	 * @param transactionID the {@link HederaTransactionID} for which the record is requested
 	 * @return true if successful
@@ -335,11 +337,11 @@ public class HederaTransaction implements Serializable {
 		return getRecord(null, transactionID, HederaQueryHeader.QueryResponseType.COST_ANSWER);
 	}
 	/**
-	 * Get cost of obtaining a record for a transaction with a state proof
-	 * If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it.
-	 * If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created.
-	 * If the transaction called a smart contract function, then the record contains the result of that call.
-	 * If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer.
+	 * Get cost of obtaining a record for a transaction with a state proof 
+	 * If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it. 
+	 * If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created. 
+	 * If the transaction called a smart contract function, then the record contains the result of that call. 
+	 * If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer. 
 	 * If the transaction didn't return anything that should be in the record, then the results field will be set to nothing.
 	 * @param transactionID the {@link HederaTransactionID} for which the record is requested
 	 * @return true if successful
@@ -349,7 +351,7 @@ public class HederaTransaction implements Serializable {
 
 		return getRecord(null, transactionID, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
 	}
-
+	
 	/**
 	 * Generates a transfer transaction to enable payments for queries
 	 * @param txQueryDefaults the defaults for transactions and queries
@@ -358,7 +360,7 @@ public class HederaTransaction implements Serializable {
 	 */
 	public HederaTransaction(HederaTransactionAndQueryDefaults txQueryDefaults, long queryFee) throws Exception {
 
-
+		
 		// create a transaction ID (starts now with accountID of the paying account id)
 		HederaTransactionID hederaTransactionID = new HederaTransactionID(txQueryDefaults.payingAccountID);
 
@@ -369,20 +371,20 @@ public class HederaTransaction implements Serializable {
 		fromAccountAmount = new HederaAccountAmount(txQueryDefaults.payingAccountID.shardNum, txQueryDefaults.payingAccountID.realmNum, txQueryDefaults.payingAccountID.accountNum, -queryFee);
 		 // positive amount to the Node's account to pay for the query
 		HederaAccountAmount toAccountAmount = new HederaAccountAmount(txQueryDefaults.node.getAccountID(), queryFee);
-
+		
 		accountAmounts.add(fromAccountAmount);
 		accountAmounts.add(toAccountAmount);
-
+		
 		HederaAccount account = new HederaAccount();
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", txQueryDefaults);
 		Utilities.throwIfNull("txQueryDefaults.node", txQueryDefaults.node);
 		Utilities.throwIfAccountIDInvalid("txQueryDefaults.node.getAccountID()", txQueryDefaults.node.getAccountID());
 		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", txQueryDefaults.payingKeyPair);
-
+		
 		account.txQueryDefaults = txQueryDefaults;
 		account.setNode(txQueryDefaults.node);
-
+		
 		// get the body for the transaction so we can sign it
 		TransactionBody transferBody = account.bodyToSignForTransfer(
 				hederaTransactionID
@@ -407,8 +409,9 @@ public class HederaTransaction implements Serializable {
 				, txQueryDefaults.generateRecord
 				, txQueryDefaults.memo
 				, account.getTransferTransactionBody(accountAmounts));
-
+		
 		// add the signatures
 		this.signatureList = sigsForTransaction;
+
 	}
 }

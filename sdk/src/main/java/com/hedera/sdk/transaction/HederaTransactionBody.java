@@ -1,7 +1,6 @@
 package com.hedera.sdk.transaction;
-import java.io.Serializable;
 
-import org.slf4j.Logger;
+import java.io.Serializable;
 import org.slf4j.LoggerFactory;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaDuration;
@@ -11,7 +10,7 @@ import com.hederahashgraph.api.proto.java.*;
  * this class manages transaction bodies
  */
 public class HederaTransactionBody implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaTransactionBody.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaTransactionBody.class);
 	private static final long serialVersionUID = 1;
 	/**
 	 * enumeration of allowed transaction types
@@ -64,7 +63,7 @@ public class HederaTransactionBody implements Serializable {
 	 * get or set the type of transaction
 	 */
 	public TransactionType transactionType = TransactionType.NOTSET;
-
+	
 	/**
 	 * Default constructor
 	 */
@@ -153,10 +152,10 @@ public class HederaTransactionBody implements Serializable {
 				break;
 			case NOTSET:
 
-	            throw new IllegalArgumentException("Transaction type not set. Unable to generate data.");
+	            throw new IllegalArgumentException("Transaction type not set. Unable to generate data.");			
 		}
 
-
+		
 		return transactionBodyProtobuf.build();
 	}
 }

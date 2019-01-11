@@ -75,20 +75,20 @@ public class HederaContractLogInfo implements Serializable {
 
 	/**
 	 * Generate a {@link ContractLoginfo} protobuf payload for this object
-	 * @return {@link ContractLoginfo}
+	 * @return {@link ContractLoginfo} 
 	 */
 	public ContractLoginfo getProtobuf() {
 
-
+	
 		ContractLoginfo.Builder contractLogInfo = ContractLoginfo.newBuilder();
-
+		
 		contractLogInfo.setContractID(this.contractID.getProtobuf());
 		contractLogInfo.setBloom(ByteString.copyFrom(this.bloom));
 		contractLogInfo.setData(ByteString.copyFrom(this.data));
 		for (int i=0; i < this.topics.length; i++) {
 			contractLogInfo.addTopic(ByteString.copyFrom(this.topics[i]));
 		}
-
+		
 		return contractLogInfo.build();
 	}
 }

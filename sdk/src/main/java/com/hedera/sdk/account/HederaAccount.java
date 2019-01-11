@@ -4,10 +4,7 @@ import java.io.Serializable;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaDuration;
@@ -51,7 +48,7 @@ import com.hederahashgraph.api.proto.java.TransferList;
  * Class to manage a cryptocurrency account
  */
 public class HederaAccount implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaAccount.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaAccount.class);
 	private static final long serialVersionUID = 1;
 	private HederaNode node = null;
 	// keys for signatures
@@ -101,7 +98,7 @@ public class HederaAccount implements Serializable {
 	 * the key that must sign each transfer out of the account. If receiverSigRequired is true, then it must also sign any transfer into the account.
 	 */
 	public HederaKeyPair newAccountKey = null;
-	/**
+	/** 
 	 * The initial balance when creating a new account
 	 */
 	public long initialBalance = 0;
@@ -114,13 +111,13 @@ public class HederaAccount implements Serializable {
 	}
 	/**
 	 * the {@link HederaAccountID} to proxy tokens to
-	 * If proxyAccountID is null, or is an invalid account, or is an account that isn't a node, then this account is
-	 * automatically proxy staked to a node chosen by the network, but without earning payments.
-	 * If the proxyAccountID account refuses to accept proxy staking at the given fraction,
+	 * If proxyAccountID is null, or is an invalid account, or is an account that isn't a node, then this account is 
+	 * automatically proxy staked to a node chosen by the network, but without earning payments. 
+	 * If the proxyAccountID account refuses to accept proxy staking at the given fraction, 
 	 * or if it is not currently running a node, then it will behave as if both proxyAccountID and proxyFraction were null.
 	 */
 	public HederaAccountID proxyAccountID = new HederaAccountID(0, 0, 0);
-	/**
+	/** 
 	 * payments earned from proxy staking are shared between the node and this account, with proxyFraction / 10000 going to this account
 	 */
 	public int proxyFraction = 0;
@@ -137,14 +134,14 @@ public class HederaAccount implements Serializable {
 	 */
 	public long receiveRecordThreshold = Long.MAX_VALUE;
 	/**
-	 * if true, this account's key must sign any transaction depositing into this account (in addition to all withdrawals).
+	 * if true, this account's key must sign any transaction depositing into this account (in addition to all withdrawals). 
 	 * This field is immutable; it cannot be changed by a CryptoUpdate transaction.
 	 */
 	public boolean receiverSigRequired = false;
 	/**
-	 * the account is charged to extend its expiration date every this many seconds. If it doesn't have enough,
+	 * the account is charged to extend its expiration date every this many seconds. If it doesn't have enough, 
 	 * it extends as long as possible. If it is empty when it expires, then it is deleted.
-	 * Defaults to 60 * 60 * 24 * 30 = 30 days (60s * 60m * 24h * 30d)
+	 * Defaults to 60 * 60 * 24 * 30 = 30 days (60s * 60m * 24h * 30d) 
 	 */
 	public HederaDuration autoRenewPeriod = new HederaDuration(60 * 60 * 24 * 30, 0); // 30 days
 	/**
@@ -154,7 +151,7 @@ public class HederaAccount implements Serializable {
 	/**
 	 * The expiration time of the account as a result of a query
 	 */
-	public HederaTimeStamp expirationTime = null;
+	public HederaTimeStamp expirationTime = null; 
 	/**
 	 * sets the node to communicate with
 	 * @param node the node to communicate with
@@ -170,7 +167,7 @@ public class HederaAccount implements Serializable {
 		return this.solidityContractAccountID;
 	}
 	/**
-	 * true if the account has been deleted
+	 * true if the account has been deleted 
 	 * set as a result of a query
 	 * @return boolean
 	 */
@@ -192,7 +189,7 @@ public class HederaAccount implements Serializable {
 		return stakers;
 	}
 	/**
-	 * Sets the hederaAccountID values (shard, realm, accountNum)
+	 * Sets the hederaAccountID values (shard, realm, accountNum) 
 	 * from a HederaAccountID
 	 * @param accountID (The HederaAccountID from which to set the properties)
 	 */
@@ -202,7 +199,7 @@ public class HederaAccount implements Serializable {
 		this.accountNum = accountID.accountNum;
 	}
 	/**
-	 * Gets the shard, realm and accountNum of this account in the form
+	 * Gets the shard, realm and accountNum of this account in the form 
 	 * of a HederaAccountID
 	 * @return {@link HederaAccountID}
 	 */
@@ -237,7 +234,7 @@ public class HederaAccount implements Serializable {
 	}
 	/**
 	 * gets the {@link ResponseCodeEnum} as a result of a transaction
-	 * @return {@link ResponseCodeEnum}
+	 * @return {@link ResponseCodeEnum} 
 	 */
 	public ResponseCodeEnum getPrecheckResult() {
 		return this.precheckResult;
@@ -266,10 +263,10 @@ public class HederaAccount implements Serializable {
 	 * @param memo String memo to include in the transaction
 	 * @return {@link TransactionBody}
 	 */
-	public TransactionBody bodyToSignForCreate(HederaTransactionID transactionID, HederaAccountID nodeAccount,
-			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord,
+	public TransactionBody bodyToSignForCreate(HederaTransactionID transactionID, HederaAccountID nodeAccount, 
+			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, 
 			String memo) {
-
+		
 		HederaTransactionBody transactionBody = new HederaTransactionBody(
 				TransactionType.CRYPTOCREATEACCOUNT
 				, transactionID
@@ -293,10 +290,10 @@ public class HederaAccount implements Serializable {
 	 * @param accountAmounts hte list of accounts and amounts to transfer
 	 * @return {@link TransactionBody}
 	 */
-	public TransactionBody bodyToSignForTransfer(HederaTransactionID transactionID, HederaAccountID nodeAccount,
-			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord,
+	public TransactionBody bodyToSignForTransfer(HederaTransactionID transactionID, HederaAccountID nodeAccount, 
+			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, 
 			String memo, ArrayList<HederaAccountAmount> accountAmounts) {
-
+		
 		HederaTransactionBody transactionBody = new HederaTransactionBody(
 				TransactionType.CRYPTOTRANSFER
 				, transactionID
@@ -320,10 +317,10 @@ public class HederaAccount implements Serializable {
 	 * @param transferAccountID the {@link HederaAccountID} to transfer remaining funds to
 	 * @return {@link TransactionBody}
 	 */
-	public TransactionBody bodyToSignForDelete(HederaTransactionID transactionID, HederaAccountID nodeAccount,
-			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord,
+	public TransactionBody bodyToSignForDelete(HederaTransactionID transactionID, HederaAccountID nodeAccount, 
+			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, 
 			String memo, HederaAccountID transferAccountID) {
-
+		
 		HederaTransactionBody transactionBody = new HederaTransactionBody(
 				TransactionType.CRYPTODELETE
 				, transactionID
@@ -346,10 +343,10 @@ public class HederaAccount implements Serializable {
 	 * @param memo String memo to include in the transaction
 	 * @return {@link TransactionBody}
 	 */
-	public TransactionBody bodyToSignForUpdate(HederaTransactionID transactionID, HederaAccountID nodeAccount,
-			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord,
+	public TransactionBody bodyToSignForUpdate(HederaTransactionID transactionID, HederaAccountID nodeAccount, 
+			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, 
 			String memo) {
-
+		
 		HederaTransactionBody transactionBody = new HederaTransactionBody(
 				TransactionType.CRYPTOUPDATEACCOUNT
 				, transactionID
@@ -373,10 +370,10 @@ public class HederaAccount implements Serializable {
 	 * @param claim the {@link HederaClaim} to add
 	 * @return {@link TransactionBody}
 	 */
-	public TransactionBody bodyToSignForAddClaim(HederaTransactionID transactionID, HederaAccountID nodeAccount,
-			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord,
+	public TransactionBody bodyToSignForAddClaim(HederaTransactionID transactionID, HederaAccountID nodeAccount, 
+			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, 
 			String memo, HederaClaim claim) {
-
+		
 		HederaTransactionBody transactionBody = new HederaTransactionBody(
 				TransactionType.CRYPTOADDCLAIM
 				, transactionID
@@ -400,10 +397,10 @@ public class HederaAccount implements Serializable {
 	 * @param claim the {@link HederaClaim} to delete
 	 * @return {@link TransactionBody}
 	 */
-	public TransactionBody bodyToSignForDeleteClaim(HederaTransactionID transactionID, HederaAccountID nodeAccount,
-			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord,
+	public TransactionBody bodyToSignForDeleteClaim(HederaTransactionID transactionID, HederaAccountID nodeAccount, 
+			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, 
 			String memo, HederaClaim claim) {
-
+		
 		HederaTransactionBody transactionBody = new HederaTransactionBody(
 				TransactionType.CRYPTODELETECLAIM
 				, transactionID
@@ -417,7 +414,7 @@ public class HederaAccount implements Serializable {
 		return transactionBody.getProtobuf();
 	}
 	/**
-	 * This method runs a transaction to create an account
+	 * This method runs a transaction to create an account 
 	 * @param transactionID the {@link HederaTransactionID} for the transaction
 	 * @param nodeAccount the {@link HederaAccountID} of the account of the node to which the transaction is submitted
 	 * @param transactionFee the fee paid by the client to run the transaction
@@ -431,7 +428,7 @@ public class HederaAccount implements Serializable {
 	public HederaTransactionResult create(HederaTransactionID transactionID, HederaAccountID nodeAccount
 			, long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord
 			, String memo, HederaSignatureList sigsForTransaction) throws InterruptedException {
-
+		
 		// build the body
 		HederaTransaction transaction = new HederaTransaction();
 		transaction.body = new HederaTransactionBody(
@@ -444,8 +441,8 @@ public class HederaAccount implements Serializable {
 				, memo
 				, this.getCreateTransactionBody());
 		// add the signatures
-		transaction.keySignatureList = sigsForTransaction;
-
+		transaction.signatureList = sigsForTransaction;
+		
 		// issue the transaction
 		Utilities.throwIfNull("Node", this.node);
 		HederaTransactionResult hederaTransactionResult = this.node.accountCreate(transaction);
@@ -454,7 +451,7 @@ public class HederaAccount implements Serializable {
 		return hederaTransactionResult;
 	}
 	/**
-	 * This method runs a transaction to transfer cryptocurrency between accounts
+	 * This method runs a transaction to transfer cryptocurrency between accounts 
 	 * @param transactionID the {@link HederaTransactionID} for the transaction
 	 * @param nodeAccount the {@link HederaAccountID} of the account of the node to which the transaction is submitted
 	 * @param transactionFee the fee paid by the client to run the transaction
@@ -469,7 +466,7 @@ public class HederaAccount implements Serializable {
 	public HederaTransactionResult transfer(HederaTransactionID transactionID, HederaAccountID nodeAccount
 			, long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord
 			, String memo, HederaSignatureList sigsForTransaction, ArrayList<HederaAccountAmount> accountAmounts) throws InterruptedException {
-
+		
 		// build the body
 		HederaTransaction transaction = new HederaTransaction();
 		transaction.body = new HederaTransactionBody(
@@ -482,8 +479,8 @@ public class HederaAccount implements Serializable {
 				, memo
 				, this.getTransferTransactionBody(accountAmounts));
 		// add the signatures
-		transaction.keySignatureList = sigsForTransaction;
-
+		transaction.signatureList = sigsForTransaction;
+		
 		// issue the transaction
 		Utilities.throwIfNull("Node", this.node);
 		HederaTransactionResult hederaTransactionResult = this.node.accountTransfer(transaction);
@@ -493,7 +490,7 @@ public class HederaAccount implements Serializable {
 	}
 
 	/**
-	 * This method runs a transaction to update an account
+	 * This method runs a transaction to update an account 
 	 * @param transactionID the {@link HederaTransactionID} for the transaction
 	 * @param nodeAccount the {@link HederaAccountID} of the account of the node to which the transaction is submitted
 	 * @param transactionFee the fee paid by the client to run the transaction
@@ -507,7 +504,7 @@ public class HederaAccount implements Serializable {
 	public HederaTransactionResult update(HederaTransactionID transactionID, HederaAccountID nodeAccount
 			, long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord
 			, String memo, HederaSignatureList sigsForTransaction) throws InterruptedException {
-
+		
 		// build the body
 		HederaTransaction transaction = new HederaTransaction();
 		transaction.body = new HederaTransactionBody(
@@ -520,8 +517,8 @@ public class HederaAccount implements Serializable {
 				, memo
 				, this.getUpdateTransactionBody());
 		// add the signatures
-		transaction.keySignatureList = sigsForTransaction;
-
+		transaction.signatureList = sigsForTransaction;
+		
 		// issue the transaction
 		Utilities.throwIfNull("Node", this.node);
 		HederaTransactionResult hederaTransactionResult = this.node.accountUpdate(transaction);
@@ -531,7 +528,7 @@ public class HederaAccount implements Serializable {
 		return hederaTransactionResult;
 	}
 	/**
-	 * This method runs a transaction to add a claim to an account
+	 * This method runs a transaction to add a claim to an account 
 	 * @param transactionID the {@link HederaTransactionID} for the transaction
 	 * @param nodeAccount the {@link HederaAccountID} of the account of the node to which the transaction is submitted
 	 * @param transactionFee the fee paid by the client to run the transaction
@@ -546,7 +543,7 @@ public class HederaAccount implements Serializable {
 	public HederaTransactionResult addClaim(HederaTransactionID transactionID, HederaAccountID nodeAccount
 			, long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord
 			, String memo, HederaSignatureList sigsForTransaction, HederaClaim claim) throws InterruptedException {
-
+		
 		// build the body
 		HederaTransaction transaction = new HederaTransaction();
 		transaction.body = new HederaTransactionBody(
@@ -560,7 +557,7 @@ public class HederaAccount implements Serializable {
 				, this.getAddClaimTransactionBody(claim));
 		// add the signatures
 		transaction.signatureList = sigsForTransaction;
-
+		
 		// issue the transaction
 		Utilities.throwIfNull("Node", this.node);
 		HederaTransactionResult hederaTransactionResult = this.node.addClaim(transaction);
@@ -571,7 +568,7 @@ public class HederaAccount implements Serializable {
 	}
 
 	/**
-	 * Runs a query to get the account balance of the given account
+	 * Runs a query to get the account balance of the given account 
 	 * If successful, the method populates the balance property of the account, cost and state proof if requested
 	 * @param payment a {@link HederaTransaction} message to indicate how this query will be paid for, this can be null for Cost queries
 	 * @param responseType the type of response requested from the query
@@ -580,7 +577,7 @@ public class HederaAccount implements Serializable {
 	 */
 	public boolean getBalance(HederaTransaction payment, HederaQueryHeader.QueryResponseType responseType) throws InterruptedException {
 		boolean result = true;
-
+		
 		// build the query
 	   	// Header
 		HederaQueryHeader queryHeader = new HederaQueryHeader();
@@ -588,18 +585,18 @@ public class HederaAccount implements Serializable {
 			queryHeader.payment = payment;
 			queryHeader.responseType = responseType;
 		}
-
+		
 		// get contents query
 		CryptoGetAccountBalanceQuery.Builder queryBalance = CryptoGetAccountBalanceQuery.newBuilder();
-
+		
 		queryBalance.setAccountID(this.getHederaAccountID().getProtobuf());
 		queryBalance.setHeader(queryHeader.getProtobuf());
-
+		
 		// the query itself
 		HederaQuery query = new HederaQuery();
 		query.queryType = QueryType.CRYPTOGETACCOUNTBALANCE;
 		query.queryData = queryBalance.build();
-
+		
 		// query now set, send to network
 		Utilities.throwIfNull("Node", this.node);
 		Response response = this.node.getAccountBalance(query);
@@ -610,7 +607,7 @@ public class HederaAccount implements Serializable {
 		}
 
 		CryptoGetAccountBalanceResponse.Builder queryResponse = response.getCryptogetAccountBalance().toBuilder();
-
+		
 		// check response header first
 		ResponseHeader.Builder responseHeader = queryResponse.getHeaderBuilder();
 
@@ -623,12 +620,12 @@ public class HederaAccount implements Serializable {
 		} else {
 			result = false;
 		}
-
+		
 	   	return result;
 	}
 	/**
 	 * Gets the balance of the account, requesting only an answer
-	 * If successful, the method populates the balance property of the account and cost
+	 * If successful, the method populates the balance property of the account and cost 
 	 * @param payment the {@link HederaTransaction} payload containing payment information for the query
 	 * @return {@link Boolean} indicating if query was successful or not
 	 * @throws InterruptedException should a communication error occur with the node
@@ -638,7 +635,7 @@ public class HederaAccount implements Serializable {
 	}
 	/**
 	 * Gets the balance of the account, requesting only an answer
-	 * If successful, the method populates the balance property of the account, cost and stateproof
+	 * If successful, the method populates the balance property of the account, cost and stateproof 
 	 * @param payment the {@link HederaTransaction} payload containing payment information for the query
 	 * @return {@link Boolean} indicating if query was successful or not
 	 * @throws InterruptedException should a communication error occur with the node
@@ -648,7 +645,7 @@ public class HederaAccount implements Serializable {
 	}
 	/**
 	 * Gets the cost of enquiring for balance of the account, requesting only an answer
-	 * If successful, the method populates the cost property
+	 * If successful, the method populates the cost property 
 	 * @return {@link Boolean} indicating if query was successful or not
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
@@ -657,16 +654,16 @@ public class HederaAccount implements Serializable {
 	}
 	/**
 	 * Gets the cost of enquiring for balance of the account, requesting a state proof
-	 * If successful, the method populates the cost property
+	 * If successful, the method populates the cost property 
 	 * @return {@link Boolean} indicating if query was successful or not
 	 * @throws InterruptedException should a communication error occur with the node
 	 */
 	public boolean getBalanceAnswerStateProof() throws InterruptedException {
 		return getBalance(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
 	}
-
+	
 	/**
-	 * Runs a query to get records attached to an account
+	 * Runs a query to get records attached to an account 
 	 * If successful, the method sets the records property, cost and state proof if requested
 	 * @param payment a {@link HederaTransaction} message to indicate how this query will be paid for, this can be null for Cost queries
 	 * @param responseType the type of response requested from the query
@@ -677,7 +674,7 @@ public class HederaAccount implements Serializable {
 		return getRecords(payment, responseType, this.getHederaAccountID());
 	}
 	/**
-	 * Runs a query to get records attached to an account
+	 * Runs a query to get records attached to an account 
 	 * If successful, the method sets the records property, cost and state proof if requested
 	 * @param payment a {@link HederaTransaction} message to indicate how this query will be paid for, this can be null for Cost queries
 	 * @param responseType the type of response requested from the query
@@ -687,7 +684,7 @@ public class HederaAccount implements Serializable {
 	 */
 	public boolean getRecords(HederaTransaction payment, HederaQueryHeader.QueryResponseType responseType, HederaAccountID accountID) throws InterruptedException {
 		boolean result = true;
-
+		
 		// build the query
 	   	// Header
 		HederaQueryHeader queryHeader = new HederaQueryHeader();
@@ -695,18 +692,18 @@ public class HederaAccount implements Serializable {
 			queryHeader.payment = payment;
 			queryHeader.responseType = responseType;
 		}
-
+		
 		// get contents query
 		CryptoGetAccountRecordsQuery.Builder queryRecords = CryptoGetAccountRecordsQuery.newBuilder();
-
+		
 		queryRecords.setAccountID(accountID.getProtobuf());
 		queryRecords.setHeader(queryHeader.getProtobuf());
-
+		
 		// the query itself
 		HederaQuery query = new HederaQuery();
 		query.queryType = QueryType.CRYPTOGETACCOUNTRECORDS;
 		query.queryData = queryRecords.build();
-
+		
 		// query now set, send to network
 		Utilities.throwIfNull("Node", this.node);
 		Response response = this.node.getAccountRecords(query);
@@ -715,7 +712,7 @@ public class HederaAccount implements Serializable {
 			return false;
 		}
 		CryptoGetAccountRecordsResponse.Builder queryResponse = response.getCryptoGetAccountRecords().toBuilder();
-
+		
 		// check response header first
 		ResponseHeader.Builder responseHeader = queryResponse.getHeaderBuilder();
 
@@ -723,24 +720,24 @@ public class HederaAccount implements Serializable {
 
 		if (this.precheckResult == ResponseCodeEnum.OK) {
 			this.records = new ArrayList<HederaTransactionRecord>();
-
+			
 			for (int i=0; i < queryResponse.getRecordsCount(); i++) {
 				HederaTransactionRecord record = new HederaTransactionRecord(queryResponse.getRecords(i));
 				this.records.add(record);
 			}
-
+			
 			this.cost = responseHeader.getCost();
 			this.stateProof = responseHeader.getStateProof().toByteArray();
 		} else {
 			this.records = null;
 			result = false;
 		}
-
+		
 	   	return result;
 	}
 	/**
-	 * Runs a query to get records attached to an account without a state proof
-	 * If successful, the method sets the records property and cost
+	 * Runs a query to get records attached to an account without a state proof 
+	 * If successful, the method sets the records property and cost 
 	 * @param payment a {@link HederaTransaction} message to indicate how this query will be paid for, this can be null for Cost queries
 	 * @return {@link Boolean} indicating success or failure of the query
 	 * @throws InterruptedException should an exception occur during communication with the node
@@ -749,8 +746,8 @@ public class HederaAccount implements Serializable {
 	   	return getRecords(payment, QueryResponseType.ANSWER_ONLY);
 	}
 	/**
-	 * Runs a query to get records attached to an account with a state proof
-	 * If successful, the method sets the records property, cost and state proof
+	 * Runs a query to get records attached to an account with a state proof 
+	 * If successful, the method sets the records property, cost and state proof 
 	 * @param payment a {@link HederaTransaction} message to indicate how this query will be paid for, this can be null for Cost queries
 	 * @return {@link Boolean} indicating success or failure of the query
 	 * @throws InterruptedException should an exception occur during communication with the node
@@ -759,8 +756,8 @@ public class HederaAccount implements Serializable {
 		return getRecords(payment, HederaQueryHeader.QueryResponseType.ANSWER_STATE_PROOF);
 	}
 	/**
-	 * Runs a query to find out the cost of getting records attached to an account without a state proof
-	 * If successful, the method sets the cost
+	 * Runs a query to find out the cost of getting records attached to an account without a state proof 
+	 * If successful, the method sets the cost 
 	 * @return {@link Boolean} indicating success or failure of the query
 	 * @throws InterruptedException should an exception occur during communication with the node
 	 */
@@ -768,8 +765,8 @@ public class HederaAccount implements Serializable {
 		return getRecords(null, HederaQueryHeader.QueryResponseType.COST_ANSWER);
 	}
 	/**
-	 * Runs a query to find out the cost of getting records attached to an account with a state proof
-	 * If successful, the method sets the cost
+	 * Runs a query to find out the cost of getting records attached to an account with a state proof 
+	 * If successful, the method sets the cost 
 	 * @return {@link Boolean} indicating success or failure of the query
 	 * @throws InterruptedException should an exception occur during communication with the node
 	 */
@@ -777,7 +774,7 @@ public class HederaAccount implements Serializable {
 		return getRecords(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
 	}
 	/**
-	 * Runs a query to get information for a given account
+	 * Runs a query to get information for a given account 
 	 * If successful, the method populates the properties this object depending on the type of answer requested
 	 * @param payment a {@link HederaTransaction} message to indicate how this query will be paid for, this can be null for Cost queries
 	 * @param responseType the type of response requested from the query
@@ -786,7 +783,7 @@ public class HederaAccount implements Serializable {
 	 */
 	public boolean getInfo(HederaTransaction payment, HederaQueryHeader.QueryResponseType responseType) throws InterruptedException {
 		boolean result = true;
-
+		
 		// build the query
 	   	// Header
 		HederaQueryHeader queryHeader = new HederaQueryHeader();
@@ -794,17 +791,17 @@ public class HederaAccount implements Serializable {
 			queryHeader.payment = payment;
 			queryHeader.responseType = responseType;
 		}
-
+		
 		// get info query
 		CryptoGetInfoQuery.Builder accountGetInfoQuery = CryptoGetInfoQuery.newBuilder();
 		accountGetInfoQuery.setAccountID(this.getHederaAccountID().getProtobuf());
 		accountGetInfoQuery.setHeader(queryHeader.getProtobuf());
-
+		
 		// the query itself
 		HederaQuery query = new HederaQuery();
 		query.queryType = QueryType.CRYPTOGETINFO;
 		query.queryData = accountGetInfoQuery.build();
-
+		
 		// query now set, send to network
 		Utilities.throwIfNull("Node", this.node);
 		Response response = this.node.getAccountInfo(query);
@@ -815,10 +812,10 @@ public class HederaAccount implements Serializable {
 		}
 
 		CryptoGetInfoResponse.Builder accountGetInfoResponse = response.getCryptoGetInfo().toBuilder();
-
+		
 		// check response header first
 		ResponseHeader.Builder responseHeader = accountGetInfoResponse.getHeaderBuilder();
-
+		
 		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
 
 		if (this.precheckResult == ResponseCodeEnum.OK) {
@@ -848,7 +845,7 @@ public class HederaAccount implements Serializable {
 		} else {
 			result = false;
 		}
-
+		
 	   	return result;
 	}
 	/**
@@ -894,7 +891,7 @@ public class HederaAccount implements Serializable {
 	 * @return {@link CryptoCreateTransactionBody}
 	 */
 	public CryptoCreateTransactionBody getCreateTransactionBody() {
-
+	   	
 	   	CryptoCreateTransactionBody.Builder transactionBody = CryptoCreateTransactionBody.newBuilder();
 	   	transactionBody.setAutoRenewPeriod(this.autoRenewPeriod.getProtobuf());
 	   	transactionBody.setInitialBalance(this.initialBalance);
@@ -902,11 +899,11 @@ public class HederaAccount implements Serializable {
    		transactionBody.setMaxReceiveProxyFraction(this.maxReceiveProxyFraction);
    		transactionBody.setReceiveRecordThreshold(this.receiveRecordThreshold);
    		transactionBody.setSendRecordThreshold(this.sendRecordThreshold);
-
+	   	
 	   	if (this.accountKey != null) {
 	   		transactionBody.setKey(this.accountKey.getProtobuf());
 	   	}
-
+	   	
 	   	if (this.realmNum > 0) {
 	   		transactionBody.setRealmID(new HederaRealmID(this.shardNum, this.realmNum).getProtobuf());
 	   	} else if (this.realmNum == -1) {
@@ -930,13 +927,13 @@ public class HederaAccount implements Serializable {
 	 * @return {@link CryptoTransferTransactionBody}
 	 */
 	public CryptoTransferTransactionBody getTransferTransactionBody(ArrayList<HederaAccountAmount>accountAmounts) {
-
+	   	
 	   	CryptoTransferTransactionBody.Builder transactionBody = CryptoTransferTransactionBody.newBuilder();
 	   	TransferList.Builder transferList = TransferList.newBuilder();
 	   	for (HederaAccountAmount accountAmount: accountAmounts) {
 	   		transferList.addAccountAmounts(accountAmount.getProtobuf());
 	   	}
-
+	   	
 	   	transactionBody.setTransfers(transferList);
 
 		return transactionBody.build();
@@ -947,7 +944,7 @@ public class HederaAccount implements Serializable {
 	 */
 	public CryptoUpdateTransactionBody getUpdateTransactionBody() {
 		CryptoUpdateTransactionBody.Builder updateTransaction = CryptoUpdateTransactionBody.newBuilder();
-
+		
 		updateTransaction.setAccountIDToUpdate(this.getHederaAccountID().getProtobuf());
 		if (this.autoRenewPeriod != null) {
 			updateTransaction.setAutoRenewPeriod(this.autoRenewPeriod.getProtobuf());
@@ -970,7 +967,7 @@ public class HederaAccount implements Serializable {
 		if (this.sendRecordThreshold != 0) {
 			updateTransaction.setSendRecordThreshold(this.sendRecordThreshold);
 		}
-
+		
 		return updateTransaction.build();
 	}
 	/**
@@ -981,12 +978,12 @@ public class HederaAccount implements Serializable {
 	public CryptoDeleteTransactionBody getDeleteTransactionBody(HederaAccountID transferAccountID) {
 		// Generates the protobuf payload for this class
 	   	CryptoDeleteTransactionBody.Builder transactionBody = CryptoDeleteTransactionBody.newBuilder();
-
+		
 	   	transactionBody.setDeleteAccountID(this.getHederaAccountID().getProtobuf());
 	   	if (transferAccountID != null) {
 	   		transactionBody.setTransferAccountID(transferAccountID.getProtobuf());
 	   	}
-
+	   	
 		return transactionBody.build();
 	}
 	/**
@@ -996,10 +993,10 @@ public class HederaAccount implements Serializable {
 	 */
 	public CryptoAddClaimTransactionBody getAddClaimTransactionBody(HederaClaim claim) {
 		CryptoAddClaimTransactionBody.Builder transaction = CryptoAddClaimTransactionBody.newBuilder();
-
+		
 		transaction.setAccountID(this.getHederaAccountID().getProtobuf());
 		transaction.setClaim(claim.getProtobuf());
-
+		
 		return transaction.build();
 	}
 	/**
@@ -1009,10 +1006,10 @@ public class HederaAccount implements Serializable {
 	 */
 	public CryptoDeleteClaimTransactionBody getDeleteClaimTransactionBody(HederaClaim claim) {
 	   	CryptoDeleteClaimTransactionBody.Builder transaction = CryptoDeleteClaimTransactionBody.newBuilder();
-
+		
 		transaction.setAccountIDToDeleteFrom(this.getHederaAccountID().getProtobuf());
 		transaction.setHashToDelete(ByteString.copyFrom(claim.hash));
-
+		
 		return transaction.build();
 	}
 	/**
@@ -1061,7 +1058,7 @@ public class HederaAccount implements Serializable {
 			this.autoRenewPeriod = new HederaDuration(defaults.autoRenewPeriodSeconds, defaults.autoRenewPeriodNanos);
 			this.newRealmAdminKey = defaults.getNewRealmAdminPublicKey();
 		}
-
+		
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
 
@@ -1069,7 +1066,7 @@ public class HederaAccount implements Serializable {
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.accountKey = new HederaKeyPair(KeyType.ED25519, publicKey, null);
-
+		
 		this.initialBalance = initialBalance;
 
 		// validate inputs
@@ -1077,10 +1074,10 @@ public class HederaAccount implements Serializable {
 		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
 		Utilities.throwIfAccountIDInvalid("txQueryDefaults.payingAccountID", this.txQueryDefaults.payingAccountID);
 		Utilities.throwIfAccountIDInvalid("txQueryDefaults.node.AccountID", this.txQueryDefaults.node.getAccountID());
-
+		
 		// set transport
 		this.node = this.txQueryDefaults.node;
-
+		
 		// create a transaction ID (starts now with accountID of the paying account id)
 		this.hederaTransactionID = new HederaTransactionID(this.txQueryDefaults.payingAccountID);
 
@@ -1100,7 +1097,7 @@ public class HederaAccount implements Serializable {
 		if (this.newRealmAdminKey != null) {
 			sigsForTransaction.addSignature(this.newRealmAdminKey.getSignature(createBody.toByteArray()));
 		}
-
+		
 		// create the account
 		transactionResult = this.create(
 				this.hederaTransactionID
@@ -1110,10 +1107,10 @@ public class HederaAccount implements Serializable {
 				, this.txQueryDefaults.generateRecord
 				, this.txQueryDefaults.memo
 				, sigsForTransaction);
-
+		
 		return transactionResult;
 	}
-
+	
 	/** Send an amount of crypto currency to an account
 	 * The paying account is the same as the one paying for the transaction
 	 * @param toAccountID, the accountID receiving the funds
@@ -1122,10 +1119,10 @@ public class HederaAccount implements Serializable {
 	 * @throws Exception in the event of an error
 	 */
 	public HederaTransactionResult send(HederaAccountID toAccountID, long amount) throws Exception {
-
+		
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
-
+		
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
@@ -1147,12 +1144,12 @@ public class HederaAccount implements Serializable {
 
 		 // positive amount to the account
 		HederaAccountAmount toAccountAmount = new HederaAccountAmount(toAccountID.shardNum, toAccountID.realmNum, toAccountID.accountNum, amount);
-
+		
 		accountAmounts.add(fromAccountAmount);
 		accountAmounts.add(toAccountAmount);
 
 		Utilities.throwIfAccountIDInvalid("Node", this.node.getAccountID());
-
+		
 		// get the body for the transaction so we can sign it
 		TransactionBody transferBody = this.bodyToSignForTransfer(
 				this.hederaTransactionID
@@ -1162,12 +1159,12 @@ public class HederaAccount implements Serializable {
 				, this.txQueryDefaults.generateRecord
 				, this.txQueryDefaults.memo
 				, accountAmounts);
-
+		
 		HederaSignatureList sigsForTransaction = new HederaSignatureList();
 		//paying signature
 		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getSignature(transferBody.toByteArray()));
 		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getSignature(transferBody.toByteArray()));
-
+		
 		// transfer the crypto currency
 		transactionResult = this.transfer(
 				this.hederaTransactionID
@@ -1198,7 +1195,7 @@ public class HederaAccount implements Serializable {
 		this.accountNum = fromAccountAccountNum;
 		return send(toAccountID, amount);
 	}
-
+	
 	/** Adds a claim to an account
 	 * @param claimToAdd the {@link HederaClaim} to add to the account
 	 * @param claimKeyPair the keypair for the claim
@@ -1206,10 +1203,10 @@ public class HederaAccount implements Serializable {
 	 * @throws Exception in the event of an error
 	 */
 	public HederaTransactionResult addClaim(HederaClaim claimToAdd, HederaKeyPair claimKeyPair) throws Exception {
-
+		
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
-
+		
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
@@ -1218,7 +1215,7 @@ public class HederaAccount implements Serializable {
 
 		// set transport
 		this.node = this.txQueryDefaults.node;
-
+		
 		// create a transaction ID (starts now with accountID of the paying account id)
 		this.hederaTransactionID = new HederaTransactionID(this.txQueryDefaults.payingAccountID);
 
@@ -1233,12 +1230,12 @@ public class HederaAccount implements Serializable {
 				, this.txQueryDefaults.generateRecord
 				, this.txQueryDefaults.memo
 				, claimToAdd);
-
+		
 		HederaSignatureList sigsForTransaction = new HederaSignatureList();
 		//paying signature
 		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getSignature(claimBody.toByteArray()));
 		sigsForTransaction.addSignature(claimKeyPair.getSignature(claimBody.toByteArray()));
-
+		
 		// transfer the crypto currency
 		transactionResult = this.addClaim(
 				this.hederaTransactionID
@@ -1249,7 +1246,7 @@ public class HederaAccount implements Serializable {
 				, this.txQueryDefaults.memo
 				, sigsForTransaction
 				, claimToAdd);
-
+		
 		return transactionResult;
 	}
 
@@ -1268,13 +1265,13 @@ public class HederaAccount implements Serializable {
 		this.accountNum = accountNum;
 		return addClaim(claimToAdd, claimKeyPair);
 	}
-
-	/**
+	
+	/** 
 	 * Gets the balance of the account, returns -1 if an error occurred
-	 * in the event of an error, check the value of this.precheckResult to determine the
+	 * in the event of an error, check the value of this.precheckResult to determine the 
 	 * cause of the error
 	 * Note: You may perform a "getBalanceCostAnswer" in order to ascertain the cost of the query first
-	 * The cost could be cached and refreshed from time to time, there is no need to look it up
+	 * The cost could be cached and refreshed from time to time, there is no need to look it up 
 	 * before each getBalance query
 	 * @return {@link Long}
 	 * @throws Exception in the event of an error
@@ -1284,7 +1281,7 @@ public class HederaAccount implements Serializable {
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
 		this.node = this.txQueryDefaults.node;
-
+		
 		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults,this.node.accountBalanceQueryFee);
 
 		if (this.getBalanceAnswerOnly(transferTransaction)) {
@@ -1293,14 +1290,14 @@ public class HederaAccount implements Serializable {
 			return -1;
 		}
 	}
-	/**
+	/** 
 	 * Gets the balance of the account, returns -1 if an error occurred
-	 * in the event of an error, check the value of this.precheckResult to determine the
+	 * in the event of an error, check the value of this.precheckResult to determine the 
 	 * cause of the error
 	 * Note: You may perform a "getBalanceCostAnswer" in order to ascertain the cost of the query first
-	 * The cost could be cached and refreshed from time to time, there is no need to look it up
+	 * The cost could be cached and refreshed from time to time, there is no need to look it up 
 	 * before each getBalance query
-	 * @param shardNum, the shard number of the account
+	 * @param shardNum, the shard number of the account 
 	 * @param realmNum, the realm number of the account remove the claim from
 	 * @param accountNum, the account number of the account
 	 * @return {@link Long} 
@@ -1316,10 +1313,10 @@ public class HederaAccount implements Serializable {
 	/**
 	 * Get info for the account which is specified by the
 	 * shardNum, realmNum and accountNum properties of this class
-	 * in the event of an error, check the value of this.precheckResult to determine the
+	 * in the event of an error, check the value of this.precheckResult to determine the 
 	 * cause of the error
 	 * Note: You may perform a "getInfoCostAnswer" in order to ascertain the cost of the query first
-	 * The cost could be cached and refreshed from time to time, there is no need to look it up
+	 * The cost could be cached and refreshed from time to time, there is no need to look it up 
 	 * before each getInfo query
 	 * @return boolean
 	 * @throws Exception in the event of an error
@@ -1334,16 +1331,16 @@ public class HederaAccount implements Serializable {
 		return this.getInfoAnswerOnly(transferTransaction);
 	}
 
-	/**
-	 * Get info for the account
-	 * in the event of an error, check the value of this.precheckResult to determine the
+	/** 
+	 * Get info for the account 
+	 * in the event of an error, check the value of this.precheckResult to determine the 
 	 * cause of the error
 	 * Note: You may perform a "getInfoCostAnswer" in order to ascertain the cost of the query first
-	 * The cost could be cached and refreshed from time to time, there is no need to look it up
+	 * The cost could be cached and refreshed from time to time, there is no need to look it up 
 	 * before each getInfo query
-	 * @param shardNum, the shard number of the account
+	 * @param shardNum, the shard number of the account 
 	 * @param realmNum, the realm number of the account remove the claim from
-	 * @param accountNum, the account number of the account
+	 * @param accountNum, the account number of the account 
 	 * @return boolean
 	 * @throws Exception in the event of an error
 	 */
@@ -1395,7 +1392,7 @@ public class HederaAccount implements Serializable {
 		}
 		// initialise the result
 		HederaTransactionResult transactionResult = new HederaTransactionResult();
-
+		
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
@@ -1405,7 +1402,7 @@ public class HederaAccount implements Serializable {
 
 		// set transport
 		this.node = this.txQueryDefaults.node;
-
+		
 		// create a transaction ID (starts now with accountID of the paying account id)
 		this.hederaTransactionID = new HederaTransactionID(this.txQueryDefaults.payingAccountID);
 
@@ -1432,7 +1429,7 @@ public class HederaAccount implements Serializable {
 		if (updates.newKey != null) {
 			sigsForTransaction.addSignature(updates.newKey.getSignature(updateBody.toByteArray()));
 		}
-
+		
 		// send
 		transactionResult = this.update(
 				this.hederaTransactionID
@@ -1442,7 +1439,7 @@ public class HederaAccount implements Serializable {
 				, this.txQueryDefaults.generateRecord
 				, this.txQueryDefaults.memo
 				, sigsForTransaction);
-
+		
 		return transactionResult;
 	}
 
@@ -1451,7 +1448,7 @@ public class HederaAccount implements Serializable {
 	 * Make sure the supplied HederaAccountUpdateValues (updates) contains all the necessary updates
 	 * It is also recommended you create a new account object prior to running this call to ensure properties from an older instance are
 	 * used to update this account's properties
-	 * @param shardNum, the shard number of the account
+	 * @param shardNum, the shard number of the account 
 	 * @param realmNum, the realm number of the account remove the claim from
 	 * @param accountNum, the account number of the account
 	 * @param updates, a set of {@link HederaAccountUpdateValues} to update the account with
@@ -1464,7 +1461,7 @@ public class HederaAccount implements Serializable {
 		this.accountNum = accountNum;
 		return update(updates);
 	}
-
+	
 	/**
 	 * Get records attached to this account
 	 * Note: If no records are found, the function returns an empty array
@@ -1477,16 +1474,16 @@ public class HederaAccount implements Serializable {
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
 		this.node = this.txQueryDefaults.node;
-
+		
 		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults, this.node.accountGetRecordsQueryFee);
 		getRecordsAnswerOnly(transferTransaction);
 		return this.records;
-	}
+	}	
 	/**
 	 * Get records attached to this account
 	 * Note: If no records are found, the function returns an empty array
 	 * if however an error occurred, it will return null
-	 * @param shardNum, the shard number of the account
+	 * @param shardNum, the shard number of the account 
 	 * @param realmNum, the realm number of the account remove the claim from
 	 * @param accountNum, the account number of the account
 	 * @return {@link List} of {@link HederaTransactionRecord}
@@ -1496,11 +1493,11 @@ public class HederaAccount implements Serializable {
 		HederaAccount recordAccount = new HederaAccount(shardNum, realmNum, accountNum);
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("node", this.node);
-
+		
 		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults, this.node.accountGetRecordsQueryFee);
 		if (getRecords(transferTransaction, QueryResponseType.ANSWER_ONLY, recordAccount.getHederaAccountID())) {
 			return this.records;
 		}
 		else return null;
-	}
+	}	
 }

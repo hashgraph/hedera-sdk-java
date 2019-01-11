@@ -1,133 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-<<<<<<< HEAD
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-
-    <parent>
-        <groupId>com.hedera</groupId>
-        <artifactId>hedera-sdk-java</artifactId>
-        <version>0.1.0</version>
-    </parent>
-
-    <groupId>com.hedera</groupId>
-    <artifactId>sdk</artifactId>
-    <version>0.1.0</version>
-
-    <name>sdk</name>
-    <dependencies>
-        <!-- Java 6 = JAX-B Version 2.0   -->
-        <!-- Java 7 = JAX-B Version 2.2.3 -->
-        <!-- Java 8 = JAX-B Version 2.2.8 -->
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.java.dev.jna</groupId>
-            <artifactId>jna</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.api.grpc</groupId>
-            <artifactId>proto-google-common-protos</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-all</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.i2p.crypto</groupId>
-            <artifactId>eddsa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.madgag.spongycastle</groupId>
-            <artifactId>core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.opencrowd</groupId>
-            <artifactId>hapi-proto</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.ethereum</groupId>
-            <artifactId>ethereumj-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-classic</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- logging -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-
-        <!-- testing -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-suite-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-commons</artifactId>
-            <version>1.2.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-launcher</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-runner</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-=======
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -313,9 +185,16 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+		</dependency>
 	</dependencies>
 
->>>>>>> 0de3041... Merge pull request #36 from hashgraph/profile-deploy
     <build>
         <resources>
             <resource>
@@ -328,12 +207,7 @@
                 <directory>src/main/resources</directory>
                 <targetPath>${project.build.directory}</targetPath>
                 <includes>
-<<<<<<< HEAD
-                    <include>log4j.xml</include>
-                    <include>simpleStorage.bin</include>
-=======
 					<include>logback.xml</include>
->>>>>>> 0de3041... Merge pull request #36 from hashgraph/profile-deploy
                 </includes>
             </resource>
         </resources>
@@ -344,11 +218,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-<<<<<<< HEAD
-                    <version>3.7.0</version>
-=======
                     <version>3.8.0</version>
->>>>>>> 0de3041... Merge pull request #36 from hashgraph/profile-deploy
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -374,160 +244,6 @@
         </pluginManagement>
 
         <!-- applying the plugins to the maven build: -->
-<<<<<<< HEAD
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!--<plugin>-->
-            <!--<groupId>com.github.os72</groupId>-->
-            <!--<artifactId>protoc-jar-maven-plugin</artifactId>-->
-            <!--<version>3.6.0.1</version>-->
-            <!--<executions>-->
-            <!--<execution>-->
-            <!--<phase>generate-sources</phase>-->
-            <!--<goals>-->
-            <!--<goal>run</goal>-->
-            <!--</goals>-->
-            <!--<configuration>-->
-            <!--<protocArtifact>com.google.protobuf:protoc:3.6.1</protocArtifact>-->
-            <!--<inputDirectories>-->
-            <!--<include>${basedir}/src/main/proto</include>-->
-            <!--</inputDirectories>-->
-            <!--<outputTargets>-->
-            <!--<outputTarget>-->
-            <!--<type>java</type>-->
-            <!--</outputTarget>-->
-            <!--<outputTarget>-->
-            <!--<type>grpc-java</type>-->
-            <!--<pluginArtifact>io.grpc:protoc-gen-grpc-java:1.14.0</pluginArtifact>-->
-            <!--</outputTarget>-->
-            <!--</outputTargets>-->
-            <!--</configuration>-->
-            <!--</execution>-->
-            <!--</executions>-->
-            <!--</plugin>-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <excludePackageNames>com.hedera.sdk.api.proto.*</excludePackageNames>
-                    <excludePackageNames>com.hedera.sdk.muquit.*</excludePackageNames>
-                    <excludePackageNames>test.com.hedera.*</excludePackageNames>
-                    <excludePackageNames>net.i2p.*</excludePackageNames>
-                    <excludePackageNames>org.json.*</excludePackageNames>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.junit.platform</groupId>
-                        <artifactId>junit-platform-surefire-provider</artifactId>
-                        <version>1.1.0</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.junit.jupiter</groupId>
-                        <artifactId>junit-jupiter-engine</artifactId>
-                        <version>5.2.0</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo
-                    </altDeploymentRepository>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>default-deploy</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>deploy</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.8</version>
-                <configuration>
-                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
-
-    <profiles>
-        <!-- Shade profile which adds the possibility to generate an "uber-jar".
-        Call "mvn clean install -Pshade" to invoke this additional plugin in the maven build -->
-        <profile>
-            <id>shade</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-shade-plugin</artifactId>
-                        <version>3.2.0</version>
-                        <configuration>
-                            <artifactSet>
-                                <excludes>
-                                    <exclude>junit:junit</exclude>
-                                    <exclude>*:xml-apis</exclude>
-                                    <exclude>org.apache.maven:lib:tests</exclude>
-                                </excludes>
-                            </artifactSet>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>shade</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-    
-</project>
-=======
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -664,4 +380,3 @@
         </profile>
     </profiles>
 </project>
->>>>>>> 0de3041... Merge pull request #36 from hashgraph/profile-deploy

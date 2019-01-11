@@ -3,10 +3,7 @@ package com.hedera.sdk.common;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.hederahashgraph.api.proto.java.Signature;
 import com.hederahashgraph.api.proto.java.SignatureList;;
 /**
@@ -14,7 +11,7 @@ import com.hederahashgraph.api.proto.java.SignatureList;;
  *
  */
 public class HederaSignatureList implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaSignatureList.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaSignatureList.class);
 	private static final long serialVersionUID = 1;
 	/**
 	 * the List of {@link HederaSignature}
@@ -47,7 +44,7 @@ public class HederaSignatureList implements Serializable {
 
 		// convert a protobuf payload into class data
 		this.signatures.clear();
-
+		
 		for (Signature signature : protobuf.getSigsList()) {
 			this.signatures.add(new HederaSignature(signature));
 		}
@@ -76,7 +73,7 @@ public class HederaSignatureList implements Serializable {
 		this.signatures.add(signature);
 
 	}
-	/**
+	/** 
 	 * Delete a {@link HederaSignature} from the list
 	 * @param signature {@link HederaSignature}
 	 * @return true if found and deleted

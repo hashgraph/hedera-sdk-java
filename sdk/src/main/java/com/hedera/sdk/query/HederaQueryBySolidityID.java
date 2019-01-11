@@ -1,9 +1,7 @@
 package com.hedera.sdk.query;
 
 import java.io.Serializable;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaContractID;
 import com.hedera.sdk.common.Utilities;
@@ -17,7 +15,7 @@ import com.hederahashgraph.api.proto.java.*;
  *
  */
 public class HederaQueryBySolidityID implements Serializable {
-	final Logger logger = LoggerFactory.getLogger(HederaQueryBySolidityID.class);
+	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaQueryBySolidityID.class);
 	private static final long serialVersionUID = 1;
 	private ResponseCodeEnum precheckResult = ResponseCodeEnum.UNKNOWN;
 	private long cost = 0;
@@ -48,7 +46,7 @@ public class HederaQueryBySolidityID implements Serializable {
 	public void setNode (HederaNode node) {
 		this.node = node;
 	}
-
+	
 	/**
 	 * Default constructor
 	 */
@@ -79,7 +77,7 @@ public class HederaQueryBySolidityID implements Serializable {
 	}
 
 	/**
-	 * Runs the query to get results from a solidityIDQuery
+	 * Runs the query to get results from a solidityIDQuery 
 	 * If successful, the method populates the properties this object depending on the type of answer requested
 	 * @param payment a {@link HederaTransaction} message to indicate how this query will be paid for, this can be null for Cost queries
 	 * @param responseType the type of response requested from the query
@@ -89,7 +87,7 @@ public class HederaQueryBySolidityID implements Serializable {
 	 */
 	public boolean query(HederaTransaction payment, HederaQueryHeader.QueryResponseType responseType, String solidityID) throws InterruptedException {
 		boolean result = true;
-
+		
 
 		// build the query
 	   	// Header
@@ -98,26 +96,26 @@ public class HederaQueryBySolidityID implements Serializable {
 			queryHeader.payment = payment;
 			queryHeader.responseType = responseType;
 		}
-
+		
 		// get solidity id query
 		GetBySolidityIDQuery.Builder getBySolidityIDQuery = GetBySolidityIDQuery.newBuilder();
 		getBySolidityIDQuery.setSolidityID(solidityID);
 		getBySolidityIDQuery.setHeader(queryHeader.getProtobuf());
-
+		
 		// the query itself
 		HederaQuery query = new HederaQuery();
 		query.queryType = QueryType.GETBYSOLIDITYID;
 		query.queryData = getBySolidityIDQuery.build();
-
+		
 		// query now set, send to network
 		Utilities.throwIfNull("Node", this.node);
 		Response response = this.node.getContractBySolidityId(query);
 
 		GetBySolidityIDResponse.Builder getBySolidityIDResponse = response.getGetBySolidityID().toBuilder();
-
+		
 		// check response header first
 		ResponseHeader.Builder responseHeader = getBySolidityIDResponse.getHeaderBuilder();
-
+		
 		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
 
 		if (this.precheckResult == ResponseCodeEnum.OK) {
@@ -126,7 +124,7 @@ public class HederaQueryBySolidityID implements Serializable {
 			this.stateProof = responseHeader.getStateProof().toByteArray();
 			this.contractID = null;
 			this.accountID = null;
-
+			
 			if (getBySolidityIDResponse.hasAccountID()) {
 				this.accountID = new HederaAccountID(getBySolidityIDResponse.getAccountID());
 			}
@@ -136,7 +134,7 @@ public class HederaQueryBySolidityID implements Serializable {
 		} else {
 			result = false;
 		}
-
+		
 
 	   	return result;
 	}
@@ -186,5 +184,5 @@ public class HederaQueryBySolidityID implements Serializable {
 
 		return query(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF, solidityID);
 	}
-
+	
 }

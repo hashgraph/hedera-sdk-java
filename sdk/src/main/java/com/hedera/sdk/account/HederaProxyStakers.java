@@ -56,7 +56,7 @@ public class HederaProxyStakers implements Serializable {
 		this.shardNum = allProxyStakers.getAccountID().getShardNum();
 		this.realmNum = allProxyStakers.getAccountID().getRealmNum();
 		this.accountNum = allProxyStakers.getAccountID().getAccountNum();
-
+		
 		proxyStakers.clear();
 		for (int i=0; i < allProxyStakers.getProxyStakerCount(); i++) {
 			proxyStakers.add(new HederaProxyStaker(allProxyStakers.getProxyStaker(i)));
@@ -65,22 +65,22 @@ public class HederaProxyStakers implements Serializable {
 
 	/**
 	 * Generate a {@link AllProxyStakers} protobuf payload for this object
-	 * @return {@link AllProxyStakers}
+	 * @return {@link AllProxyStakers} 
 	 */
 	public AllProxyStakers getProtobuf() {
-
+		
 	   	AllProxyStakers.Builder allProxyStakers = AllProxyStakers.newBuilder();
 		AccountID.Builder accountID = AccountID.newBuilder();
-
+		
 		accountID.setAccountNum(this.accountNum);
 		accountID.setRealmNum(this.realmNum);
 		accountID.setShardNum(this.shardNum);
-
+		
 		allProxyStakers.setAccountID(accountID);
 		for (HederaProxyStaker proxyStaker : proxyStakers) {
 			allProxyStakers.addProxyStaker(proxyStaker.getProtobuf());
 		}
-
+	   	
 		return allProxyStakers.build();
 	}
 	/**
