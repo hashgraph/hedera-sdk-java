@@ -1,27 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-<<<<<<< HEAD
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <groupId>com.hedera</groupId>
-        <artifactId>hedera-sdk-java</artifactId>
-        <version>0.1.0</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
-
-    <artifactId>examples</artifactId>
-
-    <dependencies>
-        <dependency>
-            <groupId>com.hedera</groupId>
-            <artifactId>sdk</artifactId>
-            <version>0.1.0</version>
-        </dependency>
-    </dependencies>
-
-</project>
-=======
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -50,6 +28,12 @@
 		</developer>
 	</developers>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>10</maven.compiler.source>
+        <maven.compiler.target>10</maven.compiler.target>
+    </properties>
+
 	<repositories>
 		<repository>
 			<id>Ethereum</id>
@@ -57,132 +41,11 @@
 			<url>https://dl.bintray.com/ethereum/maven/</url>
 		</repository>
 	</repositories>
-	<build>
-		<sourceDirectory>${basedir}/src/main/java</sourceDirectory>
-		<resources>
-			<resource>
-				<directory>src</directory>
-				<excludes>
-					<exclude>**/*.java</exclude>
-				</excludes>
-			</resource>
-			<resource>
-				<directory>${basedir}/src/main/resources</directory>
-				<targetPath>${project.build.directory}</targetPath>
-				<includes>
-					<include>logback.xml</include>
-					<include>simpleStorage.bin</include>
-				</includes>
-			</resource>
-		</resources>
-
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
-				<configuration>
-					<release>10</release>
-				</configuration>
-			</plugin>
-<!-- 			<plugin>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.7</version>
-				<configuration>
-					<altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
-				</configuration>
-				<executions>
-					<execution>
-						<id>default-deploy</id>
-						<phase>deploy</phase>
-						<goals>
-							<goal>deploy</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
- -->		</plugins>
-	</build>
-<!-- 	<distributionManagement>
-		<repository>
-			<id>internal.repo</id>
-			<name>Temporary Staging Repository</name>
-			<url>file://${project.build.directory}/mvn-repo</url>
-		</repository>
-	</distributionManagement>
- -->	<dependencies>
-		<dependency>
-			<groupId>org.ethereum</groupId>
-			<artifactId>ethereumj-core</artifactId>
-			<version>1.6.3-RELEASE</version>
-			<exclusions>
- 				<exclusion>
-					<groupId>ch.qos.logback</groupId>
-					<artifactId>logback-classic</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
+	<dependencies>
+        <dependency>
 			<groupId>com.hedera.hashgraph</groupId>
 			<artifactId>java-sdk</artifactId>
 			<version>0.2.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>io.grpc</groupId>
-					<artifactId>grpc-netty</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.2.3</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-core</artifactId>
-			<version>1.2.3</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<version>2.3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-core</artifactId>
-			<version>2.3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-			<version>2.3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.activation</groupId>
-			<artifactId>activation</artifactId>
-			<version>1.1.1</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>23.6-jre</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.25</version>
-		</dependency>
+        </dependency>
 	</dependencies>
 </project>
->>>>>>> 073dd1c... Merge pull request #30 from hashgraph/vnext-noexamples
