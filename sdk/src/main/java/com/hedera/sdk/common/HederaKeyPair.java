@@ -70,6 +70,7 @@ public class HederaKeyPair implements Serializable {
 	private HederaNode node = new HederaNode();
 	private KeyPair keyPair = null;
 	private Seed seed = null;
+	private int index = -1;
 
 	/**
 	 * The type of key held in this object
@@ -123,6 +124,13 @@ public class HederaKeyPair implements Serializable {
 		return this.cost;
 	}
 	/**
+	 * Returns the index of this key
+	 * @return int the index of the key
+	 */
+	public long getIndex() {
+		return this.index;
+	}
+	/**
 	 * Returns the stateProof if requested during a query in relation to this key
 	 * @return byte array (byte[])
 	 */
@@ -150,56 +158,107 @@ public class HederaKeyPair implements Serializable {
 	/**
 	 * Constructor from a key type and recoveryWords as an array of String
 	 * Creates or Recovers a public/private keypair from the list of words
+	 * at the default index of - 1
 	 * @param keyType the type of key to recover
 	 * @param recoveryWords String[] the list of words to recover from
 	 * @throws NoSuchAlgorithmException in the event of an error
 	 */
 	public HederaKeyPair(HederaKeyPair.KeyType keyType, String[] recoveryWords) throws NoSuchAlgorithmException  {
-		this(keyType, Arrays.asList(recoveryWords));
+		this(keyType, Arrays.asList(recoveryWords), -1);
 	}
 
 	/**
+	 * Constructor from a key type and recoveryWords as an array of String
+	 * Creates or Recovers a public/private keypair from the list of words
+	 * at the given index
+	 * @param keyType the type of key to recover
+	 * @param recoveryWords String[] the list of words to recover from
+	 * @param index the index to recover the key at
+	 * @throws NoSuchAlgorithmException in the event of an error
+	 */
+	public HederaKeyPair(HederaKeyPair.KeyType keyType, String[] recoveryWords, int index) throws NoSuchAlgorithmException  {
+		this(keyType, Arrays.asList(recoveryWords), index);
+	}
+	
+	/**
 	 * Constructor from a key type and recoveryWords as an List of String
 	 * Creates or Recovers a public/private keypair from the list of words
+	 * at the default index of -1
 	 * @param keyType the type of key to recover
 	 * @param recoveryWords the words to recover from
 	 * @throws NoSuchAlgorithmException in the event of an error
 	 */
 	public HederaKeyPair(HederaKeyPair.KeyType keyType, List<String> recoveryWords) throws NoSuchAlgorithmException  {
+		this(keyType, recoveryWords, -1);
+	}
+
+	/**
+	 * Constructor from a key type and recoveryWords as an List of String
+	 * Creates or Recovers a public/private keypair from the list of words
+	 * at the specified index
+	 * @param keyType the type of key to recover
+	 * @param recoveryWords the words to recover from
+	 * @param index the index to recover the key at
+	 * @throws NoSuchAlgorithmException in the event of an error
+	 */
+	public HederaKeyPair(HederaKeyPair.KeyType keyType, List<String> recoveryWords, int index) throws NoSuchAlgorithmException  {
 		this.keyType = keyType;
 
 		byte[] privateKey;
+		this.index = index;
 		this.seed = Seed.fromWordList(recoveryWords);
-		privateKey = CryptoUtils.deriveKey(seed.toBytes(), -1, 32);
+		privateKey = CryptoUtils.deriveKey(seed.toBytes(), index, 32);
 		this.keyPair = new EDKeyPair(privateKey);
 	}
+
 	/**
-	 * Constructor from a key type and seed 
+	 * Constructor from a key type, seed and index 
 	 * @param keyType the type of key to generate
 	 * @param seed the seed to generate with
+	 * @param the index to generate the key at
 	 */
-	public HederaKeyPair(HederaKeyPair.KeyType keyType, byte[] seed) {
+	public HederaKeyPair(HederaKeyPair.KeyType keyType, byte[] seed, int index) {
 		
 		this.keyType = keyType;
 		
+		this.index = index;
+
 		if (seed == null) {
 			seed = CryptoUtils.getSecureRandomData(32);
 		}
+		
 		byte[] privateKey;
 		if (seed.length != 32) {
 			throw new IllegalStateException(String.format("Seed size of %d is invalid, should be 32", seed.length));
 		}
 		this.seed = Seed.fromEntropy(seed);
-		privateKey = CryptoUtils.deriveKey(this.seed.toBytes(), -1, 32);
+		privateKey = CryptoUtils.deriveKey(this.seed.toBytes(), index, 32);
 		this.keyPair = new EDKeyPair(privateKey);
   }
  
+	/**
+	 * Constructor from a key type, seed at the default index of -1
+	 * @param keyType the type of key to generate
+	 * @param seed the seed to generate with
+	 */
+	public HederaKeyPair(HederaKeyPair.KeyType keyType, byte[] seed) {
+		this(keyType,seed,-1);
+  }
+
 	/** 
 	 * Constructs a key pair of the given key type, the seed is randomly generated
 	 * @param keyType the type of key to create
 	 */
 	public HederaKeyPair(HederaKeyPair.KeyType keyType) {
-		this(keyType, (byte[])null);
+		this(keyType, (byte[])null, -1);
+	}
+	
+	/** 
+	 * Constructs a key pair of the given key type at the specified index, the seed is randomly generated
+	 * @param keyType the type of key to create
+	 */
+	public HederaKeyPair(HederaKeyPair.KeyType keyType, int index) {
+		this(keyType, (byte[])null, index);
 	}
 	
 	/**
@@ -480,7 +539,6 @@ public class HederaKeyPair implements Serializable {
 	 */
 	public KeyType getKeyType() {
 	
-
 		return this.keyType;
 	}
 	/**
