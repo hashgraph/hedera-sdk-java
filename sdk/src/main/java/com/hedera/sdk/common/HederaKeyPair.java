@@ -17,6 +17,7 @@ import com.google.protobuf.ByteString;
 import com.hedera.sdk.common.HederaContractID;
 import com.hedera.sdk.cryptography.CryptoUtils;
 import com.hedera.sdk.cryptography.EDKeyPair;
+import com.hedera.sdk.cryptography.KeyPair;
 import com.hedera.sdk.cryptography.Seed;
 import com.hedera.sdk.node.HederaNode;
 import com.hedera.sdk.query.HederaQuery;
@@ -67,7 +68,7 @@ public class HederaKeyPair implements Serializable {
 	private long cost = 0;
 	private byte[] stateProof = new byte[0];
 	private HederaNode node = new HederaNode();
-	private AbstractKeyPair keyPair = null;
+	private KeyPair keyPair = null;
 	private Seed seed = null;
 
 	/**
@@ -129,12 +130,14 @@ public class HederaKeyPair implements Serializable {
 		return this.stateProof;
 	}
 	/**
-	 * sets the encoded public key as a byte[]
-	 * @param encodedPublicKey the encoded public key
+	 * sets the public key as a byte[]
+	 * @param publicKey the encoded public key
 	 */
-	public void setPublicKeyEncoded(byte[] encodedPublicKey) {
-		if (this.keyPair != null) {
-			this.keyPair.setPublicKeyEncoded(encodedPublicKey);
+	public void setPublicKeyEncoded(byte[] publicKey) {
+		if (this.keyType == KeyType.ED25519) {
+			this.keyPair = new EDKeyPair(publicKey, null);
+		} else {
+            throw new IllegalArgumentException("Key Type not recognized. You may be using an old sdk.");			
 		}
 	}
 
@@ -256,7 +259,6 @@ public class HederaKeyPair implements Serializable {
 	 * @param keyType {@link HederaKeyPair.KeyType}
 	 * @param publicKey {@link String} as a hex encoded string
 	 * @param secretKey {@link String} as a hex encoded string
-	 * @param description the description of the key
 	 * @throws DecoderException if the keys can't be decoded
 	 * @throws IllegalStateException if the key type is invalid 
 	 * @throws InvalidKeySpecException in the event of a key specification error 
@@ -482,23 +484,41 @@ public class HederaKeyPair implements Serializable {
 		return this.keyType;
 	}
 	/**
-	 * gets the public key as a byte[]
+	 * gets the non-encoded public key as a byte[]
 	 * @return byte[], null if not set
 	 */
 	public byte[] getPublicKey() {
 		if (this.keyPair != null) {
-			return this.keyPair.publicKey;
+			return this.keyPair.getPublicKey();
 		} else {
 			return null;
 		}
 	}
+
+	/**
+	 * gets the non-encoded public key as a string HEX
+	 * @return String[], null if not set
+	 */
 	public String getPublicKeyHex() {
 		if (this.keyPair != null) {
-			return Hex.toHexString(this.keyPair.getPublicKey().getEncoded());
+			return this.keyPair.getPublicKeyHex();
 		} else {
 			return "";
 		}
 	}
+
+	/**
+	 * gets the encoded public key as a string HEX
+	 * @return String[], null if not set
+	 */
+	public String getPublicKeyEncodedHex() {
+		if (this.keyPair != null) {
+			return this.keyPair.getPublicKeyEncodedHex();
+		} else {
+			return "";
+		}
+	}
+
 	/**
 	 * gets the encoded public key as a byte[]
 	 * @return byte[], null if not set
@@ -513,31 +533,59 @@ public class HederaKeyPair implements Serializable {
 
 	/**
 	 * sets the secret key as a byte[]
-	 * @param secretKey the secret key
+	 * @param secretKey the secret key (either encoded or not)
 	 */
 	public void setSecretKey(byte[] secretKey) {
-		keyPair.setSecretKey(secretKey);
+		if (this.keyType == KeyType.ED25519) {
+			this.keyPair = EDKeyPair.buildFromPrivateKey(secretKey);
+		} else {
+            throw new IllegalArgumentException("Key Type not recognized. You may be using an old sdk.");			
+		}
 	}
 
 	/**
-	 * gets the secret key as a byte[]
+	 * gets the non-encoded secret key as a byte[]
 	 * @return  byte[] or null if not set
 	 */
 	public byte[] getSecretKey() {
 		if (this.keyPair != null) {
-			return keyPair.privateKey;
+			return keyPair.getPrivateKey();
 		} else {
 			return null;
 		}
 	}
 
 	/**
-	 * gets the secret key as a String
-	 * @return empty string if not set
+	 * gets the encoded secret key as a byte[]
+	 * @return  byte[] or null if not set
+	 */
+	public byte[] getSecretKeyEncoded() {
+		if (this.keyPair != null) {
+			return keyPair.getPrivateKeyEncoded();
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * gets the non-encoded secret key as a String HEX
+	 * @return String empty string if not set
 	 */
 	public String getSecretKeyHex() {
 		if (this.keyPair != null) {
-			return Hex.toHexString(this.keyPair.getPrivateKey().getEncoded());
+			return this.keyPair.getPrivateKeyHex();
+		} else {
+			return "";
+		}
+	}
+
+	/**
+	 * gets the encoded secret key as a String HEX
+	 * @return String empty string if not set
+	 */
+	public String getSecretKeyEncodedHex() {
+		if (this.keyPair != null) {
+			return this.keyPair.getPrivateKeyEncodedHex();
 		} else {
 			return "";
 		}
