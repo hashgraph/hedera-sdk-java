@@ -38,13 +38,13 @@ public class EDKeyPair implements KeyPair {
 	public EDKeyPair(final byte[] publicKey, final byte[] privateKey) {
 		try {
 			// try encoded key first
-			final X509EncodedKeySpec encodedPubKey = new X509EncodedKeySpec(publicKey);
+			X509EncodedKeySpec encodedPubKey = new X509EncodedKeySpec(publicKey);
 			this.edPublicKey = new EdDSAPublicKey(encodedPubKey);
 		} catch (InvalidKeySpecException e) {
 			// key is invalid (likely not encoded)
 			// try non encoded
-			final EdDSAPublicKeySpec pubKey = new EdDSAPublicKeySpec(publicKey, EdDSANamedCurveTable.ED_25519_CURVE_SPEC);
-			this.edPublicKey = new EdDSAPublicKey(pubKey);
+			final EdDSAPublicKeySpec pubKeySpec = new EdDSAPublicKeySpec(publicKey, EdDSANamedCurveTable.ED_25519_CURVE_SPEC);
+			this.edPublicKey = new EdDSAPublicKey(pubKeySpec);
 		}
 
 		if (privateKey != null) {
@@ -55,8 +55,8 @@ public class EDKeyPair implements KeyPair {
 					this.edPrivateKey = new EdDSAPrivateKey(encodedPrivKey);
 				} catch (InvalidKeySpecException e) {
 					// key is invalid (likely not encoded)
-					final EdDSAPrivateKeySpec  privKey = new EdDSAPrivateKeySpec(privateKey,EdDSANamedCurveTable.ED_25519_CURVE_SPEC);
-					this.edPrivateKey = new EdDSAPrivateKey(privKey);
+					final EdDSAPrivateKeySpec  privKeySpec = new EdDSAPrivateKeySpec(privateKey,EdDSANamedCurveTable.ED_25519_CURVE_SPEC);
+					this.edPrivateKey = new EdDSAPrivateKey(privKeySpec);
 				}
 			}
 		}
@@ -86,45 +86,12 @@ public class EDKeyPair implements KeyPair {
 	@Override
 	public byte[] getPrivateKey() {
 		if (this.edPrivateKey != null) {
-			return this.edPrivateKey.getSeed();
+			return this.edPrivateKey.geta();
 		} else {
 			return null;
 		}
 	}
 	
-	public byte[] getPublicKeyEncoded() {
-		if (this.edPublicKey != null) {
-			return this.edPublicKey.getEncoded();
-		} else {
-			return null;
-		}
-	}
-
-	@Override
-	public byte[] getPublicKey() {
-		if (this.edPublicKey != null) {
-			return this.edPublicKey.getAbyte();
-		} else {
-			return null;
-		}
-	}
-
-	@Override
-	public byte[] getPrivateAndPublicKey() {
-		
-		if ((this.edPrivateKey != null)&& (this.edPublicKey != null)) {
-			byte[] seed = this.edPrivateKey.getSeed();
-	        byte[] publicKey = getPublicKey();
-	
-	        byte[] key = new byte[seed.length + publicKey.length];
-	        System.arraycopy(seed, 0, key, 0, seed.length);
-	        System.arraycopy(publicKey, 0, key, seed.length, publicKey.length);
-	        return key;
-		} else {
-			return null;
-		}
-	}
-
 	@Override
 	public byte[] getPrivateKeyEncoded() {
 		if (this.edPrivateKey != null) {
@@ -137,7 +104,7 @@ public class EDKeyPair implements KeyPair {
 	@Override
 	public String getPrivateKeyEncodedHex() {
 		if (this.edPrivateKey != null) {
-			return Hex.toHexString(edPrivateKey.getEncoded());
+			return Hex.toHexString(this.getPrivateKeyEncoded());
 		} else {
 			return "";
 		}
@@ -146,16 +113,30 @@ public class EDKeyPair implements KeyPair {
 	@Override
 	public String getPrivateKeyHex() {
 		if (this.edPrivateKey != null) {
-			return Hex.toHexString(edPrivateKey.getSeed());
+			return Hex.toHexString(this.getPrivateKey());
 		} else {
 			return "";
 		}
 	}
-
+	@Override
+	public byte[] getPublicKey() {
+		if (this.edPublicKey != null) {
+			return this.edPublicKey.getAbyte();
+		} else {
+			return null;
+		}
+	}
+	public byte[] getPublicKeyEncoded() {
+		if (this.edPublicKey != null) {
+			return this.edPublicKey.getEncoded();
+		} else {
+			return null;
+		}
+	}
 	@Override
 	public String getPublicKeyEncodedHex() {
 		if (this.edPublicKey != null) {
-			return Hex.toHexString(edPublicKey.getEncoded());
+			return Hex.toHexString(this.getPublicKeyEncoded());
 		} else {
 			return "";
 		}
@@ -164,9 +145,32 @@ public class EDKeyPair implements KeyPair {
 	@Override
 	public String getPublicKeyHex() {
 		if (this.edPublicKey != null) {
-			return Hex.toHexString(edPublicKey.getAbyte());
+			return Hex.toHexString(this.getPublicKey());
 		} else {
 			return "";
+		}
+	}
+    @Override
+    public byte[] getPrivateKeySeed() {
+        return edPrivateKey.getSeed();
+    }
+    @Override
+    public String getPrivateKeySeedHex() {
+        return Hex.toHexString(edPrivateKey.getSeed());
+    }
+	@Override
+	public byte[] getSeedAndPublicKey() {
+		
+		if ((this.edPrivateKey != null)&& (this.edPublicKey != null)) {
+			byte[] seed = this.edPrivateKey.getSeed();
+	        byte[] publicKey = getPublicKey();
+	
+	        byte[] key = new byte[seed.length + publicKey.length];
+	        System.arraycopy(seed, 0, key, 0, seed.length);
+	        System.arraycopy(publicKey, 0, key, seed.length, publicKey.length);
+	        return key;
+		} else {
+			return null;
 		}
 	}
 	

@@ -215,7 +215,7 @@ public class HederaKeyPair implements Serializable {
 	 * Constructor from a key type, seed and index 
 	 * @param keyType the type of key to generate
 	 * @param seed the seed to generate with
-	 * @param the index to generate the key at
+	 * @param index the index to generate the key at
 	 */
 	public HederaKeyPair(HederaKeyPair.KeyType keyType, byte[] seed, int index) {
 		
@@ -256,6 +256,7 @@ public class HederaKeyPair implements Serializable {
 	/** 
 	 * Constructs a key pair of the given key type at the specified index, the seed is randomly generated
 	 * @param keyType the type of key to create
+	 * @param index the index to generate the key for
 	 */
 	public HederaKeyPair(HederaKeyPair.KeyType keyType, int index) {
 		this(keyType, (byte[])null, index);
@@ -341,12 +342,6 @@ public class HederaKeyPair implements Serializable {
 				}
 
 				this.keyPair = new EDKeyPair(pub, secret);
-				
-				//byte [] pubKeybytes = HexUtils.hexToBytes(ed25519PublicKeyHex);    
-//				X509EncodedKeySpec pencoded = new X509EncodedKeySpec(pubKeybytes);
-//		        EdDSAPublicKey pubKey = new EdDSAPublicKey(pencoded);
-//				byte[] abyte = pubKey.getAbyte();
-				//
 				
 				break;
 			default:
@@ -649,6 +644,39 @@ public class HederaKeyPair implements Serializable {
 		}
 	}
 
+	/**
+	 * gets the seed for the private key
+	 * @return byte[] null if not set
+	 */
+    public byte[] getSecretKeySeed() {
+		if (this.keyPair != null) {
+			return this.keyPair.getPrivateKeySeed();
+		} else {
+			return null;
+		}
+    }
+	/**
+	 * gets the seed for the private key as a Hex string
+	 * @return String empty string if not set
+	 */
+    public String getSecretKeySeedHex() {
+		if (this.keyPair != null) {
+			return this.keyPair.getPrivateKeySeedHex();
+		} else {
+			return "";
+		}
+    }
+	/**
+	 * gets the seed for the private key concatenated with the public key as a byte array
+	 * @return byte[] containing the private key seed and public key
+	 */
+	public byte[] getSeedAndPublicKey() {
+		if (this.keyPair != null) {
+			return this.keyPair.getSeedAndPublicKey();
+		} else {
+			return null;
+		}
+	}	
 	/**
 	 * Gets the contractID stored in this key
 	 * return will be null if not set
