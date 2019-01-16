@@ -319,6 +319,7 @@ public class HederaKeyPair implements Serializable {
 	 * @param keyType {@link HederaKeyPair.KeyType}
 	 * @param publicKey {@link String} as a hex encoded string
 	 * @param secretKey {@link String} as a hex encoded string
+	 * @param description {@link String} the description for the key
 	 * @throws DecoderException if the keys can't be decoded
 	 * @throws IllegalStateException if the key type is invalid 
 	 * @throws InvalidKeySpecException in the event of a key specification error 

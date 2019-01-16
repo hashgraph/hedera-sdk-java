@@ -266,7 +266,7 @@
                     <target>${maven.compiler.target}</target>
                 </configuration>
 			</plugin>
-
+			<!--  JAVADOC JAR -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
@@ -287,6 +287,22 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<!--  JAVADOC API DOCS -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+					<excludePackageNames>com.hedera.sdk.api.proto.*</excludePackageNames>
+					<excludePackageNames>com.hedera.sdk.muquit.*</excludePackageNames>
+					<excludePackageNames>test.com.hedera.*</excludePackageNames>
+					<excludePackageNames>net.i2p.*</excludePackageNames>
+					<excludePackageNames>org.json.*</excludePackageNames>
+					<additionalOptions>-html5</additionalOptions>
+       				<reportOutputDirectory>${project.reporting.outputDirectory}/myoutput</reportOutputDirectory>
+          			<destDir>javadoc</destDir>
+	        	</configuration>				
 			</plugin>
 
 			<plugin>
