@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.hedera.hashgraph</groupId>
-    <artifactId>java-sdk-full</artifactId>
+    <artifactId>hedera-java-sdk-full</artifactId>
     <version>0.2.1</version>
     <packaging>pom</packaging>
 

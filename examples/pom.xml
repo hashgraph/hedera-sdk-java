@@ -44,7 +44,7 @@
 	<dependencies>
         <dependency>
 			<groupId>com.hedera.hashgraph</groupId>
-			<artifactId>java-sdk</artifactId>
+			<artifactId>hedera-java-sdk</artifactId>
 			<version>0.2.1</version>
         </dependency>
 
