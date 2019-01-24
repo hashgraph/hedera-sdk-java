@@ -1,10 +1,12 @@
 package com.hedera.examples.simple;
-
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import com.hedera.examples.fileWrappers.FileCreate;
-import com.hedera.examples.utilities.ExampleUtilities;
 import com.hedera.examples.contractWrappers.ContractCall;
 import com.hedera.examples.contractWrappers.ContractCreate;
 import com.hedera.examples.contractWrappers.ContractGetBytecode;
@@ -12,6 +14,8 @@ import com.hedera.examples.contractWrappers.ContractGetInfo;
 import com.hedera.examples.contractWrappers.ContractRunLocal;
 import com.hedera.examples.contractWrappers.ContractUpdate;
 import com.hedera.examples.contractWrappers.SoliditySupport;
+import com.hedera.examples.fileWrappers.FileCreate;
+import com.hedera.examples.utilities.ExampleUtilities;
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.common.HederaDuration;
 import com.hedera.sdk.common.HederaTimeStamp;
@@ -20,10 +24,13 @@ import com.hedera.sdk.contract.HederaContract;
 import com.hedera.sdk.contract.HederaContractFunctionResult;
 import com.hedera.sdk.file.HederaFile;
 
-public final class DemoContract {
+public final class DemoContractSimpleStorage {
 
 	public static void main(String... arguments) throws Exception {
+		byte[] fileContents = ExampleUtilities.readFile("/scExamples/simpleStorage.bin");
 
+		ExampleUtilities.checkBinFile(fileContents);
+		
 		// setup a set of defaults for query and transactions
 		HederaTransactionAndQueryDefaults txQueryDefaults = new HederaTransactionAndQueryDefaults();
 		txQueryDefaults = ExampleUtilities.getTxQueryDefaults();
@@ -41,18 +48,6 @@ public final class DemoContract {
 		// setup transaction/query defaults (durations, etc...)
 		file.txQueryDefaults = txQueryDefaults;
 
-		// get file contents
-		InputStream is = DemoContract.class.getResourceAsStream("/main/resources/simpleStorage.bin");
-	    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-	    int nRead;
-	    byte[] data = new byte[4096];
-	    while ((nRead = is.read(data, 0, data.length)) != -1) {
-	        buffer.write(data, 0, nRead);
-	    }
-		 
-	    buffer.flush();
-	    byte[] fileContents = buffer.toByteArray();
-	    
 		// create a file with contents
 		file = FileCreate.create(file, fileContents);
 
