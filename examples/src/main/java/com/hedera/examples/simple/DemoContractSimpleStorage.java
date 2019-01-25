@@ -1,12 +1,4 @@
 package com.hedera.examples.simple;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import com.hedera.examples.contractWrappers.ContractCall;
 import com.hedera.examples.contractWrappers.ContractCreate;
 import com.hedera.examples.contractWrappers.ContractGetBytecode;
@@ -16,7 +8,6 @@ import com.hedera.examples.contractWrappers.ContractUpdate;
 import com.hedera.examples.contractWrappers.SoliditySupport;
 import com.hedera.examples.fileWrappers.FileCreate;
 import com.hedera.examples.utilities.ExampleUtilities;
-import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.common.HederaDuration;
 import com.hedera.sdk.common.HederaTimeStamp;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
@@ -35,12 +26,7 @@ public final class DemoContractSimpleStorage {
 		HederaTransactionAndQueryDefaults txQueryDefaults = new HederaTransactionAndQueryDefaults();
 		txQueryDefaults = ExampleUtilities.getTxQueryDefaults();
 
-		// my account
-		HederaAccount myAccount = new HederaAccount();
-		// setup transaction/query defaults (durations, etc...)
-		myAccount.txQueryDefaults = txQueryDefaults;
-		myAccount.accountNum = myAccount.txQueryDefaults.payingAccountID.accountNum;
-		txQueryDefaults.fileWacl = myAccount.txQueryDefaults.payingKeyPair;
+		txQueryDefaults.fileWacl = txQueryDefaults.payingKeyPair;
 
 		// create a file
 		// new file object
