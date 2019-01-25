@@ -1,0 +1,7 @@
+pragma solidity >=0.4.22 <0.6.0;
+
+contract HelloWorld {
+ function getInt () public pure returns (uint) {
+   return 32;
+ }
+}
