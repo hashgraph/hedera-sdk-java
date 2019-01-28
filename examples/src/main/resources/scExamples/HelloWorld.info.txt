@@ -1,5 +1,6 @@
 Compiled with Remix
 Compiler: 0.5.3+commit.10d17f24.Emscripten.clang
+Note: Optimization enabled
 ABI:
 [
 	{
