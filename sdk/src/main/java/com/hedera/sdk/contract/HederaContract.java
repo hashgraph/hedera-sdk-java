@@ -798,8 +798,7 @@ public class HederaContract implements Serializable {
 		Utilities.throwIfNull("Node", this.node);
 		Response response = this.node.contractCallLocal(query);
 		if (response == null) {
-			Utilities.printResponseFailure("HederaContrat.callLocal");
-			return false;
+			throw new Exception("HederaContrat.callLocal - failed to get response");
 		}
 		ContractCallLocalResponse.Builder getCallLocalResponse = response.getContractCallLocal().toBuilder();
 		
