@@ -16,85 +16,109 @@ Features supported include:
 - Creating [Solidity](https://solidity.readthedocs.io/en/latest/index.html) Smart Contracts
 - Executing Smart Contracts
 
-## Changes in this version
+## Changes in this version from 0.1.0
 
-### Project structure
+### 0.2.1 - Change to artifact IDs
+
+The maven dependency for the sdk is now
+
+```maven
+<dependency>
+  <groupId>com.hedera.hashgraph</groupId>
+  <artifactId>hedera-java-sdk</artifactId>
+  <version>0.2.1</version>
+</dependency>
+```
+
+### 0.2.1 - CallLocal exception
+
+Calling a smart contract function locally now raises an exception if the result from Hedera doesn't include a response result. This usually indicates that either the smart contract didn't initialise properly (lack of gas), or the function call itself wasn't supplied enough gas to execute.
+
+### 0.2.1 - Javadoc
+
+Javadocs are generated during `mvn install` and are located in `sdk/javadoc` as html files rather than a .jar in `sdk/target/` previously
+
+### 0.2.1 - Additional smart contract examples
+
+- Extra smart contract examples (HelloWorld, Simple Storage and Token)
+- Documentation with smart contract examples (.sol source, compilation information, ABI in examples/src/main/resources)
+
+### 0.2.1 - ExampleUtilities.readFile
+
+This loads a file from the file system. It incorporates a number of fixes from the previous version which could in some instances miss the last byte of a file content.
+
+### 0.2.1 - ExampleUtilities.checkBinFile
+
+This method checks the contents of a supplied byte array for non Hex characters. It will raise an error if the byte array contains characters other than 0-9, a-f and A-F. This is a useful check to perform prior to loading a compiled solidity file to ensure it doesn't contain unaccepted characters such as Line Feeds, Carriage Returns and others which are sometimes introduced by text editors upon saving.
+
+This loads a file from the file system. It incorporates a number of fixes from the previous version which could in some instances miss the last byte of a file content.
+
+### 0.2.1 - public and private keys
+
+You may now use either encrypted public and private keys or their non-encrypted version.
+
+### 0.2.1 - Overloaded methods for generating and recovering keypairs
+
+The `HederaKeyPair` class has additional overloaded methods for generating keys at a given index and recovering keys from words at a given index. Default behaviour in unchanged (index=-1), these overloaded methods enable you to generate/recover keys that are compatible with the mobile Hedera wallet.
+
+### 0.2.0 - Project structure
 
 The SDK and examples are now two separate projects under the java-sdk project itself. This enables the SDK to be published to a maven repository without the examples included.
 The examples also refer to the SDK as a maven dependency.
 
-### SDK available as a maven dependency
+### 0.2.0 - SDK available as a maven dependency
 
 You may now add the SDK to your project as a maven dependency as follows:
 
-```
+```maven
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
-  <artifactId>java-sdk</artifactId>
+  <artifactId>hedera-java-sdk</artifactId>
   <version>0.2.1</version>
 </dependency>
 ```
 
 This is the link to the maven repository : [hedera java sdk on maven](https://search.maven.org/artifact/com.hedera.hashgraph/java-sdk/0.2.0/jar)
 
-### Examples have been simplified
+### 0.2.0 - Examples have been simplified
 
 Examples no longer create unnecessary accounts or transfer unnecessary large amounts of tinybar to newly created accounts. Likewise, the gas specified for running the smart contract examples are the bare minimum required.
 
-- Extra smart contract examples (HelloWorld, Simple Storage and Token)
-- Documentation with smart contract examples (.sol source, compilation information, ABI)
-
-### ExampleUtilities.readFile
-
-This loads a file from the file system. It incorporates a number of fixes from the previous version which could in some instances miss the last byte of a file content.
-
-### ExampleUtilities.checkBinFile
-
-This method checks the contents of a supplied byte array for non Hex characters. It will raise an error if the byte array contains characters other than 0-9, a-f and A-F. This is a useful check to perform prior to loading a compiled solidity file to ensure it doesn't contain unaccepted characters such as Line Feeds, Carriage Returns and others which are sometimes introduced by text editors upon saving.
-
-This loads a file from the file system. It incorporates a number of fixes from the previous version which could in some instances miss the last byte of a file content.
-
-### Logging framework
+### 0.2.0 - Logging framework
 
 SLF4J has been switched for Logback to help compatibility with Swing projects amongst others
 
-### HederaCryptoKeyPair and HederaKey Classes
+### 0.2.0 - HederaCryptoKeyPair and HederaKey Classes
 
 These classes have been deprecated, the `HederaKeyPair` class should be used instead.
 
-```
+```java
 HederaKeyPair ed25519Key = new HederaKeyPair(KeyType.ED25519);
-``` 
+```
+
 will create a new private/public key pair
 
-```
+```java
 HederaKeyPair payingKeyPair = new HederaKeyPair(KeyType.ED25519, pubKey, privKey);
 ```
+
 will create a key pair object from an existing keypair.
 
-*Note: if you only have a public key and no private key, set the privKey parameter to null or "")*
+__Note__: *if you only have a public key and no private key, set the privKey parameter to null or "")*
 
-### public and private keys
-
-You may now use either encrypted public and private keys or their non-encrypted version.
-
-### Overloaded methods for generating and recovering keypairs
-
-The `HederaKeyPair` class has additional overloaded methods for generating keys at a given index and recovering keys from words at a given index. Default behaviour in unchanged (index=-1), these overloaded methods enable you to generate/recover keys that are compatible with the mobile Hedera wallet.
-
-### SigsForTransaction parameter
+### 0.2.0 - SigsForTransaction parameter
 
 The `sigsForTransaction` parameter on methods of the `HederaAccount`, `HederaContract` and `HederaFile` classes has changed from `HederaKeySignatureList` to `HederaSignatureList`.
 
-### Transaction fees
+### 0.2.0 - Transaction fees
 
 Transaction fees are 100,000 *TinyBars*. Testnets now implement charging for transactions and queries, so your testnet account balance will reduce with each request.
 
-### Improved error responses from Hedera
+### 0.2.0 - Improved error responses from Hedera
 
 Hedera now reports a greater number of error codes in response to queries and transactions. As a result, `HederaPrecheckResult` and `HederaTransactionStatus` classes have been removed and replaced by `com.hederahasgraph.api.proto.java.ResponseCodeEnum`.
 
-### Trace logging removed
+### 0.2.0 - Trace logging removed
 
 All calls to `logger.trace` have been removed from the SDK.
 
@@ -110,13 +134,13 @@ All calls to `logger.trace` have been removed from the SDK.
    Java: `java -version`
 
    Maven: `mvn --version`
-   
+
 ### Installing
 
 Maven Installation
-   * follow the instructions here: https://maven.apache.org/install.html to install maven version 3.6.0
 
-   * once complete, confirm that `mvn -v` in a terminal/command line returns version 3.6.0.
+- follow the instructions here: https://maven.apache.org/install.html to install maven version 3.6.0
+- once complete, confirm that `mvn -v` in a terminal/command line returns version 3.6.0.
 
 From [Eclipse](https://www.eclipse.org/downloads/) or [IntelliJ](https://www.jetbrains.com/idea/):
 
@@ -125,6 +149,7 @@ From [Eclipse](https://www.eclipse.org/downloads/) or [IntelliJ](https://www.jet
 - `Run As` -> `Maven Install`
 
 From CLI:
+
 ```shell
 $> mvn install
 ```
@@ -134,13 +159,15 @@ Note that the `.proto` files are compiled with Maven, so the project may initial
 If there are still some project issues, try a Maven project update and project clean followed by a Maven install.
 
 ### Errors and solutions
+
 ```
 Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.8.0:compile (default-compile) on project java-sdk: Fatal error compiling: invalid target release: 10 -> [Help 1]
 ```
-* Check the version of the JRE in use by the project and change it to 10.
 
+- Check the version of the JRE in use by the project and change it to 10.
 
 ## Running the examples
+
 A `node.properties.sample` is provided, copy the file to `node.properties` and update with your account details, the details of the node you want to communicate to, and your private/public keys (as hex strings).
 
    This file is ignored by git so all changes will remain local.
@@ -163,6 +190,7 @@ Code snippets used in this document are excerpt from the full examples included 
 ## Prerequisites for using the SDK
 
 ### Access to the Hedera mainnet or a Hedera testnet
+
 In order to be able to use the Hedera SDK for Java you must have access to a testnet or to the Hedera mainnet. Access to mainnet and testnets are currently restricted.
 
 Temporary testnets (or "Flashnets") may become available for specific events and engagements such as hackathons.
@@ -173,17 +201,17 @@ To get access to any Hedera network you must first create a Hedera Profile in th
 
 After you join a network through the Hedera Portal, you will be provided information required connect to that network, specifically:
 
-* __IP address__ and/or __DNS name__ – providing IP connectivity to that node
-* __Port number__ – The specific port on the node to which queries and transactions must be sent
-* __Account ID__ – the Hedera account number associated with the node. This is required in order to issue transactions and queries. It determines the account to which node-fees will be paid. Hedera account IDs are made up of three int64 numbers separated by colons (e.g. 0:0:3) The three numbers represent __Shard-number__, __Realm-number__ and __Account-number__ respectively. Shards and Realms are not yet in use, so you should expect Account IDs to start with two zeros for the present time.
+- __IP address__ and/or __DNS name__ – providing IP connectivity to that node
+- __Port number__ – The specific port on the node to which queries and transactions must be sent
+- __Account ID__ – the Hedera account number associated with the node. This is required in order to issue transactions and queries. It determines the account to which node-fees will be paid. Hedera account IDs are made up of three int64 numbers separated by colons (e.g. 0:0:3) The three numbers represent __Shard-number__, __Realm-number__ and __Account-number__ respectively. Shards and Realms are not yet in use, so you should expect Account IDs to start with two zeros for the present time.
 
-__NOTE__: This information should be added to your `node.properties` file (see above) if you wish to run the example code provided.
+__NOTE__: *This information should be added to your `node.properties` file (see above) if you wish to run the example code provided.*
 
 #### Public/Private Key Pairs
 
 Hedera accounts must be associated with cryptographic keys. ED25519 key pairs can be generated using the [Hedera Keygen utility](https://github.com/hashgraph/hedera-keygen-java). A complete explanation of the key generation process is documented in the [readme](https://github.com/hashgraph/hedera-keygen-java/blob/master/README.md) file in that repo. A minimal version of that process will be shown below.
 
-__NOTE__: This information should be added to your `node.properties` file (see above) if you wish to run the example code provided.
+__NOTE__: *This information should be added to your `node.properties` file (see above) if you wish to run the example code provided.*
 
 ### Using the Hedera SDK for Java
 
@@ -199,12 +227,14 @@ The following steps describe some first steps using the SDK:
 Download the [sdk-keygen-jar](https://github.com/hashgraph/hedera-keygen-java/blob/master/target/sdk-keygen-1.0.jar) to a folder in your development environment.
 
 Open that folder using terminal and execute the following command to generate a public/private key pair based on a system-generated random seed:
+
 ```Shell
 java -jar sdk-keygen-1.0.jar
 ```
 
 ##### Example Output
-```
+
+```text
 Your key pair is:
 Public key:
 302a300506032b6570032100a1a16c812bdc3b260d3f7b42c33b8f80337fbfd3ac0df703015b096b55e99d9f
@@ -213,26 +243,29 @@ Secret key:
 Recovery word list:
 [ink, enable, opaque, clap, make, toe, brine, tundra, cater, Joe, small, run, Seoul, grand, atom, crush, circus, abbey, vacuum, whim, hollow, afar]
 ```
+
 Copy this information into a safe place as you will need these keys below.
 
 Should you wish to specify your own seed, please refer to the Hedera KeyGen [readme](https://github.com/hashgraph/hedera-keygen-java/blob/master/README.md) file.
 
 #### Create a new Java project
+
 Open your IDE of choice (Eclipse, IntelliJ, VSCode...)
 
 Refer to the java sdk in your maven pom file as follows:
 
-```
+```maven
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
-  <artifactId>java-sdk</artifactId>
-  <version>0.2.0</version>
+  <artifactId>hedera-java-sdk</artifactId>
+  <version>0.2.1</version>
 </dependency>
 ```
 
 Once you have added that dependency to your project and completed a maven install, you should be able to import classes from the SDK for use within your application.
 
 #### Create a Hedera account
+
 In the interest of clarity, these examples assume a sunny-day scenario and do not include exception-handling logic. Refer to the examples for more resilient code.
 
 This is the definition of the simple version of the `create` method in the `HederaAccount` class:
@@ -267,7 +300,7 @@ __Note__:  100,000,000 *TinyBars* is equivalent to 1 *hbar*.
 
 Utility functions have been provided within the examples. The first of these that we should use configures default settings for all transactions and queries.
 
-__Note__: For these example steps to function as expected, you must have updated the `node.properties` file as described above. The `pubkey` + `privkey` and `payingAccount...` parameters are used to determine the account from which *hbars* are transferred.
+__Note__: *For these example steps to function as expected, you must have updated the `node.properties` file as described above. The `pubkey` + `privkey` and `payingAccount...` parameters are used to determine the account from which *hbars* are transferred.*
 
 In order to create a Hedera account, an initial balance must be transferred into the new account from an existing account. The `exampleUtilities.java` package retrieves details of the "source" or paying account from the `node.properties` file.
 
@@ -329,9 +362,14 @@ long balance1 = myAccount.getBalance();
 long balance2 = newAccount.getBalance();
 ```
 
-__Note__: In the event you're not waiting for consensus on the transfer transaction, it's possible that the balances will initially show no change. Adding a small delay between the transfer and the balance queries will ensure the correct values are returned. Ideally, you would ask for a receipt and check transaction status following the transfer transaction before querying the updated balances. This is shown in the examples contained within the SDK.
+__Note__: *In the event you're not waiting for consensus on the transfer transaction, it's possible that the balances will initially show no change. Adding a small delay between the transfer and the balance queries will ensure the correct values are returned. Ideally, you would ask for a receipt and check transaction status following the transfer transaction before querying the updated balances. This is shown in the examples contained within the SDK.*
 
 ## Smart contracts
+
+### Good to know
+
+- `msg.sender` in Solidity refers to the Hedera Account which issues the transaction.
+- `address` an address value in a solidity function will accept a `HederaContract.getSolidityContractAccountID` or `HederaAccount.getSolidityContractAccountID`. These are populated following a getInfo on either a `HederaContract` or `HederaAccount` object.
 
 ### Auto-renew duration
 
@@ -359,7 +397,7 @@ It is impossible for Hedera to predict how much gas will be necessary for any op
 
 - My function call doesn't return the expected result. This may be due to insufficient gas being supplied. In the case of a local query, the node doesn't respond with an `INSUFFICIENT_GAS` error, this is a bug which is under investigation.
 
-*Note: Hedera sometimes reports a smart contract creation being successful (it looks that way), when it has in fact failed. A smart contract reference is returned in the receipt, but the smart contract itself has failed to start. This is often due to a lack of gas (although the transaction didn't report `INSUFFICIENT_GAS`) and will manifest itself when you attempt to call functions on the smart contract. If this happens, try to increase the gas until a readonly function works, this will confirm the smart contract created itself fully.*
+__Note__: *Hedera sometimes reports a smart contract creation being successful (it looks that way), when it has in fact failed. A smart contract reference is returned in the receipt, but the smart contract itself has failed to start. This is often due to a lack of gas (although the transaction didn't report `INSUFFICIENT_GAS`) and will manifest itself when you attempt to call functions on the smart contract. If this happens, try to increase the gas until a readonly function works, this will confirm the smart contract created itself fully.*
 
 #### Compiler version
 
@@ -377,8 +415,8 @@ If you want to contribute please review the [Contributing Guide](https://github.
 
 #### Need help?
 
-* Ask questions in [Discord](https://hashgraph.com/discord)
-* Open a ticket in GitHub [issue tracker](https://github.com/hashgraph/hedera-sdk-java/issues)
+- Ask questions in [Discord](https://hashgraph.com/discord)
+- Open a ticket in GitHub [issue tracker](https://github.com/hashgraph/hedera-sdk-java/issues)
 
 #### License
 
