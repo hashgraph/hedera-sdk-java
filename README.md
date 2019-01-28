@@ -5,7 +5,7 @@
 
 The Java SDK for interacting with [Hedera Hashgraph](https://hedera.com): the official distributed consensus platform built using the hashgraph consensus algorithm for fast, fair and secure transactions. Hedera enables and empowers developers to build an entirely new class of decentralized applications.
 
-## Version is 0.2.0
+## Version is 0.2.1
 
 The Hedera Java SDK uses [semantic versioning](https://semver.org/).
 
@@ -41,6 +41,19 @@ This is the link to the maven repository : [hedera java sdk on maven](https://se
 
 Examples no longer create unnecessary accounts or transfer unnecessary large amounts of tinybar to newly created accounts. Likewise, the gas specified for running the smart contract examples are the bare minimum required.
 
+- Extra smart contract examples (HelloWorld, Simple Storage and Token)
+- Documentation with smart contract examples (.sol source, compilation information, ABI)
+
+### ExampleUtilities.readFile
+
+This loads a file from the file system. It incorporates a number of fixes from the previous version which could in some instances miss the last byte of a file content.
+
+### ExampleUtilities.checkBinFile
+
+This method checks the contents of a supplied byte array for non Hex characters. It will raise an error if the byte array contains characters other than 0-9, a-f and A-F. This is a useful check to perform prior to loading a compiled solidity file to ensure it doesn't contain unaccepted characters such as Line Feeds, Carriage Returns and others which are sometimes introduced by text editors upon saving.
+
+This loads a file from the file system. It incorporates a number of fixes from the previous version which could in some instances miss the last byte of a file content.
+
 ### Logging framework
 
 SLF4J has been switched for Logback to help compatibility with Swing projects amongst others
@@ -61,14 +74,21 @@ will create a key pair object from an existing keypair.
 
 *Note: if you only have a public key and no private key, set the privKey parameter to null or "")*
 
+### public and private keys
+
+You may now use either encrypted public and private keys or their non-encrypted version.
+
+### Overloaded methods for generating and recovering keypairs
+
+The `HederaKeyPair` class has additional overloaded methods for generating keys at a given index and recovering keys from words at a given index. Default behaviour in unchanged (index=-1), these overloaded methods enable you to generate/recover keys that are compatible with the mobile Hedera wallet.
+
 ### SigsForTransaction parameter
 
 The `sigsForTransaction` parameter on methods of the `HederaAccount`, `HederaContract` and `HederaFile` classes has changed from `HederaKeySignatureList` to `HederaSignatureList`.
 
-
 ### Transaction fees
 
-Transaction fees were set to 10 *TinyBars*, they are now 100,000 *TinyBars*. Testnets are still allowing free transactions and queries, however a balance check is performed on the account funding the transaction or query. If the balance is insufficient (e.g. less than 100,000 *TinyBars*), the operation will fail.
+Transaction fees are 100,000 *TinyBars*. Testnets now implement charging for transactions and queries, so your testnet account balance will reduce with each request.
 
 ### Improved error responses from Hedera
 
@@ -134,7 +154,7 @@ The `DemoAsync.java` class is an example for making calls to the Hedera network 
 
 Javadocs are generated automatically as part of the Maven build.
 
-They are generated as a `JAR` file which is compiled into the target/ folder.
+They are generated under the sdk/javadoc folder.
 
 ## Building a simple test with the Hedera SDK for Java
 
@@ -310,6 +330,42 @@ long balance2 = newAccount.getBalance();
 ```
 
 __Note__: In the event you're not waiting for consensus on the transfer transaction, it's possible that the balances will initially show no change. Adding a small delay between the transfer and the balance queries will ensure the correct values are returned. Ideally, you would ask for a receipt and check transaction status following the transfer transaction before querying the updated balances. This is shown in the examples contained within the SDK.
+
+## Smart contracts
+
+### Auto-renew duration
+
+The examples set the auto-renew duration of a newly created smart contract to 60s. This is to avoid paying unnecessary smart contract storage fees while testing. As a result, unless the smart contract's account is funded, the smart contract will cease to exist 60 seconds after being created (note, a file is valid for 1 day by default).
+
+If you refer to a smart contract created earlier than 60s ago in a subsequent call, it may no longer be available, be sure to increase the default duration and fund the smart contracts' account if necessary.
+
+### Common pitfalls
+
+#### Invalid characters in bin file
+
+Some text editors add a CR/LF at the end of a file when it is saved, this will result in an internal error in Hedera and your smart contract will fail to load. Please ensure the file only contains valid hex (0-9, a-f and A-F).
+
+#### Gas
+
+It is impossible for Hedera to predict how much gas will be necessary for any operation. In the Hedera context, gas is used to specify the maximum amount you're prepared to spend and won't affect the execution order of your transaction.
+
+- Hedera will first check your account balance and ensure there are enough funds to pay for the transaction and the gas you specify (gas price is 1:1 with tinybar for now). In the event there aren't sufficient funds in the account, the transaction will fail with `INSUFFICIENT_PAYER_BALANCE`.
+
+- Specifying high gas values. Hedera will only charge the amount of gas used and not the full amount if less was necessary. Furthermore, higher gas values do not affect the order or acceptance of a transaction.
+
+- Insufficient gas supplied for creation. In this instance, the smart contract will fail to create, but the gas used to reach that conclusion will be charged to the account. The error returned in this instance is `INSUFFICIENT_GAS`.
+
+- How much gas did a create or function call cost ? Getting a record following the smart contract creation will indicate how much gas was consumed during execution.
+
+- My function call doesn't return the expected result. This may be due to insufficient gas being supplied. In the case of a local query, the node doesn't respond with an `INSUFFICIENT_GAS` error, this is a bug which is under investigation.
+
+#### Compiler version
+
+All examples were compiled with Remix using compiler version `0.5.3+commit.10d17f24.Emscripten.clang`
+
+#### Initial balance parameter for create
+
+This parameter is only applicable to smart contracts with payable constructors, set the value to 0 in all other cases.
 
 ## More information
 

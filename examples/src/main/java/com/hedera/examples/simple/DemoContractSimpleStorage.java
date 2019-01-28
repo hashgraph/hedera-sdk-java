@@ -18,8 +18,21 @@ import com.hedera.sdk.file.HederaFile;
 public final class DemoContractSimpleStorage {
 
 	public static void main(String... arguments) throws Exception {
+		boolean getInfo = false;
+		boolean update = false;
+		boolean getByteCode = false;
+		boolean setCall = false;
+		boolean getCall = false;
+		
+		// set flags to enable/disable demo features
+		getInfo = false;
+		update = false;
+		getByteCode = false;
+		setCall = true;
+		getCall = true;
+		
 		byte[] fileContents = ExampleUtilities.readFile("/scExamples/simpleStorage.bin");
-
+		
 		// check the bin file only contains 0-9,A-F,a-f
 		ExampleUtilities.checkBinFile(fileContents);
 		
@@ -46,35 +59,45 @@ public final class DemoContractSimpleStorage {
 		// create a contract
 		long gas = 71000;
 		contract = ContractCreate.create(contract, file.getFileID(), gas, 0);
-		//contract = create(contract, file.getFileID(), 1);
 		if (contract != null) {
 			// update the contract
 			HederaTimeStamp expirationTime = new HederaTimeStamp(100, 10);
 			HederaDuration autoRenewDuration = new HederaDuration(10, 20);
-			
-			contract = ContractUpdate.update(contract, expirationTime, autoRenewDuration);
-			
+
 			if (contract != null) {
+				if (update) {
+					contract = ContractUpdate.update(contract, expirationTime, autoRenewDuration);
+				}
+				
 				// getinfo
-				ContractGetInfo.getInfo(contract);
+				if (getInfo) {
+					ContractGetInfo.getInfo(contract);
+				}
 				// get bytecode
-				ContractGetBytecode.getByteCode(contract);
+				if (getByteCode) {
+					ContractGetBytecode.getByteCode(contract);
+				}
 				// call
-				final String SC_SET_ABI = "{\"constant\":false,\"inputs\":[{\"name\":\"x\",\"type\":\"uint256\"}],\"name\":\"set\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}";
-				gas = 42000;
-				long amount = 0;
-				byte[] functionParameters = SoliditySupport.encodeSet(10,SC_SET_ABI);
+				if (setCall) {
+					final String SC_SET_ABI = "{\"constant\":false,\"inputs\":[{\"name\":\"x\",\"type\":\"uint256\"}],\"name\":\"set\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}";
+					gas = 34000;
+					long amount = 0;
+					byte[] functionParameters = SoliditySupport.encodeSet(10,SC_SET_ABI);
+					
+					ContractCall.call(contract, gas, amount, functionParameters);
+				}
 				
-				ContractCall.call(contract, gas, amount, functionParameters);
 				// call local
-				String SC_GET_ABI = "{\"constant\":true,\"inputs\":[],\"name\":\"get\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}";
-				
-				byte[] function = SoliditySupport.encodeGetValue(SC_GET_ABI);
-				long localGas = 25000;
-				long maxResultSize = 5000;
-				HederaContractFunctionResult functionResult = ContractRunLocal.runLocal(contract, localGas, maxResultSize, function);
-				int decodeResult = SoliditySupport.decodeGetValueResult(functionResult.contractCallResult(),SC_GET_ABI);
-	    		ExampleUtilities.showResult(String.format("===>Decoded functionResult= %d", decodeResult));
+				if (getCall) {
+					String SC_GET_ABI = "{\"constant\":true,\"inputs\":[],\"name\":\"get\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}";
+					
+					byte[] function = SoliditySupport.encodeGetValue(SC_GET_ABI);
+					long localGas = 500000;
+					long maxResultSize = 5000;
+					HederaContractFunctionResult functionResult = ContractRunLocal.runLocal(contract, localGas, maxResultSize, function);
+					int decodeResult = SoliditySupport.decodeGetValueResult(functionResult.contractCallResult(),SC_GET_ABI);
+		    		ExampleUtilities.showResult(String.format("===>Decoded functionResult= %d", decodeResult));
+				}
 			}
 		}
 	}

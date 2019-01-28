@@ -278,7 +278,7 @@
 					<excludePackageNames>net.i2p.*</excludePackageNames>
 					<excludePackageNames>org.json.*</excludePackageNames>
 					<additionalOptions>-html5</additionalOptions>
-					<reportOutputDirectory>${project.basedir}/apidocs</reportOutputDirectory>
+					<reportOutputDirectory>${project.basedir}/javadoc</reportOutputDirectory>
 				</configuration>
 				<executions>
 					<execution>
