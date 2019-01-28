@@ -766,9 +766,9 @@ public class HederaContract implements Serializable {
 	 * @param payment a {@link HederaTransaction} message to indicate how this query will be paid for, this can be null for Cost queries
 	 * @param responseType the type of response requested from the query
 	 * @return {@link Boolean} indicating success or failure of the query
-	 * @throws InterruptedException should an exception occur during communication with the node
+	 * @throws Exception In the event that the smart contract local call returned no result
 	 */
-	public boolean callLocal(HederaTransaction payment, HederaQueryHeader.QueryResponseType responseType) throws InterruptedException {
+	public boolean callLocal(HederaTransaction payment, HederaQueryHeader.QueryResponseType responseType) throws Exception {
 		boolean result = true;
 
 
@@ -811,7 +811,12 @@ public class HederaContract implements Serializable {
 		
 		if (this.precheckResult == ResponseCodeEnum.OK) {
 			// result of function call
-			this.hederaContractFunctionResult = new HederaContractFunctionResult(getCallLocalResponse.getFunctionResult());
+			// check for presence of a result
+			if (getCallLocalResponse.getFunctionResult().getContractCallResult().isEmpty()) {
+				throw new Exception("Local smart contract function call returned no result. Check smart contract initialised properly and sufficient gas for function call");
+			} else {
+				this.hederaContractFunctionResult = new HederaContractFunctionResult(getCallLocalResponse.getFunctionResult());
+			}
 			// cost
 			this.cost = responseHeader.getCost();
 			//state proof
@@ -829,9 +834,9 @@ public class HederaContract implements Serializable {
 	 * If successful, the method populates the properties this object
 	 * @param payment the {@link HederaTransaction} payload containing payment information for the query
 	 * @return {@link Boolean} indicating if query was successful or not
-	 * @throws InterruptedException should a communication error occur with the node
+	 * @throws Exception In the event that the smart contract local call returned no result
 	 */
-	public boolean callLocalAnswerOnly(HederaTransaction payment) throws InterruptedException {
+	public boolean callLocalAnswerOnly(HederaTransaction payment) throws Exception {
 
 		return callLocal(payment, QueryResponseType.ANSWER_ONLY);
 	}
@@ -841,9 +846,9 @@ public class HederaContract implements Serializable {
 	 * If successful, the method populates the properties this object including a state proof
 	 * @param payment the {@link HederaTransaction} payload containing payment information for the query
 	 * @return {@link Boolean} indicating if query was successful or not
-	 * @throws InterruptedException should a communication error occur with the node
+	 * @throws Exception In the event that the smart contract local call returned no result
 	 */
-	public boolean callLocalStateProof(HederaTransaction payment) throws InterruptedException {
+	public boolean callLocalStateProof(HederaTransaction payment) throws Exception {
 
 		return callLocal(payment, HederaQueryHeader.QueryResponseType.ANSWER_STATE_PROOF);
 	}
@@ -852,9 +857,9 @@ public class HederaContract implements Serializable {
 	 * Runs a query to call a smart contract function locally (on a node), without a state proof
 	 * If successful, the method populates the cost property of this object
 	 * @return {@link Boolean} indicating if query was successful or not
-	 * @throws InterruptedException should a communication error occur with the node
+	 * @throws Exception In the event that the smart contract local call returned no result
 	 */
-	public boolean callLocalCostAnswer() throws InterruptedException {
+	public boolean callLocalCostAnswer() throws Exception {
 
 		return callLocal(null, HederaQueryHeader.QueryResponseType.COST_ANSWER);
 	}
@@ -863,9 +868,9 @@ public class HederaContract implements Serializable {
 	 * Runs a query to call a smart contract function locally (on a node), with a state proof
 	 * If successful, the method populates the cost property of this object
 	 * @return {@link Boolean} indicating if query was successful or not
-	 * @throws InterruptedException should a communication error occur with the node
+	 * @throws Exception In the event that the smart contract local call returned no result
 	 */
-	public boolean callLocalCostAnswerStateProof() throws InterruptedException {
+	public boolean callLocalCostAnswerStateProof() throws Exception {
 
 		return callLocal(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
 	}
@@ -1246,10 +1251,8 @@ public class HederaContract implements Serializable {
 		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults,this.node.contractCallLocalQueryFee);
 
 		if (this.callLocalAnswerOnly(transferTransaction)) {
-
 			return this.hederaContractFunctionResult;
 		} else {
-
 			return null;
 		}
 	}
