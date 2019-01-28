@@ -20,6 +20,7 @@ public final class DemoContractSimpleStorage {
 	public static void main(String... arguments) throws Exception {
 		byte[] fileContents = ExampleUtilities.readFile("/scExamples/simpleStorage.bin");
 
+		// check the bin file only contains 0-9,A-F,a-f
 		ExampleUtilities.checkBinFile(fileContents);
 		
 		// setup a set of defaults for query and transactions

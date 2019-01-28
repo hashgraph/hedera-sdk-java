@@ -15,9 +15,6 @@ import com.hedera.sdk.contract.HederaContractFunctionResult;
 import com.hedera.sdk.file.HederaFile;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.ethereum.core.CallTransaction;
 
 public final class DemoContractToken {
@@ -25,7 +22,8 @@ public final class DemoContractToken {
 	public static void main(String... arguments) throws Exception {
 
 		byte[] fileContents = ExampleUtilities.readFile("/scExamples/token.bin");
-		// look for unwanted characters in the file
+
+		// check the bin file only contains 0-9,A-F,a-f
 		ExampleUtilities.checkBinFile(fileContents);
 
 		// setup a set of defaults for query and transactions
@@ -35,14 +33,9 @@ public final class DemoContractToken {
 		HederaAccount myAccount = new HederaAccount();
 		// setup transaction/query defaults (durations, etc...)
 		myAccount.txQueryDefaults = txQueryDefaults;
-		myAccount.accountNum = myAccount.txQueryDefaults.payingAccountID.accountNum;
-		txQueryDefaults.fileWacl = myAccount.txQueryDefaults.payingKeyPair;
 		
-		myAccount.getBalance();
-
-		// init token owners
-		Map<String, String> tokenOwners = new HashMap<String, String>();
-
+		txQueryDefaults.fileWacl = txQueryDefaults.payingKeyPair;
+		
 		// token issuer
 		HederaKeyPair tokenIssureKeyPair = new HederaKeyPair(KeyType.ED25519);
 		HederaAccount tokenIssuer = new HederaAccount();
@@ -71,10 +64,6 @@ public final class DemoContractToken {
 		bob.getInfo();
 		String bobSolidityAddress = bob.getSolidityContractAccountID();
 
-		tokenOwners.put("Issuer", tokenIssuerSolidityAddress);
-		tokenOwners.put("Alice", aliceSolidityAddress);
-		tokenOwners.put("Bob", bobSolidityAddress);
-
 		// create a file
 		// new file object
 		HederaFile file = new HederaFile();
@@ -88,7 +77,7 @@ public final class DemoContractToken {
 		String funcJson = TOKEN_ERC20_CONSTRUCTOR_ABI.replaceAll("'", "\"");
 		CallTransaction.Function function = CallTransaction.Function.fromJsonInterface(funcJson);
 
-		long initialSupply = 1000_000L;
+		long initialSupply = 1000000L; //1000_000L;
 		byte[] constructorData = function.encodeArguments(initialSupply, "Test Token", "OCT");
 
 		// new contract object
@@ -97,7 +86,7 @@ public final class DemoContractToken {
 		createdContract.txQueryDefaults = txQueryDefaults;
 
 		// create a contract
-		long gas = 1250000;
+		long gas = 750000;
 		createdContract = ContractCreate.create(createdContract, file.getFileID(), gas, 0, constructorData);
 
 		if (createdContract != null) {
@@ -137,8 +126,7 @@ public final class DemoContractToken {
 			carol = AccountCreate.create(carol, carolKeyPair.getPublicKeyHex(), KeyType.ED25519, 100000000000L);
 			System.out.println("Carol account created");
 			carol.getInfo();
-			String carolSolidityAddress = tokenIssuer.getSolidityContractAccountID();
-			tokenOwners.put("Carol", carolSolidityAddress);
+			String carolSolidityAddress = carol.getSolidityContractAccountID();
 
 			System.out.println("Bob transfers 500 tokens to Carol");
 			// bob MUST be the originator of the transaction
@@ -161,8 +149,7 @@ public final class DemoContractToken {
 			dave = AccountCreate.create(dave, daveKeyPair.getPublicKeyHex(), KeyType.ED25519, 100000000000L);
 			System.out.println("Dave account created");
 			dave.getInfo();
-			String daveSolidityAddress = tokenIssuer.getSolidityContractAccountID();
-			tokenOwners.put("Dave", daveSolidityAddress);
+			String daveSolidityAddress = dave.getSolidityContractAccountID();
 
 			System.out.println("Alice Allows to Dave to spend up to 200 Alice's tokens");
 			// Alice MUST be the originator of the transaction

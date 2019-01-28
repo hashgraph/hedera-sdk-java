@@ -5,7 +5,7 @@ nodeport=50211
 # node account
 nodeAccountShard=0
 nodeAccountRealm=0
-nodeAccountNum=2
+nodeAccountNum=3
 
 # your public/private keys
 pubkey=
