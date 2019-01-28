@@ -31,7 +31,7 @@ You may now add the SDK to your project as a maven dependency as follows:
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>java-sdk</artifactId>
-  <version>0.2.0</version>
+  <version>0.2.1</version>
 </dependency>
 ```
 
@@ -358,6 +358,7 @@ It is impossible for Hedera to predict how much gas will be necessary for any op
 - How much gas did a create or function call cost ? Getting a record following the smart contract creation will indicate how much gas was consumed during execution.
 
 - My function call doesn't return the expected result. This may be due to insufficient gas being supplied. In the case of a local query, the node doesn't respond with an `INSUFFICIENT_GAS` error, this is a bug which is under investigation.
+*Note: Hedera sometimes reports a smart contract creation being successful (it looks that way), when it has in fact failed. A smart contract reference is returned in the receipt, but the smart contract itself has failed to start. This is often due to a lack of gas (although the transaction didn't report `INSUFFICIENT_GAS`) and will manifest itself when you attempt to call functions on the smart contract. If this happens, try to increase the gas until a readonly function works, this will confirm the smart contract created itself fully.
 
 #### Compiler version
 

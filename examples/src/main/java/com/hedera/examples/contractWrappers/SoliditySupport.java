@@ -10,24 +10,24 @@ public final class SoliditySupport {
 		  String funcJson = getABI.replaceAll("'", "\"");
 		  CallTransaction.Function function = CallTransaction.Function.fromJsonInterface(funcJson);
 		  return function;
-	 }
+	}
 	public static CallTransaction.Function getSetFunction(String setABI) {
 		  String funcJson = setABI.replaceAll("'", "\"");
 		  CallTransaction.Function function = CallTransaction.Function.fromJsonInterface(funcJson);
 		  return function;
-	 }
+	}
 	public static byte[] encodeGetValue(String getABI) {
 		  CallTransaction.Function function = getGetValueFunction(getABI);
 		  byte[] encodedFunc = function.encode();
 		  return encodedFunc;
-	 }
+	}
 	public static byte[] encodeSet(int valueToAdd, String setABI) {
 		  CallTransaction.Function function = getSetFunction(setABI);
 		  byte[] encodedFunc = function.encode(valueToAdd);
 
 		  return encodedFunc;
-	 }
-	public static int decodeGetValueResult(byte[] value, String getABI) {
+	}
+	public static int decodeGetValueResultInt(byte[] value, String getABI) {
 		  int decodedReturnedValue = 0;
 		  CallTransaction.Function function = getGetValueFunction(getABI);
 		  Object[] retResults = function.decodeResult(value);
@@ -36,6 +36,27 @@ public final class SoliditySupport {
 				decodedReturnedValue = retBi.intValue();
 		  }
 		  return decodedReturnedValue;
-	 }
+	}
+
+	public static long decodeGetValueResultLong(byte[] value, String getABI) {
+		  long decodedReturnedValue = 0;
+		  CallTransaction.Function function = getGetValueFunction(getABI);
+		  Object[] retResults = function.decodeResult(value);
+		  if (retResults != null && retResults.length > 0) {
+				BigInteger retBi = (BigInteger) retResults[0];
+				decodedReturnedValue = retBi.longValue();
+		  }
+		  return decodedReturnedValue;
+	}
+
+	public static String decodeGetValueResultString(byte[] value, String getABI) {
+		String result = "";
+		  CallTransaction.Function function = getGetValueFunction(getABI);
+		  Object[] retResults = function.decodeResult(value);
+		if (retResults != null && retResults.length > 0) {
+			result = (String) retResults[0];
+		}
+		return result;		
+	}
 
 }

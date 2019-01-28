@@ -89,7 +89,7 @@ public final class DemoContractSimpleStorage {
 					long localGas = 22000;
 					long maxResultSize = 5000;
 					HederaContractFunctionResult functionResult = ContractRunLocal.runLocal(contract, localGas, maxResultSize, function);
-					int decodeResult = SoliditySupport.decodeGetValueResult(functionResult.contractCallResult(),SC_GET_ABI);
+					int decodeResult = SoliditySupport.decodeGetValueResultInt(functionResult.contractCallResult(),SC_GET_ABI);
 		    		ExampleUtilities.showResult(String.format("===>Decoded functionResult= %d", decodeResult));
 				}
 
@@ -112,7 +112,7 @@ public final class DemoContractSimpleStorage {
 					long localGas = 22000;
 					long maxResultSize = 5000;
 					HederaContractFunctionResult functionResult = ContractRunLocal.runLocal(contract, localGas, maxResultSize, function);
-					int decodeResult = SoliditySupport.decodeGetValueResult(functionResult.contractCallResult(),SC_GET_ABI);
+					int decodeResult = SoliditySupport.decodeGetValueResultInt(functionResult.contractCallResult(),SC_GET_ABI);
 		    		ExampleUtilities.showResult(String.format("===>Decoded functionResult= %d", decodeResult));
 				}
 			}

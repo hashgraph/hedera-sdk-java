@@ -4,6 +4,7 @@ import com.hedera.examples.accountWrappers.AccountCreate;
 import com.hedera.examples.contractWrappers.ContractCall;
 import com.hedera.examples.contractWrappers.ContractCreate;
 import com.hedera.examples.contractWrappers.ContractRunLocal;
+import com.hedera.examples.contractWrappers.SoliditySupport;
 import com.hedera.examples.fileWrappers.FileCreate;
 import com.hedera.examples.utilities.ExampleUtilities;
 import com.hedera.sdk.account.HederaAccount;
@@ -42,16 +43,26 @@ public final class DemoContractToken {
 		tokenIssuer.txQueryDefaults = txQueryDefaults;
 		tokenIssuer = AccountCreate.create(tokenIssuer, tokenIssureKeyPair.getPublicKeyHex(), KeyType.ED25519,
 				1000000000000L);
-		System.out.println("Token Isssuer account created");
+
+		ExampleUtilities.showResult("Token Isssuer account created");
+
 		tokenIssuer.getInfo();
 		String tokenIssuerSolidityAddress = tokenIssuer.getSolidityContractAccountID();
+		
+		// switch TXQuery defaults to be the token Issuer from now on, this is because the contract initialises
+		// token issuer's account with a starting balance and uses msg.sender to do so. Need to ensure
+		// msg.sender is token issuer
+		
+		txQueryDefaults.payingKeyPair = tokenIssureKeyPair;
+		txQueryDefaults.fileWacl = tokenIssureKeyPair;
+		txQueryDefaults.payingAccountID = tokenIssuer.getHederaAccountID();
 
 		// alice
 		HederaKeyPair aliceKeyPair = new HederaKeyPair(KeyType.ED25519);
 		HederaAccount alice = new HederaAccount();
 		alice.txQueryDefaults = txQueryDefaults;
 		alice = AccountCreate.create(alice, aliceKeyPair.getPublicKeyHex(), KeyType.ED25519, 10000000000L);
-		System.out.println("Alice account created");
+		ExampleUtilities.showResult("Alice account created");
 		alice.getInfo();
 		String aliceSolidityAddress = alice.getSolidityContractAccountID();
 
@@ -60,7 +71,7 @@ public final class DemoContractToken {
 		HederaAccount bob = new HederaAccount();
 		bob.txQueryDefaults = txQueryDefaults;
 		bob = AccountCreate.create(bob, bobKeyPair.getPublicKeyHex(), KeyType.ED25519, 10000000000L);
-		System.out.println("Alice account created");
+		ExampleUtilities.showResult("Alice account created");
 		bob.getInfo();
 		String bobSolidityAddress = bob.getSolidityContractAccountID();
 
@@ -86,58 +97,60 @@ public final class DemoContractToken {
 		createdContract.txQueryDefaults = txQueryDefaults;
 
 		// create a contract
-		long gas = 750000;
+		long gas = 1427770;
 		createdContract = ContractCreate.create(createdContract, file.getFileID(), gas, 0, constructorData);
 
 		if (createdContract != null) {
 			createdContract.getInfo();
-			System.out.println("@@@ Contract ID is  " + createdContract.contractNum);
+			ExampleUtilities.showResult("@@@ Contract ID is  " + createdContract.contractNum);
 
 			long tokenDecimals = getDecimals(createdContract);
-			System.out.println("decimals = " + tokenDecimals);
+			ExampleUtilities.showResult("decimals = " + tokenDecimals);
 
 			String symbol = getSymbol(createdContract);
+
+			ExampleUtilities.showResult("symbol = " + symbol);
 
 			long tokenMultiplier = (long) Math.pow(10, tokenDecimals);
 
 			long balanceOfTokenIssuer = getBalance(createdContract, tokenIssuerSolidityAddress);
 
-			System.out.println("@@@ Balance of token issuer  " + balanceOfTokenIssuer / tokenMultiplier + " " + symbol
+			ExampleUtilities.showResult("@@@ Balance of token issuer  " + balanceOfTokenIssuer / tokenMultiplier + " " + symbol
 					+ "  decimals = " + tokenDecimals);
 
-			System.out.println("token owner transfers 1000 tokens to Alice ");
+			ExampleUtilities.showResult("token owner transfers 1000 tokens to Alice ");
 			transfer(createdContract, aliceSolidityAddress, 1000 * tokenMultiplier);
 
-			System.out.println("token owner transfers 2000 tokens to Bob");
+			ExampleUtilities.showResult("token owner transfers 2000 tokens to Bob");
 			transfer(createdContract, bobSolidityAddress, 2000 * tokenMultiplier);
 
 			balanceOfTokenIssuer = getBalance(createdContract, tokenIssuerSolidityAddress);
-			System.out.println("Token Issuer Balance = " + balanceOfTokenIssuer);
+			ExampleUtilities.showResult("Token Issuer Balance = " + balanceOfTokenIssuer);
 
 			long balanceOfAlice = getBalance(createdContract, aliceSolidityAddress);
-			System.out.println("Alice Balance = " + balanceOfAlice);
+			ExampleUtilities.showResult("Alice Balance = " + balanceOfAlice);
 
 			long balanceOfBob = getBalance(createdContract, bobSolidityAddress);
-			System.out.println("Bob Balance = " + balanceOfBob);
+			ExampleUtilities.showResult("Bob Balance = " + balanceOfBob);
 
 			HederaKeyPair carolKeyPair = new HederaKeyPair(KeyType.ED25519);
 			HederaAccount carol = new HederaAccount();
 			carol.txQueryDefaults = txQueryDefaults;
 			carol = AccountCreate.create(carol, carolKeyPair.getPublicKeyHex(), KeyType.ED25519, 100000000000L);
-			System.out.println("Carol account created");
+			ExampleUtilities.showResult("Carol account created");
 			carol.getInfo();
 			String carolSolidityAddress = carol.getSolidityContractAccountID();
 
-			System.out.println("Bob transfers 500 tokens to Carol");
+			ExampleUtilities.showResult("Bob transfers 500 tokens to Carol");
 			// bob MUST be the originator of the transaction
 			createdContract.txQueryDefaults.payingAccountID = bob.getHederaAccountID();
 			createdContract.txQueryDefaults.payingKeyPair = bobKeyPair;
 			transfer(createdContract, carolSolidityAddress, 500 * tokenMultiplier);
 
 			balanceOfBob = getBalance(createdContract, bobSolidityAddress);
-			System.out.println("Bob Balance = " + balanceOfBob);
+			ExampleUtilities.showResult("Bob Balance = " + balanceOfBob);
 			long balanceOfCarol = getBalance(createdContract, carolSolidityAddress);
-			System.out.println("Carol Balance = " + balanceOfCarol);
+			ExampleUtilities.showResult("Carol Balance = " + balanceOfCarol);
 
 			// Create new account Dave
 			HederaKeyPair daveKeyPair = new HederaKeyPair(KeyType.ED25519);
@@ -147,26 +160,26 @@ public final class DemoContractToken {
 			dave.txQueryDefaults  = ExampleUtilities.getTxQueryDefaults();
 			
 			dave = AccountCreate.create(dave, daveKeyPair.getPublicKeyHex(), KeyType.ED25519, 100000000000L);
-			System.out.println("Dave account created");
+			ExampleUtilities.showResult("Dave account created");
 			dave.getInfo();
 			String daveSolidityAddress = dave.getSolidityContractAccountID();
 
-			System.out.println("Alice Allows to Dave to spend up to 200 Alice's tokens");
+			ExampleUtilities.showResult("Alice Allows to Dave to spend up to 200 Alice's tokens");
 			// Alice MUST be the originator of the transaction
 			createdContract.txQueryDefaults.payingAccountID = alice.getHederaAccountID();
 			createdContract.txQueryDefaults.payingKeyPair = aliceKeyPair;
 			approve(createdContract, daveSolidityAddress, 200 * tokenMultiplier);
 
-			System.out.println("Dave transfers 100 token from Alice account into Bob's");
+			ExampleUtilities.showResult("Dave transfers 100 token from Alice account into Bob's");
 			// Dave MUST be the originator of the transaction
 			createdContract.txQueryDefaults.payingAccountID = dave.getHederaAccountID();
 			createdContract.txQueryDefaults.payingKeyPair = daveKeyPair;
 
 			transferFrom(createdContract, aliceSolidityAddress, bobSolidityAddress, 100 * tokenMultiplier);
 			balanceOfBob = getBalance(createdContract, bobSolidityAddress);
-			System.out.println("Bob Balance = " + balanceOfBob);
+			ExampleUtilities.showResult("Bob Balance = " + balanceOfBob);
 			balanceOfAlice = getBalance(createdContract, aliceSolidityAddress);
-			System.out.println("Alice Balance = " + balanceOfAlice);
+			ExampleUtilities.showResult("Alice Balance = " + balanceOfAlice);
 
 		}
 	}
@@ -198,38 +211,28 @@ public final class DemoContractToken {
 	}
 
 	private static long getDecimals(HederaContract contract) throws Exception {
+
 		final String DECIMALS_ABI = "{\"constant\":true,\"inputs\":[],\"name\":\"decimals\",\"outputs\":[{\"name\":\"\",\"type\":\"uint8\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}";
-		String funcJson = DECIMALS_ABI.replaceAll("'", "\"");
-		CallTransaction.Function function = CallTransaction.Function.fromJsonInterface(funcJson);
-		byte[] encodedFunc = function.encode();
-
-		// decode value from results
-		HederaContractFunctionResult functionResult = ContractRunLocal.runLocal(contract, 250000L, 5000, encodedFunc);
-
-		long tokenDecimals = 0;
-		Object[] retResults = function.decodeResult(functionResult.contractCallResult());
-		if (retResults != null && retResults.length > 0) {
-			BigInteger retBi = (BigInteger) retResults[0];
-			tokenDecimals = retBi.longValue();
-		}
+		byte[] function = SoliditySupport.encodeGetValue(DECIMALS_ABI);
+		long localGas = 250000L;
+		long maxResultSize = 5000;
+		HederaContractFunctionResult functionResult = ContractRunLocal.runLocal(contract, localGas, maxResultSize, function);
+		long tokenDecimals = SoliditySupport.decodeGetValueResultLong(functionResult.contractCallResult(),DECIMALS_ABI);
+		
 		return tokenDecimals;
 	}
 
 	private static String getSymbol(HederaContract contract) throws Exception {
+		
 		final String SYMBOL_ABI = "{\"constant\":true,\"inputs\":[],\"name\":\"symbol\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}";
-		String funcJson = SYMBOL_ABI.replaceAll("'", "\"");
-		CallTransaction.Function function = CallTransaction.Function.fromJsonInterface(funcJson);
-		byte[] encodedFunc = function.encode();
-
-		HederaContractFunctionResult functionResult = ContractRunLocal.runLocal(contract, 250000L, 5000, encodedFunc);
-
-		String symbol = "";
-		// decode value from results
-		Object[] retResults = function.decodeResult(functionResult.contractCallResult());
-		if (retResults != null && retResults.length > 0) {
-			symbol = (String) retResults[0];
-		}
+		byte[] function = SoliditySupport.encodeGetValue(SYMBOL_ABI);
+		long localGas = 250000L;
+		long maxResultSize = 5000;
+		HederaContractFunctionResult functionResult = ContractRunLocal.runLocal(contract, localGas, maxResultSize, function);
+		String symbol = SoliditySupport.decodeGetValueResultString(functionResult.contractCallResult(),SYMBOL_ABI);
+		
 		return symbol;
+	
 	}
 
 	private static void approve(HederaContract contract, String spenderAddress, long valueToApprove) throws Exception {

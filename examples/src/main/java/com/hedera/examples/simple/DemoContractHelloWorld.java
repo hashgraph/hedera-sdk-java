@@ -47,7 +47,7 @@ public final class DemoContractHelloWorld {
 		long localGas = 22000;
 		long maxResultSize = 5000;
 		HederaContractFunctionResult functionResult = ContractRunLocal.runLocal(createdContract, localGas, maxResultSize, function);
-		int decodeResult = SoliditySupport.decodeGetValueResult(functionResult.contractCallResult(),SC_GETINT_ABI);
+		int decodeResult = SoliditySupport.decodeGetValueResultInt(functionResult.contractCallResult(),SC_GETINT_ABI);
 		ExampleUtilities.showResult(String.format("===>Decoded functionResult= %d", decodeResult));
 	
 	}
