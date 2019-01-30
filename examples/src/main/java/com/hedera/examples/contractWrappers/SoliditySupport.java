@@ -67,7 +67,7 @@ public final class SoliditySupport {
 		Object[] retResults = function.decodeResult(value);
 		if (retResults != null && retResults.length > 0) {
 			BigInteger retBi = (BigInteger) retResults[0];
-			decodedReturnedValue = retBi.longValue();
+			decodedReturnedValue = retBi.longValueExact();
 		}
 		return decodedReturnedValue;
 	}
