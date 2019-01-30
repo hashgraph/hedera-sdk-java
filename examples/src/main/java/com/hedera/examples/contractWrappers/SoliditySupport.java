@@ -72,6 +72,16 @@ public final class SoliditySupport {
 		return decodedReturnedValue;
 	}
 
+	public static BigInteger decodeGetValueResultBigInt(byte[] value, String getABI) {
+		BigInteger decodedReturnedValue = new BigInteger("0");
+		CallTransaction.Function function = getGetValueFunction(getABI);
+		Object[] retResults = function.decodeResult(value);
+		if (retResults != null && retResults.length > 0) {
+			decodedReturnedValue = (BigInteger) retResults[0];
+		}
+		return decodedReturnedValue;
+	}
+	
 	public static String decodeGetValueResultString(byte[] value, String getABI) {
 		String result = "";
 		CallTransaction.Function function = getGetValueFunction(getABI);
