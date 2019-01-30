@@ -98,7 +98,7 @@ public final class DemoContractSimpleStorage {
 					final String SC_SET_ABI = "{\"constant\":false,\"inputs\":[{\"name\":\"x\",\"type\":\"uint256\"}],\"name\":\"set\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}";
 					gas = 27000;
 					long amount = 0;
-					byte[] functionParameters = SoliditySupport.encodeSet(10,SC_SET_ABI);
+					byte[] functionParameters = SoliditySupport.encodeSetInt(10,SC_SET_ABI);
 					
 					ContractCall.call(contract, gas, amount, functionParameters);
 					HederaTransactionRecord record = new HederaTransactionRecord(contract.hederaTransactionID, contract.txQueryDefaults.node.contractGetRecordsQueryFee, contract.txQueryDefaults);
