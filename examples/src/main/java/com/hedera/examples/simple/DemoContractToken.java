@@ -71,7 +71,7 @@ public final class DemoContractToken {
 		HederaAccount bob = new HederaAccount();
 		bob.txQueryDefaults = txQueryDefaults;
 		bob = AccountCreate.create(bob, bobKeyPair.getPublicKeyHex(), KeyType.ED25519, 10000000000L);
-		ExampleUtilities.showResult("Alice account created");
+		ExampleUtilities.showResult("Bob account created");
 		bob.getInfo();
 		String bobSolidityAddress = bob.getSolidityContractAccountID();
 
