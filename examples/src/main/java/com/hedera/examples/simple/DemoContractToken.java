@@ -33,35 +33,21 @@ public final class DemoContractToken {
 		// my account
 		HederaAccount myAccount = new HederaAccount();
 		// setup transaction/query defaults (durations, etc...)
+
+		// my account is the token issuer
 		myAccount.txQueryDefaults = txQueryDefaults;
-		
 		txQueryDefaults.fileWacl = txQueryDefaults.payingKeyPair;
 		
-		// token issuer
-		HederaKeyPair tokenIssureKeyPair = new HederaKeyPair(KeyType.ED25519);
-		HederaAccount tokenIssuer = new HederaAccount();
-		tokenIssuer.txQueryDefaults = txQueryDefaults;
-		tokenIssuer = AccountCreate.create(tokenIssuer, tokenIssureKeyPair.getPublicKeyHex(), KeyType.ED25519,
-				1000000000000L);
-
-		ExampleUtilities.showResult("Token Isssuer account created");
-
-		tokenIssuer.getInfo();
-		String tokenIssuerSolidityAddress = tokenIssuer.getSolidityContractAccountID();
+		// setup the account number on my account so we can getInfo
+		myAccount.accountNum = txQueryDefaults.payingAccountID.accountNum;
+		myAccount.getInfo();
+		String tokenIssuerSolidityAddress = myAccount.getSolidityContractAccountID();
 		
-		// switch TXQuery defaults to be the token Issuer from now on, this is because the contract initialises
-		// token issuer's account with a starting balance and uses msg.sender to do so. Need to ensure
-		// msg.sender is token issuer
-		
-		txQueryDefaults.payingKeyPair = tokenIssureKeyPair;
-		txQueryDefaults.fileWacl = tokenIssureKeyPair;
-		txQueryDefaults.payingAccountID = tokenIssuer.getHederaAccountID();
-
 		// alice
 		HederaKeyPair aliceKeyPair = new HederaKeyPair(KeyType.ED25519);
 		HederaAccount alice = new HederaAccount();
 		alice.txQueryDefaults = txQueryDefaults;
-		alice = AccountCreate.create(alice, aliceKeyPair.getPublicKeyHex(), KeyType.ED25519, 10000000000L);
+		alice = AccountCreate.create(alice, aliceKeyPair.getPublicKeyHex(), KeyType.ED25519, 400000);
 		ExampleUtilities.showResult("Alice account created");
 		alice.getInfo();
 		String aliceSolidityAddress = alice.getSolidityContractAccountID();
@@ -70,7 +56,7 @@ public final class DemoContractToken {
 		HederaKeyPair bobKeyPair = new HederaKeyPair(KeyType.ED25519);
 		HederaAccount bob = new HederaAccount();
 		bob.txQueryDefaults = txQueryDefaults;
-		bob = AccountCreate.create(bob, bobKeyPair.getPublicKeyHex(), KeyType.ED25519, 10000000000L);
+		bob = AccountCreate.create(bob, bobKeyPair.getPublicKeyHex(), KeyType.ED25519, 400000);
 		ExampleUtilities.showResult("Bob account created");
 		bob.getInfo();
 		String bobSolidityAddress = bob.getSolidityContractAccountID();
@@ -136,7 +122,7 @@ public final class DemoContractToken {
 			HederaKeyPair carolKeyPair = new HederaKeyPair(KeyType.ED25519);
 			HederaAccount carol = new HederaAccount();
 			carol.txQueryDefaults = txQueryDefaults;
-			carol = AccountCreate.create(carol, carolKeyPair.getPublicKeyHex(), KeyType.ED25519, 100000000000L);
+			carol = AccountCreate.create(carol, carolKeyPair.getPublicKeyHex(), KeyType.ED25519, 300000);
 			ExampleUtilities.showResult("Carol account created");
 			carol.getInfo();
 			String carolSolidityAddress = carol.getSolidityContractAccountID();
@@ -147,6 +133,9 @@ public final class DemoContractToken {
 			createdContract.txQueryDefaults.payingKeyPair = bobKeyPair;
 			transfer(createdContract, carolSolidityAddress, 500 * tokenMultiplier);
 
+			// reset transaction originator to myAccount
+			createdContract.txQueryDefaults.payingAccountID = myAccount.getHederaAccountID();
+			createdContract.txQueryDefaults.payingKeyPair = ExampleUtilities.getTxQueryDefaults().payingKeyPair;
 			balanceOfBob = getBalance(createdContract, bobSolidityAddress);
 			ExampleUtilities.showResult("Bob Balance = " + balanceOfBob);
 			long balanceOfCarol = getBalance(createdContract, carolSolidityAddress);
@@ -159,7 +148,7 @@ public final class DemoContractToken {
 			// We switched to BOB being the payer, need to switch back to our own account here
 			dave.txQueryDefaults  = ExampleUtilities.getTxQueryDefaults();
 			
-			dave = AccountCreate.create(dave, daveKeyPair.getPublicKeyHex(), KeyType.ED25519, 100000000000L);
+			dave = AccountCreate.create(dave, daveKeyPair.getPublicKeyHex(), KeyType.ED25519, 400000);
 			ExampleUtilities.showResult("Dave account created");
 			dave.getInfo();
 			String daveSolidityAddress = dave.getSolidityContractAccountID();
@@ -176,6 +165,10 @@ public final class DemoContractToken {
 			createdContract.txQueryDefaults.payingKeyPair = daveKeyPair;
 
 			transferFrom(createdContract, aliceSolidityAddress, bobSolidityAddress, 100 * tokenMultiplier);
+
+			// We switched to DAVE being the payer, need to switch back to our own account here
+			createdContract.txQueryDefaults.payingAccountID = myAccount.getHederaAccountID();
+			createdContract.txQueryDefaults.payingKeyPair = ExampleUtilities.getTxQueryDefaults().payingKeyPair;
 			balanceOfBob = getBalance(createdContract, bobSolidityAddress);
 			ExampleUtilities.showResult("Bob Balance = " + balanceOfBob);
 			balanceOfAlice = getBalance(createdContract, aliceSolidityAddress);
