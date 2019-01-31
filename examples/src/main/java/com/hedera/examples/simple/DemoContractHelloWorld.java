@@ -39,7 +39,7 @@ public final class DemoContractHelloWorld {
 		createdContract.txQueryDefaults = txQueryDefaults;
 
 		// create a contract
-		long gas = 59945;
+		long gas = 117000;
 		createdContract = ContractCreate.create(createdContract, file.getFileID(), gas, 0);
 
 		final String SC_GETINT_ABI = "{\"constant\": true,\"inputs\": [],\"name\": \"getInt\",\"outputs\": [{\"name\": \"\",\"type\": \"uint256\"}],\"payable\": false,\"stateMutability\": \"pure\",\"type\": \"function\"}";
@@ -50,5 +50,12 @@ public final class DemoContractHelloWorld {
 		int decodeResult = SoliditySupport.decodeGetValueResultInt(functionResult.contractCallResult(),SC_GETINT_ABI);
 		ExampleUtilities.showResult(String.format("===>Decoded functionResult= %d", decodeResult));
 	
+		final String SC_GETSTRING_ABI = "{\"constant\": true,\"inputs\": [],\"name\": \"getString\",\"outputs\": [{	\"name\": \"\",\"type\": \"string\"	}],\"payable\": false,\"stateMutability\": \"pure\",\"type\": \"function\"}";
+		function = SoliditySupport.encodeGetValue(SC_GETSTRING_ABI);
+		localGas = 22000;
+		maxResultSize = 5000;
+		functionResult = ContractRunLocal.runLocal(createdContract, localGas, maxResultSize, function);
+		String result = SoliditySupport.decodeGetValueResultString(functionResult.contractCallResult(),SC_GETSTRING_ABI);
+		ExampleUtilities.showResult(String.format("===>Decoded functionResult= %s", result));
 	}
 }
