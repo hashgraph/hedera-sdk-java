@@ -17,7 +17,7 @@ public final class FileGetInfo {
 			ExampleUtilities.showResult("**    Got info");
 			return true;
 		} else if (file.getPrecheckResult() == ResponseCodeEnum.BUSY) {
-			logger.info("system busy, try again later");
+			logger.debug("system busy, try again later");
 			return false;
 		} else {
 			ExampleUtilities.showResult("**    Getting info - precheck ERROR " + file.getPrecheckResult());

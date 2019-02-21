@@ -35,7 +35,7 @@ public final class AccountUpdate {
 				return null;
 			}
 		} else if (updateResult.getPrecheckResult() == ResponseCodeEnum.BUSY) {
-			logger.info("system busy, try again later");
+			logger.debug("system busy, try again later");
 			return null;
 		} else {
 			ExampleUtilities.showResult("**    Failed with getPrecheckResult:" + updateResult.getPrecheckResult().toString());

@@ -21,7 +21,7 @@ public final class AccountGetBalance {
 			ExampleUtilities.showResult(String.format("**    Got balance=%d", balance));
 			return true;
 		} else if (account.getPrecheckResult() == ResponseCodeEnum.BUSY) {
-			logger.info("system busy, try again later");
+			logger.debug("system busy, try again later");
 			return false;
 		} else {
 			// an error occurred

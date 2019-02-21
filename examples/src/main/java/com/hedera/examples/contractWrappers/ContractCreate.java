@@ -49,7 +49,7 @@ public final class ContractCreate {
 				return null;
 			}
 		} else if (contract.getPrecheckResult() == ResponseCodeEnum.BUSY) {
-			logger.info("system busy, try again later");
+			logger.debug("system busy, try again later");
 			return null;
 		} else {
 			ExampleUtilities.showResult("**    getPrecheckResult not OK: " + createResult.getPrecheckResult().name());

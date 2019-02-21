@@ -32,7 +32,7 @@ public final class ContractCall {
 				return null;
 			}
 		} else if (contract.getPrecheckResult() == ResponseCodeEnum.BUSY) {
-			logger.info("system busy, try again later");
+			logger.debug("system busy, try again later");
 			return null;
 		} else {
 			ExampleUtilities.showResult("**    Failed with getPrecheckResult:" + contract.getPrecheckResult());

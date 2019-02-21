@@ -30,7 +30,7 @@ public final class AccountSend {
 				return false;
 			}
 		} else if (transferResult.getPrecheckResult() == ResponseCodeEnum.BUSY) {
-			logger.info("system busy, try again later");
+			logger.debug("system busy, try again later");
 			return false;
 		} else {
 			ExampleUtilities.showResult("**    Failed with getPrecheckResult:" + transferResult.getPrecheckResult().toString());

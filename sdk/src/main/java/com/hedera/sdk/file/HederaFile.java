@@ -876,7 +876,7 @@ public class HederaFile implements Serializable {
 		}
 
 		if (this.contents != null) {
-			logger.info("Setting the contents body");
+			logger.debug("Setting the contents body");
 			ByteString fileContents = ByteString.copyFrom(this.contents);
 			fileCreateTransaction.setContents(fileContents);
 		}

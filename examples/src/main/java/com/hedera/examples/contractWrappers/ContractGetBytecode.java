@@ -19,7 +19,7 @@ public final class ContractGetBytecode {
 			ExampleUtilities.showResult("**    Got bytecode=" + bytecode.toString());
 			return true;
 		} else if (contract.getPrecheckResult() == ResponseCodeEnum.BUSY) {
-			logger.info("system busy, try again later");
+			logger.debug("system busy, try again later");
 			return false;
 		} else {
 			// an error occurred

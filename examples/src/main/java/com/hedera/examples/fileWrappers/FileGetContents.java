@@ -20,7 +20,7 @@ public final class FileGetContents {
 			ExampleUtilities.showResult(new String(contents,"UTF-8"));
 			return true;
 		} else if (file.getPrecheckResult() == ResponseCodeEnum.BUSY) {
-			logger.info("system busy, try again later");
+			logger.debug("system busy, try again later");
 			return false;
 		} else {
 			// an error occurred

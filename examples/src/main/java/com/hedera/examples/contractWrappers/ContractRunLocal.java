@@ -26,7 +26,7 @@ public final class ContractRunLocal {
 					,functionResult.contractID().contractNum));
 			
 		} else if (contract.getPrecheckResult() == ResponseCodeEnum.BUSY) {
-			logger.info("system busy, try again later");
+			logger.debug("system busy, try again later");
 			return null;
 		} else {
 			// an error occurred

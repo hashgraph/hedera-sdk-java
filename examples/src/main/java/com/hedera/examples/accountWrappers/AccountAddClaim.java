@@ -32,7 +32,7 @@ public final class AccountAddClaim {
 				return false;
 			}
 		} else if (account.getPrecheckResult() == ResponseCodeEnum.BUSY) {
-			logger.info("system busy, try again later");
+			logger.debug("system busy, try again later");
 			return false;
 		} else {
 			ExampleUtilities.showResult("**    Failed with getPrecheckResult:" + claimAddResult.getPrecheckResult());

@@ -171,244 +171,244 @@ public class Utilities {
 			
 			Thread.sleep(sleepTime);
 			sleepTime += increaseDelay;
-			logger.info("Fetching receipt");
+			logger.debug("Fetching receipt");
 			receipt = new HederaTransactionReceipt(hederaTransactionID, node);
 			// was that successful ?
 			callCount += 1;
 			switch (receipt.nodePrecheck) {
 				case ACCOUNT_UPDATE_FAILED:
-					logger.info("precheck=ACCOUNT_UPDATE_FAILED");
+					logger.debug("precheck=ACCOUNT_UPDATE_FAILED");
 					keepGoing = false;
 					break;
 				case BAD_ENCODING:
-					logger.info("precheck=BAD_ENCODING");
+					logger.debug("precheck=BAD_ENCODING");
 					keepGoing = false;
 					break;
 				case BUSY:
-					logger.info("precheck=BUSY");
+					logger.debug("precheck=BUSY");
 					break;
 				case CONTRACT_EXECUTION_EXCEPTION:
-					logger.info("precheck=CONTRACT_EXECUTION_EXCEPTION");
+					logger.debug("precheck=CONTRACT_EXECUTION_EXCEPTION");
 					keepGoing = false;
 					break;
 				case CONTRACT_REVERT_EXECUTED:
-					logger.info("precheck=CONTRACT_REVERT_EXECUTED");
+					logger.debug("precheck=CONTRACT_REVERT_EXECUTED");
 					keepGoing = false;
 					break;
 				case CONTRACT_SIZE_LIMIT_EXCEEDED:
-					logger.info("precheck=CONTRACT_SIZE_LIMIT_EXCEEDED");
+					logger.debug("precheck=CONTRACT_SIZE_LIMIT_EXCEEDED");
 					keepGoing = false;
 					break;
 				case CONTRACT_UPDATE_FAILED:
-					logger.info("precheck=CONTRACT_UPDATE_FAILED");
+					logger.debug("precheck=CONTRACT_UPDATE_FAILED");
 					keepGoing = false;
 					break;
 				case DUPLICATE_TRANSACTION:
-					logger.info("precheck=DUPLICATE_TRANSACTION");
+					logger.debug("precheck=DUPLICATE_TRANSACTION");
 					keepGoing = false;
 					break;
 				case EMPTY_TRANSACTION_BODY:
-					logger.info("precheck=EMPTY_TRANSACTION_BODY");
+					logger.debug("precheck=EMPTY_TRANSACTION_BODY");
 					keepGoing = false;
 					break;
 				case FAIL_BALANCE:
-					logger.info("precheck=FAIL_BALANCE");
+					logger.debug("precheck=FAIL_BALANCE");
 					keepGoing = false;
 					break;
 				case FAIL_FEE:
-					logger.info("precheck=FAIL_FEE");
+					logger.debug("precheck=FAIL_FEE");
 					keepGoing = false;
 					break;
 				case FAIL_INVALID:
-					logger.info("precheck=FAIL_INVALID");
+					logger.debug("precheck=FAIL_INVALID");
 					keepGoing = false;
 					break;
 				case FILE_CONTENT_EMPTY:
-					logger.info("precheck=FILE_CONTENT_EMPTY");
+					logger.debug("precheck=FILE_CONTENT_EMPTY");
 					keepGoing = false;
 					break;
 				case INSUFFICIENT_ACCOUNT_BALANCE:
-					logger.info("precheck=INSUFFICIENT_ACCOUNT_BALANCE");
+					logger.debug("precheck=INSUFFICIENT_ACCOUNT_BALANCE");
 					keepGoing = false;
 					break;
 				case INSUFFICIENT_GAS:
-					logger.info("precheck=INSUFFICIENT_GAS");
+					logger.debug("precheck=INSUFFICIENT_GAS");
 					keepGoing = false;
 					break;
 				case INSUFFICIENT_PAYER_BALANCE:
-					logger.info("precheck=INSUFFICIENT_PAYER_BALANCE");
+					logger.debug("precheck=INSUFFICIENT_PAYER_BALANCE");
 					keepGoing = false;
 					break;
 				case INSUFFICIENT_TX_FEE:
-					logger.info("precheck=INSUFFICIENT_TX_FEE");
+					logger.debug("precheck=INSUFFICIENT_TX_FEE");
 					keepGoing = false;
 					break;
 				case INVALID_ACCOUNT_AMOUNTS:
-					logger.info("precheck=INVALID_ACCOUNT_AMOUNTS");
+					logger.debug("precheck=INVALID_ACCOUNT_AMOUNTS");
 					keepGoing = false;
 					break;
 				case INVALID_ACCOUNT_ID:
-					logger.info("precheck=INVALID_ACCOUNT_ID");
+					logger.debug("precheck=INVALID_ACCOUNT_ID");
 					keepGoing = false;
 					break;
 				case INVALID_CONTRACT_ID:
-					logger.info("precheck=INVALID_CONTRACT_ID");
+					logger.debug("precheck=INVALID_CONTRACT_ID");
 					keepGoing = false;
 					break;
 				case INVALID_EXPIRATION_TIME:
-					logger.info("precheck=INVALID_EXPIRATION_TIME");
+					logger.debug("precheck=INVALID_EXPIRATION_TIME");
 					keepGoing = false;
 					break;
 				case INVALID_FEE_SUBMITTED:
-					logger.info("precheck=INVALID_FEE_SUBMITTED");
+					logger.debug("precheck=INVALID_FEE_SUBMITTED");
 					keepGoing = false;
 					break;
 				case INVALID_FILE_ID:
-					logger.info("precheck=INVALID_FILE_ID");
+					logger.debug("precheck=INVALID_FILE_ID");
 					keepGoing = false;
 					break;
 				case INVALID_KEY_ENCODING:
-					logger.info("precheck=INVALID_KEY_ENCODING");
+					logger.debug("precheck=INVALID_KEY_ENCODING");
 					keepGoing = false;
 					break;
 				case INVALID_NODE_ACCOUNT:
-					logger.info("precheck=INVALID_NODE_ACCOUNT");
+					logger.debug("precheck=INVALID_NODE_ACCOUNT");
 					keepGoing = false;
 					break;
 				case INVALID_PAYER_SIGNATURE:
-					logger.info("precheck=INVALID_PAYER_SIGNATURE");
+					logger.debug("precheck=INVALID_PAYER_SIGNATURE");
 					keepGoing = false;
 					break;
 				case INVALID_QUERY_HEADER:
-					logger.info("precheck=INVALID_QUERY_HEADER");
+					logger.debug("precheck=INVALID_QUERY_HEADER");
 					keepGoing = false;
 					break;
 				case INVALID_RECEIVING_NODE_ACCOUNT:
-					logger.info("precheck=INVALID_RECEIVING_NODE_ACCOUNT");
+					logger.debug("precheck=INVALID_RECEIVING_NODE_ACCOUNT");
 					keepGoing = false;
 					break;
 				case INVALID_SIGNATURE:
-					logger.info("precheck=INVALID_SIGNATURE");
+					logger.debug("precheck=INVALID_SIGNATURE");
 					keepGoing = false;
 					break;
 				case INVALID_SOLIDITY_ADDRESS:
-					logger.info("precheck=INVALID_SOLIDITY_ADDRESS");
+					logger.debug("precheck=INVALID_SOLIDITY_ADDRESS");
 					keepGoing = false;
 					break;
 				case INVALID_SOLIDITY_ID:
-					logger.info("precheck=INVALID_SOLIDITY_ID");
+					logger.debug("precheck=INVALID_SOLIDITY_ID");
 					keepGoing = false;
 					break;
 				case INVALID_TRANSACTION: 
 					// do nothing
-					logger.info("precheck=INVALID_TRANSACTION");
+					logger.debug("precheck=INVALID_TRANSACTION");
 					break;
 				case INVALID_TRANSACTION_BODY:
-					logger.info("precheck=INVALID_TRANSACTION_BODY");
+					logger.debug("precheck=INVALID_TRANSACTION_BODY");
 					keepGoing = false;
 					break;
 				case INVALID_TRANSACTION_DURATION:
-					logger.info("precheck=INVALID_TRANSACTION_DURATION");
+					logger.debug("precheck=INVALID_TRANSACTION_DURATION");
 					keepGoing = false;
 					break;
 				case INVALID_TRANSACTION_ID:
-					logger.info("precheck=INVALID_TRANSACTION_ID");
+					logger.debug("precheck=INVALID_TRANSACTION_ID");
 					keepGoing = false;
 					break;
 				case INVALID_TRANSACTION_START:
-					logger.info("precheck=INVALID_TRANSACTION_START");
+					logger.debug("precheck=INVALID_TRANSACTION_START");
 					keepGoing = false;
 					break;
 				case KEY_NOT_PROVIDED:
-					logger.info("precheck=KEY_NOT_PROVIDED");
+					logger.debug("precheck=KEY_NOT_PROVIDED");
 					keepGoing = false;
 					break;
 				case KEY_REQUIRED: 
-					logger.info("precheck=KEY_REQUIRED");
+					logger.debug("precheck=KEY_REQUIRED");
 					keepGoing = false;
 					break;
 				case LOCAL_CALL_MODIFICATION_EXCEPTION:
-					logger.info("precheck=LOCAL_CALL_MODIFICATION_EXCEPTION");
+					logger.debug("precheck=LOCAL_CALL_MODIFICATION_EXCEPTION");
 					keepGoing = false;
 					break;
 				case MEMO_TOO_LONG: 
-					logger.info("precheck=MEMO_TOO_LONG");
+					logger.debug("precheck=MEMO_TOO_LONG");
 					keepGoing = false;
 					break;
 				case MISSING_QUERY_HEADER:
-					logger.info("precheck=MISSING_QUERY_HEADER");
+					logger.debug("precheck=MISSING_QUERY_HEADER");
 					keepGoing = false;
 					break;
 				case NO_WACL_KEY:
-					logger.info("precheck=NO_WACL_KEY");
+					logger.debug("precheck=NO_WACL_KEY");
 					keepGoing = false;
 					break;
 				case NOT_SUPPORTED:
-					logger.info("precheck=NOT_SUPPORTED");
+					logger.debug("precheck=NOT_SUPPORTED");
 					keepGoing = false;
 					break;
 				case NULL_SOLIDITY_ADDRESS:
-					logger.info("precheck=NULL_SOLIDITY_ADDRESS");
+					logger.debug("precheck=NULL_SOLIDITY_ADDRESS");
 					keepGoing = false;
 					break;
 				case OK:
-					logger.info("precheck=OK");
+					logger.debug("precheck=OK");
 					if (receipt.transactionStatus != ResponseCodeEnum.UNKNOWN) {
-						logger.info("took " + callCount + " call, about " + sleepTime * callCount + " milliseconds");
+						logger.debug("took " + callCount + " call, about " + sleepTime * callCount + " milliseconds");
 						keepGoing = false;
 						break;
 					} else {
-						logger.info("Transaction status=" + receipt.transactionStatus.name());
+						logger.debug("Transaction status=" + receipt.transactionStatus.name());
 						break;
 					}
 				case PAYER_ACCOUNT_NOT_FOUND:
-					logger.info("precheck=PAYER_ACCOUNT_NOT_FOUND");
+					logger.debug("precheck=PAYER_ACCOUNT_NOT_FOUND");
 					keepGoing = false;
 					break;
 				case RECEIPT_NOT_FOUND:
-					logger.info("precheck=RECEIPT_NOT_FOUND");
+					logger.debug("precheck=RECEIPT_NOT_FOUND");
 					keepGoing = false;
 					break;
 				case RECORD_NOT_FOUND: 
-					logger.info("precheck=RECORD_NOT_FOUND");
+					logger.debug("precheck=RECORD_NOT_FOUND");
 					keepGoing = false;
 					break;
 				case SUCCESS:
-					logger.info("precheck=SUCCESS");
+					logger.debug("precheck=SUCCESS");
 					if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
-						logger.info("took " + callCount + " call, about " + sleepTime * callCount + " milliseconds");
+						logger.debug("took " + callCount + " call, about " + sleepTime * callCount + " milliseconds");
 						keepGoing = false;
 						break;
 					} else {
-						logger.info("Transaction status=" + receipt.transactionStatus.name());
+						logger.debug("Transaction status=" + receipt.transactionStatus.name());
 						break;
 					}
 				case TRANSACTION_EXPIRED:
-					logger.info("precheck=TRANSACTION_EXPIRED");
+					logger.debug("precheck=TRANSACTION_EXPIRED");
 					keepGoing = false;
 					break;
 				case UNKNOWN:
-					logger.info("precheck=UNKNOWN");
+					logger.debug("precheck=UNKNOWN");
 					keepGoing = false;
 					break;
 				case UNRECOGNIZED: 
-					logger.info("precheck=UNRECOGNIZED");
+					logger.debug("precheck=UNRECOGNIZED");
 					keepGoing = false;
 					break;
 				case INVALID_SIGNATURE_TYPE_MISMATCHING_KEY:
-					logger.info("precheck=INVALID_SIGNATURE_TYPE_MISMATCHING_KEY");
+					logger.debug("precheck=INVALID_SIGNATURE_TYPE_MISMATCHING_KEY");
 					keepGoing = false;
 					break;
 				case INVALID_SIGNATURE_COUNT_MISMATCHING_KEY:
-					logger.info("precheck=INVALID_SIGNATURE_COUNT_MISMATCHING_KEY");
+					logger.debug("precheck=INVALID_SIGNATURE_COUNT_MISMATCHING_KEY");
 					keepGoing = false;
 					break;
 				case INVALID_FILE_WACL:
-					logger.info("precheck=INVALID_FILE_WACL");
+					logger.debug("precheck=INVALID_FILE_WACL");
 					keepGoing = false;
 					break;
 				case SERIALIZATION_FAILED:
-					logger.info("precheck=SERIALIZATION_FAILED");
+					logger.debug("precheck=SERIALIZATION_FAILED");
 					keepGoing = false;
 					break;
 			}
