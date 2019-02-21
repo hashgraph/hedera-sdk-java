@@ -33,7 +33,7 @@ class HederaTransactionBodyTest {
 		HederaAccountID nodeAccount = new HederaAccountID(4, 5, 6);
 
 		long transactionFee = 20;
-		HederaDuration transactionValidDuration = new HederaDuration(100, 60);
+		HederaDuration transactionValidDuration = new HederaDuration(100);
 
 		HederaTransactionBody  body = new HederaTransactionBody(TransactionType.CONTRACTCALL
 				, transactionID
@@ -55,7 +55,6 @@ class HederaTransactionBodyTest {
 
 		assertEquals(20,  body.transactionFee);
 		assertEquals(100, body.transactionValidDuration.seconds);
-		assertEquals(60, body.transactionValidDuration.nanos);
 
 		assertEquals(TransactionType.CONTRACTCALL, body.transactionType);
 		assertTrue(body.generateRecord);
@@ -74,14 +73,13 @@ class HederaTransactionBodyTest {
 
 		assertEquals(20,  tbody.getTransactionFee());
 		assertEquals(100, tbody.getTransactionValidDuration().getSeconds());
-		assertEquals(60, tbody.getTransactionValidDuration().getNanos());
 
 		assertTrue(tbody.hasContractCall());
 		assertTrue(tbody.getGenerateRecord());
 		assertEquals("transaction memo", tbody.getMemo());
 
 		HederaContract contract = new HederaContract();
-		contract.autoRenewPeriod = new HederaDuration(10, 10);
+		contract.autoRenewPeriod = new HederaDuration(10);
 		contract.fileID = new HederaFileID(1, 1, 1);
 		
 		body = new HederaTransactionBody(TransactionType.CONTRACTCREATEINSTANCE, transactionID, nodeAccount, transactionFee, transactionValidDuration

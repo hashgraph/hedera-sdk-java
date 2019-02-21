@@ -28,7 +28,7 @@ class HederaContractTest {
 		HederaContract masterContract = new HederaContract();
 		masterContract.adminKey = adminKey;
 		masterContract.amount = 10;
-		masterContract.autoRenewPeriod = new HederaDuration(60, 10);
+		masterContract.autoRenewPeriod = new HederaDuration(60);
 		masterContract.constructionParameters = "construct".getBytes();
 		masterContract.expirationTime = new HederaTimeStamp(100, 20);
 		masterContract.fileID = new HederaFileID(1, 2, 3);
@@ -41,7 +41,6 @@ class HederaContractTest {
 		assertArrayEquals(adminKey.getPublicKey(), masterContract.adminKey.getPublicKey());
 		assertEquals(10,  masterContract.amount);
 		assertEquals(60, masterContract.autoRenewPeriod.seconds);
-		assertEquals(10, masterContract.autoRenewPeriod.nanos);
 		assertArrayEquals("construct".getBytes(), masterContract.constructionParameters);
 		assertEquals(100, masterContract.expirationTime.seconds());
 		assertEquals(20, masterContract.expirationTime.nanos());

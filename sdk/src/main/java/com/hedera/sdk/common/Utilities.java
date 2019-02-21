@@ -395,6 +395,22 @@ public class Utilities {
 					logger.info("precheck=UNRECOGNIZED");
 					keepGoing = false;
 					break;
+				case INVALID_SIGNATURE_TYPE_MISMATCHING_KEY:
+					logger.info("precheck=INVALID_SIGNATURE_TYPE_MISMATCHING_KEY");
+					keepGoing = false;
+					break;
+				case INVALID_SIGNATURE_COUNT_MISMATCHING_KEY:
+					logger.info("precheck=INVALID_SIGNATURE_COUNT_MISMATCHING_KEY");
+					keepGoing = false;
+					break;
+				case INVALID_FILE_WACL:
+					logger.info("precheck=INVALID_FILE_WACL");
+					keepGoing = false;
+					break;
+				case SERIALIZATION_FAILED:
+					logger.info("precheck=SERIALIZATION_FAILED");
+					keepGoing = false;
+					break;
 			}
 		}
 		return receipt;

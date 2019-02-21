@@ -314,6 +314,22 @@ public class HederaTransactionState {
 						// a callback would be implemented here to deal with the operation
 						stateMap.remove(transactionID);
 						break;
+					case INVALID_SIGNATURE_TYPE_MISMATCHING_KEY:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INVALID_SIGNATURE_COUNT_MISMATCHING_KEY:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case INVALID_FILE_WACL:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
+					case SERIALIZATION_FAILED:
+						// a callback would be implemented here to deal with the operation
+						stateMap.remove(transactionID);
+						break;
 				}
             }
         } 

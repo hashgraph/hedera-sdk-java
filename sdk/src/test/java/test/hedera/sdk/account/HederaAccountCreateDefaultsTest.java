@@ -22,10 +22,7 @@ class HederaAccountCreateDefaultsTest {
 		HederaAccount accountDefaultsFromClass = new HederaAccount();
 
 		assertEquals(accountDefaultsFromClass.autoRenewPeriod.seconds, values.autoRenewPeriodSeconds);
-		assertEquals(accountDefaultsFromClass.autoRenewPeriod.nanos, values.autoRenewPeriodNanos);
 		assertEquals(accountDefaultsFromClass.receiverSigRequired, values.receiverSignatureRequired);
-		assertEquals(accountDefaultsFromClass.maxReceiveProxyFraction, values.maxReceiveProxyFraction);
-		assertEquals(accountDefaultsFromClass.proxyFraction, values.proxyFraction);
 		
 		assertEquals(accountDefaultsFromClass.autoRenewPeriod.seconds, values.autoRenewPeriodSeconds);
 		assertEquals(accountDefaultsFromClass.autoRenewPeriod.seconds, values.autoRenewPeriodSeconds);

@@ -45,11 +45,6 @@ public class HederaAccountUpdateValues {
 	 */
 	public long autoRenewPeriodSeconds = -1;
 	/**
-	 * the new auto renew period nanos
-	 * note: you must also supply the new renew perios seconds
-	 */
-	public int autoRenewPeriosNanos = -1;
-	/**
 	 * the new expiration time seconds
 	 * note: you must also supply the new expiration time nanos
 	 */

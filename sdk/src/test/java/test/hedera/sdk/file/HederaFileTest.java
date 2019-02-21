@@ -68,7 +68,7 @@ class HederaFileTest {
 	void TestPayload_Create() {
 		
 		HederaAccountID nodeAccount = new HederaAccountID(10, 20, 30);
-		HederaDuration duration = new HederaDuration(40, 50);
+		HederaDuration duration = new HederaDuration(40);
 		
 		HederaTransactionID txId = new HederaTransactionID(new HederaAccountID(2, 3, 4));
 		txId.transactionValidStart = new HederaTimeStamp(10, 100);
@@ -86,7 +86,6 @@ class HederaFileTest {
 		assertEquals(30, create.getNodeAccountID().getAccountNum());
 		
 		assertEquals(40, create.getTransactionValidDuration().getSeconds());
-		assertEquals(50, create.getTransactionValidDuration().getNanos());
 		
 		assertEquals(10, create.getTransactionFee());
 		assertTrue(create.getGenerateRecord());
@@ -113,7 +112,7 @@ class HederaFileTest {
 	void TestPayload_Delete() {
 		
 		HederaAccountID nodeAccount = new HederaAccountID(10, 20, 30);
-		HederaDuration duration = new HederaDuration(40, 50);
+		HederaDuration duration = new HederaDuration(40);
 		
 		HederaTransactionID txId = new HederaTransactionID(new HederaAccountID(2, 3, 4));
 		txId.transactionValidStart = new HederaTimeStamp(10, 100);
@@ -132,7 +131,7 @@ class HederaFileTest {
 	void TestPayload_Update() {
 		
 		HederaAccountID nodeAccount = new HederaAccountID(10, 20, 30);
-		HederaDuration duration = new HederaDuration(40, 50);
+		HederaDuration duration = new HederaDuration(40);
 		
 		HederaTransactionID txId = new HederaTransactionID(new HederaAccountID(2, 3, 4));
 		txId.transactionValidStart = new HederaTimeStamp(10, 100);
@@ -158,7 +157,7 @@ class HederaFileTest {
 	void TestPayload_Append() {
 		
 		HederaAccountID nodeAccount = new HederaAccountID(10, 20, 30);
-		HederaDuration duration = new HederaDuration(40, 50);
+		HederaDuration duration = new HederaDuration(40);
 		
 		HederaTransactionID txId = new HederaTransactionID(new HederaAccountID(2, 3, 4));
 		txId.transactionValidStart = new HederaTimeStamp(10, 100);

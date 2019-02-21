@@ -22,7 +22,6 @@ class HederaAccountUpdateValuesTest {
 		assertEquals(-1,values.sendRecordThreshold);
 		assertEquals(-1,values.receiveRecordThreshold);
 		assertEquals(-1,values.autoRenewPeriodSeconds);
-		assertEquals(-1,values.autoRenewPeriosNanos);
 		assertEquals(-1,values.expirationTimeSeconds);
 		assertEquals(-1,values.expirationTimeNanos);
 	}

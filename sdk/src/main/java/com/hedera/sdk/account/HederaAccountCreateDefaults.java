@@ -23,21 +23,9 @@ public class HederaAccountCreateDefaults {
 	 */
 	public long autoRenewPeriodSeconds = accountDefaultsFromClass.autoRenewPeriod.seconds;
 	/**
-	 * The number of nanoseconds to add to the autoRenewPeriodSeconds 
-	 */
-	public int autoRenewPeriodNanos = accountDefaultsFromClass.autoRenewPeriod.nanos;
-	/**
 	 * Is a signature required to receive funds in this account
 	 */
 	public boolean receiverSignatureRequired = accountDefaultsFromClass.receiverSigRequired;
-	/**
-	 * when another account tries to proxy stake to this account, accept it only if the proxyFraction from that other account is at most maxReceiveProxyFraction
-	 */
-	public int maxReceiveProxyFraction = accountDefaultsFromClass.maxReceiveProxyFraction;
-	/**
-	 * payments earned from proxy staking are shared between the node and this account, with proxyFraction / 10000 going to this account
-	 */
-	public int proxyFraction = accountDefaultsFromClass.proxyFraction;
 	/**
 	 * create an account record for any transaction depositing more than this many tinybars
 	 */

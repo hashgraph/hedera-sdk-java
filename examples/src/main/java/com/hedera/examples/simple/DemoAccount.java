@@ -168,7 +168,6 @@ public final class DemoAccount {
 		    		updates.receiveRecordThreshold = 3000;
 		    		// new auto renew period
 		    		updates.autoRenewPeriodSeconds = 10;
-		    		updates.autoRenewPeriosNanos = 20;
 		    		// new expiration time
 		    		updates.expirationTimeSeconds = 200;
 		    		updates.expirationTimeNanos = 100;

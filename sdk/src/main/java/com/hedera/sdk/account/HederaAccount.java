@@ -117,16 +117,8 @@ public class HederaAccount implements Serializable {
 	 * or if it is not currently running a node, then it will behave as if both proxyAccountID and proxyFraction were null.
 	 */
 	public HederaAccountID proxyAccountID = new HederaAccountID(0, 0, 0);
-	/** 
-	 * payments earned from proxy staking are shared between the node and this account, with proxyFraction / 10000 going to this account
-	 */
-	public int proxyFraction = 0;
 	/**
 	 * when another account tries to proxy stake to this account, accept it only if the proxyFraction from that other account is at most maxReceiveProxyFraction
-	 */
-	public int maxReceiveProxyFraction = 0;
-	/**
-	 * create an account record for any transaction withdrawing more than this many tinybars
 	 */
 	public long sendRecordThreshold = Long.MAX_VALUE;
 	/**
@@ -143,7 +135,7 @@ public class HederaAccount implements Serializable {
 	 * it extends as long as possible. If it is empty when it expires, then it is deleted.
 	 * Defaults to 60 * 60 * 24 * 30 = 30 days (60s * 60m * 24h * 30d) 
 	 */
-	public HederaDuration autoRenewPeriod = new HederaDuration(60 * 60 * 24 * 30, 0); // 30 days
+	public HederaDuration autoRenewPeriod = new HederaDuration(60 * 60 * 24 * 30); // 30 days
 	/**
 	 * the list of claims attached to this account as a result of a query
 	 */
@@ -823,7 +815,6 @@ public class HederaAccount implements Serializable {
 			this.solidityContractAccountID = accountGetInfoResponse.getAccountInfo().getContractAccountID();
 			this.deleted = accountGetInfoResponse.getAccountInfo().getDeleted();
 			this.proxyAccountID = new HederaAccountID(accountGetInfoResponse.getAccountInfo().getProxyAccountID());
-			this.proxyFraction = accountGetInfoResponse.getAccountInfo().getProxyFraction();
 			this.proxyReceived = accountGetInfoResponse.getAccountInfo().getProxyReceived();
 			this.accountKey = new HederaKeyPair(accountGetInfoResponse.getAccountInfo().getKey());
 			this.balance = accountGetInfoResponse.getAccountInfo().getBalance();
@@ -896,7 +887,6 @@ public class HederaAccount implements Serializable {
 	   	transactionBody.setAutoRenewPeriod(this.autoRenewPeriod.getProtobuf());
 	   	transactionBody.setInitialBalance(this.initialBalance);
 	   	transactionBody.setReceiverSigRequired(this.receiverSigRequired);
-   		transactionBody.setMaxReceiveProxyFraction(this.maxReceiveProxyFraction);
    		transactionBody.setReceiveRecordThreshold(this.receiveRecordThreshold);
    		transactionBody.setSendRecordThreshold(this.sendRecordThreshold);
 	   	
@@ -957,9 +947,6 @@ public class HederaAccount implements Serializable {
 		}
 		if (this.proxyAccountID != null) {
 			updateTransaction.setProxyAccountID(this.proxyAccountID.getProtobuf());
-		}
-		if (this.proxyFraction != 0) {
-			updateTransaction.setProxyFraction(this.proxyFraction);
 		}
 		if (this.receiveRecordThreshold != 0) {
 			updateTransaction.setReceiveRecordThreshold(this.receiveRecordThreshold);
@@ -1050,12 +1037,10 @@ public class HederaAccount implements Serializable {
 		// setup defaults if necessary
 		if (defaults != null) {
 			this.proxyAccountID = defaults.getProxyAccountID();
-			this.proxyFraction = defaults.proxyFraction;
-			this.maxReceiveProxyFraction = defaults.maxReceiveProxyFraction;
 			this.sendRecordThreshold = defaults.sendRecordThreshold;
 			this.receiveRecordThreshold = defaults.receiveRecordThreshold;
 			this.receiverSigRequired = defaults.receiverSignatureRequired;
-			this.autoRenewPeriod = new HederaDuration(defaults.autoRenewPeriodSeconds, defaults.autoRenewPeriodNanos);
+			this.autoRenewPeriod = new HederaDuration(defaults.autoRenewPeriodSeconds);
 			this.newRealmAdminKey = defaults.getNewRealmAdminPublicKey();
 		}
 		
@@ -1366,8 +1351,8 @@ public class HederaAccount implements Serializable {
 		if (updates == null) {
 			throw new InvalidParameterException("No values to update supplied");
 		} else {
-			if ((updates.autoRenewPeriodSeconds != -1) && (updates.autoRenewPeriosNanos != -1)) {
-				this.autoRenewPeriod = new HederaDuration(updates.autoRenewPeriodSeconds, updates.autoRenewPeriosNanos);
+			if (updates.autoRenewPeriodSeconds != -1) {
+				this.autoRenewPeriod = new HederaDuration(updates.autoRenewPeriodSeconds);
 			}
 			if ((updates.expirationTimeSeconds != -1) && (updates.expirationTimeNanos != -1)) {
 				this.expirationTime = new HederaTimeStamp(updates.expirationTimeSeconds, updates.expirationTimeNanos);
@@ -1379,9 +1364,6 @@ public class HederaAccount implements Serializable {
 			}
 			if ((updates.proxyAccountAccountNum != 0) && (updates.proxyAccountRealmNum != 0) && (updates.proxyAccountShardNum != 0)) {
 				this.proxyAccountID = new HederaAccountID(updates.proxyAccountShardNum, updates.proxyAccountRealmNum, updates.proxyAccountAccountNum);
-			}
-			if (updates.proxyFraction != 0) {
-				this.proxyFraction = updates.proxyFraction;
 			}
 			if (updates.receiveRecordThreshold != 0) {
 				this.receiveRecordThreshold = updates.receiveRecordThreshold;

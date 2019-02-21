@@ -115,7 +115,7 @@ public class ExampleUtilities {
 		txQueryDefaults.memo = "Demo memo";
 		txQueryDefaults.node = node;
 		txQueryDefaults.payingAccountID = payingAccountID;
-		txQueryDefaults.transactionValidDuration = new HederaDuration(120, 0);
+		txQueryDefaults.transactionValidDuration = new HederaDuration(120);
 		
 		return txQueryDefaults;
 	}

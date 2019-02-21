@@ -65,7 +65,7 @@ public final class DemoContractSimpleStorage {
 		if (contract != null) {
 			// update the contract
 			HederaTimeStamp expirationTime = new HederaTimeStamp(100, 10);
-			HederaDuration autoRenewDuration = new HederaDuration(10, 20);
+			HederaDuration autoRenewDuration = new HederaDuration(10);
 
 			if (contract != null) {
 				if (update) {

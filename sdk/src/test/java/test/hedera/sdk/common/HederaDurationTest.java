@@ -15,7 +15,7 @@ class HederaDurationTest {
 	
 	@BeforeAll
 	static void initAll() {
-		duration1 = new HederaDuration(10,100);
+		duration1 = new HederaDuration(10);
 		
 		Duration proto = duration1.getProtobuf();
 		duration2 = new HederaDuration(proto);
@@ -24,7 +24,6 @@ class HederaDurationTest {
 	@Test
 	@DisplayName("Checking matching account details")
 	void testAccount() {
-		assertEquals(duration1.nanos, duration2.nanos);
 		assertEquals(duration1.seconds, duration2.seconds);
 	}
 

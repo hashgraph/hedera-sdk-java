@@ -59,6 +59,7 @@ public class HederaContract implements Serializable {
 	private List<HederaTransactionRecord> transactionRecords = new ArrayList<HederaTransactionRecord>();
 	private long cost = 0;
 	private HederaContractFunctionResult hederaContractFunctionResult = null;
+	private String memo = "";
 	/**
 	 * Default parameters for a transaction or query
 	 */
@@ -139,10 +140,6 @@ public class HederaContract implements Serializable {
 	 */
 	public HederaAccountID proxyAccountID = null;
 	/**
-	 * payments earned from proxy staking are shared between the node and this instance's account, with proxyFraction / 10000 going to this account
-	 */
-	public int proxyFraction = 0;
-	/**
 	 * A {@link HederaDuration} representing the auto renew period of a smart contract
 	 * initially null
 	 * the instance will charge its account every this many seconds to renew for this long
@@ -176,6 +173,20 @@ public class HederaContract implements Serializable {
 	 */
 	public long getStorage() {
 		return this.storage;
+	}
+	/**
+	 * Gets the memo associated with the smart contract
+	 * @return String
+	 */
+	public String getMemo() {
+		return this.memo;
+	}
+	/**
+	 * Sets the memo associated with the smart contract
+	 * @param memo
+	 */
+	public void setMemo(String memo) {
+		this.memo = memo;
 	}
 	/** 
 	 * Gets the bytecode for the smart contract
@@ -427,11 +438,11 @@ public class HederaContract implements Serializable {
 		if (this.proxyAccountID != null) {
 			transactionBody.setProxyAccountID(this.proxyAccountID.getProtobuf());
 		}
-		transactionBody.setProxyFraction(this.proxyFraction);
 		if (this.realmNum != -1) {
 			transactionBody.setRealmID(new HederaRealmID(this.shardNum, this.realmNum).getProtobuf());
 		}
-		transactionBody.setShardID(new HederaShardID(this.shardNum).getProtobuf());	   	
+		transactionBody.setShardID(new HederaShardID(this.shardNum).getProtobuf());
+		transactionBody.setMemo(this.memo);
 		
 	
 
@@ -527,7 +538,7 @@ public class HederaContract implements Serializable {
 		if (this.proxyAccountID != null) {
 			transactionBody.setProxyAccountID(this.proxyAccountID.getProtobuf());
 		}
-	
+		transactionBody.setMemo(this.memo);
 
 		return transactionBody.build();
 	}
@@ -706,6 +717,7 @@ public class HederaContract implements Serializable {
 			this.solidityContractAccountID = info.getContractAccountID();
 			this.expirationTime = new HederaTimeStamp(info.getExpirationTime());
 			this.storage = info.getStorage();
+			this.memo = info.getMemo();
 		} else {
 			result = false;
 		}

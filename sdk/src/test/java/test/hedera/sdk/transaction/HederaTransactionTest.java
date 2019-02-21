@@ -61,7 +61,6 @@ class HederaTransactionTest {
 
 		Transaction trans = transaction.getProtobuf();
 		assertEquals(4,  trans.getSigs().getSigsCount());
-		assertEquals("body memo", trans.getBody().getMemo());
 	}
 
 	@Test
@@ -90,8 +89,6 @@ class HederaTransactionTest {
 
 		Transaction trans = transaction.getProtobuf();
 		assertEquals(2,  trans.getSigs().getSigsCount());
-		assertEquals("body memo", trans.getBody().getMemo());
-				
 	}
 
 	@Test

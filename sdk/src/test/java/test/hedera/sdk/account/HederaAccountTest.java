@@ -41,13 +41,10 @@ class HederaAccountTest {
 		assertEquals(0, account.proxyAccountID.shardNum);
 		assertEquals(0, account.proxyAccountID.realmNum);
 		assertEquals(0, account.proxyAccountID.accountNum);
-		assertEquals(0, account.proxyFraction);
-		assertEquals(0, account.maxReceiveProxyFraction);
 		assertEquals(Long.MAX_VALUE, account.sendRecordThreshold);
 		assertEquals(Long.MAX_VALUE, account.receiveRecordThreshold);
 		assertFalse(account.receiverSigRequired);
 		assertEquals(60 * 60 * 24 * 30, account.autoRenewPeriod.seconds);
-		assertEquals(0, account.autoRenewPeriod.nanos);
 		assertEquals(0, account.claims.size());
 		assertNull(account.expirationTime);
 
@@ -100,12 +97,11 @@ class HederaAccountTest {
 		HederaAccount account = new HederaAccount();
 		HederaTransactionID transactionID = new HederaTransactionID(new HederaAccountID(6, 5, 4), new HederaTimeStamp(100, 10));
 		HederaAccountID nodeAccount = new HederaAccountID(1, 2, 3);
-		HederaDuration transactionValidDuration = new HederaDuration(100, 10);
+		HederaDuration transactionValidDuration = new HederaDuration(100);
 		
-		account.autoRenewPeriod = new HederaDuration(200, 20);
+		account.autoRenewPeriod = new HederaDuration(200);
 		account.initialBalance = 10;
 		account.receiverSigRequired = true;
-		account.maxReceiveProxyFraction = 101;
 		account.receiveRecordThreshold = 202;
 		account.sendRecordThreshold = 303;
 		account.realmNum = 200;
@@ -115,10 +111,8 @@ class HederaAccountTest {
 		TransactionBody body = account.bodyToSignForCreate(transactionID, nodeAccount, 10, transactionValidDuration, true, "A memo");
 
 		assertEquals(200, body.getCryptoCreateAccount().getAutoRenewPeriod().getSeconds());
-		assertEquals(20, body.getCryptoCreateAccount().getAutoRenewPeriod().getNanos());
 		assertEquals(10, body.getCryptoCreateAccount().getInitialBalance());
 		assertTrue(body.getCryptoCreateAccount().getReceiverSigRequired());
-		assertEquals(101, body.getCryptoCreateAccount().getMaxReceiveProxyFraction());
 		assertEquals(202, body.getCryptoCreateAccount().getReceiveRecordThreshold());
 		assertEquals(303, body.getCryptoCreateAccount().getSendRecordThreshold());
 		assertFalse(body.getCryptoCreateAccount().hasKey());

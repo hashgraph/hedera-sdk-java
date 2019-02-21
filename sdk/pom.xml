@@ -341,7 +341,10 @@
 
     <profiles>
         <!-- Depploy profile which adds the possibility to distribute the .jar to a remote repository
-        Call "mvn clean deploy -Pdeploy" to invoke this additional plugin in the maven build -->
+        Call "mvn clean deploy -Pdeploy" to invoke this additional plugin in the maven build 
+        this may fail because the javadocs jar isn't being signed automatically, in which case from the 
+        target folder, run  gpg2 -ab hedera-java-sdk-0.2.1-javadoc.jar
+        Then manually upload to staging repository-->
         <profile>
             <id>deploy</id>
 			<properties>
@@ -376,7 +379,7 @@
  					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.5</version>
+						<version>1.6</version>
 						<configuration>
 							<skip>false</skip>
 						</configuration>
@@ -393,7 +396,7 @@
 					<plugin>
 						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>1.6.7</version>
+						<version>1.6.8</version>
 						<extensions>true</extensions>
 						<configuration>
 							<serverId>ossrh</serverId>

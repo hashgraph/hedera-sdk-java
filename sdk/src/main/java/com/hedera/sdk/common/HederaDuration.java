@@ -8,8 +8,6 @@ import com.hederahashgraph.api.proto.java.Duration;
 
 /**
  * The length of a period of time. 
- * This is an identical data structure to the protobuf Duration.proto 
- * (see the comments in https://github.com/google/protobuf/blob/master/src/google/protobuf/duration.proto)
  */
 public class HederaDuration implements Serializable {
 	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaDuration.class);
@@ -21,11 +19,6 @@ public class HederaDuration implements Serializable {
 	public long seconds = 120;
 
 	/**
-	 * the number of nanoseconds (defaults to 0)
-	 */
-	public int nanos = 0;
-
-	/**
 	 * Constructor with default values 
 	 */
 	public HederaDuration() {
@@ -34,14 +27,24 @@ public class HederaDuration implements Serializable {
 	/**
 	 * Constructor with specific values
 	 * @param seconds the number of seconds
-	 * @param nanos the number of nanoseconds 
 	 */
-	public HederaDuration(long seconds, int nanos) {
+	public HederaDuration(long seconds) {
 
 		this.seconds = seconds;
-		this.nanos = nanos;
 	}
 
+	/**
+	 * Constructor with specific values for backwards compatibility, nanos are ignored
+	 * @deprecated use {@link #HederaDuration(long seconds)} instead. Nanos are no longer a property of a Duration
+	 * @param seconds the number of seconds
+	 * @param nanos the number of seconds
+	 */
+	@Deprecated
+	public HederaDuration(long seconds, long nanos) {
+
+		this.seconds = seconds;
+	}
+	
 	/**
 	 * Constructor from a protobuf duration
 	 * @param durationProtobuf the protobuf for the duration
@@ -49,7 +52,6 @@ public class HederaDuration implements Serializable {
 	public HederaDuration(Duration durationProtobuf) {
 
 		this.seconds = durationProtobuf.getSeconds();
-		this.nanos = durationProtobuf.getNanos();
 	}
 
 	/**
@@ -59,6 +61,6 @@ public class HederaDuration implements Serializable {
 	public Duration getProtobuf() {
 
 		return Duration.newBuilder().setSeconds(this.seconds)
-			    .setNanos(this.nanos).build();
+			    .build();
 	}
 }
