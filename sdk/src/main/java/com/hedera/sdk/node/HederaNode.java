@@ -282,8 +282,8 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult accountCreate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("SENDING TRANSACTION");
-		logger.info(transaction.getProtobuf().toString());
+		logger.debug("SENDING TRANSACTION");
+		logger.debug(transaction.getProtobuf().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -294,7 +294,7 @@ public class HederaNode implements Serializable {
 			response = blockingStub.createAccount(transaction.getProtobuf());
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-				logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 				Thread.sleep(waitMillisLong);
 			} else {
 				break;
@@ -317,8 +317,8 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult addClaim(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("SENDING TRANSACTION");
-		logger.info(transaction.getProtobuf().toString());
+		logger.debug("SENDING TRANSACTION");
+		logger.debug(transaction.getProtobuf().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -329,7 +329,7 @@ public class HederaNode implements Serializable {
 			response = blockingStub.addClaim(transaction.getProtobuf());
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-				logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 				Thread.sleep(waitMillisLong);
 			} else {
 				break;
@@ -351,8 +351,8 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult accountTransfer(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("SENDING TRANSACTION");
-		logger.info(transaction.getProtobuf().toString());
+		logger.debug("SENDING TRANSACTION");
+		logger.debug(transaction.getProtobuf().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -364,7 +364,7 @@ public class HederaNode implements Serializable {
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 				// wait short time
-				logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 				Thread.sleep(waitMillisLong);
 			} else {
 				break;
@@ -386,8 +386,8 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult accountUpdate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("SENDING TRANSACTION");
-		logger.info(transaction.getProtobuf().toString());
+		logger.debug("SENDING TRANSACTION");
+		logger.debug(transaction.getProtobuf().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -398,7 +398,7 @@ public class HederaNode implements Serializable {
 			response = blockingStub.updateAccount(transaction.getProtobuf());
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-				logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 				Thread.sleep(waitMillisLong);
 			} else {
 				break;
@@ -420,8 +420,8 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult fileAppend(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("SENDING TRANSACTION");
-		logger.info(transaction.getProtobuf().toString());
+		logger.debug("SENDING TRANSACTION");
+		logger.debug(transaction.getProtobuf().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -432,7 +432,7 @@ public class HederaNode implements Serializable {
 			response = blockingStub.appendContent(transaction.getProtobuf());
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-				logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 				Thread.sleep(waitMillisLong);
 			} else {
 				break;
@@ -454,8 +454,8 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult fileCreate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("SENDING TRANSACTION");
-		logger.info(transaction.getProtobuf().toString());
+		logger.debug("SENDING TRANSACTION");
+		logger.debug(transaction.getProtobuf().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -466,7 +466,7 @@ public class HederaNode implements Serializable {
 			response = blockingStub.createFile(transaction.getProtobuf());
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-				logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 				Thread.sleep(waitMillisLong);
 			} else {
 				break;
@@ -489,8 +489,8 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult fileDelete(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("SENDING TRANSACTION");
-		logger.info(transaction.getProtobuf().toString());
+		logger.debug("SENDING TRANSACTION");
+		logger.debug(transaction.getProtobuf().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -501,7 +501,7 @@ public class HederaNode implements Serializable {
 			response = blockingStub.deleteFile(transaction.getProtobuf());
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-				logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 				Thread.sleep(waitMillisLong);
 			} else {
 				break;
@@ -524,8 +524,8 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult fileUpdate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("SENDING TRANSACTION");
-		logger.info(transaction.getProtobuf().toString());
+		logger.debug("SENDING TRANSACTION");
+		logger.debug(transaction.getProtobuf().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -536,7 +536,7 @@ public class HederaNode implements Serializable {
 			response = blockingStub.updateFile(transaction.getProtobuf());
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-				logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 				Thread.sleep(waitMillisLong);
 			} else {
 				break;
@@ -559,8 +559,8 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult contractCall(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("SENDING TRANSACTION");
-		logger.info(transaction.getProtobuf().toString());
+		logger.debug("SENDING TRANSACTION");
+		logger.debug(transaction.getProtobuf().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -571,7 +571,7 @@ public class HederaNode implements Serializable {
 			response = blockingStub.contractCallMethod(transaction.getProtobuf());
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-				logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 				Thread.sleep(waitMillisLong);
 			} else {
 				break;
@@ -594,8 +594,8 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult contractCreate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("SENDING TRANSACTION");
-		logger.info(transaction.getProtobuf().toString());
+		logger.debug("SENDING TRANSACTION");
+		logger.debug(transaction.getProtobuf().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -606,7 +606,7 @@ public class HederaNode implements Serializable {
 			response = blockingStub.createContract(transaction.getProtobuf());
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-				logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 				Thread.sleep(waitMillisLong);
 			} else {
 				break;
@@ -629,8 +629,8 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult contractUpdate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("SENDING TRANSACTION");
-		logger.info(transaction.getProtobuf().toString());
+		logger.debug("SENDING TRANSACTION");
+		logger.debug(transaction.getProtobuf().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -641,7 +641,7 @@ public class HederaNode implements Serializable {
 			response = blockingStub.updateContract(transaction.getProtobuf());
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-				logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 				Thread.sleep(waitMillisLong);
 			} else {
 				break;
@@ -664,8 +664,8 @@ public class HederaNode implements Serializable {
 	 */
 	public Response contractCallLocal(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("RUNNING QUERY TO NODE");
-		logger.info(query.getProtobuf().toString());
+		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
 
@@ -676,7 +676,7 @@ public class HederaNode implements Serializable {
 				response = blockingStub.contractCallLocalMethod(query.getProtobuf());
 				// retry if busy
 				if (response.getContractCallLocal().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
 					break;
@@ -686,8 +686,8 @@ public class HederaNode implements Serializable {
 			throw new IllegalStateException("Invalid Query Type");
 		}
 
-		logger.info("--->QUERY RESPONSE");
-		logger.info(response.toString());
+		logger.debug("--->QUERY RESPONSE");
+		logger.debug(response.toString());
 
 		return response;
 	}
@@ -701,8 +701,8 @@ public class HederaNode implements Serializable {
 	 */
 	public Response getContractByteCode(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("RUNNING QUERY TO NODE");
-		logger.info(query.getProtobuf().toString());
+		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
 
@@ -713,7 +713,7 @@ public class HederaNode implements Serializable {
 				response = blockingStub.contractGetBytecode(query.getProtobuf());
 				// retry if busy
 				if (response.getContractGetBytecodeResponse().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
 					break;
@@ -723,8 +723,8 @@ public class HederaNode implements Serializable {
 			throw new IllegalStateException("Invalid Query Type");
 		}
 
-		logger.info("--->QUERY RESPONSE");
-		logger.info(response.toString());
+		logger.debug("--->QUERY RESPONSE");
+		logger.debug(response.toString());
 
 		return response;
 	}
@@ -738,8 +738,8 @@ public class HederaNode implements Serializable {
 	 */
 	public Response getContractBySolidityId(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("RUNNING QUERY TO NODE");
-		logger.info(query.getProtobuf().toString());
+		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
 		if (query.getProtobuf().hasGetBySolidityID()) {
@@ -749,7 +749,7 @@ public class HederaNode implements Serializable {
 				response = blockingStub.getBySolidityID(query.getProtobuf());
 				// retry if busy
 				if (response.getGetBySolidityID().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
 					break;
@@ -759,8 +759,8 @@ public class HederaNode implements Serializable {
 			throw new IllegalStateException("Invalid Query Type");
 		}
 
-		logger.info("--->QUERY RESPONSE");
-		logger.info(response.toString());
+		logger.debug("--->QUERY RESPONSE");
+		logger.debug(response.toString());
 
 		return response;
 	}
@@ -774,8 +774,8 @@ public class HederaNode implements Serializable {
 	 */
 	public Response getContractInfo(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("RUNNING QUERY TO NODE");
-		logger.info(query.getProtobuf().toString());
+		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
 
@@ -786,7 +786,7 @@ public class HederaNode implements Serializable {
 				response = blockingStub.getContractInfo(query.getProtobuf());
 				// retry if busy
 				if (response.getContractGetInfo().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
 					break;
@@ -796,8 +796,8 @@ public class HederaNode implements Serializable {
 			throw new IllegalStateException("Invalid Query Type");
 		}
 
-		logger.info("--->QUERY RESPONSE");
-		logger.info(response.toString());
+		logger.debug("--->QUERY RESPONSE");
+		logger.debug(response.toString());
 
 		return response;
 	}
@@ -811,8 +811,8 @@ public class HederaNode implements Serializable {
 	 */
 	public Response getAccountBalance(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("RUNNING QUERY TO NODE");
-		logger.info(query.getProtobuf().toString());
+		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
 
@@ -823,7 +823,7 @@ public class HederaNode implements Serializable {
 				response = blockingStub.cryptoGetBalance(query.getProtobuf());
 				// retry if busy
 				if (response.getCryptogetAccountBalance().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
 					break;
@@ -833,8 +833,8 @@ public class HederaNode implements Serializable {
 			throw new IllegalStateException("Invalid Query Type");
 		}
 
-		logger.info("--->QUERY RESPONSE");
-		logger.info(response.toString());
+		logger.debug("--->QUERY RESPONSE");
+		logger.debug(response.toString());
 
 		return response;
 	}
@@ -848,8 +848,8 @@ public class HederaNode implements Serializable {
 	 */
 	public Response getAccountRecords(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("RUNNING QUERY TO NODE");
-		logger.info(query.getProtobuf().toString());
+		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
 
@@ -860,7 +860,7 @@ public class HederaNode implements Serializable {
 				response = blockingStub.getAccountRecords(query.getProtobuf());
 				// retry if busy
 				if (response.getCryptoGetAccountRecords().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
 					break;
@@ -870,8 +870,8 @@ public class HederaNode implements Serializable {
 			throw new IllegalStateException("Invalid Query Type");
 		}
 
-		logger.info("--->QUERY RESPONSE");
-		logger.info(response.toString());
+		logger.debug("--->QUERY RESPONSE");
+		logger.debug(response.toString());
 
 		return response;
 	}
@@ -885,8 +885,8 @@ public class HederaNode implements Serializable {
 	 */
 	public Response getAccountInfo(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("RUNNING QUERY TO NODE");
-		logger.info(query.getProtobuf().toString());
+		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
 
@@ -897,7 +897,7 @@ public class HederaNode implements Serializable {
 				response = blockingStub.getAccountInfo(query.getProtobuf());
 				// retry if busy
 				if (response.getCryptoGetInfo().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
 					break;
@@ -907,8 +907,8 @@ public class HederaNode implements Serializable {
 			throw new IllegalStateException("Invalid Query Type");
 		}
 
-		logger.info("--->QUERY RESPONSE");
-		logger.info(response.toString());
+		logger.debug("--->QUERY RESPONSE");
+		logger.debug(response.toString());
 
 		return response;
 	}
@@ -931,7 +931,7 @@ public class HederaNode implements Serializable {
 				response = blockingStub.getTransactionReceipts(query.getProtobuf());
 				// retry if busy
 				if (response.getTransactionGetReceipt().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
 					break;
@@ -954,8 +954,8 @@ public class HederaNode implements Serializable {
 	 */
 	public Response getTransactionRecord(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("RUNNING QUERY TO NODE");
-		logger.info(query.getProtobuf().toString());
+		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
 		if (query.getProtobuf().hasTransactionGetRecord()) {
@@ -965,7 +965,7 @@ public class HederaNode implements Serializable {
 				response = blockingStub.getTxRecordByTxID(query.getProtobuf());
 				// retry if busy
 				if (response.getTransactionGetRecord().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
 					break;
@@ -975,8 +975,8 @@ public class HederaNode implements Serializable {
 			throw new IllegalStateException("Invalid Query Type");
 		}
 
-		logger.info("--->QUERY RESPONSE");
-		logger.info(response.toString());
+		logger.debug("--->QUERY RESPONSE");
+		logger.debug(response.toString());
 
 		return response;
 	}
@@ -990,8 +990,8 @@ public class HederaNode implements Serializable {
 	 */
 	public Response getTransactionFastRecord(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("RUNNING QUERY TO NODE");
-		logger.info(query.getProtobuf().toString());
+		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
 		if (query.getProtobuf().hasTransactionGetFastRecord()) {
@@ -1001,7 +1001,7 @@ public class HederaNode implements Serializable {
 				response = blockingStub.getFastTransactionRecord(query.getProtobuf());
 				// retry if busy
 				if (response.getTransactionGetFastRecord().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
 					break;
@@ -1011,8 +1011,8 @@ public class HederaNode implements Serializable {
 			throw new IllegalStateException("Invalid Query Type");
 		}
 
-		logger.info("--->QUERY RESPONSE");
-		logger.info(response.toString());
+		logger.debug("--->QUERY RESPONSE");
+		logger.debug(response.toString());
 
 		return response;
 	}
@@ -1026,8 +1026,8 @@ public class HederaNode implements Serializable {
 	 */
 	public Response getFileContents(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("RUNNING QUERY TO NODE");
-		logger.info(query.getProtobuf().toString());
+		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
 		if (query.getProtobuf().hasFileGetContents()) {
@@ -1037,7 +1037,7 @@ public class HederaNode implements Serializable {
 				response = blockingStub.getFileContent(query.getProtobuf());
 				// retry if busy
 				if (response.getFileGetContents().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
 					break;
@@ -1047,8 +1047,8 @@ public class HederaNode implements Serializable {
 			throw new IllegalStateException("Invalid Query Type");
 		}
 
-		logger.info("--->QUERY RESPONSE");
-		logger.info(response.toString());
+		logger.debug("--->QUERY RESPONSE");
+		logger.debug(response.toString());
 
 		return response;
 	}
@@ -1062,8 +1062,8 @@ public class HederaNode implements Serializable {
 	 */
 	public Response getFileInfo(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.info("RUNNING QUERY TO NODE");
-		logger.info(query.getProtobuf().toString());
+		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
 		if (query.getProtobuf().hasFileGetInfo()) {
@@ -1073,7 +1073,7 @@ public class HederaNode implements Serializable {
 				response = blockingStub.getFileInfo(query.getProtobuf());
 				// retry if busy
 				if (response.getFileGetInfo().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-					logger.info("System busy - sleeping for " + waitMillisLong + "ms");
+					logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
 					Thread.sleep(waitMillisLong);
 				} else {
 					break;
@@ -1083,8 +1083,8 @@ public class HederaNode implements Serializable {
 			throw new IllegalStateException("Invalid Query Type");
 		}
 
-		logger.info("--->QUERY RESPONSE");
-		logger.info(response.toString());
+		logger.debug("--->QUERY RESPONSE");
+		logger.debug(response.toString());
 
 		return response;
 	}
