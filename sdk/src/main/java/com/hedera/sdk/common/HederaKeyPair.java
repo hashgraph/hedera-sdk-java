@@ -17,6 +17,7 @@ import com.google.protobuf.ByteString;
 import com.hedera.sdk.common.HederaContractID;
 import com.hedera.sdk.cryptography.CryptoUtils;
 import com.hedera.sdk.cryptography.EDKeyPair;
+import com.hedera.sdk.cryptography.KeyPair;
 import com.hedera.sdk.cryptography.Seed;
 import com.hedera.sdk.node.HederaNode;
 import com.hedera.sdk.query.HederaQuery;
@@ -67,8 +68,9 @@ public class HederaKeyPair implements Serializable {
 	private long cost = 0;
 	private byte[] stateProof = new byte[0];
 	private HederaNode node = new HederaNode();
-	private AbstractKeyPair keyPair = null;
+	private KeyPair keyPair = null;
 	private Seed seed = null;
+	private int index = -1;
 
 	/**
 	 * The type of key held in this object
@@ -122,6 +124,13 @@ public class HederaKeyPair implements Serializable {
 		return this.cost;
 	}
 	/**
+	 * Returns the index of this key
+	 * @return int the index of the key
+	 */
+	public long getIndex() {
+		return this.index;
+	}
+	/**
 	 * Returns the stateProof if requested during a query in relation to this key
 	 * @return byte array (byte[])
 	 */
@@ -129,12 +138,14 @@ public class HederaKeyPair implements Serializable {
 		return this.stateProof;
 	}
 	/**
-	 * sets the encoded public key as a byte[]
-	 * @param encodedPublicKey the encoded public key
+	 * sets the public key as a byte[]
+	 * @param publicKey the encoded public key
 	 */
-	public void setPublicKeyEncoded(byte[] encodedPublicKey) {
-		if (this.keyPair != null) {
-			this.keyPair.setPublicKeyEncoded(encodedPublicKey);
+	public void setPublicKeyEncoded(byte[] publicKey) {
+		if (this.keyType == KeyType.ED25519) {
+			this.keyPair = new EDKeyPair(publicKey, null);
+		} else {
+            throw new IllegalArgumentException("Key Type not recognized. You may be using an old sdk.");			
 		}
 	}
 
@@ -147,56 +158,108 @@ public class HederaKeyPair implements Serializable {
 	/**
 	 * Constructor from a key type and recoveryWords as an array of String
 	 * Creates or Recovers a public/private keypair from the list of words
+	 * at the default index of - 1
 	 * @param keyType the type of key to recover
 	 * @param recoveryWords String[] the list of words to recover from
 	 * @throws NoSuchAlgorithmException in the event of an error
 	 */
 	public HederaKeyPair(HederaKeyPair.KeyType keyType, String[] recoveryWords) throws NoSuchAlgorithmException  {
-		this(keyType, Arrays.asList(recoveryWords));
+		this(keyType, Arrays.asList(recoveryWords), -1);
 	}
 
 	/**
+	 * Constructor from a key type and recoveryWords as an array of String
+	 * Creates or Recovers a public/private keypair from the list of words
+	 * at the given index
+	 * @param keyType the type of key to recover
+	 * @param recoveryWords String[] the list of words to recover from
+	 * @param index the index to recover the key at
+	 * @throws NoSuchAlgorithmException in the event of an error
+	 */
+	public HederaKeyPair(HederaKeyPair.KeyType keyType, String[] recoveryWords, int index) throws NoSuchAlgorithmException  {
+		this(keyType, Arrays.asList(recoveryWords), index);
+	}
+	
+	/**
 	 * Constructor from a key type and recoveryWords as an List of String
 	 * Creates or Recovers a public/private keypair from the list of words
+	 * at the default index of -1
 	 * @param keyType the type of key to recover
 	 * @param recoveryWords the words to recover from
 	 * @throws NoSuchAlgorithmException in the event of an error
 	 */
 	public HederaKeyPair(HederaKeyPair.KeyType keyType, List<String> recoveryWords) throws NoSuchAlgorithmException  {
+		this(keyType, recoveryWords, -1);
+	}
+
+	/**
+	 * Constructor from a key type and recoveryWords as an List of String
+	 * Creates or Recovers a public/private keypair from the list of words
+	 * at the specified index
+	 * @param keyType the type of key to recover
+	 * @param recoveryWords the words to recover from
+	 * @param index the index to recover the key at
+	 * @throws NoSuchAlgorithmException in the event of an error
+	 */
+	public HederaKeyPair(HederaKeyPair.KeyType keyType, List<String> recoveryWords, int index) throws NoSuchAlgorithmException  {
 		this.keyType = keyType;
 
 		byte[] privateKey;
+		this.index = index;
 		this.seed = Seed.fromWordList(recoveryWords);
-		privateKey = CryptoUtils.deriveKey(seed.toBytes(), -1, 32);
+		privateKey = CryptoUtils.deriveKey(seed.toBytes(), index, 32);
 		this.keyPair = new EDKeyPair(privateKey);
 	}
+
 	/**
-	 * Constructor from a key type and seed 
+	 * Constructor from a key type, seed and index 
 	 * @param keyType the type of key to generate
 	 * @param seed the seed to generate with
+	 * @param index the index to generate the key at
 	 */
-	public HederaKeyPair(HederaKeyPair.KeyType keyType, byte[] seed) {
+	public HederaKeyPair(HederaKeyPair.KeyType keyType, byte[] seed, int index) {
 		
 		this.keyType = keyType;
 		
+		this.index = index;
+
 		if (seed == null) {
 			seed = CryptoUtils.getSecureRandomData(32);
 		}
+		
 		byte[] privateKey;
 		if (seed.length != 32) {
 			throw new IllegalStateException(String.format("Seed size of %d is invalid, should be 32", seed.length));
 		}
 		this.seed = Seed.fromEntropy(seed);
-		privateKey = CryptoUtils.deriveKey(this.seed.toBytes(), -1, 32);
+		privateKey = CryptoUtils.deriveKey(this.seed.toBytes(), index, 32);
 		this.keyPair = new EDKeyPair(privateKey);
   }
  
+	/**
+	 * Constructor from a key type, seed at the default index of -1
+	 * @param keyType the type of key to generate
+	 * @param seed the seed to generate with
+	 */
+	public HederaKeyPair(HederaKeyPair.KeyType keyType, byte[] seed) {
+		this(keyType,seed,-1);
+  }
+
 	/** 
 	 * Constructs a key pair of the given key type, the seed is randomly generated
 	 * @param keyType the type of key to create
 	 */
 	public HederaKeyPair(HederaKeyPair.KeyType keyType) {
-		this(keyType, (byte[])null);
+		this(keyType, (byte[])null, -1);
+	}
+	
+	/** 
+	 * Constructs a key pair of the given key type at the specified index, the seed is randomly generated
+	 * @param keyType the type of key to create
+	 * @param index the index to generate the key for
+	 */
+	public HederaKeyPair(HederaKeyPair.KeyType keyType, int index) {
+		this(keyType, (byte[])null, index);
 	}
 	
 	/**
@@ -256,7 +319,7 @@ public class HederaKeyPair implements Serializable {
 	 * @param keyType {@link HederaKeyPair.KeyType}
 	 * @param publicKey {@link String} as a hex encoded string
 	 * @param secretKey {@link String} as a hex encoded string
-	 * @param description the description of the key
+	 * @param description {@link String} the description for the key
 	 * @throws DecoderException if the keys can't be decoded
 	 * @throws IllegalStateException if the key type is invalid 
 	 * @throws InvalidKeySpecException in the event of a key specification error 
@@ -280,12 +343,6 @@ public class HederaKeyPair implements Serializable {
 				}
 
 				this.keyPair = new EDKeyPair(pub, secret);
-				
-				//byte [] pubKeybytes = HexUtils.hexToBytes(ed25519PublicKeyHex);    
-//				X509EncodedKeySpec pencoded = new X509EncodedKeySpec(pubKeybytes);
-//		        EdDSAPublicKey pubKey = new EdDSAPublicKey(pencoded);
-//				byte[] abyte = pubKey.getAbyte();
-				//
 				
 				break;
 			default:
@@ -478,27 +535,44 @@ public class HederaKeyPair implements Serializable {
 	 */
 	public KeyType getKeyType() {
 	
-
 		return this.keyType;
 	}
 	/**
-	 * gets the public key as a byte[]
+	 * gets the non-encoded public key as a byte[]
 	 * @return byte[], null if not set
 	 */
 	public byte[] getPublicKey() {
 		if (this.keyPair != null) {
-			return this.keyPair.publicKey;
+			return this.keyPair.getPublicKey();
 		} else {
 			return null;
 		}
 	}
+
+	/**
+	 * gets the non-encoded public key as a string HEX
+	 * @return String[], null if not set
+	 */
 	public String getPublicKeyHex() {
 		if (this.keyPair != null) {
-			return Hex.toHexString(this.keyPair.getPublicKey().getEncoded());
+			return this.keyPair.getPublicKeyHex();
 		} else {
 			return "";
 		}
 	}
+
+	/**
+	 * gets the encoded public key as a string HEX
+	 * @return String[], null if not set
+	 */
+	public String getPublicKeyEncodedHex() {
+		if (this.keyPair != null) {
+			return this.keyPair.getPublicKeyEncodedHex();
+		} else {
+			return "";
+		}
+	}
+
 	/**
 	 * gets the encoded public key as a byte[]
 	 * @return byte[], null if not set
@@ -513,36 +587,97 @@ public class HederaKeyPair implements Serializable {
 
 	/**
 	 * sets the secret key as a byte[]
-	 * @param secretKey the secret key
+	 * @param secretKey the secret key (either encoded or not)
 	 */
 	public void setSecretKey(byte[] secretKey) {
-		keyPair.setSecretKey(secretKey);
+		if (this.keyType == KeyType.ED25519) {
+			this.keyPair = EDKeyPair.buildFromPrivateKey(secretKey);
+		} else {
+            throw new IllegalArgumentException("Key Type not recognized. You may be using an old sdk.");			
+		}
 	}
 
 	/**
-	 * gets the secret key as a byte[]
+	 * gets the non-encoded secret key as a byte[]
 	 * @return  byte[] or null if not set
 	 */
 	public byte[] getSecretKey() {
 		if (this.keyPair != null) {
-			return keyPair.privateKey;
+			return keyPair.getPrivateKey();
 		} else {
 			return null;
 		}
 	}
 
 	/**
-	 * gets the secret key as a String
-	 * @return empty string if not set
+	 * gets the encoded secret key as a byte[]
+	 * @return  byte[] or null if not set
+	 */
+	public byte[] getSecretKeyEncoded() {
+		if (this.keyPair != null) {
+			return keyPair.getPrivateKeyEncoded();
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * gets the non-encoded secret key as a String HEX
+	 * @return String empty string if not set
 	 */
 	public String getSecretKeyHex() {
 		if (this.keyPair != null) {
-			return Hex.toHexString(this.keyPair.getPrivateKey().getEncoded());
+			return this.keyPair.getPrivateKeyHex();
 		} else {
 			return "";
 		}
 	}
 
+	/**
+	 * gets the encoded secret key as a String HEX
+	 * @return String empty string if not set
+	 */
+	public String getSecretKeyEncodedHex() {
+		if (this.keyPair != null) {
+			return this.keyPair.getPrivateKeyEncodedHex();
+		} else {
+			return "";
+		}
+	}
+
+	/**
+	 * gets the seed for the private key
+	 * @return byte[] null if not set
+	 */
+    public byte[] getSecretKeySeed() {
+		if (this.keyPair != null) {
+			return this.keyPair.getPrivateKeySeed();
+		} else {
+			return null;
+		}
+    }
+	/**
+	 * gets the seed for the private key as a Hex string
+	 * @return String empty string if not set
+	 */
+    public String getSecretKeySeedHex() {
+		if (this.keyPair != null) {
+			return this.keyPair.getPrivateKeySeedHex();
+		} else {
+			return "";
+		}
+    }
+	/**
+	 * gets the seed for the private key concatenated with the public key as a byte array
+	 * @return byte[] containing the private key seed and public key
+	 */
+	public byte[] getSeedAndPublicKey() {
+		if (this.keyPair != null) {
+			return this.keyPair.getSeedAndPublicKey();
+		} else {
+			return null;
+		}
+	}	
 	/**
 	 * Gets the contractID stored in this key
 	 * return will be null if not set

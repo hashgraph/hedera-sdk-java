@@ -3,6 +3,11 @@ package com.hedera.examples.utilities;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Properties;
 
@@ -120,5 +125,46 @@ public class ExampleUtilities {
 		String log = String.format("%s\n%s\n%s\n%s\n%s", "", stars, result, stars, "");
 		logger.info(log);
 	}
-	
+
+	public static byte[] copyBytes(int start, int length, byte[] bytes) {
+		byte[] rv = new byte[length];
+		for (int i = 0; i < length; i++) {
+			rv[i] = bytes[start + i];
+		}
+		return rv;
+	}
+
+	public static void checkBinFile(byte[] fileContents) {
+		// look for unwanted characters in the file
+		final String error = "Invalid character in bin file at position ";
+		for (int i=0; i < fileContents.length; i++) {
+			boolean bOk = false;
+			if ((fileContents[i] >= 48) && (fileContents[i] <= 57)) { // 0-9
+				bOk = true;
+			} else if ((fileContents[i] >= 65) && (fileContents[i] <= 70)) { // A-F
+				bOk = true;
+			} else if ((fileContents[i] >= 97) && (fileContents[i] <= 102)) { // a-f
+				bOk = true;
+			}
+			if (!bOk) {
+				System.out.println(error + i + " - found ASCII code " + fileContents[i]);
+				throw new IllegalArgumentException(error + i);
+			}
+		}
+	}
+	public static byte[] readFile(String filePath) throws IOException, URISyntaxException {
+
+		byte[] fileContents = new byte[0];
+		if (ClassLoader.getSystemResource("") == null) {
+			fileContents = Files.readAllBytes(Paths.get("", filePath));
+
+		} else {
+			URI uri = ClassLoader.getSystemResource("").toURI();
+			String rootPath = Paths.get(uri).toString();
+			Path path = Paths.get(rootPath, filePath);
+
+			fileContents = Files.readAllBytes(path);
+		}
+		return fileContents;
+	}
 }

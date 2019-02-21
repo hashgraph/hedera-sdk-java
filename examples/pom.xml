@@ -6,7 +6,7 @@
 
 	<groupId>com.hedera.hashgraph</groupId>
 	<artifactId>hedera-sdk-java-examples</artifactId>
-	<version>0.2.0</version>
+	<version>0.2.1</version>
 	<packaging>jar</packaging>
 
 	<name>examples</name>
@@ -44,8 +44,8 @@
 	<dependencies>
         <dependency>
 			<groupId>com.hedera.hashgraph</groupId>
-			<artifactId>java-sdk</artifactId>
-			<version>0.2.0</version>
+			<artifactId>hedera-java-sdk</artifactId>
+			<version>0.2.1</version>
         </dependency>
 
 		<dependency>

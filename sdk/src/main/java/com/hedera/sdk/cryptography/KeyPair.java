@@ -1,17 +1,17 @@
 package com.hedera.sdk.cryptography;
 
-import java.security.PrivateKey;
-import java.security.PublicKey;
-
 public interface KeyPair {
-
-	PrivateKey getPrivateKey();
-
-	PublicKey getPublicKey();
-
-	byte[] getPublicKeyEncoded();
-
+	byte[] getPrivateKey();
+	byte[] getPublicKey();
 	byte[] signMessage(byte[] message);
-
 	boolean verifySignature(byte[] message, byte[] signature);
+	byte[] getSeedAndPublicKey();
+	byte[] getPrivateKeyEncoded();
+	byte[] getPublicKeyEncoded();
+	String getPrivateKeyEncodedHex();
+	String getPublicKeyEncodedHex();
+	String getPrivateKeyHex();
+	String getPublicKeyHex();
+	byte[] getPrivateKeySeed();
+	String getPrivateKeySeedHex();
 }

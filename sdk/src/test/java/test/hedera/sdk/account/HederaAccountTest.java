@@ -82,8 +82,8 @@ class HederaAccountTest {
 		assertArrayEquals(new byte[0], account.getStateProof());
 
 		account = new HederaAccount();
-		HederaKeyPair key = new HederaKeyPair(KeyType.ED25519, "key".getBytes(), null);
-		HederaKeyPair key2 = new HederaKeyPair(KeyType.ED25519, "key2".getBytes(), null);
+		HederaKeyPair key = new HederaKeyPair(KeyType.ED25519);
+		HederaKeyPair key2 = new HederaKeyPair(KeyType.ED25519, key.getPublicKey(), null);
 		
 		account.addKey(key);
 		account.addKey(key2);

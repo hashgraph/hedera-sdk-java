@@ -6,13 +6,13 @@
 
     <parent>
         <groupId>com.hedera.hashgraph</groupId>
-        <artifactId>java-sdk-full</artifactId>
-        <version>0.2.0</version>
+        <artifactId>hedera-java-sdk-full</artifactId>
+        <version>0.2.1</version>
     </parent>
     
 	<groupId>com.hedera.hashgraph</groupId>
-	<artifactId>java-sdk</artifactId>
-	<version>0.2.0</version>
+	<artifactId>hedera-java-sdk</artifactId>
+	<version>0.2.1</version>
 	<packaging>jar</packaging>
 
 	<name>sdk</name>
@@ -266,7 +266,7 @@
                     <target>${maven.compiler.target}</target>
                 </configuration>
 			</plugin>
-
+			<!--  JAVADOC local -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
@@ -278,12 +278,14 @@
 					<excludePackageNames>net.i2p.*</excludePackageNames>
 					<excludePackageNames>org.json.*</excludePackageNames>
 					<additionalOptions>-html5</additionalOptions>
+					<reportOutputDirectory>${project.basedir}/javadoc</reportOutputDirectory>
 				</configuration>
 				<executions>
 					<execution>
+						<phase>install</phase>
 						<id>attach-javadocs</id>
 						<goals>
-							<goal>jar</goal>
+							<goal>javadoc</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -347,7 +349,31 @@
 			</properties>
 			<build>
 				<plugins>
+					<!--  JAVADOC JAR -->
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<configuration>
+							<javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+							<excludePackageNames>com.hedera.sdk.api.proto.*</excludePackageNames>
+							<excludePackageNames>com.hedera.sdk.muquit.*</excludePackageNames>
+							<excludePackageNames>test.com.hedera.*</excludePackageNames>
+							<excludePackageNames>net.i2p.*</excludePackageNames>
+							<excludePackageNames>org.json.*</excludePackageNames>
+							<additionalOptions>-html5</additionalOptions>
+							<reportOutputDirectory>${project.build.directory}</reportOutputDirectory>
+						</configuration>
+						<executions>
+							<execution>
+							<phase>deploy</phase>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+ 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
 						<version>1.5</version>

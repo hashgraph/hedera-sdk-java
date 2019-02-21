@@ -8,113 +8,172 @@ import net.i2p.crypto.eddsa.spec.EdDSAParameterSpec;
 import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
 import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import static org.junit.Assert.assertNotNull;
+
 import java.security.Signature;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
-import com.hedera.sdk.common.AbstractKeyPair;
+import org.bouncycastle.util.encoders.Hex;
 
-public class EDKeyPair extends AbstractKeyPair {
+import com.hedera.sdk.cryptography.KeyPair;
+
+public class EDKeyPair implements KeyPair {
 
 	private EdDSAPrivateKey edPrivateKey;
 	private EdDSAPublicKey edPublicKey;
 
+	private EDKeyPair() {
+	}
+
 	public EDKeyPair(final byte[] seed) {
-		final EdDSAParameterSpec spec = getEdDSAParameterSpec();
-		final EdDSAPrivateKeySpec privateKeySpec = new EdDSAPrivateKeySpec(seed, spec);
-		this.edPrivateKey = new EdDSAPrivateKey(privateKeySpec);
-		this.privateKey = edPrivateKey.geta();
-		final EdDSAPublicKeySpec pubKeySpec = new EdDSAPublicKeySpec(privateKeySpec.getA(), spec);
-		this.edPublicKey = new EdDSAPublicKey(pubKeySpec);
-		this.publicKey = edPublicKey.getAbyte();
+        EdDSAParameterSpec spec = EdDSANamedCurveTable.getByName(EdDSANamedCurveTable.ED_25519);
+        EdDSAPrivateKeySpec privateKeySpec = new EdDSAPrivateKeySpec(seed, spec);
+        this.edPrivateKey = new EdDSAPrivateKey(privateKeySpec);
+        EdDSAPublicKeySpec pubKeySpec = new EdDSAPublicKeySpec(privateKeySpec.getA(), spec);
+        this.edPublicKey = new EdDSAPublicKey(pubKeySpec);		
 	}
 
 	public EDKeyPair(final byte[] publicKey, final byte[] privateKey) {
 		try {
-			if (publicKey.length  == 44) {
-				final X509EncodedKeySpec encodedPubKey = new X509EncodedKeySpec(publicKey);
-				this.edPublicKey = new EdDSAPublicKey(encodedPubKey);
-				this.publicKey = edPublicKey.getAbyte();
-			} else if (publicKey.length == 32) {
-				final EdDSAPublicKeySpec encodedPubKey = new EdDSAPublicKeySpec(publicKey, EdDSANamedCurveTable.ED_25519_CURVE_SPEC);
-				this.edPublicKey = new EdDSAPublicKey(encodedPubKey);
-				this.publicKey = edPublicKey.getAbyte();
-			}
+			// try encoded key first
+			X509EncodedKeySpec encodedPubKey = new X509EncodedKeySpec(publicKey);
+			this.edPublicKey = new EdDSAPublicKey(encodedPubKey);
+		} catch (InvalidKeySpecException e) {
+			// key is invalid (likely not encoded)
+			// try non encoded
+			final EdDSAPublicKeySpec pubKeySpec = new EdDSAPublicKeySpec(publicKey, EdDSANamedCurveTable.ED_25519_CURVE_SPEC);
+			this.edPublicKey = new EdDSAPublicKey(pubKeySpec);
+		}
 
-			if (privateKey != null) {
-				if (privateKey.length != 0) {
+		if (privateKey != null) {
+			if (privateKey.length != 0) {
+				// try encoded first
+				try {
 					final PKCS8EncodedKeySpec encodedPrivKey = new PKCS8EncodedKeySpec(privateKey);
 					this.edPrivateKey = new EdDSAPrivateKey(encodedPrivKey);
-					this.privateKey = edPrivateKey.geta();
+				} catch (InvalidKeySpecException e) {
+					// key is invalid (likely not encoded)
+					final EdDSAPrivateKeySpec  privKeySpec = new EdDSAPrivateKeySpec(privateKey,EdDSANamedCurveTable.ED_25519_CURVE_SPEC);
+					this.edPrivateKey = new EdDSAPrivateKey(privKeySpec);
 				}
 			}
-
-		} catch (final InvalidKeySpecException e) {
-			throw new RuntimeException(e);
 		}
 	}
 
 	public static EDKeyPair buildFromPrivateKey(final byte[] privateKey) {
+
+		final EDKeyPair edKeyPair = new EDKeyPair();
 		try {
-			final EDKeyPair edKeyPair = new EDKeyPair();
-			final PKCS8EncodedKeySpec encodedPrivKey = new PKCS8EncodedKeySpec(privateKey);
+			// try encoded first
+	 		final PKCS8EncodedKeySpec encodedPrivKey = new PKCS8EncodedKeySpec(privateKey);
 			edKeyPair.edPrivateKey = new EdDSAPrivateKey(encodedPrivKey);
-			edKeyPair.edPublicKey = new EdDSAPublicKey(
-					new EdDSAPublicKeySpec(edKeyPair.edPrivateKey.getAbyte(), getEdDSAParameterSpec()));
-			return edKeyPair;
-		} catch (final Exception exception) {
-			throw new RuntimeException(exception);
+		} catch (InvalidKeySpecException e) {
+			// key is invalid (likely not encoded)
+			// try non encoded
+			final EdDSAPrivateKeySpec  privKey = new EdDSAPrivateKeySpec(privateKey,EdDSANamedCurveTable.ED_25519_CURVE_SPEC);
+			edKeyPair.edPrivateKey = new EdDSAPrivateKey(privKey);
+		}
+
+		EdDSAParameterSpec spec = EdDSANamedCurveTable.getByName(EdDSANamedCurveTable.ED_25519);
+			
+		edKeyPair.edPublicKey = new EdDSAPublicKey(
+				new EdDSAPublicKeySpec(edKeyPair.edPrivateKey.getAbyte(), spec));
+		return edKeyPair;
+	}
+
+	@Override
+	public byte[] getPrivateKey() {
+		if (this.edPrivateKey != null) {
+			return this.edPrivateKey.geta();
+		} else {
+			return null;
+		}
+	}
+	
+	@Override
+	public byte[] getPrivateKeyEncoded() {
+		if (this.edPrivateKey != null) {
+			return edPrivateKey.getEncoded();
+		} else {
+			return null;
 		}
 	}
 
-//	public static EDKeyPair buildFromPublicKey(final byte[] publicKey) {
-//		try {
-//			final X509EncodedKeySpec encodedPubKey = new X509EncodedKeySpec(publicKey);
-//			this.edPublicKey = new EdDSAPublicKey(encodedPubKey);
-//			this.publicKey = edPublicKey.getAbyte();
-//		} catch (final Exception exception) {
-//			throw new RuntimeException(exception);
-//		}
-//	}
-
 	@Override
-	public void setPublicKey(final byte[] publicKey) {
-		try {
-			final X509EncodedKeySpec encodedPubKey = new X509EncodedKeySpec(publicKey);
-			this.edPublicKey = new EdDSAPublicKey(encodedPubKey);
-			this.publicKey = edPublicKey.getAbyte();
-		} catch (final InvalidKeySpecException e) {
-			throw new RuntimeException(e);
+	public String getPrivateKeyEncodedHex() {
+		if (this.edPrivateKey != null) {
+			return Hex.toHexString(this.getPrivateKeyEncoded());
+		} else {
+			return "";
 		}
 	}
-
+	
 	@Override
-	public PrivateKey getPrivateKey() {
-		return this.edPrivateKey;
+	public String getPrivateKeyHex() {
+		if (this.edPrivateKey != null) {
+			return Hex.toHexString(this.getPrivateKey());
+		} else {
+			return "";
+		}
 	}
-
 	@Override
-	public PublicKey getPublicKey() {
-		return this.edPublicKey;
+	public byte[] getPublicKey() {
+		if (this.edPublicKey != null) {
+			return this.edPublicKey.getAbyte();
+		} else {
+			return null;
+		}
 	}
-
 	public byte[] getPublicKeyEncoded() {
-		return this.edPublicKey.getEncoded();
-	}
-
-	public void setSecretKey(final byte[] secretKey) {
-		try {
-			final PKCS8EncodedKeySpec encodedPrivKey = new PKCS8EncodedKeySpec(privateKey);
-			this.edPrivateKey = new EdDSAPrivateKey(encodedPrivKey);
-			this.privateKey = edPrivateKey.getEncoded();
-		} catch (final InvalidKeySpecException e) {
-			throw new RuntimeException(e);
+		if (this.edPublicKey != null) {
+			return this.edPublicKey.getEncoded();
+		} else {
+			return null;
 		}
 	}
-
+	@Override
+	public String getPublicKeyEncodedHex() {
+		if (this.edPublicKey != null) {
+			return Hex.toHexString(this.getPublicKeyEncoded());
+		} else {
+			return "";
+		}
+	}
+	
+	@Override
+	public String getPublicKeyHex() {
+		if (this.edPublicKey != null) {
+			return Hex.toHexString(this.getPublicKey());
+		} else {
+			return "";
+		}
+	}
+    @Override
+    public byte[] getPrivateKeySeed() {
+        return edPrivateKey.getSeed();
+    }
+    @Override
+    public String getPrivateKeySeedHex() {
+        return Hex.toHexString(edPrivateKey.getSeed());
+    }
+	@Override
+	public byte[] getSeedAndPublicKey() {
+		
+		if ((this.edPrivateKey != null)&& (this.edPublicKey != null)) {
+			byte[] seed = this.edPrivateKey.getSeed();
+	        byte[] publicKey = getPublicKey();
+	
+	        byte[] key = new byte[seed.length + publicKey.length];
+	        System.arraycopy(seed, 0, key, 0, seed.length);
+	        System.arraycopy(publicKey, 0, key, seed.length, publicKey.length);
+	        return key;
+		} else {
+			return null;
+		}
+	}
+	
 	@Override
 	public byte[] signMessage(final byte[] message) {
 		try {
@@ -140,10 +199,4 @@ public class EDKeyPair extends AbstractKeyPair {
 		}
 	}
 
-	private EDKeyPair() {
-	}
-
-	private static EdDSAParameterSpec getEdDSAParameterSpec() {
-		return EdDSANamedCurveTable.getByName(EdDSANamedCurveTable.ED_25519);
-	}
 }

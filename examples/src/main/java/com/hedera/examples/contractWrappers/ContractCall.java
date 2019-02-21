@@ -10,7 +10,7 @@ import com.hedera.sdk.transaction.HederaTransactionResult;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class ContractCall {
-	public static boolean call(HederaContract contract, long gas, long amount, byte[] functionParameters) throws Exception {
+	public static HederaTransactionResult call(HederaContract contract, long gas, long amount, byte[] functionParameters) throws Exception {
 		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(ContractCall.class);
 		ExampleUtilities.showResult("**    CONTRACT CALL");
 
@@ -26,17 +26,17 @@ public final class ContractCall {
 			if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
 				// and print it out
 				ExampleUtilities.showResult(String.format("**    Smart Contract call success"));
-				return true;
+				return callResult;
 			} else {
 				ExampleUtilities.showResult("**    Failed with transactionStatus:" + receipt.transactionStatus.toString());
-				return false;
+				return null;
 			}
 		} else if (contract.getPrecheckResult() == ResponseCodeEnum.BUSY) {
 			logger.info("system busy, try again later");
-			return false;
+			return null;
 		} else {
 			ExampleUtilities.showResult("**    Failed with getPrecheckResult:" + contract.getPrecheckResult());
-			return false;
+			return null;
 		}
 	}
 
