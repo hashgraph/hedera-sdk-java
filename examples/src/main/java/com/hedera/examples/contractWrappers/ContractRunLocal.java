@@ -15,6 +15,9 @@ public final class ContractRunLocal {
 
 		HederaContractFunctionResult functionResult = new HederaContractFunctionResult();
 		// run a call local query
+		if (contract == null) {
+			throw new Exception("ContractRunLocal.runLocal - contract object is null");
+		}
 		functionResult = contract.callLocal(gas, function, maxResultSize);
 		if (functionResult != null) {
 			// it was successful, print it

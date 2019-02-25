@@ -183,7 +183,7 @@ public class HederaContract implements Serializable {
 	}
 	/**
 	 * Sets the memo associated with the smart contract
-	 * @param memo
+	 * @param memo the memo to associate with this smart contract
 	 */
 	public void setMemo(String memo) {
 		this.memo = memo;
@@ -823,9 +823,14 @@ public class HederaContract implements Serializable {
 		if (this.precheckResult == ResponseCodeEnum.OK) {
 			// result of function call
 			// check for presence of a result
-			if (getCallLocalResponse.getFunctionResult().getContractCallResult().isEmpty()) {
-				throw new Exception("Local smart contract function call returned no result. Check smart contract initialised properly and sufficient gas for function call");
+			if (getCallLocalResponse.getFunctionResult() == null) {
+				throw new Exception("Local smart contract function call returned no function result. Check smart contract initialised properly and sufficient gas for function call");
+			} else if (getCallLocalResponse.getFunctionResult().getContractCallResult() == null) {
+				throw new Exception("Local smart contract function call returned no call result. Check smart contract initialised properly and sufficient gas for function call");
+			} else if (getCallLocalResponse.getFunctionResult().getContractCallResult().isEmpty()) {
+				throw new Exception("Local smart contract function call returned no call result. Check smart contract initialised properly and sufficient gas for function call");
 			} else {
+				logger.debug("Getting smart contract call result");
 				this.hederaContractFunctionResult = new HederaContractFunctionResult(getCallLocalResponse.getFunctionResult());
 			}
 			// cost
@@ -833,6 +838,7 @@ public class HederaContract implements Serializable {
 			//state proof
 			this.stateProof = responseHeader.getStateProof().toByteArray();
 		} else {
+			logger.debug("Precheck not ok : " + this.precheckResult);
 			result = false;
 		}
 		
