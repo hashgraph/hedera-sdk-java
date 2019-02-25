@@ -8,10 +8,12 @@
     </encoder>
   </appender>
 
-  <root level="info">
+  <root level="debug">
     <appender-ref ref="STDOUT" />
   </root>
   
-    <logger name="com.ning.http.client" level="WARN"/>
+  <logger name="com.ning.http.client" level="WARN"/>
+  <logger name="io.netty" level="WARN"/>
+  <logger name="io.grpc" level="WARN"/>
   
 </configuration>

@@ -411,6 +411,57 @@ public class Utilities {
 					logger.debug("precheck=SERIALIZATION_FAILED");
 					keepGoing = false;
 					break;
+				case EMPTY_CLAIM_BODY:
+					logger.debug("precheck=EMPTY_CLAIM_BODY");
+					keepGoing = false;
+					break;
+				case EMPTY_CLAIM_HASH:
+					logger.debug("precheck=EMPTY_CLAIM_HASH");
+					keepGoing = false;
+					break;
+				case EMPTY_CLAIM_KEYS:
+					logger.debug("precheck=EMPTY_CLAIM_KEYS");
+					keepGoing = false;
+					break;
+				case INVALID_CLAIM_HASH_SIZE:
+					logger.debug("precheck=INVALID_CLAIM_HASH_SIZE");
+					keepGoing = false;
+					break;
+					
+				case EMPTY_QUERY_BODY:
+					logger.debug("precheck=EMPTY_QUERY_BODY");
+					keepGoing = false;
+					break;
+				case EMPTY_CLAIM_QUERY:
+					logger.debug("precheck=EMPTY_CLAIM_QUERY");
+					keepGoing = false;
+					break;
+				case CLAIM_NOT_FOUND:
+					logger.debug("precheck=CLAIM_NOT_FOUND");
+					keepGoing = false;
+					break;
+				case ACCOUNT_ID_DOES_NOT_EXIST:
+					logger.debug("precheck=ACCOUNT_ID_DOES_NOT_EXIST");
+					keepGoing = false;
+					break;
+
+				case CLAIM_ALREADY_EXISTS:
+					logger.debug("precheck=CLAIM_ALREADY_EXISTS");
+					keepGoing = false;
+					break;
+				case TRANSACTION_OVERSIZE:
+					logger.debug("precheck=TRANSACTION_OVERSIZE");
+					keepGoing = false;
+					break;
+				case TRANSACTION_TOO_MANY_LAYERS:
+					logger.debug("precheck=TRANSACTION_TOO_MANY_LAYERS");
+					keepGoing = false;
+					break;
+				case CONTRACT_DELETED:
+					logger.debug("precheck=CONTRACT_DELETED");
+					keepGoing = false;
+					break;
+					
 			}
 		}
 		return receipt;
