@@ -36,6 +36,61 @@ public class HederaAccountID implements Serializable {
 	}
 
 	/**
+	 * Constructor for a HederaAccountID from a string
+	 * @param accountID a colon or dot separated list of shard, realm and account numbers (e.g. 0:0:1020)
+	 */
+	public HederaAccountID(String accountID) {
+		if ((!accountID.contains(":")) || (!accountID.contains("."))) {
+			throw new IllegalArgumentException("accountID must contain '.' or ':' to separate values");
+		}
+		String[] IDs; 
+		if (accountID.contains(":")) {
+			IDs = accountID.split(":");
+		} else {
+			IDs = accountID.split(".");
+		}
+		if (IDs.length !=3) {
+			throw new IllegalArgumentException("accountID must contain 3 values for shardNum, realmNum and accountNum");
+		}
+		long realmNum;
+		try {
+			realmNum = Long.parseLong(IDs[0]);
+		}
+		catch (NumberFormatException e)
+		{
+			throw new IllegalArgumentException("realmNum must be numeric");
+		}		
+		long shardNum;
+		try {
+			shardNum = Long.parseLong(IDs[1]);
+		}
+		catch (NumberFormatException e)
+		{
+			throw new IllegalArgumentException("shardNum must be numeric");
+		}		
+		long accountNum;
+		try {
+			accountNum = Long.parseLong(IDs[2]);
+		}
+		catch (NumberFormatException e)
+		{
+			throw new IllegalArgumentException("accountNum must be numeric");
+		}		
+ 		this.shardNum = shardNum;
+		this.realmNum = realmNum;
+		this.accountNum = accountNum;
+	}
+	/**
+	 * Constructor for a HederaAccountID from specified parameter values
+	 * shard and realm are defaulted to 0
+	 * @param accountNum the account number (unique within its realm)
+	 */
+	public HederaAccountID(long accountNum) {
+ 		this.shardNum = 0;
+		this.realmNum = 0;
+		this.accountNum = accountNum;
+	}
+	/**
 	 * Constructor for a HederaAccountID from specified parameter values
 	 * @param shardNum the shard number
 	 * @param realmNum the realm number

@@ -33,8 +33,62 @@ public class HederaFileID implements Serializable {
 	 * Default constructor with default values
 	 */
 	public HederaFileID() {
+	}
 
-
+	/**
+	 * Constructor for a HederaFileID from a string
+	 * @param fileID a colon or dot separated list of shard, realm and file numbers (e.g. 0:0:1020)
+	 */
+	public HederaFileID(String fileID) {
+		if ((!fileID.contains(":")) || (!fileID.contains("."))) {
+			throw new IllegalArgumentException("fileID must contain '.' or ':' to separate values");
+		}
+		String[] IDs; 
+		if (fileID.contains(":")) {
+			IDs = fileID.split(":");
+		} else {
+			IDs = fileID.split(".");
+		}
+		if (IDs.length !=3) {
+			throw new IllegalArgumentException("fileID must contain 3 values for shardNum, realmNum and fileNum");
+		}
+		long realmNum;
+		try {
+			realmNum = Long.parseLong(IDs[0]);
+		}
+		catch (NumberFormatException e)
+		{
+			throw new IllegalArgumentException("realmNum must be numeric");
+		}		
+		long shardNum;
+		try {
+			shardNum = Long.parseLong(IDs[1]);
+		}
+		catch (NumberFormatException e)
+		{
+			throw new IllegalArgumentException("shardNum must be numeric");
+		}		
+		long fileNum;
+		try {
+			fileNum = Long.parseLong(IDs[2]);
+		}
+		catch (NumberFormatException e)
+		{
+			throw new IllegalArgumentException("fileNum must be numeric");
+		}		
+ 		this.shardNum = shardNum;
+		this.realmNum = realmNum;
+		this.fileNum = fileNum;
+	}
+	/**
+	 * Constructor for a HederaFileID from specified parameter values
+	 * shard and realm are defaulted to 0
+	 * @param fileNum the file number (unique within its realm)
+	 */
+	public HederaFileID(long fileNum) {
+ 		this.shardNum = 0;
+		this.realmNum = 0;
+		this.fileNum = fileNum;
 	}
 
 	/**

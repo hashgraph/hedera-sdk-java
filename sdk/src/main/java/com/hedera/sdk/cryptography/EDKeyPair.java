@@ -141,6 +141,14 @@ public class EDKeyPair implements KeyPair {
 			return "";
 		}
 	}
+
+	public String Public() {
+		if (this.edPublicKey != null) {
+			return Hex.toHexString(this.getPublicKeyEncoded());
+		} else {
+			return "";
+		}
+	}
 	
 	@Override
 	public String getPublicKeyHex() {

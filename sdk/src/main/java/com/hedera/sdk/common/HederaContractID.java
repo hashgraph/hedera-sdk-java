@@ -39,7 +39,61 @@ public class HederaContractID implements Serializable {
 	 */
 	public HederaContractID() {
 	}
-
+	/**
+	 * Constructor for a HederaContractID from a string
+	 * @param contractID a colon or dot separated list of shard, realm and contract numbers (e.g. 0:0:1020)
+	 */
+	public HederaContractID(String contractID) {
+		if ((!contractID.contains(":")) || (!contractID.contains("."))) {
+			throw new IllegalArgumentException("contractID must contain '.' or ':' to separate values");
+		}
+		String[] IDs; 
+		if (contractID.contains(":")) {
+			IDs = contractID.split(":");
+		} else {
+			IDs = contractID.split(".");
+		}
+		if (IDs.length !=3) {
+			throw new IllegalArgumentException("contractID must contain 3 values for shardNum, realmNum and contractNum");
+		}
+		long realmNum;
+		try {
+			realmNum = Long.parseLong(IDs[0]);
+		}
+		catch (NumberFormatException e)
+		{
+			throw new IllegalArgumentException("realmNum must be numeric");
+		}		
+		long shardNum;
+		try {
+			shardNum = Long.parseLong(IDs[1]);
+		}
+		catch (NumberFormatException e)
+		{
+			throw new IllegalArgumentException("shardNum must be numeric");
+		}		
+		long contractNum;
+		try {
+			contractNum = Long.parseLong(IDs[2]);
+		}
+		catch (NumberFormatException e)
+		{
+			throw new IllegalArgumentException("contractNum must be numeric");
+		}		
+ 		this.shardNum = shardNum;
+		this.realmNum = realmNum;
+		this.contractNum = contractNum;
+	}
+	/**
+	 * Constructor for a HederaContractID from specified parameter values
+	 * shard and realm are defaulted to 0
+	 * @param contractNum the contract number (unique within its realm)
+	 */
+	public HederaContractID(long contractNum) {
+ 		this.shardNum = 0;
+		this.realmNum = 0;
+		this.contractNum = contractNum;
+	}
 	/**
 	 * Constructor for a HederaContractID from specified parameter values
 	 * @param shardNum the shard number
