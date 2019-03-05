@@ -55,7 +55,7 @@
         </repository>
     </distributionManagement>
     <repositories>
-        <repository>
+<!--        <repository>
             <id>artifactory-central</id>
             <name>Swirlds Artifactory-releases</name>
             <url>https://art.swirlds.com/artifactory/swirlds</url>
@@ -63,6 +63,7 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
+      -->
     </repositories>
     <dependencyManagement>
         <dependencies>
@@ -194,9 +195,9 @@
       			<version>1.58.0.0</version>
       		</dependency>
       		<dependency>
-      			<groupId>com.opencrowd</groupId>
-      			<artifactId>hapi-proto</artifactId>
-      			<version>1.0-SNAPSHOT</version>
+      			<groupId>com.hedera.hashgraph</groupId>
+      			<artifactId>hedera-protobuf-java-api</artifactId>
+      			<version>0.3.0-SNAPSHOT</version>
       		</dependency>
       		<dependency>
       			<groupId>ch.qos.logback</groupId>

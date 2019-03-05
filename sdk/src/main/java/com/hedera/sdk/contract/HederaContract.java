@@ -296,6 +296,9 @@ public class HederaContract implements Serializable {
 		Utilities.throwIfNull("Node", this.node);
 		HederaTransactionResult hederaTransactionResult = this.node.contractCall(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
+
+		this.precheckResult = hederaTransactionResult.getPrecheckResult();
+		this.hederaContractFunctionResult = null;
 		// return
 
 		return hederaTransactionResult;
@@ -382,8 +385,12 @@ public class HederaContract implements Serializable {
 		Utilities.throwIfNull("Node", this.node);
 		HederaTransactionResult hederaTransactionResult = this.node.contractCreate(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
-		// return
 
+		this.precheckResult = hederaTransactionResult.getPrecheckResult();
+		this.hederaContractFunctionResult = null;
+		
+		// return
+		
 		return hederaTransactionResult;
 	}
 
@@ -483,6 +490,10 @@ public class HederaContract implements Serializable {
 		Utilities.throwIfNull("Node", this.node);
 		HederaTransactionResult hederaTransactionResult = this.node.contractUpdate(transaction);
 		hederaTransactionResult.hederaTransactionID = transactionID;
+
+		this.precheckResult = hederaTransactionResult.getPrecheckResult();
+		this.hederaContractFunctionResult = null;
+
 		// return
 
 		return hederaTransactionResult;
@@ -691,7 +702,8 @@ public class HederaContract implements Serializable {
 		ResponseHeader.Builder responseHeader = getInfoResponse.getHeaderBuilder();
 
 		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
-				
+		this.hederaContractFunctionResult = null;
+		
 		if (this.precheckResult == ResponseCodeEnum.OK) {
 			ContractInfo info = getInfoResponse.getContractInfo();
 			// cost
@@ -994,7 +1006,6 @@ public class HederaContract implements Serializable {
 			, this.txQueryDefaults.memo
 			, sigsForTransaction);
 		
-
 		return transactionResult;
 	}
 

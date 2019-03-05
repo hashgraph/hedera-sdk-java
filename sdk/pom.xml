@@ -160,8 +160,8 @@
 			<artifactId>core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.opencrowd</groupId>
-			<artifactId>hapi-proto</artifactId>
+		    <groupId>com.hedera.hashgraph</groupId>
+    		<artifactId>hedera-protobuf-java-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
