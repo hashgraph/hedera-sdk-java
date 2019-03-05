@@ -54,16 +54,18 @@
             <url>file://${project.build.directory}/mvn-repo</url>
         </repository>
     </distributionManagement>
-    <repositories>
-<!--        <repository>
-            <id>artifactory-central</id>
-            <name>Swirlds Artifactory-releases</name>
-            <url>https://art.swirlds.com/artifactory/swirlds</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-      -->
+  <repositories>
+    <repository>
+        <id>apache.snapshots</id>
+        <name>Apache Development Snapshot Repository</name>
+        <url>https://repository.apache.org/content/repositories/snapshots/</url>
+        <releases>
+            <enabled>false</enabled>
+        </releases>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+    </repository>
     </repositories>
     <dependencyManagement>
         <dependencies>
