@@ -5,7 +5,7 @@
 
 The Java SDK for interacting with [Hedera Hashgraph](https://hedera.com): the official distributed consensus platform built using the hashgraph consensus algorithm for fast, fair and secure transactions. Hedera enables and empowers developers to build an entirely new class of decentralized applications.
 
-## Version is 0.2.1
+## Version is 0.2.2
 
 The Hedera Java SDK uses [semantic versioning](https://semver.org/).
 
@@ -16,7 +16,11 @@ Features supported include:
 - Creating [Solidity](https://solidity.readthedocs.io/en/latest/index.html) Smart Contracts
 - Executing Smart Contracts
 
-## Changes in this version from 0.1.0
+## Version history
+
+### 0.2.2 - Switch to Hedera Hashgraph Protobuf repo
+
+This version uses a new repository to fetch the protobuf API from to better control version management.
 
 ### 0.2.1 - Change to artifact IDs
 
@@ -74,7 +78,7 @@ You may now add the SDK to your project as a maven dependency as follows:
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>hedera-java-sdk</artifactId>
-  <version>0.2.1</version>
+  <version>0.2.2</version>
 </dependency>
 ```
 
@@ -258,7 +262,7 @@ Refer to the java sdk in your maven pom file as follows:
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>hedera-java-sdk</artifactId>
-  <version>0.2.1</version>
+  <version>0.2.2</version>
 </dependency>
 ```
 
