@@ -1,4 +1,5 @@
 com.hedera.sdk.account
+com.hedera.sdk.builder
 com.hedera.sdk.common
 com.hedera.sdk.contract
 com.hedera.sdk.cryptography

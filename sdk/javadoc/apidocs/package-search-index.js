@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"com.hedera.sdk.account"},{"l":"com.hedera.sdk.common"},{"l":"com.hedera.sdk.contract"},{"l":"com.hedera.sdk.cryptography"},{"l":"com.hedera.sdk.file"},{"l":"com.hedera.sdk.node"},{"l":"com.hedera.sdk.query"},{"l":"com.hedera.sdk.transaction"}]
+packageSearchIndex = [{"l":"com.hedera.sdk.account"},{"l":"com.hedera.sdk.builder"},{"l":"com.hedera.sdk.common"},{"l":"com.hedera.sdk.contract"},{"l":"com.hedera.sdk.cryptography"},{"l":"com.hedera.sdk.file"},{"l":"com.hedera.sdk.node"},{"l":"com.hedera.sdk.query"},{"l":"com.hedera.sdk.transaction"}]
