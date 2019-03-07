@@ -4,12 +4,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.hedera.hashgraph</groupId>
-        <artifactId>hedera-java-sdk-full</artifactId>
-        <version>0.3.0</version>
-    </parent>
-    
+	<parent>
+		<groupId>com.hedera.hashgraph</groupId>
+		<artifactId>hedera-java-sdk-full</artifactId>
+		<version>0.3.0</version>
+	</parent>
+
 	<groupId>com.hedera.hashgraph</groupId>
 	<artifactId>hedera-java-sdk</artifactId>
 	<version>0.3.0</version>
@@ -50,70 +50,106 @@
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 	</distributionManagement>
-	
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<grpc.version>1.14.0</grpc.version><!-- CURRENT_GRPC_VERSION -->
+		<proto.version>3.6.1</proto.version>
+		<maven.compiler.source>10</maven.compiler.source>
+		<maven.compiler.target>10</maven.compiler.target>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>sonatype.snapshots</id>
+			<name>Sonatype snapshot repository</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
+      			<version>2.3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-core</artifactId>
+      			<version>2.3.0</version>
 		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.activation</groupId>
-			<artifactId>activation</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.platform</groupId>
-			<artifactId>junit-platform-suite-api</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.platform</groupId>
-			<artifactId>junit-platform-commons</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.platform</groupId>
-			<artifactId>junit-platform-engine</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.platform</groupId>
-			<artifactId>junit-platform-launcher</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.platform</groupId>
-			<artifactId>junit-platform-runner</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.java.dev.jna</groupId>
-			<artifactId>jna</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-		</dependency>
+      		<dependency>
+      			<groupId>com.sun.xml.bind</groupId>
+      			<artifactId>jaxb-impl</artifactId>
+      			<version>2.3.0</version>
+      		</dependency>
+      		<dependency>
+      			<groupId>javax.activation</groupId>
+      			<artifactId>activation</artifactId>
+      			<version>1.1.1</version>
+      		</dependency>
+      		<dependency>
+      			<groupId>org.junit.jupiter</groupId>
+      			<artifactId>junit-jupiter-api</artifactId>
+      			<version>5.2.0</version>
+      			<scope>test</scope>
+      		</dependency>
+      		<dependency>
+      			<groupId>org.junit.jupiter</groupId>
+      			<artifactId>junit-jupiter-engine</artifactId>
+      			<version>5.2.0</version>
+      			<scope>test</scope>
+      		</dependency>
+      		<dependency>
+      			<groupId>org.junit.platform</groupId>
+      			<artifactId>junit-platform-suite-api</artifactId>
+      			<version>1.1.0</version>
+      			<scope>test</scope>
+      		</dependency>
+      		<dependency>
+      			<groupId>org.junit.platform</groupId>
+      			<artifactId>junit-platform-commons</artifactId>
+      			<version>1.2.0</version>
+      			<scope>test</scope>
+      		</dependency>
+      		<dependency>
+      			<groupId>org.junit.platform</groupId>
+      			<artifactId>junit-platform-engine</artifactId>
+      			<version>1.2.0</version>
+      			<scope>test</scope>
+      		</dependency>
+      		<dependency>
+      			<groupId>org.junit.platform</groupId>
+      			<artifactId>junit-platform-launcher</artifactId>
+      			<version>1.1.0</version>
+      			<scope>test</scope>
+      		</dependency>
+      		<dependency>
+      			<groupId>org.junit.platform</groupId>
+      			<artifactId>junit-platform-runner</artifactId>
+      			<version>1.1.0</version>
+      			<scope>test</scope>
+      		</dependency>
+      		<dependency>
+      			<groupId>net.java.dev.jna</groupId>
+      			<artifactId>jna</artifactId>
+      			<version>4.2.2</version>
+      		</dependency>
+      		<dependency>
+      			<groupId>commons-codec</groupId>
+      			<artifactId>commons-codec</artifactId>
+      			<version>1.10</version>
+      		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-javadoc-plugin</artifactId>
+      			<version>2.10.4</version>
 			<type>maven-plugin</type>
 			<exclusions>
 				<exclusion>
@@ -137,35 +173,43 @@
 		<dependency>
 			<groupId>com.google.api.grpc</groupId>
 			<artifactId>proto-google-common-protos</artifactId>
+      			<version>1.12.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java</artifactId>
+      			<version>3.6.0</version>
 		</dependency>
 		<dependency>
 			<groupId>io.grpc</groupId>
 			<artifactId>grpc-all</artifactId>
+      			<version>1.17.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-params</artifactId>
+      			<version>5.2.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.i2p.crypto</groupId>
 			<artifactId>eddsa</artifactId>
+      			<version>0.3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.madgag.spongycastle</groupId>
 			<artifactId>core</artifactId>
+      			<version>1.58.0.0</version>
 		</dependency>
 		<dependency>
-		    <groupId>com.hedera.hashgraph</groupId>
-    		<artifactId>hedera-protobuf-java-api</artifactId>
+			<groupId>com.hedera.hashgraph</groupId>
+			<artifactId>hedera-protobuf-java-api</artifactId>
+      			<version>0.3.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
+      			<version>1.2.3</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -176,74 +220,79 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-core</artifactId>
+      			<version>1.2.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpkix-jdk15on</artifactId>
+      			<version>1.60</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
+      			<version>1.7.25</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
+      			<version>23.6-jre</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpcore</artifactId>
+      			<version>4.4.8</version>
 		</dependency>
 	</dependencies>
 
-    <build>
-        <resources>
-            <resource>
-                <directory>src</directory>
-                <excludes>
-                    <exclude>**/*.java</exclude>
-                </excludes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <targetPath>${project.build.directory}</targetPath>
-                <includes>
+	<build>
+		<resources>
+			<resource>
+				<directory>src</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<targetPath>${project.build.directory}</targetPath>
+				<includes>
 					<include>logback.xml</include>
-                </includes>
-            </resource>
-        </resources>
+				</includes>
+			</resource>
+		</resources>
 
-        <!-- definition of the used plugins and their version -->
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.0.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.19.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.7</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>3.0.1</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+		<!-- definition of the used plugins and their version -->
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.8.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>3.0.1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.19.1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>2.7</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>3.0.1</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 
-        <!-- applying the plugins to the maven build: -->
+		<!-- applying the plugins to the maven build: -->
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -262,11 +311,11 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                </configuration>
+					<source>${maven.compiler.source}</source>
+					<target>${maven.compiler.target}</target>
+				</configuration>
 			</plugin>
-			<!--  JAVADOC local -->
+			<!-- JAVADOC local -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
@@ -339,20 +388,20 @@
 		</plugins>
 	</reporting>
 
-    <profiles>
-        <!-- Depploy profile which adds the possibility to distribute the .jar to a remote repository
-        Call "mvn clean deploy -Pdeploy" to invoke this additional plugin in the maven build 
-        this may fail because the javadocs jar isn't being signed automatically, in which case from the 
-        target folder, run  gpg2 -ab hedera-java-sdk-0.2.1-javadoc.jar
-        Then manually upload to staging repository-->
-        <profile>
-            <id>deploy</id>
+	<profiles>
+		<!-- Depploy profile which adds the possibility to distribute the .jar 
+			to a remote repository Call "mvn clean deploy -Pdeploy" to invoke this additional 
+			plugin in the maven build this may fail because the javadocs jar isn't being 
+			signed automatically, in which case from the target folder, run gpg2 -ab 
+			hedera-java-sdk-0.2.1-javadoc.jar Then manually upload to staging repository -->
+		<profile>
+			<id>deploy</id>
 			<properties>
 				<gpg.executable>gpg2</gpg.executable>
 			</properties>
 			<build>
 				<plugins>
-					<!--  JAVADOC JAR -->
+					<!-- JAVADOC JAR -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
@@ -368,7 +417,7 @@
 						</configuration>
 						<executions>
 							<execution>
-							<phase>deploy</phase>
+								<phase>deploy</phase>
 								<id>attach-javadocs</id>
 								<goals>
 									<goal>jar</goal>
@@ -376,7 +425,7 @@
 							</execution>
 						</executions>
 					</plugin>
- 					<plugin>
+					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
 						<version>1.6</version>
@@ -405,7 +454,7 @@
 						</configuration>
 					</plugin>
 				</plugins>
-			</build>		
-        </profile>
-    </profiles>
+			</build>
+		</profile>
+	</profiles>
 </project>
