@@ -82,7 +82,7 @@ You may now add the SDK to your project as a maven dependency as follows:
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>hedera-java-sdk</artifactId>
-  <version>0.2.2</version>
+  <version>0.2.3</version>
 </dependency>
 ```
 
@@ -266,7 +266,7 @@ Refer to the java sdk in your maven pom file as follows:
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>hedera-java-sdk</artifactId>
-  <version>0.2.2</version>
+  <version>0.2.3</version>
 </dependency>
 ```
 
