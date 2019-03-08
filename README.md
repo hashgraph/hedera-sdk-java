@@ -18,9 +18,13 @@ Features supported include:
 
 ## Version history
 
-### 0.2.3 - Switch to Hedera Hashgraph Protobuf repo
+### 0.2.3 - Changes to pom structure
 
-Changes to pom structure
+Changes to pom structure including removal of parent project and inclusion of dependency version numbers.
+
+### 0.2.3 - Changes to protobuf repo version
+
+Changed dependency on protobuf repo from 0.2.0 to 0.2.1
 
 ### 0.2.2 - Switch to Hedera Hashgraph Protobuf repo
 
