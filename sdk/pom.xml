@@ -6,7 +6,7 @@
 
 	<groupId>com.hedera.hashgraph</groupId>
 	<artifactId>hedera-java-sdk</artifactId>
-	<version>0.2.2</version>
+	<version>0.2.3</version>
 	<packaging>jar</packaging>
 
 	<name>sdk</name>
@@ -191,7 +191,7 @@
 		<dependency>
             <groupId>com.hedera.hashgraph</groupId>
       			<artifactId>hedera-protobuf-java-api</artifactId>
-      			<version>0.2.0</version>
+      			<version>0.2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
