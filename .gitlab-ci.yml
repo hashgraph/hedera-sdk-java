@@ -11,6 +11,7 @@ cache:
 build:
   stage: build
   script:
+    - ls -la .gradle/*
     - ./gradlew assemble
 
 test:
