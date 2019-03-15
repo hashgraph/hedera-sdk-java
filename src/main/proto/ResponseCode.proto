@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package proto;
 
-option java_package = "com.hederahashgraph.api.proto.java";
+option java_package = "com.hedera.sdk.proto";
 option java_multiple_files = true;
 
 enum ResponseCodeEnum {
@@ -49,7 +49,7 @@ enum ResponseCodeEnum {
 	LOCAL_CALL_MODIFICATION_EXCEPTION=32;//local execution (query) is requested for a function which changes state
 	CONTRACT_REVERT_EXECUTED=33; //Contract REVERT OPCODE executed
 	CONTRACT_EXECUTION_EXCEPTION=34;//For any contract execution related error not handled by specific error codes listed above.
-    INVALID_RECEIVING_NODE_ACCOUNT = 35; //In Query validation, account with +ve(amount) value should be Receiving node account, the receiver account should be only one account in the list 
+    INVALID_RECEIVING_NODE_ACCOUNT = 35; //In Query validation, account with +ve(amount) value should be Receiving node account, the receiver account should be only one account in the list
 	MISSING_QUERY_HEADER = 36; // Header is missing in Query request
 
 
@@ -63,8 +63,8 @@ enum ResponseCodeEnum {
 
     INVALID_FEE_SUBMITTED = 42; // Invalid fee submitted*/
     INVALID_PAYER_SIGNATURE = 43; //  payer signature is invalid
-    
-    
+
+
     KEY_NOT_PROVIDED = 44;
     INVALID_EXPIRATION_TIME = 45;
     NO_WACL_KEY = 46;
@@ -73,5 +73,5 @@ enum ResponseCodeEnum {
         // new response codes to be added
     EMPTY_TRANSACTION_BODY = 49; // transaction body is empty
     INVALID_TRANSACTION_BODY = 50; // invalid transaction body
-	
+
 }
