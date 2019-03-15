@@ -18,7 +18,7 @@ repositories {
 
 dependencies {
     // Support for Protobufs
-    implementation 'com.google.protobuf:protobuf-java:3.7.0'
+    implementation 'com.google.protobuf:protobuf-java:3.6.0'
 
     // Support for gRPC
     implementation 'io.grpc:grpc-netty-shaded:1.19.0'
@@ -45,7 +45,7 @@ protobuf {
     protoc {
         // Download protoc from maven instead of depending on it existing on the
         // system path
-        artifact = 'com.google.protobuf:protoc:3.7.0'
+        artifact = 'com.google.protobuf:protoc:3.6.0'
     }
 
     plugins {
