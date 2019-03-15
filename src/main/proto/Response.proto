@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "com.hederahashgraph.api.proto.java";
+option java_multiple_files = true;
+
+import "GetByKey.proto";
+import "GetBySolidityID.proto";
+
+import "ContractCallLocal.proto";
+import "ContractGetBytecode.proto";
+import "ContractGetInfo.proto";
+import "ContractGetRecords.proto";
+
+import "CryptoGetAccountBalance.proto";
+import "CryptoGetAccountRecords.proto";
+import "CryptoGetInfo.proto";
+import "CryptoGetClaim.proto";
+import "CryptoGetStakers.proto";
+
+import "FileGetContents.proto";
+import "FileGetInfo.proto";
+
+import "TransactionGetReceipt.proto";
+import "TransactionGetRecord.proto";
+import "TransactionGetFastRecord.proto";
+
+/* A single response, which is returned from the node to the client, after the client sent the node a query. This includes all responses. */
+message Response {
+    oneof response {
+        GetByKeyResponse getByKey = 1; // get all entities associated with a given key
+        GetBySolidityIDResponse getBySolidityID = 2; // get the IDs in the format used in transactions, given the format used in Solidity
+
+        ContractCallLocalResponse contractCallLocal = 3; // call a function of a smart contract instance
+        ContractGetBytecodeResponse contractGetBytecodeResponse = 5; // get the bytecode for a smart contract instance
+        ContractGetInfoResponse contractGetInfo = 4; // get information about a smart contract instance
+        ContractGetRecordsResponse contractGetRecordsResponse = 6; //Get all existing records for a smart contract instance
+
+        CryptoGetAccountBalanceResponse cryptogetAccountBalance = 7; // get the current balance in a cryptocurrency account
+        CryptoGetAccountRecordsResponse cryptoGetAccountRecords = 8; // get all the records that currently exist for transactions involving an account
+        CryptoGetInfoResponse cryptoGetInfo = 9; // get all information about an account
+        CryptoGetClaimResponse cryptoGetClaim = 10; // get a single claim from a single account (or null if it doesn't exist)
+        CryptoGetStakersResponse cryptoGetProxyStakers = 11; // get all the accounts that proxy stake to a given account, and how much they proxy stake
+
+        FileGetContentsResponse fileGetContents = 12; // get the contents of a file (the bytes stored in it)
+        FileGetInfoResponse fileGetInfo = 13; // get information about a file, such as its expiration date
+
+        TransactionGetReceiptResponse transactionGetReceipt = 14; // get a receipt for a transaction (lasts 180 seconds)
+        TransactionGetRecordResponse transactionGetRecord = 15; // get a record for a transaction (lasts 1 hour)
+        TransactionGetFastRecordResponse transactionGetFastRecord = 16; // get a record for a transaction (lasts 180 seconds)
+    }
+}

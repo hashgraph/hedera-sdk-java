@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "com.hederahashgraph.api.proto.java";
+option java_multiple_files = true;
+
+import "AdminDelete.proto";
+import "AdminUndelete.proto";
+
+import "ContractCall.proto";
+import "ContractCreate.proto";
+import "ContractUpdate.proto";
+
+import "CryptoAddClaim.proto";
+import "CryptoCreate.proto";
+import "CryptoDelete.proto";
+import "CryptoDeleteClaim.proto";
+import "CryptoTransfer.proto";
+import "CryptoUpdate.proto";
+
+import "FileAppend.proto";
+import "FileCreate.proto";
+import "FileDelete.proto";
+import "FileUpdate.proto";
+
+import "Duration.proto";
+import "BasicTypes.proto";
+
+/* A single transaction. All transaction types are possible here. */
+message TransactionBody {
+    TransactionID transactionID = 1; // the ID for this transaction, which includes the payer's account (the account paying the transaction fee). If two transactions have the same transactionID, they won't both have an effect
+    AccountID nodeAccountID = 2; // the account of the node that submits the client's transaction to the network
+    uint64 transactionFee = 3; // the fee the client pays, which is split between the network and the node
+    Duration transactionValidDuration = 4; //the transaction is invalid if consensusTimestamp > transactionID.transactionValidStart + transactionValidDuration
+    bool generateRecord = 5; // should a record of this transaction be generated? (A receipt is always generated, but the record is optional)
+    string memo = 6; // any notes or descriptions that should be put into the record (max length 100)
+    oneof data {
+        AdminDeleteTransactionBody adminDelete = 20; // Hedera multisig admin deletes a file or smart contract
+        AdminUndeleteTransactionBody adminUndelete = 21; //to undelete an entity deleted by AdminDelete
+
+        ContractCallTransactionBody contractCall = 7; // call a function of a contract instance
+        ContractCreateTransactionBody contractCreateInstance = 8; // create a contract instance
+        ContractUpdateTransactionBody contractUpdateInstance = 9; // modify info such as expiration date for a contract instance
+
+        CryptoAddClaimTransactionBody cryptoAddClaim = 10; // attach a new claim to an account
+        CryptoCreateTransactionBody cryptoCreateAccount = 11; // create a new cryptocurrency account
+        CryptoDeleteTransactionBody cryptoDelete = 12; // delete a cryptocurrency account (mark as deleted, and transfer hbars out)
+        CryptoDeleteClaimTransactionBody cryptoDeleteClaim = 13; // remove a claim from an account
+        CryptoTransferTransactionBody cryptoTransfer = 14; // transfer hbars between accounts
+        CryptoUpdateTransactionBody cryptoUpdateAccount = 15; // modify information such as the expiration date for an account
+
+        FileAppendTransactionBody fileAppend = 16; // add bytes to the end of the contents of a file
+        FileCreateTransactionBody fileCreate = 17; // create a new file
+        FileDeleteTransactionBody fileDelete = 18; // delete a file (remove contents and mark as deleted until it expires)
+        FileUpdateTransactionBody fileUpdate = 19; // modify information such as the expiration date for a file
+    }
+}
+
+/* A single signed transaction, including all its signatures. The SignatureList will have a Signature for each Key in the transaction, either explicit or implicit, in the order that they appear in the transaction. For example, a CryptoTransfer will first have a Signature corresponding to the Key for the paying account, followed by a Signature corresponding to the Key for each account that is sending or receiving cryptocurrency in the transfer.  */
+message Transaction {
+    TransactionBody body = 1; // the body of the transaction, which needs to be signed
+    SignatureList sigs = 2; // the signatures on the body, to authorize the transaction
+}
