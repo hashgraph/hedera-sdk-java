@@ -4,5 +4,9 @@
 # Ignore Gradle build output directory
 build/
 
+# Ignore generated source directories
+gen/
+
 # Ignore IDE specific directories
 .idea/
+*.iml
