@@ -15,10 +15,22 @@ abstract class TransactionBodyBuilder<T extends TransactionBodyBuilder<T>> {
   }
 
   /**
+   * Sets the ID for this transaction, which includes the payer's account (the account paying the transaction fee).
+   * If two transactions have the same transactionID, they won't both have an effect.
+   */
+  public T setTransactionId(@Nonnull TransactionId transactionId) {
+    inner.setTransactionID(transactionId.inner);
+
+    @SuppressWarnings("unchecked")
+    T self = (T) this;
+    return self;
+  }
+
+  /**
    * Sets the account of the node that submits the transaction to the network.
    */
-  public T setNodeAccountId(@Nonnull AccountId id) {
-    inner.setNodeAccountID(id.inner);
+  public T setNodeAccountId(@Nonnull AccountId accountId) {
+    inner.setNodeAccountID(accountId.inner);
 
     @SuppressWarnings("unchecked")
     T self = (T) this;
