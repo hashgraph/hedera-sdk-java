@@ -51,7 +51,7 @@ dependencies {
 protobuf {
 	// Place generated classes in /gen for better integration
 	// into the IDE
-	generatedFilesBaseDir = '$projectDir/gen'
+	generatedFilesBaseDir = "$projectDir/gen"
 
 	// Download protoc from maven instead of depending on it existing on the
 	// system path
