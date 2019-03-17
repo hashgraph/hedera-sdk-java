@@ -9,6 +9,23 @@ import java.time.Duration;
 public class CryptoCreateTransaction extends TransactionBodyBuilder<CryptoCreateTransaction> {
   // todo: setKey
 
+
+  @Override
+  public CryptoCreateTransaction setTransactionId(@Nonnull TransactionId transactionId) {
+    // Setting the transaction ID defaults the shard and realm IDs
+    // If you truly want to create a _new_ realm, then you need to null the realm after setting this
+
+    if (!inner.getCryptoCreateAccountBuilder().hasShardID()) {
+      setShardId(transactionId.inner.getAccountID().getShardNum());
+    }
+
+    if (!inner.getCryptoCreateAccountBuilder().hasRealmID()) {
+      setRealmId(transactionId.inner.getAccountID().getRealmNum());
+    }
+
+    return super.setTransactionId(transactionId);
+  }
+
   public CryptoCreateTransaction setInitialBalance(long initialBalance) {
     inner.getCryptoCreateAccountBuilder().setInitialBalance(initialBalance);
     return this;
