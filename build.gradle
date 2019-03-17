@@ -9,14 +9,17 @@ plugins {
 	id 'groovy'
 
 	// Generates Java classes from the proto files
-	id "com.google.protobuf" version "0.8.8"
+	id 'com.google.protobuf' version '0.8.8'
 
 	// Keep your code spotless
-	id "com.diffplug.gradle.spotless" version "3.19.0"
+	id 'com.diffplug.gradle.spotless' version '3.19.0'
 
 	// Use the Error Prone compiler which wraps javac and
 	// provides contextual analysis for common issues
-	id "net.ltgt.errorprone" version "0.7.1"
+	id 'net.ltgt.errorprone' version '0.7.1'
+
+	// Performs quality checks using PMD
+	id 'pmd'
 }
 
 repositories { jcenter() }
@@ -42,13 +45,13 @@ dependencies {
 	testImplementation 'junit:junit:4.12'
 
 	// Specify the version of Error Prone for error checking
-	errorprone "com.google.errorprone:error_prone_core:2.3.3"
+	errorprone 'com.google.errorprone:error_prone_core:2.3.3'
 }
 
 protobuf {
 	// Place generated classes in /gen for better integration
 	// into the IDE
-	generatedFilesBaseDir = "$projectDir/gen"
+	generatedFilesBaseDir = '$projectDir/gen'
 
 	// Download protoc from maven instead of depending on it existing on the
 	// system path
