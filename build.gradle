@@ -13,6 +13,10 @@ plugins {
 
 	// Keep your code spotless
 	id "com.diffplug.gradle.spotless" version "3.19.0"
+
+	// Use the Error Prone compiler which wraps javac and
+	// provides contextual analysis for common issues
+	id "net.ltgt.errorprone" version "0.7.1"
 }
 
 repositories { jcenter() }
@@ -36,6 +40,9 @@ dependencies {
 	// Use the awesome Spock testing and specification framework even with Java
 	testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
 	testImplementation 'junit:junit:4.12'
+
+	// Specify the version of Error Prone for error checking
+	errorprone "com.google.errorprone:error_prone_core:2.3.3"
 }
 
 protobuf {
@@ -51,13 +58,19 @@ protobuf {
 	plugins { grpc { artifact = 'io.grpc:protoc-gen-grpc-java:1.19.0' } }
 
 	generateProtoTasks {
-		// Activate gRPC plugin
-		ofSourceSet('main')*.plugins { grpc {} }
+		ofSourceSet('main').each { task ->
+			// Activate gRPC plugin
+			task.plugins { grpc {} }
+
+			// Annotate all protoc generated classes with @Generated
+			// https://github.com/protocolbuffers/protobuf/issues/42
+			task.builtins { java { option 'annotate_code' } }
+		}
 	}
 }
 
-clean { // Removes generated files on clean
-	delete protobuf.generatedFilesBaseDir }
+// Remove gen/ (generated code) on clean
+clean { delete protobuf.generatedFilesBaseDir }
 
 idea {
 	module {
@@ -72,4 +85,10 @@ spotless {
 	java { googleJavaFormat() }
 	groovy { greclipse() }
 	groovyGradle { greclipse() }
+}
+
+tasks.withType(JavaCompile).configureEach {
+	// Listen to @Generated annotations and ignore those
+	// files for analysis
+	options.errorprone.disableWarningsInGeneratedCode = true
 }
