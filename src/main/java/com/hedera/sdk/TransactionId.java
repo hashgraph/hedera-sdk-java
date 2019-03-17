@@ -7,7 +7,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoField;
 
 public class TransactionId {
-  TransactionID.Builder inner;
+  transient TransactionID.Builder inner;
 
   public TransactionId(long accountNum) {
     this(0, 0, accountNum);

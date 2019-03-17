@@ -5,12 +5,14 @@ import java.time.Duration;
 import javax.annotation.Nonnull;
 
 abstract class TransactionBodyBuilder<T extends TransactionBodyBuilder<T>> {
-  protected TransactionBody.Builder inner = TransactionBody.newBuilder();
+  protected transient TransactionBody.Builder inner = TransactionBody.newBuilder();
+
+  private static final int MAX_MEMO_LENGTH = 100;
 
   TransactionBodyBuilder() {
     // todo: transaction fees should be defaulted to whatever the transaction fee schedule is
     setTransactionFee(100_000);
-    setTransactionValidDuration(Duration.ofSeconds(120));
+    setTransactionValidDuration(Duration.ofMinutes(2));
   }
 
   /**
@@ -20,77 +22,65 @@ abstract class TransactionBodyBuilder<T extends TransactionBodyBuilder<T>> {
    */
   public T setTransactionId(@Nonnull TransactionId transactionId) {
     inner.setTransactionID(transactionId.inner);
-
-    @SuppressWarnings("unchecked")
-    T self = (T) this;
-    return self;
+    return self();
   }
 
   /** Sets the account of the node that submits the transaction to the network. */
-  public T setNodeAccountId(@Nonnull AccountId accountId) {
+  public final T setNodeAccountId(@Nonnull AccountId accountId) {
     inner.setNodeAccountID(accountId.inner);
-
-    @SuppressWarnings("unchecked")
-    T self = (T) this;
-    return self;
+    return self();
   }
 
   /**
    * Sets the fee that the client pays to execute this transaction, which is split between the
    * network and the node.
    */
-  public T setTransactionFee(long fee) {
+  public final T setTransactionFee(long fee) {
     inner.setTransactionFee(fee);
-
-    @SuppressWarnings("unchecked")
-    T self = (T) this;
-    return self;
+    return self();
   }
 
   /**
    * Sets the the duration that this transaction is valid for. The transaction must consensus before
    * this this elapses.
    */
-  public T setTransactionValidDuration(Duration validDuration) {
+  public final T setTransactionValidDuration(Duration validDuration) {
     inner.setTransactionValidDuration(
         com.hedera.sdk.proto.Duration.newBuilder()
             .setSeconds(validDuration.getSeconds())
             .setNanos(validDuration.getNano()));
 
-    @SuppressWarnings("unchecked")
-    T self = (T) this;
-    return self;
+    return self();
   }
 
   /**
    * Sets whether the transaction should generate a record. A receipt is always generated but a
    * record is optional.
    */
-  public T setGenerateRecord(boolean generateRecord) {
+  public final T setGenerateRecord(boolean generateRecord) {
     inner.setGenerateRecord(generateRecord);
-
-    @SuppressWarnings("unchecked")
-    T self = (T) this;
-    return self;
+    return self();
   }
 
   /**
    * Sets any notes or description that should be put into the transaction record (if one is
    * requested). Note that a max of length of 100 is enforced.
    */
-  public T setMemo(String memo) {
-    if (memo.length() > 100) {
+  public final T setMemo(String memo) {
+    if (memo.length() > MAX_MEMO_LENGTH) {
       throw new IllegalArgumentException("memo must not be longer than 100 characters");
     }
 
     inner.setMemo(memo);
-
-    @SuppressWarnings("unchecked")
-    T self = (T) this;
-    return self;
+    return self();
   }
 
   public TransactionBody build() {
     return inner.build();
+  }
+
+  @SuppressWarnings("unchecked")
+  private T self() {
+    return (T) this;
   }
 }

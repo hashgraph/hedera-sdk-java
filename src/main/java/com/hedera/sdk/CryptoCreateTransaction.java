@@ -9,8 +9,8 @@ public class CryptoCreateTransaction extends TransactionBodyBuilder<CryptoCreate
   // todo: setKey
 
   public CryptoCreateTransaction() {
-    // Recommendation from Hedera to set this to ~1 month
-    setAutoRenewPeriod(Duration.ofSeconds(2_592_000));
+    // Recommendation from Hedera
+    setAutoRenewPeriod(Duration.ofDays(30));
 
     // Default to maximum values for record thresholds. Without this records would be auto-created
     // whenever a send or receive transaction takes place for this new account. This should
@@ -37,7 +37,7 @@ public class CryptoCreateTransaction extends TransactionBodyBuilder<CryptoCreate
     return super.setTransactionId(transactionId);
   }
 
-  public CryptoCreateTransaction setInitialBalance(long initialBalance) {
+  public final CryptoCreateTransaction setInitialBalance(long initialBalance) {
     inner.getCryptoCreateAccountBuilder().setInitialBalance(initialBalance);
     return this;
   }
@@ -49,7 +49,7 @@ public class CryptoCreateTransaction extends TransactionBodyBuilder<CryptoCreate
   // todo: setReceiveRecordThreshold
   // todo: setReceiverSignatureRequired
 
-  public CryptoCreateTransaction setAutoRenewPeriod(@Nonnull Duration autoRenewPeriod) {
+  public final CryptoCreateTransaction setAutoRenewPeriod(@Nonnull Duration autoRenewPeriod) {
     inner
         .getCryptoCreateAccountBuilder()
         .setAutoRenewPeriod(
@@ -60,7 +60,7 @@ public class CryptoCreateTransaction extends TransactionBodyBuilder<CryptoCreate
     return this;
   }
 
-  public CryptoCreateTransaction setShardId(long shardId) {
+  public final CryptoCreateTransaction setShardId(long shardId) {
     inner
         .getCryptoCreateAccountBuilder()
         .setShardID(ShardID.newBuilder().setShardNum(shardId).build());
@@ -68,7 +68,7 @@ public class CryptoCreateTransaction extends TransactionBodyBuilder<CryptoCreate
     return this;
   }
 
-  public CryptoCreateTransaction setRealmId(long realmId) {
+  public final CryptoCreateTransaction setRealmId(long realmId) {
     inner
         .getCryptoCreateAccountBuilder()
         .setRealmID(RealmID.newBuilder().setRealmNum(realmId).build());

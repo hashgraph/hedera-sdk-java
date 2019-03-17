@@ -3,7 +3,7 @@ package com.hedera.sdk;
 import com.hedera.sdk.proto.AccountID;
 
 public class AccountId {
-  AccountID.Builder inner;
+  transient AccountID.Builder inner;
 
   public AccountId(long accountNum) {
     this(0, 0, accountNum);
