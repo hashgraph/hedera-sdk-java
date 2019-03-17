@@ -1,77 +1,75 @@
 plugins {
-    // Auto extends code intelligence to generated code
-    id 'idea'
+	// Auto extends code intelligence to generated code
+	id 'idea'
 
-    // Adds support for Java Library
-    id 'java-library'
+	// Adds support for Java Library
+	id 'java-library'
 
-    // Adds support for Groovy (needed for Spock)
-    id 'groovy'
+	// Adds support for Groovy (needed for Spock)
+	id 'groovy'
 
-    // Generates Java classes from the proto files
-    id "com.google.protobuf" version "0.8.8"
+	// Generates Java classes from the proto files
+	id "com.google.protobuf" version "0.8.8"
+
+	// Keep your code spotless
+	id "com.diffplug.gradle.spotless" version "3.19.0"
 }
 
-repositories {
-    jcenter()
-}
+repositories { jcenter() }
 
 dependencies {
-    // Support for Protobufs
-    implementation 'com.google.protobuf:protobuf-java:3.6.0'
+	// Support for Protobufs
+	implementation 'com.google.protobuf:protobuf-java:3.6.0'
 
-    // Support for gRPC
-    implementation 'io.grpc:grpc-netty-shaded:1.19.0'
-    implementation 'io.grpc:grpc-protobuf:1.19.0'
-    implementation 'io.grpc:grpc-stub:1.19.0'
+	// Support for gRPC
+	implementation 'io.grpc:grpc-netty-shaded:1.19.0'
+	implementation 'io.grpc:grpc-protobuf:1.19.0'
+	implementation 'io.grpc:grpc-stub:1.19.0'
 
-    // Workaround for @javax.annotation.Generated
-    // see: https://github.com/grpc/grpc-java/issues/3633
-    implementation 'javax.annotation:javax.annotation-api:1.3.1'
+	// Workaround for @javax.annotation.Generated
+	// see: https://github.com/grpc/grpc-java/issues/3633
+	implementation 'javax.annotation:javax.annotation-api:1.3.1'
 
-    // Use the latest Groovy version for Spock testing
-    testImplementation 'org.codehaus.groovy:groovy-all:2.5.6'
+	// Use the latest Groovy version for Spock testing
+	testImplementation 'org.codehaus.groovy:groovy-all:2.5.6'
 
-    // Use the awesome Spock testing and specification framework even with Java
-    testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
-    testImplementation 'junit:junit:4.12'
+	// Use the awesome Spock testing and specification framework even with Java
+	testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
+	testImplementation 'junit:junit:4.12'
 }
 
 protobuf {
-    // Place generated classes in /gen for better integration
-    // into the IDE
-    generatedFilesBaseDir = "$projectDir/gen"
+	// Place generated classes in /gen for better integration
+	// into the IDE
+	generatedFilesBaseDir = "$projectDir/gen"
 
-    protoc {
-        // Download protoc from maven instead of depending on it existing on the
-        // system path
-        artifact = 'com.google.protobuf:protoc:3.6.0'
-    }
+	// Download protoc from maven instead of depending on it existing on the
+	// system path
+	protoc { artifact = 'com.google.protobuf:protoc:3.6.0' }
 
-    plugins {
-        // Generate gRPC service classes as well
-        grpc {
-            artifact = 'io.grpc:protoc-gen-grpc-java:1.19.0'
-        }
-    }
+	// Download protoc-gen-grpc-java from maven as well
+	plugins { grpc { artifact = 'io.grpc:protoc-gen-grpc-java:1.19.0' } }
 
-    generateProtoTasks {
-        ofSourceSet('main')*.plugins {
-            grpc {}
-        }
-    }
+	generateProtoTasks {
+		// Activate gRPC plugin
+		ofSourceSet('main')*.plugins { grpc {} }
+	}
 }
 
-clean {
-    // Removes generated files on clean
-    delete protobuf.generatedFilesBaseDir
-}
+clean { // Removes generated files on clean
+	delete protobuf.generatedFilesBaseDir }
 
 idea {
-    module {
-        // Marks as generated source roots so to make inspection
-        // in IDEA nicer
-        generatedSourceDirs += file('gen/main/java')
-        generatedSourceDirs += file('gen/main/grpc')
-    }
+	module {
+		// Marks as generated source roots so to make inspection
+		// in IDEA nicer
+		generatedSourceDirs += file('gen/main/java')
+		generatedSourceDirs += file('gen/main/grpc')
+	}
+}
+
+spotless {
+	java { googleJavaFormat() }
+	groovy { greclipse() }
+	groovyGradle { greclipse() }
 }
