@@ -88,4 +88,8 @@ abstract class TransactionBodyBuilder<T extends TransactionBodyBuilder<T>> {
     T self = (T) this;
     return self;
   }
+
+  public TransactionBody build() {
+    return inner.build();
+  }
 }
