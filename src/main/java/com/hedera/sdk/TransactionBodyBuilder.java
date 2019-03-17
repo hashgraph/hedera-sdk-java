@@ -8,7 +8,11 @@ import java.time.Duration;
 abstract class TransactionBodyBuilder<T extends TransactionBodyBuilder<T>> {
   protected TransactionBody.Builder inner = TransactionBody.newBuilder();
 
-  // todo: setTransactionId
+  TransactionBodyBuilder() {
+    // todo: transaction fees should be defaulted to whatever the transaction fee schedule is
+    setTransactionFee(100_000);
+    setTransactionValidDuration(Duration.ofSeconds(120));
+  }
 
   /**
    * Sets the account of the node that submits the transaction to the network.
