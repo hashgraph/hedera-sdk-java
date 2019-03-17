@@ -79,6 +79,8 @@ abstract class TransactionBodyBuilder<T extends TransactionBodyBuilder<T>> {
     return inner.build();
   }
 
+  // Work around for java not recognized that this is completely safe
+  // as T is required to extend this
   @SuppressWarnings("unchecked")
   private T self() {
     return (T) this;
