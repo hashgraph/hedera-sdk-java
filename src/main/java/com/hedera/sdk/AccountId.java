@@ -10,10 +10,11 @@ public class AccountId {
   }
 
   public AccountId(long shardNum, long realmNum, long accountNum) {
-    inner = AccountID.newBuilder()
-      .setRealmNum(realmNum)
-      .setShardNum(shardNum)
-      .setAccountNum(accountNum);
+    inner =
+        AccountID.newBuilder()
+            .setRealmNum(realmNum)
+            .setShardNum(shardNum)
+            .setAccountNum(accountNum);
   }
 
   public long getShardNum() {

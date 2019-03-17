@@ -2,9 +2,8 @@ package com.hedera.sdk;
 
 import com.hedera.sdk.proto.RealmID;
 import com.hedera.sdk.proto.ShardID;
-
-import javax.annotation.Nonnull;
 import java.time.Duration;
+import javax.annotation.Nonnull;
 
 public class CryptoCreateTransaction extends TransactionBodyBuilder<CryptoCreateTransaction> {
   // todo: setKey
@@ -16,9 +15,10 @@ public class CryptoCreateTransaction extends TransactionBodyBuilder<CryptoCreate
     // Default to maximum values for record thresholds. Without this records would be auto-created
     // whenever a send or receive transaction takes place for this new account. This should
     // be an explicit ask.
-    inner.getCryptoCreateAccountBuilder()
-      .setSendRecordThreshold(Long.MAX_VALUE)
-      .setReceiveRecordThreshold(Long.MAX_VALUE);
+    inner
+        .getCryptoCreateAccountBuilder()
+        .setSendRecordThreshold(Long.MAX_VALUE)
+        .setReceiveRecordThreshold(Long.MAX_VALUE);
   }
 
   @Override
@@ -50,22 +50,28 @@ public class CryptoCreateTransaction extends TransactionBodyBuilder<CryptoCreate
   // todo: setReceiverSignatureRequired
 
   public CryptoCreateTransaction setAutoRenewPeriod(@Nonnull Duration autoRenewPeriod) {
-    inner.getCryptoCreateAccountBuilder().setAutoRenewPeriod(
-      com.hedera.sdk.proto.Duration.newBuilder()
-        .setSeconds(autoRenewPeriod.getSeconds())
-        .setNanos(autoRenewPeriod.getNano()));
+    inner
+        .getCryptoCreateAccountBuilder()
+        .setAutoRenewPeriod(
+            com.hedera.sdk.proto.Duration.newBuilder()
+                .setSeconds(autoRenewPeriod.getSeconds())
+                .setNanos(autoRenewPeriod.getNano()));
 
     return this;
   }
 
   public CryptoCreateTransaction setShardId(long shardId) {
-    inner.getCryptoCreateAccountBuilder().setShardID(ShardID.newBuilder().setShardNum(shardId).build());
+    inner
+        .getCryptoCreateAccountBuilder()
+        .setShardID(ShardID.newBuilder().setShardNum(shardId).build());
 
     return this;
   }
 
   public CryptoCreateTransaction setRealmId(long realmId) {
-    inner.getCryptoCreateAccountBuilder().setRealmID(RealmID.newBuilder().setRealmNum(realmId).build());
+    inner
+        .getCryptoCreateAccountBuilder()
+        .setRealmID(RealmID.newBuilder().setRealmNum(realmId).build());
 
     return this;
   }

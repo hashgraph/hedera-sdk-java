@@ -1,9 +1,8 @@
 package com.hedera.sdk;
 
 import com.hedera.sdk.proto.TransactionBody;
-
-import javax.annotation.Nonnull;
 import java.time.Duration;
+import javax.annotation.Nonnull;
 
 abstract class TransactionBodyBuilder<T extends TransactionBodyBuilder<T>> {
   protected TransactionBody.Builder inner = TransactionBody.newBuilder();
@@ -15,8 +14,9 @@ abstract class TransactionBodyBuilder<T extends TransactionBodyBuilder<T>> {
   }
 
   /**
-   * Sets the ID for this transaction, which includes the payer's account (the account paying the transaction fee).
-   * If two transactions have the same transactionID, they won't both have an effect.
+   * Sets the ID for this transaction, which includes the payer's account (the account paying the
+   * transaction fee). If two transactions have the same transactionID, they won't both have an
+   * effect.
    */
   public T setTransactionId(@Nonnull TransactionId transactionId) {
     inner.setTransactionID(transactionId.inner);
@@ -26,9 +26,7 @@ abstract class TransactionBodyBuilder<T extends TransactionBodyBuilder<T>> {
     return self;
   }
 
-  /**
-   * Sets the account of the node that submits the transaction to the network.
-   */
+  /** Sets the account of the node that submits the transaction to the network. */
   public T setNodeAccountId(@Nonnull AccountId accountId) {
     inner.setNodeAccountID(accountId.inner);
 
@@ -38,8 +36,8 @@ abstract class TransactionBodyBuilder<T extends TransactionBodyBuilder<T>> {
   }
 
   /**
-   * Sets the fee that the client pays to execute this transaction, which is
-   * split between the network and the node.
+   * Sets the fee that the client pays to execute this transaction, which is split between the
+   * network and the node.
    */
   public T setTransactionFee(long fee) {
     inner.setTransactionFee(fee);
@@ -50,11 +48,14 @@ abstract class TransactionBodyBuilder<T extends TransactionBodyBuilder<T>> {
   }
 
   /**
-   * Sets the the duration that this transaction is valid for. The transaction must
-   * consensus before this this elapses.
+   * Sets the the duration that this transaction is valid for. The transaction must consensus before
+   * this this elapses.
    */
   public T setTransactionValidDuration(Duration validDuration) {
-    inner.setTransactionValidDuration(com.hedera.sdk.proto.Duration.newBuilder().setSeconds(validDuration.getSeconds()).setNanos(validDuration.getNano()));
+    inner.setTransactionValidDuration(
+        com.hedera.sdk.proto.Duration.newBuilder()
+            .setSeconds(validDuration.getSeconds())
+            .setNanos(validDuration.getNano()));
 
     @SuppressWarnings("unchecked")
     T self = (T) this;
@@ -62,8 +63,8 @@ abstract class TransactionBodyBuilder<T extends TransactionBodyBuilder<T>> {
   }
 
   /**
-   * Sets whether the transaction should generate a record. A receipt is always generated but
-   * a record is optional.
+   * Sets whether the transaction should generate a record. A receipt is always generated but a
+   * record is optional.
    */
   public T setGenerateRecord(boolean generateRecord) {
     inner.setGenerateRecord(generateRecord);
@@ -74,8 +75,8 @@ abstract class TransactionBodyBuilder<T extends TransactionBodyBuilder<T>> {
   }
 
   /**
-   * Sets any notes or description that should be put into the transaction
-   * record (if one is requested). Note that a max of length of 100 is enforced.
+   * Sets any notes or description that should be put into the transaction record (if one is
+   * requested). Note that a max of length of 100 is enforced.
    */
   public T setMemo(String memo) {
     if (memo.length() > 100) {

@@ -2,7 +2,6 @@ package com.hedera.sdk;
 
 import com.hedera.sdk.proto.Timestamp;
 import com.hedera.sdk.proto.TransactionID;
-
 import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoField;
@@ -23,8 +22,12 @@ public class TransactionId {
   }
 
   public TransactionId(AccountId accountId, Instant transactionValidStart) {
-    inner = TransactionID.newBuilder().setAccountID(accountId.inner).setTransactionValidStart(Timestamp.newBuilder()
-      .setSeconds(transactionValidStart.getLong(ChronoField.INSTANT_SECONDS))
-      .setNanos(transactionValidStart.get(ChronoField.NANO_OF_SECOND)));
+    inner =
+        TransactionID.newBuilder()
+            .setAccountID(accountId.inner)
+            .setTransactionValidStart(
+                Timestamp.newBuilder()
+                    .setSeconds(transactionValidStart.getLong(ChronoField.INSTANT_SECONDS))
+                    .setNanos(transactionValidStart.get(ChronoField.NANO_OF_SECOND)));
   }
 }
