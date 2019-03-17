@@ -9,6 +9,17 @@ import java.time.Duration;
 public class CryptoCreateTransaction extends TransactionBodyBuilder<CryptoCreateTransaction> {
   // todo: setKey
 
+  public CryptoCreateTransaction() {
+    // Recommendation from Hedera to set this to ~1 month
+    setAutoRenewPeriod(Duration.ofSeconds(2_592_000));
+
+    // Default to maximum values for record thresholds. Without this records would be auto-created
+    // whenever a send or receive transaction takes place for this new account. This should
+    // be an explicit ask.
+    inner.getCryptoCreateAccountBuilder()
+      .setSendRecordThreshold(Long.MAX_VALUE)
+      .setReceiveRecordThreshold(Long.MAX_VALUE);
+  }
 
   @Override
   public CryptoCreateTransaction setTransactionId(@Nonnull TransactionId transactionId) {
