@@ -5,7 +5,7 @@
 
 The Java SDK for interacting with [Hedera Hashgraph](https://hedera.com): the official distributed consensus platform built using the hashgraph consensus algorithm for fast, fair and secure transactions. Hedera enables and empowers developers to build an entirely new class of decentralized applications.
 
-## Version is 0.2.3
+## Version is 0.2.4
 
 The Hedera Java SDK uses [semantic versioning](https://semver.org/).
 
@@ -17,6 +17,40 @@ Features supported include:
 - Executing Smart Contracts
 
 ## Version history
+
+### 0.2.4 - Simplified smart contract call wrappers
+
+see com.hedera.examples.contractWrappers
+added `ContractFunctionsWrapper.java` which wraps all helpers related to making calls to smart contracts.
+
+Put your full ABI into a string (or a file with a path relative to the project).
+
+Initialise a `ContractFunctionsWrapper` object as follows (fullABI is a string containing my smart contract ABI in JSON format).
+
+```java
+ContractFunctionsWrapper wrapper = new ContractFunctionsWrapper();
+		wrapper.setABI(fullABI);
+```
+
+Locally call a function named `getInt` on the smart contract which returns a `BigInteger`.
+
+```java
+BigInteger decodeResult = wrapper.callLocalBigInt(createdContract, localGas, maxResultSize, "getInt");
+```
+
+Locally call a function named `getString` on the smart contract which returns a `String`.
+
+```java
+String decodeResult2 = wrapper.callLocalString(createdContract, localGas, maxResultSize, "getString");
+```
+
+There are overloaded methods for `Int`, `String`, `boolean`, `long`, `address` and `BigInt`.
+
+or, call a function named `set`
+
+```java
+wrapper.call(contract, gas, amount, "set", 10);
+```
 
 ### 0.2.3 - Changes to pom structure
 
