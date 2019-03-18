@@ -1,38 +1,18 @@
 package com.hedera.examples.simple;
-import com.hedera.examples.contractWrappers.ContractCall;
+
+import com.hedera.examples.contractWrappers.ContractFunctionsWrapper;
 import com.hedera.examples.contractWrappers.ContractCreate;
-import com.hedera.examples.contractWrappers.ContractGetBytecode;
-import com.hedera.examples.contractWrappers.ContractGetInfo;
-import com.hedera.examples.contractWrappers.ContractRunLocal;
-import com.hedera.examples.contractWrappers.ContractUpdate;
-import com.hedera.examples.contractWrappers.SoliditySupport;
 import com.hedera.examples.fileWrappers.FileCreate;
 import com.hedera.examples.utilities.ExampleUtilities;
 import com.hedera.sdk.common.HederaDuration;
 import com.hedera.sdk.common.HederaTimeStamp;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
-import com.hedera.sdk.common.HederaTransactionRecord;
 import com.hedera.sdk.contract.HederaContract;
-import com.hedera.sdk.contract.HederaContractFunctionResult;
 import com.hedera.sdk.file.HederaFile;
 
 public final class DemoContractSimpleStorage {
 
 	public static void main(String... arguments) throws Exception {
-		boolean getInfo = false;
-		boolean update = false;
-		boolean getByteCode = false;
-		boolean setCall = false;
-		boolean getBeforeSetCall = false;
-		boolean getAfterSetCall = false;
-		
-		// set flags to enable/disable demo features
-		getInfo = false;
-		update = false;
-		getByteCode = false;
-		setCall = true;
-		getBeforeSetCall = true;
-		getAfterSetCall = true;
 		
 		byte[] fileContents = ExampleUtilities.readFile("/scExamples/simpleStorage.bin");
 		
@@ -68,53 +48,54 @@ public final class DemoContractSimpleStorage {
 			HederaDuration autoRenewDuration = new HederaDuration(10, 20);
 
 			if (contract != null) {
-				if (update) {
-					contract = ContractUpdate.update(contract, expirationTime, autoRenewDuration);
-				}
-				
-				// getinfo
-				if (getInfo) {
-					ContractGetInfo.getInfo(contract);
-				}
-				// get bytecode
-				if (getByteCode) {
-					ContractGetBytecode.getByteCode(contract);
-				}
 
-				// call local before set
-				if (getBeforeSetCall) {
-					String SC_GET_ABI = "{\"constant\":true,\"inputs\":[],\"name\":\"get\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}";
-					
-					byte[] function = SoliditySupport.encodeGetValue(SC_GET_ABI);
-					long localGas = 22000;
-					long maxResultSize = 5000;
-					HederaContractFunctionResult functionResult = ContractRunLocal.runLocal(contract, localGas, maxResultSize, function);
-					int decodeResult = SoliditySupport.decodeGetValueResultInt(functionResult.contractCallResult(),SC_GET_ABI);
-		    		ExampleUtilities.showResult(String.format("===>Decoded functionResult= %d", decodeResult));
-				}
-
-				// call to set value
-				if (setCall) {
-					final String SC_SET_ABI = "{\"constant\":false,\"inputs\":[{\"name\":\"x\",\"type\":\"uint256\"}],\"name\":\"set\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}";
-					gas = 27000;
-					long amount = 0;
-					byte[] functionParameters = SoliditySupport.encodeSetInt(10,SC_SET_ABI);
-					
-					ContractCall.call(contract, gas, amount, functionParameters);
-					HederaTransactionRecord record = new HederaTransactionRecord(contract.hederaTransactionID, contract.txQueryDefaults.node.contractGetRecordsQueryFee, contract.txQueryDefaults);
-				}
+				String fullABI = "[\n" + 
+						"	{\n" + 
+						"		\"constant\": false,\n" + 
+						"		\"inputs\": [\n" + 
+						"			{\n" + 
+						"				\"name\": \"x\",\n" + 
+						"				\"type\": \"uint256\"\n" + 
+						"			}\n" + 
+						"		],\n" + 
+						"		\"name\": \"set\",\n" + 
+						"		\"outputs\": [],\n" + 
+						"		\"payable\": false,\n" + 
+						"		\"stateMutability\": \"nonpayable\",\n" + 
+						"		\"type\": \"function\"\n" + 
+						"	},\n" + 
+						"	{\n" + 
+						"		\"constant\": true,\n" + 
+						"		\"inputs\": [],\n" + 
+						"		\"name\": \"get\",\n" + 
+						"		\"outputs\": [\n" + 
+						"			{\n" + 
+						"				\"name\": \"\",\n" + 
+						"				\"type\": \"uint256\"\n" + 
+						"			}\n" + 
+						"		],\n" + 
+						"		\"payable\": false,\n" + 
+						"		\"stateMutability\": \"view\",\n" + 
+						"		\"type\": \"function\"\n" + 
+						"	}\n" + 
+						"]";
 				
-				// call local after set
-				if (getAfterSetCall) {
-					String SC_GET_ABI = "{\"constant\":true,\"inputs\":[],\"name\":\"get\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}";
-					
-					byte[] function = SoliditySupport.encodeGetValue(SC_GET_ABI);
-					long localGas = 22000;
-					long maxResultSize = 5000;
-					HederaContractFunctionResult functionResult = ContractRunLocal.runLocal(contract, localGas, maxResultSize, function);
-					int decodeResult = SoliditySupport.decodeGetValueResultInt(functionResult.contractCallResult(),SC_GET_ABI);
-		    		ExampleUtilities.showResult(String.format("===>Decoded functionResult= %d", decodeResult));
-				}
+				ContractFunctionsWrapper wrapper = new ContractFunctionsWrapper();
+				wrapper.setABI(fullABI);
+
+				gas = 22000;
+				long maxResultSize = 5000;
+				
+				int decodeResult = wrapper.callLocalInt(contract, gas, maxResultSize, "get");
+	    		ExampleUtilities.showResult(String.format("===>Decoded functionResult= %d", decodeResult));
+				
+				gas = 27000;
+				long amount = 0;
+				wrapper.call(contract, gas, amount, "set", 10);
+
+				gas = 22000;
+				decodeResult = wrapper.callLocalInt(contract, gas, maxResultSize, "get");
+	    		ExampleUtilities.showResult(String.format("===>Decoded functionResult= %d", decodeResult));
 			}
 		}
 	}

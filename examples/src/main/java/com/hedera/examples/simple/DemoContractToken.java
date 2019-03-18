@@ -1,10 +1,8 @@
 package com.hedera.examples.simple;
 
 import com.hedera.examples.accountWrappers.AccountCreate;
-import com.hedera.examples.contractWrappers.ContractCall;
+import com.hedera.examples.contractWrappers.ContractFunctionsWrapper;
 import com.hedera.examples.contractWrappers.ContractCreate;
-import com.hedera.examples.contractWrappers.ContractRunLocal;
-import com.hedera.examples.contractWrappers.SoliditySupport;
 import com.hedera.examples.fileWrappers.FileCreate;
 import com.hedera.examples.utilities.ExampleUtilities;
 import com.hedera.sdk.account.HederaAccount;
@@ -12,16 +10,313 @@ import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
 import com.hedera.sdk.contract.HederaContract;
-import com.hedera.sdk.contract.HederaContractFunctionResult;
 import com.hedera.sdk.file.HederaFile;
-import com.hedera.sdk.transaction.HederaTransactionResult;
-import java.math.BigInteger;
 import org.ethereum.core.CallTransaction;
 
 public final class DemoContractToken {
+	static String fullABI = "[\n" + 
+			"	{\n" + 
+			"		\"constant\": true,\n" + 
+			"		\"inputs\": [],\n" + 
+			"		\"name\": \"name\",\n" + 
+			"		\"outputs\": [\n" + 
+			"			{\n" + 
+			"				\"name\": \"\",\n" + 
+			"				\"type\": \"string\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"payable\": false,\n" + 
+			"		\"stateMutability\": \"view\",\n" + 
+			"		\"type\": \"function\"\n" + 
+			"	},\n" + 
+			"	{\n" + 
+			"		\"constant\": false,\n" + 
+			"		\"inputs\": [\n" + 
+			"			{\n" + 
+			"				\"name\": \"_spender\",\n" + 
+			"				\"type\": \"address\"\n" + 
+			"			},\n" + 
+			"			{\n" + 
+			"				\"name\": \"_value\",\n" + 
+			"				\"type\": \"uint256\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"name\": \"approve\",\n" + 
+			"		\"outputs\": [\n" + 
+			"			{\n" + 
+			"				\"name\": \"success\",\n" + 
+			"				\"type\": \"bool\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"payable\": false,\n" + 
+			"		\"stateMutability\": \"nonpayable\",\n" + 
+			"		\"type\": \"function\"\n" + 
+			"	},\n" + 
+			"	{\n" + 
+			"		\"constant\": true,\n" + 
+			"		\"inputs\": [],\n" + 
+			"		\"name\": \"totalSupply\",\n" + 
+			"		\"outputs\": [\n" + 
+			"			{\n" + 
+			"				\"name\": \"\",\n" + 
+			"				\"type\": \"uint256\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"payable\": false,\n" + 
+			"		\"stateMutability\": \"view\",\n" + 
+			"		\"type\": \"function\"\n" + 
+			"	},\n" + 
+			"	{\n" + 
+			"		\"constant\": false,\n" + 
+			"		\"inputs\": [\n" + 
+			"			{\n" + 
+			"				\"name\": \"_from\",\n" + 
+			"				\"type\": \"address\"\n" + 
+			"			},\n" + 
+			"			{\n" + 
+			"				\"name\": \"_to\",\n" + 
+			"				\"type\": \"address\"\n" + 
+			"			},\n" + 
+			"			{\n" + 
+			"				\"name\": \"_value\",\n" + 
+			"				\"type\": \"uint256\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"name\": \"transferFrom\",\n" + 
+			"		\"outputs\": [\n" + 
+			"			{\n" + 
+			"				\"name\": \"success\",\n" + 
+			"				\"type\": \"bool\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"payable\": false,\n" + 
+			"		\"stateMutability\": \"nonpayable\",\n" + 
+			"		\"type\": \"function\"\n" + 
+			"	},\n" + 
+			"	{\n" + 
+			"		\"constant\": true,\n" + 
+			"		\"inputs\": [],\n" + 
+			"		\"name\": \"decimals\",\n" + 
+			"		\"outputs\": [\n" + 
+			"			{\n" + 
+			"				\"name\": \"\",\n" + 
+			"				\"type\": \"uint8\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"payable\": false,\n" + 
+			"		\"stateMutability\": \"view\",\n" + 
+			"		\"type\": \"function\"\n" + 
+			"	},\n" + 
+			"	{\n" + 
+			"		\"constant\": false,\n" + 
+			"		\"inputs\": [\n" + 
+			"			{\n" + 
+			"				\"name\": \"_value\",\n" + 
+			"				\"type\": \"uint256\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"name\": \"burn\",\n" + 
+			"		\"outputs\": [\n" + 
+			"			{\n" + 
+			"				\"name\": \"success\",\n" + 
+			"				\"type\": \"bool\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"payable\": false,\n" + 
+			"		\"stateMutability\": \"nonpayable\",\n" + 
+			"		\"type\": \"function\"\n" + 
+			"	},\n" + 
+			"	{\n" + 
+			"		\"constant\": true,\n" + 
+			"		\"inputs\": [\n" + 
+			"			{\n" + 
+			"				\"name\": \"\",\n" + 
+			"				\"type\": \"address\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"name\": \"balanceOf\",\n" + 
+			"		\"outputs\": [\n" + 
+			"			{\n" + 
+			"				\"name\": \"\",\n" + 
+			"				\"type\": \"uint256\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"payable\": false,\n" + 
+			"		\"stateMutability\": \"view\",\n" + 
+			"		\"type\": \"function\"\n" + 
+			"	},\n" + 
+			"	{\n" + 
+			"		\"constant\": false,\n" + 
+			"		\"inputs\": [\n" + 
+			"			{\n" + 
+			"				\"name\": \"_from\",\n" + 
+			"				\"type\": \"address\"\n" + 
+			"			},\n" + 
+			"			{\n" + 
+			"				\"name\": \"_value\",\n" + 
+			"				\"type\": \"uint256\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"name\": \"burnFrom\",\n" + 
+			"		\"outputs\": [\n" + 
+			"			{\n" + 
+			"				\"name\": \"success\",\n" + 
+			"				\"type\": \"bool\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"payable\": false,\n" + 
+			"		\"stateMutability\": \"nonpayable\",\n" + 
+			"		\"type\": \"function\"\n" + 
+			"	},\n" + 
+			"	{\n" + 
+			"		\"constant\": true,\n" + 
+			"		\"inputs\": [],\n" + 
+			"		\"name\": \"symbol\",\n" + 
+			"		\"outputs\": [\n" + 
+			"			{\n" + 
+			"				\"name\": \"\",\n" + 
+			"				\"type\": \"string\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"payable\": false,\n" + 
+			"		\"stateMutability\": \"view\",\n" + 
+			"		\"type\": \"function\"\n" + 
+			"	},\n" + 
+			"	{\n" + 
+			"		\"constant\": false,\n" + 
+			"		\"inputs\": [\n" + 
+			"			{\n" + 
+			"				\"name\": \"_to\",\n" + 
+			"				\"type\": \"address\"\n" + 
+			"			},\n" + 
+			"			{\n" + 
+			"				\"name\": \"_value\",\n" + 
+			"				\"type\": \"uint256\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"name\": \"transfer\",\n" + 
+			"		\"outputs\": [],\n" + 
+			"		\"payable\": false,\n" + 
+			"		\"stateMutability\": \"nonpayable\",\n" + 
+			"		\"type\": \"function\"\n" + 
+			"	},\n" + 
+			"	{\n" + 
+			"		\"constant\": false,\n" + 
+			"		\"inputs\": [\n" + 
+			"			{\n" + 
+			"				\"name\": \"_spender\",\n" + 
+			"				\"type\": \"address\"\n" + 
+			"			},\n" + 
+			"			{\n" + 
+			"				\"name\": \"_value\",\n" + 
+			"				\"type\": \"uint256\"\n" + 
+			"			},\n" + 
+			"			{\n" + 
+			"				\"name\": \"_extraData\",\n" + 
+			"				\"type\": \"bytes\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"name\": \"approveAndCall\",\n" + 
+			"		\"outputs\": [\n" + 
+			"			{\n" + 
+			"				\"name\": \"success\",\n" + 
+			"				\"type\": \"bool\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"payable\": false,\n" + 
+			"		\"stateMutability\": \"nonpayable\",\n" + 
+			"		\"type\": \"function\"\n" + 
+			"	},\n" + 
+			"	{\n" + 
+			"		\"constant\": true,\n" + 
+			"		\"inputs\": [\n" + 
+			"			{\n" + 
+			"				\"name\": \"\",\n" + 
+			"				\"type\": \"address\"\n" + 
+			"			},\n" + 
+			"			{\n" + 
+			"				\"name\": \"\",\n" + 
+			"				\"type\": \"address\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"name\": \"allowance\",\n" + 
+			"		\"outputs\": [\n" + 
+			"			{\n" + 
+			"				\"name\": \"\",\n" + 
+			"				\"type\": \"uint256\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"payable\": false,\n" + 
+			"		\"stateMutability\": \"view\",\n" + 
+			"		\"type\": \"function\"\n" + 
+			"	},\n" + 
+			"	{\n" + 
+			"		\"inputs\": [\n" + 
+			"			{\n" + 
+			"				\"name\": \"initialSupply\",\n" + 
+			"				\"type\": \"uint256\"\n" + 
+			"			},\n" + 
+			"			{\n" + 
+			"				\"name\": \"tokenName\",\n" + 
+			"				\"type\": \"string\"\n" + 
+			"			},\n" + 
+			"			{\n" + 
+			"				\"name\": \"tokenSymbol\",\n" + 
+			"				\"type\": \"string\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"payable\": false,\n" + 
+			"		\"stateMutability\": \"nonpayable\",\n" + 
+			"		\"type\": \"constructor\"\n" + 
+			"	},\n" + 
+			"	{\n" + 
+			"		\"anonymous\": false,\n" + 
+			"		\"inputs\": [\n" + 
+			"			{\n" + 
+			"				\"indexed\": true,\n" + 
+			"				\"name\": \"from\",\n" + 
+			"				\"type\": \"address\"\n" + 
+			"			},\n" + 
+			"			{\n" + 
+			"				\"indexed\": true,\n" + 
+			"				\"name\": \"to\",\n" + 
+			"				\"type\": \"address\"\n" + 
+			"			},\n" + 
+			"			{\n" + 
+			"				\"indexed\": false,\n" + 
+			"				\"name\": \"value\",\n" + 
+			"				\"type\": \"uint256\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"name\": \"Transfer\",\n" + 
+			"		\"type\": \"event\"\n" + 
+			"	},\n" + 
+			"	{\n" + 
+			"		\"anonymous\": false,\n" + 
+			"		\"inputs\": [\n" + 
+			"			{\n" + 
+			"				\"indexed\": true,\n" + 
+			"				\"name\": \"from\",\n" + 
+			"				\"type\": \"address\"\n" + 
+			"			},\n" + 
+			"			{\n" + 
+			"				\"indexed\": false,\n" + 
+			"				\"name\": \"value\",\n" + 
+			"				\"type\": \"uint256\"\n" + 
+			"			}\n" + 
+			"		],\n" + 
+			"		\"name\": \"Burn\",\n" + 
+			"		\"type\": \"event\"\n" + 
+			"	}\n" + 
+			"]";
 
+	static ContractFunctionsWrapper wrapper = new ContractFunctionsWrapper();
+	
 	public static void main(String... arguments) throws Exception {
 
+		// set the wrapper's abi
+		wrapper.setABI(fullABI);
+		
 		byte[] fileContents = ExampleUtilities.readFile("/scExamples/token.bin");
 
 		// check the bin file only contains 0-9,A-F,a-f
@@ -70,13 +365,9 @@ public final class DemoContractToken {
 		// create a file with contents
 		file = FileCreate.create(file, fileContents);
 
-		final String TOKEN_ERC20_CONSTRUCTOR_ABI = "{\"inputs\":[{\"name\":\"initialSupply\",\"type\":\"uint256\"},{\"name\":\"tokenName\",\"type\":\"string\"},{\"name\":\"tokenSymbol\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"}";
-		String funcJson = TOKEN_ERC20_CONSTRUCTOR_ABI.replaceAll("'", "\"");
-		CallTransaction.Function function = CallTransaction.Function.fromJsonInterface(funcJson);
-
 		long initialSupply = 1000000L; //1000_000L;
-		byte[] constructorData = function.encodeArguments(initialSupply, "Test Token", "OCT");
-
+		byte[] constructorData = wrapper.constructor(initialSupply, "Test Token", "OCT");
+		
 		// new contract object
 		HederaContract createdContract = new HederaContract();
 		// setup transaction/query defaults (durations, etc...)
@@ -178,71 +469,30 @@ public final class DemoContractToken {
 	}
 
 	private static long getBalance(HederaContract contract, String solAddress) throws Exception {
-		long balance = 0;
-		final String BALANCE_OF_ABI = "{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}";
-		String funcJson = BALANCE_OF_ABI.replaceAll("'", "\"");
-		CallTransaction.Function function = CallTransaction.Function.fromJsonInterface(funcJson);
-		byte[] encodedFunc = function.encode(solAddress);
-
-		HederaContractFunctionResult functionResult = ContractRunLocal.runLocal(contract, 250000L, 5000, encodedFunc);
-
-		Object[] retResults = function.decodeResult(functionResult.contractCallResult());
-		if (retResults != null && retResults.length > 0) {
-			BigInteger retBi = (BigInteger) retResults[0];
-			balance = retBi.longValue();
-		}
+		long balance = wrapper.callLocalLong(contract, 250000L, 5000, "balanceOf", solAddress);
 		return balance;
 	}
 
 	private static void transfer(HederaContract contract, String toAddress, long amount) throws Exception {
-		final String TRANSFER_ABI = "{\"constant\":false,\"inputs\":[{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}";
-		String funcJson = TRANSFER_ABI.replaceAll("'", "\"");
-		CallTransaction.Function function = CallTransaction.Function.fromJsonInterface(funcJson);
-
-		byte[] encodedFunc = function.encode(toAddress, amount);
-		HederaTransactionResult result = ContractCall.call(contract, 250000, 0, encodedFunc);
+		wrapper.call(contract, 250000, 0, "transfer", toAddress, amount);
 	}
 
 	private static long getDecimals(HederaContract contract) throws Exception {
-
-		final String DECIMALS_ABI = "{\"constant\":true,\"inputs\":[],\"name\":\"decimals\",\"outputs\":[{\"name\":\"\",\"type\":\"uint8\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}";
-		byte[] function = SoliditySupport.encodeGetValue(DECIMALS_ABI);
-		long localGas = 250000L;
-		long maxResultSize = 5000;
-		HederaContractFunctionResult functionResult = ContractRunLocal.runLocal(contract, localGas, maxResultSize, function);
-		long tokenDecimals = SoliditySupport.decodeGetValueResultLong(functionResult.contractCallResult(),DECIMALS_ABI);
-		
+		long tokenDecimals = wrapper.callLocalLong(contract, 250000L, 5000, "decimals");
 		return tokenDecimals;
 	}
 
 	private static String getSymbol(HederaContract contract) throws Exception {
-		
-		final String SYMBOL_ABI = "{\"constant\":true,\"inputs\":[],\"name\":\"symbol\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}";
-		byte[] function = SoliditySupport.encodeGetValue(SYMBOL_ABI);
-		long localGas = 250000L;
-		long maxResultSize = 5000;
-		HederaContractFunctionResult functionResult = ContractRunLocal.runLocal(contract, localGas, maxResultSize, function);
-		String symbol = SoliditySupport.decodeGetValueResultString(functionResult.contractCallResult(),SYMBOL_ABI);
-		
+		String symbol = wrapper.callLocalString(contract, 250000L, 5000, "symbol");
 		return symbol;
-	
 	}
 
 	private static void approve(HederaContract contract, String spenderAddress, long valueToApprove) throws Exception {
-		final String APPROVE_ABI = "{\"constant\":false,\"inputs\":[{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}";
-		String funcJson = APPROVE_ABI.replaceAll("'", "\"");
-		CallTransaction.Function function = CallTransaction.Function.fromJsonInterface(funcJson);
-		byte[] encodedFunc = function.encode(spenderAddress, valueToApprove);
-		HederaTransactionResult result = ContractCall.call(contract, 250000, 0, encodedFunc);
+		wrapper.call(contract, 250000, 0, "approve", spenderAddress, valueToApprove);
 	}
 
 	private static void transferFrom(HederaContract contract, String fromAccountAddress, String toAccountAddress,
 			long valueToTransfer) throws Exception {
-		final String TRANSFER_FROM_ABI = "{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}";
-		String funcJson = TRANSFER_FROM_ABI.replaceAll("'", "\"");
-		CallTransaction.Function function = CallTransaction.Function.fromJsonInterface(funcJson);
-		byte[] encodedFunc = function.encode(fromAccountAddress, toAccountAddress, valueToTransfer);
-
-		HederaTransactionResult result = ContractCall.call(contract, 250000, 0, encodedFunc);
+		wrapper.call(contract, 250000, 0, "transferFrom", fromAccountAddress, toAccountAddress, valueToTransfer);
 	}
 }
