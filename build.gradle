@@ -18,7 +18,10 @@ plugins {
 	// provides contextual analysis for common issues
 	id 'net.ltgt.errorprone' version '0.7.1'
 
-	// Performs quality checks using PMD
+    // Fixes up `modulePath` because Gradle hasn't been taught about it yet and manual setup is a pain
+    id "org.javamodularity.moduleplugin" version "1.4.1"
+
+    // Performs quality checks using PMD
 	id 'pmd'
 }
 
