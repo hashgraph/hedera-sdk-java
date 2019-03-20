@@ -66,9 +66,13 @@ public final class Ed25519PrivateKey {
                 privKeyParams =
                         new Ed25519PrivateKeyParameters(
                                 ((ASN1OctetString) privateKey).getOctets(), 0);
-                pubKeyParams =
-                        new Ed25519PublicKeyParameters(
-                                privateKeyInfo.getPublicKeyData().getOctets(), 0);
+
+                var pubKeyData = privateKeyInfo.getPublicKeyData();
+
+                if (pubKeyData != null) {
+                    pubKeyParams = new Ed25519PublicKeyParameters(pubKeyData.getOctets(), 0);
+                }
+
             } catch (IOException e) {
                 // TODO: throw a better checked exception
                 throw new RuntimeException(e);
