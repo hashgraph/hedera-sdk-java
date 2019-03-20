@@ -1,13 +1,12 @@
 package com.hedera.sdk.crypto.ed25519;
 
 import java.io.IOException;
+import javax.annotation.Nonnull;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
-
-import javax.annotation.Nonnull;
 
 /**
  * An ed25519 public key.
@@ -18,7 +17,7 @@ import javax.annotation.Nonnull;
 @SuppressWarnings(
         "Duplicates") // difficult to factor out common code for all algos without exposing it
 public final class Ed25519PublicKey {
-    final Ed25519PublicKeyParameters pubKeyParams;
+    private final Ed25519PublicKeyParameters pubKeyParams;
 
     Ed25519PublicKey(@Nonnull Ed25519PublicKeyParameters pubKeyParams) {
         this.pubKeyParams = pubKeyParams;

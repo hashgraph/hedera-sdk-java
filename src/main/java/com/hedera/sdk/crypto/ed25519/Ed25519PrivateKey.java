@@ -29,7 +29,8 @@ public final class Ed25519PrivateKey {
     }
 
     private Ed25519PrivateKey(
-        @Nonnull Ed25519PrivateKeyParameters privKeyParams, @Nullable Ed25519PublicKeyParameters pubKeyParams) {
+            @Nonnull Ed25519PrivateKeyParameters privKeyParams,
+            @Nullable Ed25519PublicKeyParameters pubKeyParams) {
         this.privKeyParams = privKeyParams;
 
         if (pubKeyParams != null) {
