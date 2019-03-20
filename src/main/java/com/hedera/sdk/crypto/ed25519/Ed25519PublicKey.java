@@ -10,7 +10,8 @@ import org.bouncycastle.math.ec.rfc8032.Ed25519;
 /**
  * An ed25519 public key.
  *
- * <p>Can be constructed from a byte array or obtained from a private key {@link Ed25519PrivateKey#getPublicKey()}.
+ * <p>Can be constructed from a byte array or obtained from a private key {@link
+ * Ed25519PrivateKey#getPublicKey()}.
  */
 public final class Ed25519PublicKey {
     private final Ed25519PublicKeyParameters publicKey;
