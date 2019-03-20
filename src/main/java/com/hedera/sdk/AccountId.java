@@ -34,6 +34,6 @@ public final class AccountId {
 
     @Override
     public String toString() {
-        return String.valueOf(getShardNum()) + '.' + getRealmNum() + '.' + getAccountNum();
+        return String.format("%d.%d.%d", getShardNum(), getRealmNum(), getAccountNum());
     }
 }
