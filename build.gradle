@@ -12,7 +12,7 @@ plugins {
 	id 'com.google.protobuf' version '0.8.8'
 
 	// Keep your code spotless
-	id 'com.diffplug.gradle.spotless' version '3.19.0'
+	id 'com.diffplug.gradle.spotless' version '3.20.0'
 
 	// Use the Error Prone compiler which wraps javac and
 	// provides contextual analysis for common issues
@@ -23,6 +23,9 @@ plugins {
 
 	// Performs quality checks using PMD
 	id 'pmd'
+
+	// Check if our dependencies are up-to-date
+	id "com.github.ben-manes.versions" version "0.21.0"
 }
 
 repositories { jcenter() }
@@ -32,6 +35,7 @@ targetCompatibility = 11
 
 dependencies {
 	// Support for Protobufs
+	// Stuck on 3.6.x because of https://github.com/protocolbuffers/protobuf/issues/5875
 	implementation 'com.google.protobuf:protobuf-java:3.6.0'
 
 	// Support for gRPC
@@ -39,12 +43,12 @@ dependencies {
 	implementation 'io.grpc:grpc-protobuf:1.19.0'
 	implementation 'io.grpc:grpc-stub:1.19.0'
 
-	// crypto
+	// https://www.bouncycastle.org/java.html
 	implementation group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.61'
 
-	// Workaround for @javax.annotation.Generated
-	// see: https://github.com/grpc/grpc-java/issues/3633
-	implementation 'javax.annotation:javax.annotation-api:1.3.1'
+	// Provides @javax.annotation.*
+	// Useful stuff like Nullable, Generated, etc.
+	implementation 'javax.annotation:javax.annotation-api:1.3.2'
 
 	// Use the latest Groovy version for Spock testing
 	testImplementation 'org.codehaus.groovy:groovy-all:2.5.6'
