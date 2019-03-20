@@ -1,7 +1,6 @@
 package com.hedera.sdk.crypto.ed25519;
 
 import java.io.IOException;
-
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
@@ -14,7 +13,8 @@ import org.bouncycastle.util.encoders.Hex;
  * <p>Can be constructed from a byte array or obtained from a private key {@link
  * Ed25519PrivateKey#getPublicKey()}.
  */
-@SuppressWarnings("Duplicates") // difficult to factor out common code for all algos without exposing it
+@SuppressWarnings(
+        "Duplicates") // difficult to factor out common code for all algos without exposing it
 public final class Ed25519PublicKey {
     private final Ed25519PublicKeyParameters publicKey;
 

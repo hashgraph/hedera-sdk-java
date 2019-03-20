@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.security.SecureRandom;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
@@ -19,7 +18,8 @@ import org.bouncycastle.util.encoders.Hex;
  *
  * <p>To obtain an instance, see {@link #generate()} or {@link #fromString(String)}.
  */
-@SuppressWarnings("Duplicates") // difficult to factor out common code for all algos without exposing it
+@SuppressWarnings(
+        "Duplicates") // difficult to factor out common code for all algos without exposing it
 public final class Ed25519PrivateKey {
     private final Ed25519PrivateKeyParameters privateKey;
     // computed from private key and memoized
@@ -29,7 +29,8 @@ public final class Ed25519PrivateKey {
         this.privateKey = privateKey;
     }
 
-    private Ed25519PrivateKey(Ed25519PrivateKeyParameters privateKey, Ed25519PublicKeyParameters publicKey) {
+    private Ed25519PrivateKey(
+            Ed25519PrivateKeyParameters privateKey, Ed25519PublicKeyParameters publicKey) {
         this.privateKey = privateKey;
         this.publicKey = new Ed25519PublicKey(publicKey);
     }
@@ -45,7 +46,9 @@ public final class Ed25519PrivateKey {
             // some legacy code delivers private and public key pairs concatted together
             try {
                 // this is how we read only the first 32 bytes
-                privKeyParams = new Ed25519PrivateKeyParameters(new ByteArrayInputStream(keyBytes, 0, Ed25519.SECRET_KEY_SIZE));
+                privKeyParams =
+                        new Ed25519PrivateKeyParameters(
+                                new ByteArrayInputStream(keyBytes, 0, Ed25519.SECRET_KEY_SIZE));
                 // read the remaining 32 bytes as the public key
                 pubKeyParams = new Ed25519PublicKeyParameters(keyBytes, Ed25519.SECRET_KEY_SIZE);
 
@@ -60,8 +63,12 @@ public final class Ed25519PrivateKey {
 
             try {
                 var privateKey = privateKeyInfo.parsePrivateKey();
-                privKeyParams = new Ed25519PrivateKeyParameters(((ASN1OctetString) privateKey).getOctets(), 0);
-                pubKeyParams = new Ed25519PublicKeyParameters(privateKeyInfo.getPublicKeyData().getOctets(), 0);
+                privKeyParams =
+                        new Ed25519PrivateKeyParameters(
+                                ((ASN1OctetString) privateKey).getOctets(), 0);
+                pubKeyParams =
+                        new Ed25519PublicKeyParameters(
+                                privateKeyInfo.getPublicKeyData().getOctets(), 0);
             } catch (IOException e) {
                 // TODO: throw a better checked exception
                 throw new RuntimeException(e);
