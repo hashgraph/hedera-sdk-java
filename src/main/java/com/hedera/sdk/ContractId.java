@@ -11,4 +11,8 @@ public class ContractId {
             .setRealmNum(realmNum)
             .setContractNum(contractNum);
     }
+
+    public long getShardNum() { return inner.getShardNum(); }
+    public long getRealmNum() { return inner.getRealmNum(); }
+    public long getContractNum() { return inner.getContractNum(); }
 }

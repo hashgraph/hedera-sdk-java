@@ -11,4 +11,9 @@ public class FileId {
             .setRealmNum(realmNum)
             .setFileNum(fileNum);
     }
+
+
+    public long getShardNum() { return inner.getShardNum(); }
+    public long getRealmNum() { return inner.getRealmNum(); }
+    public long getFileNum() { return inner.getFileNum(); }
 }
