@@ -144,4 +144,20 @@ public final class Ed25519PrivateKey {
 
         return Hex.toHexString(encoded);
     }
+
+    public byte[] sign(byte[] message) {
+        var signature = new byte[Ed25519PrivateKeyParameters.SIGNATURE_SIZE];
+        privateKey.sign(
+                Ed25519.Algorithm.Ed25519,
+                // FIXME: This access looks awkward `publicKey.publicKey` - maybe a better name for the inner type
+                getPublicKey().publicKey,
+                null,
+                message,
+                0,
+                message.length,
+                signature,
+                0);
+
+        return signature;
+    }
 }
