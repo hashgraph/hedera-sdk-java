@@ -38,7 +38,8 @@ public final class Ed25519Signature {
     @Nonnull
     public static Ed25519Signature forMessage(
             Ed25519PrivateKey privateKey, byte[] message, int messageOffset, int messageLen) {
-        // we don't use the `Ed25519Signer` class because it unnecessarily calculates the public key in `init()`
+        // we don't use the `Ed25519Signer` class because it unnecessarily calculates the public key
+        // in `init()`
         var secret = privateKey.toBytes();
         var sigBytes = new byte[Ed25519.SIGNATURE_SIZE];
         Ed25519.sign(secret, 0, message, messageOffset, messageLen, sigBytes, 0);
