@@ -53,16 +53,4 @@ class Ed25519PrivateKeyTest extends Specification {
 			'db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10'
 		]
 	}
-
-	def "reproducible signature can be computed"() {
-		when:
-		def keyStr = "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10"
-		def messageStr = "This is a message about the world."
-		def key = Ed25519PrivateKey.fromString(keyStr)
-		def signature = key.sign(messageStr.getBytes())
-		def signatureStr = Hex.toHexString(signature)
-
-		then:
-		signatureStr == "73bea53f31ca9c42a422ecb7516ec08d0bbd1a6bfd630ccf10ec1872454814d29f4a8011129cd007eab544af01a75f508285b591e5bed24b68f927751e49e30e"
-	}
 }

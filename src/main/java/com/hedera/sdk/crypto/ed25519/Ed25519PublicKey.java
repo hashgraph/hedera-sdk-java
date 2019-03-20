@@ -7,6 +7,8 @@ import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
 
+import javax.annotation.Nonnull;
+
 /**
  * An ed25519 public key.
  *
@@ -18,7 +20,7 @@ import org.bouncycastle.util.encoders.Hex;
 public final class Ed25519PublicKey {
     final Ed25519PublicKeyParameters pubKeyParams;
 
-    Ed25519PublicKey(Ed25519PublicKeyParameters pubKeyParams) {
+    Ed25519PublicKey(@Nonnull Ed25519PublicKeyParameters pubKeyParams) {
         this.pubKeyParams = pubKeyParams;
     }
 

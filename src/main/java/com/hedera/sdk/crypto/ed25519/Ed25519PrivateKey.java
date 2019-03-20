@@ -24,17 +24,20 @@ public final class Ed25519PrivateKey {
     // computed from private key and memoized
     @Nullable private Ed25519PublicKey publicKey;
 
-    private Ed25519PrivateKey(Ed25519PrivateKeyParameters privKeyParams) {
+    private Ed25519PrivateKey(@Nonnull Ed25519PrivateKeyParameters privKeyParams) {
         this.privKeyParams = privKeyParams;
     }
 
     private Ed25519PrivateKey(
-        Ed25519PrivateKeyParameters privKeyParams, Ed25519PublicKeyParameters publicKey) {
+        @Nonnull Ed25519PrivateKeyParameters privKeyParams, @Nullable Ed25519PublicKeyParameters pubKeyParams) {
         this.privKeyParams = privKeyParams;
-        this.publicKey = new Ed25519PublicKey(publicKey);
+
+        if (pubKeyParams != null) {
+            this.publicKey = new Ed25519PublicKey(pubKeyParams);
+        }
     }
 
-    static Ed25519PrivateKey fromBytes(byte[] keyBytes) {
+    static Ed25519PrivateKey fromBytes(@Nonnull byte[] keyBytes) {
         Ed25519PrivateKeyParameters privKeyParams;
         Ed25519PublicKeyParameters pubKeyParams = null;
 
@@ -90,7 +93,7 @@ public final class Ed25519PrivateKey {
      * @throws RuntimeException if the decoded key was invalid
      */
     @Nonnull
-    public static Ed25519PrivateKey fromString(String privateKeyString) {
+    public static Ed25519PrivateKey fromString(@Nonnull String privateKeyString) {
         // TODO: catch unchecked `DecoderException`
         var keyBytes = Hex.decode(privateKeyString);
         return fromBytes(keyBytes);
@@ -104,7 +107,7 @@ public final class Ed25519PrivateKey {
 
     /** @return a new private key using the given {@link java.security.SecureRandom} */
     @Nonnull
-    public static Ed25519PrivateKey generate(SecureRandom secureRandom) {
+    public static Ed25519PrivateKey generate(@Nonnull SecureRandom secureRandom) {
         return new Ed25519PrivateKey(new Ed25519PrivateKeyParameters(secureRandom));
     }
 

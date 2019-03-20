@@ -2,6 +2,7 @@ package com.hedera.sdk.crypto.ed25519;
 
 import org.bouncycastle.crypto.signers.Ed25519Signer;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
+import org.bouncycastle.util.encoders.Hex;
 
 public final class Ed25519Signature {
     private final byte[] sigBytes;
@@ -29,5 +30,10 @@ public final class Ed25519Signature {
         signer.init(false, publicKey.pubKeyParams);
         signer.update(message, 0, message.length);
         return signer.verifySignature(sigBytes);
+    }
+
+    @Override
+    public String toString() {
+        return Hex.toHexString(sigBytes);
     }
 }
