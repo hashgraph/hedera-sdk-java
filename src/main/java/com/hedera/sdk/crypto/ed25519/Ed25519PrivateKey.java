@@ -149,7 +149,8 @@ public final class Ed25519PrivateKey {
         var signature = new byte[Ed25519PrivateKeyParameters.SIGNATURE_SIZE];
         privateKey.sign(
                 Ed25519.Algorithm.Ed25519,
-                // FIXME: This access looks awkward `publicKey.publicKey` - maybe a better name for the inner type
+                // FIXME: This access looks awkward `publicKey.publicKey` - maybe a better name for
+                // the inner type
                 getPublicKey().publicKey,
                 null,
                 message,
