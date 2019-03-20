@@ -18,11 +18,17 @@ plugins {
 	// provides contextual analysis for common issues
 	id 'net.ltgt.errorprone' version '0.7.1'
 
+	// Fixes up `modulePath` because Gradle hasn't been taught about it yet and manual setup is a pain
+	id "org.javamodularity.moduleplugin" version "1.4.1"
+
 	// Performs quality checks using PMD
 	id 'pmd'
 }
 
 repositories { jcenter() }
+
+sourceCompatibility = 11
+targetCompatibility = 11
 
 dependencies {
 	// Support for Protobufs
@@ -32,6 +38,9 @@ dependencies {
 	implementation 'io.grpc:grpc-netty-shaded:1.19.0'
 	implementation 'io.grpc:grpc-protobuf:1.19.0'
 	implementation 'io.grpc:grpc-stub:1.19.0'
+
+	// crypto
+	implementation group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.61'
 
 	// Workaround for @javax.annotation.Generated
 	// see: https://github.com/grpc/grpc-java/issues/3633
@@ -85,9 +94,22 @@ idea {
 }
 
 spotless {
-	java { googleJavaFormat() }
+	java {
+		// 4-space indents because 2 spaces are difficult to differentiate
+		googleJavaFormat().aosp()
+	}
 	groovy { greclipse() }
 	groovyGradle { greclipse() }
+}
+
+pmd {
+	// print PMD errors to stdout
+	consoleOutput = true
+
+	// this silences some pedantic/buggy rules:
+	// DataflowAnomalyAnalysis (priority 5): triggers many false-positives
+	// BeanMembersShouldSerialize (priority 3): we don't use Beans but this triggers anyway
+	rulePriority = 2
 }
 
 tasks.withType(JavaCompile).configureEach {
