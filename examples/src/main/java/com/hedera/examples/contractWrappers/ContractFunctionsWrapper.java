@@ -89,7 +89,7 @@ public class ContractFunctionsWrapper {
 		if (parameterValues.length == 0) {
 			constructor = function.encode();
 		} else {
-			constructor = function.encode(parameterValues);
+			constructor = function.encodeArguments(parameterValues);
 		}
 
 		return constructor;
