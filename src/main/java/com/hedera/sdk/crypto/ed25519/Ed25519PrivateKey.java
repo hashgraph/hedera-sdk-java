@@ -18,18 +18,19 @@ import org.bouncycastle.util.encoders.Hex;
  *
  * <p>To obtain an instance, see {@link #generate()} or {@link #fromString(String)}.
  */
+@SuppressWarnings("Duplicates")
 public final class Ed25519PrivateKey {
-    private final Ed25519PrivateKeyParameters privateKey;
+    final Ed25519PrivateKeyParameters privKeyParams;
     // computed from private key and memoized
     @Nullable private Ed25519PublicKey publicKey;
 
-    private Ed25519PrivateKey(Ed25519PrivateKeyParameters privateKey) {
-        this.privateKey = privateKey;
+    private Ed25519PrivateKey(Ed25519PrivateKeyParameters privKeyParams) {
+        this.privKeyParams = privKeyParams;
     }
 
     private Ed25519PrivateKey(
-            Ed25519PrivateKeyParameters privateKey, Ed25519PublicKeyParameters publicKey) {
-        this.privateKey = privateKey;
+        Ed25519PrivateKeyParameters privKeyParams, Ed25519PublicKeyParameters publicKey) {
+        this.privKeyParams = privKeyParams;
         this.publicKey = new Ed25519PublicKey(publicKey);
     }
 
@@ -111,7 +112,7 @@ public final class Ed25519PrivateKey {
     @Nonnull
     public Ed25519PublicKey getPublicKey() {
         if (publicKey == null) {
-            publicKey = new Ed25519PublicKey(privateKey.generatePublicKey());
+            publicKey = new Ed25519PublicKey(privKeyParams.generatePublicKey());
         }
 
         return publicKey;
@@ -119,7 +120,7 @@ public final class Ed25519PrivateKey {
 
     @Nonnull
     byte[] toBytes() {
-        return privateKey.getEncoded();
+        return privKeyParams.getEncoded();
     }
 
     @Override
@@ -127,7 +128,7 @@ public final class Ed25519PrivateKey {
     public String toString() {
         PrivateKeyInfo privateKeyInfo;
         try {
-            privateKeyInfo = PrivateKeyInfoFactory.createPrivateKeyInfo(privateKey);
+            privateKeyInfo = PrivateKeyInfoFactory.createPrivateKeyInfo(privKeyParams);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -143,22 +144,5 @@ public final class Ed25519PrivateKey {
         }
 
         return Hex.toHexString(encoded);
-    }
-
-    public byte[] sign(byte[] message) {
-        var signature = new byte[Ed25519PrivateKeyParameters.SIGNATURE_SIZE];
-        privateKey.sign(
-                Ed25519.Algorithm.Ed25519,
-                // FIXME: This access looks awkward `publicKey.publicKey` - maybe a better name for
-                // the inner type
-                getPublicKey().publicKey,
-                null,
-                message,
-                0,
-                message.length,
-                signature,
-                0);
-
-        return signature;
     }
 }

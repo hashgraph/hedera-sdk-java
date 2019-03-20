@@ -16,10 +16,10 @@ import org.bouncycastle.util.encoders.Hex;
 @SuppressWarnings(
         "Duplicates") // difficult to factor out common code for all algos without exposing it
 public final class Ed25519PublicKey {
-    final Ed25519PublicKeyParameters publicKey;
+    final Ed25519PublicKeyParameters pubKeyParams;
 
-    Ed25519PublicKey(Ed25519PublicKeyParameters publicKey) {
-        this.publicKey = publicKey;
+    Ed25519PublicKey(Ed25519PublicKeyParameters pubKeyParams) {
+        this.pubKeyParams = pubKeyParams;
     }
 
     /**
@@ -53,7 +53,7 @@ public final class Ed25519PublicKey {
     }
 
     public byte[] toBytes() {
-        return publicKey.getEncoded();
+        return pubKeyParams.getEncoded();
     }
 
     @Override
@@ -61,7 +61,7 @@ public final class Ed25519PublicKey {
         SubjectPublicKeyInfo publicKeyInfo;
 
         try {
-            publicKeyInfo = SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(publicKey);
+            publicKeyInfo = SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(pubKeyParams);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
