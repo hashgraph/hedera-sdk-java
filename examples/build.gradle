@@ -1,0 +1,15 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    implementation rootProject
+
+    implementation 'io.grpc:grpc-netty-shaded:1.19.0'
+    implementation 'io.grpc:grpc-protobuf:1.19.0'
+    implementation 'io.grpc:grpc-stub:1.19.0'
+}

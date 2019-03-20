@@ -99,6 +99,7 @@ idea {
 
 spotless {
 	java {
+		target 'example/**/*.java', 'src/**/*.java'
 		// 4-space indents because 2 spaces are difficult to differentiate
 		googleJavaFormat().aosp()
 	}
