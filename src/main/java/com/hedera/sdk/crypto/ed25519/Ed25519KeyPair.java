@@ -1,10 +1,9 @@
 package com.hedera.sdk.crypto.ed25519;
 
 import com.hedera.sdk.crypto.KeyPair;
+import java.security.SecureRandom;
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
-
-import java.security.SecureRandom;
 
 public final class Ed25519KeyPair extends KeyPair {
     public final Ed25519PrivateKey privateKey;
@@ -25,7 +24,8 @@ public final class Ed25519KeyPair extends KeyPair {
     /**
      * Recover a keypair from the bytes of the private key.
      *
-     * @param privateKeyBytes the previously generated private key obtained from {@link Ed25519PrivateKey#toBytes}
+     * @param privateKeyBytes the previously generated private key obtained from {@link
+     *     Ed25519PrivateKey#toBytes}
      * @return a keypair restored from the given private key bytes
      * @throws AssertionError if {@code privateKeyBytes.length != 32}
      */
@@ -38,9 +38,10 @@ public final class Ed25519KeyPair extends KeyPair {
      * Recover a keypair from the bytes of the private key.
      *
      * @param privateKeyBytes the previously generated private key obtained from {@link #privateKey}
-     * @param offset          the offset into {@code privateKeyBytes} at which to read the private key
+     * @param offset the offset into {@code privateKeyBytes} at which to read the private key
      * @return a keypair restored from the given section of the private key bytes
-     * @throws AssertionError if {@code offset >= privateKeyBytes.length || privateKeyBytes.length - offset != 32}
+     * @throws AssertionError if {@code offset >= privateKeyBytes.length || privateKeyBytes.length -
+     *     offset != 32}
      */
     public static Ed25519KeyPair fromBytes(byte[] privateKeyBytes, int offset) {
         assert offset < privateKeyBytes.length;
@@ -50,16 +51,12 @@ public final class Ed25519KeyPair extends KeyPair {
         return new Ed25519KeyPair(privateKeyParams);
     }
 
-    /**
-     * @return a new random keypair using {@link java.security.SecureRandom}
-     */
+    /** @return a new random keypair using {@link java.security.SecureRandom} */
     public static Ed25519KeyPair generate() {
         return generate(new SecureRandom());
     }
 
-    /**
-     * @return a new random keypair using the given {@link java.security.SecureRandom}
-     */
+    /** @return a new random keypair using the given {@link java.security.SecureRandom} */
     public static Ed25519KeyPair generate(SecureRandom secureRandom) {
         return new Ed25519KeyPair(new Ed25519PrivateKeyParameters(secureRandom));
     }

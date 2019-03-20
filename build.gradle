@@ -18,10 +18,10 @@ plugins {
 	// provides contextual analysis for common issues
 	id 'net.ltgt.errorprone' version '0.7.1'
 
-    // Fixes up `modulePath` because Gradle hasn't been taught about it yet and manual setup is a pain
-    id "org.javamodularity.moduleplugin" version "1.4.1"
+	// Fixes up `modulePath` because Gradle hasn't been taught about it yet and manual setup is a pain
+	id "org.javamodularity.moduleplugin" version "1.4.1"
 
-    // Performs quality checks using PMD
+	// Performs quality checks using PMD
 	id 'pmd'
 }
 
@@ -32,7 +32,7 @@ targetCompatibility = 11
 
 dependencies {
 	// Support for Protobufs
-	implementation 'com.google.protobuf:protobuf-java:3.6.0'
+	implementation 'com.google.protobuf:protobuf-java:3.+'
 
 	// Support for gRPC
 	implementation 'io.grpc:grpc-netty-shaded:1.19.0'
@@ -46,10 +46,10 @@ dependencies {
 	// Use the latest Groovy version for Spock testing
 	testImplementation 'org.codehaus.groovy:groovy-all:2.5.6'
 
-    // Use the awesome Spock testing and specification framework even with Java
-    testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
-    testImplementation 'junit:junit:4.12'
-    implementation group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.61'
+	// Use the awesome Spock testing and specification framework even with Java
+	testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
+	testImplementation 'junit:junit:4.12'
+	implementation group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.61'
 
 	// Specify the version of Error Prone for error checking
 	errorprone 'com.google.errorprone:error_prone_core:2.3.3'
@@ -92,9 +92,22 @@ idea {
 }
 
 spotless {
-	java { googleJavaFormat() }
+	java {
+		// 4-space indents because 2 spaces are difficult to differentiate
+		googleJavaFormat().aosp()
+	}
 	groovy { greclipse() }
 	groovyGradle { greclipse() }
+}
+
+pmd {
+	// print PMD errors to stdout
+	consoleOutput = true
+
+	// this silences some pedantic/buggy rules:
+	// DataflowAnomalyAnalysis (priority 5): triggers many false-positives
+	// BeanMembersShouldSerialize (priority 3): we don't use Beans but this triggers anyway
+	rulePriority = 2
 }
 
 tasks.withType(JavaCompile).configureEach {

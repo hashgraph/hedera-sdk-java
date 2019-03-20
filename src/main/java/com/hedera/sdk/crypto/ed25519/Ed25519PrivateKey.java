@@ -1,16 +1,15 @@
 package com.hedera.sdk.crypto.ed25519;
 
+import java.io.IOException;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
 import org.bouncycastle.crypto.util.PrivateKeyInfoFactory;
 
-import java.io.IOException;
-
 /**
  * An ed25519 private key.
- * <p>
- * To obtain an instance, see {@link Ed25519KeyPair}.
+ *
+ * <p>To obtain an instance, see {@link Ed25519KeyPair}.
  */
 public final class Ed25519PrivateKey {
     private final Ed25519PrivateKeyParameters privateKey;

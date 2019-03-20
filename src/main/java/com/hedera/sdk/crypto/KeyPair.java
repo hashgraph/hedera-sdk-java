@@ -1,7 +1,3 @@
 package com.hedera.sdk.crypto;
 
-import java.security.SecureRandom;
-
-public abstract class KeyPair {
-
-}
+public abstract class KeyPair {}
