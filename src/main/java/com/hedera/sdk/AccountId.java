@@ -2,30 +2,38 @@ package com.hedera.sdk;
 
 import com.hedera.sdk.proto.AccountID;
 
-public class AccountId {
-  transient AccountID.Builder inner;
+// TODO: AccountId.fromString
 
-  public AccountId(long accountNum) {
-    this(0, 0, accountNum);
-  }
+public final class AccountId {
+    final AccountID.Builder inner;
 
-  public AccountId(long shardNum, long realmNum, long accountNum) {
-    inner =
-        AccountID.newBuilder()
-            .setRealmNum(realmNum)
-            .setShardNum(shardNum)
-            .setAccountNum(accountNum);
-  }
+    /** Constructs an `AccountId` with `0` for `shard` and `realm` (e.g., `0.0.<accountNum>`). */
+    public AccountId(long accountNum) {
+        this(0, 0, accountNum);
+    }
 
-  public long getShardNum() {
-    return inner.getShardNum();
-  }
+    public AccountId(long shardNum, long realmNum, long accountNum) {
+        inner =
+                AccountID.newBuilder()
+                        .setRealmNum(realmNum)
+                        .setShardNum(shardNum)
+                        .setAccountNum(accountNum);
+    }
 
-  public long getRealmNum() {
-    return inner.getRealmNum();
-  }
+    public long getShardNum() {
+        return inner.getShardNum();
+    }
 
-  public long getAccountNum() {
-    return inner.getAccountNum();
-  }
+    public long getRealmNum() {
+        return inner.getRealmNum();
+    }
+
+    public long getAccountNum() {
+        return inner.getAccountNum();
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(getShardNum()) + '.' + getRealmNum() + '.' + getAccountNum();
+    }
 }
