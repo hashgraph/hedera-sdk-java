@@ -10,7 +10,7 @@ import org.bouncycastle.math.ec.rfc8032.Ed25519;
 /**
  * An ed25519 public key.
  *
- * <p>Can be constructed from a byte array or generated with {@link Ed25519KeyPair}.
+ * <p>Can be constructed from a byte array or obtained from a private key {@link Ed25519PrivateKey#getPublicKey()}.
  */
 public final class Ed25519PublicKey {
     private final Ed25519PublicKeyParameters publicKey;
@@ -24,8 +24,8 @@ public final class Ed25519PublicKey {
      *
      * @throws AssertionError if {@code bytes.length != 32}
      */
-    public Ed25519PublicKey(byte[] bytes) {
-        this(bytes, 0);
+    public static Ed25519PublicKey fromBytes(byte[] bytes) {
+        return fromBytes(bytes, 0);
     }
 
     /**
@@ -33,10 +33,10 @@ public final class Ed25519PublicKey {
      *
      * @throws AssertionError if {@code offset >= bytes.length || bytes.length - offset != 32}
      */
-    public Ed25519PublicKey(byte[] bytes, int offset) {
+    public static Ed25519PublicKey fromBytes(byte[] bytes, int offset) {
         assert offset < bytes.length;
         assert bytes.length - offset == Ed25519.PUBLIC_KEY_SIZE;
-        publicKey = new Ed25519PublicKeyParameters(bytes, offset);
+        return new Ed25519PublicKey(new Ed25519PublicKeyParameters(bytes, offset));
     }
 
     public byte[] toBytes() {
