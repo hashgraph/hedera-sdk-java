@@ -18,8 +18,6 @@ import org.bouncycastle.util.encoders.Hex;
  *
  * <p>To obtain an instance, see {@link #generate()} or {@link #fromString(String)}.
  */
-@SuppressWarnings(
-        "Duplicates") // difficult to factor out common code for all algos without exposing it
 public final class Ed25519PrivateKey {
     private final Ed25519PrivateKeyParameters privateKey;
     // computed from private key and memoized
