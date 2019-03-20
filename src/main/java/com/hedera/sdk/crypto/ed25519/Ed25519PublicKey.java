@@ -16,7 +16,7 @@ import org.bouncycastle.util.encoders.Hex;
 @SuppressWarnings(
         "Duplicates") // difficult to factor out common code for all algos without exposing it
 public final class Ed25519PublicKey {
-    private final Ed25519PublicKeyParameters publicKey;
+    final Ed25519PublicKeyParameters publicKey;
 
     Ed25519PublicKey(Ed25519PublicKeyParameters publicKey) {
         this.publicKey = publicKey;
