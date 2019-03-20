@@ -5,10 +5,13 @@ import java.security.SecureRandom;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
 import org.bouncycastle.crypto.util.PrivateKeyInfoFactory;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * An ed25519 private key.
@@ -56,6 +59,19 @@ public final class Ed25519PrivateKey {
         return new Ed25519PrivateKey(privateKeyParams);
     }
 
+    /**
+     * Recover a private key from its text-encoded representation.
+     *
+     * @param privateKeyString the hex-encoded private key string
+     * @return the restored private key
+     * @throws org.bouncycastle.util.encoders.DecoderException if the hex string is invalid
+     * @throws AssertionError if the hex string decodes to the wrong number of bytes
+     */
+    @Nonnull
+    public static Ed25519PrivateKey fromString(String privateKeyString) {
+        return fromBytes(Hex.decode(privateKeyString));
+    }
+
     /** @return a new private key using {@link java.security.SecureRandom} */
     @Nonnull
     public static Ed25519PrivateKey generate() {
@@ -87,6 +103,7 @@ public final class Ed25519PrivateKey {
         return privateKey.getEncoded();
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
     @Nonnull
     public String toString() {
@@ -97,6 +114,16 @@ public final class Ed25519PrivateKey {
             throw new RuntimeException(e);
         }
 
-        return ASN1OctetString.getInstance(privateKeyInfo).toString();
+        // I'd love to dedup this with the code in `Ed25519PublicKey.toString()`
+        // but there's no way to do that without creating an entirely public class
+        byte[] encoded;
+
+        try {
+            encoded = privateKeyInfo.getEncoded("DER");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return Hex.toHexString(encoded);
     }
 }
