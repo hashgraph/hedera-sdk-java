@@ -14,6 +14,7 @@ import org.bouncycastle.util.encoders.Hex;
  * <p>Can be constructed from a byte array or obtained from a private key {@link
  * Ed25519PrivateKey#getPublicKey()}.
  */
+@SuppressWarnings("Duplicates") // difficult to factor out common code for all algos without exposing it
 public final class Ed25519PublicKey {
     private final Ed25519PublicKeyParameters publicKey;
 
@@ -22,23 +23,13 @@ public final class Ed25519PublicKey {
     }
 
     /**
-     * Construct a known public key from its bytes.
-     *
-     * @throws AssertionError if {@code bytes.length != 32}
-     */
-    public static Ed25519PublicKey fromBytes(byte[] bytes) {
-        return fromBytes(bytes, 0);
-    }
-
-    /**
      * Construct a known public key from a byte array and an offset into that array.
      *
      * @throws AssertionError if {@code offset >= bytes.length || bytes.length - offset != 32}
      */
-    public static Ed25519PublicKey fromBytes(byte[] bytes, int offset) {
-        assert offset < bytes.length;
-        assert bytes.length - offset == Ed25519.PUBLIC_KEY_SIZE;
-        return new Ed25519PublicKey(new Ed25519PublicKeyParameters(bytes, offset));
+    static Ed25519PublicKey fromBytes(byte[] bytes) {
+        assert bytes.length == Ed25519.PUBLIC_KEY_SIZE;
+        return new Ed25519PublicKey(new Ed25519PublicKeyParameters(bytes, 0));
     }
 
     /**
@@ -65,7 +56,6 @@ public final class Ed25519PublicKey {
         return publicKey.getEncoded();
     }
 
-    @SuppressWarnings("Duplicates")
     @Override
     public String toString() {
         SubjectPublicKeyInfo publicKeyInfo;
