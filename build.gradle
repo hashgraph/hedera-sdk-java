@@ -32,12 +32,15 @@ targetCompatibility = 11
 
 dependencies {
 	// Support for Protobufs
-	implementation 'com.google.protobuf:protobuf-java:3.+'
+	implementation 'com.google.protobuf:protobuf-java:3.6.0'
 
 	// Support for gRPC
 	implementation 'io.grpc:grpc-netty-shaded:1.19.0'
 	implementation 'io.grpc:grpc-protobuf:1.19.0'
 	implementation 'io.grpc:grpc-stub:1.19.0'
+
+	// crypto
+	implementation group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.61'
 
 	// Workaround for @javax.annotation.Generated
 	// see: https://github.com/grpc/grpc-java/issues/3633
@@ -49,7 +52,6 @@ dependencies {
 	// Use the awesome Spock testing and specification framework even with Java
 	testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
 	testImplementation 'junit:junit:4.12'
-	implementation group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.61'
 
 	// Specify the version of Error Prone for error checking
 	errorprone 'com.google.errorprone:error_prone_core:2.3.3'
