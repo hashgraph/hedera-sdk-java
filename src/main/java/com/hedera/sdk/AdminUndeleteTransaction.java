@@ -3,13 +3,15 @@ package com.hedera.sdk;
 import javax.annotation.Nonnull;
 
 public class AdminUndeleteTransaction extends TransactionBuilder<AdminUndeleteTransaction> {
-    // Undelete a File
-    public AdminUndeleteTransaction(@Nonnull FileId fileId) {
+    public AdminUndeleteTransaction() {}
+
+    public final AdminUndeleteTransaction setID(@Nonnull FileId fileId) {
         inner.getBodyBuilder().getAdminUndeleteBuilder().setFileID(fileId.inner);
+        return this;
     }
 
-    // Undelete a Contract
-    public AdminUndeleteTransaction(@Nonnull ContractId contractId) {
+    public final AdminUndeleteTransaction setID(@Nonnull ContractId contractId) {
         inner.getBodyBuilder().getAdminUndeleteBuilder().setContractID(contractId.inner);
+        return this;
     }
 }
