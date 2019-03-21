@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.LoggerFactory;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.UInt64Value;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaDuration;
 import com.hedera.sdk.common.HederaKeyPair;
@@ -949,10 +950,10 @@ public class HederaAccount implements Serializable {
 			updateTransaction.setProxyAccountID(this.proxyAccountID.getProtobuf());
 		}
 		if (this.receiveRecordThreshold != 0) {
-			updateTransaction.setReceiveRecordThreshold(this.receiveRecordThreshold);
+			updateTransaction.setReceiveRecordThreshold(UInt64Value.of(this.receiveRecordThreshold));
 		}
 		if (this.sendRecordThreshold != 0) {
-			updateTransaction.setSendRecordThreshold(this.sendRecordThreshold);
+			updateTransaction.setSendRecordThreshold(UInt64Value.of(this.sendRecordThreshold));
 		}
 		
 		return updateTransaction.build();
@@ -981,7 +982,7 @@ public class HederaAccount implements Serializable {
 	public CryptoAddClaimTransactionBody getAddClaimTransactionBody(HederaClaim claim) {
 		CryptoAddClaimTransactionBody.Builder transaction = CryptoAddClaimTransactionBody.newBuilder();
 		
-		transaction.setAccountID(this.getHederaAccountID().getProtobuf());
+//		transaction.setAccountID(this.getHederaAccountID().getProtobuf());
 		transaction.setClaim(claim.getProtobuf());
 		
 		return transaction.build();
@@ -1283,7 +1284,7 @@ public class HederaAccount implements Serializable {
 	 * The cost could be cached and refreshed from time to time, there is no need to look it up 
 	 * before each getBalance query
 	 * @param shardNum, the shard number of the account 
-	 * @param realmNum, the realm number of the account remove the claim from
+	 * @param realmNum, the realm number of the account 
 	 * @param accountNum, the account number of the account
 	 * @return {@link Long} 
 	 * @throws Exception in the event of an error
@@ -1324,7 +1325,7 @@ public class HederaAccount implements Serializable {
 	 * The cost could be cached and refreshed from time to time, there is no need to look it up 
 	 * before each getInfo query
 	 * @param shardNum, the shard number of the account 
-	 * @param realmNum, the realm number of the account remove the claim from
+	 * @param realmNum, the realm number of the account 
 	 * @param accountNum, the account number of the account 
 	 * @return boolean
 	 * @throws Exception in the event of an error
@@ -1362,13 +1363,13 @@ public class HederaAccount implements Serializable {
 			} else {
 				this.newAccountKey = null;
 			}
-			if ((updates.proxyAccountAccountNum != 0) && (updates.proxyAccountRealmNum != 0) && (updates.proxyAccountShardNum != 0)) {
+			if ((updates.proxyAccountAccountNum >= 0) && (updates.proxyAccountRealmNum >= 0) && (updates.proxyAccountShardNum >= 0)) {
 				this.proxyAccountID = new HederaAccountID(updates.proxyAccountShardNum, updates.proxyAccountRealmNum, updates.proxyAccountAccountNum);
 			}
-			if (updates.receiveRecordThreshold != 0) {
+			if (updates.receiveRecordThreshold != -1) {
 				this.receiveRecordThreshold = updates.receiveRecordThreshold;
 			}
-			if (updates.sendRecordThreshold != 0) {
+			if (updates.sendRecordThreshold != -1) {
 				this.sendRecordThreshold = updates.sendRecordThreshold;
 			}
 		}
@@ -1379,6 +1380,7 @@ public class HederaAccount implements Serializable {
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
 		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingKeyPair);
+		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
 		Utilities.throwIfAccountIDInvalid("txQueryDefaults.payingAccountID", this.txQueryDefaults.payingAccountID);
 		Utilities.throwIfAccountIDInvalid("txQueryDefaults.node.AccountID", this.txQueryDefaults.node.getAccountID());
 
@@ -1431,7 +1433,7 @@ public class HederaAccount implements Serializable {
 	 * It is also recommended you create a new account object prior to running this call to ensure properties from an older instance are
 	 * used to update this account's properties
 	 * @param shardNum, the shard number of the account 
-	 * @param realmNum, the realm number of the account remove the claim from
+	 * @param realmNum, the realm number of the account 
 	 * @param accountNum, the account number of the account
 	 * @param updates, a set of {@link HederaAccountUpdateValues} to update the account with
 	 * @return {@link HederaTransactionResult} 
@@ -1462,11 +1464,11 @@ public class HederaAccount implements Serializable {
 		return this.records;
 	}	
 	/**
-	 * Get records attached to this account
+	 * Get records attached to an account
 	 * Note: If no records are found, the function returns an empty array
 	 * if however an error occurred, it will return null
 	 * @param shardNum, the shard number of the account 
-	 * @param realmNum, the realm number of the account remove the claim from
+	 * @param realmNum, the realm number of the account 
 	 * @param accountNum, the account number of the account
 	 * @return {@link List} of {@link HederaTransactionRecord}
 	 * @throws Exception in the event of an error

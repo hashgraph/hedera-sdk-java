@@ -5,7 +5,7 @@
 
 The Java SDK for interacting with [Hedera Hashgraph](https://hedera.com): the official distributed consensus platform built using the hashgraph consensus algorithm for fast, fair and secure transactions. Hedera enables and empowers developers to build an entirely new class of decentralized applications.
 
-## Version is 0.2.1
+## Version is 0.3.0
 
 The Hedera Java SDK uses [semantic versioning](https://semver.org/).
 
@@ -17,6 +17,73 @@ Features supported include:
 - Executing Smart Contracts
 
 ## Changes in this version from 0.1.0
+
+### 0.3.0 - Examples - getRecords Queries
+
+Added getRecords examples to account and smart contract.
+Note: The simpleStorage contract now emits an event when the `set()` function is called, this generates a record which can be retrieved with the `getRecords` query.
+
+### 0.3.0 - SDK - Account update bug fixes
+
+Bug fixes to the `HederaAccount.update` code
+
+### 0.3.0 - SDK - Added support for ContractGetRecordsQuery
+
+Returns records related to a smart contract that were created within the last 24h, events emitted by a smart contract are stored in such records
+
+### 0.3.0 - SDK - Added methods to HederaContract class
+
+`getHederaContractID()` and `setHederaContractID()` were missing, now added.
+
+### 0.3.0 - Examples - change to contract .bin file loading
+
+the previous version of ExampleUtilities.java could result in the IDE loading the required file from a number of possible locations (e.g. `/src/main/resources`, `./target/classes`), the `readFile` method of this class now loads files from a path relative to the root of the project (e.g. `./src/main/resources/scExamples/HelloWorld.bin`).
+
+### 0.2.4 - Simplified smart contract call wrappers
+
+see com.hedera.examples.contractWrappers
+added `ContractFunctionsWrapper.java` which wraps all helpers related to making calls to smart contracts.
+
+Put your full ABI into a string (or a file with a path relative to the project).
+
+Initialise a `ContractFunctionsWrapper` object as follows (fullABI is a string containing my smart contract ABI in JSON format).
+
+```java
+ContractFunctionsWrapper wrapper = new ContractFunctionsWrapper();
+		wrapper.setABI(fullABI);
+```
+
+Locally call a function named `getInt` on the smart contract which returns a `BigInteger`.
+
+```java
+BigInteger decodeResult = wrapper.callLocalBigInt(createdContract, localGas, maxResultSize, "getInt");
+```
+
+Locally call a function named `getString` on the smart contract which returns a `String`.
+
+```java
+String decodeResult2 = wrapper.callLocalString(createdContract, localGas, maxResultSize, "getString");
+```
+
+There are overloaded methods for `Int`, `String`, `boolean`, `long`, `address` and `BigInt`.
+
+or, call a function named `set`
+
+```java
+wrapper.call(contract, gas, amount, "set", 10);
+```
+
+### 0.2.3 - Changes to pom structure
+
+Changes to pom structure including removal of parent project and inclusion of dependency version numbers.
+
+### 0.2.3 - Changes to protobuf repo version
+
+Changed dependency on protobuf repo from 0.2.0 to 0.2.1
+
+### 0.2.2 - Switch to Hedera Hashgraph Protobuf repo
+
+This version uses a new repository to fetch the protobuf API from to better control version management.
 
 ### 0.2.1 - Change to artifact IDs
 
@@ -154,8 +221,6 @@ From CLI:
 $> mvn install
 ```
 
-Note that the `.proto` files are compiled with Maven, so the project may initially look full of errors, this is normal.
-
 If there are still some project issues, try a Maven project update and project clean followed by a Maven install.
 
 ### Errors and solutions
@@ -258,7 +323,7 @@ Refer to the java sdk in your maven pom file as follows:
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>hedera-java-sdk</artifactId>
-  <version>0.2.1</version>
+  <version>0.3.0</version>
 </dependency>
 ```
 

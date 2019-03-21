@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.LoggerFactory;
 import com.google.protobuf.ByteString;
+import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaContractID;
 import com.hedera.sdk.common.HederaDuration;
@@ -36,11 +37,16 @@ import com.hederahashgraph.api.proto.java.ContractGetBytecodeResponse;
 import com.hederahashgraph.api.proto.java.ContractGetInfoQuery;
 import com.hederahashgraph.api.proto.java.ContractGetInfoResponse;
 import com.hederahashgraph.api.proto.java.ContractUpdateTransactionBody;
+import com.hederahashgraph.api.proto.java.CryptoGetAccountRecordsQuery;
+import com.hederahashgraph.api.proto.java.CryptoGetAccountRecordsResponse;
 import com.hederahashgraph.api.proto.java.Response;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hederahashgraph.api.proto.java.ResponseHeader;
 import com.hederahashgraph.api.proto.java.TransactionBody;
 import com.hederahashgraph.api.proto.java.ContractGetInfoResponse.ContractInfo;
+import com.hederahashgraph.api.proto.java.ContractGetRecordsQuery;
+import com.hederahashgraph.api.proto.java.ContractGetRecordsResponse;
+import com.hederahashgraph.api.proto.java.ContractID;
 
 /**
  * This class manages all aspects of interacting with a Smart Contract on Hedera Hashgraph 
@@ -57,6 +63,7 @@ public class HederaContract implements Serializable {
 	private long storage = 0;
 	private byte[] byteCode = new byte[0];
 	private List<HederaTransactionRecord> transactionRecords = new ArrayList<HederaTransactionRecord>();
+	private List<HederaTransactionRecord> records = null;
 	private long cost = 0;
 	private HederaContractFunctionResult hederaContractFunctionResult = null;
 	private String memo = "";
@@ -239,6 +246,24 @@ public class HederaContract implements Serializable {
 
 		this.hederaTransactionID = transactionID;
 
+	}
+	/**
+	 * Sets the HederaContractID values (shard, realm, accountNum) 
+	 * from a HederaContractID
+	 * @param contractID (The HederaContractID from which to set the properties)
+	 */
+	public void setHederaContractID(HederaContractID contractID) {
+		this.shardNum = contractID.shardNum;
+		this.realmNum = contractID.realmNum;
+		this.contractNum = contractID.contractNum;
+	}
+	/**
+	 * Gets the shard, realm and contractNum of this contract in the form 
+	 * of a HederaContractID
+	 * @return {@link HederaContractID}
+	 */
+	public HederaContractID getHederaContractID() {
+		return new HederaContractID(this.shardNum,  this.realmNum,  this.contractNum);
 	}
 	/**
 	 * The precheck result {@link ResponseCodeEnum} of a transaction
@@ -785,6 +810,118 @@ public class HederaContract implements Serializable {
 	}
 
 	/**
+	 * Runs a query to get records attached to a smart contract 
+	 * If successful, the method sets the records property, cost and state proof if requested
+	 * @param payment a {@link HederaTransaction} message to indicate how this query will be paid for, this can be null for Cost queries
+	 * @param responseType the type of response requested from the query
+	 * @return {@link Boolean} indicating success or failure of the query
+	 * @throws InterruptedException should an exception occur during communication with the node
+	 */
+	public boolean getRecords(HederaTransaction payment, HederaQueryHeader.QueryResponseType responseType) throws InterruptedException {
+		return getRecords(payment, responseType, this.getHederaContractID());
+	}
+	/**
+	 * Runs a query to get records attached to a smart contract 
+	 * If successful, the method sets the records property, cost and state proof if requested
+	 * @param payment a {@link HederaTransaction} message to indicate how this query will be paid for, this can be null for Cost queries
+	 * @param responseType the type of response requested from the query
+	 * @param accountID accountID of the account records being queried
+	 * @return {@link Boolean} indicating success or failure of the query
+	 * @throws InterruptedException should an exception occur during communication with the node
+	 */
+	public boolean getRecords(HederaTransaction payment, HederaQueryHeader.QueryResponseType responseType, HederaContractID contractID) throws InterruptedException {
+		boolean result = true;
+		
+		// build the query
+	   	// Header
+		HederaQueryHeader queryHeader = new HederaQueryHeader();
+		if (payment != null) {
+			queryHeader.payment = payment;
+			queryHeader.responseType = responseType;
+		}
+		
+		// get contents query
+		ContractGetRecordsQuery.Builder queryRecords = ContractGetRecordsQuery.newBuilder();
+		
+		queryRecords.setContractID(contractID.getProtobuf());
+		queryRecords.setHeader(queryHeader.getProtobuf());
+		
+		// the query itself
+		HederaQuery query = new HederaQuery();
+		query.queryType = QueryType.CONTRACTGETRECORDS;
+		query.queryData = queryRecords.build();
+		
+		// query now set, send to network
+		Utilities.throwIfNull("Node", this.node);
+		Response response = this.node.getContractRecords(query);
+		if (response == null) {
+			Utilities.printResponseFailure("HederaContract.getRecords");
+			return false;
+		}
+		ContractGetRecordsResponse.Builder queryResponse = response.getContractGetRecordsResponse().toBuilder();
+		
+		// check response header first
+		ResponseHeader.Builder responseHeader = queryResponse.getHeaderBuilder();
+
+		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
+
+		if (this.precheckResult == ResponseCodeEnum.OK) {
+			this.records = new ArrayList<HederaTransactionRecord>();
+			
+			for (int i=0; i < queryResponse.getRecordsCount(); i++) {
+				HederaTransactionRecord record = new HederaTransactionRecord(queryResponse.getRecords(i));
+				this.records.add(record);
+			}
+			
+			this.cost = responseHeader.getCost();
+			this.stateProof = responseHeader.getStateProof().toByteArray();
+		} else {
+			this.records = null;
+			result = false;
+		}
+		
+	   	return result;
+	}
+	/**
+	 * Runs a query to get records attached to an account without a state proof 
+	 * If successful, the method sets the records property and cost 
+	 * @param payment a {@link HederaTransaction} message to indicate how this query will be paid for, this can be null for Cost queries
+	 * @return {@link Boolean} indicating success or failure of the query
+	 * @throws InterruptedException should an exception occur during communication with the node
+	 */
+	public boolean getRecordsAnswerOnly(HederaTransaction payment) throws InterruptedException {
+	   	return getRecords(payment, QueryResponseType.ANSWER_ONLY);
+	}
+	/**
+	 * Runs a query to get records attached to an account with a state proof 
+	 * If successful, the method sets the records property, cost and state proof 
+	 * @param payment a {@link HederaTransaction} message to indicate how this query will be paid for, this can be null for Cost queries
+	 * @return {@link Boolean} indicating success or failure of the query
+	 * @throws InterruptedException should an exception occur during communication with the node
+	 */
+	public boolean getRecordsStateProof(HederaTransaction payment) throws InterruptedException {
+		return getRecords(payment, HederaQueryHeader.QueryResponseType.ANSWER_STATE_PROOF);
+	}
+	/**
+	 * Runs a query to find out the cost of getting records attached to an account without a state proof 
+	 * If successful, the method sets the cost 
+	 * @return {@link Boolean} indicating success or failure of the query
+	 * @throws InterruptedException should an exception occur during communication with the node
+	 */
+	public boolean getRecordsCostAnswer() throws InterruptedException {
+		return getRecords(null, HederaQueryHeader.QueryResponseType.COST_ANSWER);
+	}
+	/**
+	 * Runs a query to find out the cost of getting records attached to an account with a state proof 
+	 * If successful, the method sets the cost 
+	 * @return {@link Boolean} indicating success or failure of the query
+	 * @throws InterruptedException should an exception occur during communication with the node
+	 */
+	public boolean getRecordsAnswerStateProof() throws InterruptedException {
+		return getRecords(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
+	}
+	
+	/**
 	 * Runs a query to call a smart contract function locally (on a node)
 	 * If successful, the method populates the properties this object depending on the type of answer requested
 	 * @param payment a {@link HederaTransaction} message to indicate how this query will be paid for, this can be null for Cost queries
@@ -1304,4 +1441,42 @@ public class HederaContract implements Serializable {
 		this.contractNum = contractNum;
 		return callLocal(gas, functionParameters, maxResultSize);
 	}
+	/**
+	 * Get records attached to this contract
+	 * Note: If no records are found, the function returns an empty array
+	 * if however an error occurred, it will return null
+	 * @return {@link List} of {@link HederaTransactionRecord}
+	 * @throws Exception in the event of an error
+	 */
+	public List<HederaTransactionRecord> getRecords() throws Exception {
+		// set transport
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
+		this.node = this.txQueryDefaults.node;
+		
+		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults, this.node.accountGetRecordsQueryFee);
+		getRecordsAnswerOnly(transferTransaction);
+		return this.records;
+	}	
+	/**
+	 * Get records attached to a given contract
+	 * Note: If no records are found, the function returns an empty array
+	 * if however an error occurred, it will return null
+	 * @param shardNum, the shard number of the contract
+	 * @param realmNum, the realm number of the contract
+	 * @param contractNum, the contract number of the contract
+	 * @return {@link List} of {@link HederaTransactionRecord}
+	 * @throws Exception in the event of an error
+	 */
+	public List<HederaTransactionRecord> getRecords(long shardNum, long realmNum, long contractNum) throws Exception {
+		HederaContract recordAccount = new HederaContract(shardNum, realmNum, contractNum);
+		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
+		Utilities.throwIfNull("node", this.node);
+		
+		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults, this.node.accountGetRecordsQueryFee);
+		if (getRecords(transferTransaction, QueryResponseType.ANSWER_ONLY, recordAccount.getHederaContractID())) {
+			return this.records;
+		}
+		else return null;
+	}	
 }

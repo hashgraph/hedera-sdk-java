@@ -7,6 +7,7 @@ import java.io.Serializable;
 import com.hederahashgraph.api.proto.java.ContractCallLocalQuery;
 import com.hederahashgraph.api.proto.java.ContractGetBytecodeQuery;
 import com.hederahashgraph.api.proto.java.ContractGetInfoQuery;
+import com.hederahashgraph.api.proto.java.ContractGetRecordsQuery;
 import com.hederahashgraph.api.proto.java.CryptoGetAccountBalanceQuery;
 import com.hederahashgraph.api.proto.java.CryptoGetAccountRecordsQuery;
 import com.hederahashgraph.api.proto.java.CryptoGetClaimQuery;
@@ -89,6 +90,9 @@ public class HederaQuery implements Serializable {
 				break;
 			case CONTRACTGETBYTECODE:
 				query.setContractGetBytecode((ContractGetBytecodeQuery)this.queryData);
+				break;
+			case CONTRACTGETRECORDS:
+				query.setContractGetRecords((ContractGetRecordsQuery)this.queryData);
 				break;
 			case CONTRACTGETINFO:
 				query.setContractGetInfo((ContractGetInfoQuery)this.queryData);

@@ -1,20 +1,21 @@
 package com.hedera.examples.simple;
-import com.hedera.examples.contractWrappers.ContractCall;
+import java.math.BigInteger;
+
+import com.hedera.examples.contractWrappers.ContractFunctionsWrapper;
+import com.hedera.examples.contractWrappers.ContractGetRecords;
+import com.hedera.examples.accountWrappers.AccountGetRecords;
 import com.hedera.examples.contractWrappers.ContractCreate;
-import com.hedera.examples.contractWrappers.ContractRunLocal;
-import com.hedera.examples.contractWrappers.SoliditySupport;
 import com.hedera.examples.fileWrappers.FileCreate;
 import com.hedera.examples.utilities.ExampleUtilities;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
 import com.hedera.sdk.contract.HederaContract;
-import com.hedera.sdk.contract.HederaContractFunctionResult;
 import com.hedera.sdk.file.HederaFile;
 
 public final class DemoContractHelloWorld {
 
 	public static void main(String... arguments) throws Exception {
 
-		byte[] fileContents = ExampleUtilities.readFile("/scExamples/HelloWorld.bin");
+		byte[] fileContents = ExampleUtilities.readFile("./src/main/resources/scExamples/HelloWorld.bin");
 
 		// check the bin file only contains 0-9,A-F,a-f
 		ExampleUtilities.checkBinFile(fileContents);
@@ -42,20 +43,17 @@ public final class DemoContractHelloWorld {
 		long gas = 117000;
 		createdContract = ContractCreate.create(createdContract, file.getFileID(), gas, 0);
 
-		final String SC_GETINT_ABI = "{\"constant\": true,\"inputs\": [],\"name\": \"getInt\",\"outputs\": [{\"name\": \"\",\"type\": \"uint256\"}],\"payable\": false,\"stateMutability\": \"pure\",\"type\": \"function\"}";
-		byte[] function = SoliditySupport.encodeGetValue(SC_GETINT_ABI);
+		ContractFunctionsWrapper wrapper = new ContractFunctionsWrapper();
+		wrapper.setABIFromFile("./src/main/resources/scExamples/HelloWorld.abi");
+		
 		long localGas = 22000;
 		long maxResultSize = 5000;
-		HederaContractFunctionResult functionResult = ContractRunLocal.runLocal(createdContract, localGas, maxResultSize, function);
-		int decodeResult = SoliditySupport.decodeGetValueResultInt(functionResult.contractCallResult(),SC_GETINT_ABI);
-		ExampleUtilities.showResult(String.format("===>Decoded functionResult= %d", decodeResult));
-	
-		final String SC_GETSTRING_ABI = "{\"constant\": true,\"inputs\": [],\"name\": \"getString\",\"outputs\": [{	\"name\": \"\",\"type\": \"string\"	}],\"payable\": false,\"stateMutability\": \"pure\",\"type\": \"function\"}";
-		function = SoliditySupport.encodeGetValue(SC_GETSTRING_ABI);
-		localGas = 22000;
-		maxResultSize = 5000;
-		functionResult = ContractRunLocal.runLocal(createdContract, localGas, maxResultSize, function);
-		String result = SoliditySupport.decodeGetValueResultString(functionResult.contractCallResult(),SC_GETSTRING_ABI);
-		ExampleUtilities.showResult(String.format("===>Decoded functionResult= %s", result));
+		
+		BigInteger decodeResult = wrapper.callLocalBigInt(createdContract, localGas, maxResultSize, "getInt");
+		ExampleUtilities.showResult(String.format("===>Decoded functionResult= %s", decodeResult.toString()));
+
+		String decodeResult2 = wrapper.callLocalString(createdContract, localGas, maxResultSize, "getString");
+		ExampleUtilities.showResult(String.format("===>Decoded functionResult= %s", decodeResult2));
+		
 	}
 }

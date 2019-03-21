@@ -1,5 +1,6 @@
 package com.hedera.examples.utilities;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -155,16 +156,10 @@ public class ExampleUtilities {
 	public static byte[] readFile(String filePath) throws IOException, URISyntaxException {
 
 		byte[] fileContents = new byte[0];
-		if (ClassLoader.getSystemResource("") == null) {
-			fileContents = Files.readAllBytes(Paths.get("", filePath));
-
-		} else {
-			URI uri = ClassLoader.getSystemResource("").toURI();
-			String rootPath = Paths.get(uri).toString();
-			Path path = Paths.get(rootPath, filePath);
-
-			fileContents = Files.readAllBytes(path);
-		}
+		File file = new File(filePath);
+		Path path = file.toPath();
+		fileContents = Files.readAllBytes(path);
+		
 		return fileContents;
 	}
 }

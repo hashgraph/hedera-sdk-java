@@ -4,6 +4,7 @@ import com.hedera.examples.accountWrappers.AccountAddClaim;
 import com.hedera.examples.accountWrappers.AccountCreate;
 import com.hedera.examples.accountWrappers.AccountGetBalance;
 import com.hedera.examples.accountWrappers.AccountGetInfo;
+import com.hedera.examples.accountWrappers.AccountGetRecords;
 import com.hedera.examples.accountWrappers.AccountSend;
 import com.hedera.examples.accountWrappers.AccountUpdate;
 import com.hedera.examples.utilities.ExampleUtilities;
@@ -28,15 +29,17 @@ public final class DemoAccount {
     	boolean doAddClaim = false;//OK
 		boolean getTXRecord = false;
 		boolean getFastRecord = false;
+    	boolean getAccountRecords = false;
 
     	create = true;
-    	getBalance = true;
-    	send = true;
-    	getInfo = true;
-    	update = true;
+//    	getBalance = true;
+//    	send = true;
+//    	getInfo = true;
+//    	update = true;
 //    	doAddClaim = true; //-- not implemented ?
-    	getTXRecord = true; //-- records temporarily disabled
-    	getFastRecord = true;
+//    	getTXRecord = true; //-- records temporarily disabled
+//    	getFastRecord = true;
+    	getAccountRecords = true;
 		
     	/* 
     	 * check my balance
@@ -139,6 +142,24 @@ public final class DemoAccount {
 			    		AccountGetBalance.getBalance(newAccount);
 			    		ExampleUtilities.showResult(String.format("New account balance=%d tinybar", newAccount.balance()));
 			    	}
+		    	}
+
+		    	if (getAccountRecords) {
+
+		    		newAccount.accountKey = newAccountKey;
+		    		newAccount.txQueryDefaults.payingAccountID = newAccount.getHederaAccountID();
+		    		newAccount.txQueryDefaults.payingKeyPair = newAccountKey;
+		    		
+		    		// send 3 amounts to the node's account
+	    			HederaAccount nodeAccount = new HederaAccount();
+	    			nodeAccount.accountNum = newAccount.txQueryDefaults.node.getAccountID().accountNum;
+	    					
+		    		AccountSend.send(newAccount, nodeAccount, 10);
+		    		AccountSend.send(newAccount, nodeAccount, 20);
+		    		AccountSend.send(newAccount, nodeAccount, 30);
+	    			
+		    		// collect records from account
+		    		AccountGetRecords.getRecords(newAccount);
 		    	}
 		    	
 		    	if (update) {

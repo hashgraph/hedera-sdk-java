@@ -877,6 +877,44 @@ public class HederaNode implements Serializable {
 	}
 
 	/**
+	 * Sends a query to a node to get the records for a contract and returns the result of the request
+	 * @param query the {@link HederaQuery} to send
+	 * @return {@link Response} the result of the query
+	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
+	 */
+	public Response getContractRecords(HederaQuery query) throws InterruptedException, StatusRuntimeException {
+
+		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug(query.getProtobuf().toString());
+
+		Response response = null;
+
+		if (query.getProtobuf().hasContractGetRecords()) {
+			openChannel();
+			
+			SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
+			for (int i=0; i < busyRetryCount; i++) {
+				response = blockingStub.getTxRecordByContractID(query.getProtobuf());
+				// retry if busy
+				if (response.getContractGetRecordsResponse().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
+					logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
+					Thread.sleep(waitMillisLong);
+				} else {
+					break;
+				}
+			}
+		} else {
+			throw new IllegalStateException("Invalid Query Type");
+		}
+
+		logger.debug("--->QUERY RESPONSE");
+		logger.debug(response.toString());
+
+		return response;
+	}
+
+	/**
 	 * Sends a query to a node to get an account's information and returns the result of the request
 	 * @param query the {@link HederaQuery} to send
 	 * @return {@link Response} the result of the query
