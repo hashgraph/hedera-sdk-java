@@ -4,7 +4,9 @@ import com.hedera.sdk.proto.Timestamp;
 import com.hedera.sdk.proto.TimestampSeconds;
 import java.time.Instant;
 
-class TimestampHelper {
+final class TimestampHelper {
+    private TimestampHelper() {}
+
     static Timestamp timestampFrom(Instant timestamp) {
         return Timestamp.newBuilder()
                 .setSeconds(timestamp.getEpochSecond())
