@@ -1,6 +1,7 @@
 package com.hedera.sdk;
 
 import com.hedera.sdk.proto.ContractID;
+import java.time.Instant;
 import javax.annotation.Nonnull;
 
 public class AdminDeleteTransaction extends TransactionBuilder<AdminDeleteTransaction> {
@@ -14,8 +15,10 @@ public class AdminDeleteTransaction extends TransactionBuilder<AdminDeleteTransa
         inner.getBodyBuilder().getAdminDeleteBuilder().setContractID(contractID);
     }
 
-    public final AdminDeleteTransaction setExpirationTime(@Nonnull TimestampSeconds timestamp) {
-        inner.getBodyBuilder().getAdminDeleteBuilder().setExpirationTime(timestamp.inner);
+    public final AdminDeleteTransaction setExpirationTime(@Nonnull Instant timestamp) {
+        inner.getBodyBuilder()
+                .getAdminDeleteBuilder()
+                .setExpirationTime(TimestampHelper.timestampSecondsFrom(timestamp));
         return this;
     }
 }
