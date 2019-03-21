@@ -1,22 +1,19 @@
 package com.hedera.sdk;
 
 import java.time.Instant;
-import javax.annotation.Nonnull;
 
 public class AdminDeleteTransaction extends TransactionBuilder<AdminDeleteTransaction> {
-    public AdminDeleteTransaction() {}
-
-    public final AdminDeleteTransaction setID(@Nonnull FileId fileId) {
+    public final AdminDeleteTransaction setID(FileId fileId) {
         inner.getBodyBuilder().getAdminDeleteBuilder().setFileID(fileId.inner);
         return this;
     }
 
-    public final AdminDeleteTransaction setID(@Nonnull ContractId contractId) {
+    public final AdminDeleteTransaction setID(ContractId contractId) {
         inner.getBodyBuilder().getAdminDeleteBuilder().setContractID(contractId.inner);
         return this;
     }
 
-    public final AdminDeleteTransaction setExpirationTime(@Nonnull Instant timestamp) {
+    public final AdminDeleteTransaction setExpirationTime(Instant timestamp) {
         inner.getBodyBuilder()
                 .getAdminDeleteBuilder()
                 .setExpirationTime(TimestampHelper.timestampSecondsFrom(timestamp));
