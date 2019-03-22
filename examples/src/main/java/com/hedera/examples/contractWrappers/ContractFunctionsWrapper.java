@@ -95,6 +95,28 @@ public class ContractFunctionsWrapper {
 		return constructor;
 	}
 	
+	public byte[] functionCall(String functionName, Object ... parameterValues) throws Exception {
+
+		JSONObject abiJSON = findABI(functionName);
+		String abi = abiJSON.toString();
+		
+		JSONArray inputs = (JSONArray) abiJSON.get("inputs");
+		
+		if (inputs.size() != parameterValues.length) {
+			throw new Exception ("Numer of parameter values mismatch with abi inputs");
+		}
+		
+		CallTransaction.Function function = CallTransaction.Function.fromJsonInterface(abi);
+		
+		byte[] encodedFunc = new byte[0];
+		if (parameterValues.length == 0) {
+			encodedFunc = function.encode();
+		} else {
+			encodedFunc = function.encode(parameterValues);
+		}
+		return encodedFunc;
+	}
+
 	private Object[] callLocal(HederaContract contract, long localGas, long maxResultSize, String functionName, Object ... parameterValues) throws Exception {
 		Object[] retResults = new Object[0];
 		
