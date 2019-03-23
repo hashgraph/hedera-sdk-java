@@ -1,5 +1,8 @@
 package com.hedera.sdk.crypto.ed25519;
 
+import com.google.protobuf.ByteString;
+import com.hedera.sdk.crypto.IPublicKey;
+import com.hedera.sdk.proto.Key;
 import java.io.IOException;
 import javax.annotation.Nonnull;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -16,7 +19,7 @@ import org.bouncycastle.util.encoders.Hex;
  */
 @SuppressWarnings(
         "Duplicates") // difficult to factor out common code for all algos without exposing it
-public final class Ed25519PublicKey {
+public final class Ed25519PublicKey implements IPublicKey {
     private final Ed25519PublicKeyParameters pubKeyParams;
 
     Ed25519PublicKey(@Nonnull Ed25519PublicKeyParameters pubKeyParams) {
@@ -78,5 +81,10 @@ public final class Ed25519PublicKey {
         }
 
         return Hex.toHexString(encoded);
+    }
+
+    @Override
+    public Key toProtoKey() {
+        return Key.newBuilder().setEd25519(ByteString.copyFrom(toBytes())).build();
     }
 }
