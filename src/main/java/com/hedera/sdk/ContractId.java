@@ -1,6 +1,7 @@
 package com.hedera.sdk;
 
 import com.hedera.sdk.proto.ContractID;
+import com.hedera.sdk.proto.Key;
 
 public class ContractId {
     transient ContractID.Builder inner;
@@ -23,5 +24,11 @@ public class ContractId {
 
     public long getContractNum() {
         return inner.getContractNum();
+    }
+
+    // duplicating this method from the `IPublicKey` interface because it doesn't make sense for
+    // this to implement it
+    Key toProtoKey() {
+        return Key.newBuilder().setContractID(inner).build();
     }
 }

@@ -1,28 +1,25 @@
 package com.hedera.sdk;
 
-import com.google.protobuf.ByteString;
-import com.hedera.sdk.crypto.ed25519.Ed25519PublicKey;
-import com.hedera.sdk.proto.Key;
-import com.hedera.sdk.proto.RealmID;
-import com.hedera.sdk.proto.ShardID;
+import com.hedera.sdk.crypto.IPublicKey;
+import com.hedera.sdk.proto.*;
 import java.time.Duration;
 import javax.annotation.Nonnull;
 
 public final class CryptoCreateTransaction extends TransactionBuilder<CryptoCreateTransaction> {
-    // todo: setKey
+
+    private final CryptoCreateTransactionBody.Builder builder;
 
     public CryptoCreateTransaction() {
         // Recommendation from Hedera
         setAutoRenewPeriod(Duration.ofDays(30));
 
+        builder = inner.getBodyBuilder().getCryptoCreateAccountBuilder();
+
         // Default to maximum values for record thresholds. Without this records would be
         // auto-created
         // whenever a send or receive transaction takes place for this new account. This should
         // be an explicit ask.
-        inner.getBodyBuilder()
-                .getCryptoCreateAccountBuilder()
-                .setSendRecordThreshold(Long.MAX_VALUE)
-                .setReceiveRecordThreshold(Long.MAX_VALUE);
+        builder.setSendRecordThreshold(Long.MAX_VALUE).setReceiveRecordThreshold(Long.MAX_VALUE);
     }
 
     @Override
@@ -31,66 +28,86 @@ public final class CryptoCreateTransaction extends TransactionBuilder<CryptoCrea
         // If you truly want to create a _new_ realm, then you need to null the realm after setting
         // this
 
-        if (!inner.getBodyBuilder().getCryptoCreateAccountBuilder().hasShardID()) {
+        if (!builder.hasShardID()) {
             setShardId(transactionId.inner.getAccountID().getShardNum());
         }
 
-        if (!inner.getBodyBuilder().getCryptoCreateAccountBuilder().hasRealmID()) {
+        if (!builder.hasRealmID()) {
             setRealmId(transactionId.inner.getAccountID().getRealmNum());
         }
 
         return super.setTransactionId(transactionId);
     }
 
-    // TODO: Accept a PublicKey interface type that can serialize itself to protobuf so we can
-    // accept N key types
-    public CryptoCreateTransaction setKey(Ed25519PublicKey publicKey) {
-        // FIXME: Is `ByteString.copyFrom` ideal here?
-        inner.getBodyBuilder()
-                .getCryptoCreateAccountBuilder()
-                .setKey(Key.newBuilder().setEd25519(ByteString.copyFrom(publicKey.toBytes())));
+    public CryptoCreateTransaction setKey(IPublicKey publicKey) {
+        builder.setKey(publicKey.toProtoKey());
+        return this;
+    }
 
+    // since `ContractId` shouldn't implement `IPublicKey`
+    public CryptoCreateTransaction setKey(ContractId contractId) {
+        builder.setKey(contractId.toProtoKey());
         return this;
     }
 
     public CryptoCreateTransaction setInitialBalance(long initialBalance) {
-        inner.getBodyBuilder().getCryptoCreateAccountBuilder().setInitialBalance(initialBalance);
+        builder.setInitialBalance(initialBalance);
         return this;
     }
 
-    // todo: setProxyAccountId
-    // todo: setProxyFraction
-    // todo: setMaxReceiveProxyFraction
-    // todo: setSendRecordThreshold
-    // todo: setReceiveRecordThreshold
-    // todo: setReceiverSignatureRequired
+    public CryptoCreateTransaction setproxyAccountId(AccountId accountId) {
+        builder.setProxyAccountID(accountId.inner);
+        return this;
+    }
+
+    public CryptoCreateTransaction setProxyFraction(int proxyFraction) {
+        builder.setProxyFraction(proxyFraction);
+        return this;
+    }
+
+    public CryptoCreateTransaction setMaxReceiveProxyFraction(int maxReceiveProxyFraction) {
+        builder.setMaxReceiveProxyFraction(maxReceiveProxyFraction);
+        return this;
+    }
+
+    public CryptoCreateTransaction setSendRecordThreshold(long sendRecordThreshold) {
+        builder.setSendRecordThreshold(sendRecordThreshold);
+        return this;
+    }
+
+    public CryptoCreateTransaction setReceiveRecordThreshold(long receiveRecordThreshold) {
+        builder.setReceiveRecordThreshold(receiveRecordThreshold);
+        return this;
+    }
+
+    public CryptoCreateTransaction setReceiverSignatureRequired(boolean receiverSignatureRequired) {
+        builder.setReceiverSigRequired(receiverSignatureRequired);
+        return this;
+    }
 
     public CryptoCreateTransaction setAutoRenewPeriod(@Nonnull Duration autoRenewPeriod) {
-        inner.getBodyBuilder()
-                .getCryptoCreateAccountBuilder()
-                .setAutoRenewPeriod(
-                        com.hedera.sdk.proto.Duration.newBuilder()
-                                .setSeconds(autoRenewPeriod.getSeconds())
-                                .setNanos(autoRenewPeriod.getNano()));
+        builder.setAutoRenewPeriod(
+                com.hedera.sdk.proto.Duration.newBuilder()
+                        .setSeconds(autoRenewPeriod.getSeconds())
+                        .setNanos(autoRenewPeriod.getNano()));
 
         return this;
     }
 
     public CryptoCreateTransaction setShardId(long shardId) {
-        inner.getBodyBuilder()
-                .getCryptoCreateAccountBuilder()
-                .setShardID(ShardID.newBuilder().setShardNum(shardId));
+        builder.setShardID(ShardID.newBuilder().setShardNum(shardId));
 
         return this;
     }
 
     public CryptoCreateTransaction setRealmId(long realmId) {
-        inner.getBodyBuilder()
-                .getCryptoCreateAccountBuilder()
-                .setRealmID(RealmID.newBuilder().setRealmNum(realmId));
+        builder.setRealmID(RealmID.newBuilder().setRealmNum(realmId));
 
         return this;
     }
 
-    // todo: setNewRealmAdminKey'
+    public CryptoCreateTransaction setNewRealmAdminKey(IPublicKey publicKey) {
+        builder.setNewRealmAdminKey(publicKey.toProtoKey());
+        return this;
+    }
 }
