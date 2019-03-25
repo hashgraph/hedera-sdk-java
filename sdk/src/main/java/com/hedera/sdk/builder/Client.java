@@ -9,6 +9,7 @@ import com.hedera.sdk.common.HederaRealmID;
 import com.hedera.sdk.common.HederaShardID;
 import com.hedera.sdk.common.HederaSignature;
 import com.hedera.sdk.common.HederaSignatureList;
+import com.hedera.sdk.common.HederaSignatures;
 import com.hedera.sdk.common.HederaTransactionID;
 import com.hedera.sdk.cryptography.EDKeyPair;
 import com.hedera.sdk.node.HederaNode;
@@ -167,13 +168,13 @@ public class Client {
     	   			, transactionData.build());
 
     		//paying signature
-			HederaSignature paySig = new HederaSignature(KeyType.ED25519, this.privateKey.signMessage(hederaTransactionBody.getProtobuf().toByteArray()));
-    		sigsForTransaction.addSignature(paySig);
+    		HederaSignatures sigsForTransaction = new HederaSignatures();
+    		sigsForTransaction.addSignature(this.publicKey, this.privateKey.signMessage(hederaTransactionBody.getProtobuf().toByteArray()));
     		// new realm admin if necessary
     		if (this.newRealmAdminKey != null) {
-    			HederaSignature adminSig = new HederaSignature(KeyType.ED25519, this.newRealmAdminKey.signMessage(hederaTransactionBody.getProtobuf().toByteArray()));
-    			sigsForTransaction.addSignature(adminSig);
+        		sigsForTransaction.addSignature(this.newRealmAdminKey.getPublicKeyEncodedHex(), this.newRealmAdminKey.signMessage(hederaTransactionBody.getProtobuf().toByteArray()));
     		}
+
          	HederaTransaction transaction = new HederaTransaction(hederaTransactionBody, sigsForTransaction);
         	
         	return this.node.accountCreate(transaction);

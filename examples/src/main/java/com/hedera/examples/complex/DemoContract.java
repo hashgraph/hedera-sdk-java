@@ -8,6 +8,7 @@ import com.hedera.sdk.common.HederaDuration;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaSignature;
 import com.hedera.sdk.common.HederaSignatureList;
+import com.hedera.sdk.common.HederaSignatures;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
 import com.hedera.sdk.common.HederaTransactionID;
 import com.hedera.sdk.common.HederaTransactionReceipt;
@@ -54,21 +55,21 @@ public class DemoContract {
 		 * append the signature to the transaction and send to node
 		 */
 		// create a signature object from the received signature
-		HederaSignature transactionSignature = new HederaSignature(KeyType.ED25519, receivedSignature);
+		byte[] transactionSignature = receivedSignature;
 		// remove this later
-		transactionSignature = txQueryDefaults.payingKeyPair.getSignature(txBody.getProtobuf().toByteArray());
+		transactionSignature = txQueryDefaults.payingKeyPair.signMessage(txBody.getProtobuf().toByteArray());
 		
 		// and a signature list to add the signature to
-		HederaSignatureList sigsForTransaction = new HederaSignatureList();
+		HederaSignatures sigsForTransaction = new HederaSignatures();
 		//paying signature
-		sigsForTransaction.addSignature(transactionSignature);
+		sigsForTransaction.addSignature(txQueryDefaults.payingKeyPair.getPublicKeyEncodedHex(), transactionSignature);
 
 		// create the transaction to send to the node
 		HederaTransaction transaction = new HederaTransaction();
 		// set its body
 		transaction.body = txBody;
 		// add the signatures
-		transaction.signatureList = sigsForTransaction;
+		transaction.signatures = sigsForTransaction;
 		
 		// now we can send to the network and check response
 		HederaTransactionResult hederaTransactionResult = txQueryDefaults.node.contractCall(transaction);

@@ -103,15 +103,15 @@ public class ExampleUtilities {
 		if (keyType ==  null) {
 			keyType = "SINGLE";
 		}
-		if (keyType.equals("LIST")) {
-			// create a new key list
-			HederaKeyPair payingKeyPair = new HederaKeyPair(KeyType.ED25519, ExampleUtilities.pubKey, ExampleUtilities.privKey);
-			HederaKeyList keyList = new HederaKeyList();
-			keyList.addKey(payingKeyPair);
-			txQueryDefaults.payingKeyPair = new HederaKeyPair(keyList);
-		} else {
+//		if (keyType.equals("LIST")) {
+//			// create a new key list
+//			HederaKeyPair payingKeyPair = new HederaKeyPair(KeyType.ED25519, ExampleUtilities.pubKey, ExampleUtilities.privKey);
+//			HederaKeyList keyList = new HederaKeyList();
+//			keyList.addKey(payingKeyPair);
+//			txQueryDefaults.payingKeyPair = new HederaKeyPair(keyList);
+//		} else {
 			txQueryDefaults.payingKeyPair = new HederaKeyPair(KeyType.ED25519, ExampleUtilities.pubKey, ExampleUtilities.privKey);
-		}
+//		}
 		
 		txQueryDefaults.memo = "Demo memo";
 		txQueryDefaults.node = node;

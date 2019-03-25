@@ -14,6 +14,7 @@ import com.hedera.sdk.common.HederaRealmID;
 import com.hedera.sdk.common.HederaShardID;
 import com.hedera.sdk.common.HederaSignature;
 import com.hedera.sdk.common.HederaSignatureList;
+import com.hedera.sdk.common.HederaSignatures;
 import com.hedera.sdk.common.HederaTimeStamp;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
 import com.hedera.sdk.common.HederaTransactionID;
@@ -338,21 +339,21 @@ public class HederaFile implements Serializable {
 	 *                                 generated as a result of this transaction
 	 * @param memo                     String memo to include in the transaction
 	 * @param sigsForTransaction       The signatures for the transaction as a
-	 *                                 {@link HederaSignatureList}
+	 *                                 {@link HederaSignatures}
 	 * @return {@link HederaTransactionResult}
 	 * @throws InterruptedException in the event that communication to the node
 	 *                              resulted in an error
 	 */
 	public HederaTransactionResult create(HederaTransactionID transactionID, HederaAccountID nodeAccount,
 			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, String memo,
-			HederaSignatureList sigsForTransaction) throws InterruptedException {
+			HederaSignatures sigsForTransaction) throws InterruptedException {
 
 		// build the body
 		HederaTransaction transaction = new HederaTransaction();
 		transaction.body = new HederaTransactionBody(TransactionType.FILECREATE, transactionID, nodeAccount, transactionFee,
 				transactionValidDuration, generateRecord, memo, this.getCreateTransactionBody());
 		// add the signatures
-		transaction.signatureList = sigsForTransaction;
+		transaction.signatures = sigsForTransaction;
 
 		// issue the transaction
 		Utilities.throwIfNull("Node", this.node);
@@ -381,21 +382,21 @@ public class HederaFile implements Serializable {
 	 *                                 generated as a result of this transaction
 	 * @param memo                     String memo to include in the transaction
 	 * @param sigsForTransaction       The signatures for the transaction as a
-	 *                                 {@link HederaSignatureList}
+	 *                                 {@link HederaSignatures}
 	 * @return {@link HederaTransactionResult}
 	 * @throws InterruptedException in the event that communication to the node
 	 *                              resulted in an error
 	 */
 	public HederaTransactionResult delete(HederaTransactionID transactionID, HederaAccountID nodeAccount,
 			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, String memo,
-			HederaSignatureList sigsForTransaction) throws InterruptedException {
+			HederaSignatures sigsForTransaction) throws InterruptedException {
 
 		// build the body
 		HederaTransaction transaction = new HederaTransaction();
 		transaction.body = new HederaTransactionBody(TransactionType.FILEDELETE, transactionID, nodeAccount, transactionFee,
 				transactionValidDuration, generateRecord, memo, getDeleteTransactionBody());
 		// add the signatures
-		transaction.signatureList = sigsForTransaction;
+		transaction.signatures = sigsForTransaction;
 
 		// issue the transaction
 		Utilities.throwIfNull("Node", this.node);
@@ -424,21 +425,21 @@ public class HederaFile implements Serializable {
 	 *                                 generated as a result of this transaction
 	 * @param memo                     String memo to include in the transaction
 	 * @param sigsForTransaction       The signatures for the transaction as a
-	 *                                 {@link HederaSignatureList}
+	 *                                 {@link HederaSignatures}
 	 * @return {@link HederaTransactionResult}
 	 * @throws InterruptedException in the event that communication to the node
 	 *                              resulted in an error
 	 */
 	public HederaTransactionResult update(HederaTransactionID transactionID, HederaAccountID nodeAccount,
 			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, String memo,
-			HederaSignatureList sigsForTransaction) throws InterruptedException {
+			HederaSignatures sigsForTransaction) throws InterruptedException {
 
 		// build the body
 		HederaTransaction transaction = new HederaTransaction();
 		transaction.body = new HederaTransactionBody(TransactionType.FILEUPDATE, transactionID, nodeAccount, transactionFee,
 				transactionValidDuration, generateRecord, memo, this.getUpdateTransactionBody());
 		// add the signatures
-		transaction.signatureList = sigsForTransaction;
+		transaction.signatures = sigsForTransaction;
 
 		// issue the transaction
 		Utilities.throwIfNull("Node", this.node);
@@ -467,21 +468,21 @@ public class HederaFile implements Serializable {
 	 *                                 generated as a result of this transaction
 	 * @param memo                     String memo to include in the transaction
 	 * @param sigsForTransaction       The signatures for the transaction as a
-	 *                                 {@link HederaSignatureList}
+	 *                                 {@link HederaSignatures}
 	 * @return {@link HederaTransactionResult}
 	 * @throws InterruptedException in the event that communication to the node
 	 *                              resulted in an error
 	 */
 	public HederaTransactionResult append(HederaTransactionID transactionID, HederaAccountID nodeAccount,
 			long transactionFee, HederaDuration transactionValidDuration, boolean generateRecord, String memo,
-			HederaSignatureList sigsForTransaction) throws InterruptedException {
+			HederaSignatures sigsForTransaction) throws InterruptedException {
 
 		// build the body
 		HederaTransaction transaction = new HederaTransaction();
 		transaction.body = new HederaTransactionBody(TransactionType.FILEAPPEND, transactionID, nodeAccount, transactionFee,
 				transactionValidDuration, generateRecord, memo, this.getAppendTransactionBody());
 		// add the signatures
-		transaction.signatureList = sigsForTransaction;
+		transaction.signatures = sigsForTransaction;
 
 		// issue the transaction
 		Utilities.throwIfNull("Node", this.node);
@@ -581,22 +582,14 @@ public class HederaFile implements Serializable {
 		byte[] body = bodyToSignForCreate(transactionId, nodeAccount, transactionFee, transactionValidDuration,
 				generateRecord, memo).toByteArray();
 
-		// Sign the body with the key(s) for the file wACL
-		HederaSignature fileSig = Utilities.getSignature(body, keyPair);
-
-		// build signature List
-		HederaSignatureList transactionSignatures = new HederaSignatureList();
-
-		// first the key+sig for the account
-		transactionSignatures.addSignature(fileSig);
-		// then file wACL
-		transactionSignatures.addSignature(fileSig);
-
+		HederaSignatures sigsForTransaction = new HederaSignatures();
+		sigsForTransaction.addSignature(keyPair.getPublicKeyHex(), keyPair.signMessage(body));
+		
 		/*
 		 * Generate transaction to send
 		 */
 		HederaTransactionResult hederaTransactionResult = create(transactionId, nodeAccount, transactionFee,
-				transactionValidDuration, generateRecord, memo, transactionSignatures);
+				transactionValidDuration, generateRecord, memo, sigsForTransaction);
 
 		hederaTransactionResult.hederaTransactionID = transactionId;
 
@@ -1102,17 +1095,17 @@ public class HederaFile implements Serializable {
 				this.node.fileCreateTransactionFee, this.txQueryDefaults.transactionValidDuration,
 				this.txQueryDefaults.generateRecord, this.txQueryDefaults.memo);
 
-		// Signatures
-		HederaSignatureList sigsForTransaction = new HederaSignatureList();
+
+		HederaSignatures sigsForTransaction = new HederaSignatures();
 		//paying signature
-		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getSignature(createBody.toByteArray()));
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKeyHex(), this.txQueryDefaults.payingKeyPair.signMessage(createBody.toByteArray()));
 		// new realm if set
 		if (this.newRealmAdminKey != null) {
-			sigsForTransaction.addSignature(this.newRealmAdminKey.getSignature(createBody.toByteArray()));
+			sigsForTransaction.addSignature(this.newRealmAdminKey.getPublicKeyHex(), this.newRealmAdminKey.signMessage(createBody.toByteArray()));
 		}
 		// FILE WACL
 		if (this.txQueryDefaults.fileWacl != null) {
-			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getSignature(createBody.toByteArray()));
+			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getPublicKeyHex(), this.txQueryDefaults.fileWacl.signMessage(createBody.toByteArray()));
 		}
 
 		// create the file
@@ -1154,13 +1147,12 @@ public class HederaFile implements Serializable {
 				this.node.fileDeleteTransactionFee, this.txQueryDefaults.transactionValidDuration,
 				this.txQueryDefaults.generateRecord, this.txQueryDefaults.memo);
 
-		// Signatures
-		HederaSignatureList sigsForTransaction = new HederaSignatureList();
+		HederaSignatures sigsForTransaction = new HederaSignatures();
 		//paying signature
-		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getSignature(deleteBody.toByteArray()));
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKeyHex(), this.txQueryDefaults.payingKeyPair.signMessage(deleteBody.toByteArray()));
 		// FILE WACL
 		if (this.txQueryDefaults.fileWacl != null) {
-			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getSignature(deleteBody.toByteArray()));
+			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getPublicKeyHex(), this.txQueryDefaults.fileWacl.signMessage(deleteBody.toByteArray()));
 		}
 		
 		// delete the file
@@ -1222,13 +1214,12 @@ public class HederaFile implements Serializable {
 				this.node.fileAppendTransactionFee, this.txQueryDefaults.transactionValidDuration,
 				this.txQueryDefaults.generateRecord, this.txQueryDefaults.memo);
 
-		// Signatures
-		HederaSignatureList sigsForTransaction = new HederaSignatureList();
+		HederaSignatures sigsForTransaction = new HederaSignatures();
 		//paying signature
-		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getSignature(appendBody.toByteArray()));
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKeyHex(), this.txQueryDefaults.payingKeyPair.signMessage(appendBody.toByteArray()));
 		// FILE WACL
 		if (this.txQueryDefaults.fileWacl != null) {
-			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getSignature(appendBody.toByteArray()));
+			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getPublicKeyHex(), this.txQueryDefaults.fileWacl.signMessage(appendBody.toByteArray()));
 		}
 		
 		// add to the file
@@ -1314,13 +1305,12 @@ public class HederaFile implements Serializable {
 				this.node.fileUpdateTransactionFee, this.txQueryDefaults.transactionValidDuration,
 				this.txQueryDefaults.generateRecord, this.txQueryDefaults.memo);
 
-		// Signatures
-		HederaSignatureList sigsForTransaction = new HederaSignatureList();
+		HederaSignatures sigsForTransaction = new HederaSignatures();
 		//paying signature
-		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getSignature(updateBody.toByteArray()));
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKeyHex(), this.txQueryDefaults.payingKeyPair.signMessage(updateBody.toByteArray()));
 		// FILE WACL
 		if (this.txQueryDefaults.fileWacl != null) {
-			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getSignature(updateBody.toByteArray()));
+			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getPublicKeyHex(), this.txQueryDefaults.fileWacl.signMessage(updateBody.toByteArray()));
 		}
 		
 		// update the file

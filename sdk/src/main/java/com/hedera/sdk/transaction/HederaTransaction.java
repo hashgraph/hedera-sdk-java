@@ -10,6 +10,7 @@ import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.node.HederaNode;
 import com.hedera.sdk.common.HederaSignature;
 import com.hedera.sdk.common.HederaSignatureList;
+import com.hedera.sdk.common.HederaSignatures;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
 import com.hedera.sdk.common.HederaTransactionID;
 import com.hedera.sdk.common.HederaTransactionReceipt;
@@ -38,10 +39,9 @@ public class HederaTransaction implements Serializable {
 	 */
 	public HederaTransactionBody body = new HederaTransactionBody();
 	/**
-	 * get or set the signatures for this transaction as a {@link HederaSignatureList}
-	 * note: if keySignatureList is not null, this signatureList will be ignored, keySignatureList takes priority
+	 * get or set the signatures for this transaction as a {@link HederaSignatures}
 	 */
-	public HederaSignatureList signatureList = null;
+	public HederaSignatures signatures = null;
 
 	/**
 	 * sets the node object to use for communication with the node
@@ -89,14 +89,14 @@ public class HederaTransaction implements Serializable {
 
 	}
 	/**
-	 * Constructs from a {@link HederaTransactionBody} body and {@link HederaSignatureList} signatures
+	 * Constructs from a {@link HederaTransactionBody} body and {@link HederaSignatures} signatures
 	 * @param body {@link HederaTransactionBody}
-	 * @param sigs {@link HederaSignatureList}
+	 * @param sigs {@link HederaSignatures}
 	 */
-	public HederaTransaction(HederaTransactionBody body, HederaSignatureList sigs) {
+	public HederaTransaction(HederaTransactionBody body, HederaSignatures sigs) {
 
 		this.body = body;
-		this.signatureList = sigs;
+		this.signatures = sigs;
 
 	}
 	/**
@@ -110,20 +110,10 @@ public class HederaTransaction implements Serializable {
 		
 		transactionProtobuf.setBodyBytes(this.body.getProtobuf().toByteString());
 		// if we have key signature pairs, use these\
-		transactionProtobuf.setSigs(this.signatureList.getProtobuf());
-
+//		transactionProtobuf.setSigs(this.signatureList.getProtobuf());
+		transactionProtobuf.setSigMap(this.signatures.getProtobuf());
 		
 		return transactionProtobuf.build();
-	}
-	/**
-	 * Adds a signature to the list
-	 * @param signature {@link HederaSignature}
-	 */
-	public void addSignature(HederaSignature signature) {
-
-		this.signatureList.addSignature(signature);
-		// can't do anything to keysignatureList here, we don't have a key
-
 	}
 
 	/**
@@ -395,10 +385,9 @@ public class HederaTransaction implements Serializable {
 				, txQueryDefaults.memo
 				, accountAmounts);
 
-		HederaSignatureList sigsForTransaction = new HederaSignatureList();
+		HederaSignatures sigsForTransaction = new HederaSignatures();
 		//paying signature
-		sigsForTransaction.addSignature(txQueryDefaults.payingKeyPair.getSignature(transferBody.toByteArray()));
-		sigsForTransaction.addSignature(txQueryDefaults.payingKeyPair.getSignature(transferBody.toByteArray()));
+		sigsForTransaction.addSignature(txQueryDefaults.payingKeyPair.getPublicKeyEncodedHex(), txQueryDefaults.payingKeyPair.signMessage(transferBody.toByteArray()));
 
 		this.body = new HederaTransactionBody(
 				TransactionType.CRYPTOTRANSFER
@@ -411,7 +400,7 @@ public class HederaTransaction implements Serializable {
 				, account.getTransferTransactionBody(accountAmounts));
 		
 		// add the signatures
-		this.signatureList = sigsForTransaction;
+		this.signatures = sigsForTransaction;
 
 	}
 }
