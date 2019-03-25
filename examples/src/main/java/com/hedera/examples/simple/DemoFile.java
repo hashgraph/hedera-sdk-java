@@ -40,6 +40,9 @@ public final class DemoFile {
     	txQueryDefaults.fileWacl = new HederaKeyPair(KeyType.ED25519);
     	file.txQueryDefaults = txQueryDefaults;
 
+    	System.out.println("paying " + file.txQueryDefaults.payingKeyPair.getPublicKeyHex());
+    	System.out.println("wacl " + file.txQueryDefaults.fileWacl.getPublicKeyHex());
+    	
     	doCreate = true; //OK
 		doGetInfo = true; //OK
 		doGetContents = true; //OK

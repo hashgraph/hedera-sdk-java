@@ -387,7 +387,7 @@ public class HederaTransaction implements Serializable {
 
 		HederaSignatures sigsForTransaction = new HederaSignatures();
 		//paying signature
-		sigsForTransaction.addSignature(txQueryDefaults.payingKeyPair.getPublicKeyEncodedHex(), txQueryDefaults.payingKeyPair.signMessage(transferBody.toByteArray()));
+		sigsForTransaction.addSignature(txQueryDefaults.payingKeyPair.getPublicKeyHex(), txQueryDefaults.payingKeyPair.signMessage(transferBody.toByteArray()));
 
 		this.body = new HederaTransactionBody(
 				TransactionType.CRYPTOTRANSFER

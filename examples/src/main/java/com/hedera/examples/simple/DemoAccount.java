@@ -205,9 +205,9 @@ public final class DemoAccount {
 		    		} else {
 		    			ExampleUtilities.showResult("ACCOUNT UPDATE FAILED - account is now null");
 		    		}
-		    		System.out.println("Paying key   " + txQueryDefaults.payingKeyPair.getPublicKeyEncodedHex());
-		    		System.out.println("Original key " + newAccountKey.getPublicKeyEncodedHex());
-		    		System.out.println("New key      " + ed25519Key.getPublicKeyEncodedHex());
+		    		System.out.println("Paying key   " + txQueryDefaults.payingKeyPair.getPublicKeyHex());
+		    		System.out.println("Original key " + newAccountKey.getPublicKeyHex());
+		    		System.out.println("New key      " + ed25519Key.getPublicKeyHex());
 		    		
 		    	}
 		    	if (doAddClaim) {

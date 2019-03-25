@@ -1403,15 +1403,15 @@ public class HederaAccount implements Serializable {
 
 		
 		HederaSignatures sigsForTransaction = new HederaSignatures();
-		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKeyEncodedHex(), this.txQueryDefaults.payingKeyPair.signMessage(updateBody.toByteArray()));
-		System.out.println(this.txQueryDefaults.payingKeyPair.getPublicKeyEncodedHex());
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKeyHex(), this.txQueryDefaults.payingKeyPair.signMessage(updateBody.toByteArray()));
+		System.out.println(this.txQueryDefaults.payingKeyPair.getPublicKeyHex());
 		//old key for change
-		sigsForTransaction.addSignature(this.accountKey.getPublicKeyEncodedHex(), this.accountKey.signMessage(updateBody.toByteArray()));
-		System.out.println(this.accountKey.getPublicKeyEncodedHex());
+		sigsForTransaction.addSignature(this.accountKey.getPublicKeyHex(), this.accountKey.signMessage(updateBody.toByteArray()));
+		System.out.println(this.accountKey.getPublicKeyHex());
 		// new key if updated
 		if (updates.newKey != null) {
-			sigsForTransaction.addSignature(updates.newKey.getPublicKeyEncodedHex(), updates.newKey.signMessage(updateBody.toByteArray()));
-			System.out.println(updates.newKey.getPublicKeyEncodedHex());
+			sigsForTransaction.addSignature(updates.newKey.getPublicKeyHex(), updates.newKey.signMessage(updateBody.toByteArray()));
+			System.out.println(updates.newKey.getPublicKeyHex());
 		}
 		
 		
