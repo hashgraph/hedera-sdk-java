@@ -29,8 +29,8 @@ class HederaTransactionTest {
 		body.data = new HederaContract().getCallTransactionBody();
 		
 		HederaSignatures keySigs = new HederaSignatures();
-		keySigs.addSignature("key1", "signature1".getBytes());
-		keySigs.addSignature("key2", "signature2".getBytes());
+		keySigs.addSignature("key1".getBytes(), "signature1".getBytes());
+		keySigs.addSignature("key2".getBytes(), "signature2".getBytes());
 		
 		HederaTransaction transaction = new HederaTransaction(body, keySigs);
 		
@@ -49,8 +49,8 @@ class HederaTransactionTest {
 		body.data = new HederaContract().getCallTransactionBody();
 
 		HederaSignatures keySigs = new HederaSignatures();
-		keySigs.addSignature("key1", "signature1".getBytes());
-		keySigs.addSignature("key2", "signature2".getBytes());
+		keySigs.addSignature("key1".getBytes(), "signature1".getBytes());
+		keySigs.addSignature("key2".getBytes(), "signature2".getBytes());
 		
 		HederaTransaction transaction = new HederaTransaction(body, keySigs);
 		

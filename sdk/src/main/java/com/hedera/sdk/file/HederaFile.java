@@ -583,7 +583,7 @@ public class HederaFile implements Serializable {
 				generateRecord, memo).toByteArray();
 
 		HederaSignatures sigsForTransaction = new HederaSignatures();
-		sigsForTransaction.addSignature(keyPair.getPublicKeyHex(), keyPair.signMessage(body));
+		sigsForTransaction.addSignature(keyPair.getPublicKey(), keyPair.signMessage(body));
 		
 		/*
 		 * Generate transaction to send
@@ -1098,14 +1098,14 @@ public class HederaFile implements Serializable {
 
 		HederaSignatures sigsForTransaction = new HederaSignatures();
 		//paying signature
-		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKeyHex(), this.txQueryDefaults.payingKeyPair.signMessage(createBody.toByteArray()));
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKey(), this.txQueryDefaults.payingKeyPair.signMessage(createBody.toByteArray()));
 		// new realm if set
 		if (this.newRealmAdminKey != null) {
-			sigsForTransaction.addSignature(this.newRealmAdminKey.getPublicKeyHex(), this.newRealmAdminKey.signMessage(createBody.toByteArray()));
+			sigsForTransaction.addSignature(this.newRealmAdminKey.getPublicKey(), this.newRealmAdminKey.signMessage(createBody.toByteArray()));
 		}
 		// FILE WACL
 		if (this.txQueryDefaults.fileWacl != null) {
-			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getPublicKeyHex(), this.txQueryDefaults.fileWacl.signMessage(createBody.toByteArray()));
+			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getPublicKey(), this.txQueryDefaults.fileWacl.signMessage(createBody.toByteArray()));
 		}
 
 		// create the file
@@ -1149,10 +1149,10 @@ public class HederaFile implements Serializable {
 
 		HederaSignatures sigsForTransaction = new HederaSignatures();
 		//paying signature
-		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKeyHex(), this.txQueryDefaults.payingKeyPair.signMessage(deleteBody.toByteArray()));
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKey(), this.txQueryDefaults.payingKeyPair.signMessage(deleteBody.toByteArray()));
 		// FILE WACL
 		if (this.txQueryDefaults.fileWacl != null) {
-			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getPublicKeyHex(), this.txQueryDefaults.fileWacl.signMessage(deleteBody.toByteArray()));
+			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getPublicKey(), this.txQueryDefaults.fileWacl.signMessage(deleteBody.toByteArray()));
 		}
 		
 		// delete the file
@@ -1216,10 +1216,10 @@ public class HederaFile implements Serializable {
 
 		HederaSignatures sigsForTransaction = new HederaSignatures();
 		//paying signature
-		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKeyHex(), this.txQueryDefaults.payingKeyPair.signMessage(appendBody.toByteArray()));
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKey(), this.txQueryDefaults.payingKeyPair.signMessage(appendBody.toByteArray()));
 		// FILE WACL
 		if (this.txQueryDefaults.fileWacl != null) {
-			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getPublicKeyHex(), this.txQueryDefaults.fileWacl.signMessage(appendBody.toByteArray()));
+			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getPublicKey(), this.txQueryDefaults.fileWacl.signMessage(appendBody.toByteArray()));
 		}
 		
 		// add to the file
@@ -1307,10 +1307,10 @@ public class HederaFile implements Serializable {
 
 		HederaSignatures sigsForTransaction = new HederaSignatures();
 		//paying signature
-		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKeyHex(), this.txQueryDefaults.payingKeyPair.signMessage(updateBody.toByteArray()));
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKey(), this.txQueryDefaults.payingKeyPair.signMessage(updateBody.toByteArray()));
 		// FILE WACL
 		if (this.txQueryDefaults.fileWacl != null) {
-			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getPublicKeyHex(), this.txQueryDefaults.fileWacl.signMessage(updateBody.toByteArray()));
+			sigsForTransaction.addSignature(this.txQueryDefaults.fileWacl.getPublicKey(), this.txQueryDefaults.fileWacl.signMessage(updateBody.toByteArray()));
 		}
 		
 		// update the file

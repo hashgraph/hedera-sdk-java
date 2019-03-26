@@ -62,7 +62,7 @@ public class DemoContract {
 		// and a signature list to add the signature to
 		HederaSignatures sigsForTransaction = new HederaSignatures();
 		//paying signature
-		sigsForTransaction.addSignature(txQueryDefaults.payingKeyPair.getPublicKeyEncodedHex(), transactionSignature);
+		sigsForTransaction.addSignature(txQueryDefaults.payingKeyPair.getPublicKey(), transactionSignature);
 
 		// create the transaction to send to the node
 		HederaTransaction transaction = new HederaTransaction();

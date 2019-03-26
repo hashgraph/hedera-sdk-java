@@ -1123,14 +1123,14 @@ public class HederaContract implements Serializable {
 			, this.txQueryDefaults.memo);
 
 		HederaSignatures sigsForTransaction = new HederaSignatures();
-		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKeyHex(), this.txQueryDefaults.payingKeyPair.signMessage(createBody.toByteArray()));
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKey(), this.txQueryDefaults.payingKeyPair.signMessage(createBody.toByteArray()));
 		// new realm admin key
 		if (this.newRealmAdminKey != null) {
-			sigsForTransaction.addSignature(this.newRealmAdminKey.getPublicKeyHex(), this.newRealmAdminKey.signMessage(createBody.toByteArray()));
+			sigsForTransaction.addSignature(this.newRealmAdminKey.getPublicKey(), this.newRealmAdminKey.signMessage(createBody.toByteArray()));
 		}
 		// admin key 
 		if (this.adminKey != null) {
-			sigsForTransaction.addSignature(this.adminKey.getPublicKeyHex(), this.adminKey.signMessage(createBody.toByteArray()));
+			sigsForTransaction.addSignature(this.adminKey.getPublicKey(), this.adminKey.signMessage(createBody.toByteArray()));
 		}
 		
 		// create the contract
@@ -1186,10 +1186,10 @@ public class HederaContract implements Serializable {
 			, this.txQueryDefaults.memo);
 
 		HederaSignatures sigsForTransaction = new HederaSignatures();
-		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKeyHex(), this.txQueryDefaults.payingKeyPair.signMessage(updateBody.toByteArray()));
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKey(), this.txQueryDefaults.payingKeyPair.signMessage(updateBody.toByteArray()));
 		// admin key for change
 		if (this.adminKey != null) {
-			sigsForTransaction.addSignature(this.adminKey.getPublicKeyHex(), this.adminKey.signMessage(updateBody.toByteArray()));
+			sigsForTransaction.addSignature(this.adminKey.getPublicKey(), this.adminKey.signMessage(updateBody.toByteArray()));
 		}
 		
 		// update the contract
@@ -1267,7 +1267,7 @@ public class HederaContract implements Serializable {
 
 		HederaSignatures sigsForTransaction = new HederaSignatures();
 		//paying signature
-		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKeyHex(), this.txQueryDefaults.payingKeyPair.signMessage(callBody.toByteArray()));
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKey(), this.txQueryDefaults.payingKeyPair.signMessage(callBody.toByteArray()));
 		
 		// call the contract function
 		transactionResult = this.call(

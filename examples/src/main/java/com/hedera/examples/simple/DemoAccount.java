@@ -201,6 +201,7 @@ public final class DemoAccount {
 		    		if (newAccount != null) {
 		    			// need to update the paying key pair to be the new account's key
 		    			newAccount.txQueryDefaults.payingKeyPair = ed25519Key;
+		    			newAccount.txQueryDefaults.payingAccountID = newAccount.getHederaAccountID();
 		    			AccountGetInfo.getInfo(newAccount);
 		    		} else {
 		    			ExampleUtilities.showResult("ACCOUNT UPDATE FAILED - account is now null");

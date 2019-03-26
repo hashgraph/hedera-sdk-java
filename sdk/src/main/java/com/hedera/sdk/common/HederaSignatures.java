@@ -1,8 +1,11 @@
 package com.hedera.sdk.common;
 
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
+
+import org.spongycastle.util.encoders.Hex;
 
 import com.google.protobuf.ByteString;
 import com.hederahashgraph.api.proto.java.SignatureMap;
@@ -10,18 +13,18 @@ import com.hederahashgraph.api.proto.java.SignaturePair;
 
 public class HederaSignatures {
 
-	private Hashtable<String, byte[]> signaturePairs  = new Hashtable<String, byte[]>();
+	private Hashtable<byte[], byte[]> signaturePairs  = new Hashtable<byte[], byte[]>();
 	private int maxLength = 0; 
 	
-	public void addSignature(String pubKey, byte[] signature) {
+	public void addSignature(byte[] pubKey, byte[] signature) {
 		this.signaturePairs.put(pubKey, signature);
-		// probably not necessary, but pub keys could be encoded/non encoded resulting in different lenghts
-		if (pubKey.length() > maxLength) {
-			maxLength = pubKey.length();
+		// probably not necessary, but pub keys could be encoded/non encoded resulting in different lengths
+		if (pubKey.length > maxLength) {
+			maxLength = pubKey.length;
 		}
 	}
 
-	public byte[] getSignature(String pubKey) throws Exception {
+	public byte[] getSignature(byte[] pubKey) throws Exception {
 		if (this.signaturePairs.containsKey(pubKey)) {
 			return this.signaturePairs.get(pubKey);
 		} else {
@@ -38,7 +41,7 @@ public class HederaSignatures {
 			// reduce public keys
 			for (int keySize = maxLength - 1; keySize > 0; keySize--) {
 				// loop through key size in reducing order
-				Hashtable<String, String> reducedPairs = new Hashtable<String, String>();
+				Hashtable<byte[], String> reducedPairs = new Hashtable<byte[], String>();
 				// loop through keys
 				Iterator it = this.signaturePairs.entrySet().iterator();
 //				System.out.println("");
@@ -47,7 +50,7 @@ public class HederaSignatures {
 			    while (it.hasNext()) {
 			        Map.Entry pair = (Map.Entry)it.next();
 //			        System.out.println(pair.getKey() + " => " + pair.getKey().toString().substring(0, keySize));
-			        reducedPairs.put(pair.getKey().toString().substring(0, keySize), "");
+			        reducedPairs.put(Arrays.copyOfRange((byte[]) pair.getKey(), 0, keySize), "");
 			    }
 		    	minSize = keySize;
 			    if (reducedPairs.size() != this.signaturePairs.size()) {
@@ -68,11 +71,11 @@ public class HederaSignatures {
 	        	signaturePair.setEd25519(ByteString.copyFrom(signature));
 	        }
 	        // add the reduced public key
-	        if (minSize == 0) {
-	        	signaturePair.setPubKeyPrefix(ByteString.copyFrom(new byte[0]));
-	        } else {
-	        	signaturePair.setPubKeyPrefix(ByteString.copyFromUtf8(pair.getKey().toString().substring(0, minSize)));
+	        byte[] key = new byte[0]; 
+	        if (minSize != 0) {
+	        	key = Arrays.copyOfRange((byte[]) pair.getKey(), 0, minSize);
 	        }
+        	signaturePair.setPubKeyPrefix(ByteString.copyFrom(key));
 	        signatureMap.addSigPair(signaturePair);
 	    }
 		

@@ -1078,11 +1078,11 @@ public class HederaAccount implements Serializable {
 				, this.txQueryDefaults.memo);
 
 		HederaSignatures sigsForTransaction = new HederaSignatures();
-		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKeyHex(), this.txQueryDefaults.payingKeyPair.signMessage(createBody.toByteArray()));
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKey(), this.txQueryDefaults.payingKeyPair.signMessage(createBody.toByteArray()));
 
 		// new realm admin if necessary
 		if (this.newRealmAdminKey != null) {
-			sigsForTransaction.addSignature(this.newRealmAdminKey.getPublicKeyHex(), this.newRealmAdminKey.signMessage(createBody.toByteArray()));
+			sigsForTransaction.addSignature(this.newRealmAdminKey.getPublicKey(), this.newRealmAdminKey.signMessage(createBody.toByteArray()));
 		}
 		
 		// create the account
@@ -1148,7 +1148,7 @@ public class HederaAccount implements Serializable {
 				, accountAmounts);
 		
 		HederaSignatures sigsForTransaction = new HederaSignatures();
-		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKeyHex(), this.txQueryDefaults.payingKeyPair.signMessage(transferBody.toByteArray()));
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKey(), this.txQueryDefaults.payingKeyPair.signMessage(transferBody.toByteArray()));
 		
 		// transfer the crypto currency
 		transactionResult = this.transfer(
@@ -1217,8 +1217,8 @@ public class HederaAccount implements Serializable {
 				, claimToAdd);
 		
 		HederaSignatures sigsForTransaction = new HederaSignatures();
-		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKeyHex(), this.txQueryDefaults.payingKeyPair.signMessage(claimBody.toByteArray()));
-		sigsForTransaction.addSignature(claimKeyPair.getPublicKeyHex(), claimKeyPair.signMessage(claimBody.toByteArray()));
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKey(), this.txQueryDefaults.payingKeyPair.signMessage(claimBody.toByteArray()));
+		sigsForTransaction.addSignature(claimKeyPair.getPublicKey(), claimKeyPair.signMessage(claimBody.toByteArray()));
 		
 		// transfer the crypto currency
 		transactionResult = this.addClaim(
@@ -1403,14 +1403,14 @@ public class HederaAccount implements Serializable {
 
 		
 		HederaSignatures sigsForTransaction = new HederaSignatures();
-		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKeyHex(), this.txQueryDefaults.payingKeyPair.signMessage(updateBody.toByteArray()));
-		System.out.println(this.txQueryDefaults.payingKeyPair.getPublicKeyHex());
+		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKey(), this.txQueryDefaults.payingKeyPair.signMessage(updateBody.toByteArray()));
+		System.out.println(this.txQueryDefaults.payingKeyPair.getPublicKey());
 		//old key for change
-		sigsForTransaction.addSignature(this.accountKey.getPublicKeyHex(), this.accountKey.signMessage(updateBody.toByteArray()));
+		sigsForTransaction.addSignature(this.accountKey.getPublicKey(), this.accountKey.signMessage(updateBody.toByteArray()));
 		System.out.println(this.accountKey.getPublicKeyHex());
 		// new key if updated
 		if (updates.newKey != null) {
-			sigsForTransaction.addSignature(updates.newKey.getPublicKeyHex(), updates.newKey.signMessage(updateBody.toByteArray()));
+			sigsForTransaction.addSignature(updates.newKey.getPublicKey(), updates.newKey.signMessage(updateBody.toByteArray()));
 			System.out.println(updates.newKey.getPublicKeyHex());
 		}
 		
