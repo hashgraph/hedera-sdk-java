@@ -11,12 +11,12 @@ public class CryptoDeleteTransaction
         builder = inner.getBodyBuilder().getCryptoDeleteBuilder();
     }
 
-    public CryptoDeleteTransaction setTransferAccountId(@Nonnull AccountId transferAccountId) {
+    public CryptoDeleteTransaction setTransferAccountId(AccountId transferAccountId) {
         builder.setTransferAccountID(transferAccountId.inner);
         return this;
     }
 
-    public CryptoDeleteTransaction setDeleteAccountId(@Nonnull AccountId deleteAccountId) {
+    public CryptoDeleteTransaction setDeleteAccountId(AccountId deleteAccountId) {
         builder.setDeleteAccountID(deleteAccountId.inner);
         return this;
     }
