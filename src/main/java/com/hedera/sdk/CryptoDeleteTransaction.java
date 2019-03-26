@@ -1,21 +1,23 @@
 package com.hedera.sdk;
 
+import com.hedera.sdk.proto.CryptoDeleteTransactionBody;
 import javax.annotation.Nonnull;
 
 public class CryptoDeleteTransaction
         extends TransactionBuilder<com.hedera.sdk.CryptoDeleteTransaction> {
+    private final CryptoDeleteTransactionBody.Builder builder;
 
-    public CryptoDeleteTransaction() {}
+    public CryptoDeleteTransaction() {
+        builder = inner.getBodyBuilder().getCryptoDeleteBuilder();
+    }
 
     public CryptoDeleteTransaction setTransferAccountId(@Nonnull AccountId transferAccountId) {
-        inner.getBodyBuilder()
-                .getCryptoDeleteBuilder()
-                .setTransferAccountID(transferAccountId.inner);
+        builder.setTransferAccountID(transferAccountId.inner);
         return this;
     }
 
     public CryptoDeleteTransaction setDeleteAccountId(@Nonnull AccountId deleteAccountId) {
-        inner.getBodyBuilder().getCryptoDeleteBuilder().setDeleteAccountID(deleteAccountId.inner);
+        builder.setDeleteAccountID(deleteAccountId.inner);
         return this;
     }
 }
