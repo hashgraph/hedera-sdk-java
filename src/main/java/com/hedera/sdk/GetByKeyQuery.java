@@ -1,6 +1,9 @@
 package com.hedera.sdk;
 
+<<<<<<< HEAD
 import com.hedera.sdk.crypto.IPublicKey;
+=======
+>>>>>>> 34b6ee5e064c006dfba5bc99d6e76ffe36ccaa6c
 import com.hedera.sdk.proto.QueryHeader;
 
 public class GetByKeyQuery extends QueryBuilder {
