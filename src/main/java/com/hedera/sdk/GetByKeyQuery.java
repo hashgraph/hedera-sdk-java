@@ -13,4 +13,10 @@ public class GetByKeyQuery extends QueryBuilder {
     protected QueryHeader.Builder getHeaderBuilder() {
         return builder.getHeaderBuilder();
     }
+
+    // TODO: This method
+    //    public GetByKeyQuery setKey(Key key) {
+    //        builder.setKey(key);
+    //        return this;
+    //    }
 }
