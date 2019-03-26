@@ -27,7 +27,7 @@ public final class CryptoUpdateTransaction extends TransactionBuilder<CryptoUpda
         return this;
     }
 
-    public CryptoUpdateTransaction setAccountForProxy(AccountId accountId) {
+    public CryptoUpdateTransaction setProxyAccount(AccountId accountId) {
         builder.setProxyAccountID(accountId.inner);
         return this;
     }
