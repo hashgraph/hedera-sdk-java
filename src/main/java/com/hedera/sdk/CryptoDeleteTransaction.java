@@ -1,7 +1,6 @@
 package com.hedera.sdk;
 
 import com.hedera.sdk.proto.CryptoDeleteTransactionBody;
-import javax.annotation.Nonnull;
 
 public class CryptoDeleteTransaction
         extends TransactionBuilder<com.hedera.sdk.CryptoDeleteTransaction> {
