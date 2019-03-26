@@ -5,7 +5,6 @@ import com.hedera.sdk.crypto.IPublicKey;
 import com.hedera.sdk.proto.FileCreateTransactionBody;
 import com.hedera.sdk.proto.KeyList;
 import com.hedera.sdk.proto.Timestamp;
-
 import java.time.Duration;
 import java.time.Instant;
 import javax.annotation.Nonnull;
@@ -46,6 +45,6 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
         return this;
     }
 
-    //todo: Needs to call builder.setKeys(this.keyList); at some point
+    // todo: Needs to call builder.setKeys(this.keyList); at some point
 
 }
