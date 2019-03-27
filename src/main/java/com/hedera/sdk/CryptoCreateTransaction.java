@@ -1,6 +1,6 @@
 package com.hedera.sdk;
 
-import com.hedera.sdk.crypto.IPublicKey;
+import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.*;
 import java.time.Duration;
 import javax.annotation.Nonnull;
@@ -39,14 +39,8 @@ public final class CryptoCreateTransaction extends TransactionBuilder<CryptoCrea
         return super.setTransactionId(transactionId);
     }
 
-    public CryptoCreateTransaction setKey(IPublicKey publicKey) {
-        builder.setKey(publicKey.toProtoKey());
-        return this;
-    }
-
-    // since `ContractId` shouldn't implement `IPublicKey`
-    public CryptoCreateTransaction setKey(ContractId contractId) {
-        builder.setKey(contractId.toProtoKey());
+    public CryptoCreateTransaction setKey(Key publicKey) {
+        builder.setKey(publicKey.toKeyProto());
         return this;
     }
 
@@ -106,8 +100,8 @@ public final class CryptoCreateTransaction extends TransactionBuilder<CryptoCrea
         return this;
     }
 
-    public CryptoCreateTransaction setNewRealmAdminKey(IPublicKey publicKey) {
-        builder.setNewRealmAdminKey(publicKey.toProtoKey());
+    public CryptoCreateTransaction setNewRealmAdminKey(Key publicKey) {
+        builder.setNewRealmAdminKey(publicKey.toKeyProto());
         return this;
     }
 }

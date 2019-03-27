@@ -1,7 +1,7 @@
 package com.hedera.sdk;
 
 import com.google.protobuf.ByteString;
-import com.hedera.sdk.crypto.IPublicKey;
+import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.Claim;
 import com.hedera.sdk.proto.CryptoAddClaimTransactionBody;
 import com.hedera.sdk.proto.KeyList;
@@ -29,13 +29,8 @@ public final class CryptoAddClaimTransaction extends TransactionBuilder<CryptoAd
         return this;
     }
 
-    public CryptoAddClaimTransaction addKey(IPublicKey key) {
-        keyList.addKeys(key.toProtoKey());
-        return this;
-    }
-
-    public CryptoAddClaimTransaction addKey(ContractId key) {
-        keyList.addKeys(key.toProtoKey());
+    public CryptoAddClaimTransaction addKey(Key key) {
+        keyList.addKeys(key.toKeyProto());
         return this;
     }
 }

@@ -1,6 +1,6 @@
 package com.hedera.sdk;
 
-import com.hedera.sdk.crypto.IPublicKey;
+import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.QueryHeader;
 
 public class GetByKeyQuery extends QueryBuilder {
@@ -15,13 +15,8 @@ public class GetByKeyQuery extends QueryBuilder {
         return builder.getHeaderBuilder();
     }
 
-    public GetByKeyQuery setKey(IPublicKey publicKey) {
-        builder.setKey(publicKey.toProtoKey());
-        return this;
-    }
-
-    public GetByKeyQuery setKey(ContractId contractId) {
-        builder.setKey(contractId.toProtoKey());
+    public GetByKeyQuery setKey(Key publicKey) {
+        builder.setKey(publicKey.toKeyProto());
         return this;
     }
 }
