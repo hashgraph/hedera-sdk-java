@@ -564,20 +564,36 @@ public class Utilities {
 		}
 	}
 	public static String calculateSolidityAddress(long accountNum) {
+	    return calculateSolidityAddress(0,0,accountNum);
+	}
+	public static String calculateSolidityAddress(HederaAccountID accountID) {
+	    return calculateSolidityAddress(accountID.shardNum, accountID.realmNum, accountID.accountNum);
+	}
+	public static String calculateSolidityAddress(HederaContractID contractID) {
+	    return calculateSolidityAddress(contractID.shardNum, contractID.realmNum, contractID.contractNum);
+	}
+	public static String calculateSolidityAddress(HederaFileID fileID) {
+	    return calculateSolidityAddress(fileID.shardNum, fileID.realmNum, fileID.fileNum);
+	}
+	public static String calculateSolidityAddress(long shardNum, long realNum, long accountNum) {
 	    byte[] solidityByteArray = new byte[20];
+	    
+	    int shard = (int)shardNum;
+	    byte[] bytes = ByteBuffer.allocate(4).putInt(shard).array();
 	    // byte 0 to 3 are shard
 	    for (int i=0; i < 4; i++) {
-	    	solidityByteArray[i] = 0;
+	    	solidityByteArray[i] = bytes[i];
 	    }
 	    // byte 4 to 11 are realm
-	    for (int i=4; i < 12; i++) {
-	    	solidityByteArray[i] = 0;
+	    bytes = ByteBuffer.allocate(8).putLong(realNum).array();
+	    for (int i=0; i < 8; i++) {
+	    	solidityByteArray[i+4] = bytes[i];
 	    }
 	    
-	    byte[] accountNumBytes = ByteBuffer.allocate(8).putLong(accountNum).array();
+	    bytes = ByteBuffer.allocate(8).putLong(accountNum).array();
 	    // byte 12 to 19 are account number
-	    for (int i=0; i < accountNumBytes.length; i++) {
-	    	solidityByteArray[i+12] = accountNumBytes[i];
+	    for (int i=0; i < 8; i++) {
+	    	solidityByteArray[i+12] = bytes[i];
 	    }
 	    return Hex.toHexString(solidityByteArray);		
 	}
