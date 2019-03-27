@@ -2,6 +2,10 @@ package com.hedera.sdk;
 
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.proto.FileAppendTransactionBody;
+import com.hedera.sdk.proto.FileServiceGrpc;
+import com.hedera.sdk.proto.Transaction;
+import com.hedera.sdk.proto.TransactionResponse;
+import io.grpc.MethodDescriptor;
 
 public final class FileAppendTransaction extends TransactionBuilder<FileAppendTransaction> {
     private final FileAppendTransactionBody.Builder builder;
@@ -19,5 +23,10 @@ public final class FileAppendTransaction extends TransactionBuilder<FileAppendTr
         // TODO: there is a maximum length for contents. What is it?
         builder.setContents(ByteString.copyFrom(contents));
         return this;
+    }
+
+    @Override
+    MethodDescriptor<Transaction, TransactionResponse> getMethod() {
+        return FileServiceGrpc.getAppendContentMethod();
     }
 }

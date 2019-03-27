@@ -2,6 +2,10 @@ package com.hedera.sdk;
 
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.proto.ContractCallTransactionBody;
+import com.hedera.sdk.proto.SmartContractServiceGrpc;
+import com.hedera.sdk.proto.Transaction;
+import com.hedera.sdk.proto.TransactionResponse;
+import io.grpc.MethodDescriptor;
 
 public final class ContractCallTransaction extends TransactionBuilder<ContractCallTransaction> {
     private final ContractCallTransactionBody.Builder builder;
@@ -28,5 +32,10 @@ public final class ContractCallTransaction extends TransactionBuilder<ContractCa
     public ContractCallTransaction setFunctionParameters(byte[] functionParameters) {
         builder.setFunctionParameters(ByteString.copyFrom(functionParameters));
         return this;
+    }
+
+    @Override
+    MethodDescriptor<Transaction, TransactionResponse> getMethod() {
+        return SmartContractServiceGrpc.getContractCallMethodMethod();
     }
 }

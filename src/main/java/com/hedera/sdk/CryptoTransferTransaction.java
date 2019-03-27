@@ -1,8 +1,8 @@
 package com.hedera.sdk;
 
-import com.hedera.sdk.proto.AccountAmount;
-import com.hedera.sdk.proto.CryptoTransferTransactionBody;
-import com.hedera.sdk.proto.TransferList;
+import com.hedera.sdk.proto.*;
+import com.hedera.sdk.proto.Transaction;
+import io.grpc.MethodDescriptor;
 import javax.annotation.Nonnegative;
 
 public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTransferTransaction> {
@@ -27,5 +27,10 @@ public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTr
                 AccountAmount.newBuilder().setAccountID(accountId.inner).setAmount(value).build());
 
         return this;
+    }
+
+    @Override
+    MethodDescriptor<Transaction, TransactionResponse> getMethod() {
+        return CryptoServiceGrpc.getCryptoTransferMethod();
     }
 }

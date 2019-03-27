@@ -2,8 +2,9 @@ package com.hedera.sdk;
 
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.crypto.Key;
-import com.hedera.sdk.proto.FileCreateTransactionBody;
-import com.hedera.sdk.proto.KeyList;
+import com.hedera.sdk.proto.*;
+import com.hedera.sdk.proto.Transaction;
+import io.grpc.MethodDescriptor;
 import java.time.Instant;
 
 public final class FileCreateTransaction extends TransactionBuilder<FileCreateTransaction> {
@@ -34,5 +35,10 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
         builder.setNewRealmAdminKey(key.toKeyProto());
 
         return this;
+    }
+
+    @Override
+    MethodDescriptor<Transaction, TransactionResponse> getMethod() {
+        return FileServiceGrpc.getCreateFileMethod();
     }
 }

@@ -1,6 +1,10 @@
 package com.hedera.sdk;
 
 import com.hedera.sdk.proto.CryptoDeleteTransactionBody;
+import com.hedera.sdk.proto.CryptoServiceGrpc;
+import com.hedera.sdk.proto.Transaction;
+import com.hedera.sdk.proto.TransactionResponse;
+import io.grpc.MethodDescriptor;
 
 public class CryptoDeleteTransaction
         extends TransactionBuilder<com.hedera.sdk.CryptoDeleteTransaction> {
@@ -18,5 +22,10 @@ public class CryptoDeleteTransaction
     public CryptoDeleteTransaction setDeleteAccountId(AccountId deleteAccountId) {
         builder.setDeleteAccountID(deleteAccountId.inner);
         return this;
+    }
+
+    @Override
+    MethodDescriptor<Transaction, TransactionResponse> getMethod() {
+        return CryptoServiceGrpc.getCryptoDeleteMethod();
     }
 }

@@ -1,7 +1,11 @@
 package com.hedera.sdk;
 
 import com.hedera.sdk.crypto.Key;
+import com.hedera.sdk.proto.CryptoServiceGrpc;
 import com.hedera.sdk.proto.CryptoUpdateTransactionBody;
+import com.hedera.sdk.proto.Transaction;
+import com.hedera.sdk.proto.TransactionResponse;
+import io.grpc.MethodDescriptor;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -50,5 +54,10 @@ public final class CryptoUpdateTransaction extends TransactionBuilder<CryptoUpda
     public CryptoUpdateTransaction setExpirationTime(Instant expirationTime) {
         builder.setExpirationTime(TimestampHelper.timestampFrom(expirationTime));
         return this;
+    }
+
+    @Override
+    MethodDescriptor<Transaction, TransactionResponse> getMethod() {
+        return CryptoServiceGrpc.getUpdateAccountMethod();
     }
 }

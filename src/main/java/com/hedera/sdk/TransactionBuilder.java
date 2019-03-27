@@ -80,8 +80,12 @@ abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
         return inner.build();
     }
 
+    abstract io.grpc.MethodDescriptor<
+                    com.hedera.sdk.proto.Transaction, com.hedera.sdk.proto.TransactionResponse>
+            getMethod();
+
     public final Transaction sign(Ed25519PrivateKey privateKey) {
-        return new Transaction(inner).sign(privateKey);
+        return new Transaction(inner, getMethod()).sign(privateKey);
     }
 
     // Work around for java not recognized that this is completely safe

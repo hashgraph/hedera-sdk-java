@@ -2,6 +2,8 @@ package com.hedera.sdk;
 
 import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.*;
+import com.hedera.sdk.proto.Transaction;
+import io.grpc.MethodDescriptor;
 import java.time.Duration;
 import javax.annotation.Nonnull;
 
@@ -103,5 +105,10 @@ public final class CryptoCreateTransaction extends TransactionBuilder<CryptoCrea
     public CryptoCreateTransaction setNewRealmAdminKey(Key publicKey) {
         builder.setNewRealmAdminKey(publicKey.toKeyProto());
         return this;
+    }
+
+    @Override
+    MethodDescriptor<Transaction, TransactionResponse> getMethod() {
+        return CryptoServiceGrpc.getCreateAccountMethod();
     }
 }
