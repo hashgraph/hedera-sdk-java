@@ -45,6 +45,4 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
         builder.setFileID(file.inner);
         return this;
     }
-
-
 }
