@@ -13,6 +13,7 @@ import com.hedera.sdk.account.HederaAccountUpdateValues;
 import com.hedera.sdk.account.HederaClaim;
 import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
+import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
 import com.hedera.sdk.common.HederaTransactionID;
 import com.hedera.sdk.common.HederaTransactionRecord;
 
@@ -35,11 +36,11 @@ public final class DemoAccount {
 //    	getBalance = true;
 //    	send = true;
 //    	getInfo = true;
-//    	update = true;
+    	update = true;
 //    	doAddClaim = true; //-- not implemented ?
 //    	getTXRecord = true; //-- records temporarily disabled
 //    	getFastRecord = true;
-    	getAccountRecords = true;
+//    	getAccountRecords = true;
 		
     	/* 
     	 * check my balance
@@ -50,7 +51,8 @@ public final class DemoAccount {
     		// setup my account
         	HederaAccount myAccount = new HederaAccount();
         	// setup transaction/query defaults (durations, etc...)
-        	myAccount.txQueryDefaults = ExampleUtilities.getTxQueryDefaults();
+        	HederaTransactionAndQueryDefaults txQueryDefaults = ExampleUtilities.getTxQueryDefaults();
+        	myAccount.txQueryDefaults = txQueryDefaults;
 	    	// setup my account number from properties file
 	    	myAccount.accountNum = myAccount.txQueryDefaults.payingAccountID.accountNum;
     	
@@ -66,7 +68,8 @@ public final class DemoAccount {
     		// setup my account
         	HederaAccount myAccount = new HederaAccount();
         	// setup transaction/query defaults (durations, etc...)
-        	myAccount.txQueryDefaults = ExampleUtilities.getTxQueryDefaults();
+        	HederaTransactionAndQueryDefaults txQueryDefaults = ExampleUtilities.getTxQueryDefaults();
+        	myAccount.txQueryDefaults = txQueryDefaults;
 	    	// setup my account number from properties file
 	    	myAccount.accountNum = myAccount.txQueryDefaults.payingAccountID.accountNum;
     		AccountGetInfo.getInfo(myAccount);
@@ -80,7 +83,8 @@ public final class DemoAccount {
         	HederaAccount newAccount = new HederaAccount();
         	// setup transaction/query defaults (durations, etc...)
         	// note: This txQueryDefaults contains a payingAccountID which is the account paying for the transaction
-        	newAccount.txQueryDefaults = ExampleUtilities.getTxQueryDefaults();
+        	HederaTransactionAndQueryDefaults txQueryDefaults = ExampleUtilities.getTxQueryDefaults();
+        	newAccount.txQueryDefaults = txQueryDefaults;
 
         	// optionally generate a record for this transaction
         	newAccount.txQueryDefaults.generateRecord = getTXRecord;
@@ -198,10 +202,15 @@ public final class DemoAccount {
 		    		if (newAccount != null) {
 		    			// need to update the paying key pair to be the new account's key
 		    			newAccount.txQueryDefaults.payingKeyPair = ed25519Key;
+		    			newAccount.txQueryDefaults.payingAccountID = newAccount.getHederaAccountID();
 		    			AccountGetInfo.getInfo(newAccount);
 		    		} else {
 		    			ExampleUtilities.showResult("ACCOUNT UPDATE FAILED - account is now null");
 		    		}
+		    		System.out.println("Paying key   " + txQueryDefaults.payingKeyPair.getPublicKeyHex());
+		    		System.out.println("Original key " + newAccountKey.getPublicKeyHex());
+		    		System.out.println("New key      " + ed25519Key.getPublicKeyHex());
+		    		
 		    	}
 		    	if (doAddClaim) {
 		    		HederaKeyPair claimKeyPair = new HederaKeyPair(KeyType.ED25519);

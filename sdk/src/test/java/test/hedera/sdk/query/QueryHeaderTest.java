@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaSignature;
 import com.hedera.sdk.common.HederaSignatureList;
+import com.hedera.sdk.common.HederaSignatures;
 import com.hedera.sdk.contract.HederaContract;
 import com.hedera.sdk.query.HederaQueryHeader;
 import com.hedera.sdk.transaction.HederaTransaction;
@@ -37,9 +38,8 @@ class QueryHeaderTest {
 		body.memo = "body memo";
 		body.data = new HederaContract().getCallTransactionBody();
 		
-		HederaSignatureList keySigs = new HederaSignatureList();
-		keySigs.addSignature(new HederaSignature(KeyType.ED25519, "signature1".getBytes()));
-//		keySigs.addKeySignaturePair(KeyType.ECDSA384, "key2".getBytes(), "signature2".getBytes());
+		HederaSignatures keySigs = new HederaSignatures();
+		keySigs.addSignature("key1".getBytes(), "signature1".getBytes());
 		
 		HederaTransaction transaction = new HederaTransaction(body, keySigs);
 		
