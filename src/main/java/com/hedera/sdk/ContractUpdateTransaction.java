@@ -40,4 +40,9 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
         builder.setFileID(file.inner);
         return this;
     }
+
+    public ContractUpdateTransaction setContract(ContractId contract) {
+        builder.setContractID(contract.inner);
+        return this;
+    }
 }
