@@ -45,6 +45,7 @@ public final class DemoAccount {
     	 * check my balance
     	 * This populates the account object's balance property 
     	 */
+    	
     	if (getBalance) {
     		// setup my account
         	HederaAccount myAccount = new HederaAccount();

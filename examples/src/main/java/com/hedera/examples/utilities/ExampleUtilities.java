@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,6 +15,7 @@ import java.util.Properties;
 
 import org.apache.commons.codec.DecoderException;
 import org.slf4j.LoggerFactory;
+import org.spongycastle.util.encoders.Hex;
 
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaDuration;
@@ -162,4 +164,5 @@ public class ExampleUtilities {
 		
 		return fileContents;
 	}
+	
 }

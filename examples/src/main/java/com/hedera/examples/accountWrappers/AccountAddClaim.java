@@ -22,7 +22,7 @@ public final class AccountAddClaim {
 		// was it successful ?
 		if (claimAddResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 			// yes, get a receipt for the transaction
-			HederaTransactionReceipt receipt  = Utilities.getReceipt(account.hederaTransactionID,  account.txQueryDefaults.node);
+			HederaTransactionReceipt receipt  = Utilities.getReceipt(account.hederaTransactionID,  account.txQueryDefaults.node, 10, 3000, 0);
 			if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
 				// if query successful, print it
 				ExampleUtilities.showResult("**    Claim addition successful");

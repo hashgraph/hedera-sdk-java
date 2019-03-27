@@ -37,7 +37,7 @@ public final class ContractCreate {
 		if (createResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 			// yes, get a receipt for the transaction
 			HederaTransactionReceipt receipt = Utilities.getReceipt(contract.hederaTransactionID,
-					contract.txQueryDefaults.node);
+					contract.txQueryDefaults.node, 10, 4000, 0);
 			// was that successful ?
 			if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
 				contract.contractNum = receipt.contractID.contractNum;

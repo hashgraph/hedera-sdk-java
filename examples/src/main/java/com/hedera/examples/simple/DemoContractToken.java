@@ -9,6 +9,7 @@ import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
+import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.contract.HederaContract;
 import com.hedera.sdk.file.HederaFile;
 
@@ -39,8 +40,7 @@ public final class DemoContractToken {
 		
 		// setup the account number on my account so we can getInfo
 		myAccount.accountNum = txQueryDefaults.payingAccountID.accountNum;
-		myAccount.getInfo();
-		String tokenIssuerSolidityAddress = myAccount.getSolidityContractAccountID();
+		String tokenIssuerSolidityAddress = Utilities.calculateSolidityAddress(txQueryDefaults.payingAccountID.accountNum);
 		
 		// alice
 		HederaKeyPair aliceKeyPair = new HederaKeyPair(KeyType.ED25519);
@@ -48,8 +48,7 @@ public final class DemoContractToken {
 		alice.txQueryDefaults = txQueryDefaults;
 		alice = AccountCreate.create(alice, aliceKeyPair.getPublicKeyHex(), KeyType.ED25519, 400000);
 		ExampleUtilities.showResult("Alice account created");
-		alice.getInfo();
-		String aliceSolidityAddress = alice.getSolidityContractAccountID();
+		String aliceSolidityAddress = Utilities.calculateSolidityAddress(alice.accountNum);
 
 		// bob
 		HederaKeyPair bobKeyPair = new HederaKeyPair(KeyType.ED25519);
@@ -57,8 +56,7 @@ public final class DemoContractToken {
 		bob.txQueryDefaults = txQueryDefaults;
 		bob = AccountCreate.create(bob, bobKeyPair.getPublicKeyHex(), KeyType.ED25519, 400000);
 		ExampleUtilities.showResult("Bob account created");
-		bob.getInfo();
-		String bobSolidityAddress = bob.getSolidityContractAccountID();
+		String bobSolidityAddress = Utilities.calculateSolidityAddress(bob.accountNum);
 
 		// create a file
 		// new file object

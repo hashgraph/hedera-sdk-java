@@ -42,7 +42,7 @@ public final class FileCreate {
 		if (createResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 			// yes, get a receipt for the transaction
 			HederaTransactionReceipt receipt = Utilities.getReceipt(file.hederaTransactionID,
-					file.txQueryDefaults.node);
+					file.txQueryDefaults.node, 10, 4000, 0);
 			// was that successful ?
 			if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
 				// yes, get the new account number from the receipt

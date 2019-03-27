@@ -5,10 +5,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Random;
 import org.slf4j.LoggerFactory;
+import org.spongycastle.util.encoders.Hex;
+
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.node.HederaNode;
 import com.hederahashgraph.api.proto.java.KeyList;
@@ -559,5 +562,23 @@ public class Utilities {
 				throw new IllegalStateException(error);
 			}
 		}
+	}
+	public static String calculateSolidityAddress(long accountNum) {
+	    byte[] solidityByteArray = new byte[20];
+	    // byte 0 to 3 are shard
+	    for (int i=0; i < 4; i++) {
+	    	solidityByteArray[i] = 0;
+	    }
+	    // byte 4 to 11 are realm
+	    for (int i=4; i < 12; i++) {
+	    	solidityByteArray[i] = 0;
+	    }
+	    
+	    byte[] accountNumBytes = ByteBuffer.allocate(8).putLong(accountNum).array();
+	    // byte 12 to 19 are account number
+	    for (int i=0; i < accountNumBytes.length; i++) {
+	    	solidityByteArray[i+12] = accountNumBytes[i];
+	    }
+	    return Hex.toHexString(solidityByteArray);		
 	}
 }

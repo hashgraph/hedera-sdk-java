@@ -29,8 +29,8 @@ public class HederaNode implements Serializable {
 	// GRPC
 	private ManagedChannel grpcChannel = null; 
     // BUSY network handling
-	private int busyRetryCount = 2;
-	private int waitMillisLong = 510;
+	private int busyRetryCount = 5;
+	private int waitMillisLong = 1000;
 	
 	/**
 	 * The default fee associated with running an account create transaction
