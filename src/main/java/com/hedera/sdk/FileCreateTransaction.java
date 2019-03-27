@@ -4,10 +4,7 @@ import com.google.protobuf.ByteString;
 import com.hedera.sdk.crypto.IPublicKey;
 import com.hedera.sdk.proto.FileCreateTransactionBody;
 import com.hedera.sdk.proto.KeyList;
-import com.hedera.sdk.proto.Timestamp;
-import java.time.Duration;
 import java.time.Instant;
-import javax.annotation.Nonnull;
 
 public final class FileCreateTransaction extends TransactionBuilder<FileCreateTransaction> {
     private final FileCreateTransactionBody.Builder builder;
@@ -35,6 +32,18 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
 
     public FileCreateTransaction setContents(byte[] bytes) {
         builder.setContents(ByteString.copyFrom(bytes));
+        return this;
+    }
+
+    public FileCreateTransaction setNewRealmAdminKey(IPublicKey key) {
+        builder.setNewRealmAdminKey(key.toProtoKey());
+
+        return this;
+    }
+
+    public FileCreateTransaction setNewRealmAdminKey(ContractId key) {
+        builder.setNewRealmAdminKey(key.toProtoKey());
+
         return this;
     }
 }
