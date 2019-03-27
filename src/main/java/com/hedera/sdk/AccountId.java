@@ -36,4 +36,8 @@ public final class AccountId {
     public String toString() {
         return String.format("%d.%d.%d", getShardNum(), getRealmNum(), getAccountNum());
     }
+
+    AccountID toProto() {
+        return inner.build();
+    }
 }
