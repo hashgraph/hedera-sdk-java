@@ -15,36 +15,26 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
 
     public FileCreateTransaction() {
         builder = inner.getBodyBuilder().getFileCreateBuilder();
-        keyList = KeyList.newBuilder();
+        keyList = builder.getKeysBuilder();
     }
 
-    public FileCreateTransaction setExpiration(@Nonnull Instant expiration) {
-        builder.setExpirationTime(
-                Timestamp.newBuilder()
-                        .setSeconds(expiration.getEpochSecond())
-                        .setNanos(expiration.getNano())
-                        .build());
+    public FileCreateTransaction setExpiration(Instant expiration) {
+        builder.setExpirationTime(TimestampHelper.timestampFrom(expiration));
         return this;
     }
 
-    public FileCreateTransaction setExpiration(@Nonnull Duration toExpiration) {
-        this.setExpiration(Instant.now().plus(toExpiration));
-
-        return this;
-    }
-
-    public FileCreateTransaction setKey(@Nonnull IPublicKey key) {
+    public FileCreateTransaction setKey(IPublicKey key) {
         keyList.addKeys(key.toProtoKey());
-
         return this;
     }
 
-    public FileCreateTransaction setContents(@Nonnull byte[] bytes) {
+    public FileCreateTransaction setKey(ContractId key) {
+        keyList.addKeys(key.toProtoKey());
+        return this;
+    }
+
+    public FileCreateTransaction setContents(byte[] bytes) {
         builder.setContents(ByteString.copyFrom(bytes));
-
         return this;
     }
-
-    // todo: Needs to call builder.setKeys(this.keyList); at some point
-
 }
