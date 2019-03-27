@@ -1,6 +1,6 @@
 package com.hedera.sdk;
 
-import com.hedera.sdk.crypto.IPublicKey;
+import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.ContractUpdateTransactionBody;
 import java.time.Duration;
 import java.time.Instant;
@@ -18,8 +18,8 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
     }
 
     // fixme: update to the new Key interface
-    public ContractUpdateTransaction setAdminKey(IPublicKey key) {
-        builder.setAdminKey(key.toProtoKey());
+    public ContractUpdateTransaction setAdminKey(Key key) {
+        builder.setAdminKey(key.toKeyProto());
         return this;
     }
 
