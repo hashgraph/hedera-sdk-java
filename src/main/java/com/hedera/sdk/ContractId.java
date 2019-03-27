@@ -1,9 +1,9 @@
 package com.hedera.sdk;
 
+import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.ContractID;
-import com.hedera.sdk.proto.Key;
 
-public class ContractId {
+public class ContractId implements Key {
     transient ContractID.Builder inner;
 
     public ContractId(long shardNum, long realmNum, long contractNum) {
@@ -26,9 +26,8 @@ public class ContractId {
         return inner.getContractNum();
     }
 
-    // duplicating this method from the `IPublicKey` interface because it doesn't make sense for
-    // this to implement it
-    Key toProtoKey() {
-        return Key.newBuilder().setContractID(inner).build();
+    @Override
+    public com.hedera.sdk.proto.Key toProtoKey() {
+        return com.hedera.sdk.proto.Key.newBuilder().setContractID(inner).build();
     }
 }

@@ -1,6 +1,6 @@
 package com.hedera.sdk;
 
-import com.hedera.sdk.crypto.IPublicKey;
+import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.CryptoUpdateTransactionBody;
 import java.time.Duration;
 import java.time.Instant;
@@ -17,13 +17,8 @@ public final class CryptoUpdateTransaction extends TransactionBuilder<CryptoUpda
         return this;
     }
 
-    public CryptoUpdateTransaction setKey(IPublicKey key) {
+    public CryptoUpdateTransaction setKey(Key key) {
         builder.setKey(key.toProtoKey());
-        return this;
-    }
-
-    public CryptoUpdateTransaction setKey(ContractId contractId) {
-        builder.setKey(contractId.toProtoKey());
         return this;
     }
 

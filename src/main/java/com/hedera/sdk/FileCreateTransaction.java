@@ -1,7 +1,7 @@
 package com.hedera.sdk;
 
 import com.google.protobuf.ByteString;
-import com.hedera.sdk.crypto.IPublicKey;
+import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.FileCreateTransactionBody;
 import com.hedera.sdk.proto.KeyList;
 import java.time.Instant;
@@ -20,12 +20,7 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
         return this;
     }
 
-    public FileCreateTransaction addKey(IPublicKey key) {
-        keyList.addKeys(key.toProtoKey());
-        return this;
-    }
-
-    public FileCreateTransaction addKey(ContractId key) {
+    public FileCreateTransaction addKey(Key key) {
         keyList.addKeys(key.toProtoKey());
         return this;
     }
@@ -35,15 +30,10 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
         return this;
     }
 
-    public FileCreateTransaction setNewRealmAdminKey(IPublicKey key) {
+    public FileCreateTransaction setNewRealmAdminKey(Key key) {
         builder.setNewRealmAdminKey(key.toProtoKey());
 
         return this;
     }
 
-    public FileCreateTransaction setNewRealmAdminKey(ContractId key) {
-        builder.setNewRealmAdminKey(key.toProtoKey());
-
-        return this;
-    }
 }
