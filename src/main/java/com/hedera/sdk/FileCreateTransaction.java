@@ -15,7 +15,7 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
         keyList = builder.getKeysBuilder();
     }
 
-    public FileCreateTransaction setExpiration(Instant expiration) {
+    public FileCreateTransaction setExpirationTime(Instant expiration) {
         builder.setExpirationTime(TimestampHelper.timestampFrom(expiration));
         return this;
     }
