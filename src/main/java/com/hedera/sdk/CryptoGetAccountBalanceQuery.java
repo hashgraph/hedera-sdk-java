@@ -2,7 +2,7 @@ package com.hedera.sdk;
 
 import com.hedera.sdk.proto.QueryHeader;
 
-public class CryptoGetAccountBalanceQuery extends QueryBuilder {
+public final class CryptoGetAccountBalanceQuery extends QueryBuilder {
     private final com.hedera.sdk.proto.CryptoGetAccountBalanceQuery.Builder builder;
 
     CryptoGetAccountBalanceQuery() {
