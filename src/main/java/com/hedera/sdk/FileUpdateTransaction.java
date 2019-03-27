@@ -15,6 +15,12 @@ public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransact
         keyList = builder.getKeysBuilder();
     }
 
+    public FileUpdateTransaction setFile(FileId file) {
+        builder.setFileID(file.inner);
+
+        return this;
+    }
+
     public FileUpdateTransaction setExpirationTime(Instant expiration) {
         builder.setExpirationTime(TimestampHelper.timestampFrom(expiration));
 
@@ -29,12 +35,6 @@ public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransact
 
     public FileUpdateTransaction setContents(byte[] bytes) {
         builder.setContents(ByteString.copyFrom(bytes));
-
-        return this;
-    }
-
-    public FileUpdateTransaction setFile(FileId file) {
-        builder.setFileID(file.inner);
 
         return this;
     }
