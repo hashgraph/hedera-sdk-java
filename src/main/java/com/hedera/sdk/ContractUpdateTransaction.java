@@ -12,6 +12,11 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
         builder = inner.getBodyBuilder().getContractUpdateInstanceBuilder();
     }
 
+    public ContractUpdateTransaction setContract(ContractId contract) {
+        builder.setContractID(contract.inner);
+        return this;
+    }
+
     public ContractUpdateTransaction setExpirationTime(Instant expiration) {
         builder.setExpirationTime(TimestampHelper.timestampFrom(expiration));
         return this;
@@ -41,8 +46,5 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
         return this;
     }
 
-    public ContractUpdateTransaction setContract(ContractId contract) {
-        builder.setContractID(contract.inner);
-        return this;
-    }
+
 }
