@@ -2,11 +2,10 @@ package com.hedera.sdk;
 
 import com.hedera.sdk.crypto.IPublicKey;
 import com.hedera.sdk.proto.ContractUpdateTransactionBody;
-
 import java.time.Duration;
 import java.time.Instant;
 
-public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdateTransaction>  {
+public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdateTransaction> {
     private final ContractUpdateTransactionBody.Builder builder;
 
     public ContractUpdateTransaction() {
@@ -30,7 +29,10 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
     }
 
     public ContractUpdateTransaction setAutoRenewPeriod(Duration duration) {
-        builder.setAutoRenewPeriod(com.hedera.sdk.proto.Duration.newBuilder().setSeconds(duration.getSeconds()).setNanos(duration.getNano()));
+        builder.setAutoRenewPeriod(
+                com.hedera.sdk.proto.Duration.newBuilder()
+                        .setSeconds(duration.getSeconds())
+                        .setNanos(duration.getNano()));
         return this;
     }
 
