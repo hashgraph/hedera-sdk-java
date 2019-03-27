@@ -16,7 +16,7 @@ public class GetByKeyQuery extends QueryBuilder {
     }
 
     public GetByKeyQuery setKey(Key publicKey) {
-        builder.setKey(publicKey.toProtoKey());
+        builder.setKey(publicKey.toKeyProto());
         return this;
     }
 }

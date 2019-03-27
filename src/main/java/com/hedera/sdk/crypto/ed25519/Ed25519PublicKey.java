@@ -83,7 +83,7 @@ public final class Ed25519PublicKey implements Key {
     }
 
     @Override
-    public com.hedera.sdk.proto.Key toProtoKey() {
+    public com.hedera.sdk.proto.Key toKeyProto() {
         return com.hedera.sdk.proto.Key.newBuilder()
                 .setEd25519(ByteString.copyFrom(toBytes()))
                 .build();

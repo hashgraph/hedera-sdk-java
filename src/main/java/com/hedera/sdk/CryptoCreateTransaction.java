@@ -40,7 +40,7 @@ public final class CryptoCreateTransaction extends TransactionBuilder<CryptoCrea
     }
 
     public CryptoCreateTransaction setKey(Key publicKey) {
-        builder.setKey(publicKey.toProtoKey());
+        builder.setKey(publicKey.toKeyProto());
         return this;
     }
 
@@ -101,7 +101,7 @@ public final class CryptoCreateTransaction extends TransactionBuilder<CryptoCrea
     }
 
     public CryptoCreateTransaction setNewRealmAdminKey(Key publicKey) {
-        builder.setNewRealmAdminKey(publicKey.toProtoKey());
+        builder.setNewRealmAdminKey(publicKey.toKeyProto());
         return this;
     }
 }

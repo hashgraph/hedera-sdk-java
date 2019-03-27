@@ -18,7 +18,7 @@ public final class CryptoUpdateTransaction extends TransactionBuilder<CryptoUpda
     }
 
     public CryptoUpdateTransaction setKey(Key key) {
-        builder.setKey(key.toProtoKey());
+        builder.setKey(key.toKeyProto());
         return this;
     }
 

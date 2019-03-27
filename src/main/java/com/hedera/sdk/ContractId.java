@@ -27,7 +27,7 @@ public class ContractId implements Key {
     }
 
     @Override
-    public com.hedera.sdk.proto.Key toProtoKey() {
+    public com.hedera.sdk.proto.Key toKeyProto() {
         return com.hedera.sdk.proto.Key.newBuilder().setContractID(inner).build();
     }
 }

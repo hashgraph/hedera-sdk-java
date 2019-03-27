@@ -21,7 +21,7 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
     }
 
     public FileCreateTransaction addKey(Key key) {
-        keyList.addKeys(key.toProtoKey());
+        keyList.addKeys(key.toKeyProto());
         return this;
     }
 
@@ -31,7 +31,7 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
     }
 
     public FileCreateTransaction setNewRealmAdminKey(Key key) {
-        builder.setNewRealmAdminKey(key.toProtoKey());
+        builder.setNewRealmAdminKey(key.toKeyProto());
 
         return this;
     }

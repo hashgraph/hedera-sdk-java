@@ -30,7 +30,7 @@ public final class CryptoAddClaimTransaction extends TransactionBuilder<CryptoAd
     }
 
     public CryptoAddClaimTransaction addKey(Key key) {
-        keyList.addKeys(key.toProtoKey());
+        keyList.addKeys(key.toKeyProto());
         return this;
     }
 }
