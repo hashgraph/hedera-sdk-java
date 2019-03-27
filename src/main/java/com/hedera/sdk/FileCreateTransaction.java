@@ -20,12 +20,12 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
         return this;
     }
 
-    public FileCreateTransaction setKey(IPublicKey key) {
+    public FileCreateTransaction addKey(IPublicKey key) {
         keyList.addKeys(key.toProtoKey());
         return this;
     }
 
-    public FileCreateTransaction setKey(ContractId key) {
+    public FileCreateTransaction addKey(ContractId key) {
         keyList.addKeys(key.toProtoKey());
         return this;
     }
