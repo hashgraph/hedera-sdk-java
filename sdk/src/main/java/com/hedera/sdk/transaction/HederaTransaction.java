@@ -111,7 +111,9 @@ public class HederaTransaction implements Serializable {
 		transactionProtobuf.setBodyBytes(this.body.getProtobuf().toByteString());
 		// if we have key signature pairs, use these\
 //		transactionProtobuf.setSigs(this.signatureList.getProtobuf());
-		transactionProtobuf.setSigMap(this.signatures.getProtobuf());
+		if (this.signatures != null) {
+			transactionProtobuf.setSigMap(this.signatures.getProtobuf());
+		}
 		
 		return transactionProtobuf.build();
 	}

@@ -8,6 +8,7 @@ import com.hedera.sdk.transaction.HederaTransactionResult;
 import com.hederahashgraph.api.proto.java.AccountID;
 import com.hederahashgraph.api.proto.java.Response;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
+import com.hederahashgraph.api.proto.java.Transaction;
 import com.hederahashgraph.api.proto.java.TransactionResponse;
 import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
 import com.hederahashgraph.service.proto.java.FileServiceGrpc;
@@ -1126,6 +1127,111 @@ public class HederaNode implements Serializable {
 
 		return response;
 	}
+
+	/**
+	 * Sends a generic transaction to a node on the smart contract grpc service
+	 * @param transaction the {@link Transaction} to send
+	 * @return {@link HederaTransactionResult} the result of the transaction
+	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
+	 */
+	public HederaTransactionResult sendContractTransaction(Transaction transaction) throws InterruptedException, StatusRuntimeException {
+
+		logger.debug("SENDING TRANSACTION");
+		logger.debug(transaction.toString());
+
+		TransactionResponse response = null;
+		HederaTransactionResult transResult = new HederaTransactionResult();
+		
+		openChannel();
+		SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
+		for (int i=0; i < busyRetryCount; i++) {
+			response = blockingStub.contractCallMethod(transaction);
+			// retry if busy
+			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
+				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
+				Thread.sleep(waitMillisLong);
+			} else {
+				break;
+			}
+		}
+
+		if(transResult != null && response != null) {		
+			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
+		}
+
+		return transResult;
+	}	
+
+	/**
+	 * Sends a generic transaction to a node on the file grpc service
+	 * @param transaction the {@link Transaction} to send
+	 * @return {@link HederaTransactionResult} the result of the transaction
+	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
+	 */
+	public HederaTransactionResult sendFileTransaction(Transaction transaction) throws InterruptedException, StatusRuntimeException {
+
+		logger.debug("SENDING TRANSACTION");
+		logger.debug(transaction.toString());
+
+		TransactionResponse response = null;
+		HederaTransactionResult transResult = new HederaTransactionResult();
+		
+		openChannel();
+		FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
+		for (int i=0; i < busyRetryCount; i++) {
+			response = blockingStub.createFile(transaction);
+			// retry if busy
+			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
+				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
+				Thread.sleep(waitMillisLong);
+			} else {
+				break;
+			}
+		}
+
+		if(transResult != null && response != null) {		
+			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
+		}
+
+		return transResult;
+	}	
+	
+	/**
+	 * Sends a generic transaction to a node on the crypto grpc service
+	 * @param transaction the {@link Transaction} to send
+	 * @return {@link HederaTransactionResult} the result of the transaction
+	 * @throws InterruptedException in the event of a node communication failure
+	 * @throws StatusRuntimeException in the event of a node communication failure
+	 */
+	public HederaTransactionResult sendCryptoTransaction(Transaction transaction) throws InterruptedException, StatusRuntimeException {
+
+		logger.debug("SENDING TRANSACTION");
+		logger.debug(transaction.toString());
+
+		TransactionResponse response = null;
+		HederaTransactionResult transResult = new HederaTransactionResult();
+		
+		openChannel();
+		CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
+		for (int i=0; i < busyRetryCount; i++) {
+			response = blockingStub.createAccount(transaction);
+			// retry if busy
+			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
+				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
+				Thread.sleep(waitMillisLong);
+			} else {
+				break;
+			}
+		}
+
+		if (transResult != null && response != null) {		
+			transResult.setPrecheckResult(response.getNodeTransactionPrecheckCode());
+		}
+
+		return transResult;
+	}	
 	
 	private void shutdown() throws InterruptedException {
 
