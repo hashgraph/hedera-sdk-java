@@ -3,7 +3,7 @@ package com.hedera.sdk;
 import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.ContractID;
 
-public class ContractId implements Key {
+public class ContractId implements Key, Entity {
     transient ContractID.Builder inner;
 
     public ContractId(long shardNum, long realmNum, long contractNum) {
