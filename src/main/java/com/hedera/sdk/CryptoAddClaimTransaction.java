@@ -3,6 +3,7 @@ package com.hedera.sdk;
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.*;
+import com.hedera.sdk.proto.Claim;
 import com.hedera.sdk.proto.Transaction;
 import io.grpc.MethodDescriptor;
 
