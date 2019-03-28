@@ -4,6 +4,7 @@ import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.AccountID;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class Claim {
     private final com.hedera.sdk.proto.Claim innner;
