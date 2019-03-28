@@ -54,6 +54,14 @@ public class Transaction {
     }
 
     public final com.hedera.sdk.proto.Transaction build() {
+        if (inner.getSigsBuilder().getSigsCount() == 0) {
+            throw new IllegalStateException("Transaction is not signed");
+        }
+
+        if (!inner.getBodyBuilder().hasTransactionID()) {
+            throw new IllegalStateException("Transaction needs an ID");
+        }
+
         return inner.build();
     }
 
