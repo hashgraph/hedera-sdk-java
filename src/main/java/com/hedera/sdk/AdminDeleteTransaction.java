@@ -1,5 +1,9 @@
 package com.hedera.sdk;
 
+import com.hedera.sdk.proto.FileServiceGrpc;
+import com.hedera.sdk.proto.Transaction;
+import com.hedera.sdk.proto.TransactionResponse;
+import io.grpc.MethodDescriptor;
 import java.time.Instant;
 
 public final class AdminDeleteTransaction extends TransactionBuilder<AdminDeleteTransaction> {
@@ -18,5 +22,10 @@ public final class AdminDeleteTransaction extends TransactionBuilder<AdminDelete
                 .getAdminDeleteBuilder()
                 .setExpirationTime(TimestampHelper.timestampSecondsFrom(timestamp));
         return this;
+    }
+
+    @Override
+    MethodDescriptor<Transaction, TransactionResponse> getMethod() {
+        return FileServiceGrpc.getAdminDeleteMethod();
     }
 }

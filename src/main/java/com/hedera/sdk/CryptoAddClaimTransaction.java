@@ -2,9 +2,9 @@ package com.hedera.sdk;
 
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.crypto.Key;
-import com.hedera.sdk.proto.Claim;
-import com.hedera.sdk.proto.CryptoAddClaimTransactionBody;
-import com.hedera.sdk.proto.KeyList;
+import com.hedera.sdk.proto.*;
+import com.hedera.sdk.proto.Transaction;
+import io.grpc.MethodDescriptor;
 
 public final class CryptoAddClaimTransaction extends TransactionBuilder<CryptoAddClaimTransaction> {
     private final CryptoAddClaimTransactionBody.Builder builder;
@@ -32,5 +32,10 @@ public final class CryptoAddClaimTransaction extends TransactionBuilder<CryptoAd
     public CryptoAddClaimTransaction addKey(Key key) {
         keyList.addKeys(key.toKeyProto());
         return this;
+    }
+
+    @Override
+    MethodDescriptor<Transaction, TransactionResponse> getMethod() {
+        return CryptoServiceGrpc.getAddClaimMethod();
     }
 }

@@ -2,8 +2,9 @@ package com.hedera.sdk;
 
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.crypto.Key;
-import com.hedera.sdk.proto.FileUpdateTransactionBody;
-import com.hedera.sdk.proto.KeyList;
+import com.hedera.sdk.proto.*;
+import com.hedera.sdk.proto.Transaction;
+import io.grpc.MethodDescriptor;
 import java.time.Instant;
 
 public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransaction> {
@@ -37,5 +38,10 @@ public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransact
         builder.setContents(ByteString.copyFrom(bytes));
 
         return this;
+    }
+
+    @Override
+    MethodDescriptor<Transaction, TransactionResponse> getMethod() {
+        return FileServiceGrpc.getUpdateFileMethod();
     }
 }

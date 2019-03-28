@@ -2,6 +2,10 @@ package com.hedera.sdk;
 
 import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.ContractUpdateTransactionBody;
+import com.hedera.sdk.proto.SmartContractServiceGrpc;
+import com.hedera.sdk.proto.Transaction;
+import com.hedera.sdk.proto.TransactionResponse;
+import io.grpc.MethodDescriptor;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -44,5 +48,10 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
     public ContractUpdateTransaction setFile(FileId file) {
         builder.setFileID(file.inner);
         return this;
+    }
+
+    @Override
+    MethodDescriptor<Transaction, TransactionResponse> getMethod() {
+        return SmartContractServiceGrpc.getUpdateContractMethod();
     }
 }

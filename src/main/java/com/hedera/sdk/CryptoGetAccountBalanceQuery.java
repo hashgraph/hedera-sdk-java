@@ -1,11 +1,14 @@
 package com.hedera.sdk;
 
-import com.hedera.sdk.proto.QueryHeader;
+import com.hedera.sdk.proto.*;
+import io.grpc.MethodDescriptor;
 
-public final class CryptoGetAccountBalanceQuery extends QueryBuilder {
+public final class CryptoGetAccountBalanceQuery
+        extends QueryBuilder<CryptoGetAccountBalanceResponse> {
     private final com.hedera.sdk.proto.CryptoGetAccountBalanceQuery.Builder builder;
 
     public CryptoGetAccountBalanceQuery() {
+        super(Response::getCryptogetAccountBalance);
         builder = inner.getCryptogetAccountBalanceBuilder();
     }
 
@@ -18,5 +21,10 @@ public final class CryptoGetAccountBalanceQuery extends QueryBuilder {
         builder.setAccountID(account.inner);
 
         return this;
+    }
+
+    @Override
+    MethodDescriptor<Query, Response> getMethod() {
+        return CryptoServiceGrpc.getCryptoGetBalanceMethod();
     }
 }
