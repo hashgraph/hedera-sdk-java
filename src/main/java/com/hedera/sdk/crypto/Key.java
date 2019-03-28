@@ -15,8 +15,7 @@ public interface Key {
                 ContractID id = key.getContractID();
                 return new ContractId(id.getShardNum(), id.getRealmNum(), id.getContractNum());
             default:
-                // Not sure if I return null instead
-                return Ed25519PublicKey.fromString(key.getEd25519().toString());
+                return null;
         }
     }
 }
