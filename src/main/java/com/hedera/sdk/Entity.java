@@ -2,12 +2,6 @@ package com.hedera.sdk;
 
 import com.hedera.sdk.proto.EntityID;
 
-public class InvalidEntityRequestException extends Exception {
-    public InvalidEntityRequestException(String message) {
-        super(message);
-    }
-};
-
 public final class Entity {
 
     private final EntityID.Builder inner;
