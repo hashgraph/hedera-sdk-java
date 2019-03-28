@@ -7,7 +7,7 @@ import com.hedera.sdk.proto.ContractID;
 public interface Key {
     com.hedera.sdk.proto.Key toKeyProto();
 
-    static Key fromProtoKey(com.hedera.sdk.proto.Key key) throws Exception {
+    static Key fromProtoKey(com.hedera.sdk.proto.Key key) {
         switch (key.getKeyCase()) {
             case ED25519:
                 return Ed25519PublicKey.fromString(key.getEd25519().toString());
@@ -15,7 +15,7 @@ public interface Key {
                 ContractID id = key.getContractID();
                 return new ContractId(id.getShardNum(), id.getRealmNum(), id.getContractNum());
             default:
-                throw new Exception("Unchecked Key Case");
+                throw new IllegalStateException("Unchecked Key Case");
         }
     }
 }

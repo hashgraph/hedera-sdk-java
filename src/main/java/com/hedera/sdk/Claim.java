@@ -26,14 +26,7 @@ public final class Claim {
         return this.innner.getHash().toByteArray();
     }
 
-    public List<Key> getKeys() throws Exception {
-        List<com.hedera.sdk.proto.Key> protoKeys = this.innner.getKeys().getKeysList();
-        ArrayList<Key> keys = new ArrayList<Key>();
-
-        for (com.hedera.sdk.proto.Key key : protoKeys) {
-            keys.add(Key.fromProtoKey(key));
-        }
-
-        return keys;
+    public List<Key> getKeys() {
+        return this.innner.getKeys().getKeysList().stream().map(key -> Key.fromProtoKey(key)).collect(Collectors.toList());
     }
 }
