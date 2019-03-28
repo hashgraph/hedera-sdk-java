@@ -5,7 +5,7 @@ import com.hedera.sdk.proto.QueryHeader;
 public final class ContractGetInfoQuery extends QueryBuilder {
     private final com.hedera.sdk.proto.ContractGetInfoQuery.Builder builder;
 
-    ContractGetInfoQuery() {
+    public ContractGetInfoQuery() {
         builder = inner.getContractGetInfoBuilder();
     }
 
