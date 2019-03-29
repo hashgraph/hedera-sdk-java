@@ -28,4 +28,9 @@ public final class ContractInfoQuery extends QueryBuilder<ContractGetInfoRespons
     public MethodDescriptor<Query, Response> getMethod() {
         return SmartContractServiceGrpc.getGetContractInfoMethod();
     }
+
+    @Override
+    protected void doValidate() {
+        require(builder.getContractIDOrBuilder(), ".setContract() required");
+    }
 }

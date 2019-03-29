@@ -3,7 +3,7 @@ package com.hedera.sdk;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import java.time.Duration;
 
-public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
+public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extends ValidatedBuilder {
     protected com.hedera.sdk.proto.Transaction.Builder inner =
             com.hedera.sdk.proto.Transaction.newBuilder();
 
@@ -76,6 +76,17 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
         return self();
     }
 
+    protected abstract void doValidate();
+
+    @Override
+    public final void validate() {
+        var bodyBuilder = inner.getBodyBuilder();
+        require(bodyBuilder.getTransactionIDBuilder(), ".setTransactionId() required");
+        require(bodyBuilder.getNodeAccountIDBuilder(), ".setNodeAccountId() required");
+        doValidate();
+        checkValidationErrors("transaction builder failed validation");
+    }
+
     public final com.hedera.sdk.proto.Transaction build() {
         return inner.build();
     }
@@ -85,6 +96,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
             getMethod();
 
     public final Transaction sign(Ed25519PrivateKey privateKey) {
+        doValidate();
         return new Transaction(inner, getMethod()).sign(privateKey);
     }
 

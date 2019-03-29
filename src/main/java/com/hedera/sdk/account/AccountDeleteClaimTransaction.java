@@ -29,6 +29,12 @@ public class AccountDeleteClaimTransaction
     }
 
     @Override
+    protected void doValidate() {
+        require(builder.getAccountIDToDeleteFromOrBuilder(), ".setAccountToDeleteFrom() required");
+        require(builder.getHashToDelete(), ".setHashToDelete() required");
+    }
+
+    @Override
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return CryptoServiceGrpc.getDeleteClaimMethod();
     }

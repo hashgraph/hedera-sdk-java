@@ -31,6 +31,11 @@ public final class AccountClaimQuery extends QueryBuilder<CryptoGetClaimResponse
     }
 
     @Override
+    protected void doValidate() {
+        require(builder.getAccountIDOrBuilder(), ".setAccount() required");
+    }
+
+    @Override
     protected MethodDescriptor<Query, Response> getMethod() {
         return CryptoServiceGrpc.getGetClaimMethod();
     }

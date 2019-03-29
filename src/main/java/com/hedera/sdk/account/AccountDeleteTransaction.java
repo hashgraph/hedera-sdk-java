@@ -27,6 +27,12 @@ public class AccountDeleteTransaction extends TransactionBuilder<AccountDeleteTr
     }
 
     @Override
+    protected void doValidate() {
+        require(builder.getTransferAccountIDOrBuilder(), ".setTransferAccountId() required");
+        require(builder.getDeleteAccountIDOrBuilder(), ".setDeleteAccountId() required");
+    }
+
+    @Override
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return CryptoServiceGrpc.getCryptoDeleteMethod();
     }

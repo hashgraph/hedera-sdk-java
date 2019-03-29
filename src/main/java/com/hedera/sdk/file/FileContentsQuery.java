@@ -28,4 +28,9 @@ public class FileContentsQuery extends QueryBuilder<FileGetContentsResponse> {
     protected MethodDescriptor<Query, Response> getMethod() {
         return FileServiceGrpc.getGetFileContentMethod();
     }
+
+    @Override
+    protected void doValidate() {
+        require(builder.getFileIDOrBuilder(), ".setFileId() required");
+    }
 }

@@ -55,4 +55,9 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return SmartContractServiceGrpc.getUpdateContractMethod();
     }
+
+    @Override
+    protected void doValidate() {
+        require(builder.getContractIDOrBuilder(), ".setContract() required");
+    }
 }

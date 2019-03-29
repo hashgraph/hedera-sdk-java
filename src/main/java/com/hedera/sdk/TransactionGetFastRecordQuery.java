@@ -3,7 +3,8 @@ package com.hedera.sdk;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
-public class TransactionGetFastRecordQuery extends QueryBuilder<TransactionGetFastRecordResponse> {
+public final class TransactionGetFastRecordQuery
+        extends QueryBuilder<TransactionGetFastRecordResponse> {
     private final com.hedera.sdk.proto.TransactionGetFastRecordQuery.Builder builder;
 
     public TransactionGetFastRecordQuery() {
@@ -24,5 +25,10 @@ public class TransactionGetFastRecordQuery extends QueryBuilder<TransactionGetFa
     @Override
     protected MethodDescriptor<Query, Response> getMethod() {
         return CryptoServiceGrpc.getGetFastTransactionRecordMethod();
+    }
+
+    @Override
+    protected void doValidate() {
+        require(builder.getTransactionIDOrBuilder(), ".setTransaction() required");
     }
 }

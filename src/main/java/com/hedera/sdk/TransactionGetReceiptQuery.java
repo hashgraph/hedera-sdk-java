@@ -3,7 +3,7 @@ package com.hedera.sdk;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
-public class TransactionGetReceiptQuery extends QueryBuilder<TransactionGetReceiptResponse> {
+public final class TransactionGetReceiptQuery extends QueryBuilder<TransactionGetReceiptResponse> {
     private final com.hedera.sdk.proto.TransactionGetReceiptQuery.Builder builder;
 
     public TransactionGetReceiptQuery() {
@@ -24,5 +24,10 @@ public class TransactionGetReceiptQuery extends QueryBuilder<TransactionGetRecei
     @Override
     protected MethodDescriptor<Query, Response> getMethod() {
         return CryptoServiceGrpc.getGetTxRecordByTxIDMethod();
+    }
+
+    @Override
+    protected void doValidate() {
+        require(builder.getTransactionIDOrBuilder(), ".setTransaction() required");
     }
 }

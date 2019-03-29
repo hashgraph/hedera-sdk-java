@@ -31,4 +31,10 @@ public final class FileAppendTransaction extends TransactionBuilder<FileAppendTr
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return FileServiceGrpc.getAppendContentMethod();
     }
+
+    @Override
+    protected void doValidate() {
+        require(builder.getFileIDOrBuilder(), ".setFileId() required");
+        require(builder.getContents(), ".setContents() required");
+    }
 }

@@ -35,12 +35,16 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
 
     public FileCreateTransaction setNewRealmAdminKey(Key key) {
         builder.setNewRealmAdminKey(key.toKeyProto());
-
         return this;
     }
 
     @Override
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return FileServiceGrpc.getCreateFileMethod();
+    }
+
+    @Override
+    protected void doValidate() {
+        require(builder.getKeysOrBuilder().getKeysOrBuilderList(), ".addKey() required");
     }
 }

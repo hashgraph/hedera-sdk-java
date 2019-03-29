@@ -35,6 +35,24 @@ public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTr
     }
 
     @Override
+    protected void doValidate() {
+        require(transferList.getAccountAmountsOrBuilderList(), "at least one transfer required");
+
+        long sum = 0;
+
+        for (var acctAmt : transferList.getAccountAmountsOrBuilderList()) {
+            sum += acctAmt.getAmount();
+        }
+
+        if (sum != 0) {
+            addValidationError(
+                    String.format(
+                            "transfer transaction must have zero sum; transfer balance: %d tinybar",
+                            sum));
+        }
+    }
+
+    @Override
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return CryptoServiceGrpc.getCryptoTransferMethod();
     }
