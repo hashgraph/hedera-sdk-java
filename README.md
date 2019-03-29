@@ -39,6 +39,10 @@ Returns records related to a smart contract that were created within the last 24
 
 the previous version of ExampleUtilities.java could result in the IDE loading the required file from a number of possible locations (e.g. `/src/main/resources`, `./target/classes`), the `readFile` method of this class now loads files from a path relative to the root of the project (e.g. `./src/main/resources/scExamples/HelloWorld.bin`).
 
+### 0.2.4 - Bug fix to EDKeypair.java
+
+Private key was being incorrectly returned
+
 ### 0.2.4 - Simplified smart contract call wrappers
 
 see com.hedera.examples.contractWrappers
