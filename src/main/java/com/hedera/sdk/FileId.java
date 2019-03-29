@@ -20,4 +20,8 @@ public class FileId {
     public long getFileNum() {
         return inner.getFileNum();
     }
+
+    FileID toProto() {
+        return inner.build();
+    }
 }
