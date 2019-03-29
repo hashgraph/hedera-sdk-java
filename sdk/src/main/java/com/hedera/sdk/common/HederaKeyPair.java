@@ -646,28 +646,6 @@ public class HederaKeyPair implements Serializable {
 	}
 
 	/**
-	 * gets the seed for the private key
-	 * @return byte[] null if not set
-	 */
-    public byte[] getSecretKeySeed() {
-		if (this.keyPair != null) {
-			return this.keyPair.getPrivateKeySeed();
-		} else {
-			return null;
-		}
-    }
-	/**
-	 * gets the seed for the private key as a Hex string
-	 * @return String empty string if not set
-	 */
-    public String getSecretKeySeedHex() {
-		if (this.keyPair != null) {
-			return this.keyPair.getPrivateKeySeedHex();
-		} else {
-			return "";
-		}
-    }
-	/**
 	 * gets the seed for the private key concatenated with the public key as a byte array
 	 * @return byte[] containing the private key seed and public key
 	 */
