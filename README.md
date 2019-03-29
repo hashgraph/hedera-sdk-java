@@ -18,6 +18,10 @@ Features supported include:
 
 ## Version history
 
+### 0.2.4 - Bug fix to EDKeypair.java
+
+Private key was being incorrectly returned
+
 ### 0.2.4 - Simplified smart contract call wrappers
 
 see com.hedera.examples.contractWrappers
