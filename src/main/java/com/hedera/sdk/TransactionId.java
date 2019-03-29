@@ -32,4 +32,12 @@ public final class TransactionId {
                                         .setSeconds(transactionValidStart.getEpochSecond())
                                         .setNanos(transactionValidStart.getNano()));
     }
+
+    public AccountId getAccountId() {
+        return new AccountId(inner.getAccountIDBuilder());
+    }
+
+    public TransactionID toProto() {
+        return inner.build();
+    }
 }

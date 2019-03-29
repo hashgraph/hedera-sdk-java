@@ -20,6 +20,10 @@ public final class AccountId implements Entity {
                         .setAccountNum(accountNum);
     }
 
+    AccountId(AccountID.Builder inner) {
+        this.inner = inner;
+    }
+
     public long getShardNum() {
         return inner.getShardNum();
     }
@@ -37,7 +41,7 @@ public final class AccountId implements Entity {
         return String.format("%d.%d.%d", getShardNum(), getRealmNum(), getAccountNum());
     }
 
-    AccountID toProto() {
+    public AccountID toProto() {
         return inner.build();
     }
 }

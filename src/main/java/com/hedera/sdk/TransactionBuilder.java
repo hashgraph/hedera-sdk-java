@@ -4,12 +4,13 @@ import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import java.time.Duration;
 import javax.annotation.Nonnull;
 
-abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
-    com.hedera.sdk.proto.Transaction.Builder inner = com.hedera.sdk.proto.Transaction.newBuilder();
+public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
+    protected com.hedera.sdk.proto.Transaction.Builder inner =
+            com.hedera.sdk.proto.Transaction.newBuilder();
 
     private static final int MAX_MEMO_LENGTH = 100;
 
-    TransactionBuilder() {
+    protected TransactionBuilder() {
         // todo: transaction fees should be defaulted to whatever the transaction fee schedule is
         setTransactionFee(100_000);
         setTransactionValidDuration(Duration.ofMinutes(2));
@@ -80,7 +81,7 @@ abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
         return inner.build();
     }
 
-    abstract io.grpc.MethodDescriptor<
+    protected abstract io.grpc.MethodDescriptor<
                     com.hedera.sdk.proto.Transaction, com.hedera.sdk.proto.TransactionResponse>
             getMethod();
 
