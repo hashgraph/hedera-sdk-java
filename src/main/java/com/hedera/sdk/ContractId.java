@@ -30,4 +30,8 @@ public class ContractId implements Key, Entity {
     public com.hedera.sdk.proto.Key toKeyProto() {
         return com.hedera.sdk.proto.Key.newBuilder().setContractID(inner).build();
     }
+
+    public ContractID toProto() {
+        return inner.build();
+    }
 }
