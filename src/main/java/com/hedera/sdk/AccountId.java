@@ -4,7 +4,7 @@ import com.hedera.sdk.proto.AccountID;
 
 // TODO: AccountId.fromString
 
-public final class AccountId {
+public final class AccountId implements Entity {
     final AccountID.Builder inner;
 
     /** Constructs an `AccountId` with `0` for `shard` and `realm` (e.g., `0.0.<accountNum>`). */

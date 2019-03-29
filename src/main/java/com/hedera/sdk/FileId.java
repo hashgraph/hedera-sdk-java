@@ -2,7 +2,7 @@ package com.hedera.sdk;
 
 import com.hedera.sdk.proto.FileID;
 
-public class FileId {
+public class FileId implements Entity {
     transient FileID.Builder inner;
 
     public FileId(long shardNum, long realmNum, long fileNum) {
