@@ -1,6 +1,8 @@
-package com.hedera.sdk;
+package com.hedera.sdk.file;
 
 import com.google.protobuf.ByteString;
+import com.hedera.sdk.TimestampHelper;
+import com.hedera.sdk.TransactionBuilder;
 import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.*;
 import com.hedera.sdk.proto.Transaction;
@@ -38,7 +40,7 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
     }
 
     @Override
-    MethodDescriptor<Transaction, TransactionResponse> getMethod() {
+    protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return FileServiceGrpc.getCreateFileMethod();
     }
 }

@@ -1,6 +1,8 @@
-package com.hedera.sdk;
+package com.hedera.sdk.file;
 
 import com.google.protobuf.ByteString;
+import com.hedera.sdk.FileId;
+import com.hedera.sdk.TransactionBuilder;
 import com.hedera.sdk.proto.FileAppendTransactionBody;
 import com.hedera.sdk.proto.FileServiceGrpc;
 import com.hedera.sdk.proto.Transaction;
@@ -15,7 +17,7 @@ public final class FileAppendTransaction extends TransactionBuilder<FileAppendTr
     }
 
     public FileAppendTransaction setFileId(FileId fileId) {
-        builder.setFileID(fileId.inner);
+        builder.setFileID(fileId.toProto());
         return this;
     }
 
@@ -26,7 +28,7 @@ public final class FileAppendTransaction extends TransactionBuilder<FileAppendTr
     }
 
     @Override
-    MethodDescriptor<Transaction, TransactionResponse> getMethod() {
+    protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return FileServiceGrpc.getAppendContentMethod();
     }
 }

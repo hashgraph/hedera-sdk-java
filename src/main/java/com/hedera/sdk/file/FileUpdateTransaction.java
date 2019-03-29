@@ -1,6 +1,9 @@
-package com.hedera.sdk;
+package com.hedera.sdk.file;
 
 import com.google.protobuf.ByteString;
+import com.hedera.sdk.FileId;
+import com.hedera.sdk.TimestampHelper;
+import com.hedera.sdk.TransactionBuilder;
 import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.*;
 import com.hedera.sdk.proto.Transaction;
@@ -17,7 +20,7 @@ public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransact
     }
 
     public FileUpdateTransaction setFile(FileId file) {
-        builder.setFileID(file.inner);
+        builder.setFileID(file.toProto());
 
         return this;
     }
@@ -41,7 +44,7 @@ public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransact
     }
 
     @Override
-    MethodDescriptor<Transaction, TransactionResponse> getMethod() {
+    protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return FileServiceGrpc.getUpdateFileMethod();
     }
 }

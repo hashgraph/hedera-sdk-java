@@ -1,5 +1,7 @@
-package com.hedera.sdk;
+package com.hedera.sdk.file;
 
+import com.hedera.sdk.FileId;
+import com.hedera.sdk.TransactionBuilder;
 import com.hedera.sdk.proto.FileDeleteTransactionBody;
 import com.hedera.sdk.proto.FileServiceGrpc;
 import com.hedera.sdk.proto.Transaction;
@@ -14,12 +16,12 @@ public final class FileDeleteTransaction extends TransactionBuilder<FileDeleteTr
     }
 
     public FileDeleteTransaction setFileId(FileId fileId) {
-        builder.setFileID(fileId.inner);
+        builder.setFileID(fileId.toProto());
         return this;
     }
 
     @Override
-    MethodDescriptor<Transaction, TransactionResponse> getMethod() {
+    protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return FileServiceGrpc.getDeleteFileMethod();
     }
 }
