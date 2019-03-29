@@ -1,17 +1,20 @@
-package com.hedera.sdk;
+package com.hedera.sdk.account;
 
+import com.hedera.sdk.AccountId;
+import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
-public class CryptoGetAccountRecordsQuery extends QueryBuilder<CryptoGetAccountRecordsResponse> {
+// `CryptoGetAccountRecordsQuery`
+public class AccountRecordsQuery extends QueryBuilder<CryptoGetAccountRecordsResponse> {
     private final com.hedera.sdk.proto.CryptoGetAccountRecordsQuery.Builder builder;
 
-    public CryptoGetAccountRecordsQuery() {
+    public AccountRecordsQuery() {
         super(Response::getCryptoGetAccountRecords);
         builder = inner.getCryptoGetAccountRecordsBuilder();
     }
 
-    public CryptoGetAccountRecordsQuery setAccount(AccountId accountId) {
+    public AccountRecordsQuery setAccount(AccountId accountId) {
         builder.setAccountID(accountId.toProto());
         return this;
     }
@@ -22,7 +25,7 @@ public class CryptoGetAccountRecordsQuery extends QueryBuilder<CryptoGetAccountR
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethod() {
+    protected MethodDescriptor<Query, Response> getMethod() {
         return CryptoServiceGrpc.getGetAccountRecordsMethod();
     }
 }

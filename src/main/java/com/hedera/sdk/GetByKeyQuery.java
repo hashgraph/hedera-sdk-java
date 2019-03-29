@@ -18,7 +18,7 @@ public class GetByKeyQuery extends QueryBuilder<GetByKeyResponse> {
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethod() {
+    protected MethodDescriptor<Query, Response> getMethod() {
         // FIXME there is no service method that corresponds to this query
         throw new Error("not implemented");
     }

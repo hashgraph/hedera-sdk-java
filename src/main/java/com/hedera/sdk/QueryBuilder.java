@@ -9,18 +9,18 @@ import io.grpc.stub.StreamObserver;
 import java.util.concurrent.Future;
 import java.util.function.Function;
 
-abstract class QueryBuilder<Resp> {
-    com.hedera.sdk.proto.Query.Builder inner = com.hedera.sdk.proto.Query.newBuilder();
+public abstract class QueryBuilder<Resp> {
+    protected com.hedera.sdk.proto.Query.Builder inner = com.hedera.sdk.proto.Query.newBuilder();
     private final Function<Response, Resp> mapResponse;
 
-    QueryBuilder(Function<Response, Resp> mapResponse) {
+    protected QueryBuilder(Function<Response, Resp> mapResponse) {
         this.mapResponse = mapResponse;
         getHeaderBuilder().setResponseType(ResponseType.ANSWER_ONLY);
     }
 
     protected abstract QueryHeader.Builder getHeaderBuilder();
 
-    abstract io.grpc.MethodDescriptor<com.hedera.sdk.proto.Query, Response> getMethod();
+    protected abstract io.grpc.MethodDescriptor<com.hedera.sdk.proto.Query, Response> getMethod();
 
     private ClientCall<Query, Response> newClientCall(Client client) {
         return client.getChannel().newCall(getMethod(), CallOptions.DEFAULT);

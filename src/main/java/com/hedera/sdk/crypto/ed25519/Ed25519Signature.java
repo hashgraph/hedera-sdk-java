@@ -1,6 +1,5 @@
 package com.hedera.sdk.crypto.ed25519;
 
-import javax.annotation.Nonnull;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -8,25 +7,22 @@ import org.bouncycastle.util.encoders.Hex;
 public final class Ed25519Signature {
     private final byte[] sigBytes;
 
-    private Ed25519Signature(@Nonnull byte[] sigBytes) {
+    private Ed25519Signature(byte[] sigBytes) {
         this.sigBytes = sigBytes;
     }
 
     /** Recover a signature from its binary representation given by {@link #toBytes()} */
-    @Nonnull
     public static Ed25519Signature fromBytes(byte[] signature) {
         assert signature.length == Ed25519.SIGNATURE_SIZE;
         return new Ed25519Signature(signature);
     }
 
     /** Recover a signature from its text representation given by {@link #toString()} */
-    @Nonnull
     public static Ed25519Signature fromString(String sigString) {
         return fromBytes(Hex.decode(sigString));
     }
 
     /** Calculate an ED25519 signature from the given private key and message bytes. */
-    @Nonnull
     public static Ed25519Signature forMessage(Ed25519PrivateKey privateKey, byte[] message) {
         return forMessage(privateKey, message, 0, message.length);
     }
@@ -35,7 +31,6 @@ public final class Ed25519Signature {
      * Calculate an ED25519 signature from the given private key and message bytes (with offset into
      * the byte array and number of bytes to process).
      */
-    @Nonnull
     public static Ed25519Signature forMessage(
             Ed25519PrivateKey privateKey, byte[] message, int messageOffset, int messageLen) {
         // we don't use the `Ed25519Signer` class because it unnecessarily calculates the public key
@@ -68,7 +63,6 @@ public final class Ed25519Signature {
      * Get the binary representation of this signature. Can be recovered later with {@link
      * #fromBytes}.
      */
-    @Nonnull
     public byte[] toBytes() {
         return sigBytes.clone();
     }

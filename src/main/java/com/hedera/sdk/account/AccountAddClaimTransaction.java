@@ -1,42 +1,47 @@
-package com.hedera.sdk;
+package com.hedera.sdk.account;
 
 import com.google.protobuf.ByteString;
+import com.hedera.sdk.AccountId;
+import com.hedera.sdk.TransactionBuilder;
 import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.*;
 import com.hedera.sdk.proto.Claim;
 import com.hedera.sdk.proto.Transaction;
 import io.grpc.MethodDescriptor;
 
-public final class CryptoAddClaimTransaction extends TransactionBuilder<CryptoAddClaimTransaction> {
+// corresponds to `CryptoAddClaimTransaction`
+public final class AccountAddClaimTransaction
+        extends TransactionBuilder<AccountAddClaimTransaction> {
     private final CryptoAddClaimTransactionBody.Builder builder;
     private final Claim.Builder claim;
     private final KeyList.Builder keyList;
 
-    public CryptoAddClaimTransaction() {
+    public AccountAddClaimTransaction() {
         builder = inner.getBodyBuilder().getCryptoAddClaimBuilder();
         claim = builder.getClaimBuilder();
         keyList = claim.getKeysBuilder();
     }
 
-    public CryptoAddClaimTransaction setAccount(AccountId id) {
+    public AccountAddClaimTransaction setAccount(AccountId id) {
         // fixme: not sure if both need to be used
-        builder.setAccountID(id.inner);
-        claim.setAccountID(id.inner);
+        var protoId = id.toProto();
+        builder.setAccountID(protoId);
+        claim.setAccountID(protoId);
         return this;
     }
 
-    public CryptoAddClaimTransaction setHash(byte[] hash) {
+    public AccountAddClaimTransaction setHash(byte[] hash) {
         claim.setHash(ByteString.copyFrom(hash));
         return this;
     }
 
-    public CryptoAddClaimTransaction addKey(Key key) {
+    public AccountAddClaimTransaction addKey(Key key) {
         keyList.addKeys(key.toKeyProto());
         return this;
     }
 
     @Override
-    MethodDescriptor<Transaction, TransactionResponse> getMethod() {
+    protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return CryptoServiceGrpc.getAddClaimMethod();
     }
 }

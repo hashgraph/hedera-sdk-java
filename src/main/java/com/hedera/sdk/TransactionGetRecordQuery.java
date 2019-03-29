@@ -22,7 +22,7 @@ public class TransactionGetRecordQuery extends QueryBuilder<TransactionGetRecord
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethod() {
+    protected MethodDescriptor<Query, Response> getMethod() {
         // FIXME does not have a corresponding service method
         throw new Error("not implemented");
     }

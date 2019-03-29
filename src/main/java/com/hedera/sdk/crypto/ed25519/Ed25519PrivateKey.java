@@ -3,7 +3,6 @@ package com.hedera.sdk.crypto.ed25519;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.SecureRandom;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -24,12 +23,12 @@ public final class Ed25519PrivateKey {
     // computed from private key and memoized
     @Nullable private Ed25519PublicKey publicKey;
 
-    private Ed25519PrivateKey(@Nonnull Ed25519PrivateKeyParameters privKeyParams) {
+    private Ed25519PrivateKey(Ed25519PrivateKeyParameters privKeyParams) {
         this.privKeyParams = privKeyParams;
     }
 
     private Ed25519PrivateKey(
-            @Nonnull Ed25519PrivateKeyParameters privKeyParams,
+            Ed25519PrivateKeyParameters privKeyParams,
             @Nullable Ed25519PublicKeyParameters pubKeyParams) {
         this.privKeyParams = privKeyParams;
 
@@ -38,7 +37,7 @@ public final class Ed25519PrivateKey {
         }
     }
 
-    static Ed25519PrivateKey fromBytes(@Nonnull byte[] keyBytes) {
+    static Ed25519PrivateKey fromBytes(byte[] keyBytes) {
         Ed25519PrivateKeyParameters privKeyParams;
         Ed25519PublicKeyParameters pubKeyParams = null;
 
@@ -93,27 +92,23 @@ public final class Ed25519PrivateKey {
      * @throws org.bouncycastle.util.encoders.DecoderException if the hex string is invalid
      * @throws RuntimeException if the decoded key was invalid
      */
-    @Nonnull
-    public static Ed25519PrivateKey fromString(@Nonnull String privateKeyString) {
+    public static Ed25519PrivateKey fromString(String privateKeyString) {
         // TODO: catch unchecked `DecoderException`
         var keyBytes = Hex.decode(privateKeyString);
         return fromBytes(keyBytes);
     }
 
     /** @return a new private key using {@link java.security.SecureRandom} */
-    @Nonnull
     public static Ed25519PrivateKey generate() {
         return generate(new SecureRandom());
     }
 
     /** @return a new private key using the given {@link java.security.SecureRandom} */
-    @Nonnull
-    public static Ed25519PrivateKey generate(@Nonnull SecureRandom secureRandom) {
+    public static Ed25519PrivateKey generate(SecureRandom secureRandom) {
         return new Ed25519PrivateKey(new Ed25519PrivateKeyParameters(secureRandom));
     }
 
     /** @return the public key counterpart of this private key to share with the hashgraph */
-    @Nonnull
     public Ed25519PublicKey getPublicKey() {
         if (publicKey == null) {
             publicKey = new Ed25519PublicKey(privKeyParams.generatePublicKey());
@@ -122,13 +117,11 @@ public final class Ed25519PrivateKey {
         return publicKey;
     }
 
-    @Nonnull
     byte[] toBytes() {
         return privKeyParams.getEncoded();
     }
 
     @Override
-    @Nonnull
     public String toString() {
         PrivateKeyInfo privateKeyInfo;
         try {

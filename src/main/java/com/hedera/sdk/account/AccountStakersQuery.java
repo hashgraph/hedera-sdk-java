@@ -1,17 +1,20 @@
-package com.hedera.sdk;
+package com.hedera.sdk.account;
 
+import com.hedera.sdk.AccountId;
+import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
-public class CryptoGetStakersQuery extends QueryBuilder<CryptoGetStakersResponse> {
+// `CryptoGetStakersQuery`
+public class AccountStakersQuery extends QueryBuilder<CryptoGetStakersResponse> {
     private final com.hedera.sdk.proto.CryptoGetStakersQuery.Builder builder;
 
-    public CryptoGetStakersQuery() {
+    public AccountStakersQuery() {
         super(Response::getCryptoGetProxyStakers);
         builder = inner.getCryptoGetProxyStakersBuilder();
     }
 
-    public CryptoGetStakersQuery setAccount(AccountId accountId) {
+    public AccountStakersQuery setAccount(AccountId accountId) {
         builder.setAccountID(accountId.toProto());
         return this;
     }
@@ -22,7 +25,7 @@ public class CryptoGetStakersQuery extends QueryBuilder<CryptoGetStakersResponse
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethod() {
+    protected MethodDescriptor<Query, Response> getMethod() {
         return CryptoServiceGrpc.getGetStakersByAccountIDMethod();
     }
 }

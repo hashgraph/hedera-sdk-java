@@ -21,7 +21,7 @@ public class FileId implements Entity {
         return inner.getFileNum();
     }
 
-    FileID toProto() {
+    public FileID toProto() {
         return inner.build();
     }
 }

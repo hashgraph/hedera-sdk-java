@@ -1,12 +1,15 @@
-package com.hedera.sdk;
+package com.hedera.sdk.file;
 
+import com.hedera.sdk.FileId;
+import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
-public class FileGetInfoQuery extends QueryBuilder<FileGetInfoResponse> {
+// `FileGetInfoQuery`
+public class FileInfoQuery extends QueryBuilder<FileGetInfoResponse> {
     private final com.hedera.sdk.proto.FileGetInfoQuery.Builder builder;
 
-    public FileGetInfoQuery() {
+    public FileInfoQuery() {
         super(Response::getFileGetInfo);
         builder = inner.getFileGetInfoBuilder();
     }
@@ -16,13 +19,13 @@ public class FileGetInfoQuery extends QueryBuilder<FileGetInfoResponse> {
         return builder.getHeaderBuilder();
     }
 
-    public FileGetInfoQuery setFileId(FileId fileId) {
-        builder.setFileID(fileId.inner);
+    public FileInfoQuery setFileId(FileId fileId) {
+        builder.setFileID(fileId.toProto());
         return this;
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethod() {
+    protected MethodDescriptor<Query, Response> getMethod() {
         return FileServiceGrpc.getGetFileInfoMethod();
     }
 }

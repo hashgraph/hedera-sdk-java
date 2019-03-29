@@ -8,12 +8,12 @@ import java.time.Instant;
 
 public final class AdminDeleteTransaction extends TransactionBuilder<AdminDeleteTransaction> {
     public AdminDeleteTransaction setID(FileId fileId) {
-        inner.getBodyBuilder().getAdminDeleteBuilder().setFileID(fileId.inner);
+        inner.getBodyBuilder().getAdminDeleteBuilder().setFileID(fileId.toProto());
         return this;
     }
 
     public AdminDeleteTransaction setID(ContractId contractId) {
-        inner.getBodyBuilder().getAdminDeleteBuilder().setContractID(contractId.inner);
+        inner.getBodyBuilder().getAdminDeleteBuilder().setContractID(contractId.toProto());
         return this;
     }
 
@@ -25,7 +25,7 @@ public final class AdminDeleteTransaction extends TransactionBuilder<AdminDelete
     }
 
     @Override
-    MethodDescriptor<Transaction, TransactionResponse> getMethod() {
+    protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return FileServiceGrpc.getAdminDeleteMethod();
     }
 }

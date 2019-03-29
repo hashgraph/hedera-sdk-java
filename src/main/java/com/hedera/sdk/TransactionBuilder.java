@@ -2,14 +2,14 @@ package com.hedera.sdk;
 
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import java.time.Duration;
-import javax.annotation.Nonnull;
 
-abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
-    com.hedera.sdk.proto.Transaction.Builder inner = com.hedera.sdk.proto.Transaction.newBuilder();
+public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
+    protected com.hedera.sdk.proto.Transaction.Builder inner =
+            com.hedera.sdk.proto.Transaction.newBuilder();
 
     private static final int MAX_MEMO_LENGTH = 100;
 
-    TransactionBuilder() {
+    protected TransactionBuilder() {
         // todo: transaction fees should be defaulted to whatever the transaction fee schedule is
         setTransactionFee(100_000);
         setTransactionValidDuration(Duration.ofMinutes(2));
@@ -20,13 +20,13 @@ abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
      * transaction fee). If two transactions have the same transactionID, they won't both have an
      * effect.
      */
-    public T setTransactionId(@Nonnull TransactionId transactionId) {
+    public T setTransactionId(TransactionId transactionId) {
         inner.getBodyBuilder().setTransactionID(transactionId.inner);
         return self();
     }
 
     /** Sets the account of the node that submits the transaction to the network. */
-    public final T setNodeAccountId(@Nonnull AccountId accountId) {
+    public final T setNodeAccountId(AccountId accountId) {
         inner.getBodyBuilder().setNodeAccountID(accountId.inner);
         return self();
     }
@@ -80,7 +80,7 @@ abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
         return inner.build();
     }
 
-    abstract io.grpc.MethodDescriptor<
+    protected abstract io.grpc.MethodDescriptor<
                     com.hedera.sdk.proto.Transaction, com.hedera.sdk.proto.TransactionResponse>
             getMethod();
 
