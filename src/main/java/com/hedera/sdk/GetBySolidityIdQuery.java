@@ -22,7 +22,7 @@ public class GetBySolidityIdQuery extends QueryBuilder<GetBySolidityIDResponse> 
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethod() {
+    protected MethodDescriptor<Query, Response> getMethod() {
         return SmartContractServiceGrpc.getGetBySolidityIDMethod();
     }
 }

@@ -22,7 +22,7 @@ public class TransactionGetFastRecordQuery extends QueryBuilder<TransactionGetFa
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethod() {
+    protected MethodDescriptor<Query, Response> getMethod() {
         return CryptoServiceGrpc.getGetFastTransactionRecordMethod();
     }
 }
