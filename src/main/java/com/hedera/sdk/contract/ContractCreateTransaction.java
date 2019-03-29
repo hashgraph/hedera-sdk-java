@@ -1,6 +1,10 @@
-package com.hedera.sdk;
+package com.hedera.sdk.contract;
 
 import com.google.protobuf.ByteString;
+import com.hedera.sdk.AccountId;
+import com.hedera.sdk.DurationHelper;
+import com.hedera.sdk.FileId;
+import com.hedera.sdk.TransactionBuilder;
 import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.*;
 import com.hedera.sdk.proto.Transaction;
@@ -14,7 +18,7 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
     }
 
     @Override
-    MethodDescriptor<Transaction, TransactionResponse> getMethod() {
+    protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return SmartContractServiceGrpc.getCreateContractMethod();
     }
 

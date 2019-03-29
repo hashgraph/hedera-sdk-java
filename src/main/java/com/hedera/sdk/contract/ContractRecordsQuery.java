@@ -1,17 +1,20 @@
-package com.hedera.sdk;
+package com.hedera.sdk.contract;
 
+import com.hedera.sdk.ContractId;
+import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
-public class ContractGetRecordsQuery extends QueryBuilder<ContractGetRecordsResponse> {
+// `ContractGetRecordsQuery`
+public class ContractRecordsQuery extends QueryBuilder<ContractGetRecordsResponse> {
     private final com.hedera.sdk.proto.ContractGetRecordsQuery.Builder builder;
 
-    public ContractGetRecordsQuery() {
+    public ContractRecordsQuery() {
         super(Response::getContractGetRecordsResponse);
         builder = inner.getContractGetRecordsBuilder();
     }
 
-    public ContractGetRecordsQuery setContract(ContractId contractId) {
+    public ContractRecordsQuery setContract(ContractId contractId) {
         builder.setContractID(contractId.toProto());
         return this;
     }
@@ -22,7 +25,7 @@ public class ContractGetRecordsQuery extends QueryBuilder<ContractGetRecordsResp
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethod() {
+    protected MethodDescriptor<Query, Response> getMethod() {
         return SmartContractServiceGrpc.getGetTxRecordByContractIDMethod();
     }
 }

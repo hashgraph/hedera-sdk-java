@@ -1,5 +1,6 @@
-package com.hedera.sdk;
+package com.hedera.sdk.contract;
 
+import com.hedera.sdk.*;
 import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.ContractUpdateTransactionBody;
 import com.hedera.sdk.proto.SmartContractServiceGrpc;
@@ -17,7 +18,7 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
     }
 
     public ContractUpdateTransaction setContract(ContractId contract) {
-        builder.setContractID(contract.inner);
+        builder.setContractID(contract.toProto());
         return this;
     }
 
@@ -33,7 +34,7 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
     }
 
     public ContractUpdateTransaction SetProxyAccount(AccountId account) {
-        builder.setProxyAccountID(account.inner);
+        builder.setProxyAccountID(account.toProto());
         return this;
     }
 
@@ -46,12 +47,12 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
     }
 
     public ContractUpdateTransaction setFile(FileId file) {
-        builder.setFileID(file.inner);
+        builder.setFileID(file.toProto());
         return this;
     }
 
     @Override
-    MethodDescriptor<Transaction, TransactionResponse> getMethod() {
+    protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return SmartContractServiceGrpc.getUpdateContractMethod();
     }
 }

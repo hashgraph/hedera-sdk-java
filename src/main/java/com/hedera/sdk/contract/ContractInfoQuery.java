@@ -1,12 +1,15 @@
-package com.hedera.sdk;
+package com.hedera.sdk.contract;
 
+import com.hedera.sdk.ContractId;
+import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
-public final class ContractGetInfoQuery extends QueryBuilder<ContractGetInfoResponse> {
+// `ContractGetInfoQuery`
+public final class ContractInfoQuery extends QueryBuilder<ContractGetInfoResponse> {
     private final com.hedera.sdk.proto.ContractGetInfoQuery.Builder builder;
 
-    public ContractGetInfoQuery() {
+    public ContractInfoQuery() {
         super(Response::getContractGetInfo);
         builder = inner.getContractGetInfoBuilder();
     }
@@ -16,13 +19,13 @@ public final class ContractGetInfoQuery extends QueryBuilder<ContractGetInfoResp
         return builder.getHeaderBuilder();
     }
 
-    public ContractGetInfoQuery setContract(ContractId contract) {
-        builder.setContractID(contract.inner);
+    public ContractInfoQuery setContract(ContractId contract) {
+        builder.setContractID(contract.toProto());
         return this;
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethod() {
+    public MethodDescriptor<Query, Response> getMethod() {
         return SmartContractServiceGrpc.getGetContractInfoMethod();
     }
 }

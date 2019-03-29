@@ -1,13 +1,16 @@
-package com.hedera.sdk;
+package com.hedera.sdk.contract;
 
 import com.google.protobuf.ByteString;
+import com.hedera.sdk.ContractId;
+import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
-public class ContractCallLocalQuery extends QueryBuilder<ContractCallLocalResponse> {
+// `ContractCallLocalQuery`
+public class ContractCallLocalMethodQuery extends QueryBuilder<ContractCallLocalResponse> {
     private final com.hedera.sdk.proto.ContractCallLocalQuery.Builder builder;
 
-    ContractCallLocalQuery() {
+    public ContractCallLocalMethodQuery() {
         super(Response::getContractCallLocal);
         builder = inner.getContractCallLocalBuilder();
     }
@@ -18,26 +21,26 @@ public class ContractCallLocalQuery extends QueryBuilder<ContractCallLocalRespon
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethod() {
+    protected MethodDescriptor<Query, Response> getMethod() {
         return SmartContractServiceGrpc.getContractCallLocalMethodMethod();
     }
 
-    public ContractCallLocalQuery setContract(ContractId id) {
-        builder.setContractID(id.inner);
+    public ContractCallLocalMethodQuery setContract(ContractId id) {
+        builder.setContractID(id.toProto());
         return this;
     }
 
-    public ContractCallLocalQuery setGas(long gas) {
+    public ContractCallLocalMethodQuery setGas(long gas) {
         builder.setGas(gas);
         return this;
     }
 
-    public ContractCallLocalQuery setFunctionParameters(byte[] parameters) {
+    public ContractCallLocalMethodQuery setFunctionParameters(byte[] parameters) {
         builder.setFunctionParameters(ByteString.copyFrom(parameters));
         return this;
     }
 
-    public ContractCallLocalQuery setMaxResultSize(long size) {
+    public ContractCallLocalMethodQuery setMaxResultSize(long size) {
         builder.setMaxResultSize(size);
         return this;
     }
