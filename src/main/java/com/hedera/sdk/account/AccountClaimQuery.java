@@ -1,15 +1,16 @@
 package com.hedera.sdk.account;
 
+import com.google.protobuf.ByteString;
 import com.hedera.sdk.AccountId;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 // `CryptoGetClaimQuery`
-public final class AccountSingleClaimQuery extends QueryBuilder<CryptoGetClaimResponse> {
+public final class AccountClaimQuery extends QueryBuilder<CryptoGetClaimResponse> {
     private final com.hedera.sdk.proto.CryptoGetClaimQuery.Builder builder;
 
-    public AccountSingleClaimQuery() {
+    public AccountClaimQuery() {
         super(Response::getCryptoGetClaim);
         builder = inner.getCryptoGetClaimBuilder();
     }
@@ -19,8 +20,13 @@ public final class AccountSingleClaimQuery extends QueryBuilder<CryptoGetClaimRe
         return builder.getHeaderBuilder();
     }
 
-    public AccountSingleClaimQuery setAccount(AccountId account) {
+    public AccountClaimQuery setAccount(AccountId account) {
         builder.setAccountID(account.toProto());
+        return this;
+    }
+
+    public AccountClaimQuery setHash(byte[] hash) {
+        builder.setHash(ByteString.copyFrom(hash));
         return this;
     }
 
