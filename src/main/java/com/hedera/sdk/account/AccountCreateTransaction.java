@@ -8,7 +8,6 @@ import com.hedera.sdk.proto.*;
 import com.hedera.sdk.proto.Transaction;
 import io.grpc.MethodDescriptor;
 import java.time.Duration;
-import javax.annotation.Nonnull;
 
 // Corresponds to `CryptoCreateTransaction`
 public final class AccountCreateTransaction extends TransactionBuilder<AccountCreateTransaction> {
@@ -29,7 +28,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
     }
 
     @Override
-    public AccountCreateTransaction setTransactionId(@Nonnull TransactionId transactionId) {
+    public AccountCreateTransaction setTransactionId(TransactionId transactionId) {
         // Setting the transaction ID defaults the shard and realm IDs
         // If you truly want to create a _new_ realm, then you need to null the realm after setting
         // this
@@ -86,7 +85,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
         return this;
     }
 
-    public AccountCreateTransaction setAutoRenewPeriod(@Nonnull Duration autoRenewPeriod) {
+    public AccountCreateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         builder.setAutoRenewPeriod(
                 com.hedera.sdk.proto.Duration.newBuilder()
                         .setSeconds(autoRenewPeriod.getSeconds())

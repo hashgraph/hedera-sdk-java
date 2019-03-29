@@ -3,7 +3,6 @@ package com.hedera.sdk.crypto.ed25519;
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.crypto.Key;
 import java.io.IOException;
-import javax.annotation.Nonnull;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
@@ -21,7 +20,7 @@ import org.bouncycastle.util.encoders.Hex;
 public final class Ed25519PublicKey implements Key {
     private final Ed25519PublicKeyParameters pubKeyParams;
 
-    Ed25519PublicKey(@Nonnull Ed25519PublicKeyParameters pubKeyParams) {
+    Ed25519PublicKey(Ed25519PublicKeyParameters pubKeyParams) {
         this.pubKeyParams = pubKeyParams;
     }
 

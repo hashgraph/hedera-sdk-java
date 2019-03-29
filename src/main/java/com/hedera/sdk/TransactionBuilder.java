@@ -2,7 +2,6 @@ package com.hedera.sdk;
 
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import java.time.Duration;
-import javax.annotation.Nonnull;
 
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     protected com.hedera.sdk.proto.Transaction.Builder inner =
@@ -21,13 +20,13 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
      * transaction fee). If two transactions have the same transactionID, they won't both have an
      * effect.
      */
-    public T setTransactionId(@Nonnull TransactionId transactionId) {
+    public T setTransactionId(TransactionId transactionId) {
         inner.getBodyBuilder().setTransactionID(transactionId.inner);
         return self();
     }
 
     /** Sets the account of the node that submits the transaction to the network. */
-    public final T setNodeAccountId(@Nonnull AccountId accountId) {
+    public final T setNodeAccountId(AccountId accountId) {
         inner.getBodyBuilder().setNodeAccountID(accountId.inner);
         return self();
     }
