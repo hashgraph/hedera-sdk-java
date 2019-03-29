@@ -25,7 +25,7 @@ class HederaCryptoKeyPairTest3 {
 	final void testPublicPrivateEncodedRecover() {
 		// generate a new key
 		firstPair = new HederaKeyPair(KeyType.ED25519);
-		byte[] privateSeed = firstPair.getSecretKeySeed();
+		byte[] privateSeed = firstPair.getSecretKey();
 		byte[] publicKey = firstPair.getPublicKey();
 		
 		// regenerate using public/private - NON ENCODED

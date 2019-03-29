@@ -12,6 +12,4 @@ public interface KeyPair {
 	String getPublicKeyEncodedHex();
 	String getPrivateKeyHex();
 	String getPublicKeyHex();
-	byte[] getPrivateKeySeed();
-	String getPrivateKeySeedHex();
 }

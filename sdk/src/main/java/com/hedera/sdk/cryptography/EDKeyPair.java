@@ -86,7 +86,7 @@ public class EDKeyPair implements KeyPair {
 	@Override
 	public byte[] getPrivateKey() {
 		if (this.edPrivateKey != null) {
-			return this.edPrivateKey.geta();
+			return this.edPrivateKey.getSeed();
 		} else {
 			return null;
 		}
@@ -150,14 +150,6 @@ public class EDKeyPair implements KeyPair {
 			return "";
 		}
 	}
-    @Override
-    public byte[] getPrivateKeySeed() {
-        return edPrivateKey.getSeed();
-    }
-    @Override
-    public String getPrivateKeySeedHex() {
-        return Hex.toHexString(edPrivateKey.getSeed());
-    }
 	@Override
 	public byte[] getSeedAndPublicKey() {
 		
