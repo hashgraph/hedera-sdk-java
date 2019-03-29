@@ -6,11 +6,12 @@ import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
+/** Call a function without updating its state or requiring concensus */
 // `ContractCallLocalQuery`
-public class ContractCallLocalMethodQuery extends QueryBuilder<ContractCallLocalResponse> {
+public class ContractCallQuery extends QueryBuilder<ContractCallLocalResponse> {
     private final com.hedera.sdk.proto.ContractCallLocalQuery.Builder builder;
 
-    public ContractCallLocalMethodQuery() {
+    public ContractCallQuery() {
         super(Response::getContractCallLocal);
         builder = inner.getContractCallLocalBuilder();
     }
@@ -25,22 +26,22 @@ public class ContractCallLocalMethodQuery extends QueryBuilder<ContractCallLocal
         return SmartContractServiceGrpc.getContractCallLocalMethodMethod();
     }
 
-    public ContractCallLocalMethodQuery setContract(ContractId id) {
+    public ContractCallQuery setContract(ContractId id) {
         builder.setContractID(id.toProto());
         return this;
     }
 
-    public ContractCallLocalMethodQuery setGas(long gas) {
+    public ContractCallQuery setGas(long gas) {
         builder.setGas(gas);
         return this;
     }
 
-    public ContractCallLocalMethodQuery setFunctionParameters(byte[] parameters) {
+    public ContractCallQuery setFunctionParameters(byte[] parameters) {
         builder.setFunctionParameters(ByteString.copyFrom(parameters));
         return this;
     }
 
-    public ContractCallLocalMethodQuery setMaxResultSize(long size) {
+    public ContractCallQuery setMaxResultSize(long size) {
         builder.setMaxResultSize(size);
         return this;
     }

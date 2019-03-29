@@ -9,31 +9,32 @@ import com.hedera.sdk.proto.Transaction;
 import com.hedera.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
-// `ContractCallMethodTransaction`
-public final class ContractCallMethodTransaction
-        extends TransactionBuilder<ContractCallMethodTransaction> {
+/** Call a function in the contract, updating its internal state in the hashgraph. */
+// `ContractCallTransaction`
+public final class ContractExecuteTransaction
+        extends TransactionBuilder<ContractExecuteTransaction> {
     private final ContractCallTransactionBody.Builder builder;
 
-    public ContractCallMethodTransaction() {
+    public ContractExecuteTransaction() {
         builder = inner.getBodyBuilder().getContractCallBuilder();
     }
 
-    public ContractCallMethodTransaction setContract(ContractId contractId) {
+    public ContractExecuteTransaction setContract(ContractId contractId) {
         builder.setContractID(contractId.toProto());
         return this;
     }
 
-    public ContractCallMethodTransaction setGas(long gas) {
+    public ContractExecuteTransaction setGas(long gas) {
         builder.setGas(gas);
         return this;
     }
 
-    public ContractCallMethodTransaction setAmount(long amount) {
+    public ContractExecuteTransaction setAmount(long amount) {
         builder.setAmount(amount);
         return this;
     }
 
-    public ContractCallMethodTransaction setFunctionParameters(byte[] functionParameters) {
+    public ContractExecuteTransaction setFunctionParameters(byte[] functionParameters) {
         builder.setFunctionParameters(ByteString.copyFrom(functionParameters));
         return this;
     }
