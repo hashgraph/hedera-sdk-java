@@ -62,6 +62,12 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
     }
 
     @Override
+    protected void doValidate() {
+        require(builder.getAccountIDToUpdateOrBuilder(), ".setAccountForUpdate() required");
+        require(builder.getKeyOrBuilder(), ".setKey() required");
+    }
+
+    @Override
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return CryptoServiceGrpc.getUpdateAccountMethod();
     }

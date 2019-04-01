@@ -9,7 +9,7 @@ import io.grpc.stub.StreamObserver;
 import java.util.concurrent.Future;
 import java.util.function.Function;
 
-public abstract class QueryBuilder<Resp> {
+public abstract class QueryBuilder<Resp> extends ValidatedBuilder {
     protected com.hedera.sdk.proto.Query.Builder inner = com.hedera.sdk.proto.Query.newBuilder();
     private final Function<Response, Resp> mapResponse;
 
@@ -79,5 +79,15 @@ public abstract class QueryBuilder<Resp> {
 
         @Override
         public void onCompleted() {}
+    }
+
+    protected abstract void doValidate();
+
+    /** Check that the query was built properly, throwing an exception on any errors. */
+    @Override
+    public final void validate() {
+        require(getHeaderBuilder().getPaymentBuilder(), ".setPayment() required");
+        doValidate();
+        checkValidationErrors("query builder failed validation");
     }
 }

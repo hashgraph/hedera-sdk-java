@@ -28,4 +28,9 @@ public class FileInfoQuery extends QueryBuilder<FileGetInfoResponse> {
     protected MethodDescriptor<Query, Response> getMethod() {
         return FileServiceGrpc.getGetFileInfoMethod();
     }
+
+    @Override
+    protected void doValidate() {
+        require(builder.getFileIDOrBuilder(), ".setFileId()");
+    }
 }

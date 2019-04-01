@@ -45,4 +45,9 @@ public class ContractCallQuery extends QueryBuilder<ContractCallLocalResponse> {
         builder.setMaxResultSize(size);
         return this;
     }
+
+    @Override
+    protected void doValidate() {
+        require(builder.getContractIDOrBuilder(), ".setContract() required");
+    }
 }

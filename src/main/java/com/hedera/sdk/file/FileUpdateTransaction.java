@@ -47,4 +47,10 @@ public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransact
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return FileServiceGrpc.getUpdateFileMethod();
     }
+
+    @Override
+    protected void doValidate() {
+        require(builder.getFileID(), ".setFileId()");
+        require(builder.getKeysOrBuilder().getKeysOrBuilderList(), ".addKey()");
+    }
 }

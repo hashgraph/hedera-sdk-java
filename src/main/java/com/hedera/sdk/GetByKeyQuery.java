@@ -4,7 +4,7 @@ import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
-public class GetByKeyQuery extends QueryBuilder<GetByKeyResponse> {
+public final class GetByKeyQuery extends QueryBuilder<GetByKeyResponse> {
     private final com.hedera.sdk.proto.GetByKeyQuery.Builder builder;
 
     GetByKeyQuery() {
@@ -21,6 +21,11 @@ public class GetByKeyQuery extends QueryBuilder<GetByKeyResponse> {
     protected MethodDescriptor<Query, Response> getMethod() {
         // FIXME there is no service method that corresponds to this query
         throw new Error("not implemented");
+    }
+
+    @Override
+    protected void doValidate() {
+        require(builder.getKeyOrBuilder(), ".setKey() required");
     }
 
     public GetByKeyQuery setKey(Key publicKey) {

@@ -25,6 +25,11 @@ public final class ContractBytecodeQuery extends QueryBuilder<ContractGetBytecod
     }
 
     @Override
+    protected void doValidate() {
+        require(builder.getContractIDOrBuilder(), ".setContract() required");
+    }
+
+    @Override
     protected MethodDescriptor<Query, Response> getMethod() {
         return SmartContractServiceGrpc.getContractGetBytecodeMethod();
     }

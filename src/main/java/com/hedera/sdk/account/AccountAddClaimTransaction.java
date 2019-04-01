@@ -41,6 +41,13 @@ public final class AccountAddClaimTransaction
     }
 
     @Override
+    protected void doValidate() {
+        require(builder.getAccountIDOrBuilder(), ".setAccount() required");
+        require(claim.getHash(), ".setHash() required");
+        require(claim.getKeysOrBuilder().getKeysOrBuilderList(), ".addKey() required");
+    }
+
+    @Override
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return CryptoServiceGrpc.getAddClaimMethod();
     }

@@ -3,7 +3,7 @@ package com.hedera.sdk;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
-public class GetBySolidityIdQuery extends QueryBuilder<GetBySolidityIDResponse> {
+public final class GetBySolidityIdQuery extends QueryBuilder<GetBySolidityIDResponse> {
     private final GetBySolidityIDQuery.Builder builder;
 
     public GetBySolidityIdQuery() {
@@ -24,5 +24,10 @@ public class GetBySolidityIdQuery extends QueryBuilder<GetBySolidityIDResponse> 
     @Override
     protected MethodDescriptor<Query, Response> getMethod() {
         return SmartContractServiceGrpc.getGetBySolidityIDMethod();
+    }
+
+    @Override
+    protected void doValidate() {
+        require(builder.getSolidityID(), ".setSolidityId() required");
     }
 }

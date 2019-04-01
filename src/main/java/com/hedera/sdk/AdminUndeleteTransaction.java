@@ -1,23 +1,40 @@
 package com.hedera.sdk;
 
+import com.hedera.sdk.proto.AdminUndeleteTransactionBody;
 import com.hedera.sdk.proto.FileServiceGrpc;
 import com.hedera.sdk.proto.Transaction;
 import com.hedera.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 public final class AdminUndeleteTransaction extends TransactionBuilder<AdminUndeleteTransaction> {
+
+    private final AdminUndeleteTransactionBody.Builder builder;
+
+    public AdminUndeleteTransaction() {
+        builder = inner.getBodyBuilder().getAdminUndeleteBuilder();
+    }
+
     public AdminUndeleteTransaction setID(FileId fileId) {
-        inner.getBodyBuilder().getAdminUndeleteBuilder().setFileID(fileId.toProto());
+        builder.setFileID(fileId.toProto());
         return this;
     }
 
     public AdminUndeleteTransaction setID(ContractId contractId) {
-        inner.getBodyBuilder().getAdminUndeleteBuilder().setContractID(contractId.toProto());
+        builder.setContractID(contractId.toProto());
         return this;
     }
 
     @Override
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return FileServiceGrpc.getAdminUndeleteMethod();
+    }
+
+    @Override
+    protected void doValidate() {
+        requireExactlyOne(
+                ".setID() required",
+                ".setID() may take a contract ID OR a file ID",
+                builder.getContractIDOrBuilder(),
+                builder.getFileIDOrBuilder());
     }
 }

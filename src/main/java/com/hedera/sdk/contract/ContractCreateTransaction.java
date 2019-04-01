@@ -77,4 +77,9 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
         builder.setNewRealmAdminKey(newRealmAdminKey.toKeyProto());
         return this;
     }
+
+    @Override
+    protected void doValidate() {
+        require(builder.getFileIDOrBuilder(), ".setBytecodeFile() required");
+    }
 }

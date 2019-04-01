@@ -28,4 +28,9 @@ public class ContractRecordsQuery extends QueryBuilder<ContractGetRecordsRespons
     protected MethodDescriptor<Query, Response> getMethod() {
         return SmartContractServiceGrpc.getGetTxRecordByContractIDMethod();
     }
+
+    @Override
+    protected void doValidate() {
+        require(builder.getContractIDOrBuilder(), ".setContract() required");
+    }
 }

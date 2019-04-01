@@ -43,4 +43,9 @@ public final class ContractExecuteTransaction
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return SmartContractServiceGrpc.getContractCallMethodMethod();
     }
+
+    @Override
+    protected void doValidate() {
+        require(builder.getContractIDOrBuilder(), ".setContract() required");
+    }
 }

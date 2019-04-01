@@ -26,4 +26,9 @@ public class TransactionGetRecordQuery extends QueryBuilder<TransactionGetRecord
         // FIXME does not have a corresponding service method
         throw new Error("not implemented");
     }
+
+    @Override
+    protected void doValidate() {
+        require(builder.getTransactionIDOrBuilder(), ".setTransaction() required");
+    }
 }

@@ -25,6 +25,11 @@ public class AccountRecordsQuery extends QueryBuilder<CryptoGetAccountRecordsRes
     }
 
     @Override
+    protected void doValidate() {
+        require(builder.getAccountIDOrBuilder(), ".setAccount() required");
+    }
+
+    @Override
     protected MethodDescriptor<Query, Response> getMethod() {
         return CryptoServiceGrpc.getGetAccountRecordsMethod();
     }

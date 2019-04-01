@@ -112,6 +112,11 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
     }
 
     @Override
+    protected void doValidate() {
+        require(builder.getKeyOrBuilder(), ".setKey() required");
+    }
+
+    @Override
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return CryptoServiceGrpc.getCreateAccountMethod();
     }

@@ -24,4 +24,9 @@ public final class FileDeleteTransaction extends TransactionBuilder<FileDeleteTr
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return FileServiceGrpc.getDeleteFileMethod();
     }
+
+    @Override
+    protected void doValidate() {
+        require(builder.getFileIDOrBuilder(), ".setFileId()");
+    }
 }
