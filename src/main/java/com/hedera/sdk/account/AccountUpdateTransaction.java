@@ -18,7 +18,8 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
     private final CryptoUpdateTransactionBody.Builder builder;
 
     public AccountUpdateTransaction() {
-        builder = inner.getBodyBuilder().getCryptoUpdateAccountBuilder();
+        builder = inner.getBodyBuilder()
+            .getCryptoUpdateAccountBuilder();
     }
 
     public AccountUpdateTransaction setAccountforUpdate(AccountId accountId) {

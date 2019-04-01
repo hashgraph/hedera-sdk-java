@@ -9,12 +9,14 @@ public final class TimestampHelper {
 
     public static Timestamp timestampFrom(Instant timestamp) {
         return Timestamp.newBuilder()
-                .setSeconds(timestamp.getEpochSecond())
-                .setNanos(timestamp.getNano())
-                .build();
+            .setSeconds(timestamp.getEpochSecond())
+            .setNanos(timestamp.getNano())
+            .build();
     }
 
     public static TimestampSeconds timestampSecondsFrom(Instant timestamp) {
-        return TimestampSeconds.newBuilder().setSeconds(timestamp.getEpochSecond()).build();
+        return TimestampSeconds.newBuilder()
+            .setSeconds(timestamp.getEpochSecond())
+            .build();
     }
 }

@@ -14,7 +14,8 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
     private final ContractUpdateTransactionBody.Builder builder;
 
     public ContractUpdateTransaction() {
-        builder = inner.getBodyBuilder().getContractUpdateInstanceBuilder();
+        builder = inner.getBodyBuilder()
+            .getContractUpdateInstanceBuilder();
     }
 
     public ContractUpdateTransaction setContract(ContractId contract) {
@@ -40,9 +41,10 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
 
     public ContractUpdateTransaction setAutoRenewPeriod(Duration duration) {
         builder.setAutoRenewPeriod(
-                com.hedera.sdk.proto.Duration.newBuilder()
-                        .setSeconds(duration.getSeconds())
-                        .setNanos(duration.getNano()));
+            com.hedera.sdk.proto.Duration.newBuilder()
+                .setSeconds(duration.getSeconds())
+                .setNanos(duration.getNano())
+        );
         return this;
     }
 

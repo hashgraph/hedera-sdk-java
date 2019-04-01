@@ -16,7 +16,11 @@ public final class Client {
     public Client(Iterable<String> targets) {
         var channelList = new ArrayList<ManagedChannel>();
         for (String target : targets) {
-            channelList.add(ManagedChannelBuilder.forTarget(target).usePlaintext().build());
+            channelList.add(
+                ManagedChannelBuilder.forTarget(target)
+                    .usePlaintext()
+                    .build()
+            );
         }
 
         assert !channelList.isEmpty();

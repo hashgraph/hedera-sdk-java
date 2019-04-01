@@ -14,7 +14,8 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
     private final KeyList.Builder keyList;
 
     public FileCreateTransaction() {
-        builder = inner.getBodyBuilder().getFileCreateBuilder();
+        builder = inner.getBodyBuilder()
+            .getFileCreateBuilder();
         keyList = builder.getKeysBuilder();
     }
 
@@ -45,6 +46,10 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
 
     @Override
     protected void doValidate() {
-        require(builder.getKeysOrBuilder().getKeysOrBuilderList(), ".addKey() required");
+        require(
+            builder.getKeysOrBuilder()
+                .getKeysOrBuilderList(),
+            ".addKey() required"
+        );
     }
 }

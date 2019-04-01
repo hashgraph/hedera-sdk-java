@@ -7,8 +7,8 @@ public final class DurationHelper {
 
     public static Duration durationFrom(java.time.Duration duration) {
         return Duration.newBuilder()
-                .setSeconds(duration.getSeconds())
-                .setNanos(duration.getNano())
-                .build();
+            .setSeconds(duration.getSeconds())
+            .setNanos(duration.getNano())
+            .build();
     }
 }

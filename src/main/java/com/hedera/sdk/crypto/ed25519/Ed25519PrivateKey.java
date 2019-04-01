@@ -21,15 +21,14 @@ import org.bouncycastle.util.encoders.Hex;
 public final class Ed25519PrivateKey {
     final Ed25519PrivateKeyParameters privKeyParams;
     // computed from private key and memoized
-    @Nullable private Ed25519PublicKey publicKey;
+    @Nullable
+    private Ed25519PublicKey publicKey;
 
     private Ed25519PrivateKey(Ed25519PrivateKeyParameters privKeyParams) {
         this.privKeyParams = privKeyParams;
     }
 
-    private Ed25519PrivateKey(
-            Ed25519PrivateKeyParameters privKeyParams,
-            @Nullable Ed25519PublicKeyParameters pubKeyParams) {
+    private Ed25519PrivateKey(Ed25519PrivateKeyParameters privKeyParams, @Nullable Ed25519PublicKeyParameters pubKeyParams) {
         this.privKeyParams = privKeyParams;
 
         if (pubKeyParams != null) {
@@ -48,9 +47,7 @@ public final class Ed25519PrivateKey {
             // some legacy code delivers private and public key pairs concatted together
             try {
                 // this is how we read only the first 32 bytes
-                privKeyParams =
-                        new Ed25519PrivateKeyParameters(
-                                new ByteArrayInputStream(keyBytes, 0, Ed25519.SECRET_KEY_SIZE));
+                privKeyParams = new Ed25519PrivateKeyParameters(new ByteArrayInputStream(keyBytes, 0, Ed25519.SECRET_KEY_SIZE));
                 // read the remaining 32 bytes as the public key
                 pubKeyParams = new Ed25519PublicKeyParameters(keyBytes, Ed25519.SECRET_KEY_SIZE);
 
@@ -65,9 +62,7 @@ public final class Ed25519PrivateKey {
 
             try {
                 var privateKey = privateKeyInfo.parsePrivateKey();
-                privKeyParams =
-                        new Ed25519PrivateKeyParameters(
-                                ((ASN1OctetString) privateKey).getOctets(), 0);
+                privKeyParams = new Ed25519PrivateKeyParameters(((ASN1OctetString) privateKey).getOctets(), 0);
 
                 var pubKeyData = privateKeyInfo.getPublicKeyData();
 

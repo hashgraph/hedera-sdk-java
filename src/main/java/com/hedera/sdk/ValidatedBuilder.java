@@ -15,12 +15,14 @@ public abstract class ValidatedBuilder {
     public abstract void validate();
 
     protected void addValidationError(String errMsg) {
-        if (validationErrors == null) validationErrors = new ArrayList<>();
+        if (validationErrors == null)
+            validationErrors = new ArrayList<>();
         validationErrors.add(errMsg);
     }
 
     protected void checkValidationErrors(String prologue) {
-        if (validationErrors == null) return;
+        if (validationErrors == null)
+            return;
         var errors = validationErrors;
         validationErrors = null;
         throw new IllegalStateException(prologue + ":\n" + String.join("\n", errors));
@@ -44,8 +46,7 @@ public abstract class ValidatedBuilder {
         }
     }
 
-    protected void requireExactlyOne(
-            String errMsg, String errCollision, MessageOrBuilder... values) {
+    protected void requireExactlyOne(String errMsg, String errCollision, MessageOrBuilder... values) {
         var oneIsInit = false;
 
         for (var message : values) {
@@ -70,9 +71,9 @@ public abstract class ValidatedBuilder {
         }
     }
 
-    /*protected void require(@Nullable Object setValue, String errMsg) {
-        if (setValue == null) {
-            addValidationError(errMsg);
-        }
-    }*/
+    /* protected void require(@Nullable Object setValue, String errMsg) {
+     * if (setValue == null) {
+     * addValidationError(errMsg);
+     * }
+     * } */
 }

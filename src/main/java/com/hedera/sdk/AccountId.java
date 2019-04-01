@@ -13,11 +13,10 @@ public final class AccountId implements Entity {
     }
 
     public AccountId(long shardNum, long realmNum, long accountNum) {
-        inner =
-                AccountID.newBuilder()
-                        .setRealmNum(realmNum)
-                        .setShardNum(shardNum)
-                        .setAccountNum(accountNum);
+        inner = AccountID.newBuilder()
+            .setRealmNum(realmNum)
+            .setShardNum(shardNum)
+            .setAccountNum(accountNum);
     }
 
     AccountId(AccountID.Builder inner) {

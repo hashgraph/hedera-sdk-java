@@ -4,8 +4,7 @@ import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import java.time.Duration;
 
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extends ValidatedBuilder {
-    protected com.hedera.sdk.proto.Transaction.Builder inner =
-            com.hedera.sdk.proto.Transaction.newBuilder();
+    protected com.hedera.sdk.proto.Transaction.Builder inner = com.hedera.sdk.proto.Transaction.newBuilder();
 
     private static final int MAX_MEMO_LENGTH = 100;
 
@@ -21,13 +20,15 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
      * effect.
      */
     public T setTransactionId(TransactionId transactionId) {
-        inner.getBodyBuilder().setTransactionID(transactionId.inner);
+        inner.getBodyBuilder()
+            .setTransactionID(transactionId.inner);
         return self();
     }
 
     /** Sets the account of the node that submits the transaction to the network. */
     public final T setNodeAccountId(AccountId accountId) {
-        inner.getBodyBuilder().setNodeAccountID(accountId.inner);
+        inner.getBodyBuilder()
+            .setNodeAccountID(accountId.inner);
         return self();
     }
 
@@ -36,7 +37,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
      * network and the node.
      */
     public final T setTransactionFee(long fee) {
-        inner.getBodyBuilder().setTransactionFee(fee);
+        inner.getBodyBuilder()
+            .setTransactionFee(fee);
         return self();
     }
 
@@ -46,10 +48,11 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
      */
     public final T setTransactionValidDuration(Duration validDuration) {
         inner.getBodyBuilder()
-                .setTransactionValidDuration(
-                        com.hedera.sdk.proto.Duration.newBuilder()
-                                .setSeconds(validDuration.getSeconds())
-                                .setNanos(validDuration.getNano()));
+            .setTransactionValidDuration(
+                com.hedera.sdk.proto.Duration.newBuilder()
+                    .setSeconds(validDuration.getSeconds())
+                    .setNanos(validDuration.getNano())
+            );
 
         return self();
     }
@@ -59,7 +62,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
      * record is optional.
      */
     public final T setGenerateRecord(boolean generateRecord) {
-        inner.getBodyBuilder().setGenerateRecord(generateRecord);
+        inner.getBodyBuilder()
+            .setGenerateRecord(generateRecord);
         return self();
     }
 
@@ -72,7 +76,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
             throw new IllegalArgumentException("memo must not be longer than 100 characters");
         }
 
-        inner.getBodyBuilder().setMemo(memo);
+        inner.getBodyBuilder()
+            .setMemo(memo);
         return self();
     }
 
@@ -91,9 +96,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
         return inner.build();
     }
 
-    protected abstract io.grpc.MethodDescriptor<
-                    com.hedera.sdk.proto.Transaction, com.hedera.sdk.proto.TransactionResponse>
-            getMethod();
+    protected abstract io.grpc.MethodDescriptor<com.hedera.sdk.proto.Transaction, com.hedera.sdk.proto.TransactionResponse> getMethod();
 
     public final Transaction sign(Ed25519PrivateKey privateKey) {
         doValidate();

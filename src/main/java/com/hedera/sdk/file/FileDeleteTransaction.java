@@ -12,7 +12,8 @@ public final class FileDeleteTransaction extends TransactionBuilder<FileDeleteTr
     private final FileDeleteTransactionBody.Builder builder;
 
     public FileDeleteTransaction() {
-        builder = inner.getBodyBuilder().getFileDeleteBuilder();
+        builder = inner.getBodyBuilder()
+            .getFileDeleteBuilder();
     }
 
     public FileDeleteTransaction setFileId(FileId fileId) {

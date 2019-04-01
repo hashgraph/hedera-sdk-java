@@ -14,7 +14,8 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
     private final ContractCreateTransactionBody.Builder builder;
 
     public ContractCreateTransaction() {
-        builder = inner.getBodyBuilder().getContractCreateInstanceBuilder();
+        builder = inner.getBodyBuilder()
+            .getContractCreateInstanceBuilder();
     }
 
     @Override
@@ -64,12 +65,18 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
     }
 
     public ContractCreateTransaction setShard(long shardId) {
-        builder.setShardID(ShardID.newBuilder().setShardNum(shardId));
+        builder.setShardID(
+            ShardID.newBuilder()
+                .setShardNum(shardId)
+        );
         return this;
     }
 
     public ContractCreateTransaction setRealm(long realmId) {
-        builder.setRealmID(RealmID.newBuilder().setRealmNum(realmId));
+        builder.setRealmID(
+            RealmID.newBuilder()
+                .setRealmNum(realmId)
+        );
         return this;
     }
 

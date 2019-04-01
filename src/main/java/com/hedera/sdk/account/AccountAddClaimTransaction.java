@@ -10,14 +10,14 @@ import com.hedera.sdk.proto.Transaction;
 import io.grpc.MethodDescriptor;
 
 // corresponds to `CryptoAddClaimTransaction`
-public final class AccountAddClaimTransaction
-        extends TransactionBuilder<AccountAddClaimTransaction> {
+public final class AccountAddClaimTransaction extends TransactionBuilder<AccountAddClaimTransaction> {
     private final CryptoAddClaimTransactionBody.Builder builder;
     private final Claim.Builder claim;
     private final KeyList.Builder keyList;
 
     public AccountAddClaimTransaction() {
-        builder = inner.getBodyBuilder().getCryptoAddClaimBuilder();
+        builder = inner.getBodyBuilder()
+            .getCryptoAddClaimBuilder();
         claim = builder.getClaimBuilder();
         keyList = claim.getKeysBuilder();
     }
@@ -44,7 +44,11 @@ public final class AccountAddClaimTransaction
     protected void doValidate() {
         require(builder.getAccountIDOrBuilder(), ".setAccount() required");
         require(claim.getHash(), ".setHash() required");
-        require(claim.getKeysOrBuilder().getKeysOrBuilderList(), ".addKey() required");
+        require(
+            claim.getKeysOrBuilder()
+                .getKeysOrBuilderList(),
+            ".addKey() required"
+        );
     }
 
     @Override

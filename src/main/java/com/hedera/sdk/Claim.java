@@ -23,12 +23,15 @@ public final class Claim implements Entity {
     }
 
     public byte[] getHash() {
-        return this.innner.getHash().toByteArray();
+        return this.innner.getHash()
+            .toByteArray();
     }
 
     public List<Key> getKeys() {
-        return this.innner.getKeys().getKeysList().stream()
-                .map(key -> Key.fromProtoKey(key))
-                .collect(Collectors.toList());
+        return this.innner.getKeys()
+            .getKeysList()
+            .stream()
+            .map(key -> Key.fromProtoKey(key))
+            .collect(Collectors.toList());
     }
 }
