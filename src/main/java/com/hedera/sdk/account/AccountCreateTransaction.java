@@ -11,14 +11,13 @@ import java.time.Duration;
 
 // Corresponds to `CryptoCreateTransaction`
 public final class AccountCreateTransaction extends TransactionBuilder<AccountCreateTransaction> {
-
     private final CryptoCreateTransactionBody.Builder builder;
 
     public AccountCreateTransaction() {
+        builder = inner.getBodyBuilder().getCryptoCreateAccountBuilder();
+
         // Recommendation from Hedera
         setAutoRenewPeriod(Duration.ofDays(30));
-
-        builder = inner.getBodyBuilder().getCryptoCreateAccountBuilder();
 
         // Default to maximum values for record thresholds. Without this records would be
         // auto-created
