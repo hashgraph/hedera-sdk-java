@@ -61,7 +61,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
         return this;
     }
 
-    public AccountCreateTransaction setproxyAccountId(AccountId accountId) {
+    public AccountCreateTransaction setProxyAccount(AccountId accountId) {
         builder.setProxyAccountID(accountId.toProto());
         return this;
     }
