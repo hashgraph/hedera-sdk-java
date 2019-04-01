@@ -826,7 +826,7 @@ public class HederaContract implements Serializable {
 	 * If successful, the method sets the records property, cost and state proof if requested
 	 * @param payment a {@link HederaTransaction} message to indicate how this query will be paid for, this can be null for Cost queries
 	 * @param responseType the type of response requested from the query
-	 * @param accountID accountID of the account records being queried
+	 * @param contractID contractID of the contract records being queried
 	 * @return {@link Boolean} indicating success or failure of the query
 	 * @throws InterruptedException should an exception occur during communication with the node
 	 */
