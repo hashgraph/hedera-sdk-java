@@ -23,7 +23,7 @@ public final class TransactionGetReceiptQuery extends QueryBuilder<TransactionGe
 
     @Override
     protected MethodDescriptor<Query, Response> getMethod() {
-        return CryptoServiceGrpc.getGetTxRecordByTxIDMethod();
+        return CryptoServiceGrpc.getGetTransactionReceiptsMethod();
     }
 
     @Override
