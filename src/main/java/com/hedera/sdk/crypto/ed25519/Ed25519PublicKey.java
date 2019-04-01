@@ -15,8 +15,7 @@ import org.bouncycastle.util.encoders.Hex;
  * <p>Can be constructed from a byte array or obtained from a private key {@link
  * Ed25519PrivateKey#getPublicKey()}.
  */
-@SuppressWarnings(
-        "Duplicates") // difficult to factor out common code for all algos without exposing it
+@SuppressWarnings("Duplicates") // difficult to factor out common code for all algos without exposing it
 public final class Ed25519PublicKey implements Key {
     private final Ed25519PublicKeyParameters pubKeyParams;
 
@@ -51,7 +50,10 @@ public final class Ed25519PublicKey implements Key {
         }
 
         var publicKeyInfo = SubjectPublicKeyInfo.getInstance(keyBytes);
-        return fromBytes(publicKeyInfo.getPublicKeyData().getBytes());
+        return fromBytes(
+            publicKeyInfo.getPublicKeyData()
+                .getBytes()
+        );
     }
 
     public byte[] toBytes() {
@@ -84,7 +86,7 @@ public final class Ed25519PublicKey implements Key {
     @Override
     public com.hedera.sdk.proto.Key toKeyProto() {
         return com.hedera.sdk.proto.Key.newBuilder()
-                .setEd25519(ByteString.copyFrom(toBytes()))
-                .build();
+            .setEd25519(ByteString.copyFrom(toBytes()))
+            .build();
     }
 }

@@ -15,7 +15,8 @@ public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransact
     private final KeyList.Builder keyList;
 
     public FileUpdateTransaction() {
-        builder = inner.getBodyBuilder().getFileUpdateBuilder();
+        builder = inner.getBodyBuilder()
+            .getFileUpdateBuilder();
         keyList = builder.getKeysBuilder();
     }
 
@@ -51,6 +52,10 @@ public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransact
     @Override
     protected void doValidate() {
         require(builder.getFileID(), ".setFileId()");
-        require(builder.getKeysOrBuilder().getKeysOrBuilderList(), ".addKey()");
+        require(
+            builder.getKeysOrBuilder()
+                .getKeysOrBuilderList(),
+            ".addKey()"
+        );
     }
 }

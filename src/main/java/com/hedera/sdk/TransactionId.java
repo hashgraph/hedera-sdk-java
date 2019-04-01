@@ -19,17 +19,20 @@ public final class TransactionId {
      * any transaction fees.
      */
     public TransactionId(AccountId accountId) {
-        this(accountId, Clock.systemUTC().instant());
+        this(
+                accountId, Clock.systemUTC()
+                    .instant()
+        );
     }
 
     private TransactionId(AccountId accountId, Instant transactionValidStart) {
-        inner =
-                TransactionID.newBuilder()
-                        .setAccountID(accountId.inner)
-                        .setTransactionValidStart(
-                                Timestamp.newBuilder()
-                                        .setSeconds(transactionValidStart.getEpochSecond())
-                                        .setNanos(transactionValidStart.getNano()));
+        inner = TransactionID.newBuilder()
+            .setAccountID(accountId.inner)
+            .setTransactionValidStart(
+                Timestamp.newBuilder()
+                    .setSeconds(transactionValidStart.getEpochSecond())
+                    .setNanos(transactionValidStart.getNano())
+            );
     }
 
     public AccountId getAccountId() {

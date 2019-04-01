@@ -13,7 +13,8 @@ public final class FileAppendTransaction extends TransactionBuilder<FileAppendTr
     private final FileAppendTransactionBody.Builder builder;
 
     public FileAppendTransaction() {
-        builder = inner.getBodyBuilder().getFileAppendBuilder();
+        builder = inner.getBodyBuilder()
+            .getFileAppendBuilder();
     }
 
     public FileAppendTransaction setFileId(FileId fileId) {

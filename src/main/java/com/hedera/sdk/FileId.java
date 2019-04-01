@@ -6,7 +6,10 @@ public class FileId implements Entity {
     transient FileID.Builder inner;
 
     public FileId(long shardNum, long realmNum, long fileNum) {
-        inner = FileID.newBuilder().setShardNum(shardNum).setRealmNum(realmNum).setFileNum(fileNum);
+        inner = FileID.newBuilder()
+            .setShardNum(shardNum)
+            .setRealmNum(realmNum)
+            .setFileNum(fileNum);
     }
 
     public long getShardNum() {

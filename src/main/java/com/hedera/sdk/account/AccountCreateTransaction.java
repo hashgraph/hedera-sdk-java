@@ -14,7 +14,8 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
     private final CryptoCreateTransactionBody.Builder builder;
 
     public AccountCreateTransaction() {
-        builder = inner.getBodyBuilder().getCryptoCreateAccountBuilder();
+        builder = inner.getBodyBuilder()
+            .getCryptoCreateAccountBuilder();
 
         // Recommendation from Hedera
         setAutoRenewPeriod(Duration.ofDays(30));
@@ -23,7 +24,8 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
         // auto-created
         // whenever a send or receive transaction takes place for this new account. This should
         // be an explicit ask.
-        builder.setSendRecordThreshold(Long.MAX_VALUE).setReceiveRecordThreshold(Long.MAX_VALUE);
+        builder.setSendRecordThreshold(Long.MAX_VALUE)
+            .setReceiveRecordThreshold(Long.MAX_VALUE);
     }
 
     @Override
@@ -33,11 +35,17 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
         // this
 
         if (!builder.hasShardID()) {
-            setShardId(transactionId.getAccountId().getShardNum());
+            setShardId(
+                transactionId.getAccountId()
+                    .getShardNum()
+            );
         }
 
         if (!builder.hasRealmID()) {
-            setRealmId(transactionId.getAccountId().getRealmNum());
+            setRealmId(
+                transactionId.getAccountId()
+                    .getRealmNum()
+            );
         }
 
         return super.setTransactionId(transactionId);
@@ -78,29 +86,35 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
         return this;
     }
 
-    public AccountCreateTransaction setReceiverSignatureRequired(
-            boolean receiverSignatureRequired) {
+    public AccountCreateTransaction setReceiverSignatureRequired(boolean receiverSignatureRequired) {
         builder.setReceiverSigRequired(receiverSignatureRequired);
         return this;
     }
 
     public AccountCreateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         builder.setAutoRenewPeriod(
-                com.hedera.sdk.proto.Duration.newBuilder()
-                        .setSeconds(autoRenewPeriod.getSeconds())
-                        .setNanos(autoRenewPeriod.getNano()));
+            com.hedera.sdk.proto.Duration.newBuilder()
+                .setSeconds(autoRenewPeriod.getSeconds())
+                .setNanos(autoRenewPeriod.getNano())
+        );
 
         return this;
     }
 
     public AccountCreateTransaction setShardId(long shardId) {
-        builder.setShardID(ShardID.newBuilder().setShardNum(shardId));
+        builder.setShardID(
+            ShardID.newBuilder()
+                .setShardNum(shardId)
+        );
 
         return this;
     }
 
     public AccountCreateTransaction setRealmId(long realmId) {
-        builder.setRealmID(RealmID.newBuilder().setRealmNum(realmId));
+        builder.setRealmID(
+            RealmID.newBuilder()
+                .setRealmNum(realmId)
+        );
 
         return this;
     }

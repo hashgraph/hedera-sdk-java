@@ -13,7 +13,8 @@ public class AccountDeleteTransaction extends TransactionBuilder<AccountDeleteTr
     private final CryptoDeleteTransactionBody.Builder builder;
 
     public AccountDeleteTransaction() {
-        builder = inner.getBodyBuilder().getCryptoDeleteBuilder();
+        builder = inner.getBodyBuilder()
+            .getCryptoDeleteBuilder();
     }
 
     public AccountDeleteTransaction setTransferAccountId(AccountId transferAccountId) {

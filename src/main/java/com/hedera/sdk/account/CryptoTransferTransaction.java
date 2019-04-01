@@ -12,7 +12,8 @@ public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTr
     private TransferList.Builder transferList;
 
     public CryptoTransferTransaction() {
-        builder = inner.getBodyBuilder().getCryptoTransferBuilder();
+        builder = inner.getBodyBuilder()
+            .getCryptoTransferBuilder();
         transferList = builder.getTransfersBuilder();
     }
 
@@ -26,10 +27,11 @@ public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTr
 
     public CryptoTransferTransaction addTransfer(AccountId accountId, long value) {
         transferList.addAccountAmounts(
-                AccountAmount.newBuilder()
-                        .setAccountID(accountId.toProto())
-                        .setAmount(value)
-                        .build());
+            AccountAmount.newBuilder()
+                .setAccountID(accountId.toProto())
+                .setAmount(value)
+                .build()
+        );
 
         return this;
     }
@@ -45,10 +47,7 @@ public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTr
         }
 
         if (sum != 0) {
-            addValidationError(
-                    String.format(
-                            "transfer transaction must have zero sum; transfer balance: %d tinybar",
-                            sum));
+            addValidationError(String.format("transfer transaction must have zero sum; transfer balance: %d tinybar", sum));
         }
     }
 

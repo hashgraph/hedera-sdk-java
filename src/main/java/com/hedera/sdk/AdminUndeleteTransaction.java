@@ -11,7 +11,8 @@ public final class AdminUndeleteTransaction extends TransactionBuilder<AdminUnde
     private final AdminUndeleteTransactionBody.Builder builder;
 
     public AdminUndeleteTransaction() {
-        builder = inner.getBodyBuilder().getAdminUndeleteBuilder();
+        builder = inner.getBodyBuilder()
+            .getAdminUndeleteBuilder();
     }
 
     public AdminUndeleteTransaction setID(FileId fileId) {
@@ -32,9 +33,10 @@ public final class AdminUndeleteTransaction extends TransactionBuilder<AdminUnde
     @Override
     protected void doValidate() {
         requireExactlyOne(
-                ".setID() required",
-                ".setID() may take a contract ID OR a file ID",
-                builder.getContractIDOrBuilder(),
-                builder.getFileIDOrBuilder());
+            ".setID() required",
+            ".setID() may take a contract ID OR a file ID",
+            builder.getContractIDOrBuilder(),
+            builder.getFileIDOrBuilder()
+        );
     }
 }

@@ -10,12 +10,12 @@ import com.hedera.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 // `CryptoDeleteClaimTransaction`
-public class AccountDeleteClaimTransaction
-        extends TransactionBuilder<AccountDeleteClaimTransaction> {
+public class AccountDeleteClaimTransaction extends TransactionBuilder<AccountDeleteClaimTransaction> {
     private final CryptoDeleteClaimTransactionBody.Builder builder;
 
     public AccountDeleteClaimTransaction() {
-        builder = inner.getBodyBuilder().getCryptoDeleteClaimBuilder();
+        builder = inner.getBodyBuilder()
+            .getCryptoDeleteClaimBuilder();
     }
 
     public AccountDeleteClaimTransaction setAccountToDeleteFrom(AccountId accountId) {

@@ -19,46 +19,49 @@ import javax.annotation.Nullable;
 
 public class Transaction {
     private final com.hedera.sdk.proto.Transaction.Builder inner;
-    private final io.grpc.MethodDescriptor<
-                    com.hedera.sdk.proto.Transaction, com.hedera.sdk.proto.TransactionResponse>
-            methodDescriptor;
+    private final io.grpc.MethodDescriptor<com.hedera.sdk.proto.Transaction, com.hedera.sdk.proto.TransactionResponse> methodDescriptor;
 
-    @Nullable private byte[] bodyBytes;
+    @Nullable
+    private byte[] bodyBytes;
 
     Transaction(
-            com.hedera.sdk.proto.Transaction.Builder inner,
-            MethodDescriptor<com.hedera.sdk.proto.Transaction, TransactionResponse>
-                    methodDescriptor) {
+        com.hedera.sdk.proto.Transaction.Builder inner,
+        MethodDescriptor<com.hedera.sdk.proto.Transaction, TransactionResponse> methodDescriptor
+    ) {
         this.inner = inner;
         this.methodDescriptor = methodDescriptor;
     }
 
     public Transaction sign(Ed25519PrivateKey privateKey) {
-        var signature = Ed25519Signature.forMessage(privateKey, getBodyBytes()).toBytes();
+        var signature = Ed25519Signature.forMessage(privateKey, getBodyBytes())
+            .toBytes();
 
         // FIXME: This nested signature is only for account IDs < 1000
         // FIXME: spotless makes this.. lovely
         // FIXME: Is `ByteString.copyFrom` ideal here?
         inner.getSigsBuilder()
-                .addSigs(
-                        Signature.newBuilder()
-                                .setSignatureList(
-                                        SignatureList.newBuilder()
-                                                .addSigs(
-                                                        Signature.newBuilder()
-                                                                .setEd25519(
-                                                                        ByteString.copyFrom(
-                                                                                signature)))));
+            .addSigs(
+                Signature.newBuilder()
+                    .setSignatureList(
+                        SignatureList.newBuilder()
+                            .addSigs(
+                                Signature.newBuilder()
+                                    .setEd25519(ByteString.copyFrom(signature))
+                            )
+                    )
+            );
 
         return this;
     }
 
     public final com.hedera.sdk.proto.Transaction build() {
-        if (inner.getSigsBuilder().getSigsCount() == 0) {
+        if (inner.getSigsBuilder()
+            .getSigsCount() == 0) {
             throw new IllegalStateException("Transaction is not signed");
         }
 
-        if (!inner.getBodyBuilder().hasTransactionID()) {
+        if (!inner.getBodyBuilder()
+            .hasTransactionID()) {
             throw new IllegalStateException("Transaction needs an ID");
         }
 
@@ -67,34 +70,32 @@ public class Transaction {
 
     private byte[] getBodyBytes() {
         if (bodyBytes == null) {
-            bodyBytes = inner.getBody().toByteArray();
+            bodyBytes = inner.getBody()
+                .toByteArray();
         }
 
         return bodyBytes;
     }
 
-    private ClientCall<com.hedera.sdk.proto.Transaction, TransactionResponse> newClientCall(
-            Client client) {
-        return client.getChannel().newCall(methodDescriptor, CallOptions.DEFAULT);
+    private ClientCall<com.hedera.sdk.proto.Transaction, TransactionResponse> newClientCall(Client client) {
+        return client.getChannel()
+            .newCall(methodDescriptor, CallOptions.DEFAULT);
     }
 
     public final ResponseCodeEnum execute(Client client) {
         return ClientCalls.blockingUnaryCall(newClientCall(client), build())
-                .getNodeTransactionPrecheckCode();
+            .getNodeTransactionPrecheckCode();
     }
 
-    public final void executeAsync(
-            Client client,
-            Function<ResponseCodeEnum, Void> onResponse,
-            Function<Throwable, Void> onError) {
-        ClientCalls.asyncUnaryCall(
-                newClientCall(client), build(), new ResponseObserver(onResponse, onError));
+    public final void executeAsync(Client client, Function<ResponseCodeEnum, Void> onResponse, Function<Throwable, Void> onError) {
+        ClientCalls.asyncUnaryCall(newClientCall(client), build(), new ResponseObserver(onResponse, onError));
     }
 
     public Future<ResponseCodeEnum> executeFuture(Client client) {
         return Futures.lazyTransform(
-                ClientCalls.futureUnaryCall(newClientCall(client), build()),
-                TransactionResponse::getNodeTransactionPrecheckCode);
+            ClientCalls.futureUnaryCall(newClientCall(client), build()),
+            TransactionResponse::getNodeTransactionPrecheckCode
+        );
     }
 
     // inner class because anonymous classes can't reassign their captures so `callbackExecuted`
@@ -104,8 +105,7 @@ public class Transaction {
         private final Function<Throwable, Void> onError;
         private boolean callbackExecuted = false;
 
-        private ResponseObserver(
-                Function<ResponseCodeEnum, Void> onResponse, Function<Throwable, Void> onError) {
+        private ResponseObserver(Function<ResponseCodeEnum, Void> onResponse, Function<Throwable, Void> onError) {
             this.onResponse = onResponse;
             this.onError = onError;
         }

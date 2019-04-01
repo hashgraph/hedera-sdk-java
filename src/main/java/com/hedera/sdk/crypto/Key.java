@@ -9,13 +9,16 @@ public interface Key {
 
     static Key fromProtoKey(com.hedera.sdk.proto.Key key) {
         switch (key.getKeyCase()) {
-            case ED25519:
-                return Ed25519PublicKey.fromString(key.getEd25519().toString());
-            case CONTRACTID:
-                ContractID id = key.getContractID();
-                return new ContractId(id.getShardNum(), id.getRealmNum(), id.getContractNum());
-            default:
-                throw new IllegalStateException("Unchecked Key Case");
+        case ED25519:
+            return Ed25519PublicKey.fromString(
+                key.getEd25519()
+                    .toString()
+            );
+        case CONTRACTID:
+            ContractID id = key.getContractID();
+            return new ContractId(id.getShardNum(), id.getRealmNum(), id.getContractNum());
+        default:
+            throw new IllegalStateException("Unchecked Key Case");
         }
     }
 }
