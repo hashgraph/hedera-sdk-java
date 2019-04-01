@@ -13,7 +13,7 @@ public final class TransactionGetReceiptQuery extends QueryBuilder<TransactionGe
 
     @Override
     protected QueryHeader.Builder getHeaderBuilder() {
-        return builder.getHeaderBuilder();
+        return inner.getTransactionGetReceiptBuilder().getHeaderBuilder();
     }
 
     public TransactionGetReceiptQuery setTransaction(TransactionId transactionId) {
