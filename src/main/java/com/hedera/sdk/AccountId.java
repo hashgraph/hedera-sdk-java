@@ -19,6 +19,10 @@ public final class AccountId implements Entity {
             .setAccountNum(accountNum);
     }
 
+    public AccountId(AccountID accountID) {
+        inner = accountID.toBuilder();
+    }
+
     AccountId(AccountID.Builder inner) {
         this.inner = inner;
     }

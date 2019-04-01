@@ -19,4 +19,8 @@ public final class TimestampHelper {
             .setSeconds(timestamp.getEpochSecond())
             .build();
     }
+
+    public static Instant timestampToInstant(Timestamp timestamp) {
+        return Instant.ofEpochSecond(timestamp.getSeconds(), timestamp.getNanos());
+    }
 }

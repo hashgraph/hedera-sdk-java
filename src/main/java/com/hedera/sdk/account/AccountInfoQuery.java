@@ -6,11 +6,11 @@ import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 // `CryptoGetInfoQuery`
-public final class AccountInfoQuery extends QueryBuilder<CryptoGetInfoResponse> {
+public final class AccountInfoQuery extends QueryBuilder<AccountInfo> {
     private final com.hedera.sdk.proto.CryptoGetInfoQuery.Builder builder;
 
     public AccountInfoQuery() {
-        super(Response::getCryptoGetInfo);
+        super(AccountInfo::new);
         builder = inner.getCryptoGetInfoBuilder();
     }
 
