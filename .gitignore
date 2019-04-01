@@ -10,3 +10,6 @@ gen/
 # Ignore IDE specific directories
 .idea/
 *.iml
+
+# Ignore local environment variables
+.env
