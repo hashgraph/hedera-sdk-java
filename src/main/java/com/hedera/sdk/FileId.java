@@ -1,8 +1,11 @@
 package com.hedera.sdk;
 
 import com.hedera.sdk.proto.FileID;
+import com.hedera.sdk.proto.FileIDOrBuilder;
 
-public class FileId implements Entity {
+import java.util.Objects;
+
+public final class FileId implements Entity {
     transient FileID.Builder inner;
 
     public FileId(long shardNum, long realmNum, long fileNum) {
@@ -24,7 +27,26 @@ public class FileId implements Entity {
         return inner.getFileNum();
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(getShardNum(), getRealmNum(), getFileNum());
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other)
+            return true;
+        if (!(other instanceof FileId))
+            return false;
+        var fileId = (FileId) other;
+        return getShardNum() == fileId.getShardNum() && getRealmNum() == fileId.getRealmNum() && getFileNum() == fileId.getFileNum();
+    }
+
     public FileID toProto() {
         return inner.build();
+    }
+
+    public static FileId fromProto(FileIDOrBuilder fileID) {
+        return new FileId(fileID.getShardNum(), fileID.getRealmNum(), fileID.getFileNum());
     }
 }
