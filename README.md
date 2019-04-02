@@ -22,7 +22,10 @@ Features supported include:
 
 ## Changes in this version from 0.1.0
 
-### 0.2.0 - Implementation of new signatures
+### 0.3.0 - Removal of deprecated signature related entities
+Signature, SignatureList and ThresholdSignature
+
+### 0.3.0 - Implementation of new signatures
 `SignatureMap` and `SignaturePair` are now used to build signatures for transactions and queries.
 Signatures are now supplied to Hedera as a public key + signature pair. The public key can be reduced to just enough data to make it uniquely identifiable.
 `HederaSignatures` implements the necessary logic to reduce public keys to the minimum necessary.
