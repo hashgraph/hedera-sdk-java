@@ -5,6 +5,7 @@ import com.hedera.sdk.Claim;
 import com.hedera.sdk.DurationHelper;
 import com.hedera.sdk.TimestampHelper;
 import com.hedera.sdk.crypto.Key;
+import com.hedera.sdk.proto.CryptoGetInfoResponse;
 import com.hedera.sdk.proto.Response;
 import java.time.Duration;
 import java.time.Instant;
@@ -13,29 +14,67 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 public class AccountInfo {
-    public final AccountId accountId;
-    public final String contractAccountId;
-    public final boolean deleted;
+    private final CryptoGetInfoResponse.AccountInfo inner;
+
+    public AccountId getAccountId() {
+        return new AccountId(inner.getAccountIDOrBuilder());
+    }
+
+    public String getContractAccountId() {
+        return inner.getContractAccountID();
+    }
+
+    public boolean isDeleted() {
+        return inner.getDeleted();
+    }
 
     @Nullable
-    public final AccountId proxyAccountId;
+    public AccountId getProxyAccountId() {
+        return inner.hasProxyAccountID() ? new AccountId(inner.getProxyAccountIDOrBuilder()) : null;
+    }
 
-    public final int proxyFraction;
-    public final long proxyReceived;
+    public int getProxyFraction() {
+        return inner.getProxyFraction();
+    }
 
-    public final Key key;
+    public long getProxyReceived() {
+        return inner.getProxyReceived();
+    }
 
-    public final long balance;
-    public final long generateSendRecordThreshold;
-    public final long generateReceiveRecordThreshold;
+    public Key getKey() {
+        return Key.fromProtoKey(inner.getKey());
+    }
 
-    public final boolean receiverSigRequired;
+    public long getBalance() {
+        return inner.getBalance();
+    }
 
-    public final Instant expirationTime;
+    public long getGenerateSendRecordThreshold() {
+        return inner.getGenerateSendRecordThreshold();
+    }
 
-    public final Duration autoRenewPeriod;
+    public long getGenerateReceiveRecordThreshold() {
+        return inner.getGenerateReceiveRecordThreshold();
+    }
 
-    public final List<Claim> claims;
+    public boolean isReceiverSigRequired() {
+        return inner.getReceiverSigRequired();
+    }
+
+    public Instant getExpirationTime() {
+        return TimestampHelper.timestampToInstant(inner.getExpirationTime());
+    }
+
+    public Duration getAutoRenewPeriod() {
+        return DurationHelper.durationToJava(inner.getAutoRenewPeriod());
+    }
+
+    public List<Claim> getClaims() {
+        return inner.getClaimsList()
+            .stream()
+            .map(Claim::fromProto)
+            .collect(Collectors.toList());
+    }
 
     AccountInfo(Response response) {
         if (!response.hasCryptoGetInfo()) {
@@ -43,32 +82,10 @@ public class AccountInfo {
         }
 
         var infoResponse = response.getCryptoGetInfo();
-        var accountInfo = infoResponse.getAccountInfo();
+        inner = infoResponse.getAccountInfo();
 
-        if (!accountInfo.hasKey()) {
+        if (!inner.hasKey()) {
             throw new IllegalArgumentException("query response missing key");
         }
-
-        accountId = new AccountId(accountInfo.getAccountID());
-        contractAccountId = accountInfo.getContractAccountID();
-        deleted = accountInfo.getDeleted();
-        proxyAccountId = accountInfo.hasProxyAccountID() ? new AccountId(accountInfo.getProxyAccountID()) : null;
-        proxyFraction = accountInfo.getProxyFraction();
-        proxyReceived = accountInfo.getProxyReceived();
-
-        key = Key.fromProtoKey(accountInfo.getKey());
-
-        balance = accountInfo.getBalance();
-        generateSendRecordThreshold = accountInfo.getGenerateSendRecordThreshold();
-        generateReceiveRecordThreshold = accountInfo.getGenerateReceiveRecordThreshold();
-
-        receiverSigRequired = accountInfo.getReceiverSigRequired();
-        expirationTime = TimestampHelper.timestampToInstant(accountInfo.getExpirationTime());
-        autoRenewPeriod = DurationHelper.durationToJava(accountInfo.getAutoRenewPeriod());
-
-        claims = accountInfo.getClaimsList()
-            .stream()
-            .map(Claim::fromProto)
-            .collect(Collectors.toList());
     }
 }
