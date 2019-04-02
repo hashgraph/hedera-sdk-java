@@ -25,7 +25,7 @@ public class HederaAccountCreateDefaults {
 	/**
 	 * Is a signature required to receive funds in this account
 	 */
-	public boolean receiverSignatureRequired = accountDefaultsFromClass.receiverSigRequired;
+	public boolean receiverSignatureRequired = accountDefaultsFromClass.getReceiverSignatureRequired();
 	/**
 	 * create an account record for any transaction depositing more than this many tinybars
 	 */

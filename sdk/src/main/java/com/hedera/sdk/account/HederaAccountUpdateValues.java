@@ -7,6 +7,9 @@ import org.slf4j.LoggerFactory;
  * and send to an account.update method
  */
 public class HederaAccountUpdateValues {
+	private boolean receiveSignatureRequired = false;
+	private boolean receiveSignatureRequiredUpdated = false;
+	
 	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaAccountUpdateValues.class);
 	/**
 	 * the details of the new public/private key if an update is required
@@ -54,4 +57,17 @@ public class HederaAccountUpdateValues {
 	 * note: you must also supply the new expiration time seconds
 	 */
 	public int expirationTimeNanos = -1;
+	/**
+	 * the new receiverSignatureRequired
+	 */
+	public void setReceiveSignatureRequired(boolean receiveSignatureRequired) {
+		this.receiveSignatureRequired = receiveSignatureRequired;
+		this.receiveSignatureRequiredUpdated = true;
+	}
+	public boolean getReceiveSignatureRequired() {
+		return this.receiveSignatureRequired;
+	}
+	public boolean receiveSignatureRequiredChanged() {
+		return this.receiveSignatureRequiredUpdated;
+	}
 }

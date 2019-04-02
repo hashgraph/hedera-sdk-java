@@ -43,7 +43,7 @@ class HederaAccountTest {
 		assertEquals(0, account.proxyAccountID.accountNum);
 		assertEquals(Long.MAX_VALUE, account.sendRecordThreshold);
 		assertEquals(Long.MAX_VALUE, account.receiveRecordThreshold);
-		assertFalse(account.receiverSigRequired);
+		assertFalse(account.getReceiverSignatureRequired());
 		assertEquals(60 * 60 * 24 * 30, account.autoRenewPeriod.seconds);
 		assertEquals(0, account.claims.size());
 		assertNull(account.expirationTime);
@@ -101,7 +101,7 @@ class HederaAccountTest {
 		
 		account.autoRenewPeriod = new HederaDuration(200);
 		account.initialBalance = 10;
-		account.receiverSigRequired = true;
+		account.setReceiverSignatureRequired(true);
 		account.receiveRecordThreshold = 202;
 		account.sendRecordThreshold = 303;
 		account.realmNum = 200;

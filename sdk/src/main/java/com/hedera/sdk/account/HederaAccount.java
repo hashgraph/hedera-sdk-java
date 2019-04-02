@@ -5,6 +5,8 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.LoggerFactory;
+
+import com.google.protobuf.BoolValue;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.UInt64Value;
 import com.hedera.sdk.common.HederaAccountID;
@@ -130,7 +132,8 @@ public class HederaAccount implements Serializable {
 	 * if true, this account's key must sign any transaction depositing into this account (in addition to all withdrawals). 
 	 * This field is immutable; it cannot be changed by a CryptoUpdate transaction.
 	 */
-	public boolean receiverSigRequired = false;
+	private boolean receiverSigRequired = false;
+	private boolean receiverSigRequiredChanged = false;
 	/**
 	 * the account is charged to extend its expiration date every this many seconds. If it doesn't have enough, 
 	 * it extends as long as possible. If it is empty when it expires, then it is deleted.
@@ -166,6 +169,21 @@ public class HederaAccount implements Serializable {
 	 */
 	public boolean getDeleted() {
 		return this.deleted;
+	}
+	/**
+	 * set the receiver signature required flag on the account
+	 * @param required
+	 */
+	public void setReceiverSignatureRequired(boolean required) {
+		this.receiverSigRequired = required;
+		this.receiverSigRequiredChanged = true;
+	}
+	/**
+	 * get the receiver signature required flag on the account
+	 * @return {@link Boolean}
+	 */
+	public boolean getReceiverSignatureRequired() {
+		return this.receiverSigRequired;
 	}
 	/**
 	 * total number of tinybars proxy staked to this account populated as a result of a query
@@ -822,6 +840,8 @@ public class HederaAccount implements Serializable {
 			this.receiveRecordThreshold = accountGetInfoResponse.getAccountInfo().getGenerateReceiveRecordThreshold();
 			this.sendRecordThreshold = accountGetInfoResponse.getAccountInfo().getGenerateSendRecordThreshold();
 			this.receiverSigRequired = accountGetInfoResponse.getAccountInfo().getReceiverSigRequired();
+			this.receiverSigRequiredChanged = false;
+			
 			this.expirationTime = new HederaTimeStamp(accountGetInfoResponse.getAccountInfo().getExpirationTime());
 			this.autoRenewPeriod = new HederaDuration(accountGetInfoResponse.getAccountInfo().getAutoRenewPeriod());
 
@@ -954,6 +974,9 @@ public class HederaAccount implements Serializable {
 		}
 		if (this.sendRecordThreshold != 0) {
 			updateTransaction.setSendRecordThreshold(UInt64Value.of(this.sendRecordThreshold));
+		}
+		if (this.receiverSigRequiredChanged) {
+			updateTransaction.setReceiverSigRequired(BoolValue.of(this.receiverSigRequired));
 		}
 		
 		return updateTransaction.build();
@@ -1368,6 +1391,9 @@ public class HederaAccount implements Serializable {
 			}
 			if (updates.sendRecordThreshold != -1) {
 				this.sendRecordThreshold = updates.sendRecordThreshold;
+			}
+			if (updates.receiveSignatureRequiredChanged()) {
+				this.receiverSigRequired = updates.getReceiveSignatureRequired();
 			}
 		}
 		// initialise the result

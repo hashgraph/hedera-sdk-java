@@ -22,7 +22,12 @@ Features supported include:
 
 ## Changes in this version from 0.1.0
 
+### 0.3.0 - Added support for updating `receiveSignatureRequired` on cryptoAccounts
+
+The Hedera API now supports updating `receiveSignatureRequired` on existing cryptoAccounts
+
 ### 0.3.0 - Added expiry to claims
+
 Claims now support an expiry expressed a duration in seconds from the time of creation
 
 ### 0.3.0 - HederaDuration class has static constructors for common durations

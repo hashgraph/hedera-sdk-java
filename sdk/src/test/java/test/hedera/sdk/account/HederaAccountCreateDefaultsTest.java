@@ -22,7 +22,7 @@ class HederaAccountCreateDefaultsTest {
 		HederaAccount accountDefaultsFromClass = new HederaAccount();
 
 		assertEquals(accountDefaultsFromClass.autoRenewPeriod.seconds, values.autoRenewPeriodSeconds);
-		assertEquals(accountDefaultsFromClass.receiverSigRequired, values.receiverSignatureRequired);
+		assertEquals(accountDefaultsFromClass.getReceiverSignatureRequired(), values.receiverSignatureRequired);
 		
 		assertEquals(accountDefaultsFromClass.autoRenewPeriod.seconds, values.autoRenewPeriodSeconds);
 		assertEquals(accountDefaultsFromClass.autoRenewPeriod.seconds, values.autoRenewPeriodSeconds);
