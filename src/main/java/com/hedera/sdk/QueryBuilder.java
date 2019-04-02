@@ -15,7 +15,7 @@ public abstract class QueryBuilder<Resp> extends ValidatedBuilder {
 
     protected QueryBuilder(Function<Response, Resp> mapResponse) {
         this.mapResponse = mapResponse;
-        getHeaderBuilder().setResponseType(ResponseType.ANSWER_ONLY);
+        // getHeaderBuilder().setResponseType(ResponseType.ANSWER_ONLY);
     }
 
     protected abstract QueryHeader.Builder getHeaderBuilder();
