@@ -21,11 +21,12 @@ public final class AccountId implements Entity {
     }
 
     /** Constructs an `AccountId` from a string formatted as <shardNum>.<realmNum>.<accountNum> * */
-    public static AccountId fromString(String account) throws Exception {
+    public static AccountId fromString(String account) throws IllegalArgumentException {
         var rawNums = account.split("\\.");
 
         if (rawNums.length != 3) {
-            throw new Exception("Invalid Id format");
+            throw new IllegalArgumentException(
+                    "Invalid Id format, should be in format {shardNum}.{realmNum}.{accountNum}");
         }
 
         return new AccountId(
