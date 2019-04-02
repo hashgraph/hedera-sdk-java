@@ -22,13 +22,27 @@ Features supported include:
 
 ## Changes in this version from 0.1.0
 
+### 0.3.0 - Added expiry to claims
+Claims now support an expiry expressed a duration in seconds from the time of creation
+
+### 0.3.0 - HederaDuration class has static constructors for common durations
+
+Standard durations for minute (60 sec), hour (60 minutes), day (24 hours), week (7 days), month (30 days) and year (365 days)
+
+For example:
+
+`public HederaDuration duration = HederaDuration.HederaDurationYear();`
+
 ### 0.3.0 - Added smart contract memo support
+
 Smart contracts can now have a memo attached on create and it may be updated.
 
 ### 0.3.0 - Removal of deprecated signature related entities
+
 Signature, SignatureList and ThresholdSignature
 
 ### 0.3.0 - Implementation of new signatures
+
 `SignatureMap` and `SignaturePair` are now used to build signatures for transactions and queries.
 Signatures are now supplied to Hedera as a public key + signature pair. The public key can be reduced to just enough data to make it uniquely identifiable.
 `HederaSignatures` implements the necessary logic to reduce public keys to the minimum necessary.
