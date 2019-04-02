@@ -25,7 +25,7 @@ public final class GetAccount {
         }
 
         var newKey = Ed25519PrivateKey.generate();
-        var account = new AccountId(1);
+        var account = new AccountId(2);
 
         var client = new Client(env.get("NETWORK"));
 
