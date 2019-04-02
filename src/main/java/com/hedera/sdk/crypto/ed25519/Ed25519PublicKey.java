@@ -24,11 +24,11 @@ public final class Ed25519PublicKey implements Key {
     }
 
     /**
-     * Construct a known public key from a byte array and an offset into that array.
+     * Construct a known public key from a byte array.
      *
-     * @throws AssertionError if {@code offset >= bytes.length || bytes.length - offset != 32}
+     * @throws AssertionError if {@code bytes.length != 32}
      */
-    static Ed25519PublicKey fromBytes(byte[] bytes) {
+    public static Ed25519PublicKey fromBytes(byte[] bytes) {
         assert bytes.length == Ed25519.PUBLIC_KEY_SIZE;
         return new Ed25519PublicKey(new Ed25519PublicKeyParameters(bytes, 0));
     }

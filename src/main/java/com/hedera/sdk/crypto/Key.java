@@ -10,9 +10,9 @@ public interface Key {
     static Key fromProtoKey(com.hedera.sdk.proto.Key key) {
         switch (key.getKeyCase()) {
         case ED25519:
-            return Ed25519PublicKey.fromString(
+            return Ed25519PublicKey.fromBytes(
                 key.getEd25519()
-                    .toString()
+                    .toByteArray()
             );
         case CONTRACTID:
             ContractID id = key.getContractID();
