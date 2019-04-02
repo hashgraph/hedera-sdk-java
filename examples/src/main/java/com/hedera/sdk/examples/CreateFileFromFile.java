@@ -4,32 +4,40 @@ import com.hedera.sdk.AccountId;
 import com.hedera.sdk.Client;
 import com.hedera.sdk.TransactionGetReceiptQuery;
 import com.hedera.sdk.TransactionId;
-import com.hedera.sdk.account.AccountCreateTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
+import com.hedera.sdk.file.FileCreateTransaction;
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+
 @SuppressWarnings("Duplicates")
-public final class CreateAccount {
-    public static void main(String[] args) throws InterruptedException {
+public final class CreateFileFromFile {
+    public static void main(String[] args) throws InterruptedException, IOException {
         var env = Dotenv.load();
 
         var operatorKey = Ed25519PrivateKey.fromString(env.get("OPERATOR_SECRET"));
-        var newKey = Ed25519PrivateKey.generate();
+        var operator = new AccountId(2);
 
         var client = new Client(env.get("NETWORK"));
 
+        byte[] fileContents;
+
+        try(var inFile = new FileInputStream("hedera.txt")) {
+            fileContents = inFile.readAllBytes();
+        }
+
         var txId = new TransactionId(new AccountId(2));
-        var tx = new AccountCreateTransaction()
+
+        var tx = new FileCreateTransaction()
             .setTransactionId(txId)
-            .setNodeAccount(new AccountId(3))
-            .setKey(newKey.getPublicKey())
-            // default (from transaction id): .setShardId(0)
-            // default (from transaction id): .setRealmId(0)
-            // default: .setAutoRenewPeriod(Duration.ofSeconds(2_592_000))
-            // default: .setSendRecordThreshold(Long.MAX_VALUE)
-            // default: .setReceiveRecordThreshold(Long.MAX_VALUE)
-            // default: .setReceiverSignatureRequired(false)
-            // default: .setInitialBalance(0)
+            .setNodeAccountId(new AccountId(3))
+            .setExpirationTime(Instant.now().plus(Duration.ofSeconds(2592000)))
+            .addKey(operatorKey.getPublicKey())
+            .setContents(fileContents)
+            .setMemo("[hedera-sdk-java][example] CreateFile")
             .sign(operatorKey);
 
         var res = tx.execute(client);
@@ -37,7 +45,6 @@ public final class CreateAccount {
         System.out.println("transaction: " + res.toString());
 
         // Sleep for 4 seconds
-        // TODO: We should make the query here retry internally if its "not ready" or "busy"
         Thread.sleep(4000);
 
         var query = new TransactionGetReceiptQuery()
@@ -48,8 +55,9 @@ public final class CreateAccount {
 
         System.out.println("status: " + receiptStatus.toString());
 
-        var newAccountId = receipt.getReceipt().getAccountID();
+        var newFileId = receipt.getReceipt().getFileID();
 
-        System.out.println("new account num: " + newAccountId.getAccountNum());
+        System.out.println("new file num: " + newFileId.getFileNum());
     }
 }
+
