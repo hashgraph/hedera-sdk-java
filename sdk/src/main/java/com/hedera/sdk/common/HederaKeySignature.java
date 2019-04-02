@@ -26,7 +26,9 @@ import com.hederahashgraph.api.proto.java.Response;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hederahashgraph.api.proto.java.ResponseHeader;
 /**
- * This class is a helper for managing keys and signatures in tandem. Each instance of the object can store a {@link HederaKeyPair} and its corresponding {@link HederaSignature}
+ * This class is a helper for managing keys and signatures in tandem. 
+ * Each instance of the object can store a {@link HederaKeyPair} and its 
+ * corresponding signature as a byte array
  */
 public class HederaKeySignature implements Serializable {
 	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaKeySignature.class);

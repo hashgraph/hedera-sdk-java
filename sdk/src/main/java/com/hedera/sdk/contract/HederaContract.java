@@ -62,7 +62,7 @@ public class HederaContract implements Serializable {
 	private List<HederaTransactionRecord> records = null;
 	private long cost = 0;
 	private HederaContractFunctionResult hederaContractFunctionResult = null;
-	private String memo = "";
+	private String contractMemo = "";
 	/**
 	 * Default parameters for a transaction or query
 	 */
@@ -178,18 +178,18 @@ public class HederaContract implements Serializable {
 		return this.storage;
 	}
 	/**
-	 * Gets the memo associated with the smart contract
+	 * Gets the memo associated with this smart contract
 	 * @return String
 	 */
-	public String getMemo() {
-		return this.memo;
+	public String getContractMemo() {
+		return this.contractMemo;
 	}
 	/**
-	 * Sets the memo associated with the smart contract
-	 * @param memo the memo to associate with this smart contract
+	 * Sets the memo associated with this smart contract
+	 * @param memo the memo to associate to this smart contract
 	 */
-	public void setMemo(String memo) {
-		this.memo = memo;
+	public void setContractMemo(String memo) {
+		this.contractMemo = memo;
 	}
 	/** 
 	 * Gets the bytecode for the smart contract
@@ -358,7 +358,6 @@ public class HederaContract implements Serializable {
 	 * @return {@link ContractCallTransactionBody}
 	 */
 	public ContractCallTransactionBody getCallTransactionBody() {
-
 		
 		ContractCallTransactionBody.Builder transactionBody = ContractCallTransactionBody.newBuilder();
 
@@ -367,7 +366,6 @@ public class HederaContract implements Serializable {
 		ByteString parameters = ByteString.copyFrom(this.functionParameters);
 		transactionBody.setFunctionParameters(parameters);
 		transactionBody.setGas(this.gas);
-	
 
 		return transactionBody.build();
 	}
@@ -411,7 +409,6 @@ public class HederaContract implements Serializable {
 		this.hederaContractFunctionResult = null;
 		
 		// return
-		
 		return hederaTransactionResult;
 	}
 
@@ -449,7 +446,6 @@ public class HederaContract implements Serializable {
 	 */
 	public ContractCreateTransactionBody getCreateTransactionBody() {
 
-		
 		ContractCreateTransactionBody.Builder transactionBody = ContractCreateTransactionBody.newBuilder();
 
 		if (this.adminKey != null) {
@@ -470,10 +466,8 @@ public class HederaContract implements Serializable {
 			transactionBody.setRealmID(new HederaRealmID(this.shardNum, this.realmNum).getProtobuf());
 		}
 		transactionBody.setShardID(new HederaShardID(this.shardNum).getProtobuf());
-		transactionBody.setMemo(this.memo);
+		transactionBody.setMemo(this.contractMemo);
 		
-	
-
 		return transactionBody.build();
 	}
 
@@ -570,7 +564,7 @@ public class HederaContract implements Serializable {
 		if (this.proxyAccountID != null) {
 			transactionBody.setProxyAccountID(this.proxyAccountID.getProtobuf());
 		}
-		transactionBody.setMemo(this.memo);
+		transactionBody.setMemo(this.contractMemo);
 
 		return transactionBody.build();
 	}
@@ -750,7 +744,7 @@ public class HederaContract implements Serializable {
 			this.solidityContractAccountID = info.getContractAccountID();
 			this.expirationTime = new HederaTimeStamp(info.getExpirationTime());
 			this.storage = info.getStorage();
-			this.memo = info.getMemo();
+			this.contractMemo = info.getMemo();
 		} else {
 			result = false;
 		}
@@ -1080,6 +1074,22 @@ public class HederaContract implements Serializable {
 	 * @throws Exception in the event of an error 
 	 */
 	public HederaTransactionResult create(long shardNum, long realmNum, HederaFileID fileID, long initialBalance, long gas, byte[] constructorParameters, HederaDuration autoRenewPeriod) throws Exception {
+		return this.create(shardNum, realmNum, fileID, initialBalance, gas, constructorParameters, autoRenewPeriod, "");
+	}
+	/**
+	 * Creates a smart contract in the simplest possible way
+	 * @param shardNum the shard in which to create the smart contract
+	 * @param realmNum the realm in which to create the smart contract
+	 * @param fileID the {@link HederaFileID} identifying the file containing the bytecode from which to create the smart contract instance
+	 * @param initialBalance the initial balance for the smart contract's account
+	 * @param gas the maximum amount of gas to use for the creation
+	 * @param constructorParameters, a byte array containing the parameters for the construction of the smart contract
+	 * @param autoRenewPeriod, a {@link HederaDuration} to specify how often the smart contract should renew itself
+	 * @param contractMemo, the memo to store against the smart contract 
+	 * @return {@link HederaTransactionResult}
+	 * @throws Exception in the event of an error 
+	 */
+	public HederaTransactionResult create(long shardNum, long realmNum, HederaFileID fileID, long initialBalance, long gas, byte[] constructorParameters, HederaDuration autoRenewPeriod, String contractMemo) throws Exception {
 
 		// setup defaults if necessary
 		
@@ -1094,6 +1104,7 @@ public class HederaContract implements Serializable {
 		this.fileID = fileID;
 		this.constructionParameters = constructorParameters;
 		this.autoRenewPeriod = autoRenewPeriod;
+		this.contractMemo = contractMemo;
 		
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
@@ -1149,6 +1160,18 @@ public class HederaContract implements Serializable {
 	 * @throws Exception in the event of an error 
 	 */
 	public HederaTransactionResult update(HederaTimeStamp expirationTime, HederaDuration autoRenewPeriod) throws Exception {
+		return this.update(expirationTime, autoRenewPeriod, "");
+	}
+	
+	/**
+	 * Updates a smart contract in the simplest possible way
+	 * @param expirationTime, a {@link HederaTimeStamp} update the expiration time of the smart contract
+	 * @param autoRenewPeriod, a {@link HederaDuration} to specify how often the smart contract should renew itself
+	 * @param contractMemo, the memo to store against the smart contract 
+	 * @return {@link HederaTransactionResult}
+	 * @throws Exception in the event of an error 
+	 */
+	public HederaTransactionResult update(HederaTimeStamp expirationTime, HederaDuration autoRenewPeriod, String contractMemo) throws Exception {
 
 		// setup defaults if necessary
 		
@@ -1158,6 +1181,7 @@ public class HederaContract implements Serializable {
 		// required
 		this.expirationTime = expirationTime;
 		this.autoRenewPeriod = autoRenewPeriod;
+		this.contractMemo = contractMemo;
 		
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
@@ -1212,10 +1236,24 @@ public class HederaContract implements Serializable {
 	 * @throws Exception in the event of an error 
 	 */
 	public HederaTransactionResult update(long shardNum, long realmNum, long contractNum, HederaTimeStamp expirationTime, HederaDuration autoRenewPeriod) throws Exception {
+		return this.update(shardNum, realmNum, contractNum, expirationTime, autoRenewPeriod, "");
+	}
+	/**
+	 * Updates a smart contract in the simplest possible way
+	 * @param shardNum, the shard number of the smart contract 
+	 * @param realmNum, the realm number of the smart contract
+	 * @param contractNum, the account number of the smart contract
+	 * @param expirationTime, a {@link HederaTimeStamp} update the expiration time of the smart contract
+	 * @param autoRenewPeriod, a {@link HederaDuration} to specify how often the smart contract should renew itself
+	 * @param contractMemo, the memo to store against the smart contract 
+	 * @return {@link HederaTransactionResult}
+	 * @throws Exception in the event of an error 
+	 */
+	public HederaTransactionResult update(long shardNum, long realmNum, long contractNum, HederaTimeStamp expirationTime, HederaDuration autoRenewPeriod, String contractMemo) throws Exception {
 		this.shardNum = shardNum;
 		this.realmNum = realmNum;
 		this.contractNum = contractNum;
-		return update(expirationTime, autoRenewPeriod);
+		return update(expirationTime, autoRenewPeriod, contractMemo);
 	}
 
 	/**

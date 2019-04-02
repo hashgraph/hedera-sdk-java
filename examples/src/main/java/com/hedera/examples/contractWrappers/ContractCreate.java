@@ -14,10 +14,15 @@ import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class ContractCreate {
 	public static HederaContract create(HederaContract contract, HederaFileID fileID, long gas, long initialBalance) throws Exception {
-		return create(contract, fileID, gas, initialBalance, new byte[0]); 
+		return create(contract, fileID, gas, initialBalance, new byte[0], ""); 
 	}
-	
+	public static HederaContract create(HederaContract contract, HederaFileID fileID, long gas, long initialBalance, String contractMemo) throws Exception {
+		return create(contract, fileID, gas, initialBalance, new byte[0], contractMemo); 
+	}
 	public static HederaContract create(HederaContract contract, HederaFileID fileID, long gas, long initialBalance, byte[] constParams) throws Exception {
+		return create(contract, fileID, gas, initialBalance, new byte[0], ""); 
+	}	
+	public static HederaContract create(HederaContract contract, HederaFileID fileID, long gas, long initialBalance, byte[] constParams, String contractMemo) throws Exception {
 		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaContract.class);
 		// new contract
 		long shardNum = 0;
@@ -32,7 +37,7 @@ public final class ContractCreate {
 		// create the new contract
 		// contract creation transaction
 		HederaTransactionResult createResult = contract.create(shardNum, realmNum, fileID, initialBalance, gas,
-				constructorParameters, autoRenewPeriod);
+				constructorParameters, autoRenewPeriod, contractMemo);
 		// was it successful ?
 		if (createResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 			// yes, get a receipt for the transaction

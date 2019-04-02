@@ -13,13 +13,16 @@ import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class ContractUpdate {
 	public static HederaContract update(HederaContract contract, HederaTimeStamp expirationTime, HederaDuration autoRenewDuration) throws Exception {
+		return update(contract, expirationTime, autoRenewDuration, "");
+	}	
+	public static HederaContract update(HederaContract contract, HederaTimeStamp expirationTime, HederaDuration autoRenewDuration, String contractMemo) throws Exception {
 		final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(ContractUpdate.class);
 
 		ExampleUtilities.showResult("**    CONTRACT UPDATE");
 		
 		// update the smart contract
 		// smart contract update transaction
-		HederaTransactionResult updateResult = contract.update(expirationTime, autoRenewDuration);
+		HederaTransactionResult updateResult = contract.update(expirationTime, autoRenewDuration, contractMemo);
 		// was it successful ?
 		if (updateResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 			// yes, get a receipt for the transaction
