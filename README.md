@@ -5,6 +5,10 @@
 
 The Java SDK for interacting with [Hedera Hashgraph](https://hedera.com): the official distributed consensus platform built using the hashgraph consensus algorithm for fast, fair and secure transactions. Hedera enables and empowers developers to build an entirely new class of decentralized applications.
 
+# Note about this branch
+This is work in progress in preparation for a testnet update. The branch of the SDK **WILL NOT WORK** on public testnets. Please use branch 0.2.0 or 0.2.2 unless you have been advised to use this one.
+Also, for this SDK version to compile, you will need to download and `mvn install` the `vNext` branch of the hedera-protobuf project.
+
 ## Version is 0.3.0
 
 The Hedera Java SDK uses [semantic versioning](https://semver.org/).
