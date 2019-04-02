@@ -20,7 +20,7 @@ public final class CreateAccount {
         var txId = new TransactionId(new AccountId(2));
         var tx = new AccountCreateTransaction()
             .setTransactionId(txId)
-            .setNodeAccountId(new AccountId(3))
+            .setNodeAccount(new AccountId(3))
             .setKey(newKey.getPublicKey())
             // default (from transaction id): .setShardId(0)
             // default (from transaction id): .setRealmId(0)

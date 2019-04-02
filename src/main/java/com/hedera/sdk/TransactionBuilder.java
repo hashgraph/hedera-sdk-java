@@ -26,7 +26,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
     }
 
     /** Sets the account of the node that submits the transaction to the network. */
-    public final T setNodeAccountId(AccountId accountId) {
+    public final T setNodeAccount(AccountId accountId) {
         inner.getBodyBuilder()
             .setNodeAccountID(accountId.inner);
         return self();
@@ -87,7 +87,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
     public final void validate() {
         var bodyBuilder = inner.getBodyBuilder();
         require(bodyBuilder.getTransactionIDBuilder(), ".setTransactionId() required");
-        require(bodyBuilder.getNodeAccountIDBuilder(), ".setNodeAccountId() required");
+        require(bodyBuilder.getNodeAccountIDBuilder(), ".setNodeAccount() required");
         doValidate();
         checkValidationErrors("transaction builder failed validation");
     }
