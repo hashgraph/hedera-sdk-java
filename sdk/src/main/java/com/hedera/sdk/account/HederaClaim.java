@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.LoggerFactory;
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.common.HederaAccountID;
+import com.hedera.sdk.common.HederaDuration;
 import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeySignature;
 import com.hedera.sdk.common.Utilities;
@@ -43,6 +44,10 @@ public class HederaClaim implements Serializable {
 	 */
 	public byte[] hash = new byte[0];
 	/**
+	 * The duration for which the claim is valid
+	 */
+	public HederaDuration duration = HederaDuration.HederaDurationYear();
+	/**
 	 * List of {@link HederaKeyPair} to attach to this claim
 	 * Note, these are mutually exclusive with keySignatures.
 	 * If keySignatures exist, keys will be ignored in any processing
@@ -61,7 +66,35 @@ public class HederaClaim implements Serializable {
 	public HederaClaim() {
 	}
 	/**
-	 * Constructor from shard, realm, account numbers and hash
+	 * Constructor from shard, realm, account numbers, hash and duration
+	 * @param shardNum the shard number for the claim
+	 * @param realmNum the realm number for the claim
+	 * @param accountNum the account number for the claim
+	 * @param hash the claim hash
+	 * @param duration for which the claim is valid ({@link HederaDuration}
+	 */
+	public HederaClaim(long shardNum, long realmNum, long accountNum, byte[] hash, HederaDuration duration) {
+		this.shardNum = shardNum;
+		this.realmNum = realmNum;
+		this.accountNum = accountNum;
+		this.hash = hash;
+		this.duration = duration;
+	}
+	/**
+	 * Constructor from {@link HederaAccountID}, hash and duration
+	 * @param accountID the account ID
+	 * @param hash the claim hash
+	 * @param duration for which the claim is valid ({@link HederaDuration}
+	 */
+	public HederaClaim(HederaAccountID accountID, byte[] hash, HederaDuration duration) {
+		this.shardNum = accountID.shardNum;
+		this.realmNum = accountID.realmNum;
+		this.accountNum = accountID.accountNum;
+		this.hash = hash;
+		this.duration = duration;
+	}
+	/**
+	 * Constructor from shard, realm, account numbers, hash and default duration
 	 * @param shardNum the shard number for the claim
 	 * @param realmNum the realm number for the claim
 	 * @param accountNum the account number for the claim
@@ -74,7 +107,7 @@ public class HederaClaim implements Serializable {
 		this.hash = hash;
 	}
 	/**
-	 * Constructor from {@link HederaAccountID} and hash
+	 * Constructor from {@link HederaAccountID}, hash and default duration
 	 * @param accountID the account ID
 	 * @param hash the claim hash
 	 */
@@ -93,6 +126,7 @@ public class HederaClaim implements Serializable {
 		this.shardNum = claim.getAccountID().getShardNum();
 		this.realmNum = claim.getAccountID().getRealmNum();
 		this.accountNum = claim.getAccountID().getAccountNum();
+		this.duration = new HederaDuration(claim.getClaimExpiration().getSeconds());
 
 		// hash
 		this.hash = claim.getHash().toByteArray();
@@ -119,6 +153,7 @@ public class HederaClaim implements Serializable {
 		HederaAccountID accountID = new HederaAccountID(this.shardNum, this.realmNum, this.accountNum);
 		protobuf.setAccountID(accountID.getProtobuf());
 		protobuf.setHash(ByteString.copyFrom(this.hash));
+		protobuf.setClaimExpiration(this.duration.getProtobuf());
 		
 		KeyList protoKeyList;
 		

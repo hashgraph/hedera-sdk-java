@@ -14,7 +14,7 @@ public class HederaDuration implements Serializable {
 	private static final long serialVersionUID = 1;
 
 	/**
-	 * the number of seconds (defaults to 120s = 2 minutes)
+	 * the number of seconds (defaults to 2 minutes)
 	 */
 	public long seconds = 120;
 
@@ -22,6 +22,25 @@ public class HederaDuration implements Serializable {
 	 * Constructor with default values 
 	 */
 	public HederaDuration() {
+	}
+	
+	public static HederaDuration HederaDurationMinute() {
+		return new HederaDuration(60);
+	}
+	public static HederaDuration HederaDurationHour() {
+		return new HederaDuration(60 * 60);
+	}
+	public static HederaDuration HederaDurationDay() {
+		return new HederaDuration(60 * 60 * 24);
+	}
+	public static HederaDuration HederaDurationWeek() {
+		return new HederaDuration(60 * 60 * 24 * 7);
+	}
+	public static HederaDuration HederaDurationMonth() {
+		return new HederaDuration(60 * 60 * 24 * 30);
+	}
+	public static HederaDuration HederaDurationYear() {
+		return new HederaDuration(60 * 60 * 24 * 365);
 	}
 
 	/**
@@ -33,18 +52,6 @@ public class HederaDuration implements Serializable {
 		this.seconds = seconds;
 	}
 
-	/**
-	 * Constructor with specific values for backwards compatibility, nanos are ignored
-	 * @deprecated use {@link #HederaDuration(long seconds)} instead. Nanos are no longer a property of a Duration
-	 * @param seconds the number of seconds
-	 * @param nanos the number of seconds
-	 */
-	@Deprecated
-	public HederaDuration(long seconds, long nanos) {
-
-		this.seconds = seconds;
-	}
-	
 	/**
 	 * Constructor from a protobuf duration
 	 * @param durationProtobuf the protobuf for the duration
