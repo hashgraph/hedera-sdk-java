@@ -25,7 +25,7 @@ public final class GetAccount {
         }
 
         var newKey = Ed25519PrivateKey.generate();
-        var account = new AccountId(2);
+        var account = new AccountId(1);
 
         var client = new Client(env.get("NETWORK"));
 
@@ -34,12 +34,11 @@ public final class GetAccount {
             .setTransactionId(new TransactionId(operator))
             .addSender(operator, 100000)
             .addRecipient(account, 100000)
-            .sign(operatorKey)
-            .sign(newKey);
+            .sign(operatorKey);
 
-        var txId = new TransactionId(new AccountId(2));
+        var txId = new TransactionId(operator);
         var tx = new AccountBalanceQuery()
-            .setAccount(new AccountId(3))
+            .setAccount(operator)
             .setPayment(txPayment);
 
         var balance = tx.execute(client);
