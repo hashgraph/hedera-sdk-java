@@ -22,6 +22,9 @@ Features supported include:
 
 ## Changes in this version from 0.1.0
 
+### 0.3.0 - Added smart contract memo support
+Smart contracts can now have a memo attached on create and it may be updated.
+
 ### 0.3.0 - Removal of deprecated signature related entities
 Signature, SignatureList and ThresholdSignature
 
