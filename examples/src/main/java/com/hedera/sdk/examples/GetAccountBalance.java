@@ -19,7 +19,6 @@ public final class GetAccountBalance {
 
         operator = AccountId.fromString(Objects.requireNonNull(env.get("OPERATOR")));
 
-        // var newKey = Ed25519PrivateKey.generate();
         var node = new AccountId(3);
 
         var client = new Client(env.get("NETWORK"));
