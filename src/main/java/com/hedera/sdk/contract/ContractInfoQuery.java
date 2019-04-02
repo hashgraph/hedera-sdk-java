@@ -6,11 +6,11 @@ import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 // `ContractGetInfoQuery`
-public final class ContractInfoQuery extends QueryBuilder<ContractGetInfoResponse> {
+public final class ContractInfoQuery extends QueryBuilder<ContractInfo> {
     private final com.hedera.sdk.proto.ContractGetInfoQuery.Builder builder;
 
     public ContractInfoQuery() {
-        super(Response::getContractGetInfo);
+        super(ContractInfo::new);
         builder = inner.getContractGetInfoBuilder();
     }
 
