@@ -8,7 +8,6 @@ import org.json.simple.JSONObject;
 import org.slf4j.LoggerFactory;
 
 import com.hederahashgraph.api.proto.java.KeyList;
-import com.hederahashgraph.api.proto.java.SignatureList;
 /**
  * A HederaKeySignatureList is a list of {@link HederaKeySignature}
  */
@@ -71,21 +70,6 @@ public class HederaKeySignatureList implements Serializable {
 
 		
 		return keyListProtobuf.build();
-	}
-	/**
-	 * Gets the protobuf for the signatures in this list
-	 * @return {@link SignatureList}
-	 */
-	public SignatureList getProtobufSignatures() {
-
-		// Generates the protobuf payload for this class
-		SignatureList.Builder sigListProtobuf = SignatureList.newBuilder();
-		for (HederaKeySignature sig : this.keySigPairs) {
-			sigListProtobuf.addSigs(sig.getSignatureProtobuf());
-		}
-
-		
-		return sigListProtobuf.build();
 	}
 	/**
 	 * Adds a key/signature pair to the list

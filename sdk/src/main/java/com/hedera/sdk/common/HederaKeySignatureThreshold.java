@@ -7,9 +7,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.slf4j.LoggerFactory;
 import com.hederahashgraph.api.proto.java.KeyList;
-import com.hederahashgraph.api.proto.java.SignatureList;
 import com.hederahashgraph.api.proto.java.ThresholdKey;
-import com.hederahashgraph.api.proto.java.ThresholdSignature;
 /**
  * This class is a helper for managing keys and signatures in tandem. 
  * Each instance of the object stores a threshold and List of {@link HederaKeySignature}
@@ -94,27 +92,6 @@ public class HederaKeySignatureThreshold implements Serializable {
 	
 
 		return keysProtobuf.build();
-	}
-	/**
-	 * Gets the protobuf {@link ThresholdSignature} for the signatures
-	 * @return {@link ThresholdSignature}
-	 */
-	public ThresholdSignature getSignatureProtobuf() {
-
-		// Generates the protobuf payload for this class
-		ThresholdSignature.Builder sigProtobuf = ThresholdSignature.newBuilder();
-		
-		SignatureList protoKeyList;
-		
-		if (!this.keySigPairs.isEmpty()) {
-			protoKeyList = Utilities.getProtoSignatureFromKeySigList(this.keySigPairs);
-			sigProtobuf.setSigs(protoKeyList);
-		} else {
-			return null;
-		}
-		
-
-		return sigProtobuf.build();
 	}
 	/**
 	 * Adds a key/signature pair to the list

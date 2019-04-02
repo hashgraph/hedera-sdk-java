@@ -8,8 +8,6 @@ import com.hedera.sdk.account.HederaAccountAmount;
 import com.hedera.sdk.common.HederaTransactionRecord;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.node.HederaNode;
-import com.hedera.sdk.common.HederaSignature;
-import com.hedera.sdk.common.HederaSignatureList;
 import com.hedera.sdk.common.HederaSignatures;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
 import com.hedera.sdk.common.HederaTransactionID;

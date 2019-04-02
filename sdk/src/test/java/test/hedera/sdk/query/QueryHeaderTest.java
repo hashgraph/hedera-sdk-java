@@ -5,9 +5,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.hedera.sdk.common.HederaKeyPair.KeyType;
-import com.hedera.sdk.common.HederaSignature;
-import com.hedera.sdk.common.HederaSignatureList;
 import com.hedera.sdk.common.HederaSignatures;
 import com.hedera.sdk.contract.HederaContract;
 import com.hedera.sdk.query.HederaQueryHeader;

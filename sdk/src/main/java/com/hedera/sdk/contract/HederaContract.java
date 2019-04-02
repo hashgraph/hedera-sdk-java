@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.LoggerFactory;
 import com.google.protobuf.ByteString;
-import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaContractID;
 import com.hedera.sdk.common.HederaDuration;
@@ -16,7 +15,6 @@ import com.hedera.sdk.common.HederaTransactionRecord;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.node.HederaNode;
 import com.hedera.sdk.common.HederaShardID;
-import com.hedera.sdk.common.HederaSignatureList;
 import com.hedera.sdk.common.HederaSignatures;
 import com.hedera.sdk.common.HederaTimeStamp;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
@@ -38,8 +36,6 @@ import com.hederahashgraph.api.proto.java.ContractGetBytecodeResponse;
 import com.hederahashgraph.api.proto.java.ContractGetInfoQuery;
 import com.hederahashgraph.api.proto.java.ContractGetInfoResponse;
 import com.hederahashgraph.api.proto.java.ContractUpdateTransactionBody;
-import com.hederahashgraph.api.proto.java.CryptoGetAccountRecordsQuery;
-import com.hederahashgraph.api.proto.java.CryptoGetAccountRecordsResponse;
 import com.hederahashgraph.api.proto.java.Response;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hederahashgraph.api.proto.java.ResponseHeader;
@@ -47,7 +43,6 @@ import com.hederahashgraph.api.proto.java.TransactionBody;
 import com.hederahashgraph.api.proto.java.ContractGetInfoResponse.ContractInfo;
 import com.hederahashgraph.api.proto.java.ContractGetRecordsQuery;
 import com.hederahashgraph.api.proto.java.ContractGetRecordsResponse;
-import com.hederahashgraph.api.proto.java.ContractID;
 
 /**
  * This class manages all aspects of interacting with a Smart Contract on Hedera Hashgraph 

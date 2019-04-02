@@ -954,29 +954,5 @@ public class HederaKeyPair implements Serializable {
 
 		return getEntities(null, HederaQueryHeader.QueryResponseType.COST_ANSWER_STATE_PROOF);
 	}
-	public HederaSignature getSignature(byte[] message) {
-		switch (this.keyType) {
-			case CONTRACT:
-				return new HederaSignature();
-			case ED25519:
-				return new HederaSignature(this.getKeyType(), this.signMessage(message));	
-			case LIST:
-				// create a signature list
-				HederaSignatureList list = new HederaSignatureList();
-				// iterate over the keys in the list
-				for (HederaKeyPair subKey : this.keyList.keys) {
-					HederaSignature subSig = subKey.getSignature(message);
-					// add to the list
-					list.addSignature(subSig);
-				}
-				// return a signature containing the list
-				return new HederaSignature(list);
-			case THRESHOLD:
-				return new HederaSignature();
-			default:
-				throw new IllegalStateException("Invalid Key Type");
-		}
-		
-	}
 	
 }

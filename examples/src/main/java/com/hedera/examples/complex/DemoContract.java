@@ -6,8 +6,6 @@ import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaContractID;
 import com.hedera.sdk.common.HederaDuration;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
-import com.hedera.sdk.common.HederaSignature;
-import com.hedera.sdk.common.HederaSignatureList;
 import com.hedera.sdk.common.HederaSignatures;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
 import com.hedera.sdk.common.HederaTransactionID;

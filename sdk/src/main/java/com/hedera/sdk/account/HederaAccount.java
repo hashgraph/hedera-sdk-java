@@ -14,7 +14,6 @@ import com.hedera.sdk.common.HederaRealmID;
 import com.hedera.sdk.common.HederaTransactionRecord;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.common.HederaShardID;
-import com.hedera.sdk.common.HederaSignatureList;
 import com.hedera.sdk.common.HederaSignatures;
 import com.hedera.sdk.common.HederaTimeStamp;
 import com.hedera.sdk.common.HederaTransactionID;
@@ -415,7 +414,7 @@ public class HederaAccount implements Serializable {
 	 * @param transactionValidDuration the duration of the transaction's validity as {@link HederaDuration}
 	 * @param generateRecord boolean to indicate if a record should be generated as a result of this transaction
 	 * @param memo String memo to include in the transaction
-	 * @param sigsForTransaction The signatures for the transaction as a {@link HederaSignatureList}
+	 * @param sigsForTransaction The signatures for the transaction as a {@link HederaSignatures}
 	 * @return {@link HederaTransactionResult}
 	 * @throws InterruptedException in the event that communication to the node resulted in an error
 	 */

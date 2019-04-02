@@ -12,11 +12,9 @@ import java.util.Random;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 
-import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.node.HederaNode;
 import com.hederahashgraph.api.proto.java.KeyList;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
-import com.hederahashgraph.api.proto.java.SignatureList;
 
 public class Utilities {
 	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(Utilities.class);
@@ -68,68 +66,6 @@ public class Utilities {
 		Random random = new SecureRandom();
 
 		return random.nextLong();
-	}
-	/**
-	 * Helper function to generate a {@link HederaKeySignature} for a given 
-	 * payload (body) and keypair
-	 * @param payload the payload to sign
-	 * @param keyPair the keypair to use for signing
-	 * @return {@link HederaKeySignature}
-	 * @throws Exception in the event of an error 
-	 */
-	public static HederaKeySignature getKeySignature(byte[] payload, HederaKeyPair keyPair) throws Exception {
-
-		byte[] signedBody = keyPair.signMessage(payload);
-		// create a Hedera Signature for it
-		HederaSignature signature = new HederaSignature(keyPair.getKeyType(), signedBody);
-
-		return new HederaKeySignature(keyPair.getKeyType(), keyPair.getPublicKeyEncoded(), signature.getSignature());
-	}
-	/**
-	 * Helper function to generate a {@link HederaKeySignature} for a given 
-	 * payload (body) key type, private and public key
-	 * @param payload the payload to sign
-	 * @param keyType the type of key
-	 * @param publicKey the public key
-	 * @param privateKey the private key
-	 * @return {@link HederaKeySignature}
-	 * @throws Exception in the event of an error 
-	 */
-	public static HederaKeySignature getKeySignature(byte[] payload, KeyType keyType, byte[] publicKey, byte[] privateKey) throws Exception {
-		// create new keypair
-		HederaKeyPair keyPair = new HederaKeyPair(keyType, publicKey, privateKey);
-		return getKeySignature(payload, keyPair);
-	}
-	/**
-	 * Helper function to generate a {@link HederaSignature} for a given 
-	 * payload (body) and keypair
-	 * @param payload the payload to sign
-	 * @param keyPair the keypair to use for the signature
-	 * @return {@link HederaSignature}
-	 * @throws Exception in the event of an error 
-	 */
-	public static HederaSignature getSignature(byte[] payload, HederaKeyPair keyPair) throws Exception {
-
-		byte[] signedBody = keyPair.signMessage(payload);
-		// create a Hedera Signature for it
-		HederaSignature signature = new HederaSignature(keyPair.getKeyType(), signedBody);
-
-		return new HederaSignature(keyPair.getKeyType(), signature.getSignature());
-	}
-	/**
-	 * Helper function to generate a {@link HederaSignature} for a given 
-	 * payload (body) key type and private key
-	 * @param payload the payload to sign
-	 * @param keyType the type of key
-	 * @param publicKey the public key
-	 * @param privateKey the private key
-	 * @return {@link HederaSignature}
-	 * @throws Exception in the event of an error 
-	 */
-	public static HederaSignature getSignature(byte[] payload, KeyType keyType, byte[] publicKey, byte[] privateKey) throws Exception {
-		// create new keypair
-		HederaKeyPair keyPair = new HederaKeyPair(keyType, publicKey, privateKey);
-		return getSignature(payload, keyPair);
 	}
 	/**
 	 * retrieves a receipt for a transaction, sleeps 1 second between attempts
@@ -464,6 +400,24 @@ public class Utilities {
 					logger.debug("precheck=CONTRACT_DELETED");
 					keepGoing = false;
 					break;
+			case INVALID_RENEWAL_PERIOD:
+				logger.debug("precheck=INVALID_RENEWAL_PERIOD");
+				keepGoing = false;
+				break;
+			case KEY_PREFIX_MISMATCH:
+				logger.debug("precheck=KEY_PREFIX_MISMATCH");
+				keepGoing = false;
+				break;
+			case PLATFORM_NOT_ACTIVE:
+				logger.debug("precheck=PLATFORM_NOT_ACTIVE");
+				keepGoing = false;
+				break;
+			case PLATFORM_TRANSACTION_NOT_CREATED:
+				logger.debug("precheck=PLATFORM_TRANSACTION_NOT_CREATED");
+				keepGoing = false;
+				break;
+			default:
+				break;
 					
 			}
 		}
@@ -495,31 +449,6 @@ public class Utilities {
 		
 		return keyListBuilder.build();
 		
-	}
-	
-	public static SignatureList getProtoSignatureFromKeySigList(List<HederaKeySignature> keySignatures) {
-		
-		com.hederahashgraph.api.proto.java.SignatureList.Builder sigListBuilder = SignatureList.newBuilder();
-		
-		if (!keySignatures.isEmpty()) {
-			for (HederaKeySignature keySig : keySignatures) {
-				sigListBuilder.addSigs(keySig.getSignatureProtobuf());
-			}
-		}
-		
-		return sigListBuilder.build();
-		
-	}
-	public static SignatureList getProtoSignatureList(List<HederaSignature> signatures) {
-		com.hederahashgraph.api.proto.java.SignatureList.Builder sigListBuilder = SignatureList.newBuilder();
-		
-		if (!signatures.isEmpty()) {
-			for (HederaSignature sig : signatures) {
-				sigListBuilder.addSigs(sig.getProtobuf());
-			}
-		}
-		
-		return sigListBuilder.build();
 	}
 	
 	public static void printResponseFailure(String location) {

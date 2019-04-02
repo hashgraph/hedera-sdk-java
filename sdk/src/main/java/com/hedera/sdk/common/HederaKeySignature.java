@@ -25,7 +25,6 @@ import com.hederahashgraph.api.proto.java.Key;
 import com.hederahashgraph.api.proto.java.Response;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hederahashgraph.api.proto.java.ResponseHeader;
-import com.hederahashgraph.api.proto.java.Signature;
 /**
  * This class is a helper for managing keys and signatures in tandem. Each instance of the object can store a {@link HederaKeyPair} and its corresponding {@link HederaSignature}
  */
@@ -341,51 +340,6 @@ public class HederaKeySignature implements Serializable {
 
 		
 		return keyProtobuf.build();
-	}
-	/** 
-	 * Returns the {@link Signature} protobuf for the signature held in this object
-	 * @return {@link Signature}
-	 */
-	public Signature getSignatureProtobuf() {
-
-		// Generates the protobuf payload for this class
-		Signature.Builder signatureProtobuf = Signature.newBuilder();
-		
-		switch (this.keyType) {
-		case ED25519:
-			if (this.signature != null) {
-				signatureProtobuf.setEd25519(ByteString.copyFrom(this.signature));
-			}
-			break;
-//		case RSA3072:
-//			if (this.signature != null) {
-//				signatureProtobuf.setRSA3072(ByteString.copyFrom(this.signature));
-//			}
-//			break;
-//		case ECDSA384:
-//			if (this.signature != null) {
-//				signatureProtobuf.setECDSA384(ByteString.copyFrom(this.signature));
-//			}
-//			break;
-		case CONTRACT:
-			signatureProtobuf.setContract(ByteString.copyFrom(new byte[0]));
-			break;
-		case THRESHOLD:
-			if (this.keySigThreshold != null) {
-				signatureProtobuf.setThresholdSignature(this.keySigThreshold.getSignatureProtobuf());
-			}
-			break;
-		case LIST:
-			if (this.keySigList != null) {
-				signatureProtobuf.setSignatureList(this.keySigList.getProtobufSignatures());
-			}
-			break;
-		case NOTSET:
-            throw new IllegalArgumentException("Signature type not set, unable to generate data.");			
-		}
-
-		
-		return signatureProtobuf.build();
 	}
 	/**
 	 * Sets the signatures against a matching key

@@ -12,8 +12,6 @@ import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeyList;
 import com.hedera.sdk.common.HederaRealmID;
 import com.hedera.sdk.common.HederaShardID;
-import com.hedera.sdk.common.HederaSignature;
-import com.hedera.sdk.common.HederaSignatureList;
 import com.hedera.sdk.common.HederaSignatures;
 import com.hedera.sdk.common.HederaTimeStamp;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;

@@ -5,8 +5,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.spongycastle.util.encoders.Hex;
-
 import com.google.protobuf.ByteString;
 import com.hederahashgraph.api.proto.java.SignatureMap;
 import com.hederahashgraph.api.proto.java.SignaturePair;
