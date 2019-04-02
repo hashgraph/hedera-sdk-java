@@ -20,7 +20,7 @@ public final class AccountId implements Entity {
             .setAccountNum(accountNum);
     }
 
-    /** Constructs an `AccountId` from a string formatted as <shardNum>.<realmNum>.<accountNum> * */
+    /** Constructs an `AccountId` from a string formatted as <shardNum>.<realmNum>.<accountNum> */
     public static AccountId fromString(String account) throws IllegalArgumentException {
         var rawNums = account.split("\\.");
 

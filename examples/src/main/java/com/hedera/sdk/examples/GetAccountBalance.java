@@ -17,12 +17,7 @@ public final class GetAccountBalance {
         var operatorKey = Ed25519PrivateKey.fromString(Objects.requireNonNull(env.get("OPERATOR_SECRET")));
         AccountId operator;
 
-        try {
-            operator = AccountId.fromString(Objects.requireNonNull(env.get("OPERATOR")));
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return;
-        }
+        operator = AccountId.fromString(Objects.requireNonNull(env.get("OPERATOR")));
 
         // var newKey = Ed25519PrivateKey.generate();
         var node = new AccountId(0, 0,3);
@@ -31,6 +26,7 @@ public final class GetAccountBalance {
 
         // Account balance query requires 100,000 tinybar
         var txPayment = new CryptoTransferTransaction()
+            .setNodeAccountId(node)
             .setTransactionId(new TransactionId(node))
             .addSender(operator, 100000)
             .addRecipient(node, 100000)
