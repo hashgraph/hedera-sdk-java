@@ -35,7 +35,7 @@ public abstract class ValidatedBuilder {
     }
 
     protected void require(@Nullable ByteString setValue, String errMsg) {
-        if (setValue == ByteString.EMPTY) {
+        if (setValue == null || setValue.isEmpty()) {
             addValidationError(errMsg);
         }
     }

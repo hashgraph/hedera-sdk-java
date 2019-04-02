@@ -44,6 +44,11 @@ public class AccountInfo {
 
         var infoResponse = response.getCryptoGetInfo();
         var accountInfo = infoResponse.getAccountInfo();
+
+        if (!accountInfo.hasKey()) {
+            throw new IllegalArgumentException("query response missing key");
+        }
+
         accountId = new AccountId(accountInfo.getAccountID());
         contractAccountId = accountInfo.getContractAccountID();
         deleted = accountInfo.getDeleted();
