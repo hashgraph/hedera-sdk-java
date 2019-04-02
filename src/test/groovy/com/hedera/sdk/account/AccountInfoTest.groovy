@@ -2,9 +2,7 @@ package com.hedera.sdk.account
 
 import com.hedera.sdk.AccountId
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey
-import com.hedera.sdk.crypto.ed25519.Ed25519PublicKey
 import com.hedera.sdk.proto.CryptoGetInfoResponse
-import com.hedera.sdk.proto.Query
 import com.hedera.sdk.proto.Response
 import spock.lang.Specification
 

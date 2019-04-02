@@ -1,6 +1,7 @@
 package com.hedera.sdk;
 
 import com.hedera.sdk.proto.AccountID;
+import com.hedera.sdk.proto.AccountIDOrBuilder;
 
 import java.util.Objects;
 
@@ -21,12 +22,8 @@ public final class AccountId implements Entity {
             .setAccountNum(accountNum);
     }
 
-    public AccountId(AccountID accountID) {
-        inner = accountID.toBuilder();
-    }
-
-    AccountId(AccountID.Builder inner) {
-        this.inner = inner;
+    public static AccountId fromProto(AccountIDOrBuilder accountID) {
+        return new AccountId(accountID.getShardNum(), accountID.getRealmNum(), accountID.getAccountNum());
     }
 
     public long getShardNum() {

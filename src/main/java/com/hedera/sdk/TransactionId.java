@@ -36,7 +36,7 @@ public final class TransactionId {
     }
 
     public AccountId getAccountId() {
-        return new AccountId(inner.getAccountIDBuilder());
+        return AccountId.fromProto(inner.getAccountIDBuilder());
     }
 
     public TransactionID toProto() {

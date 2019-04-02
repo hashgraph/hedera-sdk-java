@@ -12,7 +12,7 @@ public final class DurationHelper {
             .build();
     }
 
-    public static java.time.Duration durationToJava(Duration duration) {
+    public static java.time.Duration durationTo(Duration duration) {
         return java.time.Duration.ofSeconds(duration.getSeconds(), duration.getNanos());
     }
 }

@@ -17,7 +17,7 @@ public class AccountInfo {
     private final CryptoGetInfoResponse.AccountInfo inner;
 
     public AccountId getAccountId() {
-        return new AccountId(inner.getAccountIDOrBuilder());
+        return AccountId.fromProto(inner.getAccountIDOrBuilder());
     }
 
     public String getContractAccountId() {
@@ -30,7 +30,7 @@ public class AccountInfo {
 
     @Nullable
     public AccountId getProxyAccountId() {
-        return inner.hasProxyAccountID() ? new AccountId(inner.getProxyAccountIDOrBuilder()) : null;
+        return inner.hasProxyAccountID() ? AccountId.fromProto(inner.getProxyAccountIDOrBuilder()) : null;
     }
 
     public int getProxyFraction() {
@@ -57,16 +57,16 @@ public class AccountInfo {
         return inner.getGenerateReceiveRecordThreshold();
     }
 
-    public boolean isReceiverSigRequired() {
+    public boolean isReceiverSignatureRequired() {
         return inner.getReceiverSigRequired();
     }
 
     public Instant getExpirationTime() {
-        return TimestampHelper.timestampToInstant(inner.getExpirationTime());
+        return TimestampHelper.timestampTo(inner.getExpirationTime());
     }
 
     public Duration getAutoRenewPeriod() {
-        return DurationHelper.durationToJava(inner.getAutoRenewPeriod());
+        return DurationHelper.durationTo(inner.getAutoRenewPeriod());
     }
 
     public List<Claim> getClaims() {

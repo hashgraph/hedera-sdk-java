@@ -20,7 +20,7 @@ public final class TimestampHelper {
             .build();
     }
 
-    public static Instant timestampToInstant(Timestamp timestamp) {
+    public static Instant timestampTo(Timestamp timestamp) {
         return Instant.ofEpochSecond(timestamp.getSeconds(), timestamp.getNanos());
     }
 }
