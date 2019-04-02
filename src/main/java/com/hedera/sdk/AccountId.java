@@ -25,14 +25,10 @@ public final class AccountId implements Entity {
         var rawNums = account.split("\\.");
 
         if (rawNums.length != 3) {
-            throw new IllegalArgumentException(
-                    "Invalid Id format, should be in format {shardNum}.{realmNum}.{accountNum}");
+            throw new IllegalArgumentException("Invalid Id format, should be in format {shardNum}.{realmNum}.{accountNum}");
         }
 
-        return new AccountId(
-                Integer.parseInt(rawNums[0]),
-                Integer.parseInt(rawNums[1]),
-                Integer.parseInt(rawNums[2]));
+        return new AccountId(Integer.parseInt(rawNums[0]), Integer.parseInt(rawNums[1]), Integer.parseInt(rawNums[2]));
     }
 
     public static AccountId fromProto(AccountIDOrBuilder accountID) {
