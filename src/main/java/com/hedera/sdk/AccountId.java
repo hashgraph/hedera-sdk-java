@@ -1,6 +1,9 @@
 package com.hedera.sdk;
 
 import com.hedera.sdk.proto.AccountID;
+import com.hedera.sdk.proto.AccountIDOrBuilder;
+
+import java.util.Objects;
 
 // TODO: AccountId.fromString
 
@@ -19,8 +22,8 @@ public final class AccountId implements Entity {
             .setAccountNum(accountNum);
     }
 
-    AccountId(AccountID.Builder inner) {
-        this.inner = inner;
+    public static AccountId fromProto(AccountIDOrBuilder accountID) {
+        return new AccountId(accountID.getShardNum(), accountID.getRealmNum(), accountID.getAccountNum());
     }
 
     public long getShardNum() {
@@ -42,5 +45,21 @@ public final class AccountId implements Entity {
 
     public AccountID toProto() {
         return inner.build();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        var other = (AccountId) o;
+        return other.getAccountNum() == getAccountNum() && other.getRealmNum() == getRealmNum()
+                && other.getShardNum() == this.getShardNum();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getAccountNum(), getRealmNum(), getShardNum());
     }
 }

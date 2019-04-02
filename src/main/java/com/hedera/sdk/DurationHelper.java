@@ -11,4 +11,8 @@ public final class DurationHelper {
             .setNanos(duration.getNano())
             .build();
     }
+
+    public static java.time.Duration durationTo(Duration duration) {
+        return java.time.Duration.ofSeconds(duration.getSeconds(), duration.getNanos());
+    }
 }

@@ -12,7 +12,7 @@ public final class Claim implements Entity {
         this.innner = inner;
     }
 
-    public Claim fromProto(com.hedera.sdk.proto.Claim claim) {
+    public static Claim fromProto(com.hedera.sdk.proto.Claim claim) {
         return new Claim(claim);
     }
 
