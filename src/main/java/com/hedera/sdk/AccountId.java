@@ -5,8 +5,6 @@ import com.hedera.sdk.proto.AccountIDOrBuilder;
 
 import java.util.Objects;
 
-// TODO: AccountId.fromString
-
 public final class AccountId implements Entity {
     final AccountID.Builder inner;
 
@@ -22,8 +20,26 @@ public final class AccountId implements Entity {
             .setAccountNum(accountNum);
     }
 
+    /** Constructs an `AccountId` from a string formatted as <shardNum>.<realmNum>.<accountNum> * */
+    public static AccountId fromString(String account) throws Exception {
+        var rawNums = account.split("\\.");
+
+        if (rawNums.length != 3) {
+            throw new Exception("Invalid Id format");
+        }
+
+        return new AccountId(
+                Integer.parseInt(rawNums[0]),
+                Integer.parseInt(rawNums[1]),
+                Integer.parseInt(rawNums[2]));
+    }
+
     public static AccountId fromProto(AccountIDOrBuilder accountID) {
         return new AccountId(accountID.getShardNum(), accountID.getRealmNum(), accountID.getAccountNum());
+    }
+
+    AccountId(AccountID.Builder inner) {
+        this.inner = inner;
     }
 
     public long getShardNum() {
