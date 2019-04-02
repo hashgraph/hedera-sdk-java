@@ -24,24 +24,23 @@ public final class GetAccount {
             return;
         }
 
-        var newKey = Ed25519PrivateKey.generate();
-        var account = new AccountId(1);
+        // var newKey = Ed25519PrivateKey.generate();
+        var node = new AccountId(0, 0,3);
 
         var client = new Client(env.get("NETWORK"));
 
         // Account balance query requires 100,000 tinybar
         var txPayment = new CryptoTransferTransaction()
-            .setTransactionId(new TransactionId(operator))
+            .setTransactionId(new TransactionId(node))
             .addSender(operator, 100000)
-            .addRecipient(account, 100000)
+            .addRecipient(node, 100000)
             .sign(operatorKey);
 
-        var txId = new TransactionId(operator);
-        var tx = new AccountBalanceQuery()
+        var query = new AccountBalanceQuery()
             .setAccount(operator)
             .setPayment(txPayment);
 
-        var balance = tx.execute(client);
+        var balance = query.execute(client);
 
         System.out.println(balance.toString());
 
