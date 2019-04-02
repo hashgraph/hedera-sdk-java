@@ -10,7 +10,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
 
-public final class GetAccount {
+public final class GetAccountBalance {
     public static void main (String[] args) {
         var env = Dotenv.load();
 
