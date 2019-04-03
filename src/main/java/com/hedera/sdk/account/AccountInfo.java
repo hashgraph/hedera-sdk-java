@@ -17,7 +17,7 @@ public class AccountInfo {
     private final CryptoGetInfoResponse.AccountInfo inner;
 
     public AccountId getAccountId() {
-        return AccountId.fromProto(inner.getAccountIDOrBuilder());
+        return new AccountId(inner.getAccountIDOrBuilder());
     }
 
     public String getContractAccountId() {
@@ -30,7 +30,7 @@ public class AccountInfo {
 
     @Nullable
     public AccountId getProxyAccountId() {
-        return inner.hasProxyAccountID() ? AccountId.fromProto(inner.getProxyAccountIDOrBuilder()) : null;
+        return inner.hasProxyAccountID() ? new AccountId(inner.getProxyAccountIDOrBuilder()) : null;
     }
 
     public int getProxyFraction() {
@@ -72,7 +72,7 @@ public class AccountInfo {
     public List<Claim> getClaims() {
         return inner.getClaimsList()
             .stream()
-            .map(Claim::fromProto)
+            .map(Claim::new)
             .collect(Collectors.toList());
     }
 

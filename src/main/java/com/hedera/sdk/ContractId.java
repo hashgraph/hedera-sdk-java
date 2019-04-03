@@ -16,6 +16,10 @@ public final class ContractId implements Key, Entity {
             .setContractNum(contractNum);
     }
 
+    public ContractId(ContractIDOrBuilder contractID) {
+        this(contractID.getShardNum(), contractID.getRealmNum(), contractID.getContractNum());
+    }
+
     public long getShardNum() {
         return inner.getShardNum();
     }
@@ -54,9 +58,5 @@ public final class ContractId implements Key, Entity {
 
     public ContractID toProto() {
         return inner.build();
-    }
-
-    public static ContractId fromProto(ContractIDOrBuilder contractID) {
-        return new ContractId(contractID.getShardNum(), contractID.getRealmNum(), contractID.getContractNum());
     }
 }

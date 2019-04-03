@@ -8,12 +8,8 @@ import java.util.stream.Collectors;
 public final class Claim implements Entity {
     private final com.hedera.sdk.proto.Claim innner;
 
-    private Claim(com.hedera.sdk.proto.Claim inner) {
+    public Claim(com.hedera.sdk.proto.Claim inner) {
         this.innner = inner;
-    }
-
-    public static Claim fromProto(com.hedera.sdk.proto.Claim claim) {
-        return new Claim(claim);
     }
 
     public AccountId getAcccount() {
@@ -31,7 +27,7 @@ public final class Claim implements Entity {
         return this.innner.getKeys()
             .getKeysList()
             .stream()
-            .map(key -> Key.fromProtoKey(key))
+            .map(Key::fromProtoKey)
             .collect(Collectors.toList());
     }
 }

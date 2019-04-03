@@ -40,12 +40,8 @@ public final class AccountId implements Entity {
         return new AccountId(newAccount);
     }
 
-    public static AccountId fromProto(AccountIDOrBuilder accountID) {
-        return new AccountId(accountID.getShardNum(), accountID.getRealmNum(), accountID.getAccountNum());
-    }
-
-    AccountId(AccountID.Builder inner) {
-        this.inner = inner;
+    public AccountId(AccountIDOrBuilder accountId) {
+        this(accountId.getShardNum(), accountId.getRealmNum(), accountId.getAccountNum());
     }
 
     public long getShardNum() {

@@ -25,11 +25,11 @@ public final class ContractInfo {
     }
 
     public ContractId getContractId() {
-        return ContractId.fromProto(inner.getContractIDOrBuilder());
+        return new ContractId(inner.getContractIDOrBuilder());
     }
 
     public AccountId getAccountId() {
-        return AccountId.fromProto(inner.getAccountIDOrBuilder());
+        return new AccountId(inner.getAccountIDOrBuilder());
     }
 
     public String getContractAccountId() {
