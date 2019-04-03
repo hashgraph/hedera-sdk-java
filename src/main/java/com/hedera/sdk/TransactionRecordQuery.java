@@ -3,10 +3,10 @@ package com.hedera.sdk;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
-public class TransactionGetRecordQuery extends QueryBuilder<TransactionGetRecordResponse> {
+public class TransactionRecordQuery extends QueryBuilder<TransactionGetRecordResponse> {
     private final com.hedera.sdk.proto.TransactionGetRecordQuery.Builder builder;
 
-    public TransactionGetRecordQuery() {
+    public TransactionRecordQuery() {
         super(Response::getTransactionGetRecord);
         builder = inner.getTransactionGetRecordBuilder();
     }
@@ -16,7 +16,7 @@ public class TransactionGetRecordQuery extends QueryBuilder<TransactionGetRecord
         return builder.getHeaderBuilder();
     }
 
-    public TransactionGetRecordQuery setTransaction(TransactionId transaction) {
+    public TransactionRecordQuery setTransaction(TransactionId transaction) {
         builder.setTransactionID(transaction.inner);
         return this;
     }
