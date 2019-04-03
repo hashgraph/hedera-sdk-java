@@ -11,7 +11,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.util.Objects;
 
 public final class GetAccountBalance {
-    public static void main (String[] args) {
+    public static void main(String[] args) {
         var env = Dotenv.load();
 
         var operatorKey = Ed25519PrivateKey.fromString(Objects.requireNonNull(env.get("OPERATOR_SECRET")));
@@ -24,15 +24,13 @@ public final class GetAccountBalance {
         var client = new Client(env.get("NETWORK"));
 
         // Account balance query requires 100,000 tinybar
-        var txPayment = new CryptoTransferTransaction()
-            .setNodeAccount(node)
+        var txPayment = new CryptoTransferTransaction().setNodeAccount(node)
             .setTransactionId(new TransactionId(node))
             .addSender(operator, 100000)
             .addRecipient(node, 100000)
             .sign(operatorKey);
 
-        var query = new AccountBalanceQuery()
-            .setAccount(operator)
+        var query = new AccountBalanceQuery().setAccount(operator)
             .setPayment(txPayment);
 
         var balance = query.execute(client);

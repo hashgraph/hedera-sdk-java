@@ -113,7 +113,7 @@ tasks.withType(JavaCompile) {
 
 spotless {
 	java {
-		target 'example/**/*.java', 'src/**/*.java'
+		target 'examples/**/*.java', 'src/**/*.java'
 		removeUnusedImports()
 		eclipse().configFile 'spotless.eclipseformat.xml'
 	}

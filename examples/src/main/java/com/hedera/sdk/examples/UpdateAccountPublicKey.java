@@ -2,7 +2,7 @@ package com.hedera.sdk.examples;
 
 import com.hedera.sdk.AccountId;
 import com.hedera.sdk.Client;
-import com.hedera.sdk.TransactionGetReceiptQuery;
+import com.hedera.sdk.TransactionReceiptQuery;
 import com.hedera.sdk.TransactionId;
 import com.hedera.sdk.account.AccountCreateTransaction;
 import com.hedera.sdk.account.AccountUpdateTransaction;
@@ -25,8 +25,7 @@ public final class UpdateAccountPublicKey {
         var originalKey = Ed25519PrivateKey.generate();
 
         var txId = new TransactionId(new AccountId(2));
-        var tx = new AccountCreateTransaction()
-            .setTransactionId(txId)
+        var tx = new AccountCreateTransaction().setTransactionId(txId)
             .setNodeAccount(new AccountId(3))
             .setKey(originalKey.getPublicKey())
             .sign(operatorKey);
@@ -36,22 +35,21 @@ public final class UpdateAccountPublicKey {
         // Sleep for 4 seconds
         Thread.sleep(4000);
 
-        var query = new TransactionGetReceiptQuery()
-            .setTransaction(txId);
+        var query = new TransactionReceiptQuery().setTransaction(txId);
 
         var receipt = query.execute(client);
-        var receiptStatus = receipt.getReceipt().getStatus();
+        var receiptStatus = receipt.getReceipt()
+            .getStatus();
 
-        var newAccountId = AccountId.fromProto(receipt
-            .getReceipt()
-            .getAccountID()
+        var newAccountId = AccountId.fromProto(
+            receipt.getReceipt()
+                .getAccountID()
         );
 
         // Now we update the key
         var newKey = Ed25519PrivateKey.generate();
         txId = new TransactionId(new AccountId(6));
-        tx = new AccountUpdateTransaction()
-            .setTransactionId(txId)
+        tx = new AccountUpdateTransaction().setTransactionId(txId)
             .setNodeAccount(new AccountId(3))
             .setAccountforUpdate(newAccountId)
             .setKey(newKey.getPublicKey())
@@ -67,11 +65,11 @@ public final class UpdateAccountPublicKey {
         // Sleep for 4 seconds
         Thread.sleep(4000);
 
-        query = new TransactionGetReceiptQuery()
-            .setTransaction(txId);
+        query = new TransactionReceiptQuery().setTransaction(txId);
 
         receipt = query.execute(client);
-        receiptStatus = receipt.getReceipt().getStatus();
+        receiptStatus = receipt.getReceipt()
+            .getStatus();
 
         System.out.println("status: " + receiptStatus.toString());
     }
