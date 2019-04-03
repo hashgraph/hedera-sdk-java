@@ -4,6 +4,7 @@ import com.hedera.sdk.AccountId;
 import com.hedera.sdk.Client;
 import com.hedera.sdk.TransactionGetReceiptQuery;
 import com.hedera.sdk.TransactionId;
+import com.hedera.sdk.account.AccountCreateTransaction;
 import com.hedera.sdk.account.AccountUpdateTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -15,24 +16,22 @@ public final class UpdateAccountPublicKey {
         var env = Dotenv.load();
 
         var operatorKey = Ed25519PrivateKey.fromString(env.get("OPERATOR_SECRET"));
-        var newKey = Ed25519PrivateKey.generate();
 
         var client = new Client(env.get("NETWORK"));
 
+        // First we create a new account so we don't affect our account
+        var originalKey = Ed25519PrivateKey.generate();
+
         var txId = new TransactionId(new AccountId(2));
-        var tx = new AccountUpdateTransaction()
+        var tx = new AccountCreateTransaction()
             .setTransactionId(txId)
-            .setNodeAccountId(new AccountId(3))
-            .setAccountforUpdate(new AccountId(4))
-            .setKey(newKey.getPublicKey())
+            .setNodeAccount(new AccountId(3))
+            .setKey(originalKey.getPublicKey())
             .sign(operatorKey);
 
         var res = tx.execute(client);
 
-        System.out.println("transaction: " + res.toString());
-
         // Sleep for 4 seconds
-        // TODO: We should make the query here retry internally if its "not ready" or "busy"
         Thread.sleep(4000);
 
         var query = new TransactionGetReceiptQuery()
@@ -40,6 +39,37 @@ public final class UpdateAccountPublicKey {
 
         var receipt = query.execute(client);
         var receiptStatus = receipt.getReceipt().getStatus();
+
+        var newAccountId = AccountId.fromProto(receipt
+            .getReceipt()
+            .getAccountID()
+        );
+
+        // Now we update the key
+        var newKey = Ed25519PrivateKey.generate();
+        txId = new TransactionId(new AccountId(2));
+        tx = new AccountUpdateTransaction()
+            .setTransactionId(txId)
+            .setNodeAccount(new AccountId(3))
+            .setAccountforUpdate(newAccountId)
+            .setKey(newKey.getPublicKey())
+            // sign as the transaction payer
+            .sign(operatorKey)
+            // sign as the owner of the account
+            .sign(originalKey);
+
+        res = tx.execute(client);
+
+        System.out.println("transaction: " + res.toString());
+
+        // Sleep for another 4 seconds
+        Thread.sleep(4000);
+
+        query = new TransactionGetReceiptQuery()
+            .setTransaction(txId);
+
+        receipt = query.execute(client);
+        receiptStatus = receipt.getReceipt().getStatus();
 
         System.out.println("status: " + receiptStatus.toString());
     }
