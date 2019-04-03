@@ -4,6 +4,7 @@ import com.hedera.sdk.AccountId;
 import com.hedera.sdk.Client;
 import com.hedera.sdk.TransactionGetReceiptQuery;
 import com.hedera.sdk.TransactionId;
+import com.hedera.sdk.account.AccountBalanceQuery;
 import com.hedera.sdk.account.CryptoTransferTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -16,18 +17,22 @@ public final class TransferCrypto {
     public static void main(String[] args) throws InterruptedException {
         var env = Dotenv.load();
 
-        var operator = new AccountId(2);
+        var operator = AccountId.fromString(Objects.requireNonNull(env.get("OPERATOR")));
         var operatorKey = Ed25519PrivateKey.fromString(Objects.requireNonNull(env.get("OPERATOR_SECRET")));
+
+        var node = new AccountId(3);
 
         var client = new Client(env.get("NETWORK"));
 
-        var receiver = new AccountId(3);
+        var recipient = AccountId.fromString(Objects.requireNonNull(env.get("Recipient")));
 
         var txId = new TransactionId(new AccountId(3));
         var tx = new CryptoTransferTransaction()
+            .setTransactionId(txId)
+            .setNodeAccount(node)
             /// value must be positive for both send and receive
             .addSender(operator, 100000)
-            .addRecipient(receiver, 100000)
+            .addRecipient(recipient, 100000)
             // You can also add multiple Senders or Receivers,
             // the total value sent and received must be equal.
 
@@ -49,16 +54,20 @@ public final class TransferCrypto {
         // TODO: We should make the query here retry internally if its "not ready" or "busy"
         Thread.sleep(4000);
 
-        var query = new TransactionGetReceiptQuery()
-            .setTransaction(txId);
+        // Next we get the balance after the transaction
+        var txPayment = new CryptoTransferTransaction()
+            .setNodeAccount(node)
+            .setTransactionId(new TransactionId(node))
+            .addSender(operator, 100000)
+            .addRecipient(node, 100000)
+            .sign(operatorKey);
 
-        var receipt = query.execute(client);
-        var receiptStatus = receipt.getReceipt().getStatus();
+        var query = new AccountBalanceQuery()
+            .setAccount(recipient)
+            .setPayment(txPayment);
 
-        System.out.println("status: " + receiptStatus.toString());
+        var balance = query.execute(client);
 
-        var newAccountId = receipt.getReceipt().getAccountID();
-
-        // System.out.println("new account num: " + newAccountId.getAccountNum());
+        System.out.println(balance.toString());
     }
 }
