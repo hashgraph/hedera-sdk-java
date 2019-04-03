@@ -28,7 +28,7 @@ public final class CreateFile {
 
         var tx = new FileCreateTransaction()
             .setTransactionId(txId)
-            .setNodeAccountId(new AccountId(3))
+            .setNodeAccount(new AccountId(3))
             .setExpirationTime(Instant.now().plus(Duration.ofSeconds(2592000)))
             .addKey(operatorKey.getPublicKey())
             .setContents(fileContents.getBytes())
