@@ -10,19 +10,22 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Objects;
 
 @SuppressWarnings("Duplicates")
 public final class CreateFile {
     public static void main(String[] args) throws InterruptedException {
         var env = Dotenv.load();
 
-        var operatorKey = Ed25519PrivateKey.fromString(env.get("OPERATOR_SECRET"));
+        var operatorKey = Ed25519PrivateKey.fromString(Objects.requireNonNull(env.get("OPERATOR_SECRET")));
         var operator = new AccountId(2);
 
 
         var client = new Client(env.get("NETWORK"));
 
-        var fileContents = "Hedera hashgraph is great!";
+        // The file is required to be a byte array,
+        // you can easily use this from a file
+        var fileContents = "Hedera hashgraph is great!".getBytes();
 
         var txId = new TransactionId(new AccountId(2));
 
@@ -31,8 +34,11 @@ public final class CreateFile {
             .setNodeAccount(new AccountId(3))
             .setExpirationTime(Instant.now().plus(Duration.ofSeconds(2592000)))
             .addKey(operatorKey.getPublicKey())
-            .setContents(fileContents.getBytes())
+            .setContents(fileContents)
             .setMemo("[hedera-sdk-java][example] CreateFile")
+            // The first signature represents the transaction payer
+            .sign(operatorKey)
+            // The second signature represents the owner of the file
             .sign(operatorKey);
 
         var res = tx.execute(client);
