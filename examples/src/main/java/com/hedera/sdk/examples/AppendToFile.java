@@ -2,7 +2,7 @@ package com.hedera.sdk.examples;
 
 import com.hedera.sdk.AccountId;
 import com.hedera.sdk.Client;
-import com.hedera.sdk.TransactionGetReceiptQuery;
+import com.hedera.sdk.TransactionReceiptQuery;
 import com.hedera.sdk.TransactionId;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.sdk.file.FileAppendTransaction;
@@ -67,7 +67,7 @@ public final class AppendToFile {
         // Sleep for 4 seconds
         Thread.sleep(4000);
 
-        var query = new TransactionGetReceiptQuery().setTransaction(txId);
+        var query = new TransactionReceiptQuery().setTransaction(txId);
 
         var receipt = query.execute(client);
         var receiptStatus = receipt.getReceipt()
