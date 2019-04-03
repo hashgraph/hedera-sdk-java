@@ -9,13 +9,15 @@ import com.hedera.sdk.account.AccountUpdateTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.util.Objects;
+
 // Ignore duplicate warnings since many examples will look similar
 @SuppressWarnings("Duplicates")
 public final class UpdateAccountPublicKey {
     public static void main(String[] args) throws InterruptedException {
         var env = Dotenv.load();
 
-        var operatorKey = Ed25519PrivateKey.fromString(env.get("OPERATOR_SECRET"));
+        var operatorKey = Ed25519PrivateKey.fromString(Objects.requireNonNull(env.get("OPERATOR_SECRET")));
 
         var client = new Client(env.get("NETWORK"));
 
@@ -47,7 +49,7 @@ public final class UpdateAccountPublicKey {
 
         // Now we update the key
         var newKey = Ed25519PrivateKey.generate();
-        txId = new TransactionId(new AccountId(2));
+        txId = new TransactionId(new AccountId(6));
         tx = new AccountUpdateTransaction()
             .setTransactionId(txId)
             .setNodeAccount(new AccountId(3))
@@ -62,7 +64,7 @@ public final class UpdateAccountPublicKey {
 
         System.out.println("transaction: " + res.toString());
 
-        // Sleep for another 4 seconds
+        // Sleep for 4 seconds
         Thread.sleep(4000);
 
         query = new TransactionGetReceiptQuery()
