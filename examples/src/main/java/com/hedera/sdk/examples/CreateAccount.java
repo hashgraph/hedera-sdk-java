@@ -42,14 +42,12 @@ public final class CreateAccount {
         var query = new TransactionReceiptQuery().setTransaction(txId);
 
         var receipt = query.execute(client);
-        var receiptStatus = receipt.getReceipt()
-            .getStatus();
+        var receiptStatus = receipt.getStatus();
 
         System.out.println("status: " + receiptStatus.toString());
 
-        var newAccountId = receipt.getReceipt()
-            .getAccountID();
-
+        var newAccountId = receipt.getAccountId();
+        assert newAccountId != null;
         System.out.println("new account num: " + newAccountId.getAccountNum());
     }
 }

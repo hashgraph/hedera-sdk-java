@@ -70,8 +70,7 @@ public final class AppendToFile {
         var query = new TransactionReceiptQuery().setTransaction(txId);
 
         var receipt = query.execute(client);
-        var receiptStatus = receipt.getReceipt()
-            .getStatus();
+        var receiptStatus = receipt.getStatus();
 
         System.out.println("status: " + receiptStatus.toString());
     }

@@ -3,11 +3,11 @@ package com.hedera.sdk;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
-public final class TransactionFastRecordQuery extends QueryBuilder<TransactionGetFastRecordResponse> {
+public final class TransactionFastRecordQuery extends QueryBuilder<TransactionRecord> {
     private final com.hedera.sdk.proto.TransactionGetFastRecordQuery.Builder builder;
 
     public TransactionFastRecordQuery() {
-        super(Response::getTransactionGetFastRecord);
+        super(TransactionRecord::new);
         builder = inner.getTransactionGetFastRecordBuilder();
     }
 

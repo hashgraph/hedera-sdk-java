@@ -51,13 +51,12 @@ public final class CreateFile {
         var query = new TransactionReceiptQuery().setTransaction(txId);
 
         var receipt = query.execute(client);
-        var receiptStatus = receipt.getReceipt()
-            .getStatus();
+        var receiptStatus = receipt.getStatus();
 
         System.out.println("status: " + receiptStatus.toString());
 
-        var newFileId = receipt.getReceipt()
-            .getFileID();
+        var newFileId = receipt.getFileId();
+        assert newFileId != null;
 
         System.out.println("new file num: " + newFileId.getFileNum());
     }
