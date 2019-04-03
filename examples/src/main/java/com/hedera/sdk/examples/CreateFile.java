@@ -27,10 +27,12 @@ public final class CreateFile {
 
         var txId = new TransactionId(new AccountId(2));
 
-        var tx = new FileCreateTransaction()
-            .setTransactionId(txId)
+        var tx = new FileCreateTransaction().setTransactionId(txId)
             .setNodeAccount(new AccountId(3))
-            .setExpirationTime(Instant.now().plus(Duration.ofSeconds(2592000)))
+            .setExpirationTime(
+                Instant.now()
+                    .plus(Duration.ofSeconds(2592000))
+            )
             .addKey(operatorKey.getPublicKey())
             .setContents(fileContents)
             .setMemo("[hedera-sdk-java][example] CreateFile")
@@ -46,17 +48,17 @@ public final class CreateFile {
         // Sleep for 4 seconds
         Thread.sleep(4000);
 
-        var query = new TransactionGetReceiptQuery()
-            .setTransaction(txId);
+        var query = new TransactionGetReceiptQuery().setTransaction(txId);
 
         var receipt = query.execute(client);
-        var receiptStatus = receipt.getReceipt().getStatus();
+        var receiptStatus = receipt.getReceipt()
+            .getStatus();
 
         System.out.println("status: " + receiptStatus.toString());
 
-        var newFileId = receipt.getReceipt().getFileID();
+        var newFileId = receipt.getReceipt()
+            .getFileID();
 
         System.out.println("new file num: " + newFileId.getFileNum());
     }
 }
-
