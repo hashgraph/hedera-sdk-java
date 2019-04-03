@@ -3,6 +3,7 @@ package com.hedera.sdk;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public final class Client {
 
@@ -11,6 +12,14 @@ public final class Client {
 
     public Client(String... targets) {
         this(Arrays.asList(targets));
+    }
+
+    public Client(Targets... targets) {
+        this(
+                Arrays.stream(targets)
+                    .map(Targets::toString)
+                    .collect(Collectors.toList())
+        );
     }
 
     public Client(Iterable<String> targets) {
