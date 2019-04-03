@@ -22,6 +22,10 @@ Features supported include:
 
 ## Changes in this version from 0.1.0
 
+### 0.3.0 - Added support for current and next exchange rates in HederaTransactionReceipt
+
+Hedera receipts now contain the current next hBar to US Dollar Cent exchange rate. This is now available from the `HederaTransactionReceipt` class as `getCurrentExchangeRate` and `getNextExchangeRate`. Both methods return a `HederaExchangeRate` object which includes the value which denotes habar equivalent to cent and the value which denotes cents (USD) equivalent to Hbar. The expiration time (seconds since epoch) for both is also a property of the `HederaExchangeRate` class.
+
 ### 0.3.0 - Added support for updating `receiveSignatureRequired` on cryptoAccounts
 
 The Hedera API now supports updating `receiveSignatureRequired` on existing cryptoAccounts

@@ -3,6 +3,8 @@ package com.hedera.sdk.common;
 import java.io.Serializable;
 import com.hedera.sdk.node.HederaNode;
 import com.hedera.sdk.transaction.HederaTransaction;
+import com.hederahashgraph.api.proto.java.ExchangeRate;
+import com.hederahashgraph.api.proto.java.ExchangeRateSet;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hederahashgraph.api.proto.java.TransactionGetReceiptResponse;
 import com.hederahashgraph.api.proto.java.TransactionReceipt;
@@ -15,6 +17,9 @@ public class HederaTransactionReceipt implements Serializable {
 	final ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(HederaTransactionReceipt.class);
 	private static final long serialVersionUID = 1;
 
+   	public HederaExchangeRate currentExchangeRate = new HederaExchangeRate(0, 0, 0);
+   	public HederaExchangeRate nextExchangeRate = new HederaExchangeRate(0, 0, 0);
+   	
 	/**
 	 * The status of the transaction - {@link ResponseCodeEnum}
 	 */
@@ -127,15 +132,39 @@ public class HederaTransactionReceipt implements Serializable {
 	   	if (receipt.hasContractID()) {
 	   		this.contractID = new HederaContractID(receipt.getContractID());
 	   	}
-
+	   	
+	   	this.currentExchangeRate = new HederaExchangeRate(
+	   			receipt.getExchangeRate().getCurrentRate().getHbarEquiv()
+	   			, receipt.getExchangeRate().getCurrentRate().getCentEquiv()
+	   			, receipt.getExchangeRate().getCurrentRate().getExpirationTime().getSeconds()
+	   	);
+	   	this.currentExchangeRate = new HederaExchangeRate(
+	   			receipt.getExchangeRate().getNextRate().getHbarEquiv()
+	   			, receipt.getExchangeRate().getNextRate().getCentEquiv()
+	   			, receipt.getExchangeRate().getNextRate().getExpirationTime().getSeconds()
+	   	);
 	}
+	/**
+	 * Gets the current exchange rate stored in the receipt
+	 * @return {@link HederaExchangeRate}
+	 */
+	public HederaExchangeRate getCurrentExchangeRate() {
+		return this.currentExchangeRate;
+	}
+	/**
+	 * Gets the next exchange rate stored in the receipt
+	 * @return {@link HederaExchangeRate}
+	 */
+	public HederaExchangeRate getNextExchangeRate() {
+		return this.nextExchangeRate;
+	}
+	
 
 	/**
 	 * Generate a {@link TransactionReceipt} protobuf payload for this object
 	 * @return {@link TransactionReceipt}  
 	 */
 	public TransactionReceipt getProtobuf() {
-
 		
 		TransactionReceipt.Builder transactionReceipt = TransactionReceipt.newBuilder();
 		
@@ -150,8 +179,6 @@ public class HederaTransactionReceipt implements Serializable {
 		}
 
    		transactionReceipt.setStatus(this.transactionStatus);
-		
-
 
 		return transactionReceipt.build();
 	}
