@@ -3,10 +3,10 @@ package com.hedera.sdk;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
-public final class TransactionGetFastRecordQuery extends QueryBuilder<TransactionGetFastRecordResponse> {
+public final class TransactionFastRecordQuery extends QueryBuilder<TransactionGetFastRecordResponse> {
     private final com.hedera.sdk.proto.TransactionGetFastRecordQuery.Builder builder;
 
-    public TransactionGetFastRecordQuery() {
+    public TransactionFastRecordQuery() {
         super(Response::getTransactionGetFastRecord);
         builder = inner.getTransactionGetFastRecordBuilder();
     }
@@ -16,7 +16,7 @@ public final class TransactionGetFastRecordQuery extends QueryBuilder<Transactio
         return builder.getHeaderBuilder();
     }
 
-    public TransactionGetFastRecordQuery setTransaction(TransactionId transactionId) {
+    public TransactionFastRecordQuery setTransaction(TransactionId transactionId) {
         builder.setTransactionID(transactionId.inner);
         return this;
     }

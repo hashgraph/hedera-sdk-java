@@ -16,7 +16,7 @@ message TransactionGetRecordQuery {
     TransactionID transactionID = 2; // the ID of the transaction for which the record is requested.
 }
 
-/* Response when the client sends the node TransactionGetRecordQuery */
+/* Response when the client sends the node TransactionRecordQuery */
 message TransactionGetRecordResponse {
     ResponseHeader header = 1; //standard response from node to client, including the requested fields: cost, or state proof, or both, or neither.
     TransactionRecord transactionRecord = 3; // the requested record

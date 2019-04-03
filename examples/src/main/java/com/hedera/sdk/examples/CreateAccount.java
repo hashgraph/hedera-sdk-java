@@ -2,7 +2,7 @@ package com.hedera.sdk.examples;
 
 import com.hedera.sdk.AccountId;
 import com.hedera.sdk.Client;
-import com.hedera.sdk.TransactionGetReceiptQuery;
+import com.hedera.sdk.TransactionReceiptQuery;
 import com.hedera.sdk.TransactionId;
 import com.hedera.sdk.account.AccountCreateTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
@@ -39,7 +39,7 @@ public final class CreateAccount {
         // TODO: We should make the query here retry internally if its "not ready" or "busy"
         Thread.sleep(4000);
 
-        var query = new TransactionGetReceiptQuery()
+        var query = new TransactionReceiptQuery()
             .setTransaction(txId);
 
         var receipt = query.execute(client);
