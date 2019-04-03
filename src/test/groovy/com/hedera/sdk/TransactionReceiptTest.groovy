@@ -20,8 +20,8 @@ class TransactionReceiptTest extends Specification {
 	def "nullable fields return null"() {
 		given:
 		def response = Response.newBuilder()
-			.setTransactionGetReceipt(TransactionGetReceiptResponse.defaultInstance)
-			.build()
+				.setTransactionGetReceipt(TransactionGetReceiptResponse.defaultInstance)
+				.build()
 
 		when:
 		def receipt = new TransactionReceipt(response)
@@ -36,11 +36,11 @@ class TransactionReceiptTest extends Specification {
 	def "receipt with account ID"() {
 		given:
 		def response = Response.newBuilder()
-			.setTransactionGetReceipt(TransactionGetReceiptResponse.newBuilder()
-			.setReceipt(com.hedera.sdk.proto.TransactionReceipt.newBuilder()
-			.setAccountID(new AccountId(1, 2, 3).toProto())
-			.build()).build())
-			.build()
+				.setTransactionGetReceipt(TransactionGetReceiptResponse.newBuilder()
+				.setReceipt(com.hedera.sdk.proto.TransactionReceipt.newBuilder()
+				.setAccountID(new AccountId(1, 2, 3).toProto())
+				.build()).build())
+				.build()
 
 		when:
 		def receipt = new TransactionReceipt(response)

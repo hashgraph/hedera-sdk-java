@@ -1,6 +1,5 @@
 package com.hedera.sdk;
 
-import com.hedera.sdk.proto.AccountID;
 import com.hedera.sdk.proto.Timestamp;
 import com.hedera.sdk.proto.TransactionID;
 import com.hedera.sdk.proto.TransactionIDOrBuilder;
@@ -64,8 +63,10 @@ public final class TransactionId {
 
     @Override
     public boolean equals(Object other) {
-        if (this == other) return true;
-        if (!(other instanceof TransactionId)) return false;
+        if (this == other)
+            return true;
+        if (!(other instanceof TransactionId))
+            return false;
         var txnId = (TransactionId) other;
         return getAccountId().equals(txnId.getAccountId()) && getValidStart().equals(txnId.getValidStart());
     }

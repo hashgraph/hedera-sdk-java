@@ -20,7 +20,8 @@ public final class FunctionResult {
     }
 
     public byte[] getCallResult() {
-        return inner.getContractCallResult().toByteArray();
+        return inner.getContractCallResult()
+            .toByteArray();
     }
 
     @Nullable
@@ -30,7 +31,8 @@ public final class FunctionResult {
     }
 
     public byte[] getBloomFilter() {
-        return inner.getBloom().toByteArray();
+        return inner.getBloom()
+            .toByteArray();
     }
 
     public long getGasUsed() {
@@ -38,7 +40,10 @@ public final class FunctionResult {
     }
 
     public List<LogInfo> getLogs() {
-        return inner.getLogInfoList().stream().map(LogInfo::new).collect(Collectors.toList());
+        return inner.getLogInfoList()
+            .stream()
+            .map(LogInfo::new)
+            .collect(Collectors.toList());
     }
 
     // this only appears in this API so
@@ -50,9 +55,14 @@ public final class FunctionResult {
 
         private LogInfo(ContractLoginfoOrBuilder logInfo) {
             contractId = new ContractId(logInfo.getContractIDOrBuilder());
-            bloomFilter = logInfo.getBloom().toByteArray();
-            topics = logInfo.getTopicList().stream().map(ByteString::toByteArray).collect(Collectors.toList());
-            data = logInfo.getData().toByteArray();
+            bloomFilter = logInfo.getBloom()
+                .toByteArray();
+            topics = logInfo.getTopicList()
+                .stream()
+                .map(ByteString::toByteArray)
+                .collect(Collectors.toList());
+            data = logInfo.getData()
+                .toByteArray();
         }
     }
 }

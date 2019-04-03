@@ -21,8 +21,8 @@ class TransactionRecordTest extends Specification {
 	def "record can use `TransactionGetRecord`"() {
 		given:
 		def response = Response.newBuilder()
-		.setTransactionGetRecord(TransactionGetRecordResponse.defaultInstance)
-		.build()
+				.setTransactionGetRecord(TransactionGetRecordResponse.defaultInstance)
+				.build()
 
 		when:
 		def record = new TransactionRecord(response)
@@ -41,8 +41,8 @@ class TransactionRecordTest extends Specification {
 	def "record can use `TransactionGetFastRecord`"() {
 		given:
 		def response = Response.newBuilder()
-			.setTransactionGetFastRecord(TransactionGetFastRecordResponse.defaultInstance)
-			.build()
+				.setTransactionGetFastRecord(TransactionGetFastRecordResponse.defaultInstance)
+				.build()
 
 		when:
 		def record = new TransactionRecord(response)

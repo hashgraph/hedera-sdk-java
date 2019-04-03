@@ -13,7 +13,8 @@ public final class TransactionReceipt {
             throw new IllegalArgumentException("response was not `TransactionGetReceipt`");
         }
 
-        inner = response.getTransactionGetReceipt().getReceipt();
+        inner = response.getTransactionGetReceipt()
+            .getReceipt();
     }
 
     TransactionReceipt(com.hedera.sdk.proto.TransactionReceipt inner) {

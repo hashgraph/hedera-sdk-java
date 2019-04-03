@@ -14,14 +14,16 @@ import java.util.function.Function;
 public class ContractCallQuery extends QueryBuilder<FunctionResult> {
     private final com.hedera.sdk.proto.ContractCallLocalQuery.Builder builder;
 
-    private static final Function<Response, FunctionResult> mapResponse =
-        response -> {
-            if (!response.hasContractCallLocal()) {
-                throw new IllegalArgumentException("response was not `ContractCallLocal`");
-            }
+    private static final Function<Response, FunctionResult> mapResponse = response -> {
+        if (!response.hasContractCallLocal()) {
+            throw new IllegalArgumentException("response was not `ContractCallLocal`");
+        }
 
-            return new FunctionResult(response.getContractCallLocal().getFunctionResult());
-        };
+        return new FunctionResult(
+                response.getContractCallLocal()
+                    .getFunctionResult()
+        );
+    };
 
     public ContractCallQuery() {
         super(mapResponse);

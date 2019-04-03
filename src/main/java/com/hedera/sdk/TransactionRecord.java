@@ -1,6 +1,5 @@
 package com.hedera.sdk;
 
-import com.hedera.sdk.proto.AccountAmount;
 import com.hedera.sdk.proto.AccountAmountOrBuilder;
 import com.hedera.sdk.proto.Response;
 
@@ -14,9 +13,11 @@ public final class TransactionRecord {
 
     TransactionRecord(Response response) {
         if (response.hasTransactionGetRecord()) {
-            inner = response.getTransactionGetRecord().getTransactionRecord();
+            inner = response.getTransactionGetRecord()
+                .getTransactionRecord();
         } else if (response.hasTransactionGetFastRecord()) {
-            inner = response.getTransactionGetFastRecord().getTransactionRecord();
+            inner = response.getTransactionGetFastRecord()
+                .getTransactionRecord();
         } else {
             throw new IllegalArgumentException("response was not `TransactionGetRecord` or `TransactionGetFastRecord`");
         }
@@ -64,7 +65,13 @@ public final class TransactionRecord {
 
     @Nullable
     public List<Transfer> getTransfers() {
-        return inner.hasTransferList() ? inner.getTransferList().getAccountAmountsList().stream().map(Transfer::new).collect(Collectors.toList()) : null;
+        return inner.hasTransferList()
+            ? inner.getTransferList()
+                .getAccountAmountsList()
+                .stream()
+                .map(Transfer::new)
+                .collect(Collectors.toList())
+            : null;
     }
 
     public static class Transfer {
