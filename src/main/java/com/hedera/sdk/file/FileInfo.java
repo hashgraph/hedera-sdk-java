@@ -27,7 +27,7 @@ public final class FileInfo {
     }
 
     public FileId getFileId() {
-        return FileId.fromProto(inner.getFileIDOrBuilder());
+        return new FileId(inner.getFileIDOrBuilder());
     }
 
     public long getSize() {

@@ -3,11 +3,11 @@ package com.hedera.sdk;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
-public class TransactionRecordQuery extends QueryBuilder<TransactionGetRecordResponse> {
+public class TransactionRecordQuery extends QueryBuilder<TransactionRecord> {
     private final com.hedera.sdk.proto.TransactionGetRecordQuery.Builder builder;
 
     public TransactionRecordQuery() {
-        super(Response::getTransactionGetRecord);
+        super(TransactionRecord::new);
         builder = inner.getTransactionGetRecordBuilder();
     }
 
@@ -23,8 +23,7 @@ public class TransactionRecordQuery extends QueryBuilder<TransactionGetRecordRes
 
     @Override
     protected MethodDescriptor<Query, Response> getMethod() {
-        // FIXME does not have a corresponding service method
-        throw new Error("not implemented");
+        return CryptoServiceGrpc.getGetTxRecordByTxIDMethod();
     }
 
     @Override

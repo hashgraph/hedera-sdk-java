@@ -6,32 +6,28 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public final class Claim implements Entity {
-    private final com.hedera.sdk.proto.Claim innner;
+    private final com.hedera.sdk.proto.Claim inner;
 
-    private Claim(com.hedera.sdk.proto.Claim inner) {
-        this.innner = inner;
-    }
-
-    public static Claim fromProto(com.hedera.sdk.proto.Claim claim) {
-        return new Claim(claim);
+    public Claim(com.hedera.sdk.proto.Claim inner) {
+        this.inner = inner;
     }
 
     public AccountId getAcccount() {
-        AccountID account = this.innner.getAccountID();
+        AccountID account = this.inner.getAccountID();
 
         return new AccountId(account.getShardNum(), account.getRealmNum(), account.getAccountNum());
     }
 
     public byte[] getHash() {
-        return this.innner.getHash()
+        return this.inner.getHash()
             .toByteArray();
     }
 
     public List<Key> getKeys() {
-        return this.innner.getKeys()
+        return this.inner.getKeys()
             .getKeysList()
             .stream()
-            .map(key -> Key.fromProtoKey(key))
+            .map(Key::fromProtoKey)
             .collect(Collectors.toList());
     }
 }

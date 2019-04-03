@@ -38,13 +38,10 @@ public final class UpdateAccountPublicKey {
         var query = new TransactionReceiptQuery().setTransaction(txId);
 
         var receipt = query.execute(client);
-        var receiptStatus = receipt.getReceipt()
-            .getStatus();
+        var receiptStatus = receipt.getStatus();
 
-        var newAccountId = AccountId.fromProto(
-            receipt.getReceipt()
-                .getAccountID()
-        );
+        var newAccountId = receipt.getAccountId();
+        assert newAccountId != null;
 
         // Now we update the key
         var newKey = Ed25519PrivateKey.generate();
@@ -68,8 +65,7 @@ public final class UpdateAccountPublicKey {
         query = new TransactionReceiptQuery().setTransaction(txId);
 
         receipt = query.execute(client);
-        receiptStatus = receipt.getReceipt()
-            .getStatus();
+        receiptStatus = receipt.getStatus();
 
         System.out.println("status: " + receiptStatus.toString());
     }

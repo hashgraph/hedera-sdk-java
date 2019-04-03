@@ -15,6 +15,13 @@ public final class FileId implements Entity {
             .setFileNum(fileNum);
     }
 
+    public FileId(FileIDOrBuilder fileId) {
+        inner = FileID.newBuilder()
+            .setShardNum(fileId.getShardNum())
+            .setRealmNum(fileId.getRealmNum())
+            .setFileNum(fileId.getFileNum());
+    }
+
     public long getShardNum() {
         return inner.getShardNum();
     }
@@ -44,9 +51,5 @@ public final class FileId implements Entity {
 
     public FileID toProto() {
         return inner.build();
-    }
-
-    public static FileId fromProto(FileIDOrBuilder fileID) {
-        return new FileId(fileID.getShardNum(), fileID.getRealmNum(), fileID.getFileNum());
     }
 }
