@@ -18,13 +18,11 @@ public final class CreateFile {
         var env = Dotenv.load();
 
         var operatorKey = Ed25519PrivateKey.fromString(Objects.requireNonNull(env.get("OPERATOR_SECRET")));
-        var operator = new AccountId(2);
-
 
         var client = new Client(env.get("NETWORK"));
 
         // The file is required to be a byte array,
-        // you can easily use this from a file
+        // you can easily use the bytes of a file instead.
         var fileContents = "Hedera hashgraph is great!".getBytes();
 
         var txId = new TransactionId(new AccountId(2));
