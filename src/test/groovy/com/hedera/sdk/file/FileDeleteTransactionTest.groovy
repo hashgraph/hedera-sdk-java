@@ -10,7 +10,7 @@ import java.time.Instant
 class FileDeleteTransactionTest extends Specification {
 	def "Transaction can be built with defaults"() {
 		when:
-			def tx = new FileDeleteTransaction()
+		def tx = new FileDeleteTransaction()
 		then:
 		tx.build().toString() == """body {
   transactionFee: 100000
