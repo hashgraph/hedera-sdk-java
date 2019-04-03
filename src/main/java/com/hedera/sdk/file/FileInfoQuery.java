@@ -6,11 +6,11 @@ import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 // `FileGetInfoQuery`
-public class FileInfoQuery extends QueryBuilder<FileGetInfoResponse> {
+public class FileInfoQuery extends QueryBuilder<FileInfo> {
     private final com.hedera.sdk.proto.FileGetInfoQuery.Builder builder;
 
     public FileInfoQuery() {
-        super(Response::getFileGetInfo);
+        super(FileInfo::new);
         builder = inner.getFileGetInfoBuilder();
     }
 

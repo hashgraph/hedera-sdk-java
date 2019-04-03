@@ -2,9 +2,12 @@ package com.hedera.sdk;
 
 import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.ContractID;
+import com.hedera.sdk.proto.ContractIDOrBuilder;
 
-public class ContractId implements Key, Entity {
-    transient ContractID.Builder inner;
+import java.util.Objects;
+
+public final class ContractId implements Key, Entity {
+    private final ContractID.Builder inner;
 
     public ContractId(long shardNum, long realmNum, long contractNum) {
         inner = ContractID.newBuilder()
@@ -32,7 +35,28 @@ public class ContractId implements Key, Entity {
             .build();
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(getShardNum(), getRealmNum(), getContractNum());
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other)
+            return true;
+        if (!(other instanceof ContractId))
+            return false;
+        var contractId = (ContractId) other;
+
+        return getShardNum() == contractId.getShardNum() && getRealmNum() == contractId.getRealmNum()
+                && getContractNum() == contractId.getContractNum();
+    }
+
     public ContractID toProto() {
         return inner.build();
+    }
+
+    public static ContractId fromProto(ContractIDOrBuilder contractID) {
+        return new ContractId(contractID.getShardNum(), contractID.getRealmNum(), contractID.getContractNum());
     }
 }
