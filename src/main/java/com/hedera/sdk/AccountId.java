@@ -1,11 +1,10 @@
 package com.hedera.sdk;
 
+import com.google.common.base.Splitter;
 import com.hedera.sdk.proto.AccountID;
 import com.hedera.sdk.proto.AccountIDOrBuilder;
 
 import java.util.Objects;
-
-// TODO: AccountId.fromString
 
 public final class AccountId implements Entity {
     final AccountID.Builder inner;
@@ -22,8 +21,31 @@ public final class AccountId implements Entity {
             .setAccountNum(accountNum);
     }
 
+    /** Constructs an `AccountId` from a string formatted as <shardNum>.<realmNum>.<accountNum> */
+    public static AccountId fromString(String account) throws IllegalArgumentException {
+        var rawNums = Splitter.on('.')
+            .split(account)
+            .iterator();
+
+        var newAccount = AccountID.newBuilder();
+
+        try {
+            newAccount.setRealmNum(Integer.parseInt(rawNums.next()));
+            newAccount.setShardNum(Integer.parseInt(rawNums.next()));
+            newAccount.setAccountNum(Integer.parseInt(rawNums.next()));
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid Id format, should be in format {shardNum}.{realmNum}.{accountNum}");
+        }
+
+        return new AccountId(newAccount);
+    }
+
     public static AccountId fromProto(AccountIDOrBuilder accountID) {
         return new AccountId(accountID.getShardNum(), accountID.getRealmNum(), accountID.getAccountNum());
+    }
+
+    AccountId(AccountID.Builder inner) {
+        this.inner = inner;
     }
 
     public long getShardNum() {
