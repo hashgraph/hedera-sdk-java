@@ -8,7 +8,6 @@ import com.hedera.sdk.account.AccountCreateTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import io.github.cdimascio.dotenv.Dotenv;
 
-// Ignore duplicate warnings since many examples will look similar
 @SuppressWarnings("Duplicates")
 public final class CreateAccount {
     public static void main(String[] args) throws InterruptedException {
