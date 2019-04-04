@@ -5,38 +5,62 @@ import io.grpc.ManagedChannelBuilder;
 import java.util.*;
 import java.util.stream.Collectors;
 
+class ChannelPair {
+    final ManagedChannel channel;
+    final AccountId node;
+
+    ChannelPair(ManagedChannel channel, AccountId node) {
+        this.channel = channel;
+        this.node = node;
+    }
+}
+
 public final class Client {
 
-    private final List<ManagedChannel> channels;
+    //private final List<ManagedChannel> channels;
     private final Random random = new Random();
 
-    public Client(String... targets) {
-        this(Arrays.asList(targets));
+    private Map<String, ChannelPair> channels;
+
+    public Client(Map<String, AccountId> targets) {
+        assert !targets.isEmpty();
+
+        channels = targets.entrySet()
+            .stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, t -> new ChannelPair(ManagedChannelBuilder.forTarget(t.getKey())
+                .build(), t.getValue()
+            )));
     }
 
-    public Client(Targets... targets) {
+    public Client(Target... targets) {
         this(
                 Arrays.stream(targets)
-                    .map(Targets::toString)
-                    .collect(Collectors.toList())
+                    .collect(Collectors.toMap(Target::getAddress, Target::getNode))
         );
     }
 
-    public Client(Iterable<String> targets) {
-        var channelList = new ArrayList<ManagedChannel>();
-        for (String target : targets) {
-            channelList.add(
-                ManagedChannelBuilder.forTarget(target)
-                    .usePlaintext()
-                    .build()
-            );
+    ManagedChannel getChannel() {
+        var r = random.nextInt(channels.size() - 1);
+        var channelIter = channels.entrySet()
+            .iterator();
+
+        for (int i = 0; i < r; i++) {
+            channelIter.next();
         }
 
-        assert !channelList.isEmpty();
-        channels = channelList;
+        return channelIter.next()
+            .getValue().channel;
     }
 
-    ManagedChannel getChannel() {
-        return channels.get(random.nextInt(channels.size()));
+    AccountId getNodeForTarget(String target) throws IllegalArgumentException {
+        AccountId node;
+
+        try {
+            node = channels.get(target).node;
+        } catch (Exception e) {
+            throw new IllegalArgumentException();
+        }
+
+        return node;
     }
 }
