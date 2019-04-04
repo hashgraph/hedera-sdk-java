@@ -17,9 +17,7 @@ class ChannelPair {
 
 public final class Client {
 
-    //private final List<ManagedChannel> channels;
     private final Random random = new Random();
-
     private Map<String, ChannelPair> channels;
 
     public Client(Map<String, AccountId> targets) {
@@ -40,7 +38,9 @@ public final class Client {
     }
 
     ManagedChannel getChannel() {
-        var r = random.nextInt(channels.size() - 1);
+
+        System.out.println(channels.size());
+        var r = random.nextInt(channels.size() > 1 ? channels.size() - 1 : 1);
         var channelIter = channels.entrySet()
             .iterator();
 

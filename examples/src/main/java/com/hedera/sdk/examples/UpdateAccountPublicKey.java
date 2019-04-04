@@ -9,6 +9,7 @@ import com.hedera.sdk.account.AccountUpdateTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.util.Map;
 import java.util.Objects;
 
 // Ignore duplicate warnings since many examples will look similar
@@ -19,7 +20,9 @@ public final class UpdateAccountPublicKey {
 
         var operatorKey = Ed25519PrivateKey.fromString(Objects.requireNonNull(env.get("OPERATOR_SECRET")));
 
-        var client = new Client(env.get("NETWORK"));
+        var client = new Client(
+                Map.of(Objects.requireNonNull(env.get("NETWORK")), AccountId.fromString(Objects.requireNonNull(env.get("NODE"))))
+        );
 
         // First we create a new account so we don't affect our account
         var originalKey = Ed25519PrivateKey.generate();
