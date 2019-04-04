@@ -39,7 +39,6 @@ public final class Client {
 
     ManagedChannel getChannel() {
 
-        System.out.println(channels.size());
         var r = random.nextInt(channels.size() > 1 ? channels.size() - 1 : 1);
         var channelIter = channels.entrySet()
             .iterator();
