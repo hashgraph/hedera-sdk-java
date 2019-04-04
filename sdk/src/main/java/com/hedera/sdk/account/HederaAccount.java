@@ -970,13 +970,13 @@ public class HederaAccount implements Serializable {
 			updateTransaction.setProxyAccountID(this.proxyAccountID.getProtobuf());
 		}
 		if (this.receiveRecordThreshold != 0) {
-			updateTransaction.setReceiveRecordThreshold(UInt64Value.of(this.receiveRecordThreshold));
+			updateTransaction.setReceiveRecordThresholdWrapper(UInt64Value.of(this.receiveRecordThreshold));
 		}
 		if (this.sendRecordThreshold != 0) {
-			updateTransaction.setSendRecordThreshold(UInt64Value.of(this.sendRecordThreshold));
+			updateTransaction.setSendRecordThresholdWrapper(UInt64Value.of(this.sendRecordThreshold));
 		}
 		if (this.receiverSigRequiredChanged) {
-			updateTransaction.setReceiverSigRequired(BoolValue.of(this.receiverSigRequired));
+			updateTransaction.setReceiverSigRequiredWrapper(BoolValue.of(this.receiverSigRequired));
 		}
 		
 		return updateTransaction.build();

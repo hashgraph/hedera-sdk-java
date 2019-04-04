@@ -1,6 +1,8 @@
 package com.hedera.sdk.common;
 
 import java.io.Serializable;
+
+import com.hederahashgraph.api.proto.java.FeeComponents;
 import com.hederahashgraph.api.proto.java.FeeData;
 
 /**
@@ -26,6 +28,12 @@ public class HederaFeeData implements Serializable {
 	 * Default constructor, creates a HederaFeeData with default values
 	 */
 	public HederaFeeData() {
+	}
+
+	public HederaFeeData(FeeData feeData) {
+		this.networkData = new HederaFeeComponents(feeData.getNetworkdata());
+		this.nodeData = new HederaFeeComponents(feeData.getNodedata());
+		this.serviceData = new HederaFeeComponents(feeData.getServicedata());
 	}
 
 	/**

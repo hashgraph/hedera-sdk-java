@@ -1,9 +1,13 @@
 package com.hedera.sdk.common;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
-import com.hederahashgraph.api.proto.java.FeeComponents;
-
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.hederahashgraph.api.proto.java.CurrentAndNextFeeSchedule;
+import com.hederahashgraph.api.proto.java.FeeSchedule;
+import com.hederahashgraph.api.proto.java.HederaFunctionality;
+import com.hederahashgraph.api.proto.java.TransactionFeeSchedule;
 
 /**
  * The fee schedule for a specific hedera functionality and the time period this fee will be valid for the transaction
@@ -11,77 +15,74 @@ import com.hederahashgraph.api.proto.java.FeeComponents;
 public class HederaFeeSchedule implements Serializable {
 	private static final long serialVersionUID = 1;
 
+	private HashMap<HederaFunctionality, HederaTransactionFeeSchedule> currentTransactionFeeSchedule = null;
+	private long currentValidExpiry = 0;
+	private HashMap<HederaFunctionality, HederaTransactionFeeSchedule> nextTransactionFeeSchedule = null;
+	private long nextValidExpiry = 0;
 	/**
-	 * 	the minimum fees that needs to be paid
+	 * Build up the fee schedule from input from a file loaded from the Hedera File System
+	 * @param scheduleBytes the byte array containing the fee schedule
+	 * @throws InvalidProtocolBufferException
 	 */
-	public long min	= 0;
-	/**
-	 * the maximum fees that can be submitted
-	 */
-	public long max	= 0;
-	/**
-	 * a constant determined by the business to calculate the fees
-	 */
-	public long constant = 0;
-	/**
-	 * bytes per transaction
-	 */
-	public long	bpt	= 0;	 	
-	/**
-	 * 	verifications per transaction
-	 */
-	public long vpt	= 0;
-	/**
-	 * 	ram byte seconds
-	 */
-	public long rbs	= 0;
-	/**
-	 * 	storage byte seconds
-	 */
-	public long sbs	= 0;
-	/**
-	 * ethereum gas
-	 */
-	public long gas	= 0;
-	/**
-	 * transaction value (crypto transfers amount, tv is in tiny bars divided by 1000, rounded down)
-	 */
-	public long tv = 0;
-	/**
-	 * bytes per response 
-	 */
-	public long bpr = 0;
-	/**
-	 * storage bytes per response
-	 */
-	public long sbpr = 0;	 	
-	
-	/**
-	 * Default constructor, creates a HederaContractID with default values
-	 */
-	public HederaFeeSchedule() {
+	public HederaFeeSchedule(byte[] scheduleBytes) throws InvalidProtocolBufferException {
+		parseScheduleBytes(scheduleBytes);
 	}
+	
+	private void parseScheduleBytes(byte[] scheduleBytes) throws InvalidProtocolBufferException {
+		CurrentAndNextFeeSchedule currentAndNextFeeSchedule = CurrentAndNextFeeSchedule.parseFrom(scheduleBytes);
+		
+		FeeSchedule feeSchedule = currentAndNextFeeSchedule.getCurrentFeeSchedule();
+		this.currentValidExpiry = feeSchedule.getExpiryTime().getSeconds();
+		
+		for (int i=0; i < feeSchedule.getTransactionFeeScheduleCount(); i++) {
+			TransactionFeeSchedule transactionFeeScheduleProto = feeSchedule.getTransactionFeeSchedule(i);
+			
+			HederaTransactionFeeSchedule hederaTransactionFeeSchedule = new HederaTransactionFeeSchedule();
+			hederaTransactionFeeSchedule.hederaFunctionality = transactionFeeScheduleProto.getHederaFunctionality();
+			HederaFeeData hederaFeeData = new HederaFeeData(transactionFeeScheduleProto.getFeeData());
+			hederaTransactionFeeSchedule.feeData = hederaFeeData;
+			
+			this.currentTransactionFeeSchedule.put(transactionFeeScheduleProto.getHederaFunctionality(), hederaTransactionFeeSchedule);
+		}
 
+		feeSchedule = currentAndNextFeeSchedule.getNextFeeSchedule();
+		this.nextValidExpiry = feeSchedule.getExpiryTime().getSeconds();
+		
+		for (int i=0; i < feeSchedule.getTransactionFeeScheduleCount(); i++) {
+			TransactionFeeSchedule transactionFeeScheduleProto = feeSchedule.getTransactionFeeSchedule(i);
+			
+			HederaTransactionFeeSchedule hederaTransactionFeeSchedule = new HederaTransactionFeeSchedule();
+			hederaTransactionFeeSchedule.hederaFunctionality = transactionFeeScheduleProto.getHederaFunctionality();
+			HederaFeeData hederaFeeData = new HederaFeeData(transactionFeeScheduleProto.getFeeData());
+			hederaTransactionFeeSchedule.feeData = hederaFeeData;
+			
+			this.nextTransactionFeeSchedule.put(transactionFeeScheduleProto.getHederaFunctionality(), hederaTransactionFeeSchedule);
+		}
+	}
 	/**
-	 * Generate a protobuf payload for this object
-	 * @return a protobuf FeeComponents 
+	 * Gets the current {@link HederaTransactionFeeSchedule} for a given {@link HederaFunctionality}
+	 * @param the {@link HederaFunctionality} to return the {@link HederaTransactionFeeSchedule} for
+	 * @return {@link HederaTransactionFeeSchedule}
+	 * @throws Exception
 	 */
-	public FeeComponents getProtobuf() {
-		
-		FeeComponents.Builder feeComponents = FeeComponents.newBuilder();
-		
-		feeComponents.setMin(this.min);
-		feeComponents.setMax(this.max);
-		feeComponents.setConstant(this.constant);
-		feeComponents.setBpt(this.bpt);
-		feeComponents.setVpt(this.vpt);
-		feeComponents.setRbs(this.rbs);
-		feeComponents.setSbs(this.sbs);
-		feeComponents.setGas(this.gas);
-		feeComponents.setTv(this.tv);
-		feeComponents.setBpr(this.bpr);
-		feeComponents.setSbpr(this.sbpr);
-
-		return feeComponents.build();
+	public HederaTransactionFeeSchedule getCurrentTransactionFeeSchedule(HederaFunctionality hederaFunctionality) throws Exception {
+		if (this.currentTransactionFeeSchedule == null) {
+			throw new Exception("Fee schedule not initialised");
+		} else {
+			return this.currentTransactionFeeSchedule.get(hederaFunctionality);
+		}
+	}
+	/**
+	 * Gets the next {@link HederaTransactionFeeSchedule} for a given {@link HederaFunctionality}
+	 * @param the {@link HederaFunctionality} to return the {@link HederaTransactionFeeSchedule} for
+	 * @return {@link HederaTransactionFeeSchedule}
+	 * @throws Exception
+	 */
+	public HederaTransactionFeeSchedule getNextTransactionFeeSchedule(HederaFunctionality hederaFunctionality) throws Exception {
+		if (this.nextTransactionFeeSchedule == null) {
+			throw new Exception("Fee schedule not initialised");
+		} else {
+			return this.nextTransactionFeeSchedule.get(hederaFunctionality);
+		}
 	}
 }

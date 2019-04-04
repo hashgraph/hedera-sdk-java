@@ -15,7 +15,7 @@ public class HederaTransactionFeeSchedule implements Serializable {
 	/**
 	 * 	the minimum fees that needs to be paid
 	 */
-	public HederaFunctionality hederaFunctionality = HederaFunctionality.UNRECOGNIZED;
+	public HederaFunctionality hederaFunctionality = HederaFunctionality.NONE;
 	public HederaFeeData feeData = new HederaFeeData();
 	
 	/**

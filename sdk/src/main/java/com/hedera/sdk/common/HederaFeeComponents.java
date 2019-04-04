@@ -61,6 +61,20 @@ public class HederaFeeComponents implements Serializable {
 	 */
 	public HederaFeeComponents() {
 	}
+	
+	public HederaFeeComponents(FeeComponents feeComponents) {
+		this.bpr = feeComponents.getBpr();
+		this.bpt = feeComponents.getBpt();
+		this.constant = feeComponents.getConstant();
+		this.gas = feeComponents.getGas();
+		this.max = feeComponents.getMax();
+		this.min = feeComponents.getMin();
+		this.rbs = feeComponents.getRbs();
+		this.sbpr = feeComponents.getSbpr();
+		this.sbs = feeComponents.getSbs();
+		this.tv = feeComponents.getTv();
+		this.vpt = feeComponents.getVpt();
+	}
 
 	/**
 	 * Generate a protobuf payload for this object
