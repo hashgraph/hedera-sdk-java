@@ -13,3 +13,7 @@ gen/
 
 # Ignore local environment variables
 .env
+
+# Vim
+*.swp
+*.vim
