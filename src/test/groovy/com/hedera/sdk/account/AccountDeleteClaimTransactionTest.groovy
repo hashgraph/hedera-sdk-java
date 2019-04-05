@@ -28,7 +28,11 @@ class AccountDeleteClaimTransactionTest extends Specification {
 		def now = Instant.ofEpochSecond(1554158542)
 		def key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962")
 		def txId = new TransactionId(new AccountId(2), now)
-		def tx = new AccountDeleteClaimTransaction().with(true, { transactionId = txId }).sign(key)
+		def tx = new AccountDeleteClaimTransaction().with(true, { 
+            transactionId = txId 
+            accountToDeleteFrom = new AccountId(4)
+            hashToDelete = [4, 2, 1, 5]
+        }).sign(key)
 
 		then:
 		tx.build().toString() == """body {
@@ -45,13 +49,17 @@ class AccountDeleteClaimTransactionTest extends Specification {
     seconds: 120
   }
   cryptoDeleteClaim {
+    accountIDToDeleteFrom {
+      accountNum: 4
+    }
+    hashToDelete: "\\004\\002\\001\\005"
   }
 }
 sigs {
   sigs {
     signatureList {
       sigs {
-        ed25519: "%\\\\\\336\$\\\\{&\\336\\371\\302\\026Vg\\345\\265\\220\\247\\261\\f\\362\\232f5\\355\\241\\326\\335`\\256\\333\\263G\\'\\337\\242&\\026\\031\\006 \\272g\\203\\211\\326\\257\\017\\212\\310\\261\\365D\\227\\263\\370U/\\242I\\262\\204\\335\\324\\n"
+        ed25519: "\\023\\346\\243\\210\\302\\003\\315h\\355\\030\\271\\364\\364\\204\\265\\212\\b\\021\\311\\f.\\244\\211l\\261\\027\\3123\\247\\324\\330\\323F\\203\\362\\3312\\221I\\033\\032\\347\\267n9\\266\\340\\016~\\247\\210Pj\\267^\\265=do:|!\\235\\v"
       }
     }
   }
