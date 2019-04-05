@@ -28,11 +28,11 @@ class AccountDeleteClaimTransactionTest extends Specification {
 		def now = Instant.ofEpochSecond(1554158542)
 		def key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962")
 		def txId = new TransactionId(new AccountId(2), now)
-		def tx = new AccountDeleteClaimTransaction().with(true, { 
-            transactionId = txId 
-            accountToDeleteFrom = new AccountId(4)
-            hashToDelete = [4, 2, 1, 5]
-        }).sign(key)
+		def tx = new AccountDeleteClaimTransaction().with(true, {
+			transactionId = txId
+			accountToDeleteFrom = new AccountId(4)
+			hashToDelete = [4, 2, 1, 5]
+		}).sign(key)
 
 		then:
 		tx.build().toString() == """body {
