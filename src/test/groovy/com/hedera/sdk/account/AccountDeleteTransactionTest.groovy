@@ -36,11 +36,11 @@ class AccountDeleteTransactionTest extends Specification {
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new AccountDeleteTransaction().with(true, {
 			transactionId = txId
-            transferAccountId = new AccountId(4)
-            deleteAccountId = new AccountId(1)
-        }).sign(key)
+			transferAccountId = new AccountId(4)
+			deleteAccountId = new AccountId(1)
+		}).sign(key)
 
-        then:
+		then:
 		tx.build().toString() == """body {
   transactionID {
     transactionValidStart {
@@ -73,5 +73,5 @@ sigs {
   }
 }
 """
-    }
+	}
 }
