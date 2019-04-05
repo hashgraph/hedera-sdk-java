@@ -16,12 +16,7 @@ class AdminDeleteTransactionTest extends Specification {
   transactionValidDuration {
     seconds: 120
   }
-  cryptoCreateAccount {
-    sendRecordThreshold: 9223372036854775807
-    receiveRecordThreshold: 9223372036854775807
-    autoRenewPeriod {
-      seconds: 2592000
-    }
+  adminDelete {
   }
 }
 """
@@ -34,8 +29,8 @@ class AdminDeleteTransactionTest extends Specification {
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new AdminDeleteTransaction().with(true, {
 			transactionId = txId
-            ID = new FileId(1, 2, 3)
-            expirationTime = Instant.ofEpochSecond(1554158643)
+			ID = new FileId(1, 2, 3)
+			expirationTime = Instant.ofEpochSecond(1554158643)
 		}).sign(key)
 
 		then:
@@ -73,7 +68,7 @@ sigs {
   }
 }
 """
-    }
+	}
 
 	def "Transaction can be built with ContractId"() {
 		when:
@@ -82,8 +77,8 @@ sigs {
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new AdminDeleteTransaction().with(true, {
 			transactionId = txId
-            ID = new ContractId(1, 2, 3)
-            expirationTime = Instant.ofEpochSecond(1554158643)
+			ID = new ContractId(1, 2, 3)
+			expirationTime = Instant.ofEpochSecond(1554158643)
 		}).sign(key)
 
 		then:
@@ -121,5 +116,5 @@ sigs {
   }
 }
 """
-    }
+	}
 }

@@ -6,6 +6,8 @@ import com.hedera.sdk.proto.TransactionGetFastRecordResponse
 import com.hedera.sdk.proto.TransactionID
 import spock.lang.Specification
 
+import java.time.Duration
+
 class TransactionRecordTest extends Specification {
 	def "record requires correct response"() {
 		given:

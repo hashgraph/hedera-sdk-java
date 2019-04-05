@@ -20,7 +20,7 @@ class AdminUndeleteTransactionTest extends Specification {
   }
 }
 """
-    }
+	}
 
 	def "Transaction can be built with FileId"() {
 		when:
@@ -29,7 +29,7 @@ class AdminUndeleteTransactionTest extends Specification {
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new AdminUndeleteTransaction().with(true, {
 			transactionId = txId
-            ID = new FileId(1, 2, 3)
+			ID = new FileId(1, 2, 3)
 		}).sign(key)
 
 		then:
@@ -64,7 +64,7 @@ sigs {
   }
 }
 """
-    }
+	}
 
 	def "Transaction can be built with ContractId"() {
 		when:
@@ -73,7 +73,7 @@ sigs {
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new AdminUndeleteTransaction().with(true, {
 			transactionId = txId
-            ID = new ContractId(1, 2, 3)
+			ID = new ContractId(1, 2, 3)
 		}).sign(key)
 
 		then:
@@ -108,5 +108,5 @@ sigs {
   }
 }
 """
-    }
+	}
 }
