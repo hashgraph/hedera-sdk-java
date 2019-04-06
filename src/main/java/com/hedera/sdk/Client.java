@@ -2,23 +2,14 @@ package com.hedera.sdk;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+
 import java.util.*;
 import java.util.stream.Collectors;
-
-class ChannelPair {
-    final ManagedChannel channel;
-    final AccountId node;
-
-    ChannelPair(ManagedChannel channel, AccountId node) {
-        this.channel = channel;
-        this.node = node;
-    }
-}
 
 public final class Client {
 
     private final Random random = new Random();
-    private Map<String, ChannelPair> channels;
+    private Map<AccountId, String> channels;
 
     public Client(Map<String, AccountId> targets) {
 
@@ -28,33 +19,36 @@ public final class Client {
 
         channels = targets.entrySet()
             .stream()
-            .collect(Collectors.toMap(Map.Entry::getKey, t -> new ChannelPair(ManagedChannelBuilder.forTarget(t.getKey())
-                .usePlaintext()
-                .build(), t.getValue()
-            )));
+            .collect(Collectors.toUnmodifiableMap(Map.Entry::getValue, Map.Entry::getKey));
     }
 
-    ManagedChannel getChannel() {
+    ManagedChannel openChannel() throws IllegalArgumentException {
 
-        var r = random.nextInt(channels.size() > 1 ? channels.size() - 1 : 1);
+        var r = random.nextInt(channels.size());
         var channelIter = channels.entrySet()
             .iterator();
 
-        for (int i = 0; i < r; i++) {
+        for (int i = 0; i < r - 1; i++) {
             channelIter.next();
         }
 
-        return channelIter.next()
-            .getValue().channel;
+        var target = channelIter.next()
+            .getValue();
+
+        return ManagedChannelBuilder.forTarget(target)
+            .usePlaintext()
+            .build();
     }
 
-    AccountId getNodeForTarget(String target) throws IllegalArgumentException {
-        var channel = channels.get(target);
+    ManagedChannel openChannelForNode(AccountId node) throws IllegalArgumentException {
+        var address = channels.get(node);
 
-        if (channel == null) {
-            throw new IllegalArgumentException("Invalid target string provided");
+        if (address == null) {
+            throw new IllegalArgumentException("Node Id does not exist");
         }
 
-        return channel.node;
+        return ManagedChannelBuilder.forTarget(address)
+            .usePlaintext()
+            .build();
     }
 }
