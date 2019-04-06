@@ -8,6 +8,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Objects;
 
 @SuppressWarnings("Duplicates")
@@ -17,14 +18,15 @@ public final class AppendToFile {
 
         var operatorKey = Ed25519PrivateKey.fromString(Objects.requireNonNull(env.get("OPERATOR_SECRET")));
 
-        var client = new Client(Target.TESTNET_139);
+        var network = Objects.requireNonNull(env.get("NETWORK"));
+        var node = AccountId.fromString(Objects.requireNonNull(env.get("NODE")));
+
+        var client = new Client(Map.of(network, node));
 
         // First we create a file
         var fileContents = "Hedera hashgraph is".getBytes();
 
         var txId = new TransactionId(new AccountId(2));
-
-        var node = new AccountId(3);
 
         var fileTx = new FileCreateTransaction().setTransactionId(txId)
             .setNodeAccount(node)

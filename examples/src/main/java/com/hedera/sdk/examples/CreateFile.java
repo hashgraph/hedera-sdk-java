@@ -7,6 +7,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Objects;
 
 @SuppressWarnings("Duplicates")
@@ -16,7 +17,10 @@ public final class CreateFile {
 
         var operatorKey = Ed25519PrivateKey.fromString(Objects.requireNonNull(env.get("OPERATOR_SECRET")));
 
-        var client = new Client(Target.TESTNET_139);
+        var network = Objects.requireNonNull(env.get("NETWORK"));
+        var node = AccountId.fromString(Objects.requireNonNull(env.get("NODE")));
+
+        var client = new Client(Map.of(network, node));
 
         // The file is required to be a byte array,
         // you can easily use the bytes of a file instead.

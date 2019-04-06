@@ -2,13 +2,13 @@ package com.hedera.sdk.examples;
 
 import com.hedera.sdk.AccountId;
 import com.hedera.sdk.Client;
-import com.hedera.sdk.Target;
 import com.hedera.sdk.TransactionId;
 import com.hedera.sdk.account.AccountBalanceQuery;
 import com.hedera.sdk.account.CryptoTransferTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.util.Map;
 import java.util.Objects;
 
 @SuppressWarnings("Duplicates")
@@ -21,9 +21,10 @@ public final class GetAccountBalance {
 
         operator = AccountId.fromString(Objects.requireNonNull(env.get("OPERATOR")));
 
-        var node = new AccountId(3);
+        var network = Objects.requireNonNull(env.get("NETWORK"));
+        var node = AccountId.fromString(Objects.requireNonNull(env.get("NODE")));
 
-        var client = new Client(Target.TESTNET_139);
+        var client = new Client(Map.of(network, node));
 
         // Account balance query requires 100,000 tinybar
         var txPayment = new CryptoTransferTransaction().setNodeAccount(node)

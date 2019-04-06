@@ -34,13 +34,6 @@ public final class Client {
             )));
     }
 
-    public Client(Target... targets) {
-        this(
-                Arrays.stream(targets)
-                    .collect(Collectors.toMap(Target::getAddress, Target::getNode))
-        );
-    }
-
     ManagedChannel getChannel() {
 
         var r = random.nextInt(channels.size() > 1 ? channels.size() - 1 : 1);

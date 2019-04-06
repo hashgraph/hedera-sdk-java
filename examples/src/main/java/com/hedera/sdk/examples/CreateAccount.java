@@ -5,6 +5,7 @@ import com.hedera.sdk.account.AccountCreateTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.util.Map;
 import java.util.Objects;
 
 @SuppressWarnings("Duplicates")
@@ -15,7 +16,10 @@ public final class CreateAccount {
         var operatorKey = Ed25519PrivateKey.fromString(Objects.requireNonNull(env.get("OPERATOR_SECRET")));
         var newKey = Ed25519PrivateKey.generate();
 
-        var client = new Client(Target.TESTNET_139);
+        var network = Objects.requireNonNull(env.get("NETWORK"));
+        var node = AccountId.fromString(Objects.requireNonNull(env.get("NODE")));
+
+        var client = new Client(Map.of(network, node));
 
         var txId = new TransactionId(new AccountId(2));
         var tx = new AccountCreateTransaction().setTransactionId(txId)
