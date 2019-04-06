@@ -48,7 +48,7 @@ public final class UpdateAccountPublicKey {
         txId = new TransactionId(new AccountId(6));
         tx = new AccountUpdateTransaction().setTransactionId(txId)
             .setNodeAccount(new AccountId(3))
-            .setAccountforUpdate(newAccountId)
+            .setAccountForUpdate(newAccountId)
             .setKey(newKey.getPublicKey())
             // sign as the transaction payer
             .sign(operatorKey)

@@ -22,7 +22,7 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
             .getCryptoUpdateAccountBuilder();
     }
 
-    public AccountUpdateTransaction setAccountforUpdate(AccountId accountId) {
+    public AccountUpdateTransaction setAccountForUpdate(AccountId accountId) {
         builder.setAccountIDToUpdate(accountId.toProto());
         return this;
     }
