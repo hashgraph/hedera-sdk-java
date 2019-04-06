@@ -56,14 +56,12 @@ public final class Client {
     }
 
     AccountId getNodeForTarget(String target) throws IllegalArgumentException {
-        AccountId node;
+        var channel = channels.get(target);
 
-        try {
-            node = channels.get(target).node;
-        } catch (Exception e) {
-            throw new IllegalArgumentException();
+        if (channel == null) {
+            throw new IllegalArgumentException("Invalid target string provided");
         }
 
-        return node;
+        return channel.node;
     }
 }
