@@ -2,14 +2,16 @@ package com.hedera.sdk;
 
 public enum Target {
     //todo: add the other 40ish targets
-    TESTNET_139("testnet.hedera.com:50139", new AccountId(3));
+    TESTNET_139("testnet.hedera.com:50139", 0, 0, 3);
 
     private final String address;
-    private final AccountId node;
+    private final long shard, realm, account;
 
-    Target(final String address, final AccountId node) {
+    Target(final String address, final long realm, final long shard, final long account) {
         this.address = address;
-        this.node = node;
+        this.realm = realm;
+        this.shard = shard;
+        this.account = account;
     }
 
     public String getAddress() {
@@ -17,7 +19,7 @@ public enum Target {
     }
 
     public AccountId getNode() {
-        return node;
+        return new AccountId(shard, realm, account);
     }
 
     @Override
