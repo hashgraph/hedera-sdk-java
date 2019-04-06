@@ -28,6 +28,6 @@ public class TransactionRecordQuery extends QueryBuilder<TransactionRecord> {
 
     @Override
     protected void doValidate() {
-        require(builder.getTransactionIDOrBuilder(), ".setTransaction() required");
+        require(builder.hasTransactionID(), ".setTransaction() required");
     }
 }
