@@ -22,13 +22,14 @@ public final class Client {
 
     public Client(Map<String, AccountId> targets) {
 
-        if(targets.isEmpty()) {
+        if (targets.isEmpty()) {
             throw new IllegalArgumentException("List of targets must not be empty");
         }
 
         channels = targets.entrySet()
             .stream()
             .collect(Collectors.toMap(Map.Entry::getKey, t -> new ChannelPair(ManagedChannelBuilder.forTarget(t.getKey())
+                .usePlaintext()
                 .build(), t.getValue()
             )));
     }

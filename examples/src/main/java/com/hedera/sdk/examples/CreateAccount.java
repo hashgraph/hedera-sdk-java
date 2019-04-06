@@ -5,7 +5,6 @@ import com.hedera.sdk.account.AccountCreateTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import io.github.cdimascio.dotenv.Dotenv;
 
-import java.util.Map;
 import java.util.Objects;
 
 @SuppressWarnings("Duplicates")

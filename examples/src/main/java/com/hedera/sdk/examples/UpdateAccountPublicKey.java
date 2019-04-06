@@ -6,7 +6,6 @@ import com.hedera.sdk.account.AccountUpdateTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import io.github.cdimascio.dotenv.Dotenv;
 
-import java.util.Map;
 import java.util.Objects;
 
 // Ignore duplicate warnings since many examples will look similar
