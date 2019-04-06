@@ -21,7 +21,10 @@ public final class Client {
     private Map<String, ChannelPair> channels;
 
     public Client(Map<String, AccountId> targets) {
-        assert !targets.isEmpty();
+
+        if(targets.isEmpty()) {
+            throw new IllegalArgumentException("List of targets must not be empty");
+        }
 
         channels = targets.entrySet()
             .stream()

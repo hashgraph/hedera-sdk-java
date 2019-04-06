@@ -2,7 +2,7 @@ package com.hedera.sdk;
 
 public enum Target {
     //todo: add the other 40ish targets
-    MAIN_NET("testnet.hedera.com:50139", new AccountId(3));
+    TESTNET_139("testnet.hedera.com:50139", new AccountId(3));
 
     private final String address;
     private final AccountId node;

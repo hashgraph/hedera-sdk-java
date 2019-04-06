@@ -1,9 +1,6 @@
 package com.hedera.sdk.examples;
 
-import com.hedera.sdk.AccountId;
-import com.hedera.sdk.Client;
-import com.hedera.sdk.TransactionReceiptQuery;
-import com.hedera.sdk.TransactionId;
+import com.hedera.sdk.*;
 import com.hedera.sdk.account.AccountCreateTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -19,9 +16,7 @@ public final class CreateAccount {
         var operatorKey = Ed25519PrivateKey.fromString(Objects.requireNonNull(env.get("OPERATOR_SECRET")));
         var newKey = Ed25519PrivateKey.generate();
 
-        var client = new Client(
-                Map.of(Objects.requireNonNull(env.get("NETWORK")), AccountId.fromString(Objects.requireNonNull(env.get("NODE"))))
-        );
+        var client = new Client(Target.TESTNET_139);
 
         var txId = new TransactionId(new AccountId(2));
         var tx = new AccountCreateTransaction().setTransactionId(txId)

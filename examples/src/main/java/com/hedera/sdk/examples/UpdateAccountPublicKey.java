@@ -1,9 +1,6 @@
 package com.hedera.sdk.examples;
 
-import com.hedera.sdk.AccountId;
-import com.hedera.sdk.Client;
-import com.hedera.sdk.TransactionReceiptQuery;
-import com.hedera.sdk.TransactionId;
+import com.hedera.sdk.*;
 import com.hedera.sdk.account.AccountCreateTransaction;
 import com.hedera.sdk.account.AccountUpdateTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
@@ -20,9 +17,7 @@ public final class UpdateAccountPublicKey {
 
         var operatorKey = Ed25519PrivateKey.fromString(Objects.requireNonNull(env.get("OPERATOR_SECRET")));
 
-        var client = new Client(
-                Map.of(Objects.requireNonNull(env.get("NETWORK")), AccountId.fromString(Objects.requireNonNull(env.get("NODE"))))
-        );
+        var client = new Client(Target.TESTNET_139);
 
         // First we create a new account so we don't affect our account
         var originalKey = Ed25519PrivateKey.generate();

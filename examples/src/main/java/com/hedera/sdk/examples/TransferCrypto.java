@@ -2,6 +2,7 @@ package com.hedera.sdk.examples;
 
 import com.hedera.sdk.AccountId;
 import com.hedera.sdk.Client;
+import com.hedera.sdk.Target;
 import com.hedera.sdk.TransactionId;
 import com.hedera.sdk.account.AccountBalanceQuery;
 import com.hedera.sdk.account.CryptoTransferTransaction;
@@ -22,9 +23,7 @@ public final class TransferCrypto {
 
         var node = new AccountId(3);
 
-        var client = new Client(
-                Map.of(Objects.requireNonNull(env.get("NETWORK")), AccountId.fromString(Objects.requireNonNull(env.get("NODE"))))
-        );
+        var client = new Client(Target.TESTNET_139);
 
         var recipient = AccountId.fromString(Objects.requireNonNull(env.get("Recipient")));
 
