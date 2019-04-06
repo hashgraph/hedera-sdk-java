@@ -3,13 +3,24 @@ package com.hedera.sdk;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
+
+class ChannelPair {
+    final String address;
+    @Nullable
+    ManagedChannel channel;
+
+    ChannelPair(String address) {
+        this.address = address;
+    }
+}
 
 public final class Client {
 
     private final Random random = new Random();
-    private Map<AccountId, String> channels;
+    private Map<AccountId, ChannelPair> channels;
 
     public Client(Map<String, AccountId> targets) {
 
@@ -19,36 +30,47 @@ public final class Client {
 
         channels = targets.entrySet()
             .stream()
-            .collect(Collectors.toUnmodifiableMap(Map.Entry::getValue, Map.Entry::getKey));
+            .collect(Collectors.toUnmodifiableMap(Map.Entry::getValue, t -> new ChannelPair(t.getKey())));
     }
 
-    ManagedChannel openChannel() throws IllegalArgumentException {
+    ManagedChannel getChannel() {
+
+        if (channels.isEmpty()) {
+            throw new IllegalStateException("List of channels has become empty");
+        }
 
         var r = random.nextInt(channels.size());
-        var channelIter = channels.entrySet()
+        var channelIter = channels.values()
             .iterator();
 
-        for (int i = 0; i < r - 1; i++) {
+        for (int i = 1; i < r; i++) {
             channelIter.next();
         }
 
-        var target = channelIter.next()
-            .getValue();
+        var selectedChannel = channelIter.next();
 
-        return ManagedChannelBuilder.forTarget(target)
-            .usePlaintext()
-            .build();
+        if (selectedChannel.channel == null) {
+            selectedChannel.channel = ManagedChannelBuilder.forTarget(selectedChannel.address)
+                .usePlaintext()
+                .build();
+        }
+
+        return Objects.requireNonNull(selectedChannel.channel);
     }
 
-    ManagedChannel openChannelForNode(AccountId node) throws IllegalArgumentException {
-        var address = channels.get(node);
+    ManagedChannel getChannelForNode(AccountId node) {
+        var selectedChannel = channels.get(node);
 
-        if (address == null) {
+        if (selectedChannel == null) {
             throw new IllegalArgumentException("Node Id does not exist");
         }
 
-        return ManagedChannelBuilder.forTarget(address)
-            .usePlaintext()
-            .build();
+        if (selectedChannel.channel == null) {
+            selectedChannel.channel = ManagedChannelBuilder.forTarget(selectedChannel.address)
+                .usePlaintext()
+                .build();
+        }
+
+        return Objects.requireNonNull(selectedChannel.channel);
     }
 }

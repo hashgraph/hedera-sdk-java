@@ -22,7 +22,7 @@ public abstract class QueryBuilder<Resp> extends ValidatedBuilder {
     protected abstract io.grpc.MethodDescriptor<com.hedera.sdk.proto.Query, Response> getMethod();
 
     private ClientCall<Query, Response> newClientCall(Client client) {
-        return client.openChannel()
+        return client.getChannel()
             .newCall(getMethod(), CallOptions.DEFAULT);
     }
 

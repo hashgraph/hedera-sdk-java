@@ -78,7 +78,7 @@ public class Transaction {
     }
 
     private ClientCall<com.hedera.sdk.proto.Transaction, TransactionResponse> newClientCall(Client client) {
-        return client.openChannel()
+        return client.getChannel()
             .newCall(methodDescriptor, CallOptions.DEFAULT);
     }
 
