@@ -41,7 +41,7 @@ public abstract class ValidatedBuilder {
     }
 
     protected void require(@Nullable MessageOrBuilder setValue, String errMsg) {
-        if (setValue == null || setValue.isInitialized()) {
+        if (setValue == null || !setValue.isInitialized()) {
             addValidationError(errMsg);
         }
     }
