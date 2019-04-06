@@ -39,7 +39,7 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
         return this;
     }
 
-    public ContractCreateTransaction setIntialBalance(long intialBalance) {
+    public ContractCreateTransaction setInitialBalance(long intialBalance) {
         builder.setInitialBalance(intialBalance);
         return this;
     }
