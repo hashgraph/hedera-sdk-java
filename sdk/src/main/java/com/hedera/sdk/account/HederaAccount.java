@@ -172,7 +172,7 @@ public class HederaAccount implements Serializable {
 	}
 	/**
 	 * set the receiver signature required flag on the account
-	 * @param required
+	 * @param required determines whether a signature is required on receipt or not
 	 */
 	public void setReceiverSignatureRequired(boolean required) {
 		this.receiverSigRequired = required;

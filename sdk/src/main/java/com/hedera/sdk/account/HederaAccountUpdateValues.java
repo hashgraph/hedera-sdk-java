@@ -59,6 +59,7 @@ public class HederaAccountUpdateValues {
 	public int expirationTimeNanos = -1;
 	/**
 	 * the new receiverSignatureRequired
+	 * @param receiveSignatureRequired specifies whether a signature is required by the recipient
 	 */
 	public void setReceiveSignatureRequired(boolean receiveSignatureRequired) {
 		this.receiveSignatureRequired = receiveSignatureRequired;

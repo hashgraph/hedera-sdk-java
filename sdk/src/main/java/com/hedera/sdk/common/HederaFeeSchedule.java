@@ -22,7 +22,7 @@ public class HederaFeeSchedule implements Serializable {
 	/**
 	 * Build up the fee schedule from input from a file loaded from the Hedera File System
 	 * @param scheduleBytes the byte array containing the fee schedule
-	 * @throws InvalidProtocolBufferException
+	 * @throws InvalidProtocolBufferException in the event of an exception
 	 */
 	public HederaFeeSchedule(byte[] scheduleBytes) throws InvalidProtocolBufferException {
 		parseScheduleBytes(scheduleBytes);
@@ -61,9 +61,9 @@ public class HederaFeeSchedule implements Serializable {
 	}
 	/**
 	 * Gets the current {@link HederaTransactionFeeSchedule} for a given {@link HederaFunctionality}
-	 * @param the {@link HederaFunctionality} to return the {@link HederaTransactionFeeSchedule} for
+	 * @param hederaFunctionality {@link HederaFunctionality} to return the {@link HederaTransactionFeeSchedule} for
 	 * @return {@link HederaTransactionFeeSchedule}
-	 * @throws Exception
+	 * @throws Exception in the event of an error
 	 */
 	public HederaTransactionFeeSchedule getCurrentTransactionFeeSchedule(HederaFunctionality hederaFunctionality) throws Exception {
 		if (this.currentTransactionFeeSchedule == null) {
@@ -74,9 +74,9 @@ public class HederaFeeSchedule implements Serializable {
 	}
 	/**
 	 * Gets the next {@link HederaTransactionFeeSchedule} for a given {@link HederaFunctionality}
-	 * @param the {@link HederaFunctionality} to return the {@link HederaTransactionFeeSchedule} for
+	 * @param hederaFunctionality {@link HederaFunctionality} to return the {@link HederaTransactionFeeSchedule} for
 	 * @return {@link HederaTransactionFeeSchedule}
-	 * @throws Exception
+	 * @throws Exception in the event of an error
 	 */
 	public HederaTransactionFeeSchedule getNextTransactionFeeSchedule(HederaFunctionality hederaFunctionality) throws Exception {
 		if (this.nextTransactionFeeSchedule == null) {
