@@ -22,7 +22,7 @@ public final class Client {
     private final Random random = new Random();
     private Map<AccountId, ChannelPair> channels;
 
-    public Client(Map<String, AccountId> targets) {
+    public Client(Map<AccountId, String> targets) {
 
         if (targets.isEmpty()) {
             throw new IllegalArgumentException("List of targets must not be empty");
@@ -30,7 +30,7 @@ public final class Client {
 
         channels = targets.entrySet()
             .stream()
-            .collect(Collectors.toUnmodifiableMap(Map.Entry::getValue, t -> new ChannelPair(t.getKey())));
+            .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, t -> new ChannelPair(t.getValue())));
     }
 
     ManagedChannel getChannel() {
