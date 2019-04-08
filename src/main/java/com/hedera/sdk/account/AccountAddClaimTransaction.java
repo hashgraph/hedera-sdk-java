@@ -42,7 +42,7 @@ public final class AccountAddClaimTransaction extends TransactionBuilder<Account
 
     @Override
     protected void doValidate() {
-        require(builder.getAccountIDOrBuilder(), ".setAccount() required");
+        require(builder.hasAccountID(), ".setAccount() required");
         require(claim.getHash(), ".setHash() required");
         require(
             claim.getKeysOrBuilder()
