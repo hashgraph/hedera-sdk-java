@@ -29,6 +29,6 @@ public final class TransactionReceiptQuery extends QueryBuilder<TransactionRecei
 
     @Override
     protected void doValidate() {
-        require(builder.getTransactionIDOrBuilder(), ".setTransaction() required");
+        require(builder.hasTransactionID(), ".setTransaction() required");
     }
 }
