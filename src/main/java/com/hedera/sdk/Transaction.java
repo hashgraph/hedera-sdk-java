@@ -9,6 +9,7 @@ import com.hedera.sdk.proto.Signature;
 import com.hedera.sdk.proto.SignatureList;
 import com.hedera.sdk.proto.TransactionResponse;
 import io.grpc.CallOptions;
+import io.grpc.Channel;
 import io.grpc.ClientCall;
 import io.grpc.MethodDescriptor;
 import io.grpc.stub.ClientCalls;
@@ -20,14 +21,17 @@ import javax.annotation.Nullable;
 public class Transaction {
     private final com.hedera.sdk.proto.Transaction.Builder inner;
     private final io.grpc.MethodDescriptor<com.hedera.sdk.proto.Transaction, com.hedera.sdk.proto.TransactionResponse> methodDescriptor;
+    private final Channel rpcChannel;
 
     @Nullable
     private byte[] bodyBytes;
 
     Transaction(
+        Channel rpcChannel,
         com.hedera.sdk.proto.Transaction.Builder inner,
         MethodDescriptor<com.hedera.sdk.proto.Transaction, TransactionResponse> methodDescriptor
     ) {
+        this.rpcChannel = rpcChannel;
         this.inner = inner;
         this.methodDescriptor = methodDescriptor;
     }
@@ -77,7 +81,7 @@ public class Transaction {
         return bodyBytes;
     }
 
-    private ClientCall<com.hedera.sdk.proto.Transaction, TransactionResponse> newClientCall(Client client) {
+    private ClientCall<com.hedera.sdk.proto.Transaction, TransactionResponse> newClientCall() {
         return client.getChannel()
             .newCall(methodDescriptor, CallOptions.DEFAULT);
     }

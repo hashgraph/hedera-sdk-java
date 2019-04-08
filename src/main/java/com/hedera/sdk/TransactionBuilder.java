@@ -1,17 +1,23 @@
 package com.hedera.sdk;
 
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
+import com.hedera.sdk.proto.TransactionBody;
+
 import java.time.Duration;
 
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extends ValidatedBuilder {
     protected com.hedera.sdk.proto.Transaction.Builder inner = com.hedera.sdk.proto.Transaction.newBuilder();
+    protected final TransactionBody.Builder bodyBuilder = inner.getBodyBuilder();
+    private final Client client;
 
     private static final int MAX_MEMO_LENGTH = 100;
 
-    protected TransactionBuilder() {
+    protected TransactionBuilder(Client client) {
+        this.client = client;
+
         // todo: transaction fees should be defaulted to whatever the transaction fee schedule is
-        setTransactionFee(100_000);
-        setTransactionValidDuration(Duration.ofMinutes(2));
+        setTransactionFee(client.defaultTxnFee);
+        setTransactionValidDuration(client.defaultTxnValidDuration);
     }
 
     /**
@@ -20,14 +26,14 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
      * effect.
      */
     public T setTransactionId(TransactionId transactionId) {
-        inner.getBodyBuilder()
+        bodyBuilder
             .setTransactionID(transactionId.inner);
         return self();
     }
 
     /** Sets the account of the node that submits the transaction to the network. */
     public final T setNodeAccount(AccountId accountId) {
-        inner.getBodyBuilder()
+        bodyBuilder
             .setNodeAccountID(accountId.inner);
         return self();
     }
@@ -37,7 +43,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
      * network and the node.
      */
     public final T setTransactionFee(long fee) {
-        inner.getBodyBuilder()
+        bodyBuilder
             .setTransactionFee(fee);
         return self();
     }
@@ -47,7 +53,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
      * before this this elapses.
      */
     public final T setTransactionValidDuration(Duration validDuration) {
-        inner.getBodyBuilder()
+        bodyBuilder
             .setTransactionValidDuration(
                 com.hedera.sdk.proto.Duration.newBuilder()
                     .setSeconds(validDuration.getSeconds())
@@ -62,7 +68,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
      * record is optional.
      */
     public final T setGenerateRecord(boolean generateRecord) {
-        inner.getBodyBuilder()
+        bodyBuilder
             .setGenerateRecord(generateRecord);
         return self();
     }
@@ -76,7 +82,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
             throw new IllegalArgumentException("memo must not be longer than 100 characters");
         }
 
-        inner.getBodyBuilder()
+        bodyBuilder
             .setMemo(memo);
         return self();
     }
@@ -85,22 +91,26 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
 
     @Override
     public final void validate() {
-        var bodyBuilder = inner.getBodyBuilder();
-        require(bodyBuilder.getTransactionIDBuilder(), ".setTransactionId() required");
-        require(bodyBuilder.getNodeAccountIDBuilder(), ".setNodeAccount() required");
+        var bodyBuilder = this.bodyBuilder;
+        require(bodyBuilder.hasTransactionID(), ".setTransactionId() required");
+        require(bodyBuilder.hasNodeAccountID(), ".setNodeAccount() required");
         doValidate();
         checkValidationErrors("transaction builder failed validation");
     }
 
-    public final com.hedera.sdk.proto.Transaction build() {
+    final com.hedera.sdk.proto.Transaction build() {
         return inner.build();
     }
 
     protected abstract io.grpc.MethodDescriptor<com.hedera.sdk.proto.Transaction, com.hedera.sdk.proto.TransactionResponse> getMethod();
 
     public final Transaction sign(Ed25519PrivateKey privateKey) {
-        doValidate();
-        return new Transaction(inner, getMethod()).sign(privateKey);
+        if (!bodyBuilder.hasNodeAccountID()) {
+
+        }
+
+        validate();
+        return new Transaction(client, inner, getMethod()).sign(privateKey);
     }
 
     // Work around for java not recognized that this is completely safe

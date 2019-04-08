@@ -10,9 +10,9 @@ public final class AdminUndeleteTransaction extends TransactionBuilder<AdminUnde
 
     private final AdminUndeleteTransactionBody.Builder builder;
 
-    public AdminUndeleteTransaction() {
-        builder = inner.getBodyBuilder()
-            .getAdminUndeleteBuilder();
+    public AdminUndeleteTransaction(Client client) {
+        super(client);
+        builder = bodyBuilder.getAdminUndeleteBuilder();
     }
 
     public AdminUndeleteTransaction setID(FileId fileId) {
