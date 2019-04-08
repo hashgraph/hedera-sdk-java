@@ -28,6 +28,12 @@ public abstract class ValidatedBuilder {
         throw new IllegalStateException(prologue + ":\n" + String.join("\n", errors));
     }
 
+    protected final void require(boolean mustBeTrue, String errMsg) {
+        if (!mustBeTrue) {
+            addValidationError(errMsg);
+        }
+    }
+
     protected void require(@Nullable List setValue, String errMsg) {
         if (setValue == null || setValue.isEmpty()) {
             addValidationError(errMsg);
@@ -41,7 +47,7 @@ public abstract class ValidatedBuilder {
     }
 
     protected void require(@Nullable MessageOrBuilder setValue, String errMsg) {
-        if (setValue == null || setValue.isInitialized()) {
+        if (setValue == null || !setValue.isInitialized()) {
             addValidationError(errMsg);
         }
     }

@@ -78,7 +78,7 @@ public abstract class QueryBuilder<Resp> extends ValidatedBuilder {
     /** Check that the query was built properly, throwing an exception on any errors. */
     @Override
     public final void validate() {
-        require(getHeaderBuilder().getPaymentBuilder(), ".setPayment() required");
+        require(getHeaderBuilder().hasPayment(), ".setPayment() required");
         doValidate();
         checkValidationErrors("query builder failed validation");
     }
