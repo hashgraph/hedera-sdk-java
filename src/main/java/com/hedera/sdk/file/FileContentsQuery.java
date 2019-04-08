@@ -31,6 +31,10 @@ public class FileContentsQuery extends QueryBuilder<FileGetContentsResponse> {
 
     @Override
     protected void doValidate() {
-        require(builder.getFileIDOrBuilder(), ".setFileId() required");
+        require(builder.hasFileID(), ".setFileId() required");
+    }
+
+    Query build() {
+        return inner.build();
     }
 }

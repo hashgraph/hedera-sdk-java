@@ -28,7 +28,7 @@ public final class TransactionId {
         );
     }
 
-    TransactionId(AccountId accountId, Instant transactionValidStart) {
+    public TransactionId(AccountId accountId, Instant transactionValidStart) {
         inner = TransactionID.newBuilder()
             .setAccountID(accountId.inner)
             .setTransactionValidStart(
