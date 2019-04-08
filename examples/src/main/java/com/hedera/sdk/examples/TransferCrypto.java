@@ -8,6 +8,7 @@ import com.hedera.sdk.account.CryptoTransferTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.util.Map;
 import java.util.Objects;
 
 // Suppress duplicate warnings due to similar example patterns
@@ -19,9 +20,10 @@ public final class TransferCrypto {
         var operator = AccountId.fromString(Objects.requireNonNull(env.get("OPERATOR")));
         var operatorKey = Ed25519PrivateKey.fromString(Objects.requireNonNull(env.get("OPERATOR_SECRET")));
 
-        var node = new AccountId(3);
+        var network = Objects.requireNonNull(env.get("NETWORK"));
+        var node = AccountId.fromString(Objects.requireNonNull(env.get("NODE")));
 
-        var client = new Client(env.get("NETWORK"));
+        var client = new Client(Map.of(node, network));
 
         var recipient = AccountId.fromString(Objects.requireNonNull(env.get("Recipient")));
 

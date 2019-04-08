@@ -1,9 +1,6 @@
 package com.hedera.sdk.examples;
 
-import com.hedera.sdk.AccountId;
-import com.hedera.sdk.Client;
-import com.hedera.sdk.TransactionReceiptQuery;
-import com.hedera.sdk.TransactionId;
+import com.hedera.sdk.*;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.sdk.file.FileAppendTransaction;
 import com.hedera.sdk.file.FileCreateTransaction;
@@ -11,6 +8,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Objects;
 
 @SuppressWarnings("Duplicates")
@@ -20,14 +18,15 @@ public final class AppendToFile {
 
         var operatorKey = Ed25519PrivateKey.fromString(Objects.requireNonNull(env.get("OPERATOR_SECRET")));
 
-        var client = new Client(env.get("NETWORK"));
+        var network = Objects.requireNonNull(env.get("NETWORK"));
+        var node = AccountId.fromString(Objects.requireNonNull(env.get("NODE")));
+
+        var client = new Client(Map.of(node, network));
 
         // First we create a file
         var fileContents = "Hedera hashgraph is".getBytes();
 
         var txId = new TransactionId(new AccountId(2));
-
-        var node = new AccountId(3);
 
         var fileTx = new FileCreateTransaction().setTransactionId(txId)
             .setNodeAccount(node)

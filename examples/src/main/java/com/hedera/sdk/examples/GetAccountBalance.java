@@ -8,8 +8,10 @@ import com.hedera.sdk.account.CryptoTransferTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.util.Map;
 import java.util.Objects;
 
+@SuppressWarnings("Duplicates")
 public final class GetAccountBalance {
     public static void main(String[] args) {
         var env = Dotenv.load();
@@ -19,9 +21,10 @@ public final class GetAccountBalance {
 
         operator = AccountId.fromString(Objects.requireNonNull(env.get("OPERATOR")));
 
-        var node = new AccountId(3);
+        var network = Objects.requireNonNull(env.get("NETWORK"));
+        var node = AccountId.fromString(Objects.requireNonNull(env.get("NODE")));
 
-        var client = new Client(env.get("NETWORK"));
+        var client = new Client(Map.of(node, network));
 
         // Account balance query requires 100,000 tinybar
         var txPayment = new CryptoTransferTransaction().setNodeAccount(node)

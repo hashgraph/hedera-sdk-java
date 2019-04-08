@@ -17,3 +17,6 @@ gen/
 # Vim
 *.swp
 *.vim
+
+# Output from running examples
+out/
