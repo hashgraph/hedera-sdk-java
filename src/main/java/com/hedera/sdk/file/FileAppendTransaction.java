@@ -35,7 +35,7 @@ public final class FileAppendTransaction extends TransactionBuilder<FileAppendTr
 
     @Override
     protected void doValidate() {
-        require(builder.getFileIDOrBuilder(), ".setFileId() required");
+        require(builder.hasFileID(), ".setFileId() required");
         require(builder.getContents(), ".setContents() required");
     }
 }
