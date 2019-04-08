@@ -21,7 +21,7 @@ public final class AppendToFile {
         var network = Objects.requireNonNull(env.get("NETWORK"));
         var node = AccountId.fromString(Objects.requireNonNull(env.get("NODE")));
 
-        var client = new Client(Map.of(network, node));
+        var client = new Client(Map.of(node, network));
 
         // First we create a file
         var fileContents = "Hedera hashgraph is".getBytes();

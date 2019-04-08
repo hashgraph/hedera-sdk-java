@@ -23,7 +23,7 @@ public final class TransferCrypto {
         var network = Objects.requireNonNull(env.get("NETWORK"));
         var node = AccountId.fromString(Objects.requireNonNull(env.get("NODE")));
 
-        var client = new Client(Map.of(network, node));
+        var client = new Client(Map.of(node, network));
 
         var recipient = AccountId.fromString(Objects.requireNonNull(env.get("Recipient")));
 

@@ -19,7 +19,7 @@ public final class CreateAccount {
         var network = Objects.requireNonNull(env.get("NETWORK"));
         var node = AccountId.fromString(Objects.requireNonNull(env.get("NODE")));
 
-        var client = new Client(Map.of(network, node));
+        var client = new Client(Map.of(node, network));
 
         var txId = new TransactionId(new AccountId(2));
         var tx = new AccountCreateTransaction().setTransactionId(txId)

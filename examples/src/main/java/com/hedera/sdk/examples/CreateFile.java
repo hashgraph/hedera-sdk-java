@@ -20,7 +20,7 @@ public final class CreateFile {
         var network = Objects.requireNonNull(env.get("NETWORK"));
         var node = AccountId.fromString(Objects.requireNonNull(env.get("NODE")));
 
-        var client = new Client(Map.of(network, node));
+        var client = new Client(Map.of(node, network));
 
         // The file is required to be a byte array,
         // you can easily use the bytes of a file instead.

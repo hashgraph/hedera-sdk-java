@@ -19,7 +19,7 @@ public final class UpdateAccountPublicKey {
         var network = Objects.requireNonNull(env.get("NETWORK"));
         var node = AccountId.fromString(Objects.requireNonNull(env.get("NODE")));
 
-        var client = new Client(Map.of(network, node));
+        var client = new Client(Map.of(node, network));
 
         // First we create a new account so we don't affect our account
         var originalKey = Ed25519PrivateKey.generate();
