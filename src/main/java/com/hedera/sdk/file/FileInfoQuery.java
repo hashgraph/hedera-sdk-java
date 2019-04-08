@@ -31,6 +31,10 @@ public class FileInfoQuery extends QueryBuilder<FileInfo> {
 
     @Override
     protected void doValidate() {
-        require(builder.getFileIDOrBuilder(), ".setFileId()");
+        require(builder.hasFileID(), ".setFileId() required");
+    }
+
+    Query build() {
+        return inner.build();
     }
 }
