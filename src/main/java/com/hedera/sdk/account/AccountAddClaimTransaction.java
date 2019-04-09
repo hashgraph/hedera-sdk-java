@@ -2,6 +2,7 @@ package com.hedera.sdk.account;
 
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.AccountId;
+import com.hedera.sdk.Client;
 import com.hedera.sdk.TransactionBuilder;
 import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.*;
@@ -11,15 +12,17 @@ import io.grpc.MethodDescriptor;
 
 // corresponds to `CryptoAddClaimTransaction`
 public final class AccountAddClaimTransaction extends TransactionBuilder<AccountAddClaimTransaction> {
-    private final CryptoAddClaimTransactionBody.Builder builder;
-    private final Claim.Builder claim;
-    private final KeyList.Builder keyList;
+    private final CryptoAddClaimTransactionBody.Builder builder = inner.getBodyBuilder()
+        .getCryptoAddClaimBuilder();
+    private final Claim.Builder claim = builder.getClaimBuilder();
+    private final KeyList.Builder keyList = claim.getKeysBuilder();
 
-    public AccountAddClaimTransaction() {
-        builder = inner.getBodyBuilder()
-            .getCryptoAddClaimBuilder();
-        claim = builder.getClaimBuilder();
-        keyList = claim.getKeysBuilder();
+    public AccountAddClaimTransaction(Client client) {
+        super(client);
+    }
+
+    AccountAddClaimTransaction() {
+        super(null);
     }
 
     public AccountAddClaimTransaction setAccount(AccountId id) {

@@ -4,11 +4,14 @@ import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 public final class TransactionReceiptQuery extends QueryBuilder<TransactionReceipt> {
-    private final com.hedera.sdk.proto.TransactionGetReceiptQuery.Builder builder;
+    private final TransactionGetReceiptQuery.Builder builder = inner.getTransactionGetReceiptBuilder();
 
-    public TransactionReceiptQuery() {
-        super(TransactionReceipt::new);
-        builder = inner.getTransactionGetReceiptBuilder();
+    public TransactionReceiptQuery(Client client) {
+        super(client, TransactionReceipt::new);
+    }
+
+    TransactionReceiptQuery() {
+        super(null, TransactionReceipt::new);
     }
 
     @Override

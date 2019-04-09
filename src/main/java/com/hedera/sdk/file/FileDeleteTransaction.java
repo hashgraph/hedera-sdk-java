@@ -1,5 +1,6 @@
 package com.hedera.sdk.file;
 
+import com.hedera.sdk.Client;
 import com.hedera.sdk.FileId;
 import com.hedera.sdk.TransactionBuilder;
 import com.hedera.sdk.proto.FileDeleteTransactionBody;
@@ -9,11 +10,15 @@ import com.hedera.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 public final class FileDeleteTransaction extends TransactionBuilder<FileDeleteTransaction> {
-    private final FileDeleteTransactionBody.Builder builder;
+    private final FileDeleteTransactionBody.Builder builder = inner.getBodyBuilder()
+        .getFileDeleteBuilder();
 
-    public FileDeleteTransaction() {
-        builder = inner.getBodyBuilder()
-            .getFileDeleteBuilder();
+    public FileDeleteTransaction(Client client) {
+        super(client);
+    }
+
+    FileDeleteTransaction() {
+        super(null);
     }
 
     public FileDeleteTransaction setFileId(FileId fileId) {
@@ -28,6 +33,6 @@ public final class FileDeleteTransaction extends TransactionBuilder<FileDeleteTr
 
     @Override
     protected void doValidate() {
-        require(builder.getFileIDOrBuilder(), ".setFileId()");
+        require(builder.hasFileID(), ".setFileId()");
     }
 }

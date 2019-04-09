@@ -9,20 +9,18 @@ import java.time.Duration
 import java.time.Instant
 
 class AccountUpdateTransactionTest extends Specification {
-	def "Transaction can be built with defaults"() {
+	def "Empty builder fails validation"() {
 		when:
-		def tx = new AccountUpdateTransaction()
+		new AccountUpdateTransaction().validate()
 
 		then:
-		tx.build().toString() == """body {
-  transactionFee: 100000
-  transactionValidDuration {
-    seconds: 120
-  }
-  cryptoUpdateAccount {
-  }
-}
-"""
+		def e = thrown(IllegalStateException)
+		e.message == """\
+transaction builder failed validation:
+.setTransactionId() required
+.setNodeAccount() required
+.setAccountForUpdate() required
+.setKey() required"""
 	}
 
 	def "Transaction can be built"() {
@@ -32,6 +30,7 @@ class AccountUpdateTransactionTest extends Specification {
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new AccountUpdateTransaction().with(true, {
 			setKey(key.getPublicKey())
+			nodeAccount = new AccountId(3)
 			transactionId = txId
 			accountForUpdate = new AccountId(2)
 			proxyAccount = new AccountId(3)
@@ -40,10 +39,11 @@ class AccountUpdateTransactionTest extends Specification {
 			receiveRecordThreshold = 6
 			autoRenewPeriod = Duration.ofHours(10)
 			expirationTime = Instant.ofEpochSecond(1554158543)
-		}).sign(key)
+		}).testSign(key).toProto()
 
 		then:
-		tx.build().toString() == """body {
+		tx.toString() == """\
+body {
   transactionID {
     transactionValidStart {
       seconds: 1554158542
@@ -51,6 +51,9 @@ class AccountUpdateTransactionTest extends Specification {
     accountID {
       accountNum: 2
     }
+  }
+  nodeAccountID {
+    accountNum: 3
   }
   transactionFee: 100000
   transactionValidDuration {
@@ -81,7 +84,7 @@ sigs {
   sigs {
     signatureList {
       sigs {
-        ed25519: "\\027n\\213L\\230IiJ\\333\\000\\244J\\2368\\016\\001\\0065J\\244\\006>\\005Et\\314\\004\\363*\\373K\\335z\\317\\177 \\016\\374\\341\\335\\\\\\241\\252\\267(S\\207\\0168\\211\\312\\341\\310\\360\\275hr\\n\\222;\\3467\\327\\005"
+        ed25519: "\\003 \\266\\v\\236#\\355\\275\\023\\306\\032\\262\\f\\336(\\270J\\377\\233\\020*&\\277\\240\\277\\301\\246\\\\!f\\267\\265eI\\025\\343_\\023\\201V\\361\\204\\034\\305)\\357]p\\001\\336\\005\\243D\\352\\226)\\315s^fw\\2550\\004"
       }
     }
   }

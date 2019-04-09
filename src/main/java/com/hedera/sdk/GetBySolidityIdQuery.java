@@ -4,11 +4,14 @@ import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 public final class GetBySolidityIdQuery extends QueryBuilder<GetBySolidityIDResponse> {
-    private final GetBySolidityIDQuery.Builder builder;
+    private final GetBySolidityIDQuery.Builder builder = inner.getGetBySolidityIDBuilder();
 
-    public GetBySolidityIdQuery() {
-        super(Response::getGetBySolidityID);
-        builder = inner.getGetBySolidityIDBuilder();
+    public GetBySolidityIdQuery(Client client) {
+        super(client, Response::getGetBySolidityID);
+    }
+
+    GetBySolidityIdQuery() {
+        super(null, Response::getGetBySolidityID);
     }
 
     public GetBySolidityIdQuery setSolidityId(String solidityId) {

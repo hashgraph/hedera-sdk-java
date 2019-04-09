@@ -18,6 +18,8 @@ class FileAppendTransactionTest extends Specification {
 		then:
 		def e = thrown(IllegalStateException)
 		e.message == """transaction builder failed validation:
+.setTransactionId() required
+.setNodeAccount() required
 .setFileId() required
 .setContents() required"""
 	}
@@ -29,7 +31,7 @@ class FileAppendTransactionTest extends Specification {
 				.setTransactionId(new TransactionId(new AccountId(1234), Instant.parse("2019-04-05T12:00:00Z")))
 				.setFileId(new FileId(1, 2, 3))
 				.setContents([1, 2, 3, 4] as byte[])
-				.sign(privateKey)
+				.testSign(privateKey)
 
 		then:
 		notThrown(IllegalStateException)
@@ -42,10 +44,10 @@ class FileAppendTransactionTest extends Specification {
 				.setTransactionId(new TransactionId(new AccountId(1234), Instant.parse("2019-04-05T12:00:00Z")))
 				.setFileId(new FileId(1, 2, 3))
 				.setContents([1, 2, 3, 4] as byte[])
-				.sign(privateKey)
+				.testSign(privateKey).toProto()
 
 		then:
-		txn.build().toString() == """\
+		txn.toString() == """\
 body {
   transactionID {
     transactionValidStart {

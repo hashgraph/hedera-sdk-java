@@ -4,11 +4,14 @@ import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 public final class TransactionFastRecordQuery extends QueryBuilder<TransactionRecord> {
-    private final com.hedera.sdk.proto.TransactionGetFastRecordQuery.Builder builder;
+    private final TransactionGetFastRecordQuery.Builder builder = inner.getTransactionGetFastRecordBuilder();
 
-    public TransactionFastRecordQuery() {
-        super(TransactionRecord::new);
-        builder = inner.getTransactionGetFastRecordBuilder();
+    public TransactionFastRecordQuery(Client client) {
+        super(client, TransactionRecord::new);
+    }
+
+    TransactionFastRecordQuery() {
+        super(null, TransactionRecord::new);
     }
 
     @Override

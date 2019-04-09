@@ -28,7 +28,7 @@ public final class CreateFile {
 
         var txId = new TransactionId(new AccountId(2));
 
-        var tx = new FileCreateTransaction().setTransactionId(txId)
+        var tx = new FileCreateTransaction(client).setTransactionId(txId)
             .setNodeAccount(new AccountId(3))
             .setExpirationTime(
                 Instant.now()
@@ -42,16 +42,16 @@ public final class CreateFile {
             // The second signature represents the owner of the file
             .sign(operatorKey);
 
-        var res = tx.execute(client);
+        var res = tx.execute();
 
         System.out.println("transaction: " + res.toString());
 
         // Sleep for 4 seconds
         Thread.sleep(4000);
 
-        var query = new TransactionReceiptQuery().setTransaction(txId);
+        var query = new TransactionReceiptQuery(client).setTransaction(txId);
 
-        var receipt = query.execute(client);
+        var receipt = query.execute();
         var receiptStatus = receipt.getStatus();
 
         System.out.println("status: " + receiptStatus.toString());

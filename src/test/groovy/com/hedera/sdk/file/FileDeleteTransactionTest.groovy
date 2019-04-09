@@ -30,10 +30,10 @@ class FileDeleteTransactionTest extends Specification {
 		def tx = new FileDeleteTransaction().with(true, {
 			transactionId = txId
 			fileId = new FileId(848, 973, 1234)
-		}).sign(key)
+		}).testSign(key)
 
 		then:
-		tx.build().toString() == """body {
+		tx.toProto().toString() == """body {
   transactionID {
     transactionValidStart {
       seconds: 1554158542

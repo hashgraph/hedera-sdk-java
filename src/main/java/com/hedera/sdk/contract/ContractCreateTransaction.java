@@ -1,21 +1,22 @@
 package com.hedera.sdk.contract;
 
 import com.google.protobuf.ByteString;
-import com.hedera.sdk.AccountId;
-import com.hedera.sdk.DurationHelper;
-import com.hedera.sdk.FileId;
-import com.hedera.sdk.TransactionBuilder;
+import com.hedera.sdk.*;
 import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.*;
 import com.hedera.sdk.proto.Transaction;
 import io.grpc.MethodDescriptor;
 
 public class ContractCreateTransaction extends TransactionBuilder<ContractCreateTransaction> {
-    private final ContractCreateTransactionBody.Builder builder;
+    private final ContractCreateTransactionBody.Builder builder = inner.getBodyBuilder()
+        .getContractCreateInstanceBuilder();
 
-    public ContractCreateTransaction() {
-        builder = inner.getBodyBuilder()
-            .getContractCreateInstanceBuilder();
+    public ContractCreateTransaction(Client client) {
+        super(client);
+    }
+
+    ContractCreateTransaction() {
+        super(null);
     }
 
     @Override
@@ -87,6 +88,6 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
 
     @Override
     protected void doValidate() {
-        require(builder.getFileIDOrBuilder(), ".setBytecodeFile() required");
+        require(builder.hasFileID(), ".setBytecodeFile() required");
     }
 }

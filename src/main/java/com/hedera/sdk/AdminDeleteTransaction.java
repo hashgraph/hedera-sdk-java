@@ -8,11 +8,15 @@ import io.grpc.MethodDescriptor;
 import java.time.Instant;
 
 public final class AdminDeleteTransaction extends TransactionBuilder<AdminDeleteTransaction> {
-    private final AdminDeleteTransactionBody.Builder builder;
+    private final AdminDeleteTransactionBody.Builder builder = inner.getBodyBuilder()
+        .getAdminDeleteBuilder();
 
-    public AdminDeleteTransaction() {
-        builder = inner.getBodyBuilder()
-            .getAdminDeleteBuilder();
+    public AdminDeleteTransaction(Client client) {
+        super(client);
+    }
+
+    AdminDeleteTransaction() {
+        super(null);
     }
 
     public AdminDeleteTransaction setID(FileId fileId) {
@@ -40,8 +44,8 @@ public final class AdminDeleteTransaction extends TransactionBuilder<AdminDelete
         requireExactlyOne(
             ".setID() required",
             ".setID() may take a contract ID OR a file ID",
-            builder.getContractIDOrBuilder(),
-            builder.getFileIDOrBuilder()
+            builder.hasContractID(),
+            builder.hasFileID()
         );
     }
 }

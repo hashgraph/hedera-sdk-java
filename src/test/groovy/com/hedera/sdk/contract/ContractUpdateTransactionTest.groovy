@@ -16,7 +16,7 @@ class ContractUpdateTransactionTest extends Specification {
 		def tx = new ContractUpdateTransaction()
 
 		then:
-		tx.build().toString() == """body {
+		tx.toProto().toString() == """body {
   transactionFee: 100000
   transactionValidDuration {
     seconds: 120
@@ -41,10 +41,10 @@ class ContractUpdateTransactionTest extends Specification {
 			proxyAccount = new AccountId(10, 11, 12)
 			autoRenewPeriod = Duration.ofHours(10)
 			file = new FileId(4, 5, 6)
-		}).sign(key)
+		}).testSign(key)
 
 		then:
-		tx.build().toString() == """body {
+		tx.toProto().toString() == """body {
   transactionID {
     transactionValidStart {
       seconds: 1554158542

@@ -1,6 +1,7 @@
 package com.hedera.sdk.account;
 
 import com.hedera.sdk.AccountId;
+import com.hedera.sdk.Client;
 import com.hedera.sdk.TransactionBuilder;
 import com.hedera.sdk.TransactionId;
 import com.hedera.sdk.crypto.Key;
@@ -11,21 +12,21 @@ import java.time.Duration;
 
 // Corresponds to `CryptoCreateTransaction`
 public final class AccountCreateTransaction extends TransactionBuilder<AccountCreateTransaction> {
-    private final CryptoCreateTransactionBody.Builder builder;
-
-    public AccountCreateTransaction() {
-        builder = inner.getBodyBuilder()
-            .getCryptoCreateAccountBuilder();
-
-        // Recommendation from Hedera
-        setAutoRenewPeriod(Duration.ofDays(30));
-
+    private final CryptoCreateTransactionBody.Builder builder = inner.getBodyBuilder()
+        .getCryptoCreateAccountBuilder()
         // Default to maximum values for record thresholds. Without this records would be
         // auto-created
         // whenever a send or receive transaction takes place for this new account. This should
         // be an explicit ask.
-        builder.setSendRecordThreshold(Long.MAX_VALUE)
-            .setReceiveRecordThreshold(Long.MAX_VALUE);
+        .setSendRecordThreshold(Long.MAX_VALUE)
+        .setReceiveRecordThreshold(Long.MAX_VALUE);
+
+    public AccountCreateTransaction(Client client) {
+        super(client);
+    }
+
+    AccountCreateTransaction() {
+        super(null);
     }
 
     @Override
@@ -126,7 +127,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
 
     @Override
     protected void doValidate() {
-        require(builder.getKeyOrBuilder(), ".setKey() required");
+        require(builder.hasKey(), ".setKey() required");
     }
 
     @Override

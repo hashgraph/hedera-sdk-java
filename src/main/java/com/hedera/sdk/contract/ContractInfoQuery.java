@@ -1,5 +1,6 @@
 package com.hedera.sdk.contract;
 
+import com.hedera.sdk.Client;
 import com.hedera.sdk.ContractId;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
@@ -7,11 +8,14 @@ import io.grpc.MethodDescriptor;
 
 // `ContractGetInfoQuery`
 public final class ContractInfoQuery extends QueryBuilder<ContractInfo> {
-    private final com.hedera.sdk.proto.ContractGetInfoQuery.Builder builder;
+    private final ContractGetInfoQuery.Builder builder = inner.getContractGetInfoBuilder();
 
-    public ContractInfoQuery() {
-        super(ContractInfo::new);
-        builder = inner.getContractGetInfoBuilder();
+    public ContractInfoQuery(Client client) {
+        super(client, ContractInfo::new);
+    }
+
+    ContractInfoQuery() {
+        super(null, ContractInfo::new);
     }
 
     @Override
@@ -31,6 +35,6 @@ public final class ContractInfoQuery extends QueryBuilder<ContractInfo> {
 
     @Override
     protected void doValidate() {
-        require(builder.getContractIDOrBuilder(), ".setContract() required");
+        require(builder.hasContractID(), ".setContract() required");
     }
 }

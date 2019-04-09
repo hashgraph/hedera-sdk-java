@@ -14,7 +14,7 @@ class ContractExecuteTransactionTest extends Specification {
 		def tx = new ContractExecuteTransaction()
 
 		then:
-		tx.build().toString() == """body {
+		tx.toProto().toString() == """body {
   transactionFee: 100000
   transactionValidDuration {
     seconds: 120
@@ -36,10 +36,10 @@ class ContractExecuteTransactionTest extends Specification {
 			gas = 10
 			amount = 1000
 			functionParameters = [424, 243, 141]
-		}).sign(key)
+		}).testSign(key)
 
 		then:
-		tx.build().toString() == """body {
+		tx.toProto().toString() == """body {
   transactionID {
     transactionValidStart {
       seconds: 1554158542

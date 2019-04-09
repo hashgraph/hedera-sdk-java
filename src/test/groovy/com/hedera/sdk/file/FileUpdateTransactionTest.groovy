@@ -38,10 +38,10 @@ class FileUpdateTransactionTest extends Specification {
 			expirationTime = Instant.ofEpochSecond(1554158728)
 			addKey(key.getPublicKey())
 			contents = [1, 2, 3, 4, 5]
-		}).sign(key)
+		}).testSign(key)
 
 		then:
-		tx.build().toString() == """body {
+		tx.toProto().toString() == """body {
   transactionID {
     transactionValidStart {
       seconds: 1554158542

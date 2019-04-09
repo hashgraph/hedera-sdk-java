@@ -2,16 +2,22 @@ package com.hedera.sdk.account;
 
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.AccountId;
+import com.hedera.sdk.Client;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 // `CryptoGetClaimQuery`
 public final class AccountClaimQuery extends QueryBuilder<CryptoGetClaimResponse> {
-    private final com.hedera.sdk.proto.CryptoGetClaimQuery.Builder builder;
+    private final CryptoGetClaimQuery.Builder builder;
 
-    public AccountClaimQuery() {
-        super(Response::getCryptoGetClaim);
+    public AccountClaimQuery(Client client) {
+        super(client, Response::getCryptoGetClaim);
+        builder = inner.getCryptoGetClaimBuilder();
+    }
+
+    AccountClaimQuery() {
+        super(null, Response::getCryptoGetClaim);
         builder = inner.getCryptoGetClaimBuilder();
     }
 
@@ -32,7 +38,7 @@ public final class AccountClaimQuery extends QueryBuilder<CryptoGetClaimResponse
 
     @Override
     protected void doValidate() {
-        require(builder.getAccountIDOrBuilder(), ".setAccount() required");
+        require(builder.hasAccountID(), ".setAccount() required");
     }
 
     @Override

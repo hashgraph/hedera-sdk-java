@@ -1,6 +1,7 @@
 package com.hedera.sdk.file;
 
 import com.google.protobuf.ByteString;
+import com.hedera.sdk.Client;
 import com.hedera.sdk.TimestampHelper;
 import com.hedera.sdk.TransactionBuilder;
 import com.hedera.sdk.crypto.Key;
@@ -10,13 +11,16 @@ import io.grpc.MethodDescriptor;
 import java.time.Instant;
 
 public final class FileCreateTransaction extends TransactionBuilder<FileCreateTransaction> {
-    private final FileCreateTransactionBody.Builder builder;
-    private final KeyList.Builder keyList;
+    private final FileCreateTransactionBody.Builder builder = inner.getBodyBuilder()
+        .getFileCreateBuilder();
+    private final KeyList.Builder keyList = builder.getKeysBuilder();
 
-    public FileCreateTransaction() {
-        builder = inner.getBodyBuilder()
-            .getFileCreateBuilder();
-        keyList = builder.getKeysBuilder();
+    public FileCreateTransaction(Client client) {
+        super(client);
+    }
+
+    FileCreateTransaction() {
+        super(null);
     }
 
     public FileCreateTransaction setExpirationTime(Instant expiration) {

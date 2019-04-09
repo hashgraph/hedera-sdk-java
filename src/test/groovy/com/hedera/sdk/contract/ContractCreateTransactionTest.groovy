@@ -15,7 +15,7 @@ class ContractCreateTransactionTest extends Specification {
 		def tx = new ContractCreateTransaction()
 
 		then:
-		tx.build().toString() == """body {
+		tx.toProto().toString() == """body {
   transactionFee: 100000
   transactionValidDuration {
     seconds: 120
@@ -32,6 +32,7 @@ class ContractCreateTransactionTest extends Specification {
 		def key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962")
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new ContractCreateTransaction().with(true, {
+			nodeAccount = new AccountId(3)
 			transactionId = txId
 			bytecodeFile = new FileId(1, 2, 3)
 			adminKey = key.getPublicKey()
@@ -44,10 +45,10 @@ class ContractCreateTransactionTest extends Specification {
 			shard = 20
 			realm = 40
 			newRealmAdminKey = key.getPublicKey()
-		}).sign(key)
+		}).testSign(key)
 
 		then:
-		tx.build().toString() == """body {
+		tx.toProto().toString() == """body {
   transactionID {
     transactionValidStart {
       seconds: 1554158542

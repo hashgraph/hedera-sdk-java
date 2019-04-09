@@ -1,5 +1,6 @@
 package com.hedera.sdk.contract;
 
+import com.hedera.sdk.Client;
 import com.hedera.sdk.ContractId;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
@@ -7,11 +8,14 @@ import io.grpc.MethodDescriptor;
 
 // `ContractGetBytecodeQuery`
 public final class ContractBytecodeQuery extends QueryBuilder<ContractGetBytecodeResponse> {
-    private final com.hedera.sdk.proto.ContractGetBytecodeQuery.Builder builder;
+    private final ContractGetBytecodeQuery.Builder builder = inner.getContractGetBytecodeBuilder();
 
-    public ContractBytecodeQuery() {
-        super(Response::getContractGetBytecodeResponse);
-        builder = inner.getContractGetBytecodeBuilder();
+    public ContractBytecodeQuery(Client client) {
+        super(client, Response::getContractGetBytecodeResponse);
+    }
+
+    ContractBytecodeQuery() {
+        super(null, Response::getContractGetBytecodeResponse);
     }
 
     @Override
@@ -26,7 +30,7 @@ public final class ContractBytecodeQuery extends QueryBuilder<ContractGetBytecod
 
     @Override
     protected void doValidate() {
-        require(builder.getContractIDOrBuilder(), ".setContract() required");
+        require(builder.hasContractID(), ".setContract() required");
     }
 
     @Override

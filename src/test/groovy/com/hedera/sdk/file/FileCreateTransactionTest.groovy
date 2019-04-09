@@ -13,7 +13,7 @@ class FileCreateTransactionTest extends Specification {
 		def tx = new FileCreateTransaction()
 
 		then:
-		tx.build().toString() == """body {
+		tx.toProto().toString() == """body {
   transactionFee: 100000
   transactionValidDuration {
     seconds: 120
@@ -25,6 +25,20 @@ class FileCreateTransactionTest extends Specification {
 }
 """
 	}
+
+	def "Empty builder fails validation"() {
+		when:
+		new FileCreateTransaction().validate()
+
+		then:
+		def e = thrown(IllegalStateException)
+		e.message == """\
+transaction builder failed validation:
+.setTransactionId() required
+.setNodeAccount() required
+.addKey() required"""
+	}
+
 	def "Transaction can be built"() {
 		when:
 		def now = Instant.ofEpochSecond(1554158542)
@@ -36,10 +50,10 @@ class FileCreateTransactionTest extends Specification {
 			addKey(key.getPublicKey())
 			contents = [1, 2, 3, 4, 5]
 			newRealmAdminKey = key.getPublicKey()
-		}).sign(key)
+		}).testSign(key)
 
 		then:
-		tx.build().toString() == """body {
+		tx.toProto().toString() == """body {
   transactionID {
     transactionValidStart {
       seconds: 1554158542

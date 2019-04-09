@@ -1,6 +1,7 @@
 package com.hedera.sdk.file;
 
 import com.google.protobuf.ByteString;
+import com.hedera.sdk.Client;
 import com.hedera.sdk.FileId;
 import com.hedera.sdk.TimestampHelper;
 import com.hedera.sdk.TransactionBuilder;
@@ -11,13 +12,16 @@ import io.grpc.MethodDescriptor;
 import java.time.Instant;
 
 public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransaction> {
-    private final FileUpdateTransactionBody.Builder builder;
-    private final KeyList.Builder keyList;
+    private final FileUpdateTransactionBody.Builder builder = inner.getBodyBuilder()
+        .getFileUpdateBuilder();
+    private final KeyList.Builder keyList = builder.getKeysBuilder();
 
-    public FileUpdateTransaction() {
-        builder = inner.getBodyBuilder()
-            .getFileUpdateBuilder();
-        keyList = builder.getKeysBuilder();
+    public FileUpdateTransaction(Client client) {
+        super(client);
+    }
+
+    FileUpdateTransaction() {
+        super(null);
     }
 
     public FileUpdateTransaction setFile(FileId file) {
@@ -51,7 +55,7 @@ public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransact
 
     @Override
     protected void doValidate() {
-        require(builder.getFileID(), ".setFileId()");
+        require(builder.hasFileID(), ".setFileId()");
         require(
             builder.getKeysOrBuilder()
                 .getKeysOrBuilderList(),
