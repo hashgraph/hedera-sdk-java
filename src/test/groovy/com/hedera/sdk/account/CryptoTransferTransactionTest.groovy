@@ -1,30 +1,24 @@
-package com.hedera.sdk.contract
+package com.hedera.sdk.account
 
 import com.hedera.sdk.AccountId
 import com.hedera.sdk.TransactionId
-import com.hedera.sdk.account.CryptoTransferTransaction
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey
 import spock.lang.Specification
 
 import java.time.Instant
 
 class CryptoTransferTransactionTest extends Specification {
-	def "Transaction can be built with defaults"() {
+	def "Empty builder fails validation"() {
 		when:
-		def tx = new CryptoTransferTransaction()
+		new CryptoTransferTransaction().validate()
 
 		then:
-		tx.build().toString() == """body {
-  transactionFee: 100000
-  transactionValidDuration {
-    seconds: 120
-  }
-  cryptoTransfer {
-    transfers {
-    }
-  }
-}
-"""
+		def e = thrown(IllegalStateException)
+		e.message == """\
+transaction builder failed validation:
+.setTransactionId() required
+.setNodeAccount() required
+at least one transfer required"""
 	}
 
 	def "Transaction can be built"() {
@@ -34,13 +28,15 @@ class CryptoTransferTransactionTest extends Specification {
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new CryptoTransferTransaction().with(true, {
 			transactionId = txId
-			addSender(new AccountId(4), 4400)
-			addRecipient(new AccountId(55), 150)
-			addTransfer(new AccountId(78), 123)
-		}).sign(key)
+			nodeAccount = new AccountId(2)
+			addSender(new AccountId(4), 800)
+			addRecipient(new AccountId(55), 400)
+			addTransfer(new AccountId(78), 400)
+		}).testSign(key).toProto()
 
 		then:
-		tx.build().toString() == """body {
+		tx.toString() == """\
+body {
   transactionID {
     transactionValidStart {
       seconds: 1554158542
@@ -48,6 +44,9 @@ class CryptoTransferTransactionTest extends Specification {
     accountID {
       accountNum: 2
     }
+  }
+  nodeAccountID {
+    accountNum: 2
   }
   transactionFee: 100000
   transactionValidDuration {
@@ -59,19 +58,19 @@ class CryptoTransferTransactionTest extends Specification {
         accountID {
           accountNum: 4
         }
-        amount: -4400
+        amount: -800
       }
       accountAmounts {
         accountID {
           accountNum: 55
         }
-        amount: 150
+        amount: 400
       }
       accountAmounts {
         accountID {
           accountNum: 78
         }
-        amount: 123
+        amount: 400
       }
     }
   }
@@ -80,7 +79,7 @@ sigs {
   sigs {
     signatureList {
       sigs {
-        ed25519: "\\005\\374\\235=\\252\\005 :\\267n\\270\\363a\\300\\246\\235t2\\211\\305\\337\\366)\\b\\303\\3221\\376\\347\\266\\232\\372P\\312{-\\277\\017\\222\\262\\245\\312E\\324(\\374C\\005a\\241\\355^;\\375\\372eb\\2004\\022,;\\341\\a"
+        ed25519: "\\223\\347\\326q\\3477\\303\\307g+\\207\\252\\251N=},v\\337\\231i\\r\\201\\276Qn\\277\\227\\261\\257\\332\\201a\\003[\\320\\036\\310\\"\\353\\0338@\\216\\331w\\302\\300\\260\\276\\221\\330g\\300~\\234z\\247\\331\\031\\032\\300\\026\\006"
       }
     }
   }
