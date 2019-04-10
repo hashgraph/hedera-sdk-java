@@ -22,8 +22,6 @@ class AccountAddClaimTransactionTest extends Specification {
 		addKey(key.publicKey)
 	}
 
-	def builtTx = tx.toProto()
-
 	def txString = """\
 body {
   transactionID {
@@ -58,6 +56,15 @@ body {
     }
   }
 }
+sigs {
+  sigs {
+    signatureList {
+      sigs {
+        ed25519: "\\023\\242\\274\\a\\320I2R\\234\\\\\\253\\230Dr\\230?M\\273Fsf\\322\\001i7\\002m\\376\\331\$vae1\\326+\\267J\\006\\251\\002jh\\271c!\\bG\\213\\374\\225S\\377\\033\\302,\\233\\207\\210\\017n\\314%\\001"
+      }
+    }
+  }
+}
 """
 
 	def "correct transaction validates"() {
@@ -87,9 +94,9 @@ body {
 
 	def "transaction builds correctly"() {
 		when:
-		def serialized = builtTx.toString()
+		def builtTx = tx.testSign(key).toProto()
 
 		then:
-		serialized == txString
+		builtTx.toString() == txString
 	}
 }

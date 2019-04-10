@@ -14,24 +14,14 @@ class AccountDeleteClaimTransactionTest extends Specification {
 
 		then:
 		def e = thrown(IllegalStateException)
-		e.message == """"""
+		e.message == """\
+transaction builder failed validation:
+.setTransactionId() required
+.setNodeAccount() required
+.setAccountToDeleteFrom() required
+.setHashToDelete() required"""
 	}
 
-	def "Transaction can be built with defaults"() {
-		when:
-		def tx = new AccountDeleteClaimTransaction()
-
-		then:
-		tx.toProto().toString() == """body {
-  transactionFee: 100000
-  transactionValidDuration {
-    seconds: 120
-  }
-  cryptoDeleteClaim {
-  }
-}
-"""
-	}
 	def "Transaction can be built"() {
 		when:
 		def now = Instant.ofEpochSecond(1554158542)

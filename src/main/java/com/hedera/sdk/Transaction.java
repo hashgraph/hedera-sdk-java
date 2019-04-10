@@ -55,7 +55,8 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
         return this;
     }
 
-    public final com.hedera.sdk.proto.Transaction toProto() {
+    @Override
+    public com.hedera.sdk.proto.Transaction toProto() {
         if (inner.getSigsBuilder()
             .getSigsCount() == 0) {
             throw new IllegalStateException("Transaction is not signed");
@@ -81,11 +82,6 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
     @Override
     protected MethodDescriptor<com.hedera.sdk.proto.Transaction, TransactionResponse> getMethod() {
         return methodDescriptor;
-    }
-
-    @Override
-    protected com.hedera.sdk.proto.Transaction buildRequest() {
-        return toProto();
     }
 
     @Override

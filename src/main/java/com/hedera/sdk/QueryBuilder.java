@@ -20,20 +20,17 @@ public abstract class QueryBuilder<Resp> extends ValidatingHederaCall<Query, Res
 
     protected abstract QueryHeader.Builder getHeaderBuilder();
 
-    public final Query toProto() {
-        return inner.build();
-    }
-
     @Override
     protected Channel getChannel() {
         Objects.requireNonNull(client, "QueryBuilder.client must be non-null in regular use");
-        return client.getChannel().getChannel();
+        return client.getChannel()
+            .getChannel();
     }
 
     @Override
-    protected final Query buildRequest() {
+    public final Query toProto() {
         validate();
-        return toProto();
+        return inner.build();
     }
 
     public QueryBuilder setPayment(Transaction transaction) {

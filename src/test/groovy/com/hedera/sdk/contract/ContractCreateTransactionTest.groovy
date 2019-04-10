@@ -10,20 +10,17 @@ import java.time.Instant
 import java.time.Duration
 
 class ContractCreateTransactionTest extends Specification {
-	def "Transaction can be built with defaults"() {
+	def "Empty builder fails validation"() {
 		when:
-		def tx = new ContractCreateTransaction()
+		new ContractCreateTransaction().validate()
 
 		then:
-		tx.toProto().toString() == """body {
-  transactionFee: 100000
-  transactionValidDuration {
-    seconds: 120
-  }
-  contractCreateInstance {
-  }
-}
-"""
+		def e = thrown(IllegalStateException)
+		e.message == """\
+transaction builder failed validation:
+.setTransactionId() required
+.setNodeAccount() required
+.setBytecodeFile() required"""
 	}
 
 	def "Transaction can be built"() {
@@ -45,10 +42,11 @@ class ContractCreateTransactionTest extends Specification {
 			shard = 20
 			realm = 40
 			newRealmAdminKey = key.getPublicKey()
-		}).testSign(key)
+		}).testSign(key).toProto()
 
 		then:
-		tx.toProto().toString() == """body {
+		tx.toString() == """\
+body {
   transactionID {
     transactionValidStart {
       seconds: 1554158542
@@ -56,6 +54,9 @@ class ContractCreateTransactionTest extends Specification {
     accountID {
       accountNum: 2
     }
+  }
+  nodeAccountID {
+    accountNum: 3
   }
   transactionFee: 100000
   transactionValidDuration {
@@ -95,7 +96,7 @@ sigs {
   sigs {
     signatureList {
       sigs {
-        ed25519: "\\310\\323\\376\\346t\\364\\320\\201O<P\\312\\317/:\\320\\347\\vp\\312\\375\\037\\355\\b\\034\\242\\350\\317;\\225-\\3273\\023\\0263\\031s^!\\031\\325\\r\\370T\\214\\241`\\353\\257`\\345g L\\252\\316x\\261A5d5\\r"
+        ed25519: "\\235\\3138sY\\215\\000\\322\\251\\372\\245\\320f\\276\\304\\234\\274\\261\\006\\341{^w\\327\\230\\3537\\326|\\357~\\242m\\313\\376<\\023\\031\\252\\345`m\\346\\362&\\265\\'+\\371\\230\\357\\330#;\\a\\200F\\214\\374\\330\\266\\363S\\016"
       }
     }
   }

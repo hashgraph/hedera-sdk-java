@@ -21,25 +21,6 @@ transaction builder failed validation:
 .setKey() required"""
 	}
 
-	def "Transaction can be built with defaults"() {
-		when:
-		def tx = new AccountCreateTransaction()
-
-		then:
-		tx.toProto().toString() == """\
-body {
-  transactionFee: 100000
-  transactionValidDuration {
-    seconds: 120
-  }
-  cryptoCreateAccount {
-    sendRecordThreshold: 9223372036854775807
-    receiveRecordThreshold: 9223372036854775807
-  }
-}
-"""
-	}
-
 	def "Transaction can be built"() {
 		when:
 		def now = Instant.ofEpochSecond(1554158542)

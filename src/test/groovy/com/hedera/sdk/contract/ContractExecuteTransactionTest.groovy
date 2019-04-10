@@ -9,20 +9,17 @@ import spock.lang.Specification
 import java.time.Instant
 
 class ContractExecuteTransactionTest extends Specification {
-	def "Transaction can be built with defaults"() {
+	def "Empty builder fails validation"() {
 		when:
-		def tx = new ContractExecuteTransaction()
+		new ContractExecuteTransaction().validate()
 
 		then:
-		tx.toProto().toString() == """body {
-  transactionFee: 100000
-  transactionValidDuration {
-    seconds: 120
-  }
-  contractCall {
-  }
-}
-"""
+		def e = thrown(IllegalStateException)
+		e.message == """\
+transaction builder failed validation:
+.setTransactionId() required
+.setNodeAccount() required
+.setContract() required"""
 	}
 
 	def "Transaction can be built"() {
@@ -31,15 +28,17 @@ class ContractExecuteTransactionTest extends Specification {
 		def key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962")
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new ContractExecuteTransaction().with(true, {
+			nodeAccount = new AccountId(3)
 			transactionId = txId
 			contract = new ContractId(1, 2, 3)
 			gas = 10
 			amount = 1000
 			functionParameters = [424, 243, 141]
-		}).testSign(key)
+		}).testSign(key).toProto()
 
 		then:
-		tx.toProto().toString() == """body {
+		tx.toString() == """\
+body {
   transactionID {
     transactionValidStart {
       seconds: 1554158542
@@ -47,6 +46,9 @@ class ContractExecuteTransactionTest extends Specification {
     accountID {
       accountNum: 2
     }
+  }
+  nodeAccountID {
+    accountNum: 3
   }
   transactionFee: 100000
   transactionValidDuration {
@@ -67,7 +69,7 @@ sigs {
   sigs {
     signatureList {
       sigs {
-        ed25519: ":\\017\\311\\034^\\347\\250\\324\\257\\352\\024\\207\\355]\\230`\\263\\332\\331\\363xl\\341*\\223\\0172\\310z\\330\\037s\\316\\221/\\b\\3237\\2015rA\\352~\\2224&\\265\\260\\2144\\271_\\2337\\030\\221\\306m-8\\343^\\a"
+        ed25519: "z\\267f\\023/[6xg\\020\\246>\\356\\f\\002h4V\\360\\243q\\a\\343OV\\0052P\\035\$\\355\\177\\344\\023\\271!\\352\\3661\\370a\\337\\362\\244\\2024\\253{o\\002n\\024f\\371\\266\\ar\\375\\206\\253&\\244\\257\\003"
       }
     }
   }

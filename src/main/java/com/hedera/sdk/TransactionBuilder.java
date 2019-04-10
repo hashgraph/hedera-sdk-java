@@ -102,18 +102,15 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         checkValidationErrors("transaction builder failed validation");
     }
 
-    public final com.hedera.sdk.proto.Transaction toProto() {
-        return inner.build();
-    }
-
     @Override
     protected Channel getChannel() {
         Objects.requireNonNull(client, "TransactionBuilder.client must not be null in normal usage");
-        return client.getChannel().getChannel();
+        return client.getChannel()
+            .getChannel();
     }
 
     @Override
-    protected final com.hedera.sdk.proto.Transaction buildRequest() {
+    public final com.hedera.sdk.proto.Transaction toProto() {
         Objects.requireNonNull(client, "TransactionBuilder.client must not be null in normal usage");
 
         if (client.getOperatorKey() == null) {

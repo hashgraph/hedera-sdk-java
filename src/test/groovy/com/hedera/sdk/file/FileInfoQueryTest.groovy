@@ -12,7 +12,8 @@ import java.time.Instant
 class FileInfoQueryTest extends Specification {
 	def privateKey = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962")
 
-	def paymentTxn = new CryptoTransferTransaction(client)
+	def paymentTxn = new CryptoTransferTransaction()
+	.setNodeAccount(new AccountId(3))
 	.setTransactionId(new TransactionId(new AccountId(1234), Instant.parse("2019-04-05T12:00:00Z")))
 	.addSender(new AccountId(1234), 10000)
 	.addRecipient(new AccountId(3), 10000)
@@ -21,8 +22,6 @@ class FileInfoQueryTest extends Specification {
 	def query = new FileInfoQuery()
 	.setFileId(new FileId(1, 2, 3))
 	.setPayment(paymentTxn)
-
-	def builtQuery = query.build()
 
 	def queryString = """\
 fileGetInfo {
@@ -36,6 +35,9 @@ fileGetInfo {
           accountID {
             accountNum: 1234
           }
+        }
+        nodeAccountID {
+          accountNum: 3
         }
         transactionFee: 100000
         transactionValidDuration {
@@ -62,7 +64,7 @@ fileGetInfo {
         sigs {
           signatureList {
             sigs {
-              ed25519: "Y\\267\\231\\330\\a\\036q\\317\\324x\\177\\226\\t\\v\\320\\003\\306K\\233\\266\\320\\204\\257s\\020U\\226\\250\\275\\251\\036\\237\\306\\277GW\\202\\254\\f\\346\\"C\\334a\\263.M\\354Z\\275\\025G\\232\\256)\\301\\203\\\\\\r\\360\\372C\\317\\003"
+              ed25519: "\\304B\\017\\242d=\\273\\3439\\305\\034\\224\\203#\\\\\\261\\343fa\\002]\\351\\\\\\036\\326\\327\\v\\037\\324\\317~\\020\\2371O\\020j\\377]\\261\\300\\216\\377n\\210\\264\\204?\\320\\001<\\225\\035E\\263&\\244 \\017\\207/\\332\\355\\017"
             }
           }
         }
@@ -99,9 +101,9 @@ fileGetInfo {
 
 	def "query builds correctly"() {
 		when:
-		def serialized = builtQuery.toString()
+		def builtQuery = query.toProto()
 
 		then:
-		serialized == queryString
+		builtQuery.toString() == queryString
 	}
 }

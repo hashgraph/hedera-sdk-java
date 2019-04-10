@@ -4,11 +4,9 @@ import com.google.common.util.concurrent.Futures;
 import io.grpc.CallOptions;
 import io.grpc.Channel;
 import io.grpc.ClientCall;
-import io.grpc.ManagedChannel;
 import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
 
-import javax.annotation.Nullable;
 import java.util.concurrent.Future;
 import java.util.function.Function;
 
@@ -22,7 +20,7 @@ public abstract class HederaCall<Req, RawResp, Resp> {
 
     protected abstract io.grpc.MethodDescriptor<Req, RawResp> getMethod();
 
-    protected abstract Req buildRequest();
+    public abstract Req toProto();
 
     protected abstract Channel getChannel();
 
@@ -31,15 +29,15 @@ public abstract class HederaCall<Req, RawResp, Resp> {
     }
 
     public final Resp execute() {
-        return mapResponse.apply(ClientCalls.blockingUnaryCall(newClientCall(), buildRequest()));
+        return mapResponse.apply(ClientCalls.blockingUnaryCall(newClientCall(), toProto()));
     }
 
     public final void executeAsync(Function<Resp, Void> onSuccess, Function<Throwable, Void> onError) {
-        ClientCalls.asyncUnaryCall(newClientCall(), buildRequest(), new ResponseObserver<>(mapResponse.andThen(onSuccess), onError));
+        ClientCalls.asyncUnaryCall(newClientCall(), toProto(), new ResponseObserver<>(mapResponse.andThen(onSuccess), onError));
     }
 
     public final Future<Resp> executeFuture() {
-        return Futures.lazyTransform(ClientCalls.futureUnaryCall(newClientCall(), buildRequest()), mapResponse::apply);
+        return Futures.lazyTransform(ClientCalls.futureUnaryCall(newClientCall(), toProto()), mapResponse::apply);
     }
 
     private static final class ResponseObserver<Resp> implements StreamObserver<Resp> {

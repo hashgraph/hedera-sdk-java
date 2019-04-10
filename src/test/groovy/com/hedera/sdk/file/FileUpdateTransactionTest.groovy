@@ -9,22 +9,18 @@ import spock.lang.Specification
 import java.time.Instant
 
 class FileUpdateTransactionTest extends Specification {
-	def "Transaction can be built with defaults"() {
+	def "Empty builder fails validation"() {
 		when:
-		def tx = new FileUpdateTransaction()
+		new FileUpdateTransaction().validate()
 
 		then:
-		tx.build().toString() == """body {
-  transactionFee: 100000
-  transactionValidDuration {
-    seconds: 120
-  }
-  fileUpdate {
-    keys {
-    }
-  }
-}
-"""
+		def e = thrown(IllegalStateException)
+		e.message == """\
+transaction builder failed validation:
+.setTransactionId() required
+.setNodeAccount() required
+.setFileId()
+.addKey()"""
 	}
 
 	def "Transaction can be built"() {
@@ -33,15 +29,17 @@ class FileUpdateTransactionTest extends Specification {
 		def key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962")
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new FileUpdateTransaction().with(true, {
+			nodeAccount = new AccountId(3)
 			transactionId = txId
 			file = new FileId(1, 2, 3)
 			expirationTime = Instant.ofEpochSecond(1554158728)
 			addKey(key.getPublicKey())
 			contents = [1, 2, 3, 4, 5]
-		}).testSign(key)
+		}).testSign(key).toProto()
 
 		then:
-		tx.toProto().toString() == """body {
+		tx.toString() == """\
+body {
   transactionID {
     transactionValidStart {
       seconds: 1554158542
@@ -49,6 +47,9 @@ class FileUpdateTransactionTest extends Specification {
     accountID {
       accountNum: 2
     }
+  }
+  nodeAccountID {
+    accountNum: 3
   }
   transactionFee: 100000
   transactionValidDuration {
@@ -75,7 +76,7 @@ sigs {
   sigs {
     signatureList {
       sigs {
-        ed25519: "`xB1K\\362\\316\\265T\\203\\3666\\212S\\"\\215\\210\\201w\\372\\363,\\317\\324U\\355\\215s\\201\\302l?L\\260\\021\\324\\271rE\\321\\247\\253\\251\\2147^#>\\267\\243\\244L\\271\\225\\030\\374\\274\\373W#\\3111+\\a"
+        ed25519: "\\230\\314\\233T\\261\\257\\254\\330\\030Jyz\\270\\221\\217\\324\\233p\\217\\320\\370Q91\\374\\210\\373\\357\\255\$\\000q\\036\\202\\341\\233\\3055m\\232`\\264\$ \\202g\\037\\377\\372\\326-\\311R\\035>\\223\\004E\\354\\002I\\242\\237\\016"
       }
     }
   }
