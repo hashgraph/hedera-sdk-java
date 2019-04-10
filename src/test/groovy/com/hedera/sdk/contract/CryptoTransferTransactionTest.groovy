@@ -34,7 +34,7 @@ class CryptoTransferTransactionTest extends Specification {
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new CryptoTransferTransaction().with(true, {
 			transactionId = txId
-            addSender(new AccountId(4), 4400)
+			addSender(new AccountId(4), 4400)
 			addRecipient(new AccountId(55), 150)
 			addTransfer(new AccountId(78), 123)
 		}).sign(key)

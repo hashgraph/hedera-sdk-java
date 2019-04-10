@@ -17,7 +17,7 @@ class ContractInfoQueryTest extends Specification {
 	def "Query can be built"() {
 		when:
 		def query = new ContractInfoQuery().with(true, {
-            contract = new ContractId(10, 14, 14)
+			contract = new ContractId(10, 14, 14)
 		})
 
 		then:

@@ -8,11 +8,11 @@ class AccountClaimQueryTest extends Specification {
 		when:
 		def query = new AccountClaimQuery()
 
-        then:
+		then:
 		query.inner.build().toString() == """cryptoGetClaim {
 }
 """
-    }
+	}
 
 	def "Query can be built"() {
 		when:

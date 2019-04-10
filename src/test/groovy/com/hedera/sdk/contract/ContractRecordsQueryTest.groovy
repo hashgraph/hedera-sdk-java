@@ -17,7 +17,7 @@ class ContractRecordsQueryTest extends Specification {
 	def "Query can be built"() {
 		when:
 		def query = new ContractRecordsQuery().with(true, {
-            contract = new ContractId(10, 14, 34)
+			contract = new ContractId(10, 14, 34)
 		})
 
 		then:

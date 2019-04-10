@@ -17,7 +17,7 @@ class AccountRecordsQueryTest extends Specification{
 	def "Query can be built"() {
 		when:
 		def query = new AccountRecordsQuery().with(true, {
-            account = new AccountId(5)
+			account = new AccountId(5)
 		})
 
 		then:

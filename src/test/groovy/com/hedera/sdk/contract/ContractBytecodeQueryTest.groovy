@@ -17,7 +17,7 @@ class ContractBytecodeQueryTest extends Specification {
 	def "Query can be built"() {
 		when:
 		def query = new ContractBytecodeQuery().with(true, {
-            contract = new ContractId(14, 11, 4)
+			contract = new ContractId(14, 11, 4)
 		})
 
 		then:
