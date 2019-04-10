@@ -1,9 +1,6 @@
 package com.hedera.sdk.account;
 
-import com.hedera.sdk.AccountId;
-import com.hedera.sdk.DurationHelper;
-import com.hedera.sdk.TimestampHelper;
-import com.hedera.sdk.TransactionBuilder;
+import com.hedera.sdk.*;
 import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.CryptoServiceGrpc;
 import com.hedera.sdk.proto.CryptoUpdateTransactionBody;
@@ -15,11 +12,15 @@ import java.time.Instant;
 
 // `CryptoUpdateTransaction`
 public final class AccountUpdateTransaction extends TransactionBuilder<AccountUpdateTransaction> {
-    private final CryptoUpdateTransactionBody.Builder builder;
+    private final CryptoUpdateTransactionBody.Builder builder = inner.getBodyBuilder()
+        .getCryptoUpdateAccountBuilder();
 
-    public AccountUpdateTransaction() {
-        builder = inner.getBodyBuilder()
-            .getCryptoUpdateAccountBuilder();
+    public AccountUpdateTransaction(Client client) {
+        super(client);
+    }
+
+    AccountUpdateTransaction() {
+        super(null);
     }
 
     public AccountUpdateTransaction setAccountForUpdate(AccountId accountId) {
@@ -64,8 +65,8 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
 
     @Override
     protected void doValidate() {
-        require(builder.getAccountIDToUpdateOrBuilder(), ".setAccountForUpdate() required");
-        require(builder.getKeyOrBuilder(), ".setKey() required");
+        require(builder.hasAccountIDToUpdate(), ".setAccountForUpdate() required");
+        require(builder.hasKey(), ".setKey() required");
     }
 
     @Override

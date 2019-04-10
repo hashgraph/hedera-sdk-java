@@ -1,6 +1,7 @@
 package com.hedera.sdk.account;
 
 import com.hedera.sdk.AccountId;
+import com.hedera.sdk.Client;
 import com.hedera.sdk.TransactionBuilder;
 import com.hedera.sdk.proto.*;
 import com.hedera.sdk.proto.Transaction;
@@ -8,13 +9,16 @@ import io.grpc.MethodDescriptor;
 import javax.annotation.Nonnegative;
 
 public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTransferTransaction> {
-    private CryptoTransferTransactionBody.Builder builder;
-    private TransferList.Builder transferList;
+    private final CryptoTransferTransactionBody.Builder builder = inner.getBodyBuilder()
+        .getCryptoTransferBuilder();
+    private final TransferList.Builder transferList = builder.getTransfersBuilder();
 
-    public CryptoTransferTransaction() {
-        builder = inner.getBodyBuilder()
-            .getCryptoTransferBuilder();
-        transferList = builder.getTransfersBuilder();
+    public CryptoTransferTransaction(Client client) {
+        super(client);
+    }
+
+    CryptoTransferTransaction() {
+        super(null);
     }
 
     public CryptoTransferTransaction addSender(AccountId senderId, @Nonnegative long value) {

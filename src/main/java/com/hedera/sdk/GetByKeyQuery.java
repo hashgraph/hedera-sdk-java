@@ -5,11 +5,14 @@ import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 public final class GetByKeyQuery extends QueryBuilder<GetByKeyResponse> {
-    private final com.hedera.sdk.proto.GetByKeyQuery.Builder builder;
+    private final com.hedera.sdk.proto.GetByKeyQuery.Builder builder = inner.getGetByKeyBuilder();
+
+    GetByKeyQuery(Client client) {
+        super(client, Response::getGetByKey);
+    }
 
     GetByKeyQuery() {
-        super(Response::getGetByKey);
-        builder = inner.getGetByKeyBuilder();
+        super(null, Response::getGetByKey);
     }
 
     @Override
@@ -25,7 +28,7 @@ public final class GetByKeyQuery extends QueryBuilder<GetByKeyResponse> {
 
     @Override
     protected void doValidate() {
-        require(builder.getKeyOrBuilder(), ".setKey() required");
+        require(builder.hasKey(), ".setKey() required");
     }
 
     public GetByKeyQuery setKey(Key publicKey) {

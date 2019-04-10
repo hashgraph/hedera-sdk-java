@@ -1,6 +1,7 @@
 package com.hedera.sdk.account;
 
 import com.hedera.sdk.AccountId;
+import com.hedera.sdk.Client;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
@@ -9,8 +10,13 @@ import io.grpc.MethodDescriptor;
 public final class AccountInfoQuery extends QueryBuilder<AccountInfo> {
     private final com.hedera.sdk.proto.CryptoGetInfoQuery.Builder builder;
 
-    public AccountInfoQuery() {
-        super(AccountInfo::new);
+    public AccountInfoQuery(Client client) {
+        super(client, AccountInfo::new);
+        builder = inner.getCryptoGetInfoBuilder();
+    }
+
+    AccountInfoQuery() {
+        super(null, AccountInfo::new);
         builder = inner.getCryptoGetInfoBuilder();
     }
 
@@ -26,7 +32,7 @@ public final class AccountInfoQuery extends QueryBuilder<AccountInfo> {
 
     @Override
     protected void doValidate() {
-        require(builder.getAccountIDOrBuilder(), ".setAccount() required");
+        require(builder.hasAccountID(), ".setAccount() required");
     }
 
     @Override

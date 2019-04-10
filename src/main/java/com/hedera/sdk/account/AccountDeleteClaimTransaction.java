@@ -2,6 +2,7 @@ package com.hedera.sdk.account;
 
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.AccountId;
+import com.hedera.sdk.Client;
 import com.hedera.sdk.TransactionBuilder;
 import com.hedera.sdk.proto.CryptoDeleteClaimTransactionBody;
 import com.hedera.sdk.proto.CryptoServiceGrpc;
@@ -11,11 +12,15 @@ import io.grpc.MethodDescriptor;
 
 // `CryptoDeleteClaimTransaction`
 public class AccountDeleteClaimTransaction extends TransactionBuilder<AccountDeleteClaimTransaction> {
-    private final CryptoDeleteClaimTransactionBody.Builder builder;
+    private final CryptoDeleteClaimTransactionBody.Builder builder = inner.getBodyBuilder()
+        .getCryptoDeleteClaimBuilder();
 
-    public AccountDeleteClaimTransaction() {
-        builder = inner.getBodyBuilder()
-            .getCryptoDeleteClaimBuilder();
+    public AccountDeleteClaimTransaction(Client client) {
+        super(client);
+    }
+
+    AccountDeleteClaimTransaction() {
+        super(null);
     }
 
     public AccountDeleteClaimTransaction setAccountToDeleteFrom(AccountId accountId) {
@@ -30,7 +35,7 @@ public class AccountDeleteClaimTransaction extends TransactionBuilder<AccountDel
 
     @Override
     protected void doValidate() {
-        require(builder.getAccountIDToDeleteFromOrBuilder(), ".setAccountToDeleteFrom() required");
+        require(builder.hasAccountIDToDeleteFrom(), ".setAccountToDeleteFrom() required");
         require(builder.getHashToDelete(), ".setHashToDelete() required");
     }
 

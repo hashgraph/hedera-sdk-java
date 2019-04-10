@@ -8,25 +8,17 @@ import spock.lang.Specification
 import java.time.Instant
 
 class AccountCreateTransactionTest extends Specification {
-	def "Transaction can be built with defaults"() {
+	def "Empty builder fails validation"() {
 		when:
-		def tx = new AccountCreateTransaction()
+		new AccountCreateTransaction().validate()
 
 		then:
-		tx.build().toString() == """body {
-  transactionFee: 100000
-  transactionValidDuration {
-    seconds: 120
-  }
-  cryptoCreateAccount {
-    sendRecordThreshold: 9223372036854775807
-    receiveRecordThreshold: 9223372036854775807
-    autoRenewPeriod {
-      seconds: 2592000
-    }
-  }
-}
-"""
+		def e = thrown(IllegalStateException)
+		e.message == """\
+transaction builder failed validation:
+.setTransactionId() required
+.setNodeAccount() required
+.setKey() required"""
 	}
 
 	def "Transaction can be built"() {
@@ -35,6 +27,8 @@ class AccountCreateTransactionTest extends Specification {
 		def key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962")
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new AccountCreateTransaction().with(true, {
+			setNodeAccount(new AccountId(3))
+			setTransactionId(new TransactionId(new AccountId(1234), Instant.parse("2019-04-08T07:04:00Z")))
 			setKey(key.getPublicKey())
 			transactionId = txId
 			initialBalance = 450
@@ -42,10 +36,11 @@ class AccountCreateTransactionTest extends Specification {
 			proxyFraction = 10
 			maxReceiveProxyFraction = 20
 			receiverSignatureRequired = true
-		}).sign(key)
+		}).testSign(key)
 
 		then:
-		tx.build().toString() == """body {
+		tx.toProto().toString() == """\
+body {
   transactionID {
     transactionValidStart {
       seconds: 1554158542
@@ -53,6 +48,9 @@ class AccountCreateTransactionTest extends Specification {
     accountID {
       accountNum: 2
     }
+  }
+  nodeAccountID {
+    accountNum: 3
   }
   transactionFee: 100000
   transactionValidDuration {
@@ -71,9 +69,6 @@ class AccountCreateTransactionTest extends Specification {
     sendRecordThreshold: 9223372036854775807
     receiveRecordThreshold: 9223372036854775807
     receiverSigRequired: true
-    autoRenewPeriod {
-      seconds: 2592000
-    }
     shardID {
     }
     realmID {
@@ -84,7 +79,7 @@ sigs {
   sigs {
     signatureList {
       sigs {
-        ed25519: "\\2070t\\316Op\\245\\322\\243+\\213\\313\\211\\215\\331G\\255\\200z2\\036\\256\\325[f\\353\\312\\371aN\\367\\017\\260N\\b\\241#\\275BctK`\\333o\\334D\\177\\207+D\\002H\\250P\\347\\023YFMW\\215I\\002"
+        ed25519: "\\216\\032iU\\201M\\207\\f\\352q\\252\\345?\\005M\\243bl\\246\\204\\310\$D\\375g00\\251q[\\3036\\262\\261c\\220\\250\\030\\245\\200\\016\\020/*4\\201\\v\\244\\261\\307\\031\\311#\\257\\272f\\250\\335\\031:C\\242\\320\\002"
       }
     }
   }

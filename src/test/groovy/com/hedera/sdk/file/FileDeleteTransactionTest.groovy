@@ -8,32 +8,32 @@ import com.hedera.sdk.TransactionId
 import java.time.Instant
 
 class FileDeleteTransactionTest extends Specification {
-	def "Transaction can be built with defaults"() {
+	def "Empty builder fails validation"() {
 		when:
-		def tx = new FileDeleteTransaction()
+		new FileDeleteTransaction().validate()
 		then:
-		tx.build().toString() == """body {
-  transactionFee: 100000
-  transactionValidDuration {
-    seconds: 120
-  }
-  fileDelete {
-  }
-}
-"""
+		def e = thrown(IllegalStateException)
+		e.message == """\
+transaction builder failed validation:
+.setTransactionId() required
+.setNodeAccount() required
+.setFileId()"""
 	}
+
 	def "Transaction can be built"() {
 		when:
 		def now = Instant.ofEpochSecond(1554158542)
 		def key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962")
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new FileDeleteTransaction().with(true, {
+			nodeAccount = new AccountId(3)
 			transactionId = txId
 			fileId = new FileId(848, 973, 1234)
-		}).sign(key)
+		}).testSign(key).toProto()
 
 		then:
-		tx.build().toString() == """body {
+		tx.toString() == """\
+body {
   transactionID {
     transactionValidStart {
       seconds: 1554158542
@@ -41,6 +41,9 @@ class FileDeleteTransactionTest extends Specification {
     accountID {
       accountNum: 2
     }
+  }
+  nodeAccountID {
+    accountNum: 3
   }
   transactionFee: 100000
   transactionValidDuration {
@@ -58,7 +61,7 @@ sigs {
   sigs {
     signatureList {
       sigs {
-        ed25519: "\\024\\325\\274c\\335\\211j\\232\\322\\021V\\367H\\321{\\3360\\0218D\\vQ\\032\\231\\027\\246\\264I\\306`\\223tM\\213Pr7FAG\\3574i\\025\\241\\b*\\217\\203\\v\\0062,\\247\\277\\252k\\222\\027=\\234\\003\\327\\002"
+        ed25519: "\\231\\257\\205\\311\\2437^g\\030/\$\\346\\314\\332V\\\\\\2103\\240+\\252\\275\\263\\250=\\037\\260\\370\\342P^kf\\022ae\\346\\024\\314\\025Z\\374\\267\\301B\\301\\311\\202\\267\\fuWm%\\365\\256\\350P2By\\377o\\t"
       }
     }
   }

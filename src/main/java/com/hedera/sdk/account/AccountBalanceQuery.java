@@ -1,17 +1,21 @@
 package com.hedera.sdk.account;
 
 import com.hedera.sdk.AccountId;
+import com.hedera.sdk.Client;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 // `CryptoGetAccountBalanceQuery`
 public final class AccountBalanceQuery extends QueryBuilder<CryptoGetAccountBalanceResponse> {
-    private final com.hedera.sdk.proto.CryptoGetAccountBalanceQuery.Builder builder;
+    private final CryptoGetAccountBalanceQuery.Builder builder = inner.getCryptogetAccountBalanceBuilder();
 
-    public AccountBalanceQuery() {
-        super(Response::getCryptogetAccountBalance);
-        builder = inner.getCryptogetAccountBalanceBuilder();
+    AccountBalanceQuery() {
+        super(null, Response::getCryptogetAccountBalance);
+    }
+
+    public AccountBalanceQuery(Client client) {
+        super(client, Response::getCryptogetAccountBalance);
     }
 
     @Override
@@ -21,13 +25,12 @@ public final class AccountBalanceQuery extends QueryBuilder<CryptoGetAccountBala
 
     public AccountBalanceQuery setAccount(AccountId account) {
         builder.setAccountID(account.toProto());
-
         return this;
     }
 
     @Override
     protected void doValidate() {
-        require(builder.getAccountIDOrBuilder(), ".setAccount() required");
+        require(builder.hasAccountID(), ".setAccount() required");
     }
 
     @Override

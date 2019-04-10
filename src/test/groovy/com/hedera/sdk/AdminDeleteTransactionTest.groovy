@@ -11,7 +11,7 @@ class AdminDeleteTransactionTest extends Specification {
 		def tx = new AdminDeleteTransaction()
 
 		then:
-		tx.build().toString() == """body {
+		tx.inner.toString() == """body {
   transactionFee: 100000
   transactionValidDuration {
     seconds: 120
@@ -28,13 +28,15 @@ class AdminDeleteTransactionTest extends Specification {
 		def key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962")
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new AdminDeleteTransaction().with(true, {
+			nodeAccount = new AccountId(3)
 			transactionId = txId
 			ID = new FileId(1, 2, 3)
 			expirationTime = Instant.ofEpochSecond(1554158643)
-		}).sign(key)
+		}).testSign(key).toProto()
 
 		then:
-		tx.build().toString() == """body {
+		tx.toString() == """\
+body {
   transactionID {
     transactionValidStart {
       seconds: 1554158542
@@ -42,6 +44,9 @@ class AdminDeleteTransactionTest extends Specification {
     accountID {
       accountNum: 2
     }
+  }
+  nodeAccountID {
+    accountNum: 3
   }
   transactionFee: 100000
   transactionValidDuration {
@@ -62,7 +67,7 @@ sigs {
   sigs {
     signatureList {
       sigs {
-        ed25519: "\\236\\027\\374\\'E6w\\331+\\376\\325n\\n\\264AQ2\\244\\324\\213\\224N-yT1\\026\\026\\257\\322\\375>;\\262\\252\\035@mV\\204\\353l\\021\\365\\207\\366\\303\\232A\\317F\\006\\372-\\320\\353\\245\\322\\225\\253F>\\312\\b"
+        ed25519: "N\\273\\261\\303\\210\\025\\253\\325\\037G+D\\201\\272VD\\301\\003\\214y_\\267/\\353\\201\\\\\\320\\177\\314\\340\\271b\\365C\\222^\\251X\\0041\\374\\236\\021(\\366\\362\\212\\276}M\\016\\201*\\327pX\\222\\v\\222\\037\\301\\2641\\000"
       }
     }
   }
@@ -76,13 +81,15 @@ sigs {
 		def key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962")
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new AdminDeleteTransaction().with(true, {
+			nodeAccount = new AccountId(3)
 			transactionId = txId
 			ID = new ContractId(1, 2, 3)
 			expirationTime = Instant.ofEpochSecond(1554158643)
-		}).sign(key)
+		}).testSign(key).toProto()
 
 		then:
-		tx.build().toString() == """body {
+		tx.toString() == """\
+body {
   transactionID {
     transactionValidStart {
       seconds: 1554158542
@@ -90,6 +97,9 @@ sigs {
     accountID {
       accountNum: 2
     }
+  }
+  nodeAccountID {
+    accountNum: 3
   }
   transactionFee: 100000
   transactionValidDuration {
@@ -110,7 +120,7 @@ sigs {
   sigs {
     signatureList {
       sigs {
-        ed25519: "\\237h\\237\\325\\277\\251\\361B\\241i\\177eB\\352w\\3156/\\245\\376a2\\223\\235e\\032\\344\\270\\257\\364*D\\322di\\213\\316/h\\324\\bR\\306\\305\\202\\266\\364\\340)\\263Dl\\304\\025\\350\\344\\341\\320\\372}\\213Z\\335\\a"
+        ed25519: "\\3032\\257:>\\031\\232w\\a\\t\\335\\357iO\\301SP\\311iE\\336dM\\330\\262cQ\\347Uj\\270\\376UB\\310\\247\\334\$\\n\\335\\327\\316\\034\\357\\241\\251\\227|\\370\\222\\205\\243\\206X\\336;\\311\\rrR\\224a@\\n"
       }
     }
   }

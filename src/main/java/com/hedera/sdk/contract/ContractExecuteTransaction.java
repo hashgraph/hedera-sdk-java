@@ -1,6 +1,7 @@
 package com.hedera.sdk.contract;
 
 import com.google.protobuf.ByteString;
+import com.hedera.sdk.Client;
 import com.hedera.sdk.ContractId;
 import com.hedera.sdk.TransactionBuilder;
 import com.hedera.sdk.proto.ContractCallTransactionBody;
@@ -12,11 +13,15 @@ import io.grpc.MethodDescriptor;
 /** Call a function in the contract, updating its internal state in the hashgraph. */
 // `ContractCallTransaction`
 public final class ContractExecuteTransaction extends TransactionBuilder<ContractExecuteTransaction> {
-    private final ContractCallTransactionBody.Builder builder;
+    private final ContractCallTransactionBody.Builder builder = inner.getBodyBuilder()
+        .getContractCallBuilder();
 
-    public ContractExecuteTransaction() {
-        builder = inner.getBodyBuilder()
-            .getContractCallBuilder();
+    public ContractExecuteTransaction(Client client) {
+        super(client);
+    }
+
+    ContractExecuteTransaction() {
+        super(null);
     }
 
     public ContractExecuteTransaction setContract(ContractId contractId) {
@@ -46,6 +51,6 @@ public final class ContractExecuteTransaction extends TransactionBuilder<Contrac
 
     @Override
     protected void doValidate() {
-        require(builder.getContractIDOrBuilder(), ".setContract() required");
+        require(builder.hasContractID(), ".setContract() required");
     }
 }
