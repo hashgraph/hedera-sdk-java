@@ -28,7 +28,7 @@ public final class AppendToFile {
 
         var txId = new TransactionId(new AccountId(2));
 
-        var fileTx = new FileCreateTransaction().setTransactionId(txId)
+        var fileTx = new FileCreateTransaction(client).setTransactionId(txId)
             .setNodeAccount(node)
             .setExpirationTime(
                 Instant.now()
@@ -39,7 +39,7 @@ public final class AppendToFile {
             .sign(operatorKey)
             .sign(operatorKey);
 
-        var res = fileTx.execute(client);
+        var res = fileTx.execute();
 
         System.out.println("File create transaction: " + res.toString());
 
@@ -51,7 +51,7 @@ public final class AppendToFile {
 
         var appendFileTxId = new TransactionId(new AccountId(2));
 
-        var appendFileTx = new FileAppendTransaction().setTransactionId(appendFileTxId)
+        var appendFileTx = new FileAppendTransaction(client).setTransactionId(appendFileTxId)
             .setNodeAccount(node)
             .setContents(additionalFileContents)
             // first signature is the owner of the file
@@ -59,16 +59,16 @@ public final class AppendToFile {
             // second signature is the transaction payer
             .sign(operatorKey);
 
-        res = appendFileTx.execute(client);
+        res = appendFileTx.execute();
 
         System.out.println("File append transaction: " + res.toString());
 
         // Sleep for 4 seconds
         Thread.sleep(4000);
 
-        var query = new TransactionReceiptQuery().setTransaction(txId);
+        var query = new TransactionReceiptQuery(client).setTransaction(txId);
 
-        var receipt = query.execute(client);
+        var receipt = query.execute();
         var receiptStatus = receipt.getStatus();
 
         System.out.println("status: " + receiptStatus.toString());

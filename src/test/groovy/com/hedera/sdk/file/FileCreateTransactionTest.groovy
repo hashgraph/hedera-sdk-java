@@ -8,38 +8,36 @@ import spock.lang.Specification
 import java.time.Instant
 
 class FileCreateTransactionTest extends Specification {
-	def "Transaction can be built with defaults"() {
+	def "Empty builder fails validation"() {
 		when:
-		def tx = new FileCreateTransaction()
+		new FileCreateTransaction().validate()
 
 		then:
-		tx.build().toString() == """body {
-  transactionFee: 100000
-  transactionValidDuration {
-    seconds: 120
-  }
-  fileCreate {
-    keys {
-    }
-  }
-}
-"""
+		def e = thrown(IllegalStateException)
+		e.message == """\
+transaction builder failed validation:
+.setTransactionId() required
+.setNodeAccount() required
+.addKey() required"""
 	}
+
 	def "Transaction can be built"() {
 		when:
 		def now = Instant.ofEpochSecond(1554158542)
 		def key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962")
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new FileCreateTransaction().with(true, {
+			nodeAccount = new AccountId(3)
 			transactionId = txId
 			expirationTime = Instant.ofEpochSecond(1554158728)
 			addKey(key.getPublicKey())
 			contents = [1, 2, 3, 4, 5]
 			newRealmAdminKey = key.getPublicKey()
-		}).sign(key)
+		}).testSign(key).toProto()
 
 		then:
-		tx.build().toString() == """body {
+		tx.toString() == """\
+body {
   transactionID {
     transactionValidStart {
       seconds: 1554158542
@@ -47,6 +45,9 @@ class FileCreateTransactionTest extends Specification {
     accountID {
       accountNum: 2
     }
+  }
+  nodeAccountID {
+    accountNum: 3
   }
   transactionFee: 100000
   transactionValidDuration {
@@ -71,7 +72,7 @@ sigs {
   sigs {
     signatureList {
       sigs {
-        ed25519: "\\225\\247o\\210(\\341P=\\356\\fy\\217\\004\\367L\\274\\2507\\201\\004\\260\\254\\324\\250\\271s\\367\\r\\347:y\\264\\272\\353RK\\206\\304\\374\\243\\325@\\303\\264E\\327\\rop{k\\215\\205_\\025\\017\\310\\b\\rV\\230\\303v\\f"
+        ed25519: "\\'\\"j\\340\\340\\270kil\\246\\310\\022gpYH,C\\v\\312\\357oT\\316\\301Q\\326\\251\\020t\\240\\375\\307\\020\\340 \\205d\\262\\210\\240!\\226?\\fw^\\345\\246oA\\311W\\004\\260\\263\\235z\\374\\222lB\\370\\004"
       }
     }
   }

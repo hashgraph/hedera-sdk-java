@@ -22,7 +22,7 @@ public final class CreateAccount {
         var client = new Client(Map.of(node, network));
 
         var txId = new TransactionId(new AccountId(2));
-        var tx = new AccountCreateTransaction().setTransactionId(txId)
+        var tx = new AccountCreateTransaction(client).setTransactionId(txId)
             .setNodeAccount(new AccountId(3))
             .setKey(newKey.getPublicKey())
             // default (from transaction id): .setShardId(0)
@@ -34,7 +34,7 @@ public final class CreateAccount {
             // default: .setInitialBalance(0)
             .sign(operatorKey);
 
-        var res = tx.execute(client);
+        var res = tx.execute();
 
         System.out.println("transaction: " + res.toString());
 
@@ -42,9 +42,9 @@ public final class CreateAccount {
         // TODO: We should make the query here retry internally if its "not ready" or "busy"
         Thread.sleep(4000);
 
-        var query = new TransactionReceiptQuery().setTransaction(txId);
+        var query = new TransactionReceiptQuery(client).setTransaction(txId);
 
-        var receipt = query.execute(client);
+        var receipt = query.execute();
         var receiptStatus = receipt.getStatus();
 
         System.out.println("status: " + receiptStatus.toString());

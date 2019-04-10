@@ -8,11 +8,14 @@ import io.grpc.MethodDescriptor;
 
 public final class AdminUndeleteTransaction extends TransactionBuilder<AdminUndeleteTransaction> {
 
-    private final AdminUndeleteTransactionBody.Builder builder;
+    private final AdminUndeleteTransactionBody.Builder builder = bodyBuilder.getAdminUndeleteBuilder();
 
-    public AdminUndeleteTransaction() {
-        builder = inner.getBodyBuilder()
-            .getAdminUndeleteBuilder();
+    public AdminUndeleteTransaction(Client client) {
+        super(client);
+    }
+
+    AdminUndeleteTransaction() {
+        super(null);
     }
 
     public AdminUndeleteTransaction setID(FileId fileId) {
@@ -35,8 +38,8 @@ public final class AdminUndeleteTransaction extends TransactionBuilder<AdminUnde
         requireExactlyOne(
             ".setID() required",
             ".setID() may take a contract ID OR a file ID",
-            builder.getContractIDOrBuilder(),
-            builder.getFileIDOrBuilder()
+            builder.hasContractID(),
+            builder.hasFileID()
         );
     }
 }

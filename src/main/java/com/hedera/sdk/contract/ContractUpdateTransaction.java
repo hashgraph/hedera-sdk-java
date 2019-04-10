@@ -11,11 +11,15 @@ import java.time.Duration;
 import java.time.Instant;
 
 public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdateTransaction> {
-    private final ContractUpdateTransactionBody.Builder builder;
+    private final ContractUpdateTransactionBody.Builder builder = inner.getBodyBuilder()
+        .getContractUpdateInstanceBuilder();
 
-    public ContractUpdateTransaction() {
-        builder = inner.getBodyBuilder()
-            .getContractUpdateInstanceBuilder();
+    public ContractUpdateTransaction(Client client) {
+        super(client);
+    }
+
+    ContractUpdateTransaction() {
+        super(null);
     }
 
     public ContractUpdateTransaction setContract(ContractId contract) {
@@ -60,6 +64,6 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
 
     @Override
     protected void doValidate() {
-        require(builder.getContractIDOrBuilder(), ".setContract() required");
+        require(builder.hasContractID(), ".setContract() required");
     }
 }

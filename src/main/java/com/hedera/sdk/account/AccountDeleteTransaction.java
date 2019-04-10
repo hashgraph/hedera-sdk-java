@@ -1,6 +1,7 @@
 package com.hedera.sdk.account;
 
 import com.hedera.sdk.AccountId;
+import com.hedera.sdk.Client;
 import com.hedera.sdk.TransactionBuilder;
 import com.hedera.sdk.proto.CryptoDeleteTransactionBody;
 import com.hedera.sdk.proto.CryptoServiceGrpc;
@@ -10,11 +11,15 @@ import io.grpc.MethodDescriptor;
 
 // `CryptoDeleteTransaction`
 public class AccountDeleteTransaction extends TransactionBuilder<AccountDeleteTransaction> {
-    private final CryptoDeleteTransactionBody.Builder builder;
+    private final CryptoDeleteTransactionBody.Builder builder = inner.getBodyBuilder()
+        .getCryptoDeleteBuilder();
 
-    public AccountDeleteTransaction() {
-        builder = inner.getBodyBuilder()
-            .getCryptoDeleteBuilder();
+    public AccountDeleteTransaction(Client client) {
+        super(client);
+    }
+
+    AccountDeleteTransaction() {
+        super(null);
     }
 
     public AccountDeleteTransaction setTransferAccountId(AccountId transferAccountId) {
@@ -29,8 +34,8 @@ public class AccountDeleteTransaction extends TransactionBuilder<AccountDeleteTr
 
     @Override
     protected void doValidate() {
-        require(builder.getTransferAccountIDOrBuilder(), ".setTransferAccountId() required");
-        require(builder.getDeleteAccountIDOrBuilder(), ".setDeleteAccountId() required");
+        require(builder.hasTransferAccountID(), ".setTransferAccountId() required");
+        require(builder.hasDeleteAccountID(), ".setDeleteAccountId() required");
     }
 
     @Override

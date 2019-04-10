@@ -1,5 +1,6 @@
 package com.hedera.sdk.file;
 
+import com.hedera.sdk.Client;
 import com.hedera.sdk.FileId;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
@@ -7,11 +8,14 @@ import io.grpc.MethodDescriptor;
 
 // `FileGetContentsQuery`
 public class FileContentsQuery extends QueryBuilder<FileGetContentsResponse> {
-    private final com.hedera.sdk.proto.FileGetContentsQuery.Builder builder;
+    private final FileGetContentsQuery.Builder builder = inner.getFileGetContentsBuilder();
 
-    public FileContentsQuery() {
-        super(Response::getFileGetContents);
-        builder = inner.getFileGetContentsBuilder();
+    public FileContentsQuery(Client client) {
+        super(client, Response::getFileGetContents);
+    }
+
+    FileContentsQuery() {
+        super(null, Response::getFileGetContents);
     }
 
     @Override
@@ -32,9 +36,5 @@ public class FileContentsQuery extends QueryBuilder<FileGetContentsResponse> {
     @Override
     protected void doValidate() {
         require(builder.hasFileID(), ".setFileId() required");
-    }
-
-    Query build() {
-        return inner.build();
     }
 }

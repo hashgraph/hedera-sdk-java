@@ -28,7 +28,7 @@ public final class TransferCrypto {
         var recipient = AccountId.fromString(Objects.requireNonNull(env.get("Recipient")));
 
         var txId = new TransactionId(new AccountId(3));
-        var tx = new CryptoTransferTransaction().setTransactionId(txId)
+        var tx = new CryptoTransferTransaction(client).setTransactionId(txId)
             .setNodeAccount(node)
             /// value must be positive for both send and receive
             .addSender(operator, 100000)
@@ -46,7 +46,7 @@ public final class TransferCrypto {
             // double signing is required if it is the same account
             .sign(operatorKey);
 
-        var res = tx.execute(client);
+        var res = tx.execute();
 
         System.out.println("transaction: " + res.toString());
 
@@ -55,16 +55,16 @@ public final class TransferCrypto {
         Thread.sleep(4000);
 
         // Next we get the balance after the transaction
-        var txPayment = new CryptoTransferTransaction().setNodeAccount(node)
+        var txPayment = new CryptoTransferTransaction(client).setNodeAccount(node)
             .setTransactionId(new TransactionId(node))
             .addSender(operator, 100000)
             .addRecipient(node, 100000)
             .sign(operatorKey);
 
-        var query = new AccountBalanceQuery().setAccount(recipient)
+        var query = new AccountBalanceQuery(client).setAccount(recipient)
             .setPayment(txPayment);
 
-        var balance = query.execute(client);
+        var balance = query.execute();
 
         System.out.println(balance.toString());
     }

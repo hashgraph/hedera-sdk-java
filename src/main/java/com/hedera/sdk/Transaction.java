@@ -1,6 +1,5 @@
 package com.hedera.sdk;
 
-import com.google.common.util.concurrent.Futures;
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.sdk.crypto.ed25519.Ed25519Signature;
@@ -8,26 +7,28 @@ import com.hedera.sdk.proto.ResponseCodeEnum;
 import com.hedera.sdk.proto.Signature;
 import com.hedera.sdk.proto.SignatureList;
 import com.hedera.sdk.proto.TransactionResponse;
-import io.grpc.CallOptions;
-import io.grpc.ClientCall;
-import io.grpc.MethodDescriptor;
-import io.grpc.stub.ClientCalls;
-import io.grpc.stub.StreamObserver;
-import java.util.concurrent.Future;
-import java.util.function.Function;
+import io.grpc.*;
+
+import java.util.Objects;
 import javax.annotation.Nullable;
 
-public class Transaction {
+public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transaction, TransactionResponse, ResponseCodeEnum> {
     private final com.hedera.sdk.proto.Transaction.Builder inner;
     private final io.grpc.MethodDescriptor<com.hedera.sdk.proto.Transaction, com.hedera.sdk.proto.TransactionResponse> methodDescriptor;
+
+    @Nullable
+    private final Channel rpcChannel;
 
     @Nullable
     private byte[] bodyBytes;
 
     Transaction(
+        @Nullable Channel channel,
         com.hedera.sdk.proto.Transaction.Builder inner,
         MethodDescriptor<com.hedera.sdk.proto.Transaction, TransactionResponse> methodDescriptor
     ) {
+        super(TransactionResponse::getNodeTransactionPrecheckCode);
+        this.rpcChannel = channel;
         this.inner = inner;
         this.methodDescriptor = methodDescriptor;
     }
@@ -54,7 +55,8 @@ public class Transaction {
         return this;
     }
 
-    public final com.hedera.sdk.proto.Transaction build() {
+    @Override
+    public com.hedera.sdk.proto.Transaction toProto() {
         if (inner.getSigsBuilder()
             .getSigsCount() == 0) {
             throw new IllegalStateException("Transaction is not signed");
@@ -77,56 +79,14 @@ public class Transaction {
         return bodyBytes;
     }
 
-    private ClientCall<com.hedera.sdk.proto.Transaction, TransactionResponse> newClientCall(Client client) {
-        return client.getChannel()
-            .newCall(methodDescriptor, CallOptions.DEFAULT);
+    @Override
+    protected MethodDescriptor<com.hedera.sdk.proto.Transaction, TransactionResponse> getMethod() {
+        return methodDescriptor;
     }
 
-    public final ResponseCodeEnum execute(Client client) {
-        return ClientCalls.blockingUnaryCall(newClientCall(client), build())
-            .getNodeTransactionPrecheckCode();
-    }
-
-    public final void executeAsync(Client client, Function<ResponseCodeEnum, Void> onResponse, Function<Throwable, Void> onError) {
-        ClientCalls.asyncUnaryCall(newClientCall(client), build(), new ResponseObserver(onResponse, onError));
-    }
-
-    public Future<ResponseCodeEnum> executeFuture(Client client) {
-        return Futures.lazyTransform(
-            ClientCalls.futureUnaryCall(newClientCall(client), build()),
-            TransactionResponse::getNodeTransactionPrecheckCode
-        );
-    }
-
-    // inner class because anonymous classes can't reassign their captures so `callbackExecuted`
-    // must be a field instead
-    private static class ResponseObserver implements StreamObserver<TransactionResponse> {
-        private final Function<ResponseCodeEnum, Void> onResponse;
-        private final Function<Throwable, Void> onError;
-        private boolean callbackExecuted = false;
-
-        private ResponseObserver(Function<ResponseCodeEnum, Void> onResponse, Function<Throwable, Void> onError) {
-            this.onResponse = onResponse;
-            this.onError = onError;
-        }
-
-        @Override
-        public void onNext(TransactionResponse response) {
-            if (!callbackExecuted) {
-                callbackExecuted = true;
-                onResponse.apply(response.getNodeTransactionPrecheckCode());
-            }
-        }
-
-        @Override
-        public void onError(Throwable throwable) {
-            if (!callbackExecuted) {
-                callbackExecuted = true;
-                onError.apply(throwable);
-            }
-        }
-
-        @Override
-        public void onCompleted() {}
+    @Override
+    protected Channel getChannel() {
+        Objects.requireNonNull(rpcChannel, "Transaction.rpcChannel must be non-null in regular use");
+        return rpcChannel;
     }
 }

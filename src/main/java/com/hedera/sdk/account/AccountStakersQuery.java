@@ -1,17 +1,21 @@
 package com.hedera.sdk.account;
 
 import com.hedera.sdk.AccountId;
+import com.hedera.sdk.Client;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 // `CryptoGetStakersQuery`
 public class AccountStakersQuery extends QueryBuilder<CryptoGetStakersResponse> {
-    private final com.hedera.sdk.proto.CryptoGetStakersQuery.Builder builder;
+    private final CryptoGetStakersQuery.Builder builder = inner.getCryptoGetProxyStakersBuilder();
 
-    public AccountStakersQuery() {
-        super(Response::getCryptoGetProxyStakers);
-        builder = inner.getCryptoGetProxyStakersBuilder();
+    public AccountStakersQuery(Client client) {
+        super(client, Response::getCryptoGetProxyStakers);
+    }
+
+    AccountStakersQuery() {
+        super(null, Response::getCryptoGetProxyStakers);
     }
 
     public AccountStakersQuery setAccount(AccountId accountId) {
@@ -26,7 +30,7 @@ public class AccountStakersQuery extends QueryBuilder<CryptoGetStakersResponse> 
 
     @Override
     protected void doValidate() {
-        require(builder.getAccountIDOrBuilder(), ".setAccount() required");
+        require(builder.hasAccountID(), ".setAccount() required");
     }
 
     @Override

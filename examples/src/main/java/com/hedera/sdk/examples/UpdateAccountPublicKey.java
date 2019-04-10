@@ -25,19 +25,19 @@ public final class UpdateAccountPublicKey {
         var originalKey = Ed25519PrivateKey.generate();
 
         var txId = new TransactionId(new AccountId(2));
-        var tx = new AccountCreateTransaction().setTransactionId(txId)
+        var tx = new AccountCreateTransaction(client).setTransactionId(txId)
             .setNodeAccount(new AccountId(3))
             .setKey(originalKey.getPublicKey())
             .sign(operatorKey);
 
-        var res = tx.execute(client);
+        var res = tx.execute();
 
         // Sleep for 4 seconds
         Thread.sleep(4000);
 
-        var query = new TransactionReceiptQuery().setTransaction(txId);
+        var query = new TransactionReceiptQuery(client).setTransaction(txId);
 
-        var receipt = query.execute(client);
+        var receipt = query.execute();
         var receiptStatus = receipt.getStatus();
 
         var newAccountId = receipt.getAccountId();
@@ -46,7 +46,7 @@ public final class UpdateAccountPublicKey {
         // Now we update the key
         var newKey = Ed25519PrivateKey.generate();
         txId = new TransactionId(new AccountId(6));
-        tx = new AccountUpdateTransaction().setTransactionId(txId)
+        tx = new AccountUpdateTransaction(client).setTransactionId(txId)
             .setNodeAccount(new AccountId(3))
             .setAccountForUpdate(newAccountId)
             .setKey(newKey.getPublicKey())
@@ -55,16 +55,16 @@ public final class UpdateAccountPublicKey {
             // sign as the owner of the account
             .sign(originalKey);
 
-        res = tx.execute(client);
+        res = tx.execute();
 
         System.out.println("transaction: " + res.toString());
 
         // Sleep for 4 seconds
         Thread.sleep(4000);
 
-        query = new TransactionReceiptQuery().setTransaction(txId);
+        query = new TransactionReceiptQuery(client).setTransaction(txId);
 
-        receipt = query.execute(client);
+        receipt = query.execute();
         receiptStatus = receipt.getStatus();
 
         System.out.println("status: " + receiptStatus.toString());

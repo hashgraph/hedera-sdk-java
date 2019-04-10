@@ -1,17 +1,21 @@
 package com.hedera.sdk.account;
 
 import com.hedera.sdk.AccountId;
+import com.hedera.sdk.Client;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 // `CryptoGetAccountRecordsQuery`
 public class AccountRecordsQuery extends QueryBuilder<CryptoGetAccountRecordsResponse> {
-    private final com.hedera.sdk.proto.CryptoGetAccountRecordsQuery.Builder builder;
+    private final CryptoGetAccountRecordsQuery.Builder builder = inner.getCryptoGetAccountRecordsBuilder();
 
-    public AccountRecordsQuery() {
-        super(Response::getCryptoGetAccountRecords);
-        builder = inner.getCryptoGetAccountRecordsBuilder();
+    public AccountRecordsQuery(Client client) {
+        super(client, Response::getCryptoGetAccountRecords);
+    }
+
+    AccountRecordsQuery() {
+        super(null, Response::getCryptoGetAccountRecords);
     }
 
     public AccountRecordsQuery setAccount(AccountId accountId) {
@@ -26,7 +30,7 @@ public class AccountRecordsQuery extends QueryBuilder<CryptoGetAccountRecordsRes
 
     @Override
     protected void doValidate() {
-        require(builder.getAccountIDOrBuilder(), ".setAccount() required");
+        require(builder.hasAccountID(), ".setAccount() required");
     }
 
     @Override

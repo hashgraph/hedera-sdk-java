@@ -8,21 +8,20 @@ import spock.lang.Specification
 import java.time.Instant
 
 class AccountDeleteClaimTransactionTest extends Specification {
-	def "Transaction can be built with defaults"() {
+	def "Empty builder fails validation"() {
 		when:
-		def tx = new AccountDeleteClaimTransaction()
+		new AccountDeleteClaimTransaction().validate()
 
 		then:
-		tx.build().toString() == """body {
-  transactionFee: 100000
-  transactionValidDuration {
-    seconds: 120
-  }
-  cryptoDeleteClaim {
-  }
-}
-"""
+		def e = thrown(IllegalStateException)
+		e.message == """\
+transaction builder failed validation:
+.setTransactionId() required
+.setNodeAccount() required
+.setAccountToDeleteFrom() required
+.setHashToDelete() required"""
 	}
+
 	def "Transaction can be built"() {
 		when:
 		def now = Instant.ofEpochSecond(1554158542)
@@ -30,12 +29,14 @@ class AccountDeleteClaimTransactionTest extends Specification {
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new AccountDeleteClaimTransaction().with(true, {
 			transactionId = txId
+			nodeAccount = new AccountId(3)
 			accountToDeleteFrom = new AccountId(4)
 			hashToDelete = [4, 2, 1, 5]
-		}).sign(key)
+		}).testSign(key)
 
 		then:
-		tx.build().toString() == """body {
+		tx.toProto().toString() == """\
+body {
   transactionID {
     transactionValidStart {
       seconds: 1554158542
@@ -43,6 +44,9 @@ class AccountDeleteClaimTransactionTest extends Specification {
     accountID {
       accountNum: 2
     }
+  }
+  nodeAccountID {
+    accountNum: 3
   }
   transactionFee: 100000
   transactionValidDuration {
@@ -59,7 +63,7 @@ sigs {
   sigs {
     signatureList {
       sigs {
-        ed25519: "\\023\\346\\243\\210\\302\\003\\315h\\355\\030\\271\\364\\364\\204\\265\\212\\b\\021\\311\\f.\\244\\211l\\261\\027\\3123\\247\\324\\330\\323F\\203\\362\\3312\\221I\\033\\032\\347\\267n9\\266\\340\\016~\\247\\210Pj\\267^\\265=do:|!\\235\\v"
+        ed25519: "\\026\\nq\\314\\212-~\\363\\363?\\210Jj\\314\\256\\214\\244|\\030\\205of8\\226*0\\304\\312x\\242&\\336\\3443\\205Dx\\366\\252\\340\\352\\303\\254\\316]R\\333fU+\\255\\274\\356\\326\\314\\211\\272\\320\\201\\027\\347\\3205\\005"
       }
     }
   }
