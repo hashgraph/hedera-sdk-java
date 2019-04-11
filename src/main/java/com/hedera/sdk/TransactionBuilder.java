@@ -10,9 +10,7 @@ import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.Objects;
 
-public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
-        extends ValidatingHederaCall<com.hedera.sdk.proto.Transaction, TransactionResponse, ResponseCodeEnum> {
-    protected com.hedera.sdk.proto.Transaction.Builder inner = com.hedera.sdk.proto.Transaction.newBuilder();
+public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extends TransactionCall {
     protected final TransactionBody.Builder bodyBuilder = inner.getBodyBuilder();
 
     private static final int MAX_MEMO_LENGTH = 100;
@@ -22,8 +20,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
 
     // a single required constructor for subclasses so we don't forget
     protected TransactionBuilder(@Nullable Client client) {
-        // TODO: map response to non-proto type
-        super(TransactionResponse::getNodeTransactionPrecheckCode);
+        super();
         this.client = client;
 
         setTransactionFee(client != null ? client.getMaxTransactionFee() : Client.DEFAULT_MAX_TXN_FEE);

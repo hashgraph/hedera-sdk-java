@@ -12,8 +12,7 @@ import io.grpc.*;
 import java.util.Objects;
 import javax.annotation.Nullable;
 
-public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transaction, TransactionResponse, ResponseCodeEnum> {
-    private final com.hedera.sdk.proto.Transaction.Builder inner;
+public final class Transaction extends TransactionCall {
     private final io.grpc.MethodDescriptor<com.hedera.sdk.proto.Transaction, com.hedera.sdk.proto.TransactionResponse> methodDescriptor;
 
     @Nullable
@@ -27,9 +26,8 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
         com.hedera.sdk.proto.Transaction.Builder inner,
         MethodDescriptor<com.hedera.sdk.proto.Transaction, TransactionResponse> methodDescriptor
     ) {
-        super(TransactionResponse::getNodeTransactionPrecheckCode);
+        super(inner);
         this.rpcChannel = channel;
-        this.inner = inner;
         this.methodDescriptor = methodDescriptor;
     }
 
@@ -55,18 +53,14 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
         return this;
     }
 
+    public final void validate() {
+        require(inner.hasSigs() && inner.getSigsBuilder().getSigsCount() != 0, "Transaction must be signed");
+        require(inner.getBodyBuilder().hasTransactionID(), "Transaction needs an ID");
+    }
+
     @Override
     public com.hedera.sdk.proto.Transaction toProto() {
-        if (inner.getSigsBuilder()
-            .getSigsCount() == 0) {
-            throw new IllegalStateException("Transaction is not signed");
-        }
-
-        if (!inner.getBodyBuilder()
-            .hasTransactionID()) {
-            throw new IllegalStateException("Transaction needs an ID");
-        }
-
+        validate();
         return inner.build();
     }
 

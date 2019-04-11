@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.function.Function;
 
-public abstract class QueryBuilder<Resp> extends ValidatingHederaCall<Query, Response, Resp> {
+public abstract class QueryBuilder<Resp> extends HederaCall<Query, Response, Resp, QueryException> {
     protected Query.Builder inner = Query.newBuilder();
 
     @Nullable
