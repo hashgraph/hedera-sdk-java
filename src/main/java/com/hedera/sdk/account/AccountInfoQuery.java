@@ -2,6 +2,7 @@ package com.hedera.sdk.account;
 
 import com.hedera.sdk.AccountId;
 import com.hedera.sdk.Client;
+import com.hedera.sdk.HederaException;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
@@ -11,12 +12,12 @@ public final class AccountInfoQuery extends QueryBuilder<AccountInfo> {
     private final com.hedera.sdk.proto.CryptoGetInfoQuery.Builder builder;
 
     public AccountInfoQuery(Client client) {
-        super(client, AccountInfo::new);
+        super(client);
         builder = inner.getCryptoGetInfoBuilder();
     }
 
     AccountInfoQuery() {
-        super(null, AccountInfo::new);
+        super(null);
         builder = inner.getCryptoGetInfoBuilder();
     }
 
@@ -38,5 +39,10 @@ public final class AccountInfoQuery extends QueryBuilder<AccountInfo> {
     @Override
     protected MethodDescriptor<Query, Response> getMethod() {
         return CryptoServiceGrpc.getGetAccountInfoMethod();
+    }
+
+    @Override
+    protected AccountInfo mapResponse(Response raw) throws HederaException {
+        return new AccountInfo(raw);
     }
 }

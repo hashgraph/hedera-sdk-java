@@ -1,5 +1,8 @@
 package com.hedera.sdk;
 
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.google.protobuf.ByteString;
 import io.grpc.CallOptions;
 import io.grpc.Channel;
@@ -10,20 +13,11 @@ import io.grpc.stub.StreamObserver;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
+import java.util.Objects;
+import java.util.function.Consumer;
 
-public abstract class HederaCall<Req, RawResp, Resp, E extends Throwable> {
+public abstract class HederaCall<Req, RawResp, Resp> {
     private @Nullable List<String> validationErrors;
-    private final MapResponse<RawResp, Resp, E> mapResponse;
-
-    // a single required constructor for subclasses to make it harder to forget
-    protected HederaCall(MapResponse<RawResp, Resp, E> mapResponse) {
-        this.mapResponse = mapResponse;
-    }
 
     protected abstract io.grpc.MethodDescriptor<Req, RawResp> getMethod();
 
@@ -31,59 +25,34 @@ public abstract class HederaCall<Req, RawResp, Resp, E extends Throwable> {
 
     protected abstract Channel getChannel();
 
+    protected abstract Resp mapResponse(RawResp raw) throws HederaException;
+
     private ClientCall<Req, RawResp> newClientCall() {
         return getChannel().newCall(getMethod(), CallOptions.DEFAULT);
     }
 
-    public final Resp execute() throws E {
-        return mapResponse.mapResponse(ClientCalls.blockingUnaryCall(newClientCall(), toProto()));
+    public final Resp execute() throws HederaException {
+        return mapResponse(ClientCalls.blockingUnaryCall(newClientCall(), toProto()));
     }
 
-    public final void executeAsync(Function<Resp, Void> onSuccess, Function<Throwable, Void> onError) {
-        ClientCalls.asyncUnaryCall(newClientCall(), toProto(), new ResponseObserver<>(mapResponse, onSuccess, onError));
+    public final void executeAsync(Consumer<Resp> onSuccess, Consumer<Throwable> onError) {
+        ClientCalls.asyncUnaryCall(newClientCall(), toProto(), new ResponseObserver(onSuccess, onError));
     }
 
-    public final Future<Resp> executeFuture() {
-        var rawFuture = ClientCalls.futureUnaryCall(newClientCall(), toProto());
+    public final ListenableFuture<Resp> executeFuture() {
+        return Futures.transformAsync(ClientCalls.futureUnaryCall(newClientCall(), toProto()), rawResp -> {
+            Objects.requireNonNull(rawResp, "response returned was null");
 
-        return new Future<>() {
-            @Override
-            public boolean cancel(boolean mayInterruptIfRunning) {
-                return rawFuture.cancel(mayInterruptIfRunning);
+            // there's no convenience method for a functional transform which can throw
+            try {
+                return Futures.immediateFuture(mapResponse(rawResp));
+            } catch (HederaException e) {
+                return Futures.immediateFailedFuture(e);
             }
-
-            @Override
-            public boolean isCancelled() {
-                return rawFuture.isCancelled();
-            }
-
-            @Override
-            public boolean isDone() {
-                return rawFuture.isDone();
-            }
-
-            @Override
-            public Resp get() throws InterruptedException, ExecutionException {
-                var raw = rawFuture.get();
-
-                try {
-                    return mapResponse.mapResponse(raw);
-                } catch (Throwable e) {
-                    throw new ExecutionException(e);
-                }
-            }
-
-            @Override
-            public Resp get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-                var raw = rawFuture.get(timeout, unit);
-
-                try {
-                    return mapResponse.mapResponse(raw);
-                } catch (Throwable e) {
-                    throw new ExecutionException(e);
-                }
-            }
-        };
+        },
+            // heavier transforms should be executed asynchronously but we're fine here
+            MoreExecutors.directExecutor()
+        );
     }
 
     public abstract void validate();
@@ -144,14 +113,12 @@ public abstract class HederaCall<Req, RawResp, Resp, E extends Throwable> {
      * }
      * } */
 
-    private static class ResponseObserver<RawResp, Resp> implements StreamObserver<RawResp> {
-        private final MapResponse<RawResp, Resp, ? extends Throwable> mapResponse;
-        private final Function<Resp, Void> onResponse;
-        private final Function<Throwable, Void> onError;
+    private class ResponseObserver implements StreamObserver<RawResp> {
+        private final Consumer<Resp> onResponse;
+        private final Consumer<Throwable> onError;
         private boolean callbackExecuted = false;
 
-        private ResponseObserver(MapResponse<RawResp, Resp, ? extends Throwable> mapResponse, Function<Resp, Void> onResponse, Function<Throwable, Void> onError) {
-            this.mapResponse = mapResponse;
+        private ResponseObserver(Consumer<Resp> onResponse, Consumer<Throwable> onError) {
             this.onResponse = onResponse;
             this.onError = onError;
         }
@@ -160,9 +127,9 @@ public abstract class HederaCall<Req, RawResp, Resp, E extends Throwable> {
         public void onNext(RawResp rawResp) {
             if (!callbackExecuted) {
                 try {
-                    var resp = mapResponse.mapResponse(rawResp);
+                    var resp = mapResponse(rawResp);
                     callbackExecuted = true;
-                    onResponse.apply(resp);
+                    onResponse.accept(resp);
                 } catch (Throwable e) {
                     onError(e);
                 }
@@ -173,16 +140,11 @@ public abstract class HederaCall<Req, RawResp, Resp, E extends Throwable> {
         public void onError(Throwable t) {
             if (!callbackExecuted) {
                 callbackExecuted = true;
-                onError.apply(t);
+                onError.accept(t);
             }
         }
 
         @Override
         public void onCompleted() {}
-    }
-
-    @FunctionalInterface
-    protected interface MapResponse<RawResp, Resp, E extends Throwable> {
-        Resp mapResponse(RawResp rawResp) throws E;
     }
 }

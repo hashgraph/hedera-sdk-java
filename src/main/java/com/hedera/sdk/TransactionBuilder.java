@@ -1,7 +1,6 @@
 package com.hedera.sdk;
 
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
-import com.hedera.sdk.proto.ResponseCodeEnum;
 import com.hedera.sdk.proto.TransactionBody;
 import com.hedera.sdk.proto.TransactionResponse;
 import io.grpc.Channel;
@@ -9,8 +8,12 @@ import io.grpc.Channel;
 import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.Objects;
+import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
-public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extends TransactionCall {
+public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
+        extends HederaCall<com.hedera.sdk.proto.Transaction, TransactionResponse, TransactionId> {
+    protected final com.hedera.sdk.proto.Transaction.Builder inner = com.hedera.sdk.proto.Transaction.newBuilder();
     protected final TransactionBody.Builder bodyBuilder = inner.getBodyBuilder();
 
     private static final int MAX_MEMO_LENGTH = 100;
@@ -108,13 +111,17 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
 
     @Override
     public final com.hedera.sdk.proto.Transaction toProto() {
+        return build().toProto();
+    }
+
+    public final Transaction build() {
         Objects.requireNonNull(client, "TransactionBuilder.client must not be null in normal usage");
 
         if (client.getOperatorKey() == null) {
             throw new IllegalStateException("Client.setOperator() is required to implicitly sign transactions");
         }
 
-        return sign(client.getOperatorKey()).toProto();
+        return sign(client.getOperatorKey());
     }
 
     public final Transaction sign(Ed25519PrivateKey privateKey) {
@@ -131,7 +138,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
         }
 
         validate();
-        return new Transaction(channel.getChannel(), inner, getMethod()).sign(privateKey);
+        return new Transaction(channel, inner, getMethod()).sign(privateKey);
     }
 
     protected final Transaction testSign(Ed25519PrivateKey privateKey) {
@@ -144,5 +151,39 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
     @SuppressWarnings("unchecked")
     private T self() {
         return (T) this;
+    }
+
+    /** Execute the transaction and immediately get its receipt which may not be available yet. */
+    public final TransactionReceipt executeForReceipt() throws HederaException {
+        return build().executeForReceipt();
+    }
+
+    public void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<Throwable> onFailure) {
+        build().executeForReceiptAsync(onSuccess, onFailure);
+    }
+
+    public Future<TransactionReceipt> executeForReceiptFuture() {
+        return build().executeForReceiptFuture();
+    }
+
+    public TransactionRecord executeForRecord() throws HederaException {
+        return build().executeForRecord();
+    }
+
+    public void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<Throwable> onFailure) {
+        build().executeForRecordAsync(onSuccess, onFailure);
+    }
+
+    public Future<TransactionRecord> executeForRecordFuture() {
+        return build().executeForRecordFuture();
+    }
+
+    @Override
+    protected TransactionId mapResponse(TransactionResponse response) throws HederaException {
+        HederaException.throwIfExceptional(response.getNodeTransactionPrecheckCode());
+        return new TransactionId(
+                inner.getBody()
+                    .getTransactionIDOrBuilder()
+        );
     }
 }

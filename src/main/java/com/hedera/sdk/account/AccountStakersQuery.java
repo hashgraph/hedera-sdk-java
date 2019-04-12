@@ -2,6 +2,7 @@ package com.hedera.sdk.account;
 
 import com.hedera.sdk.AccountId;
 import com.hedera.sdk.Client;
+import com.hedera.sdk.HederaException;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
@@ -11,11 +12,11 @@ public class AccountStakersQuery extends QueryBuilder<CryptoGetStakersResponse> 
     private final CryptoGetStakersQuery.Builder builder = inner.getCryptoGetProxyStakersBuilder();
 
     public AccountStakersQuery(Client client) {
-        super(client, Response::getCryptoGetProxyStakers);
+        super(client);
     }
 
     AccountStakersQuery() {
-        super(null, Response::getCryptoGetProxyStakers);
+        super(null);
     }
 
     public AccountStakersQuery setAccount(AccountId accountId) {
@@ -36,5 +37,10 @@ public class AccountStakersQuery extends QueryBuilder<CryptoGetStakersResponse> 
     @Override
     protected MethodDescriptor<Query, Response> getMethod() {
         return CryptoServiceGrpc.getGetStakersByAccountIDMethod();
+    }
+
+    @Override
+    protected CryptoGetStakersResponse mapResponse(Response raw) throws HederaException {
+        return raw.getCryptoGetProxyStakers();
     }
 }

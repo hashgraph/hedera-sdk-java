@@ -2,6 +2,7 @@ package com.hedera.sdk.file;
 
 import com.hedera.sdk.Client;
 import com.hedera.sdk.FileId;
+import com.hedera.sdk.HederaException;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
@@ -11,11 +12,11 @@ public class FileInfoQuery extends QueryBuilder<FileInfo> {
     private final FileGetInfoQuery.Builder builder = inner.getFileGetInfoBuilder();
 
     public FileInfoQuery(Client client) {
-        super(client, FileInfo::new);
+        super(client);
     }
 
     FileInfoQuery() {
-        super(null, FileInfo::new);
+        super(null);
     }
 
     @Override
@@ -31,6 +32,11 @@ public class FileInfoQuery extends QueryBuilder<FileInfo> {
     @Override
     protected MethodDescriptor<Query, Response> getMethod() {
         return FileServiceGrpc.getGetFileInfoMethod();
+    }
+
+    @Override
+    protected FileInfo mapResponse(Response raw) throws HederaException {
+        return new FileInfo(raw);
     }
 
     @Override

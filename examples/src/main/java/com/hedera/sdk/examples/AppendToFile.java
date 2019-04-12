@@ -39,9 +39,14 @@ public final class AppendToFile {
             .sign(operatorKey)
             .sign(operatorKey);
 
-        var res = fileTx.execute();
+        try {
+            fileTx.execute();
+        } catch (HederaException e) {
+            System.out.println("Failed to create file: " + e);
+            return;
+        }
 
-        System.out.println("File create transaction: " + res.toString());
+        System.out.println("File create transaction: " + txId.toString());
 
         // Sleep for 4 seconds
         Thread.sleep(4000);
@@ -59,16 +64,14 @@ public final class AppendToFile {
             // second signature is the transaction payer
             .sign(operatorKey);
 
-        res = appendFileTx.execute();
+        TransactionReceipt receipt;
+        try {
+            receipt = appendFileTx.executeForReceipt();
+        } catch (HederaException e) {
+            System.out.println("Failed to append to file: " + e);
+            return;
+        }
 
-        System.out.println("File append transaction: " + res.toString());
-
-        // Sleep for 4 seconds
-        Thread.sleep(4000);
-
-        var query = new TransactionReceiptQuery(client).setTransaction(txId);
-
-        var receipt = query.execute();
         var receiptStatus = receipt.getStatus();
 
         System.out.println("status: " + receiptStatus.toString());

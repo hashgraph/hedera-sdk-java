@@ -30,17 +30,17 @@ public final class UpdateAccountPublicKey {
             .setKey(originalKey.getPublicKey())
             .sign(operatorKey);
 
-        var res = tx.execute();
+        TransactionReceipt createReceipt;
+        try {
+            createReceipt = tx.executeForReceipt();
+        } catch (HederaException e) {
+            System.out.println("Failed to create account: " + e);
+            return;
+        }
 
-        // Sleep for 4 seconds
-        Thread.sleep(4000);
+        var receiptStatus = createReceipt.getStatus();
 
-        var query = new TransactionReceiptQuery(client).setTransaction(txId);
-
-        var receipt = query.execute();
-        var receiptStatus = receipt.getStatus();
-
-        var newAccountId = receipt.getAccountId();
+        var newAccountId = createReceipt.getAccountId();
         assert newAccountId != null;
 
         // Now we update the key
@@ -55,17 +55,15 @@ public final class UpdateAccountPublicKey {
             // sign as the owner of the account
             .sign(originalKey);
 
-        res = tx.execute();
+        TransactionReceipt updateReceipt = null;
+        try {
+            updateReceipt = tx.executeForReceipt();
+        } catch (HederaException e) {
+            System.out.println("Failed to update private key: " + e);
+            return;
+        }
 
-        System.out.println("transaction: " + res.toString());
-
-        // Sleep for 4 seconds
-        Thread.sleep(4000);
-
-        query = new TransactionReceiptQuery(client).setTransaction(txId);
-
-        receipt = query.execute();
-        receiptStatus = receipt.getStatus();
+        receiptStatus = updateReceipt.getStatus();
 
         System.out.println("status: " + receiptStatus.toString());
     }

@@ -2,6 +2,7 @@ package com.hedera.sdk.contract;
 
 import com.hedera.sdk.Client;
 import com.hedera.sdk.ContractId;
+import com.hedera.sdk.HederaException;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
@@ -11,11 +12,11 @@ public final class ContractBytecodeQuery extends QueryBuilder<ContractGetBytecod
     private final ContractGetBytecodeQuery.Builder builder = inner.getContractGetBytecodeBuilder();
 
     public ContractBytecodeQuery(Client client) {
-        super(client, Response::getContractGetBytecodeResponse);
+        super(client);
     }
 
     ContractBytecodeQuery() {
-        super(null, Response::getContractGetBytecodeResponse);
+        super(null);
     }
 
     @Override
@@ -36,5 +37,10 @@ public final class ContractBytecodeQuery extends QueryBuilder<ContractGetBytecod
     @Override
     protected MethodDescriptor<Query, Response> getMethod() {
         return SmartContractServiceGrpc.getContractGetBytecodeMethod();
+    }
+
+    @Override
+    protected ContractGetBytecodeResponse mapResponse(Response raw) throws HederaException {
+        return raw.getContractGetBytecodeResponse();
     }
 }

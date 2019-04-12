@@ -42,16 +42,14 @@ public final class CreateFile {
             // The second signature represents the owner of the file
             .sign(operatorKey);
 
-        var res = tx.execute();
+        TransactionReceipt receipt;
+        try {
+            receipt = tx.executeForReceipt();
+        } catch (HederaException e) {
+            System.out.println("Failed to create file: " + e);
+            return;
+        }
 
-        System.out.println("transaction: " + res.toString());
-
-        // Sleep for 4 seconds
-        Thread.sleep(4000);
-
-        var query = new TransactionReceiptQuery(client).setTransaction(txId);
-
-        var receipt = query.execute();
         var receiptStatus = receipt.getStatus();
 
         System.out.println("status: " + receiptStatus.toString());

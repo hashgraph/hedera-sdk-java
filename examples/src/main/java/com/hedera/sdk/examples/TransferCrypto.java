@@ -2,6 +2,7 @@ package com.hedera.sdk.examples;
 
 import com.hedera.sdk.AccountId;
 import com.hedera.sdk.Client;
+import com.hedera.sdk.HederaException;
 import com.hedera.sdk.TransactionId;
 import com.hedera.sdk.account.AccountBalanceQuery;
 import com.hedera.sdk.account.CryptoTransferTransaction;
@@ -46,9 +47,12 @@ public final class TransferCrypto {
             // double signing is required if it is the same account
             .sign(operatorKey);
 
-        var res = tx.execute();
-
-        System.out.println("transaction: " + res.toString());
+        try {
+            tx.execute();
+        } catch (HederaException e) {
+            System.out.println("Failed to transfer balance: " + e);
+            return;
+        }
 
         // Sleep for 4 seconds
         // TODO: We should make the query here retry internally if its "not ready" or "busy"
@@ -64,8 +68,11 @@ public final class TransferCrypto {
         var query = new AccountBalanceQuery(client).setAccount(recipient)
             .setPayment(txPayment);
 
-        var balance = query.execute();
-
-        System.out.println(balance.toString());
+        try {
+            var balance = query.execute();
+            System.out.println(balance.toString());
+        } catch (HederaException e) {
+            System.out.println("Failed to get account balance: " + e);
+        }
     }
 }
