@@ -7,11 +7,11 @@ public final class GetBySolidityIdQuery extends QueryBuilder<GetBySolidityIDResp
     private final GetBySolidityIDQuery.Builder builder = inner.getGetBySolidityIDBuilder();
 
     public GetBySolidityIdQuery(Client client) {
-        super(client, Response::getGetBySolidityID);
+        super(client);
     }
 
     GetBySolidityIdQuery() {
-        super(null, Response::getGetBySolidityID);
+        super((Client) null);
     }
 
     public GetBySolidityIdQuery setSolidityId(String solidityId) {
@@ -27,6 +27,11 @@ public final class GetBySolidityIdQuery extends QueryBuilder<GetBySolidityIDResp
     @Override
     protected MethodDescriptor<Query, Response> getMethod() {
         return SmartContractServiceGrpc.getGetBySolidityIDMethod();
+    }
+
+    @Override
+    protected GetBySolidityIDResponse mapResponse(Response raw) throws HederaException {
+        return raw.getGetBySolidityID();
     }
 
     @Override

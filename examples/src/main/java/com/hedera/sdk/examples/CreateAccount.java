@@ -34,17 +34,15 @@ public final class CreateAccount {
             // default: .setInitialBalance(0)
             .sign(operatorKey);
 
-        var res = tx.execute();
+        TransactionReceipt receipt;
 
-        System.out.println("transaction: " + res.toString());
+        try {
+            receipt = tx.executeForReceipt();
+        } catch (HederaException e) {
+            System.out.println("Failed to create account: " + e);
+            return;
+        }
 
-        // Sleep for 4 seconds
-        // TODO: We should make the query here retry internally if its "not ready" or "busy"
-        Thread.sleep(4000);
-
-        var query = new TransactionReceiptQuery(client).setTransaction(txId);
-
-        var receipt = query.execute();
         var receiptStatus = receipt.getStatus();
 
         System.out.println("status: " + receiptStatus.toString());

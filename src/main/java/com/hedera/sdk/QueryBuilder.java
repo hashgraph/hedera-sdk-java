@@ -5,26 +5,28 @@ import io.grpc.Channel;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
-import java.util.function.Function;
 
-public abstract class QueryBuilder<Resp> extends ValidatingHederaCall<Query, Response, Resp> {
+public abstract class QueryBuilder<Resp> extends HederaCall<Query, Response, Resp> {
     protected Query.Builder inner = Query.newBuilder();
 
     @Nullable
-    private final Client client;
+    private final ChannelHolder channel;
 
-    protected QueryBuilder(@Nullable Client client, Function<Response, Resp> mapResponse) {
-        super(mapResponse);
-        this.client = client;
+    protected QueryBuilder(@Nullable Client client) {
+        this(client != null ? client.getChannel() : null);
+
+    }
+
+    QueryBuilder(@Nullable ChannelHolder channel) {
+        this.channel = channel;
     }
 
     protected abstract QueryHeader.Builder getHeaderBuilder();
 
     @Override
     protected Channel getChannel() {
-        Objects.requireNonNull(client, "QueryBuilder.client must be non-null in regular use");
-        return client.getChannel()
-            .getChannel();
+        Objects.requireNonNull(channel, "QueryBuilder.channel must be non-null in regular use");
+        return channel.getChannel();
     }
 
     @Override

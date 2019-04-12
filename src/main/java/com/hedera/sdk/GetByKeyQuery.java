@@ -8,11 +8,11 @@ public final class GetByKeyQuery extends QueryBuilder<GetByKeyResponse> {
     private final com.hedera.sdk.proto.GetByKeyQuery.Builder builder = inner.getGetByKeyBuilder();
 
     GetByKeyQuery(Client client) {
-        super(client, Response::getGetByKey);
+        super(client);
     }
 
     GetByKeyQuery() {
-        super(null, Response::getGetByKey);
+        super((Client) null);
     }
 
     @Override
@@ -24,6 +24,11 @@ public final class GetByKeyQuery extends QueryBuilder<GetByKeyResponse> {
     protected MethodDescriptor<Query, Response> getMethod() {
         // FIXME there is no service method that corresponds to this query
         throw new Error("not implemented");
+    }
+
+    @Override
+    protected GetByKeyResponse mapResponse(Response raw) throws HederaException {
+        return raw.getGetByKey();
     }
 
     @Override

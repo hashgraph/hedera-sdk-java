@@ -2,6 +2,7 @@ package com.hedera.sdk.contract;
 
 import com.hedera.sdk.Client;
 import com.hedera.sdk.ContractId;
+import com.hedera.sdk.HederaException;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
@@ -11,11 +12,11 @@ public final class ContractInfoQuery extends QueryBuilder<ContractInfo> {
     private final ContractGetInfoQuery.Builder builder = inner.getContractGetInfoBuilder();
 
     public ContractInfoQuery(Client client) {
-        super(client, ContractInfo::new);
+        super(client);
     }
 
     ContractInfoQuery() {
-        super(null, ContractInfo::new);
+        super(null);
     }
 
     @Override
@@ -31,6 +32,11 @@ public final class ContractInfoQuery extends QueryBuilder<ContractInfo> {
     @Override
     public MethodDescriptor<Query, Response> getMethod() {
         return SmartContractServiceGrpc.getGetContractInfoMethod();
+    }
+
+    @Override
+    protected ContractInfo mapResponse(Response raw) throws HederaException {
+        return new ContractInfo(raw);
     }
 
     @Override

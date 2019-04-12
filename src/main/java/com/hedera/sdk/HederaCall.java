@@ -1,22 +1,23 @@
 package com.hedera.sdk;
 
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
+import com.google.protobuf.ByteString;
 import io.grpc.CallOptions;
 import io.grpc.Channel;
 import io.grpc.ClientCall;
 import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
 
-import java.util.concurrent.Future;
-import java.util.function.Function;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 public abstract class HederaCall<Req, RawResp, Resp> {
-    private final Function<RawResp, Resp> mapResponse;
-
-    // a single required constructor for subclasses to make it harder to forget
-    protected HederaCall(Function<RawResp, Resp> mapResponse) {
-        this.mapResponse = mapResponse;
-    }
+    private @Nullable List<String> validationErrors;
 
     protected abstract io.grpc.MethodDescriptor<Req, RawResp> getMethod();
 
@@ -24,37 +25,114 @@ public abstract class HederaCall<Req, RawResp, Resp> {
 
     protected abstract Channel getChannel();
 
+    protected abstract Resp mapResponse(RawResp raw) throws HederaException;
+
     private ClientCall<Req, RawResp> newClientCall() {
         return getChannel().newCall(getMethod(), CallOptions.DEFAULT);
     }
 
-    public final Resp execute() {
-        return mapResponse.apply(ClientCalls.blockingUnaryCall(newClientCall(), toProto()));
+    public final Resp execute() throws HederaException {
+        return mapResponse(ClientCalls.blockingUnaryCall(newClientCall(), toProto()));
     }
 
-    public final void executeAsync(Function<Resp, Void> onSuccess, Function<Throwable, Void> onError) {
-        ClientCalls.asyncUnaryCall(newClientCall(), toProto(), new ResponseObserver<>(mapResponse.andThen(onSuccess), onError));
+    public final void executeAsync(Consumer<Resp> onSuccess, Consumer<Throwable> onError) {
+        ClientCalls.asyncUnaryCall(newClientCall(), toProto(), new ResponseObserver(onSuccess, onError));
     }
 
-    public final Future<Resp> executeFuture() {
-        return Futures.lazyTransform(ClientCalls.futureUnaryCall(newClientCall(), toProto()), mapResponse::apply);
+    public final ListenableFuture<Resp> executeFuture() {
+        return Futures.transformAsync(ClientCalls.futureUnaryCall(newClientCall(), toProto()), rawResp -> {
+            Objects.requireNonNull(rawResp, "response returned was null");
+
+            // there's no convenience method for a functional transform which can throw
+            try {
+                return Futures.immediateFuture(mapResponse(rawResp));
+            } catch (HederaException e) {
+                return Futures.immediateFailedFuture(e);
+            }
+        },
+            // heavier transforms should be executed asynchronously but we're fine here
+            MoreExecutors.directExecutor()
+        );
     }
 
-    private static final class ResponseObserver<Resp> implements StreamObserver<Resp> {
-        private final Function<Resp, Void> onResponse;
-        private final Function<Throwable, Void> onError;
+    public abstract void validate();
+
+    protected void addValidationError(String errMsg) {
+        if (validationErrors == null)
+            validationErrors = new ArrayList<>();
+        validationErrors.add(errMsg);
+    }
+
+    protected void checkValidationErrors(String prologue) {
+        if (validationErrors == null)
+            return;
+        var errors = validationErrors;
+        validationErrors = null;
+        throw new IllegalStateException(prologue + ":\n" + String.join("\n", errors));
+    }
+
+    protected final void require(boolean mustBeTrue, String errMsg) {
+        if (!mustBeTrue) {
+            addValidationError(errMsg);
+        }
+    }
+
+    protected void require(@Nullable List setValue, String errMsg) {
+        require(setValue != null && !setValue.isEmpty(), errMsg);
+    }
+
+    protected void require(@Nullable ByteString setValue, String errMsg) {
+        require(setValue != null && !setValue.isEmpty(), errMsg);
+    }
+
+    protected void requireExactlyOne(String errMsg, String errCollision, boolean... values) {
+        var oneIsTrue = false;
+
+        for (var maybeTrue : values) {
+            if (maybeTrue && oneIsTrue) {
+                addValidationError(errCollision);
+                return;
+            }
+
+            oneIsTrue |= maybeTrue;
+        }
+
+        if (!oneIsTrue) {
+            addValidationError(errMsg);
+        }
+    }
+
+    protected void require(@Nullable String setValue, String errMsg) {
+        require(setValue != null && setValue.isEmpty(), errMsg);
+    }
+
+    // builder.isInitialized() is always true
+    /* protected void require(@Nullable MessageOrBuilder setValue, String errMsg) {
+     * if (setValue == null || !setValue.isInitialized()) {
+     * addValidationError(errMsg);
+     * }
+     * } */
+
+    private class ResponseObserver implements StreamObserver<RawResp> {
+        private final Consumer<Resp> onResponse;
+        private final Consumer<Throwable> onError;
         private boolean callbackExecuted = false;
 
-        private ResponseObserver(Function<Resp, Void> onResponse, Function<Throwable, Void> onError) {
+        private ResponseObserver(Consumer<Resp> onResponse, Consumer<Throwable> onError) {
             this.onResponse = onResponse;
             this.onError = onError;
         }
 
         @Override
-        public void onNext(Resp value) {
+        public void onNext(RawResp rawResp) {
             if (!callbackExecuted) {
-                callbackExecuted = true;
-                onResponse.apply(value);
+                try {
+                    var resp = mapResponse(rawResp);
+                    callbackExecuted = true;
+                    onResponse.accept(resp);
+                } catch (Throwable e) {
+                    onError(e);
+                }
             }
         }
 
@@ -62,7 +140,7 @@ public abstract class HederaCall<Req, RawResp, Resp> {
         public void onError(Throwable t) {
             if (!callbackExecuted) {
                 callbackExecuted = true;
-                onError.apply(t);
+                onError.accept(t);
             }
         }
 

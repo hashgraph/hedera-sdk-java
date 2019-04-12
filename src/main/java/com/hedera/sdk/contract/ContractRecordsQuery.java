@@ -2,6 +2,7 @@ package com.hedera.sdk.contract;
 
 import com.hedera.sdk.Client;
 import com.hedera.sdk.ContractId;
+import com.hedera.sdk.HederaException;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
@@ -11,11 +12,11 @@ public class ContractRecordsQuery extends QueryBuilder<ContractGetRecordsRespons
     private final ContractGetRecordsQuery.Builder builder = inner.getContractGetRecordsBuilder();
 
     public ContractRecordsQuery(Client client) {
-        super(client, Response::getContractGetRecordsResponse);
+        super(client);
     }
 
     ContractRecordsQuery() {
-        super(null, Response::getContractGetRecordsResponse);
+        super(null);
     }
 
     public ContractRecordsQuery setContract(ContractId contractId) {
@@ -31,6 +32,11 @@ public class ContractRecordsQuery extends QueryBuilder<ContractGetRecordsRespons
     @Override
     protected MethodDescriptor<Query, Response> getMethod() {
         return SmartContractServiceGrpc.getGetTxRecordByContractIDMethod();
+    }
+
+    @Override
+    protected ContractGetRecordsResponse mapResponse(Response raw) throws HederaException {
+        return raw.getContractGetRecordsResponse();
     }
 
     @Override

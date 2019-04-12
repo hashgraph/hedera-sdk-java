@@ -2,6 +2,7 @@ package com.hedera.sdk.examples;
 
 import com.hedera.sdk.AccountId;
 import com.hedera.sdk.Client;
+import com.hedera.sdk.HederaException;
 import com.hedera.sdk.TransactionId;
 import com.hedera.sdk.account.AccountBalanceQuery;
 import com.hedera.sdk.account.CryptoTransferTransaction;
@@ -36,10 +37,12 @@ public final class GetAccountBalance {
         var query = new AccountBalanceQuery(client).setAccount(operator)
             .setPayment(txPayment);
 
-        var balance = query.execute();
-
-        System.out.println(balance.toString());
-
+        try {
+            var balance = query.execute();
+            System.out.println(balance.toString());
+        } catch (HederaException e) {
+            System.out.println("Failed to get account balance: " + e);
+        }
     }
 
 }

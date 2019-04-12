@@ -7,11 +7,11 @@ public class TransactionRecordQuery extends QueryBuilder<TransactionRecord> {
     private final TransactionGetRecordQuery.Builder builder = inner.getTransactionGetRecordBuilder();
 
     public TransactionRecordQuery(Client client) {
-        super(client, TransactionRecord::new);
+        super(client);
     }
 
     TransactionRecordQuery() {
-        super(null, TransactionRecord::new);
+        super((Client) null);
     }
 
     @Override
@@ -27,6 +27,11 @@ public class TransactionRecordQuery extends QueryBuilder<TransactionRecord> {
     @Override
     protected MethodDescriptor<Query, Response> getMethod() {
         return CryptoServiceGrpc.getGetTxRecordByTxIDMethod();
+    }
+
+    @Override
+    protected TransactionRecord mapResponse(Response raw) throws HederaException {
+        return new TransactionRecord(raw);
     }
 
     @Override
