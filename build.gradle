@@ -1,32 +1,27 @@
-import net.ltgt.gradle.errorprone.CheckSeverity
-
 plugins {
-	// Auto extends code intelligence to generated code
-	id 'idea'
-
-	// Adds support for Java Library
 	id 'java-library'
-
-	// Adds support for Groovy (needed for Spock)
 	id 'groovy'
 
-	// Generates Java classes from the proto files
+	// https://docs.gradle.org/current/userguide/idea_plugin.html
+	id 'idea'
+
+	// Provides protobuf compilation
 	id 'com.google.protobuf' version '0.8.8'
 
-	// Keep your code spotless
-	id 'com.diffplug.gradle.spotless' version '3.20.0'
+	// Autoformat Java and Groovy code
+	id 'com.diffplug.gradle.spotless' version '3.21.1'
 
-	// Use the Error Prone compiler which wraps javac and
-	// provides contextual analysis for common issues
+	// Use the ErrorProne compiler - Catch common Java mistakes as compile-time errors
+	// https://errorprone.info/
 	id 'net.ltgt.errorprone' version '0.7.1'
 
-	// Fixes up `modulePath` because Gradle hasn't been taught about it yet and manual setup is a pain
-	id "org.javamodularity.moduleplugin" version "1.4.1"
-
-	// Performs quality checks using PMD
+	// An extensible static code analyzer
+	// https://docs.gradle.org/current/userguide/pmd_plugin.html
+	// https://pmd.github.io/pmd-6.13.0/pmd_rules_java.html
 	id 'pmd'
 
-	// Check if our dependencies are up-to-date
+	// Discover dependency version updates
+	// https://github.com/ben-manes/gradle-versions-plugin
 	id "com.github.ben-manes.versions" version "0.21.0"
 }
 
@@ -35,53 +30,53 @@ repositories { jcenter() }
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
+final grpcVersion = '1.20.0'
+final protobufVersion = '3.7.1'
+
 dependencies {
-	// Support for Protobufs
-	// Stuck on 3.6.x because of https://github.com/protocolbuffers/protobuf/issues/5875
-	implementation 'com.google.protobuf:protobuf-java:3.6.0'
+	// Protocol Buffers
+	implementation "com.google.protobuf:protobuf-java:${protobufVersion}"
 
-	// Support for gRPC
-	implementation 'io.grpc:grpc-netty-shaded:1.19.0'
-	implementation 'io.grpc:grpc-protobuf:1.19.0'
-	implementation 'io.grpc:grpc-stub:1.19.0'
+	// The Java gRPC implementation
+	implementation "io.grpc:grpc-netty-shaded:${grpcVersion}"
+	implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+	implementation "io.grpc:grpc-stub:${grpcVersion}"
 
-	// https://www.bouncycastle.org/java.html
-	implementation group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.61'
+	// The Bouncy Castle Crypto APIs for Java
+	implementation 'org.bouncycastle:bcprov-jdk15on:1.61'
 
-	// Provides @javax.annotation.*
-	// Useful stuff like Nullable, Generated, etc.
+	// JavaX Annotations
+	// Common annotations such as @NonNull and @Nullable
 	implementation 'javax.annotation:javax.annotation-api:1.3.2'
 
-	// Use the latest Groovy version for Spock testing
+	// Spock
+	// Developer testing and specification framework for Java
+	// https://github.com/spockframework/spock
 	testImplementation 'org.codehaus.groovy:groovy-all:2.5.6'
-
-	// Use the awesome Spock testing and specification framework even with Java
 	testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
 	testImplementation 'junit:junit:4.12'
 
-	// Specify the version of Error Prone for error checking
+	// ErrorProne: Compiler version
 	errorprone 'com.google.errorprone:error_prone_core:2.3.3'
 
-	// NullAway is a plugin to error prone that attempts to add
-	// static null analysis to Java
-	annotationProcessor "com.uber.nullaway:nullaway:0.6.6"
+	// NullAway
+	// A tool to help eliminate NullPointerExceptions (NPEs) in your Java code with 
+	// 	low build-time overhead
+	// https://github.com/uber/NullAway
+	annotationProcessor "com.uber.nullaway:nullaway:0.7.2"
 }
 
 protobuf {
-	// Place generated classes in /gen for better integration
-	// into the IDE
 	generatedFilesBaseDir = "$projectDir/gen"
 
-	// Download protoc from maven instead of depending on it existing on the
-	// system path
-	protoc { artifact = 'com.google.protobuf:protoc:3.6.0' }
+	// Use an externally sourced protoc (no system requirement)
+	protoc { artifact = "com.google.protobuf:protoc:${protobufVersion}" }
 
-	// Download protoc-gen-grpc-java from maven as well
-	plugins { grpc { artifact = 'io.grpc:protoc-gen-grpc-java:1.19.0' } }
+	// Use an externally sourced protoc-gen-grpc-java (no system requirement)
+	plugins { grpc { artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}" } }
 
 	generateProtoTasks {
 		ofSourceSet('main').each { task ->
-			// Activate gRPC plugin
 			task.plugins { grpc {} }
 
 			// Annotate all protoc generated classes with @Generated
@@ -96,33 +91,24 @@ clean { delete protobuf.generatedFilesBaseDir }
 
 idea {
 	module {
-		// Marks as generated source roots so to make inspection
-		// in IDEA nicer
+		// Mark gen/ folers as _generated_ code so IDEA will 
+		// highlight and make it more accesible
 		generatedSourceDirs += file('gen/main/java')
 		generatedSourceDirs += file('gen/main/grpc')
 	}
 }
 
-tasks.withType(JavaCompile) {
-	options.errorprone {
-		check("NullAway", CheckSeverity.ERROR)
-		option("NullAway:AnnotatedPackages", "com.hedera")
-		option("NullAway:TreatGeneratedAsUnannotated", "true")
-	}
-}
-
 spotless {
+	groovy { greclipse() }
+	groovyGradle { greclipse() }
 	java {
 		target 'examples/**/*.java', 'src/**/*.java'
 		removeUnusedImports()
 		eclipse().configFile 'spotless.eclipseformat.xml'
 	}
-	groovy { greclipse() }
-	groovyGradle { greclipse() }
 }
 
 pmd {
-	// print PMD errors to stdout
 	consoleOutput = true
 
 	// this silences some pedantic/buggy rules:
@@ -132,7 +118,22 @@ pmd {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	// Listen to @Generated annotations and ignore those
-	// files for analysis
-	options.errorprone.disableWarningsInGeneratedCode = true
+	options.errorprone {
+		// NullAway: Treat any violations as a build error
+		check('NullAway', net.ltgt.gradle.errorprone.CheckSeverity.ERROR)
+
+		// NullAway: Check for null violations only in these packages
+		option('NullAway:AnnotatedPackages', 'com.hedera.sdk')
+
+		// NullAway: Process @Nullable and @NonNull annotations from
+		// 	third-party packages
+		option('NullAway:AcknowledgeRestrictiveAnnotations', 'true')
+
+		// NullAway: Ignore @Generated files
+		option('NullAway:TreatGeneratedAsUnannotated', 'true')
+
+		// Listen to @Generated annotations and ignore those
+		// files for analysis
+		options.errorprone.disableWarningsInGeneratedCode = true
+	}
 }
