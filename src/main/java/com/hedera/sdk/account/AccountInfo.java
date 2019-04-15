@@ -33,10 +33,6 @@ public class AccountInfo {
         return inner.hasProxyAccountID() ? new AccountId(inner.getProxyAccountIDOrBuilder()) : null;
     }
 
-    public int getProxyFraction() {
-        return inner.getProxyFraction();
-    }
-
     public long getProxyReceived() {
         return inner.getProxyReceived();
     }

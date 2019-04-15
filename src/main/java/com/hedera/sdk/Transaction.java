@@ -3,9 +3,7 @@ package com.hedera.sdk;
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.sdk.crypto.ed25519.Ed25519Signature;
-import com.hedera.sdk.proto.Signature;
-import com.hedera.sdk.proto.SignatureList;
-import com.hedera.sdk.proto.TransactionResponse;
+import com.hedera.sdk.proto.*;
 import io.grpc.*;
 
 import java.util.Objects;
@@ -37,9 +35,6 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
         var signature = Ed25519Signature.forMessage(privateKey, getBodyBytes())
             .toBytes();
 
-        // FIXME: This nested signature is only for account IDs < 1000
-        // FIXME: spotless makes this.. lovely
-        // FIXME: Is `ByteString.copyFrom` ideal here?
         inner.getSigsBuilder()
             .addSigs(
                 Signature.newBuilder()

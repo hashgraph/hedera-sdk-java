@@ -1,8 +1,5 @@
 package com.hedera.sdk;
 
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
 import com.google.protobuf.ByteString;
 import io.grpc.CallOptions;
 import io.grpc.Channel;
@@ -13,7 +10,6 @@ import io.grpc.stub.StreamObserver;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 public abstract class HederaCall<Req, RawResp, Resp> {

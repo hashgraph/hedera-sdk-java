@@ -1,9 +1,6 @@
 package com.hedera.sdk.account;
 
-import com.hedera.sdk.AccountId;
-import com.hedera.sdk.Client;
-import com.hedera.sdk.TransactionBuilder;
-import com.hedera.sdk.TransactionId;
+import com.hedera.sdk.*;
 import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.*;
 import com.hedera.sdk.proto.Transaction;
@@ -67,16 +64,6 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
         return this;
     }
 
-    public AccountCreateTransaction setProxyFraction(int proxyFraction) {
-        builder.setProxyFraction(proxyFraction);
-        return this;
-    }
-
-    public AccountCreateTransaction setMaxReceiveProxyFraction(int maxReceiveProxyFraction) {
-        builder.setMaxReceiveProxyFraction(maxReceiveProxyFraction);
-        return this;
-    }
-
     public AccountCreateTransaction setSendRecordThreshold(long sendRecordThreshold) {
         builder.setSendRecordThreshold(sendRecordThreshold);
         return this;
@@ -93,12 +80,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
     }
 
     public AccountCreateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
-        builder.setAutoRenewPeriod(
-            com.hedera.sdk.proto.Duration.newBuilder()
-                .setSeconds(autoRenewPeriod.getSeconds())
-                .setNanos(autoRenewPeriod.getNano())
-        );
-
+        builder.setAutoRenewPeriod(DurationHelper.durationFrom(autoRenewPeriod));
         return this;
     }
 

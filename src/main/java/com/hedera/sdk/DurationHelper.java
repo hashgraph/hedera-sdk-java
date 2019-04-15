@@ -8,11 +8,10 @@ public final class DurationHelper {
     public static Duration durationFrom(java.time.Duration duration) {
         return Duration.newBuilder()
             .setSeconds(duration.getSeconds())
-            .setNanos(duration.getNano())
             .build();
     }
 
     public static java.time.Duration durationTo(Duration duration) {
-        return java.time.Duration.ofSeconds(duration.getSeconds(), duration.getNanos());
+        return java.time.Duration.ofSeconds(duration.getSeconds());
     }
 }

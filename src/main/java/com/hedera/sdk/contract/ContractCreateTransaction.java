@@ -50,11 +50,6 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
         return this;
     }
 
-    public ContractCreateTransaction setProxyFraction(int proxyFraction) {
-        builder.setProxyFraction(proxyFraction);
-        return this;
-    }
-
     public ContractCreateTransaction setAutoRenewPeriod(java.time.Duration duration) {
         builder.setAutoRenewPeriod(DurationHelper.durationFrom(duration));
         return this;

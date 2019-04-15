@@ -8,7 +8,6 @@ import io.grpc.Channel;
 import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.Objects;
-import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
@@ -60,11 +59,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * before this this elapses.
      */
     public final T setTransactionValidDuration(Duration validDuration) {
-        bodyBuilder.setTransactionValidDuration(
-            com.hedera.sdk.proto.Duration.newBuilder()
-                .setSeconds(validDuration.getSeconds())
-                .setNanos(validDuration.getNano())
-        );
+        bodyBuilder.setTransactionValidDuration(DurationHelper.durationFrom(validDuration));
 
         return self();
     }
@@ -138,6 +133,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         }
 
         validate();
+
         return new Transaction(channel, inner, getMethod()).sign(privateKey);
     }
 
@@ -162,20 +158,12 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         build().executeForReceiptAsync(onSuccess, onFailure);
     }
 
-    public Future<TransactionReceipt> executeForReceiptFuture() {
-        return build().executeForReceiptFuture();
-    }
-
     public TransactionRecord executeForRecord() throws HederaException {
         return build().executeForRecord();
     }
 
     public void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<Throwable> onFailure) {
         build().executeForRecordAsync(onSuccess, onFailure);
-    }
-
-    public Future<TransactionRecord> executeForRecordFuture() {
-        return build().executeForRecordFuture();
     }
 
     @Override

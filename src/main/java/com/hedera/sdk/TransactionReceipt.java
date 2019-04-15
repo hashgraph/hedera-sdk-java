@@ -39,4 +39,8 @@ public final class TransactionReceipt {
     public ContractId getContractId() {
         return inner.hasContractID() ? new ContractId(inner.getContractIDOrBuilder()) : null;
     }
+
+    public com.hedera.sdk.proto.TransactionReceipt toProto() {
+        return inner;
+    }
 }

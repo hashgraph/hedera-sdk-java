@@ -44,11 +44,7 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
     }
 
     public ContractUpdateTransaction setAutoRenewPeriod(Duration duration) {
-        builder.setAutoRenewPeriod(
-            com.hedera.sdk.proto.Duration.newBuilder()
-                .setSeconds(duration.getSeconds())
-                .setNanos(duration.getNano())
-        );
+        builder.setAutoRenewPeriod(DurationHelper.durationFrom(duration));
         return this;
     }
 
