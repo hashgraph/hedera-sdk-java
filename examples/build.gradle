@@ -8,10 +8,5 @@ repositories {
 
 dependencies {
 	implementation rootProject
-	
-	implementation 'io.grpc:grpc-netty-shaded:1.20.0'
-	implementation 'io.grpc:grpc-protobuf:1.20.0'
-	implementation 'io.grpc:grpc-stub:1.20.0'
-
 	implementation 'io.github.cdimascio:java-dotenv:5.0.1'
 }

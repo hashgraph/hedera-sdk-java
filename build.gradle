@@ -35,12 +35,12 @@ final protobufVersion = '3.7.1'
 
 dependencies {
 	// Protocol Buffers
-	implementation "com.google.protobuf:protobuf-java:${protobufVersion}"
+	api "com.google.protobuf:protobuf-java:${protobufVersion}"
 
 	// The Java gRPC implementation
-	implementation "io.grpc:grpc-netty-shaded:${grpcVersion}"
-	implementation "io.grpc:grpc-protobuf:${grpcVersion}"
-	implementation "io.grpc:grpc-stub:${grpcVersion}"
+	api "io.grpc:grpc-netty-shaded:${grpcVersion}"
+	api "io.grpc:grpc-protobuf:${grpcVersion}"
+	api "io.grpc:grpc-stub:${grpcVersion}"
 
 	// The Bouncy Castle Crypto APIs for Java
 	implementation 'org.bouncycastle:bcprov-jdk15on:1.61'
