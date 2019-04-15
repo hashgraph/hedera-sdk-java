@@ -19,7 +19,7 @@ public final class TransactionRecord {
             inner = response.getTransactionGetFastRecord()
                 .getTransactionRecord();
         } else {
-            throw new IllegalArgumentException("response was not `TransactionGetRecord` or `TransactionGetFastRecord`");
+            throw new IllegalArgumentException("unexpected response: " + response.getResponseCase());
         }
     }
 
