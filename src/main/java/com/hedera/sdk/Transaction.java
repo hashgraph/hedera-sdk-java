@@ -1,8 +1,5 @@
 package com.hedera.sdk;
 
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.sdk.crypto.ed25519.Ed25519Signature;
@@ -65,6 +62,7 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
                 .getSigsCount() != 0,
             "Transaction must be signed"
         );
+
         require(
             inner.getBodyBuilder()
                 .hasTransactionID(),
@@ -98,28 +96,27 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
         return channel.getChannel();
     }
 
-    /** Execute the transaction and immediately get its receipt which may not be available yet. */
+    @Override
+    protected TransactionId mapResponse(TransactionResponse response) throws HederaException {
+        HederaException.throwIfExceptional(response.getNodeTransactionPrecheckCode());
+        return new TransactionId(
+            inner.getBody()
+                .getTransactionIDOrBuilder()
+        );
+    }
+
     public final TransactionReceipt executeForReceipt() throws HederaException {
         var txId = execute();
-        return new TransactionReceiptQuery(channel).setTransaction(txId)
+        return new TransactionReceiptQuery(channel).setTransactionId(txId)
             .execute();
     }
 
     public void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<Throwable> onFailure) {
         executeAsync(
-            txId -> new TransactionReceiptQuery(channel).setTransaction(txId)
+            txId -> new TransactionReceiptQuery(channel).setTransactionId(txId)
                 .executeAsync(onSuccess, onFailure),
             onFailure
         );
-    }
-
-    public ListenableFuture<TransactionReceipt> executeForReceiptFuture() {
-        return Futures.transformAsync(executeFuture(), txId -> {
-            Objects.requireNonNull(txId, "null transaction ID");
-            return new TransactionReceiptQuery(channel).setTransaction(txId)
-                .executeFuture();
-        }, MoreExecutors.directExecutor());
-
     }
 
     public TransactionRecord executeForRecord() throws HederaException {
@@ -133,23 +130,6 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
             txId -> new TransactionFastRecordQuery(channel).setTransaction(txId)
                 .executeAsync(onSuccess, onFailure),
             onFailure
-        );
-    }
-
-    public ListenableFuture<TransactionRecord> executeForRecordFuture() {
-        return Futures.transformAsync(executeFuture(), txId -> {
-            Objects.requireNonNull(txId, "null tranasction ID");
-            return new TransactionFastRecordQuery(channel).setTransaction(txId)
-                .executeFuture();
-        }, MoreExecutors.directExecutor());
-    }
-
-    @Override
-    protected TransactionId mapResponse(TransactionResponse response) throws HederaException {
-        HederaException.throwIfExceptional(response.getNodeTransactionPrecheckCode());
-        return new TransactionId(
-                inner.getBody()
-                    .getTransactionIDOrBuilder()
         );
     }
 }

@@ -39,22 +39,6 @@ public abstract class HederaCall<Req, RawResp, Resp> {
         ClientCalls.asyncUnaryCall(newClientCall(), toProto(), new ResponseObserver(onSuccess, onError));
     }
 
-    public final ListenableFuture<Resp> executeFuture() {
-        return Futures.transformAsync(ClientCalls.futureUnaryCall(newClientCall(), toProto()), rawResp -> {
-            Objects.requireNonNull(rawResp, "response returned was null");
-
-            // there's no convenience method for a functional transform which can throw
-            try {
-                return Futures.immediateFuture(mapResponse(rawResp));
-            } catch (HederaException e) {
-                return Futures.immediateFailedFuture(e);
-            }
-        },
-            // heavier transforms should be executed asynchronously but we're fine here
-            MoreExecutors.directExecutor()
-        );
-    }
-
     public abstract void validate();
 
     protected void addValidationError(String errMsg) {
