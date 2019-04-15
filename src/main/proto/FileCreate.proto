@@ -21,11 +21,11 @@ import "Timestamp.proto";
  * The current API ignores shardID, realmID, and newRealmAdminKey, and creates everything in shard 0 and realm 0, with a null key. Future versions of the API will support multiple realms and multiple shards.
  */
 message FileCreateTransactionBody {
-    Timestamp expirationTime = 2; // the time at which this file should expire (unless FileUpdateTransaction is used before then to extend its life)
-    KeyList keys = 3; // all these keys must sign to create or modify the file. Any one of them can sign to delete the file.
-    bytes contents = 4; // the bytes that are the contents of the file
+    Timestamp expirationTime = 2; // The time at which this file should expire (unless FileUpdateTransaction is used before then to extend its life)
+    KeyList keys = 3; // All these keys must sign to create or modify the file. Any one of them can sign to delete the file.
+    bytes contents = 4; // The bytes that are the contents of the file
 
-    ShardID shardID = 5; // shard in which to create this
-    RealmID realmID = 6; // realm in which to create this (leave this null to create a new realm)
-    Key newRealmAdminKey = 7; // if realmID is null, then this the admin key for the new realm that will be created
+    ShardID shardID = 5; // Shard in which this file is created
+    RealmID realmID = 6; // The Realm in which to the file is created (leave this null to create a new realm)
+    Key newRealmAdminKey = 7; // If realmID is null, then this the admin key for the new realm that will be created
 }

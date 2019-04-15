@@ -17,18 +17,19 @@ import "Duration.proto";
  * An entity (account, file, or smart contract instance) must be created in a particular realm. If the realmID is left null, then a new realm will be created with the given admin key. If a new realm has a null adminKey, then anyone can create/modify/delete entities in that realm. But if an admin key is given, then any transaction to create/modify/delete an entity in that realm must be signed by that key, though anyone can still call functions on smart contract instances that exist in that realm. A realm ceases to exist when everything within it has expired and no longer exists.
  *
  * The current API ignores shardID, realmID, and newRealmAdminKey, and creates everything in shard 0 and realm 0, with a null key. Future versions of the API will support multiple realms and multiple shards.
+ *
+ * The optional memo field can contain a string whose length is up to 100 bytes. That is the size after Unicode NFD then UTF-8 conversion. This field can be used to describe the smart contract. It could also be used for other purposes. One recommended purpose is to hold a hexadecimal string that is the SHA-384 hash of a PDF file containing a human-readable legal contract. Then, if the admin keys are the public keys of human arbitrators, they can use that legal document to guide their decisions during a binding arbitration tribunal, convened to consider any changes to the smart contract in the future. The memo field can only be changed using the admin keys. If there are no admin keys, then it cannot be changed after the smart contract is created.
  */
 message ContractCreateTransactionBody {
     FileID fileID = 1; // the file containing the smart contract byte code. A copy will be made and held by the contract instance, and have the same expiration time as the instance. The file is referenced one of two ways:
     Key adminKey = 3; // the state of the instance and its fields can be modified arbitrarily if this key signs a transaction to modify it. If this is null, then such modifications are not possible, and there is no administrator that can override the normal operation of this smart contract instance. Note that if it is created with no admin keys, then there is no administrator to authorize changing the admin keys, so there can never be any admin keys for that instance.
     int64 gas = 4; // gas to run the constructor
     int64 initialBalance = 5; // initial number of tinybars to put into the cryptocurrency account associated with and owned by the smart contract
-    AccountID proxyAccountID = 6; // ID of the account to which this account is proxy staked. If proxyAccountID is null, or is an invalid account, or is an account that isn't a node, then this account is automatically proxy staked to a node chosen by the network, but without earning payments. If the proxyAccountID account refuses to accept proxy staking at the given fraction, or if it is not currently running a node, then it will behave as if both proxyAccountID and proxyFraction were null.
-    int32 proxyFraction = 7; // payments earned from proxy staking are shared between the node and this instance's account, with proxyFraction / 10000 going to this account
+    AccountID proxyAccountID = 6; // ID of the account to which this account is proxy staked. If proxyAccountID is null, or is an invalid account, or is an account that isn't a node, then this account is automatically proxy staked to a node chosen by the network, but without earning payments. If the proxyAccountID account refuses to accept proxy staking , or if it is not currently running a node, then it will behave as if  proxyAccountID was null.
     Duration autoRenewPeriod = 8; // the instance will charge its account every this many seconds to renew for this long
     bytes constructorParameters = 9; // parameters to pass to the constructor
-
     ShardID shardID = 10; // shard in which to create this
     RealmID realmID = 11; // realm in which to create this (leave this null to create a new realm)
     Key newRealmAdminKey = 12; // if realmID is null, then this the admin key for the new realm that will be created
+    string memo = 13; // the memo that was submitted as part of the contract (max 100 bytes)
 }

@@ -7,5 +7,4 @@ option java_multiple_files = true;
 /*  The length of a period of time. This is an identical data structure to the protobuf Duration.proto (see the comments in https://github.com/google/protobuf/blob/master/src/google/protobuf/duration.proto) */
 message Duration {
     int64 seconds = 1; // number of seconds
-    int32 nanos = 2; // number of nanoseconds that is added to seconds to get the length of the duration
 }
