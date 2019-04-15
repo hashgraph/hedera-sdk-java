@@ -44,4 +44,9 @@ public final class TransactionFastRecordQuery extends QueryBuilder<TransactionRe
     protected void doValidate() {
         require(builder.hasTransactionID(), ".setTransactionId() required");
     }
+
+    @Override
+    protected boolean isPaymentRequired() {
+        return false;
+    }
 }

@@ -26,7 +26,7 @@ public final class TransactionReceiptQuery extends QueryBuilder<TransactionRecei
             .getHeaderBuilder();
     }
 
-    public TransactionReceiptQuery setTransaction(TransactionId transactionId) {
+    public TransactionReceiptQuery setTransactionId(TransactionId transactionId) {
         builder.setTransactionID(transactionId.inner);
         return this;
     }
@@ -43,6 +43,11 @@ public final class TransactionReceiptQuery extends QueryBuilder<TransactionRecei
 
     @Override
     protected void doValidate() {
-        require(builder.hasTransactionID(), ".setTransaction() required");
+        require(builder.hasTransactionID(), ".setTransactionId() required");
+    }
+
+    @Override
+    protected boolean isPaymentRequired() {
+        return false;
     }
 }

@@ -42,10 +42,17 @@ public abstract class QueryBuilder<Resp> extends HederaCall<Query, Response, Res
 
     protected abstract void doValidate();
 
+    protected boolean isPaymentRequired() {
+        return true;
+    }
+
     /** Check that the query was built properly, throwing an exception on any errors. */
     @Override
     public final void validate() {
-        require(getHeaderBuilder().hasPayment(), ".setPayment() required");
+        if (isPaymentRequired()) {
+            require(getHeaderBuilder().hasPayment(), ".setPayment() required");
+        }
+
         doValidate();
         checkValidationErrors("query builder failed validation");
     }
