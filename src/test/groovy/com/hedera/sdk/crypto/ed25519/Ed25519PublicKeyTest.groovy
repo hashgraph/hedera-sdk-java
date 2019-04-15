@@ -40,4 +40,16 @@ class Ed25519PublicKeyTest extends Specification {
 			'e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7',
 		]
 	}
+
+	def "public key can be encoded to string"() {
+		when:
+		def key = Ed25519PublicKey.fromString(keyStr)
+
+		then:
+		key != null
+		key.toString() == keyStr
+
+		where:
+		keyStr = '302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7'
+	}
 }
