@@ -60,7 +60,7 @@ dependencies {
 	errorprone 'com.google.errorprone:error_prone_core:2.3.3'
 
 	// NullAway
-	// A tool to help eliminate NullPointerExceptions (NPEs) in your Java code with 
+	// A tool to help eliminate NullPointerExceptions (NPEs) in your Java code with
 	// 	low build-time overhead
 	// https://github.com/uber/NullAway
 	annotationProcessor "com.uber.nullaway:nullaway:0.7.2"
@@ -91,7 +91,7 @@ clean { delete protobuf.generatedFilesBaseDir }
 
 idea {
 	module {
-		// Mark gen/ folers as _generated_ code so IDEA will 
+		// Mark gen/ folers as _generated_ code so IDEA will
 		// highlight and make it more accesible
 		generatedSourceDirs += file('gen/main/java')
 		generatedSourceDirs += file('gen/main/grpc')
