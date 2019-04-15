@@ -18,7 +18,7 @@ class TransactionReceiptQueryTest extends Specification {
 	}
 
 	def query = new TransactionReceiptQuery()
-	.setTransaction(new TransactionId(new AccountId(1234), Instant.parse("2019-04-05T11:00:00Z")))
+	.setTransactionId(new TransactionId(new AccountId(1234), Instant.parse("2019-04-05T11:00:00Z")))
 	.setPayment(paymentTxn)
 
 	def builtQuery = query.inner.build()
@@ -99,7 +99,7 @@ transactionGetReceipt {
 
 		then:
 		def e = thrown(IllegalStateException)
-		e.message == "query builder failed validation:\n.setPayment() required\n.setTransaction() required"
+		e.message == "query builder failed validation:\n.setPayment() required\n.setTransactionId() required"
 	}
 
 	def "query builds correctly"() {

@@ -97,7 +97,7 @@ transactionGetFastRecord {
 
 		then:
 		def e = thrown(IllegalStateException)
-		e.message == "query builder failed validation:\n.setPayment() required\n.setTransaction() required"
+		e.message == "query builder failed validation:\n.setPayment() required\n.setTransactionId() required"
 	}
 
 	def "query builds correctly"() {
