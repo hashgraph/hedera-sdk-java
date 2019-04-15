@@ -11,9 +11,10 @@ import java.time.Duration;
 public final class AccountCreateTransaction extends TransactionBuilder<AccountCreateTransaction> {
     private final CryptoCreateTransactionBody.Builder builder = inner.getBodyBuilder()
         .getCryptoCreateAccountBuilder()
+        // Default auto renewal period recommended from Hedera
+        .setAutoRenewPeriod(DurationHelper.durationFrom(Duration.ofDays(30)))
         // Default to maximum values for record thresholds. Without this records would be
-        // auto-created
-        // whenever a send or receive transaction takes place for this new account. This should
+        // auto-created whenever a send or receive transaction takes place for this new account. This should
         // be an explicit ask.
         .setSendRecordThreshold(Long.MAX_VALUE)
         .setReceiveRecordThreshold(Long.MAX_VALUE);
