@@ -83,7 +83,7 @@ public class HederaSignatures {
 	public Transaction transactionAddSignatures(Transaction transaction) {
 		
 		Transaction.Builder newTransaction = Transaction.newBuilder();
-		newTransaction.setBody(transaction.getBody());
+//		newTransaction.setBody(transaction.getBody());
 		newTransaction.setBodyBytes(transaction.getBodyBytes());
 
 		int minSize = 0;

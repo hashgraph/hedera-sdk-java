@@ -33,14 +33,14 @@ public final class DemoAccount {
     	boolean getAccountRecords = false;
 
     	create = true;
-//    	getBalance = true;
-//    	send = true;
+    	getBalance = true;
+    	send = true;
 //    	getInfo = true;
     	update = true;
-//    	doAddClaim = true; //-- not implemented ?
-//    	getTXRecord = true; //-- records temporarily disabled
+    	doAddClaim = true; //-- not implemented ?
+    	getTXRecord = true; //-- records temporarily disabled
 //    	getFastRecord = true;
-//    	getAccountRecords = true;
+    	getAccountRecords = true;
 		
     	/* 
     	 * check my balance
@@ -211,16 +211,20 @@ public final class DemoAccount {
 		    		System.out.println("Original key " + newAccountKey.getPublicKeyHex());
 		    		System.out.println("New key      " + ed25519Key.getPublicKeyHex());
 		    		
+		    		// set the new pub/priv key on the account so subsequent tests work
+		    		newAccountKey = ed25519Key;
+		    		newAccount.accountKey = ed25519Key;
 		    	}
 		    	if (doAddClaim) {
+		    		System.out.println(newAccount.txQueryDefaults.payingKeyPair.getPublicKeyHex());
+
 		    		HederaKeyPair claimKeyPair = new HederaKeyPair(KeyType.ED25519);
-		    		HederaKeyPair claimKey = new HederaKeyPair(claimKeyPair.getKeyType(), claimKeyPair.getPublicKey());
 		
 					// Create a new claim object
 					HederaClaim claim;
-					claim = new HederaClaim(newAccount.shardNum, newAccount.realmNum, newAccount.accountNum, "ClaimHash".getBytes("UTF-8"));
+					claim = new HederaClaim(newAccount.shardNum, newAccount.realmNum, newAccount.accountNum, "012345678901234567890123456789012345678901234567".getBytes("UTF-8"));
 					// add a key to the claim
-					claim.addKey(claimKey);
+					claim.addKey(claimKeyPair);
 			        // add a claim
 			        if (AccountAddClaim.addClaim(newAccount,claim, claimKeyPair)) {
 			        	

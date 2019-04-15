@@ -105,7 +105,7 @@ public class HederaTransaction implements Serializable {
 
 		// Generates the protobuf payload for this class
 		Transaction.Builder transactionProtobuf = Transaction.newBuilder();
-		
+		logger.debug(this.body.getProtobuf().toString());
 		transactionProtobuf.setBodyBytes(this.body.getProtobuf().toByteString());
 		// if we have key signature pairs, use these\
 //		transactionProtobuf.setSigs(this.signatureList.getProtobuf());
