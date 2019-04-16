@@ -23,7 +23,7 @@ public final class AccountBalanceQuery extends QueryBuilder<Long> {
         return builder.getHeaderBuilder();
     }
 
-    public AccountBalanceQuery setAccount(AccountId account) {
+    public AccountBalanceQuery setAccountId(AccountId account) {
         builder.setAccountID(account.toProto());
         return this;
     }

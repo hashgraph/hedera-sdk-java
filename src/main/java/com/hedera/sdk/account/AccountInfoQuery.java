@@ -25,7 +25,7 @@ public final class AccountInfoQuery extends QueryBuilder<AccountInfo> {
         return builder.getHeaderBuilder();
     }
 
-    public AccountInfoQuery setAccount(AccountId account) {
+    public AccountInfoQuery setAccountId(AccountId account) {
         builder.setAccountID(account.toProto());
         return this;
     }
