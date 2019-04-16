@@ -30,7 +30,7 @@ class FileAppendTransactionTest extends Specification {
 				.setTransactionId(new TransactionId(new AccountId(1234), Instant.parse("2019-04-05T12:00:00Z")))
 				.setFileId(new FileId(1, 2, 3))
 				.setContents([1, 2, 3, 4] as byte[])
-				.testSign(privateKey)
+				.sign(privateKey)
 
 		then:
 		notThrown(IllegalStateException)
@@ -43,7 +43,7 @@ class FileAppendTransactionTest extends Specification {
 				.setTransactionId(new TransactionId(new AccountId(1234), Instant.parse("2019-04-05T12:00:00Z")))
 				.setFileId(new FileId(1, 2, 3))
 				.setContents([1, 2, 3, 4] as byte[])
-				.testSign(privateKey).toProto()
+				.sign(privateKey).toProto()
 
 		then:
 		txn.toString() == """\

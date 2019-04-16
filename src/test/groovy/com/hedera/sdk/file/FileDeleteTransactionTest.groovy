@@ -28,7 +28,7 @@ transaction builder failed validation:
 			nodeAccountId = new AccountId(3)
 			transactionId = txId
 			fileId = new FileId(848, 973, 1234)
-		}).testSign(key).toProto()
+		}).sign(key).toProto()
 
 		then:
 		tx.toString() == """\

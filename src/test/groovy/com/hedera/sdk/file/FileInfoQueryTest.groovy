@@ -16,7 +16,7 @@ class FileInfoQueryTest extends Specification {
 	.setTransactionId(new TransactionId(new AccountId(1234), Instant.parse("2019-04-05T12:00:00Z")))
 	.addSender(new AccountId(1234), 10000)
 	.addRecipient(new AccountId(3), 10000)
-	.testSign(privateKey)
+	.sign(privateKey)
 
 	def query = new FileInfoQuery()
 	.setFileId(new FileId(1, 2, 3))

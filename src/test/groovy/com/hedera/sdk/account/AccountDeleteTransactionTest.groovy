@@ -32,7 +32,7 @@ transaction builder failed validation:
 			transactionId = txId
 			transferAccountId = new AccountId(4)
 			deleteAccountId = new AccountId(1)
-		}).testSign(key).toProto()
+		}).sign(key).toProto()
 
 		then:
 		tx.toString() == """\

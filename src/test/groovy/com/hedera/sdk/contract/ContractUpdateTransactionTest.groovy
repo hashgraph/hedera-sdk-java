@@ -38,7 +38,7 @@ transaction builder failed validation:
 			proxyAccount = new AccountId(10, 11, 12)
 			autoRenewPeriod = Duration.ofHours(10)
 			file = new FileId(4, 5, 6)
-		}).testSign(key).toProto()
+		}).sign(key).toProto()
 
 		then:
 		tx.toString() == """\

@@ -5,7 +5,7 @@ import io.grpc.Channel;
 import io.grpc.ClientCall;
 import io.grpc.stub.ClientCalls;
 
-public abstract class HederaCall<Req, RawResp, Resp> extends Builder {
+public abstract class HederaCall<Req, RawResp, Resp> {
     protected abstract io.grpc.MethodDescriptor<Req, RawResp> getMethod();
 
     public abstract Req toProto();

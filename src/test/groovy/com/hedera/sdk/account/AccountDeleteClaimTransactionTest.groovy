@@ -32,7 +32,7 @@ transaction builder failed validation:
 			nodeAccountId = new AccountId(3)
 			accountToDeleteFrom = new AccountId(4)
 			hashToDelete = [4, 2, 1, 5]
-		}).testSign(key)
+		}).sign(key)
 
 		then:
 		tx.toProto().toString() == """\

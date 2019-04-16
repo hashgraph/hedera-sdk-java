@@ -33,7 +33,7 @@ transaction builder failed validation:
 			gas = 10
 			amount = 1000
 			functionParameters = [424, 243, 141]
-		}).testSign(key).toProto()
+		}).sign(key).toProto()
 
 		then:
 		tx.toString() == """\

@@ -31,7 +31,7 @@ transaction builder failed validation:
 			nodeAccountId = new AccountId(3)
 			transactionId = txId
 			ID = new FileId(1, 2, 3)
-		}).testSign(key).toProto()
+		}).sign(key).toProto()
 
 		then:
 		tx.toString() == """\
@@ -80,7 +80,7 @@ sigs {
 			nodeAccountId = new AccountId(3)
 			transactionId = txId
 			ID = new ContractId(1, 2, 3)
-		}).testSign(key).toProto()
+		}).sign(key).toProto()
 
 		then:
 		tx.toString() == """\

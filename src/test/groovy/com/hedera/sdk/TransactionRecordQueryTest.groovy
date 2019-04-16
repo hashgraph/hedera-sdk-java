@@ -15,7 +15,7 @@ class TransactionRecordQueryTest extends Specification {
 		nodeAccountId = new AccountId(3)
 		addSender(new AccountId(1234), 10000)
 		addRecipient(new AccountId(3), 10000)
-		testSign(privateKey)
+		sign(privateKey)
 	}
 
 	def query = new TransactionRecordQuery().with {

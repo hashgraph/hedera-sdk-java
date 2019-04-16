@@ -11,7 +11,6 @@ import java.util.function.Function;
 import javax.annotation.Nullable;
 
 public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transaction, TransactionResponse, TransactionId> {
-    private final int MAX_ATTEMPTS = 10;
 
     private final io.grpc.MethodDescriptor<com.hedera.sdk.proto.Transaction, com.hedera.sdk.proto.TransactionResponse> methodDescriptor;
     private final com.hedera.sdk.proto.Transaction.Builder inner;
@@ -52,25 +51,8 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
         return this;
     }
 
-    // FIXME: This doesn't actually do anything.
-    @Override
-    public final void validate() {
-        require(
-            inner.hasSigs() && inner.getSigsBuilder()
-                .getSigsCount() != 0,
-            "Transaction must be signed"
-        );
-
-        require(
-            inner.getBodyBuilder()
-                .hasTransactionID(),
-            "Transaction needs an ID"
-        );
-    }
-
     @Override
     public com.hedera.sdk.proto.Transaction toProto() {
-        validate();
         return inner.build();
     }
 
@@ -106,8 +88,10 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
     private <T> T executeAndWaitFor(CheckedFunction<TransactionId, T, HederaException> execute, Function<T, TransactionReceipt> mapReceipt)
             throws HederaException {
         var id = execute();
+
         T response = null;
         ResponseCodeEnum receiptStatus;
+        final int MAX_ATTEMPTS = 10;
 
         for (int attempt = 1; attempt < MAX_ATTEMPTS; attempt++) {
             response = execute.apply(id);

@@ -32,7 +32,7 @@ at least one transfer required"""
 			addSender(new AccountId(4), 800)
 			addRecipient(new AccountId(55), 400)
 			addTransfer(new AccountId(78), 400)
-		}).testSign(key).toProto()
+		}).sign(key).toProto()
 
 		then:
 		tx.toString() == """\

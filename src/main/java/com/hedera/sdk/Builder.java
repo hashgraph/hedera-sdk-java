@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Builder {
+public abstract class Builder<Req, RawResp, Resp> extends HederaCall<Req, RawResp, Resp> {
     private @Nullable List<String> validationErrors;
 
     protected abstract void validate();

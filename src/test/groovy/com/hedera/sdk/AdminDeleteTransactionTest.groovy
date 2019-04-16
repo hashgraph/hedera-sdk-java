@@ -35,7 +35,7 @@ class AdminDeleteTransactionTest extends Specification {
 			transactionId = txId
 			ID = new FileId(1, 2, 3)
 			expirationTime = Instant.ofEpochSecond(1554158643)
-		}).testSign(key).toProto()
+		}).sign(key).toProto()
 
 		then:
 		tx.toString() == """\
@@ -88,7 +88,7 @@ sigs {
 			transactionId = txId
 			ID = new ContractId(1, 2, 3)
 			expirationTime = Instant.ofEpochSecond(1554158643)
-		}).testSign(key).toProto()
+		}).sign(key).toProto()
 
 		then:
 		tx.toString() == """\

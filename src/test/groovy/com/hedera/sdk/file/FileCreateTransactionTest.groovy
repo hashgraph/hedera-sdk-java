@@ -33,7 +33,7 @@ transaction builder failed validation:
 			addKey(key.getPublicKey())
 			contents = [1, 2, 3, 4, 5]
 			newRealmAdminKey = key.getPublicKey()
-		}).testSign(key).toProto()
+		}).sign(key).toProto()
 
 		then:
 		tx.toString() == """\

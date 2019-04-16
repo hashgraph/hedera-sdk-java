@@ -39,7 +39,7 @@ transaction builder failed validation:
 			receiveRecordThreshold = 6
 			autoRenewPeriod = Duration.ofHours(10)
 			expirationTime = Instant.ofEpochSecond(1554158543)
-		}).testSign(key).toProto()
+		}).sign(key).toProto()
 
 		then:
 		tx.toString() == """\

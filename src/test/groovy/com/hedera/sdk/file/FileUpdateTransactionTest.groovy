@@ -35,7 +35,7 @@ transaction builder failed validation:
 			expirationTime = Instant.ofEpochSecond(1554158728)
 			addKey(key.getPublicKey())
 			contents = [1, 2, 3, 4, 5]
-		}).testSign(key).toProto()
+		}).sign(key).toProto()
 
 		then:
 		tx.toString() == """\

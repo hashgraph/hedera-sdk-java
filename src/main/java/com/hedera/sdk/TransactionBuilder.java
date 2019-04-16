@@ -4,12 +4,14 @@ import com.hedera.sdk.account.AccountId;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.sdk.proto.TransactionBody;
 import com.hedera.sdk.proto.TransactionResponse;
-import io.grpc.MethodDescriptor;
+import io.grpc.Channel;
 
 import javax.annotation.Nullable;
 import java.time.Duration;
+import java.util.Objects;
 
-public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extends Builder {
+public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
+        extends Builder<com.hedera.sdk.proto.Transaction, TransactionResponse, TransactionId> {
     protected final com.hedera.sdk.proto.Transaction.Builder inner = com.hedera.sdk.proto.Transaction.newBuilder();
     protected final TransactionBody.Builder bodyBuilder = inner.getBodyBuilder();
 
@@ -84,10 +86,9 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
         return self();
     }
 
-    protected abstract MethodDescriptor<com.hedera.sdk.proto.Transaction, TransactionResponse> getMethod();
-
     protected abstract void doValidate();
 
+    @Override
     public final com.hedera.sdk.proto.Transaction toProto() {
         return build().toProto();
     }
@@ -96,7 +97,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
     protected void validate() {
         var bodyBuilder = this.bodyBuilder;
 
-        if (client == null || client.getOperatorId() == null) {
+        if (client == null) {
             require(bodyBuilder.hasTransactionID(), ".setTransactionId() required");
         }
 
@@ -109,11 +110,10 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
     }
 
     public final Transaction build() {
-        if (!bodyBuilder.hasNodeAccountID() && client != null && client.getOperatorId() != null) {
-            bodyBuilder.setNodeAccountID(
-                client.getOperatorId()
-                    .toProto()
-            );
+        var channel = client == null ? null : client.getChannel();
+
+        if (!bodyBuilder.hasNodeAccountID() && channel != null) {
+            bodyBuilder.setNodeAccountID(channel.accountId.toProto());
         }
 
         if (!bodyBuilder.hasTransactionID() && client != null && client.getOperatorId() != null) {
@@ -121,8 +121,6 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
         }
 
         validate();
-
-        var channel = client == null ? null : client.getChannel();
         var tx = new Transaction(channel, inner, getMethod());
 
         if (client != null && client.getOperatorKey() != null) {
@@ -136,12 +134,6 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
         return build().sign(privateKey);
     }
 
-    // FIXME: Remove this and figure out a better method for tests
-    protected final Transaction testSign(Ed25519PrivateKey privateKey) {
-        validate();
-        return new Transaction(null, inner, getMethod()).sign(privateKey);
-    }
-
     // Work around for java not recognized that this is completely safe
     // as T is required to extend this
     @SuppressWarnings("unchecked")
@@ -149,11 +141,25 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
         return (T) this;
     }
 
-    public final TransactionId execute() throws HederaException {
-        return build().execute();
-    }
-
     public final TransactionReceipt executeForReceipt() throws HederaException {
         return build().executeForReceipt();
+    }
+
+    // FIXME: This is duplicated from Transaction
+
+    @Override
+    protected Channel getChannel() {
+        Objects.requireNonNull(client, "TransactionBuilder.client must not be null in normal usage");
+        return client.getChannel()
+            .getChannel();
+    }
+
+    @Override
+    protected TransactionId mapResponse(TransactionResponse response) throws HederaException {
+        HederaException.throwIfExceptional(response.getNodeTransactionPrecheckCode());
+        return new TransactionId(
+                inner.getBody()
+                    .getTransactionIDOrBuilder()
+        );
     }
 }
