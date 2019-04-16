@@ -20,7 +20,7 @@ public class TransactionRecordQuery extends QueryBuilder<TransactionRecord> {
     }
 
     public TransactionRecordQuery setTransaction(TransactionId transaction) {
-        builder.setTransactionID(transaction.inner);
+        builder.setTransactionID(transaction.toProto());
         return this;
     }
 

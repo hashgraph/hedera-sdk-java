@@ -48,15 +48,21 @@ public final class ContractId implements Key, Entity {
     public boolean equals(Object other) {
         if (this == other)
             return true;
+
         if (!(other instanceof ContractId))
             return false;
-        var contractId = (ContractId) other;
 
-        return getShardNum() == contractId.getShardNum() && getRealmNum() == contractId.getRealmNum()
-                && getContractNum() == contractId.getContractNum();
+        var otherId = (ContractId) other;
+        return getShardNum() == otherId.getShardNum() && getRealmNum() == otherId.getRealmNum()
+                && getContractNum() == otherId.getContractNum();
     }
 
     public ContractID toProto() {
         return inner.build();
+    }
+
+    @Override
+    public String toString() {
+        return "" + getShardNum() + "." + getRealmNum() + "." + getContractNum();
     }
 }

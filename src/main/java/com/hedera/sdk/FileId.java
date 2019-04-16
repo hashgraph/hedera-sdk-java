@@ -6,7 +6,7 @@ import com.hedera.sdk.proto.FileIDOrBuilder;
 import java.util.Objects;
 
 public final class FileId implements Entity {
-    transient FileID.Builder inner;
+    private final FileID.Builder inner;
 
     public FileId(long shardNum, long realmNum, long fileNum) {
         inner = FileID.newBuilder()
@@ -16,10 +16,7 @@ public final class FileId implements Entity {
     }
 
     public FileId(FileIDOrBuilder fileId) {
-        inner = FileID.newBuilder()
-            .setShardNum(fileId.getShardNum())
-            .setRealmNum(fileId.getRealmNum())
-            .setFileNum(fileId.getFileNum());
+        this(fileId.getShardNum(), fileId.getRealmNum(), fileId.getFileNum());
     }
 
     public long getShardNum() {
@@ -43,13 +40,20 @@ public final class FileId implements Entity {
     public boolean equals(Object other) {
         if (this == other)
             return true;
+
         if (!(other instanceof FileId))
             return false;
-        var fileId = (FileId) other;
-        return getShardNum() == fileId.getShardNum() && getRealmNum() == fileId.getRealmNum() && getFileNum() == fileId.getFileNum();
+
+        var otherId = (FileId) other;
+        return getShardNum() == otherId.getShardNum() && getRealmNum() == otherId.getRealmNum() && getFileNum() == otherId.getFileNum();
     }
 
     public FileID toProto() {
         return inner.build();
+    }
+
+    @Override
+    public String toString() {
+        return "" + getShardNum() + "." + getRealmNum() + "." + getFileNum();
     }
 }

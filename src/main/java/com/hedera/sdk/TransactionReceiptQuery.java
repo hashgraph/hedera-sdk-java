@@ -27,7 +27,7 @@ public final class TransactionReceiptQuery extends QueryBuilder<TransactionRecei
     }
 
     public TransactionReceiptQuery setTransactionId(TransactionId transactionId) {
-        builder.setTransactionID(transactionId.inner);
+        builder.setTransactionID(transactionId.toProto());
         return this;
     }
 

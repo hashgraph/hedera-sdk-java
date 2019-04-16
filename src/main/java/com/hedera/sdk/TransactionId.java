@@ -12,7 +12,7 @@ import java.util.Objects;
 // TODO: TransactionId.fromString
 
 public final class TransactionId {
-    final TransactionID.Builder inner;
+    private final TransactionID.Builder inner;
 
     /**
      * Generates a new transaction ID for the given `accountId`.
@@ -30,7 +30,7 @@ public final class TransactionId {
 
     public TransactionId(AccountId accountId, Instant transactionValidStart) {
         inner = TransactionID.newBuilder()
-            .setAccountID(accountId.inner)
+            .setAccountID(accountId.toProto())
             .setTransactionValidStart(
                 Timestamp.newBuilder()
                     .setSeconds(transactionValidStart.getEpochSecond())
@@ -65,14 +65,11 @@ public final class TransactionId {
     public boolean equals(Object other) {
         if (this == other)
             return true;
+
         if (!(other instanceof TransactionId))
             return false;
-        var txnId = (TransactionId) other;
-        return getAccountId().equals(txnId.getAccountId()) && getValidStart().equals(txnId.getValidStart());
-    }
 
-    @Override
-    public String toString() {
-        return inner.toString();
+        var otherId = (TransactionId) other;
+        return getAccountId().equals(otherId.getAccountId()) && getValidStart().equals(otherId.getValidStart());
     }
 }

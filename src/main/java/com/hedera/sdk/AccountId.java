@@ -7,7 +7,7 @@ import com.hedera.sdk.proto.AccountIDOrBuilder;
 import java.util.Objects;
 
 public final class AccountId implements Entity {
-    final AccountID.Builder inner;
+    private final AccountID.Builder inner;
 
     /** Constructs an `AccountId` with `0` for `shard` and `realm` (e.g., `0.0.<accountNum>`). */
     public AccountId(long accountNum) {
@@ -58,7 +58,7 @@ public final class AccountId implements Entity {
 
     @Override
     public String toString() {
-        return String.format("%d.%d.%d", getShardNum(), getRealmNum(), getAccountNum());
+        return "" + getShardNum() + "." + getRealmNum() + "." + getAccountNum();
     }
 
     public AccountID toProto() {
@@ -66,14 +66,16 @@ public final class AccountId implements Entity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
+    public boolean equals(Object other) {
+        if (this == other)
             return true;
-        if (o == null || getClass() != o.getClass())
+
+        if (other == null || getClass() != other.getClass())
             return false;
-        var other = (AccountId) o;
-        return other.getAccountNum() == getAccountNum() && other.getRealmNum() == getRealmNum()
-                && other.getShardNum() == this.getShardNum();
+
+        var otherId = (AccountId) other;
+        return otherId.getAccountNum() == getAccountNum() && otherId.getRealmNum() == getRealmNum()
+                && otherId.getShardNum() == getShardNum();
     }
 
     @Override

@@ -32,13 +32,13 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
      * effect.
      */
     public T setTransactionId(TransactionId transactionId) {
-        bodyBuilder.setTransactionID(transactionId.inner);
+        bodyBuilder.setTransactionID(transactionId.toProto());
         return self();
     }
 
     /** Sets the account of the node that submits the transaction to the network. */
     public final T setNodeAccountId(AccountId accountId) {
-        bodyBuilder.setNodeAccountID(accountId.inner);
+        bodyBuilder.setNodeAccountID(accountId.toProto());
         return self();
     }
 
