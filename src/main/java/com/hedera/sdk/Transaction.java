@@ -1,6 +1,7 @@
 package com.hedera.sdk;
 
 import com.google.protobuf.ByteString;
+import com.hedera.sdk.account.AccountId;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.sdk.crypto.ed25519.Ed25519Signature;
 import com.hedera.sdk.proto.*;
@@ -16,19 +17,19 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
     private final com.hedera.sdk.proto.Transaction.Builder inner;
 
     @Nullable
-    private final ChannelHolder channel;
+    private final Client client;
 
     @Nullable
     private byte[] bodyBytes;
 
     Transaction(
-        @Nullable ChannelHolder channel,
+        @Nullable Client client,
         com.hedera.sdk.proto.Transaction.Builder inner,
         MethodDescriptor<com.hedera.sdk.proto.Transaction, TransactionResponse> methodDescriptor
     ) {
         super();
         this.inner = inner;
-        this.channel = channel;
+        this.client = client;
         this.methodDescriptor = methodDescriptor;
     }
 
@@ -36,16 +37,11 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
         var signature = Ed25519Signature.forMessage(privateKey, getBodyBytes())
             .toBytes();
 
-        inner.getSigsBuilder()
-            .addSigs(
-                Signature.newBuilder()
-                    .setSignatureList(
-                        SignatureList.newBuilder()
-                            .addSigs(
-                                Signature.newBuilder()
-                                    .setEd25519(ByteString.copyFrom(signature))
-                            )
-                    )
+        inner.getSigMapBuilder()
+            .addSigPair(
+                SignaturePair.newBuilder()
+                    .setEd25519(ByteString.copyFrom(signature))
+                    .build()
             );
 
         return this;
@@ -70,9 +66,20 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
         return methodDescriptor;
     }
 
+    private AccountId getNodeAccountId() {
+        return new AccountId(
+                inner.getBody()
+                    .getNodeAccountID()
+        );
+    }
+
     @Override
     protected Channel getChannel() {
-        Objects.requireNonNull(channel, "Transaction.rpcChannel must be non-null in regular use");
+        Objects.requireNonNull(client, "Transaction.client must be non-null in regular use");
+
+        var channel = client.getChannelForNode(getNodeAccountId());
+        Objects.requireNonNull(channel, "Transaction.nodeAccountId not found on Client");
+
         return channel.getChannel();
     }
 
@@ -120,7 +127,7 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
 
     public final TransactionReceipt executeForReceipt() throws HederaException {
         return executeAndWaitFor(
-            id -> new TransactionReceiptQuery(channel).setTransactionId(id)
+            id -> new TransactionReceiptQuery(client).setTransactionId(id)
                 .execute(),
             res -> res
         );

@@ -8,16 +8,8 @@ import javax.annotation.Nullable;
 public final class TransactionReceiptQuery extends QueryBuilder<TransactionReceipt> {
     private final TransactionGetReceiptQuery.Builder builder = inner.getTransactionGetReceiptBuilder();
 
-    public TransactionReceiptQuery(Client client) {
+    public TransactionReceiptQuery(@Nullable Client client) {
         super(client);
-    }
-
-    TransactionReceiptQuery(@Nullable ChannelHolder channelHolder) {
-        super(channelHolder);
-    }
-
-    TransactionReceiptQuery() {
-        super((Client) null);
     }
 
     @Override

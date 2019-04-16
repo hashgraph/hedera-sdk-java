@@ -14,7 +14,6 @@ class FileUpdateTransactionTest extends Specification {
 
 		then:
 		def e = thrown(IllegalStateException)
-		println(e)
 		e.message == """\
 transaction builder failed validation:
 .setTransactionId() required

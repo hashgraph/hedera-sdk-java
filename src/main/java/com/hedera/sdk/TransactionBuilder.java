@@ -121,7 +121,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         }
 
         validate();
-        var tx = new Transaction(channel, inner, getMethod());
+        var tx = new Transaction(client, inner, getMethod());
 
         if (client != null && client.getOperatorKey() != null) {
             tx.sign(client.getOperatorKey());
