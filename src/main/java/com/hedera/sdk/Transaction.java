@@ -40,6 +40,12 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
         inner.getSigMapBuilder()
             .addSigPair(
                 SignaturePair.newBuilder()
+                    .setPubKeyPrefix(
+                        ByteString.copyFrom(
+                            privateKey.getPublicKey()
+                                .toBytes()
+                        )
+                    )
                     .setEd25519(ByteString.copyFrom(signature))
                     .build()
             );
