@@ -1,5 +1,6 @@
 package com.hedera.sdk
 
+import com.hedera.sdk.account.AccountId
 import com.hedera.sdk.proto.Response
 import com.hedera.sdk.proto.ResponseCodeEnum
 import com.hedera.sdk.proto.TransactionGetReceiptResponse

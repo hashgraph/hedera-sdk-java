@@ -1,7 +1,6 @@
 package com.hedera.sdk.file;
 
 import com.hedera.sdk.Client;
-import com.hedera.sdk.FileId;
 import com.hedera.sdk.TransactionBuilder;
 import com.hedera.sdk.proto.FileDeleteTransactionBody;
 import com.hedera.sdk.proto.FileServiceGrpc;

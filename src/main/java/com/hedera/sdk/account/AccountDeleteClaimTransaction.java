@@ -1,7 +1,6 @@
 package com.hedera.sdk.account;
 
 import com.google.protobuf.ByteString;
-import com.hedera.sdk.AccountId;
 import com.hedera.sdk.Client;
 import com.hedera.sdk.TransactionBuilder;
 import com.hedera.sdk.proto.CryptoDeleteClaimTransactionBody;

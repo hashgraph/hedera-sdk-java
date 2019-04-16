@@ -1,5 +1,6 @@
-package com.hedera.sdk;
+package com.hedera.sdk.file;
 
+import com.hedera.sdk.Entity;
 import com.hedera.sdk.proto.FileID;
 import com.hedera.sdk.proto.FileIDOrBuilder;
 

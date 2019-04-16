@@ -1,5 +1,7 @@
 package com.hedera.sdk;
 
+import com.hedera.sdk.contract.ContractId;
+import com.hedera.sdk.file.FileId;
 import com.hedera.sdk.proto.AdminUndeleteTransactionBody;
 import com.hedera.sdk.proto.FileServiceGrpc;
 import com.hedera.sdk.proto.Transaction;

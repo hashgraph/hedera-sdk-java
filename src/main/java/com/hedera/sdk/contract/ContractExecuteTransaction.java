@@ -2,7 +2,6 @@ package com.hedera.sdk.contract;
 
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.Client;
-import com.hedera.sdk.ContractId;
 import com.hedera.sdk.TransactionBuilder;
 import com.hedera.sdk.proto.ContractCallTransactionBody;
 import com.hedera.sdk.proto.SmartContractServiceGrpc;

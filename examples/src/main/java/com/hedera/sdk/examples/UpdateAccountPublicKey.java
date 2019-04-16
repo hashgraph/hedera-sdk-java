@@ -2,6 +2,7 @@ package com.hedera.sdk.examples;
 
 import com.hedera.sdk.*;
 import com.hedera.sdk.account.AccountCreateTransaction;
+import com.hedera.sdk.account.AccountId;
 import com.hedera.sdk.account.AccountUpdateTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import io.github.cdimascio.dotenv.Dotenv;

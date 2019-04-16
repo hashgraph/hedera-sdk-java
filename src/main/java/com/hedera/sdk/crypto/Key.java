@@ -1,6 +1,6 @@
 package com.hedera.sdk.crypto;
 
-import com.hedera.sdk.ContractId;
+import com.hedera.sdk.contract.ContractId;
 import com.hedera.sdk.crypto.ed25519.Ed25519PublicKey;
 import com.hedera.sdk.proto.ContractID;
 

@@ -1,9 +1,8 @@
 package com.hedera.sdk.contract
 
 import com.hedera.sdk.TransactionId
-import com.hedera.sdk.ContractId
-import com.hedera.sdk.FileId
-import com.hedera.sdk.AccountId
+import com.hedera.sdk.file.FileId
+import com.hedera.sdk.account.AccountId
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey
 import spock.lang.Specification
 

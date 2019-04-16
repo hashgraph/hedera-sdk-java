@@ -1,6 +1,7 @@
 package com.hedera.sdk;
 
 import com.google.protobuf.ByteString;
+import com.hedera.sdk.contract.ContractId;
 import com.hedera.sdk.proto.ContractFunctionResultOrBuilder;
 import com.hedera.sdk.proto.ContractLoginfoOrBuilder;
 

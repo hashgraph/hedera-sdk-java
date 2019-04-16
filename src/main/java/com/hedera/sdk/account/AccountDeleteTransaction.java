@@ -1,6 +1,5 @@
 package com.hedera.sdk.account;
 
-import com.hedera.sdk.AccountId;
 import com.hedera.sdk.Client;
 import com.hedera.sdk.TransactionBuilder;
 import com.hedera.sdk.proto.CryptoDeleteTransactionBody;

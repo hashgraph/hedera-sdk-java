@@ -1,7 +1,6 @@
 package com.hedera.sdk.account
 
 import spock.lang.Specification
-import com.hedera.sdk.AccountId
 
 class AccountClaimQueryTest extends Specification {
 	def "Query can be built with defaults"() {

@@ -1,7 +1,5 @@
 package com.hedera.sdk.account;
 
-import com.hedera.sdk.AccountId;
-import com.hedera.sdk.Claim;
 import com.hedera.sdk.DurationHelper;
 import com.hedera.sdk.TimestampHelper;
 import com.hedera.sdk.crypto.Key;

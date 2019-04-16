@@ -1,6 +1,6 @@
 package com.hedera.sdk.file
 
-import com.hedera.sdk.FileId
+
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey
 import com.hedera.sdk.proto.FileGetInfoResponse
 import com.hedera.sdk.proto.KeyList

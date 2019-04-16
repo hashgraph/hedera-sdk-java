@@ -1,5 +1,6 @@
 package com.hedera.sdk;
 
+import com.hedera.sdk.account.AccountId;
 import com.hedera.sdk.proto.AccountAmountOrBuilder;
 
 import javax.annotation.Nullable;

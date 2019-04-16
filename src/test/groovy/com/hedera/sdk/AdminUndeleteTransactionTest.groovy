@@ -1,6 +1,9 @@
 package com.hedera.sdk
 
+import com.hedera.sdk.account.AccountId
+import com.hedera.sdk.contract.ContractId
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey
+import com.hedera.sdk.file.FileId
 import spock.lang.Specification
 
 import java.time.Instant

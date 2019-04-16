@@ -1,5 +1,6 @@
-package com.hedera.sdk;
+package com.hedera.sdk.account;
 
+import com.hedera.sdk.Entity;
 import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.AccountID;
 import java.util.List;

@@ -1,7 +1,6 @@
 package com.hedera.sdk.file;
 
 import com.hedera.sdk.Client;
-import com.hedera.sdk.FileId;
 import com.hedera.sdk.HederaException;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;

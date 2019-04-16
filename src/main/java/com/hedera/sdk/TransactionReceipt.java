@@ -1,5 +1,8 @@
 package com.hedera.sdk;
 
+import com.hedera.sdk.account.AccountId;
+import com.hedera.sdk.contract.ContractId;
+import com.hedera.sdk.file.FileId;
 import com.hedera.sdk.proto.Response;
 import com.hedera.sdk.proto.ResponseCodeEnum;
 

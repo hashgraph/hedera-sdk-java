@@ -1,5 +1,6 @@
 package com.hedera.sdk;
 
+import com.hedera.sdk.account.AccountId;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;

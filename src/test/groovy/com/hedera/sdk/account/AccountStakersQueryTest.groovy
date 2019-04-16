@@ -1,6 +1,6 @@
 package com.hedera.sdk.account
 
-import com.hedera.sdk.AccountId
+
 import spock.lang.Specification
 
 class AccountStakersQueryTest extends Specification {

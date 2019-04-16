@@ -2,7 +2,6 @@ package com.hedera.sdk.file;
 
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.Client;
-import com.hedera.sdk.FileId;
 import com.hedera.sdk.TransactionBuilder;
 import com.hedera.sdk.proto.FileAppendTransactionBody;
 import com.hedera.sdk.proto.FileServiceGrpc;

@@ -1,7 +1,6 @@
 package com.hedera.sdk.contract;
 
 import com.hedera.sdk.Client;
-import com.hedera.sdk.ContractId;
 import com.hedera.sdk.HederaException;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;

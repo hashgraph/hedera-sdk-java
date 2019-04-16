@@ -1,5 +1,6 @@
-package com.hedera.sdk;
+package com.hedera.sdk.contract;
 
+import com.hedera.sdk.Entity;
 import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.ContractID;
 import com.hedera.sdk.proto.ContractIDOrBuilder;

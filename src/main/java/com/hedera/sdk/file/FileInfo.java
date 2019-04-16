@@ -1,6 +1,5 @@
 package com.hedera.sdk.file;
 
-import com.hedera.sdk.FileId;
 import com.hedera.sdk.TimestampHelper;
 import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.proto.FileGetInfoResponse;

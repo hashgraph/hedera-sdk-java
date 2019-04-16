@@ -2,7 +2,9 @@ package com.hedera.sdk.contract;
 
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.*;
+import com.hedera.sdk.account.AccountId;
 import com.hedera.sdk.crypto.Key;
+import com.hedera.sdk.file.FileId;
 import com.hedera.sdk.proto.*;
 import com.hedera.sdk.proto.Transaction;
 import io.grpc.MethodDescriptor;

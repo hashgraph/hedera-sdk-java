@@ -1,6 +1,7 @@
-package com.hedera.sdk;
+package com.hedera.sdk.account;
 
 import com.google.common.base.Splitter;
+import com.hedera.sdk.Entity;
 import com.hedera.sdk.proto.AccountID;
 import com.hedera.sdk.proto.AccountIDOrBuilder;
 

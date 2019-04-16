@@ -1,5 +1,6 @@
 package com.hedera.sdk;
 
+import com.hedera.sdk.account.AccountId;
 import com.hedera.sdk.proto.Timestamp;
 import com.hedera.sdk.proto.TransactionID;
 import com.hedera.sdk.proto.TransactionIDOrBuilder;

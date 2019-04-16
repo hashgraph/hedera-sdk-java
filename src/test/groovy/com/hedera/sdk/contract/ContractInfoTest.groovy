@@ -1,7 +1,6 @@
 package com.hedera.sdk.contract
 
-import com.hedera.sdk.AccountId
-import com.hedera.sdk.ContractId
+import com.hedera.sdk.account.AccountId
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey
 import com.hedera.sdk.proto.ContractGetInfoResponse
 import com.hedera.sdk.proto.Response

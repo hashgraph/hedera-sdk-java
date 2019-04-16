@@ -1,6 +1,6 @@
 package com.hedera.sdk.contract
 
-import com.hedera.sdk.ContractId
+
 import spock.lang.Specification
 
 class ContractBytecodeQueryTest extends Specification {

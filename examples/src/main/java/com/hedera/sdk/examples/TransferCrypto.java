@@ -1,6 +1,6 @@
 package com.hedera.sdk.examples;
 
-import com.hedera.sdk.AccountId;
+import com.hedera.sdk.account.AccountId;
 import com.hedera.sdk.Client;
 import com.hedera.sdk.HederaException;
 import com.hedera.sdk.TransactionId;

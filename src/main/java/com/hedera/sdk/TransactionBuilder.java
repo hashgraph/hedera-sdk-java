@@ -1,5 +1,6 @@
 package com.hedera.sdk;
 
+import com.hedera.sdk.account.AccountId;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.sdk.proto.TransactionBody;
 import com.hedera.sdk.proto.TransactionResponse;
