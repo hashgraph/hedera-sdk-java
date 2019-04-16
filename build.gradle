@@ -9,11 +9,11 @@ plugins {
 	id 'com.google.protobuf' version '0.8.8'
 
 	// Autoformat Java and Groovy code
-	id 'com.diffplug.gradle.spotless' version '3.21.1'
+	id 'com.diffplug.gradle.spotless' version '3.22.0'
 
 	// Use the ErrorProne compiler - Catch common Java mistakes as compile-time errors
 	// https://errorprone.info/
-	id 'net.ltgt.errorprone' version '0.7.1'
+	id 'net.ltgt.errorprone' version '0.8'
 
 	// An extensible static code analyzer
 	// https://docs.gradle.org/current/userguide/pmd_plugin.html
