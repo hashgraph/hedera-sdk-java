@@ -40,6 +40,7 @@ public final class AccountBalanceQuery extends QueryBuilder<Long> {
 
     @Override
     protected Long mapResponse(Response raw) throws HederaException {
-        return raw.getCryptogetAccountBalance().getBalance();
+        return raw.getCryptogetAccountBalance()
+            .getBalance();
     }
 }

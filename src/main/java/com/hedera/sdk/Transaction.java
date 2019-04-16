@@ -77,7 +77,7 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
     protected Channel getChannel() {
         Objects.requireNonNull(client, "Transaction.client must be non-null in regular use");
 
-        var channel = client.getChannelForNode(getNodeAccountId());
+        var channel = client.getNodeForId(getNodeAccountId());
         Objects.requireNonNull(channel, "Transaction.nodeAccountId not found on Client");
 
         return channel.getChannel();

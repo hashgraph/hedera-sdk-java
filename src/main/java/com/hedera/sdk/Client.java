@@ -2,46 +2,15 @@ package com.hedera.sdk;
 
 import com.hedera.sdk.account.AccountId;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-class ChannelHolder {
-    final AccountId accountId;
-    final String address;
-    @Nullable
-    private volatile ManagedChannel channel;
-
-    ChannelHolder(AccountId accountId, String address) {
-        this.accountId = accountId;
-        this.address = address;
-    }
-
-    ManagedChannel getChannel() {
-        // only build the channel once; check before locking the mutex
-        if (channel == null) {
-            synchronized (this) {
-                // might have been initialized while we were waiting
-                if (channel == null) {
-                    channel = ManagedChannelBuilder.forTarget(address)
-                        .usePlaintext()
-                        .build();
-                }
-            }
-        }
-
-        return Objects.requireNonNull(channel);
-    }
-}
-
 public final class Client {
-
     private final Random random = new Random();
-    private Map<AccountId, ChannelHolder> channels;
+    private Map<AccountId, Node> channels;
 
     static final long DEFAULT_MAX_TXN_FEE = 100_000;
 
@@ -53,15 +22,15 @@ public final class Client {
     @Nullable
     private Ed25519PrivateKey operatorKey;
 
-    public Client(Map<AccountId, String> targets) {
+    public Client(Map<AccountId, String> nodes) {
 
-        if (targets.isEmpty()) {
-            throw new IllegalArgumentException("List of targets must not be empty");
+        if (nodes.isEmpty()) {
+            throw new IllegalArgumentException("List of nodes must not be empty");
         }
 
-        channels = targets.entrySet()
+        channels = nodes.entrySet()
             .stream()
-            .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, t -> new ChannelHolder(t.getKey(), t.getValue())));
+            .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, t -> new Node(t.getKey(), t.getValue())));
     }
 
     public Client setMaxTransactionFee(@Nonnegative long maxTransactionFee) {
@@ -93,7 +62,7 @@ public final class Client {
         return operatorKey;
     }
 
-    ChannelHolder getChannel() {
+    Node pickNode() {
         if (channels.isEmpty()) {
             throw new IllegalStateException("List of channels has become empty");
         }
@@ -109,7 +78,7 @@ public final class Client {
         return channelIter.next();
     }
 
-    ChannelHolder getChannelForNode(AccountId node) {
+    Node getNodeForId(AccountId node) {
         var selectedChannel = channels.get(node);
 
         if (selectedChannel == null) {

@@ -110,7 +110,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     }
 
     public final Transaction build() {
-        var channel = client == null ? null : client.getChannel();
+        var channel = client == null ? null : client.pickNode();
 
         if (!bodyBuilder.hasNodeAccountID() && channel != null) {
             bodyBuilder.setNodeAccountID(channel.accountId.toProto());
@@ -150,7 +150,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     @Override
     protected Channel getChannel() {
         Objects.requireNonNull(client, "TransactionBuilder.client must not be null in normal usage");
-        return client.getChannel()
+        return client.pickNode()
             .getChannel();
     }
 

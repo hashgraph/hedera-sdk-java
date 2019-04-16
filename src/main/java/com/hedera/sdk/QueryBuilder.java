@@ -22,7 +22,7 @@ public abstract class QueryBuilder<Resp> extends Builder<Query, Response, Resp> 
     @Override
     protected Channel getChannel() {
         Objects.requireNonNull(client, "QueryBuilder.client must be non-null in regular use");
-        return client.getChannel()
+        return client.pickNode()
             .getChannel();
     }
 
@@ -33,11 +33,12 @@ public abstract class QueryBuilder<Resp> extends Builder<Query, Response, Resp> 
 
             var cost = getCost();
             var operatorId = client.getOperatorId();
-            var nodeId = client.getChannel().accountId;
+            var nodeId = client.pickNode().accountId;
             var txPayment = new CryptoTransferTransaction(client).setNodeAccountId(nodeId)
                 .setTransactionId(new TransactionId(operatorId))
                 .addSender(operatorId, cost)
-                .addRecipient(nodeId, cost).build();
+                .addRecipient(nodeId, cost)
+                .build();
 
             setPayment(txPayment);
         }
