@@ -9,23 +9,32 @@ import java.util.Map;
 import java.util.Objects;
 
 class ExampleHelper {
-    static Client createHederaClient() {
+    static Dotenv getEnv() {
         // Load configuration from the environment or a $projectRoot/.env file, if present
         // See .env.sample for an example of what it is looking for
-        var env = Dotenv.load();
+        return Dotenv.load();
+    }
 
-        var operatorId = AccountId.fromString(Objects.requireNonNull(env.get("OPERATOR_ID")));
-        var operatorKey = Ed25519PrivateKey.fromString(Objects.requireNonNull(env.get("OPERATOR_KEY")));
+    static AccountId getNodeId() {
+        return AccountId.fromString(Objects.requireNonNull(getEnv().get("NODE_ID")));
+    }
 
-        var nodeId = AccountId.fromString(Objects.requireNonNull(env.get("NODE_ID")));
-        var nodeAddress = Objects.requireNonNull(env.get("NODE_ADDRESS"));
+    static AccountId getOperatorId() {
+        return AccountId.fromString(Objects.requireNonNull(getEnv().get("OPERATOR_ID")));
+    }
 
+    static Ed25519PrivateKey getOperatorKey() {
+        return Ed25519PrivateKey.fromString(Objects.requireNonNull(getEnv().get("OPERATOR_KEY")));
+    }
+
+    static Client createHederaClient() {
         // To connect to a network with more nodes, add additional entries to the network map
-        var client = new Client(Map.of(nodeId, nodeAddress));
+        var nodeAddress = Objects.requireNonNull(getEnv().get("NODE_ADDRESS"));
+        var client = new Client(Map.of(getNodeId(), nodeAddress));
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
-        client.setOperator(operatorId, operatorKey);
+        client.setOperator(getOperatorId(), getOperatorKey());
 
         return client;
     }

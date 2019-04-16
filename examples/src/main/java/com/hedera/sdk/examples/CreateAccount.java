@@ -20,7 +20,6 @@ public final class CreateAccount {
         var tx = new AccountCreateTransaction(client)
             // The only _required_ property here is `key`
             .setKey(newKey.getPublicKey())
-            .setGenerateRecord(true)
             .setInitialBalance(1000);
 
         // This will wait for the receipt to become available

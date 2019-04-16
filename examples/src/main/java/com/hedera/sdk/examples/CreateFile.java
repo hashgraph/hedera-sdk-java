@@ -10,6 +10,7 @@ import java.util.Objects;
 @SuppressWarnings("Duplicates")
 public final class CreateFile {
     public static void main(String[] args) throws HederaException {
+        var operatorKey = ExampleHelper.getOperatorKey();
         var client = ExampleHelper.createHederaClient();
 
         // The file is required to be a byte array,
@@ -21,9 +22,7 @@ public final class CreateFile {
                 .plus(Duration.ofSeconds(2592000))
         )
             // Use the same key as the operator to "own" this file
-            .addKey(Objects.requireNonNull(client.getOperatorKey())
-                .getPublicKey()
-            )
+            .addKey(operatorKey.getPublicKey())
             .setContents(fileContents);
 
         var receipt = tx.executeForReceipt();
