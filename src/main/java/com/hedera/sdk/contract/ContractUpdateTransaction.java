@@ -13,8 +13,7 @@ import java.time.Duration;
 import java.time.Instant;
 
 public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdateTransaction> {
-    private final ContractUpdateTransactionBody.Builder builder = inner.getBodyBuilder()
-        .getContractUpdateInstanceBuilder();
+    private final ContractUpdateTransactionBody.Builder builder = bodyBuilder.getContractUpdateInstanceBuilder();
 
     public ContractUpdateTransaction(Client client) {
         super(client);

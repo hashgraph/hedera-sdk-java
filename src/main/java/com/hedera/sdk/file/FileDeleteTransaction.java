@@ -9,8 +9,7 @@ import com.hedera.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 public final class FileDeleteTransaction extends TransactionBuilder<FileDeleteTransaction> {
-    private final FileDeleteTransactionBody.Builder builder = inner.getBodyBuilder()
-        .getFileDeleteBuilder();
+    private final FileDeleteTransactionBody.Builder builder = bodyBuilder.getFileDeleteBuilder();
 
     public FileDeleteTransaction(Client client) {
         super(client);

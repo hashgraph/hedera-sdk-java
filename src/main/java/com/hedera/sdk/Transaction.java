@@ -19,9 +19,6 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
     @Nullable
     private final Client client;
 
-    @Nullable
-    private byte[] bodyBytes;
-
     Transaction(
         @Nullable Client client,
         com.hedera.sdk.proto.Transaction.Builder inner,
@@ -34,7 +31,11 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
     }
 
     public Transaction sign(Ed25519PrivateKey privateKey) {
-        var signature = Ed25519Signature.forMessage(privateKey, getBodyBytes())
+        var signature = Ed25519Signature.forMessage(
+            privateKey,
+            inner.getBodyBytes()
+                .toByteArray()
+        )
             .toBytes();
 
         inner.getSigMapBuilder()
@@ -56,15 +57,6 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
     @Override
     public com.hedera.sdk.proto.Transaction toProto() {
         return inner.build();
-    }
-
-    private byte[] getBodyBytes() {
-        if (bodyBytes == null) {
-            bodyBytes = inner.getBody()
-                .toByteArray();
-        }
-
-        return bodyBytes;
     }
 
     @Override

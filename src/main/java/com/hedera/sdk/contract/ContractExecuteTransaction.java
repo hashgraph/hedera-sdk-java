@@ -13,8 +13,7 @@ import io.grpc.MethodDescriptor;
 /** Call a function in the contract, updating its internal state in the hashgraph. */
 // `ContractCallTransaction`
 public final class ContractExecuteTransaction extends TransactionBuilder<ContractExecuteTransaction> {
-    private final ContractCallTransactionBody.Builder builder = inner.getBodyBuilder()
-        .getContractCallBuilder();
+    private final ContractCallTransactionBody.Builder builder = bodyBuilder.getContractCallBuilder();
 
     public ContractExecuteTransaction(Client client) {
         super(client);

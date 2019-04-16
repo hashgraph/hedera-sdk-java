@@ -8,8 +8,7 @@ import io.grpc.MethodDescriptor;
 import javax.annotation.Nonnegative;
 
 public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTransferTransaction> {
-    private final CryptoTransferTransactionBody.Builder builder = inner.getBodyBuilder()
-        .getCryptoTransferBuilder();
+    private final CryptoTransferTransactionBody.Builder builder = bodyBuilder.getCryptoTransferBuilder();
     private final TransferList.Builder transferList = builder.getTransfersBuilder();
 
     public CryptoTransferTransaction(Client client) {

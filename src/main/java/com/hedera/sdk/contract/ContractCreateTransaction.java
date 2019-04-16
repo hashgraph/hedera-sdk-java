@@ -10,8 +10,7 @@ import com.hedera.sdk.proto.Transaction;
 import io.grpc.MethodDescriptor;
 
 public class ContractCreateTransaction extends TransactionBuilder<ContractCreateTransaction> {
-    private final ContractCreateTransactionBody.Builder builder = inner.getBodyBuilder()
-        .getContractCreateInstanceBuilder();
+    private final ContractCreateTransactionBody.Builder builder = bodyBuilder.getContractCreateInstanceBuilder();
 
     public ContractCreateTransaction(Client client) {
         super(client);
