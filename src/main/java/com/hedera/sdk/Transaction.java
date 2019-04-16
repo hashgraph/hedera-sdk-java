@@ -7,10 +7,12 @@ import com.hedera.sdk.proto.*;
 import io.grpc.*;
 
 import java.util.Objects;
-import java.util.function.Consumer;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 
 public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transaction, TransactionResponse, TransactionId> {
+    private final int MAX_ATTEMPTS = 10;
+
     private final io.grpc.MethodDescriptor<com.hedera.sdk.proto.Transaction, com.hedera.sdk.proto.TransactionResponse> methodDescriptor;
     private final com.hedera.sdk.proto.Transaction.Builder inner;
 
@@ -50,6 +52,7 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
         return this;
     }
 
+    // FIXME: This doesn't actually do anything.
     @Override
     public final void validate() {
         require(
@@ -95,36 +98,45 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
     protected TransactionId mapResponse(TransactionResponse response) throws HederaException {
         HederaException.throwIfExceptional(response.getNodeTransactionPrecheckCode());
         return new TransactionId(
-            inner.getBody()
-                .getTransactionIDOrBuilder()
+                inner.getBody()
+                    .getTransactionIDOrBuilder()
         );
+    }
+
+    private <T> T executeAndWaitFor(CheckedFunction<TransactionId, T, HederaException> execute, Function<T, TransactionReceipt> mapReceipt)
+            throws HederaException {
+        var id = execute();
+        T response = null;
+        ResponseCodeEnum receiptStatus = ResponseCodeEnum.UNRECOGNIZED;
+
+        for (int attempt = 1; attempt < MAX_ATTEMPTS; attempt++) {
+            response = execute.apply(id);
+
+            receiptStatus = mapReceipt.apply(response)
+                .getStatus();
+
+            if (receiptStatus == ResponseCodeEnum.UNKNOWN) {
+                try {
+                    Thread.sleep(500 * attempt);
+                    continue;
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+
+            HederaException.throwIfExceptional(receiptStatus);
+
+            break;
+        }
+
+        return response;
     }
 
     public final TransactionReceipt executeForReceipt() throws HederaException {
-        var txId = execute();
-        return new TransactionReceiptQuery(channel).setTransactionId(txId)
-            .execute();
-    }
-
-    public void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<Throwable> onFailure) {
-        executeAsync(
-            txId -> new TransactionReceiptQuery(channel).setTransactionId(txId)
-                .executeAsync(onSuccess, onFailure),
-            onFailure
-        );
-    }
-
-    public TransactionRecord executeForRecord() throws HederaException {
-        var txId = execute();
-        return new TransactionFastRecordQuery(channel).setTransaction(txId)
-            .execute();
-    }
-
-    public void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<Throwable> onFailure) {
-        executeAsync(
-            txId -> new TransactionFastRecordQuery(channel).setTransaction(txId)
-                .executeAsync(onSuccess, onFailure),
-            onFailure
+        return executeAndWaitFor(
+            id -> new TransactionReceiptQuery(channel).setTransactionId(id)
+                .execute(),
+            res -> res
         );
     }
 }

@@ -1,7 +1,6 @@
 package com.hedera.sdk;
 
 import com.hedera.sdk.proto.AccountAmountOrBuilder;
-import com.hedera.sdk.proto.Response;
 
 import javax.annotation.Nullable;
 import java.time.Instant;
@@ -11,16 +10,8 @@ import java.util.stream.Collectors;
 public final class TransactionRecord {
     private final com.hedera.sdk.proto.TransactionRecord inner;
 
-    TransactionRecord(Response response) {
-        if (response.hasTransactionGetRecord()) {
-            inner = response.getTransactionGetRecord()
-                .getTransactionRecord();
-        } else if (response.hasTransactionGetFastRecord()) {
-            inner = response.getTransactionGetFastRecord()
-                .getTransactionRecord();
-        } else {
-            throw new IllegalArgumentException("unexpected response: " + response.getResponseCase());
-        }
+    TransactionRecord(com.hedera.sdk.proto.TransactionRecord inner) {
+        this.inner = inner;
     }
 
     public TransactionId getTransactionId() {

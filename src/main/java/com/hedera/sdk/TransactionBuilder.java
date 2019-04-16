@@ -3,15 +3,12 @@ package com.hedera.sdk;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.sdk.proto.TransactionBody;
 import com.hedera.sdk.proto.TransactionResponse;
-import io.grpc.Channel;
+import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
 import java.time.Duration;
-import java.util.Objects;
-import java.util.function.Consumer;
 
-public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
-        extends HederaCall<com.hedera.sdk.proto.Transaction, TransactionResponse, TransactionId> {
+public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extends Builder {
     protected final com.hedera.sdk.proto.Transaction.Builder inner = com.hedera.sdk.proto.Transaction.newBuilder();
     protected final TransactionBody.Builder bodyBuilder = inner.getBodyBuilder();
 
@@ -86,57 +83,47 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         return self();
     }
 
+    protected abstract MethodDescriptor<com.hedera.sdk.proto.Transaction, TransactionResponse> getMethod();
+
     protected abstract void doValidate();
 
-    @Override
-    public final void validate() {
-        var bodyBuilder = this.bodyBuilder;
-        require(bodyBuilder.hasTransactionID(), ".setTransactionId() required");
-        require(bodyBuilder.hasNodeAccountID(), ".setNodeAccount() required");
-        doValidate();
-        checkValidationErrors("transaction builder failed validation");
-    }
-
-    @Override
-    protected Channel getChannel() {
-        Objects.requireNonNull(client, "TransactionBuilder.client must not be null in normal usage");
-        return client.getChannel()
-            .getChannel();
-    }
-
-    @Override
     public final com.hedera.sdk.proto.Transaction toProto() {
         return build().toProto();
     }
 
-    public final Transaction build() {
-        Objects.requireNonNull(client, "TransactionBuilder.client must not be null in normal usage");
-
-        if (client.getOperatorKey() == null) {
-            throw new IllegalStateException("Client.setOperator() is required to implicitly sign transactions");
-        }
-
-        return sign(client.getOperatorKey());
+    @Override
+    protected void validate() {
+        doValidate();
+        checkValidationErrors("transaction builder failed validation");
     }
 
-    public final Transaction sign(Ed25519PrivateKey privateKey) {
-        Objects.requireNonNull(client, "TransactionBuilder.client must not be null in normal usage");
+    public final Transaction build() {
+        validate();
 
-        var channel = client.getChannel();
+        var channel = client == null ? null : client.getChannel();
 
-        if (!bodyBuilder.hasNodeAccountID()) {
+        if (!bodyBuilder.hasNodeAccountID() && channel != null) {
             bodyBuilder.setNodeAccountID(channel.accountId.toProto());
         }
 
-        if (!bodyBuilder.hasTransactionID() && client.getOperatorId() != null) {
+        if (!bodyBuilder.hasTransactionID() && client != null && client.getOperatorId() != null) {
             bodyBuilder.setTransactionID(new TransactionId(client.getOperatorId()).toProto());
         }
 
-        validate();
+        var tx = new Transaction(channel, inner, getMethod());
 
-        return new Transaction(channel, inner, getMethod()).sign(privateKey);
+        if (client != null && client.getOperatorKey() != null) {
+            tx.sign(client.getOperatorKey());
+        }
+
+        return tx;
     }
 
+    public final Transaction sign(Ed25519PrivateKey privateKey) {
+        return build().sign(privateKey);
+    }
+
+    // FIXME: Remove this and figure out a better method for tests
     protected final Transaction testSign(Ed25519PrivateKey privateKey) {
         validate();
         return new Transaction(null, inner, getMethod()).sign(privateKey);
@@ -149,29 +136,15 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         return (T) this;
     }
 
-    /** Execute the transaction and immediately get its receipt which may not be available yet. */
+    public final TransactionId execute() throws HederaException {
+        return build().execute();
+    }
+
     public final TransactionReceipt executeForReceipt() throws HederaException {
         return build().executeForReceipt();
     }
 
-    public void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<Throwable> onFailure) {
-        build().executeForReceiptAsync(onSuccess, onFailure);
-    }
-
     public TransactionRecord executeForRecord() throws HederaException {
         return build().executeForRecord();
-    }
-
-    public void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<Throwable> onFailure) {
-        build().executeForRecordAsync(onSuccess, onFailure);
-    }
-
-    @Override
-    protected TransactionId mapResponse(TransactionResponse response) throws HederaException {
-        HederaException.throwIfExceptional(response.getNodeTransactionPrecheckCode());
-        return new TransactionId(
-                inner.getBody()
-                    .getTransactionIDOrBuilder()
-        );
     }
 }
