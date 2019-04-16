@@ -11,7 +11,7 @@ class TransactionRecordQueryTest extends Specification {
 
 	def paymentTxn = new CryptoTransferTransaction().with {
 		transactionId = new TransactionId(new AccountId(1234), Instant.parse("2019-04-05T12:00:00Z"))
-		nodeAccount = new AccountId(3)
+		nodeAccountId = new AccountId(3)
 		addSender(new AccountId(1234), 10000)
 		addRecipient(new AccountId(3), 10000)
 		testSign(privateKey)

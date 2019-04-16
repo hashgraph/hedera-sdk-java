@@ -15,9 +15,9 @@ class AccountAddClaimTransactionTest extends Specification {
 	def hash = [1, 2, 2, 3, 3, 3] as byte[]
 
 	def tx = new AccountAddClaimTransaction().with {
-		setNodeAccount(new AccountId(3))
+		setNodeAccountId(new AccountId(3))
 		setTransactionId(new TransactionId(new AccountId(1234), Instant.parse("2019-04-08T07:04:00Z")))
-		setAccount(account)
+		setAccountId(account)
 		setHash(hash)
 		addKey(key.publicKey)
 	}
@@ -40,9 +40,6 @@ body {
     seconds: 120
   }
   cryptoAddClaim {
-    accountID {
-      accountNum: 1000
-    }
     claim {
       accountID {
         accountNum: 1000
@@ -60,7 +57,7 @@ sigs {
   sigs {
     signatureList {
       sigs {
-        ed25519: "\\023\\242\\274\\a\\320I2R\\234\\\\\\253\\230Dr\\230?M\\273Fsf\\322\\001i7\\002m\\376\\331\$vae1\\326+\\267J\\006\\251\\002jh\\271c!\\bG\\213\\374\\225S\\377\\033\\302,\\233\\207\\210\\017n\\314%\\001"
+        ed25519: "\\2317\\344\\0278u\\006\\223\\212\\317lj{\\343,\\301\\301\\266\\002!08ty\\355\\303\\344\\302W\\266xa\\'\\316\\0312\\316\\035][\\017\\001;\\363rt\\234\\"\\262\\022\\336\\b\\343\\240\\200\\257_&\\200\\217f\\006\\305\\006"
       }
     }
   }
@@ -69,7 +66,7 @@ sigs {
 
 	def "correct transaction validates"() {
 		when:
-		tx.validate()
+		tx.build()
 
 		then:
 		notThrown(IllegalArgumentException)
@@ -80,21 +77,21 @@ sigs {
 		def tx = new AccountAddClaimTransaction()
 
 		when:
-		tx.validate()
+		tx.build()
 
 		then:
 		def e = thrown(IllegalStateException)
 		e.message == """transaction builder failed validation:
 .setTransactionId() required
-.setNodeAccount() required
-.setAccount() required
+.setNodeAccountId() required
+.setAccountId() required
 .setHash() required
 .addKey() required"""
 	}
 
 	def "transaction builds correctly"() {
 		when:
-		def builtTx = tx.testSign(key).toProto()
+		def builtTx = tx.sign(key).toProto()
 
 		then:
 		builtTx.toString() == txString

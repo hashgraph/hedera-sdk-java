@@ -107,29 +107,31 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
             throws HederaException {
         var id = execute();
         T response = null;
-        ResponseCodeEnum receiptStatus = ResponseCodeEnum.UNRECOGNIZED;
+        ResponseCodeEnum receiptStatus;
 
         for (int attempt = 1; attempt < MAX_ATTEMPTS; attempt++) {
             response = execute.apply(id);
-
             receiptStatus = mapReceipt.apply(response)
                 .getStatus();
 
             if (receiptStatus == ResponseCodeEnum.UNKNOWN) {
+                // If the receipt is UNKNOWN this means that the server has not finished
+                // processing the transaction
+
                 try {
                     Thread.sleep(500 * attempt);
-                    continue;
                 } catch (InterruptedException e) {
                     break;
                 }
+            } else {
+                // Otherwise either the receipt is SUCCESS or there is something _exceptional_ wrong
+
+                HederaException.throwIfExceptional(receiptStatus);
+                break;
             }
-
-            HederaException.throwIfExceptional(receiptStatus);
-
-            break;
         }
 
-        return response;
+        return Objects.requireNonNull(response);
     }
 
     public final TransactionReceipt executeForReceipt() throws HederaException {

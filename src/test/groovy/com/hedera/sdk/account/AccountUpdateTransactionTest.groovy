@@ -18,7 +18,7 @@ class AccountUpdateTransactionTest extends Specification {
 		e.message == """\
 transaction builder failed validation:
 .setTransactionId() required
-.setNodeAccount() required
+.setNodeAccountId() required
 .setAccountForUpdate() required
 .setKey() required"""
 	}
@@ -30,7 +30,7 @@ transaction builder failed validation:
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new AccountUpdateTransaction().with(true, {
 			setKey(key.getPublicKey())
-			nodeAccount = new AccountId(3)
+			nodeAccountId = new AccountId(3)
 			transactionId = txId
 			accountForUpdate = new AccountId(2)
 			proxyAccount = new AccountId(3)

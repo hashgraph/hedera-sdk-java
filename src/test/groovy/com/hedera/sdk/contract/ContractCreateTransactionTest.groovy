@@ -19,7 +19,7 @@ class ContractCreateTransactionTest extends Specification {
 		e.message == """\
 transaction builder failed validation:
 .setTransactionId() required
-.setNodeAccount() required
+.setNodeAccountId() required
 .setBytecodeFile() required"""
 	}
 
@@ -29,20 +29,19 @@ transaction builder failed validation:
 		def key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962")
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new ContractCreateTransaction().with(true, {
-			nodeAccount = new AccountId(3)
+			nodeAccountId = new AccountId(3)
 			transactionId = txId
 			bytecodeFile = new FileId(1, 2, 3)
 			adminKey = key.getPublicKey()
 			gas = 10
 			initialBalance = 1000
-			proxyAccount = new AccountId(4)
-			proxyFraction = 5
+			proxyAccountId = new AccountId(4)
 			autoRenewPeriod = Duration.ofHours(7)
 			constructorParams = [10, 11, 12, 13, 425]
 			shard = 20
 			realm = 40
 			newRealmAdminKey = key.getPublicKey()
-		}).testSign(key).toProto()
+		}).sign(key).toProto()
 
 		then:
 		tx.toString() == """\
@@ -76,7 +75,6 @@ body {
     proxyAccountID {
       accountNum: 4
     }
-    proxyFraction: 5
     autoRenewPeriod {
       seconds: 25200
     }
@@ -96,7 +94,7 @@ sigs {
   sigs {
     signatureList {
       sigs {
-        ed25519: "\\235\\3138sY\\215\\000\\322\\251\\372\\245\\320f\\276\\304\\234\\274\\261\\006\\341{^w\\327\\230\\3537\\326|\\357~\\242m\\313\\376<\\023\\031\\252\\345`m\\346\\362&\\265\\'+\\371\\230\\357\\330#;\\a\\200F\\214\\374\\330\\266\\363S\\016"
+        ed25519: "\\366\\374B\\345`Z=e\\266\\021\\303z\\221\\234#\\250\\214\\203;\\243]\\230\\2543\\274\\253F\\262\\026\\036\\372:\\240\\323H6\\f\\315\\315\\357\\027\\267\\341`o\\002\\331\\fA\\352\\223a\\0007\\317\\023\\351u\\022\\f\\033\\024\\211\\b"
       }
     }
   }

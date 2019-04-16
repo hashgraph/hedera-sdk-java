@@ -26,9 +26,7 @@ public final class CreateAccount {
         // This will wait for the receipt to become available
         var receipt = tx.executeForReceipt();
 
-        var newAccountId = Objects.requireNonNull(
-            receipt.getAccountId()
-        );
+        var newAccountId = Objects.requireNonNull(receipt.getAccountId());
 
         System.out.println("account = " + newAccountId);
     }

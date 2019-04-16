@@ -30,7 +30,7 @@ public final class TransferCrypto {
 
         var txId = new TransactionId(new AccountId(3));
         var tx = new CryptoTransferTransaction(client).setTransactionId(txId)
-            .setNodeAccount(node)
+            .setNodeAccountId(node)
             /// value must be positive for both send and receive
             .addSender(operator, 100000)
             .addRecipient(recipient, 100000)
@@ -59,7 +59,7 @@ public final class TransferCrypto {
         Thread.sleep(4000);
 
         // Next we get the balance after the transaction
-        var txPayment = new CryptoTransferTransaction(client).setNodeAccount(node)
+        var txPayment = new CryptoTransferTransaction(client).setNodeAccountId(node)
             .setTransactionId(new TransactionId(node))
             .addSender(operator, 100000)
             .addRecipient(node, 100000)

@@ -26,7 +26,7 @@ public final class UpdateAccountPublicKey {
 
         var txId = new TransactionId(new AccountId(2));
         var tx = new AccountCreateTransaction(client).setTransactionId(txId)
-            .setNodeAccount(new AccountId(3))
+            .setNodeAccountId(new AccountId(3))
             .setKey(originalKey.getPublicKey())
             .sign(operatorKey);
 
@@ -47,7 +47,7 @@ public final class UpdateAccountPublicKey {
         var newKey = Ed25519PrivateKey.generate();
         txId = new TransactionId(new AccountId(6));
         tx = new AccountUpdateTransaction(client).setTransactionId(txId)
-            .setNodeAccount(new AccountId(3))
+            .setNodeAccountId(new AccountId(3))
             .setAccountForUpdate(newAccountId)
             .setKey(newKey.getPublicKey())
             // sign as the transaction payer

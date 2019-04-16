@@ -10,7 +10,7 @@ class TransactionReceiptQueryTest extends Specification {
 	def privateKey = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962")
 
 	def paymentTxn = new CryptoTransferTransaction().with {
-		nodeAccount = new AccountId(3)
+		nodeAccountId = new AccountId(3)
 		transactionId = new TransactionId(new AccountId(1234), Instant.parse("2019-04-05T12:00:00Z"))
 		addSender(new AccountId(1234), 10000)
 		addRecipient(new AccountId(3), 10000)
@@ -99,7 +99,7 @@ transactionGetReceipt {
 
 		then:
 		def e = thrown(IllegalStateException)
-		e.message == "query builder failed validation:\n.setPayment() required\n.setTransactionId() required"
+		e.message == "query builder failed validation:\n.setTransactionId() required"
 	}
 
 	def "query builds correctly"() {

@@ -45,7 +45,7 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
         return this;
     }
 
-    public ContractCreateTransaction setProxyAccount(AccountId proxyAccountId) {
+    public ContractCreateTransaction setProxyAccountId(AccountId proxyAccountId) {
         builder.setProxyAccountID(proxyAccountId.toProto());
         return this;
     }

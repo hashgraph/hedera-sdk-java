@@ -17,7 +17,7 @@ class AccountCreateTransactionTest extends Specification {
 		e.message == """\
 transaction builder failed validation:
 .setTransactionId() required
-.setNodeAccount() required
+.setNodeAccountId() required
 .setKey() required"""
 	}
 
@@ -27,16 +27,14 @@ transaction builder failed validation:
 		def key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962")
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new AccountCreateTransaction().with(true, {
-			setNodeAccount(new AccountId(3))
+			setNodeAccountId(new AccountId(3))
 			setTransactionId(new TransactionId(new AccountId(1234), Instant.parse("2019-04-08T07:04:00Z")))
 			setKey(key.getPublicKey())
 			transactionId = txId
 			initialBalance = 450
-			proxyAccount = new AccountId(1020)
-			proxyFraction = 10
-			maxReceiveProxyFraction = 20
+			proxyAccountId = new AccountId(1020)
 			receiverSignatureRequired = true
-		}).testSign(key)
+		}).sign(key)
 
 		then:
 		tx.toProto().toString() == """\
@@ -64,11 +62,12 @@ body {
     proxyAccountID {
       accountNum: 1020
     }
-    proxyFraction: 10
-    maxReceiveProxyFraction: 20
     sendRecordThreshold: 9223372036854775807
     receiveRecordThreshold: 9223372036854775807
     receiverSigRequired: true
+    autoRenewPeriod {
+      seconds: 2592000
+    }
     shardID {
     }
     realmID {
@@ -79,7 +78,7 @@ sigs {
   sigs {
     signatureList {
       sigs {
-        ed25519: "\\216\\032iU\\201M\\207\\f\\352q\\252\\345?\\005M\\243bl\\246\\204\\310\$D\\375g00\\251q[\\3036\\262\\261c\\220\\250\\030\\245\\200\\016\\020/*4\\201\\v\\244\\261\\307\\031\\311#\\257\\272f\\250\\335\\031:C\\242\\320\\002"
+        ed25519: "\\377V\\005\\354I\\346\\303\\366\\306\\342\\366\\246a\\257\\235^\\302qII\\227\\220%S\\204\\367/\\207^\\373s\\215rkU\\235\\260z\\363\\355\\254\\353Rb\\255\\315c9\\n\\357\\225\\221\\263bQ\\r\\360(G\\335\\017\\232\\260\\005"
       }
     }
   }

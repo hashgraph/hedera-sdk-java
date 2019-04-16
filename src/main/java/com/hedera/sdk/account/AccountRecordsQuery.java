@@ -31,7 +31,7 @@ public class AccountRecordsQuery extends QueryBuilder<CryptoGetAccountRecordsRes
 
     @Override
     protected void doValidate() {
-        require(builder.hasAccountID(), ".setAccount() required");
+        require(builder.hasAccountID(), ".setAccountId() required");
     }
 
     @Override

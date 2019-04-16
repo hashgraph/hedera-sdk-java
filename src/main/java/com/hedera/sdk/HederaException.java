@@ -23,7 +23,7 @@ public class HederaException extends Exception {
     }
 
     @Override
-    public String toString() {
-        return "HederaException{" + "responseCode=" + responseCode + '}';
+    public String getMessage() {
+        return responseCode.toString();
     }
 }

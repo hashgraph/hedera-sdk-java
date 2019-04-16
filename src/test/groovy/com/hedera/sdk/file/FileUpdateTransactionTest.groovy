@@ -11,14 +11,15 @@ import java.time.Instant
 class FileUpdateTransactionTest extends Specification {
 	def "Empty builder fails validation"() {
 		when:
-		new FileUpdateTransaction().validate()
+		new FileUpdateTransaction().build()
 
 		then:
 		def e = thrown(IllegalStateException)
+		println(e)
 		e.message == """\
 transaction builder failed validation:
 .setTransactionId() required
-.setNodeAccount() required
+.setNodeAccountId() required
 .setFileId()
 .addKey()"""
 	}
@@ -29,7 +30,7 @@ transaction builder failed validation:
 		def key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962")
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new FileUpdateTransaction().with(true, {
-			nodeAccount = new AccountId(3)
+			nodeAccountId = new AccountId(3)
 			transactionId = txId
 			file = new FileId(1, 2, 3)
 			expirationTime = Instant.ofEpochSecond(1554158728)

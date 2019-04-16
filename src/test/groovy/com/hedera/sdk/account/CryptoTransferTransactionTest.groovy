@@ -17,7 +17,7 @@ class CryptoTransferTransactionTest extends Specification {
 		e.message == """\
 transaction builder failed validation:
 .setTransactionId() required
-.setNodeAccount() required
+.setNodeAccountId() required
 at least one transfer required"""
 	}
 
@@ -28,7 +28,7 @@ at least one transfer required"""
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new CryptoTransferTransaction().with(true, {
 			transactionId = txId
-			nodeAccount = new AccountId(2)
+			nodeAccountId = new AccountId(2)
 			addSender(new AccountId(4), 800)
 			addRecipient(new AccountId(55), 400)
 			addTransfer(new AccountId(78), 400)

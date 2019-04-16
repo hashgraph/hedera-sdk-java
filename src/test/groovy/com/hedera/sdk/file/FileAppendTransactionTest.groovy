@@ -19,7 +19,7 @@ class FileAppendTransactionTest extends Specification {
 		def e = thrown(IllegalStateException)
 		e.message == """transaction builder failed validation:
 .setTransactionId() required
-.setNodeAccount() required
+.setNodeAccountId() required
 .setFileId() required
 .setContents() required"""
 	}
@@ -27,7 +27,7 @@ class FileAppendTransactionTest extends Specification {
 	def "complete builder does validate"() {
 		when:
 		def txn = new FileAppendTransaction()
-				.setNodeAccount(new AccountId(3))
+				.setNodeAccountId(new AccountId(3))
 				.setTransactionId(new TransactionId(new AccountId(1234), Instant.parse("2019-04-05T12:00:00Z")))
 				.setFileId(new FileId(1, 2, 3))
 				.setContents([1, 2, 3, 4] as byte[])
@@ -40,7 +40,7 @@ class FileAppendTransactionTest extends Specification {
 	def "complete builder serializes"() {
 		when:
 		def txn = new FileAppendTransaction()
-				.setNodeAccount(new AccountId(3))
+				.setNodeAccountId(new AccountId(3))
 				.setTransactionId(new TransactionId(new AccountId(1234), Instant.parse("2019-04-05T12:00:00Z")))
 				.setFileId(new FileId(1, 2, 3))
 				.setContents([1, 2, 3, 4] as byte[])

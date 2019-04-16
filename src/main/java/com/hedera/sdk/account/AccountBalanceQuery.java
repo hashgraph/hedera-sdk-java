@@ -31,7 +31,7 @@ public final class AccountBalanceQuery extends QueryBuilder<CryptoGetAccountBala
 
     @Override
     protected void doValidate() {
-        require(builder.hasAccountID(), ".setAccount() required");
+        require(builder.hasAccountID(), ".setAccountId() required");
     }
 
     @Override

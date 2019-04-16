@@ -31,7 +31,7 @@ public class AccountStakersQuery extends QueryBuilder<CryptoGetStakersResponse> 
 
     @Override
     protected void doValidate() {
-        require(builder.hasAccountID(), ".setAccount() required");
+        require(builder.hasAccountID(), ".setAccountId() required");
     }
 
     @Override

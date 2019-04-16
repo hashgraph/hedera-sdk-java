@@ -25,7 +25,7 @@ public final class AccountAddClaimTransaction extends TransactionBuilder<Account
         super(null);
     }
 
-    public AccountAddClaimTransaction setAccount(AccountId id) {
+    public AccountAddClaimTransaction setAccountId(AccountId id) {
         // fixme: not sure if both need to be used
         var protoId = id.toProto();
         claim.setAccountID(protoId);
@@ -44,6 +44,7 @@ public final class AccountAddClaimTransaction extends TransactionBuilder<Account
 
     @Override
     protected void doValidate() {
+        require(claim.hasAccountID(), ".setAccountId() required");
         require(claim.getHash(), ".setHash() required");
         require(
             claim.getKeysOrBuilder()

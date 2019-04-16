@@ -29,7 +29,7 @@ public final class AppendToFile {
         var txId = new TransactionId(new AccountId(2));
 
         var fileTx = new FileCreateTransaction(client).setTransactionId(txId)
-            .setNodeAccount(node)
+            .setNodeAccountId(node)
             .setExpirationTime(
                 Instant.now()
                     .plus(Duration.ofSeconds(2592000))
@@ -57,7 +57,7 @@ public final class AppendToFile {
         var appendFileTxId = new TransactionId(new AccountId(2));
 
         var appendFileTx = new FileAppendTransaction(client).setTransactionId(appendFileTxId)
-            .setNodeAccount(node)
+            .setNodeAccountId(node)
             .setContents(additionalFileContents)
             // first signature is the owner of the file
             .sign(operatorKey)

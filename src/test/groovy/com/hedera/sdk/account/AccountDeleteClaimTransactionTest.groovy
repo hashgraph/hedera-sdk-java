@@ -17,7 +17,7 @@ class AccountDeleteClaimTransactionTest extends Specification {
 		e.message == """\
 transaction builder failed validation:
 .setTransactionId() required
-.setNodeAccount() required
+.setNodeAccountId() required
 .setAccountToDeleteFrom() required
 .setHashToDelete() required"""
 	}
@@ -29,7 +29,7 @@ transaction builder failed validation:
 		def txId = new TransactionId(new AccountId(2), now)
 		def tx = new AccountDeleteClaimTransaction().with(true, {
 			transactionId = txId
-			nodeAccount = new AccountId(3)
+			nodeAccountId = new AccountId(3)
 			accountToDeleteFrom = new AccountId(4)
 			hashToDelete = [4, 2, 1, 5]
 		}).testSign(key)
@@ -63,7 +63,7 @@ sigs {
   sigs {
     signatureList {
       sigs {
-        ed25519: "\\026\\nq\\314\\212-~\\363\\363?\\210Jj\\314\\256\\214\\244|\\030\\205of8\\226*0\\304\\312x\\242&\\336\\3443\\205Dx\\366\\252\\340\\352\\303\\254\\316]R\\333fU+\\255\\274\\356\\326\\314\\211\\272\\320\\201\\027\\347\\3205\\005"
+        ed25519: "\\2167\\344\\314\\366\\213\\271\\274\\267\\207\\337\\222\\371}\\332D\\r\\217k\\351\\200w@\\3353`\\031A\\215h\\352:\\226\\027p]\\313\\216\\024\\225\\373\\337\\330\\024\\033\\214_5\\255\\247\\330`\\247U\\371\\253\\233\\213\\324\\361\\207}\\357\\t"
       }
     }
   }

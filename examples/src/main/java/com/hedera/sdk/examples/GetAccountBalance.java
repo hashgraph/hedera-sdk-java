@@ -28,7 +28,7 @@ public final class GetAccountBalance {
         var client = new Client(Map.of(node, network));
 
         // Account balance query requires 100,000 tinybar
-        var txPayment = new CryptoTransferTransaction(client).setNodeAccount(node)
+        var txPayment = new CryptoTransferTransaction(client).setNodeAccountId(node)
             .setTransactionId(new TransactionId(node))
             .addSender(operator, 100000)
             .addRecipient(node, 100000)

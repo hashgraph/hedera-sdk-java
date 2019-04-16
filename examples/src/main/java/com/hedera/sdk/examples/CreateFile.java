@@ -29,7 +29,7 @@ public final class CreateFile {
         var txId = new TransactionId(new AccountId(2));
 
         var tx = new FileCreateTransaction(client).setTransactionId(txId)
-            .setNodeAccount(new AccountId(3))
+            .setNodeAccountId(new AccountId(3))
             .setExpirationTime(
                 Instant.now()
                     .plus(Duration.ofSeconds(2592000))

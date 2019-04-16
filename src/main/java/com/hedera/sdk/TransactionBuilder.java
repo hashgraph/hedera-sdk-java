@@ -37,7 +37,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
     }
 
     /** Sets the account of the node that submits the transaction to the network. */
-    public final T setNodeAccount(AccountId accountId) {
+    public final T setNodeAccountId(AccountId accountId) {
         bodyBuilder.setNodeAccountID(accountId.inner);
         return self();
     }
@@ -93,23 +93,35 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
 
     @Override
     protected void validate() {
+        var bodyBuilder = this.bodyBuilder;
+
+        if (client == null || client.getOperatorId() == null) {
+            require(bodyBuilder.hasTransactionID(), ".setTransactionId() required");
+        }
+
+        if (client == null || client.getOperatorId() == null) {
+            require(bodyBuilder.hasNodeAccountID(), ".setNodeAccountId() required");
+        }
+
         doValidate();
         checkValidationErrors("transaction builder failed validation");
     }
 
     public final Transaction build() {
-        validate();
-
-        var channel = client == null ? null : client.getChannel();
-
-        if (!bodyBuilder.hasNodeAccountID() && channel != null) {
-            bodyBuilder.setNodeAccountID(channel.accountId.toProto());
+        if (!bodyBuilder.hasNodeAccountID() && client != null && client.getOperatorId() != null) {
+            bodyBuilder.setNodeAccountID(
+                client.getOperatorId()
+                    .toProto()
+            );
         }
 
         if (!bodyBuilder.hasTransactionID() && client != null && client.getOperatorId() != null) {
             bodyBuilder.setTransactionID(new TransactionId(client.getOperatorId()).toProto());
         }
 
+        validate();
+
+        var channel = client == null ? null : client.getChannel();
         var tx = new Transaction(channel, inner, getMethod());
 
         if (client != null && client.getOperatorKey() != null) {
@@ -142,9 +154,5 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
 
     public final TransactionReceipt executeForReceipt() throws HederaException {
         return build().executeForReceipt();
-    }
-
-    public TransactionRecord executeForRecord() throws HederaException {
-        return build().executeForRecord();
     }
 }

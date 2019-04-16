@@ -39,7 +39,7 @@ public final class AccountClaimQuery extends QueryBuilder<CryptoGetClaimResponse
 
     @Override
     protected void doValidate() {
-        require(builder.hasAccountID(), ".setAccount() required");
+        require(builder.hasAccountID(), ".setAccountId() required");
     }
 
     @Override
