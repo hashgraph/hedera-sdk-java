@@ -113,8 +113,7 @@ public final class Client {
     }
 
     public TransactionId transferCryptoTo(AccountId recipient, long amount) throws HederaException {
-        return new CryptoTransferTransaction(this)
-            .addSender(Objects.requireNonNull(operatorId), amount)
+        return new CryptoTransferTransaction(this).addSender(Objects.requireNonNull(operatorId), amount)
             .addRecipient(recipient, amount)
             .execute();
     }

@@ -1,11 +1,8 @@
 package com.hedera.sdk.examples.simple;
 
 import com.hedera.sdk.*;
-import com.hedera.sdk.account.AccountCreateTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.sdk.examples.ExampleHelper;
-
-import java.util.Objects;
 
 public final class CreateAccount {
     public static void main(String[] args) throws HederaException {

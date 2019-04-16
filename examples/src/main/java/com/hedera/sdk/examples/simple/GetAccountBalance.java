@@ -1,7 +1,6 @@
 package com.hedera.sdk.examples.simple;
 
 import com.hedera.sdk.HederaException;
-import com.hedera.sdk.account.AccountBalanceQuery;
 import com.hedera.sdk.examples.ExampleHelper;
 
 public final class GetAccountBalance {
