@@ -3,52 +3,33 @@ package com.hedera.sdk.examples;
 import com.hedera.sdk.*;
 import com.hedera.sdk.account.AccountCreateTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
-import io.github.cdimascio.dotenv.Dotenv;
 
-import java.util.Map;
 import java.util.Objects;
 
-@SuppressWarnings("Duplicates")
 public final class CreateAccount {
-    public static void main(String[] args) throws InterruptedException {
-        var env = Dotenv.load();
-
-        var operatorKey = Ed25519PrivateKey.fromString(Objects.requireNonNull(env.get("OPERATOR_SECRET")));
+    public static void main(String[] args) throws HederaException {
+        // Generate a Ed25519 private, public key pair
         var newKey = Ed25519PrivateKey.generate();
+        var newPublicKey = newKey.getPublicKey();
 
-        var network = Objects.requireNonNull(env.get("NETWORK"));
-        var node = AccountId.fromString(Objects.requireNonNull(env.get("NODE")));
+        System.out.println("private key = " + newKey);
+        System.out.println("public key = " + newPublicKey);
 
-        var client = new Client(Map.of(node, network));
+        var client = ExampleHelper.createHederaClient();
 
-        var txId = new TransactionId(new AccountId(2));
-        var tx = new AccountCreateTransaction(client).setTransactionId(txId)
-            .setNodeAccount(new AccountId(3))
+        var tx = new AccountCreateTransaction(client)
+            // The only _required_ property here is `key`
             .setKey(newKey.getPublicKey())
-            // default (from transaction id): .setShardId(0)
-            // default (from transaction id): .setRealmId(0)
-            // default: .setAutoRenewPeriod(Duration.ofSeconds(2_592_000))
-            // default: .setSendRecordThreshold(Long.MAX_VALUE)
-            // default: .setReceiveRecordThreshold(Long.MAX_VALUE)
-            // default: .setReceiverSignatureRequired(false)
-            // default: .setInitialBalance(0)
-            .sign(operatorKey);
+            .setGenerateRecord(true)
+            .setInitialBalance(1000);
 
-        TransactionReceipt receipt;
+        // This will wait for the receipt to become available
+        var receipt = tx.executeForReceipt();
 
-        try {
-            receipt = tx.executeForReceipt();
-        } catch (HederaException e) {
-            System.out.println("Failed to create account: " + e);
-            return;
-        }
+        var newAccountId = Objects.requireNonNull(
+            receipt.getAccountId()
+        );
 
-        var receiptStatus = receipt.getStatus();
-
-        System.out.println("status: " + receiptStatus.toString());
-
-        var newAccountId = receipt.getAccountId();
-        assert newAccountId != null;
-        System.out.println("new account num: " + newAccountId.getAccountNum());
+        System.out.println("account = " + newAccountId);
     }
 }
