@@ -31,7 +31,7 @@ public class TransactionRecordQuery extends QueryBuilder<TransactionRecord> {
 
     @Override
     protected TransactionRecord mapResponse(Response raw) throws HederaException {
-        return new TransactionRecord(raw);
+        return new TransactionRecord(raw.getTransactionGetRecord().getTransactionRecord());
     }
 
     @Override
