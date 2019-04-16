@@ -1,6 +1,7 @@
 package com.hedera.sdk;
 
-import com.hedera.sdk.account.AccountId;
+import com.hedera.sdk.account.*;
+import com.hedera.sdk.crypto.Key;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 
 import javax.annotation.Nonnegative;
@@ -19,6 +20,7 @@ public final class Client {
 
     @Nullable
     private AccountId operatorId;
+
     @Nullable
     private Ed25519PrivateKey operatorKey;
 
@@ -42,23 +44,23 @@ public final class Client {
         return this;
     }
 
-    public long getMaxTransactionFee() {
-        return maxTransactionFee;
-    }
-
     public Client setOperator(AccountId operatorId, Ed25519PrivateKey operatorKey) {
         this.operatorId = operatorId;
         this.operatorKey = operatorKey;
         return this;
     }
 
+    long getMaxTransactionFee() {
+        return maxTransactionFee;
+    }
+
     @Nullable
-    public AccountId getOperatorId() {
+    AccountId getOperatorId() {
         return operatorId;
     }
 
     @Nullable
-    public Ed25519PrivateKey getOperatorKey() {
+    Ed25519PrivateKey getOperatorKey() {
         return operatorKey;
     }
 
@@ -86,5 +88,27 @@ public final class Client {
         }
 
         return selectedChannel;
+    }
+
+    //
+    // Simplified interface intended for high-level, opinionated operation
+    //
+
+    public AccountId createAccount(Key publicKey, long initialBalance) throws HederaException {
+        var receipt = new AccountCreateTransaction(this).setKey(publicKey)
+            .setInitialBalance(initialBalance)
+            .executeForReceipt();
+
+        return Objects.requireNonNull(receipt.getAccountId());
+    }
+
+    public AccountInfo getAccount(AccountId id) throws HederaException {
+        return new AccountInfoQuery(this).setAccountId(id)
+            .execute();
+    }
+
+    public long getAccountBalance(AccountId id) throws HederaException {
+        return new AccountBalanceQuery(this).setAccountId(id)
+            .execute();
     }
 }
