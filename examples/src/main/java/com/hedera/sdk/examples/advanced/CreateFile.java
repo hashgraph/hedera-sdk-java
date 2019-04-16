@@ -1,13 +1,13 @@
-package com.hedera.sdk.examples;
+package com.hedera.sdk.examples.advanced;
 
 import com.hedera.sdk.*;
+import com.hedera.sdk.examples.ExampleHelper;
 import com.hedera.sdk.file.FileCreateTransaction;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
 
-@SuppressWarnings("Duplicates")
 public final class CreateFile {
     public static void main(String[] args) throws HederaException {
         var operatorKey = ExampleHelper.getOperatorKey();

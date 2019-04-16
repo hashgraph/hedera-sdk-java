@@ -8,26 +8,26 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.util.Map;
 import java.util.Objects;
 
-class ExampleHelper {
-    static Dotenv getEnv() {
+public class ExampleHelper {
+    private static Dotenv getEnv() {
         // Load configuration from the environment or a $projectRoot/.env file, if present
         // See .env.sample for an example of what it is looking for
         return Dotenv.load();
     }
 
-    static AccountId getNodeId() {
+    public static AccountId getNodeId() {
         return AccountId.fromString(Objects.requireNonNull(getEnv().get("NODE_ID")));
     }
 
-    static AccountId getOperatorId() {
+    public static AccountId getOperatorId() {
         return AccountId.fromString(Objects.requireNonNull(getEnv().get("OPERATOR_ID")));
     }
 
-    static Ed25519PrivateKey getOperatorKey() {
+    public static Ed25519PrivateKey getOperatorKey() {
         return Ed25519PrivateKey.fromString(Objects.requireNonNull(getEnv().get("OPERATOR_KEY")));
     }
 
-    static Client createHederaClient() {
+    public static Client createHederaClient() {
         // To connect to a network with more nodes, add additional entries to the network map
         var nodeAddress = Objects.requireNonNull(getEnv().get("NODE_ADDRESS"));
         var client = new Client(Map.of(getNodeId(), nodeAddress));

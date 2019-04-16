@@ -111,4 +111,11 @@ public final class Client {
         return new AccountBalanceQuery(this).setAccountId(id)
             .execute();
     }
+
+    public TransactionId transferCryptoTo(AccountId recipient, long amount) throws HederaException {
+        return new CryptoTransferTransaction(this)
+            .addSender(Objects.requireNonNull(operatorId), amount)
+            .addRecipient(recipient, amount)
+            .execute();
+    }
 }

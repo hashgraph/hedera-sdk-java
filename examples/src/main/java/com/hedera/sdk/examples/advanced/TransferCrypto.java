@@ -1,11 +1,10 @@
-package com.hedera.sdk.examples;
+package com.hedera.sdk.examples.advanced;
 
 import com.hedera.sdk.account.AccountId;
 import com.hedera.sdk.HederaException;
 import com.hedera.sdk.account.CryptoTransferTransaction;
+import com.hedera.sdk.examples.ExampleHelper;
 
-// Suppress duplicate warnings due to similar example patterns
-@SuppressWarnings("Duplicates")
 public final class TransferCrypto {
     public static void main(String[] args) throws HederaException {
         var operatorId = ExampleHelper.getOperatorId();

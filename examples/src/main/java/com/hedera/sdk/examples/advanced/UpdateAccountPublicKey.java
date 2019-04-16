@@ -1,11 +1,10 @@
-package com.hedera.sdk.examples;
+package com.hedera.sdk.examples.advanced;
 
 import com.hedera.sdk.*;
 import com.hedera.sdk.account.AccountUpdateTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
+import com.hedera.sdk.examples.ExampleHelper;
 
-// Ignore duplicate warnings since many examples will look similar
-@SuppressWarnings("Duplicates")
 public final class UpdateAccountPublicKey {
     public static void main(String[] args) throws HederaException {
         var client = ExampleHelper.createHederaClient();

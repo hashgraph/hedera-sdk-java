@@ -1,17 +1,14 @@
-package com.hedera.sdk.examples;
+package com.hedera.sdk.examples.simple;
 
 import com.hedera.sdk.HederaException;
 import com.hedera.sdk.account.AccountBalanceQuery;
+import com.hedera.sdk.examples.ExampleHelper;
 
-@SuppressWarnings("Duplicates")
 public final class GetAccountBalance {
     public static void main(String[] args) throws HederaException {
         var operatorId = ExampleHelper.getOperatorId();
         var client = ExampleHelper.createHederaClient();
-
-        var query = new AccountBalanceQuery(client).setAccountId(operatorId);
-
-        var balance = query.execute();
+        var balance = client.getAccountBalance(operatorId);
 
         System.out.println("balance = " + balance);
     }
