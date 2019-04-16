@@ -7,7 +7,7 @@ import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 // `CryptoGetAccountBalanceQuery`
-public final class AccountBalanceQuery extends QueryBuilder<CryptoGetAccountBalanceResponse> {
+public final class AccountBalanceQuery extends QueryBuilder<Long> {
     private final CryptoGetAccountBalanceQuery.Builder builder = inner.getCryptogetAccountBalanceBuilder();
 
     AccountBalanceQuery() {
@@ -39,7 +39,7 @@ public final class AccountBalanceQuery extends QueryBuilder<CryptoGetAccountBala
     }
 
     @Override
-    protected CryptoGetAccountBalanceResponse mapResponse(Response raw) throws HederaException {
-        return raw.getCryptogetAccountBalance();
+    protected Long mapResponse(Response raw) throws HederaException {
+        return raw.getCryptogetAccountBalance().getBalance();
     }
 }
