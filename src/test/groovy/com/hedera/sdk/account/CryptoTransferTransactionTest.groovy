@@ -36,51 +36,13 @@ at least one transfer required"""
 
 		then:
 		tx.toString() == """\
-body {
-  transactionID {
-    transactionValidStart {
-      seconds: 1554158542
-    }
-    accountID {
-      accountNum: 2
-    }
-  }
-  nodeAccountID {
-    accountNum: 2
-  }
-  transactionFee: 100000
-  transactionValidDuration {
-    seconds: 120
-  }
-  cryptoTransfer {
-    transfers {
-      accountAmounts {
-        accountID {
-          accountNum: 4
-        }
-        amount: -800
-      }
-      accountAmounts {
-        accountID {
-          accountNum: 55
-        }
-        amount: 400
-      }
-      accountAmounts {
-        accountID {
-          accountNum: 78
-        }
-        amount: 400
-      }
-    }
-  }
-}
 sigMap {
   sigPair {
     pubKeyPrefix: "\\344\\361\\300\\353L}\\315\\303\\347\\353\\021p\\263\\b\\212=\\022\\242\\227\\364\\243\\353\\342\\362\\205\\003\\375g5F\\355\\216"
     ed25519: "\\223\\347\\326q\\3477\\303\\307g+\\207\\252\\251N=},v\\337\\231i\\r\\201\\276Qn\\277\\227\\261\\257\\332\\201a\\003[\\320\\036\\310\\"\\353\\0338@\\216\\331w\\302\\300\\260\\276\\221\\330g\\300~\\234z\\247\\331\\031\\032\\300\\026\\006"
   }
 }
+bodyBytes: "\\n\\f\\n\\006\\b\\316\\247\\212\\345\\005\\022\\002\\030\\002\\022\\002\\030\\002\\030\\240\\215\\006\\"\\002\\bxr\\035\\n\\033\\n\\a\\n\\002\\030\\004\\020\\277\\f\\n\\a\\n\\002\\0307\\020\\240\\006\\n\\a\\n\\002\\030N\\020\\240\\006"
 """
 	}
 }
