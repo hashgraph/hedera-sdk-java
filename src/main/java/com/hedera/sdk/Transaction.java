@@ -15,6 +15,8 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
 
     private final io.grpc.MethodDescriptor<com.hedera.sdk.proto.Transaction, com.hedera.sdk.proto.TransactionResponse> methodDescriptor;
     private final com.hedera.sdk.proto.Transaction.Builder inner;
+    private final com.hedera.sdk.proto.AccountID nodeAccountId;
+    private final com.hedera.sdk.proto.TransactionID transactionId;
 
     @Nullable
     private final Client client;
@@ -22,11 +24,15 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
     Transaction(
         @Nullable Client client,
         com.hedera.sdk.proto.Transaction.Builder inner,
+        com.hedera.sdk.proto.AccountID nodeAccountId,
+        com.hedera.sdk.proto.TransactionID transactionId,
         MethodDescriptor<com.hedera.sdk.proto.Transaction, TransactionResponse> methodDescriptor
     ) {
         super();
-        this.inner = inner;
         this.client = client;
+        this.inner = inner;
+        this.nodeAccountId = nodeAccountId;
+        this.transactionId = transactionId;
         this.methodDescriptor = methodDescriptor;
     }
 
@@ -64,18 +70,11 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
         return methodDescriptor;
     }
 
-    private AccountId getNodeAccountId() {
-        return new AccountId(
-                inner.getBody()
-                    .getNodeAccountID()
-        );
-    }
-
     @Override
     protected Channel getChannel() {
         Objects.requireNonNull(client, "Transaction.client must be non-null in regular use");
 
-        var channel = client.getNodeForId(getNodeAccountId());
+        var channel = client.getNodeForId(new AccountId(nodeAccountId));
         Objects.requireNonNull(channel, "Transaction.nodeAccountId not found on Client");
 
         return channel.getChannel();
@@ -84,10 +83,7 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
     @Override
     protected TransactionId mapResponse(TransactionResponse response) throws HederaException {
         HederaException.throwIfExceptional(response.getNodeTransactionPrecheckCode());
-        return new TransactionId(
-                inner.getBody()
-                    .getTransactionIDOrBuilder()
-        );
+        return new TransactionId(transactionId);
     }
 
     private <T> T executeAndWaitFor(CheckedFunction<TransactionId, T, HederaException> execute, Function<T, TransactionReceipt> mapReceipt)

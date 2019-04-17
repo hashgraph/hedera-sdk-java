@@ -126,7 +126,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
             bodyBuilder.build()
                 .toByteString()
         );
-        var tx = new Transaction(client, inner, getMethod());
+        var tx = new Transaction(client, inner, bodyBuilder.getNodeAccountID(), bodyBuilder.getTransactionID(), getMethod());
 
         if (client != null && client.getOperatorKey() != null) {
             tx.sign(client.getOperatorKey());
