@@ -55,6 +55,11 @@ public class ContractCallQuery extends QueryBuilder<FunctionResult> {
         return this;
     }
 
+    public ContractCallQuery setFunctionParameters(CallParams<CallParams.Function> parameters) {
+        builder.setFunctionParameters(parameters.toProto());
+        return this;
+    }
+
     public ContractCallQuery setMaxResultSize(long size) {
         builder.setMaxResultSize(size);
         return this;

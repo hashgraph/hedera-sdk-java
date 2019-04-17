@@ -62,6 +62,11 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
         return this;
     }
 
+    public ContractCreateTransaction setConstructorParams(CallParams<CallParams.Constructor> constructorParams) {
+        builder.setConstructorParameters(constructorParams.toProto());
+        return this;
+    }
+
     public ContractCreateTransaction setShard(long shardId) {
         builder.setShardID(
             ShardID.newBuilder()
