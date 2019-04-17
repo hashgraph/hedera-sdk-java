@@ -54,9 +54,10 @@ public final class CreateSimpleContract {
 
         // create the contract itself
         var contractTx = new ContractCreateTransaction(client).setAutoRenewPeriod(Duration.ofHours(1))
-            .setBytecodeFile(newFileId)
-            // own the contract so we can destroy it later
-            .setAdminKey(operatorKey.getPublicKey());
+            .setGas(117_000)
+            .setInitialBalance(1_000_000)
+            .setConstructorParams(new byte[0])
+            .setBytecodeFile(newFileId);
 
         var contractReceipt = contractTx.executeForReceipt();
 
