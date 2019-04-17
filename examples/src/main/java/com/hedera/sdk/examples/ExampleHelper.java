@@ -38,4 +38,26 @@ public class ExampleHelper {
 
         return client;
     }
+
+    public static byte[] parseHex(String hex) {
+        var len = hex.length();
+        var data = new byte[len / 2];
+
+        var i = 0;
+
+        //noinspection NullableProblems
+        for (var c : (Iterable<Integer>) hex.chars()::iterator) {
+            if ((i % 2) == 0) {
+                // high nibble
+                data[i / 2] = (byte) (Character.digit(c, 16) << 4);
+            } else {
+                // low nibble
+                data[i / 2] &= (byte) Character.digit(c, 16);
+            }
+
+            i++;
+        }
+
+        return data;
+    }
 }
