@@ -1,7 +1,6 @@
 package com.hedera.sdk.account;
 
 import com.hedera.sdk.Client;
-import com.hedera.sdk.HederaException;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
@@ -41,7 +40,7 @@ public final class AccountInfoQuery extends QueryBuilder<AccountInfo> {
     }
 
     @Override
-    protected AccountInfo mapResponse(Response raw) throws HederaException {
+    protected AccountInfo fromResponse(Response raw) {
         return new AccountInfo(raw);
     }
 }

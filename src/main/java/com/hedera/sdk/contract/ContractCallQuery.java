@@ -29,7 +29,7 @@ public class ContractCallQuery extends QueryBuilder<FunctionResult> {
     }
 
     @Override
-    protected FunctionResult mapResponse(Response raw) throws HederaException {
+    protected FunctionResult fromResponse(Response raw) {
         if (!raw.hasContractCallLocal()) {
             throw new IllegalArgumentException("response was not `ContractCallLocal`");
         }

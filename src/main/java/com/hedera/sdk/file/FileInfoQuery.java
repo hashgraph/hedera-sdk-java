@@ -1,7 +1,6 @@
 package com.hedera.sdk.file;
 
 import com.hedera.sdk.Client;
-import com.hedera.sdk.HederaException;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
@@ -34,7 +33,7 @@ public class FileInfoQuery extends QueryBuilder<FileInfo> {
     }
 
     @Override
-    protected FileInfo mapResponse(Response raw) throws HederaException {
+    protected FileInfo fromResponse(Response raw) {
         return new FileInfo(raw);
     }
 
