@@ -28,45 +28,13 @@ class TransactionRecordQueryTest extends Specification {
 transactionGetRecord {
   header {
     payment {
-      body {
-        transactionID {
-          transactionValidStart {
-            seconds: 1554465600
-          }
-          accountID {
-            accountNum: 1234
-          }
-        }
-        nodeAccountID {
-          accountNum: 3
-        }
-        transactionFee: 100000
-        transactionValidDuration {
-          seconds: 120
-        }
-        cryptoTransfer {
-          transfers {
-            accountAmounts {
-              accountID {
-                accountNum: 1234
-              }
-              amount: -10000
-            }
-            accountAmounts {
-              accountID {
-                accountNum: 3
-              }
-              amount: 10000
-            }
-          }
-        }
-      }
       sigMap {
         sigPair {
           pubKeyPrefix: "\\344\\361\\300\\353L}\\315\\303\\347\\353\\021p\\263\\b\\212=\\022\\242\\227\\364\\243\\353\\342\\362\\205\\003\\375g5F\\355\\216"
           ed25519: "\\304B\\017\\242d=\\273\\3439\\305\\034\\224\\203#\\\\\\261\\343fa\\002]\\351\\\\\\036\\326\\327\\v\\037\\324\\317~\\020\\2371O\\020j\\377]\\261\\300\\216\\377n\\210\\264\\204?\\320\\001<\\225\\035E\\263&\\244 \\017\\207/\\332\\355\\017"
         }
       }
+      bodyBytes: "\\n\\r\\n\\006\\b\\300\\206\\235\\345\\005\\022\\003\\030\\322\\t\\022\\002\\030\\003\\030\\240\\215\\006\\"\\002\\bxr\\027\\n\\025\\n\\t\\n\\003\\030\\322\\t\\020\\237\\234\\001\\n\\b\\n\\002\\030\\003\\020\\240\\234\\001"
     }
   }
   transactionID {

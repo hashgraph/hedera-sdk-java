@@ -10,8 +10,7 @@ import com.hedera.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 public final class FileAppendTransaction extends TransactionBuilder<FileAppendTransaction> {
-    private final FileAppendTransactionBody.Builder builder = inner.getBodyBuilder()
-        .getFileAppendBuilder();
+    private final FileAppendTransactionBody.Builder builder = bodyBuilder.getFileAppendBuilder();
 
     public FileAppendTransaction(Client client) {
         super(client);

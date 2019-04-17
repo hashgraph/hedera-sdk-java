@@ -13,7 +13,7 @@ import java.util.Objects;
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         extends Builder<com.hedera.sdk.proto.Transaction, TransactionResponse, TransactionId> {
     protected final com.hedera.sdk.proto.Transaction.Builder inner = com.hedera.sdk.proto.Transaction.newBuilder();
-    protected final TransactionBody.Builder bodyBuilder = inner.getBodyBuilder();
+    protected final TransactionBody.Builder bodyBuilder = TransactionBody.newBuilder();
 
     private static final int MAX_MEMO_LENGTH = 100;
 
@@ -121,7 +121,12 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         }
 
         validate();
-        var tx = new Transaction(client, inner, getMethod());
+
+        inner.setBodyBytes(
+            bodyBuilder.build()
+                .toByteString()
+        );
+        var tx = new Transaction(client, inner, bodyBuilder.getNodeAccountID(), bodyBuilder.getTransactionID(), getMethod());
 
         if (client != null && client.getOperatorKey() != null) {
             tx.sign(client.getOperatorKey());

@@ -12,8 +12,7 @@ import java.time.Instant;
 
 // `CryptoUpdateTransaction`
 public final class AccountUpdateTransaction extends TransactionBuilder<AccountUpdateTransaction> {
-    private final CryptoUpdateTransactionBody.Builder builder = inner.getBodyBuilder()
-        .getCryptoUpdateAccountBuilder();
+    private final CryptoUpdateTransactionBody.Builder builder = bodyBuilder.getCryptoUpdateAccountBuilder();
 
     public AccountUpdateTransaction(Client client) {
         super(client);

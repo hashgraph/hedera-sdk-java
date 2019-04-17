@@ -11,8 +11,7 @@ import io.grpc.MethodDescriptor;
 
 // corresponds to `CryptoAddClaimTransaction`
 public final class AccountAddClaimTransaction extends TransactionBuilder<AccountAddClaimTransaction> {
-    private final CryptoAddClaimTransactionBody.Builder builder = inner.getBodyBuilder()
-        .getCryptoAddClaimBuilder();
+    private final CryptoAddClaimTransactionBody.Builder builder = bodyBuilder.getCryptoAddClaimBuilder();
     private final Claim.Builder claim = builder.getClaimBuilder();
     private final KeyList.Builder keyList = claim.getKeysBuilder();
 

@@ -11,8 +11,7 @@ import io.grpc.MethodDescriptor;
 
 // `CryptoDeleteClaimTransaction`
 public class AccountDeleteClaimTransaction extends TransactionBuilder<AccountDeleteClaimTransaction> {
-    private final CryptoDeleteClaimTransactionBody.Builder builder = inner.getBodyBuilder()
-        .getCryptoDeleteClaimBuilder();
+    private final CryptoDeleteClaimTransactionBody.Builder builder = bodyBuilder.getCryptoDeleteClaimBuilder();
 
     public AccountDeleteClaimTransaction(Client client) {
         super(client);

@@ -32,36 +32,13 @@ transaction builder failed validation:
 
 		then:
 		tx.toString() == """\
-body {
-  transactionID {
-    transactionValidStart {
-      seconds: 1554158542
-    }
-    accountID {
-      accountNum: 2
-    }
-  }
-  nodeAccountID {
-    accountNum: 3
-  }
-  transactionFee: 100000
-  transactionValidDuration {
-    seconds: 120
-  }
-  fileDelete {
-    fileID {
-      shardNum: 848
-      realmNum: 973
-      fileNum: 1234
-    }
-  }
-}
 sigMap {
   sigPair {
     pubKeyPrefix: "\\344\\361\\300\\353L}\\315\\303\\347\\353\\021p\\263\\b\\212=\\022\\242\\227\\364\\243\\353\\342\\362\\205\\003\\375g5F\\355\\216"
     ed25519: "\\231\\257\\205\\311\\2437^g\\030/\$\\346\\314\\332V\\\\\\2103\\240+\\252\\275\\263\\250=\\037\\260\\370\\342P^kf\\022ae\\346\\024\\314\\025Z\\374\\267\\301B\\301\\311\\202\\267\\fuWm%\\365\\256\\350P2By\\377o\\t"
   }
 }
+bodyBytes: "\\n\\f\\n\\006\\b\\316\\247\\212\\345\\005\\022\\002\\030\\002\\022\\002\\030\\003\\030\\240\\215\\006\\"\\002\\bx\\222\\001\\v\\022\\t\\b\\320\\006\\020\\315\\a\\030\\322\\t"
 """
 	}
 }

@@ -9,20 +9,16 @@ import spock.lang.Specification
 import java.time.Instant
 
 class AdminDeleteTransactionTest extends Specification {
-	def "Transaction can be built with defaults"() {
+	def "empty Transaction does not validate"() {
 		when:
-		def tx = new AdminDeleteTransaction()
+		new AdminDeleteTransaction().validate()
 
 		then:
-		tx.inner.toString() == """body {
-  transactionFee: 100000
-  transactionValidDuration {
-    seconds: 120
-  }
-  adminDelete {
-  }
-}
-"""
+		def e = thrown(IllegalStateException)
+		e.message == """transaction builder failed validation:
+.setTransactionId() required
+.setNodeAccountId() required
+.setID() required"""
 	}
 
 	def "Transaction can be built with FileId"() {
@@ -39,39 +35,13 @@ class AdminDeleteTransactionTest extends Specification {
 
 		then:
 		tx.toString() == """\
-body {
-  transactionID {
-    transactionValidStart {
-      seconds: 1554158542
-    }
-    accountID {
-      accountNum: 2
-    }
-  }
-  nodeAccountID {
-    accountNum: 3
-  }
-  transactionFee: 100000
-  transactionValidDuration {
-    seconds: 120
-  }
-  adminDelete {
-    fileID {
-      shardNum: 1
-      realmNum: 2
-      fileNum: 3
-    }
-    expirationTime {
-      seconds: 1554158643
-    }
-  }
-}
 sigMap {
   sigPair {
     pubKeyPrefix: "\\344\\361\\300\\353L}\\315\\303\\347\\353\\021p\\263\\b\\212=\\022\\242\\227\\364\\243\\353\\342\\362\\205\\003\\375g5F\\355\\216"
     ed25519: "N\\273\\261\\303\\210\\025\\253\\325\\037G+D\\201\\272VD\\301\\003\\214y_\\267/\\353\\201\\\\\\320\\177\\314\\340\\271b\\365C\\222^\\251X\\0041\\374\\236\\021(\\366\\362\\212\\276}M\\016\\201*\\327pX\\222\\v\\222\\037\\301\\2641\\000"
   }
 }
+bodyBytes: "\\n\\f\\n\\006\\b\\316\\247\\212\\345\\005\\022\\002\\030\\002\\022\\002\\030\\003\\030\\240\\215\\006\\"\\002\\bx\\242\\001\\020\\n\\006\\b\\001\\020\\002\\030\\003\\032\\006\\b\\263\\250\\212\\345\\005"
 """
 	}
 
@@ -89,39 +59,13 @@ sigMap {
 
 		then:
 		tx.toString() == """\
-body {
-  transactionID {
-    transactionValidStart {
-      seconds: 1554158542
-    }
-    accountID {
-      accountNum: 2
-    }
-  }
-  nodeAccountID {
-    accountNum: 3
-  }
-  transactionFee: 100000
-  transactionValidDuration {
-    seconds: 120
-  }
-  adminDelete {
-    contractID {
-      shardNum: 1
-      realmNum: 2
-      contractNum: 3
-    }
-    expirationTime {
-      seconds: 1554158643
-    }
-  }
-}
 sigMap {
   sigPair {
     pubKeyPrefix: "\\344\\361\\300\\353L}\\315\\303\\347\\353\\021p\\263\\b\\212=\\022\\242\\227\\364\\243\\353\\342\\362\\205\\003\\375g5F\\355\\216"
     ed25519: "\\3032\\257:>\\031\\232w\\a\\t\\335\\357iO\\301SP\\311iE\\336dM\\330\\262cQ\\347Uj\\270\\376UB\\310\\247\\334\$\\n\\335\\327\\316\\034\\357\\241\\251\\227|\\370\\222\\205\\243\\206X\\336;\\311\\rrR\\224a@\\n"
   }
 }
+bodyBytes: "\\n\\f\\n\\006\\b\\316\\247\\212\\345\\005\\022\\002\\030\\002\\022\\002\\030\\003\\030\\240\\215\\006\\"\\002\\bx\\242\\001\\020\\022\\006\\b\\001\\020\\002\\030\\003\\032\\006\\b\\263\\250\\212\\345\\005"
 """
 	}
 }

@@ -10,8 +10,7 @@ import io.grpc.MethodDescriptor;
 import java.time.Instant;
 
 public final class AdminDeleteTransaction extends TransactionBuilder<AdminDeleteTransaction> {
-    private final AdminDeleteTransactionBody.Builder builder = inner.getBodyBuilder()
-        .getAdminDeleteBuilder();
+    private final AdminDeleteTransactionBody.Builder builder = bodyBuilder.getAdminDeleteBuilder();
 
     public AdminDeleteTransaction(Client client) {
         super(client);

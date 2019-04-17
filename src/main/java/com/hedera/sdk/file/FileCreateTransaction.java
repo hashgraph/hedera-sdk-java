@@ -11,8 +11,7 @@ import io.grpc.MethodDescriptor;
 import java.time.Instant;
 
 public final class FileCreateTransaction extends TransactionBuilder<FileCreateTransaction> {
-    private final FileCreateTransactionBody.Builder builder = inner.getBodyBuilder()
-        .getFileCreateBuilder();
+    private final FileCreateTransactionBody.Builder builder = bodyBuilder.getFileCreateBuilder();
     private final KeyList.Builder keyList = builder.getKeysBuilder();
 
     public FileCreateTransaction(Client client) {
