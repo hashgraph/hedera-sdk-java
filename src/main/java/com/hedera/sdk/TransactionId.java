@@ -23,9 +23,12 @@ public final class TransactionId {
      * any transaction fees.
      */
     public TransactionId(AccountId accountId) {
+        // Allows the transaction to be accepted as long as the
+        // server is not more than 10 seconds behind us
         this(
                 accountId, Clock.systemUTC()
                     .instant()
+                    .minusSeconds(10)
         );
     }
 
