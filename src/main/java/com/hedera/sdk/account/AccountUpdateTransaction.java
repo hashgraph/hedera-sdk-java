@@ -38,12 +38,18 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
     }
 
     public AccountUpdateTransaction setSendRecordThreshold(long sendRecordThreshold) {
-        builder.setSendRecordThresholdWrapper(com.google.protobuf.UInt64Value.newBuilder().setValue(sendRecordThreshold));
+        builder.setSendRecordThresholdWrapper(
+            com.google.protobuf.UInt64Value.newBuilder()
+                .setValue(sendRecordThreshold)
+        );
         return this;
     }
 
     public AccountUpdateTransaction setReceiveRecordThreshold(long receiveRecordThreshold) {
-        builder.setReceiveRecordThresholdWrapper(com.google.protobuf.UInt64Value.newBuilder().setValue(receiveRecordThreshold));
+        builder.setReceiveRecordThresholdWrapper(
+            com.google.protobuf.UInt64Value.newBuilder()
+                .setValue(receiveRecordThreshold)
+        );
         return this;
     }
 
