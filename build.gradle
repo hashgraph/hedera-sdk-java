@@ -140,7 +140,7 @@ jacocoTestCoverageVerification {
 		rule {
 			// TODO: remove this line to enable this rule
 			enabled = false
-			
+
 			element = 'CLASS'
 			excludes = ['com.hedera.sdk.proto.*']
 
