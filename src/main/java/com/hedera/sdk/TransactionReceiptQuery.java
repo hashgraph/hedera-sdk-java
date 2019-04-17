@@ -30,6 +30,11 @@ public final class TransactionReceiptQuery extends QueryBuilder<TransactionRecei
 
     @Override
     protected TransactionReceipt mapResponse(Response raw) throws HederaException {
+        HederaException.throwIfExceptional(
+            raw.getTransactionGetReceipt()
+                .getHeader()
+                .getNodeTransactionPrecheckCode()
+        );
         return new TransactionReceipt(raw);
     }
 
