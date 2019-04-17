@@ -150,6 +150,10 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         return build().executeForReceipt();
     }
 
+    public final TransactionRecord executeForRecord() throws HederaException {
+        return build().executeForRecord();
+    }
+
     // FIXME: This is duplicated from Transaction
 
     @Override

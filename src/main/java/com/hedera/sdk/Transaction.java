@@ -119,10 +119,20 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
     }
 
     public final TransactionReceipt executeForReceipt() throws HederaException {
+        Objects.requireNonNull(client);
+
         return executeAndWaitFor(
-            id -> new TransactionReceiptQuery(client).setTransactionId(id)
+            id -> new TransactionReceiptQuery(Objects.requireNonNull(client)).setTransactionId(id)
                 .execute(),
-            res -> res
+            receipt -> receipt
+        );
+    }
+
+    public TransactionRecord executeForRecord() throws HederaException {
+        return executeAndWaitFor(
+            id -> new TransactionRecordQuery(Objects.requireNonNull(client)).setTransaction(id)
+                .execute(),
+            TransactionRecord::getReceipt
         );
     }
 }

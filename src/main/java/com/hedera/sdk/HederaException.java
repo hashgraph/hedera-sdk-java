@@ -5,21 +5,28 @@ import com.hedera.sdk.proto.ResponseCodeEnum;
 public class HederaException extends Exception {
     public final ResponseCodeEnum responseCode;
 
-    HederaException(ResponseCodeEnum responseCode) {
-        if (!isCodeExceptional(responseCode)) {
-            throw new IllegalArgumentException("throwing an exception for a successful result code");
-        }
-
+    private HederaException(ResponseCodeEnum responseCode) {
         this.responseCode = responseCode;
     }
 
-    static boolean isCodeExceptional(ResponseCodeEnum responseCode) {
-        return responseCode != ResponseCodeEnum.OK && responseCode != ResponseCodeEnum.SUCCESS;
+    static void throwIfExceptional(ResponseCodeEnum responseCode) throws HederaException {
+        throwIfExceptional(responseCode, true);
     }
 
-    static void throwIfExceptional(ResponseCodeEnum responseCode) throws HederaException {
-        if (isCodeExceptional(responseCode))
-            throw new HederaException(responseCode);
+    static void throwIfExceptional(ResponseCodeEnum responseCode, boolean throwIfUnknown) throws HederaException {
+        switch (responseCode) {
+        case UNKNOWN:
+            if (throwIfUnknown)
+                break;
+            // fall through
+        case SUCCESS:
+        case OK:
+            return;
+
+        default:
+        }
+
+        throw new HederaException(responseCode);
     }
 
     @Override
