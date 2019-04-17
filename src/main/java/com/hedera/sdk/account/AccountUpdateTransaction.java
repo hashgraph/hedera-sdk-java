@@ -37,18 +37,13 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
         return this;
     }
 
-    public AccountUpdateTransaction setProxyFraction(int proxyFraction) {
-        builder.setProxyFraction(proxyFraction);
-        return this;
-    }
-
     public AccountUpdateTransaction setSendRecordThreshold(long sendRecordThreshold) {
-        builder.setSendRecordThreshold(sendRecordThreshold);
+        builder.setSendRecordThresholdWrapper(com.google.protobuf.UInt64Value.newBuilder().setValue(sendRecordThreshold));
         return this;
     }
 
     public AccountUpdateTransaction setReceiveRecordThreshold(long receiveRecordThreshold) {
-        builder.setReceiveRecordThreshold(receiveRecordThreshold);
+        builder.setReceiveRecordThresholdWrapper(com.google.protobuf.UInt64Value.newBuilder().setValue(receiveRecordThreshold));
         return this;
     }
 
