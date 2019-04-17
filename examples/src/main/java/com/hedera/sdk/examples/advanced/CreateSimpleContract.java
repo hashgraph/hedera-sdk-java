@@ -33,7 +33,6 @@ public final class CreateSimpleContract {
 
         var byteCodeHex = jsonObject.getAsJsonPrimitive("object")
             .getAsString();
-        var byteCode = ExampleHelper.parseHex(byteCodeHex);
 
         var operatorKey = ExampleHelper.getOperatorKey();
         var client = ExampleHelper.createHederaClient();
@@ -45,7 +44,7 @@ public final class CreateSimpleContract {
         )
             // Use the same key as the operator to "own" this file
             .addKey(operatorKey.getPublicKey())
-            .setContents(byteCode);
+            .setContents(byteCodeHex.getBytes());
 
         var fileReceipt = fileTx.executeForReceipt();
         var newFileId = Objects.requireNonNull(fileReceipt.getFileId());
@@ -54,9 +53,7 @@ public final class CreateSimpleContract {
 
         // create the contract itself
         var contractTx = new ContractCreateTransaction(client).setAutoRenewPeriod(Duration.ofHours(1))
-            .setGas(117_000)
-            .setInitialBalance(1_000_000)
-            .setConstructorParams(new byte[0])
+            .setGas(217000)
             .setBytecodeFile(newFileId);
 
         var contractReceipt = contractTx.executeForReceipt();
@@ -67,7 +64,7 @@ public final class CreateSimpleContract {
 
         System.out.println("new contract ID: " + newContractId);
 
-        var contractCallResult = new ContractCallQuery(client).setContract(newContractId)
+        var contractCallResult = new ContractCallQuery(client).setGas(30000).setContract(newContractId)
             .setFunctionParameters(CallParams.function("greet"))
             .execute();
 
