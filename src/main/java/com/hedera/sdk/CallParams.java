@@ -6,22 +6,41 @@ import org.bouncycastle.jcajce.provider.digest.Keccak;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
 import javax.annotation.Nonnegative;
+import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 // an implementation of function selector and parameter encoding as specified here:
 // https://solidity.readthedocs.io/en/v0.5.7/abi-spec.html#
-public class FunctionParams {
+public class CallParams<Kind> {
+    @Nullable
     private final String funcName;
     private final ArrayList<String> paramTypes = new ArrayList<>();
     private final ArrayList<Argument> args = new ArrayList<>();
 
-    public FunctionParams(String funcName) {
+    private CallParams(@Nullable String funcName) {
         this.funcName = funcName;
     }
 
-    public FunctionParams add(String param) {
+    public static CallParams<Constructor> constructor() {
+        return new CallParams<>(null);
+    }
+
+    public static CallParams<Function> function(String funcName) {
+        return new CallParams<>(funcName);
+    }
+
+    // some Rust-inspired type magic
+    public static class Constructor {
+        private Constructor() {}
+    }
+
+    public static class Function {
+        private Function() {}
+    }
+
+    public CallParams<Kind> add(String param) {
         var strBytes = ByteString.copyFromUtf8(param);
 
         paramTypes.add("string");
@@ -30,7 +49,7 @@ public class FunctionParams {
         return this;
     }
 
-    public FunctionParams add(byte[] param) {
+    public CallParams<Kind> add(byte[] param) {
         var bytes = ByteString.copyFrom(param);
 
         paramTypes.add("bytes");
@@ -52,7 +71,7 @@ public class FunctionParams {
 
         var needsComma = false;
 
-        for(String paramType : paramTypes) {
+        for (String paramType : paramTypes) {
             if (needsComma) {
                 digest.update(COMMA);
             }
@@ -75,7 +94,7 @@ public class FunctionParams {
         var dynamicArgs = new ArrayList<ByteString>();
 
         // iterate the arguments and determine whether they are dynamic or not
-        for(var arg : args) {
+        for (var arg : args) {
             if (arg.isDynamic) {
                 // dynamic arguments supply their offset in value position and append their data at that offset
                 argBytes.add(uint256(dynamicOffset));
@@ -89,7 +108,9 @@ public class FunctionParams {
 
         argBytes.addAll(dynamicArgs);
 
-        return funcSelector(funcName, paramTypes).concat(ByteString.copyFrom(argBytes));
+        var argByteStr = ByteString.copyFrom(argBytes);
+
+        return funcName != null ? funcSelector(funcName, paramTypes).concat(argByteStr) : argByteStr;
     }
 
     private static class Argument {
@@ -121,7 +142,12 @@ public class FunctionParams {
     private static final ByteString padding = ByteString.copyFrom(new byte[31]);
 
     static ByteString uint256(@Nonnegative int val) {
-        return leftPad32(ByteString.copyFrom(ByteBuffer.allocate(4).putInt(val).array()));
+        return leftPad32(
+            ByteString.copyFrom(ByteBuffer.allocate(4)
+                .putInt(val)
+                .array()
+            )
+        );
     }
 
     // Solidity contracts require all parameters to be padded to 32 byte multiples but specifies
@@ -129,7 +155,10 @@ public class FunctionParams {
 
     static ByteString leftPad32(ByteString input) {
         var rem = 32 - input.size() % 32;
-        return rem == 32 ? input : padding.substring(0, rem).concat(input);
+        return rem == 32
+            ? input
+            : padding.substring(0, rem)
+                .concat(input);
     }
 
     static ByteString rightPad32(ByteString input) {

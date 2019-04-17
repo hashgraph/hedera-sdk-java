@@ -2,25 +2,40 @@ package com.hedera.sdk
 
 import spock.lang.Specification
 
-class FunctionParamsTest extends Specification {
+class CallParamsTest extends Specification {
 	def 'funcSelector() produces correct bytes'() {
 		// testing all the examples here
 		// https://solidity.readthedocs.io/en/v0.5.7/abi-spec.html#examples
 		expect:
-		hash == FunctionParams.funcSelector(funcName, paramTypes).toByteArray().encodeHex().toString()
+		hash == CallParams.funcSelector(funcName, paramTypes).toByteArray().encodeHex().toString()
 
 		where:
-		hash << ['cdcd77c0', 'fce353f6', 'a5643bf2', '8be65246']
+		hash << [
+			'cdcd77c0',
+			'fce353f6',
+			'a5643bf2',
+			'8be65246'
+		]
 		funcName << ['baz', 'bar', 'sam', 'f']
-		paramTypes << [['uint32','bool'], ['bytes3[2]'], ['bytes','bool','uint256[]'], ['uint256','uint32[]','bytes10','bytes']]
+		paramTypes << [
+			['uint32', 'bool'],
+			['bytes3[2]'],
+			['bytes', 'bool', 'uint256[]'],
+			[
+				'uint256',
+				'uint32[]',
+				'bytes10',
+				'bytes'
+			]
+		]
 		// omitted ('2289b18c', 'g', ['uint[][]','string[]'])
 		// this is the only one that the hash doesn't match which suggests the documentation is wrong here
 	}
 
 	def 'encodes params correctly'() {
 		when:
-		def bytes = new FunctionParams('set_message').add("Hello, world!").toProto()
-		def bytesEquiv = new FunctionParams('set_message').add("Hello, world!".getBytes('UTF-8')).toProto()
+		def bytes = new CallParams('set_message').add("Hello, world!").toProto()
+		def bytesEquiv = new CallParams('set_message').add("Hello, world!".getBytes('UTF-8')).toProto()
 
 		then:
 		bytes.toByteArray().encodeHex().toString() == """\
@@ -40,10 +55,18 @@ class FunctionParamsTest extends Specification {
 
 	def 'uint256() left-pads properly'() {
 		expect:
-		encoded == FunctionParams.uint256(val).toByteArray().encodeHex().toString()
+		encoded == CallParams.uint256(val).toByteArray().encodeHex().toString()
 
 		where:
-		val << [0, 2, 255, 4095, 255 << 24, 4095 << 20, (int) 0xdeadbeef]
+		val << [
+			0,
+			2,
+			255,
+			4095,
+			255 << 24,
+			4095 << 20,
+			(int) 0xdeadbeef
+		]
 		encoded << [
 			'0000000000000000000000000000000000000000000000000000000000000000',
 			'0000000000000000000000000000000000000000000000000000000000000002',

@@ -2,6 +2,7 @@ package com.hedera.sdk.examples.advanced;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.hedera.sdk.CallParams;
 import com.hedera.sdk.HederaException;
 import com.hedera.sdk.contract.ContractCallQuery;
 import com.hedera.sdk.contract.ContractCreateTransaction;
@@ -30,7 +31,8 @@ public final class CreateSimpleContract {
             jsonObject = gson.fromJson(new InputStreamReader(jsonStream), JsonObject.class);
         }
 
-        var byteCodeHex = jsonObject.getAsJsonPrimitive("object").getAsString();
+        var byteCodeHex = jsonObject.getAsJsonPrimitive("object")
+            .getAsString();
         var byteCode = ExampleHelper.parseHex(byteCodeHex);
 
         var operatorKey = ExampleHelper.getOperatorKey();
@@ -51,8 +53,7 @@ public final class CreateSimpleContract {
         System.out.println("contract bytecode file: " + newFileId);
 
         // create the contract itself
-        var contractTx = new ContractCreateTransaction(client)
-            .setAutoRenewPeriod(Duration.ofHours(1))
+        var contractTx = new ContractCreateTransaction(client).setAutoRenewPeriod(Duration.ofHours(1))
             .setBytecodeFile(newFileId)
             // own the contract so we can destroy it later
             .setAdminKey(operatorKey.getPublicKey());
@@ -65,9 +66,8 @@ public final class CreateSimpleContract {
 
         System.out.println("new contract ID: " + newContractId);
 
-
-        var contractCallResult = new ContractCallQuery(client)
-            .setContract(newContractId)
+        var contractCallResult = new ContractCallQuery(client).setContract(newContractId)
+            .setFunctionParameters(CallParams.function("greet"))
             .execute();
 
         if (contractCallResult.getErrorMessage() != null) {
@@ -75,7 +75,7 @@ public final class CreateSimpleContract {
             return;
         }
 
-        var message = new String(contractCallResult.getCallResult());
+        var message = contractCallResult.getString();
         System.out.println("contract message: " + message);
     }
 }

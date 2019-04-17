@@ -2,6 +2,7 @@ package com.hedera.sdk.examples.advanced;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.hedera.sdk.CallParams;
 import com.hedera.sdk.HederaException;
 import com.hedera.sdk.contract.ContractCallQuery;
 import com.hedera.sdk.contract.ContractCreateTransaction;
@@ -31,7 +32,8 @@ public final class CreateStatefulContract {
             jsonObject = gson.fromJson(new InputStreamReader(jsonStream), JsonObject.class);
         }
 
-        var byteCodeHex = jsonObject.getAsJsonPrimitive("object").getAsString();
+        var byteCodeHex = jsonObject.getAsJsonPrimitive("object")
+            .getAsString();
         var byteCode = ExampleHelper.parseHex(byteCodeHex);
 
         var operatorKey = ExampleHelper.getOperatorKey();
@@ -51,9 +53,11 @@ public final class CreateStatefulContract {
 
         System.out.println("contract bytecode file: " + newFileId);
 
-        var contractTx = new ContractCreateTransaction(client)
-            .setBytecodeFile(newFileId)
-            .setConstructorParams("hello from hedera!".getBytes())
+        var contractTx = new ContractCreateTransaction(client).setBytecodeFile(newFileId)
+            .setConstructorParams(
+                CallParams.constructor()
+                    .add("hello from hedera!")
+            )
             // own the contract so we can destroy it later
             .setAdminKey(operatorKey.getPublicKey());
 
@@ -62,8 +66,8 @@ public final class CreateStatefulContract {
 
         System.out.println("new contract ID: " + newContractId);
 
-        var contractCallResult = new ContractCallQuery(client)
-            .setContract(newContractId)
+        var contractCallResult = new ContractCallQuery(client).setContract(newContractId)
+            .setFunctionParameters(CallParams.function("get_message"))
             .execute();
 
         if (contractCallResult.getErrorMessage() != null) {
@@ -71,12 +75,34 @@ public final class CreateStatefulContract {
             return;
         }
 
-        var callResult = new String(contractCallResult.getCallResult());
+        var message = contractCallResult.getString();
+        System.out.println("contract returned message: " + message);
 
-        System.out.println("contract returned message: " + callResult);
+        new ContractExecuteTransaction(client).setContract(newContractId)
+            .setFunctionParameters(CallParams.function("set_message")
+                .add("hello from hedera again!")
+            )
+            .execute();
 
-        var contractUpdateResult = new ContractExecuteTransaction(client)
-            .setContract(newContractId)
-            .setFunctionParameters("hello from hedera again!".getBytes())
+        var contractUpdateResult = new ContractCallQuery(client).setContract(newContractId)
+            .setFunctionParameters(CallParams.function("get_message"))
+            .execute();
+
+        if (contractUpdateResult.getErrorMessage() != null) {
+            System.out.println("error calling contract: " + contractUpdateResult.getErrorMessage());
+            return;
+        }
+
+        var contractCallResult2 = new ContractCallQuery(client).setContract(newContractId)
+            .setFunctionParameters(CallParams.function("get_message"))
+            .execute();
+
+        if (contractCallResult2.getErrorMessage() != null) {
+            System.out.println("error calling contract: " + contractCallResult2.getErrorMessage());
+            return;
+        }
+
+        var message2 = contractCallResult.getString();
+        System.out.println("contract returned message: " + message2);
     }
 }

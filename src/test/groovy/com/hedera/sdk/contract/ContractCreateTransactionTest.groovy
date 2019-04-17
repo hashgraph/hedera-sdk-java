@@ -37,7 +37,7 @@ transaction builder failed validation:
 			initialBalance = 1000
 			proxyAccountId = new AccountId(4)
 			autoRenewPeriod = Duration.ofHours(7)
-			constructorParams = [10, 11, 12, 13, 425]
+			constructorParams = [10, 11, 12, 13, 425] as byte[]
 			shard = 20
 			realm = 40
 			newRealmAdminKey = key.getPublicKey()

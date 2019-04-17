@@ -19,7 +19,7 @@ class ContractCallQueryTest extends Specification {
 		def query = new ContractCallQuery().with(true, {
 			contract = new ContractId(10, 10, 15)
 			gas = 1541
-			functionParameters = [1451, 4, 245, 1, 543]
+			functionParameters = [1451, 4, 245, 1, 543] as byte[]
 			maxResultSize = 444447
 		})
 

@@ -32,7 +32,7 @@ transaction builder failed validation:
 			contract = new ContractId(1, 2, 3)
 			gas = 10
 			amount = 1000
-			functionParameters = [424, 243, 141]
+			functionParameters = [424, 243, 141] as byte[]
 		}).sign(key).toProto()
 
 		then:
