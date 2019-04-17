@@ -91,7 +91,7 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
         var id = execute();
 
         T response = null;
-        ResponseCodeEnum receiptStatus;
+        ResponseCodeEnum receiptStatus = ResponseCodeEnum.UNRECOGNIZED;
         final int MAX_ATTEMPTS = 10;
 
         for (int attempt = 1; attempt < MAX_ATTEMPTS; attempt++) {
@@ -104,18 +104,17 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
                 // processing the transaction
 
                 try {
-                    Thread.sleep(500 * attempt);
+                    Thread.sleep(1500 * attempt);
                 } catch (InterruptedException e) {
                     break;
                 }
             } else {
                 // Otherwise either the receipt is SUCCESS or there is something _exceptional_ wrong
-
-                HederaException.throwIfExceptional(receiptStatus);
                 break;
             }
         }
 
+        HederaException.throwIfExceptional(receiptStatus);
         return Objects.requireNonNull(response);
     }
 
