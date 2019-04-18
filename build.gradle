@@ -23,6 +23,9 @@ plugins {
 	// Discover dependency version updates
 	// https://github.com/ben-manes/gradle-versions-plugin
 	id "com.github.ben-manes.versions" version "0.21.0"
+
+	// code coverage (JaCoCo)
+	id 'jacoco'
 }
 
 repositories { jcenter() }
@@ -116,6 +119,42 @@ pmd {
 	// BeanMembersShouldSerialize (priority 3): we don't use Beans but this triggers anyway
 	rulePriority = 2
 }
+
+jacocoTestReport {
+	beforeEvaluate {
+		classDirectories.from = files(classDirectories.files.collect {
+			fileTree(dir: it, excludes: [
+				"com/hedera/sdk/proto/**"
+			])
+		})
+	}
+
+	reports {
+		xml.enabled false
+		html.destination file("$buildDir/jacoco/jacocoTestCoverage")
+	}
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			// TODO: remove this line to enable this rule
+			enabled = false
+
+			element = 'CLASS'
+			excludes = ['com.hedera.sdk.proto.*']
+
+			limit {
+				counter = 'LINE'
+				value = 'COVEREDRATIO'
+				minimum = 0.8
+			}
+		}
+	}
+}
+
+// enforces code coverage validation on check
+check.dependsOn jacocoTestCoverageVerification
 
 tasks.withType(JavaCompile).configureEach {
 	options.errorprone {
