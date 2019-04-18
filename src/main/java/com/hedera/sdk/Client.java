@@ -7,6 +7,8 @@ import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.LongConsumer;
 import java.util.stream.Collectors;
 
 public final class Client {
@@ -102,9 +104,23 @@ public final class Client {
         return Objects.requireNonNull(receipt.getAccountId());
     }
 
+    public void createAccountAsync(Key publicKey, long initialBalance, Consumer<AccountId> onSuccess, Consumer<Throwable> onError) {
+        new AccountCreateTransaction(this)
+            .setKey(publicKey)
+            .setInitialBalance(initialBalance)
+            .executeForReceiptAsync(
+                receipt -> onSuccess.accept(Objects.requireNonNull(receipt.getAccountId())),
+                onError
+            );
+    }
+
     public AccountInfo getAccount(AccountId id) throws HederaException {
         return new AccountInfoQuery(this).setAccountId(id)
             .execute();
+    }
+
+    public void getAccountAsync(AccountId id, Consumer<AccountInfo> onSuccess, Consumer<Throwable> onError) {
+        new AccountInfoQuery(this).setAccountId(id).executeAsync(onSuccess, onError);
     }
 
     public long getAccountBalance(AccountId id) throws HederaException {
@@ -112,9 +128,18 @@ public final class Client {
             .execute();
     }
 
+    public void getAccountBalanceAsync(AccountId id, Consumer<Long> onSuccess, Consumer<Throwable> onError) {
+        new AccountBalanceQuery(this).setAccountId(id).executeAsync(onSuccess, onError);
+    }
+
     public TransactionId transferCryptoTo(AccountId recipient, long amount) throws HederaException {
         return new CryptoTransferTransaction(this).addSender(Objects.requireNonNull(operatorId), amount)
             .addRecipient(recipient, amount)
             .execute();
     }
-}
+
+    public void transferCryptoToAsync(AccountId recipient, long amount, Consumer<TransactionId> onSuccess, Consumer<Throwable> onError) {
+        new CryptoTransferTransaction(this).addSender(Objects.requireNonNull(operatorId), amount)
+            .addRecipient(recipient, amount)
+            .executeAsync(onSuccess, onError);
+    }}
