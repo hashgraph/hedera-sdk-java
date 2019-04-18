@@ -150,7 +150,7 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
         executeAsync(handler::waitFor, onError);
     }
 
-    public void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<Throwable> onError) throws HederaException {
+    public void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<Throwable> onError) {
         var handler = new AsyncRetryHandler<>(
                 (id, onSuccess_, onError_) -> new TransactionRecordQuery(getClient()).setTransaction(id)
                     .executeAsync(onSuccess_, onError_),

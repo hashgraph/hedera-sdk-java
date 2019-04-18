@@ -9,6 +9,7 @@ import io.grpc.Channel;
 import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         extends Builder<com.hedera.sdk.proto.Transaction, TransactionResponse, TransactionId> {
@@ -150,10 +151,18 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         return build().executeForReceipt();
     }
 
+    public final void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<Throwable> onError) {
+        build().executeForReceiptAsync(onSuccess, onError);
+    }
+
     public final TransactionRecord executeForRecord() throws HederaException {
         return build().executeForRecord();
     }
 
+    public final void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<Throwable> onError) {
+        build().executeForRecordAsync(onSuccess, onError);
+    }
+    
     // FIXME: This is duplicated from Transaction
 
     @Override
