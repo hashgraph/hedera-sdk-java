@@ -2,11 +2,33 @@ package com.hedera.sdk;
 
 import com.hedera.sdk.proto.ResponseCodeEnum;
 
+import javax.annotation.Nullable;
+
 public class HederaException extends Exception {
     public final ResponseCodeEnum responseCode;
 
-    private HederaException(ResponseCodeEnum responseCode) {
+    HederaException(ResponseCodeEnum responseCode) {
+        if (!isCodeExceptional(responseCode, true)) {
+            throw new IllegalArgumentException("code not exceptional: " + responseCode);
+        }
+
         this.responseCode = responseCode;
+    }
+
+    static boolean isCodeExceptional(ResponseCodeEnum responseCode, boolean unknownIsExceptional) {
+        switch (responseCode) {
+            case UNKNOWN:
+                if (unknownIsExceptional)
+                    break;
+                // fall through
+            case SUCCESS:
+            case OK:
+                return false;
+
+            default:
+        }
+
+        return true;
     }
 
     static void throwIfExceptional(ResponseCodeEnum responseCode) throws HederaException {
@@ -14,19 +36,9 @@ public class HederaException extends Exception {
     }
 
     static void throwIfExceptional(ResponseCodeEnum responseCode, boolean throwIfUnknown) throws HederaException {
-        switch (responseCode) {
-        case UNKNOWN:
-            if (throwIfUnknown)
-                break;
-            // fall through
-        case SUCCESS:
-        case OK:
-            return;
-
-        default:
+        if (isCodeExceptional(responseCode, throwIfUnknown)) {
+            throw new HederaException(responseCode);
         }
-
-        throw new HederaException(responseCode);
     }
 
     @Override
