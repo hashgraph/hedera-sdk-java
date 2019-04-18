@@ -10,8 +10,6 @@ import io.grpc.netty.shaded.io.netty.util.concurrent.GlobalEventExecutor;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.annotation.Nullable;
@@ -144,9 +142,9 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
 
     public void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<Throwable> onError) {
         var handler = new AsyncRetryHandler<>(
-            (id, onSuccess_, onError_) ->  new TransactionReceiptQuery(getClient()).setTransactionId(id).executeAsync(onSuccess_, onError_),
-            receipt -> receipt,
-            onSuccess, onError
+                (id, onSuccess_, onError_) -> new TransactionReceiptQuery(getClient()).setTransactionId(id)
+                    .executeAsync(onSuccess_, onError_),
+                receipt -> receipt, onSuccess, onError
         );
 
         executeAsync(handler::waitFor, onError);
@@ -154,10 +152,9 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
 
     public void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<Throwable> onError) throws HederaException {
         var handler = new AsyncRetryHandler<>(
-            (id, onSuccess_, onError_) -> new TransactionRecordQuery(getClient()).setTransaction(id)
-                .executeAsync(onSuccess_, onError_),
-            TransactionRecord::getReceipt,
-            onSuccess, onError
+                (id, onSuccess_, onError_) -> new TransactionRecordQuery(getClient()).setTransaction(id)
+                    .executeAsync(onSuccess_, onError_),
+                TransactionRecord::getReceipt, onSuccess, onError
         );
 
         executeAsync(handler::waitFor, onError);
@@ -175,7 +172,12 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
 
         private int attemptsLeft = MAX_RETRY_ATTEMPTS;
 
-        private AsyncRetryHandler(ExecuteAsync<T> execute, Function<T, TransactionReceipt> mapReceipt, Consumer<T> onSuccess, Consumer<Throwable> onError) {
+        private AsyncRetryHandler(
+            ExecuteAsync<T> execute,
+            Function<T, TransactionReceipt> mapReceipt,
+            Consumer<T> onSuccess,
+            Consumer<Throwable> onError
+        ) {
             this.execute = execute;
             this.mapReceipt = mapReceipt;
             this.onSuccess = onSuccess;

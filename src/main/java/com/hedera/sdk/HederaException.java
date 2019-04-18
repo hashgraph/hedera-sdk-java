@@ -2,8 +2,6 @@ package com.hedera.sdk;
 
 import com.hedera.sdk.proto.ResponseCodeEnum;
 
-import javax.annotation.Nullable;
-
 public class HederaException extends Exception {
     public final ResponseCodeEnum responseCode;
 
@@ -17,15 +15,15 @@ public class HederaException extends Exception {
 
     static boolean isCodeExceptional(ResponseCodeEnum responseCode, boolean unknownIsExceptional) {
         switch (responseCode) {
-            case UNKNOWN:
-                if (unknownIsExceptional)
-                    break;
-                // fall through
-            case SUCCESS:
-            case OK:
-                return false;
+        case UNKNOWN:
+            if (unknownIsExceptional)
+                break;
+            // fall through
+        case SUCCESS:
+        case OK:
+            return false;
 
-            default:
+        default:
         }
 
         return true;
