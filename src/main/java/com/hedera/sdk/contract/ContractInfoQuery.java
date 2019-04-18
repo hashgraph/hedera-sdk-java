@@ -1,7 +1,6 @@
 package com.hedera.sdk.contract;
 
 import com.hedera.sdk.Client;
-import com.hedera.sdk.HederaException;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
@@ -34,7 +33,7 @@ public final class ContractInfoQuery extends QueryBuilder<ContractInfo> {
     }
 
     @Override
-    protected ContractInfo mapResponse(Response raw) throws HederaException {
+    protected ContractInfo fromResponse(Response raw) {
         return new ContractInfo(raw);
     }
 

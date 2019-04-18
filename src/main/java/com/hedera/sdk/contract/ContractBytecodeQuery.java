@@ -1,7 +1,6 @@
 package com.hedera.sdk.contract;
 
 import com.hedera.sdk.Client;
-import com.hedera.sdk.HederaException;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
@@ -39,7 +38,7 @@ public final class ContractBytecodeQuery extends QueryBuilder<ContractGetBytecod
     }
 
     @Override
-    protected ContractGetBytecodeResponse mapResponse(Response raw) throws HederaException {
+    protected ContractGetBytecodeResponse fromResponse(Response raw) {
         return raw.getContractGetBytecodeResponse();
     }
 }

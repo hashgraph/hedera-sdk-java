@@ -30,7 +30,7 @@ public final class GetBySolidityIdQuery extends QueryBuilder<GetBySolidityIDResp
     }
 
     @Override
-    protected GetBySolidityIDResponse mapResponse(Response raw) throws HederaException {
+    protected GetBySolidityIDResponse fromResponse(Response raw) {
         return raw.getGetBySolidityID();
     }
 

@@ -2,7 +2,6 @@ package com.hedera.sdk.account;
 
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.Client;
-import com.hedera.sdk.HederaException;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
@@ -47,7 +46,7 @@ public final class AccountClaimQuery extends QueryBuilder<CryptoGetClaimResponse
     }
 
     @Override
-    protected CryptoGetClaimResponse mapResponse(Response raw) throws HederaException {
+    protected CryptoGetClaimResponse fromResponse(Response raw) {
         return raw.getCryptoGetClaim();
     }
 }

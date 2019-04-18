@@ -27,7 +27,7 @@ public final class GetByKeyQuery extends QueryBuilder<GetByKeyResponse> {
     }
 
     @Override
-    protected GetByKeyResponse mapResponse(Response raw) throws HederaException {
+    protected GetByKeyResponse fromResponse(Response raw) {
         return raw.getGetByKey();
     }
 

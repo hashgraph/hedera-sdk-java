@@ -1,7 +1,6 @@
 package com.hedera.sdk.account;
 
 import com.hedera.sdk.Client;
-import com.hedera.sdk.HederaException;
 import com.hedera.sdk.QueryBuilder;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
@@ -39,7 +38,7 @@ public class AccountStakersQuery extends QueryBuilder<CryptoGetStakersResponse> 
     }
 
     @Override
-    protected CryptoGetStakersResponse mapResponse(Response raw) throws HederaException {
+    protected CryptoGetStakersResponse fromResponse(Response raw) {
         return raw.getCryptoGetProxyStakers();
     }
 }
