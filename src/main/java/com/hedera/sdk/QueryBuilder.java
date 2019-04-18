@@ -79,6 +79,7 @@ public abstract class QueryBuilder<Resp> extends Builder<Query, Response, Resp> 
     @Override
     protected final Resp mapResponse(Response raw) throws HederaException {
         final ResponseCodeEnum precheckCode;
+        var unknownIsExceptional = true;
         switch (raw.getResponseCase()) {
         case GETBYKEY:
             precheckCode = raw.getGetByKey()
@@ -149,11 +150,13 @@ public abstract class QueryBuilder<Resp> extends Builder<Query, Response, Resp> 
             precheckCode = raw.getTransactionGetReceipt()
                 .getHeader()
                 .getNodeTransactionPrecheckCode();
+            unknownIsExceptional = false;
             break;
         case TRANSACTIONGETRECORD:
             precheckCode = raw.getTransactionGetRecord()
                 .getHeader()
                 .getNodeTransactionPrecheckCode();
+            unknownIsExceptional = false;
             break;
         case RESPONSE_NOT_SET:
             throw new IllegalStateException("Response not set");
@@ -162,7 +165,7 @@ public abstract class QueryBuilder<Resp> extends Builder<Query, Response, Resp> 
             throw new RuntimeException("Unhandled response case");
         }
 
-        HederaException.throwIfExceptional(precheckCode);
+        HederaException.throwIfExceptional(precheckCode, unknownIsExceptional);
         return fromResponse(raw);
     }
 
