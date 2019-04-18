@@ -162,7 +162,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     public final void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<Throwable> onError) {
         build().executeForRecordAsync(onSuccess, onError);
     }
-    
+
     // FIXME: This is duplicated from Transaction
 
     @Override
