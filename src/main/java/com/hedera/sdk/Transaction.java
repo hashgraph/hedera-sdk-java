@@ -7,7 +7,9 @@ import com.hedera.sdk.crypto.ed25519.Ed25519Signature;
 import com.hedera.sdk.proto.*;
 import io.grpc.*;
 import io.grpc.netty.shaded.io.netty.util.concurrent.GlobalEventExecutor;
+import org.bouncycastle.util.encoders.Hex;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -25,6 +27,7 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
     private final Client client;
 
     private static final int MAX_RETRY_ATTEMPTS = 10;
+    private static final int PREFIX_LEN = 6;
 
     Transaction(
         @Nullable Client client,
@@ -67,6 +70,7 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
 
     @Override
     public com.hedera.sdk.proto.Transaction toProto() {
+        validate();
         return inner.build();
     }
 
@@ -83,6 +87,30 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
         Objects.requireNonNull(channel, "Transaction.nodeAccountId not found on Client");
 
         return channel.getChannel();
+    }
+
+    @Override
+    protected void validate() {
+        var sigMap = inner.getSigMapOrBuilder();
+
+        if (sigMap.getSigPairCount() < 2) {
+            if (sigMap.getSigPairCount() == 0) {
+                addValidationError("Transaction requires at least one signature");
+            } // else contains one signature which is fine
+        } else {
+            var publicKeys = new HashSet<>();
+
+            for (int i = 0; i < sigMap.getSigPairCount(); i++) {
+                var sig = sigMap.getSigPairOrBuilder(i);
+                ByteString pubKeyPrefix = sig.getPubKeyPrefix();
+
+                if (!publicKeys.add(pubKeyPrefix)) {
+                    addValidationError("duplicate signing key: " + Hex.toHexString(getPrefix(pubKeyPrefix).toByteArray()) + "...");
+                }
+            }
+        }
+
+        checkValidationErrors("Transaction failed validation");
     }
 
     @Override
@@ -123,8 +151,6 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
     }
 
     public final TransactionReceipt executeForReceipt() throws HederaException {
-        getClient();
-
         return executeAndWaitFor(
             id -> new TransactionReceiptQuery(getClient()).setTransactionId(id)
                 .execute(),
@@ -211,5 +237,13 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
     @FunctionalInterface
     private interface ExecuteAsync<T> {
         void executeAsync(TransactionId id, Consumer<T> onSuccess, Consumer<Throwable> onError);
+    }
+
+    private static ByteString getPrefix(ByteString byteString) {
+        if (byteString.size() <= PREFIX_LEN) {
+            return byteString;
+        }
+
+        return byteString.substring(0, PREFIX_LEN);
     }
 }

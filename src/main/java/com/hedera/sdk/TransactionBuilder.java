@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
-        extends Builder<com.hedera.sdk.proto.Transaction, TransactionResponse, TransactionId> {
+        extends HederaCall<com.hedera.sdk.proto.Transaction, TransactionResponse, TransactionId> {
     protected final com.hedera.sdk.proto.Transaction.Builder inner = com.hedera.sdk.proto.Transaction.newBuilder();
     protected final TransactionBody.Builder bodyBuilder = TransactionBody.newBuilder();
 
