@@ -6,8 +6,11 @@ import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.sdk.crypto.ed25519.Ed25519Signature;
 import com.hedera.sdk.proto.*;
 import io.grpc.*;
+import io.grpc.netty.shaded.io.netty.util.concurrent.GlobalEventExecutor;
 
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 
@@ -20,6 +23,8 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
 
     @Nullable
     private final Client client;
+
+    private static final int MAX_RETRY_ATTEMPTS = 10;
 
     Transaction(
         @Nullable Client client,
@@ -92,9 +97,8 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
 
         T response = null;
         ResponseCodeEnum receiptStatus = ResponseCodeEnum.UNRECOGNIZED;
-        final int MAX_ATTEMPTS = 10;
 
-        for (int attempt = 1; attempt < MAX_ATTEMPTS; attempt++) {
+        for (int attempt = 1; attempt < MAX_RETRY_ATTEMPTS; attempt++) {
             response = execute.apply(id);
             receiptStatus = mapReceipt.apply(response)
                 .getStatus();
@@ -119,10 +123,93 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
     }
 
     public final TransactionReceipt executeForReceipt() throws HederaException {
+        getClient();
+
         return executeAndWaitFor(
-            id -> new TransactionReceiptQuery(client).setTransactionId(id)
+            id -> new TransactionReceiptQuery(getClient()).setTransactionId(id)
                 .execute(),
-            res -> res
+            receipt -> receipt
         );
+    }
+
+    public TransactionRecord executeForRecord() throws HederaException {
+        return executeAndWaitFor(
+            id -> new TransactionRecordQuery(getClient()).setTransaction(id)
+                .execute(),
+            TransactionRecord::getReceipt
+        );
+    }
+
+    public void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<Throwable> onError) {
+        var handler = new AsyncRetryHandler<>(
+                (id, onSuccess_, onError_) -> new TransactionReceiptQuery(getClient()).setTransactionId(id)
+                    .executeAsync(onSuccess_, onError_),
+                receipt -> receipt, onSuccess, onError
+        );
+
+        executeAsync(handler::waitFor, onError);
+    }
+
+    public void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<Throwable> onError) {
+        var handler = new AsyncRetryHandler<>(
+                (id, onSuccess_, onError_) -> new TransactionRecordQuery(getClient()).setTransaction(id)
+                    .executeAsync(onSuccess_, onError_),
+                TransactionRecord::getReceipt, onSuccess, onError
+        );
+
+        executeAsync(handler::waitFor, onError);
+    }
+
+    private Client getClient() {
+        return Objects.requireNonNull(client);
+    }
+
+    private static class AsyncRetryHandler<T> {
+        private final ExecuteAsync<T> execute;
+        private final Function<T, TransactionReceipt> mapReceipt;
+        private final Consumer<T> onSuccess;
+        private final Consumer<Throwable> onError;
+
+        private int attemptsLeft = MAX_RETRY_ATTEMPTS;
+
+        private AsyncRetryHandler(
+            ExecuteAsync<T> execute,
+            Function<T, TransactionReceipt> mapReceipt,
+            Consumer<T> onSuccess,
+            Consumer<Throwable> onError
+        ) {
+            this.execute = execute;
+            this.mapReceipt = mapReceipt;
+            this.onSuccess = onSuccess;
+            this.onError = onError;
+        }
+
+        private void waitFor(final TransactionId id) {
+            attemptsLeft -= 1;
+            execute.executeAsync(id, result -> handleResult(id, result), onError);
+        }
+
+        private void handleResult(TransactionId id, T result) {
+            var receipt = mapReceipt.apply(result);
+            var resultCode = receipt.getStatus();
+
+            if (resultCode == ResponseCodeEnum.UNKNOWN) {
+                if (attemptsLeft == 0) {
+                    onError.accept(new HederaException(ResponseCodeEnum.UNKNOWN));
+                    return;
+                }
+
+                GlobalEventExecutor.INSTANCE.schedule(() -> waitFor(id), 1500, TimeUnit.MILLISECONDS);
+            } else if (HederaException.isCodeExceptional(resultCode, false)) {
+                onError.accept(new HederaException(resultCode));
+            } else {
+                onSuccess.accept(result);
+            }
+        }
+    }
+
+    @FunctionalInterface
+    private interface ExecuteAsync<T> {
+        void executeAsync(TransactionId id, Consumer<T> onSuccess, Consumer<Throwable> onError);
     }
 }

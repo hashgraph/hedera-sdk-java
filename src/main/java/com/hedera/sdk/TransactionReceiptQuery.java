@@ -3,13 +3,15 @@ package com.hedera.sdk;
 import com.hedera.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
-import javax.annotation.Nullable;
-
 public final class TransactionReceiptQuery extends QueryBuilder<TransactionReceipt> {
     private final TransactionGetReceiptQuery.Builder builder = inner.getTransactionGetReceiptBuilder();
 
-    public TransactionReceiptQuery(@Nullable Client client) {
+    public TransactionReceiptQuery(Client client) {
         super(client);
+    }
+
+    TransactionReceiptQuery() {
+        super(null);
     }
 
     @Override

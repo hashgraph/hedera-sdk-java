@@ -11,7 +11,7 @@ public class TransactionRecordQuery extends QueryBuilder<TransactionRecord> {
     }
 
     TransactionRecordQuery() {
-        super((Client) null);
+        super(null);
     }
 
     @Override
