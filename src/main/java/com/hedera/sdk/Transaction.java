@@ -49,13 +49,7 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
         var inner = com.hedera.sdk.proto.Transaction.parseFrom(bytes);
         var body = TransactionBody.parseFrom(inner.getBodyBytes());
 
-        return new Transaction(
-            client,
-            inner.toBuilder(),
-            body.getNodeAccountID(),
-            body.getTransactionID(),
-            methodForTxnBody(body)
-        );
+        return new Transaction(client, inner.toBuilder(), body.getNodeAccountID(), body.getTransactionID(), methodForTxnBody(body));
     }
 
     public Transaction sign(Ed25519PrivateKey privateKey) {
@@ -67,7 +61,8 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
         var sigMap = inner.getSigMapBuilder();
 
         for (int i = 0; i < sigMap.getSigPairCount(); i++) {
-            var pubKeyPrefix = sigMap.getSigPair(i).getPubKeyPrefix();
+            var pubKeyPrefix = sigMap.getSigPair(i)
+                .getPubKeyPrefix();
 
             if (pubKey.startsWith(pubKeyPrefix)) {
                 throw new IllegalArgumentException("transaction already signed with key: " + privateKey.toString());
@@ -81,13 +76,12 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
         )
             .toBytes();
 
-        sigMap
-            .addSigPair(
-                SignaturePair.newBuilder()
-                    .setPubKeyPrefix(pubKey)
-                    .setEd25519(ByteString.copyFrom(signature))
-                    .build()
-            );
+        sigMap.addSigPair(
+            SignaturePair.newBuilder()
+                .setPubKeyPrefix(pubKey)
+                .setEd25519(ByteString.copyFrom(signature))
+                .build()
+        );
 
         return this;
     }
@@ -277,40 +271,40 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
 
     private static MethodDescriptor<com.hedera.sdk.proto.Transaction, TransactionResponse> methodForTxnBody(TransactionBodyOrBuilder body) {
         switch (body.getDataCase()) {
-            case ADMINDELETE:
-                return FileServiceGrpc.getAdminDeleteMethod();
-            case ADMINUNDELETE:
-                return FileServiceGrpc.getAdminUndeleteMethod();
-            case CONTRACTCALL:
-                return SmartContractServiceGrpc.getContractCallMethodMethod();
-            case CONTRACTCREATEINSTANCE:
-                return SmartContractServiceGrpc.getCreateContractMethod();
-            case CONTRACTUPDATEINSTANCE:
-                return SmartContractServiceGrpc.getUpdateContractMethod();
-            case CRYPTOADDCLAIM:
-                return CryptoServiceGrpc.getAddClaimMethod();
-            case CRYPTOCREATEACCOUNT:
-                return CryptoServiceGrpc.getCreateAccountMethod();
-            case CRYPTODELETE:
-                return CryptoServiceGrpc.getCryptoDeleteMethod();
-            case CRYPTODELETECLAIM:
-                return CryptoServiceGrpc.getDeleteClaimMethod();
-            case CRYPTOTRANSFER:
-                return CryptoServiceGrpc.getCryptoTransferMethod();
-            case CRYPTOUPDATEACCOUNT:
-                return CryptoServiceGrpc.getUpdateAccountMethod();
-            case FILEAPPEND:
-                return FileServiceGrpc.getAppendContentMethod();
-            case FILECREATE:
-                return FileServiceGrpc.getCreateFileMethod();
-            case FILEDELETE:
-                return FileServiceGrpc.getDeleteFileMethod();
-            case FILEUPDATE:
-                return FileServiceGrpc.getUpdateFileMethod();
-            case DATA_NOT_SET:
-                throw new IllegalArgumentException("method not set");
-            default:
-                throw new IllegalArgumentException("unsupported method");
+        case ADMINDELETE:
+            return FileServiceGrpc.getAdminDeleteMethod();
+        case ADMINUNDELETE:
+            return FileServiceGrpc.getAdminUndeleteMethod();
+        case CONTRACTCALL:
+            return SmartContractServiceGrpc.getContractCallMethodMethod();
+        case CONTRACTCREATEINSTANCE:
+            return SmartContractServiceGrpc.getCreateContractMethod();
+        case CONTRACTUPDATEINSTANCE:
+            return SmartContractServiceGrpc.getUpdateContractMethod();
+        case CRYPTOADDCLAIM:
+            return CryptoServiceGrpc.getAddClaimMethod();
+        case CRYPTOCREATEACCOUNT:
+            return CryptoServiceGrpc.getCreateAccountMethod();
+        case CRYPTODELETE:
+            return CryptoServiceGrpc.getCryptoDeleteMethod();
+        case CRYPTODELETECLAIM:
+            return CryptoServiceGrpc.getDeleteClaimMethod();
+        case CRYPTOTRANSFER:
+            return CryptoServiceGrpc.getCryptoTransferMethod();
+        case CRYPTOUPDATEACCOUNT:
+            return CryptoServiceGrpc.getUpdateAccountMethod();
+        case FILEAPPEND:
+            return FileServiceGrpc.getAppendContentMethod();
+        case FILECREATE:
+            return FileServiceGrpc.getCreateFileMethod();
+        case FILEDELETE:
+            return FileServiceGrpc.getDeleteFileMethod();
+        case FILEUPDATE:
+            return FileServiceGrpc.getUpdateFileMethod();
+        case DATA_NOT_SET:
+            throw new IllegalArgumentException("method not set");
+        default:
+            throw new IllegalArgumentException("unsupported method");
         }
     }
 }
