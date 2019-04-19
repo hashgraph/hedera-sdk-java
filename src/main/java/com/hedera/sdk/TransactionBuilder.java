@@ -140,6 +140,10 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         return build().sign(privateKey);
     }
 
+    public final byte[] toBytes() {
+        return build().toBytes();
+    }
+
     // Work around for java not recognized that this is completely safe
     // as T is required to extend this
     @SuppressWarnings("unchecked")
