@@ -1,5 +1,6 @@
 package com.hedera.sdk.crypto.ed25519
 
+import com.hedera.sdk.crypto.Key
 import spock.lang.Specification
 
 class Ed25519PublicKeyTest extends Specification {
@@ -17,12 +18,16 @@ class Ed25519PublicKeyTest extends Specification {
 	def "public key can be recovered from string"() {
 		when:
 		def key1 = Ed25519PrivateKey.generate().getPublicKey()
-		def key1Bytes = key1.toBytes()
-		def key2 = Ed25519PublicKey.fromBytes(key1Bytes)
-		def key2Bytes = key2.toBytes()
+		def key1Str = key1.toString()
+		def key2 = Ed25519PublicKey.fromString(key1Str)
+		def key2Str = key2.toString()
+		def key3 = Key.fromString(key1Str)
+		def key3Str = key3.toString()
 
 		then:
-		key1Bytes == key2Bytes
+		key3 instanceof Ed25519PublicKey
+		key1Str == key2Str
+		key1Str == key3Str
 	}
 
 	def "public key can be recovered from external string"() {
