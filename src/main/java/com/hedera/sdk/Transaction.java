@@ -1,13 +1,16 @@
 package com.hedera.sdk;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.sdk.account.AccountId;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.sdk.crypto.ed25519.Ed25519Signature;
 import com.hedera.sdk.proto.*;
 import io.grpc.*;
 import io.grpc.netty.shaded.io.netty.util.concurrent.GlobalEventExecutor;
+import org.bouncycastle.util.encoders.Hex;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -17,14 +20,15 @@ import javax.annotation.Nullable;
 public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transaction, TransactionResponse, TransactionId> {
 
     private final io.grpc.MethodDescriptor<com.hedera.sdk.proto.Transaction, com.hedera.sdk.proto.TransactionResponse> methodDescriptor;
-    private final com.hedera.sdk.proto.Transaction.Builder inner;
-    private final com.hedera.sdk.proto.AccountID nodeAccountId;
-    private final com.hedera.sdk.proto.TransactionID transactionId;
+    final com.hedera.sdk.proto.Transaction.Builder inner;
+    final com.hedera.sdk.proto.AccountID nodeAccountId;
+    final com.hedera.sdk.proto.TransactionID transactionId;
 
     @Nullable
     private final Client client;
 
     private static final int MAX_RETRY_ATTEMPTS = 10;
+    private static final int PREFIX_LEN = 6;
 
     Transaction(
         @Nullable Client client,
@@ -41,7 +45,30 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
         this.methodDescriptor = methodDescriptor;
     }
 
+    public static Transaction fromBytes(Client client, byte[] bytes) throws InvalidProtocolBufferException {
+        var inner = com.hedera.sdk.proto.Transaction.parseFrom(bytes);
+        var body = TransactionBody.parseFrom(inner.getBodyBytes());
+
+        return new Transaction(client, inner.toBuilder(), body.getNodeAccountID(), body.getTransactionID(), methodForTxnBody(body));
+    }
+
     public Transaction sign(Ed25519PrivateKey privateKey) {
+        var pubKey = ByteString.copyFrom(
+            privateKey.getPublicKey()
+                .toBytes()
+        );
+
+        var sigMap = inner.getSigMapBuilder();
+
+        for (int i = 0; i < sigMap.getSigPairCount(); i++) {
+            var pubKeyPrefix = sigMap.getSigPair(i)
+                .getPubKeyPrefix();
+
+            if (pubKey.startsWith(pubKeyPrefix)) {
+                throw new IllegalArgumentException("transaction already signed with key: " + privateKey.toString());
+            }
+        }
+
         var signature = Ed25519Signature.forMessage(
             privateKey,
             inner.getBodyBytes()
@@ -49,24 +76,19 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
         )
             .toBytes();
 
-        inner.getSigMapBuilder()
-            .addSigPair(
-                SignaturePair.newBuilder()
-                    .setPubKeyPrefix(
-                        ByteString.copyFrom(
-                            privateKey.getPublicKey()
-                                .toBytes()
-                        )
-                    )
-                    .setEd25519(ByteString.copyFrom(signature))
-                    .build()
-            );
+        sigMap.addSigPair(
+            SignaturePair.newBuilder()
+                .setPubKeyPrefix(pubKey)
+                .setEd25519(ByteString.copyFrom(signature))
+                .build()
+        );
 
         return this;
     }
 
     @Override
     public com.hedera.sdk.proto.Transaction toProto() {
+        validate();
         return inner.build();
     }
 
@@ -83,6 +105,30 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
         Objects.requireNonNull(channel, "Transaction.nodeAccountId not found on Client");
 
         return channel.getChannel();
+    }
+
+    @Override
+    protected void validate() {
+        var sigMap = inner.getSigMapOrBuilder();
+
+        if (sigMap.getSigPairCount() < 2) {
+            if (sigMap.getSigPairCount() == 0) {
+                addValidationError("Transaction requires at least one signature");
+            } // else contains one signature which is fine
+        } else {
+            var publicKeys = new HashSet<>();
+
+            for (int i = 0; i < sigMap.getSigPairCount(); i++) {
+                var sig = sigMap.getSigPairOrBuilder(i);
+                ByteString pubKeyPrefix = sig.getPubKeyPrefix();
+
+                if (!publicKeys.add(pubKeyPrefix)) {
+                    addValidationError("duplicate signing key: " + Hex.toHexString(getPrefix(pubKeyPrefix).toByteArray()) + "...");
+                }
+            }
+        }
+
+        checkValidationErrors("Transaction failed validation");
     }
 
     @Override
@@ -123,8 +169,6 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
     }
 
     public final TransactionReceipt executeForReceipt() throws HederaException {
-        getClient();
-
         return executeAndWaitFor(
             id -> new TransactionReceiptQuery(getClient()).setTransactionId(id)
                 .execute(),
@@ -158,6 +202,10 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
         );
 
         executeAsync(handler::waitFor, onError);
+    }
+
+    public byte[] toBytes() {
+        return toProto().toByteArray();
     }
 
     private Client getClient() {
@@ -211,5 +259,52 @@ public final class Transaction extends HederaCall<com.hedera.sdk.proto.Transacti
     @FunctionalInterface
     private interface ExecuteAsync<T> {
         void executeAsync(TransactionId id, Consumer<T> onSuccess, Consumer<Throwable> onError);
+    }
+
+    private static ByteString getPrefix(ByteString byteString) {
+        if (byteString.size() <= PREFIX_LEN) {
+            return byteString;
+        }
+
+        return byteString.substring(0, PREFIX_LEN);
+    }
+
+    private static MethodDescriptor<com.hedera.sdk.proto.Transaction, TransactionResponse> methodForTxnBody(TransactionBodyOrBuilder body) {
+        switch (body.getDataCase()) {
+        case ADMINDELETE:
+            return FileServiceGrpc.getAdminDeleteMethod();
+        case ADMINUNDELETE:
+            return FileServiceGrpc.getAdminUndeleteMethod();
+        case CONTRACTCALL:
+            return SmartContractServiceGrpc.getContractCallMethodMethod();
+        case CONTRACTCREATEINSTANCE:
+            return SmartContractServiceGrpc.getCreateContractMethod();
+        case CONTRACTUPDATEINSTANCE:
+            return SmartContractServiceGrpc.getUpdateContractMethod();
+        case CRYPTOADDCLAIM:
+            return CryptoServiceGrpc.getAddClaimMethod();
+        case CRYPTOCREATEACCOUNT:
+            return CryptoServiceGrpc.getCreateAccountMethod();
+        case CRYPTODELETE:
+            return CryptoServiceGrpc.getCryptoDeleteMethod();
+        case CRYPTODELETECLAIM:
+            return CryptoServiceGrpc.getDeleteClaimMethod();
+        case CRYPTOTRANSFER:
+            return CryptoServiceGrpc.getCryptoTransferMethod();
+        case CRYPTOUPDATEACCOUNT:
+            return CryptoServiceGrpc.getUpdateAccountMethod();
+        case FILEAPPEND:
+            return FileServiceGrpc.getAppendContentMethod();
+        case FILECREATE:
+            return FileServiceGrpc.getCreateFileMethod();
+        case FILEDELETE:
+            return FileServiceGrpc.getDeleteFileMethod();
+        case FILEUPDATE:
+            return FileServiceGrpc.getUpdateFileMethod();
+        case DATA_NOT_SET:
+            throw new IllegalArgumentException("method not set");
+        default:
+            throw new IllegalArgumentException("unsupported method");
+        }
     }
 }

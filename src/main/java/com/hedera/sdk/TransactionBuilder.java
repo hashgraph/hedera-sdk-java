@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
-        extends Builder<com.hedera.sdk.proto.Transaction, TransactionResponse, TransactionId> {
+        extends HederaCall<com.hedera.sdk.proto.Transaction, TransactionResponse, TransactionId> {
     protected final com.hedera.sdk.proto.Transaction.Builder inner = com.hedera.sdk.proto.Transaction.newBuilder();
     protected final TransactionBody.Builder bodyBuilder = TransactionBody.newBuilder();
 
@@ -138,6 +138,10 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
 
     public final Transaction sign(Ed25519PrivateKey privateKey) {
         return build().sign(privateKey);
+    }
+
+    public final byte[] toBytes() {
+        return build().toBytes();
     }
 
     // Work around for java not recognized that this is completely safe
