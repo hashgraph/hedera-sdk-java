@@ -1101,6 +1101,10 @@ public class HederaAccount implements Serializable {
 
 		HederaSignatures sigsForTransaction = new HederaSignatures();
 		sigsForTransaction.addSignature(this.txQueryDefaults.payingKeyPair.getPublicKey(), this.txQueryDefaults.payingKeyPair.signMessage(createBody.toByteArray()));
+		
+		if (this.receiverSigRequired ) {
+			sigsForTransaction.addSignature(defaults.receiverSignatureKey.getPublicKey(), defaults.receiverSignatureKey.signMessage(createBody.toByteArray()));
+		}
 
 		// new realm admin if necessary
 		if (this.newRealmAdminKey != null) {
