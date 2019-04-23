@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Objects;
 
 public final class CreateStatefulContract {
     public static void main(String[] args) throws HederaException, IOException {
@@ -49,7 +48,7 @@ public final class CreateStatefulContract {
             .setContents(byteCode);
 
         var fileReceipt = fileTx.executeForReceipt();
-        var newFileId = Objects.requireNonNull(fileReceipt.getFileId());
+        var newFileId = fileReceipt.getFileId();
 
         System.out.println("contract bytecode file: " + newFileId);
 
@@ -62,7 +61,7 @@ public final class CreateStatefulContract {
             .setAdminKey(operatorKey.getPublicKey());
 
         var contractReceipt = contractTx.executeForReceipt();
-        var newContractId = Objects.requireNonNull(contractReceipt.getContractId());
+        var newContractId = contractReceipt.getContractId();
 
         System.out.println("new contract ID: " + newContractId);
 

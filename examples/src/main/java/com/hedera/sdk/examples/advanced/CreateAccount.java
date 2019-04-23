@@ -5,8 +5,6 @@ import com.hedera.sdk.account.AccountCreateTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.sdk.examples.ExampleHelper;
 
-import java.util.Objects;
-
 public final class CreateAccount {
     public static void main(String[] args) throws HederaException {
         // Generate a Ed25519 private, public key pair
@@ -26,7 +24,7 @@ public final class CreateAccount {
         // This will wait for the receipt to become available
         var receipt = tx.executeForReceipt();
 
-        var newAccountId = Objects.requireNonNull(receipt.getAccountId());
+        var newAccountId = receipt.getAccountId();
 
         System.out.println("account = " + newAccountId);
     }

@@ -100,13 +100,13 @@ public final class Client {
             .setInitialBalance(initialBalance)
             .executeForReceipt();
 
-        return Objects.requireNonNull(receipt.getAccountId());
+        return receipt.getAccountId();
     }
 
     public void createAccountAsync(Key publicKey, long initialBalance, Consumer<AccountId> onSuccess, Consumer<Throwable> onError) {
         new AccountCreateTransaction(this).setKey(publicKey)
             .setInitialBalance(initialBalance)
-            .executeForReceiptAsync(receipt -> onSuccess.accept(Objects.requireNonNull(receipt.getAccountId())), onError);
+            .executeForReceiptAsync(receipt -> onSuccess.accept(receipt.getAccountId()), onError);
     }
 
     public AccountInfo getAccount(AccountId id) throws HederaException {

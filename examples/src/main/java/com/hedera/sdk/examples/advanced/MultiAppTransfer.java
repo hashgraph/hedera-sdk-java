@@ -9,8 +9,6 @@ import com.hedera.sdk.account.CryptoTransferTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.sdk.examples.ExampleHelper;
 
-import java.util.Objects;
-
 public class MultiAppTransfer {
     // the exchange should possess this key, we're only generating it for demonstration purposes
     private static final Ed25519PrivateKey exchangeKey = Ed25519PrivateKey.generate();
@@ -29,7 +27,7 @@ public class MultiAppTransfer {
             .setReceiverSignatureRequired(true)
             .executeForReceipt();
 
-        var exchangeAccountId = Objects.requireNonNull(exchangeAccountReceipt.getAccountId());
+        var exchangeAccountId = exchangeAccountReceipt.getAccountId();
 
         // assume the user has an account on the hashgraph with funds already
         var userAccountId = client.createAccount(userKey.getPublicKey(), client.getMaxTransactionFee() + transferAmount);
