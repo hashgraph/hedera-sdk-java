@@ -1,8 +1,9 @@
 package com.hedera.sdk.common;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.hedera.sdk.node.HederaNode;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 /**
@@ -21,7 +22,7 @@ public class HederaTransactionState {
 		public HederaTransactionReceipt receipt;
 	}
 	
-	private static Map<HederaTransactionID, TransactionState> stateMap = new HashMap<>();
+	private static Map<HederaTransactionID, TransactionState> stateMap = new ConcurrentHashMap();
 
 	/**
 	 * Adds (or replaces) a transaction to the internal hashmap
