@@ -1,0 +1,11 @@
+[
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "buy",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "pure",
+		"type": "function"
+	}
+]
