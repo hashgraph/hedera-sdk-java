@@ -123,9 +123,6 @@ public class HederaAccountID implements Serializable {
 			accountID.setRealmNum(this.realmNum);
 		}
 		accountID.setShardNum(this.shardNum);
-		if (this.realmNum != -1) {
-			accountID.setRealmNum(this.realmNum);
-		}
 		accountID.setAccountNum(this.accountNum);
 
 		return accountID.build();
