@@ -22,9 +22,13 @@ public class MultiAppTransfer {
         var transferAmount = 10_000;
 
         // the exchange creates an account for the user to transfer funds to
-        var exchangeAccountReceipt = new AccountCreateTransaction(client).setKey(exchangeKey.getPublicKey())
+        var exchangeAccountReceipt = new AccountCreateTransaction(client)
             // the exchange only accepts transfers that it validates through a side channel (e.g. REST API)
             .setReceiverSignatureRequired(true)
+            .setKey(exchangeKey.getPublicKey())
+            // The owner key has to sign this transaction
+            // when setReceiverSignatureRequired is true
+            .sign(exchangeKey)
             .executeForReceipt();
 
         var exchangeAccountId = exchangeAccountReceipt.getAccountId();
