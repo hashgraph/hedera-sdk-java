@@ -6,7 +6,6 @@ import com.hedera.sdk.file.FileCreateTransaction;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Objects;
 
 public final class CreateFile {
     public static void main(String[] args) throws HederaException {
@@ -26,7 +25,7 @@ public final class CreateFile {
             .setContents(fileContents);
 
         var receipt = tx.executeForReceipt();
-        var newFileId = Objects.requireNonNull(receipt.getFileId());
+        var newFileId = receipt.getFileId();
 
         System.out.println("file: " + newFileId);
     }

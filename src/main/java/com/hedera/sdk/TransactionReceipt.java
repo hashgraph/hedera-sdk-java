@@ -6,8 +6,6 @@ import com.hedera.sdk.file.FileId;
 import com.hedera.sdk.proto.Response;
 import com.hedera.sdk.proto.ResponseCodeEnum;
 
-import javax.annotation.Nullable;
-
 public final class TransactionReceipt {
     private final com.hedera.sdk.proto.TransactionReceipt inner;
 
@@ -28,19 +26,28 @@ public final class TransactionReceipt {
         return inner.getStatus();
     }
 
-    @Nullable
     public AccountId getAccountId() {
-        return inner.hasAccountID() ? new AccountId(inner.getAccountIDOrBuilder()) : null;
+        if (!inner.hasAccountID()) {
+            throw new IllegalStateException("receipt does not contain an account ID");
+        }
+
+        return new AccountId(inner.getAccountIDOrBuilder());
     }
 
-    @Nullable
     public FileId getFileId() {
-        return inner.hasFileID() ? new FileId(inner.getFileIDOrBuilder()) : null;
+        if (!inner.hasFileID()) {
+            throw new IllegalStateException("receipt does not contain a file ID");
+        }
+
+        return new FileId(inner.getFileIDOrBuilder());
     }
 
-    @Nullable
     public ContractId getContractId() {
-        return inner.hasContractID() ? new ContractId(inner.getContractIDOrBuilder()) : null;
+        if (!inner.hasContractID()) {
+            throw new IllegalStateException("receipt does not contain a contract ID");
+        }
+
+        return new ContractId(inner.getContractIDOrBuilder());
     }
 
     public com.hedera.sdk.proto.TransactionReceipt toProto() {

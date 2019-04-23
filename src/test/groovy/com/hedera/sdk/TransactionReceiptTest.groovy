@@ -18,20 +18,38 @@ class TransactionReceiptTest extends Specification {
 		thrown(IllegalArgumentException)
 	}
 
-	def "nullable fields return null"() {
+	def "missing fields throw"() {
 		given:
 		def response = Response.newBuilder()
 				.setTransactionGetReceipt(TransactionGetReceiptResponse.defaultInstance)
 				.build()
 
-		when:
 		def receipt = new TransactionReceipt(response)
 
-		then:
+		expect:
 		receipt.status == ResponseCodeEnum.OK
-		receipt.accountId == null
-		receipt.contractId == null
-		receipt.fileId == null
+
+		when:
+		receipt.accountId
+
+		then:
+		def eAcct = thrown(IllegalStateException)
+		eAcct.message == "receipt does not contain an account ID"
+
+		when:
+		receipt.contractId
+
+		then:
+		def eCont = thrown(IllegalStateException)
+		eCont.message == "receipt does not contain a contract ID"
+
+
+		when:
+		receipt.fileId
+
+		then:
+		def eFile = thrown(IllegalStateException)
+		eFile.message == "receipt does not contain a file ID"
 	}
 
 	def "receipt with account ID"() {
