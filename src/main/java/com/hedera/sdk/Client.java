@@ -51,7 +51,7 @@ public final class Client {
         return this;
     }
 
-    long getMaxTransactionFee() {
+    public long getMaxTransactionFee() {
         return maxTransactionFee;
     }
 
