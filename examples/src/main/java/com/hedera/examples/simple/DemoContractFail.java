@@ -72,7 +72,7 @@ public final class DemoContractFail {
 				} else {
 					// output the error
 					System.out.println("Error=" + result.errorMessage());
-					System.out.println("Address=" + wrapper.addressFromOutput(result));
+					System.out.println("Address=" + wrapper.outputAddress(result));
 					System.out.println("Data=" + new String(wrapper.outputData(result)));
 				}
 			}

@@ -260,7 +260,7 @@ public class ContractFunctionsWrapper {
 		Object[] retResults = getFunctionResult(functionName, result);
 		return Hex.toHexString((byte[]) retResults[0]);
 	}
-	public String addressFromOutput(HederaContractFunctionResult result) {
+	public String outputAddress(HederaContractFunctionResult result) {
         byte[] address = new byte[20];
         for (int i=0; i<20; i++) {
             address[i] = result.contractCallResult()[i];
