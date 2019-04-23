@@ -9,7 +9,9 @@ import com.hedera.sdk.account.CryptoTransferTransaction;
 import com.hedera.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.sdk.examples.ExampleHelper;
 
-public class TransferCryptoToExchange {
+import java.util.Objects;
+
+public class MultiAppTransfer {
     // the exchange should possess this key, we're only generating it for demonstration purposes
     private static final Ed25519PrivateKey exchangeKey = Ed25519PrivateKey.generate();
 
@@ -27,24 +29,10 @@ public class TransferCryptoToExchange {
             .setReceiverSignatureRequired(true)
             .executeForReceipt();
 
-        var exchangeAccountId = exchangeAccountReceipt.getAccountId();
-
-        if (exchangeAccountId == null) {
-            System.out.println("Unknown failure creating exchange account");
-            return;
-        }
+        var exchangeAccountId = Objects.requireNonNull(exchangeAccountReceipt.getAccountId());
 
         // assume the user has an account on the hashgraph with funds already
-        var userAccountReceipt = new AccountCreateTransaction(client).setKey(userKey.getPublicKey())
-            .setInitialBalance(client.getMaxTransactionFee() + transferAmount)
-            .executeForReceipt();
-
-        var userAccountId = userAccountReceipt.getAccountId();
-
-        if (userAccountId == null) {
-            System.out.println("Unknown failure creating exchange account");
-            return;
-        }
+        var userAccountId = client.createAccount(userKey.getPublicKey(), client.getMaxTransactionFee() + transferAmount);
 
         var transferTxn = new CryptoTransferTransaction(client).addSender(userAccountId, transferAmount)
             .addRecipient(exchangeAccountId, transferAmount)
