@@ -117,7 +117,7 @@ public class ContractFunctionsWrapper {
 		return encodedFunc;
 	}
 
-	private Object[] callLocal(HederaContract contract, long localGas, long maxResultSize, String functionName, Object ... parameterValues) throws Exception {
+	public Object[] callLocal(HederaContract contract, long localGas, long maxResultSize, String functionName, Object ... parameterValues) throws Exception {
 		Object[] retResults = new Object[0];
 		
 		JSONObject abiJSON = findABI(functionName);
