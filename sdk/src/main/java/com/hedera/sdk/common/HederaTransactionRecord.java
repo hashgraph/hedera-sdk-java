@@ -180,6 +180,10 @@ public class HederaTransactionRecord implements Serializable {
 			this.transactionHash = transaction.transactionRecord().transactionHash;
 			this.transactionId = transaction.transactionRecord().transactionId;
 			this.transactionReceipt = transaction.transactionRecord().transactionReceipt;
+			this.contractCallResult = transaction.transactionRecord().contractCallResult;
+			this.contractCreateResult = transaction.transactionRecord().contractCreateResult;
+			this.transferList = transaction.transactionRecord().transferList;
+			this.bodyType = transaction.transactionRecord().bodyType;
 		}
 	}
 	//
