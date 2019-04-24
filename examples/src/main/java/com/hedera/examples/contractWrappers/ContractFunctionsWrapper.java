@@ -95,8 +95,7 @@ public class ContractFunctionsWrapper {
 		return constructor;
 	}
 	
-	private Object[] callLocal(HederaContract contract, long localGas, long maxResultSize, String functionName, Object ... parameterValues) throws Exception {
-		Object[] retResults = new Object[0];
+	private HederaContractFunctionResult callLocal(HederaContract contract, long localGas, long maxResultSize, String functionName, Object ... parameterValues) throws Exception {
 		
 		JSONObject abiJSON = findABI(functionName);
 		String abi = abiJSON.toString();
@@ -136,42 +135,47 @@ public class ContractFunctionsWrapper {
 		} else {
 			// an error occurred
 			ExampleUtilities.showResult("**    Running local function - precheck ERROR " + contract.getPrecheckResult());
-			functionResult = null;
 		}
 
 		if (functionResult == null) {
 			throw new Exception ("Error running local smart contract function " + functionName);
 		}
 		
-		retResults = function.decodeResult(functionResult.contractCallResult());
-		return retResults;
+		return functionResult;
 	}
 	
 	public int callLocalInt(HederaContract contract, long localGas, long maxResultSize, String functionName, Object ... parameterValues) throws Exception {
-		Object[] result = this.callLocal(contract, localGas, maxResultSize, functionName, parameterValues);
-		BigInteger bigResult = (BigInteger) result[0];
+		HederaContractFunctionResult result = this.callLocal(contract, localGas, maxResultSize, functionName, parameterValues);
+		Object[] retResults = getFunctionResult(functionName, result);
+		
+		BigInteger bigResult = (BigInteger) retResults[0];
 		return bigResult.intValue();
 	}
 	public String callLocalString(HederaContract contract, long localGas, long maxResultSize, String functionName, Object ... parameterValues) throws Exception {
-		Object[] result = this.callLocal(contract, localGas, maxResultSize, functionName, parameterValues);
-		return (String) result[0];
+		HederaContractFunctionResult result = this.callLocal(contract, localGas, maxResultSize, functionName, parameterValues);
+		Object[] retResults = getFunctionResult(functionName, result);
+		return (String) retResults[0];
 	}
 	public BigInteger callLocalBigInt(HederaContract contract, long localGas, long maxResultSize, String functionName, Object ... parameterValues) throws Exception {
-		Object[] result = this.callLocal(contract, localGas, maxResultSize, functionName, parameterValues);
-		return (BigInteger) result[0];
+		HederaContractFunctionResult result = this.callLocal(contract, localGas, maxResultSize, functionName, parameterValues);
+		Object[] retResults = getFunctionResult(functionName, result);
+		return (BigInteger) retResults[0];
 	}
 	public boolean callLocalBoolean(HederaContract contract, long localGas, long maxResultSize, String functionName, Object ... parameterValues) throws Exception {
-		Object[] result = this.callLocal(contract, localGas, maxResultSize, functionName, parameterValues);
-		return (boolean) result[0];
+		HederaContractFunctionResult result = this.callLocal(contract, localGas, maxResultSize, functionName, parameterValues);
+		Object[] retResults = getFunctionResult(functionName, result);
+		return (boolean) retResults[0];
 	}
 	public long callLocalLong(HederaContract contract, long localGas, long maxResultSize, String functionName, Object ... parameterValues) throws Exception {
-		Object[] result = this.callLocal(contract, localGas, maxResultSize, functionName, parameterValues);
-		BigInteger bigResult = (BigInteger) result[0];
+		HederaContractFunctionResult result = this.callLocal(contract, localGas, maxResultSize, functionName, parameterValues);
+		Object[] retResults = getFunctionResult(functionName, result);
+		BigInteger bigResult = (BigInteger) retResults[0];
 		return bigResult.longValue();
 	}
 	public String callLocalAddress(HederaContract contract, long localGas, long maxResultSize, String functionName, Object ... parameterValues) throws Exception {
-		Object[] result = this.callLocal(contract, localGas, maxResultSize, functionName, parameterValues);
-		return Hex.toHexString((byte[]) result[0]);
+		HederaContractFunctionResult result = this.callLocal(contract, localGas, maxResultSize, functionName, parameterValues);
+		Object[] retResults = getFunctionResult(functionName, result);
+		return Hex.toHexString((byte[]) retResults[0]);
 	}
 			
 	public HederaContractFunctionResult call(HederaContract contract, long gas, long amount, String functionName, Object ... parameterValues) throws Exception {
