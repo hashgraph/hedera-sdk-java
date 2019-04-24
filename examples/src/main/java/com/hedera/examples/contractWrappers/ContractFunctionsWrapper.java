@@ -95,7 +95,7 @@ public class ContractFunctionsWrapper {
 		return constructor;
 	}
 	
-	private HederaContractFunctionResult callLocal(HederaContract contract, long localGas, long maxResultSize, String functionName, Object ... parameterValues) throws Exception {
+	public HederaContractFunctionResult callLocal(HederaContract contract, long localGas, long maxResultSize, String functionName, Object ... parameterValues) throws Exception {
 		
 		JSONObject abiJSON = findABI(functionName);
 		String abi = abiJSON.toString();
@@ -237,6 +237,13 @@ public class ContractFunctionsWrapper {
 		HederaTransactionRecord record = new HederaTransactionRecord(contract.hederaTransactionID, contract.txQueryDefaults.node.contractGetRecordsQueryFee, contract.txQueryDefaults);
 		return record;
 	}
+
+	public Object[] callForObjectArray(HederaContract contract, long gas, long amount, String functionName, Object ... parameterValues) throws Exception {
+		HederaTransactionRecord record = this.callForRecord(contract, gas, amount, functionName, parameterValues);
+		
+		return getFunctionResult(functionName, record.contractCallResult);
+	}
+	
 	public int callInt(HederaContract contract, long localGas, long amount, String functionName, Object ... parameterValues) throws Exception {
 		HederaContractFunctionResult result = this.call(contract, localGas, amount, functionName, parameterValues);
 		Object[] retResults = getFunctionResult(functionName, result);
