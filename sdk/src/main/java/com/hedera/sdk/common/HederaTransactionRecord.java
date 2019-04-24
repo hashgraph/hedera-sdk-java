@@ -186,29 +186,4 @@ public class HederaTransactionRecord implements Serializable {
 			this.bodyType = transaction.transactionRecord().bodyType;
 		}
 	}
-	//
-	/** 
-	 * Gets a fast (free) record for a transaction (lasts 180 seconds)
-	 * @param transactionID the transaction ID against which to get the record
-	 * @param txQueryDefaults - default parameters for running the query (inc. node)
-	 * @throws Exception in the event of an error 
-	 */
-	public HederaTransactionRecord(HederaTransactionID transactionID, HederaTransactionAndQueryDefaults txQueryDefaults) throws Exception {
-		HederaTransaction transaction = new HederaTransaction();
-		Utilities.throwIfNull("txQueryDefaults", txQueryDefaults);
-		Utilities.throwIfNull("txQueryDefaults.node", txQueryDefaults.node);
-		
-		transaction.setNode(txQueryDefaults.node);
-		
-		if (transaction.getFastRecord(transactionID, QueryResponseType.ANSWER_ONLY)) {
-			this.consensusTimeStamp = transaction.transactionRecord().consensusTimeStamp;
-			this.contractCallResult = transaction.transactionRecord().contractCallResult;
-			this.contractCreateResult = transaction.transactionRecord().contractCreateResult;
-			this.memo = transaction.transactionRecord().memo;
-			this.transactionFee = transaction.transactionRecord().transactionFee;
-			this.transactionHash = transaction.transactionRecord().transactionHash;
-			this.transactionId = transaction.transactionRecord().transactionId;
-			this.transactionReceipt = transaction.transactionRecord().transactionReceipt;
-		}
-	}
 }

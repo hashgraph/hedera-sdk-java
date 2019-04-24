@@ -1020,41 +1020,6 @@ public class HederaNode implements Serializable {
 		return response;
 	}
 
-	/**
-	 * Sends a query to a node to get a fast transaction record and returns the result of the request
-	 * @param query the {@link HederaQuery} to send
-	 * @return {@link Response} the result of the query
-	 * @throws InterruptedException in the event of a node communication failure
-	 * @throws StatusRuntimeException in the event of a node communication failure
-	 */
-	public Response getTransactionFastRecord(HederaQuery query) throws InterruptedException, StatusRuntimeException {
-
-		logger.debug("RUNNING QUERY TO NODE");
-		logger.debug(query.getProtobuf().toString());
-
-		Response response = null;
-		if (query.getProtobuf().hasTransactionGetFastRecord()) {
-			openChannel();
-			CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
-			for (int i=0; i < busyRetryCount; i++) {
-				response = blockingStub.getFastTransactionRecord(query.getProtobuf());
-				// retry if busy
-				if (response.getTransactionGetFastRecord().getHeader().getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
-					logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
-					Thread.sleep(waitMillisLong);
-				} else {
-					break;
-				}
-			}
-		} else {
-			throw new IllegalStateException("Invalid Query Type");
-		}
-
-		logger.debug("--->QUERY RESPONSE");
-		logger.debug(response.toString());
-
-		return response;
-	}
 	
 	/**
 	 * Sends a query to a node to get file contents and returns the result of the request
