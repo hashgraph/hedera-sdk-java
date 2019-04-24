@@ -1,3 +1,11 @@
+buildscript {
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+'
+	}
+}
 plugins {
 	id 'java-library'
 	id 'groovy'
@@ -26,7 +34,15 @@ plugins {
 
 	// code coverage (JaCoCo)
 	id 'jacoco'
+
+	id 'maven'
+	id 'maven-publish'
 }
+
+apply plugin: 'com.jfrog.bintray'
+
+group = 'com.hedera'
+version = '0.4.0'
 
 repositories { jcenter() }
 
@@ -174,5 +190,33 @@ tasks.withType(JavaCompile).configureEach {
 		// Listen to @Generated annotations and ignore those
 		// files for analysis
 		options.errorprone.disableWarningsInGeneratedCode = true
+	}
+}
+
+bintray {
+	user = System.getenv('BINTRAY_USER')
+	key = System.getenv('BINTRAY_KEY')
+	publications = ['MyPublication']
+	override = true
+	publish = true
+	pkg {
+		repo = 'maven'
+		name = 'hedera-sdk'
+		userOrg = 'hashgraph'
+
+		version {
+			name = '0.4.0'
+		}
+	}
+}
+
+publishing {
+	publications {
+		MyPublication(MavenPublication) {
+			from components.java
+			groupId 'com.hedera'
+			artifactId 'sdk'
+			version '0.4.0'
+		}
 	}
 }
