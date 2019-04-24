@@ -179,6 +179,12 @@ public class ContractFunctionsWrapper {
 	}
 			
 	public HederaContractFunctionResult call(HederaContract contract, long gas, long amount, String functionName, Object ... parameterValues) throws Exception {
+		HederaTransactionRecord record = this.callForRecord(contract, gas, amount, functionName, parameterValues);
+		
+		return record.contractCallResult;
+	}
+	
+	public HederaTransactionRecord callForRecord(HederaContract contract, long gas, long amount, String functionName, Object ... parameterValues) throws Exception {
 		
 		JSONObject abiJSON = findABI(functionName);
 		String abi = abiJSON.toString();
@@ -229,7 +235,7 @@ public class ContractFunctionsWrapper {
 		}
 
 		HederaTransactionRecord record = new HederaTransactionRecord(contract.hederaTransactionID, contract.txQueryDefaults.node.contractGetRecordsQueryFee, contract.txQueryDefaults);
-		return record.contractCallResult;
+		return record;
 	}
 	public int callInt(HederaContract contract, long localGas, long amount, String functionName, Object ... parameterValues) throws Exception {
 		HederaContractFunctionResult result = this.call(contract, localGas, amount, functionName, parameterValues);
