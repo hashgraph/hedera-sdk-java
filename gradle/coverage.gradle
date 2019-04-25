@@ -2,7 +2,7 @@ jacocoTestReport {
 	beforeEvaluate {
 		classDirectories.from = files(classDirectories.files.collect {
 			fileTree(dir: it, excludes: [
-				"com/hedera/sdk/proto/**"
+				"com/hedera/hashgraph/sdk/proto/**"
 			])
 		})
 	}
@@ -19,7 +19,7 @@ jacocoTestCoverageVerification {
 			enabled = false
 
 			element = "CLASS"
-			excludes = ["com.hedera.sdk.proto.*"]
+			excludes = ["com.hedera.hashgraph.sdk.proto.*"]
 
 			limit {
 				counter = "LINE"

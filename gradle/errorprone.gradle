@@ -9,7 +9,7 @@ tasks.withType(JavaCompile) {
 		error("NullAway")
 
 		// NullAway: Check for null violations only in these packages
-		option("NullAway:AnnotatedPackages", "com.hedera")
+		option("NullAway:AnnotatedPackages", "com.hedera.hashgraph")
 
 		// NullAway: Process @Nullable and @NonNull annotations from
 		// 	third-party packages

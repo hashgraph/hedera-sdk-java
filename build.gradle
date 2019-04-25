@@ -21,7 +21,7 @@ plugins {
 	id "com.jfrog.bintray" version "1.8.4"
 }
 
-group = "com.hedera"
+group = "com.hedera.hashgraph"
 version = "0.4.0"
 
 sourceCompatibility = JavaVersion.VERSION_11
