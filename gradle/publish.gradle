@@ -1,7 +1,7 @@
 bintray {
 	user = System.getenv("BINTRAY_USER")
 	key = System.getenv("BINTRAY_KEY")
-	publications = ["MyPublication"]
+	publications = ["HederaSdkPublication"]
 	override = true
 	publish = true
 	pkg {
@@ -10,18 +10,22 @@ bintray {
 		userOrg = "hashgraph"
 
 		version {
-			name = "0.4.0"
+			name = project.properties["version"]
 		}
 	}
 }
 
 publishing {
 	publications {
-		MyPublication(MavenPublication) {
+		HederaSdkPublication(MavenPublication) {
 			from components.java
-			groupId "com.hedera"
+			groupId "com.hedera.hashgraph"
 			artifactId "sdk"
-			version "0.4.0"
+			version project.properties["version"]
 		}
 	}
+}
+
+release {
+	failOnPublishNeeded = false
 }

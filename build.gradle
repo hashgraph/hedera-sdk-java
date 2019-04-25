@@ -19,10 +19,13 @@ plugins {
 	// Publish artifacts to BinTray
 	// https://github.com/bintray/gradle-bintray-plugin
 	id "com.jfrog.bintray" version "1.8.4"
+
+	// https://github.com/researchgate/gradle-release
+	id 'net.researchgate.release' version '2.6.0'
 }
 
 group = "com.hedera.hashgraph"
-version = "0.4.0"
+version = project.properties["version"]
 
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
@@ -30,6 +33,7 @@ targetCompatibility = JavaVersion.VERSION_11
 apply from: "gradle/dependencies.gradle"
 apply from: "gradle/errorprone.gradle"
 apply from: "gradle/protobuf.gradle"
+apply from: "gradle/publish.gradle"
 
 repositories {
 	jcenter()
