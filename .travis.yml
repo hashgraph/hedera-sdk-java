@@ -5,7 +5,6 @@ jdk:
 
 env:
     global:
-        - GRADLE_USER_HOME="$CI_PROJECT_DIR/.gradle"
         - GRADLE_OPTS="-Dorg.gradle.internal.launcher.welcomeMessageEnabled=false"
 
 # Gradle and Travis both recommend deleting these paths before caching
