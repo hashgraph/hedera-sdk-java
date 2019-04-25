@@ -33,3 +33,5 @@ release {
 	tagCommitMessage = "[release] version: "
 	newVersionCommitMessage = "[release] start next development iteration: "
 }
+
+afterReleaseBuild.dependsOn bintrayUpload
