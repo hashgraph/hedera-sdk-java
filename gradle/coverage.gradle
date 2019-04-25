@@ -1,0 +1,34 @@
+jacocoTestReport {
+	beforeEvaluate {
+		classDirectories.from = files(classDirectories.files.collect {
+			fileTree(dir: it, excludes: [
+				"com/hedera/sdk/proto/**"
+			])
+		})
+	}
+
+	reports {
+		xml.enabled false
+		html.destination file("$buildDir/jacoco/jacocoTestCoverage")
+	}
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			enabled = false
+
+			element = "CLASS"
+			excludes = ["com.hedera.sdk.proto.*"]
+
+			limit {
+				counter = "LINE"
+				value = "COVEREDRATIO"
+				minimum = 0.8
+			}
+		}
+	}
+}
+
+// enforces code coverage validation on check
+check.dependsOn jacocoTestCoverageVerification

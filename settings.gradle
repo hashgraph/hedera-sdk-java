@@ -1,2 +1,9 @@
+pluginManagement {
+	repositories {
+		gradlePluginPortal()
+		jcenter()
+	}
+}
+
 rootProject.name = 'hedera-sdk-java'
 include 'examples'

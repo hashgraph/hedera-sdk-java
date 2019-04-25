@@ -1,0 +1,28 @@
+dependencies {
+	compileOnly libraries.errorproneAnnotations
+	errorprone libraries.errorprone, libraries.nullAway
+}
+
+tasks.withType(JavaCompile) {
+	options.errorprone {
+		// NullAway: Treat any violations as a build error
+		error("NullAway")
+
+		// NullAway: Check for null violations only in these packages
+		option("NullAway:AnnotatedPackages", "com.hedera")
+
+		// NullAway: Process @Nullable and @NonNull annotations from
+		// 	third-party packages
+		option("NullAway:AcknowledgeRestrictiveAnnotations", "true")
+
+		// NullAway: Check for Option emptiness
+		option("NullAway:CheckOptionalEmptiness", "true")
+
+		// NullAway: Ignore @Generated files
+		option("NullAway:TreatGeneratedAsUnannotated", "true")
+
+		// Listen to @Generated annotations and ignore those
+		// files for analysis
+		disableWarningsInGeneratedCode = true
+	}
+}
