@@ -1,4 +1,5 @@
 # Hedera Java SDK
+[![Build Status](https://travis-ci.org/hashgraph/hedera-sdk-java.svg?branch=master)](https://travis-ci.org/hashgraph/hedera-sdk-java)
 
 > The Java SDK for interacting with [Hedera Hashgraph]: the official distributed consensus 
 > platform built using the hashgraph consensus algorithm for fast, fair and secure 
