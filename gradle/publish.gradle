@@ -28,4 +28,8 @@ publishing {
 
 release {
 	failOnPublishNeeded = false
+	tagTemplate = 'v$version'
+	preTagCommitMessage = "[release] version: "
+	tagCommitMessage = "[release] version: "
+	newVersionCommitMessage = "[release] start next development iteration: "
 }
