@@ -1,7 +1,7 @@
 bintray {
 	user = System.getenv("BINTRAY_USER")
 	key = System.getenv("BINTRAY_KEY")
-	publications = ["HederaSdkPublication"]
+	configurations = ['archives']
 	override = true
 	publish = true
 	pkg {
@@ -15,21 +15,15 @@ bintray {
 	}
 }
 
-publishing {
-	publications {
-		HederaSdkPublication(MavenPublication) {
-			from components.java
-			groupId "com.hedera.hashgraph"
-			artifactId "sdk"
-			version project.properties["version"]
-		}
-	}
-}
-
 // Add sources to the JAR
 // This is a requirement for jcenter
-jar {
-	from sourceSets.main.allSource
+task sourcesJar(type: Jar) {
+	classifier = 'sources'
+	from sourceSets.main.java.srcDirs
+}
+
+artifacts {
+	archives sourcesJar
 }
 
 release {
