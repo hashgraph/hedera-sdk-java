@@ -1,222 +1,48 @@
-buildscript {
-	repositories {
-		jcenter()
-	}
-	dependencies {
-		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+'
-	}
-}
 plugins {
-	id 'java-library'
-	id 'groovy'
+	id "java-library"
+	id "groovy"
+	id "maven-publish"
+	id "jacoco"				// Code Coverage (JaCoCo)
+	id "idea"				// Intellij IDEA
 
-	// https://docs.gradle.org/current/userguide/idea_plugin.html
-	id 'idea'
+	// https://github.com/google/protobuf-gradle-plugin
+	id "com.google.protobuf" version "0.8.8"
 
-	// Provides protobuf compilation
-	id 'com.google.protobuf' version '0.8.8'
-
-	// Autoformat Java and Groovy code
-	id 'com.diffplug.gradle.spotless' version '3.22.0'
-
-	// Use the ErrorProne compiler - Catch common Java mistakes as compile-time errors
+	// Catch common Java mistakes as compile-time errors
 	// https://errorprone.info/
-	id 'net.ltgt.errorprone' version '0.8'
-
-	// An extensible static code analyzer
-	// https://docs.gradle.org/current/userguide/pmd_plugin.html
-	// https://pmd.github.io/pmd-6.13.0/pmd_rules_java.html
-	id 'pmd'
+	id "net.ltgt.errorprone" version "0.8"
 
 	// Discover dependency version updates
 	// https://github.com/ben-manes/gradle-versions-plugin
 	id "com.github.ben-manes.versions" version "0.21.0"
 
-	// code coverage (JaCoCo)
-	id 'jacoco'
-
-	id 'maven'
-	id 'maven-publish'
+	// Publish artifacts to BinTray
+	// https://github.com/bintray/gradle-bintray-plugin
+	id "com.jfrog.bintray" version "1.8.4"
 }
 
-apply plugin: 'com.jfrog.bintray'
-
-group = 'com.hedera'
-version = '0.4.0'
-
-repositories { jcenter() }
+group = "com.hedera"
+version = "0.4.0"
 
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
-final grpcVersion = '1.20.0'
-final protobufVersion = '3.7.1'
+apply from: "gradle/dependencies.gradle"
+apply from: "gradle/errorprone.gradle"
+apply from: "gradle/protobuf.gradle"
+
+repositories {
+	jcenter()
+}
 
 dependencies {
-	// Protocol Buffers
-	api "com.google.protobuf:protobuf-java:${protobufVersion}"
+	api libraries.protobuf
+	api libraries.grpc
 
-	// The Java gRPC implementation
-	api "io.grpc:grpc-netty-shaded:${grpcVersion}"
-	api "io.grpc:grpc-protobuf:${grpcVersion}"
-	api "io.grpc:grpc-stub:${grpcVersion}"
+	implementation libraries.bouncyCastle
+	implementation libraries.javaxAnnotations
 
-	// The Bouncy Castle Crypto APIs for Java
-	implementation 'org.bouncycastle:bcprov-jdk15on:1.61'
-
-	// JavaX Annotations
-	// Common annotations such as @NonNull and @Nullable
-	implementation 'javax.annotation:javax.annotation-api:1.3.2'
-
-	// Spock
-	// Developer testing and specification framework for Java
-	// https://github.com/spockframework/spock
-	testImplementation 'org.codehaus.groovy:groovy-all:2.5.6'
-	testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
-	testImplementation 'junit:junit:4.12'
-
-	// ErrorProne: Compiler version
-	errorprone 'com.google.errorprone:error_prone_core:2.3.3'
-
-	// NullAway
-	// A tool to help eliminate NullPointerExceptions (NPEs) in your Java code with
-	// 	low build-time overhead
-	// https://github.com/uber/NullAway
-	annotationProcessor "com.uber.nullaway:nullaway:0.7.2"
-}
-
-protobuf {
-	generatedFilesBaseDir = "$projectDir/gen"
-
-	// Use an externally sourced protoc (no system requirement)
-	protoc { artifact = "com.google.protobuf:protoc:${protobufVersion}" }
-
-	// Use an externally sourced protoc-gen-grpc-java (no system requirement)
-	plugins { grpc { artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}" } }
-
-	generateProtoTasks {
-		ofSourceSet('main').each { task ->
-			task.plugins { grpc {} }
-
-			// Annotate all protoc generated classes with @Generated
-			// https://github.com/protocolbuffers/protobuf/issues/42
-			task.builtins { java { option 'annotate_code' } }
-		}
-	}
-}
-
-// Remove gen/ (generated code) on clean
-clean { delete protobuf.generatedFilesBaseDir }
-
-idea {
-	module {
-		// Mark gen/ folers as _generated_ code so IDEA will
-		// highlight and make it more accesible
-		generatedSourceDirs += file('gen/main/java')
-		generatedSourceDirs += file('gen/main/grpc')
-	}
-}
-
-spotless {
-	groovy { greclipse() }
-	groovyGradle { greclipse() }
-	java {
-		target 'examples/**/*.java', 'src/**/*.java'
-		removeUnusedImports()
-		eclipse().configFile 'spotless.eclipseformat.xml'
-	}
-}
-
-pmd {
-	consoleOutput = true
-
-	// this silences some pedantic/buggy rules:
-	// DataflowAnomalyAnalysis (priority 5): triggers many false-positives
-	// BeanMembersShouldSerialize (priority 3): we don't use Beans but this triggers anyway
-	rulePriority = 2
-}
-
-jacocoTestReport {
-	beforeEvaluate {
-		classDirectories.from = files(classDirectories.files.collect {
-			fileTree(dir: it, excludes: [
-				"com/hedera/sdk/proto/**"
-			])
-		})
-	}
-
-	reports {
-		xml.enabled false
-		html.destination file("$buildDir/jacoco/jacocoTestCoverage")
-	}
-}
-
-jacocoTestCoverageVerification {
-	violationRules {
-		rule {
-			// TODO: remove this line to enable this rule
-			enabled = false
-
-			element = 'CLASS'
-			excludes = ['com.hedera.sdk.proto.*']
-
-			limit {
-				counter = 'LINE'
-				value = 'COVEREDRATIO'
-				minimum = 0.8
-			}
-		}
-	}
-}
-
-// enforces code coverage validation on check
-check.dependsOn jacocoTestCoverageVerification
-
-tasks.withType(JavaCompile).configureEach {
-	options.errorprone {
-		// NullAway: Treat any violations as a build error
-		check('NullAway', net.ltgt.gradle.errorprone.CheckSeverity.ERROR)
-
-		// NullAway: Check for null violations only in these packages
-		option('NullAway:AnnotatedPackages', 'com.hedera.sdk')
-
-		// NullAway: Process @Nullable and @NonNull annotations from
-		// 	third-party packages
-		option('NullAway:AcknowledgeRestrictiveAnnotations', 'true')
-
-		// NullAway: Ignore @Generated files
-		option('NullAway:TreatGeneratedAsUnannotated', 'true')
-
-		// Listen to @Generated annotations and ignore those
-		// files for analysis
-		options.errorprone.disableWarningsInGeneratedCode = true
-	}
-}
-
-bintray {
-	user = System.getenv('BINTRAY_USER')
-	key = System.getenv('BINTRAY_KEY')
-	publications = ['MyPublication']
-	override = true
-	publish = true
-	pkg {
-		repo = 'maven'
-		name = 'hedera-sdk'
-		userOrg = 'hashgraph'
-
-		version {
-			name = '0.4.0'
-		}
-	}
-}
-
-publishing {
-	publications {
-		MyPublication(MavenPublication) {
-			from components.java
-			groupId 'com.hedera'
-			artifactId 'sdk'
-			version '0.4.0'
-		}
-	}
+	testImplementation libraries.groovy
+	testImplementation libraries.spock
+	testImplementation libraries.junit
 }

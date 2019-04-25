@@ -1,0 +1,29 @@
+protobuf {
+	generatedFilesBaseDir = "$projectDir/gen"
+
+	// Use an externally sourced protoc (no system requirement)
+	protoc { artifact = "com.google.protobuf:protoc:${versions.protobuf}" }
+
+	// Use an externally sourced protoc-gen-grpc-java (no system requirement)
+	plugins { grpc { artifact = "io.grpc:protoc-gen-grpc-java:${versions.grpc}" } }
+
+	generateProtoTasks {
+		ofSourceSet("main").each { task ->
+			task.plugins { grpc {} }
+
+			// Annotate all protoc generated classes with @Generated
+			// https://github.com/protocolbuffers/protobuf/issues/42
+			task.builtins { java { option "annotate_code" } }
+		}
+	}
+}
+
+// Remove gen/ (generated code) on clean
+clean { delete protobuf.generatedFilesBaseDir }
+
+idea.module {
+	// Mark gen/ folers as _generated_ code so IDEA will
+	// highlight and make it more accesible
+	generatedSourceDirs += file("gen/main/java")
+	generatedSourceDirs += file("gen/main/grpc")
+}
