@@ -1,7 +1,7 @@
 plugins {
 	id "java-library"
 	id "groovy"
-	id "maven-publish"
+	id "maven"
 	id "jacoco"				// Code Coverage (JaCoCo)
 	id "idea"				// Intellij IDEA
 
