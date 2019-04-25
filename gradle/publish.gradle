@@ -26,6 +26,12 @@ publishing {
 	}
 }
 
+// Add sources to the JAR
+// This is a requirement for jcenter
+jar {
+	from sourceSets.main.allSource
+}
+
 release {
 	failOnPublishNeeded = false
 	tagTemplate = 'v$version'
