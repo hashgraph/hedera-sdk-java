@@ -115,8 +115,6 @@ public class HederaSignatures {
 
 	/**
 	 * Finds the minimum prefix length in term of bytes.
-	 * 
-	 * @param keys set of keys to process
 	 * @return found minimum prefix length
 	 */
 	public int findMinPrefixLength() {

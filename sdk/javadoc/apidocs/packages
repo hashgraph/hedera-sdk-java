@@ -1,8 +1,0 @@
-com.hedera.sdk.transaction
-com.hedera.sdk.contract
-com.hedera.sdk.file
-com.hedera.sdk.cryptography
-com.hedera.sdk.common
-com.hedera.sdk.node
-com.hedera.sdk.account
-com.hedera.sdk.query
