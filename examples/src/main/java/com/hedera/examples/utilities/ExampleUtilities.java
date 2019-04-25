@@ -4,22 +4,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Properties;
 
 import org.apache.commons.codec.DecoderException;
 import org.slf4j.LoggerFactory;
-import org.spongycastle.util.encoders.Hex;
-
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaDuration;
-import com.hedera.sdk.common.HederaKeyList;
 import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
@@ -37,7 +31,6 @@ public class ExampleUtilities {
 	
 	public static String pubKey = "";
 	public static String privKey = "";
-	public static String keyType = "";
 	
 	public static long payAccountShard = 0;
 	public static long payAccountRealm = 0;
@@ -66,7 +59,6 @@ public class ExampleUtilities {
 			
 			pubKey = applicationProperties.getProperty("pubkey");
 			privKey = applicationProperties.getProperty("privkey");
-			keyType = applicationProperties.getProperty("keyType");
 			
 			payAccountShard = Long.parseLong(applicationProperties.getProperty("payingAccountShard"));
 			payAccountRealm = Long.parseLong(applicationProperties.getProperty("payingAccountRealm"));
@@ -101,19 +93,7 @@ public class ExampleUtilities {
 		// setup paying account
 		HederaAccountID payingAccountID = new HederaAccountID(ExampleUtilities.payAccountShard, ExampleUtilities.payAccountRealm, ExampleUtilities.payAccountNum);
 		
-		// setup paying keypair
-		if (keyType ==  null) {
-			keyType = "SINGLE";
-		}
-//		if (keyType.equals("LIST")) {
-//			// create a new key list
-//			HederaKeyPair payingKeyPair = new HederaKeyPair(KeyType.ED25519, ExampleUtilities.pubKey, ExampleUtilities.privKey);
-//			HederaKeyList keyList = new HederaKeyList();
-//			keyList.addKey(payingKeyPair);
-//			txQueryDefaults.payingKeyPair = new HederaKeyPair(keyList);
-//		} else {
-			txQueryDefaults.payingKeyPair = new HederaKeyPair(KeyType.ED25519, ExampleUtilities.pubKey, ExampleUtilities.privKey);
-//		}
+		txQueryDefaults.payingKeyPair = new HederaKeyPair(KeyType.ED25519, ExampleUtilities.pubKey, ExampleUtilities.privKey);
 		
 		txQueryDefaults.memo = "Demo memo";
 		txQueryDefaults.node = node;

@@ -65,6 +65,8 @@ public class HederaAccount implements Serializable {
 	private byte[] stateProof = new byte[0];
 	private HederaProxyStakers stakers = new HederaProxyStakers();
 	private long balance = 0;
+	public HederaQuery lastQuery;
+	public HederaTransaction lastTransaction;
 
 	/**
 	 * Default parameters for a transaction or query
@@ -454,6 +456,8 @@ public class HederaAccount implements Serializable {
 		// add the signatures
 		transaction.signatures = sigsForTransaction;
 		
+		this.lastTransaction = transaction;
+
 		// issue the transaction
 		Utilities.throwIfNull("Node", this.node);
 		HederaTransactionResult hederaTransactionResult = this.node.accountCreate(transaction);
@@ -491,6 +495,7 @@ public class HederaAccount implements Serializable {
 				, this.getTransferTransactionBody(accountAmounts));
 		// add the signatures
 		transaction.signatures = sigsForTransaction;
+		this.lastTransaction = transaction;
 		
 		// issue the transaction
 		Utilities.throwIfNull("Node", this.node);
@@ -529,7 +534,8 @@ public class HederaAccount implements Serializable {
 				, this.getUpdateTransactionBody());
 		// add the signatures
 		transaction.signatures = sigsForTransaction;
-		
+		this.lastTransaction = transaction;
+
 		// issue the transaction
 		Utilities.throwIfNull("Node", this.node);
 		HederaTransactionResult hederaTransactionResult = this.node.accountUpdate(transaction);
@@ -568,7 +574,8 @@ public class HederaAccount implements Serializable {
 				, this.getAddClaimTransactionBody(claim));
 		// add the signatures
 		transaction.signatures = sigsForTransaction;
-		
+		this.lastTransaction = transaction;
+
 		// issue the transaction
 		Utilities.throwIfNull("Node", this.node);
 		HederaTransactionResult hederaTransactionResult = this.node.addClaim(transaction);
@@ -607,6 +614,8 @@ public class HederaAccount implements Serializable {
 		HederaQuery query = new HederaQuery();
 		query.queryType = QueryType.CRYPTOGETACCOUNTBALANCE;
 		query.queryData = queryBalance.build();
+		
+		this.lastQuery = query;
 		
 		// query now set, send to network
 		Utilities.throwIfNull("Node", this.node);
@@ -714,6 +723,7 @@ public class HederaAccount implements Serializable {
 		HederaQuery query = new HederaQuery();
 		query.queryType = QueryType.CRYPTOGETACCOUNTRECORDS;
 		query.queryData = queryRecords.build();
+		this.lastQuery = query;
 		
 		// query now set, send to network
 		Utilities.throwIfNull("Node", this.node);
@@ -812,6 +822,7 @@ public class HederaAccount implements Serializable {
 		HederaQuery query = new HederaQuery();
 		query.queryType = QueryType.CRYPTOGETINFO;
 		query.queryData = accountGetInfoQuery.build();
+		this.lastQuery = query;
 		
 		// query now set, send to network
 		Utilities.throwIfNull("Node", this.node);
