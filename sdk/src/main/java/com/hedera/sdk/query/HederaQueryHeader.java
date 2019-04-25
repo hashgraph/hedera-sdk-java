@@ -58,7 +58,7 @@ public class HederaQueryHeader implements Serializable {
 		QueryHeader.Builder queryHeader = QueryHeader.newBuilder();
 
 		if (this.payment != null) {
-			queryHeader.setPayment(this.payment.getProtobuf());
+			queryHeader.setPayment(this.payment.getProtobufCompressedKeys());
 		}
 		switch (this.responseType) {
 			case ANSWER_ONLY:

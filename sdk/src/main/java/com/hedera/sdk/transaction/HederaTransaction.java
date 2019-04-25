@@ -2,6 +2,10 @@ package com.hedera.sdk.transaction;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.slf4j.LoggerFactory;
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.account.HederaAccountAmount;
@@ -98,6 +102,27 @@ public class HederaTransaction implements Serializable {
 
 	}
 	/**
+	 * returns the protobuf for this transaction with compressed public keys in signatures
+	 * @return {@link Transaction}
+	 */
+	public Transaction getProtobufCompressedKeys() {
+
+		// Generates the protobuf payload for this class
+		Transaction.Builder transactionProtobuf = Transaction.newBuilder();
+		logger.debug(this.body.getProtobuf().toString());
+		transactionProtobuf.setBodyBytes(this.body.getProtobuf().toByteString());
+		// if we have key signature pairs, use these\
+//		transactionProtobuf.setSigs(this.signatureList.getProtobuf());
+		
+		if (this.signatures != null) {
+			int pubKeyLen = this.signatures.findMinPrefixLength();
+			transactionProtobuf.setSigMap(this.signatures.getProtobuf(pubKeyLen));
+		}
+		
+		return transactionProtobuf.build();
+	}
+
+	/**
 	 * returns the protobuf for this transaction
 	 * @return {@link Transaction}
 	 */
@@ -109,13 +134,14 @@ public class HederaTransaction implements Serializable {
 		transactionProtobuf.setBodyBytes(this.body.getProtobuf().toByteString());
 		// if we have key signature pairs, use these\
 //		transactionProtobuf.setSigs(this.signatureList.getProtobuf());
+		
 		if (this.signatures != null) {
 			transactionProtobuf.setSigMap(this.signatures.getProtobuf());
 		}
 		
 		return transactionProtobuf.build();
 	}
-
+	
 	/**
 	 * Gets a receipt for a transaction
 	 * Get the receipt of a transaction, given its transaction ID. Once a transaction reaches consensus, 
@@ -349,4 +375,5 @@ public class HederaTransaction implements Serializable {
 		this.signatures = sigsForTransaction;
 
 	}
+	
 }

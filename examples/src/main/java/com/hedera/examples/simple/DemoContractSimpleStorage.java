@@ -6,6 +6,7 @@ import com.hedera.examples.contractWrappers.ContractCreate;
 import com.hedera.examples.fileWrappers.FileCreate;
 import com.hedera.examples.utilities.ExampleUtilities;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
+import com.hedera.sdk.common.HederaTransactionRecord;
 import com.hedera.sdk.contract.HederaContract;
 import com.hedera.sdk.file.HederaFile;
 
@@ -40,6 +41,7 @@ public final class DemoContractSimpleStorage {
 
 		// create a contract
 		long gas = 176103;
+		long payableAmount = 0;
 		contract = ContractCreate.create(contract, file.getFileID(), gas, 0);
 		if (contract != null) {
 
@@ -50,8 +52,9 @@ public final class DemoContractSimpleStorage {
 			
 			int decodeResult = wrapper.callLocalInt(contract, 25000, 5000, "get");
     		ExampleUtilities.showResult(String.format("===>Decoded functionResult= %d", decodeResult));
+			gas = 48000;
 			
-			wrapper.call(contract, 48000, 0, "set", 10);
+			HederaTransactionRecord record = wrapper.callForRecord(contract, gas, payableAmount, "set", 10);
 
 			decodeResult = wrapper.callLocalInt(contract, 25000, 5000, "get");
     		ExampleUtilities.showResult(String.format("===>Decoded functionResult= %d", decodeResult));

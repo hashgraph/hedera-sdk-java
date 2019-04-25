@@ -9,6 +9,7 @@ import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
+import com.hedera.sdk.common.HederaTransactionRecord;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.contract.HederaContract;
 import com.hedera.sdk.file.HederaFile;
@@ -176,7 +177,7 @@ public final class DemoContractToken {
 	}
 
 	private static void transfer(HederaContract contract, String toAddress, long amount) throws Exception {
-		wrapper.call(contract, 250000, 0, "transfer", toAddress, amount);
+		HederaTransactionRecord record = wrapper.callForRecord(contract, 250000, 0, "transfer", toAddress, amount);
 	}
 
 	private static long getDecimals(HederaContract contract) throws Exception {
@@ -190,11 +191,11 @@ public final class DemoContractToken {
 	}
 
 	private static void approve(HederaContract contract, String spenderAddress, long valueToApprove) throws Exception {
-		wrapper.call(contract, 250000, 0, "approve", spenderAddress, valueToApprove);
+		HederaTransactionRecord record = wrapper.callForRecord(contract, 250000, 0, "approve", spenderAddress, valueToApprove);
 	}
 
 	private static void transferFrom(HederaContract contract, String fromAccountAddress, String toAccountAddress,
 			long valueToTransfer) throws Exception {
-		wrapper.call(contract, 250000, 0, "transferFrom", fromAccountAddress, toAccountAddress, valueToTransfer);
+		HederaTransactionRecord record = wrapper.callForRecord(contract, 250000, 0, "transferFrom", fromAccountAddress, toAccountAddress, valueToTransfer);
 	}
 }

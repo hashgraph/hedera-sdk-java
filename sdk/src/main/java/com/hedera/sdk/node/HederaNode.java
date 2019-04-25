@@ -284,7 +284,7 @@ public class HederaNode implements Serializable {
 	public HederaTransactionResult accountCreate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
 		logger.debug("SENDING TRANSACTION");
-		logger.debug(transaction.getProtobuf().toString());
+		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -292,7 +292,7 @@ public class HederaNode implements Serializable {
 		openChannel();
 		CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
 		for (int i=0; i < busyRetryCount; i++) {
-			response = blockingStub.createAccount(transaction.getProtobuf());
+			response = blockingStub.createAccount(transaction.getProtobufCompressedKeys());
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
@@ -319,7 +319,7 @@ public class HederaNode implements Serializable {
 	public HederaTransactionResult addClaim(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
 		logger.debug("SENDING TRANSACTION");
-		logger.debug(transaction.getProtobuf().toString());
+		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -327,7 +327,7 @@ public class HederaNode implements Serializable {
 		openChannel();
 		CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
 		for (int i=0; i < busyRetryCount; i++) {
-			response = blockingStub.addClaim(transaction.getProtobuf());
+			response = blockingStub.addClaim(transaction.getProtobufCompressedKeys());
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
@@ -353,7 +353,7 @@ public class HederaNode implements Serializable {
 	public HederaTransactionResult accountTransfer(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
 		logger.debug("SENDING TRANSACTION");
-		logger.debug(transaction.getProtobuf().toString());
+		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -361,7 +361,7 @@ public class HederaNode implements Serializable {
 		openChannel();
 		CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
 		for (int i=0; i < busyRetryCount; i++) {
-			response = blockingStub.cryptoTransfer(transaction.getProtobuf());
+			response = blockingStub.cryptoTransfer(transaction.getProtobufCompressedKeys());
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 				// wait short time
@@ -388,7 +388,7 @@ public class HederaNode implements Serializable {
 	public HederaTransactionResult accountUpdate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
 		logger.debug("SENDING TRANSACTION");
-		logger.debug(transaction.getProtobuf().toString());
+		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -396,7 +396,7 @@ public class HederaNode implements Serializable {
 		openChannel();
 		CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
 		for (int i=0; i < busyRetryCount; i++) {
-			response = blockingStub.updateAccount(transaction.getProtobuf());
+			response = blockingStub.updateAccount(transaction.getProtobufCompressedKeys());
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
@@ -422,7 +422,7 @@ public class HederaNode implements Serializable {
 	public HederaTransactionResult fileAppend(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
 		logger.debug("SENDING TRANSACTION");
-		logger.debug(transaction.getProtobuf().toString());
+		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -430,7 +430,7 @@ public class HederaNode implements Serializable {
 		openChannel();
 		FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
 		for (int i=0; i < busyRetryCount; i++) {
-			response = blockingStub.appendContent(transaction.getProtobuf());
+			response = blockingStub.appendContent(transaction.getProtobufCompressedKeys());
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
@@ -456,7 +456,7 @@ public class HederaNode implements Serializable {
 	public HederaTransactionResult fileCreate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
 		logger.debug("SENDING TRANSACTION");
-		logger.debug(transaction.getProtobuf().toString());
+		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -464,7 +464,7 @@ public class HederaNode implements Serializable {
 		openChannel();
 		FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
 		for (int i=0; i < busyRetryCount; i++) {
-			response = blockingStub.createFile(transaction.getProtobuf());
+			response = blockingStub.createFile(transaction.getProtobufCompressedKeys());
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
@@ -491,7 +491,7 @@ public class HederaNode implements Serializable {
 	public HederaTransactionResult fileDelete(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
 		logger.debug("SENDING TRANSACTION");
-		logger.debug(transaction.getProtobuf().toString());
+		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -499,7 +499,7 @@ public class HederaNode implements Serializable {
 		openChannel();
 		FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
 		for (int i=0; i < busyRetryCount; i++) {
-			response = blockingStub.deleteFile(transaction.getProtobuf());
+			response = blockingStub.deleteFile(transaction.getProtobufCompressedKeys());
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
@@ -526,7 +526,7 @@ public class HederaNode implements Serializable {
 	public HederaTransactionResult fileUpdate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
 		logger.debug("SENDING TRANSACTION");
-		logger.debug(transaction.getProtobuf().toString());
+		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -534,7 +534,7 @@ public class HederaNode implements Serializable {
 		openChannel();
 		FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
 		for (int i=0; i < busyRetryCount; i++) {
-			response = blockingStub.updateFile(transaction.getProtobuf());
+			response = blockingStub.updateFile(transaction.getProtobufCompressedKeys());
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
@@ -561,7 +561,7 @@ public class HederaNode implements Serializable {
 	public HederaTransactionResult contractCall(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
 		logger.debug("SENDING TRANSACTION");
-		logger.debug(transaction.getProtobuf().toString());
+		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -569,7 +569,7 @@ public class HederaNode implements Serializable {
 		openChannel();
 		SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
 		for (int i=0; i < busyRetryCount; i++) {
-			response = blockingStub.contractCallMethod(transaction.getProtobuf());
+			response = blockingStub.contractCallMethod(transaction.getProtobufCompressedKeys());
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
@@ -596,7 +596,7 @@ public class HederaNode implements Serializable {
 	public HederaTransactionResult contractCreate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
 		logger.debug("SENDING TRANSACTION");
-		logger.debug(transaction.getProtobuf().toString());
+		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -604,7 +604,7 @@ public class HederaNode implements Serializable {
 		openChannel();
 		SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
 		for (int i=0; i < busyRetryCount; i++) {
-			response = blockingStub.createContract(transaction.getProtobuf());
+			response = blockingStub.createContract(transaction.getProtobufCompressedKeys());
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");
@@ -631,7 +631,7 @@ public class HederaNode implements Serializable {
 	public HederaTransactionResult contractUpdate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
 		logger.debug("SENDING TRANSACTION");
-		logger.debug(transaction.getProtobuf().toString());
+		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
@@ -639,7 +639,7 @@ public class HederaNode implements Serializable {
 		openChannel();
 		SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
 		for (int i=0; i < busyRetryCount; i++) {
-			response = blockingStub.updateContract(transaction.getProtobuf());
+			response = blockingStub.updateContract(transaction.getProtobufCompressedKeys());
 			// retry if busy
 			if (response.getNodeTransactionPrecheckCode() == ResponseCodeEnum.BUSY) {
 				logger.debug("System busy - sleeping for " + waitMillisLong + "ms");

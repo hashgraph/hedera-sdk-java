@@ -2,7 +2,6 @@ package com.hedera.sdk.common;
 
 import java.io.Serializable;
 
-import com.hederahashgraph.api.proto.java.FeeComponents;
 import com.hederahashgraph.api.proto.java.FeeData;
 
 /**
