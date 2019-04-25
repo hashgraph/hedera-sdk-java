@@ -5,5 +5,5 @@ pluginManagement {
 	}
 }
 
-rootProject.name = 'hedera-sdk-java'
+rootProject.name = 'sdk'
 include 'examples'
