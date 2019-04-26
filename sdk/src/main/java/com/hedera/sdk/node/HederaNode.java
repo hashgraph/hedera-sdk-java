@@ -1,7 +1,10 @@
 package com.hedera.sdk.node;
 
 import java.io.Serializable;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.sdk.common.HederaAccountID;
+import com.hedera.sdk.common.HederaTransactionID;
 import com.hedera.sdk.query.HederaQuery;
 import com.hedera.sdk.transaction.HederaTransaction;
 import com.hedera.sdk.transaction.HederaTransactionResult;
@@ -9,6 +12,7 @@ import com.hederahashgraph.api.proto.java.AccountID;
 import com.hederahashgraph.api.proto.java.Response;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hederahashgraph.api.proto.java.Transaction;
+import com.hederahashgraph.api.proto.java.TransactionBody;
 import com.hederahashgraph.api.proto.java.TransactionResponse;
 import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
 import com.hederahashgraph.service.proto.java.FileServiceGrpc;
@@ -1099,14 +1103,22 @@ public class HederaNode implements Serializable {
 	 * @return {@link HederaTransactionResult} the result of the transaction
 	 * @throws InterruptedException in the event of a node communication failure
 	 * @throws StatusRuntimeException in the event of a node communication failure
+	 * @throws InvalidProtocolBufferException 
 	 */
-	public HederaTransactionResult sendContractTransaction(Transaction transaction) throws InterruptedException, StatusRuntimeException {
+	public HederaTransactionResult sendContractTransaction(Transaction transaction) throws InterruptedException, StatusRuntimeException, InvalidProtocolBufferException {
 
 		logger.debug("SENDING TRANSACTION");
 		logger.debug(transaction.toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
+		// set the Hedera Transaction ID in the HederaTransactionResult from the transaction itself
+		if (transaction.hasBody()) {
+			transResult.hederaTransactionID = new HederaTransactionID(transaction.getBody().getTransactionID());
+		} else {
+			TransactionBody tBody = TransactionBody.parseFrom(transaction.getBodyBytes());
+			transResult.hederaTransactionID = new HederaTransactionID(tBody.getTransactionID());
+		}
 		
 		openChannel();
 		SmartContractServiceGrpc.SmartContractServiceBlockingStub blockingStub = SmartContractServiceGrpc.newBlockingStub(this.grpcChannel);
@@ -1134,14 +1146,21 @@ public class HederaNode implements Serializable {
 	 * @return {@link HederaTransactionResult} the result of the transaction
 	 * @throws InterruptedException in the event of a node communication failure
 	 * @throws StatusRuntimeException in the event of a node communication failure
+	 * @throws InvalidProtocolBufferException 
 	 */
-	public HederaTransactionResult sendFileTransaction(Transaction transaction) throws InterruptedException, StatusRuntimeException {
+	public HederaTransactionResult sendFileTransaction(Transaction transaction) throws InterruptedException, StatusRuntimeException, InvalidProtocolBufferException {
 
 		logger.debug("SENDING TRANSACTION");
 		logger.debug(transaction.toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
+		if (transaction.hasBody()) {
+			transResult.hederaTransactionID = new HederaTransactionID(transaction.getBody().getTransactionID());
+		} else {
+			TransactionBody tBody = TransactionBody.parseFrom(transaction.getBodyBytes());
+			transResult.hederaTransactionID = new HederaTransactionID(tBody.getTransactionID());
+		}
 		
 		openChannel();
 		FileServiceGrpc.FileServiceBlockingStub blockingStub = FileServiceGrpc.newBlockingStub(this.grpcChannel);
@@ -1169,14 +1188,21 @@ public class HederaNode implements Serializable {
 	 * @return {@link HederaTransactionResult} the result of the transaction
 	 * @throws InterruptedException in the event of a node communication failure
 	 * @throws StatusRuntimeException in the event of a node communication failure
+	 * @throws InvalidProtocolBufferException 
 	 */
-	public HederaTransactionResult sendCryptoTransaction(Transaction transaction) throws InterruptedException, StatusRuntimeException {
+	public HederaTransactionResult sendCryptoTransaction(Transaction transaction) throws InterruptedException, StatusRuntimeException, InvalidProtocolBufferException {
 
 		logger.debug("SENDING TRANSACTION");
 		logger.debug(transaction.toString());
 
 		TransactionResponse response = null;
 		HederaTransactionResult transResult = new HederaTransactionResult();
+		if (transaction.hasBody()) {
+			transResult.hederaTransactionID = new HederaTransactionID(transaction.getBody().getTransactionID());
+		} else {
+			TransactionBody tBody = TransactionBody.parseFrom(transaction.getBodyBytes());
+			transResult.hederaTransactionID = new HederaTransactionID(tBody.getTransactionID());
+		}
 		
 		openChannel();
 		CryptoServiceGrpc.CryptoServiceBlockingStub blockingStub = CryptoServiceGrpc.newBlockingStub(this.grpcChannel);
