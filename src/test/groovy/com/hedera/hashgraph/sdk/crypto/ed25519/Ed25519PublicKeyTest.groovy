@@ -33,9 +33,12 @@ class Ed25519PublicKeyTest extends Specification {
 	def "public key can be recovered from external string"() {
 		when:
 		def key = Ed25519PublicKey.fromString(keyStr)
+		def key2 = Key.fromString(keyStr)
 
 		then:
 		key != null
+		key2 instanceof Ed25519PublicKey
+		key.toBytes() == ((Ed25519PublicKey) key2).toBytes()
 
 		where:
 		keyStr << [
