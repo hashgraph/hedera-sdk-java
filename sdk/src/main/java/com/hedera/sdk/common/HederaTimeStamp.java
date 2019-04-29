@@ -21,9 +21,26 @@ public class HederaTimeStamp implements Serializable {
 	 * Default constructor
 	 */
 	public HederaTimeStamp() {
-
-
 	}
+	public static HederaTimeStamp plusOneMinute() {
+		return new HederaTimeStamp(Instant.now().plusSeconds(60));
+	}
+	public static HederaTimeStamp plusOneHour() {
+		return new HederaTimeStamp(Instant.now().plusSeconds(60 * 60));
+	}
+	public static HederaTimeStamp plusOneDay() {
+		return new HederaTimeStamp(Instant.now().plusSeconds(60 * 60 * 24));
+	}
+	public static HederaTimeStamp plusOneWeek() {
+		return new HederaTimeStamp(Instant.now().plusSeconds(60 * 60 * 24 * 7));
+	}
+	public static HederaTimeStamp plusOneMonth() {
+		return new HederaTimeStamp(Instant.now().plusSeconds(60 * 60 * 24 * 30));
+	}
+	public static HederaTimeStamp plusOneYear() {
+		return new HederaTimeStamp(Instant.now().plusSeconds(60 * 60 * 24 * 365));
+	}
+	
 	/**
 	 * Constructor from an {@link Instant}
 	 * @param time the instant to construct from
