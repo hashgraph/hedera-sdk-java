@@ -1,0 +1,11 @@
+[
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "fail",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+]

@@ -22,6 +22,8 @@ import com.hedera.sdk.contract.HederaContractFunctionResult;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
+
 public class ContractFunctionsWrapper {
 	
 	private JSONArray abis;
@@ -300,15 +302,32 @@ public class ContractFunctionsWrapper {
 		return Hex.toHexString((byte[]) retResults[0]);
 	}
 
-	public byte[] outputData(HederaContractFunctionResult result) {
+	public String outputData(HederaContractFunctionResult result) {
     	byte[] callResult = result.contractCallResult();
-        int size = callResult.length - 21;
-        
-        byte[] remainingData = new byte[size];
-        for (int i=21; i<callResult.length; i++) {
-            remainingData[i-21] = callResult[i];
-        }
-        return remainingData;
+    	String encodeResult = Hex.toHexString(callResult);
+    	int offset = 2 * Integer.parseInt(encodeResult.substring(8, 64 + 8), 16);
+    	int len = 2 * Integer.parseInt(encodeResult.substring(64 + 8, 64 + 64 + 8), 16);
+    	
+    	System.out.println(callResult.length);
+    	System.out.println(offset);
+    	System.out.println(len);
+    	
+    	byte[] resultBytes = Arrays.copyOfRange(callResult, offset, offset+len);
+    	System.out.println(resultBytes.length);
+    	return new String(resultBytes);
+    	
+//    	System.out.println(offset);
+//    	System.out.println(encodeResult.substring(8, 64 + 8));
+//    	System.out.println(length);
+//    	System.out.println(encodeResult.substring(64 + 8, 64 + 64 + 8));
+    	// callResult format is:
+    	// 08c379a0 - function selector
+    	// 00000000000000000000000000000000000000000000000000000000000000xx - offset of return value
+    	// 00000000000000000000000000000000000000000000000000000000000000xx - length of return value
+    	// return value
+//    	byte[] offset = Arrays.copyOfRange(callResult, from, to)
+//    	return encodeResult;
+    	
     }
     
 	public Object[] getFunctionResult(String functionName, HederaContractFunctionResult result) throws Exception {
