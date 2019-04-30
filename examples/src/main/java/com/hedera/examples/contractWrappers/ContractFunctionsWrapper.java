@@ -305,29 +305,15 @@ public class ContractFunctionsWrapper {
 	public String outputData(HederaContractFunctionResult result) {
     	byte[] callResult = result.contractCallResult();
     	String encodeResult = Hex.toHexString(callResult);
-    	int offset = 2 * Integer.parseInt(encodeResult.substring(8, 64 + 8), 16);
-    	int len = 2 * Integer.parseInt(encodeResult.substring(64 + 8, 64 + 64 + 8), 16);
-    	
-    	System.out.println(callResult.length);
-    	System.out.println(offset);
-    	System.out.println(len);
+    	int dataOffsetStart = 8;
+    	int dataOffsetEnd = 8 + 64;
+    	int offset = 2 * Integer.parseInt(encodeResult.substring(dataOffsetStart, dataOffsetEnd), 16);
+    	int lengthStart = 8 + 64;
+    	int lengthEnd = 8 + 64 + 64;
+    	int len = 2 * Integer.parseInt(encodeResult.substring(lengthStart, lengthEnd), 16);
     	
     	byte[] resultBytes = Arrays.copyOfRange(callResult, offset, offset+len);
-    	System.out.println(resultBytes.length);
     	return new String(resultBytes);
-    	
-//    	System.out.println(offset);
-//    	System.out.println(encodeResult.substring(8, 64 + 8));
-//    	System.out.println(length);
-//    	System.out.println(encodeResult.substring(64 + 8, 64 + 64 + 8));
-    	// callResult format is:
-    	// 08c379a0 - function selector
-    	// 00000000000000000000000000000000000000000000000000000000000000xx - offset of return value
-    	// 00000000000000000000000000000000000000000000000000000000000000xx - length of return value
-    	// return value
-//    	byte[] offset = Arrays.copyOfRange(callResult, from, to)
-//    	return encodeResult;
-    	
     }
     
 	public Object[] getFunctionResult(String functionName, HederaContractFunctionResult result) throws Exception {
