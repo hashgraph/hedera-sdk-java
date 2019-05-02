@@ -104,7 +104,7 @@ class HederaCryptoKeyPairTest3 {
 		// recover from words at index -1
 		String[] recoveryWords = "insist,cement,tenant,proper,lurid,seem,soften,clause,pork,want,order,tribal,picnic,remote,bow,Lewis,bulky,land,Cajun,flurry,sodium,aunt".split(",");
 		try {
-			HederaKeyPair recoverWords = new HederaKeyPair(KeyType.ED25519, recoveryWords);
+			HederaKeyPair recoverWords = new HederaKeyPair(KeyType.ED25519, recoveryWords, -1);
 			
 			assertEquals("41e6416b8d92bce7818efdc0534e7a5ffd653b5a71ebfa3b4cdb482a2b34108a",recoverWords.getPublicKeyHex());
 			assertEquals("302a300506032b657003210041e6416b8d92bce7818efdc0534e7a5ffd653b5a71ebfa3b4cdb482a2b34108a",recoverWords.getPublicKeyEncodedHex());

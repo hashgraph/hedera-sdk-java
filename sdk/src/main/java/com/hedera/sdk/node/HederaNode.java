@@ -1103,7 +1103,7 @@ public class HederaNode implements Serializable {
 	 * @return {@link HederaTransactionResult} the result of the transaction
 	 * @throws InterruptedException in the event of a node communication failure
 	 * @throws StatusRuntimeException in the event of a node communication failure
-	 * @throws InvalidProtocolBufferException 
+	 * @throws InvalidProtocolBufferException in the event of a protocol buffer error
 	 */
 	public HederaTransactionResult sendContractTransaction(Transaction transaction) throws InterruptedException, StatusRuntimeException, InvalidProtocolBufferException {
 
@@ -1146,7 +1146,7 @@ public class HederaNode implements Serializable {
 	 * @return {@link HederaTransactionResult} the result of the transaction
 	 * @throws InterruptedException in the event of a node communication failure
 	 * @throws StatusRuntimeException in the event of a node communication failure
-	 * @throws InvalidProtocolBufferException 
+	 * @throws InvalidProtocolBufferException in the event of a protocol buffer error
 	 */
 	public HederaTransactionResult sendFileTransaction(Transaction transaction) throws InterruptedException, StatusRuntimeException, InvalidProtocolBufferException {
 
@@ -1188,7 +1188,7 @@ public class HederaNode implements Serializable {
 	 * @return {@link HederaTransactionResult} the result of the transaction
 	 * @throws InterruptedException in the event of a node communication failure
 	 * @throws StatusRuntimeException in the event of a node communication failure
-	 * @throws InvalidProtocolBufferException 
+	 * @throws InvalidProtocolBufferException in the event of a protocol buffer error
 	 */
 	public HederaTransactionResult sendCryptoTransaction(Transaction transaction) throws InterruptedException, StatusRuntimeException, InvalidProtocolBufferException {
 

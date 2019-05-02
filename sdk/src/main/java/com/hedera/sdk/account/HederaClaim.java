@@ -126,7 +126,7 @@ public class HederaClaim implements Serializable {
 		this.shardNum = claim.getAccountID().getShardNum();
 		this.realmNum = claim.getAccountID().getRealmNum();
 		this.accountNum = claim.getAccountID().getAccountNum();
-		this.expiration = new HederaDuration(claim.getClaimExpiration().getSeconds());
+		this.expiration = new HederaDuration(claim.getClaimDuration().getSeconds());
 
 		// hash
 		this.hash = claim.getHash().toByteArray();
@@ -153,7 +153,7 @@ public class HederaClaim implements Serializable {
 		HederaAccountID accountID = new HederaAccountID(this.shardNum, this.realmNum, this.accountNum);
 		protobuf.setAccountID(accountID.getProtobuf());
 		protobuf.setHash(ByteString.copyFrom(this.hash));
-		protobuf.setClaimExpiration(this.expiration.getProtobuf());
+		protobuf.setClaimDuration(this.expiration.getProtobuf());
 		
 		KeyList protoKeyList;
 		

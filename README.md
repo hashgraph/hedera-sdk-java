@@ -22,6 +22,14 @@ Features supported include:
 
 ## Changes in this version from 0.1.0
 
+### 0.3.0 - Changed default key index to 0 when generating and recovering keys
+
+When generating a new key pair with the SDK, the key index is now defaulting to 0 instead of -1, likewise for key recovery from a word list.
+
+Note: If you have generated a key with a prior version of the SDK and wish to recover it with a wordlist, you'll have to override the default index value to -1 as follows:
+
+`HederaKeyPair recoverWords = new HederaKeyPair(KeyType.ED25519, recoveryWords, -1);`
+
 ### 0.3.0 - Added support for current and next exchange rates in HederaTransactionReceipt
 
 Hedera receipts now contain the current next hBar to US Dollar Cent exchange rate. This is now available from the `HederaTransactionReceipt` class as `getCurrentExchangeRate` and `getNextExchangeRate`. Both methods return a `HederaExchangeRate` object which includes the value which denotes habar equivalent to cent and the value which denotes cents (USD) equivalent to Hbar. The expiration time (seconds since epoch) for both is also a property of the `HederaExchangeRate` class.

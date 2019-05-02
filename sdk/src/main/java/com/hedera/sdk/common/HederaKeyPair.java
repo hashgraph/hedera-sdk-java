@@ -70,7 +70,7 @@ public class HederaKeyPair implements Serializable {
 	private HederaNode node = new HederaNode();
 	private KeyPair keyPair = null;
 	private Seed seed = null;
-	private int index = -1;
+	private int index = 0;
 
 	/**
 	 * The type of key held in this object
@@ -158,13 +158,13 @@ public class HederaKeyPair implements Serializable {
 	/**
 	 * Constructor from a key type and recoveryWords as an array of String
 	 * Creates or Recovers a public/private keypair from the list of words
-	 * at the default index of - 1
+	 * at the default index of 0
 	 * @param keyType the type of key to recover
 	 * @param recoveryWords String[] the list of words to recover from
 	 * @throws NoSuchAlgorithmException in the event of an error
 	 */
 	public HederaKeyPair(HederaKeyPair.KeyType keyType, String[] recoveryWords) throws NoSuchAlgorithmException  {
-		this(keyType, Arrays.asList(recoveryWords), -1);
+		this(keyType, Arrays.asList(recoveryWords), 0);
 	}
 
 	/**
@@ -183,13 +183,13 @@ public class HederaKeyPair implements Serializable {
 	/**
 	 * Constructor from a key type and recoveryWords as an List of String
 	 * Creates or Recovers a public/private keypair from the list of words
-	 * at the default index of -1
+	 * at the default index of 0
 	 * @param keyType the type of key to recover
 	 * @param recoveryWords the words to recover from
 	 * @throws NoSuchAlgorithmException in the event of an error
 	 */
 	public HederaKeyPair(HederaKeyPair.KeyType keyType, List<String> recoveryWords) throws NoSuchAlgorithmException  {
-		this(keyType, recoveryWords, -1);
+		this(keyType, recoveryWords, 0);
 	}
 
 	/**
@@ -237,12 +237,12 @@ public class HederaKeyPair implements Serializable {
   }
  
 	/**
-	 * Constructor from a key type, seed at the default index of -1
+	 * Constructor from a key type, seed at the default index of 0
 	 * @param keyType the type of key to generate
 	 * @param seed the seed to generate with
 	 */
 	public HederaKeyPair(HederaKeyPair.KeyType keyType, byte[] seed) {
-		this(keyType,seed,-1);
+		this(keyType,seed,0);
   }
 
 	/** 
@@ -250,7 +250,7 @@ public class HederaKeyPair implements Serializable {
 	 * @param keyType the type of key to create
 	 */
 	public HederaKeyPair(HederaKeyPair.KeyType keyType) {
-		this(keyType, (byte[])null, -1);
+		this(keyType, (byte[])null, 0);
 	}
 	
 	/** 
