@@ -881,16 +881,17 @@ public class HederaKeyPair implements Serializable {
 		
 		// the query itself
 		HederaQuery query = new HederaQuery();
-		query.queryType = QueryType.FILEGETINFO;
+		query.queryType = QueryType.GETBYKEY;
 		query.queryData = getByKeyQuery.build();
 		
 		// query now set, send to network
+		// TODO when implemented in API. it's not node.getFileInfo !
 		Response response = this.node.getFileInfo(query);
 
-		FileGetInfoResponse.Builder fileGetInfoResponse = response.getFileGetInfo().toBuilder();
+		GetByKeyResponse.Builder getbyKeyResponse = response.getGetByKey().toBuilder();
 		
 		// check response header first
-		ResponseHeader.Builder responseHeader = fileGetInfoResponse.getHeaderBuilder();
+		ResponseHeader.Builder responseHeader = getbyKeyResponse.getHeaderBuilder();
 		
 		this.precheckResult = responseHeader.getNodeTransactionPrecheckCode();
 
