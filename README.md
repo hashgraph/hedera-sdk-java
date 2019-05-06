@@ -76,7 +76,7 @@ The maven dependency for the sdk is now
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>hedera-java-sdk</artifactId>
-  <version>0.2.1</version>
+  <version>0.2.3</version>
 </dependency>
 ```
 
