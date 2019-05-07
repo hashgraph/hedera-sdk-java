@@ -40,15 +40,16 @@ public class HederaAccountID implements Serializable {
 	 * @param accountID a colon or dot separated list of shard, realm and account numbers (e.g. 0:0:1020)
 	 */
 	public HederaAccountID(String accountID) {
-		if ((!accountID.contains(":")) || (!accountID.contains("."))) {
+		if ((!accountID.contains(":")) && (!accountID.contains("."))) {
 			throw new IllegalArgumentException("accountID must contain '.' or ':' to separate values");
 		}
 		String[] IDs; 
 		if (accountID.contains(":")) {
 			IDs = accountID.split(":");
 		} else {
-			IDs = accountID.split(".");
+			IDs = accountID.split("\\.");
 		}
+
 		if (IDs.length !=3) {
 			throw new IllegalArgumentException("accountID must contain 3 values for shardNum, realmNum and accountNum");
 		}
@@ -127,4 +128,11 @@ public class HederaAccountID implements Serializable {
 
 		return accountID.build();
 	}
+	/**
+	 * Generate a string for this object
+	 * @return a string 
+	 */
+	public String toString(){ 
+		return this.shardNum + "." + this.realmNum + "." + this.accountNum;  
+	} 
 }
