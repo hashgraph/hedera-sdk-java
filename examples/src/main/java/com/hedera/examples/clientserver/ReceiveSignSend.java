@@ -23,6 +23,7 @@ import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
 import com.hedera.sdk.common.HederaTransactionID;
 import com.hedera.sdk.common.HederaTransactionReceipt;
 import com.hedera.sdk.common.Utilities;
+import com.hedera.sdk.node.HederaNodeList;
 import com.hedera.sdk.transaction.HederaTransaction;
 import com.hedera.sdk.transaction.HederaTransactionBody;
 import com.hedera.sdk.transaction.HederaTransactionResult;
@@ -95,10 +96,10 @@ public class ReceiveSignSend {
     		payingAccount.accountNum = txQueryDefaults.payingAccountID.accountNum;
     		
     		// paying the node account id, but this could be any other account
-    		HederaAccountID receivingAccount = txQueryDefaults.node.getAccountID();
+    		HederaAccountID receivingAccount = HederaNodeList.randomNode().getAccountID();
 
     		// we'll need a node account ID, get this from txQueryDefaults
-    		HederaAccountID nodeAccount = txQueryDefaults.node.getAccountID();
+    		HederaAccountID nodeAccount = HederaNodeList.randomNode().getAccountID();
 
     		// generate the transaction body
     		HederaTransaction txBody = cryptoTransfer(payingAccount, receivingAccount, nodeAccount);
@@ -178,14 +179,14 @@ public class ReceiveSignSend {
 		// refresh the transaction signatures
 		transaction = sigsForTransaction.transactionAddSignatures(transaction);
 		
-		HederaTransactionResult hederaTransactionResult = txQueryDefaults.node.sendCryptoTransaction(transaction);
+		HederaTransactionResult hederaTransactionResult = HederaNodeList.randomNode().sendCryptoTransaction(transaction);
 
 		hederaTransactionResult.hederaTransactionID = transactionID;
 
 		if (hederaTransactionResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 			// yes, get a receipt for the transaction
 			HederaTransactionReceipt receipt = Utilities.getReceipt(transactionID
-					,txQueryDefaults.node);
+					,HederaNodeList.randomNode());
 			
 			// was that successful ?
 			if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {

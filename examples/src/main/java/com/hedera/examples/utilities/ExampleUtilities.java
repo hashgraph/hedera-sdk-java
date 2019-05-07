@@ -2,6 +2,7 @@ package com.hedera.examples.utilities;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -11,6 +12,10 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Properties;
 
 import org.apache.commons.codec.DecoderException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.slf4j.LoggerFactory;
 import com.hedera.sdk.common.HederaAccountID;
 import com.hedera.sdk.common.HederaDuration;
@@ -18,6 +23,7 @@ import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
 import com.hedera.sdk.node.HederaNode;
+import com.hedera.sdk.node.HederaNodeList;
 
 
 public class ExampleUtilities {
@@ -45,17 +51,43 @@ public class ExampleUtilities {
 		try {
 
 			propertiesInputStream = new FileInputStream("node.properties");
-
 			// load a properties file
 			applicationProperties.load(propertiesInputStream);
 
-			// get the property value and print it out
 			nodeAddress = applicationProperties.getProperty("nodeaddress");
 			nodePort = Integer.parseInt(applicationProperties.getProperty("nodeport"));
 
 			nodeAccountShard = Long.parseLong(applicationProperties.getProperty("nodeAccountShard"));
 			nodeAccountRealm = Long.parseLong(applicationProperties.getProperty("nodeAccountRealm"));
 			nodeAccountNum = Long.parseLong(applicationProperties.getProperty("nodeAccountNum"));
+
+			// try to load node list from json file
+			JSONParser parser = new JSONParser();
+
+			try {
+
+				Object jsonObject = parser.parse(new FileReader("nodes.json"));
+				JSONArray nodes = (JSONArray) jsonObject;
+				HederaNodeList nodeList = new HederaNodeList(nodes);
+				
+			} catch (IOException ex) {
+				System.out.println("nodes.json file not found, defaulting to node.properties.");
+				JSONArray nodeArray = new JSONArray();
+				JSONObject nodeDetails = new JSONObject();
+				
+				nodeDetails.put("host", nodeAddress);
+				nodeDetails.put("port", (long)nodePort);
+				nodeDetails.put("account", nodeAccountShard + "." + nodeAccountRealm + "." + nodeAccountNum);
+				
+				nodeArray.add(nodeDetails);
+				HederaNodeList nodeList = new HederaNodeList(nodeArray);
+				
+			} catch (ParseException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+			
+			// get the property value and print it out
 			
 			pubKey = applicationProperties.getProperty("pubkey");
 			privKey = applicationProperties.getProperty("privkey");
@@ -96,7 +128,7 @@ public class ExampleUtilities {
 		txQueryDefaults.payingKeyPair = new HederaKeyPair(KeyType.ED25519, ExampleUtilities.pubKey, ExampleUtilities.privKey);
 		
 		txQueryDefaults.memo = "Demo memo";
-		txQueryDefaults.node = node;
+//		txQueryDefaults.node = node;
 		txQueryDefaults.payingAccountID = payingAccountID;
 		txQueryDefaults.transactionValidDuration = new HederaDuration(120);
 		

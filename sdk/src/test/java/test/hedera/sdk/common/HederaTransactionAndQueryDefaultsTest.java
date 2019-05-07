@@ -16,7 +16,6 @@ class HederaTransactionAndQueryDefaultsTest {
 	void HederaTXQueryDefaultsTest() {
 		HederaTransactionAndQueryDefaults txDefaults = new HederaTransactionAndQueryDefaults();
 		
-		assertNotNull(txDefaults.node);
 		assertNotNull(txDefaults.payingAccountID);
 		assertNotNull(txDefaults.transactionValidDuration);
 		assertFalse(txDefaults.generateRecord);

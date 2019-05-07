@@ -13,6 +13,7 @@ import com.hedera.sdk.account.HederaAccountUpdateValues;
 import com.hedera.sdk.account.HederaClaim;
 import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
+import com.hedera.sdk.node.HederaNodeList;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
 import com.hedera.sdk.common.HederaTransactionID;
 import com.hedera.sdk.common.HederaTransactionRecord;
@@ -36,20 +37,20 @@ public final class DemoAccount {
     	send = true;
 //    	getInfo = true;
     	update = true;
-    	doAddClaim = true; //-- not implemented ?
-    	getTXRecord = true; //-- records temporarily disabled
+    	doAddClaim = true; 
+    	getTXRecord = true; 
     	getAccountRecords = true;
 		
     	/* 
     	 * check my balance
     	 * This populates the account object's balance property 
     	 */
+    	HederaTransactionAndQueryDefaults txQueryDefaults = ExampleUtilities.getTxQueryDefaults();
     	
     	if (getBalance) {
     		// setup my account
         	HederaAccount myAccount = new HederaAccount();
         	// setup transaction/query defaults (durations, etc...)
-        	HederaTransactionAndQueryDefaults txQueryDefaults = ExampleUtilities.getTxQueryDefaults();
         	myAccount.txQueryDefaults = txQueryDefaults;
 	    	// setup my account number from properties file
 	    	myAccount.accountNum = myAccount.txQueryDefaults.payingAccountID.accountNum;
@@ -66,7 +67,6 @@ public final class DemoAccount {
     		// setup my account
         	HederaAccount myAccount = new HederaAccount();
         	// setup transaction/query defaults (durations, etc...)
-        	HederaTransactionAndQueryDefaults txQueryDefaults = ExampleUtilities.getTxQueryDefaults();
         	myAccount.txQueryDefaults = txQueryDefaults;
 	    	// setup my account number from properties file
 	    	myAccount.accountNum = myAccount.txQueryDefaults.payingAccountID.accountNum;
@@ -81,7 +81,6 @@ public final class DemoAccount {
         	HederaAccount newAccount = new HederaAccount();
         	// setup transaction/query defaults (durations, etc...)
         	// note: This txQueryDefaults contains a payingAccountID which is the account paying for the transaction
-        	HederaTransactionAndQueryDefaults txQueryDefaults = ExampleUtilities.getTxQueryDefaults();
         	newAccount.txQueryDefaults = txQueryDefaults;
 
         	// optionally generate a record for this transaction
@@ -111,7 +110,7 @@ public final class DemoAccount {
     			// optionally retrieve a record for the transaction
 	    		if (getTXRecord) {
 	    			  HederaTransactionID txID = newAccount.hederaTransactionID;
-	    			  HederaTransactionRecord txRecord = new HederaTransactionRecord(txID, newAccount.txQueryDefaults.node.transactionGetRecordsQueryFee, newAccount.txQueryDefaults);
+	    			  HederaTransactionRecord txRecord = new HederaTransactionRecord(txID, HederaNodeList.randomNode().transactionGetRecordsQueryFee, newAccount.txQueryDefaults);
 	    			  // stop getting records unnecessarily
 	    			  getTXRecord = false;
     			}
@@ -121,7 +120,7 @@ public final class DemoAccount {
 		    		// setup my account
 		        	HederaAccount myAccount = new HederaAccount();
 		        	// setup transaction/query defaults (durations, etc...)
-		        	myAccount.txQueryDefaults = ExampleUtilities.getTxQueryDefaults();
+		        	myAccount.txQueryDefaults = txQueryDefaults;
 			    	// setup my account number from properties file
 			    	myAccount.accountNum = myAccount.txQueryDefaults.payingAccountID.accountNum;
 
@@ -150,7 +149,7 @@ public final class DemoAccount {
 		    		
 		    		// send 3 amounts to the node's account
 	    			HederaAccount nodeAccount = new HederaAccount();
-	    			nodeAccount.accountNum = newAccount.txQueryDefaults.node.getAccountID().accountNum;
+	    			nodeAccount.accountNum = HederaNodeList.randomNode().getAccountID().accountNum;
 	    					
 		    		AccountSend.send(newAccount, nodeAccount, 10);
 		    		AccountSend.send(newAccount, nodeAccount, 20);
@@ -186,7 +185,7 @@ public final class DemoAccount {
 		    		// new threshold for receiving
 		    		updates.receiveRecordThreshold = 3000;
 		    		// new auto renew period
-		    		updates.autoRenewPeriodSeconds = 10;
+		    		updates.autoRenewPeriodSeconds = 86400;
 		    		// new expiration time
 		    		updates.expirationTimeSeconds = 200;
 		    		updates.expirationTimeNanos = 100;
@@ -211,6 +210,8 @@ public final class DemoAccount {
 		    	if (doAddClaim) {
 		    		System.out.println(newAccount.txQueryDefaults.payingKeyPair.getPublicKeyHex());
 
+		    		newAccount.getBalance();
+		    		
 		    		HederaKeyPair claimKeyPair = new HederaKeyPair(KeyType.ED25519);
 		
 					// Create a new claim object

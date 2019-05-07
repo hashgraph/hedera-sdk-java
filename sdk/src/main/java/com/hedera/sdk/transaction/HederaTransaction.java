@@ -12,6 +12,7 @@ import com.hedera.sdk.account.HederaAccountAmount;
 import com.hedera.sdk.common.HederaTransactionRecord;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.node.HederaNode;
+import com.hedera.sdk.node.HederaNodeList;
 import com.hedera.sdk.common.HederaSignatures;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
 import com.hedera.sdk.common.HederaTransactionID;
@@ -320,7 +321,7 @@ public class HederaTransaction implements Serializable {
 	 * @param queryFee the fee paid for the query
 	 * @throws Exception in the event of an error 
 	 */
-	public HederaTransaction(HederaTransactionAndQueryDefaults txQueryDefaults, long queryFee) throws Exception {
+	public HederaTransaction(HederaTransactionAndQueryDefaults txQueryDefaults, long queryFee, HederaNode node) throws Exception {
 
 		
 		// create a transaction ID (starts now with accountID of the paying account id)
@@ -332,7 +333,8 @@ public class HederaTransaction implements Serializable {
 		// negative amount from the account for the query fee
 		fromAccountAmount = new HederaAccountAmount(txQueryDefaults.payingAccountID.shardNum, txQueryDefaults.payingAccountID.realmNum, txQueryDefaults.payingAccountID.accountNum, -queryFee);
 		 // positive amount to the Node's account to pay for the query
-		HederaAccountAmount toAccountAmount = new HederaAccountAmount(txQueryDefaults.node.getAccountID(), queryFee);
+
+		HederaAccountAmount toAccountAmount = new HederaAccountAmount(node.getAccountID(), queryFee);
 		
 		accountAmounts.add(fromAccountAmount);
 		accountAmounts.add(toAccountAmount);
@@ -340,18 +342,16 @@ public class HederaTransaction implements Serializable {
 		HederaAccount account = new HederaAccount();
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", txQueryDefaults);
-		Utilities.throwIfNull("txQueryDefaults.node", txQueryDefaults.node);
-		Utilities.throwIfAccountIDInvalid("txQueryDefaults.node.getAccountID()", txQueryDefaults.node.getAccountID());
 		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", txQueryDefaults.payingKeyPair);
 		
 		account.txQueryDefaults = txQueryDefaults;
-		account.setNode(txQueryDefaults.node);
+		account.setNode(node);
 		
 		// get the body for the transaction so we can sign it
 		TransactionBody transferBody = account.bodyToSignForTransfer(
 				hederaTransactionID
-				, txQueryDefaults.node.getAccountID()
-				, txQueryDefaults.node.accountTransferTransactionFee // this is the transaction fee
+				, node.getAccountID()
+				, node.accountTransferTransactionFee // this is the transaction fee
 				, txQueryDefaults.transactionValidDuration
 				, txQueryDefaults.generateRecord
 				, txQueryDefaults.memo
@@ -364,8 +364,8 @@ public class HederaTransaction implements Serializable {
 		this.body = new HederaTransactionBody(
 				TransactionType.CRYPTOTRANSFER
 				, hederaTransactionID
-				, txQueryDefaults.node.getAccountID()
-				, txQueryDefaults.node.accountTransferTransactionFee // this is the transaction fee
+				, node.getAccountID()
+				, node.accountTransferTransactionFee // this is the transaction fee
 				, txQueryDefaults.transactionValidDuration
 				, txQueryDefaults.generateRecord
 				, txQueryDefaults.memo

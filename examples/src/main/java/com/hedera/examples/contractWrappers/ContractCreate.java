@@ -9,6 +9,7 @@ import com.hedera.sdk.common.HederaTransactionReceipt;
 import com.hedera.sdk.common.HederaTransactionRecord;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.contract.HederaContract;
+import com.hedera.sdk.node.HederaNodeList;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
@@ -42,13 +43,13 @@ public final class ContractCreate {
 		if (createResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 			// yes, get a receipt for the transaction
 			HederaTransactionReceipt receipt = Utilities.getReceipt(contract.hederaTransactionID,
-					contract.txQueryDefaults.node, 10, 4000, 0);
+					HederaNodeList.randomNode(), 10, 4000, 0);
 			// was that successful ?
 			if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
 				contract.contractNum = receipt.contractID.contractNum;
 				// and print it out
 				ExampleUtilities.showResult(String.format("**    Your new contract number is %d", contract.contractNum));
-				HederaTransactionRecord record = new HederaTransactionRecord(contract.hederaTransactionID, contract.txQueryDefaults.node.contractGetRecordsQueryFee, contract.txQueryDefaults);
+				HederaTransactionRecord record = new HederaTransactionRecord(contract.hederaTransactionID, HederaNodeList.randomNode().contractGetRecordsQueryFee, contract.txQueryDefaults);
 			} else {
 				ExampleUtilities.showResult("**    Failed with transactionStatus:" + receipt.transactionStatus.toString());
 				return null;

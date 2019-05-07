@@ -8,6 +8,8 @@ import com.hedera.sdk.common.HederaTimeStamp;
 import com.hedera.sdk.common.HederaTransactionReceipt;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.contract.HederaContract;
+import com.hedera.sdk.node.HederaNode;
+import com.hedera.sdk.node.HederaNodeList;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
@@ -27,7 +29,7 @@ public final class ContractUpdate {
 		if (updateResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 			// yes, get a receipt for the transaction
 			HederaTransactionReceipt receipt = Utilities.getReceipt(contract.hederaTransactionID,
-					contract.txQueryDefaults.node, 10, 4000, 0);
+					HederaNodeList.randomNode(), 10, 4000, 0);
 			// was that successful ?
 			if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
 				// and print it out

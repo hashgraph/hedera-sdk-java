@@ -12,6 +12,7 @@ import com.hedera.sdk.common.HederaTransactionID;
 import com.hedera.sdk.common.HederaTransactionReceipt;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.contract.HederaContract;
+import com.hedera.sdk.node.HederaNodeList;
 import com.hedera.sdk.transaction.HederaTransaction;
 import com.hedera.sdk.transaction.HederaTransactionBody;
 import com.hedera.sdk.transaction.HederaTransactionResult;
@@ -31,7 +32,7 @@ public class DemoContract {
 		// we are calling this from an account, using txQueryDefaults here
 		HederaAccountID payingAccount = txQueryDefaults.payingAccountID;
 		// we'll need a node account ID, get this from txQueryDefaults
-		HederaAccountID nodeAccount = txQueryDefaults.node.getAccountID();
+		HederaAccountID nodeAccount = HederaNodeList.randomNode().getAccountID();
 		// this example assumes a "SimpleStorage" contract already exists
 		long contractNum = 1332;
 		// setup a contract object
@@ -70,13 +71,13 @@ public class DemoContract {
 		transaction.signatures = sigsForTransaction;
 		
 		// now we can send to the network and check response
-		HederaTransactionResult hederaTransactionResult = txQueryDefaults.node.contractCall(transaction);
+		HederaTransactionResult hederaTransactionResult = HederaNodeList.randomNode().contractCall(transaction);
 		hederaTransactionResult.hederaTransactionID = transaction.body.transactionId;
 
 		if (hederaTransactionResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 			// yes, get a receipt for the transaction
 			HederaTransactionReceipt receipt = Utilities.getReceipt(transaction.body.transactionId,
-					txQueryDefaults.node);
+					HederaNodeList.randomNode());
 			
 			// was that successful ?
 			if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {

@@ -7,6 +7,7 @@ import com.hedera.examples.accountWrappers.AccountCreate;
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.common.HederaKeyPair;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
+import com.hedera.sdk.node.HederaNodeList;
 import com.hedera.sdk.common.HederaTransactionAndQueryDefaults;
 import com.hedera.sdk.common.HederaTransactionState;
 import com.hedera.sdk.transaction.HederaTransactionResult;
@@ -90,7 +91,7 @@ public final class DemoAccountAsync {
 			// was it successful ?
 			if (transferResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 				// yes, add Transaction to state for receipt collection
-				transactionState.setTransaction(account.hederaTransactionID, account.txQueryDefaults.node);
+				transactionState.setTransaction(account.hederaTransactionID, HederaNodeList.randomNode());
 			}
         }
         
