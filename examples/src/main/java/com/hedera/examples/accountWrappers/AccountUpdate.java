@@ -7,6 +7,7 @@ import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.account.HederaAccountUpdateValues;
 import com.hedera.sdk.common.HederaTransactionReceipt;
 import com.hedera.sdk.common.Utilities;
+import com.hedera.sdk.node.HederaNodeList;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
@@ -21,7 +22,7 @@ public final class AccountUpdate {
 		// was it successful ?
 		if (updateResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 			// yes, get a receipt for the transaction
-			HederaTransactionReceipt receipt  = Utilities.getReceipt(account.hederaTransactionID,  account.txQueryDefaults.node, 10, 3000, 0);
+			HederaTransactionReceipt receipt  = Utilities.getReceipt(account.hederaTransactionID, HederaNodeList.randomNode(), 10, 3000, 0);
 			ExampleUtilities.showResult("**    Ran Query for receipt");
 			if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
 				// if successful, print it

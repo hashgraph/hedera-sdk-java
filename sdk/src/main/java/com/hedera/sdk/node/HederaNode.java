@@ -273,8 +273,6 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaAccountID getAccountID() {
 
-
-
 		return this.accountID;
     }
 
@@ -287,7 +285,7 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult accountCreate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("SENDING TRANSACTION");
+		logger.debug("SENDING TRANSACTION to " + this.host + "/" + this.accountID.toString());
 		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
@@ -322,7 +320,7 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult addClaim(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("SENDING TRANSACTION");
+		logger.debug("SENDING TRANSACTION to " + this.host + "/" + this.accountID.toString());
 		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
@@ -356,7 +354,7 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult accountTransfer(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("SENDING TRANSACTION");
+		logger.debug("SENDING TRANSACTION to " + this.host + "/" + this.accountID.toString());
 		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
@@ -391,7 +389,7 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult accountUpdate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("SENDING TRANSACTION");
+		logger.debug("SENDING TRANSACTION to " + this.host + "/" + this.accountID.toString());
 		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
@@ -425,7 +423,7 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult fileAppend(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("SENDING TRANSACTION");
+		logger.debug("SENDING TRANSACTION to " + this.host + "/" + this.accountID.toString());
 		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
@@ -459,7 +457,7 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult fileCreate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("SENDING TRANSACTION");
+		logger.debug("SENDING TRANSACTION to " + this.host + "/" + this.accountID.toString());
 		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
@@ -494,7 +492,7 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult fileDelete(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("SENDING TRANSACTION");
+		logger.debug("SENDING TRANSACTION to " + this.host + "/" + this.accountID.toString());
 		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
@@ -529,7 +527,7 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult fileUpdate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("SENDING TRANSACTION");
+		logger.debug("SENDING TRANSACTION to " + this.host + "/" + this.accountID.toString());
 		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
@@ -564,7 +562,7 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult contractCall(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("SENDING TRANSACTION");
+		logger.debug("SENDING TRANSACTION to " + this.host + "/" + this.accountID.toString());
 		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
@@ -599,7 +597,7 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult contractCreate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("SENDING TRANSACTION");
+		logger.debug("SENDING TRANSACTION to " + this.host + "/" + this.accountID.toString());
 		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
@@ -634,7 +632,7 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult contractUpdate(HederaTransaction transaction) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("SENDING TRANSACTION");
+		logger.debug("SENDING TRANSACTION to " + this.host + "/" + this.accountID.toString());
 		logger.debug(transaction.getProtobufCompressedKeys().toString());
 
 		TransactionResponse response = null;
@@ -669,7 +667,7 @@ public class HederaNode implements Serializable {
 	 */
 	public Response contractCallLocal(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug("RUNNING QUERY TO " + this.host + "/" + this.accountID.toString());
 		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
@@ -706,7 +704,7 @@ public class HederaNode implements Serializable {
 	 */
 	public Response getContractByteCode(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug("RUNNING QUERY TO " + this.host + "/" + this.accountID.toString());
 		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
@@ -743,7 +741,7 @@ public class HederaNode implements Serializable {
 	 */
 	public Response getContractBySolidityId(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug("RUNNING QUERY TO " + this.host + "/" + this.accountID.toString());
 		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
@@ -779,7 +777,7 @@ public class HederaNode implements Serializable {
 	 */
 	public Response getContractInfo(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug("RUNNING QUERY TO " + this.host + "/" + this.accountID.toString());
 		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
@@ -816,7 +814,7 @@ public class HederaNode implements Serializable {
 	 */
 	public Response getAccountBalance(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug("RUNNING QUERY TO " + this.host + "/" + this.accountID.toString());
 		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
@@ -853,7 +851,7 @@ public class HederaNode implements Serializable {
 	 */
 	public Response getAccountRecords(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug("RUNNING QUERY TO " + this.host + "/" + this.accountID.toString());
 		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
@@ -890,7 +888,7 @@ public class HederaNode implements Serializable {
 	 */
 	public Response getContractRecords(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug("RUNNING QUERY TO " + this.host + "/" + this.accountID.toString());
 		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
@@ -928,7 +926,7 @@ public class HederaNode implements Serializable {
 	 */
 	public Response getAccountInfo(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug("RUNNING QUERY TO " + this.host + "/" + this.accountID.toString());
 		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
@@ -965,7 +963,7 @@ public class HederaNode implements Serializable {
 	 */
 	public Response getTransactionReceipt(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-
+		logger.debug("RUNNING QUERY TO " + this.host + "/" + this.accountID.toString());
 		Response response = null;
 		if (query.getProtobuf().hasTransactionGetReceipt()) {
 			openChannel();
@@ -997,7 +995,7 @@ public class HederaNode implements Serializable {
 	 */
 	public Response getTransactionRecord(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug("RUNNING QUERY TO " + this.host + "/" + this.accountID.toString());
 		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
@@ -1034,7 +1032,7 @@ public class HederaNode implements Serializable {
 	 */
 	public Response getFileContents(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug("RUNNING QUERY TO " + this.host + "/" + this.accountID.toString());
 		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
@@ -1070,7 +1068,7 @@ public class HederaNode implements Serializable {
 	 */
 	public Response getFileInfo(HederaQuery query) throws InterruptedException, StatusRuntimeException {
 
-		logger.debug("RUNNING QUERY TO NODE");
+		logger.debug("RUNNING QUERY TO " + this.host + "/" + this.accountID.toString());
 		logger.debug(query.getProtobuf().toString());
 
 		Response response = null;
@@ -1107,7 +1105,7 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult sendContractTransaction(Transaction transaction) throws InterruptedException, StatusRuntimeException, InvalidProtocolBufferException {
 
-		logger.debug("SENDING TRANSACTION");
+		logger.debug("SENDING TRANSACTION to " + this.host + "/" + this.accountID.toString());
 		logger.debug(transaction.toString());
 
 		TransactionResponse response = null;
@@ -1150,7 +1148,7 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult sendFileTransaction(Transaction transaction) throws InterruptedException, StatusRuntimeException, InvalidProtocolBufferException {
 
-		logger.debug("SENDING TRANSACTION");
+		logger.debug("SENDING TRANSACTION to " + this.host + "/" + this.accountID.toString());
 		logger.debug(transaction.toString());
 
 		TransactionResponse response = null;
@@ -1192,7 +1190,7 @@ public class HederaNode implements Serializable {
 	 */
 	public HederaTransactionResult sendCryptoTransaction(Transaction transaction) throws InterruptedException, StatusRuntimeException, InvalidProtocolBufferException {
 
-		logger.debug("SENDING TRANSACTION");
+		logger.debug("SENDING TRANSACTION to " + this.host + "/" + this.accountID.toString());
 		logger.debug(transaction.toString());
 
 		TransactionResponse response = null;

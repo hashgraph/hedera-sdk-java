@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import com.hedera.examples.utilities.ExampleUtilities;
 import com.hedera.sdk.account.HederaAccount;
 import com.hedera.sdk.common.HederaKeyPair.KeyType;
+import com.hedera.sdk.node.HederaNodeList;
 import com.hedera.sdk.common.HederaTransactionReceipt;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.transaction.HederaTransactionResult;
@@ -25,7 +26,7 @@ public final class AccountCreate {
 		// was it successful ?
 		if (createResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 			// yes, get a receipt for the transaction
-			HederaTransactionReceipt receipt = Utilities.getReceipt(account.hederaTransactionID, account.txQueryDefaults.node, 10, 3000, 0);
+			HederaTransactionReceipt receipt = Utilities.getReceipt(account.hederaTransactionID, HederaNodeList.randomNode(), 10, 3000, 0);
 			// was that successful ?
 			if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
 				// yes, get the new account number from the receipt

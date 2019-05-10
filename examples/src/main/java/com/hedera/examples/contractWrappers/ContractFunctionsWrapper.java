@@ -19,6 +19,7 @@ import com.hedera.sdk.common.HederaTransactionRecord;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.contract.HederaContract;
 import com.hedera.sdk.contract.HederaContractFunctionResult;
+import com.hedera.sdk.node.HederaNodeList;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
@@ -243,7 +244,7 @@ public class ContractFunctionsWrapper {
 		if (callResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 			// yes, get a receipt for the transaction
 			HederaTransactionReceipt receipt = Utilities.getReceipt(contract.hederaTransactionID,
-					contract.txQueryDefaults.node);
+					HederaNodeList.randomNode());
 			// was that successful ?
 			if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
 				// and print it out
@@ -264,7 +265,7 @@ public class ContractFunctionsWrapper {
 			throw new Exception ("Error running local smart contract function " + functionName);
 		}
 
-		HederaTransactionRecord record = new HederaTransactionRecord(contract.hederaTransactionID, contract.txQueryDefaults.node.contractGetRecordsQueryFee, contract.txQueryDefaults);
+		HederaTransactionRecord record = new HederaTransactionRecord(contract.hederaTransactionID, HederaNodeList.randomNode().contractGetRecordsQueryFee, contract.txQueryDefaults);
 		return record;
 	}
 	public int callInt(HederaContract contract, long localGas, long amount, String functionName, Object ... parameterValues) throws Exception {

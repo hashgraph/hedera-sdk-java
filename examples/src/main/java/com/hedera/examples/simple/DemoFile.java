@@ -133,7 +133,7 @@ public final class DemoFile {
 	        	}
         	}
         	if (doUpdate) {
-        		file = FileUpdate.update(file, 10, 2, "Updated contents".getBytes());
+        		file = FileUpdate.update(file, 86400, 2, "Updated contents".getBytes());
 	    		// get file contents
 	        	if (doGetContents) {
 	        		FileGetContents.getContents(file);

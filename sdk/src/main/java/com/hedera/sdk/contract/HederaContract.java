@@ -14,6 +14,7 @@ import com.hedera.sdk.common.HederaRealmID;
 import com.hedera.sdk.common.HederaTransactionRecord;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.node.HederaNode;
+import com.hedera.sdk.node.HederaNodeList;
 import com.hedera.sdk.common.HederaShardID;
 import com.hedera.sdk.common.HederaSignatures;
 import com.hedera.sdk.common.HederaTimeStamp;
@@ -1108,13 +1109,11 @@ public class HederaContract implements Serializable {
 		
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
-		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
 		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingKeyPair);
 		Utilities.throwIfAccountIDInvalid("txQueryDefaults.payingAccountID", this.txQueryDefaults.payingAccountID);
-		Utilities.throwIfAccountIDInvalid("txQueryDefaults.node.AccountID", this.txQueryDefaults.node.getAccountID());
 
 		// set transport
-		this.node = this.txQueryDefaults.node;
+		this.node = HederaNodeList.randomNode();
 
 		// create a transaction ID (starts now with accountID of the paying account id)
 		this.hederaTransactionID = new HederaTransactionID(this.txQueryDefaults.payingAccountID);
@@ -1185,12 +1184,11 @@ public class HederaContract implements Serializable {
 		
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
-		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
 		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingKeyPair);
 		Utilities.throwIfAccountIDInvalid("node.AccountID", this.node.getAccountID());
 
 		// set transport
-		this.node = this.txQueryDefaults.node;
+		this.node = HederaNodeList.randomNode();
 		
 		// create a transaction ID (starts now with accountID of the paying account id)
 		this.hederaTransactionID = new HederaTransactionID(this.txQueryDefaults.payingAccountID);
@@ -1278,13 +1276,11 @@ public class HederaContract implements Serializable {
 				
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
-		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
 		Utilities.throwIfNull("txQueryDefaults.payingKeyPair", this.txQueryDefaults.payingKeyPair);
 		Utilities.throwIfAccountIDInvalid("txQueryDefaults.payingAccountID", this.txQueryDefaults.payingAccountID);
-		Utilities.throwIfAccountIDInvalid("txQueryDefaults.node.AccountID", this.txQueryDefaults.node.getAccountID());
 
 		// set transport
-		this.node = this.txQueryDefaults.node;
+		this.node = HederaNodeList.randomNode();
 
 		// create a transaction ID (starts now with accountID of the paying account id)
 		this.hederaTransactionID = new HederaTransactionID(this.txQueryDefaults.payingAccountID);
@@ -1349,10 +1345,9 @@ public class HederaContract implements Serializable {
 
 		// set transport
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
-		Utilities.throwIfNull("Node", this.txQueryDefaults.node);
-		this.node = this.txQueryDefaults.node;
+		this.node = HederaNodeList.randomNode();
 		Utilities.throwIfNull("Node", this.node);
-		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults, this.node.contractGetInfoQueryFee);
+		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults, this.node.contractGetInfoQueryFee, this.node);
 
 		return this.getInfoAnswerOnly(transferTransaction);
 	}
@@ -1389,10 +1384,9 @@ public class HederaContract implements Serializable {
 
 		// set transport
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
-		Utilities.throwIfNull("Node", this.txQueryDefaults.node);
-		this.node = this.txQueryDefaults.node;
+		this.node = HederaNodeList.randomNode();
 		
-		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults,this.node.contractGetByteCodeQueryFee);
+		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults,this.node.contractGetByteCodeQueryFee, this.node);
 
 		if (this.getByteCodeAnswerOnly(transferTransaction)) {
 
@@ -1436,16 +1430,15 @@ public class HederaContract implements Serializable {
 
 		// validate inputs
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
-		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
 
 		// set transport
-		this.node = this.txQueryDefaults.node;
+		this.node = HederaNodeList.randomNode();
 		
 		this.gas = gas;
 		this.functionParameters = functionParameters;
 		this.maxResultSize = maxResultSize;
 
-		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults,this.node.contractCallLocalQueryFee);
+		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults,this.node.contractCallLocalQueryFee, this.node);
 
 		if (this.callLocalAnswerOnly(transferTransaction)) {
 			return this.hederaContractFunctionResult;
@@ -1483,10 +1476,9 @@ public class HederaContract implements Serializable {
 	public List<HederaTransactionRecord> getRecords() throws Exception {
 		// set transport
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
-		Utilities.throwIfNull("txQueryDefaults.node", this.txQueryDefaults.node);
-		this.node = this.txQueryDefaults.node;
+		this.node = HederaNodeList.randomNode();
 		
-		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults, this.node.accountGetRecordsQueryFee);
+		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults, this.node.accountGetRecordsQueryFee, this.node);
 		getRecordsAnswerOnly(transferTransaction);
 		return this.records;
 	}	
@@ -1505,7 +1497,7 @@ public class HederaContract implements Serializable {
 		Utilities.throwIfNull("txQueryDefaults", this.txQueryDefaults);
 		Utilities.throwIfNull("node", this.node);
 		
-		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults, this.node.accountGetRecordsQueryFee);
+		HederaTransaction transferTransaction = new HederaTransaction(this.txQueryDefaults, this.node.accountGetRecordsQueryFee, this.node);
 		if (getRecords(transferTransaction, QueryResponseType.ANSWER_ONLY, recordAccount.getHederaContractID())) {
 			return this.records;
 		}

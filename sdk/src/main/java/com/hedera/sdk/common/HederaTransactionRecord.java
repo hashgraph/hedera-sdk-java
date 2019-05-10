@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import com.google.protobuf.ByteString;
 import com.hedera.sdk.account.HederaAccountAmount;
 import com.hedera.sdk.contract.HederaContractFunctionResult;
+import com.hedera.sdk.node.HederaNode;
+import com.hedera.sdk.node.HederaNodeList;
 import com.hedera.sdk.query.HederaQueryHeader.QueryResponseType;
 import com.hedera.sdk.transaction.HederaTransaction;
 import com.hederahashgraph.api.proto.java.TransactionRecord;
@@ -166,10 +168,10 @@ public class HederaTransactionRecord implements Serializable {
 	public HederaTransactionRecord(HederaTransactionID transactionID, Long queryFee, HederaTransactionAndQueryDefaults txQueryDefaults) throws Exception {
 		HederaTransaction transaction = new HederaTransaction();
 		Utilities.throwIfNull("txQueryDefaults", txQueryDefaults);
-		Utilities.throwIfNull("txQueryDefaults.node", txQueryDefaults.node);
-		HederaTransaction payment = new HederaTransaction(txQueryDefaults, queryFee);
+		HederaNode node = HederaNodeList.randomNode();
+		HederaTransaction payment = new HederaTransaction(txQueryDefaults, queryFee, node);
 		
-		transaction.setNode(txQueryDefaults.node);
+		transaction.setNode(node);
 		
 		if (transaction.getRecord(payment, transactionID, QueryResponseType.ANSWER_ONLY)) {
 			this.consensusTimeStamp = transaction.transactionRecord().consensusTimeStamp;

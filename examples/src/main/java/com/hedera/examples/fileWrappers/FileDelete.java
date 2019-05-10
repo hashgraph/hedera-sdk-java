@@ -6,6 +6,7 @@ import com.hedera.examples.utilities.ExampleUtilities;
 import com.hedera.sdk.common.HederaTransactionReceipt;
 import com.hedera.sdk.common.Utilities;
 import com.hedera.sdk.file.HederaFile;
+import com.hedera.sdk.node.HederaNodeList;
 import com.hedera.sdk.transaction.HederaTransactionResult;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
@@ -20,7 +21,7 @@ public final class FileDelete {
 		// was it successful ?
 		if (deleteResult.getPrecheckResult() == ResponseCodeEnum.OK) {
 			// yes, get a receipt for the transaction
-			HederaTransactionReceipt receipt  = Utilities.getReceipt(file.hederaTransactionID,  file.txQueryDefaults.node, 10, 4000, 0);
+			HederaTransactionReceipt receipt  = Utilities.getReceipt(file.hederaTransactionID,  HederaNodeList.randomNode(), 10, 4000, 0);
 			if (receipt.transactionStatus == ResponseCodeEnum.SUCCESS) {
 				// if query successful, print it
 				ExampleUtilities.showResult("**    Deletion successful");
