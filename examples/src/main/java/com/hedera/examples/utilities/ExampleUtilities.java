@@ -117,10 +117,11 @@ public class ExampleUtilities {
 		// Get node details 
 		ExampleUtilities.getNodeDetails();
 		
-		// setup node account ID
-		HederaAccountID nodeAccountID = new HederaAccountID(ExampleUtilities.nodeAccountShard, ExampleUtilities.nodeAccountRealm, ExampleUtilities.nodeAccountNum);
 		// setup node
-		HederaNode node = new HederaNode(ExampleUtilities.nodeAddress, ExampleUtilities.nodePort, nodeAccountID);
+		HederaNode node = HederaNodeList.randomNode();
+
+		// setup node account ID
+		HederaAccountID nodeAccountID = node.getAccountID();
 		
 		// setup paying account
 		HederaAccountID payingAccountID = new HederaAccountID(ExampleUtilities.payAccountShard, ExampleUtilities.payAccountRealm, ExampleUtilities.payAccountNum);

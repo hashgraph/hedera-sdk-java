@@ -22,6 +22,40 @@ Features supported include:
 
 ## Changes in this version from 0.1.0
 
+### 0.3.0 - Added support for multi-node networks
+
+New class in the SDK - `HederaNodeList` which is constructed with a JSON array of node properties (IP/Host, Port and Account number).
+
+The list of nodes can be initialised with a file called `nodes.json` (see `ExampleUtilities.getNodeDetails` in the examples project).
+A sample file (`nodes.json.sample`) is provided in the examples:
+
+```json
+[
+  {
+    "host":"127.0.0.1",
+    "port":50211,
+    "account":"0.0.3"
+  },
+  {
+    "host":"127.0.0.1",
+    "port":50212,
+    "account":"0.0.4"
+  }
+]
+```
+
+If this file doesn't exist, `ExampleUtilities.getNodeDetails` will fetch a single node's details from the `node.properties` file to ensure backwards compatibility.
+
+Notes on usage:
+
+- `HederaTransactionAndQueryDefaults.node` is no longer available, replace with `HederaNodeList.randomNode()` which will pick a node randomly from the list of available nodes. 
+
+-`HederaNodeList.byAccountNum(long accountNum)` will return the node in the list which is associated with the account number you specify. This may be useful in cases where a transaction has already been signed and has to be sent to the node which `nodeAccountId` is referenced in the signed transaction. It is imperative that the transaction is sent to the appropriate node or an error will occur.
+
+-`HederaNodeList.byHost(String host)` will return the node in the list which is associated with the host/IP you specify.
+
+*Note: While it's perfectly ok (and recommended) to send a transaction to a node and fetch a record/receipt from another, be careful that when constructing a transaction, you send the transaction to the node which account is referenced in the transaction.*
+
 ### 0.3.0 - Changed default key index to 0 when generating and recovering keys
 
 When generating a new key pair with the SDK, the key index is now defaulting to 0 instead of -1, likewise for key recovery from a word list.
