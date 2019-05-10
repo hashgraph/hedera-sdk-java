@@ -145,22 +145,22 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <pre>public class <span class="typeNameLabel">HederaKeyPair</span>
 extends java.lang.Object
 implements java.io.Serializable</pre>
-<div class="block">A Key can be a public key from one of the three supported systems (ed25519, RSA-3072, ECDSA with p384). 
- Or, it can be the ID of a smart contract instance, which is authorized to act as if it had a key. 
- If an account has an ed25519 key associated with it, then the corresponding private key must sign any transaction to transfer cryptocurrency out of it. 
+<div class="block">A Key can be a public key from one of the three supported systems (ed25519, RSA-3072, ECDSA with p384).
+ Or, it can be the ID of a smart contract instance, which is authorized to act as if it had a key.
+ If an account has an ed25519 key associated with it, then the corresponding private key must sign any transaction to transfer cryptocurrency out of it.
  And similarly for RSA and ECDSA.
- A Key can be a smart contract ID, which means that smart contract is to authorize operations as if it had signed with a key that it owned. 
- The smart contract doesn't actually have a key, and doesn't actually sign a transaction. 
+ A Key can be a smart contract ID, which means that smart contract is to authorize operations as if it had signed with a key that it owned.
+ The smart contract doesn't actually have a key, and doesn't actually sign a transaction.
  But it's as if a virtual transaction were created, and the smart contract signed it with a private key.
- A key can be a "threshold key", which means a list of M keys, any N of which must sign in order for the threshold signature to be considered valid. 
+ A key can be a "threshold key", which means a list of M keys, any N of which must sign in order for the threshold signature to be considered valid.
  The keys within a threshold signature may themselves be threshold signatures, to allow complex signature requirements.
- A Key can be a list of keys. Their use is dependent on context. 
- For example, a Hedera file is created with a list of keys, where all of them must sign a transaction to create or modify the file, 
- but only one of them is needed to sign a transaction to delete the file. So it's a single list that sometimes acts as a 1-of-M threshold key, 
+ A Key can be a list of keys. Their use is dependent on context.
+ For example, a Hedera file is created with a list of keys, where all of them must sign a transaction to create or modify the file,
+ but only one of them is needed to sign a transaction to delete the file. So it's a single list that sometimes acts as a 1-of-M threshold key,
  and sometimes acts as an M-of-M threshold key.
- A Key can contain a ThresholdKey or KeyList, which in turn contain a Key, so this mutual recursion would allow nesting arbitrarily deep. 
- The current API only allows the nesting to a depth of 3 levels, such as the key being a list of threshold keys, 
- each of which contains a list of primitive keys (e.g., ed25519). 
+ A Key can contain a ThresholdKey or KeyList, which in turn contain a Key, so this mutual recursion would allow nesting arbitrarily deep.
+ The current API only allows the nesting to a depth of 3 levels, such as the key being a list of threshold keys,
+ each of which contains a list of primitive keys (e.g., ed25519).
  In the future, this requirement may be relaxed, to allow deeper nesting.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>

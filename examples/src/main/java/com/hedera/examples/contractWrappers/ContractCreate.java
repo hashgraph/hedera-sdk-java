@@ -29,7 +29,7 @@ public final class ContractCreate {
 		long shardNum = 0;
 		long realmNum = 0;
 		byte[] constructorParameters = constParams; 
-		HederaDuration autoRenewPeriod = new HederaDuration(60); // auto renew every minute
+		HederaDuration autoRenewPeriod = new HederaDuration(86400); 
 
 		contract.txQueryDefaults.generateRecord = true;
 		

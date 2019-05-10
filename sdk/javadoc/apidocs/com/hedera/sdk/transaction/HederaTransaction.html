@@ -282,7 +282,7 @@ implements java.io.Serializable</pre>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../../com/hedera/sdk/transaction/HederaTransaction.html#getRecordAnswerOnly(com.hedera.sdk.transaction.HederaTransaction,com.hedera.sdk.common.HederaTransactionID)">getRecordAnswerOnly</a></span>&#8203;(<a href="../../../../com/hedera/sdk/transaction/HederaTransaction.html" title="class in com.hedera.sdk.transaction">HederaTransaction</a>&nbsp;payment,
                    <a href="../../../../com/hedera/sdk/common/HederaTransactionID.html" title="class in com.hedera.sdk.common">HederaTransactionID</a>&nbsp;transactionID)</code></th>
 <td class="colLast">
-<div class="block">Get the record for a transaction without a state proof 
+<div class="block">Get the record for a transaction without a state proof
  If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it.</div>
 </td>
 </tr>
@@ -290,7 +290,7 @@ implements java.io.Serializable</pre>
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../../com/hedera/sdk/transaction/HederaTransaction.html#getRecordCostAnswer(com.hedera.sdk.common.HederaTransactionID)">getRecordCostAnswer</a></span>&#8203;(<a href="../../../../com/hedera/sdk/common/HederaTransactionID.html" title="class in com.hedera.sdk.common">HederaTransactionID</a>&nbsp;transactionID)</code></th>
 <td class="colLast">
-<div class="block">Get cost of obtaining a record for a transaction without a state proof 
+<div class="block">Get cost of obtaining a record for a transaction without a state proof
  If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it.</div>
 </td>
 </tr>
@@ -298,7 +298,7 @@ implements java.io.Serializable</pre>
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../../com/hedera/sdk/transaction/HederaTransaction.html#getRecordCostAnswerStateProof(com.hedera.sdk.common.HederaTransactionID)">getRecordCostAnswerStateProof</a></span>&#8203;(<a href="../../../../com/hedera/sdk/common/HederaTransactionID.html" title="class in com.hedera.sdk.common">HederaTransactionID</a>&nbsp;transactionID)</code></th>
 <td class="colLast">
-<div class="block">Get cost of obtaining a record for a transaction with a state proof 
+<div class="block">Get cost of obtaining a record for a transaction with a state proof
  If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it.</div>
 </td>
 </tr>
@@ -307,7 +307,7 @@ implements java.io.Serializable</pre>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../../com/hedera/sdk/transaction/HederaTransaction.html#getRecordStateProof(com.hedera.sdk.transaction.HederaTransaction,com.hedera.sdk.common.HederaTransactionID)">getRecordStateProof</a></span>&#8203;(<a href="../../../../com/hedera/sdk/transaction/HederaTransaction.html" title="class in com.hedera.sdk.transaction">HederaTransaction</a>&nbsp;payment,
                    <a href="../../../../com/hedera/sdk/common/HederaTransactionID.html" title="class in com.hedera.sdk.common">HederaTransactionID</a>&nbsp;transactionID)</code></th>
 <td class="colLast">
-<div class="block">Get the record for a transaction with a state proof 
+<div class="block">Get the record for a transaction with a state proof
  If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it.</div>
 </td>
 </tr>
@@ -559,9 +559,9 @@ implements java.io.Serializable</pre>
 <pre>public&nbsp;boolean&nbsp;getReceipt&#8203;(<a href="../../../../com/hedera/sdk/common/HederaTransactionID.html" title="class in com.hedera.sdk.common">HederaTransactionID</a>&nbsp;transactionID)
                    throws java.lang.InterruptedException</pre>
 <div class="block">Gets a receipt for a transaction
- Get the receipt of a transaction, given its transaction ID. Once a transaction reaches consensus, 
- then information about whether it succeeded or failed will be available until the end of the receipt period. 
- Before and after the receipt period, and for a transaction that was never submitted, the receipt is unknown. 
+ Get the receipt of a transaction, given its transaction ID. Once a transaction reaches consensus,
+ then information about whether it succeeded or failed will be available until the end of the receipt period.
+ Before and after the receipt period, and for a transaction that was never submitted, the receipt is unknown.
  This query is free (the payment field is left empty).</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -583,11 +583,11 @@ implements java.io.Serializable</pre>
                          <a href="../../../../com/hedera/sdk/common/HederaTransactionID.html" title="class in com.hedera.sdk.common">HederaTransactionID</a>&nbsp;transactionID,
                          <a href="../../../../com/hedera/sdk/query/HederaQueryHeader.QueryResponseType.html" title="enum in com.hedera.sdk.query">HederaQueryHeader.QueryResponseType</a>&nbsp;responseType)
                   throws java.lang.InterruptedException</pre>
-<div class="block">Get the record for a transaction. 
- If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it. 
- If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created. 
- If the transaction called a smart contract function, then the record contains the result of that call. 
- If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer. 
+<div class="block">Get the record for a transaction.
+ If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it.
+ If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created.
+ If the transaction called a smart contract function, then the record contains the result of that call.
+ If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer.
  If the transaction didn't return anything that should be in the record, then the results field will be set to nothing.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -610,11 +610,11 @@ implements java.io.Serializable</pre>
 <pre>public&nbsp;boolean&nbsp;getRecordAnswerOnly&#8203;(<a href="../../../../com/hedera/sdk/transaction/HederaTransaction.html" title="class in com.hedera.sdk.transaction">HederaTransaction</a>&nbsp;payment,
                                    <a href="../../../../com/hedera/sdk/common/HederaTransactionID.html" title="class in com.hedera.sdk.common">HederaTransactionID</a>&nbsp;transactionID)
                             throws java.lang.InterruptedException</pre>
-<div class="block">Get the record for a transaction without a state proof 
- If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it. 
- If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created. 
- If the transaction called a smart contract function, then the record contains the result of that call. 
- If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer. 
+<div class="block">Get the record for a transaction without a state proof
+ If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it.
+ If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created.
+ If the transaction called a smart contract function, then the record contains the result of that call.
+ If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer.
  If the transaction didn't return anything that should be in the record, then the results field will be set to nothing.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -636,11 +636,11 @@ implements java.io.Serializable</pre>
 <pre>public&nbsp;boolean&nbsp;getRecordStateProof&#8203;(<a href="../../../../com/hedera/sdk/transaction/HederaTransaction.html" title="class in com.hedera.sdk.transaction">HederaTransaction</a>&nbsp;payment,
                                    <a href="../../../../com/hedera/sdk/common/HederaTransactionID.html" title="class in com.hedera.sdk.common">HederaTransactionID</a>&nbsp;transactionID)
                             throws java.lang.InterruptedException</pre>
-<div class="block">Get the record for a transaction with a state proof 
- If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it. 
- If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created. 
- If the transaction called a smart contract function, then the record contains the result of that call. 
- If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer. 
+<div class="block">Get the record for a transaction with a state proof
+ If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it.
+ If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created.
+ If the transaction called a smart contract function, then the record contains the result of that call.
+ If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer.
  If the transaction didn't return anything that should be in the record, then the results field will be set to nothing.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -661,11 +661,11 @@ implements java.io.Serializable</pre>
 <h4>getRecordCostAnswer</h4>
 <pre>public&nbsp;boolean&nbsp;getRecordCostAnswer&#8203;(<a href="../../../../com/hedera/sdk/common/HederaTransactionID.html" title="class in com.hedera.sdk.common">HederaTransactionID</a>&nbsp;transactionID)
                             throws java.lang.InterruptedException</pre>
-<div class="block">Get cost of obtaining a record for a transaction without a state proof 
- If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it. 
- If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created. 
- If the transaction called a smart contract function, then the record contains the result of that call. 
- If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer. 
+<div class="block">Get cost of obtaining a record for a transaction without a state proof
+ If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it.
+ If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created.
+ If the transaction called a smart contract function, then the record contains the result of that call.
+ If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer.
  If the transaction didn't return anything that should be in the record, then the results field will be set to nothing.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -685,11 +685,11 @@ implements java.io.Serializable</pre>
 <h4>getRecordCostAnswerStateProof</h4>
 <pre>public&nbsp;boolean&nbsp;getRecordCostAnswerStateProof&#8203;(<a href="../../../../com/hedera/sdk/common/HederaTransactionID.html" title="class in com.hedera.sdk.common">HederaTransactionID</a>&nbsp;transactionID)
                                       throws java.lang.InterruptedException</pre>
-<div class="block">Get cost of obtaining a record for a transaction with a state proof 
- If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it. 
- If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created. 
- If the transaction called a smart contract function, then the record contains the result of that call. 
- If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer. 
+<div class="block">Get cost of obtaining a record for a transaction with a state proof
+ If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it.
+ If the transaction created an account, file, or smart contract instance, then the record will contain the ID for what it created.
+ If the transaction called a smart contract function, then the record contains the result of that call.
+ If the transaction was a cryptocurrency transfer, then the record includes the TransferList which gives the details of that transfer.
  If the transaction didn't return anything that should be in the record, then the results field will be set to nothing.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
