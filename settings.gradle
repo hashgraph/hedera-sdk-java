@@ -1,9 +1,0 @@
-pluginManagement {
-	repositories {
-		gradlePluginPortal()
-		jcenter()
-	}
-}
-
-rootProject.name = 'sdk'
-include 'examples'

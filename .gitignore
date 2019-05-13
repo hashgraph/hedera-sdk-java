@@ -1,22 +1,13 @@
-# Ignore Gradle project-specific cache directory
-.gradle
-
-# Ignore Gradle build output directory
-build/
-
-# Ignore generated source directories
-gen/
-
-# Ignore IDE specific directories
+# IDEA
 .idea/
 *.iml
 
-# Ignore local environment variables
+# Local environment variables
 .env
 
 # Vim
 *.swp
 *.vim
 
-# Output from running examples
-out/
+# Maven
+target/

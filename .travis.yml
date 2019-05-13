@@ -2,19 +2,3 @@ language: java
 
 jdk:
     - openjdk11
-
-env:
-    global:
-        - GRADLE_OPTS="-Dorg.gradle.internal.launcher.welcomeMessageEnabled=false"
-
-# Gradle and Travis both recommend deleting these paths before caching
-before_cache:
-    - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-    - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-
-cache:
-    directories:
-        - .gradle/wrapper
-        - .gradle/caches
-
-# implicit build-and-test script with Gradle (using wrapper): ./gradlew assemble && ./gradlew check
