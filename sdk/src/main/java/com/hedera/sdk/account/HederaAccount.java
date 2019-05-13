@@ -1162,7 +1162,7 @@ public class HederaAccount implements Serializable {
 		// add the two accounts and amounts to the array list
 		HederaAccountAmount fromAccountAmount = null;
 		// negative amount from the account
-		 fromAccountAmount = new HederaAccountAmount(this.txQueryDefaults.payingAccountID.shardNum, this.txQueryDefaults.payingAccountID.realmNum, this.txQueryDefaults.payingAccountID.accountNum, -amount);
+		fromAccountAmount = new HederaAccountAmount(this.txQueryDefaults.payingAccountID.shardNum, this.txQueryDefaults.payingAccountID.realmNum, this.txQueryDefaults.payingAccountID.accountNum, -amount);
 
 		 // positive amount to the account
 		HederaAccountAmount toAccountAmount = new HederaAccountAmount(toAccountID.shardNum, toAccountID.realmNum, toAccountID.accountNum, amount);
