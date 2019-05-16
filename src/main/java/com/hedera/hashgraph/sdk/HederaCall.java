@@ -4,6 +4,7 @@ import com.google.protobuf.ByteString;
 import io.grpc.CallOptions;
 import io.grpc.Channel;
 import io.grpc.ClientCall;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
 
@@ -27,11 +28,11 @@ public abstract class HederaCall<Req, RawResp, Resp> {
         return getChannel().newCall(getMethod(), CallOptions.DEFAULT);
     }
 
-    public final Resp execute() throws HederaException {
+    public final Resp execute() throws HederaException, HederaNetworkException {
         return mapResponse(ClientCalls.blockingUnaryCall(newClientCall(), toProto()));
     }
 
-    public final void executeAsync(Consumer<Resp> onSuccess, Consumer<Throwable> onError) {
+    public final void executeAsync(Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError) {
         ClientCalls.asyncUnaryCall(newClientCall(), toProto(), new StreamObserver<>() {
             @Override
             public void onNext(RawResp value) {
@@ -45,7 +46,17 @@ public abstract class HederaCall<Req, RawResp, Resp> {
 
             @Override
             public void onError(Throwable t) {
-                onError.accept(t);
+                HederaThrowable exception;
+
+                if (t instanceof StatusRuntimeException) {
+                    exception = new HederaNetworkException((StatusRuntimeException) t);
+                } else if (t instanceof HederaThrowable) {
+                    exception = (HederaThrowable) t;
+                } else {
+                    throw new RuntimeException("unhandled exception type", t);
+                }
+
+                onError.accept(exception);
             }
 
             @Override

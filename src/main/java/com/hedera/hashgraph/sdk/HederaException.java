@@ -2,7 +2,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
 
-public class HederaException extends Exception {
+public class HederaException extends Exception implements HederaThrowable {
     public final ResponseCodeEnum responseCode;
 
     HederaException(ResponseCodeEnum responseCode) {

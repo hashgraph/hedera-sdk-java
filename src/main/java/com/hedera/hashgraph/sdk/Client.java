@@ -95,7 +95,7 @@ public final class Client {
     // Simplified interface intended for high-level, opinionated operation
     //
 
-    public AccountId createAccount(Key publicKey, long initialBalance) throws HederaException {
+    public AccountId createAccount(Key publicKey, long initialBalance) throws HederaException, HederaNetworkException {
         var receipt = new AccountCreateTransaction(this).setKey(publicKey)
             .setInitialBalance(initialBalance)
             .executeForReceipt();
@@ -103,39 +103,39 @@ public final class Client {
         return receipt.getAccountId();
     }
 
-    public void createAccountAsync(Key publicKey, long initialBalance, Consumer<AccountId> onSuccess, Consumer<Throwable> onError) {
+    public void createAccountAsync(Key publicKey, long initialBalance, Consumer<AccountId> onSuccess, Consumer<HederaThrowable> onError) {
         new AccountCreateTransaction(this).setKey(publicKey)
             .setInitialBalance(initialBalance)
             .executeForReceiptAsync(receipt -> onSuccess.accept(receipt.getAccountId()), onError);
     }
 
-    public AccountInfo getAccount(AccountId id) throws HederaException {
+    public AccountInfo getAccount(AccountId id) throws HederaException, HederaNetworkException {
         return new AccountInfoQuery(this).setAccountId(id)
             .execute();
     }
 
-    public void getAccountAsync(AccountId id, Consumer<AccountInfo> onSuccess, Consumer<Throwable> onError) {
+    public void getAccountAsync(AccountId id, Consumer<AccountInfo> onSuccess, Consumer<HederaThrowable> onError) {
         new AccountInfoQuery(this).setAccountId(id)
             .executeAsync(onSuccess, onError);
     }
 
-    public long getAccountBalance(AccountId id) throws HederaException {
+    public long getAccountBalance(AccountId id) throws HederaException, HederaNetworkException {
         return new AccountBalanceQuery(this).setAccountId(id)
             .execute();
     }
 
-    public void getAccountBalanceAsync(AccountId id, Consumer<Long> onSuccess, Consumer<Throwable> onError) {
+    public void getAccountBalanceAsync(AccountId id, Consumer<Long> onSuccess, Consumer<HederaThrowable> onError) {
         new AccountBalanceQuery(this).setAccountId(id)
             .executeAsync(onSuccess, onError);
     }
 
-    public TransactionId transferCryptoTo(AccountId recipient, long amount) throws HederaException {
+    public TransactionId transferCryptoTo(AccountId recipient, long amount) throws HederaException, HederaNetworkException {
         return new CryptoTransferTransaction(this).addSender(Objects.requireNonNull(operatorId), amount)
             .addRecipient(recipient, amount)
             .execute();
     }
 
-    public void transferCryptoToAsync(AccountId recipient, long amount, Consumer<TransactionId> onSuccess, Consumer<Throwable> onError) {
+    public void transferCryptoToAsync(AccountId recipient, long amount, Consumer<TransactionId> onSuccess, Consumer<HederaThrowable> onError) {
         new CryptoTransferTransaction(this).addSender(Objects.requireNonNull(operatorId), amount)
             .addRecipient(recipient, amount)
             .executeAsync(onSuccess, onError);
