@@ -86,6 +86,10 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         return this;
     }
 
+    public TransactionId getId() {
+        return new TransactionId(transactionId);
+    }
+
     @Override
     public com.hedera.hashgraph.sdk.proto.Transaction toProto() {
         validate();
