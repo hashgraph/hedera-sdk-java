@@ -151,19 +151,19 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         return (T) this;
     }
 
-    public final TransactionReceipt executeForReceipt() throws HederaException {
+    public final TransactionReceipt executeForReceipt() throws HederaException, HederaNetworkException {
         return build().executeForReceipt();
     }
 
-    public final void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<Throwable> onError) {
+    public final void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<HederaThrowable> onError) {
         build().executeForReceiptAsync(onSuccess, onError);
     }
 
-    public final TransactionRecord executeForRecord() throws HederaException {
+    public final TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
         return build().executeForRecord();
     }
 
-    public final void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<Throwable> onError) {
+    public final void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<HederaThrowable> onError) {
         build().executeForRecordAsync(onSuccess, onError);
     }
 

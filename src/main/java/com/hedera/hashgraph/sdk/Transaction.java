@@ -86,6 +86,10 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         return this;
     }
 
+    public TransactionId getId() {
+        return new TransactionId(transactionId);
+    }
+
     @Override
     public com.hedera.hashgraph.sdk.proto.Transaction toProto() {
         validate();
@@ -137,8 +141,8 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         return new TransactionId(transactionId);
     }
 
-    private <T> T executeAndWaitFor(CheckedFunction<TransactionId, T, HederaException> execute, Function<T, TransactionReceipt> mapReceipt)
-            throws HederaException {
+    private <T> T executeAndWaitFor(CheckedFunction<TransactionId, T> execute, Function<T, TransactionReceipt> mapReceipt)
+            throws HederaException, HederaNetworkException {
         var id = execute();
 
         T response = null;
@@ -168,7 +172,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         return Objects.requireNonNull(response);
     }
 
-    public final TransactionReceipt executeForReceipt() throws HederaException {
+    public final TransactionReceipt executeForReceipt() throws HederaException, HederaNetworkException {
         return executeAndWaitFor(
             id -> new TransactionReceiptQuery(getClient()).setTransactionId(id)
                 .execute(),
@@ -176,7 +180,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         );
     }
 
-    public TransactionRecord executeForRecord() throws HederaException {
+    public TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
         return executeAndWaitFor(
             id -> new TransactionRecordQuery(getClient()).setTransaction(id)
                 .execute(),
@@ -184,7 +188,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         );
     }
 
-    public void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<Throwable> onError) {
+    public void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<HederaThrowable> onError) {
         var handler = new AsyncRetryHandler<>(
                 (id, onSuccess_, onError_) -> new TransactionReceiptQuery(getClient()).setTransactionId(id)
                     .executeAsync(onSuccess_, onError_),
@@ -194,7 +198,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         executeAsync(handler::waitFor, onError);
     }
 
-    public void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<Throwable> onError) {
+    public void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<HederaThrowable> onError) {
         var handler = new AsyncRetryHandler<>(
                 (id, onSuccess_, onError_) -> new TransactionRecordQuery(getClient()).setTransaction(id)
                     .executeAsync(onSuccess_, onError_),
@@ -216,7 +220,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         private final ExecuteAsync<T> execute;
         private final Function<T, TransactionReceipt> mapReceipt;
         private final Consumer<T> onSuccess;
-        private final Consumer<Throwable> onError;
+        private final Consumer<HederaThrowable> onError;
 
         private int attemptsLeft = MAX_RETRY_ATTEMPTS;
 
@@ -224,7 +228,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
             ExecuteAsync<T> execute,
             Function<T, TransactionReceipt> mapReceipt,
             Consumer<T> onSuccess,
-            Consumer<Throwable> onError
+            Consumer<HederaThrowable> onError
         ) {
             this.execute = execute;
             this.mapReceipt = mapReceipt;
@@ -258,7 +262,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
 
     @FunctionalInterface
     private interface ExecuteAsync<T> {
-        void executeAsync(TransactionId id, Consumer<T> onSuccess, Consumer<Throwable> onError);
+        void executeAsync(TransactionId id, Consumer<T> onSuccess, Consumer<HederaThrowable> onError);
     }
 
     private static ByteString getPrefix(ByteString byteString) {
