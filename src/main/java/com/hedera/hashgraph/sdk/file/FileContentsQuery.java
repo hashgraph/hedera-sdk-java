@@ -6,7 +6,7 @@ import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 // `FileGetContentsQuery`
-public class FileContentsQuery extends QueryBuilder<FileGetContentsResponse> {
+public class FileContentsQuery extends QueryBuilder<FileGetContentsResponse, FileContentsQuery> {
     private final FileGetContentsQuery.Builder builder = inner.getFileGetContentsBuilder();
 
     public FileContentsQuery(Client client) {

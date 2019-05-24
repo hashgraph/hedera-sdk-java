@@ -4,7 +4,7 @@ import com.hedera.hashgraph.sdk.crypto.Key;
 import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
-public final class GetByKeyQuery extends QueryBuilder<GetByKeyResponse> {
+public final class GetByKeyQuery extends QueryBuilder<GetByKeyResponse, GetByKeyQuery> {
     private final com.hedera.hashgraph.sdk.proto.GetByKeyQuery.Builder builder = inner.getGetByKeyBuilder();
 
     GetByKeyQuery(Client client) {

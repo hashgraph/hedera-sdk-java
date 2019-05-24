@@ -6,7 +6,7 @@ import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 // `FileGetInfoQuery`
-public class FileInfoQuery extends QueryBuilder<FileInfo> {
+public class FileInfoQuery extends QueryBuilder<FileInfo, FileInfoQuery> {
     private final FileGetInfoQuery.Builder builder = inner.getFileGetInfoBuilder();
 
     public FileInfoQuery(Client client) {

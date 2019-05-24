@@ -6,7 +6,7 @@ import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 // `CryptoGetAccountBalanceQuery`
-public final class AccountBalanceQuery extends QueryBuilder<Long> {
+public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalanceQuery> {
     private final CryptoGetAccountBalanceQuery.Builder builder = inner.getCryptogetAccountBalanceBuilder();
 
     AccountBalanceQuery() {

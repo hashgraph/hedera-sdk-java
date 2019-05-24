@@ -7,7 +7,7 @@ import io.grpc.Channel;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
-public abstract class QueryBuilder<Resp> extends HederaCall<Query, Response, Resp> {
+public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extends HederaCall<Query, Response, Resp> {
     protected Query.Builder inner = Query.newBuilder();
 
     @Nullable
@@ -48,9 +48,10 @@ public abstract class QueryBuilder<Resp> extends HederaCall<Query, Response, Res
         return inner.build();
     }
 
-    public QueryBuilder setPayment(Transaction transaction) {
+    @SuppressWarnings("unchecked")
+    public T setPayment(Transaction transaction) {
         getHeaderBuilder().setPayment(transaction.toProto());
-        return this;
+        return (T) this;
     }
 
     protected int getCost() {

@@ -10,7 +10,7 @@ import io.grpc.MethodDescriptor;
 
 /** Call a function without updating its state or requiring concensus */
 // `ContractCallLocalQuery`
-public class ContractCallQuery extends QueryBuilder<FunctionResult> {
+public class ContractCallQuery extends QueryBuilder<FunctionResult, ContractCallQuery> {
     private final ContractCallLocalQuery.Builder builder = inner.getContractCallLocalBuilder();
 
     public ContractCallQuery(Client client) {

@@ -3,7 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
-public final class TransactionReceiptQuery extends QueryBuilder<TransactionReceipt> {
+public final class TransactionReceiptQuery extends QueryBuilder<TransactionReceipt, TransactionReceiptQuery> {
     private final TransactionGetReceiptQuery.Builder builder = inner.getTransactionGetReceiptBuilder();
 
     public TransactionReceiptQuery(Client client) {
