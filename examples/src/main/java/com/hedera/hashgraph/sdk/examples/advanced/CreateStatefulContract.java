@@ -65,7 +65,7 @@ public final class CreateStatefulContract {
 
         System.out.println("new contract ID: " + newContractId);
 
-        var contractCallResult = new ContractCallQuery(client).setContract(newContractId)
+        var contractCallResult = new ContractCallQuery(client).setContractId(newContractId)
             .setFunctionParameters(CallParams.function("get_message"))
             .execute();
 
@@ -77,13 +77,13 @@ public final class CreateStatefulContract {
         var message = contractCallResult.getString();
         System.out.println("contract returned message: " + message);
 
-        new ContractExecuteTransaction(client).setContract(newContractId)
+        new ContractExecuteTransaction(client).setContractId(newContractId)
             .setFunctionParameters(CallParams.function("set_message")
                 .add("hello from hedera again!")
             )
             .execute();
 
-        var contractUpdateResult = new ContractCallQuery(client).setContract(newContractId)
+        var contractUpdateResult = new ContractCallQuery(client).setContractId(newContractId)
             .setFunctionParameters(CallParams.function("get_message"))
             .execute();
 
@@ -92,7 +92,7 @@ public final class CreateStatefulContract {
             return;
         }
 
-        var contractCallResult2 = new ContractCallQuery(client).setContract(newContractId)
+        var contractCallResult2 = new ContractCallQuery(client).setContractId(newContractId)
             .setFunctionParameters(CallParams.function("get_message"))
             .execute();
 

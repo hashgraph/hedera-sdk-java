@@ -22,14 +22,14 @@ public final class ContractBytecodeQuery extends QueryBuilder<ContractGetBytecod
         return builder.getHeaderBuilder();
     }
 
-    public ContractBytecodeQuery setContract(ContractId contract) {
+    public ContractBytecodeQuery setContractId(ContractId contract) {
         builder.setContractID(contract.toProto());
         return this;
     }
 
     @Override
     protected void doValidate() {
-        require(builder.hasContractID(), ".setContract() required");
+        require(builder.hasContractID(), ".setContractId() required");
     }
 
     @Override

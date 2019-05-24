@@ -18,7 +18,7 @@ class ContractExecuteTransactionTest extends Specification {
 transaction builder failed validation:
 .setTransactionId() required
 .setNodeAccountId() required
-.setContract() required"""
+.setContractId() required"""
 	}
 
 	def "Transaction can be built"() {

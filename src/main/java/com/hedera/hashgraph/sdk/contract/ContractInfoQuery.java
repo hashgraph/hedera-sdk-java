@@ -22,7 +22,7 @@ public final class ContractInfoQuery extends QueryBuilder<ContractInfo> {
         return builder.getHeaderBuilder();
     }
 
-    public ContractInfoQuery setContract(ContractId contract) {
+    public ContractInfoQuery setContractId(ContractId contract) {
         builder.setContractID(contract.toProto());
         return this;
     }
@@ -39,6 +39,6 @@ public final class ContractInfoQuery extends QueryBuilder<ContractInfo> {
 
     @Override
     protected void doValidate() {
-        require(builder.hasContractID(), ".setContract() required");
+        require(builder.hasContractID(), ".setContractId() required");
     }
 }

@@ -17,7 +17,7 @@ public class ContractRecordsQuery extends QueryBuilder<ContractGetRecordsRespons
         super(null);
     }
 
-    public ContractRecordsQuery setContract(ContractId contractId) {
+    public ContractRecordsQuery setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProto());
         return this;
     }
@@ -39,6 +39,6 @@ public class ContractRecordsQuery extends QueryBuilder<ContractGetRecordsRespons
 
     @Override
     protected void doValidate() {
-        require(builder.hasContractID(), ".setContract() required");
+        require(builder.hasContractID(), ".setContractId() required");
     }
 }
