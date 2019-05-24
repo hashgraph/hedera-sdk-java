@@ -17,7 +17,7 @@ public class AccountRecordsQuery extends QueryBuilder<CryptoGetAccountRecordsRes
         super(null);
     }
 
-    public AccountRecordsQuery setAccount(AccountId accountId) {
+    public AccountRecordsQuery setAccountId(AccountId accountId) {
         builder.setAccountID(accountId.toProto());
         return this;
     }
