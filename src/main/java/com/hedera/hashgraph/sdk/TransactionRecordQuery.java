@@ -19,7 +19,7 @@ public class TransactionRecordQuery extends QueryBuilder<TransactionRecord> {
         return builder.getHeaderBuilder();
     }
 
-    public TransactionRecordQuery setTransaction(TransactionId transaction) {
+    public TransactionRecordQuery setTransactionId(TransactionId transaction) {
         builder.setTransactionID(transaction.toProto());
         return this;
     }

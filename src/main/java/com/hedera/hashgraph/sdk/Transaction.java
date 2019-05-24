@@ -182,7 +182,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
 
     public TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
         return executeAndWaitFor(
-            id -> new TransactionRecordQuery(getClient()).setTransaction(id)
+            id -> new TransactionRecordQuery(getClient()).setTransactionId(id)
                 .execute(),
             TransactionRecord::getReceipt
         );
@@ -200,7 +200,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
 
     public void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<HederaThrowable> onError) {
         var handler = new AsyncRetryHandler<>(
-                (id, onSuccess_, onError_) -> new TransactionRecordQuery(getClient()).setTransaction(id)
+                (id, onSuccess_, onError_) -> new TransactionRecordQuery(getClient()).setTransactionId(id)
                     .executeAsync(onSuccess_, onError_),
                 TransactionRecord::getReceipt, onSuccess, onError
         );
