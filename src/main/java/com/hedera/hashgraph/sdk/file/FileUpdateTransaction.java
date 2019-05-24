@@ -22,7 +22,7 @@ public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransact
         super(null);
     }
 
-    public FileUpdateTransaction setFile(FileId file) {
+    public FileUpdateTransaction setFileId(FileId file) {
         builder.setFileID(file.toProto());
 
         return this;

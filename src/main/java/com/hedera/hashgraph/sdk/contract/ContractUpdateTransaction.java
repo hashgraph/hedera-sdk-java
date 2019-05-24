@@ -52,7 +52,7 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
         return this;
     }
 
-    public ContractUpdateTransaction setFile(FileId file) {
+    public ContractUpdateTransaction setFileId(FileId file) {
         builder.setFileID(file.toProto());
         return this;
     }
