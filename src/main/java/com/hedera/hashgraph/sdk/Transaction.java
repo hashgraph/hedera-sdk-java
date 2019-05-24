@@ -6,16 +6,17 @@ import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519Signature;
 import com.hedera.hashgraph.sdk.proto.*;
-import io.grpc.*;
+import io.grpc.Channel;
+import io.grpc.MethodDescriptor;
 import io.grpc.netty.shaded.io.netty.util.concurrent.GlobalEventExecutor;
 import org.bouncycastle.util.encoders.Hex;
 
+import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import javax.annotation.Nullable;
 
 public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse, TransactionId> {
 
@@ -153,7 +154,10 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
             receiptStatus = mapReceipt.apply(response)
                 .getStatus();
 
-            if (receiptStatus == ResponseCodeEnum.UNKNOWN) {
+            // if we're fetching a record it returns `RECORD_NOT_FOUND` instead of `UNKNOWN`
+            if (receiptStatus == ResponseCodeEnum.UNKNOWN ||
+                receiptStatus == ResponseCodeEnum.RECEIPT_NOT_FOUND ||
+                receiptStatus == ResponseCodeEnum.RECORD_NOT_FOUND) {
                 // If the receipt is UNKNOWN this means that the server has not finished
                 // processing the transaction
 
@@ -181,11 +185,29 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
     }
 
     public TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
+        checkGenerateRecordIsSet();
+
         return executeAndWaitFor(
             id -> new TransactionRecordQuery(getClient()).setTransactionId(id)
                 .execute(),
             TransactionRecord::getReceipt
         );
+    }
+
+    private void checkGenerateRecordIsSet() {
+        // we have to re-decode the transaction body to ensure this flag is set
+        TransactionBody txnBody;
+        try {
+            txnBody = TransactionBody.parseFrom(inner.getBodyBytes());
+        } catch (InvalidProtocolBufferException e) {
+            throw new IllegalStateException("transaction is not parseable", e);
+        }
+
+        if (!txnBody.getGenerateRecord()) {
+            throw new IllegalStateException(
+                "Getting a record from a Transaction requires `setGenerateRecord(true)` before it is built and signed"
+            );
+        }
     }
 
     public void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<HederaThrowable> onError) {
@@ -199,6 +221,8 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
     }
 
     public void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<HederaThrowable> onError) {
+        checkGenerateRecordIsSet();
+
         var handler = new AsyncRetryHandler<>(
                 (id, onSuccess_, onError_) -> new TransactionRecordQuery(getClient()).setTransactionId(id)
                     .executeAsync(onSuccess_, onError_),

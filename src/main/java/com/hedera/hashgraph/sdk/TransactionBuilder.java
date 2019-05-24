@@ -160,11 +160,13 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     }
 
     public final TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
-        return build().executeForRecord();
+        // ensure this flag is set
+        return setGenerateRecord(true).build().executeForRecord();
     }
 
     public final void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<HederaThrowable> onError) {
-        build().executeForRecordAsync(onSuccess, onError);
+        // ensure this flag is set
+        setGenerateRecord(true).build().executeForRecordAsync(onSuccess, onError);
     }
 
     // FIXME: This is duplicated from Transaction
