@@ -23,7 +23,7 @@ public final class ContractExecuteTransaction extends TransactionBuilder<Contrac
         super(null);
     }
 
-    public ContractExecuteTransaction setContract(ContractId contractId) {
+    public ContractExecuteTransaction setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProto());
         return this;
     }
@@ -55,6 +55,6 @@ public final class ContractExecuteTransaction extends TransactionBuilder<Contrac
 
     @Override
     protected void doValidate() {
-        require(builder.hasContractID(), ".setContract() required");
+        require(builder.hasContractID(), ".setContractId() required");
     }
 }

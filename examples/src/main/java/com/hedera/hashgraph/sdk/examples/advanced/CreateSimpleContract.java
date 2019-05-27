@@ -64,7 +64,7 @@ public final class CreateSimpleContract {
         System.out.println("new contract ID: " + newContractId);
 
         var contractCallResult = new ContractCallQuery(client).setGas(30000)
-            .setContract(newContractId)
+            .setContractId(newContractId)
             .setFunctionParameters(CallParams.function("greet"))
             .execute();
 

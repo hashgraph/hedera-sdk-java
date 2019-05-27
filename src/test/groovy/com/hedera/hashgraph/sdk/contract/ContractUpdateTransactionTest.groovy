@@ -20,7 +20,7 @@ class ContractUpdateTransactionTest extends Specification {
 transaction builder failed validation:
 .setTransactionId() required
 .setNodeAccountId() required
-.setContract() required"""
+.setContractId() required"""
 	}
 
 	// FIXME: Can't set adminKey

@@ -17,7 +17,7 @@ public class AccountStakersQuery extends QueryBuilder<CryptoGetStakersResponse, 
         super(null);
     }
 
-    public AccountStakersQuery setAccount(AccountId accountId) {
+    public AccountStakersQuery setAccountId(AccountId accountId) {
         builder.setAccountID(accountId.toProto());
         return this;
     }

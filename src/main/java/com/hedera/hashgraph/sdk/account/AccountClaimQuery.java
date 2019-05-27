@@ -25,7 +25,7 @@ public final class AccountClaimQuery extends QueryBuilder<CryptoGetClaimResponse
         return builder.getHeaderBuilder();
     }
 
-    public AccountClaimQuery setAccount(AccountId account) {
+    public AccountClaimQuery setAccountId(AccountId account) {
         builder.setAccountID(account.toProto());
         return this;
     }

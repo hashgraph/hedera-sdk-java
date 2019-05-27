@@ -26,7 +26,7 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
         super(null);
     }
 
-    public ContractUpdateTransaction setContract(ContractId contract) {
+    public ContractUpdateTransaction setContractId(ContractId contract) {
         builder.setContractID(contract.toProto());
         return this;
     }
@@ -52,7 +52,7 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
         return this;
     }
 
-    public ContractUpdateTransaction setFile(FileId file) {
+    public ContractUpdateTransaction setFileId(FileId file) {
         builder.setFileID(file.toProto());
         return this;
     }
@@ -64,6 +64,6 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
 
     @Override
     protected void doValidate() {
-        require(builder.hasContractID(), ".setContract() required");
+        require(builder.hasContractID(), ".setContractId() required");
     }
 }
