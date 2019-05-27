@@ -3,7 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
-public final class GetBySolidityIdQuery extends QueryBuilder<GetBySolidityIDResponse> {
+public final class GetBySolidityIdQuery extends QueryBuilder<GetBySolidityIDResponse, GetBySolidityIdQuery> {
     private final GetBySolidityIDQuery.Builder builder = inner.getGetBySolidityIDBuilder();
 
     public GetBySolidityIdQuery(Client client) {

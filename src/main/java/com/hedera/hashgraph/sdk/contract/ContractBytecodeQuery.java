@@ -6,7 +6,7 @@ import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 // `ContractGetBytecodeQuery`
-public final class ContractBytecodeQuery extends QueryBuilder<ContractGetBytecodeResponse> {
+public final class ContractBytecodeQuery extends QueryBuilder<ContractGetBytecodeResponse, ContractBytecodeQuery> {
     private final ContractGetBytecodeQuery.Builder builder = inner.getContractGetBytecodeBuilder();
 
     public ContractBytecodeQuery(Client client) {

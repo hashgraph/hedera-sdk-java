@@ -6,7 +6,7 @@ import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 // `CryptoGetAccountRecordsQuery`
-public class AccountRecordsQuery extends QueryBuilder<CryptoGetAccountRecordsResponse> {
+public class AccountRecordsQuery extends QueryBuilder<CryptoGetAccountRecordsResponse, AccountRecordsQuery> {
     private final CryptoGetAccountRecordsQuery.Builder builder = inner.getCryptoGetAccountRecordsBuilder();
 
     public AccountRecordsQuery(Client client) {

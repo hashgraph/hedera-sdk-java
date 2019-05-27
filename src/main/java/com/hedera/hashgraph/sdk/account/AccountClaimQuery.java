@@ -7,7 +7,7 @@ import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 // `CryptoGetClaimQuery`
-public final class AccountClaimQuery extends QueryBuilder<CryptoGetClaimResponse> {
+public final class AccountClaimQuery extends QueryBuilder<CryptoGetClaimResponse, AccountClaimQuery> {
     private final CryptoGetClaimQuery.Builder builder;
 
     public AccountClaimQuery(Client client) {

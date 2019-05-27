@@ -3,7 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
-public class TransactionRecordQuery extends QueryBuilder<TransactionRecord> {
+public class TransactionRecordQuery extends QueryBuilder<TransactionRecord, TransactionRecordQuery> {
     private final TransactionGetRecordQuery.Builder builder = inner.getTransactionGetRecordBuilder();
 
     public TransactionRecordQuery(Client client) {

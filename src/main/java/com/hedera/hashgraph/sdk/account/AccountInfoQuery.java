@@ -6,7 +6,7 @@ import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 // `CryptoGetInfoQuery`
-public final class AccountInfoQuery extends QueryBuilder<AccountInfo> {
+public final class AccountInfoQuery extends QueryBuilder<AccountInfo, AccountInfoQuery> {
     private final com.hedera.hashgraph.sdk.proto.CryptoGetInfoQuery.Builder builder;
 
     public AccountInfoQuery(Client client) {
