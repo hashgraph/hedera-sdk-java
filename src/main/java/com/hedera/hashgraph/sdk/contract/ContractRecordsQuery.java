@@ -6,7 +6,7 @@ import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 // `ContractGetRecordsQuery`
-public class ContractRecordsQuery extends QueryBuilder<ContractGetRecordsResponse> {
+public class ContractRecordsQuery extends QueryBuilder<ContractGetRecordsResponse, ContractRecordsQuery> {
     private final ContractGetRecordsQuery.Builder builder = inner.getContractGetRecordsBuilder();
 
     public ContractRecordsQuery(Client client) {

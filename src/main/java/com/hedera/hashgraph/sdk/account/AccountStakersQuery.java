@@ -6,7 +6,7 @@ import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 // `CryptoGetStakersQuery`
-public class AccountStakersQuery extends QueryBuilder<CryptoGetStakersResponse> {
+public class AccountStakersQuery extends QueryBuilder<CryptoGetStakersResponse, AccountStakersQuery> {
     private final CryptoGetStakersQuery.Builder builder = inner.getCryptoGetProxyStakersBuilder();
 
     public AccountStakersQuery(Client client) {
