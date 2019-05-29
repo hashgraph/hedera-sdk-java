@@ -138,7 +138,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
     }
 
     @Override
-    protected void validate() {
+    public final void validate() {
         var sigMap = inner.getSigMapOrBuilder();
 
         if (sigMap.getSigPairCount() < 2) {
