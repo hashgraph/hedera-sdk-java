@@ -66,8 +66,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     }
 
     /**
-     * Sets whether the transaction should generate a record. A receipt is always generated but a
-     * record is optional.
+     * Sets whether the transaction should generate a longer-lived record at the cost of a higher transaction fee.
+     * Records by default only live a few minutes but setting this causes them to persist for an hour.
      */
     public final T setGenerateRecord(boolean generateRecord) {
         bodyBuilder.setGenerateRecord(generateRecord);
@@ -160,13 +160,11 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     }
 
     public final TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
-        // ensure this flag is set
-        return setGenerateRecord(true).build().executeForRecord();
+        return build().executeForRecord();
     }
 
     public final void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<HederaThrowable> onError) {
-        // ensure this flag is set
-        setGenerateRecord(true).build().executeForRecordAsync(onSuccess, onError);
+        build().executeForRecordAsync(onSuccess, onError);
     }
 
     // FIXME: This is duplicated from Transaction

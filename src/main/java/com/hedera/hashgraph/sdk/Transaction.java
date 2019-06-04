@@ -16,7 +16,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse, TransactionId> {
 
@@ -28,8 +27,11 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
     @Nullable
     private final Client client;
 
-    private static final int MAX_RETRY_ATTEMPTS = 10;
+    private static final int MAX_RETRY_ATTEMPTS = 100;
+    private static final int RECEIPT_RETRY_DELAY = 100;
+
     private static final int PREFIX_LEN = 6;
+
 
     Transaction(
         @Nullable Client client,
@@ -91,6 +93,18 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         return new TransactionId(transactionId);
     }
 
+    public TransactionReceipt queryReceipt() throws HederaException {
+        return new TransactionReceiptQuery(Objects.requireNonNull(client))
+            .setTransactionId(getId())
+            .execute();
+    }
+
+    public void queryReceiptAsync(Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError) {
+        new TransactionReceiptQuery(Objects.requireNonNull(client))
+            .setTransactionId(getId())
+            .executeAsync(onReceipt, onError);
+    }
+
     @Override
     public com.hedera.hashgraph.sdk.proto.Transaction toProto() {
         validate();
@@ -142,94 +156,78 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         return new TransactionId(transactionId);
     }
 
-    private <T> T executeAndWaitFor(CheckedFunction<TransactionId, T> execute, Function<T, TransactionReceipt> mapReceipt)
+    private <T> T executeAndWaitFor(CheckedFunction<TransactionReceipt, T> mapReceipt)
             throws HederaException, HederaNetworkException {
-        var id = execute();
+        // kickoff the transaction
+        execute();
 
-        T response = null;
-        ResponseCodeEnum receiptStatus = ResponseCodeEnum.UNRECOGNIZED;
-
-        for (int attempt = 1; attempt < MAX_RETRY_ATTEMPTS; attempt++) {
-            response = execute.apply(id);
-            receiptStatus = mapReceipt.apply(response)
-                .getStatus();
+        for (int attempt = 0; attempt < MAX_RETRY_ATTEMPTS; attempt++) {
+            var receipt = queryReceipt();
+            var receiptStatus = receipt.getStatus();
 
             // if we're fetching a record it returns `RECORD_NOT_FOUND` instead of `UNKNOWN`
-            if (receiptStatus == ResponseCodeEnum.UNKNOWN ||
-                receiptStatus == ResponseCodeEnum.RECEIPT_NOT_FOUND ||
-                receiptStatus == ResponseCodeEnum.RECORD_NOT_FOUND) {
+            if (receiptStatus == ResponseCodeEnum.UNKNOWN) {
                 // If the receipt is UNKNOWN this means that the server has not finished
                 // processing the transaction
-
                 try {
-                    Thread.sleep(1500 * attempt);
+                    Thread.sleep(RECEIPT_RETRY_DELAY * attempt);
                 } catch (InterruptedException e) {
-                    break;
+                    throw new RuntimeException(e);
                 }
             } else {
-                // Otherwise either the receipt is SUCCESS or there is something _exceptional_ wrong
-                break;
+                HederaException.throwIfExceptional(receiptStatus);
+                return mapReceipt.apply(receipt);
             }
         }
 
-        HederaException.throwIfExceptional(receiptStatus);
-        return Objects.requireNonNull(response);
+        throw new HederaException(ResponseCodeEnum.UNKNOWN);
     }
 
+    /**
+     * Execute this transaction and wait for its receipt to be generated.
+     *
+     * If the receipt does not become available after a few seconds, {@link HederaException} is thrown.
+     *
+     * @return the receipt for the transaction
+     * @throws HederaException for any response code that is not {@link ResponseCodeEnum#SUCCESS}
+     * @throws HederaNetworkException
+     * @throws RuntimeException if an {@link java.lang.InterruptedException} is thrown while waiting for the receipt.
+     */
     public final TransactionReceipt executeForReceipt() throws HederaException, HederaNetworkException {
-        return executeAndWaitFor(
-            id -> new TransactionReceiptQuery(getClient()).setTransactionId(id)
-                .execute(),
-            receipt -> receipt
-        );
+        return executeAndWaitFor(receipt -> receipt);
     }
 
+    /**
+     * Execute this transaction and wait for its record to be generated.
+     *
+     * If the record does not become available after a few seconds, {@link HederaException} is thrown.
+     *
+     * @return the receipt for the transaction
+     * @throws HederaException for any response code that is not {@link ResponseCodeEnum#SUCCESS}
+     * @throws HederaNetworkException
+     * @throws RuntimeException if an {@link java.lang.InterruptedException} is thrown while waiting for the receipt.
+     */
     public TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
-        checkGenerateRecordIsSet();
-
         return executeAndWaitFor(
-            id -> new TransactionRecordQuery(getClient()).setTransactionId(id)
-                .execute(),
-            TransactionRecord::getReceipt
+            receipt -> new TransactionRecordQuery(getClient()).setTransactionId(getId()).execute()
         );
-    }
-
-    private void checkGenerateRecordIsSet() {
-        // we have to re-decode the transaction body to ensure this flag is set
-        TransactionBody txnBody;
-        try {
-            txnBody = TransactionBody.parseFrom(inner.getBodyBytes());
-        } catch (InvalidProtocolBufferException e) {
-            throw new IllegalStateException("transaction is not parseable", e);
-        }
-
-        if (!txnBody.getGenerateRecord()) {
-            throw new IllegalStateException(
-                "Getting a record from a Transaction requires `setGenerateRecord(true)` before it is built and signed"
-            );
-        }
     }
 
     public void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<HederaThrowable> onError) {
-        var handler = new AsyncRetryHandler<>(
-                (id, onSuccess_, onError_) -> new TransactionReceiptQuery(getClient()).setTransactionId(id)
-                    .executeAsync(onSuccess_, onError_),
-                receipt -> receipt, onSuccess, onError
-        );
+        var handler = new AsyncReceiptHandler(onSuccess, onError);
 
-        executeAsync(handler::waitFor, onError);
+        executeAsync(id -> handler.tryGetReceipt(), onError);
     }
 
     public void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<HederaThrowable> onError) {
-        checkGenerateRecordIsSet();
-
-        var handler = new AsyncRetryHandler<>(
-                (id, onSuccess_, onError_) -> new TransactionRecordQuery(getClient()).setTransactionId(id)
-                    .executeAsync(onSuccess_, onError_),
-                TransactionRecord::getReceipt, onSuccess, onError
+        var handler = new AsyncReceiptHandler(
+            (receipt) -> new TransactionRecordQuery(getClient())
+                .setTransactionId(getId())
+                .executeAsync(onSuccess, onError),
+            onError
         );
 
-        executeAsync(handler::waitFor, onError);
+        executeAsync(id -> handler.tryGetReceipt(), onError);
     }
 
     public byte[] toBytes() {
@@ -240,53 +238,36 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         return Objects.requireNonNull(client);
     }
 
-    private static class AsyncRetryHandler<T> {
-        private final ExecuteAsync<T> execute;
-        private final Function<T, TransactionReceipt> mapReceipt;
-        private final Consumer<T> onSuccess;
+    private class AsyncReceiptHandler {
+        private final Consumer<TransactionReceipt> onReceipt;
         private final Consumer<HederaThrowable> onError;
 
         private int attemptsLeft = MAX_RETRY_ATTEMPTS;
 
-        private AsyncRetryHandler(
-            ExecuteAsync<T> execute,
-            Function<T, TransactionReceipt> mapReceipt,
-            Consumer<T> onSuccess,
-            Consumer<HederaThrowable> onError
+        private AsyncReceiptHandler(
+            Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError
         ) {
-            this.execute = execute;
-            this.mapReceipt = mapReceipt;
-            this.onSuccess = onSuccess;
+            this.onReceipt = onReceipt;
             this.onError = onError;
         }
 
-        private void waitFor(final TransactionId id) {
+        private void tryGetReceipt() {
             attemptsLeft -= 1;
-            execute.executeAsync(id, result -> handleResult(id, result), onError);
+            queryReceiptAsync(this::handleReceipt, onError);
         }
 
-        private void handleResult(TransactionId id, T result) {
-            var receipt = mapReceipt.apply(result);
-            var resultCode = receipt.getStatus();
-
-            if (resultCode == ResponseCodeEnum.UNKNOWN) {
+        private void handleReceipt(TransactionReceipt receipt) {
+            if (receipt.getStatus() == ResponseCodeEnum.UNKNOWN) {
                 if (attemptsLeft == 0) {
                     onError.accept(new HederaException(ResponseCodeEnum.UNKNOWN));
-                    return;
+                } else {
+                    GlobalEventExecutor.INSTANCE.schedule(this::tryGetReceipt, RECEIPT_RETRY_DELAY,
+                        TimeUnit.MILLISECONDS);
                 }
-
-                GlobalEventExecutor.INSTANCE.schedule(() -> waitFor(id), 1500, TimeUnit.MILLISECONDS);
-            } else if (HederaException.isCodeExceptional(resultCode, false)) {
-                onError.accept(new HederaException(resultCode));
             } else {
-                onSuccess.accept(result);
+                onReceipt.accept(receipt);
             }
         }
-    }
-
-    @FunctionalInterface
-    private interface ExecuteAsync<T> {
-        void executeAsync(TransactionId id, Consumer<T> onSuccess, Consumer<HederaThrowable> onError);
     }
 
     private static ByteString getPrefix(ByteString byteString) {
