@@ -95,6 +95,10 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         return build().toProto();
     }
 
+    public final com.hedera.hashgraph.sdk.proto.Transaction toUnsignedProto() {
+        return build().toUnsignedProto();
+    }
+
     @Override
     protected void validate() {
         var bodyBuilder = this.bodyBuilder;
@@ -142,6 +146,10 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
 
     public final byte[] toBytes() {
         return build().toBytes();
+    }
+
+    public final byte[] toBytesUnsigned() {
+        return build().toBytesUnsigned();
     }
 
     // Work around for java not recognized that this is completely safe

@@ -15,7 +15,7 @@ public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTr
         super(client);
     }
 
-    CryptoTransferTransaction() {
+    public CryptoTransferTransaction() {
         super(null);
     }
 

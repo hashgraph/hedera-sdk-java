@@ -107,6 +107,11 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         return inner.build();
     }
 
+    public com.hedera.hashgraph.sdk.proto.Transaction toUnsignedProto() {
+        validateUnsigned();
+        return inner.build();
+    }
+
     @Override
     protected MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethod() {
         return methodDescriptor;
@@ -143,6 +148,10 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
             }
         }
 
+        checkValidationErrors("Transaction failed validation");
+    }
+
+    protected void validateUnsigned() {
         checkValidationErrors("Transaction failed validation");
     }
 
@@ -227,6 +236,10 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
 
     public byte[] toBytes() {
         return toProto().toByteArray();
+    }
+
+    public byte[] toBytesUnsigned() {
+        return toUnsignedProto().toByteArray();
     }
 
     private Client getClient() {
