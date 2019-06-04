@@ -17,7 +17,7 @@ public class AccountDeleteClaimTransaction extends TransactionBuilder<AccountDel
         super(client);
     }
 
-    AccountDeleteClaimTransaction() {
+    public AccountDeleteClaimTransaction() {
         super(null);
     }
 

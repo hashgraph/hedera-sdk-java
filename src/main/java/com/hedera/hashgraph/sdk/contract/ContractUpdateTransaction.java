@@ -22,7 +22,7 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
         super(client);
     }
 
-    ContractUpdateTransaction() {
+    public ContractUpdateTransaction() {
         super(null);
     }
 

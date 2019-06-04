@@ -19,7 +19,7 @@ public final class ContractExecuteTransaction extends TransactionBuilder<Contrac
         super(client);
     }
 
-    ContractExecuteTransaction() {
+    public ContractExecuteTransaction() {
         super(null);
     }
 

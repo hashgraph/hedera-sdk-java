@@ -9,7 +9,7 @@ import io.grpc.MethodDescriptor;
 public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalanceQuery> {
     private final CryptoGetAccountBalanceQuery.Builder builder = inner.getCryptogetAccountBalanceBuilder();
 
-    AccountBalanceQuery() {
+    public AccountBalanceQuery() {
         super(null);
     }
 

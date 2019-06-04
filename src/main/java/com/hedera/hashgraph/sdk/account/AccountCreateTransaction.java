@@ -25,7 +25,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
         super(client);
     }
 
-    AccountCreateTransaction() {
+    public AccountCreateTransaction() {
         super(null);
     }
 

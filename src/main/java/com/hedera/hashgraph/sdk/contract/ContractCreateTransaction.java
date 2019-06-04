@@ -18,7 +18,7 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
         super(client);
     }
 
-    ContractCreateTransaction() {
+    public ContractCreateTransaction() {
         super(null);
     }
 

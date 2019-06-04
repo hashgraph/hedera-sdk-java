@@ -16,7 +16,7 @@ public class AccountDeleteTransaction extends TransactionBuilder<AccountDeleteTr
         super(client);
     }
 
-    AccountDeleteTransaction() {
+    public AccountDeleteTransaction() {
         super(null);
     }
 

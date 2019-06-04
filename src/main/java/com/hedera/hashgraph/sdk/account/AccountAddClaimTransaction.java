@@ -18,7 +18,7 @@ public final class AccountAddClaimTransaction extends TransactionBuilder<Account
         super(client);
     }
 
-    AccountAddClaimTransaction() {
+    public AccountAddClaimTransaction() {
         super(null);
     }
 

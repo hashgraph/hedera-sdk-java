@@ -22,7 +22,7 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
         super(client);
     }
 
-    AccountUpdateTransaction() {
+    public AccountUpdateTransaction() {
         super(null);
     }
 
