@@ -10,17 +10,15 @@ import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
+
 /** Call a function in the contract, updating its internal state in the hashgraph. */
 // `ContractCallTransaction`
 public final class ContractExecuteTransaction extends TransactionBuilder<ContractExecuteTransaction> {
     private final ContractCallTransactionBody.Builder builder = bodyBuilder.getContractCallBuilder();
 
-    public ContractExecuteTransaction(Client client) {
+    public ContractExecuteTransaction(@Nullable Client client) {
         super(client);
-    }
-
-    public ContractExecuteTransaction() {
-        super(null);
     }
 
     public ContractExecuteTransaction setContractId(ContractId contractId) {

@@ -8,18 +8,15 @@ import com.hedera.hashgraph.sdk.crypto.Key;
 import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
 import java.time.Instant;
 
 public final class FileCreateTransaction extends TransactionBuilder<FileCreateTransaction> {
     private final FileCreateTransactionBody.Builder builder = bodyBuilder.getFileCreateBuilder();
     private final KeyList.Builder keyList = builder.getKeysBuilder();
 
-    public FileCreateTransaction(Client client) {
+    public FileCreateTransaction(@Nullable Client client) {
         super(client);
-    }
-
-    FileCreateTransaction() {
-        super(null);
     }
 
     public FileCreateTransaction setExpirationTime(Instant expiration) {

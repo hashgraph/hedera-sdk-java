@@ -5,15 +5,13 @@ import com.hedera.hashgraph.sdk.QueryBuilder;
 import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
+
 // `CryptoGetAccountBalanceQuery`
 public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalanceQuery> {
     private final CryptoGetAccountBalanceQuery.Builder builder = inner.getCryptogetAccountBalanceBuilder();
 
-    public AccountBalanceQuery() {
-        super(null);
-    }
-
-    public AccountBalanceQuery(Client client) {
+    public AccountBalanceQuery(@Nullable Client client) {
         super(client);
     }
 

@@ -8,16 +8,14 @@ import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
+
 // `CryptoDeleteTransaction`
 public class AccountDeleteTransaction extends TransactionBuilder<AccountDeleteTransaction> {
     private final CryptoDeleteTransactionBody.Builder builder = bodyBuilder.getCryptoDeleteBuilder();
 
-    public AccountDeleteTransaction(Client client) {
+    public AccountDeleteTransaction(@Nullable Client client) {
         super(client);
-    }
-
-    public AccountDeleteTransaction() {
-        super(null);
     }
 
     public AccountDeleteTransaction setTransferAccountId(AccountId transferAccountId) {
