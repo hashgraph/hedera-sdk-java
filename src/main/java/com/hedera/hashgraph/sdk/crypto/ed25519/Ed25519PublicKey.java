@@ -2,12 +2,13 @@ package com.hedera.hashgraph.sdk.crypto.ed25519;
 
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.crypto.Key;
-import java.io.IOException;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
+
+import java.io.IOException;
 
 /**
  * An ed25519 public key.
@@ -52,8 +53,7 @@ public final class Ed25519PublicKey implements Key {
         var publicKeyInfo = SubjectPublicKeyInfo.getInstance(keyBytes);
         return fromBytes(
             publicKeyInfo.getPublicKeyData()
-                .getBytes()
-        );
+                .getBytes());
     }
 
     public byte[] toBytes() {

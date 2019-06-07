@@ -1,14 +1,17 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.Query;
+import com.hedera.hashgraph.sdk.proto.QueryHeader;
+import com.hedera.hashgraph.sdk.proto.Response;
+import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
 import io.grpc.Channel;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
 
 public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extends HederaCall<Query, Response, Resp> {
-    protected Query.Builder inner = Query.newBuilder();
+    protected final Query.Builder inner = Query.newBuilder();
 
     @Nullable
     private final Client client;

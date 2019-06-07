@@ -13,16 +13,14 @@ public final class FileInfo {
     private final FileGetInfoResponse.FileInfo inner;
 
     FileInfo(Response response) {
-        if (!response.hasFileGetInfo())
-            throw new IllegalArgumentException("response was not `fileGetInfo`");
+        if (!response.hasFileGetInfo()) throw new IllegalArgumentException("response was not `fileGetInfo`");
 
         inner = response.getFileGetInfo()
             .getFileInfo();
 
-        if (!inner.hasKeys() || inner.getKeys()
-            .getKeysList()
-            .isEmpty())
+        if (!inner.hasKeys() || inner.getKeys().getKeysList().isEmpty()) {
             throw new IllegalArgumentException("`FileGetInfoResponse` missing keys");
+        }
     }
 
     public FileId getFileId() {

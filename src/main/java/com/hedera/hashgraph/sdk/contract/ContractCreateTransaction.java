@@ -9,7 +9,6 @@ import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.Key;
 import com.hedera.hashgraph.sdk.file.FileId;
 import com.hedera.hashgraph.sdk.proto.*;
-import com.hedera.hashgraph.sdk.proto.Transaction;
 import io.grpc.MethodDescriptor;
 
 public class ContractCreateTransaction extends TransactionBuilder<ContractCreateTransaction> {
@@ -72,16 +71,14 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
     public ContractCreateTransaction setShard(long shardId) {
         builder.setShardID(
             ShardID.newBuilder()
-                .setShardNum(shardId)
-        );
+                .setShardNum(shardId));
         return this;
     }
 
     public ContractCreateTransaction setRealm(long realmId) {
         builder.setRealmID(
             RealmID.newBuilder()
-                .setRealmNum(realmId)
-        );
+                .setRealmNum(realmId));
         return this;
     }
 

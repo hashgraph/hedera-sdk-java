@@ -47,11 +47,9 @@ public final class ContractId implements Key, Entity {
 
     @Override
     public boolean equals(Object other) {
-        if (this == other)
-            return true;
+        if (this == other) return true;
 
-        if (!(other instanceof ContractId))
-            return false;
+        if (!(other instanceof ContractId)) return false;
 
         var otherId = (ContractId) other;
         return getShardNum() == otherId.getShardNum() && getRealmNum() == otherId.getRealmNum()

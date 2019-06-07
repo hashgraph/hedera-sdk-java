@@ -6,8 +6,8 @@ import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.crypto.Key;
 import com.hedera.hashgraph.sdk.proto.*;
-import com.hedera.hashgraph.sdk.proto.Transaction;
 import io.grpc.MethodDescriptor;
+
 import java.time.Duration;
 
 // Corresponds to `CryptoCreateTransaction`
@@ -38,15 +38,13 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
         if (!builder.hasShardID()) {
             setShardId(
                 transactionId.getAccountId()
-                    .getShardNum()
-            );
+                    .getShardNum());
         }
 
         if (!builder.hasRealmID()) {
             setRealmId(
                 transactionId.getAccountId()
-                    .getRealmNum()
-            );
+                    .getRealmNum());
         }
 
         return super.setTransactionId(transactionId);
@@ -90,8 +88,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
     public AccountCreateTransaction setShardId(long shardId) {
         builder.setShardID(
             ShardID.newBuilder()
-                .setShardNum(shardId)
-        );
+                .setShardNum(shardId));
 
         return this;
     }
@@ -99,8 +96,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
     public AccountCreateTransaction setRealmId(long realmId) {
         builder.setRealmID(
             RealmID.newBuilder()
-                .setRealmNum(realmId)
-        );
+                .setRealmNum(realmId));
 
         return this;
     }

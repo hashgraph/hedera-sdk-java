@@ -60,21 +60,19 @@ public abstract class HederaCall<Req, RawResp, Resp> {
             }
 
             @Override
-            public void onCompleted() {}
+            public void onCompleted() { }
         });
     }
 
     protected abstract void validate();
 
     protected void addValidationError(String errMsg) {
-        if (validationErrors == null)
-            validationErrors = new ArrayList<>();
+        if (validationErrors == null) validationErrors = new ArrayList<>();
         validationErrors.add(errMsg);
     }
 
     protected void checkValidationErrors(String prologue) {
-        if (validationErrors == null)
-            return;
+        if (validationErrors == null) return;
         var errors = validationErrors;
         validationErrors = null;
         throw new IllegalStateException(prologue + ":\n" + String.join("\n", errors));

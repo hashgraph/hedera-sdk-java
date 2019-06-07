@@ -6,8 +6,8 @@ import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.crypto.Key;
 import com.hedera.hashgraph.sdk.proto.*;
-import com.hedera.hashgraph.sdk.proto.Transaction;
 import io.grpc.MethodDescriptor;
+
 import java.time.Instant;
 
 public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransaction> {
@@ -57,7 +57,6 @@ public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransact
         require(
             builder.getKeysOrBuilder()
                 .getKeysOrBuilderList(),
-            ".addKey()"
-        );
+            ".addKey()");
     }
 }

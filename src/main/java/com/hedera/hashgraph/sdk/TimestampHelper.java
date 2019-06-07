@@ -2,10 +2,11 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.Timestamp;
 import com.hedera.hashgraph.sdk.proto.TimestampSeconds;
+
 import java.time.Instant;
 
 public final class TimestampHelper {
-    private TimestampHelper() {}
+    private TimestampHelper() { }
 
     public static Timestamp timestampFrom(Instant timestamp) {
         return Timestamp.newBuilder()
