@@ -69,7 +69,6 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
     @Override
     protected void doValidate() {
         require(builder.hasAccountIDToUpdate(), ".setAccountForUpdate() required");
-        require(builder.hasKey(), ".setKey() required");
     }
 
     @Override
