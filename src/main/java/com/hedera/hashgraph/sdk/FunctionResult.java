@@ -87,7 +87,7 @@ public final class FunctionResult {
     }
 
     // this only appears in this API so
-    public static class LogInfo {
+    public final static class LogInfo {
         public final ContractId contractId;
         public final byte[] bloomFilter;
         public final List<byte[]> topics;

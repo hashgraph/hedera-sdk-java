@@ -3,8 +3,8 @@ package com.hedera.hashgraph.sdk.account;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.proto.*;
-import com.hedera.hashgraph.sdk.proto.Transaction;
 import io.grpc.MethodDescriptor;
+
 import javax.annotation.Nonnegative;
 
 public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTransferTransaction> {
@@ -32,8 +32,7 @@ public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTr
             AccountAmount.newBuilder()
                 .setAccountID(accountId.toProto())
                 .setAmount(value)
-                .build()
-        );
+                .build());
 
         return this;
     }

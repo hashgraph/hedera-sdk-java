@@ -32,14 +32,13 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
 
     private static final int PREFIX_LEN = 6;
 
-
     Transaction(
         @Nullable Client client,
         com.hedera.hashgraph.sdk.proto.Transaction.Builder inner,
         com.hedera.hashgraph.sdk.proto.AccountID nodeAccountId,
         com.hedera.hashgraph.sdk.proto.TransactionID transactionId,
-        MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> methodDescriptor
-    ) {
+        MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> methodDescriptor)
+    {
         super();
         this.client = client;
         this.inner = inner;
@@ -58,8 +57,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
     public Transaction sign(Ed25519PrivateKey privateKey) {
         var pubKey = ByteString.copyFrom(
             privateKey.getPublicKey()
-                .toBytes()
-        );
+                .toBytes());
 
         var sigMap = inner.getSigMapBuilder();
 
@@ -75,16 +73,14 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         var signature = Ed25519Signature.forMessage(
             privateKey,
             inner.getBodyBytes()
-                .toByteArray()
-        )
+                .toByteArray())
             .toBytes();
 
         sigMap.addSigPair(
             SignaturePair.newBuilder()
                 .setPubKeyPrefix(pubKey)
                 .setEd25519(ByteString.copyFrom(signature))
-                .build()
-        );
+                .build());
 
         return this;
     }
@@ -157,7 +153,8 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
     }
 
     private <T> T executeAndWaitFor(CheckedFunction<TransactionReceipt, T> mapReceipt)
-            throws HederaException, HederaNetworkException {
+            throws HederaException, HederaNetworkException
+    {
         // kickoff the transaction
         execute();
 
@@ -209,8 +206,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
      */
     public TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
         return executeAndWaitFor(
-            receipt -> new TransactionRecordQuery(getClient()).setTransactionId(getId()).execute()
-        );
+            receipt -> new TransactionRecordQuery(getClient()).setTransactionId(getId()).execute());
     }
 
     public void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<HederaThrowable> onError) {
@@ -220,12 +216,11 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
     }
 
     public void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<HederaThrowable> onError) {
-        var handler = new AsyncReceiptHandler(
-            (receipt) -> new TransactionRecordQuery(getClient())
+        var handler = new AsyncReceiptHandler((receipt) ->
+            new TransactionRecordQuery(getClient())
                 .setTransactionId(getId())
                 .executeAsync(onSuccess, onError),
-            onError
-        );
+            onError);
 
         executeAsync(id -> handler.tryGetReceipt(), onError);
     }
@@ -236,38 +231,6 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
 
     private Client getClient() {
         return Objects.requireNonNull(client);
-    }
-
-    private class AsyncReceiptHandler {
-        private final Consumer<TransactionReceipt> onReceipt;
-        private final Consumer<HederaThrowable> onError;
-
-        private int attemptsLeft = MAX_RETRY_ATTEMPTS;
-
-        private AsyncReceiptHandler(
-            Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError
-        ) {
-            this.onReceipt = onReceipt;
-            this.onError = onError;
-        }
-
-        private void tryGetReceipt() {
-            attemptsLeft -= 1;
-            queryReceiptAsync(this::handleReceipt, onError);
-        }
-
-        private void handleReceipt(TransactionReceipt receipt) {
-            if (receipt.getStatus() == ResponseCodeEnum.UNKNOWN) {
-                if (attemptsLeft == 0) {
-                    onError.accept(new HederaException(ResponseCodeEnum.UNKNOWN));
-                } else {
-                    GlobalEventExecutor.INSTANCE.schedule(this::tryGetReceipt, RECEIPT_RETRY_DELAY,
-                        TimeUnit.MILLISECONDS);
-                }
-            } else {
-                onReceipt.accept(receipt);
-            }
-        }
     }
 
     private static ByteString getPrefix(ByteString byteString) {
@@ -314,6 +277,38 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
             throw new IllegalArgumentException("method not set");
         default:
             throw new IllegalArgumentException("unsupported method");
+        }
+    }
+
+    private final class AsyncReceiptHandler {
+        private final Consumer<TransactionReceipt> onReceipt;
+        private final Consumer<HederaThrowable> onError;
+
+        private int attemptsLeft = MAX_RETRY_ATTEMPTS;
+
+        private AsyncReceiptHandler(
+            Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError)
+        {
+            this.onReceipt = onReceipt;
+            this.onError = onError;
+        }
+
+        private void tryGetReceipt() {
+            attemptsLeft -= 1;
+            queryReceiptAsync(this::handleReceipt, onError);
+        }
+
+        private void handleReceipt(TransactionReceipt receipt) {
+            if (receipt.getStatus() == ResponseCodeEnum.UNKNOWN) {
+                if (attemptsLeft == 0) {
+                    onError.accept(new HederaException(ResponseCodeEnum.UNKNOWN));
+                } else {
+                    GlobalEventExecutor.INSTANCE.schedule(this::tryGetReceipt, RECEIPT_RETRY_DELAY,
+                        TimeUnit.MILLISECONDS);
+                }
+            } else {
+                onReceipt.accept(receipt);
+            }
         }
     }
 }

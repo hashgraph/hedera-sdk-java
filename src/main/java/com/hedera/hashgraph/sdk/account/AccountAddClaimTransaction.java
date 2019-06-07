@@ -4,9 +4,8 @@ import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.crypto.Key;
-import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.Claim;
-import com.hedera.hashgraph.sdk.proto.Transaction;
+import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 // corresponds to `CryptoAddClaimTransaction`
@@ -47,8 +46,7 @@ public final class AccountAddClaimTransaction extends TransactionBuilder<Account
         require(
             claim.getKeysOrBuilder()
                 .getKeysOrBuilderList(),
-            ".addKey() required"
-        );
+            ".addKey() required");
     }
 
     @Override

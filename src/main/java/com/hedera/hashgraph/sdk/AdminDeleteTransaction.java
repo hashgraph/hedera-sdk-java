@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
+
 import java.time.Instant;
 
 public final class AdminDeleteTransaction extends TransactionBuilder<AdminDeleteTransaction> {
@@ -46,7 +47,6 @@ public final class AdminDeleteTransaction extends TransactionBuilder<AdminDelete
             ".setID() required",
             ".setID() may take a contract ID OR a file ID",
             builder.hasContractID(),
-            builder.hasFileID()
-        );
+            builder.hasFileID());
     }
 }

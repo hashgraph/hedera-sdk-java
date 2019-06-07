@@ -39,11 +39,9 @@ public final class FileId implements Entity {
 
     @Override
     public boolean equals(Object other) {
-        if (this == other)
-            return true;
+        if (this == other) return true;
 
-        if (!(other instanceof FileId))
-            return false;
+        if (!(other instanceof FileId)) return false;
 
         var otherId = (FileId) other;
         return getShardNum() == otherId.getShardNum() && getRealmNum() == otherId.getRealmNum() && getFileNum() == otherId.getFileNum();

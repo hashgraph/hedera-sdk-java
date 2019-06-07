@@ -2,3 +2,6 @@ language: java
 
 jdk:
     - openjdk11
+
+script:
+    - mvn checkstyle:check spotbugs:check compile test

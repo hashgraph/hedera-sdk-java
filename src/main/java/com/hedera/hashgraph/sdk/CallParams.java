@@ -3,17 +3,17 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
 
-import static java.nio.charset.StandardCharsets.US_ASCII;
-
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.nio.charset.StandardCharsets.US_ASCII;
+
 // an implementation of function selector and parameter encoding as specified here:
 // https://solidity.readthedocs.io/en/v0.5.7/abi-spec.html#
-public class CallParams<Kind> {
+public final class CallParams<Kind> {
     @Nullable
     private final String funcName;
     private final ArrayList<String> paramTypes = new ArrayList<>();
@@ -29,15 +29,6 @@ public class CallParams<Kind> {
 
     public static CallParams<Function> function(String funcName) {
         return new CallParams<>(funcName);
-    }
-
-    // some Rust-inspired type magic
-    public static class Constructor {
-        private Constructor() {}
-    }
-
-    public static class Function {
-        private Function() {}
     }
 
     public CallParams<Kind> add(String param) {
@@ -113,7 +104,42 @@ public class CallParams<Kind> {
         return funcName != null ? funcSelector(funcName, paramTypes).concat(argByteStr) : argByteStr;
     }
 
-    private static class Argument {
+    // padding that we can substring without new allocations
+    private static final ByteString padding = ByteString.copyFrom(new byte[31]);
+
+    static ByteString uint256(@Nonnegative int val) {
+        return leftPad32(
+            ByteString.copyFrom(ByteBuffer.allocate(4)
+                .putInt(val)
+                .array()));
+    }
+
+    // Solidity contracts require all parameters to be padded to 32 byte multiples but specifies
+    // different requirements for padding for strings/byte arrays vs integers
+
+    static ByteString leftPad32(ByteString input) {
+        var rem = 32 - input.size() % 32;
+        return rem == 32
+            ? input
+            : padding.substring(0, rem)
+                .concat(input);
+    }
+
+    static ByteString rightPad32(ByteString input) {
+        var rem = 32 - input.size() % 32;
+        return rem == 32 ? input : input.concat(padding.substring(0, rem));
+    }
+
+    // some Rust-inspired type magic
+    public final static class Constructor {
+        private Constructor() { }
+    }
+
+    public final static class Function {
+        private Function() { }
+    }
+
+    private final static class Argument {
         private final ByteString value;
         private final int len;
         private final boolean isDynamic;
@@ -136,34 +162,6 @@ public class CallParams<Kind> {
             this.value = lenBytes.concat(rightPad32(dynamic));
             isDynamic = true;
         }
-    }
-
-    // padding that we can substring without new allocations
-    private static final ByteString padding = ByteString.copyFrom(new byte[31]);
-
-    static ByteString uint256(@Nonnegative int val) {
-        return leftPad32(
-            ByteString.copyFrom(ByteBuffer.allocate(4)
-                .putInt(val)
-                .array()
-            )
-        );
-    }
-
-    // Solidity contracts require all parameters to be padded to 32 byte multiples but specifies
-    // different requirements for padding for strings/byte arrays vs integers
-
-    static ByteString leftPad32(ByteString input) {
-        var rem = 32 - input.size() % 32;
-        return rem == 32
-            ? input
-            : padding.substring(0, rem)
-                .concat(input);
-    }
-
-    static ByteString rightPad32(ByteString input) {
-        var rem = 32 - input.size() % 32;
-        return rem == 32 ? input : input.concat(padding.substring(0, rem));
     }
 
 }

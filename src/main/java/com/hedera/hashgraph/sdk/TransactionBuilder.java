@@ -12,7 +12,8 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
-        extends HederaCall<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse, TransactionId> {
+        extends HederaCall<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse, TransactionId>
+{
     protected final com.hedera.hashgraph.sdk.proto.Transaction.Builder inner = com.hedera.hashgraph.sdk.proto.Transaction.newBuilder();
     protected final TransactionBody.Builder bodyBuilder = TransactionBody.newBuilder();
 
@@ -125,8 +126,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
 
         inner.setBodyBytes(
             bodyBuilder.build()
-                .toByteString()
-        );
+                .toByteString());
         var tx = new Transaction(client, inner, bodyBuilder.getNodeAccountID(), bodyBuilder.getTransactionID(), getMethod());
 
         if (client != null && client.getOperatorKey() != null) {
@@ -180,7 +180,6 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     protected TransactionId mapResponse(TransactionResponse response) throws HederaException {
         HederaException.throwIfExceptional(response.getNodeTransactionPrecheckCode());
         return new TransactionId(
-                bodyBuilder.getTransactionIDOrBuilder()
-        );
+                bodyBuilder.getTransactionIDOrBuilder());
     }
 }

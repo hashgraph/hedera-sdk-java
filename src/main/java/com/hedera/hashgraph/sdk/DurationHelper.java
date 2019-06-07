@@ -3,7 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.hedera.hashgraph.sdk.proto.Duration;
 
 public final class DurationHelper {
-    private DurationHelper() {}
+    private DurationHelper() { }
 
     public static Duration durationFrom(java.time.Duration duration) {
         return Duration.newBuilder()

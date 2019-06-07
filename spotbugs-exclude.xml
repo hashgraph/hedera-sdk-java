@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <Match>
+        <Or>
+            <!-- Generated protobuf files -->
+            <Class name="~.*\.proto.*"/>
+        </Or>
+    </Match>
+</FindBugsFilter>

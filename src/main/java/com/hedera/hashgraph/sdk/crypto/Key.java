@@ -16,8 +16,7 @@ public interface Key {
         case ED25519:
             return Ed25519PublicKey.fromBytes(
                 key.getEd25519()
-                    .toByteArray()
-            );
+                    .toByteArray());
         case CONTRACTID:
             ContractID id = key.getContractID();
             return new ContractId(id.getShardNum(), id.getRealmNum(), id.getContractNum());
@@ -48,8 +47,7 @@ public interface Key {
         if (algId.equals(EdECObjectIdentifiers.id_Ed25519)) {
             return Ed25519PublicKey.fromBytes(
                 pubKeyInfo.getPublicKeyData()
-                    .getBytes()
-            );
+                    .getBytes());
         } else {
             throw new IllegalArgumentException("Unsupported public key type: " + algId.toString());
         }
