@@ -29,6 +29,6 @@ public final class FileDeleteTransaction extends TransactionBuilder<FileDeleteTr
 
     @Override
     protected void doValidate() {
-        require(builder.hasFileID(), ".setFileId()");
+        require(builder.hasFileID(), ".setFileId() required");
     }
 }
