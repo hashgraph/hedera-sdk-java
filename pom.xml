@@ -120,8 +120,11 @@
                         <arg>
                             -Xplugin:ErrorProne
                             -XepDisableWarningsInGeneratedCode
+                            -XepExcludedPaths:.*/target/generated-sources/.*
                             -Xep:NullAway:ERROR
                             -XepOpt:NullAway:AnnotatedPackages=com.hedera
+                            <!-- protobuf generator does not use @Generated -->
+                            -XepOpt:NullAway:UnannotatedSubPackages=com.hedera.hashgraph.sdk.proto
                             -XepOpt:NullAway:AcknowledgeRestrictiveAnnotations=true
                             -XepOpt:NullAway:TreatGeneratedAsUnannotated=true
                         </arg>
