@@ -69,7 +69,7 @@ class TransactionTest {
     void testSerialization() throws InvalidProtocolBufferException {
         final var txn1Bytes = txn.sign(key1).toBytes();
 
-        final var txn2 = Transaction.fromBytes(null, txn1Bytes);
+        final var txn2 = Transaction.fromBytes(txn1Bytes);
 
         assertEquals(txn.inner.build(), txn2.inner.build());
         assertEquals(txn.nodeAccountId, txn2.nodeAccountId);

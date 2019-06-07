@@ -19,7 +19,7 @@ class TransactionRecordQueryTest {
     static final AccountId NODE_ACCOUNT = new AccountId(3);
 
     @SuppressWarnings("/NullAway/")
-    static final Transaction paymentTxn = new CryptoTransferTransaction(null)
+    static final Transaction paymentTxn = new CryptoTransferTransaction()
         .setTransactionId(new TransactionId(USER_ACCT, Instant.parse("2019-04-05T12:00:00Z")))
         .setNodeAccountId(NODE_ACCOUNT)
         .addSender(USER_ACCT, 10000)
