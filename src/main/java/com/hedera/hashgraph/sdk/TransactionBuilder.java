@@ -180,8 +180,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     protected TransactionId mapResponse(TransactionResponse response) throws HederaException {
         HederaException.throwIfExceptional(response.getNodeTransactionPrecheckCode());
         return new TransactionId(
-                inner.getBody()
-                    .getTransactionIDOrBuilder()
+                bodyBuilder.getTransactionIDOrBuilder()
         );
     }
 }
