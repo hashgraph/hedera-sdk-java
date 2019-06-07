@@ -5,3 +5,4 @@ jdk:
 
 script:
     - mvn checkstyle:check spotbugs:check compile test
+    - (cd examples && mvn checkstyle:check spotbugs:check compile)

@@ -214,6 +214,7 @@
                 <version>3.1.0</version>
                 <configuration>
                     <configLocation>checkstyle.xml</configLocation>
+                    <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
                 </configuration>
             </plugin>
 

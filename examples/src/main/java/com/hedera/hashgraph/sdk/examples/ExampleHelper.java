@@ -1,14 +1,16 @@
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Map;
 import java.util.Objects;
 
-public class ExampleHelper {
+public final class ExampleHelper {
+    private ExampleHelper() { }
+
     private static Dotenv getEnv() {
         // Load configuration from the environment or a $projectRoot/.env file, if present
         // See .env.sample for an example of what it is looking for

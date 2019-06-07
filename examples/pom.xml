@@ -10,6 +10,10 @@
 
         <maven.compiler.source>10</maven.compiler.source>
         <maven.compiler.target>10</maven.compiler.target>
+
+        <!-- this can't be inherited from the SDK because it has jar packaging instead of pom -->
+        <errorprone.version>2.3.3</errorprone.version>
+        <nullaway.version>0.7.2</nullaway.version>
     </properties>
 
     <dependencies>
@@ -24,4 +28,73 @@
             <version>0.5.0</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Compiler -->
+            <!-- https://maven.apache.org/plugins/maven-compiler-plugin/index.html -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <showWarnings>true</showWarnings>
+                    <!-- https://issues.apache.org/jira/browse/MCOMPILER-346 -->
+                    <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                    <annotationProcessorPaths>
+                        <!-- Catch common Java mistakes as compile-time errors -->
+                        <!-- https://errorprone.info/ -->
+                        <path>
+                            <groupId>com.google.errorprone</groupId>
+                            <artifactId>error_prone_core</artifactId>
+                            <version>${errorprone.version}</version>
+                        </path>
+                        <!-- Eliminate NullPointerExceptions -->
+                        <!-- https://github.com/uber/NullAway -->
+                        <path>
+                            <groupId>com.uber.nullaway</groupId>
+                            <artifactId>nullaway</artifactId>
+                            <version>${nullaway.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <compilerArgs>
+                        <arg>-XDcompilePolicy=simple</arg>
+                        <arg>
+                            -Xplugin:ErrorProne
+                            -XepDisableWarningsInGeneratedCode
+                            -XepExcludedPaths:.*/target/generated-sources/.*
+                            -Xep:NullAway:ERROR
+                            -XepOpt:NullAway:AnnotatedPackages=com.hedera
+                            <!-- protobuf generator does not use @Generated -->
+                            -XepOpt:NullAway:UnannotatedSubPackages=com.hedera.hashgraph.sdk.proto
+                            -XepOpt:NullAway:AcknowledgeRestrictiveAnnotations=true
+                            -XepOpt:NullAway:TreatGeneratedAsUnannotated=true
+                        </arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+
+            <!-- CheckStyle -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <configLocation>../checkstyle.xml</configLocation>
+                    <suppressionsLocation>../checkstyle-suppressions.xml</suppressionsLocation>
+                </configuration>
+            </plugin>
+
+            <!-- SpotBugs -->
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>3.1.11</version>
+                <configuration>
+                    <effort>most</effort>
+                    <excludeFilterFile>../spotbugs-exclude.xml</excludeFilterFile>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
