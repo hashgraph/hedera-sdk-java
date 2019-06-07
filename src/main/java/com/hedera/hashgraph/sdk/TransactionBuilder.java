@@ -95,8 +95,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         return build().toProto();
     }
 
-    public final com.hedera.hashgraph.sdk.proto.Transaction toUnsignedProto() {
-        return build().toUnsignedProto();
+    public final com.hedera.hashgraph.sdk.proto.Transaction toProto(boolean requireSignature) {
+        return build().toProto(requireSignature);
     }
 
     @Override
@@ -148,8 +148,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         return build().toBytes();
     }
 
-    public final byte[] toBytesUnsigned() {
-        return build().toBytesUnsigned();
+    public final byte[] toBytes(boolean requiresSignature) {
+        return build().toBytes(requiresSignature);
     }
 
     // Work around for java not recognized that this is completely safe

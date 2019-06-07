@@ -19,7 +19,7 @@ public final class SystemUndeleteTransaction extends TransactionBuilder<SystemUn
         super(client);
     }
 
-    public AdminUndeleteTransaction setID(FileId fileId) {
+    public SystemUndeleteTransaction setID(FileId fileId) {
         builder.setFileID(fileId.toProto());
         return this;
     }
