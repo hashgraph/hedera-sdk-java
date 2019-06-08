@@ -9,7 +9,9 @@ import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.examples.ExampleHelper;
 
-public class MultiAppTransfer {
+public final class MultiAppTransfer {
+    private MultiAppTransfer() { }
+
     // the exchange should possess this key, we're only generating it for demonstration purposes
     private static final Ed25519PrivateKey exchangeKey = Ed25519PrivateKey.generate();
 

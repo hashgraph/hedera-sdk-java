@@ -94,8 +94,6 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
                     <showWarnings>true</showWarnings>
                     <!-- https://issues.apache.org/jira/browse/MCOMPILER-346 -->
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
@@ -216,6 +214,7 @@
                 <version>3.1.0</version>
                 <configuration>
                     <configLocation>checkstyle.xml</configLocation>
+                    <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
                 </configuration>
             </plugin>
 

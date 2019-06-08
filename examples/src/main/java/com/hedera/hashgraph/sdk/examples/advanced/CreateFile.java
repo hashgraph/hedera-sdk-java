@@ -8,6 +8,8 @@ import java.time.Duration;
 import java.time.Instant;
 
 public final class CreateFile {
+    private CreateFile() { }
+
     public static void main(String[] args) throws HederaException {
         var operatorKey = ExampleHelper.getOperatorKey();
         var client = ExampleHelper.createHederaClient();
@@ -18,8 +20,7 @@ public final class CreateFile {
 
         var tx = new FileCreateTransaction(client).setExpirationTime(
             Instant.now()
-                .plus(Duration.ofSeconds(2592000))
-        )
+                .plus(Duration.ofSeconds(2592000)))
             // Use the same key as the operator to "own" this file
             .addKey(operatorKey.getPublicKey())
             .setContents(fileContents);

@@ -1,10 +1,12 @@
 package com.hedera.hashgraph.sdk.examples.simple;
 
-import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.HederaException;
+import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.examples.ExampleHelper;
 
 public final class TransferCrypto {
+    private TransferCrypto() { }
+
     public static void main(String[] args) throws HederaException {
         var client = ExampleHelper.createHederaClient();
 

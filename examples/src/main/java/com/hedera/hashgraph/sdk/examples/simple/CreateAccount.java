@@ -5,6 +5,8 @@ import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.examples.ExampleHelper;
 
 public final class CreateAccount {
+    private CreateAccount() { }
+
     public static void main(String[] args) throws HederaException {
         // Generate a Ed25519 private, public key pair
         var newKey = Ed25519PrivateKey.generate();

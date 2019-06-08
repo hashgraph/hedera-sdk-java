@@ -15,6 +15,8 @@ import java.time.Duration;
 import java.time.Instant;
 
 public final class CreateSimpleContract {
+    private CreateSimpleContract() { }
+
     public static void main(String[] args) throws HederaException, IOException {
         var cl = CreateSimpleContract.class.getClassLoader();
 
@@ -39,8 +41,7 @@ public final class CreateSimpleContract {
         // create the contract's bytecode file
         var fileTx = new FileCreateTransaction(client).setExpirationTime(
             Instant.now()
-                .plus(Duration.ofSeconds(3600))
-        )
+                .plus(Duration.ofSeconds(3600)))
             // Use the same key as the operator to "own" this file
             .addKey(operatorKey.getPublicKey())
             .setContents(byteCodeHex.getBytes());
