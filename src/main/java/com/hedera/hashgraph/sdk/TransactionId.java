@@ -28,8 +28,7 @@ public final class TransactionId {
         this(
                 accountId, Clock.systemUTC()
                     .instant()
-                    .minusSeconds(10)
-        );
+                    .minusSeconds(10));
     }
 
     public TransactionId(AccountId accountId, Instant transactionValidStart) {
@@ -38,8 +37,7 @@ public final class TransactionId {
             .setTransactionValidStart(
                 Timestamp.newBuilder()
                     .setSeconds(transactionValidStart.getEpochSecond())
-                    .setNanos(transactionValidStart.getNano())
-            );
+                    .setNanos(transactionValidStart.getNano()));
     }
 
     TransactionId(TransactionIDOrBuilder transactionId) {
@@ -67,11 +65,9 @@ public final class TransactionId {
 
     @Override
     public boolean equals(Object other) {
-        if (this == other)
-            return true;
+        if (this == other) return true;
 
-        if (!(other instanceof TransactionId))
-            return false;
+        if (!(other instanceof TransactionId)) return false;
 
         var otherId = (TransactionId) other;
         return getAccountId().equals(otherId.getAccountId()) && getValidStart().equals(otherId.getValidStart());

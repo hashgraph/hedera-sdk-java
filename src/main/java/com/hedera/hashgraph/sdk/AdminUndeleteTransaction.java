@@ -41,7 +41,6 @@ public final class AdminUndeleteTransaction extends TransactionBuilder<AdminUnde
             ".setID() required",
             ".setID() may take a contract ID OR a file ID",
             builder.hasContractID(),
-            builder.hasFileID()
-        );
+            builder.hasFileID());
     }
 }

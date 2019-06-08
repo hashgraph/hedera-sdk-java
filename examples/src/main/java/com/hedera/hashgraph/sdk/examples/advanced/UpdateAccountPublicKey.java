@@ -6,6 +6,8 @@ import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.examples.ExampleHelper;
 
 public final class UpdateAccountPublicKey {
+    private UpdateAccountPublicKey() { }
+
     public static void main(String[] args) throws HederaException {
         var client = ExampleHelper.createHederaClient();
 

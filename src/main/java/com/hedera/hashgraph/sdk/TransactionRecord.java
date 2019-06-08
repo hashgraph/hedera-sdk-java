@@ -66,7 +66,7 @@ public final class TransactionRecord {
             : null;
     }
 
-    public static class Transfer {
+    public final static class Transfer {
         public final AccountId account;
         public final long amount;
 

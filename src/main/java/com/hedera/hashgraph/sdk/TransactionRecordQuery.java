@@ -33,8 +33,7 @@ public class TransactionRecordQuery extends QueryBuilder<TransactionRecord, Tran
     protected TransactionRecord fromResponse(Response raw) {
         return new TransactionRecord(
                 raw.getTransactionGetRecord()
-                    .getTransactionRecord()
-        );
+                    .getTransactionRecord());
     }
 
     @Override

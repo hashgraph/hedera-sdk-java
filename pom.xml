@@ -37,8 +37,10 @@
         <maven.compiler.source>10</maven.compiler.source>
         <maven.compiler.target>10</maven.compiler.target>
 
-        <protoc.version>3.7.1</protoc.version>
+        <errorprone.version>2.3.3</errorprone.version>
         <grpc.version>1.20.0</grpc.version>
+        <nullaway.version>0.7.2</nullaway.version>
+        <protoc.version>3.7.1</protoc.version>
     </properties>
 
     <dependencies>
@@ -85,6 +87,49 @@
         </extensions>
 
         <plugins>
+            <!-- Compiler -->
+            <!-- https://maven.apache.org/plugins/maven-compiler-plugin/index.html -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <showWarnings>true</showWarnings>
+                    <!-- https://issues.apache.org/jira/browse/MCOMPILER-346 -->
+                    <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                    <annotationProcessorPaths>
+                        <!-- Catch common Java mistakes as compile-time errors -->
+                        <!-- https://errorprone.info/ -->
+                        <path>
+                            <groupId>com.google.errorprone</groupId>
+                            <artifactId>error_prone_core</artifactId>
+                            <version>${errorprone.version}</version>
+                        </path>
+                        <!-- Eliminate NullPointerExceptions -->
+                        <!-- https://github.com/uber/NullAway -->
+                        <path>
+                            <groupId>com.uber.nullaway</groupId>
+                            <artifactId>nullaway</artifactId>
+                            <version>${nullaway.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <compilerArgs>
+                        <arg>-XDcompilePolicy=simple</arg>
+                        <arg>
+                            -Xplugin:ErrorProne
+                            -XepDisableWarningsInGeneratedCode
+                            -XepExcludedPaths:.*/target/generated-sources/.*
+                            -Xep:NullAway:ERROR
+                            -XepOpt:NullAway:AnnotatedPackages=com.hedera
+                            <!-- protobuf generator does not use @Generated -->
+                            -XepOpt:NullAway:UnannotatedSubPackages=com.hedera.hashgraph.sdk.proto
+                            -XepOpt:NullAway:AcknowledgeRestrictiveAnnotations=true
+                            -XepOpt:NullAway:TreatGeneratedAsUnannotated=true
+                        </arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.xolstice.maven.plugins</groupId>
                 <artifactId>protobuf-maven-plugin</artifactId>
@@ -161,6 +206,90 @@
                     <serverId>nexus</serverId>
                 </configuration>
             </plugin>
+
+            <!-- CheckStyle -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <configLocation>checkstyle.xml</configLocation>
+                    <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
+                </configuration>
+            </plugin>
+
+            <!-- SpotBugs -->
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>3.1.11</version>
+                <configuration>
+                    <effort>most</effort>
+                    <excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
+    <profiles>
+    <!-- shade profile which adds the possibility to shade the .jar file.
+        Call "mvn clean install -Pshade" to invoke this additional
+        plugin in the maven build -->
+        <profile>
+            <id>shade</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.8.0</version>
+                        <configuration>
+                            <release>11</release>
+                        </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.ow2.asm</groupId>
+                                <artifactId>asm</artifactId>
+                                <version>6.2</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <version>3.2.0</version>
+                        <configuration>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>junit:junit</exclude>
+                                    <exclude>*:xml-apis</exclude>
+                                    <exclude>org.apache.maven:lib:tests</exclude>
+                                </excludes>
+                            </artifactSet>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>shade</goal>
+                                </goals>
+                                <configuration>
+                                    <shadedArtifactAttached>true</shadedArtifactAttached>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

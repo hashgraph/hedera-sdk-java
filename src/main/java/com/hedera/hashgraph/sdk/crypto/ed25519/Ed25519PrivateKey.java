@@ -1,9 +1,5 @@
 package com.hedera.hashgraph.sdk.crypto.ed25519;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.security.SecureRandom;
-import javax.annotation.Nullable;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
@@ -13,6 +9,11 @@ import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
+
+import javax.annotation.Nullable;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.security.SecureRandom;
 
 /**
  * An ed25519 private key.
@@ -124,8 +125,7 @@ public final class Ed25519PrivateKey {
 
         try {
             privateKeyInfo = new PrivateKeyInfo(
-                    new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519), new DEROctetString(privKeyParams.getEncoded())
-            );
+                    new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519), new DEROctetString(privKeyParams.getEncoded()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

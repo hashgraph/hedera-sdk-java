@@ -10,6 +10,7 @@ import com.hedera.hashgraph.sdk.proto.CryptoUpdateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
+
 import java.time.Duration;
 import java.time.Instant;
 
@@ -43,16 +44,14 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
     public AccountUpdateTransaction setSendRecordThreshold(long sendRecordThreshold) {
         builder.setSendRecordThresholdWrapper(
             com.google.protobuf.UInt64Value.newBuilder()
-                .setValue(sendRecordThreshold)
-        );
+                .setValue(sendRecordThreshold));
         return this;
     }
 
     public AccountUpdateTransaction setReceiveRecordThreshold(long receiveRecordThreshold) {
         builder.setReceiveRecordThresholdWrapper(
             com.google.protobuf.UInt64Value.newBuilder()
-                .setValue(receiveRecordThreshold)
-        );
+                .setValue(receiveRecordThreshold));
         return this;
     }
 
@@ -69,7 +68,6 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
     @Override
     protected void doValidate() {
         require(builder.hasAccountIDToUpdate(), ".setAccountForUpdate() required");
-        require(builder.hasKey(), ".setKey() required");
     }
 
     @Override

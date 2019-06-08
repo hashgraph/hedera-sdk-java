@@ -39,8 +39,7 @@ public class ContractCallQuery extends QueryBuilder<FunctionResult, ContractCall
 
         return new FunctionResult(
                 raw.getContractCallLocal()
-                    .getFunctionResultOrBuilder()
-        );
+                    .getFunctionResultOrBuilder());
     }
 
     public ContractCallQuery setContractId(ContractId id) {

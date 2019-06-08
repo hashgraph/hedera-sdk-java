@@ -16,8 +16,9 @@ public class HederaException extends Exception implements HederaThrowable {
     static boolean isCodeExceptional(ResponseCodeEnum responseCode, boolean unknownIsExceptional) {
         switch (responseCode) {
         case UNKNOWN:
-            if (unknownIsExceptional)
-                break;
+        case RECEIPT_NOT_FOUND:
+        case RECORD_NOT_FOUND:
+            if (unknownIsExceptional) break;
             // fall through
         case SUCCESS:
         case OK:

@@ -16,6 +16,8 @@ import java.time.Duration;
 import java.time.Instant;
 
 public final class CreateStatefulContract {
+    private CreateStatefulContract() { }
+
     public static void main(String[] args) throws HederaException, IOException {
         var cl = CreateStatefulContract.class.getClassLoader();
 
@@ -41,8 +43,7 @@ public final class CreateStatefulContract {
         // create the contract's bytecode file
         var fileTx = new FileCreateTransaction(client).setExpirationTime(
             Instant.now()
-                .plus(Duration.ofSeconds(2592000))
-        )
+                .plus(Duration.ofSeconds(2592000)))
             // Use the same key as the operator to "own" this file
             .addKey(operatorKey.getPublicKey())
             .setContents(byteCode);
@@ -55,8 +56,7 @@ public final class CreateStatefulContract {
         var contractTx = new ContractCreateTransaction(client).setBytecodeFile(newFileId)
             .setConstructorParams(
                 CallParams.constructor()
-                    .add("hello from hedera!")
-            )
+                    .add("hello from hedera!"))
             // own the contract so we can destroy it later
             .setAdminKey(operatorKey.getPublicKey());
 
@@ -79,8 +79,7 @@ public final class CreateStatefulContract {
 
         new ContractExecuteTransaction(client).setContractId(newContractId)
             .setFunctionParameters(CallParams.function("set_message")
-                .add("hello from hedera again!")
-            )
+                .add("hello from hedera again!"))
             .execute();
 
         var contractUpdateResult = new ContractCallQuery(client).setContractId(newContractId)

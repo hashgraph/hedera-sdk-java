@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+<module name="Checker">
+    <property name="charset" value="UTF-8"/>
+    <property name="fileExtensions" value="java"/>
+
+    <!-- ======================================== -->
+    <!-- Annotations -->
+    <!-- ======================================== -->
+
+    <module name="TreeWalker">
+        <module name="AnnotationLocation"/>
+        <module name="AnnotationUseStyle"/>
+        <module name="PackageAnnotation"/>
+        <module name="SuppressWarnings"/>
+    </module>
+
+    <!-- ======================================== -->
+    <!-- Blocks -->
+    <!-- ======================================== -->
+
+    <module name="TreeWalker">
+        <module name="AvoidNestedBlocks"/>
+        <module name="EmptyBlock"/>
+        <module name="EmptyCatchBlock"/>
+
+        <module name="NeedBraces">
+            <property name="allowSingleLineStatement" value="true"/>
+            <property name="allowEmptyLoopBody" value="true"/>
+        </module>
+
+        <module name="LeftCurly">
+            <property name="option" value="nlow"/>
+        </module>
+
+        <module name="RightCurly">
+            <property name="option" value="same"/>
+        </module>
+    </module>
+
+    <!-- ======================================== -->
+    <!-- Class Design -->
+    <!-- ======================================== -->
+
+    <module name="TreeWalker">
+        <module name="FinalClass"/>
+        <module name="HideUtilityClassConstructor"/>
+        <module name="InnerTypeLast"/>
+        <module name="MutableException"/>
+        <module name="OneTopLevelClass"/>
+
+        <module name="VisibilityModifier">
+            <property name="allowPublicFinalFields" value="true"/>
+        </module>
+    </module>
+
+    <!-- ======================================== -->
+    <!-- Whitespace -->
+    <!-- ======================================== -->
+
+    <module name="FileTabCharacter"/>
+
+    <module name="TreeWalker">
+        <module name="EmptyForInitializerPad"/>
+        <module name="EmptyForIteratorPad"/>
+        <module name="GenericWhitespace"/>
+        <module name="MethodParamPad"/>
+        <module name="ParenPad"/>
+        <module name="SingleSpaceSeparator"/>
+        <module name="TypecastParenPad"/>
+        <module name="WhitespaceAfter"/>
+        <module name="WhitespaceAround"/>
+        <module name="OperatorWrap"/>
+        <module name="NoLineWrap"/>
+
+        <module name="SeparatorWrap">
+            <property name="option" value="eol"/>
+            <property name="tokens"
+                      value="COMMA, SEMI, ELLIPSIS, LPAREN, RPAREN, ARRAY_DECLARATOR, METHOD_REF"/>
+        </module>
+
+        <module name="NoWhitespaceAfter">
+            <property name="allowLineBreaks" value="false"/>
+            <property name="tokens"
+                      value="ARRAY_INIT, AT, INC, DEC, UNARY_MINUS, UNARY_PLUS, BNOT, LNOT, DOT, ARRAY_DECLARATOR, INDEX_OP, METHOD_REF"/>
+        </module>
+
+        <module name="NoWhitespaceBefore">
+            <property name="allowLineBreaks" value="true"/>
+            <property name="tokens"
+                      value="COMMA, SEMI, POST_INC, POST_DEC, DOT, GENERIC_END, ELLIPSIS, METHOD_REF"/>
+        </module>
+
+        <module name="EmptyLineSeparator">
+            <property name="allowMultipleEmptyLines" value="false"/>
+            <property name="allowMultipleEmptyLinesInsideClassMembers" value="false"/>
+            <property name="tokens"
+                      value="PACKAGE_DEF, IMPORT, STATIC_IMPORT, CLASS_DEF, INTERFACE_DEF, ENUM_DEF, STATIC_INIT, INSTANCE_INIT, METHOD_DEF, CTOR_DEF"/>
+        </module>
+
+        <module name="VisibilityModifier">
+            <property name="packageAllowed" value="true" />
+            <property name="protectedAllowed" value="true" />
+            <property name="allowPublicFinalFields" value="true" />
+        </module>
+    </module>
+</module>
