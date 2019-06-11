@@ -83,8 +83,8 @@ public final class CreateSimpleContract {
         
         // now delete the contract
         var contractDeleteResult = new ContractDeleteTransaction(client)
-    		.setContractId(newContractId)
-    		.executeForReceipt();
+            .setContractId(newContractId)
+            .executeForReceipt();
 
         if (contractDeleteResult.getStatus() != ResponseCodeEnum.SUCCESS) {
             System.out.println("error deleting contract: " + contractDeleteResult.getStatus());

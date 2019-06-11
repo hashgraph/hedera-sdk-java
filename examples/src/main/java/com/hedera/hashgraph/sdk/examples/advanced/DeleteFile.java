@@ -36,8 +36,8 @@ public final class DeleteFile {
         
         // now delete the file
         var txDeleteReceipt = new FileDeleteTransaction(client)
-        		.setFileId(newFileId)
-        		.executeForReceipt();
+            .setFileId(newFileId)
+            .executeForReceipt();
         
         if (txDeleteReceipt.getStatus() != ResponseCodeEnum.SUCCESS) {
         	System.out.println("Error while deleting a file");

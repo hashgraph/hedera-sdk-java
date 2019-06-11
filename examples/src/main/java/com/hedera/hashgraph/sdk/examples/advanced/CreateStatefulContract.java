@@ -66,7 +66,7 @@ public final class CreateStatefulContract {
         System.out.println("new contract ID: " + newContractId);
 
         var contractCallResult = new ContractCallQuery(client).setContractId(newContractId)
-        	.setGas(100_000_000)
+            .setGas(100_000_000)
             .setFunctionParameters(CallParams.function("get_message"))
             .execute();
 
