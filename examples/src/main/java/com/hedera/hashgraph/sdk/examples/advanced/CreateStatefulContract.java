@@ -66,7 +66,7 @@ public final class CreateStatefulContract {
         System.out.println("new contract ID: " + newContractId);
 
         var contractCallResult = new ContractCallQuery(client).setContractId(newContractId)
-        	.setGas(100_000_000)
+            .setGas(100_000_000)
             .setFunctionParameters(CallParams.function("get_message"))
             .execute();
 
@@ -79,7 +79,7 @@ public final class CreateStatefulContract {
         System.out.println("contract returned message: " + message);
 
         new ContractExecuteTransaction(client).setContractId(newContractId)
-        	.setGas(100_000_000)
+            .setGas(100_000_000)
             .setFunctionParameters(CallParams.function("set_message")
                 .add("hello from hedera again!"))
             .execute();
@@ -89,7 +89,7 @@ public final class CreateStatefulContract {
         Thread.sleep(5000);
         // now query contract
         var contractUpdateResult = new ContractCallQuery(client).setContractId(newContractId)
-        	.setGas(100_000_000)
+            .setGas(100_000_000)
             .setFunctionParameters(CallParams.function("get_message"))
             .execute();
 

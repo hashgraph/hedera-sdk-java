@@ -254,7 +254,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         case CONTRACTUPDATEINSTANCE:
             return SmartContractServiceGrpc.getUpdateContractMethod();
         case CONTRACTDELETEINSTANCE:
-        	return SmartContractServiceGrpc.getDeleteContractMethod();
+            return SmartContractServiceGrpc.getDeleteContractMethod();
         case CRYPTOADDCLAIM:
             return CryptoServiceGrpc.getAddClaimMethod();
         case CRYPTOCREATEACCOUNT:
