@@ -36,10 +36,7 @@ public class GetFileContents {
             .setFileId(newFile.getFileId())
             .execute();
 
-        // Prints query results to console
-        System.out.println("File content query results: " + contents);
-
-
+        // Prints query results to console 
+        System.out.println("File content query results: " + contents.getFileContents().getContents().toStringUtf8());
     }
-
 }
