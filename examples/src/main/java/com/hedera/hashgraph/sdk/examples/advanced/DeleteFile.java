@@ -40,14 +40,14 @@ public final class DeleteFile {
             .executeForReceipt();
         
         if (txDeleteReceipt.getStatus() != ResponseCodeEnum.SUCCESS) {
-        	System.out.println("Error while deleting a file");
-        	return;
+            System.out.println("Error while deleting a file");
+            return;
         }
         System.out.println("File deleted successfully.");
         
         var fileInfo = new FileInfoQuery(client)
-        		.setFileId(newFileId)
-        		.execute();
+            .setFileId(newFileId)
+            .execute();
         
         // note the above fileInfo will fail with FILE_DELETED due to a known issue on Hedera
         
