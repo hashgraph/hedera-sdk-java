@@ -179,3 +179,4 @@ examples/node.properties
 *.iml
 /target/
 sdk/target/
+examples/.env
