@@ -8,7 +8,7 @@ import com.hedera.hashgraph.sdk.file.FileContentsQuery;
 import java.time.Duration;
 import java.time.Instant;
 
-public class GetFileContents {
+public final class GetFileContents {
     private GetFileContents() { }
 
     public static void main(String[] args) throws HederaException {
@@ -30,7 +30,7 @@ public class GetFileContents {
             .executeForReceipt(); // Submits transaction to the network and returns receipt which contains file ID
 
         //Print the file ID to console
-        System.out.println("The new file ID is "+ newFile.getFileId().toString());
+        System.out.println("The new file ID is " + newFile.getFileId().toString());
 
         // Get file contents
         var contents = new FileContentsQuery(client)
@@ -39,8 +39,6 @@ public class GetFileContents {
 
         // Prints query results to console
         System.out.println("File content query results: " + contents.getFileContents().getContents().toStringUtf8());
-
-
     }
 
 }
