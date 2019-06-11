@@ -18,16 +18,16 @@ import java.time.Instant;
 public final class CreateStatefulContract {
     private CreateStatefulContract() { }
 
-    public static void main(String[] args) throws HederaException, IOException {
+    public static void main(String[] args) throws HederaException, IOException, InterruptedException {
         var cl = CreateStatefulContract.class.getClassLoader();
 
         var gson = new Gson();
 
         JsonObject jsonObject;
 
-        try (var jsonStream = cl.getResourceAsStream("hello_world.json")) {
+        try (var jsonStream = cl.getResourceAsStream("stateful.json")) {
             if (jsonStream == null) {
-                throw new RuntimeException("failed to get hello_world.json");
+                throw new RuntimeException("failed to get stateful.json");
             }
 
             jsonObject = gson.fromJson(new InputStreamReader(jsonStream), JsonObject.class);
@@ -35,7 +35,7 @@ public final class CreateStatefulContract {
 
         var byteCodeHex = jsonObject.getAsJsonPrimitive("object")
             .getAsString();
-        var byteCode = ExampleHelper.parseHex(byteCodeHex);
+        var byteCode = byteCodeHex.getBytes();
 
         var operatorKey = ExampleHelper.getOperatorKey();
         var client = ExampleHelper.createHederaClient();
@@ -54,11 +54,11 @@ public final class CreateStatefulContract {
         System.out.println("contract bytecode file: " + newFileId);
 
         var contractTx = new ContractCreateTransaction(client).setBytecodeFile(newFileId)
+            .setAutoRenewPeriod(Duration.ofHours(1))
+            .setGas(100_000_000)
             .setConstructorParams(
                 CallParams.constructor()
-                    .add("hello from hedera!"))
-            // own the contract so we can destroy it later
-            .setAdminKey(operatorKey.getPublicKey());
+                    .add("hello from hedera!"));
 
         var contractReceipt = contractTx.executeForReceipt();
         var newContractId = contractReceipt.getContractId();
@@ -66,6 +66,7 @@ public final class CreateStatefulContract {
         System.out.println("new contract ID: " + newContractId);
 
         var contractCallResult = new ContractCallQuery(client).setContractId(newContractId)
+        	.setGas(100_000_000)
             .setFunctionParameters(CallParams.function("get_message"))
             .execute();
 
@@ -78,11 +79,17 @@ public final class CreateStatefulContract {
         System.out.println("contract returned message: " + message);
 
         new ContractExecuteTransaction(client).setContractId(newContractId)
+        	.setGas(100_000_000)
             .setFunctionParameters(CallParams.function("set_message")
                 .add("hello from hedera again!"))
             .execute();
 
+        // sleep a few seconds to allow consensus + smart contract exec
+        System.out.println("Waiting 5s for consensus and contract execution");
+        Thread.sleep(5000);
+        // now query contract
         var contractUpdateResult = new ContractCallQuery(client).setContractId(newContractId)
+        	.setGas(100_000_000)
             .setFunctionParameters(CallParams.function("get_message"))
             .execute();
 
@@ -91,16 +98,7 @@ public final class CreateStatefulContract {
             return;
         }
 
-        var contractCallResult2 = new ContractCallQuery(client).setContractId(newContractId)
-            .setFunctionParameters(CallParams.function("get_message"))
-            .execute();
-
-        if (contractCallResult2.getErrorMessage() != null) {
-            System.out.println("error calling contract: " + contractCallResult2.getErrorMessage());
-            return;
-        }
-
-        var message2 = contractCallResult.getString();
+        var message2 = contractUpdateResult.getString();
         System.out.println("contract returned message: " + message2);
     }
 }
