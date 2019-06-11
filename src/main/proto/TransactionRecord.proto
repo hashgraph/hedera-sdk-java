@@ -22,6 +22,6 @@ message TransactionRecord {
     oneof body {
         ContractFunctionResult contractCallResult = 7; // Record of the value returned by the smart contract function (if it completed and didn't fail) from ContractCallTransaction
         ContractFunctionResult contractCreateResult = 8; // Record of the value returned by the smart contract constructor (if it completed and didn't fail) from ContractCreateTransaction
-        TransferList transferList = 9; // Record of results of a CryptoTransferTransaction
     }
+    TransferList transferList = 10; // All hbar transfers as a result of this transaction, such as fees, or transfers performed by the transaction, or by a smart contract it calls, or by the creation of threshold records that it triggers.
 }

@@ -10,7 +10,7 @@ import "TransactionRecord.proto";
 import "QueryHeader.proto";
 import "ResponseHeader.proto";
 
-/* Get all the records for an account for any transfers into it and out of it, that were above the threshold, during the last 24 hours. */
+/* Get all the records for an account for any transfers into it and out of it, that were above the threshold, during the last 25 hours. */
 message CryptoGetAccountRecordsQuery {
     QueryHeader header = 1; // Standard info sent from client to node, including the signed payment, and what kind of response is requested (cost, state proof, both, or neither).
     AccountID accountID = 2; // The account ID for which the records should be retrieved

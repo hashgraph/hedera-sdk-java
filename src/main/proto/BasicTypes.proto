@@ -131,7 +131,7 @@ message SignaturePair {
  * If one public key matches more than one prefixes on the signature map, the transaction containing the map will fail immediately with the response code KEY_PREFIX_MISMATCH.  
  */
 message SignatureMap {
-    repeated SignaturePair sigPair = 1; 
+    repeated SignaturePair sigPair = 1; // Each signature pair corresponds to a unique Key required to sign the transaction.
 }
 
 /* The functionality provided by hedera hashgraph */
@@ -164,6 +164,9 @@ enum HederaFunctionality {
     TransactionGetRecord = 25; // Crypto get the transaction records
     ContractGetRecords = 26; // Contract get the transaction records
     CryptoCreate = 27; // crypto create account
+    SystemDelete = 28; // system delete file
+    SystemUndelete = 29; // system undelete file
+    ContractDelete =30; // delete contract
 }
 
 /* The different components used for fee calculation */

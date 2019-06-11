@@ -27,4 +27,6 @@ service SmartContractService {
 
     rpc getTxRecordByContractID (Query) returns (Response); // Retrieves a contract(using contract ID) by submitting the query. The grpc server returns the Response
 
+    rpc deleteContract (Transaction) returns (TransactionResponse); //Delete a contract instance(mark as deleted until it expires), and transfer hbars to the specified account. The grpc server returns the TransactionResponse
+
     }

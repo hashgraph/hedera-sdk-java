@@ -5,8 +5,8 @@ package proto;
 option java_package = "com.hedera.hashgraph.sdk.proto";
 option java_multiple_files = true;
 
-import "AdminDelete.proto";
-import "AdminUndelete.proto";
+import "SystemDelete.proto";
+import "SystemUndelete.proto";
 
 import "ContractCall.proto";
 import "ContractCreate.proto";
@@ -26,6 +26,7 @@ import "FileUpdate.proto";
 
 import "Duration.proto";
 import "BasicTypes.proto";
+import "ContractDelete.proto";
 
 /* A single transaction. All transaction types are possible here. */
 message TransactionBody {
@@ -36,12 +37,10 @@ message TransactionBody {
     bool generateRecord = 5; // Should a record of this transaction be generated? (A receipt is always generated, but the record is optional)
     string memo = 6; // Any notes or descriptions that should be put into the record (max length 100)
     oneof data {
-        AdminDeleteTransactionBody adminDelete = 20; // Hedera multisig admin deletes a file or smart contract
-        AdminUndeleteTransactionBody adminUndelete = 21; //To undelete an entity deleted by AdminDelete
-
         ContractCallTransactionBody contractCall = 7; // Contains the call a function of a contract instance
         ContractCreateTransactionBody contractCreateInstance = 8; // Contains the create data a contract instance
         ContractUpdateTransactionBody contractUpdateInstance = 9; // Contains contract modify info such as expiration date for a contract instance
+		ContractDeleteTransactionBody contractDeleteInstance = 22;//Delete contract and transfer remaining balance into specified account
 
         CryptoAddClaimTransactionBody cryptoAddClaim = 10; // Attach a new claim to an account
         CryptoCreateTransactionBody cryptoCreateAccount = 11; // Create a new cryptocurrency account
@@ -54,5 +53,8 @@ message TransactionBody {
         FileCreateTransactionBody fileCreate = 17; // Create a new file
         FileDeleteTransactionBody fileDelete = 18; // Delete a file (remove contents and mark as deleted until it expires)
         FileUpdateTransactionBody fileUpdate = 19; // Modify information such as the expiration date for a file
+        SystemDeleteTransactionBody systemDelete = 20; // Hedera multisig system deletes a file or smart contract
+        SystemUndeleteTransactionBody systemUndelete = 21; //To undelete an entity deleted by SystemDelete
+
     }
 }

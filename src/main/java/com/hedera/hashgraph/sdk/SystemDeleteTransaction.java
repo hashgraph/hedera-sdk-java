@@ -2,37 +2,44 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.contract.ContractId;
 import com.hedera.hashgraph.sdk.file.FileId;
-import com.hedera.hashgraph.sdk.proto.AdminUndeleteTransactionBody;
 import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import com.hederahashgraph.api.proto.java.SystemDeleteTransactionBody;
+
 import io.grpc.MethodDescriptor;
 
-public final class AdminUndeleteTransaction extends TransactionBuilder<AdminUndeleteTransaction> {
+import java.time.Instant;
 
-    private final AdminUndeleteTransactionBody.Builder builder = bodyBuilder.getAdminUndeleteBuilder();
+public final class SystemDeleteTransaction extends TransactionBuilder<SystemDeleteTransaction> {
+    private final SystemDeleteTransactionBody.Builder builder = bodyBuilder.getSystemDeleteBuilder();
 
-    public AdminUndeleteTransaction(Client client) {
+    public SystemDeleteTransaction(Client client) {
         super(client);
     }
 
-    AdminUndeleteTransaction() {
+    SystemDeleteTransaction() {
         super(null);
     }
 
-    public AdminUndeleteTransaction setID(FileId fileId) {
+    public SystemDeleteTransaction setID(FileId fileId) {
         builder.setFileID(fileId.toProto());
         return this;
     }
 
-    public AdminUndeleteTransaction setID(ContractId contractId) {
+    public SystemDeleteTransaction setID(ContractId contractId) {
         builder.setContractID(contractId.toProto());
+        return this;
+    }
+
+    public SystemDeleteTransaction setExpirationTime(Instant timestamp) {
+        builder.setExpirationTime(TimestampHelper.timestampSecondsFrom(timestamp));
         return this;
     }
 
     @Override
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
-        return FileServiceGrpc.getAdminUndeleteMethod();
+        return FileServiceGrpc.getSystemDeleteMethod();
     }
 
     @Override

@@ -243,16 +243,18 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
 
     private static MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> methodForTxnBody(TransactionBodyOrBuilder body) {
         switch (body.getDataCase()) {
-        case ADMINDELETE:
-            return FileServiceGrpc.getAdminDeleteMethod();
-        case ADMINUNDELETE:
-            return FileServiceGrpc.getAdminUndeleteMethod();
+        case SYSTEMDELETE:
+            return FileServiceGrpc.getSystemDeleteMethod();
+        case SYSTEMUNDELETE:
+            return FileServiceGrpc.getSystemUndeleteMethod();
         case CONTRACTCALL:
             return SmartContractServiceGrpc.getContractCallMethodMethod();
         case CONTRACTCREATEINSTANCE:
             return SmartContractServiceGrpc.getCreateContractMethod();
         case CONTRACTUPDATEINSTANCE:
             return SmartContractServiceGrpc.getUpdateContractMethod();
+        case CONTRACTDELETEINSTANCE:
+        	return SmartContractServiceGrpc.getDeleteContractMethod();
         case CRYPTOADDCLAIM:
             return CryptoServiceGrpc.getAddClaimMethod();
         case CRYPTOCREATEACCOUNT:

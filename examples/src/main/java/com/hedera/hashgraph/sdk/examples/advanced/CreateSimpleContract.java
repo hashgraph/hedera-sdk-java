@@ -6,8 +6,10 @@ import com.hedera.hashgraph.sdk.CallParams;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.contract.ContractCallQuery;
 import com.hedera.hashgraph.sdk.contract.ContractCreateTransaction;
+import com.hedera.hashgraph.sdk.contract.ContractDeleteTransaction;
 import com.hedera.hashgraph.sdk.examples.ExampleHelper;
 import com.hedera.hashgraph.sdk.file.FileCreateTransaction;
+import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -54,7 +56,9 @@ public final class CreateSimpleContract {
         // create the contract itself
         var contractTx = new ContractCreateTransaction(client).setAutoRenewPeriod(Duration.ofHours(1))
             .setGas(217000)
-            .setBytecodeFile(newFileId);
+            .setBytecodeFile(newFileId)
+            // set an admin key so we can delete the contract later
+            .setAdminKey(operatorKey.getPublicKey());
 
         var contractReceipt = contractTx.executeForReceipt();
 
@@ -76,5 +80,16 @@ public final class CreateSimpleContract {
 
         var message = contractCallResult.getString();
         System.out.println("contract message: " + message);
+        
+        // now delete the contract
+        var contractDeleteResult = new ContractDeleteTransaction(client)
+    		.setContractId(newContractId)
+    		.executeForReceipt();
+
+        if (contractDeleteResult.getStatus() != ResponseCodeEnum.SUCCESS) {
+            System.out.println("error deleting contract: " + contractDeleteResult.getStatus());
+            return;
+        }
+        System.out.println("Contract successfully deleted");
     }
 }
