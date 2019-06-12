@@ -152,7 +152,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
     }
 
     protected void validate(boolean requireSignature) {
-        if(requireSignature) {
+        if (requireSignature) {
             validate();
             return;
         }
