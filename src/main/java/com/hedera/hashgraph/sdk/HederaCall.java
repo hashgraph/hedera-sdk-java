@@ -143,6 +143,7 @@ public abstract class HederaCall<Req, RawResp, Resp> {
 
         @Override
         public void onCompleted() {
+            // we don't care about this callback
         }
     }
 }
