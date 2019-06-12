@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.crypto.Key;
 import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
 import java.time.Duration;
 
 // Corresponds to `CryptoCreateTransaction`
@@ -21,12 +22,8 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
         .setSendRecordThreshold(Long.MAX_VALUE)
         .setReceiveRecordThreshold(Long.MAX_VALUE);
 
-    public AccountCreateTransaction(Client client) {
+    public AccountCreateTransaction(@Nullable Client client) {
         super(client);
-    }
-
-    AccountCreateTransaction() {
-        super(null);
     }
 
     @Override

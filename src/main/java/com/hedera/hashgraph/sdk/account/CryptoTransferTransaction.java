@@ -6,17 +6,14 @@ import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nonnegative;
+import javax.annotation.Nullable;
 
 public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTransferTransaction> {
     private final CryptoTransferTransactionBody.Builder builder = bodyBuilder.getCryptoTransferBuilder();
     private final TransferList.Builder transferList = builder.getTransfersBuilder();
 
-    public CryptoTransferTransaction(Client client) {
+    public CryptoTransferTransaction(@Nullable Client client) {
         super(client);
-    }
-
-    CryptoTransferTransaction() {
-        super(null);
     }
 
     public CryptoTransferTransaction addSender(AccountId senderId, @Nonnegative long value) {

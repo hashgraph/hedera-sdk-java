@@ -107,6 +107,11 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         return inner.build();
     }
 
+    public com.hedera.hashgraph.sdk.proto.Transaction toProto(boolean requireSignature) {
+        validate(requireSignature);
+        return inner.build();
+    }
+
     @Override
     protected MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethod() {
         return methodDescriptor;
@@ -141,6 +146,15 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
                     addValidationError("duplicate signing key: " + Hex.toHexString(getPrefix(pubKeyPrefix).toByteArray()) + "...");
                 }
             }
+        }
+
+        checkValidationErrors("Transaction failed validation");
+    }
+
+    protected void validate(boolean requireSignature) {
+        if (requireSignature) {
+            validate();
+            return;
         }
 
         checkValidationErrors("Transaction failed validation");
@@ -227,6 +241,10 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
 
     public byte[] toBytes() {
         return toProto().toByteArray();
+    }
+
+    public byte[] toBytes(boolean requiresSignature) {
+        return toProto(requiresSignature).toByteArray();
     }
 
     private Client getClient() {

@@ -15,7 +15,7 @@ public final class AccountClaimQuery extends QueryBuilder<CryptoGetClaimResponse
         builder = inner.getCryptoGetClaimBuilder();
     }
 
-    AccountClaimQuery() {
+    public AccountClaimQuery() {
         super(null);
         builder = inner.getCryptoGetClaimBuilder();
     }

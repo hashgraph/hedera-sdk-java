@@ -9,17 +9,14 @@ import com.hederahashgraph.api.proto.java.SystemDeleteTransactionBody;
 
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
 import java.time.Instant;
 
 public final class SystemDeleteTransaction extends TransactionBuilder<SystemDeleteTransaction> {
     private final SystemDeleteTransactionBody.Builder builder = bodyBuilder.getSystemDeleteBuilder();
 
-    public SystemDeleteTransaction(Client client) {
+    public SystemDeleteTransaction(@Nullable Client client) {
         super(client);
-    }
-
-    SystemDeleteTransaction() {
-        super(null);
     }
 
     public SystemDeleteTransaction setID(FileId fileId) {

@@ -8,15 +8,13 @@ import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
+
 public final class FileDeleteTransaction extends TransactionBuilder<FileDeleteTransaction> {
     private final FileDeleteTransactionBody.Builder builder = bodyBuilder.getFileDeleteBuilder();
 
-    public FileDeleteTransaction(Client client) {
+    public FileDeleteTransaction(@Nullable Client client) {
         super(client);
-    }
-
-    FileDeleteTransaction() {
-        super(null);
     }
 
     public FileDeleteTransaction setFileId(FileId fileId) {

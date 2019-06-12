@@ -11,15 +11,13 @@ import com.hedera.hashgraph.sdk.file.FileId;
 import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
+
 public class ContractCreateTransaction extends TransactionBuilder<ContractCreateTransaction> {
     private final ContractCreateTransactionBody.Builder builder = bodyBuilder.getContractCreateInstanceBuilder();
 
-    public ContractCreateTransaction(Client client) {
+    public ContractCreateTransaction(@Nullable Client client) {
         super(client);
-    }
-
-    ContractCreateTransaction() {
-        super(null);
     }
 
     @Override

@@ -8,18 +8,15 @@ import com.hedera.hashgraph.sdk.crypto.Key;
 import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
 import java.time.Instant;
 
 public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransaction> {
     private final FileUpdateTransactionBody.Builder builder = bodyBuilder.getFileUpdateBuilder();
     private final KeyList.Builder keyList = builder.getKeysBuilder();
 
-    public FileUpdateTransaction(Client client) {
+    public FileUpdateTransaction(@Nullable Client client) {
         super(client);
-    }
-
-    FileUpdateTransaction() {
-        super(null);
     }
 
     public FileUpdateTransaction setFileId(FileId file) {

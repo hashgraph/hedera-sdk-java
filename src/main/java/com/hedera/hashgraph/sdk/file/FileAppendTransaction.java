@@ -9,15 +9,13 @@ import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
+
 public final class FileAppendTransaction extends TransactionBuilder<FileAppendTransaction> {
     private final FileAppendTransactionBody.Builder builder = bodyBuilder.getFileAppendBuilder();
 
-    public FileAppendTransaction(Client client) {
+    public FileAppendTransaction(@Nullable Client client) {
         super(client);
-    }
-
-    FileAppendTransaction() {
-        super(null);
     }
 
     public FileAppendTransaction setFileId(FileId fileId) {

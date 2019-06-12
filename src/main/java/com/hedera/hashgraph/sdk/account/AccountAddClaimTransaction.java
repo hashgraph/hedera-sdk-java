@@ -8,18 +8,16 @@ import com.hedera.hashgraph.sdk.proto.Claim;
 import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
+
 // corresponds to `CryptoAddClaimTransaction`
 public final class AccountAddClaimTransaction extends TransactionBuilder<AccountAddClaimTransaction> {
     private final CryptoAddClaimTransactionBody.Builder builder = bodyBuilder.getCryptoAddClaimBuilder();
     private final Claim.Builder claim = builder.getClaimBuilder();
     private final KeyList.Builder keyList = claim.getKeysBuilder();
 
-    public AccountAddClaimTransaction(Client client) {
+    public AccountAddClaimTransaction(@Nullable Client client) {
         super(client);
-    }
-
-    AccountAddClaimTransaction() {
-        super(null);
     }
 
     public AccountAddClaimTransaction setAccountId(AccountId id) {

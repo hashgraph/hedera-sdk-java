@@ -12,18 +12,16 @@ import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
+
+import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.Instant;
 
 public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdateTransaction> {
     private final ContractUpdateTransactionBody.Builder builder = bodyBuilder.getContractUpdateInstanceBuilder();
 
-    public ContractUpdateTransaction(Client client) {
+    public ContractUpdateTransaction(@Nullable Client client) {
         super(client);
-    }
-
-    ContractUpdateTransaction() {
-        super(null);
     }
 
     public ContractUpdateTransaction setContractId(ContractId contract) {

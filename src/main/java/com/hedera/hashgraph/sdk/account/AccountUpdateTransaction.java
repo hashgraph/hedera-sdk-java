@@ -11,6 +11,7 @@ import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -18,12 +19,8 @@ import java.time.Instant;
 public final class AccountUpdateTransaction extends TransactionBuilder<AccountUpdateTransaction> {
     private final CryptoUpdateTransactionBody.Builder builder = bodyBuilder.getCryptoUpdateAccountBuilder();
 
-    public AccountUpdateTransaction(Client client) {
+    public AccountUpdateTransaction(@Nullable Client client) {
         super(client);
-    }
-
-    AccountUpdateTransaction() {
-        super(null);
     }
 
     public AccountUpdateTransaction setAccountForUpdate(AccountId accountId) {
