@@ -116,10 +116,11 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     }
 
     public final Transaction build() {
-        var channel = client == null ? null : client.pickNode();
-
-        if (!bodyBuilder.hasNodeAccountID() && channel != null) {
-            bodyBuilder.setNodeAccountID(channel.accountId.toProto());
+        if (!bodyBuilder.hasNodeAccountID()) {
+            var channel = client == null ? null : client.pickNode();
+            if (channel != null) {
+                bodyBuilder.setNodeAccountID(channel.accountId.toProto());
+            }
         }
 
         if (!bodyBuilder.hasTransactionID() && client != null && client.getOperatorId() != null) {

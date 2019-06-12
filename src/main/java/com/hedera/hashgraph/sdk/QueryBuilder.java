@@ -18,6 +18,9 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     @Nullable
     private final Client client;
 
+    @Nullable
+    private Node pickedNode;
+
     protected QueryBuilder(@Nullable Client client) {
         this.client = client;
     }
@@ -26,9 +29,17 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     @Override
     protected Channel getChannel() {
+        return getNode().getChannel();
+    }
+
+    private Node getNode() {
         Objects.requireNonNull(client, "QueryBuilder.client must be non-null in regular use");
-        return client.pickNode()
-            .getChannel();
+
+        if (pickedNode == null) {
+            pickedNode = client.pickNode();
+        }
+
+        return pickedNode;
     }
 
     @Override
@@ -59,7 +70,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
             var cost = getCost();
             var operatorId = client.getOperatorId();
-            var nodeId = client.pickNode().accountId;
+            var nodeId = getNode().accountId;
             var txPayment = new CryptoTransferTransaction(client)
                 .setNodeAccountId(nodeId)
                 .setTransactionId(new TransactionId(operatorId))
