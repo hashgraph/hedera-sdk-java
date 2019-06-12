@@ -5,10 +5,12 @@ import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
-import io.grpc.Channel;
+
+import java.util.Objects;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
+
+import io.grpc.Channel;
 
 public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extends HederaCall<Query, Response, Resp> {
     protected final Query.Builder inner = Query.newBuilder();
@@ -31,13 +33,35 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     @Override
     public final Query toProto() {
+        setPaymentDefault();
+        validate();
+        return inner.build();
+    }
+
+    @SuppressWarnings("unchecked")
+    public T setPayment(Transaction transaction) {
+        getHeaderBuilder().setPayment(transaction.toProto());
+        return (T) this;
+    }
+
+    /**
+     * Explicitly specify that the operator account is paying for the query and set payment.
+     * <p>
+     * Only takes effect if payment is required, has not been set yet, and an operator ID
+     * was provided to the {@link Client} used to construct this instance.
+     *
+     * @return {@code this} for fluent usage.
+     */
+    @SuppressWarnings("unchecked")
+    public T setPaymentDefault() {
         if (client != null && isPaymentRequired() && !getHeaderBuilder().hasPayment() && client.getOperatorId() != null) {
             // FIXME: Require setAutoPayment to be set ?
 
             var cost = getCost();
             var operatorId = client.getOperatorId();
             var nodeId = client.pickNode().accountId;
-            var txPayment = new CryptoTransferTransaction(client).setNodeAccountId(nodeId)
+            var txPayment = new CryptoTransferTransaction(client)
+                .setNodeAccountId(nodeId)
                 .setTransactionId(new TransactionId(operatorId))
                 .addSender(operatorId, cost)
                 .addRecipient(nodeId, cost)
@@ -46,14 +70,6 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
             setPayment(txPayment);
         }
 
-        validate();
-
-        return inner.build();
-    }
-
-    @SuppressWarnings("unchecked")
-    public T setPayment(Transaction transaction) {
-        getHeaderBuilder().setPayment(transaction.toProto());
         return (T) this;
     }
 
