@@ -9,11 +9,32 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.Objects;
 
+import javax.annotation.Nullable;
+
 // TODO: TransactionId.toString
 // TODO: TransactionId.fromString
 
 public final class TransactionId {
     private final TransactionID.Builder inner;
+
+    @Nullable
+    private static Instant lastInstant;
+
+    // `synchronized` is necessary for correctness with multiple threads
+    private static synchronized Instant getIncreasingInstant() {
+        // Allows the transaction to be accepted as long as the
+        // server is not more than 10 seconds behind us
+        final var instant = Clock.systemUTC()
+            .instant()
+            .minusSeconds(10);
+
+        // ensures every instant is at least always greater than the last
+        lastInstant = lastInstant != null && instant.compareTo(lastInstant) < 1
+            ? lastInstant.plusNanos(1)
+            : instant;
+
+        return lastInstant;
+    }
 
     /**
      * Generates a new transaction ID for the given `accountId`.
@@ -23,14 +44,21 @@ public final class TransactionId {
      * any transaction fees.
      */
     public TransactionId(AccountId accountId) {
-        // Allows the transaction to be accepted as long as the
-        // server is not more than 10 seconds behind us
-        this(
-                accountId, Clock.systemUTC()
-                    .instant()
-                    .minusSeconds(10));
+        this(accountId, getIncreasingInstant());
     }
 
+    /**
+     * Generate a transaction ID with a given account ID and valid start time.
+     *
+     * <i>Nota bene</i>: executing transactions with the same ID (account ID & account start time)
+     * will throw {@link HederaException} with code {@code DUPLICATE_TRANSACTION}.
+     * <p>
+     * Use the other constructor to get an ID with a known-valid {@code transactionValidStart}.
+     *
+     * @param accountId
+     * @param transactionValidStart the time by which the transaction takes effect; must be in the
+     *                              past by the time it is submitted to the network.
+     */
     public TransactionId(AccountId accountId, Instant transactionValidStart) {
         inner = TransactionID.newBuilder()
             .setAccountID(accountId.toProto())

@@ -5,17 +5,27 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519Signature;
-import com.hedera.hashgraph.sdk.proto.*;
-import io.grpc.Channel;
-import io.grpc.MethodDescriptor;
-import io.grpc.netty.shaded.io.netty.util.concurrent.GlobalEventExecutor;
+import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
+import com.hedera.hashgraph.sdk.proto.SignaturePair;
+import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBodyOrBuilder;
+import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+
 import org.bouncycastle.util.encoders.Hex;
 
-import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+
+import javax.annotation.Nullable;
+
+import io.grpc.Channel;
+import io.grpc.MethodDescriptor;
+import io.grpc.netty.shaded.io.netty.util.concurrent.GlobalEventExecutor;
 
 public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse, TransactionId> {
 
@@ -230,10 +240,12 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
     }
 
     public void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<HederaThrowable> onError) {
+        final var recordQuery = new TransactionRecordQuery(getClient())
+            .setTransactionId(getId())
+            .setPaymentDefault();
+
         var handler = new AsyncReceiptHandler((receipt) ->
-            new TransactionRecordQuery(getClient())
-                .setTransactionId(getId())
-                .executeAsync(onSuccess, onError),
+            recordQuery.executeAsync(onSuccess, onError),
             onError);
 
         executeAsync(id -> handler.tryGetReceipt(), onError);
@@ -305,6 +317,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         private final Consumer<HederaThrowable> onError;
 
         private int attemptsLeft = MAX_RETRY_ATTEMPTS;
+        private volatile boolean receiptEmitted = false;
 
         private AsyncReceiptHandler(
             Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError)
@@ -327,6 +340,9 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
                         TimeUnit.MILLISECONDS);
                 }
             } else {
+                if (receiptEmitted) throw new IllegalStateException();
+                receiptEmitted = true;
+
                 onReceipt.accept(receipt);
             }
         }
