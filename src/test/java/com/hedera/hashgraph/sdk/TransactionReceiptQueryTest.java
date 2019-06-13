@@ -4,12 +4,15 @@ import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.proto.Query;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TransactionReceiptQueryTest {
     static final Ed25519PrivateKey privateKey = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962");
@@ -17,7 +20,7 @@ class TransactionReceiptQueryTest {
     private static final AccountId NODE_ACCOUNT = new AccountId(3);
     private static final AccountId USER_ACCOUNT = new AccountId(1234);
 
-    static final Transaction paymentTxn = new CryptoTransferTransaction()
+    static final Transaction paymentTxn = new CryptoTransferTransaction(null)
         .setNodeAccountId(NODE_ACCOUNT)
         .setTransactionId(new TransactionId(USER_ACCOUNT, Instant.parse("2019-04-05T12:00:00Z")))
         .addSender(USER_ACCOUNT, 10000)

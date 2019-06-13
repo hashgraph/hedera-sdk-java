@@ -4,6 +4,7 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.file.FileId;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +26,7 @@ class ContractCreateTransactionTest {
                 ".setBytecodeFile() required",
             assertThrows(
                 IllegalStateException.class,
-                () -> new ContractCreateTransaction().validate()
+                () -> new ContractCreateTransaction(null).validate()
             ).getMessage()
         );
     }
@@ -36,7 +37,7 @@ class ContractCreateTransactionTest {
         final var now = Instant.ofEpochSecond(1554158542);
         final var key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962");
         final var txnId = new TransactionId(new AccountId(2), now);
-        final var txn = new ContractCreateTransaction()
+        final var txn = new ContractCreateTransaction(null)
             .setNodeAccountId(new AccountId(3))
             .setTransactionId(txnId)
             .setBytecodeFile(new FileId(1, 2, 3))
@@ -45,7 +46,7 @@ class ContractCreateTransactionTest {
             .setInitialBalance(1000)
             .setProxyAccountId(new AccountId(4))
             .setAutoRenewPeriod(Duration.ofHours(7))
-            .setConstructorParams(new byte[] {10, 11, 12, 13, 25})
+            .setConstructorParams(new byte[]{10, 11, 12, 13, 25})
             .setShard(20)
             .setRealm(40)
             .setNewRealmAdminKey(key.getPublicKey())

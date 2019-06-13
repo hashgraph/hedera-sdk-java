@@ -4,6 +4,7 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -14,10 +15,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ContractBytecodeQueryTest {
 
-    private static final Ed25519PrivateKey key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962" );
+    private static final Ed25519PrivateKey key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962");
 
     @Test
-    @DisplayName("empty query fails validation" )
+    @DisplayName("empty query fails validation")
     void emptyBuilder() {
         assertEquals(
             "query builder failed validation:\n" +
@@ -31,11 +32,11 @@ class ContractBytecodeQueryTest {
     }
 
     @Test
-    @DisplayName("correct query can be built" )
+    @DisplayName("correct query can be built")
     void correctBuilder() {
         final var query = new ContractBytecodeQuery()
             .setPayment(
-                new CryptoTransferTransaction()
+                new CryptoTransferTransaction(null)
                     .setTransactionId(new TransactionId(new AccountId(2), Instant.ofEpochSecond(1559868457)))
                     .setNodeAccountId(new AccountId(3))
                     .addSender(new AccountId(2), 10000)

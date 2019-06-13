@@ -4,6 +4,7 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +36,7 @@ class ContractRecordsQueryTest {
     void correctBuilder() {
         final var query = new ContractRecordsQuery()
             .setPayment(
-                new CryptoTransferTransaction()
+                new CryptoTransferTransaction(null)
                     .setTransactionId(new TransactionId(new AccountId(2), Instant.ofEpochSecond(1559868457)))
                     .setNodeAccountId(new AccountId(3))
                     .addSender(new AccountId(2), 10000)

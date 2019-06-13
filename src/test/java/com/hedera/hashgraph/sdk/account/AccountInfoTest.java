@@ -3,18 +3,21 @@ package com.hedera.hashgraph.sdk.account;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.proto.CryptoGetInfoResponse;
 import com.hedera.hashgraph.sdk.proto.Response;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class AccountInfoTest {
     private static final Ed25519PrivateKey privateKey = Ed25519PrivateKey.generate();
 
     @Test
-    @DisplayName("won't deserialize from the wrong kind of response" )
+    @DisplayName("won't deserialize from the wrong kind of response")
     void incorrectResponse() {
         assertThrows(
             IllegalArgumentException.class,
@@ -23,10 +26,10 @@ class AccountInfoTest {
     }
 
     @Test
-    @DisplayName("requires a key" )
+    @DisplayName("requires a key")
     void requiresKey() {
         final var response = Response.newBuilder()
-            .setCryptoGetInfo((CryptoGetInfoResponse.getDefaultInstance()))
+            .setCryptoGetInfo(CryptoGetInfoResponse.getDefaultInstance())
             .build();
 
         assertThrows(
@@ -37,7 +40,7 @@ class AccountInfoTest {
     }
 
     @Test
-    @DisplayName("deserializes from a correct response" )
+    @DisplayName("deserializes from a correct response")
     void correct() {
         final var response = Response.newBuilder()
             .setCryptoGetInfo(
@@ -49,7 +52,7 @@ class AccountInfoTest {
         final var accountInfo = new AccountInfo(response);
 
         assertEquals(accountInfo.getAccountId(), new AccountId(0));
-        assertEquals(accountInfo.getContractAccountId(), "" );
+        assertEquals(accountInfo.getContractAccountId(), "");
         assertNull(accountInfo.getProxyAccountId());
         assertEquals(accountInfo.getClaims(), List.of());
     }

@@ -2,6 +2,7 @@ package com.hedera.hashgraph.sdk.account;
 
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +23,7 @@ class CryptoTransferTransactionTest {
                 "at least one transfer required",
             assertThrows(
                 IllegalStateException.class,
-                () -> new CryptoTransferTransaction().validate()
+                () -> new CryptoTransferTransaction(null).validate()
             ).getMessage()
         );
     }
@@ -33,16 +34,16 @@ class CryptoTransferTransactionTest {
         final var now = Instant.ofEpochSecond(1554158542);
         final var key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962");
         final var txnId = new TransactionId(new AccountId(2), now);
-        final var txn = new CryptoTransferTransaction()
+        final var txn = new CryptoTransferTransaction(null)
             .setTransactionId(txnId)
             .setNodeAccountId(new AccountId(2))
             .addSender(new AccountId(4), 800)
             .addRecipient(new AccountId(55), 400)
             .addTransfer(new AccountId(78), 400)
             .sign(key).toProto();
-        
+
         assertEquals(
-                "sigMap {\n" +
+            "sigMap {\n" +
                 "  sigPair {\n" +
                 "    pubKeyPrefix: \"\\344\\361\\300\\353L}\\315\\303\\347\\353\\021p\\263\\b\\212=\\022\\242\\227\\364\\243\\353\\342\\362\\205\\003\\375g5F\\355\\216\"\n" +
                 "    ed25519: \"\\223\\347\\326q\\3477\\303\\307g+\\207\\252\\251N=},v\\337\\231i\\r\\201\\276Qn\\277\\227\\261\\257\\332\\201a\\003[\\320\\036\\310\\\"\\353\\0338@\\216\\331w\\302\\300\\260\\276\\221\\330g\\300~\\234z\\247\\331\\031\\032\\300\\026\\006\"\n" +

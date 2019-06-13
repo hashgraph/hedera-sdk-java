@@ -3,12 +3,15 @@ package com.hedera.hashgraph.sdk;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TransactionRecordQueryTest {
     static final Ed25519PrivateKey privateKey = Ed25519PrivateKey.fromString(
@@ -19,7 +22,7 @@ class TransactionRecordQueryTest {
     static final AccountId NODE_ACCOUNT = new AccountId(3);
 
     @SuppressWarnings("/NullAway/")
-    static final Transaction paymentTxn = new CryptoTransferTransaction()
+    static final Transaction paymentTxn = new CryptoTransferTransaction(null)
         .setTransactionId(new TransactionId(USER_ACCT, Instant.parse("2019-04-05T12:00:00Z")))
         .setNodeAccountId(NODE_ACCOUNT)
         .addSender(USER_ACCT, 10000)

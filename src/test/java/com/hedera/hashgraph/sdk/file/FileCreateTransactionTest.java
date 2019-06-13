@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk.file;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +24,7 @@ class FileCreateTransactionTest {
                 + ".addKey() required",
             assertThrows(
                 IllegalStateException.class,
-                () -> new FileCreateTransaction().validate()
+                () -> new FileCreateTransaction(null).validate()
             ).getMessage());
     }
 
@@ -33,10 +34,10 @@ class FileCreateTransactionTest {
         final var now = Instant.ofEpochSecond(1554158542);
         final var key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962");
         final var txnId = new TransactionId(new AccountId(2), now);
-        final var txn = new FileCreateTransaction()
+        final var txn = new FileCreateTransaction(null)
             .setNodeAccountId(new AccountId(3))
             .setTransactionId(txnId)
-            .setContents(new byte[] {1, 2, 3, 4})
+            .setContents(new byte[]{1, 2, 3, 4})
             .setExpirationTime(Instant.ofEpochSecond(1554158728))
             .addKey(key.getPublicKey())
             .setNewRealmAdminKey(key.getPublicKey())

@@ -3,28 +3,32 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
+import com.hedera.hashgraph.sdk.file.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.file.FileId;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TransactionTest {
-    static final AccountId nodeAcctId = new AccountId(0);
-    static final AccountId acctId = new AccountId(3);
-    static final Ed25519PrivateKey key1 = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962");
+    private static final AccountId nodeAcctId = new AccountId(0);
+    private static final AccountId acctId = new AccountId(3);
+    private static final Ed25519PrivateKey key1 = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962");
 
 
-    static final Instant txnStartAt = Instant.parse("2019-04-18T20:50:00Z");
-    static final TransactionId txnId = new TransactionId(acctId, txnStartAt);
+    private static final Instant txnStartAt = Instant.parse("2019-04-18T20:50:00Z");
+    private static final TransactionId txnId = new TransactionId(acctId, txnStartAt);
 
     // a different instance for each test
-    final Transaction txn = new AdminDeleteTransaction()
+    private final Transaction txn = new FileDeleteTransaction(null)
         .setTransactionId(txnId)
         .setNodeAccountId(nodeAcctId)
-        .setID(new FileId(0, 0, 0))
+        .setFileId(new FileId(0, 0, 0))
         .build();
 
     @Test

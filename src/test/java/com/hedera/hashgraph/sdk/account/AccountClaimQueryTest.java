@@ -2,12 +2,15 @@ package com.hedera.hashgraph.sdk.account;
 
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class AccountClaimQueryTest {
 
@@ -18,7 +21,7 @@ class AccountClaimQueryTest {
 
     private static final AccountClaimQuery query = new AccountClaimQuery()
         .setPayment(
-            new CryptoTransferTransaction()
+            new CryptoTransferTransaction(null)
                 .setTransactionId(new TransactionId(userAccountId, Instant.parse("2019-05-28T15:20:00Z")))
                 .setNodeAccountId(nodeAccountId)
                 .addSender(userAccountId, 10000)
