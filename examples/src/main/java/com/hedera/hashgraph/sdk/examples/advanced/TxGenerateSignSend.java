@@ -11,10 +11,10 @@ import com.hedera.hashgraph.sdk.examples.ExampleHelper;
 import com.hedera.hashgraph.sdk.Transaction;
 
 public final class TxGenerateSignSend {
-	
-	// this example demonstrates how to generate an unsigned transaction (by specifying a null client) into a byte array
-	// then having this byte array signed independently before sending it onto Hedera for processing
-	
+    
+    // this example demonstrates how to generate an unsigned transaction (by specifying a null client) into a byte array
+    // then having this byte array signed independently before sending it onto Hedera for processing
+    
     public static void main(String[] args) throws HederaException, HederaNetworkException, InvalidProtocolBufferException {
         // Generate a Ed25519 private, public key pair
         var newKey = Ed25519PrivateKey.generate();
@@ -30,11 +30,11 @@ public final class TxGenerateSignSend {
         
         // create a new transaction with a null client
         var txBytes = new AccountCreateTransaction(null)
-        		.setKey(newPublicKey)
-        		.setInitialBalance(10)
-        		.setTransactionId(transactionId)
-        		.setNodeAccountId(AccountId.fromString("0.0.3"))
-        		.toBytes(false);
+                .setKey(newPublicKey)
+                .setInitialBalance(10)
+                .setTransactionId(transactionId)
+                .setNodeAccountId(AccountId.fromString("0.0.3"))
+                .toBytes(false);
         
         // sign the transaction and return a byte array
         byte[] signedTX = Transaction.fromBytes(client, txBytes)
