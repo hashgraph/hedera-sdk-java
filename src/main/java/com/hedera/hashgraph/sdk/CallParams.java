@@ -5,7 +5,6 @@ import com.google.protobuf.ByteString;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
 
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -54,37 +53,35 @@ public final class CallParams<Kind> {
     }
 
     public CallParams<Kind> add(byte i8) {
-        paramTypes.add("int<8>");
-        args.add(new Argument(int256(i8)));
-
-        return this;
+        return add((long) i8, 8);
     }
 
     public CallParams<Kind> add(short i16) {
-        paramTypes.add("int<16>");
-        args.add(new Argument(int256(i16)));
-
-        return this;
+        return add((long) i16, 16);
     }
 
     public CallParams<Kind> add(int i32) {
-        paramTypes.add("int<32>");
-        args.add(new Argument(int256(i32)));
-
-        return this;
+        return add((long) i32, 32);
     }
 
     public CallParams<Kind> add(long i64) {
-        paramTypes.add("int<64>");
-        args.add(new Argument(int256(i64)));
+        return add(i64, 8);
+    }
+
+    public CallParams<Kind> add(long i64, int width) {
+        checkIntWidth(width);
+        if (width > 64) {
+            throw new IllegalArgumentException("integer width > 64");
+        }
+
+        paramTypes.add("int<" + width + ">");
+        args.add(new Argument(int256(i64, width)));
 
         return this;
     }
 
     public CallParams<Kind> add(BigInteger bigInt, byte width) {
-        if (width % 8 != 0) {
-            throw new IllegalArgumentException("Solidity integer width must be a multiple of 8");
-        }
+        checkIntWidth(width);
 
         paramTypes.add("int<" + width + ">");
         args.add(new Argument(int256(bigInt)));
@@ -92,21 +89,23 @@ public final class CallParams<Kind> {
         return this;
     }
 
-    public CallParams<Kind> addUnsigned(@Nonnegative long uint, int width) {
+    private static void checkIntWidth(int width) {
         if (width % 8 != 0) {
             throw new IllegalArgumentException("Solidity integer width must be a multiple of 8");
         }
+    }
+
+    public CallParams<Kind> addUnsigned(@Nonnegative long uint, int width) {
+        checkIntWidth(width);
 
         paramTypes.add("uint<" + width + ">");
-        args.add(new Argument(int256(uint)));
+        args.add(new Argument(int256(uint, width)));
 
         return this;
     }
 
-    public CallParams<Kind> addUnsigned(BigInteger bigInt, byte width) {
-        if (width % 8 != 0) {
-            throw new IllegalArgumentException("Solidity integer width must be a multiple of 8");
-        }
+    public CallParams<Kind> addUnsigned(BigInteger bigInt, int width) {
+        checkIntWidth(width);
 
         paramTypes.add("int<" + width + ">");
         args.add(new Argument(int256(bigInt)));
@@ -153,7 +152,7 @@ public final class CallParams<Kind> {
         for (var arg : args) {
             if (arg.isDynamic) {
                 // dynamic arguments supply their offset in value position and append their data at that offset
-                argBytes.add(int256(dynamicOffset));
+                argBytes.add(int256(dynamicOffset, 256));
                 dynamicArgs.add(arg.value);
                 dynamicOffset += arg.len;
             } else {
@@ -179,24 +178,14 @@ public final class CallParams<Kind> {
         negativePadding = ByteString.copyFrom(fill);
     }
 
-    static ByteString int256(byte val) {
-        final var buffer = ByteBuffer.allocate(1).put(val);
-        return leftPad32(ByteString.copyFrom(buffer), val < 0);
-    }
+    static ByteString int256(long val, int width) {
+        final var output = ByteString.newOutput(width);
 
-    static ByteString int256(short val) {
-        final var buffer = ByteBuffer.allocate(2).putShort(val);
-        return leftPad32(ByteString.copyFrom(buffer), val < 0);
-    }
+        for (int i = 0; i < width; i += 8) {
+            output.write((byte) val >> i);
+        }
 
-    static ByteString int256(int val) {
-        final var buffer = ByteBuffer.allocate(4).putInt(val);
-        return leftPad32(ByteString.copyFrom(buffer), val < 0);
-    }
-
-    static ByteString int256(long val) {
-        final var buffer = ByteBuffer.allocate(8).putLong(val);
-        return leftPad32(ByteString.copyFrom(buffer), val < 0);
+        return leftPad32(output.toByteString(), val < 0);
     }
 
     static ByteString int256(BigInteger val) {
@@ -254,7 +243,7 @@ public final class CallParams<Kind> {
 
         // dynamic constructor
         private Argument(int len, ByteString dynamic) {
-            var lenBytes = int256(len);
+            var lenBytes = int256(len, 256);
             this.len = len;
             this.value = lenBytes.concat(rightPad32(dynamic));
             isDynamic = true;
