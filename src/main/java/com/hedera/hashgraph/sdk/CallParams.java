@@ -14,6 +14,8 @@ import java.util.Objects;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
 // an implementation of function selector and parameter encoding as specified here:
@@ -474,6 +476,8 @@ public final class CallParams<Kind> {
     /**
      * Builder class for Solidity function selectors.
      */
+    @SuppressFBWarnings(value = {"EI_EXPOSE_REP"},
+        justification = "we don't care about the contents of `finished`")
     public static final class FunctionSelector {
 
         @Nullable

@@ -45,6 +45,7 @@
         <junit.version>5.3.1</junit.version>
         <nullaway.version>0.7.2</nullaway.version>
         <protoc.version>3.7.1</protoc.version>
+        <spotbugs.version>3.1.11</spotbugs.version>
     </properties>
 
     <dependencies>
@@ -90,6 +91,12 @@
             <artifactId>junit-jupiter-params</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <scope>provided</scope>
+            <version>${spotbugs.version}</version>
         </dependency>
     </dependencies>
 
@@ -244,7 +251,7 @@
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>3.1.11</version>
+                <version>${spotbugs.version}</version>
                 <configuration>
                     <effort>most</effort>
                     <excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
