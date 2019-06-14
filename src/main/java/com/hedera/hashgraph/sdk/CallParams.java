@@ -375,9 +375,106 @@ public final class CallParams<Kind> {
     // TODO: arrays and tuples
 
     /**
+     * Get the encoding of the currently added parameters as a {@link ByteString}.
+     * <p>
+     * You may continue to add parameters and call this again.
+     *
+     * @return the Solidity encoding of the call parameters in the order they were added.
+     */
+    public ByteString toProto() {
+        // offset for dynamic-length data, immediately after value arguments
+        var dynamicOffset = args.size() * 32;
+
+        var paramsBytes = new ArrayList<ByteString>(args.size() + 1);
+
+        // use `finishIntermediate()` so this object can continue being used
+        paramsBytes.add(ByteString.copyFrom(funcSelector.finishIntermediate()));
+
+        var dynamicArgs = new ArrayList<ByteString>();
+
+        // iterate the arguments and determine whether they are dynamic or not
+        for (var arg : args) {
+            if (arg.isDynamic) {
+                // dynamic arguments supply their offset in value position and append their data at that offset
+                paramsBytes.add(int256(dynamicOffset, 256));
+                dynamicArgs.add(arg.value);
+                dynamicOffset += arg.len;
+            } else {
+                // value arguments are dropped in the current arg position
+                paramsBytes.add(arg.value);
+            }
+        }
+
+        paramsBytes.addAll(dynamicArgs);
+
+        return ByteString.copyFrom(paramsBytes);
+    }
+
+    // padding that we can substring without new allocations
+    private static final ByteString padding = ByteString.copyFrom(new byte[31]);
+    private static final ByteString negativePadding;
+
+    static {
+        final var fill = new byte[31];
+        Arrays.fill(fill, (byte) 0xFF);
+        negativePadding = ByteString.copyFrom(fill);
+    }
+
+    static ByteString int256(long val, int width) {
+        // don't try to get wider than a `long` as it should just be filled with padding
+        width = Math.min(width, 64);
+        final var output = ByteString.newOutput(width / 8);
+
+        // write bytes in big-endian order
+        for (int i = width - 8; i >= 0; i -= 8) {
+            // widening conversion sign-extends so we don't have to do anything special when
+            // truncating a previously widened value
+            output.write((byte) val >> i);
+        }
+
+        // byte padding will sign-extend appropriately
+        return leftPad32(output.toByteString(), val < 0);
+    }
+
+    // Solidity contracts require all parameters to be padded to 32 byte multiples but specifies
+    // different requirements for padding for strings/byte arrays vs integers
+
+    static ByteString leftPad32(ByteString input) {
+        return leftPad32(input, false);
+    }
+
+    static ByteString leftPad32(ByteString input, boolean negative) {
+        var rem = 32 - input.size() % 32;
+        return rem == 32
+            ? input
+            : (negative ? negativePadding : padding).substring(0, rem)
+            .concat(input);
+    }
+
+    static ByteString leftPad32(byte[] input, boolean negative) {
+        return leftPad32(ByteString.copyFrom(input), negative);
+    }
+
+    static ByteString rightPad32(ByteString input) {
+        var rem = 32 - input.size() % 32;
+        return rem == 32 ? input : input.concat(padding.substring(0, rem));
+    }
+
+    // some Rust-inspired type magic
+    public final static class Constructor {
+        private Constructor() {
+        }
+    }
+
+    public final static class Function {
+        private Function() {
+        }
+    }
+
+    /**
      * Builder class for Solidity function selectors.
      */
-    public static class FunctionSelector {
+    public static final class FunctionSelector {
 
         @Nullable
         private Keccak.Digest256 digest;
@@ -483,103 +580,6 @@ public final class CallParams<Kind> {
             }
 
             return finished;
-        }
-    }
-
-    /**
-     * Get the encoding of the currently added parameters as a {@link ByteString}.
-     * <p>
-     * You may continue to add parameters and call this again.
-     *
-     * @return the Solidity encoding of the call parameters in the order they were added.
-     */
-    public ByteString toProto() {
-        // offset for dynamic-length data, immediately after value arguments
-        var dynamicOffset = args.size() * 32;
-
-        var paramsBytes = new ArrayList<ByteString>(args.size() + 1);
-
-        // use `finishIntermediate()` so this object can continue being used
-        paramsBytes.add(ByteString.copyFrom(funcSelector.finishIntermediate()));
-
-        var dynamicArgs = new ArrayList<ByteString>();
-
-        // iterate the arguments and determine whether they are dynamic or not
-        for (var arg : args) {
-            if (arg.isDynamic) {
-                // dynamic arguments supply their offset in value position and append their data at that offset
-                paramsBytes.add(int256(dynamicOffset, 256));
-                dynamicArgs.add(arg.value);
-                dynamicOffset += arg.len;
-            } else {
-                // value arguments are dropped in the current arg position
-                paramsBytes.add(arg.value);
-            }
-        }
-
-        paramsBytes.addAll(dynamicArgs);
-
-        return ByteString.copyFrom(paramsBytes);
-    }
-
-    // padding that we can substring without new allocations
-    private static final ByteString padding = ByteString.copyFrom(new byte[31]);
-    private static final ByteString negativePadding;
-
-    static {
-        final var fill = new byte[31];
-        Arrays.fill(fill, (byte) 0xFF);
-        negativePadding = ByteString.copyFrom(fill);
-    }
-
-    static ByteString int256(long val, int width) {
-        // don't try to get wider than a `long` as it should just be filled with padding
-        width = Math.min(width, 64);
-        final var output = ByteString.newOutput(width / 8);
-
-        // write bytes in big-endian order
-        for (int i = width - 8; i >= 0; i -= 8) {
-            // widening conversion sign-extends so we don't have to do anything special when
-            // truncating a previously widened value
-            output.write((byte) val >> i);
-        }
-
-        // byte padding will sign-extend appropriately
-        return leftPad32(output.toByteString(), val < 0);
-    }
-
-    // Solidity contracts require all parameters to be padded to 32 byte multiples but specifies
-    // different requirements for padding for strings/byte arrays vs integers
-
-    static ByteString leftPad32(ByteString input) {
-        return leftPad32(input, false);
-    }
-
-    static ByteString leftPad32(ByteString input, boolean negative) {
-        var rem = 32 - input.size() % 32;
-        return rem == 32
-            ? input
-            : (negative ? negativePadding : padding).substring(0, rem)
-            .concat(input);
-    }
-
-    static ByteString leftPad32(byte[] input, boolean negative) {
-        return leftPad32(ByteString.copyFrom(input), negative);
-    }
-
-    static ByteString rightPad32(ByteString input) {
-        var rem = 32 - input.size() % 32;
-        return rem == 32 ? input : input.concat(padding.substring(0, rem));
-    }
-
-    // some Rust-inspired type magic
-    public final static class Constructor {
-        private Constructor() {
-        }
-    }
-
-    public final static class Function {
-        private Function() {
         }
     }
 
