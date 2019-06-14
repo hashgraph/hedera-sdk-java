@@ -527,15 +527,18 @@ public final class CallParams<Kind> {
     }
 
     static ByteString int256(long val, int width) {
-        final var output = ByteString.newOutput(width);
+        // don't try to get wider than a `long` as it should just be filled with padding
+        width = Math.min(width, 64);
+        final var output = ByteString.newOutput(width / 8);
 
+        // write bytes in big-endian order
         for (int i = width - 8; i >= 0; i -= 8) {
-            // write bytes in big-endian order
             // widening conversion sign-extends so we don't have to do anything special when
             // truncating a previously widened value
             output.write((byte) val >> i);
         }
 
+        // byte padding will sign-extend appropriately
         return leftPad32(output.toByteString(), val < 0);
     }
 
