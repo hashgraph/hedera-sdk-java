@@ -101,9 +101,11 @@ public final class CallParams<Kind> {
      * Add an integer as an signed {@code intN} param, explicitly setting the parameter width.
      * <p>
      * The value will be truncated to the last {@code width} bits, the same as Java's
-     * behavior when casting from a larger integer type to a smaller one.
+     * behavior when casting from a larger integer type to a smaller one. When passing a smaller
+     * integer type, Java will widen it by sign-extending so if it is truncated again it should
+     * still result in the same two's complement value.
      *
-     * @param width the nominal bit width for encoding the integer type in the function funcSelector,
+     * @param width the nominal bit width for encoding the integer type in the function selector,
      *              e.g. {@code width = 128} produces a param type of {@code int128};
      *              must be a multiple of 8 and between 8 and 256.
      * @throws IllegalArgumentException if {@code width} is not in a valid range (see above).
@@ -124,7 +126,7 @@ public final class CallParams<Kind> {
      * Add an arbitrary precision integer as a signed {@code intN} param, explicitly
      * setting the parameter width.
      *
-     * @param width the nominal bit width for encoding the integer type in the function funcSelector,
+     * @param width the nominal bit width for encoding the integer type in the function selector,
      *              e.g. {@code width = 128} produces a param type of {@code int128};
      *              must be a multiple of 8 and between 8 and 256.
      * @throws IllegalArgumentException if {@code uint.bitLength() > 256}
@@ -211,7 +213,7 @@ public final class CallParams<Kind> {
      * The value will be truncated to the last {@code width} bits, the same as Java's
      * behavior when casting from a larger integer type to a smaller one.
      *
-     * @param width the nominal bit width for encoding the integer type in the function funcSelector,
+     * @param width the nominal bit width for encoding the integer type in the function selector,
      *              e.g. {@code width = 128} produces a param type of {@code uint128};
      *              must be a multiple of 8 and between 8 and 256.
      * @throws IllegalArgumentException if {@code uint < 0},
@@ -231,12 +233,14 @@ public final class CallParams<Kind> {
      * Add an arbitrary precision non-negative integer as an unsigned {@code uintN} param,
      * explicitly setting the parameter width.
      *
-     * @param width the nominal bit width for encoding the integer type in the function funcSelector,
+     * @param width the nominal bit width for encoding the integer type in the function selector,
      *              e.g. {@code width = 128} produces a param type of {@code uint128};
      *              must be a multiple of 8 and between 8 and 256.
      * @throws IllegalArgumentException if {@code uint.signum() < 0},
-     *                                  if {@code uint.bitLength() > 256} (cannot be represented as a Solidity integer type),
-     *                                  {@code width < uint.bitLength()} or {@code width} is not in a valid range (see above).
+     *                                  if {@code uint.bitLength() > 256}
+     *                                  (cannot be represented as a Solidity integer type),
+     *                                  {@code width < uint.bitLength()} or
+     *                                  {@code width} is not in a valid range (see above).
      */
     public CallParams<Kind> addUnsigned(@Nonnegative BigInteger uint, int width) {
         checkBigInt(uint, width);
@@ -367,6 +371,8 @@ public final class CallParams<Kind> {
     public CallParams<Kind> addFunction(String address, FunctionSelector selector) {
         return addFunction(decodeAddress(address), selector.finish());
     }
+
+    // TODO: arrays and tuples
 
     /**
      * Builder class for Solidity function selectors.
