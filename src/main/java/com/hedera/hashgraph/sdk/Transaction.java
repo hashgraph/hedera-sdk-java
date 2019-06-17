@@ -197,7 +197,11 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
                 }
             } else {
                 HederaException.throwIfExceptional(receiptStatus);
-                return mapReceipt.apply(receipt);
+                if (receiptStatus != ResponseCodeEnum.OK) {
+                	// OK means receipt exists, but transaction may not yet be completed
+                	// we want SUCCESS for example, not just OK.
+                	return mapReceipt.apply(receipt);
+                }
             }
         }
 
