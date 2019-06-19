@@ -45,7 +45,7 @@
         <junit.version>5.3.1</junit.version>
         <nullaway.version>0.7.2</nullaway.version>
         <protoc.version>3.7.1</protoc.version>
-        <spotbugs.version>3.1.11</spotbugs.version>
+        <spotbugs.version>3.1.12</spotbugs.version>
     </properties>
 
     <dependencies>
@@ -143,6 +143,9 @@
                             -XepDisableWarningsInGeneratedCode
                             -XepExcludedPaths:.*/target/generated-sources/.*
                             -Xep:NullAway:ERROR
+                            <!-- FIXME: this check is broken on OpenJDK 12
+                                https://github.com/google/error-prone/issues/1106 -->
+                            -Xep:Finally:OFF
                             -XepOpt:NullAway:AnnotatedPackages=com.hedera
                             <!-- protobuf generator does not use @Generated -->
                             -XepOpt:NullAway:UnannotatedSubPackages=com.hedera.hashgraph.sdk.proto
