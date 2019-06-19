@@ -72,34 +72,6 @@ public final class CallParams<Kind> {
     }
 
     /**
-     * Add an 8-bit integer as an unsigned param, inferring a type of {@code int8}.
-     */
-    public CallParams<Kind> add(byte int8) {
-        return add(int8, 8);
-    }
-
-    /**
-     * Add an 16-bit integer as an unsigned param, inferring a type of {@code int16}.
-     */
-    public CallParams<Kind> add(short int16) {
-        return add(int16, 16);
-    }
-
-    /**
-     * Add an 32-bit integer as an unsigned param, inferring a type of {@code int32}.
-     */
-    public CallParams<Kind> add(int int32) {
-        return add(int32, 32);
-    }
-
-    /**
-     * Add an 64-bit integer as an unsigned param, inferring a type of {@code int64}.
-     */
-    public CallParams<Kind> add(long int64) {
-        return add(int64, 64);
-    }
-
-    /**
      * Add an integer as an signed {@code intN} param, explicitly setting the parameter width.
      * <p>
      * The value will be truncated to the last {@code width} bits, the same as Java's
@@ -112,7 +84,7 @@ public final class CallParams<Kind> {
      *              must be a multiple of 8 and between 8 and 256.
      * @throws IllegalArgumentException if {@code width} is not in a valid range (see above).
      */
-    public CallParams<Kind> add(long i64, int width) {
+    public CallParams<Kind> addInt(long i64, int width) {
         checkIntWidth(width);
         if (width > 64) {
             throw new IllegalArgumentException("integer width > 64");
@@ -133,9 +105,10 @@ public final class CallParams<Kind> {
      *              must be a multiple of 8 and between 8 and 256.
      * @throws IllegalArgumentException if {@code uint.bitLength() > 256}
      *                                  (cannot be represented as a Solidity integer type),
-     *                                  {@code width < uint.bitLength()} or {@code width} is not in a valid range (see above).
+     *                                  {@code width < uint.bitLength()} or {@code width} is not in
+     *                                  a valid range (see above).
      */
-    public CallParams<Kind> add(BigInteger bigInt, int width) {
+    public CallParams<Kind> addInt(BigInteger bigInt, int width) {
         checkBigInt(bigInt, width);
 
         final var bytes = bigInt.toByteArray();
@@ -173,47 +146,12 @@ public final class CallParams<Kind> {
     }
 
     /**
-     * Add an 8-bit non-negative integer as an unsigned param, inferring a type of {@code uint8}.
-     *
-     * @throws IllegalArgumentException if {@code uint8 < 0}
-     */
-    public CallParams<Kind> addUnsigned(@Nonnegative byte uint8) {
-        return addUnsigned(uint8, 8);
-    }
-
-    /**
-     * Add a 16-bit non-negative integer as an unsigned param, inferring a type of {@code uint16}.
-     *
-     * @throws IllegalArgumentException if {@code uint16 < 0}
-     */
-    public CallParams<Kind> addUnsigned(@Nonnegative short uint16) {
-        return addUnsigned(uint16, 16);
-    }
-
-    /**
-     * Add a 32-bit non-negative integer as an unsigned param, inferring a type of {@code uint32}.
-     *
-     * @throws IllegalArgumentException if {@code uint32 < 0}
-     */
-    public CallParams<Kind> addUnsigned(@Nonnegative int uint32) {
-        return addUnsigned(uint32, 32);
-    }
-
-    /**
-     * Add a 64-bit non-negative integer as an unsigned param, inferring a type of {@code uint64}.
-     *
-     * @throws IllegalArgumentException if {@code uint64 < 0}
-     */
-    public CallParams<Kind> addUnsigned(@Nonnegative long uint64) {
-        return addUnsigned(uint64, 64);
-    }
-
-    /**
      * Add a non-negative integer as an unsigned {@code uintN} param,
      * explicitly setting the parameter width.
      * <p>
      * The value will be truncated to the last {@code width} bits, the same as Java's
-     * behavior when casting from a larger integer type to a smaller one.
+     * behavior when casting from a larger integer type to a smaller one. Passing a smaller
+     * integer type is allowed.
      *
      * @param width the nominal bit width for encoding the integer type in the function selector,
      *              e.g. {@code width = 128} produces a param type of {@code uint128};
@@ -221,7 +159,7 @@ public final class CallParams<Kind> {
      * @throws IllegalArgumentException if {@code uint < 0},
      *                                  or {@code width} is not in a valid range (see above).
      */
-    public CallParams<Kind> addUnsigned(@Nonnegative long uint, int width) {
+    public CallParams<Kind> addUint(@Nonnegative long uint, int width) {
         checkIntWidth(width);
         checkUnsignedVal(uint);
 
@@ -244,7 +182,7 @@ public final class CallParams<Kind> {
      *                                  {@code width < uint.bitLength()} or
      *                                  {@code width} is not in a valid range (see above).
      */
-    public CallParams<Kind> addUnsigned(@Nonnegative BigInteger uint, int width) {
+    public CallParams<Kind> addUint(@Nonnegative BigInteger uint, int width) {
         checkBigInt(uint, width);
         checkUnsignedVal(uint.signum());
 
@@ -291,7 +229,6 @@ public final class CallParams<Kind> {
      * Note: adding a {@code address payable} or {@code contract} parameter must also use
      * this function as the ABI does not support those types directly.
      *
-     * @return
      * @throws IllegalArgumentException if the address is not exactly {@value ADDRESS_LEN} bytes
      *                                  long.
      */
@@ -312,7 +249,6 @@ public final class CallParams<Kind> {
      * Note: adding a {@code address payable} or {@code contract} parameter must also use
      * this function as the ABI does not support those types directly.
      *
-     * @return
      * @throws IllegalArgumentException if the address is not exactly {@value ADDRESS_LEN_HEX}
      *                                  characters long or fails to decode as hexadecimal.
      */
@@ -324,11 +260,10 @@ public final class CallParams<Kind> {
 
     /**
      * Add a Solidity function reference as a {@value ADDRESS_LEN}-byte contract address and a
-     * {@value SELECTOR_LEN}-byte function funcSelector.
+     * {@value SELECTOR_LEN}-byte function selector.
      *
-     * @return
      * @throws IllegalArgumentException if {@code address} is not {@value ADDRESS_LEN} bytes or
-     *                                  {@code funcSelector} is not {@value SELECTOR_LEN} bytes.
+     *                                  {@code selector} is not {@value SELECTOR_LEN} bytes.
      */
     public CallParams<Kind> addFunction(byte[] address, byte[] selector) {
         checkAddressLen(address);
@@ -350,11 +285,13 @@ public final class CallParams<Kind> {
 
     /**
      * Add a Solidity function reference as a {@value ADDRESS_LEN}-byte contract address and a
-     * {@value SELECTOR_LEN}-byte function funcSelector.
+     * {@value SELECTOR_LEN}-byte function selector.
      *
-     * @return
+     * @param address a hex-encoded {@value ADDRESS_LEN_HEX}-character Solidity address.
+     * @param selector a
+     *
      * @throws IllegalArgumentException if {@code address} is not {@value ADDRESS_LEN_HEX}
-     *                                  characters or {@code funcSelector} is not
+     *                                  characters or {@code selector} is not
      *                                  {@value SELECTOR_LEN} bytes.
      */
     public CallParams<Kind> addFunction(String address, byte[] selector) {
@@ -367,11 +304,11 @@ public final class CallParams<Kind> {
      *
      * @return
      * @throws IllegalArgumentException if {@code address} is not {@value ADDRESS_LEN_HEX}
-     *                                  characters or {@code funcSelector} is not
-     *                                  {@value SELECTOR_LEN} bytes.
+     *                                  characters.
      */
     public CallParams<Kind> addFunction(String address, FunctionSelector selector) {
-        return addFunction(decodeAddress(address), selector.finish());
+        // allow the `FunctionSelector` to be reused multiple times
+        return addFunction(decodeAddress(address), selector.finishIntermediate());
     }
 
     // TODO: arrays and tuples
@@ -422,16 +359,17 @@ public final class CallParams<Kind> {
         negativePadding = ByteString.copyFrom(fill);
     }
 
-    static ByteString int256(long val, int width) {
+    static ByteString int256(long val, int bitWidth) {
         // don't try to get wider than a `long` as it should just be filled with padding
-        width = Math.min(width, 64);
-        final var output = ByteString.newOutput(width / 8);
+        bitWidth = Math.min(bitWidth, 64);
+        final var output = ByteString.newOutput(bitWidth / 8);
 
         // write bytes in big-endian order
-        for (int i = width - 8; i >= 0; i -= 8) {
+        for (int i = bitWidth - 8; i >= 0; i -= 8) {
             // widening conversion sign-extends so we don't have to do anything special when
             // truncating a previously widened value
-            output.write((byte) val >> i);
+            final var u8 = (byte) (val >> i);
+            output.write(u8);
         }
 
         // byte padding will sign-extend appropriately

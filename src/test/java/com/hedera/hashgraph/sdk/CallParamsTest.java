@@ -9,7 +9,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,22 +34,28 @@ class CallParamsTest {
 
     @ParameterizedTest
     @MethodSource("funcSelectorArgs")
-    @DisplayName("funcSelector() produces correct hash")
+    @DisplayName("FunctionSelector produces correct hash")
     void funcSelectorTest(String hash, String funcName, String[] paramTypes) {
+        final var funcSelector = CallParams.FunctionSelector.function(funcName);
+
+        for (final var paramType : paramTypes) {
+            funcSelector.addParamType(paramType);
+        }
+
         assertEquals(
             hash,
-            Hex.toHexString(CallParams.funcSelector(funcName, Arrays.asList(paramTypes)).toByteArray())
+            Hex.toHexString(funcSelector.finish())
         );
     }
 
     @Test
     @DisplayName("encodes params correctly")
     void encodesParamsCorrectly() {
-        final var paramsStringArg = new CallParams("set_message")
+        final var paramsStringArg = CallParams.function("set_message")
             .add("Hello, world!")
             .toProto();
 
-        final var paramsBytesArg = new CallParams("set_message")
+        final var paramsBytesArg = CallParams.function("set_message")
             .add("Hello, world!".getBytes(StandardCharsets.UTF_8))
             .toProto();
 
@@ -75,25 +80,33 @@ class CallParamsTest {
         );
     }
 
-    private static Stream<Arguments> uint256Arguments() {
+    private static Stream<Arguments> int256Arguments() {
         return Stream.of(
             of(0, "0000000000000000000000000000000000000000000000000000000000000000"),
             of(2, "0000000000000000000000000000000000000000000000000000000000000002"),
             of(255, "00000000000000000000000000000000000000000000000000000000000000ff"),
             of(4095, "0000000000000000000000000000000000000000000000000000000000000fff"),
-            of(255 << 24, "00000000000000000000000000000000000000000000000000000000ff000000"),
-            of(4095 << 20, "00000000000000000000000000000000000000000000000000000000fff00000"),
-            of(0xdeadbeef, "00000000000000000000000000000000000000000000000000000000deadbeef")
+            of(127 << 24, "000000000000000000000000000000000000000000000000000000007f000000"),
+            of(2047 << 20, "000000000000000000000000000000000000000000000000000000007ff00000"),
+            // deadbeef as an integer literal is negative
+            of(0xdeadbeefL, "00000000000000000000000000000000000000000000000000000000deadbeef"),
+            of(-1, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"),
+            of(-2, "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe"),
+            of(-256, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00"),
+            of(-4096, "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000"),
+            of(255 << 24, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000"),
+            of(4095 << 20, "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000"),
+            of(0xdeadbeef, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffdeadbeef")
         );
     }
 
     @ParameterizedTest
-    @DisplayName("uint256() encodes correctly")
-    @MethodSource("uint256Arguments")
-    void uint256EncodesCorrectly(int val, String hexString) {
+    @DisplayName("int256() encodes correctly")
+    @MethodSource("int256Arguments")
+    void int256EncodesCorrectly(long val, String hexString) {
         assertEquals(
-            Hex.toHexString(CallParams.uint256(val).toByteArray()),
-            hexString
+            hexString,
+            Hex.toHexString(CallParams.int256(val, 64).toByteArray())
         );
     }
 }
