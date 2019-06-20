@@ -19,7 +19,7 @@ public final class CallParams<Kind> {
     private final ArrayList<String> paramTypes = new ArrayList<>();
     private final ArrayList<Argument> args = new ArrayList<>();
 
-    private CallParams(@Nullable String funcName) {
+    CallParams(@Nullable String funcName) {
         this.funcName = funcName;
     }
 

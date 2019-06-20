@@ -42,6 +42,7 @@
 
         <errorprone.version>2.3.3</errorprone.version>
         <grpc.version>1.20.0</grpc.version>
+        <junit.version>5.3.1</junit.version>
         <nullaway.version>0.7.2</nullaway.version>
         <protoc.version>3.7.1</protoc.version>
     </properties>
@@ -77,6 +78,18 @@
             <groupId>io.grpc</groupId>
             <artifactId>grpc-stub</artifactId>
             <version>${grpc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -152,6 +165,12 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- JUnit 5 requires Surefire version 2.22.1 or higher -->
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.1</version>
             </plugin>
 
             <plugin>
