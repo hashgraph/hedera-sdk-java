@@ -71,6 +71,35 @@ public final class CallParams<Kind> {
         return this;
     }
 
+    private static void checkIntWidth(int width) {
+        if (width % 8 != 0 || width < 8 || width > 256) {
+            throw new IllegalArgumentException(
+                "Solidity integer width must be a multiple of 8, in the closed range [8, 256]");
+        }
+    }
+
+    private static void checkUnsignedVal(long unsignedVal) {
+        if (unsignedVal < 0) {
+            throw new IllegalArgumentException("addUint() does not accept negative values");
+        }
+    }
+
+    private static void checkBigInt(BigInteger val, int width, boolean signed) {
+        checkIntWidth(width);
+
+        // bitLength() does not include the sign bit
+        final var actualBitLen = val.bitLength() + (signed ? 1 : 0);
+
+        if (actualBitLen > 256) {
+            throw new IllegalArgumentException("BigInteger out of range for Solidity integers");
+        }
+
+        if (width < actualBitLen) {
+            throw new IllegalArgumentException(
+                "BigInteger.bitLength() is greater than the nominal parameter width");
+        }
+    }
+
     /**
      * Add an integer as an signed {@code intN} param, explicitly setting the parameter width.
      * <p>
@@ -86,9 +115,6 @@ public final class CallParams<Kind> {
      */
     public CallParams<Kind> addInt(long i64, int width) {
         checkIntWidth(width);
-        if (width > 64) {
-            throw new IllegalArgumentException("integer width > 64");
-        }
 
         funcSelector.addParamType("int" + width);
         args.add(new Argument(int256(i64, width)));
@@ -103,13 +129,13 @@ public final class CallParams<Kind> {
      * @param width the nominal bit width for encoding the integer type in the function selector,
      *              e.g. {@code width = 128} produces a param type of {@code int128};
      *              must be a multiple of 8 and between 8 and 256.
-     * @throws IllegalArgumentException if {@code bigInt.bitLength() > 256}
-     *                                  (cannot be represented as a Solidity integer type),
+     * @throws IllegalArgumentException if {@code bigInt.bitLength() > 255}
+     *                                  (max range including the sign bit),
      *                                  {@code width < uint.bitLength()} or {@code width} is not in
      *                                  a valid range (see above).
      */
     public CallParams<Kind> addInt(BigInteger bigInt, int width) {
-        checkBigInt(bigInt, width);
+        checkBigInt(bigInt, width, true);
 
         final var bytes = bigInt.toByteArray();
 
@@ -117,32 +143,6 @@ public final class CallParams<Kind> {
         args.add(new Argument(leftPad32(bytes, bigInt.signum() < 0)));
 
         return this;
-    }
-
-    private static void checkIntWidth(int width) {
-        if (width % 8 != 0 || width < 8 || width > 256) {
-            throw new IllegalArgumentException(
-                "Solidity integer width must be a multiple of 8, in the closed range [8, 256]");
-        }
-    }
-
-    private static void checkUnsignedVal(long unsignedVal) {
-        if (unsignedVal < 0) {
-            throw new IllegalArgumentException("addUnsigned() does not accept negative values");
-        }
-    }
-
-    private static void checkBigInt(BigInteger val, int width) {
-        checkIntWidth(width);
-
-        if (val.bitLength() > 256) {
-            throw new IllegalArgumentException("BigInteger out of range for Solidity uint256");
-        }
-
-        if (width < val.bitLength()) {
-            throw new IllegalArgumentException(
-                "BigInteger.bitLength() is greater than the nominal parameter width");
-        }
     }
 
     /**
@@ -172,6 +172,9 @@ public final class CallParams<Kind> {
     /**
      * Add an arbitrary precision non-negative integer as an unsigned {@code uintN} param,
      * explicitly setting the parameter width.
+     * <p>
+     * As this uses the unsigned type, it gets an extra bit of range over
+     * {@link #addInt(BigInteger, int)} which has to count the sign bit.
      *
      * @param width the nominal bit width for encoding the integer type in the function selector,
      *              e.g. {@code width = 128} produces a param type of {@code uint128};
@@ -183,13 +186,22 @@ public final class CallParams<Kind> {
      *                                  {@code width} is not in a valid range (see above).
      */
     public CallParams<Kind> addUint(@Nonnegative BigInteger uint, int width) {
-        checkBigInt(uint, width);
+        checkBigInt(uint, width, false);
         checkUnsignedVal(uint.signum());
 
         final var bytes = uint.toByteArray();
 
+        final ByteString byteStr;
+
+        if (uint.bitLength() == 256) {
+            // cut out the extra byte added by the sign bit so we get full range
+            byteStr = ByteString.copyFrom(bytes, 1, bytes.length - 1);
+        } else {
+            byteStr = ByteString.copyFrom(bytes);
+        }
+
         funcSelector.addParamType("uint" + (bytes.length * 8));
-        args.add(new Argument(leftPad32(bytes, false)));
+        args.add(new Argument(leftPad32(byteStr, false)));
 
         return this;
     }
@@ -206,14 +218,14 @@ public final class CallParams<Kind> {
     private static void checkAddressLen(byte[] address) {
         if (address.length != ADDRESS_LEN) {
             throw new IllegalArgumentException(
-                "solidity addresses must be 20 bytes or 40 hex chars");
+                "Solidity addresses must be 20 bytes or 40 hex chars");
         }
     }
 
     private static byte[] decodeAddress(String address) {
         if (address.length() != ADDRESS_LEN_HEX) {
             throw new IllegalArgumentException(
-                "solidity addresses must be 20 bytes or 40 hex chars");
+                "Solidity addresses must be 20 bytes or 40 hex chars");
         }
 
         try {
@@ -256,7 +268,15 @@ public final class CallParams<Kind> {
         return addAddress(decodeAddress(address));
     }
 
-    private static final int SELECTOR_LEN = 4;
+    /**
+     * Function selector length in bytes
+     */
+    public static final int SELECTOR_LEN = 4;
+
+    /**
+     * Function selector length in hex characters
+     */
+    public static final int SELECTOR_LEN_HEX = 8;
 
     /**
      * Add a Solidity function reference as a {@value ADDRESS_LEN}-byte contract address and a
@@ -269,7 +289,7 @@ public final class CallParams<Kind> {
         checkAddressLen(address);
 
         if (selector.length != SELECTOR_LEN) {
-            throw new IllegalArgumentException("function selectors must be 4 bytes");
+            throw new IllegalArgumentException("function selectors must be 4 bytes or 8 hex chars");
         }
 
         final var output = ByteString.newOutput(ADDRESS_LEN + SELECTOR_LEN);
@@ -295,6 +315,24 @@ public final class CallParams<Kind> {
      */
     public CallParams<Kind> addFunction(String address, byte[] selector) {
         return addFunction(decodeAddress(address), selector);
+    }
+
+    /**
+     * Add a Solidity function reference as a {@value ADDRESS_LEN}-byte contract address and a
+     * {@value SELECTOR_LEN}-byte function selector.
+     *
+     * @param address  a hex-encoded {@value ADDRESS_LEN_HEX}-character Solidity address.
+     * @param selector a
+     * @throws IllegalArgumentException if {@code address} is not {@value ADDRESS_LEN_HEX}
+     *                                  characters or {@code selector} is not
+     *                                  {@value SELECTOR_LEN_HEX} characters.
+     */
+    public CallParams<Kind> addFunction(String address, String selector) {
+        if (selector.length() != SELECTOR_LEN_HEX) {
+            throw new IllegalArgumentException("function selectors must be 4 bytes or 8 hex chars");
+        }
+
+        return addFunction(decodeAddress(address), Hex.decode(selector));
     }
 
     /**
