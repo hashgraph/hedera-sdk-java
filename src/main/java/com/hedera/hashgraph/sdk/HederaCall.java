@@ -52,7 +52,7 @@ public abstract class HederaCall<Req, RawResp, Resp> {
             new CallStreamObserver(onSuccess, onError));
     }
 
-    protected abstract void validate();
+    public abstract void validate();
 
     protected void addValidationError(String errMsg) {
         if (validationErrors == null) validationErrors = new ArrayList<>();

@@ -100,7 +100,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     }
 
     @Override
-    protected void validate() {
+    public final void validate() {
         var bodyBuilder = this.bodyBuilder;
 
         if (client == null) {

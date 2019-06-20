@@ -42,8 +42,10 @@
 
         <errorprone.version>2.3.3</errorprone.version>
         <grpc.version>1.20.0</grpc.version>
+        <junit.version>5.3.1</junit.version>
         <nullaway.version>0.7.2</nullaway.version>
         <protoc.version>3.7.1</protoc.version>
+        <spotbugs.version>3.1.12</spotbugs.version>
     </properties>
 
     <dependencies>
@@ -77,6 +79,24 @@
             <groupId>io.grpc</groupId>
             <artifactId>grpc-stub</artifactId>
             <version>${grpc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <scope>provided</scope>
+            <version>${spotbugs.version}</version>
         </dependency>
     </dependencies>
 
@@ -123,6 +143,9 @@
                             -XepDisableWarningsInGeneratedCode
                             -XepExcludedPaths:.*/target/generated-sources/.*
                             -Xep:NullAway:ERROR
+                            <!-- FIXME: this check is broken on OpenJDK 12
+                                https://github.com/google/error-prone/issues/1106 -->
+                            -Xep:Finally:OFF
                             -XepOpt:NullAway:AnnotatedPackages=com.hedera
                             <!-- protobuf generator does not use @Generated -->
                             -XepOpt:NullAway:UnannotatedSubPackages=com.hedera.hashgraph.sdk.proto
@@ -152,6 +175,12 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- JUnit 5 requires Surefire version 2.22.1 or higher -->
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.1</version>
             </plugin>
 
             <plugin>
@@ -225,7 +254,7 @@
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>3.1.11</version>
+                <version>${spotbugs.version}</version>
                 <configuration>
                     <effort>most</effort>
                     <excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
