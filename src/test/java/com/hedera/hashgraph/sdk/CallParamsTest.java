@@ -231,6 +231,58 @@ class CallParamsTest {
                 .getMessage());
     }
 
+    @Test
+    @DisplayName("address param checks")
+    void addressParamChecks() {
+        final var params = CallParams.constructor();
+
+        final var lenErr = "Solidity addresses must be 20 bytes or 40 hex chars";
+
+        assertEquals(
+            lenErr,
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> params.addAddress(new byte[0])).getMessage());
+
+        assertEquals(
+            lenErr,
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> params.addAddress(new byte[17])).getMessage());
+
+        assertEquals(
+            lenErr,
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> params.addAddress(new byte[21])).getMessage());
+
+        assertEquals(
+            lenErr,
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> params.addAddress("")).getMessage());
+
+        assertEquals(
+            lenErr,
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> params.addAddress("aabbccdd")).getMessage());
+
+        assertEquals(
+            lenErr,
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> params.addAddress("00112233445566778899aabbccddeeff0011223344"))
+                .getMessage());
+
+        assertEquals(
+            "failed to decode Solidity address as hex",
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> params.addAddress("gghhii--__zz66778899aabbccddeeff00112233"))
+                .getMessage());
+    }
+
     private static Stream<Arguments> int256Arguments() {
         return Stream.of(
             of(0, "0000000000000000000000000000000000000000000000000000000000000000"),

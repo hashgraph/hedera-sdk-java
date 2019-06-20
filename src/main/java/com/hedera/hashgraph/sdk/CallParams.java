@@ -25,16 +25,16 @@ public final class CallParams<Kind> {
     private final FunctionSelector funcSelector;
     private final ArrayList<Argument> args = new ArrayList<>();
 
-    private CallParams(@Nullable String funcName) {
-        funcSelector = new FunctionSelector(funcName);
+    private CallParams(FunctionSelector funcSelector) {
+        this.funcSelector = funcSelector;
     }
 
     public static CallParams<Constructor> constructor() {
-        return new CallParams<>(null);
+        return new CallParams<>(FunctionSelector.constructor());
     }
 
     public static CallParams<Function> function(String funcName) {
-        return new CallParams<>(funcName);
+        return new CallParams<>(FunctionSelector.function(funcName));
     }
 
     /**
@@ -319,20 +319,30 @@ public final class CallParams<Kind> {
 
     /**
      * Add a Solidity function reference as a {@value ADDRESS_LEN}-byte contract address and a
-     * {@value SELECTOR_LEN}-byte function selector.
+     * {@value SELECTOR_LEN_HEX}-character hexadecimal function selector.
      *
      * @param address  a hex-encoded {@value ADDRESS_LEN_HEX}-character Solidity address.
      * @param selector a
      * @throws IllegalArgumentException if {@code address} is not {@value ADDRESS_LEN_HEX}
      *                                  characters or {@code selector} is not
-     *                                  {@value SELECTOR_LEN_HEX} characters.
+     *                                  {@value SELECTOR_LEN_HEX} characters or fails to decode
+     *                                  as hex.
      */
     public CallParams<Kind> addFunction(String address, String selector) {
         if (selector.length() != SELECTOR_LEN_HEX) {
             throw new IllegalArgumentException("function selectors must be 4 bytes or 8 hex chars");
         }
 
-        return addFunction(decodeAddress(address), Hex.decode(selector));
+        final byte[] selectorBytes;
+
+        try {
+            selectorBytes = Hex.decode(selector);
+        } catch (DecoderException e) {
+            throw new IllegalArgumentException(
+                "failed to decode Solidity function selector as hex", e);
+        }
+
+        return addFunction(decodeAddress(address), selectorBytes);
     }
 
     /**
