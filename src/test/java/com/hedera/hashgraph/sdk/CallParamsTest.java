@@ -84,9 +84,9 @@ class CallParamsTest {
     @DisplayName("encodes static params correctly")
     void staticParamsEncoding() {
         final var params = CallParams.constructor()
-            .addInt(0x11223344, 32)
+            .addInt(32, 0x11223344)
             // tests implicit widening
-            .addUint(0x44556677, 128)
+            .addUint(128, 0x44556677)
             .addAddress("00112233445566778899aabbccddeeff00112233")
             .addFunction("44556677889900aabbccddeeff00112233445566", "aabbccdd");
 
@@ -105,20 +105,20 @@ class CallParamsTest {
     @DisplayName("encodes mixed static and dynamic params correctly")
     void mixedParamsEncoding() {
         final var params = CallParams.function("foo")
-            .addInt(BigInteger.valueOf(0xdeadbeef).shiftLeft(8), 72)
+            .addInt(72, BigInteger.valueOf(0xdeadbeef).shiftLeft(8))
             .addString("Hello, world!")
-            .addUint(BigInteger.valueOf(0x77889900).shiftLeft(8), 72)
+            .addUint(72, BigInteger.valueOf(0x77889900).shiftLeft(8))
             .addBytes(new byte[]{-1, -18, 63, 127})
             .addBool(true);
 
         final var paramsHex = Hex.toHexString(params.toProto().toByteArray());
 
         assertEquals(
-            "1f0001c0"
+            "cd3bd246"
                 + "ffffffffffffffffffffffffffffffffffffffffffffffffffffffdeadbeef00"
                 + "00000000000000000000000000000000000000000000000000000000000000a0"
                 + "0000000000000000000000000000000000000000000000000000007788990000"
-                + "00000000000000000000000000000000000000000000000000000000000000ad"
+                + "00000000000000000000000000000000000000000000000000000000000000e0"
                 + "0000000000000000000000000000000000000000000000000000000000000001"
                 + "000000000000000000000000000000000000000000000000000000000000000d"
                 + "48656c6c6f2c20776f726c642100000000000000000000000000000000000000"
@@ -140,25 +140,25 @@ class CallParamsTest {
             message,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addInt(0, width)).getMessage());
+                () -> params.addInt(width, 0)).getMessage());
 
         assertEquals(
             message,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addInt(BigInteger.ZERO, width)).getMessage());
+                () -> params.addInt(width, BigInteger.ZERO)).getMessage());
 
         assertEquals(
             message,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addUint(0, width)).getMessage());
+                () -> params.addUint(width, 0)).getMessage());
 
         assertEquals(
             message,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addUint(BigInteger.ZERO, width)).getMessage());
+                () -> params.addUint(width, BigInteger.ZERO)).getMessage());
     }
 
     @Test
@@ -167,9 +167,9 @@ class CallParamsTest {
         final var params = CallParams.constructor();
 
         // allowed values for BigInteger
-        params.addInt(BigInteger.ONE.shiftLeft(254), 256);
-        params.addInt(BigInteger.ONE.negate().shiftLeft(255), 256);
-        params.addUint(BigInteger.ONE.shiftLeft(255), 256);
+        params.addInt(256, BigInteger.ONE.shiftLeft(254));
+        params.addInt(256, BigInteger.ONE.negate().shiftLeft(255));
+        params.addUint(256, BigInteger.ONE.shiftLeft(255));
 
         final var negativeErr = "addUint() does not accept negative values";
 
@@ -177,13 +177,13 @@ class CallParamsTest {
             negativeErr,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addUint(-1, 64)).getMessage());
+                () -> params.addUint(64, -1)).getMessage());
 
         assertEquals(
             negativeErr,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addUint(BigInteger.ONE.negate(), 64)).getMessage());
+                () -> params.addUint(64, BigInteger.ONE.negate())).getMessage());
 
         final var rangeErr = "BigInteger out of range for Solidity integers";
 
@@ -191,20 +191,20 @@ class CallParamsTest {
             rangeErr,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addInt(BigInteger.ONE.shiftLeft(255), 256)).getMessage());
+                () -> params.addInt(256, BigInteger.ONE.shiftLeft(255))).getMessage());
 
         assertEquals(
             rangeErr,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addInt(BigInteger.ONE.negate().shiftLeft(256), 256))
+                () -> params.addInt(256, BigInteger.ONE.negate().shiftLeft(256)))
                 .getMessage());
 
         assertEquals(
             rangeErr,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addUint(BigInteger.ONE.shiftLeft(256), 256))
+                () -> params.addUint(256, BigInteger.ONE.shiftLeft(256)))
                 .getMessage());
 
         final var widthErr = "BigInteger.bitLength() is greater than the nominal parameter width";
@@ -213,20 +213,20 @@ class CallParamsTest {
             widthErr,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addInt(BigInteger.ONE.shiftLeft(65), 64)).getMessage());
+                () -> params.addInt(64, BigInteger.ONE.shiftLeft(65))).getMessage());
 
         assertEquals(
             widthErr,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addInt(BigInteger.ONE.negate().shiftLeft(65), 64))
+                () -> params.addInt(64, BigInteger.ONE.negate().shiftLeft(65)))
                 .getMessage());
 
         assertEquals(
             widthErr,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addUint(BigInteger.ONE.shiftLeft(65), 64))
+                () -> params.addUint(64, BigInteger.ONE.shiftLeft(65)))
                 .getMessage());
     }
 
