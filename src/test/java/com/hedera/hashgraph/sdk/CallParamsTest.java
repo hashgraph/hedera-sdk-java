@@ -49,14 +49,14 @@ class CallParamsTest {
     }
 
     @Test
-    @DisplayName("encodes params correctly")
-    void encodesParamsCorrectly() {
+    @DisplayName("encodes dynamic params correctly")
+    void dynamicParamsEncoding() {
         final var paramsStringArg = CallParams.function("set_message")
-            .add("Hello, world!")
+            .addString("Hello, world!")
             .toProto();
 
         final var paramsBytesArg = CallParams.function("set_message")
-            .add("Hello, world!".getBytes(StandardCharsets.UTF_8))
+            .addBytes("Hello, world!".getBytes(StandardCharsets.UTF_8))
             .toProto();
 
         final var paramsStringArgHex = Hex.toHexString(paramsStringArg.toByteArray());

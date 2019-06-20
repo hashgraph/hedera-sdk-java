@@ -46,7 +46,7 @@ public final class CallParams<Kind> {
      * @return
      * @see #addAddress(byte[])
      */
-    public CallParams<Kind> add(String param) {
+    public CallParams<Kind> addString(String param) {
         var strBytes = ByteString.copyFromUtf8(param);
 
         funcSelector.addParamType("string");
@@ -55,7 +55,7 @@ public final class CallParams<Kind> {
         return this;
     }
 
-    public CallParams<Kind> add(byte[] param) {
+    public CallParams<Kind> addBytes(byte[] param) {
         var bytes = ByteString.copyFrom(param);
 
         funcSelector.addParamType("bytes");
@@ -64,7 +64,7 @@ public final class CallParams<Kind> {
         return this;
     }
 
-    public CallParams<Kind> add(boolean bool) {
+    public CallParams<Kind> addBool(boolean bool) {
         funcSelector.addParamType("bool");
         // boolean encodes to `uint8` of values [0, 1]
         args.add(new Argument(int256(bool ? 1 : 0, 8)));
@@ -103,7 +103,7 @@ public final class CallParams<Kind> {
      * @param width the nominal bit width for encoding the integer type in the function selector,
      *              e.g. {@code width = 128} produces a param type of {@code int128};
      *              must be a multiple of 8 and between 8 and 256.
-     * @throws IllegalArgumentException if {@code uint.bitLength() > 256}
+     * @throws IllegalArgumentException if {@code bigInt.bitLength() > 256}
      *                                  (cannot be represented as a Solidity integer type),
      *                                  {@code width < uint.bitLength()} or {@code width} is not in
      *                                  a valid range (see above).
@@ -287,9 +287,8 @@ public final class CallParams<Kind> {
      * Add a Solidity function reference as a {@value ADDRESS_LEN}-byte contract address and a
      * {@value SELECTOR_LEN}-byte function selector.
      *
-     * @param address a hex-encoded {@value ADDRESS_LEN_HEX}-character Solidity address.
+     * @param address  a hex-encoded {@value ADDRESS_LEN_HEX}-character Solidity address.
      * @param selector a
-     *
      * @throws IllegalArgumentException if {@code address} is not {@value ADDRESS_LEN_HEX}
      *                                  characters or {@code selector} is not
      *                                  {@value SELECTOR_LEN} bytes.
@@ -543,7 +542,7 @@ public final class CallParams<Kind> {
 
         // dynamic constructor
         private Argument(int len, ByteString dynamic) {
-            var lenBytes = int256(len, 256);
+            var lenBytes = int256(len, 32);
             this.len = len;
             this.value = lenBytes.concat(rightPad32(dynamic));
             isDynamic = true;
