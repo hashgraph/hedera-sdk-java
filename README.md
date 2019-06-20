@@ -1,20 +1,31 @@
 # Hedera Java SDK
 [![Build Status](https://travis-ci.org/hashgraph/hedera-sdk-java.svg?branch=master)](https://travis-ci.org/hashgraph/hedera-sdk-java)
-[![Bintray](https://api.bintray.com/packages/hashgraph/maven/hedera-sdk/images/download.svg)](https://bintray.com/hashgraph/maven/hedera-sdk/_latestVersion)
+![Maven](https://img.shields.io/maven-metadata/v/http/central.maven.org/maven2/com/hedera/hashgraph/sdk/maven-metadata.xml.svg)
 
 > The Java SDK for interacting with [Hedera Hashgraph]: the official distributed consensus 
 > platform built using the hashgraph consensus algorithm for fast, fair and secure 
 > transactions. Hedera enables and empowers developers to build an entirely new 
 > class of decentralized applications.
 
-**WARNING:** This is a preview of the upcoming official Hedera Java SDK, optimized for 
-developer productivity. To view the current and stable Java SDK, [go here](https://github.com/hashgraph/hedera-sdk-java/tree/release/0.2.1).
-
 [Hedera Hashgraph]: https://hedera.com/
 
 ## Usage
 
-_to be written when JAR is published_
+#### Maven
+
+```xml
+<dependency>
+  <groupId>com.hedera.hashgraph</groupId>
+  <artifactId>sdk</artifactId>
+  <version>0.5.0</version>
+</dependency>
+```
+
+#### Gradle
+
+```groovy
+implementation 'com.hedera.hashgraph:sdk:0.5.0'
+```
 
 ## Contributing to this Project
 
