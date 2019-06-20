@@ -18,8 +18,7 @@ public class HederaException extends Exception implements HederaThrowable {
         case UNKNOWN:
         case RECEIPT_NOT_FOUND:
         case RECORD_NOT_FOUND:
-            if (unknownIsExceptional) break;
-            // fall through
+            return unknownIsExceptional;
         case SUCCESS:
         case OK:
             return false;
