@@ -47,8 +47,8 @@ class ContractCallQueryTest {
             .setGas(1541)
             .setFunctionParameters(
                 CallParams.function("foo")
-                    .add("Hello")
-                    .add("world!"))
+                    .addString("Hello")
+                    .addString("world!"))
             .setMaxResultSize(4444444);
 
         assertEquals(

@@ -58,7 +58,7 @@ public final class CreateStatefulContract {
             .setGas(100_000_000)
             .setConstructorParams(
                 CallParams.constructor()
-                    .add("hello from hedera!"));
+                    .addString("hello from hedera!"));
 
         var contractReceipt = contractTx.executeForReceipt();
         var newContractId = contractReceipt.getContractId();
@@ -81,7 +81,7 @@ public final class CreateStatefulContract {
         new ContractExecuteTransaction(client).setContractId(newContractId)
             .setGas(100_000_000)
             .setFunctionParameters(CallParams.function("set_message")
-                .add("hello from hedera again!"))
+                .addString("hello from hedera again!"))
             .execute();
 
         // sleep a few seconds to allow consensus + smart contract exec
