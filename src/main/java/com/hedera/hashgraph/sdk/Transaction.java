@@ -39,6 +39,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
 
     private static final int MAX_RETRY_ATTEMPTS = 100;
     private static final int RECEIPT_RETRY_DELAY = 100;
+    private static final int INITIAL_WAIT = 2000;
 
     private static final int PREFIX_LEN = 6;
 
@@ -181,15 +182,25 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
     {
         // kickoff the transaction
         execute();
-
+        
+        // wait for an initial delay before querying for the first receipt
+        try {
+            // INITIAL_WAIT=2s is a reasonable time to wait
+            Thread.sleep(INITIAL_WAIT);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        
         for (int attempt = 0; attempt < MAX_RETRY_ATTEMPTS; attempt++) {
             var receipt = queryReceipt();
             var receiptStatus = receipt.getStatus();
 
             // if we're fetching a record it returns `RECORD_NOT_FOUND` instead of `UNKNOWN`
-            if (receiptStatus == ResponseCodeEnum.UNKNOWN) {
+            if ((receiptStatus == ResponseCodeEnum.UNKNOWN) || (receiptStatus == ResponseCodeEnum.OK)) {
                 // If the receipt is UNKNOWN this means that the server has not finished
                 // processing the transaction
+                // If the receipt is OK this means that the transaction passed precheck
+                // but has not yet reached consensus
                 try {
                     Thread.sleep(RECEIPT_RETRY_DELAY * attempt);
                 } catch (InterruptedException e) {
@@ -197,11 +208,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
                 }
             } else {
                 HederaException.throwIfExceptional(receiptStatus);
-                if (receiptStatus != ResponseCodeEnum.OK) {
-                	// OK means receipt exists, but transaction may not yet be completed
-                	// we want SUCCESS for example, not just OK.
-                	return mapReceipt.apply(receipt);
-                }
+            	return mapReceipt.apply(receipt);
             }
         }
 
