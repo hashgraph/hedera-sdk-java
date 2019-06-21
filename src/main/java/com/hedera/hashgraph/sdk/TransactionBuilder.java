@@ -4,15 +4,18 @@ import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import io.grpc.Channel;
 
-import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import javax.annotation.Nullable;
+
+import io.grpc.Channel;
+
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
-        extends HederaCall<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse, TransactionId>
+    extends HederaCall<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse, TransactionId, T>
 {
     protected final com.hedera.hashgraph.sdk.proto.Transaction.Builder inner = com.hedera.hashgraph.sdk.proto.Transaction.newBuilder();
     protected final TransactionBody.Builder bodyBuilder = TransactionBody.newBuilder();
@@ -168,12 +171,30 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         build().executeForReceiptAsync(onSuccess, onError);
     }
 
+    /**
+     * Equivalent to {@link #executeForReceiptAsync(Consumer, Consumer)} but providing {@code this}
+     * to the callback for additional context.
+     */
+    public final void executeForReceiptAsync(BiConsumer<T, TransactionReceipt> onSuccess, BiConsumer<T, HederaThrowable> onError) {
+        //noinspection unchecked
+        build().executeForReceiptAsync(r -> onSuccess.accept((T) this, r), e -> onError.accept((T) this, e));
+    }
+
     public final TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
         return build().executeForRecord();
     }
 
     public final void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<HederaThrowable> onError) {
         build().executeForRecordAsync(onSuccess, onError);
+    }
+
+    /**
+     * Equivalent to {@link #executeForRecordAsync(Consumer, Consumer)} but providing {@code this}
+     * to the callback for additional context.
+     */
+    public final void executeForRecordAsync(BiConsumer<T, TransactionRecord> onSuccess, BiConsumer<T, HederaThrowable> onError) {
+        //noinspection unchecked
+        build().executeForRecordAsync(r -> onSuccess.accept((T) this, r), e -> onError.accept((T) this, e));
     }
 
     // FIXME: This is duplicated from Transaction

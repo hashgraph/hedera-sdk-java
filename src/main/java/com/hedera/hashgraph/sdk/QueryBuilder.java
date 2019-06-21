@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 
 import io.grpc.Channel;
 
-public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extends HederaCall<Query, Response, Resp> {
+public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extends HederaCall<Query, Response, Resp, T> {
     protected final Query.Builder inner = Query.newBuilder();
 
     @Nullable
