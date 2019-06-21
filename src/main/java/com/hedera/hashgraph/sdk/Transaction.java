@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.account.AccountId;
@@ -68,6 +69,14 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         var body = TransactionBody.parseFrom(inner.getBodyBytes());
 
         return new Transaction(client, inner.toBuilder(), body.getNodeAccountID(), body.getTransactionID(), methodForTxnBody(body));
+    }
+
+    @VisibleForTesting
+    public static Transaction fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        var inner = com.hedera.hashgraph.sdk.proto.Transaction.parseFrom(bytes);
+        var body = TransactionBody.parseFrom(inner.getBodyBytes());
+
+        return new Transaction(null, inner.toBuilder(), body.getNodeAccountID(), body.getTransactionID(), methodForTxnBody(body));
     }
 
     public Transaction sign(Ed25519PrivateKey privateKey) {
@@ -144,7 +153,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
     }
 
     @Override
-    protected void validate() {
+    public final void validate() {
         var sigMap = inner.getSigMapOrBuilder();
 
         if (sigMap.getSigPairCount() < 2) {

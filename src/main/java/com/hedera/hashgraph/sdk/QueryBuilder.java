@@ -98,7 +98,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     /** Check that the query was built properly, throwing an exception on any errors. */
     @Override
-    protected final void validate() {
+    public final void validate() {
         if (isPaymentRequired()) {
             require(getHeaderBuilder().hasPayment(), ".setPayment() required");
         }
