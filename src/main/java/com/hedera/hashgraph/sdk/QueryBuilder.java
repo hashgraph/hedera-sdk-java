@@ -87,6 +87,13 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         return (T) this;
     }
 
+    /**
+     * Ask the network how much this query will cost to execute as configured.
+     *
+     * @return the query cost, in tinybar.
+     * @throws HederaException
+     * @throws HederaNetworkException
+     */
     public long requestCost() throws HederaException, HederaNetworkException {
         return new QueryCostRequest().execute();
     }
@@ -170,7 +177,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     protected abstract Resp fromResponse(Response raw);
 
-    private class QueryCostRequest extends HederaCall<Query, Response, Long> {
+    private class QueryCostRequest extends HederaCall<Query, Response, Long, QueryCostRequest> {
 
         @Override
         protected MethodDescriptor<Query, Response> getMethod() {
@@ -179,6 +186,8 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
         @Override
         public Query toProto() {
+            validate();
+
             final var header = getHeaderBuilder();
             final var responseType = header.getResponseType();
 
@@ -204,8 +213,9 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         @Override
         public void validate() {
             // ignore payment since we're just now checking what it costs
-            doValidate();
-            checkValidationErrors("cannot get cost for incomplete query builder");
+            QueryBuilder.this.doValidate();
+            QueryBuilder.this.checkValidationErrors(
+                "cannot get cost for incomplete query builder");
         }
     }
 }
