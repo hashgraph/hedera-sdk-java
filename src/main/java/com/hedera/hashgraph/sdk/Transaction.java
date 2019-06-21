@@ -196,7 +196,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
             throw new RuntimeException(e);
         }
         
-        for (int attempt = 0; attempt < MAX_RETRY_ATTEMPTS; attempt++) {
+        for (int attempt = 1; attempt <= MAX_RETRY_ATTEMPTS; attempt++) {
             var receipt = queryReceipt();
             var receiptStatus = receipt.getStatus();
 
