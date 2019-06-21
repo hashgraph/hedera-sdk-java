@@ -9,6 +9,8 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.ResponseType;
 
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.LongConsumer;
 
 import javax.annotation.Nullable;
 
@@ -23,6 +25,8 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     @Nullable
     private Node pickedNode;
+
+    private boolean autoPay = false;
 
     protected QueryBuilder(@Nullable Client client) {
         this.client = client;
@@ -47,7 +51,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     @Override
     public final Query toProto() {
-        setPaymentDefault();
+        getHeaderBuilder().setResponseType(ResponseType.ANSWER_ONLY);
         validate();
         return inner.build();
     }
@@ -58,8 +62,51 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         return (T) this;
     }
 
+    @Override
+    protected void preExecute() throws HederaException, HederaNetworkException {
+        if (!autoPay || !isPaymentRequired()) return;
+
+        final var cost = requestCost();
+        // if cost is 0 we shouldn't have to set a payment but the network currently requires it
+        addAutoPayment(cost);
+    }
+
+    @Override
+    protected void preExecuteAsync(Runnable onSuccess, Consumer<HederaThrowable> onError) {
+        if (!autoPay || !isPaymentRequired()) {
+            onSuccess.run();
+            return;
+        }
+
+        requestCostAsync(cost -> {
+            addAutoPayment(cost);
+            onSuccess.run();
+        }, onError);
+    }
+
+    private void addAutoPayment(long cost) {
+        if (client != null && isPaymentRequired() && !getHeaderBuilder().hasPayment() && client.getOperatorId() != null) {
+            // FIXME: queries that say they have 0 cost are still requiring fee payments
+            final var minCost = Math.max(cost, 100_000);
+
+            var operatorId = client.getOperatorId();
+            var nodeId = getNode().accountId;
+            var txPayment = new CryptoTransferTransaction(client)
+                .setNodeAccountId(nodeId)
+                .setTransactionId(new TransactionId(operatorId))
+                .addSender(operatorId, minCost)
+                .addRecipient(nodeId, minCost)
+                .build();
+
+            setPayment(txPayment);
+        }
+    }
+
     /**
-     * Explicitly specify that the operator account is paying for the query and set payment.
+     * Explicitly specify that the operator account is paying for the query.
+     * <p>
+     * On execute, the query will first request its cost and then add a payment transaction
+     * from the operator account with that amount.
      * <p>
      * Only takes effect if payment is required, has not been set yet, and an operator ID
      * was provided to the {@link Client} used to construct this instance.
@@ -68,33 +115,26 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
      */
     @SuppressWarnings("unchecked")
     public T setPaymentDefault() {
-        if (client != null && isPaymentRequired() && !getHeaderBuilder().hasPayment() && client.getOperatorId() != null) {
-            // FIXME: Require setAutoPayment to be set ?
-
-            var cost = getCost();
-            var operatorId = client.getOperatorId();
-            var nodeId = getNode().accountId;
-            var txPayment = new CryptoTransferTransaction(client)
-                .setNodeAccountId(nodeId)
-                .setTransactionId(new TransactionId(operatorId))
-                .addSender(operatorId, cost)
-                .addRecipient(nodeId, cost)
-                .build();
-
-            setPayment(txPayment);
-        }
-
+        autoPay = true;
         return (T) this;
     }
 
+    /**
+     * Ask the network how much this query will cost to execute as configured.
+     *
+     * @return the query cost, in tinybar.
+     * @throws HederaException
+     * @throws HederaNetworkException
+     */
     public long requestCost() throws HederaException, HederaNetworkException {
         return new QueryCostRequest().execute();
     }
 
-    protected int getCost() {
-        // FIXME: Currently query costs are fixed at 100,000 tinybar; this should change to
-        //        an actual hedera request with the response type of COST (and cache this information on the client)
-        return 100_000;
+    /**
+     * Ask the network how much this query will cost to execute as configured.
+     */
+    public void requestCostAsync(LongConsumer withCost, Consumer<HederaThrowable> onError) {
+        new QueryCostRequest().executeAsync(withCost::accept, onError);
     }
 
     protected abstract void doValidate();
@@ -170,7 +210,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     protected abstract Resp fromResponse(Response raw);
 
-    private class QueryCostRequest extends HederaCall<Query, Response, Long> {
+    private class QueryCostRequest extends HederaCall<Query, Response, Long, QueryCostRequest> {
 
         @Override
         protected MethodDescriptor<Query, Response> getMethod() {
@@ -179,6 +219,8 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
         @Override
         public Query toProto() {
+            validate();
+
             final var header = getHeaderBuilder();
             final var responseType = header.getResponseType();
 
@@ -204,8 +246,9 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         @Override
         public void validate() {
             // ignore payment since we're just now checking what it costs
-            doValidate();
-            checkValidationErrors("cannot get cost for incomplete query builder");
+            QueryBuilder.this.doValidate();
+            QueryBuilder.this.checkValidationErrors(
+                "cannot get cost for incomplete query builder");
         }
     }
 }

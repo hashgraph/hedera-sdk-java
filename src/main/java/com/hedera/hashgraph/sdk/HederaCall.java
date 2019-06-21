@@ -34,12 +34,30 @@ public abstract class HederaCall<Req, RawResp, Resp, T> {
         return getChannel().newCall(getMethod(), CallOptions.DEFAULT);
     }
 
+    /**
+     * Callback issued before execute() or toProto() is called.
+     * <p>
+     * Queries may use this to pre-calculate their cost and add payment.
+     */
+    protected void preExecute() throws HederaException, HederaNetworkException {
+    }
+
+    /**
+     * Callback issued before executeAsync() or toProto() is called.
+     * <p>
+     * Queries may use this to pre-calculate their cost and add payment.
+     */
+    protected void preExecuteAsync(Runnable onSuccess, Consumer<HederaThrowable> onError) {
+        onSuccess.run();
+    }
+
     public final Resp execute() throws HederaException, HederaNetworkException {
         if (isExecuted) {
             throw new IllegalStateException("call already executed");
         }
         isExecuted = true;
 
+        preExecute();
         return mapResponse(ClientCalls.blockingUnaryCall(newClientCall(), toProto()));
     }
 
@@ -49,8 +67,8 @@ public abstract class HederaCall<Req, RawResp, Resp, T> {
         }
         isExecuted = true;
 
-        ClientCalls.asyncUnaryCall(newClientCall(), toProto(),
-            new CallStreamObserver(onSuccess, onError));
+        preExecuteAsync(() -> ClientCalls.asyncUnaryCall(newClientCall(), toProto(),
+            new CallStreamObserver(onSuccess, onError)), onError);
     }
 
     /**
