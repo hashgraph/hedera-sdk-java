@@ -180,3 +180,4 @@ examples/node.properties
 /target/
 sdk/target/
 examples/.env
+.env
