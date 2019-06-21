@@ -92,6 +92,17 @@ public final class CallParams<Kind> {
         }
     }
 
+    private static ByteString encodeArray(Stream<ByteString> elements, boolean prependLen) {
+        if (prependLen) {
+            final var list = elements.collect(Collectors.toList());
+
+            return int256(list.size(), 32)
+                .concat(ByteString.copyFrom(list));
+        } else {
+            return ByteString.copyFrom(elements::iterator);
+        }
+    }
+
     private static ByteString encodeDynArr(List<ByteString> elements, boolean prependLen) {
         final var offsetsLen = elements.size() + (prependLen ? 1 : 0);
 
@@ -642,7 +653,7 @@ public final class CallParams<Kind> {
     }
 
     /**
-     * Add a {@value ADDRESS_LEN * 2}-character hex-encoded Solidity address parameter with the type
+     * Add a {@value ADDRESS_LEN_HEX}-character hex-encoded Solidity address parameter with the type
      * {@code address}.
      * <p>
      * Note: adding a {@code address payable} or {@code contract} parameter must also use
@@ -653,6 +664,91 @@ public final class CallParams<Kind> {
      */
     public CallParams<Kind> addAddress(String address) {
         return addAddress(decodeAddress(address));
+    }
+
+    /**
+     * Add an array of {@value ADDRESS_LEN}-byte Solidity addresses as a {@code address[]} param.
+     *
+     * @throws IllegalArgumentException if any value is not exactly {@value ADDRESS_LEN} bytes long.
+     * @throws NullPointerException     if any value in the array is null.
+     */
+    public CallParams<Kind> addAddressArray(byte[][] addresses) {
+        final var addressArray = encodeArray(
+            Arrays.stream(addresses).map(a -> {
+                checkAddressLen(a);
+                return leftPad32(ByteString.copyFrom(a));
+            }), true);
+
+        addParamType("address[]");
+        args.add(new Argument(addressArray, true));
+
+        return this;
+    }
+
+    /**
+     * Add a fixed-length array of {@value ADDRESS_LEN}-byte Solidity addresses as a
+     * {@code address[N]} param, explicitly setting the array length.
+     *
+     * @throws IllegalArgumentException if any value is not exactly {@value ADDRESS_LEN} bytes long
+     *                                  or if {@code fixedLen != addresses.length}.
+     * @throws NullPointerException     if any value in the array is null.
+     */
+    public CallParams<Kind> addAddressArray(byte[][] addresses, int fixedLen) {
+        final var addressArray = encodeArray(
+            Arrays.stream(addresses).map(a -> {
+                checkAddressLen(a);
+                return leftPad32(ByteString.copyFrom(a));
+            }), false);
+
+        addParamType("address[" + fixedLen + "]");
+        args.add(new Argument(addressArray, false));
+
+        return this;
+    }
+
+    /**
+     * Add an array of {@value ADDRESS_LEN_HEX}-character hex-encoded Solidity addresses as a
+     * {@code address[]} param.
+     *
+     * @throws IllegalArgumentException if any value is not exactly {@value ADDRESS_LEN_HEX}
+     *                                  characters long or fails to decode as hexadecimal.
+     * @throws NullPointerException     if any value in the array is null.
+     */
+    public CallParams<Kind> addAddressArray(String[] addresses) {
+        final var addressArray = encodeArray(
+            Arrays.stream(addresses).map(a -> {
+                final var address = decodeAddress(a);
+                checkAddressLen(address);
+                return leftPad32(ByteString.copyFrom(address));
+            }), true);
+
+        addParamType("address[]");
+        args.add(new Argument(addressArray, true));
+
+        return this;
+    }
+
+    /**
+     * Add a fixed-length array of {@value ADDRESS_LEN_HEX}-character hex-encoded Solidity addresses
+     * as a {@code address[N]} param, explicitly setting the array length.
+     *
+     * @throws IllegalArgumentException if any value is not exactly {@value ADDRESS_LEN_HEX}
+     *                                  characters long, fails to decode as hexadecimal,
+     *                                  or if {@code fixedLen != addresses.length}.
+     * @throws NullPointerException     if any value in the array is null.
+     */
+    public CallParams<Kind> addAddressArray(String[] addresses, int fixedLen) {
+        final var addressArray = encodeArray(
+            Arrays.stream(addresses).map(a -> {
+                final var address = decodeAddress(a);
+                checkAddressLen(address);
+                return leftPad32(ByteString.copyFrom(address));
+            }), false);
+
+        addParamType("address[" + fixedLen + "]");
+        args.add(new Argument(addressArray, false));
+
+        return this;
     }
 
     /**
