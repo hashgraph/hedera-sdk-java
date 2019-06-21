@@ -37,6 +37,11 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
     @Nullable
     private final Client client;
 
+    // longest wait time should be 120s (maximum valid transaction duration)
+    // any time beyond that will result in an UNKOWN response for receipt
+    // total time = xn(n+1)/2, where x is the wait time, and n the number of retries
+    // if x is 100 (RECEIPT_RETRY_DELAY), MAX_RETRY_ATTEMPTS can be as low as 49
+    // which gives us a total wait time of 122.5s + the INITIAL_WAIT
     private static final int MAX_RETRY_ATTEMPTS = 100;
     private static final int RECEIPT_RETRY_DELAY = 100;
     private static final int INITIAL_WAIT = 2000;
