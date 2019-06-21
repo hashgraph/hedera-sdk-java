@@ -84,9 +84,10 @@ class CallParamsTest {
     @DisplayName("encodes static params correctly")
     void staticParamsEncoding() {
         final var params = CallParams.constructor()
-            .addInt(32, 0x11223344)
+            .addInt(0x11223344, 32)
             // tests implicit widening
-            .addUint(128, 0x44556677)
+            .addUint(0x44556677, 128)
+            .addBytes(new byte[]{0x11, 0x22, 0x33, 0x44}, 4)
             .addAddress("00112233445566778899aabbccddeeff00112233")
             .addFunction("44556677889900aabbccddeeff00112233445566", "aabbccdd");
 
@@ -95,6 +96,7 @@ class CallParamsTest {
         assertEquals(
             "0000000000000000000000000000000000000000000000000000000011223344"
                 + "0000000000000000000000000000000000000000000000000000000044556677"
+                + "1122334400000000000000000000000000000000000000000000000000000000"
                 + "00000000000000000000000000112233445566778899aabbccddeeff00112233"
                 + "44556677889900aabbccddeeff00112233445566aabbccdd0000000000000000",
             paramsHex
@@ -105,9 +107,9 @@ class CallParamsTest {
     @DisplayName("encodes mixed static and dynamic params correctly")
     void mixedParamsEncoding() {
         final var params = CallParams.function("foo")
-            .addInt(72, BigInteger.valueOf(0xdeadbeef).shiftLeft(8))
+            .addInt(BigInteger.valueOf(0xdeadbeef).shiftLeft(8), 72)
             .addString("Hello, world!")
-            .addUint(72, BigInteger.valueOf(0x77889900).shiftLeft(8))
+            .addUint(BigInteger.valueOf(0x77889900).shiftLeft(8), 72)
             .addBytes(new byte[]{-1, -18, 63, 127})
             .addBool(true);
 
@@ -128,6 +130,28 @@ class CallParamsTest {
         );
     }
 
+    @Test
+    @DisplayName("encodes array types correctly")
+    void arrayTypesEncoding() {
+        final var params = CallParams.function("foo")
+            .addStringArray(new String[]{"hello", ",", "world!"})
+            .addStringArray(new String[]{"lorem", "ipsum", "dolor", "sit", "amet"}, 5)
+            .addIntArray(new long[]{0x88, 0x99, 0xAA, 0xBB}, 32)
+            .addIntArray(new long[]{0xCC, 0xDD, 0xEE, 0xFF}, 32, 4)
+            .addIntArray(new BigInteger[]{BigInteger.valueOf(0x1111)}, 128)
+            .addIntArray(new BigInteger[]{BigInteger.valueOf(2222)}, 128, 1)
+            .addUintArray(new long[]{0x111, 0x222, 0x333, 0x444}, 256)
+            .addUintArray(new long[]{0x555, 0x666}, 64, 2)
+            .addUintArray(new BigInteger[]{BigInteger.valueOf(0x777)}, 168)
+            .addUintArray(new BigInteger[]{BigInteger.valueOf(0x888)}, 144, 1);
+
+        assertEquals(
+            "08712407",
+            // just test the function selector because the encoded repr of the above is 6.4kib
+            Hex.toHexString(params.toProto().toByteArray()).substring(0, 8)
+        );
+    }
+
     @ParameterizedTest
     @DisplayName("integer parameter methods check widths")
     @ValueSource(ints = {-128, -8, 0, 3, 9, 384})
@@ -140,13 +164,13 @@ class CallParamsTest {
             message,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addInt(width, 0)).getMessage());
+                () -> params.addInt(0, width)).getMessage());
 
         assertEquals(
             message,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addInt(width, BigInteger.ZERO)).getMessage());
+                () -> params.addInt(BigInteger.ZERO, width)).getMessage());
 
         assertEquals(
             message,
@@ -158,7 +182,7 @@ class CallParamsTest {
             message,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addUint(width, BigInteger.ZERO)).getMessage());
+                () -> params.addUint(BigInteger.ZERO, width)).getMessage());
     }
 
     @Test
@@ -167,9 +191,9 @@ class CallParamsTest {
         final var params = CallParams.constructor();
 
         // allowed values for BigInteger
-        params.addInt(256, BigInteger.ONE.shiftLeft(254));
-        params.addInt(256, BigInteger.ONE.negate().shiftLeft(255));
-        params.addUint(256, BigInteger.ONE.shiftLeft(255));
+        params.addInt(BigInteger.ONE.shiftLeft(254), 256);
+        params.addInt(BigInteger.ONE.negate().shiftLeft(255), 256);
+        params.addUint(BigInteger.ONE.shiftLeft(255), 256);
 
         final var negativeErr = "addUint() does not accept negative values";
 
@@ -177,13 +201,13 @@ class CallParamsTest {
             negativeErr,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addUint(64, -1)).getMessage());
+                () -> params.addUint(-1, 64)).getMessage());
 
         assertEquals(
             negativeErr,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addUint(64, BigInteger.ONE.negate())).getMessage());
+                () -> params.addUint(BigInteger.ONE.negate(), 64)).getMessage());
 
         final var rangeErr = "BigInteger out of range for Solidity integers";
 
@@ -191,20 +215,20 @@ class CallParamsTest {
             rangeErr,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addInt(256, BigInteger.ONE.shiftLeft(255))).getMessage());
+                () -> params.addInt(BigInteger.ONE.shiftLeft(255), 256)).getMessage());
 
         assertEquals(
             rangeErr,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addInt(256, BigInteger.ONE.negate().shiftLeft(256)))
+                () -> params.addInt(BigInteger.ONE.negate().shiftLeft(256), 256))
                 .getMessage());
 
         assertEquals(
             rangeErr,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addUint(256, BigInteger.ONE.shiftLeft(256)))
+                () -> params.addUint(BigInteger.ONE.shiftLeft(256), 256))
                 .getMessage());
 
         final var widthErr = "BigInteger.bitLength() is greater than the nominal parameter width";
@@ -213,20 +237,20 @@ class CallParamsTest {
             widthErr,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addInt(64, BigInteger.ONE.shiftLeft(65))).getMessage());
+                () -> params.addInt(BigInteger.ONE.shiftLeft(65), 64)).getMessage());
 
         assertEquals(
             widthErr,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addInt(64, BigInteger.ONE.negate().shiftLeft(65)))
+                () -> params.addInt(BigInteger.ONE.negate().shiftLeft(65), 64))
                 .getMessage());
 
         assertEquals(
             widthErr,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addUint(64, BigInteger.ONE.shiftLeft(65)))
+                () -> params.addUint(BigInteger.ONE.shiftLeft(65), 64))
                 .getMessage());
     }
 

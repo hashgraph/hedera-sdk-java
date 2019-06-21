@@ -120,8 +120,7 @@ public final class CallParams<Kind> {
             currOffset += elem.size();
         }
 
-        return ByteString.copyFrom(
-            Stream.concat(offsets.stream(), elements.stream())::iterator);
+        return ByteString.copyFrom(offsets).concat(ByteString.copyFrom(elements));
     }
 
     /**
@@ -149,7 +148,7 @@ public final class CallParams<Kind> {
      * @throws IllegalArgumentException if {@code fixedLen != strings.length}
      * @throws NullPointerException     if any value in `strings` is null
      */
-    public CallParams<Kind> addStringArray(int fixedLen, String[] strings) {
+    public CallParams<Kind> addStringArray(String[] strings, int fixedLen) {
         checkFixedArrayLen(fixedLen, strings);
 
         final var byteStrings = Arrays.stream(strings)
@@ -192,7 +191,7 @@ public final class CallParams<Kind> {
 
         addParamType("bytes[" + fixedLen + "]");
         // the bytesN type is fixed size
-        args.add(new Argument(ByteString.copyFrom(param), false));
+        args.add(new Argument(rightPad32(ByteString.copyFrom(param)), false));
 
         return this;
     }
@@ -207,6 +206,24 @@ public final class CallParams<Kind> {
 
         addParamType("bytes[]");
         args.add(new Argument(encodeDynArr(byteArrays, true), true));
+
+        return this;
+    }
+
+    /**
+     * Add a parameter of type {@code bytes[N]}, a fixed-length array of byte-strings.
+     */
+    public CallParams<Kind> addBytesArray(byte[][] param, int fixedLen) {
+        checkFixedArrayLen(fixedLen, param);
+
+        final var byteStrings = Arrays.stream(param)
+            .map(CallParams::encodeBytes)
+            .collect(Collectors.toList());
+
+        final var argBytes = encodeDynArr(byteStrings, false);
+
+        addParamType("bytes[" + fixedLen + "]");
+        args.add(new Argument(argBytes, true));
 
         return this;
     }
@@ -260,7 +277,7 @@ public final class CallParams<Kind> {
      *              must be a multiple of 8 and between 8 and 256.
      * @throws IllegalArgumentException if {@code width} is not in a valid range (see above).
      */
-    public CallParams<Kind> addInt(int width, long value) {
+    public CallParams<Kind> addInt(long value, int width) {
         checkIntWidth(width);
 
         addParamType("int" + width);
@@ -281,7 +298,7 @@ public final class CallParams<Kind> {
      *                                  {@code width < uint.bitLength()} or {@code width} is not in
      *                                  a valid range (see above).
      */
-    public CallParams<Kind> addInt(int width, BigInteger bigInt) {
+    public CallParams<Kind> addInt(BigInteger bigInt, int width) {
         checkBigInt(bigInt, width, true);
 
         addParamType("int" + width);
@@ -294,7 +311,8 @@ public final class CallParams<Kind> {
         checkIntWidth(intWidth);
 
         final var arrayBytes = ByteString.copyFrom(
-            Arrays.stream(intArray).mapToObj(i -> int256(i, intWidth))::iterator);
+            Arrays.stream(intArray).mapToObj(i -> int256(i, intWidth))
+                .collect(Collectors.toList()));
 
         if (prependLen) {
             return int256(intArray.length, 32).concat(arrayBytes);
@@ -307,7 +325,8 @@ public final class CallParams<Kind> {
         checkIntWidth(intWidth);
 
         final var arrayBytes = ByteString.copyFrom(
-            Arrays.stream(intArray).map(CallParams::int256)::iterator);
+            Arrays.stream(intArray).map(CallParams::int256)
+                .collect(Collectors.toList()));
 
         if (prependLen) {
             return int256(intArray.length, 32).concat(arrayBytes);
@@ -323,7 +342,7 @@ public final class CallParams<Kind> {
             Arrays.stream(intArray).mapToObj(i -> {
                 checkUnsignedVal(i);
                 return int256(i, intWidth);
-            })::iterator);
+            }).collect(Collectors.toList()));
 
         if (prependLen) {
             return int256(intArray.length, 32).concat(arrayBytes);
@@ -339,7 +358,7 @@ public final class CallParams<Kind> {
             Arrays.stream(intArray).map(i -> {
                 checkUnsignedVal(i.signum());
                 return uint256(i);
-            })::iterator);
+            }).collect(Collectors.toList()));
 
         if (prependLen) {
             return int256(intArray.length, 32).concat(arrayBytes);
@@ -392,7 +411,7 @@ public final class CallParams<Kind> {
         checkFixedArrayLen(fixedLen, intArray);
         final var arrayBytes = encodeIntArray(intWidth, intArray, false);
 
-        addParamType("int" + intWidth + "[]");
+        addParamType("int" + intWidth + "[" + fixedLen + "]");
         args.add(new Argument(arrayBytes, true));
 
         return this;
@@ -442,7 +461,7 @@ public final class CallParams<Kind> {
         checkFixedArrayLen(fixedLen, intArray);
         final var arrayBytes = encodeIntArray(intWidth, intArray, false);
 
-        addParamType("int" + intWidth + "[]");
+        addParamType("int" + intWidth + "[" + fixedLen + "]");
         args.add(new Argument(arrayBytes, true));
 
         return this;
@@ -545,7 +564,7 @@ public final class CallParams<Kind> {
         checkFixedArrayLen(fixedLen, intArray);
         final var arrayBytes = encodeUintArray(intWidth, intArray, false);
 
-        addParamType("int" + intWidth + "[]");
+        addParamType("uint" + intWidth + "[" + fixedLen + "]");
         args.add(new Argument(arrayBytes, true));
 
         return this;
@@ -598,7 +617,7 @@ public final class CallParams<Kind> {
         checkFixedArrayLen(fixedLen, intArray);
         final var arrayBytes = encodeUintArray(intWidth, intArray, false);
 
-        addParamType("uint" + intWidth + "[]");
+        addParamType("uint" + intWidth + "[" + fixedLen + "]");
         args.add(new Argument(arrayBytes, true));
 
         return this;
