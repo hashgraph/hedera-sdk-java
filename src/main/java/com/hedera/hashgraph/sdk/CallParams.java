@@ -473,7 +473,11 @@ public final class CallParams<Kind> {
         @Nullable
         private byte[] finished = null;
 
+        @Nullable
+        private String funcName;
+        
         private FunctionSelector(@Nullable String funcName) {
+            this.funcName = funcName;
             digest = new Keccak.Digest256();
 
             if (funcName != null) {
@@ -562,8 +566,12 @@ public final class CallParams<Kind> {
         public byte[] finish() {
             if (finished == null) {
                 Objects.requireNonNull(digest);
-                digest.update((byte) ')');
-                finished = Arrays.copyOf(digest.digest(), 4);
+                if (this.funcName != null) {
+                    digest.update((byte) ')');
+                    finished = Arrays.copyOf(digest.digest(), 4);
+                } else {
+                    finished = new byte[0];
+                }
                 // release digest state
                 digest = null;
             }
