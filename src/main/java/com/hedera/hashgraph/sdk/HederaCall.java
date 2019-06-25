@@ -4,6 +4,7 @@ import com.google.protobuf.ByteString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
@@ -15,7 +16,7 @@ import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
 
-public abstract class HederaCall<Req, RawResp, Resp> {
+public abstract class HederaCall<Req, RawResp, Resp, T> {
     private @Nullable
     List<String> validationErrors;
 
@@ -50,6 +51,15 @@ public abstract class HederaCall<Req, RawResp, Resp> {
 
         ClientCalls.asyncUnaryCall(newClientCall(), toProto(),
             new CallStreamObserver(onSuccess, onError));
+    }
+
+    /**
+     * Equivalent to {@link #executeAsync(Consumer, Consumer)} but providing {@code this}
+     * to the callback for additional context.
+     */
+    public final void executeAsync(BiConsumer<T, Resp> onSuccess, BiConsumer<T, HederaThrowable> onError) {
+        //noinspection unchecked
+        executeAsync(resp -> onSuccess.accept((T) this, resp), err -> onError.accept((T) this, err));
     }
 
     public abstract void validate();

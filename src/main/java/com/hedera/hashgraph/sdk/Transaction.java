@@ -20,6 +20,7 @@ import org.bouncycastle.util.encoders.Hex;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
@@ -28,7 +29,7 @@ import io.grpc.Channel;
 import io.grpc.MethodDescriptor;
 import io.grpc.netty.shaded.io.netty.util.concurrent.GlobalEventExecutor;
 
-public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse, TransactionId> {
+public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse, TransactionId, Transaction> {
 
     private final io.grpc.MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, com.hedera.hashgraph.sdk.proto.TransactionResponse> methodDescriptor;
     final com.hedera.hashgraph.sdk.proto.Transaction.Builder inner;
@@ -264,6 +265,14 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         executeAsync(id -> handler.tryGetReceipt(), onError);
     }
 
+    /**
+     * Equivalent to {@link #executeForReceiptAsync(Consumer, Consumer)} but providing {@code this}
+     * to the callback for additional context.
+     */
+    public final void executeForReceiptAsync(BiConsumer<Transaction, TransactionReceipt> onSuccess, BiConsumer<Transaction, HederaThrowable> onError) {
+        executeForReceiptAsync(r -> onSuccess.accept(this, r), e -> onError.accept(this, e));
+    }
+
     public void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<HederaThrowable> onError) {
         final var recordQuery = new TransactionRecordQuery(getClient())
             .setTransactionId(getId())
@@ -276,6 +285,14 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         executeAsync(id -> handler.tryGetReceipt(), onError);
     }
 
+    /**
+     * Equivalent to {@link #executeForRecordAsync(Consumer, Consumer)} but providing {@code this}
+     * to the callback for additional context.
+     */
+    public final void executeForRecordAsync(BiConsumer<Transaction, TransactionRecord> onSuccess, BiConsumer<Transaction, HederaThrowable> onError) {
+        executeForRecordAsync(r -> onSuccess.accept(this, r), e -> onError.accept(this, e));
+    }
+    
     public byte[] toBytes() {
         return toProto().toByteArray();
     }
