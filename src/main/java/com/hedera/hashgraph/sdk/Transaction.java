@@ -222,7 +222,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
                 }
             } else {
                 HederaException.throwIfExceptional(receiptStatus);
-            	return mapReceipt.apply(receipt);
+                return mapReceipt.apply(receipt);
             }
         }
 
