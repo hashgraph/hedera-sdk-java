@@ -22,19 +22,27 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
 // https://solidity.readthedocs.io/en/v0.5.7/abi-spec.html#
 public final class CallParams<Kind> {
 
+    @Nullable
     private final FunctionSelector funcSelector;
     private final ArrayList<Argument> args = new ArrayList<>();
 
-    private CallParams(FunctionSelector funcSelector) {
+    private CallParams(@Nullable FunctionSelector funcSelector) {
         this.funcSelector = funcSelector;
     }
 
     public static CallParams<Constructor> constructor() {
-        return new CallParams<>(FunctionSelector.constructor());
+        return new CallParams<>(null);
     }
 
     public static CallParams<Function> function(String funcName) {
-        return new CallParams<>(FunctionSelector.function(funcName));
+        return new CallParams<>(new FunctionSelector(funcName));
+    }
+
+    private void addParamType(String paramType) {
+        // we only calculate the selector for functions, not constructors
+        if (funcSelector != null) {
+            funcSelector.addParamType(paramType);
+        }
     }
 
     /**
@@ -49,7 +57,7 @@ public final class CallParams<Kind> {
     public CallParams<Kind> addString(String param) {
         var strBytes = ByteString.copyFromUtf8(param);
 
-        funcSelector.addParamType("string");
+        addParamType("string");
         args.add(new Argument(strBytes.size(), strBytes));
 
         return this;
@@ -58,14 +66,14 @@ public final class CallParams<Kind> {
     public CallParams<Kind> addBytes(byte[] param) {
         var bytes = ByteString.copyFrom(param);
 
-        funcSelector.addParamType("bytes");
+        addParamType("bytes");
         args.add(new Argument(param.length, bytes));
 
         return this;
     }
 
     public CallParams<Kind> addBool(boolean bool) {
-        funcSelector.addParamType("bool");
+        addParamType("bool");
         // boolean encodes to `uint8` of values [0, 1]
         args.add(new Argument(int256(bool ? 1 : 0, 8)));
         return this;
@@ -116,7 +124,7 @@ public final class CallParams<Kind> {
     public CallParams<Kind> addInt(long i64, int width) {
         checkIntWidth(width);
 
-        funcSelector.addParamType("int" + width);
+        addParamType("int" + width);
         args.add(new Argument(int256(i64, width)));
 
         return this;
@@ -139,7 +147,7 @@ public final class CallParams<Kind> {
 
         final var bytes = bigInt.toByteArray();
 
-        funcSelector.addParamType("int" + width);
+        addParamType("int" + width);
         args.add(new Argument(leftPad32(bytes, bigInt.signum() < 0)));
 
         return this;
@@ -163,7 +171,7 @@ public final class CallParams<Kind> {
         checkIntWidth(width);
         checkUnsignedVal(uint);
 
-        funcSelector.addParamType("uint" + width);
+        addParamType("uint" + width);
         args.add(new Argument(int256(uint, width)));
 
         return this;
@@ -200,7 +208,7 @@ public final class CallParams<Kind> {
             byteStr = ByteString.copyFrom(bytes);
         }
 
-        funcSelector.addParamType("uint" + (bytes.length * 8));
+        addParamType("uint" + (bytes.length * 8));
         args.add(new Argument(leftPad32(byteStr, false)));
 
         return this;
@@ -247,7 +255,7 @@ public final class CallParams<Kind> {
     public CallParams<Kind> addAddress(byte[] address) {
         checkAddressLen(address);
 
-        funcSelector.addParamType("address");
+        addParamType("address");
         // address encodes as `uint160`
         args.add(new Argument(leftPad32(ByteString.copyFrom(address))));
 
@@ -296,7 +304,7 @@ public final class CallParams<Kind> {
         output.write(address, 0, address.length);
         output.write(selector, 0, selector.length);
 
-        funcSelector.addParamType("function");
+        addParamType("function");
         // function reference encodes as `bytes24`
         args.add(new Argument(rightPad32(output.toByteString())));
 
@@ -373,8 +381,10 @@ public final class CallParams<Kind> {
 
         var paramsBytes = new ArrayList<ByteString>(args.size() + 1);
 
-        // use `finishIntermediate()` so this object can continue being used
-        paramsBytes.add(ByteString.copyFrom(funcSelector.finishIntermediate()));
+        if (funcSelector != null) {
+            // use `finishIntermediate()` so this object can continue being used
+            paramsBytes.add(ByteString.copyFrom(funcSelector.finishIntermediate()));
+        }
 
         var dynamicArgs = new ArrayList<ByteString>();
 
@@ -473,28 +483,13 @@ public final class CallParams<Kind> {
         @Nullable
         private byte[] finished = null;
 
-        private FunctionSelector(@Nullable String funcName) {
-            digest = new Keccak.Digest256();
-
-            if (funcName != null) {
-                digest.update(funcName.getBytes(US_ASCII));
-            }
-
-            digest.update((byte) '(');
-        }
-
         /**
          * Start building a selector for a function with a given name.
          */
-        public static FunctionSelector function(String funcName) {
-            return new FunctionSelector(funcName);
-        }
-
-        /**
-         * Start building a selector for an unnamed constructor.
-         */
-        public static FunctionSelector constructor() {
-            return new FunctionSelector(null);
+        public FunctionSelector(String funcName) {
+            digest = new Keccak.Digest256();
+            digest.update(funcName.getBytes(US_ASCII));
+            digest.update((byte) '(');
         }
 
         /**
