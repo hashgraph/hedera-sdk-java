@@ -38,7 +38,7 @@ class CallParamsTest {
     @MethodSource("funcSelectorArgs")
     @DisplayName("FunctionSelector produces correct hash")
     void funcSelectorTest(String hash, String funcName, String[] paramTypes) {
-        final var funcSelector = CallParams.FunctionSelector.function(funcName);
+        final var funcSelector = new CallParams.FunctionSelector(funcName);
 
         for (final var paramType : paramTypes) {
             funcSelector.addParamType(paramType);
@@ -93,8 +93,7 @@ class CallParamsTest {
         final var paramsHex = Hex.toHexString(params.toProto().toByteArray());
 
         assertEquals(
-            "5486e94a"
-                + "0000000000000000000000000000000000000000000000000000000011223344"
+            "0000000000000000000000000000000000000000000000000000000011223344"
                 + "0000000000000000000000000000000000000000000000000000000044556677"
                 + "00000000000000000000000000112233445566778899aabbccddeeff00112233"
                 + "44556677889900aabbccddeeff00112233445566aabbccdd0000000000000000",
