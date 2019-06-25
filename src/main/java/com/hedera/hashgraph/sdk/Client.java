@@ -1,17 +1,25 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.account.*;
+import com.hedera.hashgraph.sdk.account.AccountBalanceQuery;
+import com.hedera.hashgraph.sdk.account.AccountCreateTransaction;
+import com.hedera.hashgraph.sdk.account.AccountId;
+import com.hedera.hashgraph.sdk.account.AccountInfo;
+import com.hedera.hashgraph.sdk.account.AccountInfoQuery;
+import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hedera.hashgraph.sdk.crypto.Key;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
-import javax.annotation.Nonnegative;
-import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nullable;
+
 public final class Client {
-    private final Random random = new Random();
+    final Random random = new Random();
     private Map<AccountId, Node> channels;
 
     static final long DEFAULT_MAX_TXN_FEE = 100_000;
