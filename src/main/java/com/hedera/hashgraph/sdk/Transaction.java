@@ -17,8 +17,10 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 
 import org.bouncycastle.util.encoders.Hex;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -39,31 +41,34 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
     @Nullable
     private final Client client;
 
-    private static final int MAX_RETRY_ATTEMPTS = 100;
-    private static final int RECEIPT_RETRY_DELAY = 100;
+    // fully qualified to disambiguate
+    private final java.time.Duration validDuration;
+
+    private static final int RECEIPT_RETRY_DELAY = 500;
+    private static final int RECEIPT_INITIAL_DELAY = 1000;
 
     private static final int PREFIX_LEN = 6;
 
     Transaction(
         @Nullable Client client,
         com.hedera.hashgraph.sdk.proto.Transaction.Builder inner,
-        com.hedera.hashgraph.sdk.proto.AccountID nodeAccountId,
-        com.hedera.hashgraph.sdk.proto.TransactionID transactionId,
+        TransactionBodyOrBuilder body,
         MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> methodDescriptor)
     {
         super();
         this.client = client;
         this.inner = inner;
-        this.nodeAccountId = nodeAccountId;
-        this.transactionId = transactionId;
+        this.nodeAccountId = body.getNodeAccountID();
+        this.transactionId = body.getTransactionID();
         this.methodDescriptor = methodDescriptor;
+        validDuration = DurationHelper.durationTo(body.getTransactionValidDuration());
     }
 
     public static Transaction fromBytes(Client client, byte[] bytes) throws InvalidProtocolBufferException {
         var inner = com.hedera.hashgraph.sdk.proto.Transaction.parseFrom(bytes);
         var body = TransactionBody.parseFrom(inner.getBodyBytes());
 
-        return new Transaction(client, inner.toBuilder(), body.getNodeAccountID(), body.getTransactionID(), methodForTxnBody(body));
+        return new Transaction(client, inner.toBuilder(), body, methodForTxnBody(body));
     }
 
     @VisibleForTesting
@@ -71,7 +76,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         var inner = com.hedera.hashgraph.sdk.proto.Transaction.parseFrom(bytes);
         var body = TransactionBody.parseFrom(inner.getBodyBytes());
 
-        return new Transaction(null, inner.toBuilder(), body.getNodeAccountID(), body.getTransactionID(), methodForTxnBody(body));
+        return new Transaction(null, inner.toBuilder(), body, methodForTxnBody(body));
     }
 
     public Transaction sign(Ed25519PrivateKey privateKey) {
@@ -187,21 +192,37 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
     }
 
     private <T> T executeAndWaitFor(CheckedFunction<TransactionReceipt, T> mapReceipt)
-            throws HederaException, HederaNetworkException
+        throws HederaException, HederaNetworkException
     {
+        final var startTime = Instant.now();
+
         // kickoff the transaction
         execute();
 
-        for (int attempt = 0; attempt < MAX_RETRY_ATTEMPTS; attempt++) {
+        try {
+            Thread.sleep(RECEIPT_INITIAL_DELAY);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        var attempt = 0;
+
+        while (true) {
             var receipt = queryReceipt();
             var receiptStatus = receipt.getStatus();
 
-            // if we're fetching a record it returns `RECORD_NOT_FOUND` instead of `UNKNOWN`
-            if (receiptStatus == ResponseCodeEnum.UNKNOWN) {
-                // If the receipt is UNKNOWN this means that the server has not finished
-                // processing the transaction
+            if (receiptStatus == ResponseCodeEnum.UNKNOWN || receiptStatus == ResponseCodeEnum.OK) {
+                // If the receipt is UNKNOWN this means that the node has not finished
+                // processing the transaction; if it is OK it means the transaction has not yet
+                // reached consensus
+
+                final var delayMs =
+                    getReceiptDelayMs(startTime, attempt)
+                        // throw if the delay will put us over `validDuraiton`
+                        .orElseThrow(() -> new HederaException(ResponseCodeEnum.UNKNOWN));
+
                 try {
-                    Thread.sleep(RECEIPT_RETRY_DELAY * attempt);
+                    Thread.sleep(delayMs);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -210,8 +231,20 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
                 return mapReceipt.apply(receipt);
             }
         }
+    }
 
-        throw new HederaException(ResponseCodeEnum.UNKNOWN);
+    private Optional<Long> getReceiptDelayMs(Instant startTime, int attempt) {
+        // exponential backoff algorithm:
+        // next delay is some constant * rand(0, 2 ** attempt - 1)
+        final var delay = RECEIPT_RETRY_DELAY
+            * Objects.requireNonNull(client).random.nextInt(1 << attempt);
+
+        // if the next delay will put us past the valid duration throw an error
+        if (Instant.now().plusMillis(delay).compareTo(startTime.plus(validDuration)) > 0) {
+            return Optional.empty();
+        }
+
+        return Optional.of((long) delay);
     }
 
     /**
@@ -342,8 +375,11 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         private final Consumer<TransactionReceipt> onReceipt;
         private final Consumer<HederaThrowable> onError;
 
-        private int attemptsLeft = MAX_RETRY_ATTEMPTS;
+        // sentinel value signaling initial delay needs to be scheduled
+        private int attempts = -1;
         private volatile boolean receiptEmitted = false;
+
+        private final Instant startTime = Instant.now();
 
         private AsyncReceiptHandler(
             Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError)
@@ -353,24 +389,33 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         }
 
         private void tryGetReceipt() {
-            attemptsLeft -= 1;
-            queryReceiptAsync(this::handleReceipt, onError);
+            if (attempts == -1) {
+                scheduleReceiptAttempt(RECEIPT_INITIAL_DELAY);
+                attempts = 0;
+            } else {
+                queryReceiptAsync(this::handleReceipt, onError);
+            }
         }
 
         private void handleReceipt(TransactionReceipt receipt) {
-            if (receipt.getStatus() == ResponseCodeEnum.UNKNOWN) {
-                if (attemptsLeft == 0) {
-                    onError.accept(new HederaException(ResponseCodeEnum.UNKNOWN));
-                } else {
-                    GlobalEventExecutor.INSTANCE.schedule(this::tryGetReceipt, RECEIPT_RETRY_DELAY,
-                        TimeUnit.MILLISECONDS);
-                }
+            final var status = receipt.getStatus();
+
+            if (status == ResponseCodeEnum.UNKNOWN || status == ResponseCodeEnum.OK) {
+                getReceiptDelayMs(startTime, ++attempts) // increment and get
+                    .ifPresentOrElse(
+                        this::scheduleReceiptAttempt, () ->
+                            onError.accept(new HederaException(ResponseCodeEnum.UNKNOWN)));
             } else {
                 if (receiptEmitted) throw new IllegalStateException();
                 receiptEmitted = true;
 
                 onReceipt.accept(receipt);
             }
+        }
+
+        private void scheduleReceiptAttempt(long delayMs) {
+            GlobalEventExecutor.INSTANCE.schedule(this::tryGetReceipt, delayMs,
+                TimeUnit.MILLISECONDS);
         }
     }
 }

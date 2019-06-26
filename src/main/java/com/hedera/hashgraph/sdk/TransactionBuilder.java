@@ -22,6 +22,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
 
     private static final int MAX_MEMO_LENGTH = 100;
 
+    private static final Duration MAX_VALID_DURATION = Duration.ofMinutes(2);
+
     @Nullable
     protected final Client client;
 
@@ -60,11 +62,20 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     }
 
     /**
-     * Sets the the duration that this transaction is valid for. The transaction must consensus
-     * before this this elapses.
+     * Sets the the duration that this transaction is valid for. The transaction must reach
+     * consensus before this elapses.
+     *
+     * The duration will be capped at 2 minutes as that is the maximum {@code validDuration} for
+     * the network.
      */
     public final T setTransactionValidDuration(Duration validDuration) {
-        bodyBuilder.setTransactionValidDuration(DurationHelper.durationFrom(validDuration));
+        var actual = validDuration;
+
+        if (MAX_VALID_DURATION.compareTo(validDuration) < 0) {
+            actual = MAX_VALID_DURATION;
+        }
+
+        bodyBuilder.setTransactionValidDuration(DurationHelper.durationFrom(actual));
 
         return self();
     }
@@ -135,7 +146,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         inner.setBodyBytes(
             bodyBuilder.build()
                 .toByteString());
-        var tx = new Transaction(client, inner, bodyBuilder.getNodeAccountID(), bodyBuilder.getTransactionID(), getMethod());
+        var tx = new Transaction(client, inner, bodyBuilder, getMethod());
 
         if (client != null && client.getOperatorKey() != null) {
             tx.sign(client.getOperatorKey());
