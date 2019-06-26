@@ -5,9 +5,12 @@ import com.hedera.hashgraph.sdk.contract.ContractId;
 import com.hedera.hashgraph.sdk.proto.ContractFunctionResultOrBuilder;
 import com.hedera.hashgraph.sdk.proto.ContractLoginfoOrBuilder;
 
-import javax.annotation.Nullable;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
 
 public final class FunctionResult {
     private final ContractFunctionResultOrBuilder inner;
@@ -23,7 +26,7 @@ public final class FunctionResult {
     // The call result as the Solidity-encoded bytes, does NOT get the function result as bytes
     // RFC: do we want to remove this in favor of the strong getters below?
     public byte[] getCallResult() {
-        return getByteString().toByteArray();
+        return getRawResult().toByteArray();
     }
 
     @Nullable
@@ -48,42 +51,112 @@ public final class FunctionResult {
             .collect(Collectors.toList());
     }
 
-    // get the first (or only) returned value as a string
+    /**
+     * Get the first (or only) returned value as a string
+     */
+    @Deprecated(forRemoval = true)
     public String getString() {
         return getString(0);
     }
 
-    // get the nth returned value as a string
+    /** Get the nth returned value as a string */
     public String getString(int valIndex) {
         return getBytes(valIndex).toStringUtf8();
     }
 
-    // get the first (or only) returned value as an int
+    /**
+     * Get the nth value in the result as a dynamic byte array.
+     */
+    public ByteString getBytes(int valIndex) {
+        var offset = getInt(valIndex);
+        var len = getIntValueAt(offset);
+        return getByteString(offset + 32, offset + 32 + len);
+    }
+
+    /**
+     * Get the nth 32-byte value as an untyped byte string.
+     */
+    public ByteString getRawValue(int valIndex) {
+        return getByteString(valIndex * 32, valIndex * 32 + 32);
+    }
+
+    /**
+     * Get the nth value as a boolean.
+     */
+    public boolean getBool(int valIndex) {
+        return getByteBuffer(valIndex * 32 + 31).get() != 0;
+    }
+
+    /**
+     * Get the first (or only) returned value as an int.
+     *
+     * If the actual value is wider it will be truncated to the last 4 bytes (similar to Java's
+     * integer narrowing semantics).
+     */
+    @Deprecated(forRemoval = true)
     public int getInt() {
         return getInt(0);
     }
 
-    // get the nth returned value as an int
+    /**
+     * Get the nth returned value as an int.
+     *
+     * If the actual value is wider it will be truncated to the last 4 bytes (similar to Java's
+     * integer narrowing semantics).
+     */
     public int getInt(int valIndex) {
         // int will be the last 4 bytes in the "value"
         return getIntValueAt(valIndex * 32);
     }
 
+    /**
+     * Get the nth returned value as a long.
+     * <p>
+     * If the actual value is wider it will be truncated to the last 8 bytes (similar to Java's
+     * integer narrowing semantics).
+     */
+    public long getLong(int valIndex) {
+        return getByteBuffer(valIndex * 32 + 24).getLong();
+    }
+
+    /**
+     * Get the nth returned value as {@link BigInteger}.
+     * <p>
+     * This type can represent the full width of Solidity integers.
+     */
+    public BigInteger getBigInt(int valIndex) {
+        return new BigInteger(getInt256(valIndex).toByteArray());
+    }
+
+    /**
+     * Get the nth returned value as a Solidity address.
+     */
+    public ByteString getAddress(int valIndex) {
+        final var offset = valIndex * 32;
+        // address is a uint160
+        return getByteString(offset + 12, offset + 32);
+    }
+
     private int getIntValueAt(int valueOffset) {
-        // **NB** `.asReadOnlyByteBuffer()` on a substring reads from the start of the parent, not the substring (bug)
-        return getByteString().asReadOnlyByteBuffer()
-            .getInt(valueOffset + 28);
+        return getByteBuffer(valueOffset + 28).getInt();
     }
 
-    // get a dynamic byte array with the offset at the given valIndex
-    private ByteString getBytes(int valIndex) {
-        var offset = getInt(valIndex);
-        var len = getIntValueAt(offset);
-        return getByteString().substring(offset + 32, offset + 32 + len);
+    private ByteString getInt256(int valIndex) {
+        return getByteString(valIndex * 32, (valIndex + 1) * 32);
     }
 
-    private ByteString getByteString() {
+    private ByteBuffer getByteBuffer(int offset) {
+        // **NB** `.asReadOnlyByteBuffer()` on a substring reads from the start of the parent,
+        // not the substring (bug)
+        return getRawResult().asReadOnlyByteBuffer().position(offset);
+    }
+
+    private ByteString getRawResult() {
         return inner.getContractCallResult();
+    }
+
+    private ByteString getByteString(int startIndex, int endIndex) {
+        return getRawResult().substring(startIndex, endIndex);
     }
 
     // this only appears in this API so
