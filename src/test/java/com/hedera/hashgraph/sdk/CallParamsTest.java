@@ -87,6 +87,7 @@ class CallParamsTest {
             .addInt(0x11223344, 32)
             // tests implicit widening
             .addUint(0x44556677, 128)
+            .addBytes(new byte[]{0x11, 0x22, 0x33, 0x44}, 4)
             .addAddress("00112233445566778899aabbccddeeff00112233")
             .addFunction("44556677889900aabbccddeeff00112233445566", "aabbccdd");
 
@@ -95,6 +96,7 @@ class CallParamsTest {
         assertEquals(
             "0000000000000000000000000000000000000000000000000000000011223344"
                 + "0000000000000000000000000000000000000000000000000000000044556677"
+                + "1122334400000000000000000000000000000000000000000000000000000000"
                 + "00000000000000000000000000112233445566778899aabbccddeeff00112233"
                 + "44556677889900aabbccddeeff00112233445566aabbccdd0000000000000000",
             paramsHex
@@ -114,17 +116,39 @@ class CallParamsTest {
         final var paramsHex = Hex.toHexString(params.toProto().toByteArray());
 
         assertEquals(
-            "1f0001c0"
+            "cd3bd246"
                 + "ffffffffffffffffffffffffffffffffffffffffffffffffffffffdeadbeef00"
                 + "00000000000000000000000000000000000000000000000000000000000000a0"
                 + "0000000000000000000000000000000000000000000000000000007788990000"
-                + "00000000000000000000000000000000000000000000000000000000000000ad"
+                + "00000000000000000000000000000000000000000000000000000000000000e0"
                 + "0000000000000000000000000000000000000000000000000000000000000001"
                 + "000000000000000000000000000000000000000000000000000000000000000d"
                 + "48656c6c6f2c20776f726c642100000000000000000000000000000000000000"
                 + "0000000000000000000000000000000000000000000000000000000000000004"
                 + "ffee3f7f00000000000000000000000000000000000000000000000000000000",
             paramsHex
+        );
+    }
+
+    @Test
+    @DisplayName("encodes array types correctly")
+    void arrayTypesEncoding() {
+        final var params = CallParams.function("foo")
+            .addStringArray(new String[]{"hello", ",", "world!"})
+            .addStringArray(new String[]{"lorem", "ipsum", "dolor", "sit", "amet"}, 5)
+            .addIntArray(new long[]{0x88, 0x99, 0xAA, 0xBB}, 32)
+            .addIntArray(new long[]{0xCC, 0xDD, 0xEE, 0xFF}, 32, 4)
+            .addIntArray(new BigInteger[]{BigInteger.valueOf(0x1111)}, 128)
+            .addIntArray(new BigInteger[]{BigInteger.valueOf(2222)}, 128, 1)
+            .addUintArray(new long[]{0x111, 0x222, 0x333, 0x444}, 256)
+            .addUintArray(new long[]{0x555, 0x666}, 64, 2)
+            .addUintArray(new BigInteger[]{BigInteger.valueOf(0x777)}, 168)
+            .addUintArray(new BigInteger[]{BigInteger.valueOf(0x888)}, 144, 1);
+
+        assertEquals(
+            "08712407",
+            // just test the function selector because the encoded repr of the above is 6.4kib
+            Hex.toHexString(params.toProto().toByteArray()).substring(0, 8)
         );
     }
 
@@ -152,7 +176,7 @@ class CallParamsTest {
             message,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> params.addUint(0, width)).getMessage());
+                () -> params.addUint(width, 0)).getMessage());
 
         assertEquals(
             message,

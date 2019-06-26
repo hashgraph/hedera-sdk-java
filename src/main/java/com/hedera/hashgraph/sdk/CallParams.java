@@ -6,10 +6,14 @@ import org.bouncycastle.jcajce.provider.digest.Keccak;
 import org.bouncycastle.util.encoders.DecoderException;
 import org.bouncycastle.util.encoders.Hex;
 
+import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
@@ -30,10 +34,18 @@ public final class CallParams<Kind> {
         this.funcSelector = funcSelector;
     }
 
+    /**
+     * Create a new function call builder for a smart contract constructor.
+     */
     public static CallParams<Constructor> constructor() {
         return new CallParams<>(null);
     }
 
+    /**
+     * Create a new function call builder for a smart contract function.
+     *
+     * @param funcName the name of the function without the parameter list.
+     */
     public static CallParams<Function> function(String funcName) {
         return new CallParams<>(new FunctionSelector(funcName));
     }
@@ -50,24 +62,168 @@ public final class CallParams<Kind> {
      * <p>
      * For Solidity addresses, use {@link #addAddress(byte[])}.
      *
-     * @param param
-     * @return
-     * @see #addAddress(byte[])
+     * @return {@code this} for fluent usage
      */
     public CallParams<Kind> addString(String param) {
-        var strBytes = ByteString.copyFromUtf8(param);
-
         addParamType("string");
-        args.add(new Argument(strBytes.size(), strBytes));
+        args.add(new Argument(encodeString(param), true));
 
         return this;
     }
 
-    public CallParams<Kind> addBytes(byte[] param) {
-        var bytes = ByteString.copyFrom(param);
+    private static ByteString encodeString(String string) {
+        final var strBytes = ByteString.copyFromUtf8(string);
+        // prepend the size of the string in UTF-8 bytes
+        return int256(strBytes.size(), 32)
+            .concat(rightPad32(strBytes));
+    }
 
+    private static ByteString encodeBytes(byte[] bytes) {
+        return int256(bytes.length, 32)
+            .concat(rightPad32(ByteString.copyFrom(bytes)));
+    }
+
+    private static void checkFixedArrayLen(int fixedLen, Object array) {
+        final var len = Array.getLength(array);
+
+        if (fixedLen != len) {
+            throw new IllegalArgumentException(
+                "fixedLen (" + fixedLen + ") does not match string length (" + len + ")");
+        }
+    }
+
+    private static ByteString encodeArray(Stream<ByteString> elements, boolean prependLen) {
+        if (prependLen) {
+            final var list = elements.collect(Collectors.toList());
+
+            return int256(list.size(), 32)
+                .concat(ByteString.copyFrom(list));
+        } else {
+            return ByteString.copyFrom(elements::iterator);
+        }
+    }
+
+    private static ByteString encodeDynArr(List<ByteString> elements, boolean prependLen) {
+        final var offsetsLen = elements.size() + (prependLen ? 1 : 0);
+
+        final var offsets = new ArrayList<ByteString>(offsetsLen);
+
+        if (prependLen) {
+            offsets.add(int256(elements.size(), 32));
+        }
+
+        // points to start of dynamic segment
+        long currOffset = offsetsLen * 32;
+
+        for (final var elem : elements) {
+            offsets.add(int256(currOffset, 64));
+            currOffset += elem.size();
+        }
+
+        return ByteString.copyFrom(offsets).concat(ByteString.copyFrom(elements));
+    }
+
+    /**
+     * Add a parameter of type {@code string[]}.
+     *
+     * @throws NullPointerException if any value in `strings` is null
+     */
+    public CallParams<Kind> addStringArray(String[] strings) {
+        final var byteStrings = Arrays.stream(strings)
+            .map(CallParams::encodeString)
+            .collect(Collectors.toList());
+
+        final var argBytes = encodeDynArr(byteStrings, true);
+
+        addParamType("string[]");
+        args.add(new Argument(argBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a parameter of type {@code string[N]}, a fixed-length array of strings.
+     *
+     * @param fixedLen the length of the fixed-size array type.
+     * @throws IllegalArgumentException if {@code fixedLen != strings.length}
+     * @throws NullPointerException     if any value in `strings` is null
+     */
+    public CallParams<Kind> addStringArray(String[] strings, int fixedLen) {
+        checkFixedArrayLen(fixedLen, strings);
+
+        final var byteStrings = Arrays.stream(strings)
+            .map(CallParams::encodeString)
+            .collect(Collectors.toList());
+
+        final var argBytes = encodeDynArr(byteStrings, false);
+
+        addParamType("string[" + fixedLen + "]");
+        // argument is dynamic in that the encoded size is not fixed
+        args.add(new Argument(argBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a parameter of type {@code bytes}, a byte-string.
+     */
+    public CallParams<Kind> addBytes(byte[] param) {
         addParamType("bytes");
-        args.add(new Argument(param.length, bytes));
+        args.add(new Argument(encodeBytes(param), true));
+
+        return this;
+    }
+
+    /**
+     * Add a parameter of type {@code bytesN}, a fixed-length byte-string.
+     * <p>
+     * Only strings up to 32 bytes are permitted.
+     *
+     * @throws IllegalArgumentException if {@code param.length != fixedLen}
+     *                                  or if {@code fixedLen > 32}
+     */
+    public CallParams<Kind> addBytes(byte[] param, int fixedLen) {
+        checkFixedArrayLen(fixedLen, param);
+        if (fixedLen > 32) {
+            throw new IllegalArgumentException(
+                "bytesN cannot have a length greater than 32; given length: " + fixedLen);
+        }
+
+        addParamType("bytes[" + fixedLen + "]");
+        // the bytesN type is fixed size
+        args.add(new Argument(rightPad32(ByteString.copyFrom(param)), false));
+
+        return this;
+    }
+
+    /**
+     * Add a parameter of type {@code bytes[]}, an array of byte-strings.
+     */
+    public CallParams<Kind> addBytesArray(byte[][] param) {
+        final var byteArrays = Arrays.stream(param)
+            .map(CallParams::encodeBytes)
+            .collect(Collectors.toList());
+
+        addParamType("bytes[]");
+        args.add(new Argument(encodeDynArr(byteArrays, true), true));
+
+        return this;
+    }
+
+    /**
+     * Add a parameter of type {@code bytes[N]}, a fixed-length array of byte-strings.
+     */
+    public CallParams<Kind> addBytesArray(byte[][] param, int fixedLen) {
+        checkFixedArrayLen(fixedLen, param);
+
+        final var byteStrings = Arrays.stream(param)
+            .map(CallParams::encodeBytes)
+            .collect(Collectors.toList());
+
+        final var argBytes = encodeDynArr(byteStrings, false);
+
+        addParamType("bytes[" + fixedLen + "]");
+        args.add(new Argument(argBytes, true));
 
         return this;
     }
@@ -75,7 +231,7 @@ public final class CallParams<Kind> {
     public CallParams<Kind> addBool(boolean bool) {
         addParamType("bool");
         // boolean encodes to `uint8` of values [0, 1]
-        args.add(new Argument(int256(bool ? 1 : 0, 8)));
+        args.add(new Argument(int256(bool ? 1 : 0, 8), false));
         return this;
     }
 
@@ -121,11 +277,11 @@ public final class CallParams<Kind> {
      *              must be a multiple of 8 and between 8 and 256.
      * @throws IllegalArgumentException if {@code width} is not in a valid range (see above).
      */
-    public CallParams<Kind> addInt(long i64, int width) {
+    public CallParams<Kind> addInt(long value, int width) {
         checkIntWidth(width);
 
         addParamType("int" + width);
-        args.add(new Argument(int256(i64, width)));
+        args.add(new Argument(int256(value, width), false));
 
         return this;
     }
@@ -145,10 +301,168 @@ public final class CallParams<Kind> {
     public CallParams<Kind> addInt(BigInteger bigInt, int width) {
         checkBigInt(bigInt, width, true);
 
-        final var bytes = bigInt.toByteArray();
-
         addParamType("int" + width);
-        args.add(new Argument(leftPad32(bytes, bigInt.signum() < 0)));
+        args.add(new Argument(int256(bigInt), false));
+
+        return this;
+    }
+
+    private static ByteString encodeIntArray(int intWidth, long[] intArray, boolean prependLen) {
+        checkIntWidth(intWidth);
+
+        final var arrayBytes = ByteString.copyFrom(
+            Arrays.stream(intArray).mapToObj(i -> int256(i, intWidth))
+                .collect(Collectors.toList()));
+
+        if (prependLen) {
+            return int256(intArray.length, 32).concat(arrayBytes);
+        } else {
+            return arrayBytes;
+        }
+    }
+
+    private static ByteString encodeIntArray(int intWidth, BigInteger[] intArray, boolean prependLen) {
+        checkIntWidth(intWidth);
+
+        final var arrayBytes = ByteString.copyFrom(
+            Arrays.stream(intArray).map(CallParams::int256)
+                .collect(Collectors.toList()));
+
+        if (prependLen) {
+            return int256(intArray.length, 32).concat(arrayBytes);
+        } else {
+            return arrayBytes;
+        }
+    }
+
+    private static ByteString encodeUintArray(int intWidth, long[] intArray, boolean prependLen) {
+        checkIntWidth(intWidth);
+
+        final var arrayBytes = ByteString.copyFrom(
+            Arrays.stream(intArray).mapToObj(i -> {
+                checkUnsignedVal(i);
+                return int256(i, intWidth);
+            }).collect(Collectors.toList()));
+
+        if (prependLen) {
+            return int256(intArray.length, 32).concat(arrayBytes);
+        } else {
+            return arrayBytes;
+        }
+    }
+
+    private static ByteString encodeUintArray(int intWidth, BigInteger[] intArray, boolean prependLen) {
+        checkIntWidth(intWidth);
+
+        final var arrayBytes = ByteString.copyFrom(
+            Arrays.stream(intArray).map(i -> {
+                checkUnsignedVal(i.signum());
+                return uint256(i);
+            }).collect(Collectors.toList()));
+
+        if (prependLen) {
+            return int256(intArray.length, 32).concat(arrayBytes);
+        } else {
+            return arrayBytes;
+        }
+    }
+
+    /**
+     * Add an integer array as an signed {@code intN[]} param, explicitly setting the integer
+     * bit-width.
+     * <p>
+     * The values will be truncated to the last {@code width} bits, the same as Java's
+     * behavior when casting from a larger integer type to a smaller one. When passing a smaller
+     * integer type, Java will widen it by sign-extending so if it is truncated again it should
+     * still result in the same two's complement value.
+     *
+     * @param intWidth the nominal bit width for encoding the integer type in the function selector,
+     *                 e.g. {@code width = 128} produces a param type of {@code int128};
+     *                 must be a multiple of 8 and between 8 and 256.
+     * @throws IllegalArgumentException if {@code width} is not in a valid range (see above).
+     */
+    public CallParams<Kind> addIntArray(long[] intArray, int intWidth) {
+        final var arrayBytes = encodeIntArray(intWidth, intArray, true);
+
+        addParamType("int" + intWidth + "[]");
+        args.add(new Argument(arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a fixed-length integer array as a signed {@code intM[N]} param, explicitly setting the
+     * integer bit-width and array length.
+     * <p>
+     * The values will be truncated to the last {@code width} bits, the same as Java's
+     * behavior when casting from a larger integer type to a smaller one. When passing a smaller
+     * integer type, Java will widen it by sign-extending so if it is truncated again it should
+     * still result in the same two's complement value.
+     *
+     * @param intWidth the nominal bit width for encoding the integer type in the function selector,
+     *                 e.g. {@code width = 128} produces a param type of {@code int128};
+     *                 must be a multiple of 8 and between 8 and 256.
+     * @param fixedLen the nominal length of the fixed-size array; must be the length of the array
+     *                 that is passed.
+     * @throws IllegalArgumentException if {@code width} is not in a valid range (see above)
+     *                                  or {@code fixedLen != intArray.length}.
+     */
+    public CallParams<Kind> addIntArray(long[] intArray, int intWidth, int fixedLen) {
+        checkFixedArrayLen(fixedLen, intArray);
+        final var arrayBytes = encodeIntArray(intWidth, intArray, false);
+
+        addParamType("int" + intWidth + "[" + fixedLen + "]");
+        args.add(new Argument(arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add an integer array as a signed {@code intN[]} param, explicitly setting the integer
+     * bit-width.
+     * <p>
+     * The values will be truncated to the last {@code width} bits, the same as Java's
+     * behavior when casting from a larger integer type to a smaller one. When passing a smaller
+     * integer type, Java will widen it by sign-extending so if it is truncated again it should
+     * still result in the same two's complement value.
+     *
+     * @param intWidth the nominal bit width for encoding the integer type in the function selector,
+     *                 e.g. {@code width = 128} produces a param type of {@code int128};
+     *                 must be a multiple of 8 and between 8 and 256.
+     * @throws IllegalArgumentException if {@code width} is not in a valid range (see above).
+     */
+    public CallParams<Kind> addIntArray(BigInteger[] intArray, int intWidth) {
+        final var arrayBytes = encodeIntArray(intWidth, intArray, true);
+
+        addParamType("int" + intWidth + "[]");
+        args.add(new Argument(arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a fixed-length integer array as a signed {@code intM[N]} param, explicitly setting the
+     * integer bit-width and array length.
+     * <p>
+     * The values will be truncated to the last {@code width} bits, the same as Java's
+     * behavior when casting from a larger integer type to a smaller one. When passing a smaller
+     * integer type, Java will widen it by sign-extending so if it is truncated again it should
+     * still result in the same two's complement value.
+     *
+     * @param intWidth the nominal bit width for encoding the integer type in the function selector,
+     *                 e.g. {@code width = 128} produces a param type of {@code int128};
+     *                 must be a multiple of 8 and between 8 and 256.
+     * @param fixedLen the nominal length of the fixed-size array; must be the length of the array
+     *                 that is passed.
+     * @throws IllegalArgumentException if {@code width} is not in a valid range (see above)
+     *                                  or {@code fixedLen != intArray.length}.
+     */
+    public CallParams<Kind> addIntArray(BigInteger[] intArray, int intWidth, int fixedLen) {
+        checkFixedArrayLen(fixedLen, intArray);
+        final var arrayBytes = encodeIntArray(intWidth, intArray, false);
+
+        addParamType("int" + intWidth + "[" + fixedLen + "]");
+        args.add(new Argument(arrayBytes, true));
 
         return this;
     }
@@ -172,7 +486,7 @@ public final class CallParams<Kind> {
         checkUnsignedVal(uint);
 
         addParamType("uint" + width);
-        args.add(new Argument(int256(uint, width)));
+        args.add(new Argument(int256(uint, width), false));
 
         return this;
     }
@@ -182,7 +496,7 @@ public final class CallParams<Kind> {
      * explicitly setting the parameter width.
      * <p>
      * As this uses the unsigned type, it gets an extra bit of range over
-     * {@link #addInt(BigInteger, int)} which has to count the sign bit.
+     * {@link #addInt(int, BigInteger)} which has to count the sign bit.
      *
      * @param width the nominal bit width for encoding the integer type in the function selector,
      *              e.g. {@code width = 128} produces a param type of {@code uint128};
@@ -197,19 +511,114 @@ public final class CallParams<Kind> {
         checkBigInt(uint, width, false);
         checkUnsignedVal(uint.signum());
 
-        final var bytes = uint.toByteArray();
+        addParamType("uint" + width);
+        args.add(new Argument(uint256(uint), false));
 
-        final ByteString byteStr;
+        return this;
+    }
 
-        if (uint.bitLength() == 256) {
-            // cut out the extra byte added by the sign bit so we get full range
-            byteStr = ByteString.copyFrom(bytes, 1, bytes.length - 1);
-        } else {
-            byteStr = ByteString.copyFrom(bytes);
-        }
+    /**
+     * Add an array of non-negative integers as an unsigned {@code intN[]} param, explicitly setting
+     * the integer bit-width.
+     * <p>
+     * The values will be truncated to the last {@code width} bits, the same as Java's
+     * behavior when casting from a larger integer type to a smaller one. When passing a smaller
+     * integer type, Java will widen it by sign-extending so if it is truncated again it should
+     * still result in the same two's complement value.
+     *
+     * @param intWidth the nominal bit width for encoding the integer type in the function selector,
+     *                 e.g. {@code width = 128} produces a param type of {@code int128};
+     *                 must be a multiple of 8 and between 8 and 256.
+     * @throws IllegalArgumentException if any value is less than 0,
+     *                                  {@code width} is not in a valid range (see above),
+     *                                  or {@code fixedLen != intArray.length}.
+     */
+    public CallParams<Kind> addUintArray(long[] uintArray, int intWidth) {
+        final var arrayBytes = encodeUintArray(intWidth, uintArray, true);
 
-        addParamType("uint" + (bytes.length * 8));
-        args.add(new Argument(leftPad32(byteStr, false)));
+        addParamType("uint" + intWidth + "[]");
+        args.add(new Argument(arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a fixed-length array of non-negative integers as an unsigned {@code intM[N]} param,
+     * explicitly setting the integer bit-width and array length.
+     * <p>
+     * The values will be truncated to the last {@code width} bits, the same as Java's
+     * behavior when casting from a larger integer type to a smaller one. When passing a smaller
+     * integer type, Java will widen it by sign-extending so if it is truncated again it should
+     * still result in the same two's complement value.
+     *
+     * @param intWidth the nominal bit width for encoding the integer type in the function selector,
+     *                 e.g. {@code width = 128} produces a param type of {@code int128};
+     *                 must be a multiple of 8 and between 8 and 256.
+     * @param fixedLen the nominal length of the fixed-size array; must be the length of the array
+     *                 that is passed.
+     * @throws IllegalArgumentException if any value is less than 0,
+     *                                  {@code width} is not in a valid range (see above),
+     *                                  or {@code fixedLen != intArray.length}.
+     */
+    public CallParams<Kind> addUintArray(long[] intArray, int intWidth, int fixedLen) {
+        checkFixedArrayLen(fixedLen, intArray);
+        final var arrayBytes = encodeUintArray(intWidth, intArray, false);
+
+        addParamType("uint" + intWidth + "[" + fixedLen + "]");
+        args.add(new Argument(arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add an array of arbitrary precision non-negative integers as an unsigned {@code intN[]}
+     * param, explicitly setting the integer bit-width.
+     * <p>
+     * The values will be truncated to the last {@code width} bits, the same as Java's
+     * behavior when casting from a larger integer type to a smaller one. When passing a smaller
+     * integer type, Java will widen it by sign-extending so if it is truncated again it should
+     * still result in the same two's complement value.
+     *
+     * @param intWidth the nominal bit width for encoding the integer type in the function selector,
+     *                 e.g. {@code width = 128} produces a param type of {@code int128};
+     *                 must be a multiple of 8 and between 8 and 256.
+     * @throws IllegalArgumentException if any value is less than 0, or has a
+     *                                  {@link BigInteger#bitLength()} greater than {@code width},
+     *                                  or if {@code width} is not in a valid range (see above).
+     */
+    public CallParams<Kind> addUintArray(BigInteger[] intArray, int intWidth) {
+        final var arrayBytes = encodeUintArray(intWidth, intArray, true);
+
+        addParamType("uint" + intWidth + "[]");
+        args.add(new Argument(arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a fixed-length array of arbitrary precision non-negative integers as an unsigned
+     * {@code intM[N]} param, explicitly setting the integer bit-width and array length.
+     * <p>
+     * The values will be truncated to the last {@code width} bits, the same as Java's
+     * behavior when casting from a larger integer type to a smaller one. When passing a smaller
+     * integer type, Java will widen it by sign-extending so if it is truncated again it should
+     * still result in the same two's complement value.
+     *
+     * @param intWidth the nominal bit width for encoding the integer type in the function selector,
+     *                 e.g. {@code width = 128} produces a param type of {@code int128};
+     *                 must be a multiple of 8 and between 8 and 256.
+     * @param fixedLen the nominal length of the fixed-size array; must be the length of the array
+     *                 that is passed.
+     * @throws IllegalArgumentException if any value is less than 0, or has a
+     *                                  {@link BigInteger#bitLength()} greater than {@code width},
+     *                                  or if {@code width} is not in a valid range (see above).
+     */
+    public CallParams<Kind> addUintArray(BigInteger[] intArray, int intWidth, int fixedLen) {
+        checkFixedArrayLen(fixedLen, intArray);
+        final var arrayBytes = encodeUintArray(intWidth, intArray, false);
+
+        addParamType("uint" + intWidth + "[" + fixedLen + "]");
+        args.add(new Argument(arrayBytes, true));
 
         return this;
     }
@@ -257,13 +666,13 @@ public final class CallParams<Kind> {
 
         addParamType("address");
         // address encodes as `uint160`
-        args.add(new Argument(leftPad32(ByteString.copyFrom(address))));
+        args.add(new Argument(leftPad32(ByteString.copyFrom(address)), false));
 
         return this;
     }
 
     /**
-     * Add a {@value ADDRESS_LEN * 2}-character hex-encoded Solidity address parameter with the type
+     * Add a {@value ADDRESS_LEN_HEX}-character hex-encoded Solidity address parameter with the type
      * {@code address}.
      * <p>
      * Note: adding a {@code address payable} or {@code contract} parameter must also use
@@ -274,6 +683,91 @@ public final class CallParams<Kind> {
      */
     public CallParams<Kind> addAddress(String address) {
         return addAddress(decodeAddress(address));
+    }
+
+    /**
+     * Add an array of {@value ADDRESS_LEN}-byte Solidity addresses as a {@code address[]} param.
+     *
+     * @throws IllegalArgumentException if any value is not exactly {@value ADDRESS_LEN} bytes long.
+     * @throws NullPointerException     if any value in the array is null.
+     */
+    public CallParams<Kind> addAddressArray(byte[][] addresses) {
+        final var addressArray = encodeArray(
+            Arrays.stream(addresses).map(a -> {
+                checkAddressLen(a);
+                return leftPad32(ByteString.copyFrom(a));
+            }), true);
+
+        addParamType("address[]");
+        args.add(new Argument(addressArray, true));
+
+        return this;
+    }
+
+    /**
+     * Add a fixed-length array of {@value ADDRESS_LEN}-byte Solidity addresses as a
+     * {@code address[N]} param, explicitly setting the array length.
+     *
+     * @throws IllegalArgumentException if any value is not exactly {@value ADDRESS_LEN} bytes long
+     *                                  or if {@code fixedLen != addresses.length}.
+     * @throws NullPointerException     if any value in the array is null.
+     */
+    public CallParams<Kind> addAddressArray(byte[][] addresses, int fixedLen) {
+        final var addressArray = encodeArray(
+            Arrays.stream(addresses).map(a -> {
+                checkAddressLen(a);
+                return leftPad32(ByteString.copyFrom(a));
+            }), false);
+
+        addParamType("address[" + fixedLen + "]");
+        args.add(new Argument(addressArray, false));
+
+        return this;
+    }
+
+    /**
+     * Add an array of {@value ADDRESS_LEN_HEX}-character hex-encoded Solidity addresses as a
+     * {@code address[]} param.
+     *
+     * @throws IllegalArgumentException if any value is not exactly {@value ADDRESS_LEN_HEX}
+     *                                  characters long or fails to decode as hexadecimal.
+     * @throws NullPointerException     if any value in the array is null.
+     */
+    public CallParams<Kind> addAddressArray(String[] addresses) {
+        final var addressArray = encodeArray(
+            Arrays.stream(addresses).map(a -> {
+                final var address = decodeAddress(a);
+                checkAddressLen(address);
+                return leftPad32(ByteString.copyFrom(address));
+            }), true);
+
+        addParamType("address[]");
+        args.add(new Argument(addressArray, true));
+
+        return this;
+    }
+
+    /**
+     * Add a fixed-length array of {@value ADDRESS_LEN_HEX}-character hex-encoded Solidity addresses
+     * as a {@code address[N]} param, explicitly setting the array length.
+     *
+     * @throws IllegalArgumentException if any value is not exactly {@value ADDRESS_LEN_HEX}
+     *                                  characters long, fails to decode as hexadecimal,
+     *                                  or if {@code fixedLen != addresses.length}.
+     * @throws NullPointerException     if any value in the array is null.
+     */
+    public CallParams<Kind> addAddressArray(String[] addresses, int fixedLen) {
+        final var addressArray = encodeArray(
+            Arrays.stream(addresses).map(a -> {
+                final var address = decodeAddress(a);
+                checkAddressLen(address);
+                return leftPad32(ByteString.copyFrom(address));
+            }), false);
+
+        addParamType("address[" + fixedLen + "]");
+        args.add(new Argument(addressArray, false));
+
+        return this;
     }
 
     /**
@@ -306,7 +800,7 @@ public final class CallParams<Kind> {
 
         addParamType("function");
         // function reference encodes as `bytes24`
-        args.add(new Argument(rightPad32(output.toByteString())));
+        args.add(new Argument(rightPad32(output.toByteString()), false));
 
         return this;
     }
@@ -366,8 +860,6 @@ public final class CallParams<Kind> {
         return addFunction(decodeAddress(address), selector.finishIntermediate());
     }
 
-    // TODO: arrays and tuples
-
     /**
      * Get the encoding of the currently added parameters as a {@link ByteString}.
      * <p>
@@ -391,10 +883,11 @@ public final class CallParams<Kind> {
         // iterate the arguments and determine whether they are dynamic or not
         for (var arg : args) {
             if (arg.isDynamic) {
-                // dynamic arguments supply their offset in value position and append their data at that offset
+                // dynamic arguments supply their offset in value position and append their data at
+                // that offset
                 paramsBytes.add(int256(dynamicOffset, 256));
                 dynamicArgs.add(arg.value);
-                dynamicOffset += arg.len;
+                dynamicOffset += arg.value.size();
             } else {
                 // value arguments are dropped in the current arg position
                 paramsBytes.add(arg.value);
@@ -431,6 +924,25 @@ public final class CallParams<Kind> {
 
         // byte padding will sign-extend appropriately
         return leftPad32(output.toByteString(), val < 0);
+    }
+
+    static ByteString int256(BigInteger bigInt) {
+        return leftPad32(bigInt.toByteArray(), bigInt.signum() < 0);
+    }
+
+    static ByteString uint256(BigInteger uint) {
+        final var bytes = uint.toByteArray();
+
+        final ByteString byteStr;
+
+        if (uint.bitLength() == 256) {
+            // cut out the extra byte added by the sign bit so we get full range
+            byteStr = ByteString.copyFrom(bytes, 1, bytes.length - 1);
+        } else {
+            byteStr = ByteString.copyFrom(bytes);
+        }
+
+        return leftPad32(byteStr, false);
     }
 
     // Solidity contracts require all parameters to be padded to 32 byte multiples but specifies
@@ -569,26 +1081,15 @@ public final class CallParams<Kind> {
 
     private final static class Argument {
         private final ByteString value;
-        private final int len;
         private final boolean isDynamic;
 
-        // value constructor
-        private Argument(ByteString value) {
-            if (value.size() != 32) {
+        private Argument(ByteString value, boolean isDynamic) {
+            if (!isDynamic && value.size() != 32) {
                 throw new IllegalArgumentException("value argument that was not 32 bytes");
             }
 
             this.value = value;
-            this.len = 0;
-            this.isDynamic = false;
-        }
-
-        // dynamic constructor
-        private Argument(int len, ByteString dynamic) {
-            var lenBytes = int256(len, 32);
-            this.len = len;
-            this.value = lenBytes.concat(rightPad32(dynamic));
-            isDynamic = true;
+            this.isDynamic = isDynamic;
         }
     }
 
