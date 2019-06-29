@@ -208,6 +208,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         var attempt = 0;
 
         while (true) {
+            attempt += 1;
             var receipt = queryReceipt();
             var receiptStatus = receipt.getStatus();
 
