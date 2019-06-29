@@ -1,10 +1,10 @@
 package com.hedera.hashgraph.sdk.contract;
 
 import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.proto.ContractDeleteTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 
 import io.grpc.MethodDescriptor;
@@ -29,7 +29,7 @@ public final class ContractDeleteTransaction extends TransactionBuilder<Contract
 
     @Override
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
-        return SmartContractServiceGrpc.getContractCallMethodMethod();
+        return SmartContractServiceGrpc.getDeleteContractMethod();
     }
 
     @Override
