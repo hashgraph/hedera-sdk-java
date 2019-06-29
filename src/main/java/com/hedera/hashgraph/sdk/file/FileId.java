@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk.file;
 
 import com.hedera.hashgraph.sdk.Entity;
+import com.hedera.hashgraph.sdk.SolidityUtil;
 import com.hedera.hashgraph.sdk.proto.FileID;
 import com.hedera.hashgraph.sdk.proto.FileIDOrBuilder;
 
@@ -18,6 +19,10 @@ public final class FileId implements Entity {
 
     public FileId(FileIDOrBuilder fileId) {
         this(fileId.getShardNum(), fileId.getRealmNum(), fileId.getFileNum());
+    }
+
+    public static FileId fromSolidityAddress(String address) {
+        return SolidityUtil.parseAddress(address, FileId::new);
     }
 
     public long getShardNum() {
@@ -54,5 +59,9 @@ public final class FileId implements Entity {
     @Override
     public String toString() {
         return "" + getShardNum() + "." + getRealmNum() + "." + getFileNum();
+    }
+
+    public String toSolidityAddress() {
+        return SolidityUtil.addressFor(this);
     }
 }

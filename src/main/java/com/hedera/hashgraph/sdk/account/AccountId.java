@@ -2,6 +2,7 @@ package com.hedera.hashgraph.sdk.account;
 
 import com.google.common.base.Splitter;
 import com.hedera.hashgraph.sdk.Entity;
+import com.hedera.hashgraph.sdk.SolidityUtil;
 import com.hedera.hashgraph.sdk.proto.AccountID;
 import com.hedera.hashgraph.sdk.proto.AccountIDOrBuilder;
 
@@ -45,6 +46,10 @@ public final class AccountId implements Entity {
         this(accountId.getShardNum(), accountId.getRealmNum(), accountId.getAccountNum());
     }
 
+    public static AccountId fromSolidityAddress(String address) {
+        return SolidityUtil.parseAddress(address, AccountId::new);
+    }
+
     public long getShardNum() {
         return inner.getShardNum();
     }
@@ -60,6 +65,10 @@ public final class AccountId implements Entity {
     @Override
     public String toString() {
         return "" + getShardNum() + "." + getRealmNum() + "." + getAccountNum();
+    }
+
+    public String toSolidityAddress() {
+        return SolidityUtil.addressFor(this);
     }
 
     public AccountID toProto() {

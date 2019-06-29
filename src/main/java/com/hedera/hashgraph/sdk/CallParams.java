@@ -20,6 +20,8 @@ import javax.annotation.Nullable;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import static com.hedera.hashgraph.sdk.SolidityUtil.checkAddressLen;
+import static com.hedera.hashgraph.sdk.SolidityUtil.decodeAddress;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
 // an implementation of function selector and parameter encoding as specified here:
@@ -496,7 +498,7 @@ public final class CallParams<Kind> {
      * explicitly setting the parameter width.
      * <p>
      * As this uses the unsigned type, it gets an extra bit of range over
-     * {@link #addInt(int, BigInteger)} which has to count the sign bit.
+     * {@link #addInt(BigInteger, int)} which has to count the sign bit.
      *
      * @param width the nominal bit width for encoding the integer type in the function selector,
      *              e.g. {@code width = 128} produces a param type of {@code uint128};
@@ -626,31 +628,11 @@ public final class CallParams<Kind> {
     /**
      * The length of a Solidity address in bytes.
      */
-    public static final int ADDRESS_LEN = 20;
+    public static final int ADDRESS_LEN = SolidityUtil.ADDRESS_LEN;
     /**
      * The length of a hexadecimal-encoded Solidity address, in ASCII characters (bytes).
      */
-    public static final int ADDRESS_LEN_HEX = ADDRESS_LEN * 2;
-
-    private static void checkAddressLen(byte[] address) {
-        if (address.length != ADDRESS_LEN) {
-            throw new IllegalArgumentException(
-                "Solidity addresses must be 20 bytes or 40 hex chars");
-        }
-    }
-
-    private static byte[] decodeAddress(String address) {
-        if (address.length() != ADDRESS_LEN_HEX) {
-            throw new IllegalArgumentException(
-                "Solidity addresses must be 20 bytes or 40 hex chars");
-        }
-
-        try {
-            return Hex.decode(address);
-        } catch (DecoderException e) {
-            throw new IllegalArgumentException("failed to decode Solidity address as hex", e);
-        }
-    }
+    public static final int ADDRESS_LEN_HEX = SolidityUtil.ADDRESS_LEN_HEX;
 
     /**
      * Add a {@value ADDRESS_LEN}-byte Solidity address parameter with the type {@code address}.

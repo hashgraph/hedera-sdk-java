@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk.contract;
 
 import com.hedera.hashgraph.sdk.Entity;
+import com.hedera.hashgraph.sdk.SolidityUtil;
 import com.hedera.hashgraph.sdk.crypto.Key;
 import com.hedera.hashgraph.sdk.proto.ContractID;
 import com.hedera.hashgraph.sdk.proto.ContractIDOrBuilder;
@@ -19,6 +20,10 @@ public final class ContractId implements Key, Entity {
 
     public ContractId(ContractIDOrBuilder contractID) {
         this(contractID.getShardNum(), contractID.getRealmNum(), contractID.getContractNum());
+    }
+
+    public static ContractId fromSolidityAddress(String address) {
+        return SolidityUtil.parseAddress(address, ContractId::new);
     }
 
     public long getShardNum() {
@@ -63,5 +68,9 @@ public final class ContractId implements Key, Entity {
     @Override
     public String toString() {
         return "" + getShardNum() + "." + getRealmNum() + "." + getContractNum();
+    }
+
+    public String toSolidityAddress() {
+        return SolidityUtil.addressFor(this);
     }
 }
