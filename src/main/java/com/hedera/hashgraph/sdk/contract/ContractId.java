@@ -2,6 +2,7 @@ package com.hedera.hashgraph.sdk.contract;
 
 import com.hedera.hashgraph.sdk.Entity;
 import com.hedera.hashgraph.sdk.SolidityUtil;
+import com.hedera.hashgraph.sdk.IdUtil;
 import com.hedera.hashgraph.sdk.crypto.Key;
 import com.hedera.hashgraph.sdk.proto.ContractID;
 import com.hedera.hashgraph.sdk.proto.ContractIDOrBuilder;
@@ -20,6 +21,23 @@ public final class ContractId implements Key, Entity {
 
     public ContractId(ContractIDOrBuilder contractID) {
         this(contractID.getShardNum(), contractID.getRealmNum(), contractID.getContractNum());
+    }
+
+    /** Constructs a `ContractId` from a string formatted as <shardNum>.<realmNum>.<contractNum> */
+    public static ContractId fromString(String account) throws IllegalArgumentException {
+
+        long[] rawNums = IdUtil.parseIdString(account);
+        var newContract = ContractID.newBuilder();
+
+        try {
+            newContract.setRealmNum(rawNums[0]);
+            newContract.setShardNum(rawNums[1]);
+            newContract.setContractNum(rawNums[2]);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid Id format, should be in format {shardNum}.{realmNum}.{accountNum}");
+        }
+
+        return new ContractId(newContract);
     }
 
     public static ContractId fromSolidityAddress(String address) {

@@ -2,6 +2,7 @@ package com.hedera.hashgraph.sdk.account;
 
 import com.google.common.base.Splitter;
 import com.hedera.hashgraph.sdk.Entity;
+import com.hedera.hashgraph.sdk.IdUtil;
 import com.hedera.hashgraph.sdk.SolidityUtil;
 import com.hedera.hashgraph.sdk.proto.AccountID;
 import com.hedera.hashgraph.sdk.proto.AccountIDOrBuilder;
@@ -25,16 +26,14 @@ public final class AccountId implements Entity {
 
     /** Constructs an `AccountId` from a string formatted as <shardNum>.<realmNum>.<accountNum> */
     public static AccountId fromString(String account) throws IllegalArgumentException {
-        var rawNums = Splitter.on('.')
-            .split(account)
-            .iterator();
 
+        long[] rawNums = IdUtil.parseIdString(account);
         var newAccount = AccountID.newBuilder();
 
         try {
-            newAccount.setRealmNum(Integer.parseInt(rawNums.next()));
-            newAccount.setShardNum(Integer.parseInt(rawNums.next()));
-            newAccount.setAccountNum(Integer.parseInt(rawNums.next()));
+            newAccount.setRealmNum(rawNums[0]);
+            newAccount.setShardNum(rawNums[1]);
+            newAccount.setAccountNum(rawNums[2]);
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid Id format, should be in format {shardNum}.{realmNum}.{accountNum}");
         }
