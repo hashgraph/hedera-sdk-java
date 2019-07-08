@@ -12,10 +12,6 @@ public final class IdUtil {
             .split(id)
             .iterator();
 
-        return new long[]{
-            Long.parseLong(rawNums.next()),
-            Long.parseLong(rawNums.next()),
-            Long.parseLong(rawNums.next())
-        };
+        return new long[]{Long.parseLong(rawNums.next()), Long.parseLong(rawNums.next()), Long.parseLong(rawNums.next())};
     }
 }
