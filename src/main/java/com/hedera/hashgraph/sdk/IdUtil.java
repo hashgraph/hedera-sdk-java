@@ -14,6 +14,4 @@ public final class IdUtil {
             Long.parseLong(rawNums.next())
         };
     }
-
-
 }
