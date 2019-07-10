@@ -34,7 +34,7 @@ public final class ContractId implements Key, Entity {
             newContract.setShardNum(rawNums[1]);
             newContract.setContractNum(rawNums[2]);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid Id format, should be in format {shardNum}.{realmNum}.{accountNum}");
+            throw new IllegalArgumentException("Invalid Id format, should be in format {shardNum}.{realmNum}.{contractNum}");
         }
 
         return new ContractId(newContract);
