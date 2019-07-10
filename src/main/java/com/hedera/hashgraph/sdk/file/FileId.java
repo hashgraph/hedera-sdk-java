@@ -33,7 +33,7 @@ public final class FileId implements Entity {
             newFile.setShardNum(rawNums[1]);
             newFile.setFileNum(rawNums[2]);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid Id format, should be in format {shardNum}.{realmNum}.{accountNum}");
+            throw new IllegalArgumentException("Invalid Id format, should be in format {shardNum}.{realmNum}.{fileNum}");
         }
 
         return new FileId(newFile);
