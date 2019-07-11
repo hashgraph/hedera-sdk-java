@@ -22,21 +22,9 @@ public final class FileId implements Entity {
         this(fileId.getShardNum(), fileId.getRealmNum(), fileId.getFileNum());
     }
 
-    /** Constructs a `FileId` from a string formatted as <shardNum>.<realmNum>.<contractNum> */
+    /** Constructs a `FileId` from a string formatted as <shardNum>.<realmNum>.<fileNum> */
     public static FileId fromString(String account) throws IllegalArgumentException {
-
-        long[] rawNums = IdUtil.parseIdString(account);
-        var newFile = FileID.newBuilder();
-
-        try {
-            newFile.setRealmNum(rawNums[0]);
-            newFile.setShardNum(rawNums[1]);
-            newFile.setFileNum(rawNums[2]);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid Id format, should be in format {shardNum}.{realmNum}.{fileNum}");
-        }
-
-        return new FileId(newFile);
+        return IdUtil.parseIdString(account, FileId::new);
     }
 
     public static FileId fromSolidityAddress(String address) {

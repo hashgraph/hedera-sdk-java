@@ -25,19 +25,7 @@ public final class ContractId implements Key, Entity {
 
     /** Constructs a `ContractId` from a string formatted as <shardNum>.<realmNum>.<contractNum> */
     public static ContractId fromString(String account) throws IllegalArgumentException {
-
-        long[] rawNums = IdUtil.parseIdString(account);
-        var newContract = ContractID.newBuilder();
-
-        try {
-            newContract.setRealmNum(rawNums[0]);
-            newContract.setShardNum(rawNums[1]);
-            newContract.setContractNum(rawNums[2]);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid Id format, should be in format {shardNum}.{realmNum}.{contractNum}");
-        }
-
-        return new ContractId(newContract);
+        return IdUtil.parseIdString(account, ContractId::new);
     }
 
     public static ContractId fromSolidityAddress(String address) {
