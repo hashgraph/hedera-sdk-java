@@ -7,11 +7,20 @@ public final class IdUtil {
     private IdUtil() {
     }
 
-    public static long[] parseIdString(String id) {
+    @FunctionalInterface
+    public interface WithIdNums<R> {
+        R apply(long shardNum, long realmNum, long entityNum);
+    }
+    public static <R> R parseIdString(String id, WithIdNums<R> withIdNums) {
         var rawNums = Splitter.on('.')
             .split(id)
             .iterator();
-
-        return new long[]{Long.parseLong(rawNums.next()), Long.parseLong(rawNums.next()), Long.parseLong(rawNums.next())};
+        R newId;
+        try {
+            newId = withIdNums.apply(Long.parseLong(rawNums.next()), Long.parseLong(rawNums.next()), Long.parseLong(rawNums.next()));
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid Id format, should be in format {shardNum}.{realmNum}.{idNum}");
+        }
+        return newId;
     }
 }

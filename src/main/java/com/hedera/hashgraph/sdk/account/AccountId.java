@@ -26,19 +26,7 @@ public final class AccountId implements Entity {
 
     /** Constructs an `AccountId` from a string formatted as <shardNum>.<realmNum>.<accountNum> */
     public static AccountId fromString(String account) throws IllegalArgumentException {
-
-        long[] rawNums = IdUtil.parseIdString(account);
-        var newAccount = AccountID.newBuilder();
-
-        try {
-            newAccount.setRealmNum(rawNums[0]);
-            newAccount.setShardNum(rawNums[1]);
-            newAccount.setAccountNum(rawNums[2]);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid Id format, should be in format {shardNum}.{realmNum}.{accountNum}");
-        }
-
-        return new AccountId(newAccount);
+        return IdUtil.parseIdString(account, AccountId::new);
     }
 
     public AccountId(AccountIDOrBuilder accountId) {
