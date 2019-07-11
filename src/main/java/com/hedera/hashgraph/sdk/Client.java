@@ -1,11 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.account.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.account.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.account.AccountInfo;
-import com.hedera.hashgraph.sdk.account.AccountInfoQuery;
-import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
+import com.hedera.hashgraph.sdk.account.*;
+import com.hedera.hashgraph.sdk.consensus.*;
 import com.hedera.hashgraph.sdk.crypto.Key;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
@@ -97,6 +93,22 @@ public final class Client {
         }
 
         return selectedChannel;
+    }
+
+    public TopicId createTopic(String topicMemo) throws HederaException, HederaNetworkException {
+        var record = new CreateTopicTransaction(this).setTopicMemo(topicMemo)
+            .executeForRecord();
+        return record.getReceipt().getTopicId();
+    }
+
+    public TransactionId submitMessage(TopicId topicId, byte[] message) throws HederaException, HederaNetworkException {
+        return new SubmitMessageTransaction(this).setTopicId(topicId).setMessage(message)
+            .execute();
+    }
+
+    public TopicInfo getTopicInfo(TopicId topicId) throws HederaException, HederaNetworkException {
+        return new GetTopicInfoQuery(this).setTopicId(topicId)
+            .execute();
     }
 
     //

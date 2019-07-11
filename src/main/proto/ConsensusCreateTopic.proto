@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "com.hedera.hashgraph.sdk.proto";
+option java_multiple_files = true;
+
+import "BasicTypes.proto";
+import "Duration.proto";
+import "Timestamp.proto";
+
+// See [ConsensusService.createTopic()](#proto.ConsensusService)
+message ConsensusCreateTopicTransactionBody {
+    ShardID shardID = 1; // Shard for the topic.
+    RealmID realmID = 2; // Realm for the topic.
+    string memo = 3; // Short publicly visible memo about the topic. No guarantee of uniqueness.
+
+    // Effective timestamp at which submitMessage calls will begin to succeed on the topic.
+    // If unspecified, the consensus timestamp of this transaction will be the effective creationTime.
+    Timestamp creationTime = 4;
+
+    // Effective timestamp at which submitMessage calls will no longer succeed on the topic.
+    // If unspecified, the consensus timestamp + MAX_LIFETIME_SECONDS will become the effective expirationTime.
+    // The expirationTime may be no longer than MAX_LIFETIME_SECONDS from the consensus timestamp of this
+    // transaction.
+    oneof expiration {
+        Timestamp expirationTime = 5;
+        Duration expirationDuration = 6; // Duration after the creationTime to set the expirationTime to.
+    }
+    Key adminKey = 7; // Who can change/delete this topic. Defaults to requester if unspecified on create.
+    Key submitKey = 8; // Who can submitMessage (empty means anyone can). Defaults to allowing anyone to submit.
+}

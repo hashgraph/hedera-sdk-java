@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "com.hedera.hashgraph.sdk.proto";
+option java_multiple_files = true;
+
+import "google/protobuf/wrappers.proto";
+import "BasicTypes.proto";
+import "Duration.proto";
+import "Timestamp.proto";
+
+// See [ConsensusService.updateTopic()](#proto.ConsensusService)
+message ConsensusUpdateTopicTransactionBody {
+    TopicID topicID = 1;
+
+    // Short publicly visible memo about the topic. No guarantee of uniqueness. Null for "do not update".
+    google.protobuf.StringValue memo = 2;
+
+    // Effective timestamp at which submitMessage calls will begin to succeed on the topic.
+    // If unspecified, the consensus timestamp of this topic will remain unchanged.
+    Timestamp creationTime = 3;
+
+    // Effective timestamp at which submitMessage calls will no longer succeed on the topic.
+    // If unspecified, the expirationTime of the topic will remain unchanged.
+    // If specified, the topic's lifetime may not be extended past MAX_LIFETIME_SECONDS
+    // from now.
+    oneof expiration {
+        Timestamp expirationTime = 4;
+        Duration expirationDuration = 5; // Duration to increment the topic's expirationTime.
+    }
+
+    Key adminKey = 6; // Who can change/delete this topic. If unspecified, no update will be made.
+
+    // Who can submitMessage (empty means anyone can). If unspecified, no update will be made.
+    // To _remove_ the current submitKey, specify an empty KeyList.
+    Key submitKey = 7;
+}

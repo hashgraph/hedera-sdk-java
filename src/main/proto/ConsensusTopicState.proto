@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "com.hedera.hashgraph.sdk.proto";
+option java_multiple_files = true;
+
+// The consensus state of a topic.
+message ConsensusTopicState {
+    uint64 sequenceNumber = 1; // Starts at 0 for first submitted message. Incremented on each submitted message.
+    bytes runningHash = 2; // Running hash (SHA384) of every (message, sequenceNumber, topicID) tuple in this topic.
+}

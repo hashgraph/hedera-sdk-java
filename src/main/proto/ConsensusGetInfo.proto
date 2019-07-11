@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "com.hedera.hashgraph.sdk.proto";
+option java_multiple_files = true;
+
+import "BasicTypes.proto";
+import "QueryHeader.proto";
+import "ResponseHeader.proto";
+import "ConsensusTopicDefinition.proto";
+import "ConsensusTopicState.proto";
+
+// See [ConsensusService.getInfo()](#proto.ConsensusService)
+message ConsensusGetInfoQuery {
+    QueryHeader header = 1; // standard info sent from client to node, including the signed payment, and what kind of response is requested (cost, state proof, both, or neither).
+    TopicID topicID = 2; // Topic to retrieve info about (the running state of).
+}
+
+// Retrieve info about a consensus topic.
+message ConsensusGetInfoResponse {
+    ResponseHeader header = 1; // standard response from node to client, including the requested fields: cost, or state proof, or both, or neither
+
+    TopicID topicID = 2; // Topic identifier.
+    ConsensusTopicDefinition topicDefinition = 3; // Topic definition.
+    ConsensusTopicState topicState = 4; // Topic's consensus state.
+}

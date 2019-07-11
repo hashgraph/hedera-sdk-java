@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "com.hedera.hashgraph.sdk.proto";
+
+import "Query.proto";
+import "Response.proto";
+import "TransactionResponse.proto";
+import "Transaction.proto";
+
+/* The Consensus Service provides the ability for Hedera Hashgraph to provide aBFT consensus as to the order and
+ * validity of messages submitted to a *topic*, as well as a *consensus timestamp* for those messages.
+ *
+ * Authorization of submitted messages is based on the application of rules specified in the
+ * [topic's](#proto.ConsensusTopicDefinition) [submitKey](#proto.Key).
+ *
+ * Authorization for submitted messages is optional.
+ *
+ * Authorization as to modification (_update/delete_) of the topic is based on the application of rules specified in the
+ * [topic's](#proto.ConsensusTopicDefinition) [adminKey](#proto.Key).
+ *
+ * These authorization rules allow for the use of digital signature verification on a single key, set of keys (M-of-N
+ * signatures required), contract evaluation, etc.
+ *
+ * Topics may also have timespans affecting the validity of submitted messages; ie - valid from date/time T until
+ * date/time T.
+ *
+ * The default expiration of a topic is 365 days (* 86400 seconds) from creation unless a sooner expiration is
+ * specified for the default transaction fee.
+ *
+ * A state proof, verifiable by any Hedera Hashgraph node, may be requested for the topic.
+ *
+ * Mirrornet consensus services may be used to subscribe to changes on the topic, including changes to the topic
+ * definition and the consensus ordering and timestamp of submitted messages.
+ */
+service ConsensusService {
+    /* Create a topic to be used for consensus.
+     * Request is [ConsensusCreateTopicTransactionBody](#proto.ConsensusCreateTopicTransactionBody)
+     */
+    rpc createTopic (Transaction) returns (TransactionResponse);
+
+    /* Update a topic.
+     * Request is [ConsensusUpdateTopicTransactionBody](#proto.ConsensusUpdateTopicTransactionBody)
+     */
+    rpc updateTopic (Transaction) returns (TransactionResponse);
+
+    /* Delete a topic. No more transactions on the topic are allowed.
+     * Request is [ConsensusDeleteTopicTransactionBody](#proto.ConsensusDeleteTopicTransactionBody)
+     */
+    rpc deleteTopic (Transaction) returns (TransactionResponse);
+
+    /* Retrieve the parameters of and state of a topic including the latest state (sequenceNumber and runningHash), and
+     * the topic's definition (valid message submission timespan, authorization rules, etc).
+     * Request is [ConsensusGetTopicInfoQuery](#proto.ConsensusGetTopicInfoQuery)
+     * Response is [ConsensusGetTopicInfoResponse](#proto.ConsensusGetTopicInfoResponse)
+     */
+    rpc getTopicInfo (Query) returns (Response);
+
+    /* Submit a message for consensus.
+     * Valid and authorized messages on valid topics will be ordered by the consensus service, gossipped to the
+     * mirror net, and published (in order) to all subscribers (from the mirror net) on this topic.
+     * Request is [ConsensusSubmitMessageTransactionBody](#proto.ConsensusSubmitMessageTransactionBody)
+     */
+    rpc submitMessage (Transaction) returns (TransactionResponse);
+}

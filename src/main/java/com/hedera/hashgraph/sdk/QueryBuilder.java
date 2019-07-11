@@ -189,6 +189,12 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
                 .getNodeTransactionPrecheckCode();
             unknownIsExceptional = false;
             break;
+        case CONSENSUSGETTOPICINFO:
+            precheckCode = raw.getTransactionGetRecord()
+                .getHeader()
+                .getNodeTransactionPrecheckCode();
+            unknownIsExceptional = false;
+            break;
         case RESPONSE_NOT_SET:
             throw new IllegalStateException("Response not set");
         default:

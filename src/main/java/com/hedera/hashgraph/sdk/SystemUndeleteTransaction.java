@@ -5,7 +5,7 @@ import com.hedera.hashgraph.sdk.file.FileId;
 import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import com.hederahashgraph.api.proto.java.SystemUndeleteTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SystemUndeleteTransactionBody;
 
 import io.grpc.MethodDescriptor;
 
