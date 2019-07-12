@@ -11,6 +11,7 @@ public final class IdUtil {
     public interface WithIdNums<R> {
         R apply(long shardNum, long realmNum, long entityNum);
     }
+
     public static <R> R parseIdString(String id, WithIdNums<R> withIdNums) {
         var rawNums = Splitter.on('.')
             .split(id)

@@ -7,7 +7,10 @@ import com.hedera.hashgraph.sdk.file.FileId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 class IdUtilTest {
 
@@ -37,4 +40,39 @@ class IdUtilTest {
         assertEquals( 0, fileFromString.getShardNum());
         assertEquals( 400, fileFromString.getFileNum());
     }
+
+    @Test
+    @DisplayName("incorrect account id from string should fail")
+    void testBadAccountIdFromStringFails() {
+        final var message = "Invalid Id format, should be in format {shardNum}.{realmNum}.{idNum}";
+        assertEquals(
+            message,
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> IdUtil.parseIdString("a.0.400", AccountId::new)).getMessage());
+    }
+
+    @Test
+    @DisplayName("incorrect contract id from string should fail")
+    void testBadContractIdFromStringFails() {
+        final var message = "Invalid Id format, should be in format {shardNum}.{realmNum}.{idNum}";
+        assertEquals(
+            message,
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> IdUtil.parseIdString("0.!.400", ContractId::new)).getMessage());
+    }
+
+    @Test
+    @DisplayName("incorrect file id from string should fail")
+    void testBadFileIdFromStringFails() {
+        final var message = "Invalid Id format, should be in format {shardNum}.{realmNum}.{idNum}";
+        assertEquals(
+            message,
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> IdUtil.parseIdString("0.1.plus", FileId::new)).getMessage());
+    }
+
+
 }
