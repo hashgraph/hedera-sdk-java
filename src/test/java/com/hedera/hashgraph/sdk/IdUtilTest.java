@@ -71,7 +71,7 @@ class IdUtilTest {
             message,
             assertThrows(
                 IllegalArgumentException.class,
-                () -> IdUtil.parseIdString("0.1.plus", FileId::new)).getMessage());
+                () -> IdUtil.parseIdString("0.1", FileId::new)).getMessage());
     }
 
 
