@@ -2,11 +2,17 @@ package com.hedera.hashgraph.sdk.file;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.QueryBuilder;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.FileGetContentsQuery;
+import com.hedera.hashgraph.sdk.proto.FileGetContentsResponse;
+import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.Query;
+import com.hedera.hashgraph.sdk.proto.QueryHeader;
+import com.hedera.hashgraph.sdk.proto.Response;
+
 import io.grpc.MethodDescriptor;
 
 // `FileGetContentsQuery`
-public class FileContentsQuery extends QueryBuilder<FileGetContentsResponse, FileContentsQuery> {
+public final class FileContentsQuery extends QueryBuilder<FileGetContentsResponse, FileContentsQuery> {
     private final FileGetContentsQuery.Builder builder = inner.getFileGetContentsBuilder();
 
     public FileContentsQuery(Client client) {
@@ -40,5 +46,10 @@ public class FileContentsQuery extends QueryBuilder<FileGetContentsResponse, Fil
     @Override
     protected void doValidate() {
         require(builder.hasFileID(), ".setFileId() required");
+    }
+
+    @Override
+    protected boolean isPaymentRequired() {
+        return true;
     }
 }
