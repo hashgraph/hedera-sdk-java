@@ -7,11 +7,6 @@ public final class IdUtil {
     private IdUtil() {
     }
 
-    @FunctionalInterface
-    public interface WithIdNums<R> {
-        R apply(long shardNum, long realmNum, long entityNum);
-    }
-
     public static <R> R parseIdString(String id, WithIdNums<R> withIdNums) {
         var rawNums = Splitter.on('.')
             .split(id)
@@ -23,5 +18,10 @@ public final class IdUtil {
             throw new IllegalArgumentException("Invalid Id format, should be in format {shardNum}.{realmNum}.{idNum}");
         }
         return newId;
+    }
+
+    @FunctionalInterface
+    public interface WithIdNums<R> {
+        R apply(long shardNum, long realmNum, long entityNum);
     }
 }
