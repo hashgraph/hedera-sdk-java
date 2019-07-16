@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk.file;
 
 import com.hedera.hashgraph.sdk.Entity;
+import com.hedera.hashgraph.sdk.IdUtil;
 import com.hedera.hashgraph.sdk.SolidityUtil;
 import com.hedera.hashgraph.sdk.proto.FileID;
 import com.hedera.hashgraph.sdk.proto.FileIDOrBuilder;
@@ -19,6 +20,11 @@ public final class FileId implements Entity {
 
     public FileId(FileIDOrBuilder fileId) {
         this(fileId.getShardNum(), fileId.getRealmNum(), fileId.getFileNum());
+    }
+
+    /** Constructs a `FileId` from a string formatted as <shardNum>.<realmNum>.<fileNum> */
+    public static FileId fromString(String account) throws IllegalArgumentException {
+        return IdUtil.parseIdString(account, FileId::new);
     }
 
     public static FileId fromSolidityAddress(String address) {
