@@ -101,6 +101,10 @@ public final class Client {
         return record.getReceipt().getTopicId();
     }
 
+	public TransactionId deleteTopic(TopicId topicId) throws HederaException, HederaNetworkException {
+		return new DeleteTopicTransaction(this).setTopicId(topicId).execute();
+	}
+
     public TransactionId submitMessage(TopicId topicId, byte[] message) throws HederaException, HederaNetworkException {
         return new SubmitMessageTransaction(this).setTopicId(topicId).setMessage(message)
             .execute();

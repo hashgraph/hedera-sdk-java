@@ -11,13 +11,9 @@
 
 # Maven
 target/
-examples/.settings/org.eclipse.m2e.core.prefs
-examples/.settings/org.eclipse.jdt.core.prefs
-examples/.settings/org.eclipse.core.resources.prefs
+examples/.settings/
 examples/.project
 examples/.classpath
-.settings/org.eclipse.m2e.core.prefs
-.settings/org.eclipse.jdt.core.prefs
-.settings/org.eclipse.core.resources.prefs
+.settings/
 .project
 .classpath

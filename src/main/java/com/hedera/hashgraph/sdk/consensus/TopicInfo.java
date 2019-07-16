@@ -1,5 +1,7 @@
 package com.hedera.hashgraph.sdk.consensus;
 
+import org.bouncycastle.util.encoders.Hex;
+
 import com.hedera.hashgraph.sdk.proto.*;
 
 public class TopicInfo {
@@ -22,5 +24,10 @@ public class TopicInfo {
 
     public byte[] getRunningHash() {
         return inner.hasTopicState() ? inner.getTopicState().getRunningHash().toByteArray() : new byte[0];
+    }
+
+    @Override
+    public String toString() {
+        return String.format("sequenceNumber: %d, runningHash: %s", getSequenceNumber(), Hex.toHexString(getRunningHash()));
     }
 }

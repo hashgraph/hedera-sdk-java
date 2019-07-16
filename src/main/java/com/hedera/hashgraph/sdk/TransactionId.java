@@ -11,7 +11,6 @@ import java.util.Objects;
 
 import javax.annotation.Nullable;
 
-// TODO: TransactionId.toString
 // TODO: TransactionId.fromString
 
 public final class TransactionId {
@@ -99,5 +98,10 @@ public final class TransactionId {
 
         var otherId = (TransactionId) other;
         return getAccountId().equals(otherId.getAccountId()) && getValidStart().equals(otherId.getValidStart());
+    }
+
+    @Override
+    public String toString() {
+        return String.format("accountId: %s, validStart: %s", getAccountId(), getValidStart());
     }
 }
