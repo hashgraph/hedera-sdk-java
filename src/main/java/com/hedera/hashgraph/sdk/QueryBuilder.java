@@ -196,8 +196,15 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     @Override
     protected final Resp mapResponse(Response raw) throws HederaException {
-        final ResponseCodeEnum precheckCode = getResponseHeader(raw)
-            .getNodeTransactionPrecheckCode();
+        validatePrecheckCode(raw);
+        return fromResponse(raw);
+    }
+
+    protected abstract Resp fromResponse(Response raw);
+
+    private ResponseHeader validatePrecheckCode(Response raw) throws HederaException {
+        final var header = getResponseHeader(raw);
+        final ResponseCodeEnum precheckCode = header.getNodeTransactionPrecheckCode();
 
         final var responseCase = raw.getResponseCase();
 
@@ -205,10 +212,9 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
             || responseCase == Response.ResponseCase.TRANSACTIONGETRECORD;
 
         HederaException.throwIfExceptional(precheckCode, unknownIsExceptional);
-        return fromResponse(raw);
-    }
 
-    protected abstract Resp fromResponse(Response raw);
+        return header;
+    }
 
     private class QueryCostRequest extends HederaCall<Query, Response, Long, QueryCostRequest> {
 
@@ -240,7 +246,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
         @Override
         protected Long mapResponse(Response raw) throws HederaException {
-            return getResponseHeader(raw).getCost();
+            return validatePrecheckCode(raw).getCost();
         }
 
         @Override
