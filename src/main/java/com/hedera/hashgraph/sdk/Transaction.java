@@ -6,6 +6,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519Signature;
+import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
@@ -365,6 +366,14 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
             return FileServiceGrpc.getDeleteFileMethod();
         case FILEUPDATE:
             return FileServiceGrpc.getUpdateFileMethod();
+        case CONSENSUSCREATETOPIC:
+        	return ConsensusServiceGrpc.getCreateTopicMethod();
+        case CONSENSUSDELETETOPIC:
+        	return ConsensusServiceGrpc.getDeleteTopicMethod();
+        case CONSENSUSUPDATETOPIC:
+        	return ConsensusServiceGrpc.getUpdateTopicMethod();
+        case CONSENSUSSUBMITMESSAGE:
+        	return ConsensusServiceGrpc.getSubmitMessageMethod();
         case DATA_NOT_SET:
             throw new IllegalArgumentException("method not set");
         default:

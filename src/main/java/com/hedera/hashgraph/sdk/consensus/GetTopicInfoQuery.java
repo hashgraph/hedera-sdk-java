@@ -8,6 +8,7 @@ import io.grpc.MethodDescriptor;
 import javax.annotation.Nullable;
 
 public final class GetTopicInfoQuery extends QueryBuilder<TopicInfo, GetTopicInfoQuery> {
+
     private final ConsensusGetTopicInfoQuery.Builder builder = inner.getConsensusGetTopicInfoBuilder();
 
     public GetTopicInfoQuery(@Nullable Client client) {
@@ -26,7 +27,7 @@ public final class GetTopicInfoQuery extends QueryBuilder<TopicInfo, GetTopicInf
 
     @Override
     protected void doValidate() {
-        require(builder.hasTopicID(), ".setTopicID() required");
+        require(builder.hasTopicID(), ".setTopicId() required");
     }
 
     @Override
