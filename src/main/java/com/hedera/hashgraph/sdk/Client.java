@@ -14,9 +14,11 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public final class Client {
-    static final long DEFAULT_MAX_TXN_FEE = 100_000;
     final Random random = new Random();
     private Map<AccountId, Node> channels;
+
+    static final long DEFAULT_MAX_TXN_FEE = 100_000;
+
     // todo: transaction fees should be defaulted to whatever the transaction fee schedule is
     private long maxTransactionFee = DEFAULT_MAX_TXN_FEE;
 
@@ -37,6 +39,15 @@ public final class Client {
             .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, t -> new Node(t.getKey(), t.getValue())));
     }
 
+    public Client setMaxTransactionFee(@Nonnegative long maxTransactionFee) {
+        if (maxTransactionFee <= 0) {
+            throw new IllegalArgumentException("maxTransactionFee must be > 0");
+        }
+
+        this.maxTransactionFee = maxTransactionFee;
+        return this;
+    }
+
     public Client setOperator(AccountId operatorId, Ed25519PrivateKey operatorKey) {
         this.operatorId = operatorId;
         this.operatorKey = operatorKey;
@@ -45,15 +56,6 @@ public final class Client {
 
     public long getMaxTransactionFee() {
         return maxTransactionFee;
-    }
-
-    public Client setMaxTransactionFee(@Nonnegative long maxTransactionFee) {
-        if (maxTransactionFee <= 0) {
-            throw new IllegalArgumentException("maxTransactionFee must be > 0");
-        }
-
-        this.maxTransactionFee = maxTransactionFee;
-        return this;
     }
 
     @Nullable

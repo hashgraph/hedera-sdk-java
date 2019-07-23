@@ -17,6 +17,7 @@ public final class SimpleWorkflow {
 
     public static void main(String[] args) throws HederaException {
         var client = ExampleHelper.createHederaClient();
+        client.setMaxTransactionFee(10_000_000L);
         var newKey = Ed25519PrivateKey.generate();
 
         var topicId = client.createTopic("test1");
