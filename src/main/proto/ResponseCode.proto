@@ -125,14 +125,23 @@ enum ResponseCodeEnum {
   NOT_SPECIAL_ACCOUNT = 94; //The payer account is not a special account(account 0.0.55)
   CONTRACT_NEGATIVE_GAS = 95; // Negative gas was offered in smart contract call
   CONTRACT_NEGATIVE_VALUE = 96; // Negative value / initial balance was specified in a smart contract call / create
-  INVALID_TOPIC_ID = 97;
+  INVALID_TOPIC_ID = 97; // The Topic ID specified is not in the system.
+  // The Topic referenced is in a deleted state for a period of time pending removal from the system.
+  // No ConsensusService transactions on this topic will succeed once the topic is deleted, though getTopicInfo()
+  // may return the topic's state.
   TOPIC_DELETED = 98;
   MESSAGE_TOO_LONG = 99;
+  // An attempted ConsensusService.submitMessage failed due to being called outside the valid time period for the
+  // topic, defined by the topic's creationTimestamp and expirationTimestamp. All other operations on the topic
+  // will succeed.
   TOPIC_NOT_ENABLED = 100;
   INVALID_TOPIC_CREATION_TIME = 101;
   INVALID_TOPIC_EXPIRATION_TIME = 102;
   INVALID_TOPIC_ADMIN_KEY = 103;
   INVALID_TOPIC_SUBMIT_KEY = 104;
-  UNAUTHORIZED = 105;
-  INVALID_TOPIC_MESSAGE = 106;
+  UNAUTHORIZED = 105; // An attempted ConsensusService operation failed due to missing/insufficient keys.
+  INVALID_TOPIC_MESSAGE = 106; // A ConsensusService message is empty.
+  INVALID_CREATE_TOPIC_ID = 107; // Realm/shard for ConsensusService.createTopic do not match payer.
+  // Realm/shard of a contract ID in adminKey or submitKey for a ConsensusService topic doesn't match the shard/realm of the topic.
+  INVALID_TOPIC_CONTRACT_ID = 108;
 }
