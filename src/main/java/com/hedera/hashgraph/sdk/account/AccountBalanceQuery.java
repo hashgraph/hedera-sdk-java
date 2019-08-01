@@ -2,10 +2,15 @@ package com.hedera.hashgraph.sdk.account;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.QueryBuilder;
-import com.hedera.hashgraph.sdk.proto.*;
-import io.grpc.MethodDescriptor;
+import com.hedera.hashgraph.sdk.proto.CryptoGetAccountBalanceQuery;
+import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.Query;
+import com.hedera.hashgraph.sdk.proto.QueryHeader;
+import com.hedera.hashgraph.sdk.proto.Response;
 
 import javax.annotation.Nullable;
+
+import io.grpc.MethodDescriptor;
 
 // `CryptoGetAccountBalanceQuery`
 public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalanceQuery> {
@@ -39,5 +44,10 @@ public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalance
     protected Long fromResponse(Response raw) {
         return raw.getCryptogetAccountBalance()
             .getBalance();
+    }
+
+    @Override
+    protected boolean isPaymentRequired() {
+        return true;
     }
 }

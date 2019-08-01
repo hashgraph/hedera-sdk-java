@@ -13,6 +13,10 @@ public final class GetAccountBalance {
 
         var query = new AccountBalanceQuery(client).setAccountId(operatorId);
 
+        var cost = query.requestCost();
+
+        System.out.println("balance query cost: " + cost);
+
         var balance = query.execute();
 
         System.out.println("balance = " + balance);

@@ -17,6 +17,7 @@ public final class GetQueryCost {
         var cost = new FileContentsQuery(client)
             // fileNum 102 is the fee schedule
             .setFileId(new FileId(0, 0, 102))
+            // .addAutoPayment(100_000)
             .requestCost();
 
         // Prints query results to console

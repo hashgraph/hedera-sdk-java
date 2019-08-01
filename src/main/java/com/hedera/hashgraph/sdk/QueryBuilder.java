@@ -84,22 +84,23 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         }, onError);
     }
 
-    private void addAutoPayment(long cost) {
+    public T addAutoPayment(long cost) {
         if (client != null && isPaymentRequired() && !getHeaderBuilder().hasPayment() && client.getOperatorId() != null) {
-            // FIXME: queries that say they have 0 cost are still requiring fee payments
-            final var minCost = Math.max(cost, 100_000);
-
             var operatorId = client.getOperatorId();
             var nodeId = getNode().accountId;
             var txPayment = new CryptoTransferTransaction(client)
                 .setNodeAccountId(nodeId)
                 .setTransactionId(new TransactionId(operatorId))
-                .addSender(operatorId, minCost)
-                .addRecipient(nodeId, minCost)
-                .build();
+                .addSender(operatorId, cost)
+                .addRecipient(nodeId, cost);
 
-            setPayment(txPayment);
+            // txPayment.setTransactionFee(client.getMaxTransactionFee());
+
+            return setPayment(txPayment.build());
         }
+
+        //noinspection unchecked
+        return (T) this;
     }
 
     /**
@@ -140,7 +141,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     protected abstract void doValidate();
 
     protected boolean isPaymentRequired() {
-        return true;
+        return !getHeaderBuilder().hasPayment();
     }
 
     /** Check that the query was built properly, throwing an exception on any errors. */
@@ -229,6 +230,10 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
             final var header = getHeaderBuilder();
             final var responseType = header.getResponseType();
+
+            final var payment = header.getPayment();
+
+            QueryBuilder.this.addAutoPayment(0);
 
             // set response type to COST before serializing
             header.setResponseType(ResponseType.COST_ANSWER);
