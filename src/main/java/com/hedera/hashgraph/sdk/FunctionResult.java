@@ -73,6 +73,12 @@ public final class FunctionResult {
         return getByteString(offset + 32, offset + 32 + len);
     }
 
+    /** Get the nth returned value as a string  from byte 32*/
+    public String getBytes32(int valIndex) {
+        var offset = getInt(valIndex);
+        return getByteString(offset + 0, offset + 32).toStringUtf8();
+    }
+
     /**
      * Get the nth 32-byte value as an untyped byte string.
      */
