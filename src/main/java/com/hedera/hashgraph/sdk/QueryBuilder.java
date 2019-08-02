@@ -92,7 +92,8 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
                 .setNodeAccountId(nodeId)
                 .setTransactionId(new TransactionId(operatorId))
                 .addSender(operatorId, cost)
-                .addRecipient(nodeId, cost);
+                .addRecipient(nodeId, cost)
+                .setTransactionFee(client.getMaxTransactionFee());
 
             // txPayment.setTransactionFee(client.getMaxTransactionFee());
 
@@ -233,7 +234,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
             final var payment = header.getPayment();
 
-            QueryBuilder.this.addAutoPayment(0);
+            // QueryBuilder.this.addAutoPayment(0);
 
             // set response type to COST before serializing
             header.setResponseType(ResponseType.COST_ANSWER);

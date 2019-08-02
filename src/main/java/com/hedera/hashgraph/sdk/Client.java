@@ -119,6 +119,7 @@ public final class Client {
 
     public AccountInfo getAccount(AccountId id) throws HederaException, HederaNetworkException {
         return new AccountInfoQuery(this).setAccountId(id)
+            .addAutoPayment(10_000)
             .execute();
     }
 
@@ -129,6 +130,7 @@ public final class Client {
 
     public long getAccountBalance(AccountId id) throws HederaException, HederaNetworkException {
         return new AccountBalanceQuery(this).setAccountId(id)
+            .addAutoPayment(0)
             .execute();
     }
 

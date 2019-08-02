@@ -1,7 +1,6 @@
 package com.hedera.hashgraph.sdk.examples.advanced;
 
 import com.hedera.hashgraph.sdk.HederaException;
-import com.hedera.hashgraph.sdk.account.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.examples.ExampleHelper;
 
 public final class GetAccountBalance {
@@ -11,7 +10,9 @@ public final class GetAccountBalance {
         var operatorId = ExampleHelper.getOperatorId();
         var client = ExampleHelper.createHederaClient();
 
-        var query = new AccountBalanceQuery(client).setAccountId(operatorId);
+        /*var query = new AccountBalanceQuery(client)
+            .setAccountId(operatorId)
+            .addAutoPayment(0);
 
         var cost = query.requestCost();
 
@@ -19,6 +20,8 @@ public final class GetAccountBalance {
 
         var balance = query.execute();
 
-        System.out.println("balance = " + balance);
+        System.out.println("balance = " + balance);*/
+
+        System.out.println("expiry: " + client.getAccount(operatorId).getExpirationTime());
     }
 }

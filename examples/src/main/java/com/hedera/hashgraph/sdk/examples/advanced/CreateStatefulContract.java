@@ -5,15 +5,12 @@ import com.google.gson.JsonObject;
 import com.hedera.hashgraph.sdk.CallParams;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.contract.ContractCallQuery;
-import com.hedera.hashgraph.sdk.contract.ContractCreateTransaction;
 import com.hedera.hashgraph.sdk.contract.ContractExecuteTransaction;
+import com.hedera.hashgraph.sdk.contract.ContractId;
 import com.hedera.hashgraph.sdk.examples.ExampleHelper;
-import com.hedera.hashgraph.sdk.file.FileCreateTransaction;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.time.Duration;
-import java.time.Instant;
 
 public final class CreateStatefulContract {
     private CreateStatefulContract() { }
@@ -41,21 +38,23 @@ public final class CreateStatefulContract {
         var client = ExampleHelper.createHederaClient();
 
         // create the contract's bytecode file
-        var fileTx = new FileCreateTransaction(client).setExpirationTime(
+        /*var fileTx = new FileCreateTransaction(client).setExpirationTime(
             Instant.now()
-                .plus(Duration.ofSeconds(2592000)))
+                .plus(Duration.ofSeconds(3600)))
             // Use the same key as the operator to "own" this file
             .addKey(operatorKey.getPublicKey())
-            .setContents(byteCode);
+            .setContents(byteCode)
+            .setTransactionFee(100_000_000L);
 
         var fileReceipt = fileTx.executeForReceipt();
         var newFileId = fileReceipt.getFileId();
 
-        System.out.println("contract bytecode file: " + newFileId);
+        System.out.println("contract bytecode file: " + newFileId);*/
 
-        var contractTx = new ContractCreateTransaction(client).setBytecodeFile(newFileId)
+        /*var contractTx = new ContractCreateTransaction(client).setBytecodeFile(FileId.fromString("0.0.37170"))
             .setAutoRenewPeriod(Duration.ofHours(1))
             .setGas(100_000_000)
+            .setTransactionFee(1_000_000_000L)
             .setConstructorParams(
                 CallParams.constructor()
                     .addString("hello from hedera!"));
@@ -63,11 +62,14 @@ public final class CreateStatefulContract {
         var contractReceipt = contractTx.executeForReceipt();
         var newContractId = contractReceipt.getContractId();
 
-        System.out.println("new contract ID: " + newContractId);
+        System.out.println("new contract ID: " + newContractId);*/
+
+        var newContractId = ContractId.fromString("0.0.37171");
 
         var contractCallResult = new ContractCallQuery(client).setContractId(newContractId)
             .setGas(100_000_000)
             .setFunctionParameters(CallParams.function("get_message"))
+            .addAutoPayment(1_000_000L)
             .execute();
 
         if (contractCallResult.getErrorMessage() != null) {
@@ -82,6 +84,7 @@ public final class CreateStatefulContract {
             .setGas(100_000_000)
             .setFunctionParameters(CallParams.function("set_message")
                 .addString("hello from hedera again!"))
+            .setTransactionFee(100_000_000)
             .execute();
 
         // sleep a few seconds to allow consensus + smart contract exec
@@ -91,6 +94,7 @@ public final class CreateStatefulContract {
         var contractUpdateResult = new ContractCallQuery(client).setContractId(newContractId)
             .setGas(100_000_000)
             .setFunctionParameters(CallParams.function("get_message"))
+            .addAutoPayment(1_000_000)
             .execute();
 
         if (contractUpdateResult.getErrorMessage() != null) {

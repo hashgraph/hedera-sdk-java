@@ -21,7 +21,8 @@ public final class CreateAccount {
         var tx = new AccountCreateTransaction(client)
             // The only _required_ property here is `key`
             .setKey(newKey.getPublicKey())
-            .setInitialBalance(1000);
+            .setInitialBalance(100_000)
+            .setTransactionFee(10_000_000);
 
         // This will wait for the receipt to become available
         var receipt = tx.executeForReceipt();
