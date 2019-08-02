@@ -108,7 +108,7 @@ public abstract class HederaCall<Req, RawResp, Resp, T> {
     }
 
     protected void require(@Nullable String setValue, String errMsg) {
-        require(setValue != null && setValue.isEmpty(), errMsg);
+        require(setValue != null && !setValue.isEmpty(), errMsg);
     }
 
     private final class CallStreamObserver implements StreamObserver<RawResp> {
