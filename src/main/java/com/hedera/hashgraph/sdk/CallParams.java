@@ -73,6 +73,16 @@ public final class CallParams<Kind> {
         return this;
     }
 
+    public CallParams<Kind> addBytes32(String param) {
+    	byte[] ret = new byte[32];
+    	byte[] bytes = ((String) param).getBytes(StandardCharsets.UTF_8);
+    	System.arraycopy(bytes, 0, ret, 0, bytes.length);
+    	addParamType("bytes32");
+        args.add(new Argument(ByteString.copyFrom(ret), false));
+
+        return this;
+    }
+
     private static ByteString encodeString(String string) {
         final var strBytes = ByteString.copyFromUtf8(string);
         // prepend the size of the string in UTF-8 bytes
