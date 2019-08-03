@@ -191,7 +191,8 @@ public final class CallParams<Kind> {
                 "bytesN cannot have a length greater than 32; given length: " + fixedLen);
         }
 
-        addParamType("bytes[" + fixedLen + "]");
+        //addParamType("bytes[" + fixedLen + "]");
+        addParamType("bytes" + fixedLen );
         // the bytesN type is fixed size
         args.add(new Argument(rightPad32(ByteString.copyFrom(param)), false));
 
