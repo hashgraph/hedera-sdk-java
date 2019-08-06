@@ -192,7 +192,7 @@ public final class CallParams<Kind> {
         }
 
         //addParamType("bytes[" + fixedLen + "]");
-        addParamType("bytes" + fixedLen );
+        addParamType("bytes" + fixedLen);
         // the bytesN type is fixed size
         args.add(new Argument(rightPad32(ByteString.copyFrom(param)), false));
 
