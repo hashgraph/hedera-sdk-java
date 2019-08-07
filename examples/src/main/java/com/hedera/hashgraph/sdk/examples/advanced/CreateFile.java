@@ -17,12 +17,14 @@ public final class CreateFile {
         // The file is required to be a byte array,
         // you can easily use the bytes of a file instead.
         var fileContents = "Hedera hashgraph is great!".getBytes();
-
+        
+        var txFee = 100000000; 
         var tx = new FileCreateTransaction(client).setExpirationTime(
             Instant.now()
                 .plus(Duration.ofSeconds(2592000)))
             // Use the same key as the operator to "own" this file
             .addKey(operatorKey.getPublicKey())
+            .setTransactionFee(txFee)
             .setContents(fileContents);
 
         var receipt = tx.executeForReceipt();
