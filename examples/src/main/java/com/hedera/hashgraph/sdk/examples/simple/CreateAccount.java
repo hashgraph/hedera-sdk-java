@@ -16,7 +16,8 @@ public final class CreateAccount {
         System.out.println("public key = " + newPublicKey);
 
         var client = ExampleHelper.createHederaClient();
-        var newAccountId = client.createAccount(newKey.getPublicKey(), 1000);
+        var maxTransactionFee = 100000000;
+        var newAccountId = client.setMaxTransactionFee(maxTransactionFee).createAccount(newPublicKey, 100000000);
 
         System.out.println("account = " + newAccountId);
     }
