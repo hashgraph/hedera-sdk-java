@@ -1,6 +1,6 @@
-# Contributing to the Hedera SDK for Rust
+# Contributing to the Hedera SDK for Java
 
-Thank you for your interest in contributing the Hedera SDK for Rust!
+Thank you for your interest in contributing the Hedera SDK for Java!
 
 We appreciate your interest in helping us and the rest of our community. We welcome bug reports, feature requests, and code contributions.
 
@@ -78,7 +78,7 @@ Before submitting your pull request, refer to the pull request readiness checkli
 
 * [ ] Includes tests to exercise the new behaviour
 * [ ] Code is documented, especially public and user-facing constructs
-* [ ] Local run of `cargo test` succeeds
+* [ ] Local run of `mvn checkstyle:check` and `mvn spotbugs:check` succeed
 * [ ] Git commit message is detailed and includes context behind the change
 * [ ] If the change is related to an existing Bug Report or Feature Request, please include its issue number
 
@@ -92,11 +92,11 @@ All Pull Requests must be approved by at least one member of the SDK team before
 
 * Join us in our [Discord][discord] channel; there you can engage with the Hedera team and other developers and enthusiasts.
 
-[license]: https://github.com/hashgraph/hedera-sdk-rust/blob/master/LICENSE
+[license]: https://github.com/hashgraph/hedera-sdk-java/blob/master/LICENSE
 [mwe]: https://en.wikipedia.org/wiki/Minimal_Working_Example
 [markdown]: https://guides.github.com/features/mastering-markdown/
-[issues]: https://github.com/hashgraph/hedera-sdk-rust/issues
-[pull-requests]: https://github.com/hashgraph/hedera-sdk-rust/pulls
-[label-bug]: https://github.com/hashgraph/hedera-sdk-rust/labels/bug
-[label-enhancement]: https://github.com/hashgraph/hedera-sdk-rust/labels/enhancement
+[issues]: https://github.com/hashgraph/hedera-sdk-java/issues
+[pull-requests]: https://github.com/hashgraph/hedera-sdk-java/pulls
+[label-bug]: https://github.com/hashgraph/hedera-sdk-java/labels/bug
+[label-enhancement]: https://github.com/hashgraph/hedera-sdk-java/labels/enhancement
 [discord]: https://hedera.com/discord

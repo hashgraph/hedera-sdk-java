@@ -63,24 +63,36 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
      *
      * @return {@code this} for fluent usage.
      */
-    @SuppressWarnings("unchecked")
     public T setPaymentDefault() {
-        if (client != null && isPaymentRequired() && !getHeaderBuilder().hasPayment() && client.getOperatorId() != null) {
-            // FIXME: Require setAutoPayment to be set ?
+        return setPaymentDefault(getCost());
+    }
 
-            var cost = getCost();
+    /**
+     * Explicitly specify that the operator account is paying for the query and set payment
+     * with the given amount.
+     * <p>
+     * Only takes effect if payment is required, has not been set yet, and an operator ID
+     * was provided to the {@link Client} used to construct this instance.
+     *
+     * @return {@code this} for fluent usage.
+     */
+    public T setPaymentDefault(long paymentAmount) {
+        if (client != null && isPaymentRequired() && !getHeaderBuilder().hasPayment()
+            && client.getOperatorId() != null)
+        {
             var operatorId = client.getOperatorId();
             var nodeId = getNode().accountId;
             var txPayment = new CryptoTransferTransaction(client)
                 .setNodeAccountId(nodeId)
                 .setTransactionId(new TransactionId(operatorId))
-                .addSender(operatorId, cost)
-                .addRecipient(nodeId, cost)
+                .addSender(operatorId, paymentAmount)
+                .addRecipient(nodeId, paymentAmount)
                 .build();
 
             setPayment(txPayment);
         }
 
+        //noinspection unchecked
         return (T) this;
     }
 

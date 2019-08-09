@@ -367,13 +367,13 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         case FILEUPDATE:
             return FileServiceGrpc.getUpdateFileMethod();
         case CONSENSUSCREATETOPIC:
-        	return ConsensusServiceGrpc.getCreateTopicMethod();
+            return ConsensusServiceGrpc.getCreateTopicMethod();
         case CONSENSUSDELETETOPIC:
-        	return ConsensusServiceGrpc.getDeleteTopicMethod();
+            return ConsensusServiceGrpc.getDeleteTopicMethod();
         case CONSENSUSUPDATETOPIC:
-        	return ConsensusServiceGrpc.getUpdateTopicMethod();
+            return ConsensusServiceGrpc.getUpdateTopicMethod();
         case CONSENSUSSUBMITMESSAGE:
-        	return ConsensusServiceGrpc.getSubmitMessageMethod();
+            return ConsensusServiceGrpc.getSubmitMessageMethod();
         case DATA_NOT_SET:
             throw new IllegalArgumentException("method not set");
         default:

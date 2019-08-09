@@ -17,14 +17,14 @@
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>sdk</artifactId>
-  <version>0.5.1</version>
+  <version>0.5.2</version>
 </dependency>
 ```
 
 #### Gradle
 
 ```groovy
-implementation 'com.hedera.hashgraph:sdk:0.5.1'
+implementation 'com.hedera.hashgraph:sdk:0.5.2'
 ```
 
 ## Contributing to this Project
