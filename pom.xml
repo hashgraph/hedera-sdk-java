@@ -56,6 +56,7 @@
             <artifactId>hedera-protobuf-java-api</artifactId>
             <version>${hedera-protobuf.version}</version>
             <exclusions>
+                <!-- this lets us override io.grpc group dependencies with our own versions -->
                 <exclusion>
                     <groupId>io.grpc</groupId>
                     <artifactId>*</artifactId>
