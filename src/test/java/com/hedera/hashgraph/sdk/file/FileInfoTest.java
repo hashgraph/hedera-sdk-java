@@ -2,9 +2,9 @@ package com.hedera.hashgraph.sdk.file;
 
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
-import com.hedera.hashgraph.sdk.proto.FileGetInfoResponse;
-import com.hedera.hashgraph.sdk.proto.KeyList;
-import com.hedera.hashgraph.sdk.proto.Response;
+import com.hederahashgraph.api.proto.java.FileGetInfoResponse;
+import com.hederahashgraph.api.proto.java.KeyList;
+import com.hederahashgraph.api.proto.java.Response;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

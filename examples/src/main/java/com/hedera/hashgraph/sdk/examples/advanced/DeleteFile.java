@@ -5,8 +5,7 @@ import com.hedera.hashgraph.sdk.examples.ExampleHelper;
 import com.hedera.hashgraph.sdk.file.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.file.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.file.FileInfoQuery;
-import com.hedera.hashgraph.sdk.proto.FileGetInfoQuery;
-import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -33,23 +32,23 @@ public final class DeleteFile {
         var newFileId = receipt.getFileId();
 
         System.out.println("file: " + newFileId);
-        
+
         // now delete the file
         var txDeleteReceipt = new FileDeleteTransaction(client)
             .setFileId(newFileId)
             .executeForReceipt();
-        
+
         if (txDeleteReceipt.getStatus() != ResponseCodeEnum.SUCCESS) {
             System.out.println("Error while deleting a file");
             return;
         }
         System.out.println("File deleted successfully.");
-        
+
         var fileInfo = new FileInfoQuery(client)
             .setFileId(newFileId)
             .execute();
-        
+
         // note the above fileInfo will fail with FILE_DELETED due to a known issue on Hedera
-        
+
     }
 }
