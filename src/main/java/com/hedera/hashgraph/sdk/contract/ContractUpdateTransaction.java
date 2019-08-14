@@ -7,15 +7,17 @@ import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.Key;
 import com.hedera.hashgraph.sdk.file.FileId;
-import com.hedera.hashgraph.sdk.proto.ContractUpdateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.Transaction;
-import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import io.grpc.MethodDescriptor;
+import com.hederahashgraph.api.proto.java.ContractUpdateTransactionBody;
+import com.hederahashgraph.api.proto.java.Transaction;
+import com.hederahashgraph.api.proto.java.TransactionResponse;
+import com.hederahashgraph.service.proto.java.SmartContractServiceGrpc;
 
-import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.Instant;
+
+import javax.annotation.Nullable;
+
+import io.grpc.MethodDescriptor;
 
 public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdateTransaction> {
     private final ContractUpdateTransactionBody.Builder builder = bodyBuilder.getContractUpdateInstanceBuilder();

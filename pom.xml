@@ -41,14 +41,21 @@
         <maven.compiler.target>10</maven.compiler.target>
 
         <errorprone.version>2.3.3</errorprone.version>
-        <grpc.version>1.20.0</grpc.version>
+        <grpc.version>1.13.1</grpc.version>
         <junit.version>5.3.1</junit.version>
         <nullaway.version>0.7.2</nullaway.version>
-        <protoc.version>3.7.1</protoc.version>
         <spotbugs.version>3.1.12</spotbugs.version>
+
+        <hedera-protobuf.version>0.3.3</hedera-protobuf.version>
     </properties>
 
     <dependencies>
+        <!-- Pre-compiled protobufs for Hedera -->
+        <dependency>
+            <groupId>com.hedera.hashgraph</groupId>
+            <artifactId>hedera-protobuf-java-api</artifactId>
+            <version>${hedera-protobuf.version}</version>
+        </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
@@ -154,27 +161,6 @@
                         </arg>
                     </compilerArgs>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.xolstice.maven.plugins</groupId>
-                <artifactId>protobuf-maven-plugin</artifactId>
-                <version>0.5.1</version>
-                <configuration>
-                    <protocArtifact>com.google.protobuf:protoc:${protoc.version}:exe:${os.detected.classifier}
-                    </protocArtifact>
-                    <pluginId>grpc-java</pluginId>
-                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}
-                    </pluginArtifact>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>compile</goal>
-                            <goal>compile-custom</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <!-- JUnit 5 requires Surefire version 2.22.1 or higher -->

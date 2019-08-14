@@ -2,7 +2,12 @@ package com.hedera.hashgraph.sdk.file;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.QueryBuilder;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hederahashgraph.api.proto.java.FileGetInfoQuery;
+import com.hederahashgraph.api.proto.java.Query;
+import com.hederahashgraph.api.proto.java.QueryHeader;
+import com.hederahashgraph.api.proto.java.Response;
+import com.hederahashgraph.service.proto.java.FileServiceGrpc;
+
 import io.grpc.MethodDescriptor;
 
 // `FileGetInfoQuery`

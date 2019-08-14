@@ -1,10 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
-import com.hedera.hashgraph.sdk.proto.Query;
-import com.hedera.hashgraph.sdk.proto.QueryHeader;
-import com.hedera.hashgraph.sdk.proto.Response;
-import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
+import com.hederahashgraph.api.proto.java.Query;
+import com.hederahashgraph.api.proto.java.QueryHeader;
+import com.hederahashgraph.api.proto.java.Response;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 import java.util.Objects;
 
