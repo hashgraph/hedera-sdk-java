@@ -271,7 +271,11 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
      * @throws HederaException for any response code that is not {@link ResponseCodeEnum#SUCCESS}
      * @throws HederaNetworkException
      * @throws RuntimeException if an {@link java.lang.InterruptedException} is thrown while waiting for the receipt.
+     * @deprecated querying for records has a cost separate from executing the transaction and so
+     * should be done in an explicit step
+     *
      */
+    @Deprecated(forRemoval = true)
     public TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
         return executeAndWaitFor(
             receipt -> new TransactionRecordQuery(getClient()).setTransactionId(getId()).execute());
@@ -291,6 +295,11 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
         executeForReceiptAsync(r -> onSuccess.accept(this, r), e -> onError.accept(this, e));
     }
 
+    /**
+     * @deprecated querying for records has a cost separate from executing the transaction and so
+     * should be done in an explicit step
+     */
+    @Deprecated(forRemoval = true)
     public void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<HederaThrowable> onError) {
         final var recordQuery = new TransactionRecordQuery(getClient())
             .setTransactionId(getId())
@@ -304,9 +313,10 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
     }
 
     /**
-     * Equivalent to {@link #executeForRecordAsync(Consumer, Consumer)} but providing {@code this}
-     * to the callback for additional context.
+     * @deprecated querying for records has a cost separate from executing the transaction and so
+     * should be done in an explicit step
      */
+    @Deprecated(forRemoval = true)
     public final void executeForRecordAsync(BiConsumer<Transaction, TransactionRecord> onSuccess, BiConsumer<Transaction, HederaThrowable> onError) {
         executeForRecordAsync(r -> onSuccess.accept(this, r), e -> onError.accept(this, e));
     }
