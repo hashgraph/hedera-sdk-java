@@ -2,8 +2,8 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import com.hederahashgraph.api.proto.java.TransactionBody;
+import com.hederahashgraph.api.proto.java.TransactionResponse;
 
 import java.time.Duration;
 import java.util.Objects;
@@ -15,9 +15,9 @@ import javax.annotation.Nullable;
 import io.grpc.Channel;
 
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
-    extends HederaCall<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse, TransactionId, T>
+    extends HederaCall<com.hederahashgraph.api.proto.java.Transaction, TransactionResponse, TransactionId, T>
 {
-    protected final com.hedera.hashgraph.sdk.proto.Transaction.Builder inner = com.hedera.hashgraph.sdk.proto.Transaction.newBuilder();
+    protected final com.hederahashgraph.api.proto.java.Transaction.Builder inner = com.hederahashgraph.api.proto.java.Transaction.newBuilder();
     protected final TransactionBody.Builder bodyBuilder = TransactionBody.newBuilder();
 
     private static final int MAX_MEMO_LENGTH = 100;
@@ -105,11 +105,11 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     protected abstract void doValidate();
 
     @Override
-    public final com.hedera.hashgraph.sdk.proto.Transaction toProto() {
+    public final com.hederahashgraph.api.proto.java.Transaction toProto() {
         return build().toProto();
     }
 
-    public final com.hedera.hashgraph.sdk.proto.Transaction toProto(boolean requireSignature) {
+    public final com.hederahashgraph.api.proto.java.Transaction toProto(boolean requireSignature) {
         return build().toProto(requireSignature);
     }
 

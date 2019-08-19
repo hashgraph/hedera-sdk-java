@@ -1,6 +1,11 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hederahashgraph.api.proto.java.Query;
+import com.hederahashgraph.api.proto.java.QueryHeader;
+import com.hederahashgraph.api.proto.java.Response;
+import com.hederahashgraph.api.proto.java.TransactionGetReceiptQuery;
+import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
+
 import io.grpc.MethodDescriptor;
 
 public final class TransactionReceiptQuery extends QueryBuilder<TransactionReceipt, TransactionReceiptQuery> {

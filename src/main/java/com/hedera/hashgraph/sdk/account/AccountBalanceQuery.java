@@ -2,10 +2,15 @@ package com.hedera.hashgraph.sdk.account;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.QueryBuilder;
-import com.hedera.hashgraph.sdk.proto.*;
-import io.grpc.MethodDescriptor;
+import com.hederahashgraph.api.proto.java.CryptoGetAccountBalanceQuery;
+import com.hederahashgraph.api.proto.java.Query;
+import com.hederahashgraph.api.proto.java.QueryHeader;
+import com.hederahashgraph.api.proto.java.Response;
+import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
 
 import javax.annotation.Nullable;
+
+import io.grpc.MethodDescriptor;
 
 // `CryptoGetAccountBalanceQuery`
 public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalanceQuery> {

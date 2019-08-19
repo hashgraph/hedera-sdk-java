@@ -2,7 +2,13 @@ package com.hedera.hashgraph.sdk.account;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.QueryBuilder;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hederahashgraph.api.proto.java.CryptoGetStakersQuery;
+import com.hederahashgraph.api.proto.java.CryptoGetStakersResponse;
+import com.hederahashgraph.api.proto.java.Query;
+import com.hederahashgraph.api.proto.java.QueryHeader;
+import com.hederahashgraph.api.proto.java.Response;
+import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
+
 import io.grpc.MethodDescriptor;
 
 // `CryptoGetStakersQuery`

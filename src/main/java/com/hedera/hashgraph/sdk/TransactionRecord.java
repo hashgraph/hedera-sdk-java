@@ -1,17 +1,18 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.proto.AccountAmountOrBuilder;
+import com.hederahashgraph.api.proto.java.AccountAmountOrBuilder;
 
-import javax.annotation.Nullable;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class TransactionRecord {
-    private final com.hedera.hashgraph.sdk.proto.TransactionRecord inner;
+import javax.annotation.Nullable;
 
-    TransactionRecord(com.hedera.hashgraph.sdk.proto.TransactionRecord inner) {
+public final class TransactionRecord {
+    private final com.hederahashgraph.api.proto.java.TransactionRecord inner;
+
+    TransactionRecord(com.hederahashgraph.api.proto.java.TransactionRecord inner) {
         this.inner = inner;
     }
 
