@@ -212,13 +212,14 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     protected final Resp mapResponse(Response raw) throws HederaException {
         final ResponseCodeEnum precheckCode = getResponseHeader(raw).getNodeTransactionPrecheckCode();
         final var responseCase = raw.getResponseCase();
-        var unknownIsExceptional = true;
+        var unknownIsExceptional = false;
 
         switch (responseCase) {
             case TRANSACTIONGETRECEIPT:
             case TRANSACTIONGETRECORD:
-                unknownIsExceptional = false;
+                break;
             default:
+                unknownIsExceptional = true;
         }
 
         HederaException.throwIfExceptional(precheckCode, unknownIsExceptional);
