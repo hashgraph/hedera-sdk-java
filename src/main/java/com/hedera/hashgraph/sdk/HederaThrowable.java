@@ -7,6 +7,7 @@ package com.hedera.hashgraph.sdk;
  * <ul>
  * <li> {@link HederaException} </li>
  * <li> {@link HederaNetworkException}</li>
+ * <li> {@link QueryBuilder.MaxPaymentExceededException}</li> (thrown for queries)
  * </ul>
  */
 public interface HederaThrowable {

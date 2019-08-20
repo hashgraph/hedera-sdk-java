@@ -26,6 +26,8 @@ public final class Client {
 
     // todo: transaction fees should be defaulted to whatever the transaction fee schedule is
     private long maxTransactionFee = DEFAULT_MAX_TXN_FEE;
+    // require users to opt into query payment
+    private long maxQueryPayment = 0;
 
     @Nullable
     private AccountId operatorId;
@@ -44,12 +46,43 @@ public final class Client {
             .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, t -> new Node(t.getKey(), t.getValue())));
     }
 
+    /**
+     * Set the maximum fee to be paid for transactions executed by this client.
+     *
+     * Because transaction fees are always maximums, this will simply add a call to
+     * {@link TransactionBuilder#setTransactionFee(long)} on every new transaction. The actual
+     * fee assessed for a given transaction may be less than this value, but never greater.
+     *
+     * @param maxTransactionFee
+     * @return {@code this} for fluent usage.
+     */
     public Client setMaxTransactionFee(@Nonnegative long maxTransactionFee) {
         if (maxTransactionFee <= 0) {
             throw new IllegalArgumentException("maxTransactionFee must be > 0");
         }
 
         this.maxTransactionFee = maxTransactionFee;
+        return this;
+    }
+
+    /**
+     * Set the maximum default payment value allowable for queries.
+     *
+     * When a query is executed without an explicit {@link QueryBuilder#setPayment(Transaction)}
+     * or {@link QueryBuilder#setPaymentDefault(long)} call, the client will first request the cost
+     * of the given query from the node it will be submitted to and attach a payment for that amount
+     * from the operator account on the client.
+     *
+     * If the returned value is greater than this value, a
+     * {@link QueryBuilder.MaxPaymentExceededException} will be thrown from
+     * {@link QueryBuilder#execute()} or returned in the second callback of
+     * {@link QueryBuilder#executeAsync(Consumer, Consumer)}.
+     *
+     * @param maxQueryPayment
+     * @return
+     */
+    public Client setMaxQueryPayment(@Nonnegative long maxQueryPayment) {
+        this.maxQueryPayment = maxQueryPayment;
         return this;
     }
 
@@ -61,6 +94,10 @@ public final class Client {
 
     public long getMaxTransactionFee() {
         return maxTransactionFee;
+    }
+
+    public long getMaxQueryPayment() {
+        return maxQueryPayment;
     }
 
     @Nullable

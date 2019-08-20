@@ -34,11 +34,20 @@ public abstract class HederaCall<Req, RawResp, Resp, T> {
         return getChannel().newCall(getMethod(), CallOptions.DEFAULT);
     }
 
+    // callbacks which can perform their own calls
+    protected void onPreExecute() throws HederaException, HederaNetworkException { }
+
+    protected void onPreExecuteAsync(Runnable onSuccess, Consumer<HederaThrowable> onError) {
+        onSuccess.run();
+    }
+
     public final Resp execute() throws HederaException, HederaNetworkException {
         if (isExecuted) {
             throw new IllegalStateException("call already executed");
         }
         isExecuted = true;
+
+        onPreExecute();
 
         return mapResponse(ClientCalls.blockingUnaryCall(newClientCall(), toProto()));
     }
@@ -49,8 +58,9 @@ public abstract class HederaCall<Req, RawResp, Resp, T> {
         }
         isExecuted = true;
 
-        ClientCalls.asyncUnaryCall(newClientCall(), toProto(),
-            new CallStreamObserver(onSuccess, onError));
+        onPreExecuteAsync(() -> ClientCalls.asyncUnaryCall(newClientCall(), toProto(),
+            new CallStreamObserver(onSuccess, onError)),
+            onError);
     }
 
     /**
