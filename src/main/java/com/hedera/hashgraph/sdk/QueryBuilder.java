@@ -260,7 +260,11 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
             final var built = inner.build();
 
-            if (origPayment != null) header.setPayment(origPayment);
+            if (origPayment != null) {
+                header.setPayment(origPayment);
+            } else {
+                header.clearPayment();
+            }
             header.setResponseType(origResponseType);
 
             return built;
