@@ -117,9 +117,10 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     @Override
     protected void onPreExecute() throws HederaException, HederaNetworkException {
-        if (!getHeaderBuilder().hasPayment() && isPaymentRequired()) {
+        final var maxQueryPayment = requireClient().getMaxQueryPayment();
+
+        if (!getHeaderBuilder().hasPayment() && isPaymentRequired() && maxQueryPayment > 0) {
             final var cost = requestCost();
-            final var maxQueryPayment = requireClient().getMaxQueryPayment();
             if (cost > maxQueryPayment) {
                 throw new MaxPaymentExceededException(this, cost, maxQueryPayment);
             }
@@ -130,9 +131,10 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     @Override
     protected void onPreExecuteAsync(Runnable onSuccess, Consumer<HederaThrowable> onError) {
-        if (!getHeaderBuilder().hasPayment() && isPaymentRequired()) {
+        final var maxQueryPayment = requireClient().getMaxQueryPayment();
+
+        if (!getHeaderBuilder().hasPayment() && isPaymentRequired() && maxQueryPayment > 0) {
             requestCostAsync(cost -> {
-                final var maxQueryPayment = requireClient().getMaxQueryPayment();
                 if (cost > maxQueryPayment) {
                     onError.accept(new MaxPaymentExceededException(this, cost, maxQueryPayment));
                     return;
