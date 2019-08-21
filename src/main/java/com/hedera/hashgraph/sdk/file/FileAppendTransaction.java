@@ -3,13 +3,14 @@ package com.hedera.hashgraph.sdk.file;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
-import com.hedera.hashgraph.sdk.proto.FileAppendTransactionBody;
-import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.Transaction;
-import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import io.grpc.MethodDescriptor;
+import com.hederahashgraph.api.proto.java.FileAppendTransactionBody;
+import com.hederahashgraph.api.proto.java.Transaction;
+import com.hederahashgraph.api.proto.java.TransactionResponse;
+import com.hederahashgraph.service.proto.java.FileServiceGrpc;
 
 import javax.annotation.Nullable;
+
+import io.grpc.MethodDescriptor;
 
 public final class FileAppendTransaction extends TransactionBuilder<FileAppendTransaction> {
     private final FileAppendTransactionBody.Builder builder = bodyBuilder.getFileAppendBuilder();

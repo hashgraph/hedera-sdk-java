@@ -2,12 +2,16 @@ package com.hedera.hashgraph.sdk.account;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.QueryBuilder;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hederahashgraph.api.proto.java.Query;
+import com.hederahashgraph.api.proto.java.QueryHeader;
+import com.hederahashgraph.api.proto.java.Response;
+import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
+
 import io.grpc.MethodDescriptor;
 
 // `CryptoGetInfoQuery`
 public final class AccountInfoQuery extends QueryBuilder<AccountInfo, AccountInfoQuery> {
-    private final com.hedera.hashgraph.sdk.proto.CryptoGetInfoQuery.Builder builder;
+    private final com.hederahashgraph.api.proto.java.CryptoGetInfoQuery.Builder builder;
 
     public AccountInfoQuery(Client client) {
         super(client);

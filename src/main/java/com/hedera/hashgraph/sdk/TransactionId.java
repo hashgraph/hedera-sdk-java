@@ -1,9 +1,9 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.proto.Timestamp;
-import com.hedera.hashgraph.sdk.proto.TransactionID;
-import com.hedera.hashgraph.sdk.proto.TransactionIDOrBuilder;
+import com.hederahashgraph.api.proto.java.Timestamp;
+import com.hederahashgraph.api.proto.java.TransactionID;
+import com.hederahashgraph.api.proto.java.TransactionIDOrBuilder;
 
 import java.time.Clock;
 import java.time.Instant;

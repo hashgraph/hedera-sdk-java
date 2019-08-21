@@ -9,7 +9,7 @@ import com.hedera.hashgraph.sdk.contract.ContractCreateTransaction;
 import com.hedera.hashgraph.sdk.contract.ContractDeleteTransaction;
 import com.hedera.hashgraph.sdk.examples.ExampleHelper;
 import com.hedera.hashgraph.sdk.file.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -80,7 +80,7 @@ public final class CreateSimpleContract {
 
         var message = contractCallResult.getString();
         System.out.println("contract message: " + message);
-        
+
         // now delete the contract
         var contractDeleteResult = new ContractDeleteTransaction(client)
             .setContractId(newContractId)

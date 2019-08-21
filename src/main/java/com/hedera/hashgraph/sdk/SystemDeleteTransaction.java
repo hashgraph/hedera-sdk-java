@@ -2,15 +2,16 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.contract.ContractId;
 import com.hedera.hashgraph.sdk.file.FileId;
-import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.Transaction;
-import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import com.hederahashgraph.api.proto.java.SystemDeleteTransactionBody;
+import com.hederahashgraph.api.proto.java.Transaction;
+import com.hederahashgraph.api.proto.java.TransactionResponse;
+import com.hederahashgraph.service.proto.java.FileServiceGrpc;
 
-import io.grpc.MethodDescriptor;
+import java.time.Instant;
 
 import javax.annotation.Nullable;
-import java.time.Instant;
+
+import io.grpc.MethodDescriptor;
 
 public final class SystemDeleteTransaction extends TransactionBuilder<SystemDeleteTransaction> {
     private final SystemDeleteTransactionBody.Builder builder = bodyBuilder.getSystemDeleteBuilder();

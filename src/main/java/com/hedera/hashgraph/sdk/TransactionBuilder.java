@@ -2,8 +2,8 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import com.hederahashgraph.api.proto.java.TransactionBody;
+import com.hederahashgraph.api.proto.java.TransactionResponse;
 
 import java.time.Duration;
 import java.util.Objects;
@@ -15,9 +15,9 @@ import javax.annotation.Nullable;
 import io.grpc.Channel;
 
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
-    extends HederaCall<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse, TransactionId, T>
+    extends HederaCall<com.hederahashgraph.api.proto.java.Transaction, TransactionResponse, TransactionId, T>
 {
-    protected final com.hedera.hashgraph.sdk.proto.Transaction.Builder inner = com.hedera.hashgraph.sdk.proto.Transaction.newBuilder();
+    protected final com.hederahashgraph.api.proto.java.Transaction.Builder inner = com.hederahashgraph.api.proto.java.Transaction.newBuilder();
     protected final TransactionBody.Builder bodyBuilder = TransactionBody.newBuilder();
 
     private static final int MAX_MEMO_LENGTH = 100;
@@ -105,11 +105,11 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     protected abstract void doValidate();
 
     @Override
-    public final com.hedera.hashgraph.sdk.proto.Transaction toProto() {
+    public final com.hederahashgraph.api.proto.java.Transaction toProto() {
         return build().toProto();
     }
 
-    public final com.hedera.hashgraph.sdk.proto.Transaction toProto(boolean requireSignature) {
+    public final com.hederahashgraph.api.proto.java.Transaction toProto(boolean requireSignature) {
         return build().toProto(requireSignature);
     }
 
@@ -191,18 +191,29 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         build().executeForReceiptAsync(r -> onSuccess.accept((T) this, r), e -> onError.accept((T) this, e));
     }
 
+    /**
+     * @deprecated querying for records has a cost separate from executing the transaction and so
+     * should be done in an explicit step
+     */
+    @Deprecated(forRemoval = true)
     public final TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
         return build().executeForRecord();
     }
 
+    /**
+     * @deprecated querying for records has a cost separate from executing the transaction and so
+     * should be done in an explicit step
+     */
+    @Deprecated(forRemoval = true)
     public final void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<HederaThrowable> onError) {
         build().executeForRecordAsync(onSuccess, onError);
     }
 
     /**
-     * Equivalent to {@link #executeForRecordAsync(Consumer, Consumer)} but providing {@code this}
-     * to the callback for additional context.
+     * @deprecated querying for records has a cost separate from executing the transaction and so
+     * should be done in an explicit step
      */
+    @Deprecated(forRemoval = true)
     public final void executeForRecordAsync(BiConsumer<T, TransactionRecord> onSuccess, BiConsumer<T, HederaThrowable> onError) {
         //noinspection unchecked
         build().executeForRecordAsync(r -> onSuccess.accept((T) this, r), e -> onError.accept((T) this, e));

@@ -2,8 +2,8 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.contract.ContractId;
-import com.hedera.hashgraph.sdk.proto.ContractFunctionResultOrBuilder;
-import com.hedera.hashgraph.sdk.proto.ContractLoginfoOrBuilder;
+import com.hederahashgraph.api.proto.java.ContractFunctionResultOrBuilder;
+import com.hederahashgraph.api.proto.java.ContractLoginfoOrBuilder;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
