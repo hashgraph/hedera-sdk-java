@@ -8,8 +8,9 @@ import com.hedera.hashgraph.sdk.file.FileId;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public final class LoadAddressBook {
-    private LoadAddressBook() { }
+/** Get the network address book for inspecting the node public keys, among other things */
+public final class GetAddressBook {
+    private GetAddressBook() { }
 
     public static void main(String[] args) throws HederaException, IOException {
         final var client = ExampleHelper.createHederaClient();
