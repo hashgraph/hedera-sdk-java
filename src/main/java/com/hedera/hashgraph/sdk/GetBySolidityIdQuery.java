@@ -1,6 +1,12 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hederahashgraph.api.proto.java.GetBySolidityIDQuery;
+import com.hederahashgraph.api.proto.java.GetBySolidityIDResponse;
+import com.hederahashgraph.api.proto.java.Query;
+import com.hederahashgraph.api.proto.java.QueryHeader;
+import com.hederahashgraph.api.proto.java.Response;
+import com.hederahashgraph.service.proto.java.SmartContractServiceGrpc;
+
 import io.grpc.MethodDescriptor;
 
 public final class GetBySolidityIdQuery extends QueryBuilder<GetBySolidityIDResponse, GetBySolidityIdQuery> {

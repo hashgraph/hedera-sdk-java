@@ -1,22 +1,26 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
-import com.hedera.hashgraph.sdk.proto.Query;
-import com.hedera.hashgraph.sdk.proto.QueryHeader;
-import com.hedera.hashgraph.sdk.proto.Response;
-import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
+import com.hederahashgraph.api.proto.java.Query;
+import com.hederahashgraph.api.proto.java.QueryHeader;
+import com.hederahashgraph.api.proto.java.Response;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
+import com.hederahashgraph.api.proto.java.ResponseHeader;
+import com.hederahashgraph.api.proto.java.ResponseType;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
 import io.grpc.Channel;
+import io.grpc.MethodDescriptor;
 
 public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extends HederaCall<Query, Response, Resp, T> {
     protected final Query.Builder inner = Query.newBuilder();
 
     @Nullable
-    private final Client client;
+    protected final Client client;
 
     @Nullable
     private Node pickedNode;
@@ -32,11 +36,15 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         return getNode().getChannel();
     }
 
+    protected Client requireClient() {
+        return Objects.requireNonNull(client,
+            "QueryBuilder.client must be non-null in regular use");
+    }
+
     private Node getNode() {
-        Objects.requireNonNull(client, "QueryBuilder.client must be non-null in regular use");
 
         if (pickedNode == null) {
-            pickedNode = client.pickNode();
+            pickedNode = requireClient().pickNode();
         }
 
         return pickedNode;
@@ -62,9 +70,12 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
      * was provided to the {@link Client} used to construct this instance.
      *
      * @return {@code this} for fluent usage.
+     * @deprecated query cost should be calculated by requesting it from the node so this function's
+     * signature is insufficient to abstract over that operation.
      */
+    @Deprecated(forRemoval = true)
     public T setPaymentDefault() {
-        return setPaymentDefault(getCost());
+        return setPaymentDefault(100_000);
     }
 
     /**
@@ -96,10 +107,45 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         return (T) this;
     }
 
-    protected int getCost() {
-        // FIXME: Currently query costs are fixed at 100,000 tinybar; this should change to
-        //        an actual hedera request with the response type of COST (and cache this information on the client)
-        return 100_000;
+    public final long requestCost() throws HederaException, HederaNetworkException {
+        return new CostQuery().execute();
+    }
+
+    public final void requestCostAsync(Consumer<Long> withCost, Consumer<HederaThrowable> onError) {
+        new CostQuery().executeAsync(withCost, onError);
+    }
+
+    @Override
+    protected void onPreExecute() throws HederaException, HederaNetworkException {
+        final var maxQueryPayment = requireClient().getMaxQueryPayment();
+
+        if (!getHeaderBuilder().hasPayment() && isPaymentRequired() && maxQueryPayment > 0) {
+            final var cost = requestCost();
+            if (cost > maxQueryPayment) {
+                throw new MaxPaymentExceededException(this, cost, maxQueryPayment);
+            }
+
+            setPaymentDefault(requestCost());
+        }
+    }
+
+    @Override
+    protected void onPreExecuteAsync(Runnable onSuccess, Consumer<HederaThrowable> onError) {
+        final var maxQueryPayment = requireClient().getMaxQueryPayment();
+
+        if (!getHeaderBuilder().hasPayment() && isPaymentRequired() && maxQueryPayment > 0) {
+            requestCostAsync(cost -> {
+                if (cost > maxQueryPayment) {
+                    onError.accept(new MaxPaymentExceededException(this, cost, maxQueryPayment));
+                    return;
+                }
+
+                setPaymentDefault(cost);
+                onSuccess.run();
+            }, onError);
+        } else {
+            onSuccess.run();
+        }
     }
 
     protected abstract void doValidate();
@@ -108,7 +154,9 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         return true;
     }
 
-    /** Check that the query was built properly, throwing an exception on any errors. */
+    /**
+     * Check that the query was built properly, throwing an exception on any errors.
+     */
     @Override
     public final void validate() {
         if (isPaymentRequired()) {
@@ -116,96 +164,62 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         }
 
         doValidate();
+
         checkValidationErrors("query builder failed validation");
+    }
+
+    private static ResponseHeader getResponseHeader(Response raw) {
+        switch (raw.getResponseCase()) {
+            case GETBYKEY:
+                return raw.getGetByKey().getHeader();
+            case GETBYSOLIDITYID:
+                return raw.getGetBySolidityID().getHeader();
+            case CONTRACTCALLLOCAL:
+                return raw.getContractCallLocal().getHeader();
+            case CONTRACTGETBYTECODERESPONSE:
+                return raw.getContractGetBytecodeResponse().getHeader();
+            case CONTRACTGETINFO:
+                return raw.getContractGetInfo().getHeader();
+            case CONTRACTGETRECORDSRESPONSE:
+                return raw.getContractGetRecordsResponse().getHeader();
+            case CRYPTOGETACCOUNTBALANCE:
+                return raw.getCryptogetAccountBalance().getHeader();
+            case CRYPTOGETACCOUNTRECORDS:
+                return raw.getCryptoGetAccountRecords().getHeader();
+            case CRYPTOGETINFO:
+                return raw.getCryptoGetInfo().getHeader();
+            case CRYPTOGETCLAIM:
+                return raw.getCryptoGetClaim().getHeader();
+            case CRYPTOGETPROXYSTAKERS:
+                return raw.getCryptoGetProxyStakers().getHeader();
+            case FILEGETCONTENTS:
+                return raw.getFileGetContents().getHeader();
+            case FILEGETINFO:
+                return raw.getFileGetInfo().getHeader();
+            case TRANSACTIONGETRECEIPT:
+                return raw.getTransactionGetReceipt().getHeader();
+            case TRANSACTIONGETRECORD:
+                return raw.getTransactionGetRecord().getHeader();
+            case RESPONSE_NOT_SET:
+                throw new IllegalStateException("Response not set");
+            default:
+                // NOTE: TRANSACTIONGETFASTRECORD shouldn't be handled as we don't expose that query
+                throw new RuntimeException("Unhandled response case");
+        }
     }
 
     @Override
     protected final Resp mapResponse(Response raw) throws HederaException {
-        final ResponseCodeEnum precheckCode;
-        var unknownIsExceptional = true;
-        switch (raw.getResponseCase()) {
-        case GETBYKEY:
-            precheckCode = raw.getGetByKey()
-                .getHeader()
-                .getNodeTransactionPrecheckCode();
-            break;
-        case GETBYSOLIDITYID:
-            precheckCode = raw.getGetBySolidityID()
-                .getHeader()
-                .getNodeTransactionPrecheckCode();
-            break;
-        case CONTRACTCALLLOCAL:
-            precheckCode = raw.getContractCallLocal()
-                .getHeader()
-                .getNodeTransactionPrecheckCode();
-            break;
-        case CONTRACTGETBYTECODERESPONSE:
-            precheckCode = raw.getContractGetBytecodeResponse()
-                .getHeader()
-                .getNodeTransactionPrecheckCode();
-            break;
-        case CONTRACTGETINFO:
-            precheckCode = raw.getContractGetInfo()
-                .getHeader()
-                .getNodeTransactionPrecheckCode();
-            break;
-        case CONTRACTGETRECORDSRESPONSE:
-            precheckCode = raw.getContractGetRecordsResponse()
-                .getHeader()
-                .getNodeTransactionPrecheckCode();
-            break;
-        case CRYPTOGETACCOUNTBALANCE:
-            precheckCode = raw.getCryptogetAccountBalance()
-                .getHeader()
-                .getNodeTransactionPrecheckCode();
-            break;
-        case CRYPTOGETACCOUNTRECORDS:
-            precheckCode = raw.getCryptoGetAccountRecords()
-                .getHeader()
-                .getNodeTransactionPrecheckCode();
-            break;
-        case CRYPTOGETINFO:
-            precheckCode = raw.getCryptoGetInfo()
-                .getHeader()
-                .getNodeTransactionPrecheckCode();
-            break;
-        case CRYPTOGETCLAIM:
-            precheckCode = raw.getCryptoGetClaim()
-                .getHeader()
-                .getNodeTransactionPrecheckCode();
-            break;
-        case CRYPTOGETPROXYSTAKERS:
-            precheckCode = raw.getCryptoGetProxyStakers()
-                .getHeader()
-                .getNodeTransactionPrecheckCode();
-            break;
-        case FILEGETCONTENTS:
-            precheckCode = raw.getFileGetContents()
-                .getHeader()
-                .getNodeTransactionPrecheckCode();
-            break;
-        case FILEGETINFO:
-            precheckCode = raw.getFileGetInfo()
-                .getHeader()
-                .getNodeTransactionPrecheckCode();
-            break;
-        case TRANSACTIONGETRECEIPT:
-            precheckCode = raw.getTransactionGetReceipt()
-                .getHeader()
-                .getNodeTransactionPrecheckCode();
-            unknownIsExceptional = false;
-            break;
-        case TRANSACTIONGETRECORD:
-            precheckCode = raw.getTransactionGetRecord()
-                .getHeader()
-                .getNodeTransactionPrecheckCode();
-            unknownIsExceptional = false;
-            break;
-        case RESPONSE_NOT_SET:
-            throw new IllegalStateException("Response not set");
-        default:
-            // NOTE: TRANSACTIONGETFASTRECORD shouldn't be handled as we don't expose that query
-            throw new RuntimeException("Unhandled response case");
+        final ResponseCodeEnum precheckCode = getResponseHeader(raw).getNodeTransactionPrecheckCode();
+        final var responseCase = raw.getResponseCase();
+        var unknownIsExceptional = false;
+
+        switch (responseCase) {
+            case TRANSACTIONGETRECEIPT:
+            case TRANSACTIONGETRECORD:
+                break;
+            default:
+                unknownIsExceptional = true;
         }
 
         HederaException.throwIfExceptional(precheckCode, unknownIsExceptional);
@@ -213,4 +227,75 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     }
 
     protected abstract Resp fromResponse(Response raw);
+
+    private final class CostQuery extends HederaCall<Query, Response, Long, CostQuery> {
+
+        @Override
+        protected MethodDescriptor<Query, Response> getMethod() {
+            return QueryBuilder.this.getMethod();
+        }
+
+        @Override
+        public Query toProto() {
+            final var header = getHeaderBuilder();
+
+            final var origPayment = header.hasPayment() ? header.getPayment() : null;
+            final var origResponseType = header.getResponseType();
+
+            final var nodeAccountId = getNode().accountId;
+            final var operatorId = Objects.requireNonNull(
+                requireClient().getOperatorId(),
+                "COST_ANSWER requires an operator ID to be set");
+
+            // COST_ANSWER requires a payment to pass validation but doesn't actually process it
+            final var fakePayment = new CryptoTransferTransaction(client)
+                .addRecipient(nodeAccountId, 0)
+                .addSender(operatorId, 0)
+                .build()
+                .toProto();
+
+            // set our fake values, build and then reset
+            header.setPayment(fakePayment);
+            header.setResponseType(ResponseType.COST_ANSWER);
+
+            final var built = inner.build();
+
+            if (origPayment != null) {
+                header.setPayment(origPayment);
+            } else {
+                header.clearPayment();
+            }
+            header.setResponseType(origResponseType);
+
+            return built;
+        }
+
+        @Override
+        protected Channel getChannel() {
+            return QueryBuilder.this.getChannel();
+        }
+
+        @Override
+        protected Long mapResponse(Response raw) throws HederaException {
+            return getResponseHeader(raw).getCost();
+        }
+
+        @Override
+        public void validate() {
+            // skip payment validation
+            doValidate();
+            QueryBuilder.this.checkValidationErrors("cannot get cost for incomplete query");
+        }
+    }
+
+    public static final class MaxPaymentExceededException extends RuntimeException implements HederaThrowable {
+        private MaxPaymentExceededException(QueryBuilder builder, long cost, long maxQueryPayment) {
+            super(String.format(
+                "cost of %s (%d) without explicit payment is greater than "
+                    + "Client.maxQueryPayment (%d)",
+                builder.getClass().getSimpleName(),
+                cost,
+                maxQueryPayment));
+        }
+    }
 }

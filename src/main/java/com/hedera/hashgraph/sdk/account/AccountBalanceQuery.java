@@ -2,10 +2,15 @@ package com.hedera.hashgraph.sdk.account;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.QueryBuilder;
-import com.hedera.hashgraph.sdk.proto.*;
-import io.grpc.MethodDescriptor;
+import com.hederahashgraph.api.proto.java.CryptoGetAccountBalanceQuery;
+import com.hederahashgraph.api.proto.java.Query;
+import com.hederahashgraph.api.proto.java.QueryHeader;
+import com.hederahashgraph.api.proto.java.Response;
+import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
 
 import javax.annotation.Nullable;
+
+import io.grpc.MethodDescriptor;
 
 // `CryptoGetAccountBalanceQuery`
 public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalanceQuery> {
@@ -13,6 +18,8 @@ public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalance
 
     public AccountBalanceQuery(@Nullable Client client) {
         super(client);
+        // a payment transaction is required but is not processed so it can have zero value
+        setPaymentDefault(0);
     }
 
     @Override
@@ -28,6 +35,11 @@ public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalance
     @Override
     protected void doValidate() {
         require(builder.hasAccountID(), ".setAccountId() required");
+        require(getHeaderBuilder().hasPayment(),
+            "AccountBalanceQuery requires a payment for validation but it is not processed; "
+                + "one would have been created automatically but the given Client did not have "
+                + "an operator ID or key set. You must instead manually create, sign and then set "
+                + "a payment transaction with .setPayment().");
     }
 
     @Override
@@ -37,7 +49,6 @@ public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalance
 
     @Override
     protected Long fromResponse(Response raw) {
-        return raw.getCryptogetAccountBalance()
-            .getBalance();
+        return raw.getCryptogetAccountBalance().getBalance();
     }
 }
