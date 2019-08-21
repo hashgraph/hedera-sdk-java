@@ -1,15 +1,16 @@
 package com.hedera.hashgraph.sdk.contract;
 
-import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.TimestampHelper;
+import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.Key;
-import com.hedera.hashgraph.sdk.proto.ContractGetInfoResponse;
-import com.hedera.hashgraph.sdk.proto.Response;
+import com.hederahashgraph.api.proto.java.ContractGetInfoResponse;
+import com.hederahashgraph.api.proto.java.Response;
 
-import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.Instant;
+
+import javax.annotation.Nullable;
 
 public final class ContractInfo {
     private final ContractGetInfoResponse.ContractInfo inner;

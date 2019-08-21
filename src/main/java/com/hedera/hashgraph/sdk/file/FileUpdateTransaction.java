@@ -5,11 +5,17 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.crypto.Key;
-import com.hedera.hashgraph.sdk.proto.*;
-import io.grpc.MethodDescriptor;
+import com.hederahashgraph.api.proto.java.FileUpdateTransactionBody;
+import com.hederahashgraph.api.proto.java.KeyList;
+import com.hederahashgraph.api.proto.java.Transaction;
+import com.hederahashgraph.api.proto.java.TransactionResponse;
+import com.hederahashgraph.service.proto.java.FileServiceGrpc;
+
+import java.time.Instant;
 
 import javax.annotation.Nullable;
-import java.time.Instant;
+
+import io.grpc.MethodDescriptor;
 
 public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransaction> {
     private final FileUpdateTransactionBody.Builder builder = bodyBuilder.getFileUpdateBuilder();

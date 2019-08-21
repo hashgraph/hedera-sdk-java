@@ -2,6 +2,7 @@ package com.hedera.hashgraph.sdk.crypto.ed25519;
 
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.crypto.Key;
+
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
@@ -84,8 +85,8 @@ public final class Ed25519PublicKey implements Key {
     }
 
     @Override
-    public com.hedera.hashgraph.sdk.proto.Key toKeyProto() {
-        return com.hedera.hashgraph.sdk.proto.Key.newBuilder()
+    public com.hederahashgraph.api.proto.java.Key toKeyProto() {
+        return com.hederahashgraph.api.proto.java.Key.newBuilder()
             .setEd25519(ByteString.copyFrom(toBytes()))
             .build();
     }

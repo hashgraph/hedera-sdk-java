@@ -5,7 +5,12 @@ import com.hedera.hashgraph.sdk.CallParams;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.FunctionResult;
 import com.hedera.hashgraph.sdk.QueryBuilder;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hederahashgraph.api.proto.java.ContractCallLocalQuery;
+import com.hederahashgraph.api.proto.java.Query;
+import com.hederahashgraph.api.proto.java.QueryHeader;
+import com.hederahashgraph.api.proto.java.Response;
+import com.hederahashgraph.service.proto.java.SmartContractServiceGrpc;
+
 import io.grpc.MethodDescriptor;
 
 /** Call a function without updating its state or requiring concensus */

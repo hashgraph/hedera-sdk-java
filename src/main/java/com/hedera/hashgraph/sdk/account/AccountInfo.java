@@ -3,12 +3,14 @@ package com.hedera.hashgraph.sdk.account;
 import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.crypto.Key;
-import com.hedera.hashgraph.sdk.proto.CryptoGetInfoResponse;
-import com.hedera.hashgraph.sdk.proto.Response;
+import com.hederahashgraph.api.proto.java.CryptoGetInfoResponse;
+import com.hederahashgraph.api.proto.java.Response;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import javax.annotation.Nullable;
 
 public class AccountInfo {

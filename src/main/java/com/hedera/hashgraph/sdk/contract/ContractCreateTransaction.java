@@ -8,10 +8,16 @@ import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.Key;
 import com.hedera.hashgraph.sdk.file.FileId;
-import com.hedera.hashgraph.sdk.proto.*;
-import io.grpc.MethodDescriptor;
+import com.hederahashgraph.api.proto.java.ContractCreateTransactionBody;
+import com.hederahashgraph.api.proto.java.RealmID;
+import com.hederahashgraph.api.proto.java.ShardID;
+import com.hederahashgraph.api.proto.java.Transaction;
+import com.hederahashgraph.api.proto.java.TransactionResponse;
+import com.hederahashgraph.service.proto.java.SmartContractServiceGrpc;
 
 import javax.annotation.Nullable;
+
+import io.grpc.MethodDescriptor;
 
 public class ContractCreateTransaction extends TransactionBuilder<ContractCreateTransaction> {
     private final ContractCreateTransactionBody.Builder builder = bodyBuilder.getContractCreateInstanceBuilder();

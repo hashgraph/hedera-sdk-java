@@ -2,14 +2,14 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.contract.ContractId;
 import com.hedera.hashgraph.sdk.file.FileId;
-import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.Transaction;
-import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import com.hederahashgraph.api.proto.java.SystemUndeleteTransactionBody;
-
-import io.grpc.MethodDescriptor;
+import com.hederahashgraph.api.proto.java.Transaction;
+import com.hederahashgraph.api.proto.java.TransactionResponse;
+import com.hederahashgraph.service.proto.java.FileServiceGrpc;
 
 import javax.annotation.Nullable;
+
+import io.grpc.MethodDescriptor;
 
 public final class SystemUndeleteTransaction extends TransactionBuilder<SystemUndeleteTransaction> {
 

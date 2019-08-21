@@ -2,13 +2,14 @@ package com.hedera.hashgraph.sdk.account;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
-import com.hedera.hashgraph.sdk.proto.CryptoDeleteTransactionBody;
-import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.Transaction;
-import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import io.grpc.MethodDescriptor;
+import com.hederahashgraph.api.proto.java.CryptoDeleteTransactionBody;
+import com.hederahashgraph.api.proto.java.Transaction;
+import com.hederahashgraph.api.proto.java.TransactionResponse;
+import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
 
 import javax.annotation.Nullable;
+
+import io.grpc.MethodDescriptor;
 
 // `CryptoDeleteTransaction`
 public class AccountDeleteTransaction extends TransactionBuilder<AccountDeleteTransaction> {

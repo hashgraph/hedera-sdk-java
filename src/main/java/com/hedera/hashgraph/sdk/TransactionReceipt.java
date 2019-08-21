@@ -3,11 +3,11 @@ package com.hedera.hashgraph.sdk;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.contract.ContractId;
 import com.hedera.hashgraph.sdk.file.FileId;
-import com.hedera.hashgraph.sdk.proto.Response;
-import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
+import com.hederahashgraph.api.proto.java.Response;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class TransactionReceipt {
-    private final com.hedera.hashgraph.sdk.proto.TransactionReceipt inner;
+    private final com.hederahashgraph.api.proto.java.TransactionReceipt inner;
 
     TransactionReceipt(Response response) {
         if (!response.hasTransactionGetReceipt()) {
@@ -18,7 +18,7 @@ public final class TransactionReceipt {
             .getReceipt();
     }
 
-    TransactionReceipt(com.hedera.hashgraph.sdk.proto.TransactionReceipt inner) {
+    TransactionReceipt(com.hederahashgraph.api.proto.java.TransactionReceipt inner) {
         this.inner = inner;
     }
 
@@ -50,7 +50,7 @@ public final class TransactionReceipt {
         return new ContractId(inner.getContractIDOrBuilder());
     }
 
-    public com.hedera.hashgraph.sdk.proto.TransactionReceipt toProto() {
+    public com.hederahashgraph.api.proto.java.TransactionReceipt toProto() {
         return inner;
     }
 }

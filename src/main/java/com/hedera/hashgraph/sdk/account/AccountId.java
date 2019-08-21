@@ -1,11 +1,10 @@
 package com.hedera.hashgraph.sdk.account;
 
-import com.google.common.base.Splitter;
 import com.hedera.hashgraph.sdk.Entity;
 import com.hedera.hashgraph.sdk.IdUtil;
 import com.hedera.hashgraph.sdk.SolidityUtil;
-import com.hedera.hashgraph.sdk.proto.AccountID;
-import com.hedera.hashgraph.sdk.proto.AccountIDOrBuilder;
+import com.hederahashgraph.api.proto.java.AccountID;
+import com.hederahashgraph.api.proto.java.AccountIDOrBuilder;
 
 import java.util.Objects;
 

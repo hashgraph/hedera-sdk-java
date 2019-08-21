@@ -1,16 +1,17 @@
 package com.hedera.hashgraph.sdk.contract;
 
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.CallParams;
+import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
-import com.hedera.hashgraph.sdk.proto.ContractCallTransactionBody;
-import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.Transaction;
-import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import io.grpc.MethodDescriptor;
+import com.hederahashgraph.api.proto.java.ContractCallTransactionBody;
+import com.hederahashgraph.api.proto.java.Transaction;
+import com.hederahashgraph.api.proto.java.TransactionResponse;
+import com.hederahashgraph.service.proto.java.SmartContractServiceGrpc;
 
 import javax.annotation.Nullable;
+
+import io.grpc.MethodDescriptor;
 
 /** Call a function in the contract, updating its internal state in the hashgraph. */
 // `ContractCallTransaction`
