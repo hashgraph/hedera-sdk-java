@@ -2,14 +2,15 @@ package com.hedera.hashgraph.sdk.account;
 
 import com.hedera.hashgraph.sdk.Entity;
 import com.hedera.hashgraph.sdk.crypto.Key;
-import com.hedera.hashgraph.sdk.proto.AccountID;
+import com.hederahashgraph.api.proto.java.AccountID;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 public final class Claim implements Entity {
-    private final com.hedera.hashgraph.sdk.proto.Claim inner;
+    private final com.hederahashgraph.api.proto.java.Claim inner;
 
-    public Claim(com.hedera.hashgraph.sdk.proto.Claim inner) {
+    public Claim(com.hederahashgraph.api.proto.java.Claim inner) {
         this.inner = inner;
     }
 

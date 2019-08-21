@@ -2,11 +2,17 @@ package com.hedera.hashgraph.sdk.account;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
-import com.hedera.hashgraph.sdk.proto.*;
-import io.grpc.MethodDescriptor;
+import com.hederahashgraph.api.proto.java.AccountAmount;
+import com.hederahashgraph.api.proto.java.CryptoTransferTransactionBody;
+import com.hederahashgraph.api.proto.java.Transaction;
+import com.hederahashgraph.api.proto.java.TransactionResponse;
+import com.hederahashgraph.api.proto.java.TransferList;
+import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
+
+import io.grpc.MethodDescriptor;
 
 public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTransferTransaction> {
     private final CryptoTransferTransactionBody.Builder builder = bodyBuilder.getCryptoTransferBuilder();

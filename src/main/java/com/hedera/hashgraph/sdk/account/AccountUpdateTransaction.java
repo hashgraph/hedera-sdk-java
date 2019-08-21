@@ -5,15 +5,17 @@ import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.crypto.Key;
-import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.CryptoUpdateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.Transaction;
-import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import io.grpc.MethodDescriptor;
+import com.hederahashgraph.api.proto.java.CryptoUpdateTransactionBody;
+import com.hederahashgraph.api.proto.java.Transaction;
+import com.hederahashgraph.api.proto.java.TransactionResponse;
+import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
 
-import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.Instant;
+
+import javax.annotation.Nullable;
+
+import io.grpc.MethodDescriptor;
 
 // `CryptoUpdateTransaction`
 public final class AccountUpdateTransaction extends TransactionBuilder<AccountUpdateTransaction> {

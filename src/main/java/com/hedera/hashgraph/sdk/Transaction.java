@@ -6,14 +6,14 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519Signature;
-import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
-import com.hedera.hashgraph.sdk.proto.SignaturePair;
-import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBodyOrBuilder;
-import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
+import com.hederahashgraph.api.proto.java.SignaturePair;
+import com.hederahashgraph.api.proto.java.TransactionBody;
+import com.hederahashgraph.api.proto.java.TransactionBodyOrBuilder;
+import com.hederahashgraph.api.proto.java.TransactionResponse;
+import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
+import com.hederahashgraph.service.proto.java.FileServiceGrpc;
+import com.hederahashgraph.service.proto.java.SmartContractServiceGrpc;
 
 import org.bouncycastle.util.encoders.Hex;
 
@@ -31,12 +31,12 @@ import io.grpc.Channel;
 import io.grpc.MethodDescriptor;
 import io.grpc.netty.shaded.io.netty.util.concurrent.GlobalEventExecutor;
 
-public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse, TransactionId, Transaction> {
+public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.java.Transaction, TransactionResponse, TransactionId, Transaction> {
 
-    private final io.grpc.MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, com.hedera.hashgraph.sdk.proto.TransactionResponse> methodDescriptor;
-    final com.hedera.hashgraph.sdk.proto.Transaction.Builder inner;
-    final com.hedera.hashgraph.sdk.proto.AccountID nodeAccountId;
-    final com.hedera.hashgraph.sdk.proto.TransactionID transactionId;
+    private final io.grpc.MethodDescriptor<com.hederahashgraph.api.proto.java.Transaction, com.hederahashgraph.api.proto.java.TransactionResponse> methodDescriptor;
+    final com.hederahashgraph.api.proto.java.Transaction.Builder inner;
+    final com.hederahashgraph.api.proto.java.AccountID nodeAccountId;
+    final com.hederahashgraph.api.proto.java.TransactionID transactionId;
 
     @Nullable
     private final Client client;
@@ -51,9 +51,9 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
 
     Transaction(
         @Nullable Client client,
-        com.hedera.hashgraph.sdk.proto.Transaction.Builder inner,
+        com.hederahashgraph.api.proto.java.Transaction.Builder inner,
         TransactionBodyOrBuilder body,
-        MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> methodDescriptor)
+        MethodDescriptor<com.hederahashgraph.api.proto.java.Transaction, TransactionResponse> methodDescriptor)
     {
         super();
         this.client = client;
@@ -65,7 +65,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
     }
 
     public static Transaction fromBytes(Client client, byte[] bytes) throws InvalidProtocolBufferException {
-        var inner = com.hedera.hashgraph.sdk.proto.Transaction.parseFrom(bytes);
+        var inner = com.hederahashgraph.api.proto.java.Transaction.parseFrom(bytes);
         var body = TransactionBody.parseFrom(inner.getBodyBytes());
 
         return new Transaction(client, inner.toBuilder(), body, methodForTxnBody(body));
@@ -73,7 +73,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
 
     @VisibleForTesting
     public static Transaction fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        var inner = com.hedera.hashgraph.sdk.proto.Transaction.parseFrom(bytes);
+        var inner = com.hederahashgraph.api.proto.java.Transaction.parseFrom(bytes);
         var body = TransactionBody.parseFrom(inner.getBodyBytes());
 
         return new Transaction(null, inner.toBuilder(), body, methodForTxnBody(body));
@@ -127,18 +127,18 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
     }
 
     @Override
-    public com.hedera.hashgraph.sdk.proto.Transaction toProto() {
+    public com.hederahashgraph.api.proto.java.Transaction toProto() {
         validate();
         return inner.build();
     }
 
-    public com.hedera.hashgraph.sdk.proto.Transaction toProto(boolean requireSignature) {
+    public com.hederahashgraph.api.proto.java.Transaction toProto(boolean requireSignature) {
         validate(requireSignature);
         return inner.build();
     }
 
     @Override
-    protected MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethod() {
+    protected MethodDescriptor<com.hederahashgraph.api.proto.java.Transaction, TransactionResponse> getMethod() {
         return methodDescriptor;
     }
 
@@ -271,7 +271,11 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
      * @throws HederaException for any response code that is not {@link ResponseCodeEnum#SUCCESS}
      * @throws HederaNetworkException
      * @throws RuntimeException if an {@link java.lang.InterruptedException} is thrown while waiting for the receipt.
+     * @deprecated querying for records has a cost separate from executing the transaction and so
+     * should be done in an explicit step
+     *
      */
+    @Deprecated(forRemoval = true)
     public TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
         return executeAndWaitFor(
             receipt -> new TransactionRecordQuery(getClient()).setTransactionId(getId()).execute());
@@ -291,6 +295,11 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         executeForReceiptAsync(r -> onSuccess.accept(this, r), e -> onError.accept(this, e));
     }
 
+    /**
+     * @deprecated querying for records has a cost separate from executing the transaction and so
+     * should be done in an explicit step
+     */
+    @Deprecated(forRemoval = true)
     public void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<HederaThrowable> onError) {
         final var recordQuery = new TransactionRecordQuery(getClient())
             .setTransactionId(getId())
@@ -304,13 +313,14 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
     }
 
     /**
-     * Equivalent to {@link #executeForRecordAsync(Consumer, Consumer)} but providing {@code this}
-     * to the callback for additional context.
+     * @deprecated querying for records has a cost separate from executing the transaction and so
+     * should be done in an explicit step
      */
+    @Deprecated(forRemoval = true)
     public final void executeForRecordAsync(BiConsumer<Transaction, TransactionRecord> onSuccess, BiConsumer<Transaction, HederaThrowable> onError) {
         executeForRecordAsync(r -> onSuccess.accept(this, r), e -> onError.accept(this, e));
     }
-    
+
     public byte[] toBytes() {
         return toProto().toByteArray();
     }
@@ -331,7 +341,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.sdk.proto
         return byteString.substring(0, PREFIX_LEN);
     }
 
-    private static MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> methodForTxnBody(TransactionBodyOrBuilder body) {
+    private static MethodDescriptor<com.hederahashgraph.api.proto.java.Transaction, TransactionResponse> methodForTxnBody(TransactionBodyOrBuilder body) {
         switch (body.getDataCase()) {
         case SYSTEMDELETE:
             return FileServiceGrpc.getSystemDeleteMethod();

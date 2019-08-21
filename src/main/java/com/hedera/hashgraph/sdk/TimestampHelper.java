@@ -1,7 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.proto.Timestamp;
-import com.hedera.hashgraph.sdk.proto.TimestampSeconds;
+import com.hederahashgraph.api.proto.java.Timestamp;
+import com.hederahashgraph.api.proto.java.TimestampSeconds;
 
 import java.time.Instant;
 

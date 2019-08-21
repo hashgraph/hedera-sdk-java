@@ -3,8 +3,8 @@ package com.hedera.hashgraph.sdk.file;
 import com.hedera.hashgraph.sdk.Entity;
 import com.hedera.hashgraph.sdk.IdUtil;
 import com.hedera.hashgraph.sdk.SolidityUtil;
-import com.hedera.hashgraph.sdk.proto.FileID;
-import com.hedera.hashgraph.sdk.proto.FileIDOrBuilder;
+import com.hederahashgraph.api.proto.java.FileID;
+import com.hederahashgraph.api.proto.java.FileIDOrBuilder;
 
 import java.util.Objects;
 

@@ -3,7 +3,13 @@ package com.hedera.hashgraph.sdk.account;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.QueryBuilder;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hederahashgraph.api.proto.java.CryptoGetClaimQuery;
+import com.hederahashgraph.api.proto.java.CryptoGetClaimResponse;
+import com.hederahashgraph.api.proto.java.Query;
+import com.hederahashgraph.api.proto.java.QueryHeader;
+import com.hederahashgraph.api.proto.java.Response;
+import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
+
 import io.grpc.MethodDescriptor;
 
 // `CryptoGetClaimQuery`
