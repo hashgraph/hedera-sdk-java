@@ -46,7 +46,8 @@ public final class CreateStatefulContract {
                 .plus(Duration.ofSeconds(2592000)))
             // Use the same key as the operator to "own" this file
             .addKey(operatorKey.getPublicKey())
-            .setContents(byteCode);
+            .setContents(byteCode)
+            .setTransactionFee(1_000_000_000);
 
         var fileReceipt = fileTx.executeForReceipt();
         var newFileId = fileReceipt.getFileId();
@@ -56,6 +57,7 @@ public final class CreateStatefulContract {
         var contractTx = new ContractCreateTransaction(client).setBytecodeFile(newFileId)
             .setAutoRenewPeriod(Duration.ofHours(1))
             .setGas(100_000_000)
+            .setTransactionFee(1_000_000_000)
             .setConstructorParams(
                 CallParams.constructor()
                     .addString("hello from hedera!"));
@@ -68,6 +70,7 @@ public final class CreateStatefulContract {
         var contractCallResult = new ContractCallQuery(client).setContractId(newContractId)
             .setGas(100_000_000)
             .setFunctionParameters(CallParams.function("get_message"))
+            .setPaymentDefault(8_000_000)
             .execute();
 
         if (contractCallResult.getErrorMessage() != null) {
@@ -82,6 +85,7 @@ public final class CreateStatefulContract {
             .setGas(100_000_000)
             .setFunctionParameters(CallParams.function("set_message")
                 .addString("hello from hedera again!"))
+            .setTransactionFee(800_000_000)
             .execute();
 
         // sleep a few seconds to allow consensus + smart contract exec
@@ -91,6 +95,7 @@ public final class CreateStatefulContract {
         var contractUpdateResult = new ContractCallQuery(client).setContractId(newContractId)
             .setGas(100_000_000)
             .setFunctionParameters(CallParams.function("get_message"))
+            .setPaymentDefault(800_000_000)
             .execute();
 
         if (contractUpdateResult.getErrorMessage() != null) {

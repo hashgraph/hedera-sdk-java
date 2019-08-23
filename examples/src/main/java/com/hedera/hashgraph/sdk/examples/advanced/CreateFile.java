@@ -23,6 +23,7 @@ public final class CreateFile {
                 .plus(Duration.ofSeconds(2592000)))
             // Use the same key as the operator to "own" this file
             .addKey(operatorKey.getPublicKey())
+            .setTransactionFee(100_000_000)
             .setContents(fileContents);
 
         var receipt = tx.executeForReceipt();
