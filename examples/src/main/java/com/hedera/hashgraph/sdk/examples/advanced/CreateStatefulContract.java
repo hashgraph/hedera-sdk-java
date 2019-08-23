@@ -41,25 +41,23 @@ public final class CreateStatefulContract {
         var client = ExampleHelper.createHederaClient();
 
         // create the contract's bytecode file
-        var fileTxFee = 1000000000;
         var fileTx = new FileCreateTransaction(client).setExpirationTime(
             Instant.now()
                 .plus(Duration.ofSeconds(2592000)))
             // Use the same key as the operator to "own" this file
             .addKey(operatorKey.getPublicKey())
             .setContents(byteCode)
-            .setTransactionFee(fileTxFee);
+            .setTransactionFee(1_000_000_000);
 
         var fileReceipt = fileTx.executeForReceipt();
         var newFileId = fileReceipt.getFileId();
 
         System.out.println("contract bytecode file: " + newFileId);
 
-        var contractTxFee = 1000000000;
         var contractTx = new ContractCreateTransaction(client).setBytecodeFile(newFileId)
             .setAutoRenewPeriod(Duration.ofHours(1))
             .setGas(100_000_000)
-            .setTransactionFee(contractTxFee)
+            .setTransactionFee(1_000_000_000)
             .setConstructorParams(
                 CallParams.constructor()
                     .addString("hello from hedera!"));
@@ -69,11 +67,10 @@ public final class CreateStatefulContract {
 
         System.out.println("new contract ID: " + newContractId);
 
-        var paymentAmount = 8000000;
         var contractCallResult = new ContractCallQuery(client).setContractId(newContractId)
             .setGas(100_000_000)
             .setFunctionParameters(CallParams.function("get_message"))
-            .setPaymentDefault(paymentAmount)
+            .setPaymentDefault(8_000_000)
             .execute();
 
         if (contractCallResult.getErrorMessage() != null) {
@@ -84,23 +81,21 @@ public final class CreateStatefulContract {
         var message = contractCallResult.getString();
         System.out.println("contract returned message: " + message);
 
-        var contractExecuteTxFee = 800000000;
         new ContractExecuteTransaction(client).setContractId(newContractId)
             .setGas(100_000_000)
             .setFunctionParameters(CallParams.function("set_message")
                 .addString("hello from hedera again!"))
-            .setTransactionFee(contractExecuteTxFee)
+            .setTransactionFee(800_000_000)
             .execute();
 
         // sleep a few seconds to allow consensus + smart contract exec
         System.out.println("Waiting 5s for consensus and contract execution");
         Thread.sleep(5000);
         // now query contract
-        var queryPayment = 800000000;
         var contractUpdateResult = new ContractCallQuery(client).setContractId(newContractId)
             .setGas(100_000_000)
             .setFunctionParameters(CallParams.function("get_message"))
-            .setPaymentDefault(queryPayment)
+            .setPaymentDefault(800_000_000)
             .execute();
 
         if (contractUpdateResult.getErrorMessage() != null) {

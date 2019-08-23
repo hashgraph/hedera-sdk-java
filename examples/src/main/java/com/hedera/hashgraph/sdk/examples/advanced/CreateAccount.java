@@ -17,13 +17,12 @@ public final class CreateAccount {
         System.out.println("public key = " + newPublicKey);
 
         var client = ExampleHelper.createHederaClient();
-        
-        var txFee = 10000000; 
+
         var tx = new AccountCreateTransaction(client)
             // The only _required_ property here is `key`
             .setKey(newKey.getPublicKey())
             .setInitialBalance(1000)
-            .setTransactionFee(txFee);
+            .setTransactionFee(10_000_000);
 
         // This will wait for the receipt to become available
         var receipt = tx.executeForReceipt();
