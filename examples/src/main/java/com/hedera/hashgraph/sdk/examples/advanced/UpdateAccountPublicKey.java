@@ -10,6 +10,7 @@ public final class UpdateAccountPublicKey {
 
     public static void main(String[] args) throws HederaException {
         var client = ExampleHelper.createHederaClient();
+        client.setMaxTransactionFee(800000000);
 
         // First, we create a new account so we don't affect our account
 
