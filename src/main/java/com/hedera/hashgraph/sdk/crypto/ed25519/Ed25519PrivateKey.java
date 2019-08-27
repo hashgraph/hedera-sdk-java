@@ -9,11 +9,21 @@ import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
+import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemReader;
+import org.bouncycastle.util.io.pem.PemWriter;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.charset.Charset;
+import java.security.SecureRandom;
 
 import javax.annotation.Nullable;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.security.SecureRandom;
 
 /**
  * An ed25519 private key.
@@ -22,6 +32,7 @@ import java.security.SecureRandom;
  */
 @SuppressWarnings("Duplicates")
 public final class Ed25519PrivateKey {
+    public static final String TYPE_PRIVATE_KEY = "PRIVATE KEY";
     final Ed25519PrivateKeyParameters privKeyParams;
     // computed from private key and memoized
     @Nullable
@@ -83,6 +94,51 @@ public final class Ed25519PrivateKey {
     }
 
     /**
+     * Parse a private key from a PEM encoded file using the default system charset to decode.
+     *
+     * This will read the first "PRIVATE KEY" section in the file as an Ed25519 private key.
+     *
+     * @throws IOException if one occurred while reading or if no "PRIVATE KEY" section was found
+     */
+    public static Ed25519PrivateKey fromPemFile(File pemFile) throws IOException {
+        return fromPemFile(pemFile, Charset.defaultCharset());
+    }
+
+    /**
+     * Parse a private key from a PEM encoded file using the given {@link Charset} to decode.
+     *
+     * This will read the first "PRIVATE KEY" section in the file as an Ed25519 private key.
+     *
+     * @throws IOException if one occurred while reading or if no "PRIVATE KEY" section was found
+     */
+    public static Ed25519PrivateKey fromPemFile(File pemFile, Charset charset) throws IOException {
+        return fromPemFile(new InputStreamReader(new FileInputStream(pemFile), charset));
+    }
+
+    /**
+     * Parse a private key from a PEM encoded reader.
+     *
+     * This will read the first "PRIVATE KEY" section in the stream as an Ed25519 private key.
+     *
+     * @throws IOException if one occurred while reading or if no "PRIVATE KEY" section was found
+     */
+    public static Ed25519PrivateKey fromPemFile(Reader pemFile) throws IOException {
+        final var pemReader = new PemReader(pemFile);
+
+        PemObject readObject;
+
+        do {
+            readObject = pemReader.readPemObject();
+        } while (readObject != null && !readObject.getType().equals(TYPE_PRIVATE_KEY));
+
+        if (readObject != null && readObject.getType().equals(TYPE_PRIVATE_KEY)) {
+            return fromBytes(readObject.getContent());
+        }
+
+        throw new IOException("pem file did not contain a private key");
+    }
+
+    /**
      * Recover a private key from its text-encoded representation.
      *
      * @param privateKeyString the hex-encoded private key string
@@ -119,25 +175,32 @@ public final class Ed25519PrivateKey {
         return privKeyParams.getEncoded();
     }
 
-    @Override
-    public String toString() {
+    private byte[] encodeDER() {
         PrivateKeyInfo privateKeyInfo;
 
         try {
             privateKeyInfo = new PrivateKeyInfo(
-                    new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519), new DEROctetString(privKeyParams.getEncoded()));
+                new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519), new DEROctetString(privKeyParams.getEncoded()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        byte[] encoded;
 
         try {
-            encoded = privateKeyInfo.getEncoded("DER");
+            return privateKeyInfo.getEncoded("DER");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
 
-        return Hex.toHexString(encoded);
+    @Override
+    public String toString() {
+        return Hex.toHexString(encodeDER());
+    }
+
+    /** Write out a PEM encoded version of this private key. */
+    public void writePem(Writer out) throws IOException {
+        final var pemWriter = new PemWriter(out);
+        pemWriter.writeObject(new PemObject(TYPE_PRIVATE_KEY, encodeDER()));
+        pemWriter.flush();
     }
 }
