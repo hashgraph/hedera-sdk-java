@@ -22,8 +22,7 @@ class FileUpdateTransactionTest {
             "transaction builder failed validation:\n"
                 + ".setTransactionId() required\n"
                 + ".setNodeAccountId() required\n"
-                + ".setFileId()\n"
-                + ".addKey()",
+                + ".setFileId() required",
             assertThrows(
                 IllegalStateException.class,
                 () -> new FileUpdateTransaction(null).validate()

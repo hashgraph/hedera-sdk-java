@@ -56,10 +56,6 @@ public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransact
 
     @Override
     protected void doValidate() {
-        require(builder.hasFileID(), ".setFileId()");
-        require(
-            builder.getKeysOrBuilder()
-                .getKeysOrBuilderList(),
-            ".addKey()");
+        require(builder.hasFileID(), ".setFileId() required");
     }
 }
