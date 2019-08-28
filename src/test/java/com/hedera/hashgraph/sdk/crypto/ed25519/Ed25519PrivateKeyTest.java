@@ -5,6 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -12,6 +16,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class Ed25519PrivateKeyTest {
 
     private static final String testKeyStr = "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10";
+    private static final String testKeyPem = "-----BEGIN PRIVATE KEY-----\n"
+        + "MC4CAQAwBQYDK2VwBCIEINtIS4KOZLLY8SzjwKDpOguMznrxu485yXcyOUSCU44Q\n"
+        + "-----END PRIVATE KEY-----\n";
 
     @Test
     @DisplayName("private key generates successfully")
@@ -60,5 +67,24 @@ class Ed25519PrivateKeyTest {
 
         assertNotNull(key);
         assertEquals(testKeyStr, key.toString());
+    }
+
+    @Test
+    @DisplayName("private key can be decoded from a PEM file")
+    void keyFromPem() throws IOException {
+        final var stringReader = new StringReader(testKeyPem);
+        final var privateKey = Ed25519PrivateKey.fromPemFile(stringReader);
+
+        assertEquals(privateKey.toString(), testKeyStr);
+    }
+
+    @Test
+    @DisplayName("private key can be decoded from a PEM file")
+    void keyToPem() throws IOException {
+        final var stringWriter = new StringWriter();
+        final var privateKey = Ed25519PrivateKey.fromString(testKeyStr);
+        privateKey.writePem(stringWriter);
+
+        assertEquals(stringWriter.toString(), testKeyPem);
     }
 }
