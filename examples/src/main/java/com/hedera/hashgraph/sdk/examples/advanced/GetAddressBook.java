@@ -1,5 +1,7 @@
 package com.hedera.hashgraph.sdk.examples.advanced;
 
+import com.google.protobuf.ByteString;
+import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.examples.ExampleHelper;
 import com.hedera.hashgraph.sdk.file.FileContentsQuery;
@@ -13,18 +15,18 @@ public final class GetAddressBook {
     private GetAddressBook() { }
 
     public static void main(String[] args) throws HederaException, IOException {
-        final var client = ExampleHelper.createHederaClient();
-        final var fileQuery = new FileContentsQuery(client)
+        final Client client = ExampleHelper.createHederaClient();
+        final FileContentsQuery fileQuery = new FileContentsQuery(client)
             .setFileId(new FileId(0, 0, 102));
 
-        final var cost = fileQuery.requestCost();
+        final long cost = fileQuery.requestCost();
         System.out.println("file contents cost: " + cost);
 
         fileQuery.setPaymentDefault(100_000);
 
-        final var contents = fileQuery.execute().getFileContents().getContents();
+        final ByteString contents = fileQuery.execute().getFileContents().getContents();
 
-        try (final var fos = new FileOutputStream("address-book.proto.bin")) {
+        try (final FileOutputStream fos = new FileOutputStream("address-book.proto.bin")) {
             contents.newInput().transferTo(fos);
         }
     }

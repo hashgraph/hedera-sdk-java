@@ -28,8 +28,8 @@ class Ed25519SignatureTest {
     @DisplayName("reproducible signature can be computed")
     @MethodSource("privKeyStrings")
     void computeSignature(String keyStr) {
-        final var key = Ed25519PrivateKey.fromString(keyStr);
-        final var signature = Ed25519Signature.forMessage(key, messageBytes);
+        final Ed25519PrivateKey key = Ed25519PrivateKey.fromString(keyStr);
+        final Ed25519Signature signature = Ed25519Signature.forMessage(key, messageBytes);
 
         Assertions.assertEquals(
             sigStr,
@@ -41,8 +41,8 @@ class Ed25519SignatureTest {
     @DisplayName("signature can be verified")
     @MethodSource("privKeyStrings")
     void verifySignature(String keyStr) {
-        final var privKey = Ed25519PrivateKey.fromString(keyStr);
-        final var signature = Ed25519Signature.fromString(sigStr);
+        final Ed25519PrivateKey privKey = Ed25519PrivateKey.fromString(keyStr);
+        final Ed25519Signature signature = Ed25519Signature.fromString(sigStr);
 
         Assertions.assertTrue(
             signature.verify(privKey.getPublicKey(), messageBytes)

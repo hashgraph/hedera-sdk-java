@@ -34,7 +34,7 @@ class FileInfoQueryTest {
     @Test
     @DisplayName("correct query can be built")
     void correctBuilder() {
-        final var query = new FileInfoQuery()
+        final FileInfoQuery query = new FileInfoQuery()
             .setPayment(
                 new CryptoTransferTransaction(null)
                     .setTransactionId(new TransactionId(new AccountId(2), Instant.ofEpochSecond(1559868457)))

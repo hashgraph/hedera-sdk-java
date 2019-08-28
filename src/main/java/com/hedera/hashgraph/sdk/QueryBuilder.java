@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hederahashgraph.api.proto.java.Query;
 import com.hederahashgraph.api.proto.java.QueryHeader;
@@ -91,9 +92,9 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         if (client != null && isPaymentRequired() && !getHeaderBuilder().hasPayment()
             && client.getOperatorId() != null)
         {
-            var operatorId = client.getOperatorId();
-            var nodeId = getNode().accountId;
-            var txPayment = new CryptoTransferTransaction(client)
+            AccountId operatorId = client.getOperatorId();
+            AccountId nodeId = getNode().accountId;
+            Transaction txPayment = new CryptoTransferTransaction(client)
                 .setNodeAccountId(nodeId)
                 .setTransactionId(new TransactionId(operatorId))
                 .addSender(operatorId, paymentAmount)
@@ -117,10 +118,10 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     @Override
     protected void onPreExecute() throws HederaException, HederaNetworkException {
-        final var maxQueryPayment = requireClient().getMaxQueryPayment();
+        final long maxQueryPayment = requireClient().getMaxQueryPayment();
 
         if (!getHeaderBuilder().hasPayment() && isPaymentRequired() && maxQueryPayment > 0) {
-            final var cost = requestCost();
+            final long cost = requestCost();
             if (cost > maxQueryPayment) {
                 throw new MaxPaymentExceededException(this, cost, maxQueryPayment);
             }
@@ -131,7 +132,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     @Override
     protected void onPreExecuteAsync(Runnable onSuccess, Consumer<HederaThrowable> onError) {
-        final var maxQueryPayment = requireClient().getMaxQueryPayment();
+        final long maxQueryPayment = requireClient().getMaxQueryPayment();
 
         if (!getHeaderBuilder().hasPayment() && isPaymentRequired() && maxQueryPayment > 0) {
             requestCostAsync(cost -> {
@@ -211,8 +212,8 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     @Override
     protected final Resp mapResponse(Response raw) throws HederaException {
         final ResponseCodeEnum precheckCode = getResponseHeader(raw).getNodeTransactionPrecheckCode();
-        final var responseCase = raw.getResponseCase();
-        var unknownIsExceptional = false;
+        final Response.ResponseCase responseCase = raw.getResponseCase();
+        boolean unknownIsExceptional = false;
 
         switch (responseCase) {
             case TRANSACTIONGETRECEIPT:
@@ -237,18 +238,18 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
         @Override
         public Query toProto() {
-            final var header = getHeaderBuilder();
+            final QueryHeader.Builder header = getHeaderBuilder();
 
-            final var origPayment = header.hasPayment() ? header.getPayment() : null;
-            final var origResponseType = header.getResponseType();
+            final com.hederahashgraph.api.proto.java.Transaction origPayment = header.hasPayment() ? header.getPayment() : null;
+            final ResponseType origResponseType = header.getResponseType();
 
-            final var nodeAccountId = getNode().accountId;
-            final var operatorId = Objects.requireNonNull(
+            final AccountId nodeAccountId = getNode().accountId;
+            final AccountId operatorId = Objects.requireNonNull(
                 requireClient().getOperatorId(),
                 "COST_ANSWER requires an operator ID to be set");
 
             // COST_ANSWER requires a payment to pass validation but doesn't actually process it
-            final var fakePayment = new CryptoTransferTransaction(client)
+            final com.hederahashgraph.api.proto.java.Transaction fakePayment = new CryptoTransferTransaction(client)
                 .addRecipient(nodeAccountId, 0)
                 .addSender(operatorId, 0)
                 .build()
@@ -258,7 +259,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
             header.setPayment(fakePayment);
             header.setResponseType(ResponseType.COST_ANSWER);
 
-            final var built = inner.build();
+            final Query built = inner.build();
 
             if (origPayment != null) {
                 header.setPayment(origPayment);

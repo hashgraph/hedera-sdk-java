@@ -31,7 +31,7 @@ class FunctionResultTest {
     @Test
     @DisplayName("provides results correctly")
     void providesResultsCorrectly() {
-        final var result = new FunctionResult(
+        final FunctionResult result = new FunctionResult(
             ContractFunctionResult.newBuilder()
                 .setContractCallResult(ByteString.copyFrom(callResult))
         );

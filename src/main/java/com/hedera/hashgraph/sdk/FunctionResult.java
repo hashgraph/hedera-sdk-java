@@ -31,7 +31,7 @@ public final class FunctionResult {
 
     @Nullable
     public String getErrorMessage() {
-        var errMsg = inner.getErrorMessage();
+        String errMsg = inner.getErrorMessage();
         return !errMsg.isEmpty() ? errMsg : null;
     }
 
@@ -68,8 +68,8 @@ public final class FunctionResult {
      * Get the nth value in the result as a dynamic byte array.
      */
     public ByteString getBytes(int valIndex) {
-        var offset = getInt(valIndex);
-        var len = getIntValueAt(offset);
+        int offset = getInt(valIndex);
+        int len = getIntValueAt(offset);
         return getByteString(offset + 32, offset + 32 + len);
     }
 
@@ -132,7 +132,7 @@ public final class FunctionResult {
      * Get the nth returned value as a Solidity address.
      */
     public ByteString getAddress(int valIndex) {
-        final var offset = valIndex * 32;
+        final int offset = valIndex * 32;
         // address is a uint160
         return getByteString(offset + 12, offset + 32);
     }

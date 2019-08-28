@@ -74,7 +74,7 @@ public final class CallParams<Kind> {
     }
 
     private static ByteString encodeString(String string) {
-        final var strBytes = ByteString.copyFromUtf8(string);
+        final ByteString strBytes = ByteString.copyFromUtf8(string);
         // prepend the size of the string in UTF-8 bytes
         return int256(strBytes.size(), 32)
             .concat(rightPad32(strBytes));
@@ -86,7 +86,7 @@ public final class CallParams<Kind> {
     }
 
     private static void checkFixedArrayLen(int fixedLen, Object array) {
-        final var len = Array.getLength(array);
+        final int len = Array.getLength(array);
 
         if (fixedLen != len) {
             throw new IllegalArgumentException(
@@ -96,7 +96,7 @@ public final class CallParams<Kind> {
 
     private static ByteString encodeArray(Stream<ByteString> elements, boolean prependLen) {
         if (prependLen) {
-            final var list = elements.collect(Collectors.toList());
+            final List<ByteString> list = elements.collect(Collectors.toList());
 
             return int256(list.size(), 32)
                 .concat(ByteString.copyFrom(list));
@@ -106,9 +106,9 @@ public final class CallParams<Kind> {
     }
 
     private static ByteString encodeDynArr(List<ByteString> elements, boolean prependLen) {
-        final var offsetsLen = elements.size() + (prependLen ? 1 : 0);
+        final int offsetsLen = elements.size() + (prependLen ? 1 : 0);
 
-        final var offsets = new ArrayList<ByteString>(offsetsLen);
+        final ArrayList<ByteString> offsets = new ArrayList<ByteString>(offsetsLen);
 
         if (prependLen) {
             offsets.add(int256(elements.size(), 32));
@@ -117,7 +117,7 @@ public final class CallParams<Kind> {
         // points to start of dynamic segment
         long currOffset = offsetsLen * 32;
 
-        for (final var elem : elements) {
+        for (final ByteString elem : elements) {
             offsets.add(int256(currOffset, 64));
             currOffset += elem.size();
         }
@@ -131,11 +131,11 @@ public final class CallParams<Kind> {
      * @throws NullPointerException if any value in `strings` is null
      */
     public CallParams<Kind> addStringArray(String[] strings) {
-        final var byteStrings = Arrays.stream(strings)
+        final List<ByteString> byteStrings = Arrays.stream(strings)
             .map(CallParams::encodeString)
             .collect(Collectors.toList());
 
-        final var argBytes = encodeDynArr(byteStrings, true);
+        final ByteString argBytes = encodeDynArr(byteStrings, true);
 
         addParamType("string[]");
         args.add(new Argument(argBytes, true));
@@ -153,11 +153,11 @@ public final class CallParams<Kind> {
     public CallParams<Kind> addStringArray(String[] strings, int fixedLen) {
         checkFixedArrayLen(fixedLen, strings);
 
-        final var byteStrings = Arrays.stream(strings)
+        final List<ByteString> byteStrings = Arrays.stream(strings)
             .map(CallParams::encodeString)
             .collect(Collectors.toList());
 
-        final var argBytes = encodeDynArr(byteStrings, false);
+        final ByteString argBytes = encodeDynArr(byteStrings, false);
 
         addParamType("string[" + fixedLen + "]");
         // argument is dynamic in that the encoded size is not fixed
@@ -203,7 +203,7 @@ public final class CallParams<Kind> {
      * Add a parameter of type {@code bytes[]}, an array of byte-strings.
      */
     public CallParams<Kind> addBytesArray(byte[][] param) {
-        final var byteArrays = Arrays.stream(param)
+        final List<ByteString> byteArrays = Arrays.stream(param)
             .map(CallParams::encodeBytes)
             .collect(Collectors.toList());
 
@@ -219,11 +219,11 @@ public final class CallParams<Kind> {
     public CallParams<Kind> addBytesArray(byte[][] param, int fixedLen) {
         checkFixedArrayLen(fixedLen, param);
 
-        final var byteStrings = Arrays.stream(param)
+        final List<ByteString> byteStrings = Arrays.stream(param)
             .map(CallParams::encodeBytes)
             .collect(Collectors.toList());
 
-        final var argBytes = encodeDynArr(byteStrings, false);
+        final ByteString argBytes = encodeDynArr(byteStrings, false);
 
         addParamType("bytes[" + fixedLen + "]");
         args.add(new Argument(argBytes, true));
@@ -255,7 +255,7 @@ public final class CallParams<Kind> {
         checkIntWidth(width);
 
         // bitLength() does not include the sign bit
-        final var actualBitLen = val.bitLength() + (signed ? 1 : 0);
+        final int actualBitLen = val.bitLength() + (signed ? 1 : 0);
 
         if (actualBitLen > 256) {
             throw new IllegalArgumentException("BigInteger out of range for Solidity integers");
@@ -313,7 +313,7 @@ public final class CallParams<Kind> {
     private static ByteString encodeIntArray(int intWidth, long[] intArray, boolean prependLen) {
         checkIntWidth(intWidth);
 
-        final var arrayBytes = ByteString.copyFrom(
+        final ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> int256(i, intWidth))
                 .collect(Collectors.toList()));
 
@@ -327,7 +327,7 @@ public final class CallParams<Kind> {
     private static ByteString encodeIntArray(int intWidth, BigInteger[] intArray, boolean prependLen) {
         checkIntWidth(intWidth);
 
-        final var arrayBytes = ByteString.copyFrom(
+        final ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(CallParams::int256)
                 .collect(Collectors.toList()));
 
@@ -341,7 +341,7 @@ public final class CallParams<Kind> {
     private static ByteString encodeUintArray(int intWidth, long[] intArray, boolean prependLen) {
         checkIntWidth(intWidth);
 
-        final var arrayBytes = ByteString.copyFrom(
+        final ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> {
                 checkUnsignedVal(i);
                 return int256(i, intWidth);
@@ -357,7 +357,7 @@ public final class CallParams<Kind> {
     private static ByteString encodeUintArray(int intWidth, BigInteger[] intArray, boolean prependLen) {
         checkIntWidth(intWidth);
 
-        final var arrayBytes = ByteString.copyFrom(
+        final ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> {
                 checkUnsignedVal(i.signum());
                 return uint256(i);
@@ -385,7 +385,7 @@ public final class CallParams<Kind> {
      * @throws IllegalArgumentException if {@code width} is not in a valid range (see above).
      */
     public CallParams<Kind> addIntArray(long[] intArray, int intWidth) {
-        final var arrayBytes = encodeIntArray(intWidth, intArray, true);
+        final ByteString arrayBytes = encodeIntArray(intWidth, intArray, true);
 
         addParamType("int" + intWidth + "[]");
         args.add(new Argument(arrayBytes, true));
@@ -412,7 +412,7 @@ public final class CallParams<Kind> {
      */
     public CallParams<Kind> addIntArray(long[] intArray, int intWidth, int fixedLen) {
         checkFixedArrayLen(fixedLen, intArray);
-        final var arrayBytes = encodeIntArray(intWidth, intArray, false);
+        final ByteString arrayBytes = encodeIntArray(intWidth, intArray, false);
 
         addParamType("int" + intWidth + "[" + fixedLen + "]");
         args.add(new Argument(arrayBytes, true));
@@ -435,7 +435,7 @@ public final class CallParams<Kind> {
      * @throws IllegalArgumentException if {@code width} is not in a valid range (see above).
      */
     public CallParams<Kind> addIntArray(BigInteger[] intArray, int intWidth) {
-        final var arrayBytes = encodeIntArray(intWidth, intArray, true);
+        final ByteString arrayBytes = encodeIntArray(intWidth, intArray, true);
 
         addParamType("int" + intWidth + "[]");
         args.add(new Argument(arrayBytes, true));
@@ -462,7 +462,7 @@ public final class CallParams<Kind> {
      */
     public CallParams<Kind> addIntArray(BigInteger[] intArray, int intWidth, int fixedLen) {
         checkFixedArrayLen(fixedLen, intArray);
-        final var arrayBytes = encodeIntArray(intWidth, intArray, false);
+        final ByteString arrayBytes = encodeIntArray(intWidth, intArray, false);
 
         addParamType("int" + intWidth + "[" + fixedLen + "]");
         args.add(new Argument(arrayBytes, true));
@@ -537,7 +537,7 @@ public final class CallParams<Kind> {
      *                                  or {@code fixedLen != intArray.length}.
      */
     public CallParams<Kind> addUintArray(long[] uintArray, int intWidth) {
-        final var arrayBytes = encodeUintArray(intWidth, uintArray, true);
+        final ByteString arrayBytes = encodeUintArray(intWidth, uintArray, true);
 
         addParamType("uint" + intWidth + "[]");
         args.add(new Argument(arrayBytes, true));
@@ -565,7 +565,7 @@ public final class CallParams<Kind> {
      */
     public CallParams<Kind> addUintArray(long[] intArray, int intWidth, int fixedLen) {
         checkFixedArrayLen(fixedLen, intArray);
-        final var arrayBytes = encodeUintArray(intWidth, intArray, false);
+        final ByteString arrayBytes = encodeUintArray(intWidth, intArray, false);
 
         addParamType("uint" + intWidth + "[" + fixedLen + "]");
         args.add(new Argument(arrayBytes, true));
@@ -590,7 +590,7 @@ public final class CallParams<Kind> {
      *                                  or if {@code width} is not in a valid range (see above).
      */
     public CallParams<Kind> addUintArray(BigInteger[] intArray, int intWidth) {
-        final var arrayBytes = encodeUintArray(intWidth, intArray, true);
+        final ByteString arrayBytes = encodeUintArray(intWidth, intArray, true);
 
         addParamType("uint" + intWidth + "[]");
         args.add(new Argument(arrayBytes, true));
@@ -618,7 +618,7 @@ public final class CallParams<Kind> {
      */
     public CallParams<Kind> addUintArray(BigInteger[] intArray, int intWidth, int fixedLen) {
         checkFixedArrayLen(fixedLen, intArray);
-        final var arrayBytes = encodeUintArray(intWidth, intArray, false);
+        final ByteString arrayBytes = encodeUintArray(intWidth, intArray, false);
 
         addParamType("uint" + intWidth + "[" + fixedLen + "]");
         args.add(new Argument(arrayBytes, true));
@@ -675,7 +675,7 @@ public final class CallParams<Kind> {
      * @throws NullPointerException     if any value in the array is null.
      */
     public CallParams<Kind> addAddressArray(byte[][] addresses) {
-        final var addressArray = encodeArray(
+        final ByteString addressArray = encodeArray(
             Arrays.stream(addresses).map(a -> {
                 checkAddressLen(a);
                 return leftPad32(ByteString.copyFrom(a));
@@ -696,7 +696,7 @@ public final class CallParams<Kind> {
      * @throws NullPointerException     if any value in the array is null.
      */
     public CallParams<Kind> addAddressArray(byte[][] addresses, int fixedLen) {
-        final var addressArray = encodeArray(
+        final ByteString addressArray = encodeArray(
             Arrays.stream(addresses).map(a -> {
                 checkAddressLen(a);
                 return leftPad32(ByteString.copyFrom(a));
@@ -717,9 +717,9 @@ public final class CallParams<Kind> {
      * @throws NullPointerException     if any value in the array is null.
      */
     public CallParams<Kind> addAddressArray(String[] addresses) {
-        final var addressArray = encodeArray(
+        final ByteString addressArray = encodeArray(
             Arrays.stream(addresses).map(a -> {
-                final var address = decodeAddress(a);
+                final byte[] address = decodeAddress(a);
                 checkAddressLen(address);
                 return leftPad32(ByteString.copyFrom(address));
             }), true);
@@ -740,9 +740,9 @@ public final class CallParams<Kind> {
      * @throws NullPointerException     if any value in the array is null.
      */
     public CallParams<Kind> addAddressArray(String[] addresses, int fixedLen) {
-        final var addressArray = encodeArray(
+        final ByteString addressArray = encodeArray(
             Arrays.stream(addresses).map(a -> {
-                final var address = decodeAddress(a);
+                final byte[] address = decodeAddress(a);
                 checkAddressLen(address);
                 return leftPad32(ByteString.copyFrom(address));
             }), false);
@@ -777,7 +777,7 @@ public final class CallParams<Kind> {
             throw new IllegalArgumentException("function selectors must be 4 bytes or 8 hex chars");
         }
 
-        final var output = ByteString.newOutput(ADDRESS_LEN + SELECTOR_LEN);
+        final ByteString.Output output = ByteString.newOutput(ADDRESS_LEN + SELECTOR_LEN);
         output.write(address, 0, address.length);
         output.write(selector, 0, selector.length);
 
@@ -852,19 +852,19 @@ public final class CallParams<Kind> {
      */
     public ByteString toProto() {
         // offset for dynamic-length data, immediately after value arguments
-        var dynamicOffset = args.size() * 32;
+        int dynamicOffset = args.size() * 32;
 
-        var paramsBytes = new ArrayList<ByteString>(args.size() + 1);
+        ArrayList<ByteString> paramsBytes = new ArrayList<ByteString>(args.size() + 1);
 
         if (funcSelector != null) {
             // use `finishIntermediate()` so this object can continue being used
             paramsBytes.add(ByteString.copyFrom(funcSelector.finishIntermediate()));
         }
 
-        var dynamicArgs = new ArrayList<ByteString>();
+        ArrayList<ByteString> dynamicArgs = new ArrayList<ByteString>();
 
         // iterate the arguments and determine whether they are dynamic or not
-        for (var arg : args) {
+        for (Argument arg : args) {
             if (arg.isDynamic) {
                 // dynamic arguments supply their offset in value position and append their data at
                 // that offset
@@ -887,7 +887,7 @@ public final class CallParams<Kind> {
     private static final ByteString negativePadding;
 
     static {
-        final var fill = new byte[31];
+        final byte[] fill = new byte[31];
         Arrays.fill(fill, (byte) 0xFF);
         negativePadding = ByteString.copyFrom(fill);
     }
@@ -895,13 +895,13 @@ public final class CallParams<Kind> {
     static ByteString int256(long val, int bitWidth) {
         // don't try to get wider than a `long` as it should just be filled with padding
         bitWidth = Math.min(bitWidth, 64);
-        final var output = ByteString.newOutput(bitWidth / 8);
+        final ByteString.Output output = ByteString.newOutput(bitWidth / 8);
 
         // write bytes in big-endian order
         for (int i = bitWidth - 8; i >= 0; i -= 8) {
             // widening conversion sign-extends so we don't have to do anything special when
             // truncating a previously widened value
-            final var u8 = (byte) (val >> i);
+            final byte u8 = (byte) (val >> i);
             output.write(u8);
         }
 
@@ -914,7 +914,7 @@ public final class CallParams<Kind> {
     }
 
     static ByteString uint256(BigInteger uint) {
-        final var bytes = uint.toByteArray();
+        final byte[] bytes = uint.toByteArray();
 
         final ByteString byteStr;
 
@@ -936,7 +936,7 @@ public final class CallParams<Kind> {
     }
 
     static ByteString leftPad32(ByteString input, boolean negative) {
-        var rem = 32 - input.size() % 32;
+        int rem = 32 - input.size() % 32;
         return rem == 32
             ? input
             : (negative ? negativePadding : padding).substring(0, rem)
@@ -948,7 +948,7 @@ public final class CallParams<Kind> {
     }
 
     static ByteString rightPad32(ByteString input) {
-        var rem = 32 - input.size() % 32;
+        int rem = 32 - input.size() % 32;
         return rem == 32 ? input : input.concat(padding.substring(0, rem));
     }
 
@@ -1025,9 +1025,9 @@ public final class CallParams<Kind> {
         public byte[] finishIntermediate() {
             if (finished == null) {
                 try {
-                    final var resetDigest =
+                    final Keccak.Digest256 resetDigest =
                         (Keccak.Digest256) Objects.requireNonNull(digest).clone();
-                    final var ret = finish();
+                    final byte[] ret = finish();
                     digest = resetDigest;
                     return ret;
                 } catch (CloneNotSupportedException e) {

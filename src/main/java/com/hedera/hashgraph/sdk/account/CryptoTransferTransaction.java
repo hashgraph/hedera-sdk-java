@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk.account;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hederahashgraph.api.proto.java.AccountAmount;
+import com.hederahashgraph.api.proto.java.AccountAmountOrBuilder;
 import com.hederahashgraph.api.proto.java.CryptoTransferTransactionBody;
 import com.hederahashgraph.api.proto.java.Transaction;
 import com.hederahashgraph.api.proto.java.TransactionResponse;
@@ -46,7 +47,7 @@ public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTr
 
         long sum = 0;
 
-        for (var acctAmt : transferList.getAccountAmountsOrBuilderList()) {
+        for (AccountAmountOrBuilder acctAmt : transferList.getAccountAmountsOrBuilderList()) {
             sum += acctAmt.getAmount();
         }
 

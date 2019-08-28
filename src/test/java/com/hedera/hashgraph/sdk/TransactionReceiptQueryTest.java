@@ -67,7 +67,7 @@ class TransactionReceiptQueryTest {
     @Test
     @DisplayName("incorrect query does not validate")
     void incorrectQueryDoesNotValidate() {
-        final var query = new TransactionReceiptQuery();
+        final TransactionReceiptQuery query = new TransactionReceiptQuery();
 
         assertThrows(
             IllegalStateException.class,

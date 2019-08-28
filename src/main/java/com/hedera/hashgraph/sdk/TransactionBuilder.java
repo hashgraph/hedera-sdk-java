@@ -69,7 +69,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * the network.
      */
     public final T setTransactionValidDuration(Duration validDuration) {
-        var actual = validDuration;
+        Duration actual = validDuration;
 
         if (MAX_VALID_DURATION.compareTo(validDuration) < 0) {
             actual = MAX_VALID_DURATION;
@@ -115,7 +115,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
 
     @Override
     public final void validate() {
-        var bodyBuilder = this.bodyBuilder;
+        TransactionBody.Builder bodyBuilder = this.bodyBuilder;
 
         if (client == null) {
             require(bodyBuilder.hasTransactionID(), ".setTransactionId() required");
@@ -131,7 +131,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
 
     public final Transaction build() {
         if (!bodyBuilder.hasNodeAccountID()) {
-            var channel = client == null ? null : client.pickNode();
+            Node channel = client == null ? null : client.pickNode();
             if (channel != null) {
                 bodyBuilder.setNodeAccountID(channel.accountId.toProto());
             }
@@ -146,7 +146,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         inner.setBodyBytes(
             bodyBuilder.build()
                 .toByteString());
-        var tx = new Transaction(client, inner, bodyBuilder, getMethod());
+        Transaction tx = new Transaction(client, inner, bodyBuilder, getMethod());
 
         if (client != null && client.getOperatorKey() != null) {
             tx.sign(client.getOperatorKey());

@@ -16,7 +16,7 @@ class TransactionReceiptTest {
     @Test
     @DisplayName("requires `TransactionGetReceipt`")
     void requiresTransactionGetReceipt() {
-        final var response = Response.getDefaultInstance();
+        final Response response = Response.getDefaultInstance();
 
         assertThrows(
             IllegalArgumentException.class,
@@ -28,13 +28,13 @@ class TransactionReceiptTest {
     @Test
     @DisplayName("missing fields throw")
     void missingFieldsThrow() {
-        final var response = Response.newBuilder()
+        final Response response = Response.newBuilder()
             .setTransactionGetReceipt(
                 TransactionGetReceiptResponse.getDefaultInstance()
             )
             .build();
 
-        final var receipt = new TransactionReceipt(response);
+        final TransactionReceipt receipt = new TransactionReceipt(response);
 
         assertEquals(receipt.getStatus(), ResponseCodeEnum.OK);
 
@@ -60,9 +60,9 @@ class TransactionReceiptTest {
     @Test
     @DisplayName("receipt with account ID")
     void receiptWithAccountId() {
-        final var expectedAccountId = new AccountId(1, 2, 3);
+        final AccountId expectedAccountId = new AccountId(1, 2, 3);
 
-        final var response = Response.newBuilder()
+        final Response response = Response.newBuilder()
             .setTransactionGetReceipt(
                 TransactionGetReceiptResponse.newBuilder()
                     .setReceipt(
@@ -72,7 +72,7 @@ class TransactionReceiptTest {
             ).build();
 
 
-        final var receipt = new TransactionReceipt(response);
+        final TransactionReceipt receipt = new TransactionReceipt(response);
 
         assertEquals(receipt.getAccountId(), expectedAccountId);
     }

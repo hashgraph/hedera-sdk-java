@@ -34,8 +34,8 @@ public final class Ed25519Signature {
     public static Ed25519Signature forMessage(Ed25519PrivateKey privateKey, byte[] message, int messageOffset, int messageLen) {
         // we don't use the `Ed25519Signer` class because it unnecessarily calculates the public key
         // in `init()`
-        var secret = privateKey.toBytes();
-        var sigBytes = new byte[Ed25519.SIGNATURE_SIZE];
+        byte[] secret = privateKey.toBytes();
+        byte[] sigBytes = new byte[Ed25519.SIGNATURE_SIZE];
         Ed25519.sign(secret, 0, message, messageOffset, messageLen, sigBytes, 0);
         return new Ed25519Signature(sigBytes);
     }
@@ -53,7 +53,7 @@ public final class Ed25519Signature {
      * message bytes (with offset into the byte array and number of bytes to process).
      */
     public boolean verify(Ed25519PublicKey publicKey, byte[] message, int messageOffset, int messageLen) {
-        var pubKeyBytes = publicKey.toBytes();
+        byte[] pubKeyBytes = publicKey.toBytes();
         return Ed25519.verify(sigBytes, 0, pubKeyBytes, 0, message, messageOffset, messageLen);
     }
 

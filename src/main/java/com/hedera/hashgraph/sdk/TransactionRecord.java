@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hederahashgraph.api.proto.java.AccountAmountOrBuilder;
 
@@ -30,7 +31,7 @@ public final class TransactionRecord {
 
     @Nullable
     public byte[] getTransactionHash() {
-        var hash = inner.getTransactionHash();
+        ByteString hash = inner.getTransactionHash();
         // proto specifies hash is not provided if the transaction failed due to a duplicate ID
         return !hash.isEmpty() ? hash.toByteArray() : null;
     }
@@ -42,7 +43,7 @@ public final class TransactionRecord {
 
     @Nullable
     public String getMemo() {
-        var memo = inner.getMemo();
+        String memo = inner.getMemo();
         return !memo.isEmpty() ? memo : null;
     }
 

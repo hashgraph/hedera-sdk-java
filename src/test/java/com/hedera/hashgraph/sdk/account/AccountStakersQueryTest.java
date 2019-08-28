@@ -33,7 +33,7 @@ class AccountStakersQueryTest {
     @Test
     @DisplayName("Query can be built")
     void correctQuery() {
-        final var query = new AccountStakersQuery()
+        final AccountStakersQuery query = new AccountStakersQuery()
             .setPayment(
                 new CryptoTransferTransaction(null)
                     .setTransactionId(new TransactionId(new AccountId(2), Instant.ofEpochSecond(1559868457)))

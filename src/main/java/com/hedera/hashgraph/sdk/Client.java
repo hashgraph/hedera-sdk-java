@@ -9,6 +9,7 @@ import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hedera.hashgraph.sdk.crypto.Key;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
@@ -115,8 +116,8 @@ public final class Client {
             throw new IllegalStateException("List of channels has become empty");
         }
 
-        var r = random.nextInt(channels.size());
-        var channelIter = channels.values()
+        int r = random.nextInt(channels.size());
+        Iterator<Node> channelIter = channels.values()
             .iterator();
 
         for (int i = 1; i < r; i++) {
@@ -127,7 +128,7 @@ public final class Client {
     }
 
     Node getNodeForId(AccountId node) {
-        var selectedChannel = channels.get(node);
+        Node selectedChannel = channels.get(node);
 
         if (selectedChannel == null) {
             throw new IllegalArgumentException("Node Id does not exist");
@@ -141,7 +142,7 @@ public final class Client {
     //
 
     public AccountId createAccount(Key publicKey, long initialBalance) throws HederaException, HederaNetworkException {
-        var receipt = new AccountCreateTransaction(this).setKey(publicKey)
+        TransactionReceipt receipt = new AccountCreateTransaction(this).setKey(publicKey)
             .setInitialBalance(initialBalance)
             .executeForReceipt();
 

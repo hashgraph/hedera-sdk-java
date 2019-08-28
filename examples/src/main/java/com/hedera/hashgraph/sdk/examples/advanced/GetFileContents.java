@@ -1,9 +1,13 @@
 package com.hedera.hashgraph.sdk.examples.advanced;
 
+import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaException;
+import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.examples.ExampleHelper;
-import com.hedera.hashgraph.sdk.file.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.file.FileContentsQuery;
+import com.hedera.hashgraph.sdk.file.FileCreateTransaction;
+import com.hederahashgraph.api.proto.java.FileGetContentsResponse;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -14,16 +18,16 @@ public final class GetFileContents {
     public static void main(String[] args) throws HederaException {
 
         // Grab the private key from the .env file
-        var operatorKey = ExampleHelper.getOperatorKey();
+        Ed25519PrivateKey operatorKey = ExampleHelper.getOperatorKey();
 
         // Build the Hedera client using ExampleHelper class
-        var client = ExampleHelper.createHederaClient();
+        Client client = ExampleHelper.createHederaClient();
 
         // Content to be stored in the file
-        var fileContents = ("Hedera is great!").getBytes();
+        byte[] fileContents = ("Hedera is great!").getBytes();
 
         // Create the new file and set its properties
-        var newFile = new FileCreateTransaction(client)
+        TransactionReceipt newFile = new FileCreateTransaction(client)
             .addKey(operatorKey.getPublicKey()) // The public key of the owner of the file
             .setContents(fileContents) // Contents of the file
             .setExpirationTime(Instant.now().plus(Duration.ofSeconds(2592000))) // Set file expiration time in seconds
@@ -33,7 +37,7 @@ public final class GetFileContents {
         System.out.println("The new file ID is " + newFile.getFileId().toString());
 
         // Get file contents
-        var contents = new FileContentsQuery(client)
+        FileGetContentsResponse contents = new FileContentsQuery(client)
             .setFileId(newFile.getFileId())
             .execute();
 

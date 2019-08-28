@@ -23,7 +23,7 @@ class Ed25519PrivateKeyTest {
     @Test
     @DisplayName("private key generates successfully")
     void keyGenerates() {
-        final var key = Ed25519PrivateKey.generate();
+        final Ed25519PrivateKey key = Ed25519PrivateKey.generate();
 
         assertNotNull(key);
         assertNotNull(key.toBytes());
@@ -32,10 +32,10 @@ class Ed25519PrivateKeyTest {
     @Test
     @DisplayName("private key can be recovered from bytes")
     void keySerialization() {
-        final var key1 = Ed25519PrivateKey.generate();
-        final var key1Bytes = key1.toBytes();
-        final var key2 = Ed25519PrivateKey.fromBytes(key1Bytes);
-        final var key2Bytes = key2.toBytes();
+        final Ed25519PrivateKey key1 = Ed25519PrivateKey.generate();
+        final byte[] key1Bytes = key1.toBytes();
+        final Ed25519PrivateKey key2 = Ed25519PrivateKey.fromBytes(key1Bytes);
+        final byte[] key2Bytes = key2.toBytes();
 
         assertArrayEquals(key1Bytes, key2Bytes);
     }
@@ -51,7 +51,7 @@ class Ed25519PrivateKeyTest {
         "db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10"
     })
     void externalKeyDeserialize(String keyStr) {
-        final var key = Ed25519PrivateKey.fromString(keyStr);
+        final Ed25519PrivateKey key = Ed25519PrivateKey.fromString(keyStr);
         assertNotNull(key);
         // the above are all the same key
         assertEquals(
@@ -63,7 +63,7 @@ class Ed25519PrivateKeyTest {
     @Test
     @DisplayName("private key can be encoded to a string")
     void keyToString() {
-        final var key = Ed25519PrivateKey.fromString(testKeyStr);
+        final Ed25519PrivateKey key = Ed25519PrivateKey.fromString(testKeyStr);
 
         assertNotNull(key);
         assertEquals(testKeyStr, key.toString());
@@ -72,8 +72,8 @@ class Ed25519PrivateKeyTest {
     @Test
     @DisplayName("private key can be decoded from a PEM file")
     void keyFromPem() throws IOException {
-        final var stringReader = new StringReader(testKeyPem);
-        final var privateKey = Ed25519PrivateKey.fromPemFile(stringReader);
+        final StringReader stringReader = new StringReader(testKeyPem);
+        final Ed25519PrivateKey privateKey = Ed25519PrivateKey.fromPemFile(stringReader);
 
         assertEquals(privateKey.toString(), testKeyStr);
     }
@@ -81,8 +81,8 @@ class Ed25519PrivateKeyTest {
     @Test
     @DisplayName("private key can be decoded from a PEM file")
     void keyToPem() throws IOException {
-        final var stringWriter = new StringWriter();
-        final var privateKey = Ed25519PrivateKey.fromString(testKeyStr);
+        final StringWriter stringWriter = new StringWriter();
+        final Ed25519PrivateKey privateKey = Ed25519PrivateKey.fromString(testKeyStr);
         privateKey.writePem(stringWriter);
 
         assertEquals(stringWriter.toString(), testKeyPem);

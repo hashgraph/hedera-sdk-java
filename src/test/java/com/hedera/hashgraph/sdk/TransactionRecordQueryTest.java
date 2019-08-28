@@ -65,7 +65,7 @@ class TransactionRecordQueryTest {
     @Test
     @DisplayName("incorrect query does not validate")
     void incorrectQueryDoesNotValidate() {
-        final var emptyQuery = new TransactionRecordQuery();
+        final TransactionRecordQuery emptyQuery = new TransactionRecordQuery();
 
         assertThrows(
             IllegalStateException.class,

@@ -1,9 +1,14 @@
 package com.hedera.hashgraph.sdk.examples.advanced;
 
+import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaException;
+import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.examples.ExampleHelper;
 import com.hedera.hashgraph.sdk.file.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.file.FileDeleteTransaction;
+import com.hedera.hashgraph.sdk.file.FileId;
+import com.hedera.hashgraph.sdk.file.FileInfo;
 import com.hedera.hashgraph.sdk.file.FileInfoQuery;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
@@ -14,27 +19,27 @@ public final class DeleteFile {
     private DeleteFile() { }
 
     public static void main(String[] args) throws HederaException {
-        var operatorKey = ExampleHelper.getOperatorKey();
-        var client = ExampleHelper.createHederaClient();
+        Ed25519PrivateKey operatorKey = ExampleHelper.getOperatorKey();
+        Client client = ExampleHelper.createHederaClient();
 
         // The file is required to be a byte array,
         // you can easily use the bytes of a file instead.
-        var fileContents = "Hedera hashgraph is great!".getBytes();
+        byte[] fileContents = "Hedera hashgraph is great!".getBytes();
 
-        var tx = new FileCreateTransaction(client).setExpirationTime(
+        FileCreateTransaction tx = new FileCreateTransaction(client).setExpirationTime(
             Instant.now()
                 .plus(Duration.ofSeconds(2592000)))
             // Use the same key as the operator to "own" this file
             .addKey(operatorKey.getPublicKey())
             .setContents(fileContents);
 
-        var receipt = tx.executeForReceipt();
-        var newFileId = receipt.getFileId();
+        TransactionReceipt receipt = tx.executeForReceipt();
+        FileId newFileId = receipt.getFileId();
 
         System.out.println("file: " + newFileId);
 
         // now delete the file
-        var txDeleteReceipt = new FileDeleteTransaction(client)
+        TransactionReceipt txDeleteReceipt = new FileDeleteTransaction(client)
             .setFileId(newFileId)
             .executeForReceipt();
 
@@ -44,7 +49,7 @@ public final class DeleteFile {
         }
         System.out.println("File deleted successfully.");
 
-        var fileInfo = new FileInfoQuery(client)
+        FileInfo fileInfo = new FileInfoQuery(client)
             .setFileId(newFileId)
             .execute();
 

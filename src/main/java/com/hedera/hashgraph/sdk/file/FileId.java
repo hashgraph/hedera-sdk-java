@@ -54,7 +54,7 @@ public final class FileId implements Entity {
 
         if (!(other instanceof FileId)) return false;
 
-        var otherId = (FileId) other;
+        FileId otherId = (FileId) other;
         return getShardNum() == otherId.getShardNum() && getRealmNum() == otherId.getRealmNum() && getFileNum() == otherId.getFileNum();
     }
 
