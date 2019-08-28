@@ -77,7 +77,7 @@ public class AccountInfo {
             throw new IllegalArgumentException("query response was not `CryptoGetInfoResponse`");
         }
 
-        var infoResponse = response.getCryptoGetInfo();
+        CryptoGetInfoResponse infoResponse = response.getCryptoGetInfo();
         inner = infoResponse.getAccountInfo();
 
         if (!inner.hasKey()) {

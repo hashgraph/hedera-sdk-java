@@ -35,7 +35,7 @@ class ContractCallQueryTest {
     @Test
     @DisplayName("correct query can be built")
     void correctBuilder() {
-        final var query = new ContractCallQuery()
+        final ContractCallQuery query = new ContractCallQuery()
             .setPayment(
                 new CryptoTransferTransaction(null)
                     .setTransactionId(new TransactionId(new AccountId(2), Instant.ofEpochSecond(1559868457)))

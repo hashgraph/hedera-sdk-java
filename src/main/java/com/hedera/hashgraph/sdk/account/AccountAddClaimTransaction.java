@@ -4,6 +4,7 @@ import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.crypto.Key;
+import com.hederahashgraph.api.proto.java.AccountID;
 import com.hederahashgraph.api.proto.java.Claim;
 import com.hederahashgraph.api.proto.java.CryptoAddClaimTransactionBody;
 import com.hederahashgraph.api.proto.java.KeyList;
@@ -27,7 +28,7 @@ public final class AccountAddClaimTransaction extends TransactionBuilder<Account
 
     public AccountAddClaimTransaction setAccountId(AccountId id) {
         // fixme: not sure if both need to be used
-        var protoId = id.toProto();
+        AccountID protoId = id.toProto();
         claim.setAccountID(protoId);
         return this;
     }

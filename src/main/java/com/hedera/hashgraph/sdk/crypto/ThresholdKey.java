@@ -26,7 +26,7 @@ public class ThresholdKey implements Key {
     }
 
     public ThresholdKey addAll(Collection<? extends Key> keys) {
-        for (final var key : keys) {
+        for (final Key key : keys) {
             add(key);
         }
 
@@ -34,7 +34,7 @@ public class ThresholdKey implements Key {
     }
 
     public ThresholdKey addAll(Key... keys) {
-        for (final var key : keys) {
+        for (final Key key : keys) {
             add(key);
         }
 
@@ -50,7 +50,7 @@ public class ThresholdKey implements Key {
             throw new IllegalStateException("ThresholdKey must have at least as many keys as the set threshold");
         }
 
-        final var key = com.hederahashgraph.api.proto.java.Key.newBuilder();
+        final com.hederahashgraph.api.proto.java.Key.Builder key = com.hederahashgraph.api.proto.java.Key.newBuilder();
         key.setThresholdKey(inner);
         return key.build();
     }

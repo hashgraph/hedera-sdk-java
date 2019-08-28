@@ -44,14 +44,14 @@ public final class Ed25519PublicKey implements Key {
      * @throws AssertionError if the hex string decodes to the wrong number of bytes
      */
     public static Ed25519PublicKey fromString(String publicKeyString) {
-        var keyBytes = Hex.decode(publicKeyString);
+        byte[] keyBytes = Hex.decode(publicKeyString);
 
         // if the decoded bytes matches the length of a public key, try that
         if (keyBytes.length == Ed25519.PUBLIC_KEY_SIZE) {
             return fromBytes(keyBytes);
         }
 
-        var publicKeyInfo = SubjectPublicKeyInfo.getInstance(keyBytes);
+        SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(keyBytes);
         return fromBytes(
             publicKeyInfo.getPublicKeyData()
                 .getBytes());

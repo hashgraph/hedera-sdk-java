@@ -2,13 +2,15 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.Splitter;
 
+import java.util.Iterator;
+
 public final class IdUtil {
 
     private IdUtil() {
     }
 
     public static <R> R parseIdString(String id, WithIdNums<R> withIdNums) {
-        var rawNums = Splitter.on('.')
+        Iterator<String> rawNums = Splitter.on('.')
             .split(id)
             .iterator();
         R newId;

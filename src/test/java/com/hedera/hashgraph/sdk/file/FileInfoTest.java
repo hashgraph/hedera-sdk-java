@@ -30,7 +30,7 @@ class FileInfoTest {
     @Test
     @DisplayName("requires at least one key")
     void doesntRequireKey() {
-        final var response = Response.newBuilder()
+        final Response response = Response.newBuilder()
             .setFileGetInfo(FileGetInfoResponse.getDefaultInstance())
             .build();
 
@@ -45,7 +45,7 @@ class FileInfoTest {
     @Test
     @DisplayName("deserializes from a correct response")
     void correct() {
-        final var response = Response.newBuilder()
+        final Response response = Response.newBuilder()
             .setFileGetInfo(
                 FileGetInfoResponse.newBuilder()
                     .setFileInfo(
@@ -55,7 +55,7 @@ class FileInfoTest {
                                 KeyList.newBuilder().addKeys(publicKey.toKeyProto()))))
             .build();
 
-        final var fileInfo = new FileInfo(response);
+        final FileInfo fileInfo = new FileInfo(response);
 
         assertEquals(fileInfo.getFileId(), new FileId(0, 0, 0));
         assertFalse(fileInfo.isDeleted());

@@ -51,7 +51,7 @@ class TransactionTest {
     @Test
     @DisplayName("validate() accepts two signatures")
     void validateTwoSignatures() {
-        final var key2 = Ed25519PrivateKey.generate();
+        final Ed25519PrivateKey key2 = Ed25519PrivateKey.generate();
 
         assertDoesNotThrow(
             () -> txn.sign(key1).sign(key2).validate()
@@ -71,9 +71,9 @@ class TransactionTest {
     @Test
     @DisplayName("transaction goes to bytes and back")
     void testSerialization() throws InvalidProtocolBufferException {
-        final var txn1Bytes = txn.sign(key1).toBytes();
+        final byte[] txn1Bytes = txn.sign(key1).toBytes();
 
-        final var txn2 = Transaction.fromBytes(txn1Bytes);
+        final Transaction txn2 = Transaction.fromBytes(txn1Bytes);
 
         assertEquals(txn.inner.build(), txn2.inner.build());
         assertEquals(txn.nodeAccountId, txn2.nodeAccountId);

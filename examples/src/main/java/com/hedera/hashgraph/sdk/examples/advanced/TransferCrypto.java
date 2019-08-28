@@ -1,6 +1,8 @@
 package com.hedera.hashgraph.sdk.examples.advanced;
 
+import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaException;
+import com.hedera.hashgraph.sdk.TransactionRecord;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hedera.hashgraph.sdk.examples.ExampleHelper;
@@ -9,19 +11,19 @@ public final class TransferCrypto {
     private TransferCrypto() { }
 
     public static void main(String[] args) throws HederaException {
-        var operatorId = ExampleHelper.getOperatorId();
-        var client = ExampleHelper.createHederaClient();
+        AccountId operatorId = ExampleHelper.getOperatorId();
+        Client client = ExampleHelper.createHederaClient();
 
-        var recipientId = AccountId.fromString("0.0.3");
-        var amount = 10_000;
+        AccountId recipientId = AccountId.fromString("0.0.3");
+        int amount = 10_000;
 
-        var senderBalanceBefore = client.getAccountBalance(operatorId);
-        var receiptBalanceBefore = client.getAccountBalance(recipientId);
+        long senderBalanceBefore = client.getAccountBalance(operatorId);
+        long receiptBalanceBefore = client.getAccountBalance(recipientId);
 
         System.out.println("" + operatorId + " balance = " + senderBalanceBefore);
         System.out.println("" + recipientId + " balance = " + receiptBalanceBefore);
 
-        var record = new CryptoTransferTransaction(client)
+        TransactionRecord record = new CryptoTransferTransaction(client)
             // .addSender and .addRecipient can be called as many times as you want as long as the total sum from
             // both sides is equivalent
             .addSender(operatorId, amount)
@@ -32,8 +34,8 @@ public final class TransferCrypto {
 
         System.out.println("transferred " + amount + "...");
 
-        var senderBalanceAfter = client.getAccountBalance(operatorId);
-        var receiptBalanceAfter = client.getAccountBalance(recipientId);
+        long senderBalanceAfter = client.getAccountBalance(operatorId);
+        long receiptBalanceAfter = client.getAccountBalance(recipientId);
 
         System.out.println("" + operatorId + " balance = " + senderBalanceAfter);
         System.out.println("" + recipientId + " balance = " + receiptBalanceAfter);

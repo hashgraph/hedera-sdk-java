@@ -24,12 +24,12 @@ public final class TransactionId {
     private static synchronized Instant getIncreasingInstant() {
         // Allows the transaction to be accepted as long as the
         // server is not more than 10 seconds behind us
-        final var instant = Clock.systemUTC()
+        final Instant instant = Clock.systemUTC()
             .instant()
             .minusSeconds(10);
 
         // ensures every instant is at least always greater than the last
-        lastInstant = lastInstant != null && instant.compareTo(lastInstant) < 1
+        lastInstant = lastInstant != null && instant.compareTo(lastInstant) <= 0
             ? lastInstant.plusNanos(1)
             : instant;
 
@@ -97,7 +97,7 @@ public final class TransactionId {
 
         if (!(other instanceof TransactionId)) return false;
 
-        var otherId = (TransactionId) other;
+        TransactionId otherId = (TransactionId) other;
         return getAccountId().equals(otherId.getAccountId()) && getValidStart().equals(otherId.getValidStart());
     }
 }

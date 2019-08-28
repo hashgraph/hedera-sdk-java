@@ -4,6 +4,7 @@ import com.hedera.hashgraph.sdk.contract.ContractId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import com.hederahashgraph.api.proto.java.ContractID;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
@@ -30,7 +31,7 @@ public interface Key {
         SubjectPublicKeyInfo pubKeyInfo;
 
         try {
-            var keyBytes = Hex.decode(keyString);
+            byte[] keyBytes = Hex.decode(keyString);
 
             // it could be a hex-encoded raw public key or a DER-encoded public key
             if (keyBytes.length == Ed25519.PUBLIC_KEY_SIZE) {
@@ -42,7 +43,7 @@ public interface Key {
             throw new IllegalArgumentException("Failed to parse public key", e);
         }
 
-        var algId = pubKeyInfo.getAlgorithm()
+        ASN1ObjectIdentifier algId = pubKeyInfo.getAlgorithm()
             .getAlgorithm();
 
         if (algId.equals(EdECObjectIdentifiers.id_Ed25519)) {

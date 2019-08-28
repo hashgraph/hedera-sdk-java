@@ -81,7 +81,7 @@ public abstract class HederaCall<Req, RawResp, Resp, T> {
 
     protected void checkValidationErrors(String prologue) {
         if (validationErrors == null) return;
-        var errors = validationErrors;
+        List<String> errors = validationErrors;
         validationErrors = null;
         throw new IllegalStateException(prologue + ":\n" + String.join("\n", errors));
     }
@@ -101,9 +101,9 @@ public abstract class HederaCall<Req, RawResp, Resp, T> {
     }
 
     protected void requireExactlyOne(String errMsg, String errCollision, boolean... values) {
-        var oneIsTrue = false;
+        boolean oneIsTrue = false;
 
-        for (var maybeTrue : values) {
+        for (boolean maybeTrue : values) {
             if (maybeTrue && oneIsTrue) {
                 addValidationError(errCollision);
                 return;
@@ -139,7 +139,7 @@ public abstract class HederaCall<Req, RawResp, Resp, T> {
             onNextCalled = true;
 
             try {
-                var response = mapResponse(value);
+                Resp response = mapResponse(value);
                 onSuccess.accept(response);
             } catch (HederaException e) {
                 onError.accept(e);

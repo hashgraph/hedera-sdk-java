@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk.account;
 
+import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
@@ -28,10 +29,10 @@ class AccountDeleteClaimTransactionTest {
     @Test
     @DisplayName("transaction can be built")
     void correctBuilder() {
-        final var now = Instant.ofEpochSecond(1554158542);
-        final var key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962");
-        final var txnId = new TransactionId(new AccountId(2), now);
-        final var txn = new AccountDeleteClaimTransaction(null)
+        final Instant now = Instant.ofEpochSecond(1554158542);
+        final Ed25519PrivateKey key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962");
+        final TransactionId txnId = new TransactionId(new AccountId(2), now);
+        final Transaction txn = new AccountDeleteClaimTransaction(null)
             .setTransactionId(txnId)
             .setNodeAccountId(new AccountId(3))
             .setAccountToDeleteFrom(new AccountId(4))

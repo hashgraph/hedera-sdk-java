@@ -62,7 +62,7 @@ public final class SolidityUtil {
 
     public static <T> T decodeAddress(byte[] address, WithAddress<T> withAddress) {
         checkAddressLen(address);
-        final var buf = ByteBuffer.wrap(address);
+        final ByteBuffer buf = ByteBuffer.wrap(address);
         return withAddress.apply(buf.getInt(), buf.getLong(), buf.getLong());
     }
 

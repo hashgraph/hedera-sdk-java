@@ -27,7 +27,7 @@ class AccountInfoQueryTest {
     @Test
     @DisplayName("Query can be built")
     void correctQuery() {
-        final var query = new AccountInfoQuery()
+        final AccountInfoQuery query = new AccountInfoQuery()
             .setPayment(
                 new CryptoTransferTransaction(null)
                     .setTransactionId(new TransactionId(new AccountId(2), Instant.ofEpochSecond(1559868457)))

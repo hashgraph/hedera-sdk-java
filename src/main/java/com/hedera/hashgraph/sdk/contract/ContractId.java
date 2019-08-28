@@ -62,7 +62,7 @@ public final class ContractId implements Key, Entity {
 
         if (!(other instanceof ContractId)) return false;
 
-        var otherId = (ContractId) other;
+        ContractId otherId = (ContractId) other;
         return getShardNum() == otherId.getShardNum() && getRealmNum() == otherId.getRealmNum()
                 && getContractNum() == otherId.getContractNum();
     }

@@ -28,7 +28,7 @@ class AccountInfoTest {
     @Test
     @DisplayName("requires a key")
     void requiresKey() {
-        final var response = Response.newBuilder()
+        final Response response = Response.newBuilder()
             .setCryptoGetInfo(CryptoGetInfoResponse.getDefaultInstance())
             .build();
 
@@ -42,14 +42,14 @@ class AccountInfoTest {
     @Test
     @DisplayName("deserializes from a correct response")
     void correct() {
-        final var response = Response.newBuilder()
+        final Response response = Response.newBuilder()
             .setCryptoGetInfo(
                 CryptoGetInfoResponse.newBuilder()
                     .setAccountInfo(CryptoGetInfoResponse.AccountInfo.newBuilder()
                         .setKey(privateKey.getPublicKey().toKeyProto())))
             .build();
 
-        final var accountInfo = new AccountInfo(response);
+        final AccountInfo accountInfo = new AccountInfo(response);
 
         assertEquals(accountInfo.getAccountId(), new AccountId(0));
         assertEquals(accountInfo.getContractAccountId(), "");

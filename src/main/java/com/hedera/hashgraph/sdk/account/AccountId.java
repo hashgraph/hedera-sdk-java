@@ -67,7 +67,7 @@ public final class AccountId implements Entity {
 
         if (other == null || getClass() != other.getClass()) return false;
 
-        var otherId = (AccountId) other;
+        AccountId otherId = (AccountId) other;
         return otherId.getAccountNum() == getAccountNum() && otherId.getRealmNum() == getRealmNum()
                 && otherId.getShardNum() == getShardNum();
     }

@@ -1,5 +1,7 @@
 package com.hedera.hashgraph.sdk.crypto.ed25519;
 
+import org.bouncycastle.asn1.ASN1BitString;
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
@@ -72,13 +74,13 @@ public final class Ed25519PrivateKey {
             }
         } else {
             // decode a properly DER-encoded private key descriptor
-            var privateKeyInfo = PrivateKeyInfo.getInstance(keyBytes);
+            PrivateKeyInfo privateKeyInfo = PrivateKeyInfo.getInstance(keyBytes);
 
             try {
-                var privateKey = privateKeyInfo.parsePrivateKey();
+                ASN1Encodable privateKey = privateKeyInfo.parsePrivateKey();
                 privKeyParams = new Ed25519PrivateKeyParameters(((ASN1OctetString) privateKey).getOctets(), 0);
 
-                var pubKeyData = privateKeyInfo.getPublicKeyData();
+                ASN1BitString pubKeyData = privateKeyInfo.getPublicKeyData();
 
                 if (pubKeyData != null) {
                     pubKeyParams = new Ed25519PublicKeyParameters(pubKeyData.getOctets(), 0);
@@ -123,7 +125,7 @@ public final class Ed25519PrivateKey {
      * @throws IOException if one occurred while reading or if no "PRIVATE KEY" section was found
      */
     public static Ed25519PrivateKey fromPemFile(Reader pemFile) throws IOException {
-        final var pemReader = new PemReader(pemFile);
+        final PemReader pemReader = new PemReader(pemFile);
 
         PemObject readObject;
 
@@ -148,7 +150,7 @@ public final class Ed25519PrivateKey {
      */
     public static Ed25519PrivateKey fromString(String privateKeyString) {
         // TODO: catch unchecked `DecoderException`
-        var keyBytes = Hex.decode(privateKeyString);
+        byte[] keyBytes = Hex.decode(privateKeyString);
         return fromBytes(keyBytes);
     }
 
@@ -199,7 +201,7 @@ public final class Ed25519PrivateKey {
 
     /** Write out a PEM encoded version of this private key. */
     public void writePem(Writer out) throws IOException {
-        final var pemWriter = new PemWriter(out);
+        final PemWriter pemWriter = new PemWriter(out);
         pemWriter.writeObject(new PemObject(TYPE_PRIVATE_KEY, encodeDER()));
         pemWriter.flush();
     }

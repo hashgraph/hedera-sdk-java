@@ -34,7 +34,7 @@ class ContractBytecodeQueryTest {
     @Test
     @DisplayName("correct query can be built")
     void correctBuilder() {
-        final var query = new ContractBytecodeQuery()
+        final ContractBytecodeQuery query = new ContractBytecodeQuery()
             .setPayment(
                 new CryptoTransferTransaction(null)
                     .setTransactionId(new TransactionId(new AccountId(2), Instant.ofEpochSecond(1559868457)))

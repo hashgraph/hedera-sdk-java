@@ -28,11 +28,11 @@ class ContractInfoTest {
     @Test
     @DisplayName("doesn't require a key")
     void doesntRequireKey() {
-        final var response = Response.newBuilder()
+        final Response response = Response.newBuilder()
             .setContractGetInfo(ContractGetInfoResponse.getDefaultInstance())
             .build();
 
-        final var contractInfo = new ContractInfo(response);
+        final ContractInfo contractInfo = new ContractInfo(response);
 
         assertNull(contractInfo.getAdminKey());
     }
@@ -40,7 +40,7 @@ class ContractInfoTest {
     @Test
     @DisplayName("deserializes from a correct response")
     void correct() {
-        final var response = Response.newBuilder()
+        final Response response = Response.newBuilder()
             .setContractGetInfo(
                 ContractGetInfoResponse.newBuilder()
                     .setContractInfo(
@@ -48,7 +48,7 @@ class ContractInfoTest {
                             .setStorage(1234)))
             .build();
 
-        final var contractInfo = new ContractInfo(response);
+        final ContractInfo contractInfo = new ContractInfo(response);
 
         assertEquals(contractInfo.getAccountId(), new AccountId(0));
         assertEquals(contractInfo.getContractAccountId(), "");

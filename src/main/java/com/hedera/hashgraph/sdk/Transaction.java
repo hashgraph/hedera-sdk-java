@@ -7,7 +7,10 @@ import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519Signature;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
+import com.hederahashgraph.api.proto.java.SignatureMap;
+import com.hederahashgraph.api.proto.java.SignatureMapOrBuilder;
 import com.hederahashgraph.api.proto.java.SignaturePair;
+import com.hederahashgraph.api.proto.java.SignaturePairOrBuilder;
 import com.hederahashgraph.api.proto.java.TransactionBody;
 import com.hederahashgraph.api.proto.java.TransactionBodyOrBuilder;
 import com.hederahashgraph.api.proto.java.TransactionResponse;
@@ -65,29 +68,29 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
     }
 
     public static Transaction fromBytes(Client client, byte[] bytes) throws InvalidProtocolBufferException {
-        var inner = com.hederahashgraph.api.proto.java.Transaction.parseFrom(bytes);
-        var body = TransactionBody.parseFrom(inner.getBodyBytes());
+        com.hederahashgraph.api.proto.java.Transaction inner = com.hederahashgraph.api.proto.java.Transaction.parseFrom(bytes);
+        TransactionBody body = TransactionBody.parseFrom(inner.getBodyBytes());
 
         return new Transaction(client, inner.toBuilder(), body, methodForTxnBody(body));
     }
 
     @VisibleForTesting
     public static Transaction fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        var inner = com.hederahashgraph.api.proto.java.Transaction.parseFrom(bytes);
-        var body = TransactionBody.parseFrom(inner.getBodyBytes());
+        com.hederahashgraph.api.proto.java.Transaction inner = com.hederahashgraph.api.proto.java.Transaction.parseFrom(bytes);
+        TransactionBody body = TransactionBody.parseFrom(inner.getBodyBytes());
 
         return new Transaction(null, inner.toBuilder(), body, methodForTxnBody(body));
     }
 
     public Transaction sign(Ed25519PrivateKey privateKey) {
-        var pubKey = ByteString.copyFrom(
+        ByteString pubKey = ByteString.copyFrom(
             privateKey.getPublicKey()
                 .toBytes());
 
-        var sigMap = inner.getSigMapBuilder();
+        SignatureMap.Builder sigMap = inner.getSigMapBuilder();
 
         for (int i = 0; i < sigMap.getSigPairCount(); i++) {
-            var pubKeyPrefix = sigMap.getSigPair(i)
+            ByteString pubKeyPrefix = sigMap.getSigPair(i)
                 .getPubKeyPrefix();
 
             if (pubKey.startsWith(pubKeyPrefix)) {
@@ -95,7 +98,7 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
             }
         }
 
-        var signature = Ed25519Signature.forMessage(
+        byte[] signature = Ed25519Signature.forMessage(
             privateKey,
             inner.getBodyBytes()
                 .toByteArray())
@@ -146,7 +149,7 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
     protected Channel getChannel() {
         Objects.requireNonNull(client, "Transaction.client must be non-null in regular use");
 
-        var channel = client.getNodeForId(new AccountId(nodeAccountId));
+        Node channel = client.getNodeForId(new AccountId(nodeAccountId));
         Objects.requireNonNull(channel, "Transaction.nodeAccountId not found on Client");
 
         return channel.getChannel();
@@ -154,17 +157,17 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
 
     @Override
     public final void validate() {
-        var sigMap = inner.getSigMapOrBuilder();
+        SignatureMapOrBuilder sigMap = inner.getSigMapOrBuilder();
 
         if (sigMap.getSigPairCount() < 2) {
             if (sigMap.getSigPairCount() == 0) {
                 addValidationError("Transaction requires at least one signature");
             } // else contains one signature which is fine
         } else {
-            var publicKeys = new HashSet<>();
+            HashSet<Object> publicKeys = new HashSet<>();
 
             for (int i = 0; i < sigMap.getSigPairCount(); i++) {
-                var sig = sigMap.getSigPairOrBuilder(i);
+                SignaturePairOrBuilder sig = sigMap.getSigPairOrBuilder(i);
                 ByteString pubKeyPrefix = sig.getPubKeyPrefix();
 
                 if (!publicKeys.add(pubKeyPrefix)) {
@@ -194,7 +197,7 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
     private <T> T executeAndWaitFor(CheckedFunction<TransactionReceipt, T> mapReceipt)
         throws HederaException, HederaNetworkException
     {
-        final var startTime = Instant.now();
+        final Instant startTime = Instant.now();
 
         // kickoff the transaction
         execute();
@@ -202,22 +205,22 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
         try {
             Thread.sleep(RECEIPT_INITIAL_DELAY);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
-        var attempt = 0;
+        int attempt = 0;
 
         while (true) {
             attempt += 1;
-            var receipt = queryReceipt();
-            var receiptStatus = receipt.getStatus();
+            TransactionReceipt receipt = queryReceipt();
+            ResponseCodeEnum receiptStatus = receipt.getStatus();
 
             if (receiptStatus == ResponseCodeEnum.UNKNOWN || receiptStatus == ResponseCodeEnum.OK) {
                 // If the receipt is UNKNOWN this means that the node has not finished
                 // processing the transaction; if it is OK it means the transaction has not yet
                 // reached consensus
 
-                final var delayMs =
+                final Long delayMs =
                     getReceiptDelayMs(startTime, attempt)
                         // throw if the delay will put us over `validDuraiton`
                         .orElseThrow(() -> new HederaException(ResponseCodeEnum.UNKNOWN));
@@ -237,7 +240,7 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
     private Optional<Long> getReceiptDelayMs(Instant startTime, int attempt) {
         // exponential backoff algorithm:
         // next delay is some constant * rand(0, 2 ** attempt - 1)
-        final var delay = RECEIPT_RETRY_DELAY
+        final int delay = RECEIPT_RETRY_DELAY
             * Objects.requireNonNull(client).random.nextInt(1 << attempt);
 
         // if the next delay will put us past the valid duration throw an error
@@ -275,14 +278,14 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
      * should be done in an explicit step
      *
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated
     public TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
         return executeAndWaitFor(
             receipt -> new TransactionRecordQuery(getClient()).setTransactionId(getId()).execute());
     }
 
     public void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<HederaThrowable> onError) {
-        var handler = new AsyncReceiptHandler(onSuccess, onError);
+        AsyncReceiptHandler handler = new AsyncReceiptHandler(onSuccess, onError);
 
         executeAsync(id -> handler.tryGetReceipt(), onError);
     }
@@ -299,13 +302,12 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
      * @deprecated querying for records has a cost separate from executing the transaction and so
      * should be done in an explicit step
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated
     public void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<HederaThrowable> onError) {
-        final var recordQuery = new TransactionRecordQuery(getClient())
-            .setTransactionId(getId())
-            .setPaymentDefault();
+        final TransactionRecordQuery recordQuery = new TransactionRecordQuery(getClient())
+            .setTransactionId(getId());
 
-        var handler = new AsyncReceiptHandler((receipt) ->
+        AsyncReceiptHandler handler = new AsyncReceiptHandler((receipt) ->
             recordQuery.executeAsync(onSuccess, onError),
             onError);
 
@@ -316,7 +318,7 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
      * @deprecated querying for records has a cost separate from executing the transaction and so
      * should be done in an explicit step
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated
     public final void executeForRecordAsync(BiConsumer<Transaction, TransactionRecord> onSuccess, BiConsumer<Transaction, HederaThrowable> onError) {
         executeForRecordAsync(r -> onSuccess.accept(this, r), e -> onError.accept(this, e));
     }
@@ -409,13 +411,15 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
         }
 
         private void handleReceipt(TransactionReceipt receipt) {
-            final var status = receipt.getStatus();
+            final ResponseCodeEnum status = receipt.getStatus();
 
             if (status == ResponseCodeEnum.UNKNOWN || status == ResponseCodeEnum.OK) {
-                getReceiptDelayMs(startTime, ++attempts) // increment and get
-                    .ifPresentOrElse(
-                        this::scheduleReceiptAttempt, () ->
-                            onError.accept(new HederaException(ResponseCodeEnum.UNKNOWN)));
+                final Optional<Long> receiptDelayMs = getReceiptDelayMs(startTime, ++attempts); // increment and get
+                receiptDelayMs.ifPresent(this::scheduleReceiptAttempt);
+
+                if (!receiptDelayMs.isPresent()) {
+                    onError.accept(new HederaException(ResponseCodeEnum.UNKNOWN));
+                }
             } else {
                 if (receiptEmitted) throw new IllegalStateException();
                 receiptEmitted = true;

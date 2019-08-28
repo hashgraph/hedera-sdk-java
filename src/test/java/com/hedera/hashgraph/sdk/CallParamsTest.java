@@ -1,5 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.ByteString;
+
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,9 +40,9 @@ class CallParamsTest {
     @MethodSource("funcSelectorArgs")
     @DisplayName("FunctionSelector produces correct hash")
     void funcSelectorTest(String hash, String funcName, String[] paramTypes) {
-        final var funcSelector = new CallParams.FunctionSelector(funcName);
+        final CallParams.FunctionSelector funcSelector = new CallParams.FunctionSelector(funcName);
 
-        for (final var paramType : paramTypes) {
+        for (final String paramType : paramTypes) {
             funcSelector.addParamType(paramType);
         }
 
@@ -53,16 +55,16 @@ class CallParamsTest {
     @Test
     @DisplayName("encodes dynamic params correctly")
     void dynamicParamsEncoding() {
-        final var paramsStringArg = CallParams.function("set_message")
+        final ByteString paramsStringArg = CallParams.function("set_message")
             .addString("Hello, world!")
             .toProto();
 
-        final var paramsBytesArg = CallParams.function("set_message")
+        final ByteString paramsBytesArg = CallParams.function("set_message")
             .addBytes("Hello, world!".getBytes(StandardCharsets.UTF_8))
             .toProto();
 
-        final var paramsStringArgHex = Hex.toHexString(paramsStringArg.toByteArray());
-        final var paramsBytesArgHex = Hex.toHexString(paramsBytesArg.toByteArray());
+        final String paramsStringArgHex = Hex.toHexString(paramsStringArg.toByteArray());
+        final String paramsBytesArgHex = Hex.toHexString(paramsBytesArg.toByteArray());
 
         assertEquals(
             "2e982602"
@@ -83,7 +85,7 @@ class CallParamsTest {
     @Test
     @DisplayName("encodes static params correctly")
     void staticParamsEncoding() {
-        final var params = CallParams.constructor()
+        final CallParams<CallParams.Constructor> params = CallParams.constructor()
             .addInt(0x11223344, 32)
             // tests implicit widening
             .addUint(0x44556677, 128)
@@ -91,7 +93,7 @@ class CallParamsTest {
             .addAddress("00112233445566778899aabbccddeeff00112233")
             .addFunction("44556677889900aabbccddeeff00112233445566", "aabbccdd");
 
-        final var paramsHex = Hex.toHexString(params.toProto().toByteArray());
+        final String paramsHex = Hex.toHexString(params.toProto().toByteArray());
 
         assertEquals(
             "0000000000000000000000000000000000000000000000000000000011223344"
@@ -106,14 +108,14 @@ class CallParamsTest {
     @Test
     @DisplayName("encodes mixed static and dynamic params correctly")
     void mixedParamsEncoding() {
-        final var params = CallParams.function("foo")
+        final CallParams<CallParams.Function> params = CallParams.function("foo")
             .addInt(BigInteger.valueOf(0xdeadbeef).shiftLeft(8), 72)
             .addString("Hello, world!")
             .addUint(BigInteger.valueOf(0x77889900).shiftLeft(8), 72)
             .addBytes(new byte[]{-1, -18, 63, 127})
             .addBool(true);
 
-        final var paramsHex = Hex.toHexString(params.toProto().toByteArray());
+        final String paramsHex = Hex.toHexString(params.toProto().toByteArray());
 
         assertEquals(
             "cd3bd246"
@@ -133,7 +135,7 @@ class CallParamsTest {
     @Test
     @DisplayName("encodes array types correctly")
     void arrayTypesEncoding() {
-        final var params = CallParams.function("foo")
+        final CallParams<CallParams.Function> params = CallParams.function("foo")
             .addStringArray(new String[]{"hello", ",", "world!"})
             .addStringArray(new String[]{"lorem", "ipsum", "dolor", "sit", "amet"}, 5)
             .addIntArray(new long[]{0x88, 0x99, 0xAA, 0xBB}, 32)
@@ -156,8 +158,8 @@ class CallParamsTest {
     @DisplayName("integer parameter methods check widths")
     @ValueSource(ints = {-128, -8, 0, 3, 9, 384})
     void integerWidthChecks(int width) {
-        final var params = CallParams.constructor();
-        final var message = "Solidity integer width must be a multiple of 8, "
+        final CallParams<CallParams.Constructor> params = CallParams.constructor();
+        final String message = "Solidity integer width must be a multiple of 8, "
             + "in the closed range [8, 256]";
 
         assertEquals(
@@ -188,14 +190,14 @@ class CallParamsTest {
     @Test
     @DisplayName("BigInteger and unsigned checks")
     void bigIntAndUnsignedChecks() {
-        final var params = CallParams.constructor();
+        final CallParams<CallParams.Constructor> params = CallParams.constructor();
 
         // allowed values for BigInteger
         params.addInt(BigInteger.ONE.shiftLeft(254), 256);
         params.addInt(BigInteger.ONE.negate().shiftLeft(255), 256);
         params.addUint(BigInteger.ONE.shiftLeft(255), 256);
 
-        final var negativeErr = "addUint() does not accept negative values";
+        final String negativeErr = "addUint() does not accept negative values";
 
         assertEquals(
             negativeErr,
@@ -209,7 +211,7 @@ class CallParamsTest {
                 IllegalArgumentException.class,
                 () -> params.addUint(BigInteger.ONE.negate(), 64)).getMessage());
 
-        final var rangeErr = "BigInteger out of range for Solidity integers";
+        final String rangeErr = "BigInteger out of range for Solidity integers";
 
         assertEquals(
             rangeErr,
@@ -231,7 +233,7 @@ class CallParamsTest {
                 () -> params.addUint(BigInteger.ONE.shiftLeft(256), 256))
                 .getMessage());
 
-        final var widthErr = "BigInteger.bitLength() is greater than the nominal parameter width";
+        final String widthErr = "BigInteger.bitLength() is greater than the nominal parameter width";
 
         assertEquals(
             widthErr,
@@ -257,9 +259,9 @@ class CallParamsTest {
     @Test
     @DisplayName("address param checks")
     void addressParamChecks() {
-        final var params = CallParams.constructor();
+        final CallParams<CallParams.Constructor> params = CallParams.constructor();
 
-        final var lenErr = "Solidity addresses must be 20 bytes or 40 hex chars";
+        final String lenErr = "Solidity addresses must be 20 bytes or 40 hex chars";
 
         assertEquals(
             lenErr,
