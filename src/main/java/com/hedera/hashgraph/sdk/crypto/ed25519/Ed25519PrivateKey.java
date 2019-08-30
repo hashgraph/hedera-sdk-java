@@ -1,5 +1,7 @@
 package com.hedera.hashgraph.sdk.crypto.ed25519;
 
+import com.hedera.hashgraph.sdk.crypto.Keystore;
+import com.hedera.hashgraph.sdk.crypto.KeystoreParseException;
 import com.hedera.hashgraph.sdk.crypto.PrivateKey;
 
 import org.bouncycastle.asn1.ASN1BitString;
@@ -21,7 +23,9 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
@@ -161,6 +165,20 @@ public final class Ed25519PrivateKey extends PrivateKey {
         return fromBytes(keyBytes);
     }
 
+    /**
+     * Recover a private key from an encrypted keystore file.
+     *
+     * @param inputStream the inputstream to read the keystore from
+     * @param passphrase the passphrase used to encrypt the keystore
+     * @return the recovered key
+     * @throws IOException if any occurs while reading from the inputstream
+     * @throws KeystoreParseException if there is a problem with the keystore; most likely
+     * is if the passphrase is incorrect.
+     */
+    public static Ed25519PrivateKey fromKeystore(InputStream inputStream, String passphrase) throws IOException {
+        return Keystore.fromStream(inputStream, passphrase).getEd25519();
+    }
+
     /** @return a new private key using {@link java.security.SecureRandom} */
     public static Ed25519PrivateKey generate() {
         return generate(new SecureRandom());
@@ -212,5 +230,18 @@ public final class Ed25519PrivateKey extends PrivateKey {
         final PemWriter pemWriter = new PemWriter(out);
         pemWriter.writeObject(new PemObject(TYPE_PRIVATE_KEY, encodeDER()));
         pemWriter.flush();
+    }
+
+    /**
+     * Export a keystore file to the given {@link OutputStream} encrypted with a given passphrase.
+     *
+     * You can recover this key later with {@link #fromKeystore(InputStream, String)}.
+     *
+     * @param outputStream the OutputStream to write the keystore to.
+     * @param passphrase the passphrase to encrypt the keystore with.
+     * @throws IOException if any occurs while writing to the OutputStream
+     */
+    public void exportKeystore(OutputStream outputStream, String passphrase) throws IOException {
+        new Keystore(this).export(outputStream, passphrase);
     }
 }

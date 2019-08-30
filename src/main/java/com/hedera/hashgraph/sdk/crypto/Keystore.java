@@ -264,8 +264,4 @@ public final class Keystore {
         secureRandom.nextBytes(out);
         return out;
     }
-
-    public static final class KeystoreParseException extends RuntimeException {
-        private KeystoreParseException(String message) { super(message); }
-    }
 }
