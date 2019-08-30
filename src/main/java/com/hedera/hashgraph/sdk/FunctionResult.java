@@ -54,7 +54,7 @@ public final class FunctionResult {
     /**
      * Get the first (or only) returned value as a string
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated
     public String getString() {
         return getString(0);
     }
@@ -93,7 +93,7 @@ public final class FunctionResult {
      * If the actual value is wider it will be truncated to the last 4 bytes (similar to Java's
      * integer narrowing semantics).
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated
     public int getInt() {
         return getInt(0);
     }
@@ -148,7 +148,7 @@ public final class FunctionResult {
     private ByteBuffer getByteBuffer(int offset) {
         // **NB** `.asReadOnlyByteBuffer()` on a substring reads from the start of the parent,
         // not the substring (bug)
-        return getRawResult().asReadOnlyByteBuffer().position(offset);
+        return (ByteBuffer) getRawResult().asReadOnlyByteBuffer().position(offset);
     }
 
     private ByteString getRawResult() {

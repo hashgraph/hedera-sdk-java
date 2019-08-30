@@ -74,7 +74,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
      * @deprecated query cost should be calculated by requesting it from the node so this function's
      * signature is insufficient to abstract over that operation.
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated
     public T setPaymentDefault() {
         return setPaymentDefault(100_000);
     }

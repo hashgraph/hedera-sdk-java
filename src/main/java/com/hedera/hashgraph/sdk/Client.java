@@ -44,7 +44,7 @@ public final class Client {
 
         channels = nodes.entrySet()
             .stream()
-            .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, t -> new Node(t.getKey(), t.getValue())));
+            .collect(Collectors.toMap(Map.Entry::getKey, t -> new Node(t.getKey(), t.getValue())));
     }
 
     /**
