@@ -29,7 +29,6 @@ class KeystoreTest {
 
     @Test
     @DisplayName("Keystore.toStream produces decodable value")
-    @SuppressWarnings("UnstableApiUsage")
     void keystoreToStream() throws IOException {
         final Ed25519PrivateKey privateKey = Ed25519PrivateKey.fromString(testKeyStr);
         final Keystore keystore = new Keystore(privateKey);

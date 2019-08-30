@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk.crypto;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonWriter;
@@ -24,6 +25,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.crypto.BadPaddingException;
@@ -62,6 +64,11 @@ public final class Keystore {
             return fromJson(jsonObject, passphrase);
         } catch (IllegalStateException e) {
             throw new KeystoreParseException(Optional.ofNullable(e.getMessage()).orElse("failed to parse Keystore"));
+        } catch (JsonIOException e) {
+            // RFC (@abonander): I'm all for keeping this as an unchecked exception
+            // but I want consistency with export() so this may involve creating our own exception
+            // because JsonIOException is kinda leaking implementation details.
+            throw (IOException) Objects.requireNonNull(e.getCause());
         }
     }
 
