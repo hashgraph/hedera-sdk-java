@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonWriter;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
@@ -57,7 +58,7 @@ public final class Keystore {
         this.keyBytes = privateKey.toBytes();
     }
 
-    public static Keystore fromStream(InputStream stream, String passphrase) throws IOException {
+    public static Keystore fromStream(InputStream stream, String passphrase) throws IOException, KeystoreParseException {
         try {
             final JsonObject jsonObject = jsonParser.parse(new InputStreamReader(stream, StandardCharsets.UTF_8))
                 .getAsJsonObject();
@@ -69,6 +70,8 @@ public final class Keystore {
             // but I want consistency with export() so this may involve creating our own exception
             // because JsonIOException is kinda leaking implementation details.
             throw (IOException) Objects.requireNonNull(e.getCause());
+        } catch (JsonSyntaxException e) {
+            throw new KeystoreParseException(e);
         }
     }
 
