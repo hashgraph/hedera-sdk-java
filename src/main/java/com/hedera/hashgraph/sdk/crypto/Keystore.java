@@ -57,7 +57,7 @@ public final class Keystore {
 
     public static Keystore fromStream(InputStream stream, String passphrase) throws IOException {
         try {
-            final JsonObject jsonObject = jsonParser.parse(new InputStreamReader(stream))
+            final JsonObject jsonObject = jsonParser.parse(new InputStreamReader(stream, StandardCharsets.UTF_8))
                 .getAsJsonObject();
             return fromJson(jsonObject, passphrase);
         } catch (IllegalStateException e) {
@@ -89,7 +89,7 @@ public final class Keystore {
     }
 
     public void export(OutputStream outputStream, String passphrase) throws IOException {
-        final JsonWriter writer = new JsonWriter(new OutputStreamWriter(outputStream));
+        final JsonWriter writer = new JsonWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
         gson.toJson(exportJson(passphrase), writer);
         writer.flush();
     }
