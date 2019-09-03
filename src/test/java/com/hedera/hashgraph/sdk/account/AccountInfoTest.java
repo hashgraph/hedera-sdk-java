@@ -7,7 +7,7 @@ import com.hederahashgraph.api.proto.java.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -54,7 +54,7 @@ class AccountInfoTest {
         assertEquals(accountInfo.getAccountId(), new AccountId(0));
         assertEquals(accountInfo.getContractAccountId(), "");
         assertNull(accountInfo.getProxyAccountId());
-        assertEquals(accountInfo.getClaims(), List.of());
+        assertEquals(accountInfo.getClaims(), new ArrayList<>());
     }
 
 }

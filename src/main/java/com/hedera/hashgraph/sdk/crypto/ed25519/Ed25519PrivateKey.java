@@ -1,5 +1,9 @@
 package com.hedera.hashgraph.sdk.crypto.ed25519;
 
+import com.hedera.hashgraph.sdk.crypto.Keystore;
+import com.hedera.hashgraph.sdk.crypto.KeystoreParseException;
+import com.hedera.hashgraph.sdk.crypto.PrivateKey;
+
 import org.bouncycastle.asn1.ASN1BitString;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1OctetString;
@@ -19,7 +23,9 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
@@ -33,7 +39,7 @@ import javax.annotation.Nullable;
  * <p>To obtain an instance, see {@link #generate()} or {@link #fromString(String)}.
  */
 @SuppressWarnings("Duplicates")
-public final class Ed25519PrivateKey {
+public final class Ed25519PrivateKey extends PrivateKey {
     public static final String TYPE_PRIVATE_KEY = "PRIVATE KEY";
     final Ed25519PrivateKeyParameters privKeyParams;
     // computed from private key and memoized
@@ -52,7 +58,14 @@ public final class Ed25519PrivateKey {
         }
     }
 
-    static Ed25519PrivateKey fromBytes(byte[] keyBytes) {
+    /**
+     * Construct an Ed25519PrivateKey from a raw byte array.
+     *
+     * @throws IllegalArgumentException if the key bytes are of an incorrect length for a raw
+     * private key or private key + public key, or do not represent a DER encoded Ed25519
+     * private key.
+     */
+    public static Ed25519PrivateKey fromBytes(byte[] keyBytes) {
         Ed25519PrivateKeyParameters privKeyParams;
         Ed25519PublicKeyParameters pubKeyParams = null;
 
@@ -69,8 +82,7 @@ public final class Ed25519PrivateKey {
 
                 return new Ed25519PrivateKey(privKeyParams, pubKeyParams);
             } catch (IOException e) {
-                // TODO throw a better checked exception
-                throw new RuntimeException(e);
+                throw new IllegalArgumentException(e);
             }
         } else {
             // decode a properly DER-encoded private key descriptor
@@ -87,8 +99,7 @@ public final class Ed25519PrivateKey {
                 }
 
             } catch (IOException e) {
-                // TODO: throw a better checked exception
-                throw new RuntimeException(e);
+                throw new IllegalArgumentException(e);
             }
         }
 
@@ -154,6 +165,20 @@ public final class Ed25519PrivateKey {
         return fromBytes(keyBytes);
     }
 
+    /**
+     * Recover a private key from an encrypted keystore file.
+     *
+     * @param inputStream the inputstream to read the keystore from
+     * @param passphrase the passphrase used to encrypt the keystore
+     * @return the recovered key
+     * @throws IOException if any occurs while reading from the inputstream
+     * @throws KeystoreParseException if there is a problem with the keystore; most likely
+     * is if the passphrase is incorrect.
+     */
+    public static Ed25519PrivateKey fromKeystore(InputStream inputStream, String passphrase) throws IOException {
+        return Keystore.fromStream(inputStream, passphrase).getEd25519();
+    }
+
     /** @return a new private key using {@link java.security.SecureRandom} */
     public static Ed25519PrivateKey generate() {
         return generate(new SecureRandom());
@@ -173,7 +198,8 @@ public final class Ed25519PrivateKey {
         return publicKey;
     }
 
-    byte[] toBytes() {
+    @Override
+    protected byte[] toBytes() {
         return privKeyParams.getEncoded();
     }
 
@@ -204,5 +230,18 @@ public final class Ed25519PrivateKey {
         final PemWriter pemWriter = new PemWriter(out);
         pemWriter.writeObject(new PemObject(TYPE_PRIVATE_KEY, encodeDER()));
         pemWriter.flush();
+    }
+
+    /**
+     * Export a keystore file to the given {@link OutputStream} encrypted with a given passphrase.
+     *
+     * You can recover this key later with {@link #fromKeystore(InputStream, String)}.
+     *
+     * @param outputStream the OutputStream to write the keystore to.
+     * @param passphrase the passphrase to encrypt the keystore with.
+     * @throws IOException if any occurs while writing to the OutputStream
+     */
+    public void exportKeystore(OutputStream outputStream, String passphrase) throws IOException {
+        new Keystore(this).export(outputStream, passphrase);
     }
 }
