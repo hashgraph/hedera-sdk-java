@@ -46,7 +46,7 @@
         <nullaway.version>0.7.2</nullaway.version>
         <spotbugs.version>3.1.12</spotbugs.version>
 
-        <hedera-protobuf.version>0.3.3</hedera-protobuf.version>
+        <hedera-protobuf.version>0.3.4</hedera-protobuf.version>
     </properties>
 
     <dependencies>
