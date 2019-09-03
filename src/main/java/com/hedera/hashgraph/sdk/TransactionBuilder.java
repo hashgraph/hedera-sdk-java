@@ -195,7 +195,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * @deprecated querying for records has a cost separate from executing the transaction and so
      * should be done in an explicit step
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated
     public final TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
         return build().executeForRecord();
     }
@@ -204,7 +204,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * @deprecated querying for records has a cost separate from executing the transaction and so
      * should be done in an explicit step
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated
     public final void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<HederaThrowable> onError) {
         build().executeForRecordAsync(onSuccess, onError);
     }
@@ -213,7 +213,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * @deprecated querying for records has a cost separate from executing the transaction and so
      * should be done in an explicit step
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated
     public final void executeForRecordAsync(BiConsumer<T, TransactionRecord> onSuccess, BiConsumer<T, HederaThrowable> onError) {
         //noinspection unchecked
         build().executeForRecordAsync(r -> onSuccess.accept((T) this, r), e -> onError.accept((T) this, e));
