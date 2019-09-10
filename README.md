@@ -10,7 +10,7 @@
 
 [Hedera Hashgraph]: https://hedera.com/
 
-Hedera Hashgraph communicates using [gRPC]; the Protobufs definitions for the protocol are 
+Hedera Hashgraph communicates using [gRPC]; the Protobufs definitions for the protocol are
 available in the [hashgraph/hedera-protobuf] repository.
 
 [gRPC]: https://grpc.io
@@ -24,14 +24,14 @@ available in the [hashgraph/hedera-protobuf] repository.
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>sdk</artifactId>
-  <version>0.5.2</version>
+  <version>0.6.0</version>
 </dependency>
 ```
 
 #### Gradle
 
 ```groovy
-implementation 'com.hedera.hashgraph:sdk:0.5.2'
+implementation 'com.hedera.hashgraph:sdk:0.6.0'
 ```
 
 ## Contributing to this Project
