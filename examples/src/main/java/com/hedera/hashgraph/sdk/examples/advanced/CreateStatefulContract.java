@@ -74,10 +74,17 @@ public final class CreateStatefulContract {
 
         System.out.println("new contract ID: " + newContractId);
 
-        FunctionResult contractCallResult = new ContractCallQuery(client).setContractId(newContractId)
-            .setGas(100_000_000)
-            .setFunctionParameters(CallParams.function("get_message"))
-            .setPaymentDefault(8_000_000)
+        long gas = 1000;
+        var query = new ContractCallQuery(client).setContractId(newContractId)
+                .setGas(gas)
+                .setFunctionParameters(CallParams.function("get_message"));
+
+        long queryCost = query.requestCost();
+        System.out.println("First contract local call estimated cost: " + queryCost);
+        queryCost = (long) (queryCost * 1.1);
+        
+        FunctionResult contractCallResult = query
+            .setPaymentDefault(queryCost)
             .execute();
 
         if (contractCallResult.getErrorMessage() != null) {
@@ -88,23 +95,35 @@ public final class CreateStatefulContract {
         String message = contractCallResult.getString();
         System.out.println("contract returned message: " + message);
 
-        new ContractExecuteTransaction(client).setContractId(newContractId)
-            .setGas(100_000_000)
+        gas = 10_000;
+        var record = new ContractExecuteTransaction(client).setContractId(newContractId)
+            .setGas(gas)
             .setFunctionParameters(CallParams.function("set_message")
                 .addString("hello from hedera again!"))
-            .setTransactionFee(800_000_000)
-            .execute();
+            .setTransactionFee(31_000_000)
+            .executeForRecord();
+        
+        System.out.println("Contract function call transaction cost: " + record.getTransactionFee());
+        System.out.println("Contract call result " + record.getReceipt().getStatus());
 
         // sleep a few seconds to allow consensus + smart contract exec
         System.out.println("Waiting 5s for consensus and contract execution");
         Thread.sleep(5000);
+        
         // now query contract
-        FunctionResult contractUpdateResult = new ContractCallQuery(client).setContractId(newContractId)
-            .setGas(100_000_000)
-            .setFunctionParameters(CallParams.function("get_message"))
-            .setPaymentDefault(800_000_000)
-            .execute();
+        gas = 1000;
+        query = new ContractCallQuery(client).setContractId(newContractId)
+            .setGas(gas)
+            .setFunctionParameters(CallParams.function("get_message"));
+        
+        queryCost = query.requestCost();
+        System.out.println("Second contract local call estimated cost: " + queryCost);
+        queryCost = (long) (queryCost * 1.1);
 
+        FunctionResult contractUpdateResult = query
+                .setPaymentDefault(queryCost)
+                .execute();
+        
         if (contractUpdateResult.getErrorMessage() != null) {
             System.out.println("error calling contract: " + contractUpdateResult.getErrorMessage());
             return;
@@ -112,5 +131,58 @@ public final class CreateStatefulContract {
 
         String message2 = contractUpdateResult.getString();
         System.out.println("contract returned message: " + message2);
+        
+        System.out.println("");
+        System.out.println("Example error conditions");
+        System.out.println("");
+        System.out.println("-> Setting gas too low - 200");
+        try {
+            gas = 200;
+            query = new ContractCallQuery(client).setContractId(newContractId)
+                    .setGas(gas)
+                    .setFunctionParameters(CallParams.function("get_message"));
+                
+                contractUpdateResult = query
+                    .setPaymentDefault(queryCost)
+                    .execute();
+        	
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }
+
+        Thread.sleep(1000);
+
+        System.out.println("");
+        System.out.println("-> Setting query fee too low - 20");
+        try {
+            gas = 1000;
+            query = new ContractCallQuery(client).setContractId(newContractId)
+                    .setGas(gas)
+                    .setFunctionParameters(CallParams.function("get_message"));
+                
+                contractUpdateResult = query
+                    .setPaymentDefault(20)
+                    .execute();
+        	
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }
+
+        Thread.sleep(1000);
+
+        System.out.println("");
+        System.out.println("-> Setting transaction fee too low - 1000");
+        try {
+            gas = 10_000;
+            var receipt = new ContractExecuteTransaction(client).setContractId(newContractId)
+                .setGas(gas)
+                .setFunctionParameters(CallParams.function("set_message")
+                    .addString("hello from hedera again!"))
+                .setTransactionFee(1000)
+                .executeForReceipt();
+        	
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }
     }
 }
