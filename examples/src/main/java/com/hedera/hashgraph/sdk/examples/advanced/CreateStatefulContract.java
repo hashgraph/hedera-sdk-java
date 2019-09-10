@@ -145,9 +145,8 @@ public final class CreateStatefulContract {
                 contractUpdateResult = query
                     .setPaymentDefault(queryCost)
                     .execute();
-        	
         } catch (Exception e) {
-        	e.printStackTrace();
+            e.printStackTrace();
         }
 
         Thread.sleep(1000);
@@ -163,9 +162,8 @@ public final class CreateStatefulContract {
                 contractUpdateResult = query
                     .setPaymentDefault(20)
                     .execute();
-        	
         } catch (Exception e) {
-        	e.printStackTrace();
+            e.printStackTrace();
         }
 
         Thread.sleep(1000);
@@ -180,9 +178,8 @@ public final class CreateStatefulContract {
                     .addString("hello from hedera again!"))
                 .setTransactionFee(1000)
                 .executeForReceipt();
-        	
         } catch (Exception e) {
-        	e.printStackTrace();
+            e.printStackTrace();
         }
     }
 }
