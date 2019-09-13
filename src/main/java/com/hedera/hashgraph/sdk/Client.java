@@ -9,6 +9,7 @@ import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hedera.hashgraph.sdk.crypto.Key;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -36,8 +37,12 @@ public final class Client {
     @Nullable
     private Ed25519PrivateKey operatorKey;
 
-    public Client(Map<AccountId, String> nodes) {
+    public Client(AccountId nodeAccountId, String nodeUrl) {
+        channels = new HashMap<>();
+        putNode(nodeAccountId, nodeUrl);
+    }
 
+    public Client(Map<AccountId, String> nodes) {
         if (nodes.isEmpty()) {
             throw new IllegalArgumentException("List of nodes must not be empty");
         }
@@ -45,6 +50,18 @@ public final class Client {
         channels = nodes.entrySet()
             .stream()
             .collect(Collectors.toMap(Map.Entry::getKey, t -> new Node(t.getKey(), t.getValue())));
+    }
+
+    /**
+     * Insert or update a node in the client.
+     *
+     * @param nodeAccountId
+     * @param nodeUrl
+     * @return
+     */
+    public Client putNode(AccountId nodeAccountId, String nodeUrl) {
+        channels.put(nodeAccountId, new Node(nodeAccountId, nodeUrl));
+        return this;
     }
 
     /**
