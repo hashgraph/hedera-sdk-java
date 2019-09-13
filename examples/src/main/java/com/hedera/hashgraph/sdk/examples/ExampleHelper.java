@@ -4,7 +4,6 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
-import java.util.Map;
 import java.util.Objects;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -33,7 +32,7 @@ public final class ExampleHelper {
     public static Client createHederaClient() {
         // To connect to a network with more nodes, add additional entries to the network map
         String nodeAddress = Objects.requireNonNull(getEnv().get("NODE_ADDRESS"));
-        Client client = new Client(Map.of(getNodeId(), nodeAddress));
+        Client client = new Client(getNodeId(), nodeAddress);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
