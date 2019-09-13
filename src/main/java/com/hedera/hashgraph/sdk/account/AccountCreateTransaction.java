@@ -21,8 +21,8 @@ import io.grpc.MethodDescriptor;
 // Corresponds to `CryptoCreateTransaction`
 public final class AccountCreateTransaction extends TransactionBuilder<AccountCreateTransaction> {
     private final CryptoCreateTransactionBody.Builder builder = bodyBuilder.getCryptoCreateAccountBuilder()
-        // Default auto renewal period recommended from Hedera
-        .setAutoRenewPeriod(DurationHelper.durationFrom(Duration.ofDays(30)))
+        // Required fixed autorenew duration (roughly 1/4 year)
+        .setAutoRenewPeriod(DurationHelper.durationFrom(Duration.ofSeconds(7_890_000)))
         // Default to maximum values for record thresholds. Without this records would be
         // auto-created whenever a send or receive transaction takes place for this new account. This should
         // be an explicit ask.

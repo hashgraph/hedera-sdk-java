@@ -15,6 +15,8 @@ import com.hederahashgraph.api.proto.java.Transaction;
 import com.hederahashgraph.api.proto.java.TransactionResponse;
 import com.hederahashgraph.service.proto.java.SmartContractServiceGrpc;
 
+import java.time.Duration;
+
 import javax.annotation.Nullable;
 
 import io.grpc.MethodDescriptor;
@@ -24,6 +26,8 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
 
     public ContractCreateTransaction(@Nullable Client client) {
         super(client);
+        // Required fixed autorenew duration (roughly 1/4 year)
+        setAutoRenewPeriod(Duration.ofSeconds(7_890_000));
     }
 
     @Override
