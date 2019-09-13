@@ -2,6 +2,7 @@ package com.hedera.hashgraph.sdk.crypto.ed25519;
 
 import com.hedera.hashgraph.sdk.crypto.Keystore;
 import com.hedera.hashgraph.sdk.crypto.KeystoreParseException;
+import com.hedera.hashgraph.sdk.crypto.Mnemonic;
 import com.hedera.hashgraph.sdk.crypto.PrivateKey;
 
 import org.bouncycastle.asn1.ASN1BitString;
@@ -104,6 +105,10 @@ public final class Ed25519PrivateKey extends PrivateKey {
         }
 
         return new Ed25519PrivateKey(privKeyParams, pubKeyParams);
+    }
+
+    public static Ed25519PrivateKey fromMnemonic(Mnemonic mnemonic) {
+
     }
 
     /**
