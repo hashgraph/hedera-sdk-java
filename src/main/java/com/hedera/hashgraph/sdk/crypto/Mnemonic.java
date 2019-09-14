@@ -45,12 +45,17 @@ public final class Mnemonic {
     }
 
     public static Mnemonic generate() {
-        final byte[] entropy = new byte[64];
+        final byte[] entropy = new byte[32];
         secureRandom.nextBytes(entropy);
 
         final ArrayList<CharSequence> wordList = new ArrayList<>(24);
 
-        generator.createMnemonic(entropy, wordList::add);
+        generator.createMnemonic(entropy, word -> {
+            // the generator spits out spaces whether you want them or not
+            if (!word.equals(" ")) {
+                wordList.add(word);
+            }
+        });
 
         return new Mnemonic(wordList);
     }
@@ -65,7 +70,7 @@ public final class Mnemonic {
     }
 
     /**
-     * Derive a 64 byte seed from this mnemonic, using the given passphrase, which can be empty.
+     * Derive a 64 byte seed from this mnemonic using the given passphrase, which can be empty.
      */
     public byte[] toSeed(String passphrase) {
         final String salt = "mnemonic" + passphrase;
