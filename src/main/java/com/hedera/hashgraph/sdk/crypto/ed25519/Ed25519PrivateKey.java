@@ -169,6 +169,15 @@ public final class Ed25519PrivateKey extends PrivateKey {
     }
 
     /**
+     * Check if this private key supports derivation.
+     *
+     * This is currently only the case if this private key was created from a mnemonic.
+     */
+    public boolean supportsDerivation() {
+        return this.chainCode != null;
+    }
+
+    /**
      * Given a wallet/account index, derive a child key compatible with the iOS and Android wallets.
      *
      * Use index 0 for the default account.
@@ -176,6 +185,7 @@ public final class Ed25519PrivateKey extends PrivateKey {
      * @param index the wallet/account index of the account, 0 for the default account.
      * @return the derived key
      * @throws IllegalStateException if this key does not support derivation.
+     * @see #supportsDerivation()
      */
     public Ed25519PrivateKey derive(int index) {
         if (this.chainCode == null) {
@@ -197,7 +207,6 @@ public final class Ed25519PrivateKey extends PrivateKey {
         indexBytes[0] |= (byte) 0b10000000;
 
         hmacSha512.update(indexBytes, 0, indexBytes.length);
-
 
         byte[] output = new byte[64];
         hmacSha512.doFinal(output, 0);
