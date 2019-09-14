@@ -7,6 +7,7 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,6 +40,10 @@ public final class Mnemonic {
         this.wordList = Collections.unmodifiableList(wordList);
     }
 
+    public static Mnemonic fromString(String mnemonicString) {
+        return new Mnemonic(Arrays.asList(mnemonicString.split(" ")));
+    }
+
     public static Mnemonic generate() {
         final byte[] entropy = new byte[64];
         secureRandom.nextBytes(entropy);
@@ -59,8 +64,11 @@ public final class Mnemonic {
         return asString;
     }
 
-    public byte[] toSeed(@Nullable String passphrase) {
-        final String salt = "mnemonic" + (passphrase != null ? passphrase : "");
+    /**
+     * Derive a 64 byte seed from this mnemonic, using the given passphrase, which can be empty.
+     */
+    public byte[] toSeed(String passphrase) {
+        final String salt = "mnemonic" + passphrase;
 
         // BIP-39 seed generation
         final PKCS5S2ParametersGenerator pbkdf2 = new PKCS5S2ParametersGenerator(new SHA512Digest());
