@@ -51,6 +51,7 @@ class ContractCreateTransactionTest {
             .setShard(20)
             .setRealm(40)
             .setNewRealmAdminKey(key.getPublicKey())
+            .setTransactionFee(100_000)
             .sign(key)
             .toProto();
 

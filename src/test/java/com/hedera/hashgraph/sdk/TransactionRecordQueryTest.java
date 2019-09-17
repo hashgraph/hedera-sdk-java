@@ -27,6 +27,7 @@ class TransactionRecordQueryTest {
         .setNodeAccountId(NODE_ACCOUNT)
         .addSender(USER_ACCT, 10000)
         .addRecipient(NODE_ACCOUNT, 10000)
+        .setTransactionFee(100_000)
         .sign(privateKey);
 
     // new instance for every test

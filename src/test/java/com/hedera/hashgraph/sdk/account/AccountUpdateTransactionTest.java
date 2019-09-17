@@ -46,6 +46,7 @@ class AccountUpdateTransactionTest {
             .setReceiveRecordThreshold(6)
             .setAutoRenewPeriod(Duration.ofHours(10))
             .setExpirationTime(Instant.ofEpochSecond(1554158543))
+            .setTransactionFee(100_000)
             .sign(key)
             .toProto();
 

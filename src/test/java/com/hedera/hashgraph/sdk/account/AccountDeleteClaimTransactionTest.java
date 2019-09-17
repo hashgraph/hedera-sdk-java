@@ -37,6 +37,7 @@ class AccountDeleteClaimTransactionTest {
             .setNodeAccountId(new AccountId(3))
             .setAccountToDeleteFrom(new AccountId(4))
             .setHashToDelete(new byte[]{4, 2, 1, 5})
+            .setTransactionFee(100_000)
             .sign(key);
 
         Assertions.assertEquals(

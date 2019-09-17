@@ -25,6 +25,7 @@ class TransactionReceiptQueryTest {
         .setTransactionId(new TransactionId(USER_ACCOUNT, Instant.parse("2019-04-05T12:00:00Z")))
         .addSender(USER_ACCOUNT, 10000)
         .addRecipient(NODE_ACCOUNT, 10000)
+        .setTransactionFee(100_000)
         .sign(privateKey);
 
     static final TransactionReceiptQuery query = new TransactionReceiptQuery()
