@@ -24,7 +24,7 @@ public final class Client {
     final Random random = new Random();
     private Map<AccountId, Node> channels;
 
-    static final long DEFAULT_MAX_TXN_FEE = 100_000;
+    static final long DEFAULT_MAX_TXN_FEE = 100_000_000; // 1 hbar
 
     // todo: transaction fees should be defaulted to whatever the transaction fee schedule is
     private long maxTransactionFee = DEFAULT_MAX_TXN_FEE;
