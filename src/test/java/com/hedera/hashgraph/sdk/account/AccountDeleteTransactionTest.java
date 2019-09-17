@@ -36,6 +36,7 @@ class AccountDeleteTransactionTest {
             .setTransactionId(txnId)
             .setTransferAccountId(new AccountId(4))
             .setDeleteAccountId(new AccountId(1))
+            .setTransactionFee(100_000)
             .sign(key).toProto();
 
         Assertions.assertEquals(

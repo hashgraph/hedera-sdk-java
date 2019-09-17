@@ -24,7 +24,8 @@ class AccountAddClaimTransactionTest {
         .setTransactionId(new TransactionId(new AccountId(1234), Instant.parse("2019-04-08T07:04:00Z")))
         .setAccountId(account)
         .setHash(hash)
-        .addKey(key.getPublicKey());
+        .addKey(key.getPublicKey())
+        .setTransactionFee(100_000);
 
     @Test
     @DisplayName("collect transaction validates")

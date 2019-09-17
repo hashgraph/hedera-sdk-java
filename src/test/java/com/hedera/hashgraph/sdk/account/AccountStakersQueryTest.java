@@ -40,6 +40,7 @@ class AccountStakersQueryTest {
                     .setNodeAccountId(new AccountId(3))
                     .addSender(new AccountId(2), 10000)
                     .addRecipient(new AccountId(3), 10000)
+                    .setTransactionFee(100_000)
                     .sign(key))
             .setAccountId(new AccountId(5));
 

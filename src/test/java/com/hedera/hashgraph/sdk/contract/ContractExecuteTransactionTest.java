@@ -43,6 +43,7 @@ class ContractExecuteTransactionTest {
             .setGas(10)
             .setAmount(1000)
             .setFunctionParameters(new byte[]{24, 43, 11})
+            .setTransactionFee(100_000)
             .sign(key)
             .toProto();
 

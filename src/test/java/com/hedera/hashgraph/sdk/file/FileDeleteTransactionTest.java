@@ -39,6 +39,7 @@ class FileDeleteTransactionTest {
             .setNodeAccountId(new AccountId(3))
             .setTransactionId(txnId)
             .setFileId(new FileId(1, 2, 3))
+            .setTransactionFee(100_000)
             .sign(key)
             .toProto();
 

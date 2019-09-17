@@ -42,6 +42,7 @@ class FileCreateTransactionTest {
             .setExpirationTime(Instant.ofEpochSecond(1554158728))
             .addKey(key.getPublicKey())
             .setNewRealmAdminKey(key.getPublicKey())
+            .setTransactionFee(100_000)
             .sign(key)
             .toProto();
 

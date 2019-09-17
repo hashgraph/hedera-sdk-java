@@ -39,6 +39,7 @@ class ContractUpdateTransactionTest {
             .setNodeAccountId(new AccountId(3))
             .setTransactionId(txnId)
             .setContractId(new ContractId(1, 2, 3))
+            .setTransactionFee(100_000)
             .sign(key)
             .toProto();
 

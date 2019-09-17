@@ -39,6 +39,7 @@ class AccountCreateTransactionTest {
             .setInitialBalance(450)
             .setProxyAccountId(new AccountId(1020))
             .setReceiverSignatureRequired(true)
+            .setTransactionFee(100_000)
             .sign(key);
 
         assertEquals(

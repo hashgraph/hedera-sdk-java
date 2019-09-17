@@ -26,6 +26,7 @@ class AccountClaimQueryTest {
                 .setNodeAccountId(nodeAccountId)
                 .addSender(userAccountId, 10000)
                 .addRecipient(nodeAccountId, 10000)
+                .setTransactionFee(100_000)
                 .sign(key)
         )
         .setAccountId(new AccountId(1234));

@@ -41,6 +41,7 @@ class CryptoTransferTransactionTest {
             .addSender(new AccountId(4), 800)
             .addRecipient(new AccountId(55), 400)
             .addTransfer(new AccountId(78), 400)
+            .setTransactionFee(100_000)
             .sign(key).toProto();
 
         assertEquals(

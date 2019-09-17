@@ -41,6 +41,7 @@ class FileAppendTransactionTest {
             .setTransactionId(txnId)
             .setFileId(new FileId(1, 2, 3))
             .setContents(new byte[]{1, 2, 3, 4})
+            .setTransactionFee(100_000)
             .sign(key)
             .toProto();
 
