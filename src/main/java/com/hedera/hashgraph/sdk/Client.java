@@ -14,15 +14,39 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 
-public final class Client {
+/**
+ * The Hedera protocol wrapper for the SDK, used by all transaction and query types.
+ *
+ * <h3>Note: AutoCloseable</h3>
+ * The gRPC channels used by this client must be explicitly shutdown before it is garbage
+ * collected or error messages will be printed to the console. These messages are emitted by the
+ * gRPC library itself; the SDK has no direct control over this.
+ *
+ * These error messages are printed because the runtime may exit with pending calls if you do not
+ * shutdown the channels properly which allows them to finish any pending calls.
+ *
+ * To shutdown channels, this class implements {@link AutoCloseable} (allowing use
+ * with the try-with-resources syntax) which waits at most a few seconds for channels to finish
+ * their calls and terminate.
+ *
+ * Alternatively, you may call {@link #awaitChannelShutdown(long, TimeUnit)} directly with a
+ * custom timeout.
+ *
+ * This is only necessary when you're completely finished with the Client; it can and should be
+ * reused between multiple queries and transactions. The Client may not be reused once its
+ * channels have been shut down.
+ */
+public final class Client implements AutoCloseable {
     final Random random = new Random();
-    private Map<AccountId, Node> channels;
+    private Map<AccountId, Node> nodes;
 
     static final long DEFAULT_MAX_TXN_FEE = 100_000;
 
@@ -38,7 +62,7 @@ public final class Client {
     private Ed25519PrivateKey operatorKey;
 
     public Client(AccountId nodeAccountId, String nodeUrl) {
-        channels = new HashMap<>();
+        nodes = new HashMap<>();
         putNode(nodeAccountId, nodeUrl);
     }
 
@@ -47,7 +71,7 @@ public final class Client {
             throw new IllegalArgumentException("List of nodes must not be empty");
         }
 
-        channels = nodes.entrySet()
+        this.nodes = nodes.entrySet()
             .stream()
             .collect(Collectors.toMap(Map.Entry::getKey, t -> new Node(t.getKey(), t.getValue())));
     }
@@ -55,12 +79,23 @@ public final class Client {
     /**
      * Insert or update a node in the client.
      *
+     * If a replaced node is already being used by some transaction or query, this call will cause
+     * that transaction/query to return an error on execute.
+     *
      * @param nodeAccountId
      * @param nodeUrl
      * @return
      */
     public Client putNode(AccountId nodeAccountId, String nodeUrl) {
-        channels.put(nodeAccountId, new Node(nodeAccountId, nodeUrl));
+        final Node replaced = nodes.put(nodeAccountId, new Node(nodeAccountId, nodeUrl));
+
+        if (replaced != null) {
+            // only `.shutdown()` is necessary to silence the error, we just don't want to
+            // exit prematurely if the whole client is going to be garbage collected
+            // which is why we await termination in close() below
+            replaced.closeChannel();
+        }
+
         return this;
     }
 
@@ -129,12 +164,12 @@ public final class Client {
     }
 
     Node pickNode() {
-        if (channels.isEmpty()) {
+        if (nodes.isEmpty()) {
             throw new IllegalStateException("List of channels has become empty");
         }
 
-        int r = random.nextInt(channels.size());
-        Iterator<Node> channelIter = channels.values()
+        int r = random.nextInt(nodes.size());
+        Iterator<Node> channelIter = nodes.values()
             .iterator();
 
         for (int i = 1; i < r; i++) {
@@ -145,7 +180,7 @@ public final class Client {
     }
 
     Node getNodeForId(AccountId node) {
-        Node selectedChannel = channels.get(node);
+        Node selectedChannel = nodes.get(node);
 
         if (selectedChannel == null) {
             throw new IllegalArgumentException("Node Id does not exist");
@@ -202,5 +237,55 @@ public final class Client {
         new CryptoTransferTransaction(this).addSender(Objects.requireNonNull(operatorId), amount)
             .addRecipient(recipient, amount)
             .executeAsync(onSuccess, onError);
+    }
+
+
+    /**
+     * Waits 10 seconds for all channels to finish their calls to their respective nodes.
+     *
+     * Any new transactions or queries executed with this client after this call will return an
+     * error.
+     *
+     * If you want to adjust the timeout, use {@link #awaitChannelShutdown(long, TimeUnit)} instead.
+     *
+     * @throws InterruptedException if the thread is interrupted during shutdown.
+     * @throws TimeoutException if 10 seconds elapses before the channels are closed.
+     */
+    @Override
+    public void close() throws InterruptedException, TimeoutException {
+        awaitChannelShutdown(10, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Wait for all channels to finish their calls to their respective nodes.
+     *
+     * Any new transactions or queries executed with this client after this call will return an
+     * error.
+     *
+     * @param timeout the timeout amount for the entire shutdown operation (not per channel).
+     * @param timeUnit the unit of the timeout amount.
+     * @throws InterruptedException if the thread is interrupted during shutdown.
+     * @throws TimeoutException if the timeout elapses before all channels are shutdown.
+     */
+    public void awaitChannelShutdown(long timeout, TimeUnit timeUnit) throws InterruptedException, TimeoutException {
+        final long startMs = System.currentTimeMillis();
+        final long timeoutAtMs = startMs + timeUnit.toMillis(timeout);
+
+        // go through and initiate shutdown for all channels; this shouldn't block
+        for (final Node node : nodes.values()) {
+            node.closeChannel();
+        }
+
+        // wait for all nodes to shutdown
+        for (final Node node : nodes.values()) {
+            if (timeoutAtMs <= System.currentTimeMillis()) {
+                throw new TimeoutException("Hedera Client timed out waiting for all node channels to shutdown");
+            }
+
+            final long nextTimeoutMs = timeoutAtMs - System.currentTimeMillis();
+
+            // this also calls `.shutdown()` which should be safe to call multiple times
+            node.awaitChannelTermination(nextTimeoutMs, TimeUnit.MILLISECONDS);
+        }
     }
 }
