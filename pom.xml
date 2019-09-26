@@ -62,8 +62,8 @@
         <maven.compiler.target>8</maven.compiler.target>
 
         <errorprone.version>2.3.3</errorprone.version>
-        <grpc.version>1.20.0</grpc.version>
-        <junit.version>5.3.1</junit.version>
+        <grpc.version>1.24.0</grpc.version>
+        <junit.version>5.5.2</junit.version>
         <nullaway.version>0.7.2</nullaway.version>
         <spotbugs.version>3.1.12</spotbugs.version>
 
@@ -93,7 +93,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.61</version>
+            <version>1.63</version>
         </dependency>
         <dependency>
             <groupId>io.github.novacrypto</groupId>
@@ -103,7 +103,7 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>3.7.1</version>
+            <version>3.10.0</version>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
@@ -155,6 +155,27 @@
         </extensions>
 
         <plugins>
+            <!-- Enforce Recent Maven Version -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.0.0-M2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>3.6.2</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- Compiler -->
             <!-- https://maven.apache.org/plugins/maven-compiler-plugin/index.html -->
             <plugin>
@@ -202,13 +223,13 @@
             <!-- JUnit 5 requires Surefire version 2.22.1 or higher -->
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.1</version>
+                <version>3.0.0-M3</version>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <phase>verify</phase>
@@ -222,7 +243,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.1.1</version>
                 <executions>
                     <execution>
                         <phase>verify</phase>
@@ -285,7 +306,7 @@
         </plugins>
     </build>
     <profiles>
-    <!-- shade profile which adds the possibility to shade the .jar file.
+     <!-- shade profile which adds the possibility to shade the .jar file.
         Call "mvn clean install -Pshade" to invoke this additional
         plugin in the maven build -->
         <profile>
@@ -310,7 +331,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-shade-plugin</artifactId>
-                        <version>3.2.0</version>
+                        <version>3.2.1</version>
                         <configuration>
                             <artifactSet>
                                 <excludes>
