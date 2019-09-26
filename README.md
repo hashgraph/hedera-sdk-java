@@ -24,14 +24,14 @@ available in the [hashgraph/hedera-protobuf] repository.
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>sdk</artifactId>
-  <version>0.6.1</version>
+  <version>0.7.0</version>
 </dependency>
 ```
 
 #### Gradle
 
 ```groovy
-implementation 'com.hedera.hashgraph:sdk:0.6.1'
+implementation 'com.hedera.hashgraph:sdk:0.7.0'
 ```
 
 ## Contributing to this Project
