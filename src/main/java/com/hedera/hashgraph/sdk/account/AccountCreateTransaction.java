@@ -22,7 +22,7 @@ import io.grpc.MethodDescriptor;
 public final class AccountCreateTransaction extends TransactionBuilder<AccountCreateTransaction> {
     private final CryptoCreateTransactionBody.Builder builder = bodyBuilder.getCryptoCreateAccountBuilder()
         // Required fixed autorenew duration (roughly 1/4 year)
-        .setAutoRenewPeriod(DurationHelper.durationFrom(Duration.ofSeconds(7_890_000)))
+        .setAutoRenewPeriod(DurationHelper.durationFrom(Duration.ofMinutes(131_500)))
         // Default to maximum values for record thresholds. Without this records would be
         // auto-created whenever a send or receive transaction takes place for this new account. This should
         // be an explicit ask.

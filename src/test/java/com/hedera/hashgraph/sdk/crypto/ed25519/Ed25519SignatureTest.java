@@ -13,6 +13,7 @@ class Ed25519SignatureTest {
     private static final byte[] messageBytes = messageStr.getBytes(StandardCharsets.UTF_8);
     private static final String sigStr = "73bea53f31ca9c42a422ecb7516ec08d0bbd1a6bfd630ccf10ec1872454814d29f4a8011129cd007eab544af01a75f508285b591e5bed24b68f927751e49e30e";
 
+    @SuppressWarnings("unused")
     private static Stream<String> privKeyStrings() {
         return Stream.of(
             "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10",

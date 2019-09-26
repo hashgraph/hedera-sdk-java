@@ -27,7 +27,7 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
     public ContractCreateTransaction(@Nullable Client client) {
         super(client);
         // Required fixed autorenew duration (roughly 1/4 year)
-        setAutoRenewPeriod(Duration.ofSeconds(7_890_000));
+        setAutoRenewPeriod(Duration.ofMinutes(131_500));
     }
 
     @Override

@@ -115,7 +115,7 @@ public final class CallParams<Kind> {
         }
 
         // points to start of dynamic segment
-        long currOffset = offsetsLen * 32;
+        long currOffset = offsetsLen * 32L;
 
         for (final ByteString elem : elements) {
             offsets.add(int256(currOffset, 64));

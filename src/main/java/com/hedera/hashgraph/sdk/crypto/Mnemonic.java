@@ -52,7 +52,7 @@ public final class Mnemonic {
 
         generator.createMnemonic(entropy, word -> {
             // the generator spits out spaces whether you want them or not
-            if (!word.equals(" ")) {
+            if (!word.toString().equals(" ")) {
                 wordList.add(word);
             }
         });

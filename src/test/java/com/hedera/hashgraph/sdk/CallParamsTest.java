@@ -9,6 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.Arguments;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -16,10 +17,9 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.params.provider.Arguments.of;
 
 class CallParamsTest {
-
+    @SuppressWarnings("unused")
     private static Stream<Arguments> funcSelectorArgs() {
         return Stream.of(
             funcSelectorArgs("cdcd77c0", "baz", "uint32", "bool"),
@@ -33,7 +33,7 @@ class CallParamsTest {
     }
 
     private static Arguments funcSelectorArgs(String hash, String funcName, String... paramTypes) {
-        return of(hash, funcName, paramTypes);
+        return Arguments.of(hash, funcName, paramTypes);
     }
 
     @ParameterizedTest
@@ -308,23 +308,24 @@ class CallParamsTest {
                 .getMessage());
     }
 
+    @SuppressWarnings("unused")
     private static Stream<Arguments> int256Arguments() {
         return Stream.of(
-            of(0, "0000000000000000000000000000000000000000000000000000000000000000"),
-            of(2, "0000000000000000000000000000000000000000000000000000000000000002"),
-            of(255, "00000000000000000000000000000000000000000000000000000000000000ff"),
-            of(4095, "0000000000000000000000000000000000000000000000000000000000000fff"),
-            of(127 << 24, "000000000000000000000000000000000000000000000000000000007f000000"),
-            of(2047 << 20, "000000000000000000000000000000000000000000000000000000007ff00000"),
+            Arguments.of(0, "0000000000000000000000000000000000000000000000000000000000000000"),
+            Arguments.of(2, "0000000000000000000000000000000000000000000000000000000000000002"),
+            Arguments.of(255, "00000000000000000000000000000000000000000000000000000000000000ff"),
+            Arguments.of(4095, "0000000000000000000000000000000000000000000000000000000000000fff"),
+            Arguments.of(127 << 24, "000000000000000000000000000000000000000000000000000000007f000000"),
+            Arguments.of(2047 << 20, "000000000000000000000000000000000000000000000000000000007ff00000"),
             // deadbeef as an integer literal is negative
-            of(0xdeadbeefL, "00000000000000000000000000000000000000000000000000000000deadbeef"),
-            of(-1, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"),
-            of(-2, "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe"),
-            of(-256, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00"),
-            of(-4096, "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000"),
-            of(255 << 24, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000"),
-            of(4095 << 20, "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000"),
-            of(0xdeadbeef, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffdeadbeef")
+            Arguments.of(0xdeadbeefL, "00000000000000000000000000000000000000000000000000000000deadbeef"),
+            Arguments.of(-1, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"),
+            Arguments.of(-2, "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe"),
+            Arguments.of(-256, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00"),
+            Arguments.of(-4096, "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000"),
+            Arguments.of(255 << 24, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000"),
+            Arguments.of(4095 << 20, "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000"),
+            Arguments.of(0xdeadbeef, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffdeadbeef")
         );
     }
 

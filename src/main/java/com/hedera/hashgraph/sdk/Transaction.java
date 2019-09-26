@@ -428,6 +428,7 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
             }
         }
 
+        @SuppressWarnings("FutureReturnValueIgnored")
         private void scheduleReceiptAttempt(long delayMs) {
             GlobalEventExecutor.INSTANCE.schedule(this::tryGetReceipt, delayMs,
                 TimeUnit.MILLISECONDS);
