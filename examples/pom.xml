@@ -45,13 +45,8 @@
                     <!-- https://issues.apache.org/jira/browse/MCOMPILER-346 -->
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
                     <annotationProcessorPaths>
-                        <!-- Catch common Java mistakes as compile-time errors -->
-                        <!-- https://errorprone.info/ -->
-                        <path>
-                            <groupId>com.google.errorprone</groupId>
-                            <artifactId>error_prone_core</artifactId>
-                            <version>${errorprone.version}</version>
-                        </path>
+                        <!-- Errorprone moved to its own profile (see ../pom.xml) -->
+
                         <!-- Eliminate NullPointerExceptions -->
                         <!-- https://github.com/uber/NullAway -->
                         <path>
@@ -62,15 +57,6 @@
                     </annotationProcessorPaths>
                     <compilerArgs>
                         <arg>-XDcompilePolicy=simple</arg>
-                        <arg>
-                            -Xplugin:ErrorProne
-                            -XepDisableWarningsInGeneratedCode
-                            -XepExcludedPaths:.*/target/generated-sources/.*
-                            -Xep:NullAway:ERROR
-                            -XepOpt:NullAway:AnnotatedPackages=com.hedera
-                            -XepOpt:NullAway:AcknowledgeRestrictiveAnnotations=true
-                            -XepOpt:NullAway:TreatGeneratedAsUnannotated=true
-                        </arg>
                     </compilerArgs>
                 </configuration>
             </plugin>
@@ -98,4 +84,55 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <!--
+            profile to add Errorprone to compilation; requires JDK 9 or higher
+            without this profile, the example project should build for JDK 8
+        -->
+        <profile>
+            <id>errorprone</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.8.1</version>
+                        <configuration>
+                            <showWarnings>true</showWarnings>
+                            <!-- https://issues.apache.org/jira/browse/MCOMPILER-346 -->
+                            <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                            <annotationProcessorPaths>
+                                <!-- Catch common Java mistakes as compile-time errors -->
+                                <!-- https://errorprone.info/ -->
+                                <path>
+                                    <groupId>com.google.errorprone</groupId>
+                                    <artifactId>error_prone_core</artifactId>
+                                    <version>${errorprone.version}</version>
+                                </path>
+                                <!-- Eliminate NullPointerExceptions -->
+                                <!-- https://github.com/uber/NullAway -->
+                                <path>
+                                    <groupId>com.uber.nullaway</groupId>
+                                    <artifactId>nullaway</artifactId>
+                                    <version>${nullaway.version}</version>
+                                </path>
+                            </annotationProcessorPaths>
+                            <compilerArgs>
+                                <arg>-XDcompilePolicy=simple</arg>
+                                <arg>
+                                    -Xplugin:ErrorProne
+                                    -XepDisableWarningsInGeneratedCode
+                                    -XepExcludedPaths:.*/target/generated-sources/.*
+                                    -Xep:NullAway:ERROR
+                                    -XepOpt:NullAway:AnnotatedPackages=com.hedera
+                                    -XepOpt:NullAway:AcknowledgeRestrictiveAnnotations=true
+                                    -XepOpt:NullAway:TreatGeneratedAsUnannotated=true
+                                </arg>
+                            </compilerArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
