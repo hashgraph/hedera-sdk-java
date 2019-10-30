@@ -1,8 +1,12 @@
 language: java
 
 jdk:
+    - openjdk8
     - openjdk11
 
 script:
-    - mvn -P errorprone checkstyle:check spotbugs:check compile test
-    - (cd examples && mvn checkstyle:check spotbugs:check compile)
+    - echo $TRAVIS_JDK_VERSION
+    - export MVN_PROFILES=$([ "$TRAVIS_JDK_VERSION" = "openjdk11" ] && echo '-P errorprone')
+    # errorprone only works on JDK 9 and above
+    - mvn $MVN_PROFILES checkstyle:check spotbugs:check compile test
+    - (cd examples && mvn $MVN_PROFILES checkstyle:check spotbugs:check compile)
