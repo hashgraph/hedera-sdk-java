@@ -30,6 +30,11 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
         return this;
     }
 
+    /**
+     * Add a key which must sign any transactions modifying this file. Optional.
+     *
+     * A file without any keys is immutable.
+     */
     public FileCreateTransaction addKey(Key key) {
         keyList.addKeys(key.toKeyProto());
         return this;
@@ -52,9 +57,7 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
 
     @Override
     protected void doValidate() {
-        require(
-            builder.getKeysOrBuilder()
-                .getKeysOrBuilderList(),
-            ".addKey() required");
+        // file without contents is allowed
+        // file without key is just immutable
     }
 }
