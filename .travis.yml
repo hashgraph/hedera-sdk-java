@@ -4,5 +4,5 @@ jdk:
     - openjdk11
 
 script:
-    - mvn checkstyle:check spotbugs:check compile test
+    - mvn -P errorprone checkstyle:check spotbugs:check compile test
     - (cd examples && mvn checkstyle:check spotbugs:check compile)
