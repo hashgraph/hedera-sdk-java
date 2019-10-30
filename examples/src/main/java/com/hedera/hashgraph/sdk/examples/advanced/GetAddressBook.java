@@ -7,8 +7,9 @@ import com.hedera.hashgraph.sdk.examples.ExampleHelper;
 import com.hedera.hashgraph.sdk.file.FileContentsQuery;
 import com.hedera.hashgraph.sdk.file.FileId;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 
 /** Get the network address book for inspecting the node public keys, among other things */
 public final class GetAddressBook {
@@ -26,8 +27,7 @@ public final class GetAddressBook {
 
         final ByteString contents = fileQuery.execute().getFileContents().getContents();
 
-        try (final FileOutputStream fos = new FileOutputStream("address-book.proto.bin")) {
-            contents.newInput().transferTo(fos);
-        }
+        Files.copy(contents.newInput(),
+            FileSystems.getDefault().getPath("address-book.proto.bin"));
     }
 }
