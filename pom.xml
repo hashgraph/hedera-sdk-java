@@ -67,7 +67,7 @@
         <nullaway.version>0.7.2</nullaway.version>
         <spotbugs.version>3.1.12</spotbugs.version>
 
-        <hedera-protobuf.version>0.3.4</hedera-protobuf.version>
+        <hedera-protobuf.version>0.3.5</hedera-protobuf.version>
     </properties>
 
     <dependencies>
@@ -106,11 +106,6 @@
             <!-- 3.10.0 breaks compatibility with Android < 26, should be fixed in 3.11 -->
             <!-- https://github.com/protocolbuffers/protobuf/issues/6718#issuecomment-546058263 -->
             <version>3.9.2</version>
-        </dependency>
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-netty-shaded</artifactId>
-            <version>${grpc.version}</version>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>

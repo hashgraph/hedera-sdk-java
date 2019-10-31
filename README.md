@@ -26,12 +26,41 @@ available in the [hashgraph/hedera-protobuf] repository.
   <artifactId>sdk</artifactId>
   <version>0.7.0</version>
 </dependency>
+<dependency>
+
+<!-- SELECT ONE: -->
+<!-- netty transport (for server or desktop applications) -->
+<dependency>
+  <groupId>io.grpc</groupId>
+  <artifactId>grpc-netty-shaded</artifactId>
+  <version>1.24.0</version>
+</dependency>
+<!-- netty transport, unshaded (if you have a matching Netty dependency already) -->
+<dependency>
+  <groupId>io.grpc</groupId>
+  <artifactId>grpc-netty</artifactId>
+  <version>1.24.0</version>
+</dependency>
+<!-- okhttp transport (for lighter-weight applications or Android) -->
+<dependency>
+  <groupId>io.grpc</groupId>
+  <artifactId>grpc-okhttp</artifactId>
+  <version>1.24.0</version>
+</dependency>
 ```
 
 #### Gradle
 
 ```groovy
 implementation 'com.hedera.hashgraph:sdk:0.7.0'
+
+// SELECT ONE:
+// netty transport (for high throughput applications)
+implementation 'io.grpc:grpc-netty-shaded:1.24.0'
+// netty transport, unshaded (if you have a matching Netty dependency already)
+implementation 'io.grpc:grpc-netty:1.24.0'
+// okhttp transport (for lighter-weight applications or Android)
+implementation 'io.grpc:grpc-okhttp:1.24.0'
 ```
 
 ## Contributing to this Project
