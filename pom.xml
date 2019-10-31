@@ -103,7 +103,9 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>3.10.0</version>
+            <!-- 3.10.0 breaks compatibility with Android < 26, should be fixed in 3.11 -->
+            <!-- https://github.com/protocolbuffers/protobuf/issues/6718#issuecomment-546058263 -->
+            <version>3.9.2</version>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
