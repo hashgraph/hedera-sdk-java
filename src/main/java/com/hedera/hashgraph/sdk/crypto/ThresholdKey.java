@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import javax.annotation.Nonnegative;
 
-public class ThresholdKey implements Key {
+public class ThresholdKey extends PublicKey {
     private final com.hederahashgraph.api.proto.java.ThresholdKey.Builder inner =
         com.hederahashgraph.api.proto.java.ThresholdKey.newBuilder();
 
@@ -20,21 +20,21 @@ public class ThresholdKey implements Key {
      *
      * @return {@code this} for fluent API usage.
      */
-    public ThresholdKey add(Key key) {
+    public ThresholdKey add(PublicKey key) {
         inner.getKeysBuilder().addKeys(key.toKeyProto());
         return this;
     }
 
-    public ThresholdKey addAll(Collection<? extends Key> keys) {
-        for (final Key key : keys) {
+    public ThresholdKey addAll(Collection<? extends PublicKey> keys) {
+        for (final PublicKey key : keys) {
             add(key);
         }
 
         return this;
     }
 
-    public ThresholdKey addAll(Key... keys) {
-        for (final Key key : keys) {
+    public ThresholdKey addAll(PublicKey... keys) {
+        for (final PublicKey key : keys) {
             add(key);
         }
 

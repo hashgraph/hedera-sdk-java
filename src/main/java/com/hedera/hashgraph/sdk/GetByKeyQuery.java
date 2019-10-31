@@ -1,6 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.crypto.Key;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hederahashgraph.api.proto.java.GetByKeyResponse;
 import com.hederahashgraph.api.proto.java.Query;
 import com.hederahashgraph.api.proto.java.QueryHeader;
@@ -40,7 +40,7 @@ public final class GetByKeyQuery extends QueryBuilder<GetByKeyResponse, GetByKey
         require(builder.hasKey(), ".setKey() required");
     }
 
-    public GetByKeyQuery setKey(Key publicKey) {
+    public GetByKeyQuery setKey(PublicKey publicKey) {
         builder.setKey(publicKey.toKeyProto());
         return this;
     }

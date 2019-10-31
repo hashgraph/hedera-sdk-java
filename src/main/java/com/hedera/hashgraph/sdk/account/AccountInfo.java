@@ -2,7 +2,7 @@ package com.hedera.hashgraph.sdk.account;
 
 import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.TimestampHelper;
-import com.hedera.hashgraph.sdk.crypto.Key;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hederahashgraph.api.proto.java.CryptoGetInfoResponse;
 import com.hederahashgraph.api.proto.java.Response;
 
@@ -37,8 +37,8 @@ public class AccountInfo {
         return inner.getProxyReceived();
     }
 
-    public Key getKey() {
-        return Key.fromProtoKey(inner.getKey());
+    public PublicKey getKey() {
+        return PublicKey.fromProtoKey(inner.getKey());
     }
 
     public long getBalance() {

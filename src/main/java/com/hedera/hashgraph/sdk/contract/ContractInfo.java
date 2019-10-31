@@ -3,7 +3,7 @@ package com.hedera.hashgraph.sdk.contract;
 import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.crypto.Key;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hederahashgraph.api.proto.java.ContractGetInfoResponse;
 import com.hederahashgraph.api.proto.java.Response;
 
@@ -37,8 +37,8 @@ public final class ContractInfo {
     }
 
     @Nullable
-    public Key getAdminKey() {
-        return inner.hasAdminKey() ? Key.fromProtoKey(inner.getAdminKey()) : null;
+    public PublicKey getAdminKey() {
+        return inner.hasAdminKey() ? PublicKey.fromProtoKey(inner.getAdminKey()) : null;
     }
 
     public Instant getExpirationTime() {

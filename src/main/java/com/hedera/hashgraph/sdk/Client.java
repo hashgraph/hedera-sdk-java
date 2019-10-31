@@ -6,7 +6,7 @@ import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.AccountInfo;
 import com.hedera.hashgraph.sdk.account.AccountInfoQuery;
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
-import com.hedera.hashgraph.sdk.crypto.Key;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
 import java.util.HashMap;
@@ -193,7 +193,7 @@ public final class Client implements AutoCloseable {
     // Simplified interface intended for high-level, opinionated operation
     //
 
-    public AccountId createAccount(Key publicKey, long initialBalance) throws HederaException, HederaNetworkException {
+    public AccountId createAccount(PublicKey publicKey, long initialBalance) throws HederaException, HederaNetworkException {
         TransactionReceipt receipt = new AccountCreateTransaction(this).setKey(publicKey)
             .setInitialBalance(initialBalance)
             .executeForReceipt();
@@ -201,7 +201,7 @@ public final class Client implements AutoCloseable {
         return receipt.getAccountId();
     }
 
-    public void createAccountAsync(Key publicKey, long initialBalance, Consumer<AccountId> onSuccess, Consumer<HederaThrowable> onError) {
+    public void createAccountAsync(PublicKey publicKey, long initialBalance, Consumer<AccountId> onSuccess, Consumer<HederaThrowable> onError) {
         new AccountCreateTransaction(this).setKey(publicKey)
             .setInitialBalance(initialBalance)
             .executeForReceiptAsync(receipt -> onSuccess.accept(receipt.getAccountId()), onError);

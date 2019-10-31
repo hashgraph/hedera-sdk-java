@@ -4,7 +4,7 @@ import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
-import com.hedera.hashgraph.sdk.crypto.Key;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hederahashgraph.api.proto.java.FileCreateTransactionBody;
 import com.hederahashgraph.api.proto.java.KeyList;
 import com.hederahashgraph.api.proto.java.Transaction;
@@ -35,7 +35,7 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
      *
      * A file without any keys is immutable.
      */
-    public FileCreateTransaction addKey(Key key) {
+    public FileCreateTransaction addKey(PublicKey key) {
         keyList.addKeys(key.toKeyProto());
         return this;
     }
@@ -45,7 +45,7 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
         return this;
     }
 
-    public FileCreateTransaction setNewRealmAdminKey(Key key) {
+    public FileCreateTransaction setNewRealmAdminKey(PublicKey key) {
         builder.setNewRealmAdminKey(key.toKeyProto());
         return this;
     }

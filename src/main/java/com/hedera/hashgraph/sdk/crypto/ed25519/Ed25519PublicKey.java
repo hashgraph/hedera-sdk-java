@@ -1,7 +1,7 @@
 package com.hedera.hashgraph.sdk.crypto.ed25519;
 
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.crypto.Key;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
@@ -18,7 +18,7 @@ import java.io.IOException;
  * Ed25519PrivateKey#getPublicKey()}.
  */
 @SuppressWarnings("Duplicates") // difficult to factor out common code for all algos without exposing it
-public final class Ed25519PublicKey implements Key {
+public final class Ed25519PublicKey extends PublicKey {
     private final Ed25519PublicKeyParameters pubKeyParams;
 
     Ed25519PublicKey(Ed25519PublicKeyParameters pubKeyParams) {
