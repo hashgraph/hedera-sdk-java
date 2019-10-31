@@ -10,10 +10,10 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
 
-public interface Key {
-    com.hederahashgraph.api.proto.java.Key toKeyProto();
+public abstract class PublicKey {
+    public abstract com.hederahashgraph.api.proto.java.Key toKeyProto();
 
-    static Key fromProtoKey(com.hederahashgraph.api.proto.java.Key key) {
+    public static PublicKey fromProtoKey(com.hederahashgraph.api.proto.java.Key key) {
         switch (key.getKeyCase()) {
         case ED25519:
             return Ed25519PublicKey.fromBytes(
@@ -27,7 +27,7 @@ public interface Key {
         }
     }
 
-    static Key fromString(String keyString) {
+    public static PublicKey fromString(String keyString) {
         SubjectPublicKeyInfo pubKeyInfo;
 
         try {

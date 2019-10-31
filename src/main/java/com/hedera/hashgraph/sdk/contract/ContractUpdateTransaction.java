@@ -5,7 +5,7 @@ import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.crypto.Key;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hedera.hashgraph.sdk.file.FileId;
 import com.hederahashgraph.api.proto.java.ContractUpdateTransactionBody;
 import com.hederahashgraph.api.proto.java.Transaction;
@@ -37,7 +37,7 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
     }
 
     // fixme: update to the new Key interface
-    public ContractUpdateTransaction setAdminKey(Key key) {
+    public ContractUpdateTransaction setAdminKey(PublicKey key) {
         builder.setAdminKey(key.toKeyProto());
         return this;
     }

@@ -1,7 +1,7 @@
 package com.hedera.hashgraph.sdk.account;
 
 import com.hedera.hashgraph.sdk.Entity;
-import com.hedera.hashgraph.sdk.crypto.Key;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hederahashgraph.api.proto.java.AccountID;
 
 import java.util.List;
@@ -25,11 +25,11 @@ public final class Claim implements Entity {
             .toByteArray();
     }
 
-    public List<Key> getKeys() {
+    public List<PublicKey> getKeys() {
         return this.inner.getKeys()
             .getKeysList()
             .stream()
-            .map(Key::fromProtoKey)
+            .map(PublicKey::fromProtoKey)
             .collect(Collectors.toList());
     }
 }

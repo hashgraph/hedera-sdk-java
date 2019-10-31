@@ -4,7 +4,7 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
-import com.hedera.hashgraph.sdk.crypto.Key;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hederahashgraph.api.proto.java.CryptoUpdateTransactionBody;
 import com.hederahashgraph.api.proto.java.Transaction;
 import com.hederahashgraph.api.proto.java.TransactionResponse;
@@ -30,7 +30,7 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
         return this;
     }
 
-    public AccountUpdateTransaction setKey(Key key) {
+    public AccountUpdateTransaction setKey(PublicKey key) {
         builder.setKey(key.toKeyProto());
         return this;
     }

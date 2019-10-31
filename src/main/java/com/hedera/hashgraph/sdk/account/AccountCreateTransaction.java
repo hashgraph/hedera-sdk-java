@@ -4,7 +4,7 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.crypto.Key;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hederahashgraph.api.proto.java.CryptoCreateTransactionBody;
 import com.hederahashgraph.api.proto.java.RealmID;
 import com.hederahashgraph.api.proto.java.ShardID;
@@ -54,7 +54,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
         return super.setTransactionId(transactionId);
     }
 
-    public AccountCreateTransaction setKey(Key publicKey) {
+    public AccountCreateTransaction setKey(PublicKey publicKey) {
         builder.setKey(publicKey.toKeyProto());
         return this;
     }
@@ -105,7 +105,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
         return this;
     }
 
-    public AccountCreateTransaction setNewRealmAdminKey(Key publicKey) {
+    public AccountCreateTransaction setNewRealmAdminKey(PublicKey publicKey) {
         builder.setNewRealmAdminKey(publicKey.toKeyProto());
         return this;
     }

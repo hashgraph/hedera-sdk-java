@@ -1,7 +1,7 @@
 package com.hedera.hashgraph.sdk.file;
 
 import com.hedera.hashgraph.sdk.TimestampHelper;
-import com.hedera.hashgraph.sdk.crypto.Key;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hederahashgraph.api.proto.java.FileGetInfoResponse;
 import com.hederahashgraph.api.proto.java.Response;
 
@@ -39,11 +39,11 @@ public final class FileInfo {
         return inner.getDeleted();
     }
 
-    public List<Key> getKeys() {
+    public List<PublicKey> getKeys() {
         return inner.getKeys()
             .getKeysList()
             .stream()
-            .map(Key::fromProtoKey)
+            .map(PublicKey::fromProtoKey)
             .collect(Collectors.toList());
     }
 }

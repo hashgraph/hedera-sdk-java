@@ -4,7 +4,7 @@ import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
-import com.hedera.hashgraph.sdk.crypto.Key;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hederahashgraph.api.proto.java.FileUpdateTransactionBody;
 import com.hederahashgraph.api.proto.java.KeyList;
 import com.hederahashgraph.api.proto.java.Transaction;
@@ -37,7 +37,7 @@ public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransact
         return this;
     }
 
-    public FileUpdateTransaction addKey(Key key) {
+    public FileUpdateTransaction addKey(PublicKey key) {
         keyList.addKeys(key.toKeyProto());
 
         return this;

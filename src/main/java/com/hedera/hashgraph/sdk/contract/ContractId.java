@@ -3,13 +3,13 @@ package com.hedera.hashgraph.sdk.contract;
 import com.hedera.hashgraph.sdk.Entity;
 import com.hedera.hashgraph.sdk.IdUtil;
 import com.hedera.hashgraph.sdk.SolidityUtil;
-import com.hedera.hashgraph.sdk.crypto.Key;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hederahashgraph.api.proto.java.ContractID;
 import com.hederahashgraph.api.proto.java.ContractIDOrBuilder;
 
 import java.util.Objects;
 
-public final class ContractId implements Key, Entity {
+public final class ContractId extends PublicKey implements Entity {
     private final ContractID.Builder inner;
 
     public ContractId(long shardNum, long realmNum, long contractNum) {

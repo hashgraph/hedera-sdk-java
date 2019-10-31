@@ -6,7 +6,7 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.crypto.Key;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hedera.hashgraph.sdk.file.FileId;
 import com.hederahashgraph.api.proto.java.ContractCreateTransactionBody;
 import com.hederahashgraph.api.proto.java.RealmID;
@@ -41,7 +41,7 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
         return this;
     }
 
-    public ContractCreateTransaction setAdminKey(Key adminKey) {
+    public ContractCreateTransaction setAdminKey(PublicKey adminKey) {
         builder.setAdminKey(adminKey.toKeyProto());
         return this;
     }
@@ -90,7 +90,7 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
         return this;
     }
 
-    public ContractCreateTransaction setNewRealmAdminKey(Key newRealmAdminKey) {
+    public ContractCreateTransaction setNewRealmAdminKey(PublicKey newRealmAdminKey) {
         builder.setNewRealmAdminKey(newRealmAdminKey.toKeyProto());
         return this;
     }

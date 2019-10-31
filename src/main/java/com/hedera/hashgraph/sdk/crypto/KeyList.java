@@ -6,13 +6,13 @@ package com.hedera.hashgraph.sdk.crypto;
  *
  * Equivalent to a threshold key with a threshold the same as the number of keys it contains.
  */
-public class KeyList implements Key {
+public class KeyList extends PublicKey {
     private com.hederahashgraph.api.proto.java.KeyList.Builder keyListBuilder =
         com.hederahashgraph.api.proto.java.KeyList.newBuilder();
 
     public KeyList() { }
 
-    public KeyList addKey(Key key) {
+    public KeyList addKey(PublicKey key) {
         keyListBuilder.addKeys(key.toKeyProto());
         return this;
     }

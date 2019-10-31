@@ -3,7 +3,7 @@ package com.hedera.hashgraph.sdk.account;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
-import com.hedera.hashgraph.sdk.crypto.Key;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hederahashgraph.api.proto.java.AccountID;
 import com.hederahashgraph.api.proto.java.Claim;
 import com.hederahashgraph.api.proto.java.CryptoAddClaimTransactionBody;
@@ -38,7 +38,7 @@ public final class AccountAddClaimTransaction extends TransactionBuilder<Account
         return this;
     }
 
-    public AccountAddClaimTransaction addKey(Key key) {
+    public AccountAddClaimTransaction addKey(PublicKey key) {
         keyList.addKeys(key.toKeyProto());
         return this;
     }

@@ -1,6 +1,6 @@
 package com.hedera.hashgraph.sdk.crypto.ed25519;
 
-import com.hedera.hashgraph.sdk.crypto.Key;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ class Ed25519PublicKeyTest {
         final String key1Str = key1.toString();
         final Ed25519PublicKey key2 = Ed25519PublicKey.fromString(key1Str);
         final String key2Str = key2.toString();
-        final Key key3 = Key.fromString(key1Str);
+        final PublicKey key3 = PublicKey.fromString(key1Str);
         final String key3Str = key3.toString();
 
         assertEquals(key3.getClass(), Ed25519PublicKey.class);
