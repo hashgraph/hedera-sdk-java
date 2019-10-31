@@ -1,0 +1,44 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.0"
+    defaultConfig {
+        applicationId "com.hedera.android_example"
+        // FIXME: API 21 required for automatic multidex, shouldn't be required once we get
+        // the lightweight bouncycastle package (see below)
+        minSdkVersion 21
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+    lintOptions {
+        // FIXME: this silences lint errors about bouncycastle using javax packages that don't exist
+        // we only need the lightweight bouncycastle crypto APIs but they only publish source
+        // releases of those; the bcprov-jdk15on package is the only one right now that has
+        // everything we need
+        disable 'InvalidPackage'
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'com.hedera.hashgraph:sdk:0.8.0-alpha.15'
+    implementation 'io.grpc:grpc-okhttp:1.24.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+}

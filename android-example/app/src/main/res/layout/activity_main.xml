@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <EditText
+        android:id="@+id/private_key"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:minLines="2"
+        android:lines="2"
+        android:inputType="textPersonName"
+        android:text="Private Key"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/gen_private_key"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Generate Private Key"
+        app:layout_constraintEnd_toEndOf="@+id/private_key"
+        app:layout_constraintStart_toStartOf="@+id/private_key"
+        app:layout_constraintTop_toBottomOf="@+id/private_key" />
+</androidx.constraintlayout.widget.ConstraintLayout>
