@@ -17,6 +17,7 @@
         <!-- this can't be inherited from the SDK because it has jar packaging instead of pom -->
         <errorprone.version>2.3.3</errorprone.version>
         <nullaway.version>0.7.2</nullaway.version>
+        <grpc.version>1.24.0</grpc.version>
     </properties>
 
     <dependencies>
@@ -29,6 +30,11 @@
             <groupId>com.hedera.hashgraph</groupId>
             <artifactId>sdk</artifactId>
             <version>0.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty-shaded</artifactId>
+            <version>${grpc.version}</version>
         </dependency>
     </dependencies>
 
