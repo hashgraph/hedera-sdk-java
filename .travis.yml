@@ -10,3 +10,4 @@ script:
     # errorprone only works on JDK 9 and above
     - mvn $MVN_PROFILES checkstyle:check spotbugs:check compile test
     - (cd examples && mvn $MVN_PROFILES checkstyle:check spotbugs:check compile)
+    - (cd android-example && ./gradlew clean build test)
