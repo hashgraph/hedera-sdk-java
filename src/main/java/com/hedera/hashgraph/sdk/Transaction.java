@@ -24,6 +24,8 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -32,7 +34,6 @@ import javax.annotation.Nullable;
 
 import io.grpc.Channel;
 import io.grpc.MethodDescriptor;
-import io.grpc.netty.shaded.io.netty.util.concurrent.GlobalEventExecutor;
 
 public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.java.Transaction, TransactionResponse, TransactionId, Transaction> {
 
@@ -384,6 +385,14 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
         }
     }
 
+    // we need a background thread to execute timeouts
+    private static final ScheduledExecutorService timeoutExecutor =
+        Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread thread = new Thread(r, "hedera-async-receipt");
+            thread.setDaemon(true);
+            return thread;
+        });
+
     private final class AsyncReceiptHandler {
         private final Consumer<TransactionReceipt> onReceipt;
         private final Consumer<HederaThrowable> onError;
@@ -430,8 +439,7 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
 
         @SuppressWarnings("FutureReturnValueIgnored")
         private void scheduleReceiptAttempt(long delayMs) {
-            GlobalEventExecutor.INSTANCE.schedule(this::tryGetReceipt, delayMs,
-                TimeUnit.MILLISECONDS);
+            timeoutExecutor.schedule(this::tryGetReceipt, delayMs, TimeUnit.MILLISECONDS);
         }
     }
 }
