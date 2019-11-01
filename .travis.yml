@@ -4,6 +4,15 @@ jdk:
     - openjdk8
     - openjdk11
 
+# build the android example
+matrix:
+    include:
+        - language: android
+          jdk: openjdk8
+          script:
+              - mvn install
+              - (cd android-example && TERM=dumb ./gradlew clean build)
+
 script:
     - echo $TRAVIS_JDK_VERSION
     - export MVN_PROFILES=$([ "$TRAVIS_JDK_VERSION" = "openjdk11" ] && echo '-P errorprone')
@@ -11,5 +20,3 @@ script:
     # install so examples and android-example can use it
     - mvn $MVN_PROFILES checkstyle:check spotbugs:check compile test install
     - (cd examples && mvn $MVN_PROFILES checkstyle:check spotbugs:check compile)
-    # so Gradle spits out nice output for Travis logs
-    - (cd android-example && TERM=dumb ./gradlew clean build)
