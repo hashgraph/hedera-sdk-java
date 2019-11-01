@@ -9,6 +9,10 @@ matrix:
     include:
         - language: android
           jdk: openjdk8
+          android:
+              components:
+                  - build-tools-29.0.0
+                  - platform-tools-29.0.5
           script:
               - mvn install
               - (cd android-example && TERM=dumb ./gradlew clean build)
