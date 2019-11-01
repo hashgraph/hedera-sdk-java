@@ -8,6 +8,8 @@ script:
     - echo $TRAVIS_JDK_VERSION
     - export MVN_PROFILES=$([ "$TRAVIS_JDK_VERSION" = "openjdk11" ] && echo '-P errorprone')
     # errorprone only works on JDK 9 and above
-    - mvn $MVN_PROFILES checkstyle:check spotbugs:check compile test
+    # install so examples and android-example can use it
+    - mvn $MVN_PROFILES checkstyle:check spotbugs:check compile test install
     - (cd examples && mvn $MVN_PROFILES checkstyle:check spotbugs:check compile)
-    - (cd android-example && ./gradlew clean build)
+    # so Gradle spits out nice output for Travis logs
+    - (cd android-example && TERM=dumb ./gradlew clean build)
