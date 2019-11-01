@@ -11,6 +11,7 @@ matrix:
           jdk: openjdk8
           android:
               components:
+                  - android-29
                   - build-tools-29.0.0
                   - platform-tools-29.0.5
           script:
