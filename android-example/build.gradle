@@ -16,9 +16,10 @@ buildscript {
 
 allprojects {
     repositories {
+        // resolve locally installed versions first
+        mavenLocal()
         google()
         jcenter()
-        mavenLocal()
     }
 }
 
