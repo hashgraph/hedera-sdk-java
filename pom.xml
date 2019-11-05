@@ -159,6 +159,7 @@
                 <version>3.0.0-M2</version>
                 <executions>
                     <execution>
+                        <id>enforce-maven</id>
                         <goals>
                             <goal>enforce</goal>
                         </goals>
@@ -171,6 +172,7 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>enforce-java</id>
                         <goals>
                             <goal>enforce</goal>
                         </goals>
@@ -182,16 +184,14 @@
                         </phase>
                         <configuration>
                             <rules>
-                                <rule>
-                                    <requiredJavaVersion>
-                                        [1.8.0, 1.9.0)
-                                    </requiredJavaVersion>
+                                <requireJavaVersion>
+                                    <version>[1.8.0, 1.9.0)</version>
                                     <message>
                                         SDK should be deployed with Java 1.8 only, otherwise
                                         incompatible bytecode is emitted.
                                         https://github.com/hashgraph/hedera-sdk-java/issues/239
                                     </message>
-                                </rule>
+                                </requireJavaVersion>
                             </rules>
                         </configuration>
                     </execution>
