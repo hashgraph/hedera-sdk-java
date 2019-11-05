@@ -170,6 +170,31 @@
                             </rules>
                         </configuration>
                     </execution>
+                    <execution>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <!--
+                            ensure we deploy with JDK 8 to avoid publishing incompatible bytecode
+                        -->
+                        <phase>
+                            deploy
+                        </phase>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <requiredJavaVersion>
+                                        [1.8.0, 1.9.0)
+                                    </requiredJavaVersion>
+                                    <message>
+                                        SDK should be deployed with Java 1.8 only, otherwise
+                                        incompatible bytecode is emitted.
+                                        https://github.com/hashgraph/hedera-sdk-java/issues/239
+                                    </message>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
