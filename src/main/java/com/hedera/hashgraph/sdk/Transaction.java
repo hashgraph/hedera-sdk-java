@@ -20,13 +20,11 @@ import com.hederahashgraph.service.proto.java.SmartContractServiceGrpc;
 
 import org.bouncycastle.util.encoders.Hex;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -48,8 +46,8 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
     // fully qualified to disambiguate
     private final java.time.Duration validDuration;
 
-    private static final int RECEIPT_RETRY_DELAY = 500;
-    private static final int RECEIPT_INITIAL_DELAY = 1000;
+    private static final Duration RECEIPT_RETRY_DELAY = Duration.ofMillis(500);
+    private static final Duration RECEIPT_INITIAL_DELAY = Duration.ofMillis(1000);
 
     private static final int PREFIX_LEN = 6;
 
@@ -61,7 +59,6 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
         TransactionBodyOrBuilder body,
         MethodDescriptor<com.hederahashgraph.api.proto.java.Transaction, TransactionResponse> methodDescriptor)
     {
-        super();
         this.client = client;
         this.inner = inner;
         this.nodeAccountId = body.getNodeAccountID();
@@ -98,7 +95,8 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
                 .getPubKeyPrefix();
 
             if (pubKey.startsWith(pubKeyPrefix)) {
-                throw new IllegalArgumentException("transaction already signed with key: " + privateKey.toString());
+                throw new IllegalArgumentException(
+                    "transaction already signed with key: " + privateKey.toString());
             }
         }
 
@@ -128,12 +126,14 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
     public TransactionReceipt queryReceipt() throws HederaException {
         return new TransactionReceiptQuery(Objects.requireNonNull(client))
             .setTransactionId(id)
+            .setRetryTimeout(Duration.between(getId().getValidStart(), getExpiration()))
             .execute();
     }
 
     public void queryReceiptAsync(Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError) {
         new TransactionReceiptQuery(Objects.requireNonNull(client))
             .setTransactionId(id)
+            .setRetryTimeout(Duration.between(getId().getValidStart(), getExpiration()))
             .executeAsync(onReceipt, onError);
     }
 
@@ -179,7 +179,8 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
                 ByteString pubKeyPrefix = sig.getPubKeyPrefix();
 
                 if (!publicKeys.add(pubKeyPrefix)) {
-                    addValidationError("duplicate signing key: " + Hex.toHexString(getPrefix(pubKeyPrefix).toByteArray()) + "...");
+                    addValidationError("duplicate signing key: "
+                        + Hex.toHexString(getPrefix(pubKeyPrefix).toByteArray()) + "...");
                 }
             }
         }
@@ -202,100 +203,54 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
         return new TransactionId(txnIdProto);
     }
 
-    private <T> T executeAndWaitFor(CheckedFunction<TransactionReceipt, T> mapReceipt)
-        throws HederaException, HederaNetworkException
-    {
-        final Instant startTime = Instant.now();
-
-        // kickoff the transaction
-        execute();
-
-        try {
-            Thread.sleep(RECEIPT_INITIAL_DELAY);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        int attempt = 0;
-
-        while (true) {
-            attempt += 1;
-            TransactionReceipt receipt = queryReceipt();
-            ResponseCodeEnum receiptStatus = receipt.getStatus();
-
-            if (receiptStatus == ResponseCodeEnum.UNKNOWN || receiptStatus == ResponseCodeEnum.OK) {
-                // If the receipt is UNKNOWN this means that the node has not finished
-                // processing the transaction; if it is OK it means the transaction has not yet
-                // reached consensus
-
-                final Long delayMs =
-                    getReceiptDelayMs(startTime, attempt)
-                        // throw if the delay will put us over `validDuraiton`
-                        .orElseThrow(() -> new HederaException(ResponseCodeEnum.UNKNOWN));
-
-                try {
-                    Thread.sleep(delayMs);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                HederaException.throwIfExceptional(receiptStatus);
-                return mapReceipt.apply(receipt);
-            }
-        }
+    @Override
+    protected Optional<Instant> getRetryUntil() {
+        return Optional.of(getExpiration());
     }
 
-    private Optional<Long> getReceiptDelayMs(Instant startTime, int attempt) {
-        // exponential backoff algorithm:
-        // next delay is some constant * rand(0, 2 ** attempt - 1)
-        final int delay = RECEIPT_RETRY_DELAY
-            * Objects.requireNonNull(client).random.nextInt(1 << attempt);
-
-        // if the next delay will put us past the valid duration throw an error
-        if (Instant.now().plusMillis(delay).compareTo(startTime.plus(validDuration)) > 0) {
-            return Optional.empty();
-        }
-
-        return Optional.of((long) delay);
+    private Instant getExpiration() {
+        return getId().getValidStart().plus(validDuration);
     }
 
     /**
      * Execute this transaction and wait for its receipt to be generated.
-     *
+     * <p>
      * If the receipt does not become available after a few seconds, {@link HederaException} is thrown.
      *
      * @return the receipt for the transaction
-     * @throws HederaException for any response code that is not {@link ResponseCodeEnum#SUCCESS}
+     * @throws HederaException        for any response code that is not {@link ResponseCodeEnum#SUCCESS}
      * @throws HederaNetworkException
-     * @throws RuntimeException if an {@link java.lang.InterruptedException} is thrown while waiting for the receipt.
+     * @throws RuntimeException       if an {@link java.lang.InterruptedException} is thrown while waiting for the receipt.
      */
     public final TransactionReceipt executeForReceipt() throws HederaException, HederaNetworkException {
-        return executeAndWaitFor(receipt -> receipt);
+        execute();
+        return queryReceipt();
     }
 
     /**
      * Execute this transaction and wait for its record to be generated.
-     *
+     * <p>
      * If the record does not become available after a few seconds, {@link HederaException} is thrown.
      *
      * @return the receipt for the transaction
-     * @throws HederaException for any response code that is not {@link ResponseCodeEnum#SUCCESS}
+     * @throws HederaException        for any response code that is not {@link ResponseCodeEnum#SUCCESS}
      * @throws HederaNetworkException
-     * @throws RuntimeException if an {@link java.lang.InterruptedException} is thrown while waiting for the receipt.
+     * @throws RuntimeException       if an {@link java.lang.InterruptedException} is thrown while waiting for the receipt.
      * @deprecated querying for records has a cost separate from executing the transaction and so
      * should be done in an explicit step
-     *
      */
     @Deprecated
     public TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
-        return executeAndWaitFor(
-            receipt -> new TransactionRecordQuery(getClient()).setTransactionId(id).execute());
+        execute();
+        // wait for receipt
+        queryReceipt();
+        return new TransactionRecordQuery(Objects.requireNonNull(this.client))
+            .setTransactionId(id)
+            .execute();
     }
 
     public void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<HederaThrowable> onError) {
-        AsyncReceiptHandler handler = new AsyncReceiptHandler(onSuccess, onError);
-
-        executeAsync(id -> handler.tryGetReceipt(), onError);
+        executeAsync(id -> queryReceiptAsync(onSuccess, onError), onError);
     }
 
     /**
@@ -315,11 +270,7 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
         final TransactionRecordQuery recordQuery = new TransactionRecordQuery(getClient())
             .setTransactionId(id);
 
-        AsyncReceiptHandler handler = new AsyncReceiptHandler((receipt) ->
-            recordQuery.executeAsync(onSuccess, onError),
-            onError);
-
-        executeAsync(id -> handler.tryGetReceipt(), onError);
+        executeForReceiptAsync((receipt) -> recordQuery.executeAsync(onSuccess, onError), onError);
     }
 
     /**
@@ -353,100 +304,42 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
 
     private static MethodDescriptor<com.hederahashgraph.api.proto.java.Transaction, TransactionResponse> methodForTxnBody(TransactionBodyOrBuilder body) {
         switch (body.getDataCase()) {
-        case SYSTEMDELETE:
-            return FileServiceGrpc.getSystemDeleteMethod();
-        case SYSTEMUNDELETE:
-            return FileServiceGrpc.getSystemUndeleteMethod();
-        case CONTRACTCALL:
-            return SmartContractServiceGrpc.getContractCallMethodMethod();
-        case CONTRACTCREATEINSTANCE:
-            return SmartContractServiceGrpc.getCreateContractMethod();
-        case CONTRACTUPDATEINSTANCE:
-            return SmartContractServiceGrpc.getUpdateContractMethod();
-        case CONTRACTDELETEINSTANCE:
-            return SmartContractServiceGrpc.getDeleteContractMethod();
-        case CRYPTOADDCLAIM:
-            return CryptoServiceGrpc.getAddClaimMethod();
-        case CRYPTOCREATEACCOUNT:
-            return CryptoServiceGrpc.getCreateAccountMethod();
-        case CRYPTODELETE:
-            return CryptoServiceGrpc.getCryptoDeleteMethod();
-        case CRYPTODELETECLAIM:
-            return CryptoServiceGrpc.getDeleteClaimMethod();
-        case CRYPTOTRANSFER:
-            return CryptoServiceGrpc.getCryptoTransferMethod();
-        case CRYPTOUPDATEACCOUNT:
-            return CryptoServiceGrpc.getUpdateAccountMethod();
-        case FILEAPPEND:
-            return FileServiceGrpc.getAppendContentMethod();
-        case FILECREATE:
-            return FileServiceGrpc.getCreateFileMethod();
-        case FILEDELETE:
-            return FileServiceGrpc.getDeleteFileMethod();
-        case FILEUPDATE:
-            return FileServiceGrpc.getUpdateFileMethod();
-        case DATA_NOT_SET:
-            throw new IllegalArgumentException("method not set");
-        default:
-            throw new IllegalArgumentException("unsupported method");
-        }
-    }
-
-    // we need a background thread to execute timeouts
-    private static final ScheduledExecutorService timeoutExecutor =
-        Executors.newSingleThreadScheduledExecutor(r -> {
-            Thread thread = new Thread(r, "hedera-async-receipt");
-            thread.setDaemon(true);
-            return thread;
-        });
-
-    private final class AsyncReceiptHandler {
-        private final Consumer<TransactionReceipt> onReceipt;
-        private final Consumer<HederaThrowable> onError;
-
-        // sentinel value signaling initial delay needs to be scheduled
-        private int attempts = -1;
-        private volatile boolean receiptEmitted = false;
-
-        private final Instant startTime = Instant.now();
-
-        private AsyncReceiptHandler(
-            Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError)
-        {
-            this.onReceipt = onReceipt;
-            this.onError = onError;
-        }
-
-        private void tryGetReceipt() {
-            if (attempts == -1) {
-                scheduleReceiptAttempt(RECEIPT_INITIAL_DELAY);
-                attempts = 0;
-            } else {
-                queryReceiptAsync(this::handleReceipt, onError);
-            }
-        }
-
-        private void handleReceipt(TransactionReceipt receipt) {
-            final ResponseCodeEnum status = receipt.getStatus();
-
-            if (status == ResponseCodeEnum.UNKNOWN || status == ResponseCodeEnum.OK) {
-                final Optional<Long> receiptDelayMs = getReceiptDelayMs(startTime, ++attempts); // increment and get
-                receiptDelayMs.ifPresent(this::scheduleReceiptAttempt);
-
-                if (!receiptDelayMs.isPresent()) {
-                    onError.accept(new HederaException(ResponseCodeEnum.UNKNOWN));
-                }
-            } else {
-                if (receiptEmitted) throw new IllegalStateException();
-                receiptEmitted = true;
-
-                onReceipt.accept(receipt);
-            }
-        }
-
-        @SuppressWarnings("FutureReturnValueIgnored")
-        private void scheduleReceiptAttempt(long delayMs) {
-            timeoutExecutor.schedule(this::tryGetReceipt, delayMs, TimeUnit.MILLISECONDS);
+            case SYSTEMDELETE:
+                return FileServiceGrpc.getSystemDeleteMethod();
+            case SYSTEMUNDELETE:
+                return FileServiceGrpc.getSystemUndeleteMethod();
+            case CONTRACTCALL:
+                return SmartContractServiceGrpc.getContractCallMethodMethod();
+            case CONTRACTCREATEINSTANCE:
+                return SmartContractServiceGrpc.getCreateContractMethod();
+            case CONTRACTUPDATEINSTANCE:
+                return SmartContractServiceGrpc.getUpdateContractMethod();
+            case CONTRACTDELETEINSTANCE:
+                return SmartContractServiceGrpc.getDeleteContractMethod();
+            case CRYPTOADDCLAIM:
+                return CryptoServiceGrpc.getAddClaimMethod();
+            case CRYPTOCREATEACCOUNT:
+                return CryptoServiceGrpc.getCreateAccountMethod();
+            case CRYPTODELETE:
+                return CryptoServiceGrpc.getCryptoDeleteMethod();
+            case CRYPTODELETECLAIM:
+                return CryptoServiceGrpc.getDeleteClaimMethod();
+            case CRYPTOTRANSFER:
+                return CryptoServiceGrpc.getCryptoTransferMethod();
+            case CRYPTOUPDATEACCOUNT:
+                return CryptoServiceGrpc.getUpdateAccountMethod();
+            case FILEAPPEND:
+                return FileServiceGrpc.getAppendContentMethod();
+            case FILECREATE:
+                return FileServiceGrpc.getCreateFileMethod();
+            case FILEDELETE:
+                return FileServiceGrpc.getDeleteFileMethod();
+            case FILEUPDATE:
+                return FileServiceGrpc.getUpdateFileMethod();
+            case DATA_NOT_SET:
+                throw new IllegalArgumentException("method not set");
+            default:
+                throw new IllegalArgumentException("unsupported method");
         }
     }
 }
