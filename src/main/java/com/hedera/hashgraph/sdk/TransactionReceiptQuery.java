@@ -31,6 +31,25 @@ public final class TransactionReceiptQuery extends QueryBuilder<TransactionRecei
     }
 
     @Override
+    protected boolean shouldRetry(HederaThrowable e) {
+        if (!(e instanceof HederaException)) {
+            return false;
+        }
+
+        switch (((HederaException) e).responseCode) {
+            // still in the node's queue
+            case UNKNOWN:
+            // accepted but has not reached consensus
+            case OK:
+            // node queue is full
+            case BUSY:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    @Override
     protected MethodDescriptor<Query, Response> getMethod() {
         return CryptoServiceGrpc.getGetTransactionReceiptsMethod();
     }

@@ -1,9 +1,13 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
+import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -16,11 +20,13 @@ import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
 
-public abstract class HederaCall<Req, RawResp, Resp, T> {
+public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, RawResp, Resp, T>> {
     private @Nullable
     List<String> validationErrors;
 
     private boolean isExecuted = false;
+
+    private static final Duration RETRY_DELAY = Duration.ofMillis(500);
 
     protected abstract io.grpc.MethodDescriptor<Req, RawResp> getMethod();
 
@@ -29,6 +35,12 @@ public abstract class HederaCall<Req, RawResp, Resp, T> {
     protected abstract Channel getChannel();
 
     protected abstract Resp mapResponse(RawResp raw) throws HederaException;
+
+    protected abstract Optional<Instant> getRetryUntil();
+
+    protected boolean shouldRetry(HederaThrowable e) {
+        return e instanceof HederaException && ((HederaException) e).responseCode == ResponseCodeEnum.BUSY;
+    }
 
     private ClientCall<Req, RawResp> newClientCall() {
         return getChannel().newCall(getMethod(), CallOptions.DEFAULT);
@@ -49,7 +61,17 @@ public abstract class HederaCall<Req, RawResp, Resp, T> {
 
         onPreExecute();
 
-        return mapResponse(ClientCalls.blockingUnaryCall(newClientCall(), toProto()));
+        final Backoff.FallibleProducer<Resp, HederaException> tryProduce = () ->
+            mapResponse(ClientCalls.blockingUnaryCall(newClientCall(), toProto()));
+
+        final Optional<Instant> retryUntil = getRetryUntil();
+
+        if (retryUntil.isPresent()) {
+            return new Backoff(RETRY_DELAY, retryUntil.get())
+                .tryWhile(this::shouldRetry, tryProduce);
+        } else {
+            return tryProduce.tryProduce();
+        }
     }
 
     public final void executeAsync(Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError) {
@@ -58,9 +80,20 @@ public abstract class HederaCall<Req, RawResp, Resp, T> {
         }
         isExecuted = true;
 
-        onPreExecuteAsync(() -> ClientCalls.asyncUnaryCall(newClientCall(), toProto(),
-            new CallStreamObserver(onSuccess, onError)),
-            onError);
+        final Consumer<Consumer<HederaThrowable>> executeCall = (onError2) ->
+                ClientCalls.asyncUnaryCall(newClientCall(), toProto(),
+                    new CallStreamObserver(onSuccess, onError2));
+
+        onPreExecuteAsync(() -> {
+            final Optional<Instant> retryUntil = getRetryUntil();
+
+            if (retryUntil.isPresent()) {
+                new Backoff(RETRY_DELAY, retryUntil.get())
+                    .asyncTryWhile(this::shouldRetry, executeCall, onError);
+            } else {
+                executeCall.accept(onError);
+            }
+        }, onError);
     }
 
     /**
