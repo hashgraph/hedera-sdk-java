@@ -45,6 +45,6 @@ public final class AccountInfoQuery extends QueryBuilder<AccountInfo, AccountInf
 
     @Override
     protected AccountInfo fromResponse(Response raw) {
-        return new AccountInfo(raw);
+        return AccountInfo.fromResponse(raw);
     }
 }

@@ -14,14 +14,15 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class AccountInfoTest {
-    private static final Ed25519PrivateKey privateKey = Ed25519PrivateKey.generate();
+    private static final Ed25519PrivateKey privateKey = Ed25519PrivateKey.fromString(
+        "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
 
     @Test
     @DisplayName("won't deserialize from the wrong kind of response")
     void incorrectResponse() {
         assertThrows(
             IllegalArgumentException.class,
-            () -> new AccountInfo(Response.getDefaultInstance())
+            () -> AccountInfo.fromResponse(Response.getDefaultInstance())
         );
     }
 
@@ -34,7 +35,7 @@ class AccountInfoTest {
 
         assertThrows(
             IllegalArgumentException.class,
-            () -> new AccountInfo(response),
+            () -> AccountInfo.fromResponse(response),
             "query response missing key"
         );
     }
@@ -49,12 +50,12 @@ class AccountInfoTest {
                         .setKey(privateKey.getPublicKey().toKeyProto())))
             .build();
 
-        final AccountInfo accountInfo = new AccountInfo(response);
+        final AccountInfo accountInfo = AccountInfo.fromResponse(response);
 
-        assertEquals(accountInfo.getAccountId(), new AccountId(0));
-        assertEquals(accountInfo.getContractAccountId(), "");
-        assertNull(accountInfo.getProxyAccountId());
-        assertEquals(accountInfo.getClaims(), new ArrayList<>());
+        assertEquals(accountInfo.accountId, new AccountId(0));
+        assertEquals(accountInfo.contractAccountId, "");
+        assertNull(accountInfo.proxyAccountId);
+        assertEquals(accountInfo.claims, new ArrayList<>());
     }
 
 }

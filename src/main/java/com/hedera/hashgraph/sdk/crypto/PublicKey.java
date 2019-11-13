@@ -2,7 +2,8 @@ package com.hedera.hashgraph.sdk.crypto;
 
 import com.hedera.hashgraph.sdk.contract.ContractId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
-import com.hederahashgraph.api.proto.java.ContractID;
+import com.hederahashgraph.api.proto.java.ContractIDOrBuilder;
+import com.hederahashgraph.api.proto.java.KeyOrBuilder;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
@@ -13,14 +14,14 @@ import org.bouncycastle.util.encoders.Hex;
 public abstract class PublicKey {
     public abstract com.hederahashgraph.api.proto.java.Key toKeyProto();
 
-    public static PublicKey fromProtoKey(com.hederahashgraph.api.proto.java.Key key) {
+    public static PublicKey fromProtoKey(KeyOrBuilder key) {
         switch (key.getKeyCase()) {
         case ED25519:
             return Ed25519PublicKey.fromBytes(
                 key.getEd25519()
                     .toByteArray());
         case CONTRACTID:
-            ContractID id = key.getContractID();
+            ContractIDOrBuilder id = key.getContractIDOrBuilder();
             return new ContractId(id.getShardNum(), id.getRealmNum(), id.getContractNum());
         default:
             throw new IllegalStateException("Unchecked Key Case");

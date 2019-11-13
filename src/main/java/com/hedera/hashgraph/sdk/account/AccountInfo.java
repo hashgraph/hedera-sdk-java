@@ -13,75 +13,130 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-public class AccountInfo {
-    private final CryptoGetInfoResponse.AccountInfo inner;
+public final class AccountInfo {
+    public final AccountId accountId;
+    public final String contractAccountId;
 
-    public AccountId getAccountId() {
-        return new AccountId(inner.getAccountIDOrBuilder());
-    }
-
-    public String getContractAccountId() {
-        return inner.getContractAccountID();
-    }
-
-    public boolean isDeleted() {
-        return inner.getDeleted();
-    }
+    public final boolean isDeleted;
 
     @Nullable
-    public AccountId getProxyAccountId() {
-        return inner.hasProxyAccountID() ? new AccountId(inner.getProxyAccountIDOrBuilder()) : null;
-    }
+    public final AccountId proxyAccountId;
+    public final long proxyReceived;
 
-    public long getProxyReceived() {
-        return inner.getProxyReceived();
-    }
+    public final PublicKey key;
 
-    public PublicKey getKey() {
-        return PublicKey.fromProtoKey(inner.getKey());
-    }
+    public final long balance;
 
-    public long getBalance() {
-        return inner.getBalance();
-    }
+    public final long generateSendRecordThreshold;
+    public final long generateReceiveRecordThreshold;
 
-    public long getGenerateSendRecordThreshold() {
-        return inner.getGenerateSendRecordThreshold();
-    }
+    public final boolean isReceiverSignatureRequired;
 
-    public long getGenerateReceiveRecordThreshold() {
-        return inner.getGenerateReceiveRecordThreshold();
-    }
+    public final Instant expirationTime;
 
-    public boolean isReceiverSignatureRequired() {
-        return inner.getReceiverSigRequired();
-    }
+    public final Duration autoRenewPeriod;
 
-    public Instant getExpirationTime() {
-        return TimestampHelper.timestampTo(inner.getExpirationTime());
-    }
+    public final List<Claim> claims;
 
-    public Duration getAutoRenewPeriod() {
-        return DurationHelper.durationTo(inner.getAutoRenewPeriod());
-    }
+    public AccountInfo(CryptoGetInfoResponse.AccountInfoOrBuilder info) {
+        if (!info.hasKey()) {
+            throw new IllegalArgumentException("query response missing key");
+        }
 
-    public List<Claim> getClaims() {
-        return inner.getClaimsList()
+        accountId = new AccountId(info.getAccountIDOrBuilder());
+        contractAccountId = info.getContractAccountID();
+        isDeleted = info.getDeleted();
+        proxyAccountId = info.hasProxyAccountID() ? new AccountId(info.getProxyAccountIDOrBuilder()) : null;
+        proxyReceived = info.getProxyReceived();
+        key = PublicKey.fromProtoKey(info.getKeyOrBuilder());
+        balance = info.getBalance();
+        generateSendRecordThreshold = info.getGenerateSendRecordThreshold();
+        generateReceiveRecordThreshold = info.getGenerateReceiveRecordThreshold();
+        isReceiverSignatureRequired = info.getReceiverSigRequired();
+        expirationTime = TimestampHelper.timestampTo(info.getExpirationTime());
+        autoRenewPeriod = DurationHelper.durationTo(info.getAutoRenewPeriod());
+        claims = info.getClaimsList()
             .stream()
             .map(Claim::new)
             .collect(Collectors.toList());
     }
 
-    AccountInfo(Response response) {
+    /**
+     * @deprecated is now a public field.
+     * @return
+     */
+    @Deprecated
+    public AccountId getAccountId() {
+        return accountId;
+    }
+
+    public String getContractAccountId() {
+        return contractAccountId;
+    }
+
+    @Deprecated
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    @Deprecated
+    @Nullable
+    public AccountId getProxyAccountId() {
+        return proxyAccountId;
+    }
+
+    @Deprecated
+    public long getProxyReceived() {
+        return proxyReceived;
+    }
+
+    @Deprecated
+    public PublicKey getKey() {
+        return key;
+    }
+
+    @Deprecated
+    public long getBalance() {
+        return balance;
+    }
+
+    @Deprecated
+    public long getGenerateSendRecordThreshold() {
+        return generateSendRecordThreshold;
+    }
+
+    @Deprecated
+    public long getGenerateReceiveRecordThreshold() {
+        return generateReceiveRecordThreshold;
+    }
+
+    @Deprecated
+    public boolean isReceiverSignatureRequired() {
+        return isReceiverSignatureRequired;
+    }
+
+    @Deprecated
+    public Instant getExpirationTime() {
+        return expirationTime;
+    }
+
+    @Deprecated
+    public Duration getAutoRenewPeriod() {
+        return autoRenewPeriod;
+    }
+
+    @Deprecated
+    public List<Claim> getClaims() {
+        return claims;
+    }
+
+    static AccountInfo fromResponse(Response response) {
         if (!response.hasCryptoGetInfo()) {
             throw new IllegalArgumentException("query response was not `CryptoGetInfoResponse`");
         }
 
         CryptoGetInfoResponse infoResponse = response.getCryptoGetInfo();
-        inner = infoResponse.getAccountInfo();
 
-        if (!inner.hasKey()) {
-            throw new IllegalArgumentException("query response missing key");
-        }
+        return new AccountInfo(infoResponse.getAccountInfo());
     }
 }
