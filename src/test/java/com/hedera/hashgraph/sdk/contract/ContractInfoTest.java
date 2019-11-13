@@ -21,7 +21,7 @@ class ContractInfoTest {
     void incorrectResponse() {
         assertThrows(
             IllegalArgumentException.class,
-            () -> new ContractInfo(Response.getDefaultInstance())
+            () -> ContractInfo.fromResponse(Response.getDefaultInstance())
         );
     }
 
@@ -32,9 +32,9 @@ class ContractInfoTest {
             .setContractGetInfo(ContractGetInfoResponse.getDefaultInstance())
             .build();
 
-        final ContractInfo contractInfo = new ContractInfo(response);
+        final ContractInfo contractInfo = ContractInfo.fromResponse(response);
 
-        assertNull(contractInfo.getAdminKey());
+        assertNull(contractInfo.adminKey);
     }
 
     @Test
@@ -48,14 +48,14 @@ class ContractInfoTest {
                             .setStorage(1234)))
             .build();
 
-        final ContractInfo contractInfo = new ContractInfo(response);
+        final ContractInfo contractInfo = ContractInfo.fromResponse(response);
 
-        assertEquals(contractInfo.getAccountId(), new AccountId(0));
-        assertEquals(contractInfo.getContractAccountId(), "");
-        assertEquals(contractInfo.getContractId(), new ContractId(0, 0, 0));
-        assertNull(contractInfo.getAdminKey());
-        assertEquals(contractInfo.getExpirationTime(), Instant.EPOCH);
-        assertEquals(contractInfo.getAutoRenewPeriod(), Duration.ZERO);
-        assertEquals(contractInfo.getStorage(), 1234);
+        assertEquals(contractInfo.accountId, new AccountId(0));
+        assertEquals(contractInfo.contractAccountId, "");
+        assertEquals(contractInfo.contractId, new ContractId(0, 0, 0));
+        assertNull(contractInfo.adminKey);
+        assertEquals(contractInfo.expirationTime, Instant.EPOCH);
+        assertEquals(contractInfo.autoRenewPeriod, Duration.ZERO);
+        assertEquals(contractInfo.storage, 1234);
     }
 }

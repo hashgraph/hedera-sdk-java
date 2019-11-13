@@ -13,43 +13,74 @@ import java.time.Instant;
 import javax.annotation.Nullable;
 
 public final class ContractInfo {
-    private final ContractGetInfoResponse.ContractInfo inner;
+    public final ContractId contractId;
+    public final AccountId accountId;
 
-    ContractInfo(Response response) {
+    public final String contractAccountId;
+
+    public final PublicKey adminKey;
+
+    public final Instant expirationTime;
+
+    public final Duration autoRenewPeriod;
+
+    public final long storage;
+
+    public ContractInfo(ContractGetInfoResponse.ContractInfoOrBuilder info) {
+        if (!info.hasContractID()) {
+            throw new IllegalArgumentException("info is empty");
+        }
+
+        contractId = new ContractId(info.getContractIDOrBuilder());
+        accountId = new AccountId(info.getAccountIDOrBuilder());
+        contractAccountId = info.getContractAccountID();
+        adminKey = info.hasAdminKey() ? PublicKey.fromProtoKey(info.getAdminKey()) : null;
+        expirationTime = TimestampHelper.timestampTo(info.getExpirationTime());
+        autoRenewPeriod = DurationHelper.durationTo(info.getAutoRenewPeriod());
+        storage = info.getStorage();
+    }
+
+    @Deprecated
+    public ContractId getContractId() {
+        return contractId;
+    }
+
+    @Deprecated
+    public AccountId getAccountId() {
+        return accountId;
+    }
+
+    @Deprecated
+    public String getContractAccountId() {
+        return contractAccountId;
+    }
+
+    @Deprecated
+    @Nullable
+    public PublicKey getAdminKey() {
+        return adminKey;
+    }
+
+    @Deprecated
+    public Instant getExpirationTime() {
+        return expirationTime;
+    }
+
+    @Deprecated
+    public Duration getAutoRenewPeriod() {
+        return autoRenewPeriod;
+    }
+
+    @Deprecated
+    public long getStorage() {
+        return storage;
+    }
+
+    static ContractInfo fromResponse(Response response) {
         if (!response.hasContractGetInfo()) {
             throw new IllegalArgumentException("response was not `contractGetInfo`");
         }
 
-        inner = response.getContractGetInfo()
-            .getContractInfo();
-    }
-
-    public ContractId getContractId() {
-        return new ContractId(inner.getContractIDOrBuilder());
-    }
-
-    public AccountId getAccountId() {
-        return new AccountId(inner.getAccountIDOrBuilder());
-    }
-
-    public String getContractAccountId() {
-        return inner.getContractAccountID();
-    }
-
-    @Nullable
-    public PublicKey getAdminKey() {
-        return inner.hasAdminKey() ? PublicKey.fromProtoKey(inner.getAdminKey()) : null;
-    }
-
-    public Instant getExpirationTime() {
-        return TimestampHelper.timestampTo(inner.getExpirationTime());
-    }
-
-    public Duration getAutoRenewPeriod() {
-        return DurationHelper.durationTo(inner.getAutoRenewPeriod());
-    }
-
-    public long getStorage() {
-        return inner.getStorage();
+        return new ContractInfo(response.getContractGetInfo().getContractInfo());
     }
 }
