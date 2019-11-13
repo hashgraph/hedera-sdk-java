@@ -23,7 +23,7 @@ class FileInfoTest {
     void incorrectResponse() {
         assertThrows(
             IllegalArgumentException.class,
-            () -> new FileInfo(Response.getDefaultInstance())
+            () -> FileInfo.fromResponse(Response.getDefaultInstance())
         );
     }
 
@@ -38,7 +38,7 @@ class FileInfoTest {
             "`FileGetInfoResponse` missing keys",
             assertThrows(
                 IllegalArgumentException.class,
-                () -> new FileInfo(response)
+                () -> FileInfo.fromResponse(response)
             ).getMessage());
     }
 
@@ -55,7 +55,7 @@ class FileInfoTest {
                                 KeyList.newBuilder().addKeys(publicKey.toKeyProto()))))
             .build();
 
-        final FileInfo fileInfo = new FileInfo(response);
+        final FileInfo fileInfo = FileInfo.fromResponse(response);
 
         assertEquals(fileInfo.getFileId(), new FileId(0, 0, 0));
         assertFalse(fileInfo.isDeleted());
