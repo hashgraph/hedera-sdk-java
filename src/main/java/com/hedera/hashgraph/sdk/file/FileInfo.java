@@ -10,40 +10,56 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public final class FileInfo {
-    private final FileGetInfoResponse.FileInfo inner;
+    public final FileId fileId;
+    public final long size;
+    public final Instant expirationTime;
+    public final boolean isDeleted;
+    public final List<PublicKey> keys;
 
-    FileInfo(Response response) {
-        if (!response.hasFileGetInfo()) throw new IllegalArgumentException("response was not `fileGetInfo`");
-
-        inner = response.getFileGetInfo()
-            .getFileInfo();
-
-        if (!inner.hasKeys() || inner.getKeys().getKeysList().isEmpty()) {
+    public FileInfo(FileGetInfoResponse.FileInfoOrBuilder info) {
+        if (!info.hasKeys() || info.getKeys().getKeysList().isEmpty()) {
             throw new IllegalArgumentException("`FileGetInfoResponse` missing keys");
         }
-    }
 
-    public FileId getFileId() {
-        return new FileId(inner.getFileIDOrBuilder());
-    }
-
-    public long getSize() {
-        return inner.getSize();
-    }
-
-    public Instant getExpirationTime() {
-        return TimestampHelper.timestampTo(inner.getExpirationTime());
-    }
-
-    public boolean isDeleted() {
-        return inner.getDeleted();
-    }
-
-    public List<PublicKey> getKeys() {
-        return inner.getKeys()
+        fileId = new FileId(info.getFileIDOrBuilder());
+        size = info.getSize();
+        expirationTime = TimestampHelper.timestampTo(info.getExpirationTime());
+        isDeleted = info.getDeleted();
+        keys = info.getKeys()
             .getKeysList()
             .stream()
             .map(PublicKey::fromProtoKey)
             .collect(Collectors.toList());
+    }
+
+    static FileInfo fromResponse(Response response) {
+        if (!response.hasFileGetInfo()) throw new IllegalArgumentException("response was not `fileGetInfo`");
+
+        return new FileInfo(response.getFileGetInfo().getFileInfoOrBuilder());
+    }
+
+    @Deprecated
+    public FileId getFileId() {
+        return fileId;
+    }
+
+    @Deprecated
+    public long getSize() {
+        return size;
+    }
+
+    @Deprecated
+    public Instant getExpirationTime() {
+        return expirationTime;
+    }
+
+    @Deprecated
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    @Deprecated
+    public List<PublicKey> getKeys() {
+        return keys;
     }
 }
