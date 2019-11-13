@@ -9,13 +9,14 @@ import com.hederahashgraph.api.proto.java.FileIDOrBuilder;
 import java.util.Objects;
 
 public final class FileId implements Entity {
-    private final FileID.Builder inner;
+    public final long shard;
+    public final long realm;
+    public final long file;
 
     public FileId(long shardNum, long realmNum, long fileNum) {
-        inner = FileID.newBuilder()
-            .setShardNum(shardNum)
-            .setRealmNum(realmNum)
-            .setFileNum(fileNum);
+        this.shard = shardNum;
+        this.realm = realmNum;
+        this.file = fileNum;
     }
 
     public FileId(FileIDOrBuilder fileId) {
@@ -31,21 +32,24 @@ public final class FileId implements Entity {
         return SolidityUtil.parseAddress(address, FileId::new);
     }
 
+    @Deprecated
     public long getShardNum() {
-        return inner.getShardNum();
+        return shard;
     }
 
+    @Deprecated
     public long getRealmNum() {
-        return inner.getRealmNum();
+        return realm;
     }
 
+    @Deprecated
     public long getFileNum() {
-        return inner.getFileNum();
+        return file;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getShardNum(), getRealmNum(), getFileNum());
+        return Objects.hash(shard, realm, file);
     }
 
     @Override
@@ -55,16 +59,20 @@ public final class FileId implements Entity {
         if (!(other instanceof FileId)) return false;
 
         FileId otherId = (FileId) other;
-        return getShardNum() == otherId.getShardNum() && getRealmNum() == otherId.getRealmNum() && getFileNum() == otherId.getFileNum();
+        return shard == otherId.shard && realm == otherId.realm && file == otherId.file;
     }
 
     public FileID toProto() {
-        return inner.build();
+        return FileID.newBuilder()
+            .setShardNum(shard)
+            .setRealmNum(realm)
+            .setFileNum(file)
+            .build();
     }
 
     @Override
     public String toString() {
-        return "" + getShardNum() + "." + getRealmNum() + "." + getFileNum();
+        return "" + shard + "." + realm + "." + file;
     }
 
     public String toSolidityAddress() {
