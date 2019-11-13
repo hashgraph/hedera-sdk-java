@@ -26,9 +26,9 @@ class IdUtilTest {
     @DisplayName("creates contract id from string correctly")
     void testContractIdFromString() {
         ContractId contractFromString = ContractId.fromString("0.0.400");
-        assertEquals( 0, contractFromString.getRealmNum());
-        assertEquals( 0, contractFromString.getShardNum());
-        assertEquals( 400, contractFromString.getContractNum());
+        assertEquals(1, contractFromString.shard);
+        assertEquals(2, contractFromString.realm);
+        assertEquals(400, contractFromString.contract);
     }
 
     @Test

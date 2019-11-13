@@ -10,13 +10,14 @@ import com.hederahashgraph.api.proto.java.ContractIDOrBuilder;
 import java.util.Objects;
 
 public final class ContractId extends PublicKey implements Entity {
-    private final ContractID.Builder inner;
+    public final long shard;
+    public final long realm;
+    public final long contract;
 
-    public ContractId(long shardNum, long realmNum, long contractNum) {
-        inner = ContractID.newBuilder()
-            .setShardNum(shardNum)
-            .setRealmNum(realmNum)
-            .setContractNum(contractNum);
+    public ContractId(long shard, long realm, long contract) {
+        this.shard = shard;
+        this.realm = realm;
+        this.contract = contract;
     }
 
     public ContractId(ContractIDOrBuilder contractID) {
@@ -32,28 +33,31 @@ public final class ContractId extends PublicKey implements Entity {
         return SolidityUtil.parseAddress(address, ContractId::new);
     }
 
+    @Deprecated
     public long getShardNum() {
-        return inner.getShardNum();
+        return shard;
     }
 
+    @Deprecated
     public long getRealmNum() {
-        return inner.getRealmNum();
+        return realm;
     }
 
+    @Deprecated
     public long getContractNum() {
-        return inner.getContractNum();
+        return contract;
     }
 
     @Override
     public com.hederahashgraph.api.proto.java.Key toKeyProto() {
         return com.hederahashgraph.api.proto.java.Key.newBuilder()
-            .setContractID(inner)
+            .setContractID(toProto())
             .build();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getShardNum(), getRealmNum(), getContractNum());
+        return Objects.hash(shard, realm, contract);
     }
 
     @Override
@@ -63,17 +67,22 @@ public final class ContractId extends PublicKey implements Entity {
         if (!(other instanceof ContractId)) return false;
 
         ContractId otherId = (ContractId) other;
-        return getShardNum() == otherId.getShardNum() && getRealmNum() == otherId.getRealmNum()
-                && getContractNum() == otherId.getContractNum();
+        return shard == otherId.shard
+            && realm == otherId.realm
+            && contract == otherId.contract;
     }
 
     public ContractID toProto() {
-        return inner.build();
+        return ContractID.newBuilder()
+            .setShardNum(shard)
+            .setRealmNum(realm)
+            .setContractNum(contract)
+            .build();
     }
 
     @Override
     public String toString() {
-        return "" + getShardNum() + "." + getRealmNum() + "." + getContractNum();
+        return "" + shard + "." + realm + "." + contract;
     }
 
     public String toSolidityAddress() {
