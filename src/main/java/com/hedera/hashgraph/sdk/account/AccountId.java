@@ -9,18 +9,19 @@ import com.hederahashgraph.api.proto.java.AccountIDOrBuilder;
 import java.util.Objects;
 
 public final class AccountId implements Entity {
-    private final AccountID.Builder inner;
+    public final long shard;
+    public final long realm;
+    public final long account;
 
     /** Constructs an `AccountId` with `0` for `shard` and `realm` (e.g., `0.0.<accountNum>`). */
     public AccountId(long accountNum) {
         this(0, 0, accountNum);
     }
 
-    public AccountId(long shardNum, long realmNum, long accountNum) {
-        inner = AccountID.newBuilder()
-            .setRealmNum(realmNum)
-            .setShardNum(shardNum)
-            .setAccountNum(accountNum);
+    public AccountId(long shard, long realm, long account) {
+        this.shard = shard;
+        this.realm = realm;
+        this.account = account;
     }
 
     /** Constructs an `AccountId` from a string formatted as <shardNum>.<realmNum>.<accountNum> */
@@ -36,21 +37,24 @@ public final class AccountId implements Entity {
         return SolidityUtil.parseAddress(address, AccountId::new);
     }
 
+    @Deprecated
     public long getShardNum() {
-        return inner.getShardNum();
+        return shard;
     }
 
+    @Deprecated
     public long getRealmNum() {
-        return inner.getRealmNum();
+        return realm;
     }
 
+    @Deprecated
     public long getAccountNum() {
-        return inner.getAccountNum();
+        return account;
     }
 
     @Override
     public String toString() {
-        return "" + getShardNum() + "." + getRealmNum() + "." + getAccountNum();
+        return "" + shard + "." + realm + "." + account;
     }
 
     public String toSolidityAddress() {
@@ -58,7 +62,11 @@ public final class AccountId implements Entity {
     }
 
     public AccountID toProto() {
-        return inner.build();
+        return AccountID.newBuilder()
+            .setShardNum(shard)
+            .setRealmNum(realm)
+            .setAccountNum(account)
+            .build();
     }
 
     @Override
@@ -68,12 +76,13 @@ public final class AccountId implements Entity {
         if (other == null || getClass() != other.getClass()) return false;
 
         AccountId otherId = (AccountId) other;
-        return otherId.getAccountNum() == getAccountNum() && otherId.getRealmNum() == getRealmNum()
-                && otherId.getShardNum() == getShardNum();
+        return otherId.account == account
+            && otherId.realm == realm
+            && otherId.shard == shard;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getAccountNum(), getRealmNum(), getShardNum());
+        return Objects.hash(account, realm, shard);
     }
 }

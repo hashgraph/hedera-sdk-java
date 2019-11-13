@@ -16,10 +16,10 @@ class IdUtilTest {
     @Test
     @DisplayName("creates account id from string correctly")
     void testAccountIdFromString() {
-        AccountId accountFromString = AccountId.fromString("0.0.400");
-        assertEquals( 0, accountFromString.getRealmNum());
-        assertEquals( 0, accountFromString.getShardNum());
-        assertEquals( 400, accountFromString.getAccountNum());
+        AccountId accountFromString = AccountId.fromString("1.2.400");
+        assertEquals(1, accountFromString.shard);
+        assertEquals(2, accountFromString.realm);
+        assertEquals(400, accountFromString.account);
     }
 
     @Test

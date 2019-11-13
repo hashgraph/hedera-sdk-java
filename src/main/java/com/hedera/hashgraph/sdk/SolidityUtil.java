@@ -37,9 +37,9 @@ public final class SolidityUtil {
 
     public static String addressFor(AccountId accountId) {
         return addressForEntity(
-            accountId.getShardNum(),
-            accountId.getRealmNum(),
-            accountId.getAccountNum());
+            accountId.shard,
+            accountId.realm,
+            accountId.account);
     }
 
     public static String addressFor(ContractId contractId) {
