@@ -40,15 +40,11 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
         // this
 
         if (!builder.hasShardID()) {
-            setShardId(
-                transactionId.getAccountId()
-                    .getShardNum());
+            setShardId(transactionId.getAccountId().shard);
         }
 
         if (!builder.hasRealmID()) {
-            setRealmId(
-                transactionId.getAccountId()
-                    .getRealmNum());
+            setRealmId(transactionId.getAccountId().realm);
         }
 
         return super.setTransactionId(transactionId);
