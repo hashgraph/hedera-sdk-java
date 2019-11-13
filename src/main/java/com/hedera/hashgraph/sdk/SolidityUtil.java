@@ -51,9 +51,9 @@ public final class SolidityUtil {
 
     public static String addressFor(FileId fileId) {
         return addressForEntity(
-            fileId.getShardNum(),
-            fileId.getRealmNum(),
-            fileId.getFileNum());
+            fileId.shard,
+            fileId.realm,
+            fileId.file);
     }
 
     public static <T> T parseAddress(String address, WithAddress<T> withAddress) {

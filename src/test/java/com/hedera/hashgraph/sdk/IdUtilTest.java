@@ -35,9 +35,9 @@ class IdUtilTest {
     @DisplayName("creates file id from string correctly")
     void testFileIdFromString() {
         FileId fileFromString = FileId.fromString("0.0.400");
-        assertEquals( 0, fileFromString.getRealmNum());
-        assertEquals( 0, fileFromString.getShardNum());
-        assertEquals( 400, fileFromString.getFileNum());
+        assertEquals( 0, fileFromString.shard);
+        assertEquals( 0, fileFromString.realm);
+        assertEquals( 400, fileFromString.file);
     }
 
     @Test
