@@ -180,26 +180,55 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         return validDuration;
     }
 
+    /**
+     * @deprecated Makes it difficult to discern whether an error occurred while executing or
+     * while fetching a receipt. If an error occurs while fetching the receipt then the transaction
+     * ID is difficult to retrieve.
+     *
+     * Call {@link #build()} then {@link Transaction#execute()} then
+     * {@link Transaction#queryReceipt()} and handle the errors separately from each.
+     */
+    @Deprecated
     public final TransactionReceipt executeForReceipt() throws HederaException, HederaNetworkException {
         return build().executeForReceipt();
     }
 
+    /**
+     * @deprecated Makes it difficult to discern whether an error occurred while executing or
+     * while fetching a receipt. If an error occurs while fetching the receipt then the transaction
+     * ID is difficult to retrieve.
+     *
+     * Call {@link #build()} then {@link Transaction#executeAsync(Consumer, Consumer)} then
+     * {@link Transaction#queryReceiptAsync(Consumer, Consumer)} and handle the errors separately
+     * from each.
+     */
+    @Deprecated
     public final void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<HederaThrowable> onError) {
         build().executeForReceiptAsync(onSuccess, onError);
     }
 
     /**
-     * Equivalent to {@link #executeForReceiptAsync(Consumer, Consumer)} but providing {@code this}
-     * to the callback for additional context.
+     * @deprecated Makes it difficult to discern whether an error occurred while executing or
+     * while fetching a receipt. If an error occurs while fetching the receipt then the transaction
+     * ID is difficult to retrieve.
+     *
+     * Call {@link #build()} then {@link Transaction#executeAsync(BiConsumer, BiConsumer)} then
+     * {@link Transaction#queryReceiptAsync(BiConsumer, BiConsumer)} and handle the errors
+     * separately from each.
      */
+    @Deprecated
     public final void executeForReceiptAsync(BiConsumer<T, TransactionReceipt> onSuccess, BiConsumer<T, HederaThrowable> onError) {
         //noinspection unchecked
         build().executeForReceiptAsync(r -> onSuccess.accept((T) this, r), e -> onError.accept((T) this, e));
     }
 
     /**
-     * @deprecated querying for records has a cost separate from executing the transaction and so
-     * should be done in an explicit step
+     * @deprecated Makes it difficult to discern whether an error occurred while executing or
+     * while fetching a record. If an error occurs while fetching the record then the transaction
+     * ID is difficult to retrieve.
+     *
+     * Call {@link #build()} then {@link Transaction#execute()} then
+     * {@link Transaction#queryRecord()} and handle the errors separately from each.
      */
     @Deprecated
     public final TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
@@ -207,8 +236,13 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     }
 
     /**
-     * @deprecated querying for records has a cost separate from executing the transaction and so
-     * should be done in an explicit step
+     * @deprecated Makes it difficult to discern whether an error occurred while executing or
+     * while fetching a record. If an error occurs while fetching the record then the transaction
+     * ID is difficult to retrieve.
+     *
+     * Call {@link #build()} then {@link Transaction#executeAsync(Consumer, Consumer)} then
+     * {@link Transaction#queryRecordAsync(Consumer, Consumer)} and handle the errors separately
+     * from each.
      */
     @Deprecated
     public final void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<HederaThrowable> onError) {
@@ -216,8 +250,13 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     }
 
     /**
-     * @deprecated querying for records has a cost separate from executing the transaction and so
-     * should be done in an explicit step
+     * @deprecated Makes it difficult to discern whether an error occurred while executing or
+     * while fetching a record. If an error occurs while fetching the record then the transaction
+     * ID is difficult to retrieve.
+     *
+     * Call {@link #build()} then {@link Transaction#executeAsync(BiConsumer, BiConsumer)} then
+     * {@link Transaction#queryRecordAsync(BiConsumer, BiConsumer)} and handle the errors separately
+     * from each.
      */
     @Deprecated
     public final void executeForRecordAsync(BiConsumer<T, TransactionRecord> onSuccess, BiConsumer<T, HederaThrowable> onError) {
