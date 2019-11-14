@@ -104,7 +104,7 @@ public final class Client implements AutoCloseable {
      * Set the maximum fee to be paid for transactions executed by this client.
      *
      * Because transaction fees are always maximums, this will simply add a call to
-     * {@link TransactionBuilder#setTransactionFee(long)} on every new transaction. The actual
+     * {@link TransactionBuilder#setMaxTransactionFee(long)} on every new transaction. The actual
      * fee assessed for a given transaction may be less than this value, but never greater.
      *
      * @param maxTransactionFee
