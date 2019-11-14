@@ -55,8 +55,27 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     /**
      * Sets the fee that the client pays to execute this transaction, which is split between the
      * network and the node.
+     *
+     * @deprecated renamed to {@link #setMaxTransactionFee(long)} (the semantics are unchanged)
      */
+    @Deprecated
     public final T setTransactionFee(long fee) {
+        return setMaxTransactionFee(fee);
+    }
+
+    /**
+     * Sets the maximum fee that the client is willing to pay to execute this transaction, which is
+     * split between the network and the node.
+     *
+     * The actual fee assessed may be less than this, in which case you will only be charged
+     * that amount. An error is thrown if the assessed fee is greater than this.
+     *
+     * The calculation of the fee depends on the type of the transaction and its parameters,
+     * as well as the current fee schedule of the network.
+     *
+     * Defaults to the value of {@link Client#setMaxTransactionFee(long)}.
+     */
+    public final T setMaxTransactionFee(long fee) {
         bodyBuilder.setTransactionFee(fee);
         return self();
     }
