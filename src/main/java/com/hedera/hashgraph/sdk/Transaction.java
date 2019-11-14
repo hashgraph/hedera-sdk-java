@@ -40,7 +40,7 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
     private final io.grpc.MethodDescriptor<com.hederahashgraph.api.proto.java.Transaction, com.hederahashgraph.api.proto.java.TransactionResponse> methodDescriptor;
     final com.hederahashgraph.api.proto.java.Transaction.Builder inner;
     final com.hederahashgraph.api.proto.java.AccountID nodeAccountId;
-    final com.hederahashgraph.api.proto.java.TransactionID transactionId;
+    final com.hederahashgraph.api.proto.java.TransactionID txnIdProto;
 
     @Nullable
     private final Client client;
@@ -53,6 +53,8 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
 
     private static final int PREFIX_LEN = 6;
 
+    public final TransactionId id;
+
     Transaction(
         @Nullable Client client,
         com.hederahashgraph.api.proto.java.Transaction.Builder inner,
@@ -63,9 +65,10 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
         this.client = client;
         this.inner = inner;
         this.nodeAccountId = body.getNodeAccountID();
-        this.transactionId = body.getTransactionID();
+        this.txnIdProto = body.getTransactionID();
         this.methodDescriptor = methodDescriptor;
         validDuration = DurationHelper.durationTo(body.getTransactionValidDuration());
+        id = new TransactionId(txnIdProto);
     }
 
     public static Transaction fromBytes(Client client, byte[] bytes) throws InvalidProtocolBufferException {
@@ -114,19 +117,23 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
         return this;
     }
 
+    /**
+     * @deprecated now available as {{@link #id}} instead.
+     */
+    @Deprecated
     public TransactionId getId() {
-        return new TransactionId(transactionId);
+        return new TransactionId(txnIdProto);
     }
 
     public TransactionReceipt queryReceipt() throws HederaException {
         return new TransactionReceiptQuery(Objects.requireNonNull(client))
-            .setTransactionId(getId())
+            .setTransactionId(id)
             .execute();
     }
 
     public void queryReceiptAsync(Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError) {
         new TransactionReceiptQuery(Objects.requireNonNull(client))
-            .setTransactionId(getId())
+            .setTransactionId(id)
             .executeAsync(onReceipt, onError);
     }
 
@@ -192,7 +199,7 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
     @Override
     protected TransactionId mapResponse(TransactionResponse response) throws HederaException {
         HederaException.throwIfExceptional(response.getNodeTransactionPrecheckCode());
-        return new TransactionId(transactionId);
+        return new TransactionId(txnIdProto);
     }
 
     private <T> T executeAndWaitFor(CheckedFunction<TransactionReceipt, T> mapReceipt)
@@ -282,7 +289,7 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
     @Deprecated
     public TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
         return executeAndWaitFor(
-            receipt -> new TransactionRecordQuery(getClient()).setTransactionId(getId()).execute());
+            receipt -> new TransactionRecordQuery(getClient()).setTransactionId(id).execute());
     }
 
     public void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<HederaThrowable> onError) {
@@ -306,7 +313,7 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
     @Deprecated
     public void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<HederaThrowable> onError) {
         final TransactionRecordQuery recordQuery = new TransactionRecordQuery(getClient())
-            .setTransactionId(getId());
+            .setTransactionId(id);
 
         AsyncReceiptHandler handler = new AsyncReceiptHandler((receipt) ->
             recordQuery.executeAsync(onSuccess, onError),
