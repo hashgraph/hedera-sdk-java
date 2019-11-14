@@ -196,6 +196,14 @@ public final class Client implements AutoCloseable {
     // Simplified interface intended for high-level, opinionated operation
     //
 
+    /**
+     * @deprecated hides useful configuration parameters for accounts and makes it difficult to
+     * handle errors properly; if an error occurs while fetching the receipt for the
+     * {@link AccountCreateTransaction} then the transaction ID is lost.
+     *
+     * You should build and execute your own {@link AccountCreateTransaction} instead.
+     */
+    @Deprecated
     public AccountId createAccount(PublicKey publicKey, long initialBalance) throws HederaException, HederaNetworkException {
         TransactionReceipt receipt = new AccountCreateTransaction(this).setKey(publicKey)
             .setInitialBalance(initialBalance)
@@ -204,6 +212,14 @@ public final class Client implements AutoCloseable {
         return receipt.getAccountId();
     }
 
+    /**
+     * @deprecated hides useful configuration parameters for accounts and makes it difficult to
+     * handle errors properly; if an error occurs while fetching the receipt for the
+     * {@link AccountCreateTransaction} then the transaction ID is lost.
+     *
+     * You should build and execute your own {@link AccountCreateTransaction} instead.
+     */
+    @Deprecated
     public void createAccountAsync(PublicKey publicKey, long initialBalance, Consumer<AccountId> onSuccess, Consumer<HederaThrowable> onError) {
         new AccountCreateTransaction(this).setKey(publicKey)
             .setInitialBalance(initialBalance)
@@ -230,12 +246,28 @@ public final class Client implements AutoCloseable {
             .executeAsync(onSuccess, onError);
     }
 
+    /**
+     * @deprecated difficult to overload for multi-party transfers; additionally,
+     * if an error occurs while fetching the receipt for the {@link CryptoTransferTransaction} then
+     * the transaction ID is lost.
+     *
+     * You should build and execute your own {@link CryptoTransferTransaction} instead.
+     */
+    @Deprecated
     public TransactionId transferCryptoTo(AccountId recipient, long amount) throws HederaException, HederaNetworkException {
         return new CryptoTransferTransaction(this).addSender(Objects.requireNonNull(operatorId), amount)
             .addRecipient(recipient, amount)
             .execute();
     }
 
+    /**
+     * @deprecated difficult to overload for multi-party transfers; additionally,
+     * if an error occurs while fetching the receipt for the {@link CryptoTransferTransaction} then
+     * the transaction ID is lost.
+     *
+     * You should build and execute your own {@link CryptoTransferTransaction} instead.
+     */
+    @Deprecated
     public void transferCryptoToAsync(AccountId recipient, long amount, Consumer<TransactionId> onSuccess, Consumer<HederaThrowable> onError) {
         new CryptoTransferTransaction(this).addSender(Objects.requireNonNull(operatorId), amount)
             .addRecipient(recipient, amount)
