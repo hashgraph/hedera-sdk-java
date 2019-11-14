@@ -13,9 +13,9 @@ final class Backoff {
     private final Duration baseDelay;
     private final Instant expiration;
 
-    Backoff(Duration baseDelay, Instant expiration) {
+    Backoff(Duration baseDelay, Duration timeout) {
         this.baseDelay = baseDelay;
-        this.expiration = expiration;
+        this.expiration = Instant.now().plus(timeout);
     }
 
     private Optional<Duration> getNextDelay() {

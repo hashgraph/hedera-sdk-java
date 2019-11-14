@@ -10,9 +10,7 @@ import com.hederahashgraph.api.proto.java.ResponseHeader;
 import com.hederahashgraph.api.proto.java.ResponseType;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
@@ -28,9 +26,6 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     @Nullable
     private Node pickedNode;
-
-    @Nullable
-    private Duration retryTimeout;
 
     protected QueryBuilder(@Nullable Client client) {
         this.client = client;
@@ -114,25 +109,6 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         return (T) this;
     }
 
-    /**
-     * If set, {@link #execute()} and {@link #executeAsync(Consumer, Consumer)} (both versions) will
-     * retry on recoverable {@link HederaException}s until the timeout has elapsed.
-     *
-     * @param retryTimeout the maximum time to attempt executing this query for.
-     * @return {@code this} for fluent usage.
-     */
-    public final T setRetryTimeout(Duration retryTimeout) {
-        this.retryTimeout = retryTimeout;
-
-        //noinspection unchecked
-        return (T) this;
-    }
-
-    @Override
-    protected Optional<Instant> getRetryUntil() {
-        return Optional.ofNullable(retryTimeout).map(timeout -> Instant.now().plus(timeout));
-    }
-
     public final long requestCost() throws HederaException, HederaNetworkException {
         return new CostQuery().execute();
     }
@@ -142,7 +118,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     }
 
     @Override
-    protected void onPreExecute() throws HederaException, HederaNetworkException {
+    protected void onPreExecute(Duration timeout) throws HederaException, HederaNetworkException {
         final long maxQueryPayment = requireClient().getMaxQueryPayment();
 
         if (!getHeaderBuilder().hasPayment() && isPaymentRequired() && maxQueryPayment > 0) {
@@ -156,7 +132,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     }
 
     @Override
-    protected void onPreExecuteAsync(Runnable onSuccess, Consumer<HederaThrowable> onError) {
+    protected void onPreExecuteAsync(Runnable onSuccess, Consumer<HederaThrowable> onError, Duration timeout) {
         final long maxQueryPayment = requireClient().getMaxQueryPayment();
 
         if (!getHeaderBuilder().hasPayment() && isPaymentRequired() && maxQueryPayment > 0) {
@@ -302,13 +278,13 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         }
 
         @Override
-        protected Long mapResponse(Response raw) throws HederaException {
-            return getResponseHeader(raw).getCost();
+        protected Duration getDefaultTimeout() {
+            return QueryBuilder.this.getDefaultTimeout();
         }
 
         @Override
-        protected Optional<Instant> getRetryUntil() {
-            return QueryBuilder.this.getRetryUntil();
+        protected Long mapResponse(Response raw) throws HederaException {
+            return getResponseHeader(raw).getCost();
         }
 
         @Override

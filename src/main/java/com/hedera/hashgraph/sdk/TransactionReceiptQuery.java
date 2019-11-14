@@ -6,6 +6,8 @@ import com.hederahashgraph.api.proto.java.Response;
 import com.hederahashgraph.api.proto.java.TransactionGetReceiptQuery;
 import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
 
+import java.time.Duration;
+
 import io.grpc.MethodDescriptor;
 
 public final class TransactionReceiptQuery extends QueryBuilder<TransactionReceipt, TransactionReceiptQuery> {
@@ -62,6 +64,11 @@ public final class TransactionReceiptQuery extends QueryBuilder<TransactionRecei
     @Override
     protected void doValidate() {
         require(builder.hasTransactionID(), ".setTransactionId() required");
+    }
+
+    @Override
+    protected Duration getDefaultTimeout() {
+        return Transaction.DEFAULT_TIMEOUT;
     }
 
     @Override

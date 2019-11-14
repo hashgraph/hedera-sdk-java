@@ -6,9 +6,7 @@ import com.hederahashgraph.api.proto.java.TransactionBody;
 import com.hederahashgraph.api.proto.java.TransactionResponse;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -177,8 +175,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     }
 
     @Override
-    protected Optional<Instant> getRetryUntil() {
-        return Optional.of(Instant.now().plus(MAX_VALID_DURATION));
+    protected Duration getDefaultTimeout() {
+        return Transaction.DEFAULT_TIMEOUT;
     }
 
     public final TransactionReceipt executeForReceipt() throws HederaException, HederaNetworkException {

@@ -22,9 +22,9 @@ import org.bouncycastle.util.encoders.Hex;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -39,6 +39,11 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
     final com.hederahashgraph.api.proto.java.Transaction.Builder inner;
     final com.hederahashgraph.api.proto.java.AccountID nodeAccountId;
     final com.hederahashgraph.api.proto.java.TransactionID txnIdProto;
+
+
+    // receipt exists for 3 minutes from the consensus time, which is unknown to the client
+    // after 5 minutes the transaction would be invalid anyway
+    static final Duration DEFAULT_TIMEOUT = Duration.ofMinutes(5);
 
     @Nullable
     private final Client client;
@@ -126,14 +131,12 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
     public TransactionReceipt queryReceipt() throws HederaException {
         return new TransactionReceiptQuery(Objects.requireNonNull(client))
             .setTransactionId(id)
-            .setRetryTimeout(Duration.between(getId().getValidStart(), getExpiration()))
             .execute();
     }
 
     public void queryReceiptAsync(Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError) {
         new TransactionReceiptQuery(Objects.requireNonNull(client))
             .setTransactionId(id)
-            .setRetryTimeout(Duration.between(getId().getValidStart(), getExpiration()))
             .executeAsync(onReceipt, onError);
     }
 
@@ -204,8 +207,10 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
     }
 
     @Override
-    protected Optional<Instant> getRetryUntil() {
-        return Optional.of(getExpiration());
+    protected Duration getDefaultTimeout() {
+        // receipt exists for 3 minutes from the consensus time, which is unknown to the client
+        // after 5 minutes at the most the transaction would be invalid anyway
+        return validDuration.plus(3, ChronoUnit.MINUTES);
     }
 
     private Instant getExpiration() {
