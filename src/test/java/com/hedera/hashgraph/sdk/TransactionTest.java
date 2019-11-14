@@ -77,6 +77,6 @@ class TransactionTest {
 
         assertEquals(txn.inner.build(), txn2.inner.build());
         assertEquals(txn.nodeAccountId, txn2.nodeAccountId);
-        assertEquals(txn.transactionId, txn2.transactionId);
+        assertEquals(txn.txnIdProto, txn2.txnIdProto);
     }
 }
