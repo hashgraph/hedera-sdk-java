@@ -29,7 +29,14 @@ class ContractInfoTest {
     @DisplayName("doesn't require a key")
     void doesntRequireKey() {
         final Response response = Response.newBuilder()
-            .setContractGetInfo(ContractGetInfoResponse.getDefaultInstance())
+            .setContractGetInfo(
+                ContractGetInfoResponse.newBuilder()
+                    .setContractInfo(
+                        ContractGetInfoResponse.ContractInfo
+                            .newBuilder()
+                            .setContractID(new ContractId(0, 0, 1)
+                                .toProto()))
+            )
             .build();
 
         final ContractInfo contractInfo = ContractInfo.fromResponse(response);
@@ -45,6 +52,7 @@ class ContractInfoTest {
                 ContractGetInfoResponse.newBuilder()
                     .setContractInfo(
                         ContractGetInfoResponse.ContractInfo.newBuilder()
+                            .setContractID(new ContractId(0, 0, 0).toProto())
                             .setStorage(1234)))
             .build();
 
