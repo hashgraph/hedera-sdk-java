@@ -25,7 +25,7 @@ class IdUtilTest {
     @Test
     @DisplayName("creates contract id from string correctly")
     void testContractIdFromString() {
-        ContractId contractFromString = ContractId.fromString("0.0.400");
+        ContractId contractFromString = ContractId.fromString("1.2.400");
         assertEquals(1, contractFromString.shard);
         assertEquals(2, contractFromString.realm);
         assertEquals(400, contractFromString.contract);
@@ -34,9 +34,9 @@ class IdUtilTest {
     @Test
     @DisplayName("creates file id from string correctly")
     void testFileIdFromString() {
-        FileId fileFromString = FileId.fromString("0.0.400");
-        assertEquals( 0, fileFromString.shard);
-        assertEquals( 0, fileFromString.realm);
+        FileId fileFromString = FileId.fromString("1.2.400");
+        assertEquals( 1, fileFromString.shard);
+        assertEquals( 2, fileFromString.realm);
         assertEquals( 400, fileFromString.file);
     }
 
