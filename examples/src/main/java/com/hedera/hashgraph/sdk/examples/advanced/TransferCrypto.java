@@ -2,6 +2,7 @@ package com.hedera.hashgraph.sdk.examples.advanced;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaException;
+import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
@@ -23,14 +24,18 @@ public final class TransferCrypto {
         System.out.println("" + operatorId + " balance = " + senderBalanceBefore);
         System.out.println("" + recipientId + " balance = " + receiptBalanceBefore);
 
-        TransactionRecord record = new CryptoTransferTransaction(client)
+        Transaction transaction = new CryptoTransferTransaction(client)
             // .addSender and .addRecipient can be called as many times as you want as long as the total sum from
             // both sides is equivalent
             .addSender(operatorId, amount)
             .addRecipient(recipientId, amount)
             .setMemo("transfer test")
-            // As we are sending from the operator we do not need to explicitly sign the transaction
-            .executeForRecord();
+            .build();
+
+        System.out.println("transaction ID: " + transaction.id);
+
+        transaction.execute();
+        TransactionRecord record = transaction.queryRecord();
 
         System.out.println("transferred " + amount + "...");
 
