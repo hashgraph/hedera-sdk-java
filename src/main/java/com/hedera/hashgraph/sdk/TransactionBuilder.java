@@ -22,7 +22,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
 
     private static final int MAX_MEMO_LENGTH = 100;
 
-    private static final Duration MAX_VALID_DURATION = Duration.ofMinutes(2);
+    private Duration validDuration = Transaction.MAX_VALID_DURATION;
 
     @Nullable
     protected final Client client;
@@ -33,7 +33,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         this.client = client;
 
         setTransactionFee(client != null ? client.getMaxTransactionFee() : Client.DEFAULT_MAX_TXN_FEE);
-        setTransactionValidDuration(Duration.ofMinutes(2));
+        setTransactionValidDuration(Transaction.MAX_VALID_DURATION);
     }
 
     /**
@@ -71,11 +71,12 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     public final T setTransactionValidDuration(Duration validDuration) {
         Duration actual = validDuration;
 
-        if (MAX_VALID_DURATION.compareTo(validDuration) < 0) {
-            actual = MAX_VALID_DURATION;
+        if (Transaction.MAX_VALID_DURATION.compareTo(validDuration) < 0) {
+            actual = Transaction.MAX_VALID_DURATION;
         }
 
         bodyBuilder.setTransactionValidDuration(DurationHelper.durationFrom(actual));
+        this.validDuration = actual;
 
         return self();
     }
@@ -176,7 +177,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
 
     @Override
     protected Duration getDefaultTimeout() {
-        return Transaction.DEFAULT_TIMEOUT;
+        return validDuration;
     }
 
     public final TransactionReceipt executeForReceipt() throws HederaException, HederaNetworkException {

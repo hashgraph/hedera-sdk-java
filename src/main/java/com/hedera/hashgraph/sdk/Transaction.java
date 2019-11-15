@@ -21,8 +21,6 @@ import com.hederahashgraph.service.proto.java.SmartContractServiceGrpc;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -35,24 +33,18 @@ import io.grpc.MethodDescriptor;
 
 public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.java.Transaction, TransactionResponse, TransactionId, Transaction> {
 
+    static final Duration MAX_VALID_DURATION = Duration.ofMinutes(2);
+
     private final io.grpc.MethodDescriptor<com.hederahashgraph.api.proto.java.Transaction, com.hederahashgraph.api.proto.java.TransactionResponse> methodDescriptor;
     final com.hederahashgraph.api.proto.java.Transaction.Builder inner;
     final com.hederahashgraph.api.proto.java.AccountID nodeAccountId;
     final com.hederahashgraph.api.proto.java.TransactionID txnIdProto;
-
-
-    // receipt exists for 3 minutes from the consensus time, which is unknown to the client
-    // after 5 minutes the transaction would be invalid anyway
-    static final Duration DEFAULT_TIMEOUT = Duration.ofMinutes(5);
 
     @Nullable
     private final Client client;
 
     // fully qualified to disambiguate
     private final java.time.Duration validDuration;
-
-    private static final Duration RECEIPT_RETRY_DELAY = Duration.ofMillis(500);
-    private static final Duration RECEIPT_INITIAL_DELAY = Duration.ofMillis(1000);
 
     private static final int PREFIX_LEN = 6;
 
@@ -208,13 +200,7 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
 
     @Override
     protected Duration getDefaultTimeout() {
-        // receipt exists for 3 minutes from the consensus time, which is unknown to the client
-        // after 5 minutes at the most the transaction would be invalid anyway
-        return validDuration.plus(3, ChronoUnit.MINUTES);
-    }
-
-    private Instant getExpiration() {
-        return getId().getValidStart().plus(validDuration);
+        return validDuration;
     }
 
     /**

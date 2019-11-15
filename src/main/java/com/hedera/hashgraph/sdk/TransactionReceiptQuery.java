@@ -68,7 +68,9 @@ public final class TransactionReceiptQuery extends QueryBuilder<TransactionRecei
 
     @Override
     protected Duration getDefaultTimeout() {
-        return Transaction.DEFAULT_TIMEOUT;
+        // receipt lives for 3 minutes after consensus which we can't know ahead of time
+        // validDuration plus the receipt time should be long enough
+        return Transaction.MAX_VALID_DURATION.plus(Duration.ofMinutes(3));
     }
 
     @Override
