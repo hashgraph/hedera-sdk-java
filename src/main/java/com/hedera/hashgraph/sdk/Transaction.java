@@ -126,10 +126,22 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
             .execute();
     }
 
+    public TransactionReceipt queryReceipt(Duration timeout) throws HederaException {
+        return new TransactionReceiptQuery(Objects.requireNonNull(client))
+            .setTransactionId(getId())
+            .execute(timeout);
+    }
+
     public void queryReceiptAsync(Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError) {
         new TransactionReceiptQuery(Objects.requireNonNull(client))
             .setTransactionId(id)
             .executeAsync(onReceipt, onError);
+    }
+
+    public void queryReceiptAsync(Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError, Duration timeout) {
+        new TransactionReceiptQuery(Objects.requireNonNull(client))
+            .setTransactionId(getId())
+            .executeAsync(onReceipt, onError, timeout);
     }
 
     @Override
