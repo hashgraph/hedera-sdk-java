@@ -2,6 +2,8 @@ package com.hedera.hashgraph.sdk.examples.simple;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaException;
+import com.hedera.hashgraph.sdk.Transaction;
+import com.hedera.hashgraph.sdk.account.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
@@ -19,9 +21,17 @@ public final class CreateAccount {
         System.out.println("public key = " + newPublicKey);
 
         Client client = ExampleHelper.createHederaClient();
-        int maxTransactionFee = 100000000;
-        AccountId newAccountId = client.setMaxTransactionFee(maxTransactionFee).createAccount(newPublicKey, 100000000);
 
+        Transaction transaction = new AccountCreateTransaction(client)
+            .setMaxTransactionFee(1_000_000_000)
+            .setKey(newPublicKey)
+            .setInitialBalance(100_000_000)
+            .build();
+
+        transaction.execute();
+
+        System.out.println("transaction ID: " + transaction.execute());
+        AccountId newAccountId = transaction.queryReceipt().getAccountId();
         System.out.println("account = " + newAccountId);
     }
 }
