@@ -144,16 +144,16 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
             .executeAsync(onReceipt, onError, timeout);
     }
 
-    public void queryReceiptAsync(BiConsumer<Transaction, TransactionReceipt> onReceipt, BiConsumer<Transaction, HederaThrowable> onError) {
-        new TransactionReceiptQuery(Objects.requireNonNull(client))
-            .setTransactionId(id)
-            .executeAsync(receipt -> onReceipt.accept(this, receipt), err -> onError.accept(this, err));
-    }
-
     public TransactionRecord queryRecord() throws HederaException, HederaNetworkException {
         return new TransactionRecordQuery(Objects.requireNonNull(client))
             .setTransactionId(id)
             .execute();
+    }
+
+    public TransactionRecord queryRecord(Duration timeout) throws HederaException {
+        return new TransactionRecordQuery(Objects.requireNonNull(client))
+            .setTransactionId(getId())
+            .execute(timeout);
     }
 
     public void queryRecordAsync(Consumer<TransactionRecord> onRecord, Consumer<HederaThrowable> onError) {
@@ -162,10 +162,10 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
             .executeAsync(onRecord, onError);
     }
 
-    public void queryRecordAsync(BiConsumer<Transaction, TransactionRecord> onRecord, BiConsumer<Transaction, HederaThrowable> onError) {
+    public void queryRecordAsync(Consumer<TransactionRecord> onRecord, Consumer<HederaThrowable> onError, Duration timeout) {
         new TransactionRecordQuery(Objects.requireNonNull(client))
-            .setTransactionId(id)
-            .executeAsync(record -> onRecord.accept(this, record), err -> onError.accept(this, err));
+            .setTransactionId(getId())
+            .executeAsync(onRecord, onError, timeout);
     }
 
     @Override
