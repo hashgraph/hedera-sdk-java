@@ -47,7 +47,7 @@ public final class CreateAccount {
         transaction.execute();
 
         System.out.println("transaction ID: " + transaction.execute());
-        AccountId newAccountId = transaction.queryReceipt().getAccountId();
+        AccountId newAccountId = transaction.getReceipt().getAccountId();
         System.out.println("account = " + newAccountId);
     }
 }

@@ -45,7 +45,7 @@ public final class UpdateAccountPublicKey {
             .build();
 
         System.out.println("transaction ID: " + acctTransaction.execute());
-        AccountId accountId = acctTransaction.queryReceipt().getAccountId();
+        AccountId accountId = acctTransaction.getReceipt().getAccountId();
         System.out.println("account = " + accountId);
         // Next, we update the key
 
