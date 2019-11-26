@@ -38,7 +38,7 @@ public final class TransferCrypto {
 
         transaction.execute();
         // queryReceipt() waits for consensus
-        transaction.queryReceipt();
+        transaction.getReceipt();
 
         System.out.println("transferred 10_000 tinybar...");
     }

@@ -39,7 +39,7 @@ public final class GetAddressBook {
         final FileContentsQuery fileQuery = new FileContentsQuery(client)
             .setFileId(FileId.ADDRESS_BOOK);
 
-        final long cost = fileQuery.requestCost();
+        final long cost = fileQuery.getCost();
         System.out.println("file contents cost: " + cost);
 
         fileQuery.setPaymentDefault(100_000);

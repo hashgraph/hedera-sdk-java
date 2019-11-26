@@ -109,10 +109,24 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         return (T) this;
     }
 
+    public final long getCost() throws HederaException, HederaNetworkException {
+        return new CostQuery().execute();
+    }
+
+    public final void getCostAsync(Consumer<Long> withCost, Consumer<HederaThrowable> onError) {
+        new CostQuery().executeAsync(withCost, onError);
+    }
+
+    /**
+     * @deprecated renamed to {@link #getCost()}
+     */
     public final long requestCost() throws HederaException, HederaNetworkException {
         return new CostQuery().execute();
     }
 
+    /**
+     * @deprecated renamed to {@link #getCostAsync(Consumer, Consumer)}
+     */
     public final void requestCostAsync(Consumer<Long> withCost, Consumer<HederaThrowable> onError) {
         new CostQuery().executeAsync(withCost, onError);
     }
@@ -122,12 +136,12 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         final long maxQueryPayment = requireClient().getMaxQueryPayment();
 
         if (!getHeaderBuilder().hasPayment() && isPaymentRequired() && maxQueryPayment > 0) {
-            final long cost = requestCost();
+            final long cost = getCost();
             if (cost > maxQueryPayment) {
                 throw new MaxPaymentExceededException(this, cost, maxQueryPayment);
             }
 
-            setPaymentDefault(requestCost());
+            setPaymentDefault(getCost());
         }
     }
 
@@ -136,7 +150,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         final long maxQueryPayment = requireClient().getMaxQueryPayment();
 
         if (!getHeaderBuilder().hasPayment() && isPaymentRequired() && maxQueryPayment > 0) {
-            requestCostAsync(cost -> {
+            getCostAsync(cost -> {
                 if (cost > maxQueryPayment) {
                     onError.accept(new MaxPaymentExceededException(this, cost, maxQueryPayment));
                     return;

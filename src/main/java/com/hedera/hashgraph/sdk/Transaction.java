@@ -120,51 +120,71 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
         return new TransactionId(txnIdProto);
     }
 
+    /**
+     * @deprecated renamed to {@link #getReceipt()}
+     */
+    @Deprecated
     public TransactionReceipt queryReceipt() throws HederaException {
         return new TransactionReceiptQuery(Objects.requireNonNull(client))
             .setTransactionId(id)
             .execute();
     }
 
+    /**
+     * @deprecated renamed to {@link #getReceipt(Duration)}
+     */
+    @Deprecated
     public TransactionReceipt queryReceipt(Duration timeout) throws HederaException {
         return new TransactionReceiptQuery(Objects.requireNonNull(client))
-            .setTransactionId(getId())
+            .setTransactionId(id)
             .execute(timeout);
     }
 
-    public void queryReceiptAsync(Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError) {
+    public TransactionReceipt getReceipt() throws HederaException {
+        return new TransactionReceiptQuery(Objects.requireNonNull(client))
+            .setTransactionId(id)
+            .execute();
+    }
+
+    public TransactionReceipt getReceipt(Duration timeout) throws HederaException {
+        return new TransactionReceiptQuery(Objects.requireNonNull(client))
+            .setTransactionId(id)
+            .execute(timeout);
+    }
+
+    public void getReceiptAsync(Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError) {
         new TransactionReceiptQuery(Objects.requireNonNull(client))
             .setTransactionId(id)
             .executeAsync(onReceipt, onError);
     }
 
-    public void queryReceiptAsync(Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError, Duration timeout) {
+    public void getReceiptAsync(Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError, Duration timeout) {
         new TransactionReceiptQuery(Objects.requireNonNull(client))
             .setTransactionId(getId())
             .executeAsync(onReceipt, onError, timeout);
     }
 
-    public TransactionRecord queryRecord() throws HederaException, HederaNetworkException {
+    public TransactionRecord getRecord() throws HederaException, HederaNetworkException {
         return new TransactionRecordQuery(Objects.requireNonNull(client))
             .setTransactionId(id)
             .execute();
     }
 
-    public TransactionRecord queryRecord(Duration timeout) throws HederaException {
+    public TransactionRecord getRecord(Duration timeout) throws HederaException {
         return new TransactionRecordQuery(Objects.requireNonNull(client))
-            .setTransactionId(getId())
+            .setTransactionId(id)
             .execute(timeout);
     }
 
-    public void queryRecordAsync(Consumer<TransactionRecord> onRecord, Consumer<HederaThrowable> onError) {
+    public void getRecordAsync(Consumer<TransactionRecord> onRecord, Consumer<HederaThrowable> onError) {
         new TransactionRecordQuery(Objects.requireNonNull(client))
             .setTransactionId(id)
             .executeAsync(onRecord, onError);
     }
 
-    public void queryRecordAsync(Consumer<TransactionRecord> onRecord, Consumer<HederaThrowable> onError, Duration timeout) {
+    public void getRecordAsync(Consumer<TransactionRecord> onRecord, Consumer<HederaThrowable> onError, Duration timeout) {
         new TransactionRecordQuery(Objects.requireNonNull(client))
-            .setTransactionId(getId())
+            .setTransactionId(id)
             .executeAsync(onRecord, onError, timeout);
     }
 
@@ -252,11 +272,11 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
      * @deprecated Makes it difficult to discern whether an error occurred while executing or
      * while fetching a receipt.
      *
-     * Call {@link #execute()} then {@link #queryReceipt()} and handle the errors separately from each.
+     * Call {@link #execute()} then {@link #getReceipt()} and handle the errors separately from each.
      */
     public final TransactionReceipt executeForReceipt() throws HederaException, HederaNetworkException {
         execute();
-        return queryReceipt();
+        return getReceipt();
     }
 
     /**
@@ -272,13 +292,13 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
      * @deprecated Makes it difficult to discern whether an error occurred while executing or
      * while fetching a record.
      *
-     * Call {@link #execute()} then {@link #queryRecord()} and handle the errors separately from each.
+     * Call {@link #execute()} then {@link #getRecord()} and handle the errors separately from each.
      */
     @Deprecated
     public TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
         execute();
         // wait for receipt
-        queryReceipt();
+        getReceipt();
         return new TransactionRecordQuery(Objects.requireNonNull(this.client))
             .setTransactionId(id)
             .execute();
@@ -289,12 +309,12 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
      * while fetching a receipt.
      *
      * Call {@link #executeAsync(Consumer, Consumer)} then
-     * {@link #queryReceiptAsync(Consumer, Consumer)} and handle the errors separately
+     * {@link #getReceiptAsync(Consumer, Consumer)} and handle the errors separately
      * from each.
      */
     @Deprecated
     public void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<HederaThrowable> onError) {
-        executeAsync(id -> queryReceiptAsync(onSuccess, onError), onError);
+        executeAsync(id -> getReceiptAsync(onSuccess, onError), onError);
     }
 
     /**
@@ -304,8 +324,8 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
      * @deprecated Makes it difficult to discern whether an error occurred while executing or
      * while fetching a receipt.
      *
-     * Call {@link #executeAsync(BiConsumer, BiConsumer)} then
-     * {@link #queryReceiptAsync(BiConsumer, BiConsumer)} and handle the errors
+     * Call {@link #executeAsync(Consumer, Consumer)} then
+     * {@link #getReceiptAsync(Consumer, Consumer)} and handle the errors
      * separately from each.
      */
     @Deprecated
@@ -318,7 +338,7 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
      * while fetching a record.
      *
      * Call {@link #executeAsync(Consumer, Consumer)} then
-     * {@link #queryRecordAsync(Consumer, Consumer)} and handle the errors separately
+     * {@link #getRecordAsync(Consumer, Consumer)} and handle the errors separately
      * from each.
      */
     @Deprecated
@@ -333,8 +353,8 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
      * @deprecated Makes it difficult to discern whether an error occurred while executing or
      * while fetching a record.
      *
-     * Call {@link #executeAsync(BiConsumer, BiConsumer)} then
-     * {@link #queryRecordAsync(BiConsumer, BiConsumer)} and handle the errors separately
+     * Call {@link #executeAsync(Consumer, Consumer)} then
+     * {@link #getRecordAsync(Consumer, Consumer)} and handle the errors separately
      * from each.
      */
     @Deprecated
