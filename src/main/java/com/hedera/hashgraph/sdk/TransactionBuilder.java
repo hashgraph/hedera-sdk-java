@@ -205,7 +205,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * ID is difficult to retrieve.
      *
      * Call {@link #build()} then {@link Transaction#execute()} then
-     * {@link Transaction#queryReceipt()} and handle the errors separately from each.
+     * {@link Transaction#getReceipt()} and handle the errors separately from each.
      */
     @Deprecated
     public final TransactionReceipt executeForReceipt() throws HederaException, HederaNetworkException {
@@ -218,7 +218,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * ID is difficult to retrieve.
      *
      * Call {@link #build()} then {@link Transaction#executeAsync(Consumer, Consumer)} then
-     * {@link Transaction#queryReceiptAsync(Consumer, Consumer)} and handle the errors separately
+     * {@link Transaction#getReceiptAsync(Consumer, Consumer)} and handle the errors separately
      * from each.
      */
     @Deprecated
@@ -247,7 +247,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * ID is difficult to retrieve.
      *
      * Call {@link #build()} then {@link Transaction#execute()} then
-     * {@link Transaction#queryRecord()} and handle the errors separately from each.
+     * {@link Transaction#getRecord()} and handle the errors separately from each.
      */
     @Deprecated
     public final TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
@@ -260,7 +260,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * ID is difficult to retrieve.
      *
      * Call {@link #build()} then {@link Transaction#executeAsync(Consumer, Consumer)} then
-     * {@link Transaction#queryRecordAsync(Consumer, Consumer)} and handle the errors separately
+     * {@link Transaction#getRecordAsync(Consumer, Consumer)} and handle the errors separately
      * from each.
      */
     @Deprecated
