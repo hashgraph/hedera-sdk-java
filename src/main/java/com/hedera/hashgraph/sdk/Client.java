@@ -52,8 +52,9 @@ public final class Client implements AutoCloseable {
 
     // todo: transaction fees should be defaulted to whatever the transaction fee schedule is
     private long maxTransactionFee = DEFAULT_MAX_TXN_FEE;
-    // require users to opt into query payment
-    private long maxQueryPayment = 0;
+
+    // also 1 hbar
+    private long maxQueryPayment = 100_000_000;
 
     @Nullable
     private AccountId operatorId;
@@ -130,6 +131,8 @@ public final class Client implements AutoCloseable {
      * {@link QueryBuilder.MaxPaymentExceededException} will be thrown from
      * {@link QueryBuilder#execute()} or returned in the second callback of
      * {@link QueryBuilder#executeAsync(Consumer, Consumer)}.
+     *
+     * Set to 0 to disable automatic implicit payments.
      *
      * @param maxQueryPayment
      * @return
