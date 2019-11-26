@@ -8,8 +8,8 @@ import com.hederahashgraph.api.proto.java.Response;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -36,8 +36,6 @@ public final class AccountInfo {
 
     public final Duration autoRenewPeriod;
 
-    public final List<Claim> claims;
-
     public AccountInfo(CryptoGetInfoResponse.AccountInfoOrBuilder info) {
         if (!info.hasKey()) {
             throw new IllegalArgumentException("query response missing key");
@@ -55,10 +53,6 @@ public final class AccountInfo {
         isReceiverSignatureRequired = info.getReceiverSigRequired();
         expirationTime = TimestampHelper.timestampTo(info.getExpirationTime());
         autoRenewPeriod = DurationHelper.durationTo(info.getAutoRenewPeriod());
-        claims = info.getClaimsList()
-            .stream()
-            .map(Claim::new)
-            .collect(Collectors.toList());
     }
 
     /**
@@ -125,9 +119,13 @@ public final class AccountInfo {
         return autoRenewPeriod;
     }
 
+    /**
+     * @deprecated for removal
+     */
     @Deprecated
     public List<Claim> getClaims() {
-        return claims;
+        // claims were never implemented so an empty list is fine
+        return new ArrayList<>();
     }
 
     static AccountInfo fromResponse(Response response) {

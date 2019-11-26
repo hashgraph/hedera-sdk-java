@@ -55,7 +55,7 @@ class AccountInfoTest {
         assertEquals(accountInfo.accountId, new AccountId(0));
         assertEquals(accountInfo.contractAccountId, "");
         assertNull(accountInfo.proxyAccountId);
-        assertEquals(accountInfo.claims, new ArrayList<>());
+        assertEquals(accountInfo.getClaims(), new ArrayList<>());
     }
 
 }
