@@ -11,13 +11,23 @@ import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hedera.hashgraph.sdk.crypto.ThresholdKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
-import com.hedera.hashgraph.sdk.examples.ExampleHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 public final class CreateAccountThresholdKey {
+
+    // see `.env.sample` in the repository root for how to specify these values
+    // or set environment variables with the same names
+    private static final AccountId NODE_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("NODE_ID")));
+    private static final String NODE_ADDRESS = Objects.requireNonNull(Dotenv.load().get("NODE_ADDRESS"));
+    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final Ed25519PrivateKey OPERATOR_KEY = Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     private CreateAccountThresholdKey() { }
 
     public static void main(String[] args) throws HederaException {
@@ -35,7 +45,13 @@ public final class CreateAccountThresholdKey {
             .map(Object::toString)
             .collect(Collectors.joining("\n")));
 
-        Client client = ExampleHelper.createHederaClient();
+        // To improve responsiveness, you should specify multiple nodes using the
+        // `Client(<Map<AccountId, String>>)` constructor instead
+        Client client = new Client(NODE_ID, NODE_ADDRESS);
+
+        // Defaults the operator account ID and key such that all generated transactions will be paid for
+        // by this account and be signed by this key
+        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         AccountCreateTransaction tx = new AccountCreateTransaction(client)
             // require 2 of the 3 keys we generated to sign on anything modifying this account
@@ -52,7 +68,7 @@ public final class CreateAccountThresholdKey {
 
         Transaction tsfrTxn = new CryptoTransferTransaction(client)
             .addSender(newAccountId, 50_000)
-            .addRecipient(ExampleHelper.getNodeId(), 50_000)
+            .addRecipient(AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("NODE_ID"))), 50_000)
             .setTransactionFee(200_000)
             // we sign with 2 of the 3 keys
             .sign(keys.get(0))
