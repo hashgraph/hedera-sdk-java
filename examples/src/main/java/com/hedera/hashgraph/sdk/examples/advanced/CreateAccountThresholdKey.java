@@ -53,14 +53,17 @@ public final class CreateAccountThresholdKey {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        AccountCreateTransaction tx = new AccountCreateTransaction(client)
+        Transaction tx = new AccountCreateTransaction(client)
             // require 2 of the 3 keys we generated to sign on anything modifying this account
             .setKey(new ThresholdKey(2).addAll(pubKeys))
             .setInitialBalance(1_000_000)
-            .setTransactionFee(10_000_000);
+            .setMaxTransactionFee(10_000_000)
+            .build();
+
+        tx.execute();
 
         // This will wait for the receipt to become available
-        TransactionReceipt receipt = tx.executeForReceipt();
+        TransactionReceipt receipt = tx.queryReceipt();
 
         AccountId newAccountId = receipt.getAccountId();
 
@@ -69,13 +72,16 @@ public final class CreateAccountThresholdKey {
         Transaction tsfrTxn = new CryptoTransferTransaction(client)
             .addSender(newAccountId, 50_000)
             .addRecipient(AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("NODE_ID"))), 50_000)
-            .setTransactionFee(200_000)
+            .setMaxTransactionFee(200_000)
             // we sign with 2 of the 3 keys
             .sign(keys.get(0))
             .sign(keys.get(1));
 
-        // wait for the transfer to go to consensus
-        tsfrTxn.executeForReceipt();
+        // submit the transaction to the network
+        tsfrTxn.execute();
+
+        // (important!) wait for the transfer to go to consensus
+        tsfrTxn.queryReceipt();
 
         Long balanceAfter = new AccountBalanceQuery(client)
             .setAccountId(newAccountId)

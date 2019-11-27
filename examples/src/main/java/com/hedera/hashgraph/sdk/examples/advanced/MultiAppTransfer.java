@@ -4,7 +4,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.Transaction;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
@@ -47,24 +46,25 @@ public final class MultiAppTransfer {
         int transferAmount = 10_000;
 
         // the exchange creates an account for the user to transfer funds to
-        TransactionReceipt exchangeAccountReceipt = new AccountCreateTransaction(client)
+        Transaction createExchangeAccountTxn = new AccountCreateTransaction(client)
             // the exchange only accepts transfers that it validates through a side channel (e.g. REST API)
             .setReceiverSignatureRequired(true)
             .setKey(exchangeKey.getPublicKey())
+            .build()
             // The owner key has to sign this transaction
             // when setReceiverSignatureRequired is true
-            .sign(exchangeKey)
-            .executeForReceipt();
+            .sign(exchangeKey);
 
-        AccountId exchangeAccountId = exchangeAccountReceipt.getAccountId();
+        createExchangeAccountTxn.execute();
 
-        // assume the user has an account on the hashgraph with funds already
-        AccountId userAccountId = client.createAccount(userKey.getPublicKey(), client.getMaxTransactionFee() + transferAmount);
+        AccountId exchangeAccountId = createExchangeAccountTxn.queryReceipt().getAccountId();
 
-        Transaction transferTxn = new CryptoTransferTransaction(client).addSender(userAccountId, transferAmount)
+        Transaction transferTxn = new CryptoTransferTransaction(client)
+            .addSender(OPERATOR_ID, transferAmount)
             .addRecipient(exchangeAccountId, transferAmount)
             // the exchange-provided memo required to validate the transaction
             .setMemo("https://some-exchange.com/user1/account1")
+            .build()
             .sign(userKey);
 
         // the exchange must sign the transaction in order for it to be accepted by the network
@@ -72,15 +72,18 @@ public final class MultiAppTransfer {
         byte[] signedTxnBytes = exchangeSignsTransaction(transferTxn.toBytes());
 
         // we execute the signed transaction and wait for it to be accepted
-        Transaction.fromBytes(client, signedTxnBytes)
-            .executeForReceipt();
+        Transaction signedTransferTxn = Transaction.fromBytes(client, signedTxnBytes);
+
+        signedTransferTxn.execute();
+        // (important!) wait for consensus by querying for the receipt
+        signedTransferTxn.queryReceipt();
 
         System.out.println("transferred " + transferAmount + "...");
 
-        long senderBalanceAfter = client.getAccountBalance(userAccountId);
+        long senderBalanceAfter = client.getAccountBalance(OPERATOR_ID);
         long receiptBalanceAfter = client.getAccountBalance(exchangeAccountId);
 
-        System.out.println("" + userAccountId + " balance = " + senderBalanceAfter);
+        System.out.println("" + OPERATOR_ID + " balance = " + senderBalanceAfter);
         System.out.println("" + exchangeAccountId + " balance = " + receiptBalanceAfter);
     }
 

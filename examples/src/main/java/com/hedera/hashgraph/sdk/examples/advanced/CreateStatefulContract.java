@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.CallParams;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.FunctionResult;
 import com.hedera.hashgraph.sdk.HederaException;
+import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.contract.ContractCallQuery;
@@ -55,40 +56,41 @@ public final class CreateStatefulContract {
             .getAsString();
         byte[] byteCode = byteCodeHex.getBytes();
 
-        Ed25519PrivateKey operatorKey = Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
-        // To connect to a network with more nodes, add additional entries to the network map
-        String nodeAddress = Objects.requireNonNull(Dotenv.load().get("NODE_ADDRESS"));
-        Client client1 = new Client(AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("NODE_ID"))), nodeAddress);
+        // To improve responsiveness, you should specify multiple nodes using the
+        // `Client(<Map<AccountId, String>>)` constructor instead
+        Client client = new Client(NODE_ID, NODE_ADDRESS);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
-        client1.setOperator(AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID"))), Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY"))));
-
-        Client client = client1;
+        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // create the contract's bytecode file
-        FileCreateTransaction fileTx = new FileCreateTransaction(client).setExpirationTime(
+        Transaction fileTx = new FileCreateTransaction(client).setExpirationTime(
             Instant.now()
                 .plus(Duration.ofSeconds(2592000)))
             // Use the same key as the operator to "own" this file
-            .addKey(operatorKey.getPublicKey())
+            .addKey(OPERATOR_KEY.getPublicKey())
             .setContents(byteCode)
-            .setTransactionFee(1_000_000_000);
+            .setMaxTransactionFee(1_000_000_000)
+            .build();
 
-        TransactionReceipt fileReceipt = fileTx.executeForReceipt();
+        fileTx.execute();
+
+        TransactionReceipt fileReceipt = fileTx.queryReceipt();
         FileId newFileId = fileReceipt.getFileId();
 
         System.out.println("contract bytecode file: " + newFileId);
 
-        ContractCreateTransaction contractTx = new ContractCreateTransaction(client).setBytecodeFile(newFileId)
+        Transaction contractTx = new ContractCreateTransaction(client).setBytecodeFile(newFileId)
             .setAutoRenewPeriod(Duration.ofHours(1))
             .setGas(100_000_000)
-            .setTransactionFee(1_000_000_000)
+            .setMaxTransactionFee(1_000_000_000)
             .setConstructorParams(
                 CallParams.constructor()
-                    .addString("hello from hedera!"));
+                    .addString("hello from hedera!"))
+            .build();
 
-        TransactionReceipt contractReceipt = contractTx.executeForReceipt();
+        TransactionReceipt contractReceipt = contractTx.queryReceipt();
         ContractId newContractId = contractReceipt.getContractId();
 
         System.out.println("new contract ID: " + newContractId);
@@ -104,21 +106,25 @@ public final class CreateStatefulContract {
             return;
         }
 
-        String message = contractCallResult.getString();
+        String message = contractCallResult.getString(0);
         System.out.println("contract returned message: " + message);
 
-        new ContractExecuteTransaction(client).setContractId(newContractId)
+        Transaction contractExecTxn = new ContractExecuteTransaction(client)
+            .setContractId(newContractId)
             .setGas(100_000_000)
             .setFunctionParameters(CallParams.function("set_message")
                 .addString("hello from hedera again!"))
-            .setTransactionFee(800_000_000)
-            .execute();
+            .setMaxTransactionFee(800_000_000)
+            .build();
 
-        // sleep a few seconds to allow consensus + smart contract exec
-        System.out.println("Waiting 5s for consensus and contract execution");
-        Thread.sleep(5000);
+        contractExecTxn.execute();
+
+        // if this doesn't throw then we know the contract executed successfully
+        contractExecTxn.queryReceipt();
+
         // now query contract
-        FunctionResult contractUpdateResult = new ContractCallQuery(client).setContractId(newContractId)
+        FunctionResult contractUpdateResult = new ContractCallQuery(client)
+            .setContractId(newContractId)
             .setGas(100_000_000)
             .setFunctionParameters(CallParams.function("get_message"))
             .setPaymentDefault(800_000_000)
@@ -129,7 +135,7 @@ public final class CreateStatefulContract {
             return;
         }
 
-        String message2 = contractUpdateResult.getString();
+        String message2 = contractUpdateResult.getString(0);
         System.out.println("contract returned message: " + message2);
     }
 }
