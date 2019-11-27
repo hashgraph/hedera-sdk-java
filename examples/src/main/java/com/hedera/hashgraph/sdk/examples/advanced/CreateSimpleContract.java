@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.CallParams;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.FunctionResult;
 import com.hedera.hashgraph.sdk.HederaException;
+import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.contract.ContractCallQuery;
@@ -64,24 +65,31 @@ public final class CreateSimpleContract {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // create the contract's bytecode file
-        FileCreateTransaction fileTx = new FileCreateTransaction(client).setExpirationTime(
+        Transaction fileTx = new FileCreateTransaction(client).setExpirationTime(
             Instant.now()
                 .plus(Duration.ofSeconds(3600)))
             // Use the same key as the operator to "own" this file
             .addKey(OPERATOR_KEY.getPublicKey())
-            .setContents(byteCodeHex.getBytes());
+            .setContents(byteCodeHex.getBytes())
+            .build();
 
-        TransactionReceipt fileReceipt = fileTx.executeForReceipt();
+        fileTx.execute();
+
+        TransactionReceipt fileReceipt = fileTx.queryReceipt();
         FileId newFileId = fileReceipt.getFileId();
 
         System.out.println("contract bytecode file: " + newFileId);
 
         // create the contract itself
-        ContractCreateTransaction contractTx = new ContractCreateTransaction(client).setAutoRenewPeriod(Duration.ofHours(1))
+        Transaction contractTx = new ContractCreateTransaction(client).setAutoRenewPeriod(Duration.ofHours(1))
             .setGas(217000)
             .setBytecodeFile(newFileId)
             // set an admin key so we can delete the contract later
-            .setAdminKey(OPERATOR_KEY.getPublicKey());
+            .setAdminKey(OPERATOR_KEY.getPublicKey())
+            .build();
+
+        // important: submit the transaction to the network
+        contractTx.execute();
 
         TransactionReceipt contractReceipt = contractTx.executeForReceipt();
 
@@ -105,9 +113,13 @@ public final class CreateSimpleContract {
         System.out.println("contract message: " + message);
 
         // now delete the contract
-        TransactionReceipt contractDeleteResult = new ContractDeleteTransaction(client)
+        Transaction contractDeleteTxn = new ContractDeleteTransaction(client)
             .setContractId(newContractId)
-            .executeForReceipt();
+            .build();
+
+        contractDeleteTxn.execute();
+
+        TransactionReceipt contractDeleteResult = contractDeleteTxn.queryReceipt();
 
         if (contractDeleteResult.getStatus() != ResponseCodeEnum.SUCCESS) {
             System.out.println("error deleting contract: " + contractDeleteResult.getStatus());

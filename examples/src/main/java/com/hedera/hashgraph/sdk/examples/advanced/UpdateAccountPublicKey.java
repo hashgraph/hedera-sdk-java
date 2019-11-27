@@ -64,6 +64,8 @@ public final class UpdateAccountPublicKey {
         System.out.println("transaction ID: " + transaction.id);
 
         transaction.execute();
+        // (important!) wait for the transaction to complete by querying the receipt
+        transaction.queryReceipt();
 
         // Now we fetch the account information to check if the key was changed
 
