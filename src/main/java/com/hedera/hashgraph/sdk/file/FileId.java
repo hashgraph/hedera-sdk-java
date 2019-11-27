@@ -13,6 +13,27 @@ public final class FileId implements Entity {
     public final long realm;
     public final long file;
 
+    /**
+     * The public node address book for the current network.
+     *
+     * This file can be decoded using {@link com.hederahashgraph.api.proto.java.NodeAddressBook}.
+     */
+    public static final FileId ADDRESS_BOOK = new FileId(0, 0, 102);
+
+    /**
+     * The current fee schedule for the network.
+     *
+     * This file can be decoded using {@link com.hederahashgraph.api.proto.java.CurrentAndNextFeeSchedule}.
+     */
+    public static final FileId FEE_SCHEDULE = new FileId(0, 0, 111);
+
+    /**
+     * The current exchange rate of HBAR to USD.
+     *
+     * This file can be decoded using {@link com.hederahashgraph.api.proto.java.ExchangeRateSet}.
+     */
+    public static final FileId EXCHANGE_RATES = new FileId(0, 0, 112);
+
     public FileId(long shardNum, long realmNum, long fileNum) {
         this.shard = shardNum;
         this.realm = realmNum;
