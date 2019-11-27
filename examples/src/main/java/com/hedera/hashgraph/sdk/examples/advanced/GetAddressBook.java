@@ -18,7 +18,7 @@ public final class GetAddressBook {
     public static void main(String[] args) throws HederaException, IOException {
         final Client client = ExampleHelper.createHederaClient();
         final FileContentsQuery fileQuery = new FileContentsQuery(client)
-            .setFileId(new FileId(0, 0, 102));
+            .setFileId(FileId.ADDRESS_BOOK);
 
         final long cost = fileQuery.requestCost();
         System.out.println("file contents cost: " + cost);
