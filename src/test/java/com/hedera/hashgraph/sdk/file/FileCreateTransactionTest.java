@@ -19,12 +19,12 @@ class FileCreateTransactionTest {
     @DisplayName("empty builder fails validation")
     void emptyBuilder() {
         assertEquals(
-            "transaction builder failed validation:\n"
+            "transaction builder failed local validation:\n"
                 + ".setTransactionId() required\n"
                 + ".setNodeAccountId() required",
             assertThrows(
                 IllegalStateException.class,
-                () -> new FileCreateTransaction(null).validate()
+                () -> new FileCreateTransaction().validate()
             ).getMessage());
     }
 
@@ -34,14 +34,15 @@ class FileCreateTransactionTest {
         final Instant now = Instant.ofEpochSecond(1554158542);
         final Ed25519PrivateKey key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962");
         final TransactionId txnId = new TransactionId(new AccountId(2), now);
-        final Transaction txn = new FileCreateTransaction(null)
+        final Transaction txn = new FileCreateTransaction()
             .setNodeAccountId(new AccountId(3))
             .setTransactionId(txnId)
             .setContents(new byte[]{1, 2, 3, 4})
             .setExpirationTime(Instant.ofEpochSecond(1554158728))
             .addKey(key.getPublicKey())
             .setNewRealmAdminKey(key.getPublicKey())
-            .setTransactionFee(100_000)
+            .setMaxTransactionFee(100_000)
+            .build()
             .sign(key)
             .toProto();
 
@@ -63,10 +64,11 @@ class FileCreateTransactionTest {
         final Instant now = Instant.ofEpochSecond(1554158542);
         final Ed25519PrivateKey key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962");
         final TransactionId txnId = new TransactionId(new AccountId(2), now);
-        final Transaction txn = new FileCreateTransaction(null)
+        final Transaction txn = new FileCreateTransaction()
             .setNodeAccountId(new AccountId(3))
             .setTransactionId(txnId)
-            .setTransactionFee(100_000)
+            .setMaxTransactionFee(100_000)
+            .build()
             .sign(key)
             .toProto();
 

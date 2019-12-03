@@ -19,13 +19,13 @@ class ContractExecuteTransactionTest {
     @DisplayName("empty builder fails validation")
     void emptyBuilder() {
         assertEquals(
-            "transaction builder failed validation:\n"
+            "transaction builder failed local validation:\n"
                 + ".setTransactionId() required\n"
                 + ".setNodeAccountId() required\n"
                 + ".setContractId() required",
             assertThrows(
                 IllegalStateException.class,
-                () -> new ContractExecuteTransaction(null).validate()
+                () -> new ContractExecuteTransaction().validate()
             ).getMessage()
         );
     }
@@ -36,15 +36,16 @@ class ContractExecuteTransactionTest {
         final Instant now = Instant.ofEpochSecond(1554158542);
         final Ed25519PrivateKey key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962");
         final TransactionId txnId = new TransactionId(new AccountId(2), now);
-        final Transaction txn = new ContractExecuteTransaction(null)
+        final Transaction txn = new ContractExecuteTransaction()
             .setNodeAccountId(new AccountId(3))
             .setTransactionId(txnId)
             .setContractId(new ContractId(1, 2, 3))
             .setGas(10)
             .setAmount(1000)
             .setFunctionParameters(new byte[]{24, 43, 11})
-            .setTransactionFee(100_000)
-            .sign(key)
+            .setMaxTransactionFee(100_000)
+                    .build()
+                    .sign(key)
             .toProto();
 
         assertEquals(

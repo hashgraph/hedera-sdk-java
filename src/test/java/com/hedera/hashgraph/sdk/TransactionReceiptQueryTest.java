@@ -20,7 +20,7 @@ class TransactionReceiptQueryTest {
     private static final AccountId NODE_ACCOUNT = new AccountId(3);
     private static final AccountId USER_ACCOUNT = new AccountId(1234);
 
-    static final Transaction paymentTxn = new CryptoTransferTransaction(null)
+    static final Transaction paymentTxn = new CryptoTransferTransaction()
         .setNodeAccountId(NODE_ACCOUNT)
         .setTransactionId(new TransactionId(USER_ACCOUNT, Instant.parse("2019-04-05T12:00:00Z")))
         .addSender(USER_ACCOUNT, 10000)
@@ -73,7 +73,7 @@ class TransactionReceiptQueryTest {
         assertThrows(
             IllegalStateException.class,
             query::validate,
-            "query builder failed validation:\n" +
+            "query builder failed local validation:\n" +
                 ".setTransactionId() required"
         );
     }

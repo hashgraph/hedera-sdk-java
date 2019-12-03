@@ -21,9 +21,15 @@ public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransact
     private final FileUpdateTransactionBody.Builder builder = bodyBuilder.getFileUpdateBuilder();
     private final KeyList.Builder keyList = builder.getKeysBuilder();
 
+    /**
+     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
+     */
+    @Deprecated
     public FileUpdateTransaction(@Nullable Client client) {
         super(client);
     }
+
+    public FileUpdateTransaction() { super(); }
 
     public FileUpdateTransaction setFileId(FileId file) {
         builder.setFileID(file.toProto());

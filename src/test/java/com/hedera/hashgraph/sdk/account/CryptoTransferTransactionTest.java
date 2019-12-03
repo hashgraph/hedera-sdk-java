@@ -18,13 +18,13 @@ class CryptoTransferTransactionTest {
     @DisplayName("empty builder fails validation")
     void emptyBuilder() {
         assertEquals(
-            "transaction builder failed validation:\n" +
+            "transaction builder failed local validation:\n" +
                 ".setTransactionId() required\n" +
                 ".setNodeAccountId() required\n" +
                 "at least one transfer required",
             assertThrows(
                 IllegalStateException.class,
-                () -> new CryptoTransferTransaction(null).validate()
+                () -> new CryptoTransferTransaction().validate()
             ).getMessage()
         );
     }
@@ -35,14 +35,16 @@ class CryptoTransferTransactionTest {
         final Instant now = Instant.ofEpochSecond(1554158542);
         final Ed25519PrivateKey key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962");
         final TransactionId txnId = new TransactionId(new AccountId(2), now);
-        final Transaction txn = new CryptoTransferTransaction(null)
+        final Transaction txn = new CryptoTransferTransaction()
             .setTransactionId(txnId)
             .setNodeAccountId(new AccountId(2))
             .addSender(new AccountId(4), 800)
             .addRecipient(new AccountId(55), 400)
             .addTransfer(new AccountId(78), 400)
-            .setTransactionFee(100_000)
-            .sign(key).toProto();
+            .setMaxTransactionFee(100_000)
+            .build()
+            .sign(key)
+            .toProto();
 
         assertEquals(
             "sigMap {\n" +

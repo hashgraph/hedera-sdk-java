@@ -41,18 +41,18 @@ public final class TransferCrypto {
         System.out.println("" + OPERATOR_ID + " balance = " + senderBalanceBefore);
         System.out.println("" + recipientId + " balance = " + receiptBalanceBefore);
 
-        Transaction transaction = new CryptoTransferTransaction(client)
+        Transaction transaction = new CryptoTransferTransaction()
             // .addSender and .addRecipient can be called as many times as you want as long as the total sum from
             // both sides is equivalent
             .addSender(OPERATOR_ID, amount)
             .addRecipient(recipientId, amount)
             .setMemo("transfer test")
-            .build();
+            .build(client);
 
         System.out.println("transaction ID: " + transaction.id);
 
-        transaction.execute();
-        TransactionRecord record = transaction.getRecord();
+        transaction.execute(client);
+        TransactionRecord record = transaction.getRecord(client);
 
         System.out.println("transferred " + amount + "...");
 

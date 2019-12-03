@@ -31,14 +31,14 @@ public final class TransferCrypto {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // Transfer X hbar from the operator of the client to the given account ID
-        Transaction transaction = new CryptoTransferTransaction(client)
+        Transaction transaction = new CryptoTransferTransaction()
             .addSender(OPERATOR_ID, 10_000)
             .addRecipient(AccountId.fromString("0.0.3"), 10_000)
-            .build();
+            .build(client);
 
-        transaction.execute();
+        transaction.execute(client);
         // queryReceipt() waits for consensus
-        transaction.getReceipt();
+        transaction.getReceipt(client);
 
         System.out.println("transferred 10_000 tinybar...");
     }

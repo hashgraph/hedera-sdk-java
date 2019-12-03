@@ -40,17 +40,17 @@ public final class CreateAccount {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        Transaction tx = new AccountCreateTransaction(client)
+        Transaction tx = new AccountCreateTransaction()
             // The only _required_ property here is `key`
             .setKey(newKey.getPublicKey())
             .setInitialBalance(1000)
             .setMaxTransactionFee(10_000_000)
-            .build();
+            .build(client);
 
-        tx.execute();
+        tx.execute(client);
 
         // This will wait for the receipt to become available
-        TransactionReceipt receipt = tx.queryReceipt();
+        TransactionReceipt receipt = tx.getReceipt(client);
 
         AccountId newAccountId = receipt.getAccountId();
 

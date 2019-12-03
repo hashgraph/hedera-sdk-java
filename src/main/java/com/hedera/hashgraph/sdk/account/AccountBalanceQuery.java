@@ -16,10 +16,18 @@ import io.grpc.MethodDescriptor;
 public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalanceQuery> {
     private final CryptoGetAccountBalanceQuery.Builder builder = inner.getCryptogetAccountBalanceBuilder();
 
+    /**
+     * @deprecated {@link Client} should now be provided to {@link #execute(Client)}
+     */
+    @Deprecated
     public AccountBalanceQuery(@Nullable Client client) {
         super(client);
         // a payment transaction is required but is not processed so it can have zero value
-        setPaymentDefault(0);
+        setPaymentAmount(0);
+    }
+
+    public AccountBalanceQuery() {
+        super();
     }
 
     @Override

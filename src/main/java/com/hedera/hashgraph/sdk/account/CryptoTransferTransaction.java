@@ -19,9 +19,15 @@ public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTr
     private final CryptoTransferTransactionBody.Builder builder = bodyBuilder.getCryptoTransferBuilder();
     private final TransferList.Builder transferList = builder.getTransfersBuilder();
 
+    /**
+     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
+     */
+    @Deprecated
     public CryptoTransferTransaction(@Nullable Client client) {
         super(client);
     }
+
+    public CryptoTransferTransaction() { super(); }
 
     public CryptoTransferTransaction addSender(AccountId senderId, @Nonnegative long value) {
         return this.addTransfer(senderId, value * -1L);

@@ -38,16 +38,17 @@ public final class CreateAccount {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        Transaction transaction = new AccountCreateTransaction(client)
+        Transaction transaction = new AccountCreateTransaction()
             .setMaxTransactionFee(1_000_000_000)
             .setKey(newPublicKey)
             .setInitialBalance(100_000_000)
-            .build();
+            .build(client);
 
-        transaction.execute();
+        transaction.execute(client);
 
-        System.out.println("transaction ID: " + transaction.execute());
-        AccountId newAccountId = transaction.getReceipt().getAccountId();
+        System.out.println("transaction ID: " + transaction.id);
+        // this is where we wait for the transaction to reach consensus
+        AccountId newAccountId = transaction.getReceipt(client).getAccountId();
         System.out.println("account = " + newAccountId);
     }
 }

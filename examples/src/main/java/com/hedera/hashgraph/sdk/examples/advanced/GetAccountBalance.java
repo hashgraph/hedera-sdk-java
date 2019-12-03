@@ -30,9 +30,9 @@ public final class GetAccountBalance {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        AccountBalanceQuery query = new AccountBalanceQuery(client).setAccountId(OPERATOR_ID);
+        AccountBalanceQuery query = new AccountBalanceQuery().setAccountId(OPERATOR_ID);
 
-        Long balance = query.execute();
+        Long balance = query.execute(client);
 
         System.out.println("balance = " + balance);
     }

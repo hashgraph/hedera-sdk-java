@@ -11,11 +11,15 @@ import io.grpc.MethodDescriptor;
 public class TransactionRecordQuery extends QueryBuilder<TransactionRecord, TransactionRecordQuery> {
     private final TransactionGetRecordQuery.Builder builder = inner.getTransactionGetRecordBuilder();
 
+    /**
+     * @deprecated {@link Client} should now be provided to {@link #execute(Client)}
+     */
+    @Deprecated
     public TransactionRecordQuery(Client client) {
         super(client);
     }
 
-    TransactionRecordQuery() {
+    public TransactionRecordQuery() {
         super(null);
     }
 

@@ -15,9 +15,15 @@ import io.grpc.MethodDescriptor;
 public final class FileAppendTransaction extends TransactionBuilder<FileAppendTransaction> {
     private final FileAppendTransactionBody.Builder builder = bodyBuilder.getFileAppendBuilder();
 
+    /**
+     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
+     */
+    @Deprecated
     public FileAppendTransaction(@Nullable Client client) {
         super(client);
     }
+
+    public FileAppendTransaction() { super(); }
 
     public FileAppendTransaction setFileId(FileId fileId) {
         builder.setFileID(fileId.toProto());

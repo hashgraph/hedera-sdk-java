@@ -42,36 +42,36 @@ public final class DeleteFile {
         // you can easily use the bytes of a file instead.
         byte[] fileContents = "Hedera hashgraph is great!".getBytes();
 
-        Transaction tx = new FileCreateTransaction(client).setExpirationTime(
+        Transaction tx = new FileCreateTransaction().setExpirationTime(
             Instant.now()
                 .plus(Duration.ofSeconds(2592000)))
             // Use the same key as the operator to "own" this file
             .addKey(OPERATOR_KEY.getPublicKey())
             .setContents(fileContents)
-            .build();
+            .build(client);
 
-        tx.execute();
+        tx.execute(client);
 
-        TransactionReceipt receipt = tx.queryReceipt();
+        TransactionReceipt receipt = tx.getReceipt(client);
         FileId newFileId = receipt.getFileId();
 
         System.out.println("file: " + newFileId);
 
         // now delete the file
-        Transaction fileDeleteTxn = new FileDeleteTransaction(client)
+        Transaction fileDeleteTxn = new FileDeleteTransaction()
             .setFileId(newFileId)
-            .build();
+            .build(client);
 
-        fileDeleteTxn.execute();
+        fileDeleteTxn.execute(client);
 
         // if this doesn't throw then the transaction was a success
-        fileDeleteTxn.queryReceipt();
+        fileDeleteTxn.getReceipt(client);
 
         System.out.println("File deleted successfully.");
 
-        FileInfo fileInfo = new FileInfoQuery(client)
+        FileInfo fileInfo = new FileInfoQuery()
             .setFileId(newFileId)
-            .execute();
+            .execute(client);
 
         // note the above fileInfo will fail with FILE_DELETED due to a known issue on Hedera
 

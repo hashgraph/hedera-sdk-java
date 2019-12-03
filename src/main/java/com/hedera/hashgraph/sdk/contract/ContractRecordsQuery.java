@@ -15,11 +15,15 @@ import io.grpc.MethodDescriptor;
 public class ContractRecordsQuery extends QueryBuilder<ContractGetRecordsResponse, ContractRecordsQuery> {
     private final ContractGetRecordsQuery.Builder builder = inner.getContractGetRecordsBuilder();
 
+    /**
+     * @deprecated {@link Client} should now be provided to {@link #execute(Client)}
+     */
+    @Deprecated
     public ContractRecordsQuery(Client client) {
         super(client);
     }
 
-    ContractRecordsQuery() {
+    public ContractRecordsQuery() {
         super(null);
     }
 

@@ -25,7 +25,7 @@ class TransactionTest {
     private static final TransactionId txnId = new TransactionId(acctId, txnStartAt);
 
     // a different instance for each test
-    private final Transaction txn = new FileDeleteTransaction(null)
+    private final Transaction txn = new FileDeleteTransaction()
         .setTransactionId(txnId)
         .setNodeAccountId(nodeAcctId)
         .setFileId(new FileId(0, 0, 0))
@@ -37,7 +37,7 @@ class TransactionTest {
         assertThrows(
             IllegalStateException.class,
             txn::validate,
-            "Transaction failed validation:\n"
+            "Transaction failed local validation:\n"
                 + "Transaction requires at least one signature"
         );
     }

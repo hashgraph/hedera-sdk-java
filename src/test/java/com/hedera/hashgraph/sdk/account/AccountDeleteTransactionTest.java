@@ -4,25 +4,28 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hederahashgraph.api.proto.java.Transaction;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class AccountDeleteTransactionTest {
 
     @Test
     @DisplayName("empty builder fails validation")
     void emptyBuilder() {
-        Assertions.assertThrows(
-            IllegalStateException.class,
-            () -> new AccountCreateTransaction(null).validate(),
-            "transaction builder failed validation:\n" +
+        assertEquals(
+            "transaction builder failed local validation:\n" +
                 ".setTransactionId() required\n" +
                 ".setNodeAccountId() required\n" +
                 ".setTransferAccountId() required\n" +
-                ".setDeleteAccountId() required");
+                ".setDeleteAccountId() required",
+            assertThrows(
+                IllegalStateException.class,
+                () -> new AccountDeleteTransaction().validate()).getMessage());
     }
 
     @Test
@@ -31,15 +34,17 @@ class AccountDeleteTransactionTest {
         final Instant now = Instant.ofEpochSecond(1554158542);
         final Ed25519PrivateKey key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962");
         final TransactionId txnId = new TransactionId(new AccountId(2), now);
-        final Transaction txn = new AccountDeleteTransaction(null)
+        final Transaction txn = new AccountDeleteTransaction()
             .setNodeAccountId(new AccountId(3))
             .setTransactionId(txnId)
             .setTransferAccountId(new AccountId(4))
             .setDeleteAccountId(new AccountId(1))
-            .setTransactionFee(100_000)
-            .sign(key).toProto();
+            .setMaxTransactionFee(100_000)
+            .build()
+            .sign(key)
+            .toProto();
 
-        Assertions.assertEquals(
+        assertEquals(
             "sigMap {\n" +
                 "  sigPair {\n" +
                 "    pubKeyPrefix: \"\\344\\361\\300\\353L}\\315\\303\\347\\353\\021p\\263\\b\\212=\\022\\242\\227\\364\\243\\353\\342\\362\\205\\003\\375g5F\\355\\216\"\n" +

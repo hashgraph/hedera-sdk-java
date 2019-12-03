@@ -24,11 +24,20 @@ import io.grpc.MethodDescriptor;
 public class ContractCreateTransaction extends TransactionBuilder<ContractCreateTransaction> {
     private final ContractCreateTransactionBody.Builder builder = bodyBuilder.getContractCreateInstanceBuilder();
 
-    public ContractCreateTransaction(@Nullable Client client) {
-        super(client);
+    {
         // Required fixed autorenew duration (roughly 1/4 year)
         setAutoRenewPeriod(Duration.ofMinutes(131_500));
     }
+
+    /**
+     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
+     */
+    @Deprecated
+    public ContractCreateTransaction(@Nullable Client client) {
+        super(client);
+    }
+
+    public ContractCreateTransaction() { super(); }
 
     @Override
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {

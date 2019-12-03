@@ -65,33 +65,33 @@ public final class CreateSimpleContract {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // create the contract's bytecode file
-        Transaction fileTx = new FileCreateTransaction(client).setExpirationTime(
+        Transaction fileTx = new FileCreateTransaction().setExpirationTime(
             Instant.now()
                 .plus(Duration.ofSeconds(3600)))
             // Use the same key as the operator to "own" this file
             .addKey(OPERATOR_KEY.getPublicKey())
             .setContents(byteCodeHex.getBytes())
-            .build();
+            .build(client);
 
-        fileTx.execute();
+        fileTx.execute(client);
 
-        TransactionReceipt fileReceipt = fileTx.queryReceipt();
+        TransactionReceipt fileReceipt = fileTx.getReceipt(client);
         FileId newFileId = fileReceipt.getFileId();
 
         System.out.println("contract bytecode file: " + newFileId);
 
         // create the contract itself
-        Transaction contractTx = new ContractCreateTransaction(client).setAutoRenewPeriod(Duration.ofHours(1))
+        Transaction contractTx = new ContractCreateTransaction().setAutoRenewPeriod(Duration.ofHours(1))
             .setGas(217000)
             .setBytecodeFile(newFileId)
             // set an admin key so we can delete the contract later
             .setAdminKey(OPERATOR_KEY.getPublicKey())
-            .build();
+            .build(client);
 
         // important: submit the transaction to the network
-        contractTx.execute();
+        contractTx.execute(client);
 
-        TransactionReceipt contractReceipt = contractTx.executeForReceipt();
+        TransactionReceipt contractReceipt = contractTx.getReceipt(client);
 
         System.out.println(contractReceipt.toProto());
 
@@ -99,27 +99,28 @@ public final class CreateSimpleContract {
 
         System.out.println("new contract ID: " + newContractId);
 
-        FunctionResult contractCallResult = new ContractCallQuery(client).setGas(30000)
+        FunctionResult contractCallResult = new ContractCallQuery()
+            .setGas(30000)
             .setContractId(newContractId)
             .setFunctionParameters(CallParams.function("greet"))
-            .execute();
+            .execute(client);
 
         if (contractCallResult.getErrorMessage() != null) {
             System.out.println("error calling contract: " + contractCallResult.getErrorMessage());
             return;
         }
 
-        String message = contractCallResult.getString();
+        String message = contractCallResult.getString(0);
         System.out.println("contract message: " + message);
 
         // now delete the contract
-        Transaction contractDeleteTxn = new ContractDeleteTransaction(client)
+        Transaction contractDeleteTxn = new ContractDeleteTransaction()
             .setContractId(newContractId)
-            .build();
+            .build(client);
 
-        contractDeleteTxn.execute();
+        contractDeleteTxn.execute(client);
 
-        TransactionReceipt contractDeleteResult = contractDeleteTxn.queryReceipt();
+        TransactionReceipt contractDeleteResult = contractDeleteTxn.getReceipt(client);
 
         if (contractDeleteResult.getStatus() != ResponseCodeEnum.SUCCESS) {
             System.out.println("error deleting contract: " + contractDeleteResult.getStatus());

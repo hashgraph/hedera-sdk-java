@@ -15,11 +15,15 @@ import io.grpc.MethodDescriptor;
 public class AccountStakersQuery extends QueryBuilder<CryptoGetStakersResponse, AccountStakersQuery> {
     private final CryptoGetStakersQuery.Builder builder = inner.getCryptoGetProxyStakersBuilder();
 
+    /**
+     * @deprecated {@link Client} should now be provided to {@link #execute(Client)}
+     */
+    @Deprecated
     public AccountStakersQuery(Client client) {
         super(client);
     }
 
-    AccountStakersQuery() {
+    public AccountStakersQuery() {
         super(null);
     }
 

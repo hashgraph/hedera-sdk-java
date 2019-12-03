@@ -15,11 +15,15 @@ import io.grpc.MethodDescriptor;
 public final class ContractBytecodeQuery extends QueryBuilder<ContractGetBytecodeResponse, ContractBytecodeQuery> {
     private final ContractGetBytecodeQuery.Builder builder = inner.getContractGetBytecodeBuilder();
 
+    /**
+     * @deprecated {@link Client} should now be provided to {@link #execute(Client)}
+     */
+    @Deprecated
     public ContractBytecodeQuery(Client client) {
         super(client);
     }
 
-    ContractBytecodeQuery() {
+    public ContractBytecodeQuery() {
         super(null);
     }
 

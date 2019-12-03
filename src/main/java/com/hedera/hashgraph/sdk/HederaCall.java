@@ -1,10 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.ByteString;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -14,7 +14,6 @@ import javax.annotation.Nullable;
 
 import io.grpc.CallOptions;
 import io.grpc.Channel;
-import io.grpc.ClientCall;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
@@ -33,6 +32,8 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
 
     protected abstract Channel getChannel();
 
+    protected abstract Channel getChannel(Client client);
+
     protected abstract Resp mapResponse(RawResp raw) throws HederaException;
 
     protected Duration getDefaultTimeout() {
@@ -43,64 +44,100 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
         return e instanceof HederaException && ((HederaException) e).responseCode == ResponseCodeEnum.BUSY;
     }
 
-    private ClientCall<Req, RawResp> newClientCall() {
-        return getChannel().newCall(getMethod(), CallOptions.DEFAULT);
+    public final Resp execute(Client client) throws HederaException, HederaNetworkException {
+        return execute(client, getDefaultTimeout());
     }
 
-    // callbacks which can perform their own calls
-    protected void onPreExecute(Duration timeout) throws HederaException, HederaNetworkException { }
-
-    protected void onPreExecuteAsync(Runnable onSuccess, Consumer<HederaThrowable> onError, Duration timeout) {
-        onSuccess.run();
-    }
-
-    public final Resp execute() throws HederaException, HederaNetworkException {
-        return execute(getDefaultTimeout());
-    }
-
-    public final Resp execute(Duration retryTimeout) throws HederaException, HederaNetworkException {
+    public Resp execute(Client client, Duration retryTimeout) throws HederaException, HederaNetworkException {
         if (isExecuted) {
             throw new IllegalStateException("call already executed");
         }
         isExecuted = true;
 
-        Instant preStart = Instant.now();
-        onPreExecute(retryTimeout);
-        // take the time preExecute took into account so the given timeout holds
-        Duration remaining = retryTimeout.minus(Duration.between(preStart, Instant.now()));
+        // N.B. only QueryBuilder used onPreExecute() so instead it should just override this
+        // method instead
 
         final Backoff.FallibleProducer<Resp, HederaException> tryProduce = () ->
-            mapResponse(ClientCalls.blockingUnaryCall(newClientCall(), toProto()));
+            mapResponse(ClientCalls.blockingUnaryCall(getChannel(client).newCall(getMethod(), CallOptions.DEFAULT), toProto()));
 
-        return new Backoff(RETRY_DELAY, remaining)
+        return new Backoff(RETRY_DELAY, retryTimeout)
             .tryWhile(this::shouldRetry, tryProduce);
     }
 
+    /**
+     * @deprecated use {@link #execute(Client)} instead.
+     */
+    @Deprecated
+    public final Resp execute() throws HederaException, HederaNetworkException {
+        return execute(getDefaultTimeout());
+    }
+
+    /**
+     * @deprecated use {@link #execute(Client, Duration)} instead.
+     */
+    @Deprecated
+    public Resp execute(Duration retryTimeout) throws HederaException, HederaNetworkException {
+        if (isExecuted) {
+            throw new IllegalStateException("call already executed");
+        }
+        isExecuted = true;
+
+        final Backoff.FallibleProducer<Resp, HederaException> tryProduce = () ->
+            mapResponse(ClientCalls.blockingUnaryCall(getChannel().newCall(getMethod(), CallOptions.DEFAULT), toProto()));
+
+        return new Backoff(RETRY_DELAY, retryTimeout)
+            .tryWhile(this::shouldRetry, tryProduce);
+    }
+
+    public final void executeAsync(Client client, Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError) {
+        executeAsync(client, onSuccess, onError, getDefaultTimeout());
+    }
+
+    public void executeAsync(Client client, Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError, Duration retryTimeout) {
+        if (isExecuted) {
+            throw new IllegalStateException("call already executed");
+        }
+        isExecuted = true;
+
+        final Consumer<Consumer<HederaThrowable>> executeCall = (onError2) -> ClientCalls.asyncUnaryCall(getChannel(client).newCall(getMethod(), CallOptions.DEFAULT), toProto(),
+            new CallStreamObserver(onSuccess, onError2));
+
+        new Backoff(RETRY_DELAY, retryTimeout)
+            .asyncTryWhile(this::shouldRetry, executeCall, onError);
+    }
+
+    /**
+     * @deprecated use {@link #executeAsync(Client, Consumer, Consumer)} instead.
+     */
+    @Deprecated
     public final void executeAsync(Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError) {
         executeAsync(onSuccess, onError, getDefaultTimeout());
     }
 
+    /**
+     * @deprecated use {@link #executeAsync(Client, Consumer, Consumer, Duration)} instead.
+     */
+    @Deprecated
     public final void executeAsync(Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError, Duration retryTimeout) {
         if (isExecuted) {
             throw new IllegalStateException("call already executed");
         }
         isExecuted = true;
 
-        final Consumer<Consumer<HederaThrowable>> executeCall = (onError2) ->
-            ClientCalls.asyncUnaryCall(newClientCall(), toProto(),
-                new CallStreamObserver(onSuccess, onError2));
+        final Consumer<Consumer<HederaThrowable>> executeCall = (onError2) -> ClientCalls.asyncUnaryCall(getChannel().newCall(getMethod(), CallOptions.DEFAULT), toProto(),
+            new CallStreamObserver(onSuccess, onError2));
 
-        Instant preStart = Instant.now();
-        onPreExecuteAsync(() ->
-            // take the time preExecute took into account so the given timeout holds
-            new Backoff(RETRY_DELAY, retryTimeout.minus(Duration.between(preStart, Instant.now())))
-                .asyncTryWhile(this::shouldRetry, executeCall, onError), onError, retryTimeout);
+        new Backoff(RETRY_DELAY, retryTimeout)
+            .asyncTryWhile(this::shouldRetry, executeCall, onError);
     }
 
     /**
      * Equivalent to {@link #executeAsync(Consumer, Consumer)} but providing {@code this}
      * to the callback for additional context.
+     *
+     *
      */
+    @Deprecated
     public final void executeAsync(BiConsumer<T, Resp> onSuccess, BiConsumer<T, HederaThrowable> onError) {
         executeAsync(onSuccess, onError, getDefaultTimeout());
     }
@@ -114,7 +151,17 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
         executeAsync(resp -> onSuccess.accept((T) this, resp), err -> onError.accept((T) this, err), timeout);
     }
 
-    public abstract void validate();
+    /**
+     * @deprecated this method is being removed because it has limited utility for users;
+     * most implementations cannot guarantee that passing validation means the transaction
+     * or query will always succeed, so the method name is misleading at best.
+     */
+    @VisibleForTesting
+    public final void validate() {
+        localValidate();
+    }
+
+    protected abstract void localValidate();
 
     protected void addValidationError(String errMsg) {
         if (validationErrors == null) validationErrors = new ArrayList<>();
