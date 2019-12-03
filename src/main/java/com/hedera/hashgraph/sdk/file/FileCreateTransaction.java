@@ -21,9 +21,15 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
     private final FileCreateTransactionBody.Builder builder = bodyBuilder.getFileCreateBuilder();
     private final KeyList.Builder keyList = builder.getKeysBuilder();
 
+    /**
+     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
+     */
+    @Deprecated
     public FileCreateTransaction(@Nullable Client client) {
         super(client);
     }
+
+    public FileCreateTransaction() { super(); }
 
     public FileCreateTransaction setExpirationTime(Instant expiration) {
         builder.setExpirationTime(TimestampHelper.timestampFrom(expiration));

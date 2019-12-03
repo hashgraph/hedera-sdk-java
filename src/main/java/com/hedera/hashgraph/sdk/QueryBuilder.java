@@ -1,15 +1,19 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
+import com.hederahashgraph.api.proto.java.AccountAmount;
 import com.hederahashgraph.api.proto.java.Query;
 import com.hederahashgraph.api.proto.java.QueryHeader;
 import com.hederahashgraph.api.proto.java.Response;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 import com.hederahashgraph.api.proto.java.ResponseHeader;
 import com.hederahashgraph.api.proto.java.ResponseType;
+import com.hederahashgraph.api.proto.java.TransactionBody;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -25,17 +29,29 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     protected final Client client;
 
     @Nullable
-    private Node pickedNode;
+    private AccountId nodeId;
+
+    private long paymentAmount;
+    private long maxPayment = 0;
 
     protected QueryBuilder(@Nullable Client client) {
         this.client = client;
+    }
+
+    protected QueryBuilder() {
+        this.client = null;
     }
 
     protected abstract QueryHeader.Builder getHeaderBuilder();
 
     @Override
     protected Channel getChannel() {
-        return getNode().getChannel();
+        return getNode(requireClient()).getChannel();
+    }
+
+    @Override
+    protected Channel getChannel(Client client) {
+        return getNode(client).getChannel();
     }
 
     protected Client requireClient() {
@@ -43,41 +59,60 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
             "QueryBuilder.client must be non-null in regular use");
     }
 
-    private Node getNode() {
+    private Node getNode(Client client) {
+        if (nodeId == null && getHeaderBuilder().hasPayment()) {
+            TransactionBody paymentBody;
 
-        if (pickedNode == null) {
-            pickedNode = requireClient().pickNode();
+            try {
+                paymentBody = TransactionBody.parseFrom(getHeaderBuilder().getPayment().getBodyBytes());
+            } catch (InvalidProtocolBufferException e) {
+                throw new RuntimeException("payment transaction was not properly encoded", e);
+            }
+
+            List<AccountAmount> transfers = paymentBody.getCryptoTransfer()
+                .getTransfers().getAccountAmountsList();
+
+            //
+            for (AccountAmount transfer : transfers) {
+                if (transfer.getAmount() > 0) {
+                    nodeId = new AccountId(transfer.getAccountID());
+                    break;
+                }
+            }
         }
 
-        return pickedNode;
+        if (nodeId != null) {
+            return client.getNodeForId(nodeId);
+        } else {
+            Node node = client.pickNode();
+            nodeId = node.accountId;
+            return node;
+        }
+    }
+
+    private long getMaxPayment(Client client) {
+        if (maxPayment > 0) return maxPayment;
+        return client.getMaxQueryPayment();
     }
 
     @Override
     public final Query toProto() {
-        setPaymentDefault();
-        validate();
+        localValidate();
         return inner.build();
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * Explicitly set a payment for this query.
+     *
+     * The payment must only be a single payer and a single payee.
+     *
+     * @param transaction
+     * @return
+     */
     public T setPayment(Transaction transaction) {
         getHeaderBuilder().setPayment(transaction.toProto());
+        // noinspection unchecked
         return (T) this;
-    }
-
-    /**
-     * Explicitly specify that the operator account is paying for the query and set payment.
-     * <p>
-     * Only takes effect if payment is required, has not been set yet, and an operator ID
-     * was provided to the {@link Client} used to construct this instance.
-     *
-     * @return {@code this} for fluent usage.
-     * @deprecated query cost should be calculated by requesting it from the node so this function's
-     * signature is insufficient to abstract over that operation.
-     */
-    @Deprecated
-    public T setPaymentDefault() {
-        return setPaymentDefault(100_000);
     }
 
     /**
@@ -88,79 +123,117 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
      * was provided to the {@link Client} used to construct this instance.
      *
      * @return {@code this} for fluent usage.
+     * @deprecated use {@link #setPaymentAmount(long)} instead.
      */
+    @Deprecated
     public T setPaymentDefault(long paymentAmount) {
-        if (client != null && isPaymentRequired() && !getHeaderBuilder().hasPayment()
-            && client.getOperatorId() != null)
-        {
-            AccountId operatorId = client.getOperatorId();
-            AccountId nodeId = getNode().accountId;
-            Transaction txPayment = new CryptoTransferTransaction(client)
-                .setNodeAccountId(nodeId)
-                .setTransactionId(new TransactionId(operatorId))
-                .addSender(operatorId, paymentAmount)
-                .addRecipient(nodeId, paymentAmount)
-                .build();
+        setPaymentAmount(paymentAmount);
+        if (client != null) generatePayment(client);
+        //noinspection unchecked
+        return (T) this;
+    }
 
-            setPayment(txPayment);
-        }
+    /**
+     * Explicitly specify that the operator account is paying for the query; when the query is
+     * executed a payment transaction will be constructed with a transfer of this amount
+     * from the operator account to the node which will handle the query.
+     *
+     * @return {@code this} for fluent usage.
+     */
+    public T setPaymentAmount(long paymentAmount) {
+        this.paymentAmount = paymentAmount;
 
         //noinspection unchecked
         return (T) this;
     }
 
-    public final long getCost() throws HederaException, HederaNetworkException {
-        return new CostQuery().execute();
+    public T setMaxQueryPayment(long maxPayment) {
+        this.maxPayment = maxPayment;
+
+        //noinspection unchecked
+        return (T) this;
     }
 
-    public final void getCostAsync(Consumer<Long> withCost, Consumer<HederaThrowable> onError) {
-        new CostQuery().executeAsync(withCost, onError);
+    public final long getCost(Client client) throws HederaException, HederaNetworkException {
+        // set which node we're going to be working with
+        getNode(requireClient());
+        return new CostQuery().execute(client);
+    }
+
+    public final void getCostAsync(Client client, Consumer<Long> withCost, Consumer<HederaThrowable> onError) {
+        getNode(requireClient());
+        new CostQuery().executeAsync(client, withCost, onError);
     }
 
     /**
-     * @deprecated renamed to {@link #getCost()}
+     * @deprecated renamed to {@link #getCost(Client)}
      */
-    public final long requestCost() throws HederaException, HederaNetworkException {
+    public final long queryCost() throws HederaException, HederaNetworkException {
+        getNode(requireClient());
         return new CostQuery().execute();
     }
 
     /**
-     * @deprecated renamed to {@link #getCostAsync(Consumer, Consumer)}
+     * @deprecated renamed to {@link #getCostAsync(Client, Consumer, Consumer)}
      */
-    public final void requestCostAsync(Consumer<Long> withCost, Consumer<HederaThrowable> onError) {
+    public final void queryCostAsync(Consumer<Long> withCost, Consumer<HederaThrowable> onError) {
+        getNode(requireClient());
         new CostQuery().executeAsync(withCost, onError);
     }
 
-    @Override
-    protected void onPreExecute(Duration timeout) throws HederaException, HederaNetworkException {
-        final long maxQueryPayment = requireClient().getMaxQueryPayment();
+    private void generatePayment(Client client) {
+        if (isPaymentRequired() && !getHeaderBuilder().hasPayment()
+            && client.getOperatorId() != null)
+        {
+            AccountId operatorId = client.getOperatorId();
+            AccountId nodeId = getNode(client).accountId;
+            Transaction txPayment = new CryptoTransferTransaction()
+                .setNodeAccountId(nodeId)
+                .setTransactionId(new TransactionId(operatorId))
+                .addSender(operatorId, paymentAmount)
+                .addRecipient(nodeId, paymentAmount)
+                .build(client);
 
-        if (!getHeaderBuilder().hasPayment() && isPaymentRequired() && maxQueryPayment > 0) {
-            final long cost = getCost();
-            if (cost > maxQueryPayment) {
-                throw new MaxPaymentExceededException(this, cost, maxQueryPayment);
-            }
-
-            setPaymentDefault(getCost());
+            setPayment(txPayment);
         }
     }
 
     @Override
-    protected void onPreExecuteAsync(Runnable onSuccess, Consumer<HederaThrowable> onError, Duration timeout) {
+    public final Resp execute(Client client, Duration timeout) throws HederaException, HederaNetworkException {
         final long maxQueryPayment = requireClient().getMaxQueryPayment();
 
         if (!getHeaderBuilder().hasPayment() && isPaymentRequired() && maxQueryPayment > 0) {
-            getCostAsync(cost -> {
+            if (paymentAmount == 0) {
+                final long cost = getCost(client);
+                if (cost > maxQueryPayment) {
+                    throw new MaxPaymentExceededException(this, cost, maxQueryPayment);
+                }
+
+                this.paymentAmount = cost;
+            }
+
+            generatePayment(client);
+        }
+
+        return super.execute(client, timeout);
+    }
+
+    @Override
+    public final void executeAsync(Client client, Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError, Duration timeout) {
+        final long maxQueryPayment = requireClient().getMaxQueryPayment();
+
+        if (!getHeaderBuilder().hasPayment() && isPaymentRequired() && maxQueryPayment > 0) {
+            getCostAsync(client, cost -> {
                 if (cost > maxQueryPayment) {
                     onError.accept(new MaxPaymentExceededException(this, cost, maxQueryPayment));
                     return;
                 }
+                paymentAmount = cost;
 
-                setPaymentDefault(cost);
-                onSuccess.run();
+                super.executeAsync(client, onSuccess, onError, timeout);
             }, onError);
         } else {
-            onSuccess.run();
+            super.executeAsync(client, onSuccess, onError, timeout);
         }
     }
 
@@ -170,18 +243,15 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         return true;
     }
 
-    /**
-     * Check that the query was built properly, throwing an exception on any errors.
-     */
     @Override
-    public final void validate() {
+    protected final void localValidate() {
         if (isPaymentRequired()) {
             require(getHeaderBuilder().hasPayment(), ".setPayment() required");
         }
 
         doValidate();
 
-        checkValidationErrors("query builder failed validation");
+        checkValidationErrors("query builder failed local validation");
     }
 
     private static ResponseHeader getResponseHeader(Response raw) {
@@ -258,14 +328,13 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
             final com.hederahashgraph.api.proto.java.Transaction origPayment = header.hasPayment() ? header.getPayment() : null;
             final ResponseType origResponseType = header.getResponseType();
 
-            final AccountId nodeAccountId = getNode().accountId;
             final AccountId operatorId = Objects.requireNonNull(
                 requireClient().getOperatorId(),
                 "COST_ANSWER requires an operator ID to be set");
 
             // COST_ANSWER requires a payment to pass validation but doesn't actually process it
             final com.hederahashgraph.api.proto.java.Transaction fakePayment = new CryptoTransferTransaction(client)
-                .addRecipient(nodeAccountId, 0)
+                .addRecipient(Objects.requireNonNull(nodeId), 0)
                 .addSender(operatorId, 0)
                 .build()
                 .toProto();
@@ -292,6 +361,11 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         }
 
         @Override
+        protected Channel getChannel(Client client) {
+            return QueryBuilder.this.getChannel(client);
+        }
+
+        @Override
         protected Duration getDefaultTimeout() {
             return QueryBuilder.this.getDefaultTimeout();
         }
@@ -302,7 +376,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         }
 
         @Override
-        public void validate() {
+        public void localValidate() {
             // skip payment validation
             doValidate();
             QueryBuilder.this.checkValidationErrors("cannot get cost for incomplete query");

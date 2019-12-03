@@ -65,41 +65,42 @@ public final class CreateStatefulContract {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // create the contract's bytecode file
-        Transaction fileTx = new FileCreateTransaction(client).setExpirationTime(
+        Transaction fileTx = new FileCreateTransaction().setExpirationTime(
             Instant.now()
                 .plus(Duration.ofSeconds(2592000)))
             // Use the same key as the operator to "own" this file
             .addKey(OPERATOR_KEY.getPublicKey())
             .setContents(byteCode)
             .setMaxTransactionFee(1_000_000_000)
-            .build();
+            .build(client);
 
-        fileTx.execute();
+        fileTx.execute(client);
 
-        TransactionReceipt fileReceipt = fileTx.queryReceipt();
+        TransactionReceipt fileReceipt = fileTx.getReceipt(client);
         FileId newFileId = fileReceipt.getFileId();
 
         System.out.println("contract bytecode file: " + newFileId);
 
-        Transaction contractTx = new ContractCreateTransaction(client).setBytecodeFile(newFileId)
+        Transaction contractTx = new ContractCreateTransaction().setBytecodeFile(newFileId)
             .setAutoRenewPeriod(Duration.ofHours(1))
             .setGas(100_000_000)
             .setMaxTransactionFee(1_000_000_000)
             .setConstructorParams(
                 CallParams.constructor()
                     .addString("hello from hedera!"))
-            .build();
+            .build(client);
 
-        TransactionReceipt contractReceipt = contractTx.queryReceipt();
+        TransactionReceipt contractReceipt = contractTx.getReceipt(client);
         ContractId newContractId = contractReceipt.getContractId();
 
         System.out.println("new contract ID: " + newContractId);
 
-        FunctionResult contractCallResult = new ContractCallQuery(client).setContractId(newContractId)
+        FunctionResult contractCallResult = new ContractCallQuery()
+            .setContractId(newContractId)
             .setGas(100_000_000)
             .setFunctionParameters(CallParams.function("get_message"))
-            .setPaymentDefault(8_000_000)
-            .execute();
+            .setMaxQueryPayment(8_000_000)
+            .execute(client);
 
         if (contractCallResult.getErrorMessage() != null) {
             System.out.println("error calling contract: " + contractCallResult.getErrorMessage());
@@ -109,26 +110,26 @@ public final class CreateStatefulContract {
         String message = contractCallResult.getString(0);
         System.out.println("contract returned message: " + message);
 
-        Transaction contractExecTxn = new ContractExecuteTransaction(client)
+        Transaction contractExecTxn = new ContractExecuteTransaction()
             .setContractId(newContractId)
             .setGas(100_000_000)
             .setFunctionParameters(CallParams.function("set_message")
                 .addString("hello from hedera again!"))
             .setMaxTransactionFee(800_000_000)
-            .build();
+            .build(client);
 
-        contractExecTxn.execute();
+        contractExecTxn.execute(client);
 
         // if this doesn't throw then we know the contract executed successfully
-        contractExecTxn.queryReceipt();
+        contractExecTxn.getReceipt(client);
 
         // now query contract
-        FunctionResult contractUpdateResult = new ContractCallQuery(client)
+        FunctionResult contractUpdateResult = new ContractCallQuery()
             .setContractId(newContractId)
             .setGas(100_000_000)
             .setFunctionParameters(CallParams.function("get_message"))
-            .setPaymentDefault(800_000_000)
-            .execute();
+            .setMaxQueryPayment(800_000_000)
+            .execute(client);
 
         if (contractUpdateResult.getErrorMessage() != null) {
             System.out.println("error calling contract: " + contractUpdateResult.getErrorMessage());

@@ -22,8 +22,16 @@ import io.grpc.MethodDescriptor;
 public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdateTransaction> {
     private final ContractUpdateTransactionBody.Builder builder = bodyBuilder.getContractUpdateInstanceBuilder();
 
+    /**
+     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
+     */
+    @Deprecated
     public ContractUpdateTransaction(@Nullable Client client) {
         super(client);
+    }
+
+    public ContractUpdateTransaction() {
+        super();
     }
 
     public ContractUpdateTransaction setContractId(ContractId contract) {

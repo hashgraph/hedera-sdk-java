@@ -46,25 +46,25 @@ public final class MultiAppTransfer {
         int transferAmount = 10_000;
 
         // the exchange creates an account for the user to transfer funds to
-        Transaction createExchangeAccountTxn = new AccountCreateTransaction(client)
+        Transaction createExchangeAccountTxn = new AccountCreateTransaction()
             // the exchange only accepts transfers that it validates through a side channel (e.g. REST API)
             .setReceiverSignatureRequired(true)
             .setKey(exchangeKey.getPublicKey())
-            .build()
+            .build(client)
             // The owner key has to sign this transaction
             // when setReceiverSignatureRequired is true
             .sign(exchangeKey);
 
-        createExchangeAccountTxn.execute();
+        createExchangeAccountTxn.execute(client);
 
-        AccountId exchangeAccountId = createExchangeAccountTxn.queryReceipt().getAccountId();
+        AccountId exchangeAccountId = createExchangeAccountTxn.getReceipt(client).getAccountId();
 
-        Transaction transferTxn = new CryptoTransferTransaction(client)
+        Transaction transferTxn = new CryptoTransferTransaction()
             .addSender(OPERATOR_ID, transferAmount)
             .addRecipient(exchangeAccountId, transferAmount)
             // the exchange-provided memo required to validate the transaction
             .setMemo("https://some-exchange.com/user1/account1")
-            .build()
+            .build(client)
             .sign(userKey);
 
         // the exchange must sign the transaction in order for it to be accepted by the network
@@ -72,11 +72,11 @@ public final class MultiAppTransfer {
         byte[] signedTxnBytes = exchangeSignsTransaction(transferTxn.toBytes());
 
         // we execute the signed transaction and wait for it to be accepted
-        Transaction signedTransferTxn = Transaction.fromBytes(client, signedTxnBytes);
+        Transaction signedTransferTxn = Transaction.fromBytes(signedTxnBytes);
 
-        signedTransferTxn.execute();
+        signedTransferTxn.execute(client);
         // (important!) wait for consensus by querying for the receipt
-        signedTransferTxn.queryReceipt();
+        signedTransferTxn.getReceipt(client);
 
         System.out.println("transferred " + transferAmount + "...");
 
@@ -88,7 +88,7 @@ public final class MultiAppTransfer {
     }
 
     private static byte[] exchangeSignsTransaction(byte[] transactionData) throws InvalidProtocolBufferException {
-        return Transaction.fromBytes(client, transactionData)
+        return Transaction.fromBytes(transactionData)
             .sign(exchangeKey)
             .toBytes();
     }

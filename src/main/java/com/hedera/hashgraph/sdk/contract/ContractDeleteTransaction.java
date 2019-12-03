@@ -14,11 +14,15 @@ import io.grpc.MethodDescriptor;
 public final class ContractDeleteTransaction extends TransactionBuilder<ContractDeleteTransaction> {
     private final ContractDeleteTransactionBody.Builder builder = bodyBuilder.getContractDeleteInstanceBuilder();
 
+    /**
+     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
+     */
+    @Deprecated
     public ContractDeleteTransaction(Client client) {
         super(client);
     }
 
-    ContractDeleteTransaction() {
+    public ContractDeleteTransaction() {
         super(null);
     }
 

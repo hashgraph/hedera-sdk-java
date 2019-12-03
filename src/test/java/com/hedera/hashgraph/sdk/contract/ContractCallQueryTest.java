@@ -22,7 +22,7 @@ class ContractCallQueryTest {
     @DisplayName("empty query fails validation")
     void emptyBuilder() {
         assertEquals(
-            "query builder failed validation:\n" +
+            "query builder failed local validation:\n" +
                 ".setPayment() required\n" +
                 ".setContractId() required",
             assertThrows(
@@ -37,12 +37,13 @@ class ContractCallQueryTest {
     void correctBuilder() {
         final ContractCallQuery query = new ContractCallQuery()
             .setPayment(
-                new CryptoTransferTransaction(null)
+                new CryptoTransferTransaction()
                     .setTransactionId(new TransactionId(new AccountId(2), Instant.ofEpochSecond(1559868457)))
                     .setNodeAccountId(new AccountId(3))
                     .addSender(new AccountId(2), 10000)
                     .addRecipient(new AccountId(3), 10000)
-                    .setTransactionFee(100_000)
+                    .setMaxTransactionFee(100_000)
+                    .build()
                     .sign(key))
             .setContractId(new ContractId(0, 0, 0))
             .setGas(1541)

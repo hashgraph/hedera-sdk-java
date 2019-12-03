@@ -15,11 +15,15 @@ import io.grpc.MethodDescriptor;
 public class AccountRecordsQuery extends QueryBuilder<CryptoGetAccountRecordsResponse, AccountRecordsQuery> {
     private final CryptoGetAccountRecordsQuery.Builder builder = inner.getCryptoGetAccountRecordsBuilder();
 
+    /**
+     * @deprecated {@link Client} should now be provided to {@link #execute(Client)}
+     */
+    @Deprecated
     public AccountRecordsQuery(Client client) {
         super(client);
     }
 
-    AccountRecordsQuery() {
+    public AccountRecordsQuery() {
         super(null);
     }
 

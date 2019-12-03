@@ -38,14 +38,14 @@ public final class UpdateAccountPublicKey {
         // First, we create a new account so we don't affect our account
 
         Ed25519PrivateKey originalKey = Ed25519PrivateKey.generate();
-        Transaction acctTransaction = new AccountCreateTransaction(client)
+        Transaction acctTransaction = new AccountCreateTransaction()
             .setMaxTransactionFee(1_000_000_000)
             .setKey(originalKey.getPublicKey())
             .setInitialBalance(100_000_000)
-            .build();
+            .build(client);
 
-        System.out.println("transaction ID: " + acctTransaction.execute());
-        AccountId accountId = acctTransaction.getReceipt().getAccountId();
+        System.out.println("transaction ID: " + acctTransaction.execute(client));
+        AccountId accountId = acctTransaction.getReceipt(client).getAccountId();
         System.out.println("account = " + accountId);
         // Next, we update the key
 
@@ -54,21 +54,21 @@ public final class UpdateAccountPublicKey {
         System.out.println(" :: update public key of account " + accountId);
         System.out.println("set key = " + newKey.getPublicKey());
 
-        Transaction transaction = new AccountUpdateTransaction(client)
+        Transaction transaction = new AccountUpdateTransaction()
             .setAccountForUpdate(accountId)
             .setKey(newKey.getPublicKey())
             // Sign with the previous key and the new key
+            .build(client)
             .sign(originalKey)
             .sign(newKey);
 
         System.out.println("transaction ID: " + transaction.id);
 
-        transaction.execute();
+        transaction.execute(client);
         // (important!) wait for the transaction to complete by querying the receipt
-        transaction.queryReceipt();
+        transaction.getReceipt(client);
 
         // Now we fetch the account information to check if the key was changed
-
         System.out.println(" :: getAccount and check our current key");
 
         AccountInfo info = client.getAccount(accountId);

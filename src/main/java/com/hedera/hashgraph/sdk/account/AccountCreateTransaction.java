@@ -29,9 +29,15 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
         .setSendRecordThreshold(Long.MAX_VALUE)
         .setReceiveRecordThreshold(Long.MAX_VALUE);
 
+    /**
+     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
+     */
+    @Deprecated
     public AccountCreateTransaction(@Nullable Client client) {
         super(client);
     }
+
+    public AccountCreateTransaction() { super(); }
 
     @Override
     public AccountCreateTransaction setTransactionId(TransactionId transactionId) {

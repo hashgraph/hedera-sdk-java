@@ -19,7 +19,7 @@ class AccountStakersQueryTest {
     @DisplayName("empty query does not validate")
     void defaultQuery() {
         assertEquals(
-            "query builder failed validation:\n" +
+            "query builder failed local validation:\n" +
                 ".setPayment() required\n" +
                 ".setAccountId() required",
             assertThrows(
@@ -35,12 +35,13 @@ class AccountStakersQueryTest {
     void correctQuery() {
         final AccountStakersQuery query = new AccountStakersQuery()
             .setPayment(
-                new CryptoTransferTransaction(null)
+                new CryptoTransferTransaction()
                     .setTransactionId(new TransactionId(new AccountId(2), Instant.ofEpochSecond(1559868457)))
                     .setNodeAccountId(new AccountId(3))
                     .addSender(new AccountId(2), 10000)
                     .addRecipient(new AccountId(3), 10000)
-                    .setTransactionFee(100_000)
+                    .setMaxTransactionFee(100_000)
+                    .build()
                     .sign(key))
             .setAccountId(new AccountId(5));
 

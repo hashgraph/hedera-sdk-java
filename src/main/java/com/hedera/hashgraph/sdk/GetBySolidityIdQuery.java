@@ -12,11 +12,15 @@ import io.grpc.MethodDescriptor;
 public final class GetBySolidityIdQuery extends QueryBuilder<GetBySolidityIDResponse, GetBySolidityIdQuery> {
     private final GetBySolidityIDQuery.Builder builder = inner.getGetBySolidityIDBuilder();
 
+    /**
+     * @deprecated {@link Client} should now be provided to {@link #execute(Client)}
+     */
+    @Deprecated
     public GetBySolidityIdQuery(Client client) {
         super(client);
     }
 
-    GetBySolidityIdQuery() {
+    public GetBySolidityIdQuery() {
         super((Client) null);
     }
 

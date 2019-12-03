@@ -39,7 +39,7 @@ public final class CreateFile {
         // you can easily use the bytes of a file instead.
         byte[] fileContents = "Hedera hashgraph is great!".getBytes();
 
-        Transaction tx = new FileCreateTransaction(client)
+        Transaction tx = new FileCreateTransaction()
             .setExpirationTime(
             Instant.now()
                 .plus(Duration.ofSeconds(2592000)))
@@ -47,12 +47,12 @@ public final class CreateFile {
             .addKey(OPERATOR_KEY.getPublicKey())
             .setMaxTransactionFee(100_000_000)
             .setContents(fileContents)
-            .build();
+            .build(client);
 
         // send the transaction to the network
-        tx.execute();
+        tx.execute(client);
 
-        TransactionReceipt receipt = tx.queryReceipt();
+        TransactionReceipt receipt = tx.getReceipt(client);
         FileId newFileId = receipt.getFileId();
 
         System.out.println("file: " + newFileId);

@@ -15,11 +15,15 @@ import io.grpc.MethodDescriptor;
 public class FileContentsQuery extends QueryBuilder<FileGetContentsResponse, FileContentsQuery> {
     private final FileGetContentsQuery.Builder builder = inner.getFileGetContentsBuilder();
 
+    /**
+     * @deprecated {@link Client} should now be provided to {@link #execute(Client)}
+     */
+    @Deprecated
     public FileContentsQuery(Client client) {
         super(client);
     }
 
-    FileContentsQuery() {
+    public FileContentsQuery() {
         super(null);
     }
 
