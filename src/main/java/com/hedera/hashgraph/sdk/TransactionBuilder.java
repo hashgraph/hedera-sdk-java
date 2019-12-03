@@ -20,6 +20,10 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     protected final com.hederahashgraph.api.proto.java.Transaction.Builder inner = com.hederahashgraph.api.proto.java.Transaction.newBuilder();
     protected final TransactionBody.Builder bodyBuilder = TransactionBody.newBuilder();
 
+    {
+        setTransactionValidDuration(Transaction.MAX_VALID_DURATION);
+    }
+
     private static final int MAX_MEMO_LENGTH = 100;
 
     private Duration validDuration = Transaction.MAX_VALID_DURATION;
@@ -31,9 +35,10 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     protected TransactionBuilder(@Nullable Client client) {
         super();
         this.client = client;
+    }
 
-        setTransactionFee(client != null ? client.getMaxTransactionFee() : Client.DEFAULT_MAX_TXN_FEE);
-        setTransactionValidDuration(Transaction.MAX_VALID_DURATION);
+    public TransactionBuilder() {
+        this(null);
     }
 
     /**
@@ -46,7 +51,9 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         return self();
     }
 
-    /** Sets the account of the node that submits the transaction to the network. */
+    /**
+     * Sets the account of the node that submits the transaction to the network.
+     */
     public final T setNodeAccountId(AccountId accountId) {
         bodyBuilder.setNodeAccountID(accountId.toProto());
         return self();
@@ -66,13 +73,13 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     /**
      * Sets the maximum fee that the client is willing to pay to execute this transaction, which is
      * split between the network and the node.
-     *
+     * <p>
      * The actual fee assessed may be less than this, in which case you will only be charged
      * that amount. An error is thrown if the assessed fee is greater than this.
-     *
+     * <p>
      * The calculation of the fee depends on the type of the transaction and its parameters,
      * as well as the current fee schedule of the network.
-     *
+     * <p>
      * Defaults to the value of {@link Client#setMaxTransactionFee(long)}.
      */
     public final T setMaxTransactionFee(long fee) {
@@ -83,7 +90,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     /**
      * Sets the the duration that this transaction is valid for. The transaction must reach
      * consensus before this elapses.
-     *
+     * <p>
      * The duration will be capped at 2 minutes as that is the maximum {@code validDuration} for
      * the network.
      */
@@ -134,7 +141,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     }
 
     @Override
-    public final void validate() {
+    protected final void localValidate() {
         TransactionBody.Builder bodyBuilder = this.bodyBuilder;
 
         if (client == null) {
@@ -146,27 +153,33 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         }
 
         doValidate();
-        checkValidationErrors("transaction builder failed validation");
+        checkValidationErrors("transaction builder failed local validation");
     }
 
     public final Transaction build() {
+        return build(client);
+    }
+
+    public final Transaction build(@Nullable Client client) {
         if (!bodyBuilder.hasNodeAccountID()) {
-            Node channel = client == null ? null : client.pickNode();
+            Node channel = client != null ? client.pickNode() : null;
             if (channel != null) {
                 bodyBuilder.setNodeAccountID(channel.accountId.toProto());
             }
         }
 
-        if (!bodyBuilder.hasTransactionID() && client != null && client.getOperatorId() != null) {
+        if (!bodyBuilder.hasTransactionID() && client != null
+            && client.getOperatorId() != null)
+        {
             bodyBuilder.setTransactionID(new TransactionId(client.getOperatorId()).toProto());
         }
 
-        validate();
+        localValidate();
 
         inner.setBodyBytes(
             bodyBuilder.build()
                 .toByteString());
-        Transaction tx = new Transaction(client, inner, bodyBuilder, getMethod());
+        Transaction tx = new Transaction(null, inner, bodyBuilder, getMethod());
 
         if (client != null && client.getOperatorKey() != null) {
             tx.sign(client.getOperatorKey());
@@ -175,14 +188,26 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         return tx;
     }
 
+    /**
+     * @deprecated use {@code .build().sign()} instead.
+     */
+    @Deprecated
     public final Transaction sign(Ed25519PrivateKey privateKey) {
         return build().sign(privateKey);
     }
 
+    /**
+     * @deprecated use {@code .build().toBytes()} instead.
+     */
+    @Deprecated
     public final byte[] toBytes() {
         return build().toBytes();
     }
 
+    /**
+     * @deprecated use {@code .build().toBytes()} instead.
+     */
+    @Deprecated
     public final byte[] toBytes(boolean requiresSignature) {
         return build().toBytes(requiresSignature);
     }
@@ -203,7 +228,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * @deprecated Makes it difficult to discern whether an error occurred while executing or
      * while fetching a receipt. If an error occurs while fetching the receipt then the transaction
      * ID is difficult to retrieve.
-     *
+     * <p>
      * Call {@link #build()} then {@link Transaction#execute()} then
      * {@link Transaction#getReceipt()} and handle the errors separately from each.
      */
@@ -216,7 +241,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * @deprecated Makes it difficult to discern whether an error occurred while executing or
      * while fetching a receipt. If an error occurs while fetching the receipt then the transaction
      * ID is difficult to retrieve.
-     *
+     * <p>
      * Call {@link #build()} then {@link Transaction#executeAsync(Consumer, Consumer)} then
      * {@link Transaction#getReceiptAsync(Consumer, Consumer)} and handle the errors separately
      * from each.
@@ -230,10 +255,6 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * @deprecated Makes it difficult to discern whether an error occurred while executing or
      * while fetching a receipt. If an error occurs while fetching the receipt then the transaction
      * ID is difficult to retrieve.
-     *
-     * Call {@link #build()} then {@link Transaction#executeAsync(BiConsumer, BiConsumer)} then
-     * {@link Transaction#queryReceiptAsync(BiConsumer, BiConsumer)} and handle the errors
-     * separately from each.
      */
     @Deprecated
     public final void executeForReceiptAsync(BiConsumer<T, TransactionReceipt> onSuccess, BiConsumer<T, HederaThrowable> onError) {
@@ -245,7 +266,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * @deprecated Makes it difficult to discern whether an error occurred while executing or
      * while fetching a record. If an error occurs while fetching the record then the transaction
      * ID is difficult to retrieve.
-     *
+     * <p>
      * Call {@link #build()} then {@link Transaction#execute()} then
      * {@link Transaction#getRecord()} and handle the errors separately from each.
      */
@@ -258,7 +279,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * @deprecated Makes it difficult to discern whether an error occurred while executing or
      * while fetching a record. If an error occurs while fetching the record then the transaction
      * ID is difficult to retrieve.
-     *
+     * <p>
      * Call {@link #build()} then {@link Transaction#executeAsync(Consumer, Consumer)} then
      * {@link Transaction#getRecordAsync(Consumer, Consumer)} and handle the errors separately
      * from each.
@@ -272,10 +293,6 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * @deprecated Makes it difficult to discern whether an error occurred while executing or
      * while fetching a record. If an error occurs while fetching the record then the transaction
      * ID is difficult to retrieve.
-     *
-     * Call {@link #build()} then {@link Transaction#executeAsync(BiConsumer, BiConsumer)} then
-     * {@link Transaction#queryRecordAsync(BiConsumer, BiConsumer)} and handle the errors separately
-     * from each.
      */
     @Deprecated
     public final void executeForRecordAsync(BiConsumer<T, TransactionRecord> onSuccess, BiConsumer<T, HederaThrowable> onError) {
@@ -288,14 +305,22 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     @Override
     protected Channel getChannel() {
         Objects.requireNonNull(client, "TransactionBuilder.client must not be null in normal usage");
-        return client.pickNode()
-            .getChannel();
+        return getChannel(client);
+    }
+
+    @Override
+    protected Channel getChannel(Client client) {
+        if (bodyBuilder.hasNodeAccountID()) {
+            return client.getNodeForId(new AccountId(bodyBuilder.getNodeAccountID())).getChannel();
+        } else {
+            return client.pickNode().getChannel();
+        }
     }
 
     @Override
     protected TransactionId mapResponse(TransactionResponse response) throws HederaException {
         HederaException.throwIfExceptional(response.getNodeTransactionPrecheckCode());
         return new TransactionId(
-                bodyBuilder.getTransactionIDOrBuilder());
+            bodyBuilder.getTransactionIDOrBuilder());
     }
 }

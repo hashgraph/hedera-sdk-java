@@ -39,12 +39,12 @@ public final class GetAddressBook {
         final FileContentsQuery fileQuery = new FileContentsQuery(client)
             .setFileId(FileId.ADDRESS_BOOK);
 
-        final long cost = fileQuery.getCost();
+        final long cost = fileQuery.getCost(client);
         System.out.println("file contents cost: " + cost);
 
-        fileQuery.setPaymentDefault(100_000);
+        fileQuery.setMaxQueryPayment(100_000_000);
 
-        final ByteString contents = fileQuery.execute().getFileContents().getContents();
+        final ByteString contents = fileQuery.execute(client).getFileContents().getContents();
 
         Files.copy(contents.newInput(),
             FileSystems.getDefault().getPath("address-book.proto.bin"));

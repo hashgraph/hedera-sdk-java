@@ -52,7 +52,7 @@ public final class TransferCrypto {
         System.out.println("transaction ID: " + transaction.id);
 
         transaction.execute();
-        TransactionRecord record = transaction.getRecord();
+        TransactionRecord record = transaction.getRecord(client);
 
         System.out.println("transferred " + amount + "...");
 

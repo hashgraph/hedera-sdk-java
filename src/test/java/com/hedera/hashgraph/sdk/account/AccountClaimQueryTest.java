@@ -21,13 +21,14 @@ class AccountClaimQueryTest {
 
     private static final AccountClaimQuery query = new AccountClaimQuery()
         .setPayment(
-            new CryptoTransferTransaction(null)
+            new CryptoTransferTransaction()
                 .setTransactionId(new TransactionId(userAccountId, Instant.parse("2019-05-28T15:20:00Z")))
                 .setNodeAccountId(nodeAccountId)
                 .addSender(userAccountId, 10000)
                 .addRecipient(nodeAccountId, 10000)
-                .setTransactionFee(100_000)
-                .sign(key)
+                .setMaxTransactionFee(100_000)
+                    .build()
+                    .sign(key)
         )
         .setAccountId(new AccountId(1234));
 

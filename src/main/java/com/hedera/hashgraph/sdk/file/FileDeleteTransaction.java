@@ -14,9 +14,15 @@ import io.grpc.MethodDescriptor;
 public final class FileDeleteTransaction extends TransactionBuilder<FileDeleteTransaction> {
     private final FileDeleteTransactionBody.Builder builder = bodyBuilder.getFileDeleteBuilder();
 
+    /**
+     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
+     */
+    @Deprecated
     public FileDeleteTransaction(@Nullable Client client) {
         super(client);
     }
+
+    public FileDeleteTransaction() { super(); }
 
     public FileDeleteTransaction setFileId(FileId fileId) {
         builder.setFileID(fileId.toProto());

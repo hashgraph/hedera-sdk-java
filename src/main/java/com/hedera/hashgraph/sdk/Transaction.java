@@ -65,6 +65,10 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
         id = new TransactionId(txnIdProto);
     }
 
+    /**
+     * @deprecated the {@code client} parameter has been moved to {@link #execute(Client)}
+     */
+    @Deprecated
     public static Transaction fromBytes(Client client, byte[] bytes) throws InvalidProtocolBufferException {
         com.hederahashgraph.api.proto.java.Transaction inner = com.hederahashgraph.api.proto.java.Transaction.parseFrom(bytes);
         TransactionBody body = TransactionBody.parseFrom(inner.getBodyBytes());
@@ -121,76 +125,72 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
     }
 
     /**
-     * @deprecated renamed to {@link #getReceipt()}
+     * @deprecated renamed to {@link #getReceipt(Client)}
      */
     @Deprecated
     public TransactionReceipt queryReceipt() throws HederaException {
-        return new TransactionReceiptQuery(Objects.requireNonNull(client))
-            .setTransactionId(id)
-            .execute();
+        return getReceipt(Objects.requireNonNull(client));
     }
 
     /**
-     * @deprecated renamed to {@link #getReceipt(Duration)}
+     * @deprecated renamed to {@link #getReceipt(Client, Duration)}
      */
     @Deprecated
     public TransactionReceipt queryReceipt(Duration timeout) throws HederaException {
-        return new TransactionReceiptQuery(Objects.requireNonNull(client))
-            .setTransactionId(id)
-            .execute(timeout);
+        return getReceipt(Objects.requireNonNull(client), timeout);
     }
 
-    public TransactionReceipt getReceipt() throws HederaException {
-        return new TransactionReceiptQuery(Objects.requireNonNull(client))
+    public TransactionReceipt getReceipt(Client client) throws HederaException {
+        return new TransactionReceiptQuery()
             .setTransactionId(id)
-            .execute();
+            .execute(client);
     }
 
-    public TransactionReceipt getReceipt(Duration timeout) throws HederaException {
-        return new TransactionReceiptQuery(Objects.requireNonNull(client))
+    public TransactionReceipt getReceipt(Client client, Duration timeout) throws HederaException {
+        return new TransactionReceiptQuery()
             .setTransactionId(id)
-            .execute(timeout);
+            .execute(client, timeout);
     }
 
-    public void getReceiptAsync(Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError) {
-        new TransactionReceiptQuery(Objects.requireNonNull(client))
+    public void getReceiptAsync(Client client, Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError) {
+        new TransactionReceiptQuery()
             .setTransactionId(id)
-            .executeAsync(onReceipt, onError);
+            .executeAsync(client, onReceipt, onError);
     }
 
-    public void getReceiptAsync(Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError, Duration timeout) {
-        new TransactionReceiptQuery(Objects.requireNonNull(client))
-            .setTransactionId(getId())
-            .executeAsync(onReceipt, onError, timeout);
+    public void getReceiptAsync(Client client, Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError, Duration timeout) {
+        new TransactionReceiptQuery()
+            .setTransactionId(id)
+            .executeAsync(client, onReceipt, onError, timeout);
     }
 
-    public TransactionRecord getRecord() throws HederaException, HederaNetworkException {
-        return new TransactionRecordQuery(Objects.requireNonNull(client))
+    public TransactionRecord getRecord(Client client) throws HederaException, HederaNetworkException {
+        return new TransactionRecordQuery()
             .setTransactionId(id)
-            .execute();
+            .execute(client);
     }
 
-    public TransactionRecord getRecord(Duration timeout) throws HederaException {
-        return new TransactionRecordQuery(Objects.requireNonNull(client))
+    public TransactionRecord getRecord(Client client, Duration timeout) throws HederaException {
+        return new TransactionRecordQuery()
             .setTransactionId(id)
-            .execute(timeout);
+            .execute(client, timeout);
     }
 
-    public void getRecordAsync(Consumer<TransactionRecord> onRecord, Consumer<HederaThrowable> onError) {
-        new TransactionRecordQuery(Objects.requireNonNull(client))
+    public void getRecordAsync(Client client, Consumer<TransactionRecord> onRecord, Consumer<HederaThrowable> onError) {
+        new TransactionRecordQuery()
             .setTransactionId(id)
-            .executeAsync(onRecord, onError);
+            .executeAsync(client, onRecord, onError);
     }
 
-    public void getRecordAsync(Consumer<TransactionRecord> onRecord, Consumer<HederaThrowable> onError, Duration timeout) {
-        new TransactionRecordQuery(Objects.requireNonNull(client))
+    public void getRecordAsync(Client client, Consumer<TransactionRecord> onRecord, Consumer<HederaThrowable> onError, Duration timeout) {
+        new TransactionRecordQuery()
             .setTransactionId(id)
-            .executeAsync(onRecord, onError, timeout);
+            .executeAsync(client, onRecord, onError, timeout);
     }
 
     @Override
     public com.hederahashgraph.api.proto.java.Transaction toProto() {
-        validate();
+        localValidate();
         return inner.build();
     }
 
@@ -207,7 +207,11 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
     @Override
     protected Channel getChannel() {
         Objects.requireNonNull(client, "Transaction.client must be non-null in regular use");
+        return getChannel(client);
+    }
 
+    @Override
+    protected Channel getChannel(Client client) {
         Node channel = client.getNodeForId(new AccountId(nodeAccountId));
         Objects.requireNonNull(channel, "Transaction.nodeAccountId not found on Client");
 
@@ -215,7 +219,7 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
     }
 
     @Override
-    public final void validate() {
+    public final void localValidate() {
         SignatureMapOrBuilder sigMap = inner.getSigMapOrBuilder();
 
         if (sigMap.getSigPairCount() < 2) {
@@ -241,7 +245,7 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
 
     protected void validate(boolean requireSignature) {
         if (requireSignature) {
-            validate();
+            localValidate();
             return;
         }
 
@@ -272,11 +276,11 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
      * @deprecated Makes it difficult to discern whether an error occurred while executing or
      * while fetching a receipt.
      *
-     * Call {@link #execute()} then {@link #getReceipt()} and handle the errors separately from each.
+     * Call {@link #execute(Client)} then {@link #getReceipt(Client)} and handle the errors separately from each.
      */
     public final TransactionReceipt executeForReceipt() throws HederaException, HederaNetworkException {
-        execute();
-        return getReceipt();
+        execute(Objects.requireNonNull(client));
+        return getReceipt(client);
     }
 
     /**
@@ -292,16 +296,16 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
      * @deprecated Makes it difficult to discern whether an error occurred while executing or
      * while fetching a record.
      *
-     * Call {@link #execute()} then {@link #getRecord()} and handle the errors separately from each.
+     * Call {@link #execute(Client)} then {@link #getRecord(Client)} and handle the errors separately from each.
      */
     @Deprecated
     public TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
         execute();
         // wait for receipt
-        getReceipt();
-        return new TransactionRecordQuery(Objects.requireNonNull(this.client))
+        getReceipt(Objects.requireNonNull(client));
+        return new TransactionRecordQuery()
             .setTransactionId(id)
-            .execute();
+            .execute(client);
     }
 
     /**
@@ -309,12 +313,12 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
      * while fetching a receipt.
      *
      * Call {@link #executeAsync(Consumer, Consumer)} then
-     * {@link #getReceiptAsync(Consumer, Consumer)} and handle the errors separately
+     * {@link #getReceiptAsync(Client, Consumer, Consumer)} and handle the errors separately
      * from each.
      */
     @Deprecated
     public void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<HederaThrowable> onError) {
-        executeAsync(id -> getReceiptAsync(onSuccess, onError), onError);
+        executeAsync(Objects.requireNonNull(client), id -> getReceiptAsync(client, onSuccess, onError), onError);
     }
 
     /**
@@ -343,7 +347,7 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
      */
     @Deprecated
     public void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<HederaThrowable> onError) {
-        final TransactionRecordQuery recordQuery = new TransactionRecordQuery(getClient())
+        final TransactionRecordQuery recordQuery = new TransactionRecordQuery(Objects.requireNonNull(client))
             .setTransactionId(id);
 
         executeForReceiptAsync((receipt) -> recordQuery.executeAsync(onSuccess, onError), onError);
@@ -368,10 +372,6 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
 
     public byte[] toBytes(boolean requiresSignature) {
         return toProto(requiresSignature).toByteArray();
-    }
-
-    private Client getClient() {
-        return Objects.requireNonNull(client);
     }
 
     private static ByteString getPrefix(ByteString byteString) {

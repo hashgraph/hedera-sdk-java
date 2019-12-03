@@ -18,7 +18,7 @@ class AccountDeleteClaimTransactionTest {
         Assertions.assertThrows(
             IllegalStateException.class,
             () -> new AccountDeleteClaimTransaction(null).validate(),
-            "transaction builder failed validation:\n" +
+            "transaction builder failed local validation:\n" +
                 ".setTransactionId() required\n" +
                 ".setNodeAccountId() required\n" +
                 ".setAccountToDeleteFrom() required\n" +
@@ -37,8 +37,9 @@ class AccountDeleteClaimTransactionTest {
             .setNodeAccountId(new AccountId(3))
             .setAccountToDeleteFrom(new AccountId(4))
             .setHashToDelete(new byte[]{4, 2, 1, 5})
-            .setTransactionFee(100_000)
-            .sign(key);
+            .setMaxTransactionFee(100_000)
+                    .build()
+                    .sign(key);
 
         Assertions.assertEquals(
             txn.toProto().toString(),

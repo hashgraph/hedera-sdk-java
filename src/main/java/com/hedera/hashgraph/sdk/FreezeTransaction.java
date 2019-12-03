@@ -22,8 +22,17 @@ import io.grpc.MethodDescriptor;
 public class FreezeTransaction extends TransactionBuilder<FreezeTransaction> {
     private FreezeTransactionBody.Builder builder = FreezeTransactionBody.newBuilder();
 
+    /**
+     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
+     */
+    @Deprecated
     public FreezeTransaction(@Nullable Client client) {
         super(client);
+        bodyBuilder.setFreeze(builder);
+    }
+
+    public FreezeTransaction() {
+        super();
         bodyBuilder.setFreeze(builder);
     }
 

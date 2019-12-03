@@ -15,8 +15,16 @@ import io.grpc.MethodDescriptor;
 public class AccountDeleteTransaction extends TransactionBuilder<AccountDeleteTransaction> {
     private final CryptoDeleteTransactionBody.Builder builder = bodyBuilder.getCryptoDeleteBuilder();
 
+    /**
+     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
+     */
+    @Deprecated
     public AccountDeleteTransaction(@Nullable Client client) {
         super(client);
+    }
+
+    public AccountDeleteTransaction() {
+        super();
     }
 
     public AccountDeleteTransaction setTransferAccountId(AccountId transferAccountId) {

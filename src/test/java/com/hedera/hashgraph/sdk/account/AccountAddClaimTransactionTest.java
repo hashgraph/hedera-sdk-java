@@ -1,10 +1,12 @@
 package com.hedera.hashgraph.sdk.account;
 
+import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.ThrowingSupplier;
 
 import java.time.Instant;
 
@@ -25,19 +27,19 @@ class AccountAddClaimTransactionTest {
         .setAccountId(account)
         .setHash(hash)
         .addKey(key.getPublicKey())
-        .setTransactionFee(100_000);
+        .setMaxTransactionFee(100_000);
 
     @Test
     @DisplayName("collect transaction validates")
     void correctTransactionValidates() {
-        assertDoesNotThrow(txn::build);
+        assertDoesNotThrow((ThrowingSupplier<Transaction>) txn::build);
     }
 
     @Test
     @DisplayName("incorrect transaction does not validate")
     void incorrectTransaction() {
         assertEquals(
-            "transaction builder failed validation:\n"
+            "transaction builder failed local validation:\n"
                 + ".setTransactionId() required\n"
                 + ".setNodeAccountId() required\n"
                 + ".setAccountId() required\n"

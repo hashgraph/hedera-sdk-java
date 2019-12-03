@@ -19,13 +19,13 @@ class AccountUpdateTransactionTest {
     @DisplayName("empty builder fails validation")
     void emptyBuilder() {
         assertEquals(
-            "transaction builder failed validation:\n"
+            "transaction builder failed local validation:\n"
                 + ".setTransactionId() required\n"
                 + ".setNodeAccountId() required\n"
                 + ".setAccountForUpdate() required",
             assertThrows(
                 IllegalStateException.class,
-                () -> new AccountUpdateTransaction(null).validate()
+                () -> new AccountUpdateTransaction().validate()
             ).getMessage()
         );
     }
@@ -36,7 +36,7 @@ class AccountUpdateTransactionTest {
         final Instant now = Instant.ofEpochSecond(1554158542);
         final Ed25519PrivateKey key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962");
         final TransactionId txnId = new TransactionId(new AccountId(2), now);
-        final Transaction txn = new AccountUpdateTransaction(null)
+        final Transaction txn = new AccountUpdateTransaction()
             .setKey(key.getPublicKey())
             .setNodeAccountId(new AccountId(3))
             .setTransactionId(txnId)
@@ -46,7 +46,8 @@ class AccountUpdateTransactionTest {
             .setReceiveRecordThreshold(6)
             .setAutoRenewPeriod(Duration.ofHours(10))
             .setExpirationTime(Instant.ofEpochSecond(1554158543))
-            .setTransactionFee(100_000)
+            .setMaxTransactionFee(100_000)
+            .build()
             .sign(key)
             .toProto();
 

@@ -21,9 +21,15 @@ import io.grpc.MethodDescriptor;
 public final class AccountUpdateTransaction extends TransactionBuilder<AccountUpdateTransaction> {
     private final CryptoUpdateTransactionBody.Builder builder = bodyBuilder.getCryptoUpdateAccountBuilder();
 
+    /**
+     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
+     */
+    @Deprecated
     public AccountUpdateTransaction(@Nullable Client client) {
         super(client);
     }
+
+    public AccountUpdateTransaction() { super(); }
 
     public AccountUpdateTransaction setAccountForUpdate(AccountId accountId) {
         builder.setAccountIDToUpdate(accountId.toProto());
