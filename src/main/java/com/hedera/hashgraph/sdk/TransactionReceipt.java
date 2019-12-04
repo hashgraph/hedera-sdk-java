@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.account.AccountId;
+import com.hedera.hashgraph.sdk.consensus.TopicId;
 import com.hedera.hashgraph.sdk.contract.ContractId;
 import com.hedera.hashgraph.sdk.file.FileId;
 import com.hederahashgraph.api.proto.java.Response;
@@ -48,6 +49,14 @@ public final class TransactionReceipt {
         }
 
         return new ContractId(inner.getContractIDOrBuilder());
+    }
+
+    public TopicId getTopicId() {
+        if (!inner.hasTopicID()) {
+            throw new IllegalStateException("receipt does not contain a topic ID");
+        }
+
+        return new TopicId(inner.getTopicIDOrBuilder());
     }
 
     public com.hederahashgraph.api.proto.java.TransactionReceipt toProto() {
