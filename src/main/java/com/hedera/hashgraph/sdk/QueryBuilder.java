@@ -213,18 +213,18 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     @Override
     protected final Resp mapResponse(Response raw) throws HederaException {
         final ResponseCodeEnum precheckCode = getResponseHeader(raw).getNodeTransactionPrecheckCode();
-        final Response.ResponseCase responseCase = raw.getResponseCase();
-        boolean unknownIsExceptional = false;
+        HederaException.throwIfExceptional(precheckCode);
 
-        switch (responseCase) {
+        switch (raw.getResponseCase()) {
             case TRANSACTIONGETRECEIPT:
+                HederaException.throwIfExceptional(raw.getTransactionGetReceipt().getReceipt().getStatus());
+                break;
             case TRANSACTIONGETRECORD:
+                HederaException.throwIfExceptional(raw.getTransactionGetRecord().getTransactionRecord().getReceipt().getStatus());
                 break;
             default:
-                unknownIsExceptional = true;
         }
 
-        HederaException.throwIfExceptional(precheckCode, unknownIsExceptional);
         return fromResponse(raw);
     }
 
