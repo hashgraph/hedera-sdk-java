@@ -35,12 +35,11 @@ final class Backoff {
         for (;;) {
             try {
                 return producer.tryProduce();
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 final Optional<Duration> nextDelay = getNextDelay();
 
                 // `producer` can only throw `E` as a checked exception
-                //noinspection unchecked
-                if (shouldRetry.test((E) e) && nextDelay.isPresent()) {
+                if (!(e instanceof RuntimeException) && shouldRetry.test((E) e) && nextDelay.isPresent()) {
                     ThreadUtil.sleepDuration(nextDelay.get());
                 } else {
                     throw e;

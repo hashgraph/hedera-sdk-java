@@ -67,14 +67,19 @@
         <nullaway.version>0.7.2</nullaway.version>
         <spotbugs.version>3.1.12</spotbugs.version>
 
-        <hedera-protobuf.version>0.3.5</hedera-protobuf.version>
+        <hedera-protobuf.version>0.1.0-SNAPSHOT</hedera-protobuf.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.hedera</groupId>
+            <artifactId>hedera-mirror-protobuf-hcs</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+        </dependency>
         <!-- Pre-compiled protobufs for Hedera -->
         <dependency>
             <groupId>com.hedera.hashgraph</groupId>
-            <artifactId>hedera-protobuf-java-api</artifactId>
+            <artifactId>hedera-protobuf-java-api-hcs</artifactId>
             <version>${hedera-protobuf.version}</version>
             <exclusions>
                 <!-- this lets us override io.grpc group dependencies with our own versions -->
