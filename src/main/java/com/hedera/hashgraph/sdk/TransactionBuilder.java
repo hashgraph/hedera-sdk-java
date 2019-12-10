@@ -107,10 +107,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         return self();
     }
 
-    /**
-     * Sets whether the transaction should generate a longer-lived record at the cost of a higher transaction fee.
-     * Records by default only live a few minutes but setting this causes them to persist for an hour.
-     */
+    @Deprecated
     public final T setGenerateRecord(boolean generateRecord) {
         bodyBuilder.setGenerateRecord(generateRecord);
         return self();
