@@ -62,12 +62,12 @@
         <maven.compiler.target>8</maven.compiler.target>
 
         <errorprone.version>2.3.3</errorprone.version>
-        <grpc.version>1.24.0</grpc.version>
+        <grpc.version>1.25.0</grpc.version>
         <junit.version>5.5.2</junit.version>
         <nullaway.version>0.7.2</nullaway.version>
         <spotbugs.version>3.1.12</spotbugs.version>
 
-        <hedera-protobuf.version>0.3.5</hedera-protobuf.version>
+        <hedera-protobuf.version>0.3.6</hedera-protobuf.version>
     </properties>
 
     <dependencies>
@@ -93,7 +93,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.63</version>
+            <version>1.64</version>
         </dependency>
         <dependency>
             <groupId>io.github.novacrypto</groupId>
@@ -103,9 +103,7 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <!-- 3.10.0 breaks compatibility with Android < 26, should be fixed in 3.11 -->
-            <!-- https://github.com/protocolbuffers/protobuf/issues/6718#issuecomment-546058263 -->
-            <version>3.9.2</version>
+            <version>3.11.1</version>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
@@ -237,7 +235,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <phase>verify</phase>
