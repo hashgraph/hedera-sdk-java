@@ -1,11 +1,10 @@
 package com.hedera.hashgraph.sdk.consensus;
 
-import com.hedera.hashgraph.sdk.file.FileInfo;
 import com.hederahashgraph.api.proto.java.*;
 
 public class ConsensusTopicInfo {
     /** Topic identifier */
-    public final TopicId id;
+    public final ConsensusTopicId id;
 
     /**
      * Topic definition
@@ -19,7 +18,7 @@ public class ConsensusTopicInfo {
     public final ConsensusTopicState state;
 
     public ConsensusTopicInfo(ConsensusGetTopicInfoResponseOrBuilder response) {
-        id = new TopicId(response.getTopicIDOrBuilder());
+        id = new ConsensusTopicId(response.getTopicIDOrBuilder());
         definition = new ConsensusTopicDefinition(response.getTopicDefinitionOrBuilder());
         state = new ConsensusTopicState(response.getTopicStateOrBuilder());
     }

@@ -14,7 +14,7 @@ public final class ConsensusTopicInfoQuery extends QueryBuilder<ConsensusTopicIn
         builder = inner.getConsensusGetTopicInfoBuilder();
     }
 
-    public ConsensusTopicInfoQuery setTopicId(TopicId id) {
+    public ConsensusTopicInfoQuery setTopicId(ConsensusTopicId id) {
         builder.setTopicID(id.toProto());
         return this;
     }

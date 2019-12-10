@@ -1,7 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.consensus.TopicId;
+import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hashgraph.sdk.contract.ContractId;
 import com.hedera.hashgraph.sdk.file.FileId;
 import com.hederahashgraph.api.proto.java.Response;
@@ -61,23 +61,23 @@ public final class TransactionReceipt {
         return new ContractId(inner.getContractIDOrBuilder());
     }
 
-    public TopicId getTopicId() {
+    public ConsensusTopicId getConsensusTopicId() {
         // Should be present for [ConsensusTopicCreateTransaction]
         if (!inner.hasTopicID()) {
             throw new IllegalStateException("receipt does not contain a topic ID");
         }
 
-        return new TopicId(inner.getTopicIDOrBuilder());
+        return new ConsensusTopicId(inner.getTopicIDOrBuilder());
     }
 
-    public long getTopicSequenceNumber() {
+    public long getConsensusTopicSequenceNumber() {
         // Should be present for [ConsensusTopicCreateTransaction]
         // FIXME[@mike-burrage-hedera]: Should this bail if there is no Topic ID
 
         return inner.getTopicSequenceNumber();
     }
 
-    public byte[] getTopicRunningHash() {
+    public byte[] getConsensusTopicRunningHash() {
         // Should be present for [ConsensusTopicCreateTransaction]
         // FIXME[@mike-burrage-hedera]: Should this bail if there is no Topic ID
 

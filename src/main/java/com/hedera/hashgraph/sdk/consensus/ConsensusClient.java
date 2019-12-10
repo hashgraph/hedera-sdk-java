@@ -23,7 +23,7 @@ import io.grpc.stub.StreamObserver;
 public class ConsensusClient implements AutoCloseable {
     private final ManagedChannel channel;
 
-    private final HashMap<TopicId, Subscription> subscriptions = new HashMap<>();
+    private final HashMap<ConsensusTopicId, Subscription> subscriptions = new HashMap<>();
 
     public ConsensusClient(String endpoint) {
         channel = ManagedChannelBuilder.forTarget(endpoint)
@@ -31,13 +31,13 @@ public class ConsensusClient implements AutoCloseable {
             .build();
     }
 
-    public void subscribe(TopicId topic, TopicListener listener) {
+    public void subscribe(ConsensusTopicId topic, TopicListener listener) {
         subscriptions.computeIfAbsent(topic, _topic -> new Subscription(startStreamingCall(topic)))
             .listeners
             .add(listener);
     }
 
-    private ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> startStreamingCall(TopicId topic) {
+    private ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> startStreamingCall(ConsensusTopicId topic) {
         final ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call =
             channel.newCall(ConsensusServiceGrpc.getSubscribeTopicMethod(), CallOptions.DEFAULT);
 
@@ -67,7 +67,7 @@ public class ConsensusClient implements AutoCloseable {
         return call;
     }
 
-    public Iterator<ConsensusMessage> messagesForPeriod(TopicId topic, Instant startTime, Instant endTime) {
+    public Iterator<ConsensusMessage> messagesForPeriod(ConsensusTopicId topic, Instant startTime, Instant endTime) {
         final ConsensusTopicQuery topicQuery = ConsensusTopicQuery.newBuilder()
             .setTopicID(topic.toProto())
             .setConsensusStartTime(TimestampHelper.timestampFrom(startTime))
@@ -83,7 +83,7 @@ public class ConsensusClient implements AutoCloseable {
         return Iterators.transform(iter, message -> new ConsensusMessage(topic, Objects.requireNonNull(message)));
     }
 
-    public void unsubscribe(TopicId topicId, TopicListener listener) {
+    public void unsubscribe(ConsensusTopicId topicId, TopicListener listener) {
         subscriptions.computeIfPresent(topicId, (_topic, sub) -> {
             sub.listeners.remove(listener);
 

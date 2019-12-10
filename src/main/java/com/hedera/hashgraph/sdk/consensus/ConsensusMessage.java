@@ -8,14 +8,14 @@ import java.time.Instant;
 import java.util.Arrays;
 
 public class ConsensusMessage {
-    public final TopicId topicId;
+    public final ConsensusTopicId topicId;
 
     public final Instant consensusTimestamp;
     public final byte[] message;
     public final byte[] runningHash;
     public final long sequenceNumber;
 
-    ConsensusMessage(TopicId topicId, ConsensusTopicResponse message) {
+    ConsensusMessage(ConsensusTopicId topicId, ConsensusTopicResponse message) {
         this.topicId = topicId;
         consensusTimestamp = TimestampHelper.timestampTo(message.getConsensusTimestamp());
         this.message = message.getMessage().toByteArray();

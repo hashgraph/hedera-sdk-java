@@ -1,15 +1,10 @@
 package com.hedera.hashgraph.sdk.consensus;
 
-import com.google.protobuf.StringValue;
-import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
-import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hederahashgraph.api.proto.java.ConsensusUpdateTopicTransactionBody;
 import com.hederahashgraph.api.proto.java.Transaction;
 import com.hederahashgraph.api.proto.java.TransactionResponse;
 import com.hederahashgraph.service.proto.java.ConsensusServiceGrpc;
-
-import java.time.Instant;
 
 import io.grpc.MethodDescriptor;
 
@@ -20,7 +15,7 @@ public class ConsensusTopicDeleteTransaction extends TransactionBuilder<Consensu
         super();
     }
 
-    public ConsensusTopicDeleteTransaction setTopicId(TopicId topicId) {
+    public ConsensusTopicDeleteTransaction setTopicId(ConsensusTopicId topicId) {
         builder.setTopicID(topicId.toProto());
         return this;
     }

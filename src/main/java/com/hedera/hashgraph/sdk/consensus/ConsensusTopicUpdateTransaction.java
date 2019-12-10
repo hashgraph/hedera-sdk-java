@@ -20,7 +20,7 @@ public class ConsensusTopicUpdateTransaction extends TransactionBuilder<Consensu
         super();
     }
 
-    public ConsensusTopicUpdateTransaction setTopicId(TopicId topicId) {
+    public ConsensusTopicUpdateTransaction setTopicId(ConsensusTopicId topicId) {
         builder.setTopicID(topicId.toProto());
         return this;
     }

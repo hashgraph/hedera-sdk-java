@@ -4,7 +4,7 @@ import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.consensus.ConsensusClient;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicCreateTransaction;
-import com.hedera.hashgraph.sdk.consensus.TopicId;
+import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hashgraph.sdk.examples.ExampleHelper;
 
 public final class ConsensusPubSub {
@@ -18,7 +18,7 @@ public final class ConsensusPubSub {
 
         topicTxn.execute();
 
-        final TopicId topicId = topicTxn.queryReceipt().getTopicId();
+        final ConsensusTopicId topicId = topicTxn.queryReceipt().getTopicId();
 
         consensusClient.subscribe(topicId, message -> {
             System.out.println("received topic message: " + message.getMessageString());
