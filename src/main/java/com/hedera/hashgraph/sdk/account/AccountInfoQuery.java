@@ -22,8 +22,8 @@ public final class AccountInfoQuery extends QueryBuilder<AccountInfo, AccountInf
         builder = inner.getCryptoGetInfoBuilder();
     }
 
-    AccountInfoQuery() {
-        super(null);
+    public AccountInfoQuery() {
+        super();
         builder = inner.getCryptoGetInfoBuilder();
     }
 
