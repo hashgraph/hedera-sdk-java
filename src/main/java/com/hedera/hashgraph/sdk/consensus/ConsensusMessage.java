@@ -11,8 +11,11 @@ public class ConsensusMessage {
     public final ConsensusTopicId topicId;
 
     public final Instant consensusTimestamp;
+
     public final byte[] message;
+
     public final byte[] runningHash;
+
     public final long sequenceNumber;
 
     ConsensusMessage(ConsensusTopicId topicId, ConsensusTopicResponse message) {
