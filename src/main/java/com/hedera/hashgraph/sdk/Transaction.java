@@ -158,10 +158,10 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
             .executeAsync(client, onReceipt, onError);
     }
 
-    public void getReceiptAsync(Client client, Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError, Duration timeout) {
+    public void getReceiptAsync(Client client, Duration timeout, Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError) {
         new TransactionReceiptQuery()
             .setTransactionId(id)
-            .executeAsync(client, onReceipt, onError, timeout);
+            .executeAsync(client, timeout, onReceipt, onError);
     }
 
     public TransactionRecord getRecord(Client client) throws HederaException, HederaNetworkException {
@@ -182,10 +182,10 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
             .executeAsync(client, onRecord, onError);
     }
 
-    public void getRecordAsync(Client client, Consumer<TransactionRecord> onRecord, Consumer<HederaThrowable> onError, Duration timeout) {
+    public void getRecordAsync(Client client, Duration timeout, Consumer<TransactionRecord> onRecord, Consumer<HederaThrowable> onError) {
         new TransactionRecordQuery()
             .setTransactionId(id)
-            .executeAsync(client, onRecord, onError, timeout);
+            .executeAsync(client, timeout, onRecord, onError);
     }
 
     @Override

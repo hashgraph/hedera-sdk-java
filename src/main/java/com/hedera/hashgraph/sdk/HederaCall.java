@@ -91,10 +91,10 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
     }
 
     public final void executeAsync(Client client, Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError) {
-        executeAsync(client, onSuccess, onError, getDefaultTimeout());
+        executeAsync(client, getDefaultTimeout(), onSuccess, onError);
     }
 
-    public void executeAsync(Client client, Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError, Duration retryTimeout) {
+    public void executeAsync(Client client, Duration retryTimeout, Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError) {
         if (isExecuted) {
             throw new IllegalStateException("call already executed");
         }
@@ -112,14 +112,14 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
      */
     @Deprecated
     public final void executeAsync(Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError) {
-        executeAsync(onSuccess, onError, getDefaultTimeout());
+        executeAsync(getDefaultTimeout(), onSuccess, onError);
     }
 
     /**
-     * @deprecated use {@link #executeAsync(Client, Consumer, Consumer, Duration)} instead.
+     * @deprecated use {@link #executeAsync(Client, Duration, Consumer, Consumer)} instead.
      */
     @Deprecated
-    public final void executeAsync(Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError, Duration retryTimeout) {
+    public final void executeAsync(Duration retryTimeout, Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError) {
         if (isExecuted) {
             throw new IllegalStateException("call already executed");
         }
@@ -140,16 +140,16 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
      */
     @Deprecated
     public final void executeAsync(BiConsumer<T, Resp> onSuccess, BiConsumer<T, HederaThrowable> onError) {
-        executeAsync(onSuccess, onError, getDefaultTimeout());
+        executeAsync(getDefaultTimeout(), onSuccess, onError);
     }
 
     /**
-     * Equivalent to {@link #executeAsync(Consumer, Consumer, Duration)} but providing {@code this}
+     * Equivalent to {@link #executeAsync(Duration, Consumer, Consumer)} but providing {@code this}
      * to the callback for additional context.
      */
-    public final void executeAsync(BiConsumer<T, Resp> onSuccess, BiConsumer<T, HederaThrowable> onError, Duration timeout) {
+    public final void executeAsync(Duration timeout, BiConsumer<T, Resp> onSuccess, BiConsumer<T, HederaThrowable> onError) {
         //noinspection unchecked
-        executeAsync(resp -> onSuccess.accept((T) this, resp), err -> onError.accept((T) this, err), timeout);
+        executeAsync(timeout, resp -> onSuccess.accept((T) this, resp), err -> onError.accept((T) this, err));
     }
 
     /**
