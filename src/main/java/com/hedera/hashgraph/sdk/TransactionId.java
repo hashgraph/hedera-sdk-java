@@ -15,6 +15,10 @@ import javax.annotation.Nullable;
 // TODO: TransactionId.fromString
 
 public final class TransactionId {
+    public final AccountId accountId;
+
+    public final Instant validStart;
+
     private final TransactionID.Builder inner;
 
     @Nullable
@@ -66,20 +70,34 @@ public final class TransactionId {
                 Timestamp.newBuilder()
                     .setSeconds(transactionValidStart.getEpochSecond())
                     .setNanos(transactionValidStart.getNano()));
+
+        this.accountId = accountId;
+        this.validStart = transactionValidStart;
     }
 
     TransactionId(TransactionIDOrBuilder transactionId) {
         inner = TransactionID.newBuilder()
             .setAccountID(transactionId.getAccountID())
             .setTransactionValidStart(transactionId.getTransactionValidStart());
+
+        accountId = new AccountId(transactionId.getAccountIDOrBuilder());
+        validStart = TimestampHelper.timestampTo(transactionId.getTransactionValidStart());
     }
 
+    /**
+     * @deprecated use {@link #accountId} instead.
+     */
+    @Deprecated
     public AccountId getAccountId() {
-        return new AccountId(inner.getAccountIDOrBuilder());
+        return accountId;
     }
 
+    /**
+     * @deprecated use {@link #validStart} instead.
+     */
+    @Deprecated
     public Instant getValidStart() {
-        return TimestampHelper.timestampTo(inner.getTransactionValidStart());
+        return validStart;
     }
 
     public TransactionID toProto() {
@@ -88,7 +106,7 @@ public final class TransactionId {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getAccountId(), getValidStart());
+        return Objects.hash(accountId, validStart);
     }
 
     @Override
@@ -98,6 +116,6 @@ public final class TransactionId {
         if (!(other instanceof TransactionId)) return false;
 
         TransactionId otherId = (TransactionId) other;
-        return getAccountId().equals(otherId.getAccountId()) && getValidStart().equals(otherId.getValidStart());
+        return accountId.equals(otherId.accountId) && validStart.equals(otherId.validStart);
     }
 }
