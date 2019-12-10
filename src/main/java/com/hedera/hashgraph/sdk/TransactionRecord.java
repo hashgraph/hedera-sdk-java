@@ -48,13 +48,31 @@ public final class TransactionRecord {
     }
 
     @Nullable
-    public FunctionResult getCallResult() {
+    public FunctionResult getContractExecuteResult() {
         return inner.hasContractCallResult() ? new FunctionResult(inner.getContractCallResultOrBuilder()) : null;
     }
 
     @Nullable
-    public FunctionResult getCreateResult() {
+    public FunctionResult getContractCreateResult() {
         return inner.hasContractCreateResult() ? new FunctionResult(inner.getContractCreateResultOrBuilder()) : null;
+    }
+
+    /**
+     * @deprecated use {@link #getContractExecuteResult()} instead.
+     */
+    @Deprecated
+    @Nullable
+    public FunctionResult getCallResult() {
+        return getContractExecuteResult();
+    }
+
+    /**
+     * @deprecated use {@link #getContractCreateResult()} instead.
+     */
+    @Deprecated
+    @Nullable
+    public FunctionResult getCreateResult() {
+        return getContractCreateResult();
     }
 
     public List<Transfer> getTransfers() {
