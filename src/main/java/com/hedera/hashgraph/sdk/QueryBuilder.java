@@ -219,7 +219,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     }
 
     @Override
-    public final void executeAsync(Client client, Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError, Duration timeout) {
+    public final void executeAsync(Client client, Duration timeout, Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError) {
         final long maxQueryPayment = requireClient().getMaxQueryPayment();
 
         if (!getHeaderBuilder().hasPayment() && isPaymentRequired() && maxQueryPayment > 0) {
@@ -230,10 +230,10 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
                 }
                 paymentAmount = cost;
 
-                super.executeAsync(client, onSuccess, onError, timeout);
+                super.executeAsync(client, timeout, onSuccess, onError);
             }, onError);
         } else {
-            super.executeAsync(client, onSuccess, onError, timeout);
+            super.executeAsync(client, timeout, onSuccess, onError);
         }
     }
 
