@@ -8,6 +8,8 @@ import com.hederahashgraph.api.proto.java.Response;
 import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
 
 public final class TransactionReceipt {
+    public final ResponseCodeEnum status;
+
     private final com.hederahashgraph.api.proto.java.TransactionReceipt inner;
 
     TransactionReceipt(Response response) {
@@ -17,12 +19,20 @@ public final class TransactionReceipt {
 
         inner = response.getTransactionGetReceipt()
             .getReceipt();
+
+        status = inner.getStatus();
     }
 
     TransactionReceipt(com.hederahashgraph.api.proto.java.TransactionReceipt inner) {
         this.inner = inner;
+
+        status = inner.getStatus();
     }
 
+    /**
+     * @deprecated use {@link #status} instead.
+     */
+    @Deprecated
     public ResponseCodeEnum getStatus() {
         return inner.getStatus();
     }
