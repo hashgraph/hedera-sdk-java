@@ -57,7 +57,6 @@ public final class TransactionRecord {
         return inner.hasContractCreateResult() ? new FunctionResult(inner.getContractCreateResultOrBuilder()) : null;
     }
 
-    @Nullable
     public List<Transfer> getTransfers() {
         return inner.hasTransferList()
             ? inner.getTransferList()
@@ -65,7 +64,7 @@ public final class TransactionRecord {
                 .stream()
                 .map(Transfer::new)
                 .collect(Collectors.toList())
-            : null;
+            : Collections.emptyList();
     }
 
     public final static class Transfer {
