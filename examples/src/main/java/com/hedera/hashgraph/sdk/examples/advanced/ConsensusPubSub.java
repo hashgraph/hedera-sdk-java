@@ -3,7 +3,7 @@ package com.hedera.hashgraph.sdk.examples.advanced;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.consensus.ConsensusClient;
-import com.hedera.hashgraph.sdk.consensus.TopicCreateTransaction;
+import com.hedera.hashgraph.sdk.consensus.ConsensusTopicCreateTransaction;
 import com.hedera.hashgraph.sdk.consensus.TopicId;
 import com.hedera.hashgraph.sdk.examples.ExampleHelper;
 
@@ -13,7 +13,7 @@ public final class ConsensusPubSub {
     public static void main(String[] args) throws InterruptedException, HederaException {
         final ConsensusClient consensusClient = new ConsensusClient("34.66.214.12:6552");
 
-        final Transaction topicTxn = new TopicCreateTransaction(ExampleHelper.createHederaClient())
+        final Transaction topicTxn = new ConsensusTopicCreateTransaction(ExampleHelper.createHederaClient())
             .build();
 
         topicTxn.execute();
