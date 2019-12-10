@@ -36,9 +36,9 @@ public class ConsensusTopicCreateTransaction extends TransactionBuilder<Consensu
     }
 
     /**
-     * Access control for {@link MessageSendTransaction}.
+     * Access control for {@link ConsensusMessageSubmitTransaction}.
      *
-     * If unspecified, no access control will be performed {@link MessageSendTransaction} (all
+     * If unspecified, no access control will be performed {@link ConsensusMessageSubmitTransaction} (all
      * submissions would be allowed).
      */
     public ConsensusTopicCreateTransaction setSubmitKey(PublicKey key) {
@@ -47,7 +47,7 @@ public class ConsensusTopicCreateTransaction extends TransactionBuilder<Consensu
     }
 
     /**
-     * Effective consensus timestamp at which {@link MessageSendTransaction} will begin to succeed on this topic.
+     * Effective consensus timestamp at which {@link ConsensusMessageSubmitTransaction} will begin to succeed on this topic.
      *
      * If unspecified, the consensus timestamp of this transaction will be the effective validStartTime.
      */
@@ -57,7 +57,7 @@ public class ConsensusTopicCreateTransaction extends TransactionBuilder<Consensu
     }
 
     /**
-     * Effective consensus timestamp at (and after) which {@link MessageSendTransaction} calls will no longer
+     * Effective consensus timestamp at (and after) which {@link ConsensusMessageSubmitTransaction} calls will no longer
      * succeed on the topic.
      *
      * If unspecified, the consensus timestamp + 90 days will become the effective expirationTime.

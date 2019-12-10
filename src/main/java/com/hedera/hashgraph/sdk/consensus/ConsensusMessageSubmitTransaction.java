@@ -12,31 +12,31 @@ import javax.annotation.Nullable;
 
 import io.grpc.MethodDescriptor;
 
-public class MessageSendTransaction extends TransactionBuilder<MessageSendTransaction> {
+public class ConsensusMessageSubmitTransaction extends TransactionBuilder<ConsensusMessageSubmitTransaction> {
     private ConsensusSubmitMessageTransactionBody.Builder builder = bodyBuilder.getConsensusSubmitMessageBuilder();
 
-    public MessageSendTransaction(@Nullable Client client) {
-        super(client);
+    public ConsensusMessageSubmitTransaction() {
+        super();
     }
 
-    public MessageSendTransaction setTopic(TopicId topic) {
+    public ConsensusMessageSubmitTransaction setTopicId(TopicId topic) {
         builder.setTopicID(topic.toProto());
         return this;
     }
 
-    public MessageSendTransaction setMessage(byte[] message) {
+    public ConsensusMessageSubmitTransaction setMessage(byte[] message) {
         builder.setMessage(ByteString.copyFrom(message));
         return this;
     }
 
-    public MessageSendTransaction setMessage(String message) {
+    public ConsensusMessageSubmitTransaction setMessage(String message) {
         builder.setMessage(ByteString.copyFromUtf8(message));
         return this;
     }
 
     @Override
     protected void doValidate() {
-        require(builder.hasTopicID(), "setTopic() required");
+        require(builder.hasTopicID(), "setTopicId() required");
     }
 
     @Override
