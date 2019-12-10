@@ -1,60 +1,108 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hederahashgraph.api.proto.java.AccountAmountOrBuilder;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
 public final class TransactionRecord {
+    /** The ID of the transaction this record represents */
+    public final TransactionId transactionId;
+
+    /** The hash of the Transaction that executed */
+    public final byte[] transactionHash;
+
+    /** The actual transaction fee charged, unless there were insufficient funds in the operator account */
+    public final long transactionFee;
+
+    /** The consensus timestamp */
+    @Nullable
+    public final Instant consensusTimestamp;
+
+    /** The memo that was submitted as part of the transaction (max 100 bytes) */
+    @Nullable
+    public final String memo;
+
+    /**
+     * The status (reach consensus, or failed, or is unknown), and the ID of any
+     * new account/file/instance created
+     */
+    public final TransactionReceipt receipt;
+
     private final com.hederahashgraph.api.proto.java.TransactionRecord inner;
 
     TransactionRecord(com.hederahashgraph.api.proto.java.TransactionRecord inner) {
         this.inner = inner;
+
+        transactionId = new TransactionId(inner.getTransactionIDOrBuilder());
+        transactionFee = inner.getTransactionFee();
+        receipt = new TransactionReceipt(inner.getReceipt());
+        transactionHash = inner.getTransactionHash().toByteArray();
+        consensusTimestamp = inner.hasConsensusTimestamp() ? TimestampHelper.timestampTo(inner.getConsensusTimestamp()) : null;
+
+        String memo = inner.getMemo();
+        this.memo = memo.isEmpty() ? null : memo;
     }
 
+    @Deprecated
     public TransactionId getTransactionId() {
-        return new TransactionId(inner.getTransactionIDOrBuilder());
+        return transactionId;
     }
 
+    @Deprecated
     public long getTransactionFee() {
-        return inner.getTransactionFee();
+        return transactionFee;
     }
 
+    @Deprecated
     public TransactionReceipt getReceipt() {
-        return new TransactionReceipt(inner.getReceipt());
+        return receipt;
     }
 
-    @Nullable
+    @Deprecated
     public byte[] getTransactionHash() {
-        ByteString hash = inner.getTransactionHash();
-        // proto specifies hash is not provided if the transaction failed due to a duplicate ID
-        return !hash.isEmpty() ? hash.toByteArray() : null;
+        return transactionHash;
     }
 
+    @Deprecated
     @Nullable
     public Instant getConsensusTimestamp() {
-        return inner.hasConsensusTimestamp() ? TimestampHelper.timestampTo(inner.getConsensusTimestamp()) : null;
+        return consensusTimestamp;
     }
 
+    @Deprecated
     @Nullable
     public String getMemo() {
-        String memo = inner.getMemo();
-        return !memo.isEmpty() ? memo : null;
+        return memo;
     }
 
-    @Nullable
+    /**
+     * Record of the value returned by the smart contract function (if it completed and didn't fail)
+     * from {@link com.hedera.hashgraph.sdk.contract.ContractExecuteTransaction}.
+     */
     public FunctionResult getContractExecuteResult() {
-        return inner.hasContractCallResult() ? new FunctionResult(inner.getContractCallResultOrBuilder()) : null;
+        if (!inner.hasContractCallResult()) {
+            throw new IllegalStateException("record does not contain a contract execute result");
+        }
+
+        return new FunctionResult(inner.getContractCallResultOrBuilder());
     }
 
-    @Nullable
+    /**
+     * Record of the value returned by the smart contract constructor (if it completed and didn't fail)
+     * from {@link com.hedera.hashgraph.sdk.contract.ContractCreateTransaction}.
+     */
     public FunctionResult getContractCreateResult() {
-        return inner.hasContractCreateResult() ? new FunctionResult(inner.getContractCreateResultOrBuilder()) : null;
+        if (!inner.hasContractCreateResult()) {
+            throw new IllegalStateException("record does not contain a contract create result");
+        }
+
+        return new FunctionResult(inner.getContractCreateResultOrBuilder());
     }
 
     /**
@@ -63,6 +111,10 @@ public final class TransactionRecord {
     @Deprecated
     @Nullable
     public FunctionResult getCallResult() {
+        if (!inner.hasContractCallResult()) {
+            return null;
+        }
+
         return getContractExecuteResult();
     }
 
@@ -72,9 +124,18 @@ public final class TransactionRecord {
     @Deprecated
     @Nullable
     public FunctionResult getCreateResult() {
+        if (!inner.hasContractCreateResult()) {
+            return null;
+        }
+
         return getContractCreateResult();
     }
 
+    /**
+     * All Hbar transfers as a result of this transaction, such as fees, or transfers performed by the
+     * transaction, or by a smart contract it calls, or by the creation of threshold
+     * records that it triggers.
+     */
     public List<Transfer> getTransfers() {
         return inner.hasTransferList()
             ? inner.getTransferList()
