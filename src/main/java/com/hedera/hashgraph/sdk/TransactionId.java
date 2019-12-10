@@ -6,8 +6,10 @@ import com.hederahashgraph.api.proto.java.TransactionID;
 import com.hederahashgraph.api.proto.java.TransactionIDOrBuilder;
 
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
@@ -117,5 +119,53 @@ public final class TransactionId {
 
         TransactionId otherId = (TransactionId) other;
         return accountId.equals(otherId.accountId) && validStart.equals(otherId.validStart);
+    }
+
+    public TransactionReceipt getReceipt(Client client) throws HederaException {
+        return new TransactionReceiptQuery()
+            .setTransactionId(this)
+            .execute(client);
+    }
+
+    public TransactionReceipt getReceipt(Client client, Duration timeout) throws HederaException {
+        return new TransactionReceiptQuery()
+            .setTransactionId(this)
+            .execute(client, timeout);
+    }
+
+    public void getReceiptAsync(Client client, Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError) {
+        new TransactionReceiptQuery()
+            .setTransactionId(this)
+            .executeAsync(client, onReceipt, onError);
+    }
+
+    public void getReceiptAsync(Client client, Duration timeout, Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError) {
+        new TransactionReceiptQuery()
+            .setTransactionId(this)
+            .executeAsync(client, timeout, onReceipt, onError);
+    }
+
+    public TransactionRecord getRecord(Client client) throws HederaException, HederaNetworkException {
+        return new TransactionRecordQuery()
+            .setTransactionId(this)
+            .execute(client);
+    }
+
+    public TransactionRecord getRecord(Client client, Duration timeout) throws HederaException {
+        return new TransactionRecordQuery()
+            .setTransactionId(this)
+            .execute(client, timeout);
+    }
+
+    public void getRecordAsync(Client client, Consumer<TransactionRecord> onRecord, Consumer<HederaThrowable> onError) {
+        new TransactionRecordQuery()
+            .setTransactionId(this)
+            .executeAsync(client, onRecord, onError);
+    }
+
+    public void getRecordAsync(Client client, Duration timeout, Consumer<TransactionRecord> onRecord, Consumer<HederaThrowable> onError) {
+        new TransactionRecordQuery()
+            .setTransactionId(this)
+            .executeAsync(client, timeout, onRecord, onError);
     }
 }
