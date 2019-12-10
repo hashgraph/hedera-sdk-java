@@ -14,9 +14,7 @@ import com.hederahashgraph.api.proto.java.SignaturePairOrBuilder;
 import com.hederahashgraph.api.proto.java.TransactionBody;
 import com.hederahashgraph.api.proto.java.TransactionBodyOrBuilder;
 import com.hederahashgraph.api.proto.java.TransactionResponse;
-import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
-import com.hederahashgraph.service.proto.java.FileServiceGrpc;
-import com.hederahashgraph.service.proto.java.SmartContractServiceGrpc;
+import com.hederahashgraph.service.proto.java.*;
 
 import org.bouncycastle.util.encoders.Hex;
 
@@ -368,10 +366,17 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
 
     private static MethodDescriptor<com.hederahashgraph.api.proto.java.Transaction, TransactionResponse> methodForTxnBody(TransactionBodyOrBuilder body) {
         switch (body.getDataCase()) {
+            // System
+
             case SYSTEMDELETE:
                 return FileServiceGrpc.getSystemDeleteMethod();
             case SYSTEMUNDELETE:
                 return FileServiceGrpc.getSystemUndeleteMethod();
+            case FREEZE:
+                return FreezeServiceGrpc.getFreezeMethod();
+
+            // Contracts
+
             case CONTRACTCALL:
                 return SmartContractServiceGrpc.getContractCallMethodMethod();
             case CONTRACTCREATEINSTANCE:
@@ -380,6 +385,9 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
                 return SmartContractServiceGrpc.getUpdateContractMethod();
             case CONTRACTDELETEINSTANCE:
                 return SmartContractServiceGrpc.getDeleteContractMethod();
+
+            // Account / Crypto
+
             case CRYPTOADDCLAIM:
                 return CryptoServiceGrpc.getAddClaimMethod();
             case CRYPTOCREATEACCOUNT:
@@ -392,6 +400,9 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
                 return CryptoServiceGrpc.getCryptoTransferMethod();
             case CRYPTOUPDATEACCOUNT:
                 return CryptoServiceGrpc.getUpdateAccountMethod();
+
+            // Files
+
             case FILEAPPEND:
                 return FileServiceGrpc.getAppendContentMethod();
             case FILECREATE:
@@ -400,8 +411,22 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
                 return FileServiceGrpc.getDeleteFileMethod();
             case FILEUPDATE:
                 return FileServiceGrpc.getUpdateFileMethod();
+
+            // Consensus
+
+            case CONSENSUSCREATETOPIC:
+                return ConsensusServiceGrpc.getCreateTopicMethod();
+            case CONSENSUSUPDATETOPIC:
+                return ConsensusServiceGrpc.getUpdateTopicMethod();
+            case CONSENSUSDELETETOPIC:
+                return ConsensusServiceGrpc.getDeleteTopicMethod();
+
+            case CONSENSUSSUBMITMESSAGE:
+                return ConsensusServiceGrpc.getSubmitMessageMethod();
+
             case DATA_NOT_SET:
                 throw new IllegalArgumentException("method not set");
+
             default:
                 throw new IllegalArgumentException("unsupported method");
         }
