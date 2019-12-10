@@ -12,13 +12,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import io.grpc.CallOptions;
-import io.grpc.ClientCall;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.ClientCalls;
-import io.grpc.stub.StreamObserver;
 
 public class ConsensusClient implements AutoCloseable {
     private final ManagedChannel channel;
@@ -31,7 +30,7 @@ public class ConsensusClient implements AutoCloseable {
             .build();
     }
 
-    public void subscribe(ConsensusTopicId topic, TopicListener listener) {
+    public void subscribe(ConsensusTopicId topic, Consumer<ConsensusMessage> listener) {
         subscriptions.computeIfAbsent(topic, _topic -> new Subscription(startStreamingCall(topic)))
             .listeners
             .add(listener);
@@ -50,7 +49,7 @@ public class ConsensusClient implements AutoCloseable {
             public void onNext(ConsensusTopicResponse value) {
                 subscriptions.get(topic)
                     .listeners
-                    .forEach(listener -> listener.onMessage(new ConsensusMessage(topic, value)));
+                    .forEach(listener -> listener.accept(new ConsensusMessage(topic, value)));
             }
 
             @Override
@@ -83,7 +82,7 @@ public class ConsensusClient implements AutoCloseable {
         return Iterators.transform(iter, message -> new ConsensusMessage(topic, Objects.requireNonNull(message)));
     }
 
-    public void unsubscribe(ConsensusTopicId topicId, TopicListener listener) {
+    public void unsubscribe(ConsensusTopicId topicId, Consumer<ConsensusMessage> listener) {
         subscriptions.computeIfPresent(topicId, (_topic, sub) -> {
             sub.listeners.remove(listener);
 
@@ -121,7 +120,7 @@ public class ConsensusClient implements AutoCloseable {
     }
 
     private static final class Subscription {
-        final ArrayList<TopicListener> listeners = new ArrayList<>();
+        final ArrayList<Consumer<ConsensusMessage>> listeners = new ArrayList<>();
         final ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call;
 
         private Subscription(ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call) {
