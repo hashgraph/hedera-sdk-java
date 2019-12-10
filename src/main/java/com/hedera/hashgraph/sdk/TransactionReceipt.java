@@ -52,11 +52,26 @@ public final class TransactionReceipt {
     }
 
     public TopicId getTopicId() {
+        // Should be present for [ConsensusTopicCreateTransaction]
         if (!inner.hasTopicID()) {
             throw new IllegalStateException("receipt does not contain a topic ID");
         }
 
         return new TopicId(inner.getTopicIDOrBuilder());
+    }
+
+    public long getTopicSequenceNumber() {
+        // Should be present for [ConsensusTopicCreateTransaction]
+        // FIXME[@mike-burrage-hedera]: Should this bail if there is no Topic ID
+
+        return inner.getTopicSequenceNumber();
+    }
+
+    public byte[] getTopicRunningHash() {
+        // Should be present for [ConsensusTopicCreateTransaction]
+        // FIXME[@mike-burrage-hedera]: Should this bail if there is no Topic ID
+
+        return inner.getTopicRunningHash().toByteArray();
     }
 
     public com.hederahashgraph.api.proto.java.TransactionReceipt toProto() {
