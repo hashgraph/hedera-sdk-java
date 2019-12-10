@@ -22,12 +22,16 @@ public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalance
     @Deprecated
     public AccountBalanceQuery(@Nullable Client client) {
         super(client);
+
         // a payment transaction is required but is not processed so it can have zero value
         setPaymentAmount(0);
     }
 
     public AccountBalanceQuery() {
         super();
+
+        // a payment transaction is required but is not processed so it can have zero value
+        setPaymentAmount(0);
     }
 
     @Override
