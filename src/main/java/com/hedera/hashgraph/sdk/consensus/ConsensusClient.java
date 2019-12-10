@@ -67,7 +67,7 @@ public class ConsensusClient implements AutoCloseable {
         return call;
     }
 
-    public Iterator<ConsensusMessage> messagesForPeriod(ConsensusTopicId topic, Instant startTime, Instant endTime) {
+    public Iterator<ConsensusMessage> getMessages(ConsensusTopicId topic, Instant startTime, Instant endTime) {
         final ConsensusTopicQuery topicQuery = ConsensusTopicQuery.newBuilder()
             .setTopicID(topic.toProto())
             .setConsensusStartTime(TimestampHelper.timestampFrom(startTime))
