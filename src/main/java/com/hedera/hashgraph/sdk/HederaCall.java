@@ -30,6 +30,7 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
 
     public abstract Req toProto();
 
+    @Deprecated
     protected abstract Channel getChannel();
 
     protected abstract Channel getChannel(Client client);
