@@ -200,7 +200,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     @Override
     public final Resp execute(Client client, Duration timeout) throws HederaException, HederaNetworkException {
-        final long maxQueryPayment = requireClient().getMaxQueryPayment();
+        final long maxQueryPayment = client.getMaxQueryPayment();
 
         if (!getHeaderBuilder().hasPayment() && isPaymentRequired() && maxQueryPayment > 0) {
             if (paymentAmount == 0) {
@@ -220,7 +220,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     @Override
     public final void executeAsync(Client client, Duration timeout, Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError) {
-        final long maxQueryPayment = requireClient().getMaxQueryPayment();
+        final long maxQueryPayment = client.getMaxQueryPayment();
 
         if (!getHeaderBuilder().hasPayment() && isPaymentRequired() && maxQueryPayment > 0) {
             getCostAsync(client, cost -> {
