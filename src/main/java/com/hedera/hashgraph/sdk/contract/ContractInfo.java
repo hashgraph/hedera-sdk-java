@@ -18,6 +18,7 @@ public final class ContractInfo {
 
     public final String contractAccountId;
 
+    @Nullable
     public final PublicKey adminKey;
 
     public final Instant expirationTime;

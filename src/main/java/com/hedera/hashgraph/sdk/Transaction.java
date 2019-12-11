@@ -14,7 +14,11 @@ import com.hederahashgraph.api.proto.java.SignaturePairOrBuilder;
 import com.hederahashgraph.api.proto.java.TransactionBody;
 import com.hederahashgraph.api.proto.java.TransactionBodyOrBuilder;
 import com.hederahashgraph.api.proto.java.TransactionResponse;
-import com.hederahashgraph.service.proto.java.*;
+import com.hederahashgraph.service.proto.java.ConsensusServiceGrpc;
+import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
+import com.hederahashgraph.service.proto.java.FileServiceGrpc;
+import com.hederahashgraph.service.proto.java.FreezeServiceGrpc;
+import com.hederahashgraph.service.proto.java.SmartContractServiceGrpc;
 
 import org.bouncycastle.util.encoders.Hex;
 
@@ -300,7 +304,8 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
      */
     @Deprecated
     public void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<HederaThrowable> onError) {
-        executeAsync(Objects.requireNonNull(client), id -> getReceiptAsync(client, onSuccess, onError), onError);
+        final Client client = Objects.requireNonNull(this.client);
+        executeAsync(client, id -> getReceiptAsync(client, onSuccess, onError), onError);
     }
 
     /**
