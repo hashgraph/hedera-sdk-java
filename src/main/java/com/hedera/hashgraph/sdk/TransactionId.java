@@ -146,26 +146,34 @@ public final class TransactionId {
     }
 
     public TransactionRecord getRecord(Client client) throws HederaException, HederaNetworkException {
+        getReceipt(client);
+
         return new TransactionRecordQuery()
             .setTransactionId(this)
             .execute(client);
     }
 
     public TransactionRecord getRecord(Client client, Duration timeout) throws HederaException {
+        getReceipt(client, timeout);
+
         return new TransactionRecordQuery()
             .setTransactionId(this)
             .execute(client, timeout);
     }
 
     public void getRecordAsync(Client client, Consumer<TransactionRecord> onRecord, Consumer<HederaThrowable> onError) {
-        new TransactionRecordQuery()
-            .setTransactionId(this)
-            .executeAsync(client, onRecord, onError);
+        getReceiptAsync(client, (receipt) -> {
+            new TransactionRecordQuery()
+                .setTransactionId(this)
+                .executeAsync(client, onRecord, onError);
+        }, onError);
     }
 
     public void getRecordAsync(Client client, Duration timeout, Consumer<TransactionRecord> onRecord, Consumer<HederaThrowable> onError) {
-        new TransactionRecordQuery()
-            .setTransactionId(this)
-            .executeAsync(client, timeout, onRecord, onError);
+        getReceiptAsync(client, timeout, (receipt) -> {
+            new TransactionRecordQuery()
+                .setTransactionId(this)
+                .executeAsync(client, timeout, onRecord, onError);
+        }, onError);
     }
 }
