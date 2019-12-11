@@ -158,6 +158,10 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     }
 
     public final Transaction build(@Nullable Client client) {
+        if (client != null && bodyBuilder.getTransactionFee() == 0) {
+            setMaxTransactionFee(client.getMaxTransactionFee());
+        }
+
         if (!bodyBuilder.hasNodeAccountID()) {
             Node channel = client != null ? client.pickNode() : null;
             if (channel != null) {
@@ -176,6 +180,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         inner.setBodyBytes(
             bodyBuilder.build()
                 .toByteString());
+
         Transaction tx = new Transaction(null, inner, bodyBuilder, getMethod());
 
         if (client != null && client.getOperatorKey() != null) {
@@ -185,10 +190,16 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         return tx;
     }
 
-    /**
-     * @deprecated use {@code .build().sign()} instead.
-     */
-    @Deprecated
+    @Override
+    public TransactionId execute(Client client, Duration retryTimeout) throws HederaException, HederaNetworkException {
+        return build(client).execute(client, retryTimeout);
+    }
+
+    @Override
+    public void executeAsync(Client client, Duration retryTimeout, Consumer<TransactionId> onSuccess, Consumer<HederaThrowable> onError) {
+        build(client).executeAsync(client, retryTimeout, onSuccess, onError);
+    }
+
     public final Transaction sign(Ed25519PrivateKey privateKey) {
         return build().sign(privateKey);
     }
@@ -226,8 +237,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * while fetching a receipt. If an error occurs while fetching the receipt then the transaction
      * ID is difficult to retrieve.
      * <p>
-     * Call {@link #build()} then {@link Transaction#execute()} then
-     * {@link Transaction#getReceipt()} and handle the errors separately from each.
+     * Call {@link TransactionBuilder#execute(Client)} then
+     * {@link TransactionId#getReceipt(Client)} and handle the errors separately from each.
      */
     @Deprecated
     public final TransactionReceipt executeForReceipt() throws HederaException, HederaNetworkException {
@@ -239,8 +250,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * while fetching a receipt. If an error occurs while fetching the receipt then the transaction
      * ID is difficult to retrieve.
      * <p>
-     * Call {@link #build()} then {@link Transaction#executeAsync(Consumer, Consumer)} then
-     * {@link Transaction#getReceiptAsync(Consumer, Consumer)} and handle the errors separately
+     * Call {@link TransactionBuilder#executeAsync(Client, Consumer, Consumer)} then
+     * {@link TransactionId#getReceiptAsync(Client, Consumer, Consumer)} and handle the errors separately
      * from each.
      */
     @Deprecated
@@ -264,8 +275,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * while fetching a record. If an error occurs while fetching the record then the transaction
      * ID is difficult to retrieve.
      * <p>
-     * Call {@link #build()} then {@link Transaction#execute()} then
-     * {@link Transaction#getRecord()} and handle the errors separately from each.
+     * Call {@link TransactionBuilder#execute(Client)} then
+     * {@link TransactionId#getRecord(Client)} and handle the errors separately from each.
      */
     @Deprecated
     public final TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
@@ -277,8 +288,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * while fetching a record. If an error occurs while fetching the record then the transaction
      * ID is difficult to retrieve.
      * <p>
-     * Call {@link #build()} then {@link Transaction#executeAsync(Consumer, Consumer)} then
-     * {@link Transaction#getRecordAsync(Consumer, Consumer)} and handle the errors separately
+     * Call {@link TransactionBuilder#executeAsync(Client, Consumer, Consumer)} then
+     * {@link TransactionId#getRecordAsync(Client, Consumer, Consumer)} and handle the errors separately
      * from each.
      */
     @Deprecated
