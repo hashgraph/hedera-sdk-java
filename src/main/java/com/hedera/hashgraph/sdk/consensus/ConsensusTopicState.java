@@ -1,7 +1,7 @@
 package com.hedera.hashgraph.sdk.consensus;
 
 import com.hedera.hashgraph.sdk.TimestampHelper;
-import com.hederahashgraph.api.proto.java.ConsensusTopicStateOrBuilder;
+import com.hedera.hashgraph.proto.ConsensusTopicStateOrBuilder;
 
 import javax.annotation.Nullable;
 import java.time.Instant;

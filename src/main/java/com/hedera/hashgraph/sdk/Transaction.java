@@ -6,19 +6,19 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519Signature;
-import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
-import com.hederahashgraph.api.proto.java.SignatureMap;
-import com.hederahashgraph.api.proto.java.SignatureMapOrBuilder;
-import com.hederahashgraph.api.proto.java.SignaturePair;
-import com.hederahashgraph.api.proto.java.SignaturePairOrBuilder;
-import com.hederahashgraph.api.proto.java.TransactionBody;
-import com.hederahashgraph.api.proto.java.TransactionBodyOrBuilder;
-import com.hederahashgraph.api.proto.java.TransactionResponse;
-import com.hederahashgraph.service.proto.java.ConsensusServiceGrpc;
-import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
-import com.hederahashgraph.service.proto.java.FileServiceGrpc;
-import com.hederahashgraph.service.proto.java.FreezeServiceGrpc;
-import com.hederahashgraph.service.proto.java.SmartContractServiceGrpc;
+import com.hedera.hashgraph.proto.ResponseCodeEnum;
+import com.hedera.hashgraph.proto.SignatureMap;
+import com.hedera.hashgraph.proto.SignatureMapOrBuilder;
+import com.hedera.hashgraph.proto.SignaturePair;
+import com.hedera.hashgraph.proto.SignaturePairOrBuilder;
+import com.hedera.hashgraph.proto.TransactionBody;
+import com.hedera.hashgraph.proto.TransactionBodyOrBuilder;
+import com.hedera.hashgraph.proto.TransactionResponse;
+import com.hedera.hashgraph.proto.ConsensusServiceGrpc;
+import com.hedera.hashgraph.proto.CryptoServiceGrpc;
+import com.hedera.hashgraph.proto.FileServiceGrpc;
+import com.hedera.hashgraph.proto.FreezeServiceGrpc;
+import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
 
 import org.bouncycastle.util.encoders.Hex;
 
@@ -33,14 +33,14 @@ import javax.annotation.Nullable;
 import io.grpc.Channel;
 import io.grpc.MethodDescriptor;
 
-public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.java.Transaction, TransactionResponse, TransactionId, Transaction> {
+public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Transaction, TransactionResponse, TransactionId, Transaction> {
 
     static final Duration MAX_VALID_DURATION = Duration.ofMinutes(2);
 
-    private final io.grpc.MethodDescriptor<com.hederahashgraph.api.proto.java.Transaction, com.hederahashgraph.api.proto.java.TransactionResponse> methodDescriptor;
-    final com.hederahashgraph.api.proto.java.Transaction.Builder inner;
-    final com.hederahashgraph.api.proto.java.AccountID nodeAccountId;
-    final com.hederahashgraph.api.proto.java.TransactionID txnIdProto;
+    private final io.grpc.MethodDescriptor<com.hedera.hashgraph.proto.Transaction, com.hedera.hashgraph.proto.TransactionResponse> methodDescriptor;
+    final com.hedera.hashgraph.proto.Transaction.Builder inner;
+    final com.hedera.hashgraph.proto.AccountID nodeAccountId;
+    final com.hedera.hashgraph.proto.TransactionID txnIdProto;
 
     @Nullable
     private final Client client;
@@ -54,9 +54,9 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
 
     Transaction(
         @Nullable Client client,
-        com.hederahashgraph.api.proto.java.Transaction.Builder inner,
+        com.hedera.hashgraph.proto.Transaction.Builder inner,
         TransactionBodyOrBuilder body,
-        MethodDescriptor<com.hederahashgraph.api.proto.java.Transaction, TransactionResponse> methodDescriptor)
+        MethodDescriptor<com.hedera.hashgraph.proto.Transaction, TransactionResponse> methodDescriptor)
     {
         this.client = client;
         this.inner = inner;
@@ -72,7 +72,7 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
      */
     @Deprecated
     public static Transaction fromBytes(Client client, byte[] bytes) throws InvalidProtocolBufferException {
-        com.hederahashgraph.api.proto.java.Transaction inner = com.hederahashgraph.api.proto.java.Transaction.parseFrom(bytes);
+        com.hedera.hashgraph.proto.Transaction inner = com.hedera.hashgraph.proto.Transaction.parseFrom(bytes);
         TransactionBody body = TransactionBody.parseFrom(inner.getBodyBytes());
 
         return new Transaction(client, inner.toBuilder(), body, methodForTxnBody(body));
@@ -80,7 +80,7 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
 
     @VisibleForTesting
     public static Transaction fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        com.hederahashgraph.api.proto.java.Transaction inner = com.hederahashgraph.api.proto.java.Transaction.parseFrom(bytes);
+        com.hedera.hashgraph.proto.Transaction inner = com.hedera.hashgraph.proto.Transaction.parseFrom(bytes);
         TransactionBody body = TransactionBody.parseFrom(inner.getBodyBytes());
 
         return new Transaction(null, inner.toBuilder(), body, methodForTxnBody(body));
@@ -175,18 +175,18 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
     }
 
     @Override
-    public com.hederahashgraph.api.proto.java.Transaction toProto() {
+    public com.hedera.hashgraph.proto.Transaction toProto() {
         localValidate();
         return inner.build();
     }
 
-    public com.hederahashgraph.api.proto.java.Transaction toProto(boolean requireSignature) {
+    public com.hedera.hashgraph.proto.Transaction toProto(boolean requireSignature) {
         validate(requireSignature);
         return inner.build();
     }
 
     @Override
-    protected MethodDescriptor<com.hederahashgraph.api.proto.java.Transaction, TransactionResponse> getMethod() {
+    protected MethodDescriptor<com.hedera.hashgraph.proto.Transaction, TransactionResponse> getMethod() {
         return methodDescriptor;
     }
 
@@ -369,7 +369,7 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
         return byteString.substring(0, PREFIX_LEN);
     }
 
-    private static MethodDescriptor<com.hederahashgraph.api.proto.java.Transaction, TransactionResponse> methodForTxnBody(TransactionBodyOrBuilder body) {
+    private static MethodDescriptor<com.hedera.hashgraph.proto.Transaction, TransactionResponse> methodForTxnBody(TransactionBodyOrBuilder body) {
         switch (body.getDataCase()) {
             // System
 

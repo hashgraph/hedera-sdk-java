@@ -2,8 +2,8 @@ package com.hedera.hashgraph.sdk.file;
 
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
-import com.hederahashgraph.api.proto.java.FileGetInfoResponse;
-import com.hederahashgraph.api.proto.java.Response;
+import com.hedera.hashgraph.proto.FileGetInfoResponse;
+import com.hedera.hashgraph.proto.Response;
 
 import java.time.Instant;
 import java.util.List;

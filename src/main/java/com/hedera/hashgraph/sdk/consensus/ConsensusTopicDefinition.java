@@ -2,7 +2,7 @@ package com.hedera.hashgraph.sdk.consensus;
 
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
-import com.hederahashgraph.api.proto.java.ConsensusTopicDefinitionOrBuilder;
+import com.hedera.hashgraph.proto.ConsensusTopicDefinitionOrBuilder;
 
 import javax.annotation.Nullable;
 import java.time.Instant;

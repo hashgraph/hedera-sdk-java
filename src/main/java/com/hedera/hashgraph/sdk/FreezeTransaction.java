@@ -1,9 +1,9 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hederahashgraph.api.proto.java.FreezeTransactionBody;
-import com.hederahashgraph.api.proto.java.Transaction;
-import com.hederahashgraph.api.proto.java.TransactionResponse;
-import com.hederahashgraph.service.proto.java.FreezeServiceGrpc;
+import com.hedera.hashgraph.proto.FreezeTransactionBody;
+import com.hedera.hashgraph.proto.Transaction;
+import com.hedera.hashgraph.proto.TransactionResponse;
+import com.hedera.hashgraph.proto.FreezeServiceGrpc;
 
 import java.time.OffsetTime;
 import java.time.ZoneOffset;

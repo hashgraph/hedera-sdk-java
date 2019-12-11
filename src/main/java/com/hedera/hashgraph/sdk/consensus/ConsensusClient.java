@@ -2,9 +2,9 @@ package com.hedera.hashgraph.sdk.consensus;
 
 import com.google.common.collect.Iterators;
 import com.hedera.hashgraph.sdk.TimestampHelper;
-import com.hedera.mirror.api.proto.ConsensusServiceGrpc;
-import com.hedera.mirror.api.proto.ConsensusTopicQuery;
-import com.hedera.mirror.api.proto.ConsensusTopicResponse;
+import com.hedera.hashgraph.proto.mirror.ConsensusServiceGrpc;
+import com.hedera.hashgraph.proto.mirror.ConsensusTopicQuery;
+import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
 
 import java.time.Instant;
 import java.util.Iterator;

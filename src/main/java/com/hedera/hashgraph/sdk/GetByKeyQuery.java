@@ -1,15 +1,15 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
-import com.hederahashgraph.api.proto.java.GetByKeyResponse;
-import com.hederahashgraph.api.proto.java.Query;
-import com.hederahashgraph.api.proto.java.QueryHeader;
-import com.hederahashgraph.api.proto.java.Response;
+import com.hedera.hashgraph.proto.GetByKeyResponse;
+import com.hedera.hashgraph.proto.Query;
+import com.hedera.hashgraph.proto.QueryHeader;
+import com.hedera.hashgraph.proto.Response;
 
 import io.grpc.MethodDescriptor;
 
 public final class GetByKeyQuery extends QueryBuilder<GetByKeyResponse, GetByKeyQuery> {
-    private final com.hederahashgraph.api.proto.java.GetByKeyQuery.Builder builder = inner.getGetByKeyBuilder();
+    private final com.hedera.hashgraph.proto.GetByKeyQuery.Builder builder = inner.getGetByKeyBuilder();
 
     GetByKeyQuery(Client client) {
         super(client);

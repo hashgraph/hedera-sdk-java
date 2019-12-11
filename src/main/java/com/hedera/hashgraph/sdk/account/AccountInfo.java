@@ -3,8 +3,8 @@ package com.hedera.hashgraph.sdk.account;
 import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
-import com.hederahashgraph.api.proto.java.CryptoGetInfoResponse;
-import com.hederahashgraph.api.proto.java.Response;
+import com.hedera.hashgraph.proto.CryptoGetInfoResponse;
+import com.hedera.hashgraph.proto.Response;
 
 import java.time.Duration;
 import java.time.Instant;

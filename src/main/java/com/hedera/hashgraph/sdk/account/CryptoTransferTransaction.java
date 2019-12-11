@@ -2,13 +2,13 @@ package com.hedera.hashgraph.sdk.account;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
-import com.hederahashgraph.api.proto.java.AccountAmount;
-import com.hederahashgraph.api.proto.java.AccountAmountOrBuilder;
-import com.hederahashgraph.api.proto.java.CryptoTransferTransactionBody;
-import com.hederahashgraph.api.proto.java.Transaction;
-import com.hederahashgraph.api.proto.java.TransactionResponse;
-import com.hederahashgraph.api.proto.java.TransferList;
-import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
+import com.hedera.hashgraph.proto.AccountAmount;
+import com.hedera.hashgraph.proto.AccountAmountOrBuilder;
+import com.hedera.hashgraph.proto.CryptoTransferTransactionBody;
+import com.hedera.hashgraph.proto.Transaction;
+import com.hedera.hashgraph.proto.TransactionResponse;
+import com.hedera.hashgraph.proto.TransferList;
+import com.hedera.hashgraph.proto.CryptoServiceGrpc;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;

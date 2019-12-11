@@ -16,7 +16,7 @@ import com.hedera.hashgraph.sdk.contract.ContractId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.file.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.file.FileId;
-import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
+import com.hedera.hashgraph.proto.ResponseCodeEnum;
 
 import java.io.IOException;
 import java.io.InputStream;

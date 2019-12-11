@@ -1,11 +1,11 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hederahashgraph.api.proto.java.GetBySolidityIDQuery;
-import com.hederahashgraph.api.proto.java.GetBySolidityIDResponse;
-import com.hederahashgraph.api.proto.java.Query;
-import com.hederahashgraph.api.proto.java.QueryHeader;
-import com.hederahashgraph.api.proto.java.Response;
-import com.hederahashgraph.service.proto.java.SmartContractServiceGrpc;
+import com.hedera.hashgraph.proto.GetBySolidityIDQuery;
+import com.hedera.hashgraph.proto.GetBySolidityIDResponse;
+import com.hedera.hashgraph.proto.Query;
+import com.hedera.hashgraph.proto.QueryHeader;
+import com.hedera.hashgraph.proto.Response;
+import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
 
 import io.grpc.MethodDescriptor;
 

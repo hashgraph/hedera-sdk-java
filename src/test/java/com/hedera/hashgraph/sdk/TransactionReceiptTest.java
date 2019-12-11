@@ -1,9 +1,9 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hederahashgraph.api.proto.java.Response;
-import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
-import com.hederahashgraph.api.proto.java.TransactionGetReceiptResponse;
+import com.hedera.hashgraph.proto.Response;
+import com.hedera.hashgraph.proto.ResponseCodeEnum;
+import com.hedera.hashgraph.proto.TransactionGetReceiptResponse;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -66,7 +66,7 @@ class TransactionReceiptTest {
             .setTransactionGetReceipt(
                 TransactionGetReceiptResponse.newBuilder()
                     .setReceipt(
-                        com.hederahashgraph.api.proto.java.TransactionReceipt.newBuilder()
+                        com.hedera.hashgraph.proto.TransactionReceipt.newBuilder()
                             .setAccountID(expectedAccountId.toProto())
                     )
             ).build();

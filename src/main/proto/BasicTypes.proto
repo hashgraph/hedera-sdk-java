@@ -4,7 +4,7 @@ package proto;
 
 import "Timestamp.proto";
 
-option java_package = "com.hederahashgraph.api.proto.java";
+option java_package = "com.hedera.hashgraph.proto";
 option java_multiple_files = true;
 
 /* Each shard has a nonnegative shard number. Each realm within a given shard has a nonnegative realm number (that number might be reused in other shards). And each account, file, and smart contract instance within a given realm has a nonnegative number (which might be reused in other realms). Every account, file, and smart contract instance is within exactly one realm. So a FileID is a triplet of numbers, like 0.1.2 for entity number 2 within realm 1  within shard 0.  Each realm maintains a single counter for assigning numbers,  so if there is a file with ID 0.1.2, then there won't be an account or smart  contract instance with ID 0.1.2.
@@ -90,7 +90,7 @@ message KeyList {
 
 /* A Signature corresponding to a Key. It is a sequence of bytes holding a public key signature from one of the three supported systems (ed25519, RSA-3072,  ECDSA with p384). Or, it can be a list of signatures corresponding to a single threshold key. Or, it can be the ID of a smart contract instance, which is authorized to act as if it had a key. If an account has an ed25519 key associated with it, then the corresponding private key must sign any transaction to transfer cryptocurrency out of it. If it has a smart contract ID associated with it, then that smart contract is allowed to transfer cryptocurrency out of it. The smart contract doesn't actually have a key, and  doesn't actually sign a transaction. But it's as if a virtual transaction were created, and the smart contract signed it with a private key. A key can also be a "threshold key", which means a list of M keys, any N of which must sign in order for the threshold signature to be considered valid. The keys within a threshold signature may themselves be threshold signatures, to allow complex signature requirements (this nesting is not supported in the currently, but will be supported in a future version of API). If a Signature message is missing the "signature" field, then this is considered to be a null signature. That is useful in cases such as threshold signatures, where some of the signatures can be null.
  * The definition of Key uses mutual recursion, so it allows nesting that is arbitrarily deep. But the current API only accepts Key messages up to 3 levels deep, such as a list of threshold keys, each of which is a list of primitive keys. Therefore, the matching Signature will have the same limitation. This restriction may be relaxed in future versions of the API, to allow deeper nesting.
- * This message is deprecated and succeeded by SignaturePair and SignatureMap messages. 
+ * This message is deprecated and succeeded by SignaturePair and SignatureMap messages.
  */
 message Signature {
     option deprecated = true;
@@ -104,8 +104,8 @@ message Signature {
     }
 }
 
-/* A signature corresponding to a ThresholdKey. For an N-of-M threshold key, this is a list of M signatures, at least N of which must be non-null. 
- * This message is deprecated and succeeded by SignaturePair and SignatureMap messages. 
+/* A signature corresponding to a ThresholdKey. For an N-of-M threshold key, this is a list of M signatures, at least N of which must be non-null.
+ * This message is deprecated and succeeded by SignaturePair and SignatureMap messages.
  */
 message ThresholdSignature {
     option deprecated = true;
@@ -113,14 +113,14 @@ message ThresholdSignature {
 }
 
 /* The signatures corresponding to a KeyList of the same length.
- * This message is deprecated and succeeded by SignaturePair and SignatureMap messages. 
+ * This message is deprecated and succeeded by SignaturePair and SignatureMap messages.
  */
 message SignatureList {
     option deprecated = true;
     repeated Signature sigs = 2; // each signature corresponds to a Key in the KeyList
 }
 
-/* The client may use any number of bytes from 0 to the whole length of the public key for pubKeyPrefix. 
+/* The client may use any number of bytes from 0 to the whole length of the public key for pubKeyPrefix.
  * If 0 bytes is used, then it is assumed that only one public key is used to sign.
  */
 message SignaturePair {
@@ -133,8 +133,8 @@ message SignaturePair {
     }
 }
 
-/* A set of signatures corresponding to every unique public key used to sign a given transaction. 
- * If one public key matches more than one prefixes on the signature map, the transaction containing the map will fail immediately with the response code KEY_PREFIX_MISMATCH.  
+/* A set of signatures corresponding to every unique public key used to sign a given transaction.
+ * If one public key matches more than one prefixes on the signature map, the transaction containing the map will fail immediately with the response code KEY_PREFIX_MISMATCH.
  */
 message SignatureMap {
     repeated SignaturePair sigPair = 1; // Each signature pair corresponds to a unique Key required to sign the transaction.

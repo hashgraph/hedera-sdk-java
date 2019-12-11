@@ -1,10 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hederahashgraph.api.proto.java.Query;
-import com.hederahashgraph.api.proto.java.QueryHeader;
-import com.hederahashgraph.api.proto.java.Response;
-import com.hederahashgraph.api.proto.java.TransactionGetReceiptQuery;
-import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
+import com.hedera.hashgraph.proto.Query;
+import com.hedera.hashgraph.proto.QueryHeader;
+import com.hedera.hashgraph.proto.Response;
+import com.hedera.hashgraph.proto.TransactionGetReceiptQuery;
+import com.hedera.hashgraph.proto.CryptoServiceGrpc;
 
 import java.time.Duration;
 

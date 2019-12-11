@@ -5,11 +5,11 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
-import com.hederahashgraph.api.proto.java.FileUpdateTransactionBody;
-import com.hederahashgraph.api.proto.java.KeyList;
-import com.hederahashgraph.api.proto.java.Transaction;
-import com.hederahashgraph.api.proto.java.TransactionResponse;
-import com.hederahashgraph.service.proto.java.FileServiceGrpc;
+import com.hedera.hashgraph.proto.FileUpdateTransactionBody;
+import com.hedera.hashgraph.proto.KeyList;
+import com.hedera.hashgraph.proto.Transaction;
+import com.hedera.hashgraph.proto.TransactionResponse;
+import com.hedera.hashgraph.proto.FileServiceGrpc;
 
 import java.time.Instant;
 

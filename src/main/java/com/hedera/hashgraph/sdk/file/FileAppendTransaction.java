@@ -3,10 +3,10 @@ package com.hedera.hashgraph.sdk.file;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
-import com.hederahashgraph.api.proto.java.FileAppendTransactionBody;
-import com.hederahashgraph.api.proto.java.Transaction;
-import com.hederahashgraph.api.proto.java.TransactionResponse;
-import com.hederahashgraph.service.proto.java.FileServiceGrpc;
+import com.hedera.hashgraph.proto.FileAppendTransactionBody;
+import com.hedera.hashgraph.proto.Transaction;
+import com.hedera.hashgraph.proto.TransactionResponse;
+import com.hedera.hashgraph.proto.FileServiceGrpc;
 
 import javax.annotation.Nullable;
 

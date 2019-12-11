@@ -1,7 +1,7 @@
 package com.hedera.hashgraph.sdk.consensus;
 
 import com.hedera.hashgraph.sdk.TimestampHelper;
-import com.hedera.mirror.api.proto.ConsensusTopicResponse;
+import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;

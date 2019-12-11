@@ -1,6 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hederahashgraph.api.proto.java.Duration;
+import com.hedera.hashgraph.proto.Duration;
 
 public final class DurationHelper {
     private DurationHelper() { }

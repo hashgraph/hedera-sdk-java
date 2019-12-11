@@ -85,8 +85,8 @@ public final class Ed25519PublicKey extends PublicKey {
     }
 
     @Override
-    public com.hederahashgraph.api.proto.java.Key toKeyProto() {
-        return com.hederahashgraph.api.proto.java.Key.newBuilder()
+    public com.hedera.hashgraph.proto.Key toKeyProto() {
+        return com.hedera.hashgraph.proto.Key.newBuilder()
             .setEd25519(ByteString.copyFrom(toBytes()))
             .build();
     }

@@ -1,6 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
+import com.hedera.hashgraph.proto.ResponseCodeEnum;
 
 public class HederaException extends Exception implements HederaThrowable {
     public final ResponseCodeEnum responseCode;

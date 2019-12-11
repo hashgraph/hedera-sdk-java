@@ -1,10 +1,10 @@
 package com.hedera.hashgraph.sdk.consensus;
 
 import com.hedera.hashgraph.sdk.TransactionBuilder;
-import com.hederahashgraph.api.proto.java.ConsensusUpdateTopicTransactionBody;
-import com.hederahashgraph.api.proto.java.Transaction;
-import com.hederahashgraph.api.proto.java.TransactionResponse;
-import com.hederahashgraph.service.proto.java.ConsensusServiceGrpc;
+import com.hedera.hashgraph.proto.ConsensusUpdateTopicTransactionBody;
+import com.hedera.hashgraph.proto.Transaction;
+import com.hedera.hashgraph.proto.TransactionResponse;
+import com.hedera.hashgraph.proto.ConsensusServiceGrpc;
 
 import io.grpc.MethodDescriptor;
 

@@ -3,7 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
-import com.hederahashgraph.api.proto.java.Query;
+import com.hedera.hashgraph.proto.Query;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

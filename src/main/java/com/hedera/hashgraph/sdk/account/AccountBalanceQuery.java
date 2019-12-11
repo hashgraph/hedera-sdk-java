@@ -2,11 +2,11 @@ package com.hedera.hashgraph.sdk.account;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.QueryBuilder;
-import com.hederahashgraph.api.proto.java.CryptoGetAccountBalanceQuery;
-import com.hederahashgraph.api.proto.java.Query;
-import com.hederahashgraph.api.proto.java.QueryHeader;
-import com.hederahashgraph.api.proto.java.Response;
-import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
+import com.hedera.hashgraph.proto.CryptoGetAccountBalanceQuery;
+import com.hedera.hashgraph.proto.Query;
+import com.hedera.hashgraph.proto.QueryHeader;
+import com.hedera.hashgraph.proto.Response;
+import com.hedera.hashgraph.proto.CryptoServiceGrpc;
 
 import javax.annotation.Nullable;
 

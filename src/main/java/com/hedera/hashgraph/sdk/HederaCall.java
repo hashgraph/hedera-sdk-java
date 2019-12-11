@@ -2,7 +2,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.ByteString;
-import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
+import com.hedera.hashgraph.proto.ResponseCodeEnum;
 
 import java.time.Duration;
 import java.util.ArrayList;

@@ -1,8 +1,8 @@
 package com.hedera.hashgraph.sdk.account;
 
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
-import com.hederahashgraph.api.proto.java.CryptoGetInfoResponse;
-import com.hederahashgraph.api.proto.java.Response;
+import com.hedera.hashgraph.proto.CryptoGetInfoResponse;
+import com.hedera.hashgraph.proto.Response;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

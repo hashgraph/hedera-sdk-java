@@ -4,13 +4,13 @@ import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hashgraph.sdk.contract.ContractId;
 import com.hedera.hashgraph.sdk.file.FileId;
-import com.hederahashgraph.api.proto.java.Response;
-import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
+import com.hedera.hashgraph.proto.Response;
+import com.hedera.hashgraph.proto.ResponseCodeEnum;
 
 public final class TransactionReceipt {
     public final ResponseCodeEnum status;
 
-    private final com.hederahashgraph.api.proto.java.TransactionReceipt inner;
+    private final com.hedera.hashgraph.proto.TransactionReceipt inner;
 
     TransactionReceipt(Response response) {
         if (!response.hasTransactionGetReceipt()) {
@@ -23,7 +23,7 @@ public final class TransactionReceipt {
         status = inner.getStatus();
     }
 
-    TransactionReceipt(com.hederahashgraph.api.proto.java.TransactionReceipt inner) {
+    TransactionReceipt(com.hedera.hashgraph.proto.TransactionReceipt inner) {
         this.inner = inner;
 
         status = inner.getStatus();
@@ -84,7 +84,7 @@ public final class TransactionReceipt {
         return inner.getTopicRunningHash().toByteArray();
     }
 
-    public com.hederahashgraph.api.proto.java.TransactionReceipt toProto() {
+    public com.hedera.hashgraph.proto.TransactionReceipt toProto() {
         return inner;
     }
 }

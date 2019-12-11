@@ -3,8 +3,8 @@ package com.hedera.hashgraph.sdk.file;
 import com.hedera.hashgraph.sdk.Entity;
 import com.hedera.hashgraph.sdk.IdUtil;
 import com.hedera.hashgraph.sdk.SolidityUtil;
-import com.hederahashgraph.api.proto.java.FileID;
-import com.hederahashgraph.api.proto.java.FileIDOrBuilder;
+import com.hedera.hashgraph.proto.FileID;
+import com.hedera.hashgraph.proto.FileIDOrBuilder;
 
 import java.util.Objects;
 
@@ -16,21 +16,21 @@ public final class FileId implements Entity {
     /**
      * The public node address book for the current network.
      *
-     * This file can be decoded using {@link com.hederahashgraph.api.proto.java.NodeAddressBook}.
+     * This file can be decoded using {@link com.hedera.hashgraph.proto.NodeAddressBook}.
      */
     public static final FileId ADDRESS_BOOK = new FileId(0, 0, 102);
 
     /**
      * The current fee schedule for the network.
      *
-     * This file can be decoded using {@link com.hederahashgraph.api.proto.java.CurrentAndNextFeeSchedule}.
+     * This file can be decoded using {@link com.hedera.hashgraph.proto.CurrentAndNextFeeSchedule}.
      */
     public static final FileId FEE_SCHEDULE = new FileId(0, 0, 111);
 
     /**
      * The current exchange rate of HBAR to USD.
      *
-     * This file can be decoded using {@link com.hederahashgraph.api.proto.java.ExchangeRateSet}.
+     * This file can be decoded using {@link com.hedera.hashgraph.proto.ExchangeRateSet}.
      */
     public static final FileId EXCHANGE_RATES = new FileId(0, 0, 112);
 

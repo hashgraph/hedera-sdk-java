@@ -5,8 +5,8 @@ import java.util.Collection;
 import javax.annotation.Nonnegative;
 
 public class ThresholdKey extends PublicKey {
-    private final com.hederahashgraph.api.proto.java.ThresholdKey.Builder inner =
-        com.hederahashgraph.api.proto.java.ThresholdKey.newBuilder();
+    private final com.hedera.hashgraph.proto.ThresholdKey.Builder inner =
+        com.hedera.hashgraph.proto.ThresholdKey.newBuilder();
 
     /**
      * Create a new threshold-key with the given threshold.
@@ -45,12 +45,12 @@ public class ThresholdKey extends PublicKey {
      * @throws IllegalStateException if fewer keys have been added than the threshold set in {@link #ThresholdKey(int)}
      */
     @Override
-    public com.hederahashgraph.api.proto.java.Key toKeyProto() {
+    public com.hedera.hashgraph.proto.Key toKeyProto() {
         if (inner.getKeysBuilder().getKeysCount() < inner.getThreshold()) {
             throw new IllegalStateException("ThresholdKey must have at least as many keys as the set threshold");
         }
 
-        final com.hederahashgraph.api.proto.java.Key.Builder key = com.hederahashgraph.api.proto.java.Key.newBuilder();
+        final com.hedera.hashgraph.proto.Key.Builder key = com.hedera.hashgraph.proto.Key.newBuilder();
         key.setThresholdKey(inner);
         return key.build();
     }

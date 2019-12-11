@@ -20,10 +20,10 @@
 
 syntax = "proto3";
 
-package com.hedera.mirror.api.proto;
+package com.hedera.hashgraph.proto.mirror;
 
 option java_multiple_files = true; // Required for the reactor-grpc generator to work correctly
-option java_package = "com.hedera.mirror.api.proto";
+option java_package = "com.hedera.hashgraph.proto.mirror";
 
 import "BasicTypes.proto";
 import "Timestamp.proto";

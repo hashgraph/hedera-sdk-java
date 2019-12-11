@@ -1,7 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
-import com.hederahashgraph.api.proto.java.ContractFunctionResult;
+import com.hedera.hashgraph.proto.ContractFunctionResult;
 
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;

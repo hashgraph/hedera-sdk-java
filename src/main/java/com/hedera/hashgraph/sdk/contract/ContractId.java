@@ -4,8 +4,8 @@ import com.hedera.hashgraph.sdk.Entity;
 import com.hedera.hashgraph.sdk.IdUtil;
 import com.hedera.hashgraph.sdk.SolidityUtil;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
-import com.hederahashgraph.api.proto.java.ContractID;
-import com.hederahashgraph.api.proto.java.ContractIDOrBuilder;
+import com.hedera.hashgraph.proto.ContractID;
+import com.hedera.hashgraph.proto.ContractIDOrBuilder;
 
 import java.util.Objects;
 
@@ -49,8 +49,8 @@ public final class ContractId extends PublicKey implements Entity {
     }
 
     @Override
-    public com.hederahashgraph.api.proto.java.Key toKeyProto() {
-        return com.hederahashgraph.api.proto.java.Key.newBuilder()
+    public com.hedera.hashgraph.proto.Key toKeyProto() {
+        return com.hedera.hashgraph.proto.Key.newBuilder()
             .setContractID(toProto())
             .build();
     }

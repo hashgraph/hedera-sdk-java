@@ -2,10 +2,10 @@ package com.hedera.hashgraph.sdk.contract;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
-import com.hederahashgraph.api.proto.java.ContractDeleteTransactionBody;
-import com.hederahashgraph.api.proto.java.Transaction;
-import com.hederahashgraph.api.proto.java.TransactionResponse;
-import com.hederahashgraph.service.proto.java.SmartContractServiceGrpc;
+import com.hedera.hashgraph.proto.ContractDeleteTransactionBody;
+import com.hedera.hashgraph.proto.Transaction;
+import com.hedera.hashgraph.proto.TransactionResponse;
+import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
 
 import io.grpc.MethodDescriptor;
 

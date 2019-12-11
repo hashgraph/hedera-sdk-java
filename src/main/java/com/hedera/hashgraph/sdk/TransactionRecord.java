@@ -1,7 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hederahashgraph.api.proto.java.AccountAmountOrBuilder;
+import com.hedera.hashgraph.proto.AccountAmountOrBuilder;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -34,9 +34,9 @@ public final class TransactionRecord {
      */
     public final TransactionReceipt receipt;
 
-    private final com.hederahashgraph.api.proto.java.TransactionRecord inner;
+    private final com.hedera.hashgraph.proto.TransactionRecord inner;
 
-    TransactionRecord(com.hederahashgraph.api.proto.java.TransactionRecord inner) {
+    TransactionRecord(com.hedera.hashgraph.proto.TransactionRecord inner) {
         this.inner = inner;
 
         transactionId = new TransactionId(inner.getTransactionIDOrBuilder());

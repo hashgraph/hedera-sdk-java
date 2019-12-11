@@ -5,12 +5,12 @@ import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
-import com.hederahashgraph.api.proto.java.CryptoCreateTransactionBody;
-import com.hederahashgraph.api.proto.java.RealmID;
-import com.hederahashgraph.api.proto.java.ShardID;
-import com.hederahashgraph.api.proto.java.Transaction;
-import com.hederahashgraph.api.proto.java.TransactionResponse;
-import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
+import com.hedera.hashgraph.proto.CryptoCreateTransactionBody;
+import com.hedera.hashgraph.proto.RealmID;
+import com.hedera.hashgraph.proto.ShardID;
+import com.hedera.hashgraph.proto.Transaction;
+import com.hedera.hashgraph.proto.TransactionResponse;
+import com.hedera.hashgraph.proto.CryptoServiceGrpc;
 
 import java.time.Duration;
 

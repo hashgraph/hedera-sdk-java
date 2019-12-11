@@ -1,6 +1,6 @@
 package com.hedera.hashgraph.sdk.consensus;
 
-import com.hederahashgraph.api.proto.java.*;
+import com.hedera.hashgraph.proto.*;
 
 public class ConsensusTopicInfo {
     /** Topic identifier */

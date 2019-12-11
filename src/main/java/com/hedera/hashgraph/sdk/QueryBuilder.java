@@ -3,14 +3,14 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
-import com.hederahashgraph.api.proto.java.AccountAmount;
-import com.hederahashgraph.api.proto.java.Query;
-import com.hederahashgraph.api.proto.java.QueryHeader;
-import com.hederahashgraph.api.proto.java.Response;
-import com.hederahashgraph.api.proto.java.ResponseCodeEnum;
-import com.hederahashgraph.api.proto.java.ResponseHeader;
-import com.hederahashgraph.api.proto.java.ResponseType;
-import com.hederahashgraph.api.proto.java.TransactionBody;
+import com.hedera.hashgraph.proto.AccountAmount;
+import com.hedera.hashgraph.proto.Query;
+import com.hedera.hashgraph.proto.QueryHeader;
+import com.hedera.hashgraph.proto.Response;
+import com.hedera.hashgraph.proto.ResponseCodeEnum;
+import com.hedera.hashgraph.proto.ResponseHeader;
+import com.hedera.hashgraph.proto.ResponseType;
+import com.hedera.hashgraph.proto.TransactionBody;
 
 import java.time.Duration;
 import java.util.List;
@@ -325,7 +325,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         public Query toProto() {
             final QueryHeader.Builder header = getHeaderBuilder();
 
-            final com.hederahashgraph.api.proto.java.Transaction origPayment = header.hasPayment() ? header.getPayment() : null;
+            final com.hedera.hashgraph.proto.Transaction origPayment = header.hasPayment() ? header.getPayment() : null;
             final ResponseType origResponseType = header.getResponseType();
 
             final AccountId operatorId = Objects.requireNonNull(
@@ -333,7 +333,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
                 "COST_ANSWER requires an operator ID to be set");
 
             // COST_ANSWER requires a payment to pass validation but doesn't actually process it
-            final com.hederahashgraph.api.proto.java.Transaction fakePayment = new CryptoTransferTransaction(client)
+            final com.hedera.hashgraph.proto.Transaction fakePayment = new CryptoTransferTransaction(client)
                 .addRecipient(Objects.requireNonNull(nodeId), 0)
                 .addSender(operatorId, 0)
                 .build()

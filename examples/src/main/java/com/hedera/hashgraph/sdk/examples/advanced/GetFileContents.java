@@ -8,7 +8,7 @@ import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.file.FileContentsQuery;
 import com.hedera.hashgraph.sdk.file.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.file.FileId;
-import com.hederahashgraph.api.proto.java.FileGetContentsResponse;
+import com.hedera.hashgraph.proto.FileGetContentsResponse;
 
 import java.time.Duration;
 import java.time.Instant;

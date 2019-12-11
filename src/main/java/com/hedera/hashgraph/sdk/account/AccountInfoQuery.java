@@ -2,16 +2,16 @@ package com.hedera.hashgraph.sdk.account;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.QueryBuilder;
-import com.hederahashgraph.api.proto.java.Query;
-import com.hederahashgraph.api.proto.java.QueryHeader;
-import com.hederahashgraph.api.proto.java.Response;
-import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
+import com.hedera.hashgraph.proto.Query;
+import com.hedera.hashgraph.proto.QueryHeader;
+import com.hedera.hashgraph.proto.Response;
+import com.hedera.hashgraph.proto.CryptoServiceGrpc;
 
 import io.grpc.MethodDescriptor;
 
 // `CryptoGetInfoQuery`
 public final class AccountInfoQuery extends QueryBuilder<AccountInfo, AccountInfoQuery> {
-    private final com.hederahashgraph.api.proto.java.CryptoGetInfoQuery.Builder builder;
+    private final com.hedera.hashgraph.proto.CryptoGetInfoQuery.Builder builder;
 
     /**
      * @deprecated {@link Client} should now be provided to {@link #execute(Client)}

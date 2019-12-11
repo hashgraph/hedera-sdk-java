@@ -3,8 +3,8 @@ package com.hedera.hashgraph.sdk.account;
 import com.hedera.hashgraph.sdk.Entity;
 import com.hedera.hashgraph.sdk.IdUtil;
 import com.hedera.hashgraph.sdk.SolidityUtil;
-import com.hederahashgraph.api.proto.java.AccountID;
-import com.hederahashgraph.api.proto.java.AccountIDOrBuilder;
+import com.hedera.hashgraph.proto.AccountID;
+import com.hedera.hashgraph.proto.AccountIDOrBuilder;
 
 import java.util.Objects;
 

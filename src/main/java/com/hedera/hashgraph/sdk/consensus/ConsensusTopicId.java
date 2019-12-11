@@ -2,8 +2,8 @@ package com.hedera.hashgraph.sdk.consensus;
 
 import com.hedera.hashgraph.sdk.Entity;
 import com.hedera.hashgraph.sdk.IdUtil;
-import com.hederahashgraph.api.proto.java.TopicID;
-import com.hederahashgraph.api.proto.java.TopicIDOrBuilder;
+import com.hedera.hashgraph.proto.TopicID;
+import com.hedera.hashgraph.proto.TopicIDOrBuilder;
 
 import java.util.Objects;
 

@@ -4,8 +4,8 @@ import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
-import com.hederahashgraph.api.proto.java.ContractGetInfoResponse;
-import com.hederahashgraph.api.proto.java.Response;
+import com.hedera.hashgraph.proto.ContractGetInfoResponse;
+import com.hedera.hashgraph.proto.Response;
 
 import java.time.Duration;
 import java.time.Instant;

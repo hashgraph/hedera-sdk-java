@@ -7,8 +7,8 @@ package com.hedera.hashgraph.sdk.crypto;
  * Equivalent to a threshold key with a threshold the same as the number of keys it contains.
  */
 public class KeyList extends PublicKey {
-    private com.hederahashgraph.api.proto.java.KeyList.Builder keyListBuilder =
-        com.hederahashgraph.api.proto.java.KeyList.newBuilder();
+    private com.hedera.hashgraph.proto.KeyList.Builder keyListBuilder =
+        com.hedera.hashgraph.proto.KeyList.newBuilder();
 
     public KeyList() { }
 
@@ -18,8 +18,8 @@ public class KeyList extends PublicKey {
     }
 
     @Override
-    public com.hederahashgraph.api.proto.java.Key toKeyProto() {
-        com.hederahashgraph.api.proto.java.Key.Builder key = com.hederahashgraph.api.proto.java.Key.newBuilder();
+    public com.hedera.hashgraph.proto.Key toKeyProto() {
+        com.hedera.hashgraph.proto.Key.Builder key = com.hedera.hashgraph.proto.Key.newBuilder();
         key.setKeyList(keyListBuilder.build());
         return key.build();
     }
