@@ -171,7 +171,7 @@ public final class Transaction extends HederaCall<com.hederahashgraph.api.proto.
     }
 
     public void getRecordAsync(Client client, Duration timeout, Consumer<TransactionRecord> onRecord, Consumer<HederaThrowable> onError) {
-        id.getRecordAsync(client, timeout, onReceipt, onError);
+        id.getRecordAsync(client, timeout, onRecord, onError);
     }
 
     @Override
