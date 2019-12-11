@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "com.hederahashgraph.service.proto.java";
+
+import "Query.proto";
+import "Response.proto";
+import "TransactionResponse.proto";
+import "Transaction.proto";
+
+/* The Consensus Service provides the ability for Hedera Hashgraph to provide aBFT consensus as to the order and
+ * validity of messages submitted to a *topic*, as well as a *consensus timestamp* for those messages.
+ *
+ * Automatic renewal can be configured via autoRenewAccount and autoRenewPeriod. At expirationTime the topic will either
+ * renew for a time up to autoRenewPeriod, paid for by the autoRenewAccount, or be deleted.
+ *
+ * No transactions or queries on a deleted topic will succeed.
+ *
+ * Mirrornet ConsensusService may be used to subscribe to changes on the topic, including changes to the topic
+ * definition and the consensus ordering and timestamp of submitted messages.
+ */
+service ConsensusService {
+    /* Create a topic to be used for consensus.
+     * If an autoRenewAccount is specified, that account must also sign this transaction, and there must be an adminKey
+     * specified.
+     * Request is [ConsensusCreateTopicTransactionBody](#proto.ConsensusCreateTopicTransactionBody)
+     */
+    rpc createTopic (Transaction) returns (TransactionResponse);
+
+    /* Update a topic.
+     * If there is no adminKey, the only authorized update (available to anyone) is to extend the expirationTime.
+     * Otherwise transaction must be signed by the adminKey.
+     * If a new autoRenewAccount is specified (not just being removed), that account must also sign the transaction.
+     * Request is [ConsensusUpdateTopicTransactionBody](#proto.ConsensusUpdateTopicTransactionBody)
+     */
+    rpc updateTopic (Transaction) returns (TransactionResponse);
+
+    /* Delete a topic. No more transactions or queries on the topic (via HAPI) will succeed.
+     * If an adminKey is set, this transaction must be signed by that key.
+     * If there is no adminKey, this transaction will fail UNAUTHORIZED.
+     * Request is [ConsensusDeleteTopicTransactionBody](#proto.ConsensusDeleteTopicTransactionBody)
+     */
+    rpc deleteTopic (Transaction) returns (TransactionResponse);
+
+    /* Retrieve the latest state of a topic. This method is unrestricted and allowed on any topic by any payer account.
+     * Deleted accounts will not be returned.
+     * Request is [ConsensusGetTopicInfoQuery](#proto.ConsensusGetTopicInfoQuery)
+     * Response is [ConsensusGetTopicInfoResponse](#proto.ConsensusGetTopicInfoResponse)
+     */
+    rpc getTopicInfo (Query) returns (Response);
+
+    /* Submit a message for consensus.
+     * Valid and authorized messages on valid topics will be ordered by the consensus service, gossipped to the
+     * mirror net, and published (in order) to all subscribers (from the mirror net) on this topic.
+     * The submitKey (if any) must sign this transaction.
+     * Request is [ConsensusSubmitMessageTransactionBody](#proto.ConsensusSubmitMessageTransactionBody)
+     */
+    rpc submitMessage (Transaction) returns (TransactionResponse);
+}
