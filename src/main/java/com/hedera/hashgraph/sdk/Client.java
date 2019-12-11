@@ -227,22 +227,26 @@ public final class Client implements AutoCloseable {
     }
 
     public AccountInfo getAccount(AccountId id) throws HederaException, HederaNetworkException {
-        return new AccountInfoQuery(this).setAccountId(id)
+        return new AccountInfoQuery(this)
+            .setAccountId(id)
             .execute();
     }
 
     public void getAccountAsync(AccountId id, Consumer<AccountInfo> onSuccess, Consumer<HederaThrowable> onError) {
-        new AccountInfoQuery(this).setAccountId(id)
+        new AccountInfoQuery(this)
+            .setAccountId(id)
             .executeAsync(onSuccess, onError);
     }
 
     public long getAccountBalance(AccountId id) throws HederaException, HederaNetworkException {
-        return new AccountBalanceQuery(this).setAccountId(id)
+        return new AccountBalanceQuery(this)
+            .setAccountId(id)
             .execute();
     }
 
     public void getAccountBalanceAsync(AccountId id, Consumer<Long> onSuccess, Consumer<HederaThrowable> onError) {
-        new AccountBalanceQuery(this).setAccountId(id)
+        new AccountBalanceQuery(this)
+            .setAccountId(id)
             .executeAsync(onSuccess, onError);
     }
 

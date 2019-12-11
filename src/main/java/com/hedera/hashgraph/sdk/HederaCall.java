@@ -69,7 +69,7 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
      * @deprecated use {@link #execute(Client)} instead.
      */
     @Deprecated
-    public final Resp execute() throws HederaException, HederaNetworkException {
+    public Resp execute() throws HederaException, HederaNetworkException {
         return execute(getDefaultTimeout());
     }
 
@@ -119,7 +119,7 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
      * @deprecated use {@link #executeAsync(Client, Duration, Consumer, Consumer)} instead.
      */
     @Deprecated
-    public final void executeAsync(Duration retryTimeout, Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError) {
+    public void executeAsync(Duration retryTimeout, Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError) {
         if (isExecuted) {
             throw new IllegalStateException("call already executed");
         }

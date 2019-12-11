@@ -156,13 +156,11 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     public final long getCost(Client client) throws HederaException, HederaNetworkException {
         // set which node we're going to be working with
-        getNode(requireClient());
-        return new CostQuery().execute(client);
+        return new CostQuery(client).execute(client);
     }
 
     public final void getCostAsync(Client client, Consumer<Long> withCost, Consumer<HederaThrowable> onError) {
-        getNode(requireClient());
-        new CostQuery().executeAsync(client, withCost, onError);
+        new CostQuery(client).executeAsync(client, withCost, onError);
     }
 
     /**
@@ -170,7 +168,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
      */
     public final long queryCost() throws HederaException, HederaNetworkException {
         getNode(requireClient());
-        return new CostQuery().execute();
+        return new CostQuery(requireClient()).execute();
     }
 
     /**
@@ -178,7 +176,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
      */
     public final void queryCostAsync(Consumer<Long> withCost, Consumer<HederaThrowable> onError) {
         getNode(requireClient());
-        new CostQuery().executeAsync(withCost, onError);
+        new CostQuery(requireClient()).executeAsync(withCost, onError);
     }
 
     private void generatePayment(Client client) {
@@ -235,6 +233,18 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         } else {
             super.executeAsync(client, timeout, onSuccess, onError);
         }
+    }
+
+    @Deprecated
+    @Override
+    public Resp execute(Duration timeout) throws HederaException, HederaNetworkException {
+        return execute(requireClient(), timeout);
+    }
+
+    @Deprecated
+    @Override
+    public void executeAsync(Duration timeout, Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError) {
+        executeAsync(requireClient(), timeout, onSuccess, onError);
     }
 
     protected abstract void doValidate();
@@ -315,6 +325,11 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     protected abstract Resp fromResponse(Response raw);
 
     private final class CostQuery extends HederaCall<Query, Response, Long, CostQuery> {
+        private final Client client;
+
+        CostQuery(Client client) {
+            this.client = client;
+        }
 
         @Override
         protected MethodDescriptor<Query, Response> getMethod() {
@@ -329,14 +344,14 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
             final ResponseType origResponseType = header.getResponseType();
 
             final AccountId operatorId = Objects.requireNonNull(
-                requireClient().getOperatorId(),
+                client.getOperatorId(),
                 "COST_ANSWER requires an operator ID to be set");
 
             // COST_ANSWER requires a payment to pass validation but doesn't actually process it
-            final com.hedera.hashgraph.proto.Transaction fakePayment = new CryptoTransferTransaction(client)
+            final com.hedera.hashgraph.proto.Transaction fakePayment = new CryptoTransferTransaction()
                 .addRecipient(Objects.requireNonNull(nodeId), 0)
                 .addSender(operatorId, 0)
-                .build()
+                .build(client)
                 .toProto();
 
             // set our fake values, build and then reset
@@ -350,6 +365,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
             } else {
                 header.clearPayment();
             }
+
             header.setResponseType(origResponseType);
 
             return built;
