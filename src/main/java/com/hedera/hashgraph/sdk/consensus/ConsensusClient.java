@@ -7,22 +7,25 @@ import com.hedera.mirror.api.proto.ConsensusTopicQuery;
 import com.hedera.mirror.api.proto.ConsensusTopicResponse;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import javax.annotation.Nullable;
+
 import io.grpc.CallOptions;
+import io.grpc.ClientCall;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.ClientCalls;
+import io.grpc.stub.StreamObserver;
 
 public class ConsensusClient implements AutoCloseable {
     private final ManagedChannel channel;
 
-    private final HashMap<ConsensusTopicId, Subscription> subscriptions = new HashMap<>();
+    @Nullable
+    private Consumer<Throwable> errorHandler;
 
     public ConsensusClient(String endpoint) {
         channel = ManagedChannelBuilder.forTarget(endpoint)
@@ -30,31 +33,69 @@ public class ConsensusClient implements AutoCloseable {
             .build();
     }
 
-    public void subscribe(ConsensusTopicId topic, Consumer<ConsensusMessage> listener) {
-        subscriptions.computeIfAbsent(topic, _topic -> new Subscription(startStreamingCall(topic)))
-            .listeners
-            .add(listener);
+    // TODO: enumerate possible throwable types
+    /**
+     * Set a global error handler for all streams.
+     *
+     * @param errorHandler
+     * @return
+     */
+    public ConsensusClient setErrorHandler(Consumer<Throwable> errorHandler) {
+        this.errorHandler = errorHandler;
+        return this;
     }
 
-    private ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> startStreamingCall(ConsensusTopicId topic) {
+    /**
+     * Subscribe to a Consensus Service topic; the callback will receive messages
+     * with consensus timestamps starting now and continuing indefinitely into the future.
+     *
+     * @param topicId
+     * @param listener
+     * @return a handle which you can use to cancel the subscription at any time.
+     */
+    public Subscription subscribe(ConsensusTopicId topicId, Consumer<ConsensusMessage> listener) {
+        return startStreamingCall(topicId, null, listener);
+    }
+
+    /**
+     * Subscribe to a Consensus Service topic; the callback will receive messages
+     * with consensus timestamps falling on or after the given {@link Instant}
+     * (which may be in the past or future) and continuing indefinitely afterwards.
+     *
+     * @param topicId
+     * @param consensusStartTime the lower bound for timestamps (inclusive), may be in the past
+     *                           or future.
+     * @param listener
+     * @return a handle which you can use to cancel the subscription at any time.
+     */
+    public Subscription subscribe(ConsensusTopicId topicId, Instant consensusStartTime, Consumer<ConsensusMessage> listener) {
+        return startStreamingCall(topicId, consensusStartTime, listener);
+    }
+
+    private Subscription startStreamingCall(ConsensusTopicId topic, @Nullable Instant startTime, Consumer<ConsensusMessage> listener) {
         final ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call =
             channel.newCall(ConsensusServiceGrpc.getSubscribeTopicMethod(), CallOptions.DEFAULT);
 
-        final ConsensusTopicQuery topicQuery = ConsensusTopicQuery.newBuilder()
-            .setTopicID(topic.toProto())
-            .build();
+        final ConsensusTopicQuery.Builder topicQuery = ConsensusTopicQuery.newBuilder()
+            .setTopicID(topic.toProto());
 
-        ClientCalls.asyncServerStreamingCall(call, topicQuery, new StreamObserver<ConsensusTopicResponse>() {
+        if (startTime != null) {
+            topicQuery.setConsensusStartTime(TimestampHelper.timestampFrom(startTime));
+        }
+
+        final Subscription subscription = new Subscription(topic, startTime, call);
+
+        ClientCalls.asyncServerStreamingCall(call, topicQuery.build(), new StreamObserver<ConsensusTopicResponse>() {
             @Override
-            public void onNext(ConsensusTopicResponse value) {
-                subscriptions.get(topic)
-                    .listeners
-                    .forEach(listener -> listener.accept(new ConsensusMessage(topic, value)));
+            public void onNext(ConsensusTopicResponse message) {
+                listener.accept(new ConsensusMessage(topic, message));
             }
 
             @Override
             public void onError(Throwable t) {
-
+                if (errorHandler != null) {
+                    errorHandler.accept(t);
+                }
             }
 
             @Override
@@ -63,9 +104,18 @@ public class ConsensusClient implements AutoCloseable {
             }
         });
 
-        return call;
+        return subscription;
     }
 
+    /**
+     * Get a blocking iterator which returns messages for the given topic with consensus timestamps
+     * between two {@link Instant}s.
+     *
+     * @param topic
+     * @param startTime the lower bound for timestamps (inclusive), may be in the past or future.
+     * @param endTime the upper bound for timestamps (exclusive), may also be in the past or future.
+     * @return
+     */
     public Iterator<ConsensusMessage> getMessages(ConsensusTopicId topic, Instant startTime, Instant endTime) {
         final ConsensusTopicQuery topicQuery = ConsensusTopicQuery.newBuilder()
             .setTopicID(topic.toProto())
@@ -82,49 +132,70 @@ public class ConsensusClient implements AutoCloseable {
         return Iterators.transform(iter, message -> new ConsensusMessage(topic, Objects.requireNonNull(message)));
     }
 
-    public void unsubscribe(ConsensusTopicId topicId, Consumer<ConsensusMessage> listener) {
-        subscriptions.computeIfPresent(topicId, (_topic, sub) -> {
-            sub.listeners.remove(listener);
+    /**
+     * Get a blocking iterator which returns messages for the given topic with consensus timestamps
+     * starting now and continuing until the given {@link Instant}.
+     *
+     * @param topic
+     * @param endTime the upper bound for timestamps (exclusive), may be in the past or future.
+     * @return
+     */
+    public Iterator<ConsensusMessage> getMessagesUntil(ConsensusTopicId topic, Instant endTime) {
+        final ConsensusTopicQuery topicQuery = ConsensusTopicQuery.newBuilder()
+            .setTopicID(topic.toProto())
+            .setConsensusEndTime(TimestampHelper.timestampFrom(endTime))
+            .build();
 
-            if (sub.listeners.isEmpty()) {
-                sub.call.cancel("no more listeners for topic", null);
-                return null;
-            }
+        final Iterator<ConsensusTopicResponse> iter = ClientCalls.blockingServerStreamingCall(
+            channel,
+            ConsensusServiceGrpc.getSubscribeTopicMethod(),
+            CallOptions.DEFAULT,
+            topicQuery);
 
-            return sub;
-        });
-    }
-
-    private void unsubscribeAll() {
-        final Iterator<Subscription> iterator = subscriptions.values().iterator();
-
-        while (iterator.hasNext()) {
-            final Subscription sub = iterator.next();
-
-            sub.call.cancel("ConsensusClient.unsubscribeAll() called", null);
-            iterator.remove();
-        }
+        return Iterators.transform(iter, message -> new ConsensusMessage(topic, Objects.requireNonNull(message)));
     }
 
     @Override
     public void close() throws InterruptedException {
-        unsubscribeAll();
-        channel.shutdown();
-        channel.awaitTermination(5, TimeUnit.SECONDS);
+        close(5, TimeUnit.SECONDS);
     }
 
     public boolean close(long timeout, TimeUnit timeoutUnit) throws InterruptedException {
-        unsubscribeAll();
-        channel.shutdown();
+        // shutdownNow() is required because we have by-design infinitely running calls
+        channel.shutdownNow();
         return channel.awaitTermination(timeout, timeoutUnit);
     }
 
-    private static final class Subscription {
-        final ArrayList<Consumer<ConsensusMessage>> listeners = new ArrayList<>();
-        final ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call;
+    public static final class Subscription {
+        private final ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call;
 
-        private Subscription(ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call) {
+        public final ConsensusTopicId topicId;
+
+        @Nullable
+        public final Instant consensusStartTime;
+
+        private Subscription(ConsensusTopicId topicId, @Nullable Instant startTime, ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call) {
             this.call = call;
+            this.topicId = topicId;
+            this.consensusStartTime = startTime;
+        }
+
+        public void unsubscribe() {
+            call.cancel("unsubscribed from topic", null);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Subscription that = (Subscription) o;
+            return topicId.equals(that.topicId)
+                && Objects.equals(consensusStartTime, that.consensusStartTime);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(topicId, consensusStartTime);
         }
     }
 }

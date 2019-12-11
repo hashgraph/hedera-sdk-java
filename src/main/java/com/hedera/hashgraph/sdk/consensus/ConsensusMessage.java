@@ -20,7 +20,7 @@ public class ConsensusMessage {
 
     ConsensusMessage(ConsensusTopicId topicId, ConsensusTopicResponse message) {
         this.topicId = topicId;
-        consensusTimestamp = TimestampHelper.timestampTo(message.getConsensusTimestamp());
+        this.consensusTimestamp = TimestampHelper.timestampTo(message.getConsensusTimestamp());
         this.message = message.getMessage().toByteArray();
         this.runningHash = message.getRunningHash().toByteArray();
         this.sequenceNumber = message.getSequenceNumber();
