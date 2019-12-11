@@ -1,9 +1,6 @@
 package com.hedera.hashgraph.sdk.examples.advanced;
 
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.HederaException;
-import com.hedera.hashgraph.sdk.Transaction;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.account.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
@@ -40,17 +37,14 @@ public final class CreateAccount {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        Transaction tx = new AccountCreateTransaction()
+        TransactionId txId = new AccountCreateTransaction()
             // The only _required_ property here is `key`
             .setKey(newKey.getPublicKey())
             .setInitialBalance(1000)
-            .setMaxTransactionFee(10_000_000)
-            .build(client);
-
-        tx.execute(client);
+            .execute(client);
 
         // This will wait for the receipt to become available
-        TransactionReceipt receipt = tx.getReceipt(client);
+        TransactionReceipt receipt = txId.getReceipt(client);
 
         AccountId newAccountId = receipt.getAccountId();
 

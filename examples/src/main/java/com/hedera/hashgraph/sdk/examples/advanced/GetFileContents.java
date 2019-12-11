@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk.examples.advanced;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.Transaction;
+import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.file.FileContentsQuery;
@@ -40,15 +41,13 @@ public final class GetFileContents {
         byte[] fileContents = ("Hedera is great!").getBytes();
 
         // Create the new file and set its properties
-        Transaction newFileTx = new FileCreateTransaction()
+        TransactionId newFileTxId = new FileCreateTransaction()
             .addKey(OPERATOR_KEY.getPublicKey()) // The public key of the owner of the file
             .setContents(fileContents) // Contents of the file
-            .setExpirationTime(Instant.now().plus(Duration.ofSeconds(2592000))) // Set file expiration time in seconds
-            .build(client); // Submits transaction to the network and returns receipt which contains file ID
+            .setMaxTransactionFee(200_000_000L) // 2h
+            .execute(client);
 
-        newFileTx.execute(client);
-
-        FileId newFileId = newFileTx.getReceipt(client).getFileId();
+        FileId newFileId = newFileTxId.getReceipt(client).getFileId();
 
         //Print the file ID to console
         System.out.println("The new file ID is " + newFileId.toString());

@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk.examples.advanced;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.Transaction;
+import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.AccountInfo;
@@ -38,14 +39,14 @@ public final class UpdateAccountPublicKey {
         // First, we create a new account so we don't affect our account
 
         Ed25519PrivateKey originalKey = Ed25519PrivateKey.generate();
-        Transaction acctTransaction = new AccountCreateTransaction()
+        TransactionId acctTransactionId = new AccountCreateTransaction()
             .setMaxTransactionFee(1_000_000_000)
             .setKey(originalKey.getPublicKey())
             .setInitialBalance(100_000_000)
-            .build(client);
+            .execute(client);
 
-        System.out.println("transaction ID: " + acctTransaction.execute(client));
-        AccountId accountId = acctTransaction.getReceipt(client).getAccountId();
+        System.out.println("transaction ID: " + acctTransactionId);
+        AccountId accountId = acctTransactionId.getReceipt(client).getAccountId();
         System.out.println("account = " + accountId);
         // Next, we update the key
 
@@ -54,19 +55,18 @@ public final class UpdateAccountPublicKey {
         System.out.println(" :: update public key of account " + accountId);
         System.out.println("set key = " + newKey.getPublicKey());
 
-        Transaction transaction = new AccountUpdateTransaction()
+        TransactionId transactionId = new AccountUpdateTransaction()
             .setAccountForUpdate(accountId)
             .setKey(newKey.getPublicKey())
             // Sign with the previous key and the new key
-            .build(client)
             .sign(originalKey)
-            .sign(newKey);
+            .sign(newKey)
+            .execute(client);
 
-        System.out.println("transaction ID: " + transaction.id);
+        System.out.println("transaction ID: " + transactionId);
 
-        transaction.execute(client);
         // (important!) wait for the transaction to complete by querying the receipt
-        transaction.getReceipt(client);
+        transactionId.getReceipt(client);
 
         // Now we fetch the account information to check if the key was changed
         System.out.println(" :: getAccount and check our current key");

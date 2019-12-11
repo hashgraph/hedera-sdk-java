@@ -1,9 +1,6 @@
 package com.hedera.hashgraph.sdk.examples.advanced;
 
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.HederaException;
-import com.hedera.hashgraph.sdk.Transaction;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.account.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.account.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.account.AccountId;
@@ -57,7 +54,6 @@ public final class CreateAccountThresholdKey {
             // require 2 of the 3 keys we generated to sign on anything modifying this account
             .setKey(new ThresholdKey(2).addAll(pubKeys))
             .setInitialBalance(1_000_000)
-            .setMaxTransactionFee(10_000_000)
             .build(client);
 
         tx.execute(client);
@@ -69,20 +65,16 @@ public final class CreateAccountThresholdKey {
 
         System.out.println("account = " + newAccountId);
 
-        Transaction tsfrTxn = new CryptoTransferTransaction()
+        TransactionId tsfrTxnId = new CryptoTransferTransaction()
             .addSender(newAccountId, 50_000)
             .addRecipient(AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("NODE_ID"))), 50_000)
-            .setMaxTransactionFee(200_000)
-            .build(client)
             // we sign with 2 of the 3 keys
             .sign(keys.get(0))
-            .sign(keys.get(1));
-
-        // submit the transaction to the network
-        tsfrTxn.execute(client);
+            .sign(keys.get(1))
+            .execute(client);
 
         // (important!) wait for the transfer to go to consensus
-        tsfrTxn.getReceipt(client);
+        tsfrTxnId.getReceipt(client);
 
         Long balanceAfter = new AccountBalanceQuery()
             .setAccountId(newAccountId)

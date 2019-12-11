@@ -1,9 +1,6 @@
 package com.hedera.hashgraph.sdk.examples.advanced;
 
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.HederaException;
-import com.hedera.hashgraph.sdk.Transaction;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.file.FileCreateTransaction;
@@ -42,30 +39,26 @@ public final class DeleteFile {
         // you can easily use the bytes of a file instead.
         byte[] fileContents = "Hedera hashgraph is great!".getBytes();
 
-        Transaction tx = new FileCreateTransaction().setExpirationTime(
+        TransactionId txId = new FileCreateTransaction().setExpirationTime(
             Instant.now()
                 .plus(Duration.ofSeconds(2592000)))
             // Use the same key as the operator to "own" this file
             .addKey(OPERATOR_KEY.getPublicKey())
             .setContents(fileContents)
-            .build(client);
+            .execute(client);
 
-        tx.execute(client);
-
-        TransactionReceipt receipt = tx.getReceipt(client);
+        TransactionReceipt receipt = txId.getReceipt(client);
         FileId newFileId = receipt.getFileId();
 
         System.out.println("file: " + newFileId);
 
         // now delete the file
-        Transaction fileDeleteTxn = new FileDeleteTransaction()
+        TransactionId fileDeleteTxnId = new FileDeleteTransaction()
             .setFileId(newFileId)
-            .build(client);
-
-        fileDeleteTxn.execute(client);
+            .execute(client);
 
         // if this doesn't throw then the transaction was a success
-        fileDeleteTxn.getReceipt(client);
+        fileDeleteTxnId.getReceipt(client);
 
         System.out.println("File deleted successfully.");
 

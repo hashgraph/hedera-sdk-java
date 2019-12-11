@@ -4,6 +4,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.Transaction;
+import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
@@ -46,18 +47,16 @@ public final class MultiAppTransfer {
         int transferAmount = 10_000;
 
         // the exchange creates an account for the user to transfer funds to
-        Transaction createExchangeAccountTxn = new AccountCreateTransaction()
+        TransactionId createExchangeAccountTxnId = new AccountCreateTransaction()
             // the exchange only accepts transfers that it validates through a side channel (e.g. REST API)
             .setReceiverSignatureRequired(true)
             .setKey(exchangeKey.getPublicKey())
-            .build(client)
             // The owner key has to sign this transaction
             // when setReceiverSignatureRequired is true
-            .sign(exchangeKey);
+            .sign(exchangeKey)
+            .execute(client);
 
-        createExchangeAccountTxn.execute(client);
-
-        AccountId exchangeAccountId = createExchangeAccountTxn.getReceipt(client).getAccountId();
+        AccountId exchangeAccountId = createExchangeAccountTxnId.getReceipt(client).getAccountId();
 
         Transaction transferTxn = new CryptoTransferTransaction()
             .addSender(OPERATOR_ID, transferAmount)

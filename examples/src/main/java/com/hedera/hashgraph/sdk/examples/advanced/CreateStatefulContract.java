@@ -2,12 +2,7 @@ package com.hedera.hashgraph.sdk.examples.advanced;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.hedera.hashgraph.sdk.CallParams;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.FunctionResult;
-import com.hedera.hashgraph.sdk.HederaException;
-import com.hedera.hashgraph.sdk.Transaction;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.contract.ContractCallQuery;
 import com.hedera.hashgraph.sdk.contract.ContractCreateTransaction;
@@ -65,32 +60,29 @@ public final class CreateStatefulContract {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // create the contract's bytecode file
-        Transaction fileTx = new FileCreateTransaction().setExpirationTime(
+        TransactionId fileTxId = new FileCreateTransaction().setExpirationTime(
             Instant.now()
                 .plus(Duration.ofSeconds(2592000)))
             // Use the same key as the operator to "own" this file
             .addKey(OPERATOR_KEY.getPublicKey())
             .setContents(byteCode)
-            .setMaxTransactionFee(1_000_000_000)
-            .build(client);
+            .execute(client);
 
-        fileTx.execute(client);
-
-        TransactionReceipt fileReceipt = fileTx.getReceipt(client);
+        TransactionReceipt fileReceipt = fileTxId.getReceipt(client);
         FileId newFileId = fileReceipt.getFileId();
 
         System.out.println("contract bytecode file: " + newFileId);
 
-        Transaction contractTx = new ContractCreateTransaction().setBytecodeFile(newFileId)
+        TransactionId contractTxId = new ContractCreateTransaction().setBytecodeFile(newFileId)
             .setAutoRenewPeriod(Duration.ofHours(1))
             .setGas(100_000_000)
             .setMaxTransactionFee(1_000_000_000)
             .setConstructorParams(
                 CallParams.constructor()
                     .addString("hello from hedera!"))
-            .build(client);
+            .execute(client);
 
-        TransactionReceipt contractReceipt = contractTx.getReceipt(client);
+        TransactionReceipt contractReceipt = contractTxId.getReceipt(client);
         ContractId newContractId = contractReceipt.getContractId();
 
         System.out.println("new contract ID: " + newContractId);
@@ -110,18 +102,16 @@ public final class CreateStatefulContract {
         String message = contractCallResult.getString(0);
         System.out.println("contract returned message: " + message);
 
-        Transaction contractExecTxn = new ContractExecuteTransaction()
+        TransactionId contractExecTxnId = new ContractExecuteTransaction()
             .setContractId(newContractId)
             .setGas(100_000_000)
             .setFunctionParameters(CallParams.function("set_message")
                 .addString("hello from hedera again!"))
             .setMaxTransactionFee(800_000_000)
-            .build(client);
-
-        contractExecTxn.execute(client);
+            .execute(client);
 
         // if this doesn't throw then we know the contract executed successfully
-        contractExecTxn.getReceipt(client);
+        contractExecTxnId.getReceipt(client);
 
         // now query contract
         FunctionResult contractUpdateResult = new ContractCallQuery()

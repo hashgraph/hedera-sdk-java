@@ -2,7 +2,7 @@ package com.hedera.hashgraph.sdk.examples.advanced;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaException;
-import com.hedera.hashgraph.sdk.Transaction;
+import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusClient;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicCreateTransaction;
@@ -19,13 +19,16 @@ public final class ConsensusPubSub {
     // or set environment variables with the same names
     private static final AccountId NODE_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("NODE_ID")));
     private static final String NODE_ADDRESS = Objects.requireNonNull(Dotenv.load().get("NODE_ADDRESS"));
+
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final Ed25519PrivateKey OPERATOR_KEY = Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
+    private static final String MIRROR_NODE_ADDRESS = Objects.requireNonNull(Dotenv.load().get("MIRROR_NODE_ADDRESS"));
 
     private ConsensusPubSub() { }
 
     public static void main(String[] args) throws InterruptedException, HederaException {
-        final ConsensusClient consensusClient = new ConsensusClient("34.66.214.12:6552");
+        final ConsensusClient consensusClient = new ConsensusClient(MIRROR_NODE_ADDRESS);
 
         // To improve responsiveness, you should specify multiple nodes using the
         // `Client(<Map<AccountId, String>>)` constructor instead
@@ -35,13 +38,11 @@ public final class ConsensusPubSub {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        final Transaction topicTxn = new ConsensusTopicCreateTransaction()
+        final TransactionId transactionId = new ConsensusTopicCreateTransaction()
             .setMaxTransactionFee(1_000_000_000)
-            .build(client);
+            .execute(client);
 
-        topicTxn.execute(client);
-
-        final ConsensusTopicId topicId = topicTxn.getReceipt(client).getConsensusTopicId();
+        final ConsensusTopicId topicId = transactionId.getReceipt(client).getConsensusTopicId();
 
         consensusClient.subscribe(topicId, message -> {
             System.out.println("received topic message: " + message.getMessageString());
