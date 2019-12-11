@@ -11,6 +11,7 @@ import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.proto.FileServiceGrpc;
 
+import java.time.Duration;
 import java.time.Instant;
 
 import javax.annotation.Nullable;
@@ -27,9 +28,14 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
     @Deprecated
     public FileCreateTransaction(@Nullable Client client) {
         super(client);
+
+        // Default expiration time to an acceptable value
+        setExpirationTime(Instant.now().plus(Duration.ofMillis(7890000000L)));
     }
 
-    public FileCreateTransaction() { super(); }
+    public FileCreateTransaction() {
+        this(null);
+    }
 
     public FileCreateTransaction setExpirationTime(Instant expiration) {
         builder.setExpirationTime(TimestampHelper.timestampFrom(expiration));
