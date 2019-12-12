@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
 
     steps:
@@ -25,6 +26,7 @@ jobs:
       run: mvn -B package --file pom.xml
 
   check:
+    name: Checkstyle
     runs-on: ubuntu-latest
 
     steps:
