@@ -200,12 +200,16 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         build(client).executeAsync(client, retryTimeout, onSuccess, onError);
     }
 
+    /**
+     * @deprecated use {@code .build(client).sign(privateKey)} instead.
+     */
+    @Deprecated
     public final Transaction sign(Ed25519PrivateKey privateKey) {
         return build().sign(privateKey);
     }
 
     /**
-     * @deprecated use {@code .build().toBytes()} instead.
+     * @deprecated use {@code .build(client).toBytes()} instead.
      */
     @Deprecated
     public final byte[] toBytes() {
@@ -213,7 +217,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     }
 
     /**
-     * @deprecated use {@code .build().toBytes()} instead.
+     * @deprecated use {@code .build(client).toBytes()} instead.
      */
     @Deprecated
     public final byte[] toBytes(boolean requiresSignature) {
