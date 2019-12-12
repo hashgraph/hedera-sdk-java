@@ -1,5 +1,6 @@
 # Hedera Java SDK
-[![Build Status](https://travis-ci.org/hashgraph/hedera-sdk-java.svg?branch=master)](https://travis-ci.org/hashgraph/hedera-sdk-java)
+[![Actions Status](https://github.com/hashgraph/hedera-sdk-java/workflows/Java/badge.svg
+)](https://github.com/hashgraph/hedera-sdk-java/actions?query=workflow%3AJava)
 ![Maven](https://img.shields.io/maven-metadata/v/http/central.maven.org/maven2/com/hedera/hashgraph/sdk/maven-metadata.xml.svg)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-green)](https://github.com/hashgraph/hedera-sdk-java/blob/master/LICENSE)
 
