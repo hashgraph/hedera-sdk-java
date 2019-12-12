@@ -33,4 +33,4 @@ jobs:
       env:
         EMAIL: ryan@launchbadge.com
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BUILD_DIR: target/site/apidocs 
+        BUILD_DIR: ${{ GITHUB_WORKSPACE }}/target/site/apidocs 
