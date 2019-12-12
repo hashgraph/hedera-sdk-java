@@ -37,12 +37,11 @@ public final class CreateFile {
         byte[] fileContents = "Hedera hashgraph is great!".getBytes();
 
         TransactionId txId = new FileCreateTransaction()
-            .setExpirationTime(
-            Instant.now()
-                .plus(Duration.ofSeconds(2592000)))
             // Use the same key as the operator to "own" this file
             .addKey(OPERATOR_KEY.getPublicKey())
             .setContents(fileContents)
+            // The default max fee of 1 HBAR is not enough to make a file ( starts around 1.1 HBAR )
+            .setMaxTransactionFee(200_000_000) // 2 HBAR
             .execute(client);
 
         TransactionReceipt receipt = txId.getReceipt(client);

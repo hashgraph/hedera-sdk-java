@@ -68,6 +68,8 @@ public final class CreateAccountThresholdKey {
         TransactionId tsfrTxnId = new CryptoTransferTransaction()
             .addSender(newAccountId, 50_000)
             .addRecipient(AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("NODE_ID"))), 50_000)
+            // To manually sign, you must explicitly build the Transaction
+            .build(client)
             // we sign with 2 of the 3 keys
             .sign(keys.get(0))
             .sign(keys.get(1))

@@ -53,6 +53,7 @@ public final class MultiAppTransfer {
             .setKey(exchangeKey.getPublicKey())
             // The owner key has to sign this transaction
             // when setReceiverSignatureRequired is true
+            .build(client)
             .sign(exchangeKey)
             .execute(client);
 
@@ -63,6 +64,7 @@ public final class MultiAppTransfer {
             .addRecipient(exchangeAccountId, transferAmount)
             // the exchange-provided memo required to validate the transaction
             .setMemo("https://some-exchange.com/user1/account1")
+            // To manually sign, you must explicitly build the Transaction
             .build(client)
             .sign(userKey);
 

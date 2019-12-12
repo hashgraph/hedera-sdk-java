@@ -177,13 +177,14 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
 
         localValidate();
 
-        inner.setBodyBytes(
-            bodyBuilder.build()
-                .toByteString());
+        inner.setBodyBytes(bodyBuilder.build().toByteString());
 
         Transaction tx = new Transaction(null, inner, bodyBuilder, getMethod());
 
-        if (client != null && client.getOperatorKey() != null) {
+        // Sign with the operator if there is a client; the client has an operator; and, the transaction
+        // has a transaction ID that matches that operator ( which it would unless overridden ).
+        if (client != null && client.getOperatorKey() != null && client.getOperatorId() != null &&
+            client.getOperatorId().equals(new AccountId(bodyBuilder.getTransactionID().getAccountID()))) {
             tx.sign(client.getOperatorKey());
         }
 
