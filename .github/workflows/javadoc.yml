@@ -34,4 +34,4 @@ jobs:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         BASE_BRANCH: master 
         BRANCH: gh-pages
-        BUILD_DIR: target/site/apidocs 
+        FOLDER: target/site/apidocs 
