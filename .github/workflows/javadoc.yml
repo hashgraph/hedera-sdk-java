@@ -29,8 +29,9 @@ jobs:
       run: mvn -B javadoc:javadoc --file pom.xml
     
     - name: Publish
-      uses: Cecilapp/GitHub-Pages-deploy@2.0.0
-      env:
-        EMAIL: ryan@launchbadge.com
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BUILD_DIR: ${{ GITHUB_WORKSPACE }}/target/site/apidocs 
+      uses: JamesIves/github-pages-deploy-action@releases/v3
+      with:
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        BASE_BRANCH: master 
+        BRANCH: gh-pages
+        BUILD_DIR: target/site/apidocs 
