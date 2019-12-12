@@ -183,8 +183,9 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
 
         // Sign with the operator if there is a client; the client has an operator; and, the transaction
         // has a transaction ID that matches that operator ( which it would unless overridden ).
-        if (client != null && client.getOperatorKey() != null && client.getOperatorId() != null &&
-            client.getOperatorId().equals(new AccountId(bodyBuilder.getTransactionID().getAccountID()))) {
+        if (client != null && client.getOperatorKey() != null && client.getOperatorId() != null
+            && client.getOperatorId().equals(new AccountId(bodyBuilder.getTransactionID().getAccountID())))
+        {
             tx.sign(client.getOperatorKey());
         }
 
