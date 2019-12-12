@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk.consensus;
 
 import com.hedera.hashgraph.sdk.DurationHelper;
+import com.hedera.hashgraph.sdk.Experimental;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.account.AccountId;
@@ -20,6 +21,8 @@ public class ConsensusTopicCreateTransaction extends TransactionBuilder<Consensu
 
     public ConsensusTopicCreateTransaction() {
         super();
+
+        Experimental.requireFor(ConsensusTopicCreateTransaction.class.getName());
     }
 
     public ConsensusTopicCreateTransaction setTopicMemo(String topicMemo) {

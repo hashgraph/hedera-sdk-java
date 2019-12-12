@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk.consensus;
 
 import com.hedera.hashgraph.sdk.Entity;
+import com.hedera.hashgraph.sdk.Experimental;
 import com.hedera.hashgraph.sdk.IdUtil;
 import com.hedera.hashgraph.proto.TopicID;
 import com.hedera.hashgraph.proto.TopicIDOrBuilder;
@@ -16,6 +17,8 @@ public final class ConsensusTopicId implements Entity {
         this.shard = shard;
         this.realm = realm;
         this.topic = topic;
+
+        Experimental.requireFor(ConsensusTopicId.class.getName());
     }
 
     public ConsensusTopicId(long topic) {

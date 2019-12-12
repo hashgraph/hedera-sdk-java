@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk.consensus;
 
+import com.hedera.hashgraph.sdk.Experimental;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
 
@@ -19,6 +20,8 @@ public class ConsensusMessage {
     public final long sequenceNumber;
 
     ConsensusMessage(ConsensusTopicId topicId, ConsensusTopicResponse message) {
+        Experimental.requireFor(ConsensusMessage.class.getName());
+
         this.topicId = topicId;
         this.consensusTimestamp = TimestampHelper.timestampTo(message.getConsensusTimestamp());
         this.message = message.getMessage().toByteArray();

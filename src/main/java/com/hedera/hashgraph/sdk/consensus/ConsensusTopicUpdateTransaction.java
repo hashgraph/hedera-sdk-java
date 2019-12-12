@@ -2,6 +2,7 @@ package com.hedera.hashgraph.sdk.consensus;
 
 import com.google.protobuf.StringValue;
 import com.hedera.hashgraph.sdk.DurationHelper;
+import com.hedera.hashgraph.sdk.Experimental;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.account.AccountId;
@@ -21,6 +22,8 @@ public class ConsensusTopicUpdateTransaction extends TransactionBuilder<Consensu
 
     public ConsensusTopicUpdateTransaction() {
         super();
+
+        Experimental.requireFor(ConsensusTopicUpdateTransaction.class.getName());
     }
 
     public ConsensusTopicUpdateTransaction setTopicId(ConsensusTopicId topicId) {

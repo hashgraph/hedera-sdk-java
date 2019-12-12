@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk.consensus;
 
+import com.hedera.hashgraph.sdk.Experimental;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.proto.ConsensusUpdateTopicTransactionBody;
 import com.hedera.hashgraph.proto.Transaction;
@@ -13,6 +14,8 @@ public class ConsensusTopicDeleteTransaction extends TransactionBuilder<Consensu
 
     public ConsensusTopicDeleteTransaction() {
         super();
+
+        Experimental.requireFor(ConsensusTopicDeleteTransaction.class.getName());
     }
 
     public ConsensusTopicDeleteTransaction setTopicId(ConsensusTopicId topicId) {

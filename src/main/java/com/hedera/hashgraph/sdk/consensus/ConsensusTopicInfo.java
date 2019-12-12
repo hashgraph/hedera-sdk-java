@@ -2,6 +2,7 @@ package com.hedera.hashgraph.sdk.consensus;
 
 import com.hedera.hashgraph.proto.*;
 import com.hedera.hashgraph.sdk.DurationHelper;
+import com.hedera.hashgraph.sdk.Experimental;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
@@ -35,6 +36,8 @@ public class ConsensusTopicInfo {
     public final AccountId autoRenewAccount;
 
     public ConsensusTopicInfo(com.hedera.hashgraph.proto.ConsensusGetTopicInfoResponse response) {
+        Experimental.requireFor(ConsensusTopicInfo.class.getName());
+
         id = new ConsensusTopicId(response.getTopicIDOrBuilder());
 
         com.hedera.hashgraph.proto.ConsensusTopicInfo info = response.getTopicInfo();
