@@ -35,3 +35,4 @@ jobs:
         BASE_BRANCH: master 
         BRANCH: gh-pages
         FOLDER: target/site/apidocs 
+        CLEAN: true
