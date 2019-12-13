@@ -274,7 +274,7 @@
                 </executions>
                 <configuration>
                     <additionalJOption>-Xdoclint:none</additionalJOption>
-                    <excludePackageNames>com.hedera.hashgraph.proto.*</excludePackageNames>
+                    <excludePackageNames>com.hedera.hashgraph.proto</excludePackageNames>
                 </configuration>
             </plugin>
 
