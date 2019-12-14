@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusClient;
+import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicCreateTransaction;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
@@ -27,12 +28,13 @@ public final class ConsensusPubSub {
     private static final String MIRROR_NODE_ADDRESS = Objects.requireNonNull(Dotenv.load().get("MIRROR_NODE_ADDRESS"));
 
     private ConsensusPubSub() { }
-    
+
     public static void main(String[] args) throws InterruptedException, HederaException {
         // Requires an explicit opt-in as HCS is experimental and not yet generally available on mainnet or testnet
         System.setProperty(Experimental.PROPERTY, "true");
 
-        final ConsensusClient consensusClient = new ConsensusClient(MIRROR_NODE_ADDRESS);
+        final ConsensusClient consensusClient = new ConsensusClient(MIRROR_NODE_ADDRESS)
+            .setErrorHandler(e -> System.out.println("error in consensus client: " + e));
 
         // To improve responsiveness, you should specify multiple nodes using the
         // `Client(<Map<AccountId, String>>)` constructor instead
@@ -49,11 +51,17 @@ public final class ConsensusPubSub {
         final ConsensusTopicId topicId = transactionId.getReceipt(client).getConsensusTopicId();
 
         consensusClient.subscribe(topicId, message -> {
-            System.out.println("received topic message: " + message.getMessageString());
+            System.out.println(message.consensusTimestamp + " received topic message: " + message.getMessageString());
         });
 
         // keep the main thread from exiting because the listeners run on daemon threads
-        for (;;) {
+        for (int i = 0; ; i++) {
+            new ConsensusMessageSubmitTransaction()
+                .setTopicId(topicId)
+                .setMessage("hello, HCS! " + i)
+                .execute(client)
+                .getReceipt(client);
+
             Thread.sleep(2500);
         }
     }
