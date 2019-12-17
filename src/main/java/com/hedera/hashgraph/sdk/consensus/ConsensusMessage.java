@@ -19,7 +19,7 @@ public class ConsensusMessage {
 
     public final long sequenceNumber;
 
-    ConsensusMessage(ConsensusTopicId topicId, ConsensusTopicResponse message) {
+    public ConsensusMessage(ConsensusTopicId topicId, ConsensusTopicResponse message) {
         Experimental.requireFor(ConsensusMessage.class.getName());
 
         this.topicId = topicId;
