@@ -108,7 +108,21 @@ public enum Status {
     FileUploadedProtoInvalid(ResponseCodeEnum.FILE_UPLOADED_PROTO_INVALID),
     FileUploadedProtoNotSavedToDisk(ResponseCodeEnum.FILE_UPLOADED_PROTO_NOT_SAVED_TO_DISK),
     FeeScheduleFilePartUploaded(ResponseCodeEnum.FEE_SCHEDULE_FILE_PART_UPLOADED),
-    ExchangeRateChangeLimitExceeded(ResponseCodeEnum.EXCHANGE_RATE_CHANGE_LIMIT_EXCEEDED);
+    ExchangeRateChangeLimitExceeded(ResponseCodeEnum.EXCHANGE_RATE_CHANGE_LIMIT_EXCEEDED),
+    MaxContractStorageExceeded(ResponseCodeEnum.MAX_CONTRACT_STORAGE_EXCEEDED),
+    TransferAccountSameAsDeleteAccount(ResponseCodeEnum.TRANSFER_ACCOUNT_SAME_AS_DELETE_ACCOUNT),
+    TotalLedgerBalanceInvalid(ResponseCodeEnum.TOTAL_LEDGER_BALANCE_INVALID),
+    ExpirationReductionNotAllowed(ResponseCodeEnum.EXPIRATION_REDUCTION_NOT_ALLOWED),
+    MaxGasLimitExceeded(ResponseCodeEnum.MAX_GAS_LIMIT_EXCEEDED),
+    MaxFileSizeExceeded(ResponseCodeEnum.MAX_FILE_SIZE_EXCEEDED),
+    InvalidTopicId(ResponseCodeEnum.INVALID_TOPIC_ID),
+    InvalidAdminKey(ResponseCodeEnum.INVALID_ADMIN_KEY),
+    InvalidSubmitKey(ResponseCodeEnum.INVALID_SUBMIT_KEY),
+    Unauthorized(ResponseCodeEnum.UNAUTHORIZED),
+    InvalidTopicMessage(ResponseCodeEnum.INVALID_TOPIC_MESSAGE),
+    InvalidAutorenewAccount(ResponseCodeEnum.INVALID_AUTORENEW_ACCOUNT),
+    AutorenewAccountNotAllowed(ResponseCodeEnum.AUTORENEW_ACCOUNT_NOT_ALLOWED),
+    TopicExpired(ResponseCodeEnum.TOPIC_EXPIRED);
 
     private final ResponseCodeEnum responseCode;
 
@@ -231,6 +245,21 @@ public enum Status {
             case FILE_UPLOADED_PROTO_NOT_SAVED_TO_DISK: return FileUploadedProtoNotSavedToDisk;
             case FEE_SCHEDULE_FILE_PART_UPLOADED: return FeeScheduleFilePartUploaded;
             case EXCHANGE_RATE_CHANGE_LIMIT_EXCEEDED: return ExchangeRateChangeLimitExceeded;
+            case MAX_CONTRACT_STORAGE_EXCEEDED: return MaxContractStorageExceeded;
+            case TRANSFER_ACCOUNT_SAME_AS_DELETE_ACCOUNT: return TransferAccountSameAsDeleteAccount;
+            case TOTAL_LEDGER_BALANCE_INVALID: return TotalLedgerBalanceInvalid;
+            case EXPIRATION_REDUCTION_NOT_ALLOWED: return ExpirationReductionNotAllowed;
+            case MAX_GAS_LIMIT_EXCEEDED: return MaxGasLimitExceeded;
+            case MAX_FILE_SIZE_EXCEEDED: return MaxFileSizeExceeded;
+            case INVALID_TOPIC_ID: return InvalidTopicId;
+            case INVALID_ADMIN_KEY: return InvalidAdminKey;
+            case INVALID_SUBMIT_KEY: return InvalidSubmitKey;
+            case UNAUTHORIZED: return Unauthorized;
+            case INVALID_TOPIC_MESSAGE: return InvalidTopicMessage;
+            case INVALID_AUTORENEW_ACCOUNT: return InvalidAutorenewAccount;
+            case AUTORENEW_ACCOUNT_NOT_ALLOWED: return AutorenewAccountNotAllowed;
+            case TOPIC_EXPIRED: return TopicExpired;
+
             default:
                 throw new IllegalArgumentException("unexpected response code: " + responseCode);
         }
