@@ -1,11 +1,11 @@
 package com.hedera.hashgraph.sdk.consensus;
 
 import com.google.common.collect.Iterators;
-import com.hedera.hashgraph.sdk.Experimental;
-import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.proto.mirror.ConsensusServiceGrpc;
 import com.hedera.hashgraph.proto.mirror.ConsensusTopicQuery;
 import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
+import com.hedera.hashgraph.sdk.Experimental;
+import com.hedera.hashgraph.sdk.TimestampHelper;
 
 import java.time.Instant;
 import java.util.Iterator;
@@ -32,6 +32,8 @@ public class ConsensusClient implements AutoCloseable {
         Experimental.requireFor(ConsensusClient.class.getName());
 
         channel = ManagedChannelBuilder.forTarget(endpoint)
+            // https://github.com/hashgraph/hedera-sdk-java/issues/294
+            .keepAliveTime(2, TimeUnit.MINUTES)
             .usePlaintext()
             .build();
     }
