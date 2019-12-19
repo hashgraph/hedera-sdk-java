@@ -2,12 +2,12 @@ package com.hedera.hashgraph.sdk.consensus;
 
 import com.hedera.hashgraph.proto.TopicID;
 import com.hedera.hashgraph.proto.TopicIDOrBuilder;
-import com.hedera.hashgraph.sdk.Entity;
 import com.hedera.hashgraph.sdk.IdUtil;
+import com.hedera.hashgraph.sdk.Internal;
 
 import java.util.Objects;
 
-public final class ConsensusTopicId implements Entity {
+public final class ConsensusTopicId {
     public final long shard;
     public final long realm;
     public final long topic;
@@ -22,6 +22,7 @@ public final class ConsensusTopicId implements Entity {
         this(0, 0, topic);
     }
 
+    @Internal
     public ConsensusTopicId(TopicIDOrBuilder topicID) {
         this(topicID.getShardNum(), topicID.getRealmNum(), topicID.getTopicNum());
     }
@@ -48,6 +49,7 @@ public final class ConsensusTopicId implements Entity {
             && topic == otherId.topic;
     }
 
+    @Internal
     public TopicID toProto() {
         return TopicID.newBuilder()
             .setShardNum(shard)

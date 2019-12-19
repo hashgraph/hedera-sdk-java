@@ -36,7 +36,8 @@ public final class ConsensusTopicInfoQuery extends QueryBuilder<ConsensusTopicIn
     }
 
     @Override
-    protected ConsensusTopicInfo fromResponse(Response response) {
-        return ConsensusTopicInfo.fromResponse(response);
+    protected ConsensusTopicInfo extractResponse(Response raw) {
+        return ConsensusTopicInfo.fromResponse(raw);
     }
 }
+

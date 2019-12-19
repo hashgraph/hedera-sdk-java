@@ -29,6 +29,8 @@ public class ConsensusClient implements AutoCloseable {
 
     public ConsensusClient(String endpoint) {
         channel = ManagedChannelBuilder.forTarget(endpoint)
+            // https://github.com/hashgraph/hedera-sdk-java/issues/294
+            .keepAliveTime(2, TimeUnit.MINUTES)
             .usePlaintext()
             .build();
     }

@@ -77,6 +77,7 @@ public final class TransactionReceipt {
         return inner.getTopicRunningHash().toByteArray();
     }
 
+    @Internal
     public com.hedera.hashgraph.proto.TransactionReceipt toProto() {
         return inner;
     }
