@@ -314,6 +314,11 @@
                     <pluginId>grpc-java</pluginId>
                     <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}
                     </pluginArtifact>
+                    <additionalProtoPathElements>
+                        <element>
+                            ${basedir}/src/main/proto/mirror
+                        </element>
+                    </additionalProtoPathElements>
                 </configuration>
                 <executions>
                     <execution>
