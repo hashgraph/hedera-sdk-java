@@ -1,18 +1,15 @@
 package com.hedera.hashgraph.sdk.consensus;
 
+import com.hedera.hashgraph.proto.ConsensusCreateTopicTransactionBody;
+import com.hedera.hashgraph.proto.ConsensusServiceGrpc;
+import com.hedera.hashgraph.proto.Transaction;
+import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.DurationHelper;
-import com.hedera.hashgraph.sdk.Experimental;
-import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
-import com.hedera.hashgraph.proto.ConsensusCreateTopicTransactionBody;
-import com.hedera.hashgraph.proto.Transaction;
-import com.hedera.hashgraph.proto.TransactionResponse;
-import com.hedera.hashgraph.proto.ConsensusServiceGrpc;
 
 import java.time.Duration;
-import java.time.Instant;
 
 import io.grpc.MethodDescriptor;
 
@@ -21,8 +18,6 @@ public class ConsensusTopicCreateTransaction extends TransactionBuilder<Consensu
 
     public ConsensusTopicCreateTransaction() {
         super();
-
-        Experimental.requireFor(ConsensusTopicCreateTransaction.class.getName());
     }
 
     public ConsensusTopicCreateTransaction setTopicMemo(String topicMemo) {

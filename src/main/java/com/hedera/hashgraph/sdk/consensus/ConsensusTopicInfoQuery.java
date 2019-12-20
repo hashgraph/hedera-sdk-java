@@ -1,11 +1,11 @@
 package com.hedera.hashgraph.sdk.consensus;
 
-import com.hedera.hashgraph.sdk.Experimental;
-import com.hedera.hashgraph.sdk.QueryBuilder;
+import com.hedera.hashgraph.proto.ConsensusServiceGrpc;
 import com.hedera.hashgraph.proto.Query;
 import com.hedera.hashgraph.proto.QueryHeader;
 import com.hedera.hashgraph.proto.Response;
-import com.hedera.hashgraph.proto.ConsensusServiceGrpc;
+import com.hedera.hashgraph.sdk.QueryBuilder;
+
 import io.grpc.MethodDescriptor;
 
 public final class ConsensusTopicInfoQuery extends QueryBuilder<ConsensusTopicInfo, ConsensusTopicInfoQuery> {
@@ -13,8 +13,6 @@ public final class ConsensusTopicInfoQuery extends QueryBuilder<ConsensusTopicIn
 
     public ConsensusTopicInfoQuery() {
         builder = inner.getConsensusGetTopicInfoBuilder();
-
-        Experimental.requireFor(ConsensusTopicInfoQuery.class.getName());
     }
 
     public ConsensusTopicInfoQuery setTopicId(ConsensusTopicId id) {
