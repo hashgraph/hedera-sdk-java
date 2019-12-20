@@ -1,12 +1,11 @@
 package com.hedera.hashgraph.sdk.consensus;
 
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.Experimental;
-import com.hedera.hashgraph.sdk.TransactionBuilder;
+import com.hedera.hashgraph.proto.ConsensusServiceGrpc;
 import com.hedera.hashgraph.proto.ConsensusSubmitMessageTransactionBody;
 import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
-import com.hedera.hashgraph.proto.ConsensusServiceGrpc;
+import com.hedera.hashgraph.sdk.TransactionBuilder;
 
 import io.grpc.MethodDescriptor;
 
@@ -15,8 +14,6 @@ public class ConsensusMessageSubmitTransaction extends TransactionBuilder<Consen
 
     public ConsensusMessageSubmitTransaction() {
         super();
-
-        Experimental.requireFor(ConsensusMessageSubmitTransaction.class.getName());
     }
 
     public ConsensusMessageSubmitTransaction setTopicId(ConsensusTopicId topic) {
