@@ -3,22 +3,21 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
-import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519Signature;
+import com.hedera.hashgraph.proto.CryptoServiceGrpc;
+import com.hedera.hashgraph.proto.FileServiceGrpc;
+import com.hedera.hashgraph.proto.FreezeServiceGrpc;
 import com.hedera.hashgraph.proto.ResponseCodeEnum;
 import com.hedera.hashgraph.proto.SignatureMap;
 import com.hedera.hashgraph.proto.SignatureMapOrBuilder;
 import com.hedera.hashgraph.proto.SignaturePair;
 import com.hedera.hashgraph.proto.SignaturePairOrBuilder;
+import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.proto.TransactionBody;
 import com.hedera.hashgraph.proto.TransactionBodyOrBuilder;
 import com.hedera.hashgraph.proto.TransactionResponse;
-import com.hedera.hashgraph.proto.ConsensusServiceGrpc;
-import com.hedera.hashgraph.proto.CryptoServiceGrpc;
-import com.hedera.hashgraph.proto.FileServiceGrpc;
-import com.hedera.hashgraph.proto.FreezeServiceGrpc;
-import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
+import com.hedera.hashgraph.sdk.account.AccountId;
+import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
+import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519Signature;
 
 import org.bouncycastle.util.encoders.Hex;
 
@@ -416,18 +415,6 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
                 return FileServiceGrpc.getDeleteFileMethod();
             case FILEUPDATE:
                 return FileServiceGrpc.getUpdateFileMethod();
-
-            // Consensus
-
-            case CONSENSUSCREATETOPIC:
-                return ConsensusServiceGrpc.getCreateTopicMethod();
-            case CONSENSUSUPDATETOPIC:
-                return ConsensusServiceGrpc.getUpdateTopicMethod();
-            case CONSENSUSDELETETOPIC:
-                return ConsensusServiceGrpc.getDeleteTopicMethod();
-
-            case CONSENSUSSUBMITMESSAGE:
-                return ConsensusServiceGrpc.getSubmitMessageMethod();
 
             case DATA_NOT_SET:
                 throw new IllegalArgumentException("method not set");
