@@ -141,4 +141,30 @@ enum ResponseCodeEnum {
 
   MAX_GAS_LIMIT_EXCEEDED = 111; //Gas exceeded currently allowable gas limit per transaction
   MAX_FILE_SIZE_EXCEEDED = 112;  // File size exceeded the currently allowable limit
+
+  // New functionality in the HCS release below here
+
+  INVALID_TOPIC_ID = 150; // The Topic ID specified is not in the system.
+
+  // The Topic referenced is in a deleted state for a period of time pending removal from the system.
+  // No ConsensusService transactions or queries on this topic will succeed once the topic is deleted.
+  TOPIC_DELETED = 151;
+
+  TOPIC_NOT_ENABLED = 152 [deprecated = true]; // Deprecated and to be removed before HCS release.
+  INVALID_TOPIC_VALID_START_TIME = 153 [deprecated = true]; // Deprecated and to be removed before HCS release.
+
+  INVALID_TOPIC_EXPIRATION_TIME = 154;
+  INVALID_TOPIC_ADMIN_KEY = 155;
+  INVALID_TOPIC_SUBMIT_KEY = 156;
+  UNAUTHORIZED = 157; // An attempted operation was not authorized (ie - a deleteTopic for a topic with no adminKey).
+  INVALID_TOPIC_MESSAGE = 158; // A ConsensusService message is empty.
+
+  // The autoRenewAccount specified is not a valid, active account.
+  INVALID_AUTORENEW_ACCOUNT = 159;
+
+  // An admin key was not specified on the topic, so there must not be an autorenew account.
+  AUTORENEW_ACCOUNT_NOT_ALLOWED = 160;
+
+  // The autoRenewAccount didn't sign the transaction.
+  AUTORENEW_ACCOUNT_SIGNATURE_MISSING = 161;
 }
