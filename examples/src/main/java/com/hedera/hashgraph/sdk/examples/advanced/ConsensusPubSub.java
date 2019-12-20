@@ -1,7 +1,6 @@
 package com.hedera.hashgraph.sdk.examples.advanced;
 
 import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Experimental;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
@@ -30,9 +29,6 @@ public final class ConsensusPubSub {
     private ConsensusPubSub() { }
 
     public static void main(String[] args) throws InterruptedException, HederaException {
-        // Requires an explicit opt-in as HCS is experimental and not yet generally available on mainnet or testnet
-        System.setProperty(Experimental.PROPERTY, "true");
-
         final ConsensusClient consensusClient = new ConsensusClient(MIRROR_NODE_ADDRESS)
             .setErrorHandler(e -> System.out.println("error in consensus client: " + e));
 
