@@ -119,15 +119,6 @@ public final class AccountInfo {
         return autoRenewPeriod;
     }
 
-    /**
-     * @deprecated for removal
-     */
-    @Deprecated
-    public List<Claim> getClaims() {
-        // claims were never implemented so an empty list is fine
-        return new ArrayList<>();
-    }
-
     static AccountInfo fromResponse(Response response) {
         if (!response.hasCryptoGetInfo()) {
             throw new IllegalArgumentException("query response was not `CryptoGetInfoResponse`");
