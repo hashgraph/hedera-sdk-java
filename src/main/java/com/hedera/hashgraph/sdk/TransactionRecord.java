@@ -1,7 +1,8 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.proto.AccountAmountOrBuilder;
+import com.hedera.hashgraph.sdk.account.AccountId;
+import com.hedera.hashgraph.sdk.contract.ContractFunctionResult;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -85,24 +86,24 @@ public final class TransactionRecord {
      * Record of the value returned by the smart contract function (if it completed and didn't fail)
      * from {@link com.hedera.hashgraph.sdk.contract.ContractExecuteTransaction}.
      */
-    public FunctionResult getContractExecuteResult() {
+    public ContractFunctionResult getContractExecuteResult() {
         if (!inner.hasContractCallResult()) {
             throw new IllegalStateException("record does not contain a contract execute result");
         }
 
-        return new FunctionResult(inner.getContractCallResultOrBuilder());
+        return new ContractFunctionResult(inner.getContractCallResultOrBuilder());
     }
 
     /**
      * Record of the value returned by the smart contract constructor (if it completed and didn't fail)
      * from {@link com.hedera.hashgraph.sdk.contract.ContractCreateTransaction}.
      */
-    public FunctionResult getContractCreateResult() {
+    public ContractFunctionResult getContractCreateResult() {
         if (!inner.hasContractCreateResult()) {
             throw new IllegalStateException("record does not contain a contract create result");
         }
 
-        return new FunctionResult(inner.getContractCreateResultOrBuilder());
+        return new ContractFunctionResult(inner.getContractCreateResultOrBuilder());
     }
 
     /**
@@ -115,7 +116,7 @@ public final class TransactionRecord {
             return null;
         }
 
-        return getContractExecuteResult();
+        return new FunctionResult(inner.getContractCallResultOrBuilder());
     }
 
     /**
@@ -128,7 +129,7 @@ public final class TransactionRecord {
             return null;
         }
 
-        return getContractCreateResult();
+        return new FunctionResult(inner.getContractCreateResultOrBuilder());
     }
 
     /**

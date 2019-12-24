@@ -18,8 +18,15 @@ import java.util.function.Consumer;
 
 import io.grpc.MethodDescriptor;
 
-/** Call a function without updating its state or requiring concensus */
+/**
+ * Call a function without updating its state or requiring concensus.
+ *
+ * @deprecated the result type of {@link FunctionResult} returned from the various
+ * {@code execute[Async](...)} methods is changing in 1.0 to {@link ContractFunctionResult}, which
+ * is a breaking change. This class is not being removed.
+ */
 // `ContractCallLocalQuery`
+@Deprecated
 public class ContractCallQuery extends QueryBuilder<FunctionResult, ContractCallQuery> {
     private final ContractCallLocalQuery.Builder builder = inner.getContractCallLocalBuilder();
 

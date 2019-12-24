@@ -1,9 +1,9 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.contract.ContractId;
 import com.hedera.hashgraph.proto.ContractFunctionResultOrBuilder;
 import com.hedera.hashgraph.proto.ContractLoginfoOrBuilder;
+import com.hedera.hashgraph.sdk.contract.ContractId;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -12,6 +12,12 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+/**
+ * @deprecated renamed to {@link com.hedera.hashgraph.sdk.contract.ContractFunctionResult}.
+ *
+ * Note that some methods renamed for clarity and some less-used methods have been removed.
+ */
+@Deprecated
 public final class FunctionResult {
     private final ContractFunctionResultOrBuilder inner;
 

@@ -8,12 +8,19 @@ import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.CallParams;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
+import com.hedera.hashgraph.sdk.TransactionRecord;
 
 import javax.annotation.Nullable;
 
 import io.grpc.MethodDescriptor;
 
-/** Call a function in the contract, updating its internal state in the hashgraph. */
+/**
+ * Call a function in the contract, updating its internal state in the hashgraph.
+ *
+ * After execution, call {@link com.hedera.hashgraph.sdk.Transaction#getRecord(Client)}
+ * and {@link TransactionRecord#getContractExecuteResult()} to get the
+ * result of the function call.
+ */
 // `ContractCallTransaction`
 public final class ContractExecuteTransaction extends TransactionBuilder<ContractExecuteTransaction> {
     private final ContractCallTransactionBody.Builder builder = bodyBuilder.getContractCallBuilder();
