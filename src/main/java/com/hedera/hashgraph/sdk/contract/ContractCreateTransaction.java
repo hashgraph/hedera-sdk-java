@@ -11,6 +11,7 @@ import com.hedera.hashgraph.sdk.CallParams;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
+import com.hedera.hashgraph.sdk.TransactionRecord;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hedera.hashgraph.sdk.file.FileId;
@@ -21,6 +22,13 @@ import javax.annotation.Nullable;
 
 import io.grpc.MethodDescriptor;
 
+/**
+ * Transaction to create a contract on the Hedera network.
+ *
+ * After execution, call {@link com.hedera.hashgraph.sdk.Transaction#getRecord(Client)}
+ * and {@link TransactionRecord#getContractCreateResult()} to get the
+ * result of the constructor call.
+ */
 public class ContractCreateTransaction extends TransactionBuilder<ContractCreateTransaction> {
     private final ContractCreateTransactionBody.Builder builder = bodyBuilder.getContractCreateInstanceBuilder();
 
