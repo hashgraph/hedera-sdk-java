@@ -2,11 +2,16 @@ package com.hedera.hashgraph.sdk.examples.advanced;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.FunctionResult;
+import com.hedera.hashgraph.sdk.HederaException;
+import com.hedera.hashgraph.sdk.TransactionId;
+import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.contract.ContractCallQuery;
 import com.hedera.hashgraph.sdk.contract.ContractCreateTransaction;
 import com.hedera.hashgraph.sdk.contract.ContractExecuteTransaction;
+import com.hedera.hashgraph.sdk.contract.ContractFunctionParams;
 import com.hedera.hashgraph.sdk.contract.ContractId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.file.FileCreateTransaction;
@@ -15,8 +20,6 @@ import com.hedera.hashgraph.sdk.file.FileId;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Objects;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -59,10 +62,12 @@ public final class CreateStatefulContract {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
+        // default max fee for all transactions executed by this client
+        client.setMaxTransactionFee(100_000_000_000L);
+        client.setMaxQueryPayment(1_000_000_000L);
+
         // create the contract's bytecode file
-        TransactionId fileTxId = new FileCreateTransaction().setExpirationTime(
-            Instant.now()
-                .plus(Duration.ofSeconds(2592000)))
+        TransactionId fileTxId = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file
             .addKey(OPERATOR_KEY.getPublicKey())
             .setContents(byteCode)
@@ -73,12 +78,11 @@ public final class CreateStatefulContract {
 
         System.out.println("contract bytecode file: " + newFileId);
 
-        TransactionId contractTxId = new ContractCreateTransaction().setBytecodeFile(newFileId)
-            .setAutoRenewPeriod(Duration.ofHours(1))
+        TransactionId contractTxId = new ContractCreateTransaction()
+            .setBytecodeFile(newFileId)
             .setGas(100_000_000)
-            .setMaxTransactionFee(1_000_000_000)
             .setConstructorParams(
-                CallParams.constructor()
+                new ContractFunctionParams()
                     .addString("hello from hedera!"))
             .execute(client);
 
@@ -89,9 +93,8 @@ public final class CreateStatefulContract {
 
         FunctionResult contractCallResult = new ContractCallQuery()
             .setContractId(newContractId)
-            .setGas(100_000_000)
-            .setFunctionParameters(CallParams.function("get_message"))
-            .setMaxQueryPayment(8_000_000)
+            .setGas(1000)
+            .setFunction("get_message")
             .execute(client);
 
         if (contractCallResult.getErrorMessage() != null) {
@@ -105,9 +108,8 @@ public final class CreateStatefulContract {
         TransactionId contractExecTxnId = new ContractExecuteTransaction()
             .setContractId(newContractId)
             .setGas(100_000_000)
-            .setFunctionParameters(CallParams.function("set_message")
+            .setFunction("set_message", new ContractFunctionParams()
                 .addString("hello from hedera again!"))
-            .setMaxTransactionFee(800_000_000)
             .execute(client);
 
         // if this doesn't throw then we know the contract executed successfully
@@ -117,8 +119,7 @@ public final class CreateStatefulContract {
         FunctionResult contractUpdateResult = new ContractCallQuery()
             .setContractId(newContractId)
             .setGas(100_000_000)
-            .setFunctionParameters(CallParams.function("get_message"))
-            .setMaxQueryPayment(800_000_000)
+            .setFunction("get_message")
             .execute(client);
 
         if (contractUpdateResult.getErrorMessage() != null) {

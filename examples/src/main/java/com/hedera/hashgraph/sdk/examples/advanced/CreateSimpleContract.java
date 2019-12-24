@@ -2,7 +2,12 @@ package com.hedera.hashgraph.sdk.examples.advanced;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.proto.ResponseCodeEnum;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.FunctionResult;
+import com.hedera.hashgraph.sdk.HederaException;
+import com.hedera.hashgraph.sdk.TransactionId;
+import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.contract.ContractCallQuery;
 import com.hedera.hashgraph.sdk.contract.ContractCreateTransaction;
@@ -11,7 +16,6 @@ import com.hedera.hashgraph.sdk.contract.ContractId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.file.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.file.FileId;
-import com.hedera.hashgraph.proto.ResponseCodeEnum;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -92,7 +96,7 @@ public final class CreateSimpleContract {
         FunctionResult contractCallResult = new ContractCallQuery()
             .setGas(30000)
             .setContractId(newContractId)
-            .setFunctionParameters(CallParams.function("greet"))
+            .setFunction("greet")
             .execute(client);
 
         if (contractCallResult.getErrorMessage() != null) {

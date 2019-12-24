@@ -26,6 +26,12 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
 
 // an implementation of function selector and parameter encoding as specified here:
 // https://solidity.readthedocs.io/en/v0.5.7/abi-spec.html#
+
+/**
+ * @deprecated Moved to {@link com.hedera.hashgraph.sdk.contract.ContractFunctionParams}.
+ * Note that some methods renamed for clarity and some less-used methods have been removed.
+ */
+@Deprecated
 public final class CallParams<Kind> {
 
     @Nullable
@@ -965,7 +971,10 @@ public final class CallParams<Kind> {
 
     /**
      * Builder class for Solidity function selectors.
+     *
+     * @deprecated Moved to {@link com.hedera.hashgraph.sdk.contract.ContractFunctionSelector}.
      */
+    @Deprecated
     @SuppressFBWarnings(value = {"EI_EXPOSE_REP"},
         justification = "we don't care about the contents of `finished`")
     public static final class FunctionSelector {

@@ -1,8 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hedera.hashgraph.proto.AccountAmount;
 import com.hedera.hashgraph.proto.Query;
 import com.hedera.hashgraph.proto.QueryHeader;
@@ -11,6 +9,8 @@ import com.hedera.hashgraph.proto.ResponseCodeEnum;
 import com.hedera.hashgraph.proto.ResponseHeader;
 import com.hedera.hashgraph.proto.ResponseType;
 import com.hedera.hashgraph.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.account.AccountId;
+import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 
 import java.time.Duration;
 import java.util.List;
@@ -154,12 +154,12 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         return (T) this;
     }
 
-    public final long getCost(Client client) throws HederaException, HederaNetworkException {
+    public long getCost(Client client) throws HederaException, HederaNetworkException {
         // set which node we're going to be working with
         return new CostQuery(client).execute(client);
     }
 
-    public final void getCostAsync(Client client, Consumer<Long> withCost, Consumer<HederaThrowable> onError) {
+    public void getCostAsync(Client client, Consumer<Long> withCost, Consumer<HederaThrowable> onError) {
         new CostQuery(client).executeAsync(client, withCost, onError);
     }
 
