@@ -245,7 +245,8 @@ public final class ContractFunctionParams {
 
     /**
      * Add a Solidity function reference as a {@value ADDRESS_LEN}-byte contract address and a
-     * constructed {@link ContractFunctionSelector}.
+     * constructed {@link ContractFunctionSelector}. The {@link ContractFunctionSelector}
+     * may not be modified after this call.
      *
      * @return {@code this} for fluent usage.
      * @throws IllegalArgumentException if {@code address} is not {@value ADDRESS_LEN_HEX}
@@ -253,7 +254,7 @@ public final class ContractFunctionParams {
      */
     public ContractFunctionParams addFunction(String address, ContractFunctionSelector selector) {
         // allow the `FunctionSelector` to be reused multiple times
-        return addFunction(decodeAddress(address), selector.finishIntermediate());
+        return addFunction(decodeAddress(address), selector.finish());
     }
 
     /**
