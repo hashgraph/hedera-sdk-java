@@ -1,6 +1,12 @@
 package com.hedera.hashgraph.sdk.contract;
 
 import com.google.protobuf.ByteString;
+import com.hedera.hashgraph.proto.ContractCreateTransactionBody;
+import com.hedera.hashgraph.proto.RealmID;
+import com.hedera.hashgraph.proto.ShardID;
+import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
+import com.hedera.hashgraph.proto.Transaction;
+import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.CallParams;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.DurationHelper;
@@ -8,12 +14,6 @@ import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hedera.hashgraph.sdk.file.FileId;
-import com.hedera.hashgraph.proto.ContractCreateTransactionBody;
-import com.hedera.hashgraph.proto.RealmID;
-import com.hedera.hashgraph.proto.ShardID;
-import com.hedera.hashgraph.proto.Transaction;
-import com.hedera.hashgraph.proto.TransactionResponse;
-import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
 
 import java.time.Duration;
 
@@ -80,8 +80,18 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
         return this;
     }
 
+    /**
+     * @deprecated Associated class is being removed; use {@link #setConstructorParams(ContractFunctionParams)}
+     * and see {@link ContractFunctionParams} for new API.
+     */
+    @Deprecated
     public ContractCreateTransaction setConstructorParams(CallParams<CallParams.Constructor> constructorParams) {
         builder.setConstructorParameters(constructorParams.toProto());
+        return this;
+    }
+
+    public ContractCreateTransaction setConstructorParams(ContractFunctionParams constructorParams) {
+        builder.setConstructorParameters(constructorParams.toBytes(null));
         return this;
     }
 
