@@ -35,6 +35,62 @@ public final class ContractFunctionSelector {
         digest.update((byte) '(');
     }
 
+    public ContractFunctionSelector addString() {
+        return addParamType("string");
+    }
+
+    public ContractFunctionSelector addStringArray() {
+        return addParamType("string[]");
+    }
+
+    public ContractFunctionSelector addBytes() {
+        return addParamType("bytes");
+    }
+
+    public ContractFunctionSelector addBytesArray() {
+        return addParamType("bytes[]");
+    }
+
+    public ContractFunctionSelector addBool() {
+        return addParamType("bool");
+    }
+
+    public ContractFunctionSelector addInt32() {
+        return addParamType("int32");
+    }
+
+    public ContractFunctionSelector addInt64() {
+        return addParamType("int64");
+    }
+
+    public ContractFunctionSelector addInt256() {
+        return addParamType("int256");
+    }
+
+    public ContractFunctionSelector addInt32Array() {
+        return addParamType("int32[]");
+    }
+
+    public ContractFunctionSelector addInt64Array() {
+        return addParamType("int64[]");
+    }
+
+    public ContractFunctionSelector addInt256Array() {
+        return addParamType("int256[]");
+    }
+
+    public ContractFunctionSelector addAddress() {
+        return addParamType("address");
+    }
+
+    public ContractFunctionSelector addAddressArray() {
+        return addParamType("address[]");
+    }
+
+    public ContractFunctionSelector addFunction() {
+        return addParamType("function");
+    }
+
     /**
      * Add a Solidity type name to this selector;
      * {@see https://solidity.readthedocs.io/en/v0.5.9/types.html}
@@ -43,7 +99,7 @@ public final class ContractFunctionSelector {
      * @return {@code this} for fluent usage.
      * @throws IllegalStateException if {@link #finish()} has already been called.
      */
-    public ContractFunctionSelector addParamType(String typeName) {
+    ContractFunctionSelector addParamType(String typeName) {
         if (finished != null) {
             throw new IllegalStateException("FunctionSelector already finished");
         }
@@ -61,43 +117,16 @@ public final class ContractFunctionSelector {
     }
 
     /**
-     * Complete the function selector and return its bytes, but leave the selector in a
-     * state which allows adding more parameters.
-     * <p>
-     * This requires copying the digest state and so is less efficient than {@link #finish()}
-     * but is more efficient than throwing the selector state out and starting over
-     * with the same subset of parameters.
-     *
-     * @return the computed selector bytes.
-     */
-    public byte[] finishIntermediate() {
-        if (finished == null) {
-            try {
-                final Keccak.Digest256 resetDigest =
-                    (Keccak.Digest256) Objects.requireNonNull(digest).clone();
-                final byte[] ret = finish();
-                digest = resetDigest;
-                return ret;
-            } catch (CloneNotSupportedException e) {
-                throw new Error("Keccak.Digest256 should implement Cloneable", e);
-            }
-        }
-
-        return finished;
-    }
-
-    /**
      * Complete the function selector after all parameters have been added and get the selector
      * bytes.
      * <p>
      * No more parameters may be added after this method call.
-     * If you want to reuse the state of this selector, call {@link #finishIntermediate()}.
      * <p>
      * However, this can be called multiple times; it will always return the same result.
      *
      * @return the computed selector bytes.
      */
-    public byte[] finish() {
+    byte[] finish() {
         if (finished == null) {
             Objects.requireNonNull(digest);
             digest.update((byte) ')');
