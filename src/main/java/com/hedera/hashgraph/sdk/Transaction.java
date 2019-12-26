@@ -263,6 +263,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
      *
      * Call {@link #execute(Client)} then {@link #getReceipt(Client)} and handle the errors separately from each.
      */
+    @Deprecated
     public final TransactionReceipt executeForReceipt() throws HederaException, HederaNetworkException {
         execute(Objects.requireNonNull(client));
         return getReceipt(client);
