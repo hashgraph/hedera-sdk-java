@@ -67,6 +67,7 @@ public final class ContractExecuteTransaction extends TransactionBuilder<Contrac
      * @deprecated Associated class is being removed; use {@link #setFunction(String, ContractFunctionParams)}
      * and see {@link ContractFunctionParams} for new API.
      */
+    @Deprecated
     public ContractExecuteTransaction setFunctionParameters(CallParams<CallParams.Function> parameters) {
         builder.setFunctionParameters(parameters.toProto());
         return this;
