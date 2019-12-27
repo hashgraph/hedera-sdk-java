@@ -1,16 +1,24 @@
 package com.hedera.hashgraph.sdk.contract;
 
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.QueryBuilder;
 import com.hedera.hashgraph.proto.ContractGetBytecodeQuery;
 import com.hedera.hashgraph.proto.ContractGetBytecodeResponse;
 import com.hedera.hashgraph.proto.Query;
 import com.hedera.hashgraph.proto.QueryHeader;
 import com.hedera.hashgraph.proto.Response;
 import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.QueryBuilder;
 
 import io.grpc.MethodDescriptor;
 
+/**
+ * Get the bytecode of a contract.
+ *
+ * @deprecated the result type of {@link ContractGetBytecodeResponse} returned from the various
+ * {@code execute[Async](...)} methods is changing in 1.0 to {@code byte[]}, which
+ * is a breaking change. This class is not being removed.
+ */
+@Deprecated
 // `ContractGetBytecodeQuery`
 public final class ContractBytecodeQuery extends QueryBuilder<ContractGetBytecodeResponse, ContractBytecodeQuery> {
     private final ContractGetBytecodeQuery.Builder builder = inner.getContractGetBytecodeBuilder();
