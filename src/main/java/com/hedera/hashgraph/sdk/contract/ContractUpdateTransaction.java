@@ -1,5 +1,9 @@
 package com.hedera.hashgraph.sdk.contract;
 
+import com.hedera.hashgraph.proto.ContractUpdateTransactionBody;
+import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
+import com.hedera.hashgraph.proto.Transaction;
+import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.TimestampHelper;
@@ -7,10 +11,6 @@ import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hedera.hashgraph.sdk.file.FileId;
-import com.hedera.hashgraph.proto.ContractUpdateTransactionBody;
-import com.hedera.hashgraph.proto.Transaction;
-import com.hedera.hashgraph.proto.TransactionResponse;
-import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -62,6 +62,15 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
 
     public ContractUpdateTransaction setFileId(FileId file) {
         builder.setFileID(file.toProto());
+        return this;
+    }
+
+    /**
+     * Set a memo for the contract itself, as opposed to for this transaction
+     * (via {@link #setMemo(String)}).
+     */
+    public ContractUpdateTransaction setContractMemo(String memo) {
+        builder.setMemo(memo);
         return this;
     }
 
