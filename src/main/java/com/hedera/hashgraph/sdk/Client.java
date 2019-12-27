@@ -426,21 +426,20 @@ public final class Client implements AutoCloseable {
             .executeAsync(onSuccess, onError);
     }
 
-
     /**
      * Waits 10 seconds for all channels to finish their calls to their respective nodes.
      * <p>
      * Any new transactions or queries executed with this client after this call will return an
      * error.
      * <p>
-     * If you want to adjust the timeout, use {@link #awaitChannelShutdown(long, TimeUnit)} instead.
+     * If you want to adjust the timeout, use {@link #close(long, TimeUnit)} instead.
      *
      * @throws InterruptedException if the thread is interrupted during shutdown.
      * @throws TimeoutException     if 10 seconds elapses before the channels are closed.
      */
     @Override
     public void close() throws InterruptedException, TimeoutException {
-        awaitChannelShutdown(10, TimeUnit.SECONDS);
+        close(10, TimeUnit.SECONDS);
     }
 
     /**
@@ -454,7 +453,7 @@ public final class Client implements AutoCloseable {
      * @throws InterruptedException if the thread is interrupted during shutdown.
      * @throws TimeoutException     if the timeout elapses before all channels are shutdown.
      */
-    public void awaitChannelShutdown(long timeout, TimeUnit timeUnit) throws InterruptedException, TimeoutException {
+    public void close(long timeout, TimeUnit timeUnit) throws InterruptedException, TimeoutException {
         final long startMs = System.currentTimeMillis();
         final long timeoutAtMs = startMs + timeUnit.toMillis(timeout);
 
@@ -474,6 +473,24 @@ public final class Client implements AutoCloseable {
             // this also calls `.shutdown()` which should be safe to call multiple times
             node.awaitChannelTermination(nextTimeoutMs, TimeUnit.MILLISECONDS);
         }
+    }
+
+    /**
+     * Wait for all channels to finish their calls to their respective nodes.
+     * <p>
+     * Any new transactions or queries executed with this client after this call will return an
+     * error.
+     *
+     * @deprecated renamed to {@link #close(long, TimeUnit)}
+     *
+     * @param timeout  the timeout amount for the entire shutdown operation (not per channel).
+     * @param timeUnit the unit of the timeout amount.
+     * @throws InterruptedException if the thread is interrupted during shutdown.
+     * @throws TimeoutException     if the timeout elapses before all channels are shutdown.
+     */
+    @Deprecated
+    public void awaitChannelShutdown(long timeout, TimeUnit timeUnit) throws InterruptedException, TimeoutException {
+        close(timeout, timeUnit);
     }
 
     private static class Config {
