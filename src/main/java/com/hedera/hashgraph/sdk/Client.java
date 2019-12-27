@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.gson.Gson;
 import com.hedera.hashgraph.sdk.account.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.account.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.account.AccountId;
@@ -9,6 +10,11 @@ import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -29,17 +35,17 @@ import javax.annotation.Nullable;
  * The gRPC channels used by this client must be explicitly shutdown before it is garbage
  * collected or error messages will be printed to the console. These messages are emitted by the
  * gRPC library itself; the SDK has no direct control over this.
- *
+ * <p>
  * These error messages are printed because the runtime may exit with pending calls if you do not
  * shutdown the channels properly which allows them to finish any pending calls.
- *
+ * <p>
  * To shutdown channels, this class implements {@link AutoCloseable} (allowing use
  * with the try-with-resources syntax) which waits at most a few seconds for channels to finish
  * their calls and terminate.
- *
+ * <p>
  * Alternatively, you may call {@link #awaitChannelShutdown(long, TimeUnit)} directly with a
  * custom timeout.
- *
+ * <p>
  * This is only necessary when you're completely finished with the Client; it can and should be
  * reused between multiple queries and transactions. The Client may not be reused once its
  * channels have been shut down.
@@ -84,7 +90,7 @@ public final class Client implements AutoCloseable {
 
     /**
      * Get a Client configured for Hedera mainnet access.
-     *
+     * <p>
      * Most users will also want to set an operator account with
      * {@link #setOperator(AccountId, Ed25519PrivateKey)} so transactions can be automatically
      * given {@link TransactionId}s and signed.
@@ -110,7 +116,7 @@ public final class Client implements AutoCloseable {
 
     /**
      * Get a Client configured for Hedera public testnet access.
-     *
+     * <p>
      * Most users will also want to set an operator account with
      * {@link #setOperator(AccountId, Ed25519PrivateKey)} so transactions can be automatically
      * given {@link TransactionId}s and signed.
@@ -128,18 +134,73 @@ public final class Client implements AutoCloseable {
     }
 
     /**
-     * Insert or update a node in the client.
+     * Configure a client based off the given JSON string.
      *
+     * @param json
+     * @return
+     */
+    public static Client fromJson(String json) {
+        return fromJson(new StringReader(json));
+    }
+
+    /**
+     * Configure a client based off the given JSON reader.
+     *
+     * @param json
+     * @return
+     */
+    public static Client fromJson(Reader json) {
+        Config config = new Gson().fromJson(json, Config.class);
+
+        Map<AccountId, String> nodes = config.network.entrySet().stream()
+            .collect(Collectors.toMap(entry -> AccountId.fromString(entry.getKey()), Map.Entry::getValue));
+
+        final Client client = new Client(nodes);
+
+        if (config.operator != null) {
+            final AccountId operatorAccount = AccountId.fromString(config.operator.accountId);
+            final Ed25519PrivateKey privateKey = Ed25519PrivateKey.fromString(config.operator.privateKey);
+
+            client.setOperator(operatorAccount, privateKey);
+        }
+
+        return client;
+    }
+
+    /**
+     * Configure a client based on a JSON file at the given path.
+     *
+     * @param fileName
+     * @return
+     * @throws FileNotFoundException
+     */
+    public static Client fromFile(String fileName) throws FileNotFoundException {
+        return fromFile(new File(fileName));
+    }
+
+    /**
+     * Configure a client based on a JSON file.
+     *
+     * @param file
+     * @return
+     * @throws FileNotFoundException
+     */
+    public static Client fromFile(File file) throws FileNotFoundException {
+        return fromJson(new FileReader(file));
+    }
+
+    /**
+     * Insert or update a node in the client.
+     * <p>
      * If a replaced node is already being used by some transaction or query, this call will cause
      * that transaction/query to return an error on execute.
-     *
-     * @deprecated superceded by {@link #forMainnet()} or {@link #forTestnet()} which construct
-     * a Client with all the nodes for their respective networks, and {@link #replaceNodes(Map)} for
-     * replacing existing nodes in the client.
      *
      * @param nodeAccountId
      * @param nodeUrl
      * @return
+     * @deprecated superceded by {@link #forMainnet()} or {@link #forTestnet()} which construct
+     * a Client with all the nodes for their respective networks, and {@link #replaceNodes(Map)} for
+     * replacing existing nodes in the client.
      */
     @Deprecated
     public Client putNode(AccountId nodeAccountId, String nodeUrl) {
@@ -157,7 +218,7 @@ public final class Client implements AutoCloseable {
 
     /**
      * Replace all nodes in this Client with a new set of nodes (e.g. for an Address Book update).
-     *
+     * <p>
      * If a node URL for a given account ID is the same, it is not replaced.
      *
      * @param nodes a map of node account ID to node URL.
@@ -189,7 +250,7 @@ public final class Client implements AutoCloseable {
 
     /**
      * Set the maximum fee to be paid for transactions executed by this client.
-     *
+     * <p>
      * Because transaction fees are always maximums, this will simply add a call to
      * {@link TransactionBuilder#setMaxTransactionFee(long)} on every new transaction. The actual
      * fee assessed for a given transaction may be less than this value, but never greater.
@@ -208,17 +269,17 @@ public final class Client implements AutoCloseable {
 
     /**
      * Set the maximum default payment value allowable for queries.
-     *
+     * <p>
      * When a query is executed without an explicit {@link QueryBuilder#setPayment(Transaction)}
      * or {@link QueryBuilder#setPaymentDefault(long)} call, the client will first request the cost
      * of the given query from the node it will be submitted to and attach a payment for that amount
      * from the operator account on the client.
-     *
+     * <p>
      * If the returned value is greater than this value, a
      * {@link QueryBuilder.MaxPaymentExceededException} will be thrown from
      * {@link QueryBuilder#execute(Client)} or returned in the second callback of
      * {@link QueryBuilder#executeAsync(Client, Consumer, Consumer)}.
-     *
+     * <p>
      * Set to 0 to disable automatic implicit payments.
      *
      * @param maxQueryPayment
@@ -287,7 +348,7 @@ public final class Client implements AutoCloseable {
      * @deprecated hides useful configuration parameters for accounts and makes it difficult to
      * handle errors properly; if an error occurs while fetching the receipt for the
      * {@link AccountCreateTransaction} then the transaction ID is lost.
-     *
+     * <p>
      * You should build and execute your own {@link AccountCreateTransaction} instead.
      */
     @Deprecated
@@ -303,7 +364,7 @@ public final class Client implements AutoCloseable {
      * @deprecated hides useful configuration parameters for accounts and makes it difficult to
      * handle errors properly; if an error occurs while fetching the receipt for the
      * {@link AccountCreateTransaction} then the transaction ID is lost.
-     *
+     * <p>
      * You should build and execute your own {@link AccountCreateTransaction} instead.
      */
     @Deprecated
@@ -341,7 +402,7 @@ public final class Client implements AutoCloseable {
      * @deprecated difficult to overload for multi-party transfers; additionally,
      * if an error occurs while fetching the receipt for the {@link CryptoTransferTransaction} then
      * the transaction ID is lost.
-     *
+     * <p>
      * You should build and execute your own {@link CryptoTransferTransaction} instead.
      */
     @Deprecated
@@ -355,7 +416,7 @@ public final class Client implements AutoCloseable {
      * @deprecated difficult to overload for multi-party transfers; additionally,
      * if an error occurs while fetching the receipt for the {@link CryptoTransferTransaction} then
      * the transaction ID is lost.
-     *
+     * <p>
      * You should build and execute your own {@link CryptoTransferTransaction} instead.
      */
     @Deprecated
@@ -368,14 +429,14 @@ public final class Client implements AutoCloseable {
 
     /**
      * Waits 10 seconds for all channels to finish their calls to their respective nodes.
-     *
+     * <p>
      * Any new transactions or queries executed with this client after this call will return an
      * error.
-     *
+     * <p>
      * If you want to adjust the timeout, use {@link #awaitChannelShutdown(long, TimeUnit)} instead.
      *
      * @throws InterruptedException if the thread is interrupted during shutdown.
-     * @throws TimeoutException if 10 seconds elapses before the channels are closed.
+     * @throws TimeoutException     if 10 seconds elapses before the channels are closed.
      */
     @Override
     public void close() throws InterruptedException, TimeoutException {
@@ -384,14 +445,14 @@ public final class Client implements AutoCloseable {
 
     /**
      * Wait for all channels to finish their calls to their respective nodes.
-     *
+     * <p>
      * Any new transactions or queries executed with this client after this call will return an
      * error.
      *
-     * @param timeout the timeout amount for the entire shutdown operation (not per channel).
+     * @param timeout  the timeout amount for the entire shutdown operation (not per channel).
      * @param timeUnit the unit of the timeout amount.
      * @throws InterruptedException if the thread is interrupted during shutdown.
-     * @throws TimeoutException if the timeout elapses before all channels are shutdown.
+     * @throws TimeoutException     if the timeout elapses before all channels are shutdown.
      */
     public void awaitChannelShutdown(long timeout, TimeUnit timeUnit) throws InterruptedException, TimeoutException {
         final long startMs = System.currentTimeMillis();
@@ -412,6 +473,17 @@ public final class Client implements AutoCloseable {
 
             // this also calls `.shutdown()` which should be safe to call multiple times
             node.awaitChannelTermination(nextTimeoutMs, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    private static class Config {
+        private HashMap<String, String> network;
+        @Nullable
+        private Operator operator;
+
+        private static class Operator {
+            private String accountId;
+            private String privateKey;
         }
     }
 }
