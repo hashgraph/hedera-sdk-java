@@ -52,8 +52,17 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
         return SmartContractServiceGrpc.getCreateContractMethod();
     }
 
-    // more descriptive name than `setFileId`
+    /**
+     * @deprecated renamed to {@link #setBytecodeFileId(FileId)}
+     */
+    @Deprecated
     public ContractCreateTransaction setBytecodeFile(FileId fileId) {
+        builder.setFileID(fileId.toProto());
+        return this;
+    }
+
+    // more descriptive name than `setFileId`
+    public ContractCreateTransaction setBytecodeFileId(FileId fileId) {
         builder.setFileID(fileId.toProto());
         return this;
     }

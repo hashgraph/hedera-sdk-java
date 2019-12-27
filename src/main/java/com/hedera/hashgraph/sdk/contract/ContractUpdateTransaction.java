@@ -60,7 +60,15 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
         return this;
     }
 
+    /**
+     * @deprecated renamed to {@link #setBytecodeFileId(FileId)}.
+     */
     public ContractUpdateTransaction setFileId(FileId file) {
+        builder.setFileID(file.toProto());
+        return this;
+    }
+
+    public ContractUpdateTransaction setBytecodeFileId(FileId file) {
         builder.setFileID(file.toProto());
         return this;
     }
