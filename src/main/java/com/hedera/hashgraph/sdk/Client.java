@@ -62,6 +62,11 @@ public final class Client implements AutoCloseable {
     @Nullable
     private Ed25519PrivateKey operatorKey;
 
+    /**
+     * @deprecated use {@link #forMainnet()} or {@link #forTestnet()} as the most convenient
+     * ways to get a Client.
+     */
+    @Deprecated
     public Client(AccountId nodeAccountId, String nodeUrl) {
         nodes = new HashMap<>();
         putNode(nodeAccountId, nodeUrl);
@@ -78,15 +83,65 @@ public final class Client implements AutoCloseable {
     }
 
     /**
+     * Get a Client configured for Hedera mainnet access.
+     *
+     * Most users will also want to set an operator account with
+     * {@link #setOperator(AccountId, Ed25519PrivateKey)} so transactions can be automatically
+     * given {@link TransactionId}s and signed.
+     *
+     * @return a Client configured for Hedera mainnet access
+     */
+    public static Client forMainnet() {
+        // connect to all known nodes
+        final HashMap<AccountId, String> nodes = new HashMap<>();
+        nodes.put(new AccountId(3), "35.237.200.180:50211");
+        nodes.put(new AccountId(4), "35.186.191.247:50211");
+        nodes.put(new AccountId(5), "35.192.2.25:50211");
+        nodes.put(new AccountId(6), "35.199.161.108:50211");
+        nodes.put(new AccountId(7), "35.203.82.240:50211");
+        nodes.put(new AccountId(8), "35.236.5.219:50211");
+        nodes.put(new AccountId(9), "35.197.192.225:50211");
+        nodes.put(new AccountId(10), "35.242.233.154:50211");
+        nodes.put(new AccountId(11), "35.240.118.96:50211");
+        nodes.put(new AccountId(12), "35.204.86.32:50211");
+
+        return new Client(nodes);
+    }
+
+    /**
+     * Get a Client configured for Hedera public testnet access.
+     *
+     * Most users will also want to set an operator account with
+     * {@link #setOperator(AccountId, Ed25519PrivateKey)} so transactions can be automatically
+     * given {@link TransactionId}s and signed.
+     *
+     * @return a Client configured for Hedera testnet access
+     */
+    public static Client forTestnet() {
+        final HashMap<AccountId, String> nodes = new HashMap<>();
+        nodes.put(new AccountId(3), "0.testnet.hedera.com:50211");
+        nodes.put(new AccountId(4), "1.testnet.hedera.com:50211");
+        nodes.put(new AccountId(5), "2.testnet.hedera.com:50211");
+        nodes.put(new AccountId(6), "3.testnet.hedera.com:50211");
+
+        return new Client(nodes);
+    }
+
+    /**
      * Insert or update a node in the client.
      *
      * If a replaced node is already being used by some transaction or query, this call will cause
      * that transaction/query to return an error on execute.
      *
+     * @deprecated superceded by {@link #forMainnet()} or {@link #forTestnet()} which construct
+     * a Client with all the nodes for their respective networks, and {@link #replaceNodes(Map)} for
+     * replacing existing nodes in the client.
+     *
      * @param nodeAccountId
      * @param nodeUrl
      * @return
      */
+    @Deprecated
     public Client putNode(AccountId nodeAccountId, String nodeUrl) {
         final Node replaced = nodes.put(nodeAccountId, new Node(nodeAccountId, nodeUrl));
 
@@ -96,6 +151,38 @@ public final class Client implements AutoCloseable {
             // which is why we await termination in close() below
             replaced.closeChannel();
         }
+
+        return this;
+    }
+
+    /**
+     * Replace all nodes in this Client with a new set of nodes (e.g. for an Address Book update).
+     *
+     * If a node URL for a given account ID is the same, it is not replaced.
+     *
+     * @param nodes a map of node account ID to node URL.
+     * @return {@code this} for fluent API usage.
+     */
+    public Client replaceNodes(Map<AccountId, String> nodes) {
+        this.nodes.replaceAll((nodeAcct, node) -> {
+            String newNodeUrl = nodes.get(nodeAcct);
+
+            // node hasn't changed
+            if (node.address.equals(newNodeUrl)) {
+                return node;
+            }
+
+            // replace or remove node
+            node.closeChannel();
+
+            // replace node
+            if (newNodeUrl != null) {
+                return new Node(nodeAcct, newNodeUrl);
+            }
+
+            // remove
+            return null;
+        });
 
         return this;
     }
@@ -129,8 +216,8 @@ public final class Client implements AutoCloseable {
      *
      * If the returned value is greater than this value, a
      * {@link QueryBuilder.MaxPaymentExceededException} will be thrown from
-     * {@link QueryBuilder#execute()} or returned in the second callback of
-     * {@link QueryBuilder#executeAsync(Consumer, Consumer)}.
+     * {@link QueryBuilder#execute(Client)} or returned in the second callback of
+     * {@link QueryBuilder#executeAsync(Client, Consumer, Consumer)}.
      *
      * Set to 0 to disable automatic implicit payments.
      *
