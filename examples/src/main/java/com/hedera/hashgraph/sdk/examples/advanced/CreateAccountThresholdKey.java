@@ -1,6 +1,10 @@
 package com.hedera.hashgraph.sdk.examples.advanced;
 
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.HederaException;
+import com.hedera.hashgraph.sdk.Transaction;
+import com.hedera.hashgraph.sdk.TransactionId;
+import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.account.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.account.AccountId;
@@ -20,8 +24,6 @@ public final class CreateAccountThresholdKey {
 
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names
-    private static final AccountId NODE_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("NODE_ID")));
-    private static final String NODE_ADDRESS = Objects.requireNonNull(Dotenv.load().get("NODE_ADDRESS"));
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final Ed25519PrivateKey OPERATOR_KEY = Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
@@ -42,9 +44,8 @@ public final class CreateAccountThresholdKey {
             .map(Object::toString)
             .collect(Collectors.joining("\n")));
 
-        // To improve responsiveness, you should specify multiple nodes using the
-        // `Client(<Map<AccountId, String>>)` constructor instead
-        Client client = new Client(NODE_ID, NODE_ADDRESS);
+        // `Client.forMainnet()` is provided for connecting to Hedera mainnet
+        Client client = Client.forTestnet();
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
