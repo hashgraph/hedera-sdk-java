@@ -25,8 +25,8 @@ import io.grpc.MethodDescriptor;
  * {@code execute[Async](...)} methods is changing in 1.0 to {@link ContractFunctionResult}, which
  * is a breaking change. This class is not being removed.
  */
-// `ContractCallLocalQuery`
 @Deprecated
+// `ContractCallLocalQuery`
 public class ContractCallQuery extends QueryBuilder<FunctionResult, ContractCallQuery> {
     private final ContractCallLocalQuery.Builder builder = inner.getContractCallLocalBuilder();
 
