@@ -1,11 +1,11 @@
 package com.hedera.hashgraph.sdk.contract;
 
+import com.hedera.hashgraph.proto.ContractGetInfoResponse;
+import com.hedera.hashgraph.proto.Response;
 import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
-import com.hedera.hashgraph.proto.ContractGetInfoResponse;
-import com.hedera.hashgraph.proto.Response;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -27,6 +27,16 @@ public final class ContractInfo {
 
     public final long storage;
 
+    /**
+     * The memo for the contract itself, set by
+     * {@link ContractCreateTransaction#setContractMemo(String)} or
+     * {@link ContractUpdateTransaction#setContractMemo(String)}.
+     *
+     * Null if the memo was empty.
+     */
+    @Nullable
+    public final String memo;
+
     public ContractInfo(ContractGetInfoResponse.ContractInfoOrBuilder info) {
         if (!info.hasContractID()) {
             throw new IllegalArgumentException("info is empty");
@@ -39,6 +49,9 @@ public final class ContractInfo {
         expirationTime = TimestampHelper.timestampTo(info.getExpirationTime());
         autoRenewPeriod = DurationHelper.durationTo(info.getAutoRenewPeriod());
         storage = info.getStorage();
+
+        String memo = info.getMemo();
+        this.memo = memo.isEmpty() ? null : memo;
     }
 
     @Deprecated

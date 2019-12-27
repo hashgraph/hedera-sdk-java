@@ -122,6 +122,15 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
         return this;
     }
 
+    /**
+     * Set a memo for the contract itself, as opposed to for this transaction
+     * (via {@link #setMemo(String)}).
+     */
+    public ContractCreateTransaction setContractMemo(String memo) {
+        builder.setMemo(memo);
+        return this;
+    }
+
     @Override
     protected void doValidate() {
         require(builder.hasFileID(), ".setBytecodeFile() required");
