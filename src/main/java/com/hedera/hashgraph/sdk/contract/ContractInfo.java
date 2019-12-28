@@ -35,7 +35,7 @@ public final class ContractInfo {
      * Null if the memo was empty.
      */
     @Nullable
-    public final String memo;
+    public final String contractMemo;
 
     public ContractInfo(ContractGetInfoResponse.ContractInfoOrBuilder info) {
         if (!info.hasContractID()) {
@@ -51,7 +51,7 @@ public final class ContractInfo {
         storage = info.getStorage();
 
         String memo = info.getMemo();
-        this.memo = memo.isEmpty() ? null : memo;
+        contractMemo = memo.isEmpty() ? null : memo;
     }
 
     @Deprecated
