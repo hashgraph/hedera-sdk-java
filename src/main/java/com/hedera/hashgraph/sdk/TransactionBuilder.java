@@ -1,9 +1,9 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.proto.TransactionBody;
 import com.hedera.hashgraph.proto.TransactionResponse;
+import com.hedera.hashgraph.sdk.account.AccountId;
+import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
 import java.time.Duration;
 import java.util.Objects;
@@ -117,13 +117,24 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * Sets any notes or description that should be put into the transaction record (if one is
      * requested). Note that a max of length of 100 is enforced.
      */
-    public final T setMemo(String memo) {
+    public final T setTransactionMemo(String memo) {
         if (memo.length() > MAX_MEMO_LENGTH) {
             throw new IllegalArgumentException("memo must not be longer than 100 characters");
         }
 
         bodyBuilder.setMemo(memo);
         return self();
+    }
+
+    /**
+     * Sets any notes or description that should be put into the transaction record (if one is
+     * requested). Note that a max of length of 100 is enforced.
+     *
+     * @deprecated renamed to {@link #setTransactionMemo(String)}
+     */
+    @Deprecated
+    public final T setMemo(String memo) {
+        return setTransactionMemo(memo);
     }
 
     protected abstract void doValidate();

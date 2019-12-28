@@ -133,7 +133,7 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
 
     /**
      * Set a memo for the contract itself, as opposed to for this transaction
-     * (via {@link #setMemo(String)}).
+     * (via {@link #setTransactionMemo(String)}).
      */
     public ContractCreateTransaction setContractMemo(String memo) {
         builder.setMemo(memo);
