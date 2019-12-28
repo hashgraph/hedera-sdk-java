@@ -63,7 +63,7 @@ public final class MultiAppTransfer {
             .addSender(OPERATOR_ID, transferAmount)
             .addRecipient(exchangeAccountId, transferAmount)
             // the exchange-provided memo required to validate the transaction
-            .setMemo("https://some-exchange.com/user1/account1")
+            .setTransactionMemo("https://some-exchange.com/user1/account1")
             // To manually sign, you must explicitly build the Transaction
             .build(client)
             .sign(userKey);

@@ -75,7 +75,7 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
 
     /**
      * Set a memo for the contract itself, as opposed to for this transaction
-     * (via {@link #setMemo(String)}).
+     * (via {@link #setTransactionMemo(String)}).
      */
     public ContractUpdateTransaction setContractMemo(String memo) {
         builder.setMemo(memo);
