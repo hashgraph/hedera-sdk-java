@@ -112,6 +112,11 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
         return this;
     }
 
+    /**
+     * @deprecated shards and realms are not yet implemented on Hedera so this method won't
+     * function as expected. It will be restored when the network functionality is available.
+     */
+    @Deprecated
     public ContractCreateTransaction setShard(long shardId) {
         builder.setShardID(
             ShardID.newBuilder()
@@ -119,6 +124,11 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
         return this;
     }
 
+    /**
+     * @deprecated shards and realms are not yet implemented on Hedera so this method won't
+     * function as expected. It will be restored when the network functionality is available.
+     */
+    @Deprecated
     public ContractCreateTransaction setRealm(long realmId) {
         builder.setRealmID(
             RealmID.newBuilder()
@@ -126,6 +136,11 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
         return this;
     }
 
+    /**
+     * @deprecated shards and realms are not yet implemented on Hedera so this method won't
+     * function as expected. It will be restored when the network functionality is available.
+     */
+    @Deprecated
     public ContractCreateTransaction setNewRealmAdminKey(PublicKey newRealmAdminKey) {
         builder.setNewRealmAdminKey(newRealmAdminKey.toKeyProto());
         return this;

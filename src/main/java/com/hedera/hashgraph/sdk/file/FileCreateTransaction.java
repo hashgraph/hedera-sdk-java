@@ -1,15 +1,15 @@
 package com.hedera.hashgraph.sdk.file;
 
 import com.google.protobuf.ByteString;
+import com.hedera.hashgraph.proto.FileCreateTransactionBody;
+import com.hedera.hashgraph.proto.FileServiceGrpc;
+import com.hedera.hashgraph.proto.KeyList;
+import com.hedera.hashgraph.proto.Transaction;
+import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
-import com.hedera.hashgraph.proto.FileCreateTransactionBody;
-import com.hedera.hashgraph.proto.KeyList;
-import com.hedera.hashgraph.proto.Transaction;
-import com.hedera.hashgraph.proto.TransactionResponse;
-import com.hedera.hashgraph.proto.FileServiceGrpc;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -57,6 +57,11 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
         return this;
     }
 
+    /**
+     * @deprecated shards and realms are not yet implemented on Hedera so this method won't
+     * do anything. It will be restored when the network functionality is available.
+     */
+    @Deprecated
     public FileCreateTransaction setNewRealmAdminKey(PublicKey key) {
         builder.setNewRealmAdminKey(key.toKeyProto());
         return this;

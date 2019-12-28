@@ -1,16 +1,16 @@
 package com.hedera.hashgraph.sdk.account;
 
+import com.hedera.hashgraph.proto.CryptoCreateTransactionBody;
+import com.hedera.hashgraph.proto.CryptoServiceGrpc;
+import com.hedera.hashgraph.proto.RealmID;
+import com.hedera.hashgraph.proto.ShardID;
+import com.hedera.hashgraph.proto.Transaction;
+import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
-import com.hedera.hashgraph.proto.CryptoCreateTransactionBody;
-import com.hedera.hashgraph.proto.RealmID;
-import com.hedera.hashgraph.proto.ShardID;
-import com.hedera.hashgraph.proto.Transaction;
-import com.hedera.hashgraph.proto.TransactionResponse;
-import com.hedera.hashgraph.proto.CryptoServiceGrpc;
 
 import java.time.Duration;
 
@@ -91,6 +91,11 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
         return this;
     }
 
+    /**
+     * @deprecated shards and realms are not yet implemented on Hedera so this method won't
+     * function as expected. It will be restored when the network functionality is available.
+     */
+    @Deprecated
     public AccountCreateTransaction setShardId(long shardId) {
         builder.setShardID(
             ShardID.newBuilder()
@@ -99,6 +104,11 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
         return this;
     }
 
+    /**
+     * @deprecated shards and realms are not yet implemented on Hedera so this method won't
+     * function as expected. It will be restored when the network functionality is available.
+     */
+    @Deprecated
     public AccountCreateTransaction setRealmId(long realmId) {
         builder.setRealmID(
             RealmID.newBuilder()
@@ -107,6 +117,11 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
         return this;
     }
 
+    /**
+     * @deprecated shards and realms are not yet implemented on Hedera so this method won't
+     * function as expected. It will be restored when the network functionality is available.
+     */
+    @Deprecated
     public AccountCreateTransaction setNewRealmAdminKey(PublicKey publicKey) {
         builder.setNewRealmAdminKey(publicKey.toKeyProto());
         return this;
