@@ -159,6 +159,11 @@ public final class TransactionRecord {
         return transfers;
     }
 
+    /**
+     * @deprecated this class is being hoisted to a top level class in 1.0; it is not changing
+     * otherwise.
+     */
+    @Deprecated
     public final static class Transfer {
         public final AccountId account;
         public final long amount;
