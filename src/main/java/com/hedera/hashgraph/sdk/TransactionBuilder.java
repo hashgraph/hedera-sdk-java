@@ -161,6 +161,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         return build().toProto();
     }
 
+    @Internal
     public final com.hedera.hashgraph.proto.Transaction toProto(boolean requireSignature) {
         return build().toProto(requireSignature);
     }

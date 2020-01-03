@@ -2,6 +2,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.proto.Duration;
 
+@Internal
 public final class DurationHelper {
     private DurationHelper() { }
 

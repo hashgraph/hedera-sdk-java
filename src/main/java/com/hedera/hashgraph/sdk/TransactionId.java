@@ -1,9 +1,9 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.proto.Timestamp;
 import com.hedera.hashgraph.proto.TransactionID;
 import com.hedera.hashgraph.proto.TransactionIDOrBuilder;
+import com.hedera.hashgraph.sdk.account.AccountId;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -102,6 +102,7 @@ public final class TransactionId {
         return validStart;
     }
 
+    @Internal
     public TransactionID toProto() {
         return inner.build();
     }

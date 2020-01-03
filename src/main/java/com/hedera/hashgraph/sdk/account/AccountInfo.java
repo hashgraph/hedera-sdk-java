@@ -1,10 +1,10 @@
 package com.hedera.hashgraph.sdk.account;
 
+import com.hedera.hashgraph.proto.CryptoGetInfoResponse;
+import com.hedera.hashgraph.proto.Response;
 import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
-import com.hedera.hashgraph.proto.CryptoGetInfoResponse;
-import com.hedera.hashgraph.proto.Response;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -36,6 +36,10 @@ public final class AccountInfo {
 
     public final Duration autoRenewPeriod;
 
+    /**
+     * @deprecated this constructor is being hidden in 1.0.
+     */
+    @Deprecated
     public AccountInfo(CryptoGetInfoResponse.AccountInfoOrBuilder info) {
         if (!info.hasKey()) {
             throw new IllegalArgumentException("query response missing key");

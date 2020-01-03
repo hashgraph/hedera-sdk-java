@@ -9,6 +9,13 @@ import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
 
 import io.grpc.MethodDescriptor;
 
+/**
+ * Look up the ID of an entity (account, contract, file) by its Solidity address.
+ *
+ * @deprecated the result type of {@link GetBySolidityIDResponse} returned from the various
+ * {@code execute[Async](...)} methods is changing in 1.0 to a new class, which
+ * is a breaking change. This class is not being removed.
+ */
 public final class GetBySolidityIdQuery extends QueryBuilder<GetBySolidityIDResponse, GetBySolidityIdQuery> {
     private final GetBySolidityIDQuery.Builder builder = inner.getGetBySolidityIDBuilder();
 

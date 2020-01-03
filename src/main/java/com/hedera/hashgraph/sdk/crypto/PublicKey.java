@@ -1,9 +1,10 @@
 package com.hedera.hashgraph.sdk.crypto;
 
-import com.hedera.hashgraph.sdk.contract.ContractId;
-import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import com.hedera.hashgraph.proto.ContractIDOrBuilder;
 import com.hedera.hashgraph.proto.KeyOrBuilder;
+import com.hedera.hashgraph.sdk.Internal;
+import com.hedera.hashgraph.sdk.contract.ContractId;
+import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
@@ -12,8 +13,10 @@ import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
 
 public abstract class PublicKey {
+    @Internal
     public abstract com.hedera.hashgraph.proto.Key toKeyProto();
 
+    @Internal
     public static PublicKey fromProtoKey(KeyOrBuilder key) {
         switch (key.getKeyCase()) {
         case ED25519:

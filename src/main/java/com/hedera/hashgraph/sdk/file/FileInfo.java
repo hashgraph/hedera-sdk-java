@@ -1,9 +1,9 @@
 package com.hedera.hashgraph.sdk.file;
 
-import com.hedera.hashgraph.sdk.TimestampHelper;
-import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hedera.hashgraph.proto.FileGetInfoResponse;
 import com.hedera.hashgraph.proto.Response;
+import com.hedera.hashgraph.sdk.TimestampHelper;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 
 import java.time.Instant;
 import java.util.List;
@@ -16,6 +16,10 @@ public final class FileInfo {
     public final boolean isDeleted;
     public final List<PublicKey> keys;
 
+    /**
+     * @deprecated this constructor is being hidden in 1.0.
+     */
+    @Deprecated
     public FileInfo(FileGetInfoResponse.FileInfoOrBuilder info) {
         if (!info.hasKeys() || info.getKeys().getKeysList().isEmpty()) {
             throw new IllegalArgumentException("`FileGetInfoResponse` missing keys");

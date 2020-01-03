@@ -5,6 +5,7 @@ import com.hedera.hashgraph.proto.TimestampSeconds;
 
 import java.time.Instant;
 
+@Internal
 public final class TimestampHelper {
     private TimestampHelper() { }
 

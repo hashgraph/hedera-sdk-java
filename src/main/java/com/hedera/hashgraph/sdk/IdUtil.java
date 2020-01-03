@@ -4,6 +4,7 @@ import com.google.common.base.Splitter;
 
 import java.util.Iterator;
 
+@Internal
 public final class IdUtil {
 
     private IdUtil() {
