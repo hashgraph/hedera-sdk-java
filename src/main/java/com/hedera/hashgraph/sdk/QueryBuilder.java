@@ -140,8 +140,29 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
      *
      * @return {@code this} for fluent usage.
      */
+    public T setPaymentAmount(Hbar paymentAmount) {
+        this.paymentAmount = paymentAmount.asTinybar();
+
+        //noinspection unchecked
+        return (T) this;
+    }
+
+    /**
+     * Explicitly specify that the operator account is paying for the query with an amount in
+     * tinybar; when the query is executed a payment transaction will be constructed with a transfer
+     * of this amount from the operator account to the node which will handle the query.
+     *
+     * @return {@code this} for fluent usage.
+     */
     public T setPaymentAmount(long paymentAmount) {
         this.paymentAmount = paymentAmount;
+
+        //noinspection unchecked
+        return (T) this;
+    }
+
+    public T setMaxQueryPayment(Hbar maxPayment) {
+        this.maxPayment = maxPayment.asTinybar();
 
         //noinspection unchecked
         return (T) this;

@@ -7,6 +7,7 @@ import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.CallParams;
 import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 
@@ -45,6 +46,37 @@ public final class ContractExecuteTransaction extends TransactionBuilder<Contrac
         return this;
     }
 
+    /**
+     * Set the amount of hbar that will be paid from the operator account to the function
+     * being invoked.
+     *
+     * The function being invoked must itself be marked {@code payable}.
+     *
+     * @param amount the amount being paid to the function.
+     * @return {@code this} for fluent API usage.
+     */
+    public ContractExecuteTransaction setPayableAmount(Hbar amount) {
+        builder.setAmount(amount.asTinybar());
+        return this;
+    }
+
+    /**
+     * Set the amount of hbar that will be paid, in tinybar, from the operator account to the
+     * function being invoked.
+     *
+     * The function being invoked must itself be marked {@code payable}.
+     *
+     * @param amount the amount being paid to the function, in tinybar.
+     * @return {@code this} for fluent API usage.
+     */
+    public ContractExecuteTransaction setPayableAmount(long amount) {
+        builder.setAmount(amount);
+        return this;
+    }
+
+    /**
+     * @deprecated renamed to {@link #setPayableAmount(long)}.
+     */
     public ContractExecuteTransaction setAmount(long amount) {
         builder.setAmount(amount);
         return this;

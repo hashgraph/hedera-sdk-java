@@ -82,6 +82,23 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * <p>
      * Defaults to the value of {@link Client#setMaxTransactionFee(long)}.
      */
+    public final T setMaxTransactionFee(Hbar fee) {
+        bodyBuilder.setTransactionFee(fee.asTinybar());
+        return self();
+    }
+
+    /**
+     * Sets the maximum fee, in tinybar, that the client is willing to pay to execute this
+     * transaction, which is split between the network and the node.
+     * <p>
+     * The actual fee assessed may be less than this, in which case you will only be charged
+     * that amount. An error is thrown if the assessed fee is greater than this.
+     * <p>
+     * The calculation of the fee depends on the type of the transaction and its parameters,
+     * as well as the current fee schedule of the network.
+     * <p>
+     * Defaults to the value of {@link Client#setMaxTransactionFee(long)}.
+     */
     public final T setMaxTransactionFee(long fee) {
         bodyBuilder.setTransactionFee(fee);
         return self();
