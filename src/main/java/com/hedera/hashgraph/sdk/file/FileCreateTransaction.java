@@ -58,6 +58,18 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
     }
 
     /**
+     * Encode the given {@link String} as UTF-8 and set it as the file's contents.
+     *
+     * The string can later be recovered from {@link FileContentsQuery#execute(Client)}
+     * via {@link String#String(byte[], java.nio.charset.Charset)} using
+     * {@link java.nio.charset.StandardCharsets#UTF_8}.
+     */
+    public FileCreateTransaction setContents(String text) {
+        builder.setContents(ByteString.copyFromUtf8(text));
+        return this;
+    }
+
+    /**
      * @deprecated shards and realms are not yet implemented on Hedera so this method won't
      * do anything. It will be restored when the network functionality is available.
      */

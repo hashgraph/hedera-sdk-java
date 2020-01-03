@@ -1,12 +1,12 @@
 package com.hedera.hashgraph.sdk.file;
 
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.proto.FileAppendTransactionBody;
+import com.hedera.hashgraph.proto.FileServiceGrpc;
 import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
-import com.hedera.hashgraph.proto.FileServiceGrpc;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.TransactionBuilder;
 
 import javax.annotation.Nullable;
 
@@ -33,6 +33,19 @@ public final class FileAppendTransaction extends TransactionBuilder<FileAppendTr
     public FileAppendTransaction setContents(byte[] contents) {
         // TODO: there is a maximum length for contents. What is it?
         builder.setContents(ByteString.copyFrom(contents));
+        return this;
+    }
+
+    /**
+     * Encode the given {@link String} as UTF-8 and append it to the file's contents.
+     *
+     * If the whole file is UTF-8 encoded, the string can later be recovered from
+     * {@link FileContentsQuery#execute(Client)} via
+     * {@link String#String(byte[], java.nio.charset.Charset)} using
+     * {@link java.nio.charset.StandardCharsets#UTF_8}.
+     */
+    public FileAppendTransaction setContents(String text) {
+        builder.setContents(ByteString.copyFromUtf8(text));
         return this;
     }
 
