@@ -53,7 +53,7 @@ public final class UpdateAccountPublicKey {
         System.out.println("set key = " + newKey.getPublicKey());
 
         TransactionId transactionId = new AccountUpdateTransaction()
-            .setAccountForUpdate(accountId)
+            .setAccountId(accountId)
             .setKey(newKey.getPublicKey())
             // Sign with the previous key and the new key
             .sign(originalKey)

@@ -32,9 +32,17 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
 
     public AccountUpdateTransaction() { super(); }
 
-    public AccountUpdateTransaction setAccountForUpdate(AccountId accountId) {
+    public AccountUpdateTransaction setAccountId(AccountId accountId) {
         builder.setAccountIDToUpdate(accountId.toProto());
         return this;
+    }
+
+    /**
+     * @deprecated renamed to {@link #setAccountId} for consistency with other classes.
+     */
+    @Deprecated
+    public AccountUpdateTransaction setAccountForUpdate(AccountId accountId) {
+        return setAccountId(accountId);
     }
 
     public AccountUpdateTransaction setKey(PublicKey key) {

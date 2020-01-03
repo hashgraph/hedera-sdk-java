@@ -40,7 +40,7 @@ class AccountUpdateTransactionTest {
             .setKey(key.getPublicKey())
             .setNodeAccountId(new AccountId(3))
             .setTransactionId(txnId)
-            .setAccountForUpdate(new AccountId(2))
+            .setAccountId(new AccountId(2))
             .setProxyAccount(new AccountId(3))
             .setSendRecordThreshold(5)
             .setReceiveRecordThreshold(6)
