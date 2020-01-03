@@ -102,20 +102,6 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     }
 
     /**
-     * Explicitly set a payment for this query.
-     *
-     * The payment must only be a single payer and a single payee.
-     *
-     * @param transaction
-     * @return
-     */
-    public T setPayment(Transaction transaction) {
-        getHeaderBuilder().setPayment(transaction.toProto());
-        // noinspection unchecked
-        return (T) this;
-    }
-
-    /**
      * Explicitly specify that the operator account is paying for the query and set payment
      * with the given amount.
      * <p>
@@ -133,34 +119,6 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         return (T) this;
     }
 
-    /**
-     * Explicitly specify that the operator account is paying for the query; when the query is
-     * executed a payment transaction will be constructed with a transfer of this amount
-     * from the operator account to the node which will handle the query.
-     *
-     * @return {@code this} for fluent usage.
-     */
-    public T setPaymentAmount(Hbar paymentAmount) {
-        this.paymentAmount = paymentAmount.asTinybar();
-
-        //noinspection unchecked
-        return (T) this;
-    }
-
-    /**
-     * Explicitly specify that the operator account is paying for the query with an amount in
-     * tinybar; when the query is executed a payment transaction will be constructed with a transfer
-     * of this amount from the operator account to the node which will handle the query.
-     *
-     * @return {@code this} for fluent usage.
-     */
-    public T setPaymentAmount(long paymentAmount) {
-        this.paymentAmount = paymentAmount;
-
-        //noinspection unchecked
-        return (T) this;
-    }
-
     public T setMaxQueryPayment(Hbar maxPayment) {
         this.maxPayment = maxPayment.asTinybar();
 
@@ -173,6 +131,89 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
         //noinspection unchecked
         return (T) this;
+    }
+
+    /**
+     * Explicitly specify that the operator account is paying for the query; when the query is
+     * executed a payment transaction will be constructed with a transfer of this amount
+     * from the operator account to the node which will handle the query.
+     *
+     * @return {@code this} for fluent usage.
+     */
+    public T setQueryPayment(Hbar paymentAmount) {
+        return setQueryPayment(paymentAmount.asTinybar());
+    }
+
+    /**
+     * Explicitly specify that the operator account is paying for the query with an amount in
+     * tinybar; when the query is executed a payment transaction will be constructed with a transfer
+     * of this amount from the operator account to the node which will handle the query.
+     *
+     * @return {@code this} for fluent usage.
+     */
+    public T setQueryPayment(long paymentAmount) {
+        this.paymentAmount = paymentAmount;
+
+        //noinspection unchecked
+        return (T) this;
+    }
+
+    /**
+     * Explicitly specify that the operator account is paying for the query; when the query is
+     * executed a payment transaction will be constructed with a transfer of this amount
+     * from the operator account to the node which will handle the query.
+     *
+     * @return {@code this} for fluent usage.
+     *
+     * @deprecated renamed to {@link #setQueryPayment()} for consistency with {@link #setMaxQueryPayment()}.
+     */
+    @Deprecated
+    public T setPaymentAmount(Hbar paymentAmount) {
+        return setQueryPayment(paymentAmount);
+    }
+
+    /**
+     * Explicitly specify that the operator account is paying for the query with an amount in
+     * tinybar; when the query is executed a payment transaction will be constructed with a transfer
+     * of this amount from the operator account to the node which will handle the query.
+     *
+     * @return {@code this} for fluent usage.
+     *
+     * @deprecated renamed to {@link #setQueryPayment()} for consistency with {@link #setMaxQueryPayment()}.
+     */
+    @Deprecated
+    public T setPaymentAmount(long paymentAmount) {
+        return setQueryPayment(paymentAmount);
+    }
+
+    /**
+     * Explicitly set a payment for this query.
+     *
+     * The payment must only be a single payer and a single payee.
+     *
+     * @param transaction
+     * @return {@code this} for fluent usage.
+     */
+    public T setPaymentTransaction(Transaction transaction) {
+        getHeaderBuilder().setPayment(transaction.toProto());
+        // noinspection unchecked
+        return (T) this;
+    }
+
+    /**
+     * Explicitly set a payment for this query.
+     *
+     * The payment must only be a single payer and a single payee.
+     *
+     * @param transaction
+     * @return {@code this} for fluent usage.
+     *
+     * @deprecated renamed to {@link #setPaymentTransaction()} to make it clear that we are setting the actual
+     *             transaction here.
+     */
+    @Deprecated
+    public T setPayment(Transaction transaction) {
+        return setPaymentTransaction(transaction);
     }
 
     public long getCost(Client client) throws HederaException, HederaNetworkException {

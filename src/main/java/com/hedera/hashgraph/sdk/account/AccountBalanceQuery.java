@@ -24,14 +24,14 @@ public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalance
         super(client);
 
         // a payment transaction is required but is not processed so it can have zero value
-        setPaymentAmount(0);
+        setQueryPayment(0);
     }
 
     public AccountBalanceQuery() {
         super();
 
         // a payment transaction is required but is not processed so it can have zero value
-        setPaymentAmount(0);
+        setQueryPayment(0);
     }
 
     @Override
