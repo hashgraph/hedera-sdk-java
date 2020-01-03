@@ -17,7 +17,7 @@ class FreezeTransactionTest {
     @DisplayName("correct transactions should build")
     void correctTxn() {
         final Instant now = Instant.ofEpochSecond(1554158542);
-        final TransactionId txnId = new TransactionId(new AccountId(2), now);
+        final TransactionId txnId = TransactionId.withValidStart(new AccountId(2), now);
         final AccountId nodeAcctId = new AccountId(3);
 
         new FreezeTransaction()
@@ -54,7 +54,7 @@ class FreezeTransactionTest {
         final Instant now = Instant.ofEpochSecond(1554158542);
         final Ed25519PrivateKey key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962");
         Transaction txn = new FreezeTransaction()
-            .setTransactionId(new TransactionId(new AccountId(2), now))
+            .setTransactionId(TransactionId.withValidStart(new AccountId(2), now))
             .setNodeAccountId(new AccountId(3))
             .setStartTime(OffsetTime.of(0, 0, 0, 0, ZoneOffset.UTC))
             .setEndTime(OffsetTime.of(23, 59, 0, 0, ZoneOffset.UTC))

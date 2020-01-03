@@ -22,14 +22,14 @@ class TransactionReceiptQueryTest {
 
     static final Transaction paymentTxn = new CryptoTransferTransaction()
         .setNodeAccountId(NODE_ACCOUNT)
-        .setTransactionId(new TransactionId(USER_ACCOUNT, Instant.parse("2019-04-05T12:00:00Z")))
+        .setTransactionId(TransactionId.withValidStart(USER_ACCOUNT, Instant.parse("2019-04-05T12:00:00Z")))
         .addSender(USER_ACCOUNT, 10000)
         .addRecipient(NODE_ACCOUNT, 10000)
         .setTransactionFee(100_000)
         .sign(privateKey);
 
     static final TransactionReceiptQuery query = new TransactionReceiptQuery()
-        .setTransactionId(new TransactionId(USER_ACCOUNT, Instant.parse("2019-04-05T11:00:00Z")))
+        .setTransactionId(TransactionId.withValidStart(USER_ACCOUNT, Instant.parse("2019-04-05T11:00:00Z")))
         .setPayment(paymentTxn);
 
     static final Query builtQuery = query.inner.build();

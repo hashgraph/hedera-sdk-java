@@ -64,7 +64,10 @@ public final class TransactionId {
      * @param accountId
      * @param transactionValidStart the time by which the transaction takes effect; must be in the
      *                              past by the time it is submitted to the network.
+     *
+     * @deprecated use {@link #withValidStart} instead.
      */
+    @Deprecated
     public TransactionId(AccountId accountId, Instant transactionValidStart) {
         inner = TransactionID.newBuilder()
             .setAccountID(accountId.toProto())
@@ -75,6 +78,23 @@ public final class TransactionId {
 
         this.accountId = accountId;
         this.validStart = transactionValidStart;
+    }
+
+    /**
+     * Generate a transaction ID with a given account ID and valid start time.
+     *
+     * <i>Nota bene</i>: executing transactions with the same ID (account ID & account start time)
+     * will throw {@link HederaException} with code {@code DUPLICATE_TRANSACTION}.
+     * <p>
+     *
+     * Use the primary constructor to get an ID with a known-valid {@code transactionValidStart}.
+     *
+     * @param accountId
+     * @param transactionValidStart the time by which the transaction takes effect; must be in the
+     *                              past by the time it is submitted to the network.
+     */
+    public static TransactionId withValidStart(AccountId accountId, Instant transactionValidStart) {
+        return new TransactionId(accountId, transactionValidStart);
     }
 
     TransactionId(TransactionIDOrBuilder transactionId) {

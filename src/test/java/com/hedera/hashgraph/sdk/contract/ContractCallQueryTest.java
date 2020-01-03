@@ -38,7 +38,7 @@ class ContractCallQueryTest {
         final ContractCallQuery query = new ContractCallQuery()
             .setPayment(
                 new CryptoTransferTransaction()
-                    .setTransactionId(new TransactionId(new AccountId(2), Instant.ofEpochSecond(1559868457)))
+                    .setTransactionId(TransactionId.withValidStart(new AccountId(2), Instant.ofEpochSecond(1559868457)))
                     .setNodeAccountId(new AccountId(3))
                     .addSender(new AccountId(2), 10000)
                     .addRecipient(new AccountId(3), 10000)

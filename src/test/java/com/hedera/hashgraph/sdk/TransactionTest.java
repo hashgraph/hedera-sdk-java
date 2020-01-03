@@ -22,7 +22,7 @@ class TransactionTest {
 
 
     private static final Instant txnStartAt = Instant.parse("2019-04-18T20:50:00Z");
-    private static final TransactionId txnId = new TransactionId(acctId, txnStartAt);
+    private static final TransactionId txnId = TransactionId.withValidStart(acctId, txnStartAt);
 
     // a different instance for each test
     private final Transaction txn = new FileDeleteTransaction()

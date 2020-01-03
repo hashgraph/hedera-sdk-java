@@ -23,7 +23,7 @@ class TransactionRecordQueryTest {
 
     @SuppressWarnings("/NullAway/")
     static final Transaction paymentTxn = new CryptoTransferTransaction()
-        .setTransactionId(new TransactionId(USER_ACCT, Instant.parse("2019-04-05T12:00:00Z")))
+        .setTransactionId(TransactionId.withValidStart(USER_ACCT, Instant.parse("2019-04-05T12:00:00Z")))
         .setNodeAccountId(NODE_ACCOUNT)
         .addSender(USER_ACCT, 10000)
         .addRecipient(NODE_ACCOUNT, 10000)
@@ -32,7 +32,7 @@ class TransactionRecordQueryTest {
 
     // new instance for every test
     final TransactionRecordQuery query = new TransactionRecordQuery()
-        .setTransactionId(new TransactionId(USER_ACCT, Instant.parse("2019-04-05T11:00:00Z")))
+        .setTransactionId(TransactionId.withValidStart(USER_ACCT, Instant.parse("2019-04-05T11:00:00Z")))
         .setPayment(paymentTxn);
 
     static final String queryString = "transactionGetRecord {\n" +
