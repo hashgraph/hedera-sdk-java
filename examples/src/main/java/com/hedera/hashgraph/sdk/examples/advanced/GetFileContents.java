@@ -2,6 +2,7 @@ package com.hedera.hashgraph.sdk.examples.advanced;
 
 import com.hedera.hashgraph.proto.FileGetContentsResponse;
 import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
@@ -38,7 +39,7 @@ public final class GetFileContents {
         TransactionId newFileTxId = new FileCreateTransaction()
             .addKey(OPERATOR_KEY.getPublicKey()) // The public key of the owner of the file
             .setContents(fileContents) // Contents of the file
-            .setMaxTransactionFee(200_000_000L) // 2h
+            .setMaxTransactionFee(Hbar.of(2))
             .execute(client);
 
         FileId newFileId = newFileTxId.getReceipt(client).getFileId();

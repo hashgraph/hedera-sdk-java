@@ -2,6 +2,7 @@ package com.hedera.hashgraph.sdk.examples.advanced;
 
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
@@ -39,7 +40,7 @@ public final class GetAddressBook {
         final long cost = fileQuery.getCost(client);
         System.out.println("file contents cost: " + cost);
 
-        fileQuery.setMaxQueryPayment(100_000_000);
+        fileQuery.setMaxQueryPayment(Hbar.of(1));
 
         final ByteString contents = fileQuery.execute(client).getFileContents().getContents();
 

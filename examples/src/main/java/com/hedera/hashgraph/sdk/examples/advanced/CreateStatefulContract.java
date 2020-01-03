@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.FunctionResult;
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
@@ -60,8 +61,8 @@ public final class CreateStatefulContract {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // default max fee for all transactions executed by this client
-        client.setMaxTransactionFee(100_000_000_000L);
-        client.setMaxQueryPayment(1_000_000_000L);
+        client.setMaxTransactionFee(Hbar.of(100));
+        client.setMaxQueryPayment(Hbar.of(10));
 
         // create the contract's bytecode file
         TransactionId fileTxId = new FileCreateTransaction()
