@@ -10,6 +10,7 @@ import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.CallParams;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.DurationHelper;
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 import com.hedera.hashgraph.sdk.account.AccountId;
@@ -77,6 +78,26 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
         return this;
     }
 
+    /**
+     * Set the initial balance that will be transferred from the operator's account to the new
+     * contract's internal crypto account before the constructor is called.
+     *
+     * @param intialBalance the initial balance of the new contract's internal crypto account.
+     * @return {@code this} for fluent API usage.
+     */
+    public ContractCreateTransaction setInitialBalance(Hbar intialBalance) {
+        builder.setInitialBalance(intialBalance.asTinybar());
+        return this;
+    }
+
+    /**
+     * Set the initial balance that will be transferred from the operator's account to the new
+     * contract's internal crypto account before the constructor is called.
+     *
+     * @param intialBalance the initial balance of the new contract's internal crypto account,
+     *                      in tinybar.
+     * @return {@code this} for fluent API usage.
+     */
     public ContractCreateTransaction setInitialBalance(long intialBalance) {
         builder.setInitialBalance(intialBalance);
         return this;

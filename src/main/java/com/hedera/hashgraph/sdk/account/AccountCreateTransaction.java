@@ -8,6 +8,7 @@ import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.DurationHelper;
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
@@ -61,8 +62,25 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
         return this;
     }
 
+    /**
+     * Set the initial balance of the account, transferred from the operator account, in tinybar.
+     *
+     * @param initialBalance the initial balance of the account in tinybar.
+     * @return {@code this} for fluent API usage.
+     */
     public AccountCreateTransaction setInitialBalance(long initialBalance) {
         builder.setInitialBalance(initialBalance);
+        return this;
+    }
+
+    /**
+     * Set the initial balance of the account, transferred from the operator account.
+     *
+     * @param initialBalance the initial balance of the account.
+     * @return {@code this} for fluent API usage.
+     */
+    public AccountCreateTransaction setInitialBalance(Hbar initialBalance) {
+        builder.setInitialBalance(initialBalance.asTinybar());
         return this;
     }
 
@@ -71,13 +89,29 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
         return this;
     }
 
+    /**
+     * Set the threshold for generating records when sending currency, in tinybar.
+     */
     public AccountCreateTransaction setSendRecordThreshold(long sendRecordThreshold) {
         builder.setSendRecordThreshold(sendRecordThreshold);
         return this;
     }
 
+    public AccountCreateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
+        builder.setSendRecordThreshold(sendRecordThreshold.asTinybar());
+        return this;
+    }
+
+    /**
+     * Set the threshold for generating records when receiving currency, in tinybar.
+     */
     public AccountCreateTransaction setReceiveRecordThreshold(long receiveRecordThreshold) {
         builder.setReceiveRecordThreshold(receiveRecordThreshold);
+        return this;
+    }
+
+    public AccountCreateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
+        builder.setReceiveRecordThreshold(receiveRecordThreshold.asTinybar());
         return this;
     }
 

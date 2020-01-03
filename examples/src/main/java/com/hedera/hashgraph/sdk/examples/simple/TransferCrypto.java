@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk.examples.simple;
 
 import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.account.AccountId;
@@ -30,8 +31,8 @@ public final class TransferCrypto {
 
         // Transfer X hbar from the operator of the client to the given account ID
         Transaction transaction = new CryptoTransferTransaction()
-            .addSender(OPERATOR_ID, 10_000)
-            .addRecipient(AccountId.fromString("0.0.3"), 10_000)
+            .addSender(OPERATOR_ID, Hbar.of(1))
+            .addRecipient(AccountId.fromString("0.0.3"), Hbar.of(1))
             .build(client);
 
         transaction.execute(client);
