@@ -27,13 +27,20 @@ public final class TransactionRecord {
 
     /** The memo that was submitted as part of the transaction (max 100 bytes) */
     @Nullable
-    public final String memo;
+    public final String transactionMemo;
 
     /**
      * The status (reach consensus, or failed, or is unknown), and the ID of any
      * new account/file/instance created
      */
     public final TransactionReceipt receipt;
+
+    /**
+     * All Hbar transfers as a result of this transaction, such as fees, or transfers performed by
+     * the transaction, or by a smart contract it calls, or by the creation of threshold
+     * records that it triggers.
+     */
+    public final List<Transfer> transfers;
 
     private final com.hedera.hashgraph.proto.TransactionRecord inner;
 
@@ -47,7 +54,15 @@ public final class TransactionRecord {
         consensusTimestamp = inner.hasConsensusTimestamp() ? TimestampHelper.timestampTo(inner.getConsensusTimestamp()) : null;
 
         String memo = inner.getMemo();
-        this.memo = memo.isEmpty() ? null : memo;
+        this.transactionMemo = memo.isEmpty() ? null : memo;
+
+        this.transfers = inner.hasTransferList()
+            ? inner.getTransferList()
+            .getAccountAmountsList()
+            .stream()
+            .map(Transfer::new)
+            .collect(Collectors.toList())
+            : Collections.emptyList();
     }
 
     @Deprecated
@@ -79,7 +94,7 @@ public final class TransactionRecord {
     @Deprecated
     @Nullable
     public String getMemo() {
-        return memo;
+        return transactionMemo;
     }
 
     /**
@@ -136,15 +151,12 @@ public final class TransactionRecord {
      * All Hbar transfers as a result of this transaction, such as fees, or transfers performed by the
      * transaction, or by a smart contract it calls, or by the creation of threshold
      * records that it triggers.
+     *
+     * @deprecated available as field {@link #transfers}.
      */
+    @Deprecated
     public List<Transfer> getTransfers() {
-        return inner.hasTransferList()
-            ? inner.getTransferList()
-                .getAccountAmountsList()
-                .stream()
-                .map(Transfer::new)
-                .collect(Collectors.toList())
-            : Collections.emptyList();
+        return transfers;
     }
 
     public final static class Transfer {
