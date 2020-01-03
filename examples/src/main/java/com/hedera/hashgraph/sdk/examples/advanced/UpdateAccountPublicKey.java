@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk.examples.advanced;
 
 import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountCreateTransaction;
@@ -38,7 +39,7 @@ public final class UpdateAccountPublicKey {
         TransactionId acctTransactionId = new AccountCreateTransaction()
             .setMaxTransactionFee(1_000_000_000)
             .setKey(originalKey.getPublicKey())
-            .setInitialBalance(100_000_000)
+            .setInitialBalance(Hbar.of(1))
             .execute(client);
 
         System.out.println("transaction ID: " + acctTransactionId);

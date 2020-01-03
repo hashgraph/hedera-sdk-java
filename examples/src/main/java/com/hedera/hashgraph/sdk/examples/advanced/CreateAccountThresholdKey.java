@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk.examples.advanced;
 
 import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionId;
@@ -54,7 +55,7 @@ public final class CreateAccountThresholdKey {
         Transaction tx = new AccountCreateTransaction()
             // require 2 of the 3 keys we generated to sign on anything modifying this account
             .setKey(new ThresholdKey(2).addAll(pubKeys))
-            .setInitialBalance(1_000_000)
+            .setInitialBalance(Hbar.fromTinybar(1000))
             .build(client);
 
         tx.execute(client);
@@ -67,8 +68,8 @@ public final class CreateAccountThresholdKey {
         System.out.println("account = " + newAccountId);
 
         TransactionId tsfrTxnId = new CryptoTransferTransaction()
-            .addSender(newAccountId, 50_000)
-            .addRecipient(AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("NODE_ID"))), 50_000)
+            .addSender(newAccountId, Hbar.of(10))
+            .addRecipient(AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("NODE_ID"))), Hbar.of(10))
             // To manually sign, you must explicitly build the Transaction
             .build(client)
             // we sign with 2 of the 3 keys

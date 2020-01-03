@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk.examples.simple;
 
 import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.account.AccountCreateTransaction;
@@ -37,9 +38,9 @@ public final class CreateAccount {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         Transaction transaction = new AccountCreateTransaction()
-            .setMaxTransactionFee(1_000_000_000)
+            .setMaxTransactionFee(Hbar.of(10))
             .setKey(newPublicKey)
-            .setInitialBalance(100_000_000)
+            .setInitialBalance(Hbar.of(1))
             .build(client);
 
         transaction.execute(client);

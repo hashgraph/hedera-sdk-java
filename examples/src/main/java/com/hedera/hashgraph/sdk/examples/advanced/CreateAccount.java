@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk.examples.advanced;
 
 import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
@@ -40,7 +41,7 @@ public final class CreateAccount {
         TransactionId txId = new AccountCreateTransaction()
             // The only _required_ property here is `key`
             .setKey(newKey.getPublicKey())
-            .setInitialBalance(1000)
+            .setInitialBalance(Hbar.fromTinybar(1000))
             .execute(client);
 
         // This will wait for the receipt to become available
