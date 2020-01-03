@@ -1,11 +1,12 @@
 package com.hedera.hashgraph.sdk.contract;
 
-import com.hedera.hashgraph.sdk.Entity;
-import com.hedera.hashgraph.sdk.IdUtil;
-import com.hedera.hashgraph.sdk.SolidityUtil;
-import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hedera.hashgraph.proto.ContractID;
 import com.hedera.hashgraph.proto.ContractIDOrBuilder;
+import com.hedera.hashgraph.sdk.Entity;
+import com.hedera.hashgraph.sdk.IdUtil;
+import com.hedera.hashgraph.sdk.Internal;
+import com.hedera.hashgraph.sdk.SolidityUtil;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 
 import java.util.Objects;
 
@@ -72,6 +73,7 @@ public final class ContractId extends PublicKey implements Entity {
             && contract == otherId.contract;
     }
 
+    @Internal
     public ContractID toProto() {
         return ContractID.newBuilder()
             .setShardNum(shard)

@@ -856,6 +856,7 @@ public final class CallParams<Kind> {
      *
      * @return the Solidity encoding of the call parameters in the order they were added.
      */
+    @Internal
     public ByteString toProto() {
         // offset for dynamic-length data, immediately after value arguments
         int dynamicOffset = args.size() * 32;

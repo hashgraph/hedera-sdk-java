@@ -37,6 +37,10 @@ public final class ContractInfo {
     @Nullable
     public final String contractMemo;
 
+    /**
+     * @deprecated this constructor is being hidden in 1.0.
+     */
+    @Deprecated
     public ContractInfo(ContractGetInfoResponse.ContractInfoOrBuilder info) {
         if (!info.hasContractID()) {
             throw new IllegalArgumentException("info is empty");

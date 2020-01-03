@@ -9,6 +9,7 @@ import org.bouncycastle.util.encoders.Hex;
 
 import java.nio.ByteBuffer;
 
+@Internal
 public final class SolidityUtil {
 
     /**

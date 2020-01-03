@@ -1,10 +1,11 @@
 package com.hedera.hashgraph.sdk.file;
 
-import com.hedera.hashgraph.sdk.Entity;
-import com.hedera.hashgraph.sdk.IdUtil;
-import com.hedera.hashgraph.sdk.SolidityUtil;
 import com.hedera.hashgraph.proto.FileID;
 import com.hedera.hashgraph.proto.FileIDOrBuilder;
+import com.hedera.hashgraph.sdk.Entity;
+import com.hedera.hashgraph.sdk.IdUtil;
+import com.hedera.hashgraph.sdk.Internal;
+import com.hedera.hashgraph.sdk.SolidityUtil;
 
 import java.util.Objects;
 
@@ -83,6 +84,7 @@ public final class FileId implements Entity {
         return shard == otherId.shard && realm == otherId.realm && file == otherId.file;
     }
 
+    @Internal
     public FileID toProto() {
         return FileID.newBuilder()
             .setShardNum(shard)

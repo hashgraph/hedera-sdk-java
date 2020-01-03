@@ -2,6 +2,7 @@ package com.hedera.hashgraph.sdk.contract;
 
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.proto.ContractFunctionResultOrBuilder;
+import com.hedera.hashgraph.sdk.Internal;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 
 import org.bouncycastle.util.encoders.Hex;
@@ -41,6 +42,8 @@ public final class ContractFunctionResult {
 
     public final List<ContractLogInfo> logs;
 
+    @Internal
+    // exposed for use in `TransactionRecord`
     public ContractFunctionResult(ContractFunctionResultOrBuilder inner) {
         rawResult = inner.getContractCallResult();
 

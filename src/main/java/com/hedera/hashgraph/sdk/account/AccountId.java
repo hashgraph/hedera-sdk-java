@@ -1,10 +1,11 @@
 package com.hedera.hashgraph.sdk.account;
 
-import com.hedera.hashgraph.sdk.Entity;
-import com.hedera.hashgraph.sdk.IdUtil;
-import com.hedera.hashgraph.sdk.SolidityUtil;
 import com.hedera.hashgraph.proto.AccountID;
 import com.hedera.hashgraph.proto.AccountIDOrBuilder;
+import com.hedera.hashgraph.sdk.Entity;
+import com.hedera.hashgraph.sdk.IdUtil;
+import com.hedera.hashgraph.sdk.Internal;
+import com.hedera.hashgraph.sdk.SolidityUtil;
 
 import java.util.Objects;
 
@@ -61,6 +62,7 @@ public final class AccountId implements Entity {
         return SolidityUtil.addressFor(this);
     }
 
+    @Internal
     public AccountID toProto() {
         return AccountID.newBuilder()
             .setShardNum(shard)

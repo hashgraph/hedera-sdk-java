@@ -1,12 +1,16 @@
 package com.hedera.hashgraph.sdk.account;
 
+import com.hedera.hashgraph.proto.AccountID;
 import com.hedera.hashgraph.sdk.Entity;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
-import com.hedera.hashgraph.proto.AccountID;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * @deprecated for removal
+ */
+@Deprecated
 public final class Claim implements Entity {
     private final com.hedera.hashgraph.proto.Claim inner;
 

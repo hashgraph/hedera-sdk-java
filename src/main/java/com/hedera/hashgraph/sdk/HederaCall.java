@@ -28,6 +28,7 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
 
     protected abstract io.grpc.MethodDescriptor<Req, RawResp> getMethod();
 
+    @Internal
     public abstract Req toProto();
 
     @Deprecated

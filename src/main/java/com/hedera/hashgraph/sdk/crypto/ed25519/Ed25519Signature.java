@@ -3,7 +3,12 @@ package com.hedera.hashgraph.sdk.crypto.ed25519;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
 
-/** ED25519 signature generation and verification */
+/**
+ * ED25519 signature generation and verification.
+ *
+ * @deprecated this class is being hidden in 1.0 because it was not intended for general use.
+ */
+@Deprecated
 public final class Ed25519Signature {
     private final byte[] sigBytes;
 
