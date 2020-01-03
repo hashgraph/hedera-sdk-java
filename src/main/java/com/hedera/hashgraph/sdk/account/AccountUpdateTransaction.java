@@ -1,14 +1,15 @@
 package com.hedera.hashgraph.sdk.account;
 
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.DurationHelper;
-import com.hedera.hashgraph.sdk.TimestampHelper;
-import com.hedera.hashgraph.sdk.TransactionBuilder;
-import com.hedera.hashgraph.sdk.crypto.PublicKey;
+import com.hedera.hashgraph.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.proto.CryptoUpdateTransactionBody;
 import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
-import com.hedera.hashgraph.proto.CryptoServiceGrpc;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.DurationHelper;
+import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.TimestampHelper;
+import com.hedera.hashgraph.sdk.TransactionBuilder;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -46,6 +47,9 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
         return this;
     }
 
+    /**
+     * Set the threshold for generating records when sending currency, in tinybar.
+     */
     public AccountUpdateTransaction setSendRecordThreshold(long sendRecordThreshold) {
         builder.setSendRecordThresholdWrapper(
             com.google.protobuf.UInt64Value.newBuilder()
@@ -53,10 +57,27 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
         return this;
     }
 
+    public AccountUpdateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
+        builder.setSendRecordThresholdWrapper(
+            com.google.protobuf.UInt64Value.newBuilder()
+                .setValue(sendRecordThreshold.asTinybar()));
+        return this;
+    }
+
+    /**
+     * Set the threshold for generating records when receiving currency, in tinybar.
+     */
     public AccountUpdateTransaction setReceiveRecordThreshold(long receiveRecordThreshold) {
         builder.setReceiveRecordThresholdWrapper(
             com.google.protobuf.UInt64Value.newBuilder()
                 .setValue(receiveRecordThreshold));
+        return this;
+    }
+
+    public AccountUpdateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
+        builder.setReceiveRecordThresholdWrapper(
+            com.google.protobuf.UInt64Value.newBuilder()
+                .setValue(receiveRecordThreshold.asTinybar()));
         return this;
     }
 

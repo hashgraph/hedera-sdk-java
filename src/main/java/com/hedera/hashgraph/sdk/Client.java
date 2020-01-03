@@ -258,6 +258,20 @@ public final class Client implements AutoCloseable {
      * @param maxTransactionFee
      * @return {@code this} for fluent usage.
      */
+    public Client setMaxTransactionFee(Hbar maxTransactionFee) {
+        return setMaxTransactionFee(maxTransactionFee.asTinybar());
+    }
+
+    /**
+     * Set the maximum fee to be paid for transactions executed by this client.
+     * <p>
+     * Because transaction fees are always maximums, this will simply add a call to
+     * {@link TransactionBuilder#setMaxTransactionFee(long)} on every new transaction. The actual
+     * fee assessed for a given transaction may be less than this value, but never greater.
+     *
+     * @param maxTransactionFee
+     * @return {@code this} for fluent usage.
+     */
     public Client setMaxTransactionFee(@Nonnegative long maxTransactionFee) {
         if (maxTransactionFee <= 0) {
             throw new IllegalArgumentException("maxTransactionFee must be > 0");
@@ -268,7 +282,29 @@ public final class Client implements AutoCloseable {
     }
 
     /**
-     * Set the maximum default payment value allowable for queries.
+     * Set the maximum default payment allowable for queries.
+     * <p>
+     * When a query is executed without an explicit {@link QueryBuilder#setPayment(Transaction)}
+     * or {@link QueryBuilder#setPaymentDefault(long)} call, the client will first request the cost
+     * of the given query from the node it will be submitted to and attach a payment for that amount
+     * from the operator account on the client.
+     * <p>
+     * If the returned value is greater than this value, a
+     * {@link QueryBuilder.MaxPaymentExceededException} will be thrown from
+     * {@link QueryBuilder#execute(Client)} or returned in the second callback of
+     * {@link QueryBuilder#executeAsync(Client, Consumer, Consumer)}.
+     * <p>
+     * Set to 0 to disable automatic implicit payments.
+     *
+     * @param maxQueryPayment
+     * @return
+     */
+    public Client setMaxQueryPayment(Hbar maxQueryPayment) {
+        return setMaxQueryPayment(maxQueryPayment.asTinybar());
+    }
+
+    /**
+     * Set the maximum default payment, in tinybar, allowable for queries.
      * <p>
      * When a query is executed without an explicit {@link QueryBuilder#setPayment(Transaction)}
      * or {@link QueryBuilder#setPaymentDefault(long)} call, the client will first request the cost
@@ -286,6 +322,10 @@ public final class Client implements AutoCloseable {
      * @return
      */
     public Client setMaxQueryPayment(@Nonnegative long maxQueryPayment) {
+        if (maxQueryPayment <= 0) {
+            throw new IllegalArgumentException("maxQueryPayment must be > 0");
+        }
+
         this.maxQueryPayment = maxQueryPayment;
         return this;
     }
