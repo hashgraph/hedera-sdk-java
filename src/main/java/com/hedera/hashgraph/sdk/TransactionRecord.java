@@ -40,7 +40,7 @@ public final class TransactionRecord {
      * the transaction, or by a smart contract it calls, or by the creation of threshold
      * records that it triggers.
      */
-    public final List<Transfer> transfers;
+    public final List<com.hedera.hashgraph.sdk.Transfer> transfers;
 
     private final com.hedera.hashgraph.proto.TransactionRecord inner;
 
@@ -60,7 +60,7 @@ public final class TransactionRecord {
             ? inner.getTransferList()
             .getAccountAmountsList()
             .stream()
-            .map(Transfer::new)
+            .map(com.hedera.hashgraph.sdk.Transfer::new)
             .collect(Collectors.toList())
             : Collections.emptyList();
     }
@@ -152,16 +152,22 @@ public final class TransactionRecord {
      * transaction, or by a smart contract it calls, or by the creation of threshold
      * records that it triggers.
      *
-     * @deprecated available as field {@link #transfers}.
+     * @deprecated available as field {@link #transfers}; note the {@code Transfer} class is
+     * different.
      */
     @Deprecated
-    public List<Transfer> getTransfers() {
-        return transfers;
+    public List<TransactionRecord.Transfer> getTransfers() {
+        return inner.hasTransferList()
+            ? inner.getTransferList()
+            .getAccountAmountsList()
+            .stream()
+            .map(Transfer::new)
+            .collect(Collectors.toList())
+            : Collections.emptyList();
     }
 
     /**
-     * @deprecated this class is being hoisted to a top level class in 1.0; it is not changing
-     * otherwise.
+     * @deprecated this class is being hoisted to a top level class in 1.0.
      */
     @Deprecated
     public final static class Transfer {
