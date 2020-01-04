@@ -67,7 +67,7 @@ public final class CreateStatefulContract {
         // create the contract's bytecode file
         TransactionId fileTxId = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file
-            .addKey(OPERATOR_KEY.getPublicKey())
+            .addKey(OPERATOR_KEY.publicKey)
             .setContents(byteCode)
             .execute(client);
 

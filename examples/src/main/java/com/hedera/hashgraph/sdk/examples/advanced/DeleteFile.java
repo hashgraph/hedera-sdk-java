@@ -43,7 +43,7 @@ public final class DeleteFile {
             Instant.now()
                 .plus(Duration.ofSeconds(2592000)))
             // Use the same key as the operator to "own" this file
-            .addKey(OPERATOR_KEY.getPublicKey())
+            .addKey(OPERATOR_KEY.publicKey)
             .setContents(fileContents)
             .execute(client);
 

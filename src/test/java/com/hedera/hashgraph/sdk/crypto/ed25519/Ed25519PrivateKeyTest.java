@@ -46,6 +46,8 @@ class Ed25519PrivateKeyTest {
 
         assertNotNull(key);
         assertNotNull(key.toBytes());
+        // we generate the chain code at the same time
+        assertTrue(key.supportsDerivation(), "generated key must support generation");
     }
 
     @Test
@@ -146,6 +148,6 @@ class Ed25519PrivateKeyTest {
 
         final Ed25519Signature signature = Ed25519Signature.forMessage(privateKey, messageToSign);
 
-        assertTrue(signature.verify(privateKey.getPublicKey(), messageToSign));
+        assertTrue(signature.verify(privateKey.publicKey, messageToSign));
     }
 }

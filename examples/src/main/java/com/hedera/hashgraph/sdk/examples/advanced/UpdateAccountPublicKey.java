@@ -38,7 +38,7 @@ public final class UpdateAccountPublicKey {
         Ed25519PrivateKey originalKey = Ed25519PrivateKey.generate();
         TransactionId acctTransactionId = new AccountCreateTransaction()
             .setMaxTransactionFee(1_000_000_000)
-            .setKey(originalKey.getPublicKey())
+            .setKey(originalKey.publicKey)
             .setInitialBalance(Hbar.of(1))
             .execute(client);
 
@@ -50,11 +50,11 @@ public final class UpdateAccountPublicKey {
         Ed25519PrivateKey newKey = Ed25519PrivateKey.generate();
 
         System.out.println(" :: update public key of account " + accountId);
-        System.out.println("set key = " + newKey.getPublicKey());
+        System.out.println("set key = " + newKey.publicKey);
 
         TransactionId transactionId = new AccountUpdateTransaction()
             .setAccountId(accountId)
-            .setKey(newKey.getPublicKey())
+            .setKey(newKey.publicKey)
             // Sign with the previous key and the new key
             .sign(originalKey)
             .sign(newKey)

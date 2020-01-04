@@ -12,6 +12,23 @@ public class KeyList extends PublicKey {
 
     public KeyList() { }
 
+    public KeyList add(PublicKey key) {
+        keyListBuilder.addKeys(key.toKeyProto());
+        return this;
+    }
+
+    public KeyList addAll(PublicKey... keys) {
+        for (PublicKey key : keys) {
+            add(key);
+        }
+
+        return this;
+    }
+
+    /**
+     * @deprecated renamed to {@link #add(PublicKey)}.
+     */
+    @Deprecated
     public KeyList addKey(PublicKey key) {
         keyListBuilder.addKeys(key.toKeyProto());
         return this;

@@ -86,9 +86,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
     }
 
     public Transaction sign(Ed25519PrivateKey privateKey) {
-        ByteString pubKey = ByteString.copyFrom(
-            privateKey.getPublicKey()
-                .toBytes());
+        ByteString pubKey = ByteString.copyFrom(privateKey.publicKey.toBytes());
 
         SignatureMap.Builder sigMap = inner.getSigMapBuilder();
 

@@ -1,9 +1,9 @@
 package com.hedera.hashgraph.sdk.file;
 
+import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
-import com.hedera.hashgraph.proto.Transaction;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ class FileUpdateTransactionTest {
             .setExpirationTime(Instant.ofEpochSecond(1554158728))
             .setContents(new byte[]{1, 2, 3, 4, 5})
             .setTransactionFee(100_000)
-            .addKey(key.getPublicKey())
+            .addKey(key.publicKey)
             .sign(key)
             .toProto();
 

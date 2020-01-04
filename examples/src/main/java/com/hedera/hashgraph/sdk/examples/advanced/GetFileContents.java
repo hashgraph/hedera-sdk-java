@@ -37,7 +37,7 @@ public final class GetFileContents {
 
         // Create the new file and set its properties
         TransactionId newFileTxId = new FileCreateTransaction()
-            .addKey(OPERATOR_KEY.getPublicKey()) // The public key of the owner of the file
+            .addKey(OPERATOR_KEY.publicKey) // The public key of the owner of the file
             .setContents(fileContents) // Contents of the file
             .setMaxTransactionFee(Hbar.of(2))
             .execute(client);

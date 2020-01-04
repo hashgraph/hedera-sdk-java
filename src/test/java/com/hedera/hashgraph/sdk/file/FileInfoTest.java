@@ -1,10 +1,10 @@
 package com.hedera.hashgraph.sdk.file;
 
-import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
-import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import com.hedera.hashgraph.proto.FileGetInfoResponse;
 import com.hedera.hashgraph.proto.KeyList;
 import com.hedera.hashgraph.proto.Response;
+import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
+import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class FileInfoTest {
 
     private final Ed25519PrivateKey privateKey = Ed25519PrivateKey.generate();
-    private final Ed25519PublicKey publicKey = privateKey.getPublicKey();
+    private final Ed25519PublicKey publicKey = privateKey.publicKey;
 
     @Test
     @DisplayName("won't deserialize from the wrong kind of response")

@@ -36,7 +36,7 @@ public final class CreateFile {
 
         TransactionId txId = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file
-            .addKey(OPERATOR_KEY.getPublicKey())
+            .addKey(OPERATOR_KEY.publicKey)
             .setContents(fileContents)
             // The default max fee of 1 HBAR is not enough to make a file ( starts around 1.1 HBAR )
             .setMaxTransactionFee(200_000_000) // 2 HBAR
