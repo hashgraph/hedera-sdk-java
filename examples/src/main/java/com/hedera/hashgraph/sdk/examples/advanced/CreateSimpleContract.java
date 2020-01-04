@@ -65,7 +65,7 @@ public final class CreateSimpleContract {
             Instant.now()
                 .plus(Duration.ofSeconds(3600)))
             // Use the same key as the operator to "own" this file
-            .addKey(OPERATOR_KEY.getPublicKey())
+            .addKey(OPERATOR_KEY.publicKey)
             .setContents(byteCodeHex.getBytes())
             .execute(client);
 
@@ -79,7 +79,7 @@ public final class CreateSimpleContract {
             .setGas(217000)
             .setBytecodeFile(newFileId)
             // set an admin key so we can delete the contract later
-            .setAdminKey(OPERATOR_KEY.getPublicKey())
+            .setAdminKey(OPERATOR_KEY.publicKey)
             .execute(client);
 
         TransactionReceipt contractReceipt = contractTxId.getReceipt(client);

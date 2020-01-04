@@ -19,7 +19,7 @@ class Ed25519PublicKeyTest {
     @Test
     @DisplayName("private key can be recovered from bytes")
     void keyByteSerialization() {
-        final Ed25519PublicKey key1 = Ed25519PrivateKey.generate().getPublicKey();
+        final Ed25519PublicKey key1 = Ed25519PrivateKey.generate().publicKey;
         final byte[] key1Bytes = key1.toBytes();
         final Ed25519PublicKey key2 = Ed25519PublicKey.fromBytes(key1Bytes);
         final byte[] key2Bytes = key2.toBytes();
@@ -30,7 +30,7 @@ class Ed25519PublicKeyTest {
     @Test
     @DisplayName("private key can be recovered from string")
     void keyStringSerialization() {
-        final Ed25519PublicKey key1 = Ed25519PrivateKey.generate().getPublicKey();
+        final Ed25519PublicKey key1 = Ed25519PrivateKey.generate().publicKey;
         final String key1Str = key1.toString();
         final Ed25519PublicKey key2 = Ed25519PublicKey.fromString(key1Str);
         final String key2Str = key2.toString();

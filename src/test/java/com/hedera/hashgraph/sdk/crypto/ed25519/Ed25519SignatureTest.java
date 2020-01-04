@@ -46,7 +46,7 @@ class Ed25519SignatureTest {
         final Ed25519Signature signature = Ed25519Signature.fromString(sigStr);
 
         Assertions.assertTrue(
-            signature.verify(privKey.getPublicKey(), messageBytes)
+            signature.verify(privKey.publicKey, messageBytes)
         );
     }
 }

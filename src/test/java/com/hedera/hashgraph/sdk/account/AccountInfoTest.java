@@ -1,8 +1,8 @@
 package com.hedera.hashgraph.sdk.account;
 
-import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.proto.CryptoGetInfoResponse;
 import com.hedera.hashgraph.proto.Response;
+import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,7 +47,7 @@ class AccountInfoTest {
             .setCryptoGetInfo(
                 CryptoGetInfoResponse.newBuilder()
                     .setAccountInfo(CryptoGetInfoResponse.AccountInfo.newBuilder()
-                        .setKey(privateKey.getPublicKey().toKeyProto())))
+                        .setKey(privateKey.publicKey.toKeyProto())))
             .build();
 
         final AccountInfo accountInfo = AccountInfo.fromResponse(response);

@@ -51,7 +51,7 @@ public final class MultiAppTransfer {
         TransactionId createExchangeAccountTxnId = new AccountCreateTransaction()
             // the exchange only accepts transfers that it validates through a side channel (e.g. REST API)
             .setReceiverSignatureRequired(true)
-            .setKey(exchangeKey.getPublicKey())
+            .setKey(exchangeKey.publicKey)
             // The owner key has to sign this transaction
             // when setReceiverSignatureRequired is true
             .build(client)

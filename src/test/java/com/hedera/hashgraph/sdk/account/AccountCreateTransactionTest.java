@@ -36,7 +36,7 @@ class AccountCreateTransactionTest {
         final Transaction txn = new AccountCreateTransaction()
             .setNodeAccountId(new AccountId(3))
             .setTransactionId(TransactionId.withValidStart(new AccountId(2), now))
-            .setKey(key.getPublicKey())
+            .setKey(key.publicKey)
             .setInitialBalance(450)
             .setProxyAccountId(new AccountId(1020))
             .setReceiverSignatureRequired(true)

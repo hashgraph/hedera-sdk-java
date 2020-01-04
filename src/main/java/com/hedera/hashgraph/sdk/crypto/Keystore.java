@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonWriter;
+import com.hedera.hashgraph.sdk.Internal;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
 import org.bouncycastle.crypto.digests.SHA256Digest;
@@ -24,7 +25,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,11 +37,10 @@ import javax.crypto.ShortBufferException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+@Internal
 public final class Keystore {
     private static final Gson gson = new Gson();
     private static final JsonParser jsonParser = new JsonParser();
-
-    private static final SecureRandom secureRandom = new SecureRandom();
 
     private static final int IV_LEN = 16;
     private static final int COUNT = 262144;
@@ -271,7 +270,7 @@ public final class Keystore {
 
     private static byte[] randomBytes(int len) {
         final byte[] out = new byte[len];
-        secureRandom.nextBytes(out);
+        PrivateKey.secureRandom.nextBytes(out);
         return out;
     }
 }

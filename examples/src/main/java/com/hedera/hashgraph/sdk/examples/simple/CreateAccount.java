@@ -25,7 +25,7 @@ public final class CreateAccount {
     public static void main(String[] args) throws HederaException {
         // Generate a Ed25519 private, public key pair
         Ed25519PrivateKey newKey = Ed25519PrivateKey.generate();
-        Ed25519PublicKey newPublicKey = newKey.getPublicKey();
+        Ed25519PublicKey newPublicKey = newKey.publicKey;
 
         System.out.println("private key = " + newKey);
         System.out.println("public key = " + newPublicKey);
