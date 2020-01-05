@@ -39,12 +39,10 @@ public final class DeleteFile {
         // you can easily use the bytes of a file instead.
         byte[] fileContents = "Hedera hashgraph is great!".getBytes();
 
-        TransactionId txId = new FileCreateTransaction().setExpirationTime(
-            Instant.now()
-                .plus(Duration.ofSeconds(2592000)))
-            // Use the same key as the operator to "own" this file
+        TransactionId txId = new FileCreateTransaction()
             .addKey(OPERATOR_KEY.publicKey)
             .setContents(fileContents)
+            .setMaxTransactionFee(200_000_000)
             .execute(client);
 
         TransactionReceipt receipt = txId.getReceipt(client);
@@ -64,6 +62,7 @@ public final class DeleteFile {
 
         FileInfo fileInfo = new FileInfoQuery()
             .setFileId(newFileId)
+            .setPaymentAmount(200_000_000)
             .execute(client);
 
         // note the above fileInfo will fail with FILE_DELETED due to a known issue on Hedera
