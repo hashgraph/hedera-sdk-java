@@ -1,5 +1,7 @@
 package com.hedera.hashgraph.sdk.account;
 
+import com.google.protobuf.BoolValue;
+import com.google.protobuf.UInt64Value;
 import com.hedera.hashgraph.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.proto.CryptoUpdateTransactionBody;
 import com.hedera.hashgraph.proto.Transaction;
@@ -50,6 +52,15 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
         return this;
     }
 
+    public AccountUpdateTransaction setProxyAccountId(AccountId accountId) {
+        builder.setProxyAccountID(accountId.toProto());
+        return this;
+    }
+
+    /**
+     * @deprecated renamed to {@link #setProxyAccountId(AccountId)}.
+     */
+    @Deprecated
     public AccountUpdateTransaction setProxyAccount(AccountId accountId) {
         builder.setProxyAccountID(accountId.toProto());
         return this;
@@ -59,16 +70,13 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
      * Set the threshold for generating records when sending currency, in tinybar.
      */
     public AccountUpdateTransaction setSendRecordThreshold(long sendRecordThreshold) {
-        builder.setSendRecordThresholdWrapper(
-            com.google.protobuf.UInt64Value.newBuilder()
-                .setValue(sendRecordThreshold));
+        builder.setSendRecordThresholdWrapper(UInt64Value.of(sendRecordThreshold));
         return this;
     }
 
     public AccountUpdateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
         builder.setSendRecordThresholdWrapper(
-            com.google.protobuf.UInt64Value.newBuilder()
-                .setValue(sendRecordThreshold.asTinybar()));
+            UInt64Value.of(sendRecordThreshold.asTinybar()));
         return this;
     }
 
@@ -76,16 +84,13 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
      * Set the threshold for generating records when receiving currency, in tinybar.
      */
     public AccountUpdateTransaction setReceiveRecordThreshold(long receiveRecordThreshold) {
-        builder.setReceiveRecordThresholdWrapper(
-            com.google.protobuf.UInt64Value.newBuilder()
-                .setValue(receiveRecordThreshold));
+        builder.setReceiveRecordThresholdWrapper(UInt64Value.of(receiveRecordThreshold));
         return this;
     }
 
     public AccountUpdateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
         builder.setReceiveRecordThresholdWrapper(
-            com.google.protobuf.UInt64Value.newBuilder()
-                .setValue(receiveRecordThreshold.asTinybar()));
+            UInt64Value.of(receiveRecordThreshold.asTinybar()));
         return this;
     }
 
@@ -96,6 +101,11 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
 
     public AccountUpdateTransaction setExpirationTime(Instant expirationTime) {
         builder.setExpirationTime(TimestampHelper.timestampFrom(expirationTime));
+        return this;
+    }
+
+    public AccountUpdateTransaction setReceiverSignatureRequired(boolean receiverSignatureRequired) {
+        builder.setReceiverSigRequiredWrapper(BoolValue.of(receiverSignatureRequired));
         return this;
     }
 
