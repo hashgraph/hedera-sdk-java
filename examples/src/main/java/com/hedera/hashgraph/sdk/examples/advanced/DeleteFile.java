@@ -42,7 +42,7 @@ public final class DeleteFile {
         TransactionId txId = new FileCreateTransaction()
             .addKey(OPERATOR_KEY.publicKey)
             .setContents(fileContents)
-            .setMaxTransactionFee(200_000_000)
+            .setMaxTransactionFee(Hbar.of(2))
             .execute(client);
 
         TransactionReceipt receipt = txId.getReceipt(client);
@@ -62,7 +62,7 @@ public final class DeleteFile {
 
         FileInfo fileInfo = new FileInfoQuery()
             .setFileId(newFileId)
-            .setPaymentAmount(200_000_000)
+            .setPaymentAmount(Hbar.of(2))
             .execute(client);
 
         // note the above fileInfo will fail with FILE_DELETED due to a known issue on Hedera
