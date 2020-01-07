@@ -17,8 +17,9 @@ class ContractFunctionResultTest {
         + "00000000000000000000000000000000000000000000000000000000ffffffff"
         + "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
         + "00000000000000000000000011223344556677889900aabbccddeeff00112233"
-        + "00000000000000000000000000000000000000000000000000000000000000a0"
-        + "00000000000000000000000000000000000000000000000000000000000000e0"
+        + "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+        + "00000000000000000000000000000000000000000000000000000000000000c0"
+        + "0000000000000000000000000000000000000000000000000000000000000100"
         + "000000000000000000000000000000000000000000000000000000000000000d"
         + "48656c6c6f2c20776f726c642100000000000000000000000000000000000000"
         + "0000000000000000000000000000000000000000000000000000000000000014"
@@ -44,7 +45,13 @@ class ContractFunctionResultTest {
 
         assertEquals("11223344556677889900aabbccddeeff00112233", result.getAddress(2));
 
-        assertEquals("Hello, world!", result.getString(3));
-        assertEquals("Hello, world, again!", result.getString(4));
+        // unsigned integers (where applicable)
+        assertEquals(-1, result.getUint32(3));
+        assertEquals(-1L, result.getUint64(3));
+        // BigInteger can represent the full range and so should be 2^256 - 1
+        assertEquals(BigInteger.ONE.shiftLeft(256).subtract(BigInteger.ONE), result.getUint256(3));
+
+        assertEquals("Hello, world!", result.getString(4));
+        assertEquals("Hello, world, again!", result.getString(5));
     }
 }
