@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk.examples.advanced;
 
 import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
@@ -12,8 +13,6 @@ import com.hedera.hashgraph.sdk.file.FileId;
 import com.hedera.hashgraph.sdk.file.FileInfo;
 import com.hedera.hashgraph.sdk.file.FileInfoQuery;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Objects;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -62,7 +61,6 @@ public final class DeleteFile {
 
         FileInfo fileInfo = new FileInfoQuery()
             .setFileId(newFileId)
-            .setPaymentAmount(Hbar.of(2))
             .execute(client);
 
         // note the above fileInfo will fail with FILE_DELETED due to a known issue on Hedera
