@@ -18,10 +18,10 @@ import javax.annotation.Nullable;
  * Result of invoking a contract via {@link ContractCallQuery},
  * or {@link ContractExecuteTransaction}, or the result of a contract constructor being called
  * by {@link ContractCreateTransaction}.
- *
+ * <p>
  * Return type of {@link TransactionRecord#getContractCreateResult()}
  * and {@link TransactionRecord#getContractExecuteResult()}.
- *
+ * <p>
  * If you require a type which is not supported here, please let us know on
  * <a href="https://github.com/hashgraph/hedera-sdk-java/issues/298>this Github issue</a>.
  */
@@ -64,7 +64,9 @@ public final class ContractFunctionResult {
      */
     public byte[] asBytes() { return rawResult.toByteArray(); }
 
-    /** Get the nth returned value as a string */
+    /**
+     * Get the nth returned value as a string
+     */
     public String getString(int valIndex) {
         return getDynamicBytes(valIndex).toStringUtf8();
     }
@@ -91,7 +93,7 @@ public final class ContractFunctionResult {
 
     /**
      * Get the nth returned value as a 32-bit integer.
-     *
+     * <p>
      * If the actual value is wider it will be truncated to the last 4 bytes (similar to Java's
      * integer narrowing semantics).
      */
@@ -117,6 +119,57 @@ public final class ContractFunctionResult {
      */
     public BigInteger getInt256(int valIndex) {
         return new BigInteger(getByteString(valIndex * 32, (valIndex + 1) * 32).toByteArray());
+    }
+
+    /**
+     * Get the nth returned value as a 32-bit unsigned integer.
+     * <p>
+     * If the actual value is wider it will be truncated to the last 4 bytes (similar to Java's
+     * integer narrowing semantics).
+     * <p>
+     * Because Java does not have native unsigned integers, this is semantically identical to
+     * {@link #getInt32(int)}. The {@link Integer} class has static methods for treating an
+     * {@code int} as unsigned where the difference between signed and unsigned actually matters
+     * (comparison, division, printing and widening to {@code long}).
+     */
+    public int getUint32(int valIndex) {
+        return getInt32(valIndex);
+    }
+
+    /**
+     * Get the nth returned value as a 64-bit integer.
+     * <p>
+     * If the actual value is wider it will be truncated to the last 8 bytes (similar to Java's
+     * integer narrowing semantics).
+     * <p>
+     * Because Java does not have native unsigned integers, this is semantically identical to
+     * {@link #getInt64(int)}. The {@link Long} class has static methods for treating a
+     * {@code long} as unsigned where the difference between signed and unsigned actually matters
+     * (comparison, division and printing).
+     */
+    public long getUint64(int valIndex) {
+        return getInt64(valIndex);
+    }
+
+    /**
+     * Get the nth returned value as a 256-bit unsigned integer.
+     * <p>
+     * The value will be padded with a leading zero-byte so that
+     * {@link BigInteger#BigInteger(byte[])} treats the value as positive regardless of
+     * whether the most significant bit is set or not.
+     * <p>
+     * This type can represent the full width of Solidity integers.
+     */
+    public BigInteger getUint256(int valIndex) {
+        // prepend a zero byte so that `BigInteger` finds a zero sign bit and treats it as positive
+        // `ByteString -> byte[]` requires copying anyway so we can amortize these two operations
+        byte[] bytes = new byte[33];
+        getByteString(valIndex * 32, (valIndex + 1) * 32).copyTo(bytes, 1);
+
+        // there's a constructor that takes a signum but we would need to scan the array
+        // to check that it's nonzero; this constructor does that work for us but requires
+        // prepending a sign bit
+        return new BigInteger(bytes);
     }
 
     /**

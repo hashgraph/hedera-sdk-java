@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 
 // an implementation of function selector and parameter encoding as specified here:
@@ -150,7 +151,7 @@ public final class ContractFunctionParams {
             Arrays.stream(intArray).mapToObj(i -> int256(i, 32))
                 .collect(Collectors.toList()));
 
-        arrayBytes = int256(intArray.length, 32).concat(arrayBytes);
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
         args.add(new Argument("int32[]", arrayBytes, true));
 
@@ -165,7 +166,7 @@ public final class ContractFunctionParams {
             Arrays.stream(intArray).mapToObj(i -> int256(i, 64))
                 .collect(Collectors.toList()));
 
-        arrayBytes = int256(intArray.length, 64).concat(arrayBytes);
+        arrayBytes = uint256(intArray.length, 64).concat(arrayBytes);
 
         args.add(new Argument("int64[]", arrayBytes, true));
 
@@ -183,9 +184,107 @@ public final class ContractFunctionParams {
             Arrays.stream(intArray).map(ContractFunctionParams::int256)
                 .collect(Collectors.toList()));
 
-        arrayBytes = int256(intArray.length, 256).concat(arrayBytes);
+        arrayBytes = uint256(intArray.length, 256).concat(arrayBytes);
 
         args.add(new Argument("int256[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a 32-bit unsigned integer.
+     *
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     */
+    public ContractFunctionParams addUint32(int value) {
+        args.add(new Argument("uint32", uint256(value, 32), false));
+
+        return this;
+    }
+
+    /**
+     * Add a 64-bit unsigned integer.
+     *
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     */
+    public ContractFunctionParams addUint64(long value) {
+        args.add(new Argument("uint64", uint256(value, 64), false));
+
+        return this;
+    }
+
+    /**
+     * Add a 256-bit unsigned integer.
+     *
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @throws IllegalArgumentException if {@code bigUint.bitLength() > 256}
+     *                                  (max range including the sign bit) or
+     *                                  {@code bigUint.signum() < 0}.
+     */
+    public ContractFunctionParams addUint256(@Nonnegative BigInteger bigUint) {
+        checkBigUint(bigUint);
+        args.add(new Argument("uint256", uint256(bigUint), false));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 32-bit unsigned integers.
+     *
+     * Each value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     */
+    public ContractFunctionParams addUint32Array(int[] intArray) {
+        ByteString arrayBytes = ByteString.copyFrom(
+            Arrays.stream(intArray).mapToObj(i -> uint256(i, 32))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint32[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 64-bit unsigned integers.
+     *
+     * Each value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     */
+    public ContractFunctionParams addUint64Array(long[] intArray) {
+        ByteString arrayBytes = ByteString.copyFrom(
+            Arrays.stream(intArray).mapToObj(i -> uint256(i, 64))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 64).concat(arrayBytes);
+
+        args.add(new Argument("uint64[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 256-bit unsigned integers.
+     *
+     * Each value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @throws IllegalArgumentException if any value has a {@code .bitLength() > 256}
+     *                                  (max range including the sign bit) or is negative.
+     */
+    public ContractFunctionParams addUint256Array(BigInteger[] intArray) {
+        ByteString arrayBytes = ByteString.copyFrom(
+            Arrays.stream(intArray).map(ContractFunctionParams::uint256)
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 256).concat(arrayBytes);
+
+        args.add(new Argument("uint256[]", arrayBytes, true));
 
         return this;
     }
@@ -326,13 +425,13 @@ public final class ContractFunctionParams {
 
         final ArrayList<ByteString> offsets = new ArrayList<ByteString>(offsetsLen);
 
-        offsets.add(int256(elements.size(), 32));
+        offsets.add(uint256(elements.size(), 32));
 
         // points to start of dynamic segment
         long currOffset = offsetsLen * 32L;
 
         for (final ByteString elem : elements) {
-            offsets.add(int256(currOffset, 64));
+            offsets.add(uint256(currOffset, 64));
             currOffset += elem.size();
         }
 
@@ -346,7 +445,26 @@ public final class ContractFunctionParams {
         }
     }
 
+    private static void checkBigUint(BigInteger val) {
+        if (val.signum() < 0) {
+            throw new IllegalArgumentException("negative BigInteger passed to unsigned function");
+        }
+
+        // bitLength() does not include the sign bit
+        if (val.bitLength() > 256) {
+            throw new IllegalArgumentException("BigInteger out of range for Solidity integers");
+        }
+    }
+
+    static ByteString uint256(long val, int bitWidth) {
+        return int256(val, bitWidth, false);
+    }
+
     static ByteString int256(long val, int bitWidth) {
+        return int256(val, bitWidth, true);
+    }
+
+    static ByteString int256(long val, int bitWidth, boolean signed) {
         // don't try to get wider than a `long` as it should just be filled with padding
         bitWidth = Math.min(bitWidth, 64);
         final ByteString.Output output = ByteString.newOutput(bitWidth / 8);
@@ -360,7 +478,17 @@ public final class ContractFunctionParams {
         }
 
         // byte padding will sign-extend appropriately
-        return leftPad32(output.toByteString(), val < 0);
+        return leftPad32(output.toByteString(), signed && val < 0);
+    }
+
+    static ByteString uint256(BigInteger bigInt) {
+        if (bigInt.bitLength() == 256) {
+            // we have to chop off the sign bit or else we'll have a 33 byte value
+            // we have no choice but to copy twice here but hopefully the JIT elides one
+            return ByteString.copyFrom(bigInt.toByteArray(), 1, 32);
+        }
+
+        return leftPad32(bigInt.toByteArray(), false);
     }
 
     static ByteString int256(BigInteger bigInt) {
@@ -373,7 +501,6 @@ public final class ContractFunctionParams {
 
     // Solidity contracts require all parameters to be padded to 32 byte multiples but specifies
     // different requirements for padding for strings/byte arrays vs integers
-
     static ByteString leftPad32(ByteString input, boolean negative) {
         int rem = 32 - input.size() % 32;
         return rem == 32

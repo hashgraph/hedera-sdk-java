@@ -52,17 +52,19 @@ class ContractFunctionParamsTest {
     void staticParamsEncoding() {
         final ContractFunctionParams params = new ContractFunctionParams()
             .addInt32(0x11223344)
-            .addBytes(new byte[]{0x11, 0x22, 0x33, 0x44})
+            .addInt32(-65536)
+            .addUint64(-65536)
             .addAddress("00112233445566778899aabbccddeeff00112233");
 
         final String paramsHex = Hex.toHexString(params.toBytes(null).toByteArray());
 
         assertEquals(
             "0000000000000000000000000000000000000000000000000000000011223344"
-                + "0000000000000000000000000000000000000000000000000000000000000060"
-                + "00112233445566778899aabbccddeeff00112233000000000000000000000000"
-                + "0000000000000000000000000000000000000000000000000000000000000004"
-                + "1122334400000000000000000000000000000000000000000000000000000000",
+                // sign-extended
+                + "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000"
+                // zero-padded
+                + "000000000000000000000000000000000000000000000000ffffffffffff0000"
+                + "00112233445566778899aabbccddeeff00112233000000000000000000000000",
             paramsHex
         );
     }
