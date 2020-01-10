@@ -53,7 +53,7 @@ public final class Keystore {
         this.keyBytes = keyBytes;
     }
 
-    public Keystore(PrivateKey privateKey) {
+    public Keystore(PrivateKey<? extends PublicKey> privateKey) {
         this.keyBytes = privateKey.toBytes();
     }
 
