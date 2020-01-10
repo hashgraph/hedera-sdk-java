@@ -7,26 +7,16 @@ import com.hedera.hashgraph.proto.CryptoTransferTransactionBody;
 import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.proto.TransferList;
-import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 
 import javax.annotation.Nonnegative;
-import javax.annotation.Nullable;
 
 import io.grpc.MethodDescriptor;
 
 public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTransferTransaction> {
     private final CryptoTransferTransactionBody.Builder builder = bodyBuilder.getCryptoTransferBuilder();
     private final TransferList.Builder transferList = builder.getTransfersBuilder();
-
-    /**
-     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
-     */
-    @Deprecated
-    public CryptoTransferTransaction(@Nullable Client client) {
-        super(client);
-    }
 
     public CryptoTransferTransaction() { super(); }
 

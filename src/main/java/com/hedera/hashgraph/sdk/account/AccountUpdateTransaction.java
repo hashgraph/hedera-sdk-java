@@ -6,7 +6,6 @@ import com.hedera.hashgraph.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.proto.CryptoUpdateTransactionBody;
 import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
-import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.TimestampHelper;
@@ -16,21 +15,11 @@ import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import java.time.Duration;
 import java.time.Instant;
 
-import javax.annotation.Nullable;
-
 import io.grpc.MethodDescriptor;
 
 // `CryptoUpdateTransaction`
 public final class AccountUpdateTransaction extends TransactionBuilder<AccountUpdateTransaction> {
     private final CryptoUpdateTransactionBody.Builder builder = bodyBuilder.getCryptoUpdateAccountBuilder();
-
-    /**
-     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
-     */
-    @Deprecated
-    public AccountUpdateTransaction(@Nullable Client client) {
-        super(client);
-    }
 
     public AccountUpdateTransaction() { super(); }
 

@@ -6,7 +6,6 @@ import com.hedera.hashgraph.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.proto.Query;
 import com.hedera.hashgraph.proto.QueryHeader;
 import com.hedera.hashgraph.proto.Response;
-import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.QueryBuilder;
 
 import io.grpc.MethodDescriptor;
@@ -22,14 +21,6 @@ import io.grpc.MethodDescriptor;
 // `CryptoGetAccountRecordsQuery`
 public class AccountRecordsQuery extends QueryBuilder<CryptoGetAccountRecordsResponse, AccountRecordsQuery> {
     private final CryptoGetAccountRecordsQuery.Builder builder = inner.getCryptoGetAccountRecordsBuilder();
-
-    /**
-     * @deprecated {@link Client} should now be provided to {@link #execute(Client)}
-     */
-    @Deprecated
-    public AccountRecordsQuery(Client client) {
-        super(client);
-    }
 
     public AccountRecordsQuery() {
         super(null);

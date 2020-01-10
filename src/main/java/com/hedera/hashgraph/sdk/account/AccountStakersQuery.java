@@ -6,7 +6,6 @@ import com.hedera.hashgraph.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.proto.Query;
 import com.hedera.hashgraph.proto.QueryHeader;
 import com.hedera.hashgraph.proto.Response;
-import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.QueryBuilder;
 
 import io.grpc.MethodDescriptor;
@@ -22,14 +21,6 @@ import io.grpc.MethodDescriptor;
 // `CryptoGetStakersQuery`
 public class AccountStakersQuery extends QueryBuilder<CryptoGetStakersResponse, AccountStakersQuery> {
     private final CryptoGetStakersQuery.Builder builder = inner.getCryptoGetProxyStakersBuilder();
-
-    /**
-     * @deprecated {@link Client} should now be provided to {@link #execute(Client)}
-     */
-    @Deprecated
-    public AccountStakersQuery(Client client) {
-        super(client);
-    }
 
     public AccountStakersQuery() {
         super(null);
