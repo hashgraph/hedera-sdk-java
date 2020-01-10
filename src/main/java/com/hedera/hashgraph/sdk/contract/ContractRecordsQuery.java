@@ -6,7 +6,6 @@ import com.hedera.hashgraph.proto.Query;
 import com.hedera.hashgraph.proto.QueryHeader;
 import com.hedera.hashgraph.proto.Response;
 import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
-import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.QueryBuilder;
 
 import io.grpc.MethodDescriptor;
@@ -22,14 +21,6 @@ import io.grpc.MethodDescriptor;
 // `ContractGetRecordsQuery`
 public class ContractRecordsQuery extends QueryBuilder<ContractGetRecordsResponse, ContractRecordsQuery> {
     private final ContractGetRecordsQuery.Builder builder = inner.getContractGetRecordsBuilder();
-
-    /**
-     * @deprecated {@link Client} should now be provided to {@link #execute(Client)}
-     */
-    @Deprecated
-    public ContractRecordsQuery(Client client) {
-        super(client);
-    }
 
     public ContractRecordsQuery() {
         super(null);

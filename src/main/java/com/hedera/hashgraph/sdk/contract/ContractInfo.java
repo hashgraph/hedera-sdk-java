@@ -37,11 +37,7 @@ public final class ContractInfo {
     @Nullable
     public final String contractMemo;
 
-    /**
-     * @deprecated this constructor is being hidden in 1.0.
-     */
-    @Deprecated
-    public ContractInfo(ContractGetInfoResponse.ContractInfoOrBuilder info) {
+    ContractInfo(ContractGetInfoResponse.ContractInfoOrBuilder info) {
         if (!info.hasContractID()) {
             throw new IllegalArgumentException("info is empty");
         }
@@ -56,42 +52,6 @@ public final class ContractInfo {
 
         String memo = info.getMemo();
         contractMemo = memo.isEmpty() ? null : memo;
-    }
-
-    @Deprecated
-    public ContractId getContractId() {
-        return contractId;
-    }
-
-    @Deprecated
-    public AccountId getAccountId() {
-        return accountId;
-    }
-
-    @Deprecated
-    public String getContractAccountId() {
-        return contractAccountId;
-    }
-
-    @Deprecated
-    @Nullable
-    public PublicKey getAdminKey() {
-        return adminKey;
-    }
-
-    @Deprecated
-    public Instant getExpirationTime() {
-        return expirationTime;
-    }
-
-    @Deprecated
-    public Duration getAutoRenewPeriod() {
-        return autoRenewPeriod;
-    }
-
-    @Deprecated
-    public long getStorage() {
-        return storage;
     }
 
     static ContractInfo fromResponse(Response response) {

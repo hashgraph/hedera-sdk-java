@@ -4,7 +4,6 @@ import com.hedera.hashgraph.proto.ContractUpdateTransactionBody;
 import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
-import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
@@ -15,20 +14,10 @@ import com.hedera.hashgraph.sdk.file.FileId;
 import java.time.Duration;
 import java.time.Instant;
 
-import javax.annotation.Nullable;
-
 import io.grpc.MethodDescriptor;
 
 public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdateTransaction> {
     private final ContractUpdateTransactionBody.Builder builder = bodyBuilder.getContractUpdateInstanceBuilder();
-
-    /**
-     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
-     */
-    @Deprecated
-    public ContractUpdateTransaction(@Nullable Client client) {
-        super(client);
-    }
 
     public ContractUpdateTransaction() {
         super();
@@ -57,14 +46,6 @@ public class ContractUpdateTransaction extends TransactionBuilder<ContractUpdate
 
     public ContractUpdateTransaction setAutoRenewPeriod(Duration duration) {
         builder.setAutoRenewPeriod(DurationHelper.durationFrom(duration));
-        return this;
-    }
-
-    /**
-     * @deprecated renamed to {@link #setBytecodeFileId(FileId)}.
-     */
-    public ContractUpdateTransaction setFileId(FileId file) {
-        builder.setFileID(file.toProto());
         return this;
     }
 
