@@ -1,14 +1,12 @@
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.proto.FreezeServiceGrpc;
 import com.hedera.hashgraph.proto.FreezeTransactionBody;
 import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
-import com.hedera.hashgraph.proto.FreezeServiceGrpc;
 
 import java.time.OffsetTime;
 import java.time.ZoneOffset;
-
-import javax.annotation.Nullable;
 
 import io.grpc.MethodDescriptor;
 
@@ -21,15 +19,6 @@ import io.grpc.MethodDescriptor;
  */
 public class FreezeTransaction extends TransactionBuilder<FreezeTransaction> {
     private FreezeTransactionBody.Builder builder = FreezeTransactionBody.newBuilder();
-
-    /**
-     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
-     */
-    @Deprecated
-    public FreezeTransaction(@Nullable Client client) {
-        super(client);
-        bodyBuilder.setFreeze(builder);
-    }
 
     public FreezeTransaction() {
         super();

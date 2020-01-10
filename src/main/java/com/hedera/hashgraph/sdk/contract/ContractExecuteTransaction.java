@@ -64,14 +64,6 @@ public final class ContractExecuteTransaction extends TransactionBuilder<Contrac
     }
 
     /**
-     * @deprecated renamed to {@link #setPayableAmount(long)}.
-     */
-    public ContractExecuteTransaction setAmount(long amount) {
-        builder.setAmount(amount);
-        return this;
-    }
-
-    /**
      * Set the function parameters (selector plus arguments) as a raw byte array.
      *
      * @param parameters
