@@ -1,7 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.proto.GetBySolidityIDQuery;
-import com.hedera.hashgraph.proto.GetBySolidityIDResponse;
 import com.hedera.hashgraph.proto.Query;
 import com.hedera.hashgraph.proto.QueryHeader;
 import com.hedera.hashgraph.proto.Response;
@@ -11,24 +10,12 @@ import io.grpc.MethodDescriptor;
 
 /**
  * Look up the ID of an entity (account, contract, file) by its Solidity address.
- *
- * @deprecated the result type of {@link GetBySolidityIDResponse} returned from the various
- * {@code execute[Async](...)} methods is changing in 1.0 to a new class, which
- * is a breaking change. This class is not being removed.
  */
-public final class GetBySolidityIdQuery extends QueryBuilder<GetBySolidityIDResponse, GetBySolidityIdQuery> {
+public final class GetBySolidityIdQuery extends QueryBuilder<HederaEntityInfo, GetBySolidityIdQuery> {
     private final GetBySolidityIDQuery.Builder builder = inner.getGetBySolidityIDBuilder();
 
-    /**
-     * @deprecated {@link Client} should now be provided to {@link #execute(Client)}
-     */
-    @Deprecated
-    public GetBySolidityIdQuery(Client client) {
-        super(client);
-    }
-
     public GetBySolidityIdQuery() {
-        super((Client) null);
+        super();
     }
 
     public GetBySolidityIdQuery setSolidityId(String solidityId) {
@@ -47,8 +34,8 @@ public final class GetBySolidityIdQuery extends QueryBuilder<GetBySolidityIDResp
     }
 
     @Override
-    protected GetBySolidityIDResponse extractResponse(Response raw) {
-        return raw.getGetBySolidityID();
+    protected HederaEntityInfo extractResponse(Response raw) {
+        return new HederaEntityInfo(raw.getGetBySolidityID());
     }
 
     @Override
