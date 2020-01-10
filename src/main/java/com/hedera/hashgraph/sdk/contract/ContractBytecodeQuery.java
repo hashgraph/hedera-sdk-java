@@ -1,7 +1,6 @@
 package com.hedera.hashgraph.sdk.contract;
 
 import com.hedera.hashgraph.proto.ContractGetBytecodeQuery;
-import com.hedera.hashgraph.proto.ContractGetBytecodeResponse;
 import com.hedera.hashgraph.proto.Query;
 import com.hedera.hashgraph.proto.QueryHeader;
 import com.hedera.hashgraph.proto.Response;
@@ -12,18 +11,13 @@ import io.grpc.MethodDescriptor;
 
 /**
  * Get the bytecode of a contract.
- *
- * @deprecated the result type of {@link ContractGetBytecodeResponse} returned from the various
- * {@code execute[Async](...)} methods is changing in 1.0 to {@code byte[]}, which
- * is a breaking change. This class is not being removed.
  */
-@Deprecated
 // `ContractGetBytecodeQuery`
-public final class ContractBytecodeQuery extends QueryBuilder<ContractGetBytecodeResponse, ContractBytecodeQuery> {
+public final class ContractBytecodeQuery extends QueryBuilder<byte[], ContractBytecodeQuery> {
     private final ContractGetBytecodeQuery.Builder builder = inner.getContractGetBytecodeBuilder();
 
     public ContractBytecodeQuery() {
-        super(null);
+        super();
     }
 
     @Override
@@ -47,7 +41,7 @@ public final class ContractBytecodeQuery extends QueryBuilder<ContractGetBytecod
     }
 
     @Override
-    protected ContractGetBytecodeResponse extractResponse(Response raw) {
-        return raw.getContractGetBytecodeResponse();
+    protected byte[] extractResponse(Response raw) {
+        return raw.getContractGetBytecodeResponse().getBytecode().toByteArray();
     }
 }
