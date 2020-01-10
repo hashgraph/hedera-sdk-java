@@ -3,7 +3,6 @@ package com.hedera.hashgraph.sdk;
 import com.hedera.hashgraph.proto.TransactionBody;
 import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
 import java.time.Duration;
 import java.util.Objects;
@@ -28,19 +27,6 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
 
     private Duration validDuration = Transaction.MAX_VALID_DURATION;
 
-    @Nullable
-    protected final Client client;
-
-    // a single required constructor for subclasses so we don't forget
-    protected TransactionBuilder(@Nullable Client client) {
-        super();
-        this.client = client;
-    }
-
-    public TransactionBuilder() {
-        this(null);
-    }
-
     /**
      * Sets the ID for this transaction, which includes the payer's account (the account paying the
      * transaction fee). If two transactions have the same transactionID, they won't both have an
@@ -57,17 +43,6 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     public final T setNodeAccountId(AccountId accountId) {
         bodyBuilder.setNodeAccountID(accountId.toProto());
         return self();
-    }
-
-    /**
-     * Sets the fee that the client pays to execute this transaction, which is split between the
-     * network and the node.
-     *
-     * @deprecated renamed to {@link #setMaxTransactionFee(long)} (the semantics are unchanged)
-     */
-    @Deprecated
-    public final T setTransactionFee(long fee) {
-        return setMaxTransactionFee(fee);
     }
 
     /**
@@ -124,12 +99,6 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         return self();
     }
 
-    @Deprecated
-    public final T setGenerateRecord(boolean generateRecord) {
-        bodyBuilder.setGenerateRecord(generateRecord);
-        return self();
-    }
-
     /**
      * Sets any notes or description that should be put into the transaction record (if one is
      * requested). Note that a max of length of 100 is enforced.
@@ -143,47 +112,27 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         return self();
     }
 
-    /**
-     * Sets any notes or description that should be put into the transaction record (if one is
-     * requested). Note that a max of length of 100 is enforced.
-     *
-     * @deprecated renamed to {@link #setTransactionMemo(String)}
-     */
-    @Deprecated
-    public final T setMemo(String memo) {
-        return setTransactionMemo(memo);
-    }
-
     protected abstract void doValidate();
 
     @Override
     public final com.hedera.hashgraph.proto.Transaction toProto() {
-        return build().toProto();
+        return build(null).toProto();
     }
 
     @Internal
     public final com.hedera.hashgraph.proto.Transaction toProto(boolean requireSignature) {
-        return build().toProto(requireSignature);
+        return build(null).toProto(requireSignature);
     }
 
     @Override
     protected final void localValidate() {
         TransactionBody.Builder bodyBuilder = this.bodyBuilder;
 
-        if (client == null) {
-            require(bodyBuilder.hasTransactionID(), ".setTransactionId() required");
-        }
-
-        if (client == null || client.getOperatorId() == null) {
-            require(bodyBuilder.hasNodeAccountID(), ".setNodeAccountId() required");
-        }
+        require(bodyBuilder.hasTransactionID(), ".setTransactionId() required");
+        require(bodyBuilder.hasNodeAccountID(), ".setNodeAccountId() required");
 
         doValidate();
         checkValidationErrors("transaction builder failed local validation");
-    }
-
-    public final Transaction build() {
-        return build(client);
     }
 
     public final Transaction build(@Nullable Client client) {
@@ -208,7 +157,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
 
         inner.setBodyBytes(bodyBuilder.build().toByteString());
 
-        Transaction tx = new Transaction(null, inner, bodyBuilder, getMethod());
+        Transaction tx = new Transaction(inner, bodyBuilder, getMethod());
 
         // Sign with the operator if there is a client; the client has an operator; and, the transaction
         // has a transaction ID that matches that operator ( which it would unless overridden ).
@@ -231,30 +180,6 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         build(client).executeAsync(client, retryTimeout, onSuccess, onError);
     }
 
-    /**
-     * @deprecated use {@code .build(client).sign(privateKey)} instead.
-     */
-    @Deprecated
-    public final Transaction sign(Ed25519PrivateKey privateKey) {
-        return build().sign(privateKey);
-    }
-
-    /**
-     * @deprecated use {@code .build(client).toBytes()} instead.
-     */
-    @Deprecated
-    public final byte[] toBytes() {
-        return build().toBytes();
-    }
-
-    /**
-     * @deprecated use {@code .build(client).toBytes()} instead.
-     */
-    @Deprecated
-    public final byte[] toBytes(boolean requiresSignature) {
-        return build().toBytes(requiresSignature);
-    }
-
     // Work around for java not recognized that this is completely safe
     // as T is required to extend this
     @SuppressWarnings("unchecked")
@@ -265,90 +190,6 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     @Override
     protected Duration getDefaultTimeout() {
         return validDuration;
-    }
-
-    /**
-     * @deprecated Makes it difficult to discern whether an error occurred while executing or
-     * while fetching a receipt. If an error occurs while fetching the receipt then the transaction
-     * ID is difficult to retrieve.
-     * <p>
-     * Call {@link TransactionBuilder#execute(Client)} then
-     * {@link TransactionId#getReceipt(Client)} and handle the errors separately from each.
-     */
-    @Deprecated
-    public final TransactionReceipt executeForReceipt() throws HederaException, HederaNetworkException {
-        return build().executeForReceipt();
-    }
-
-    /**
-     * @deprecated Makes it difficult to discern whether an error occurred while executing or
-     * while fetching a receipt. If an error occurs while fetching the receipt then the transaction
-     * ID is difficult to retrieve.
-     * <p>
-     * Call {@link TransactionBuilder#executeAsync(Client, Consumer, Consumer)} then
-     * {@link TransactionId#getReceiptAsync(Client, Consumer, Consumer)} and handle the errors separately
-     * from each.
-     */
-    @Deprecated
-    public final void executeForReceiptAsync(Consumer<TransactionReceipt> onSuccess, Consumer<HederaThrowable> onError) {
-        build().executeForReceiptAsync(onSuccess, onError);
-    }
-
-    /**
-     * @deprecated Makes it difficult to discern whether an error occurred while executing or
-     * while fetching a receipt. If an error occurs while fetching the receipt then the transaction
-     * ID is difficult to retrieve.
-     */
-    @Deprecated
-    public final void executeForReceiptAsync(BiConsumer<T, TransactionReceipt> onSuccess, BiConsumer<T, HederaThrowable> onError) {
-        //noinspection unchecked
-        build().executeForReceiptAsync(r -> onSuccess.accept((T) this, r), e -> onError.accept((T) this, e));
-    }
-
-    /**
-     * @deprecated Makes it difficult to discern whether an error occurred while executing or
-     * while fetching a record. If an error occurs while fetching the record then the transaction
-     * ID is difficult to retrieve.
-     * <p>
-     * Call {@link TransactionBuilder#execute(Client)} then
-     * {@link TransactionId#getRecord(Client)} and handle the errors separately from each.
-     */
-    @Deprecated
-    public final TransactionRecord executeForRecord() throws HederaException, HederaNetworkException {
-        return build().executeForRecord();
-    }
-
-    /**
-     * @deprecated Makes it difficult to discern whether an error occurred while executing or
-     * while fetching a record. If an error occurs while fetching the record then the transaction
-     * ID is difficult to retrieve.
-     * <p>
-     * Call {@link TransactionBuilder#executeAsync(Client, Consumer, Consumer)} then
-     * {@link TransactionId#getRecordAsync(Client, Consumer, Consumer)} and handle the errors separately
-     * from each.
-     */
-    @Deprecated
-    public final void executeForRecordAsync(Consumer<TransactionRecord> onSuccess, Consumer<HederaThrowable> onError) {
-        build().executeForRecordAsync(onSuccess, onError);
-    }
-
-    /**
-     * @deprecated Makes it difficult to discern whether an error occurred while executing or
-     * while fetching a record. If an error occurs while fetching the record then the transaction
-     * ID is difficult to retrieve.
-     */
-    @Deprecated
-    public final void executeForRecordAsync(BiConsumer<T, TransactionRecord> onSuccess, BiConsumer<T, HederaThrowable> onError) {
-        //noinspection unchecked
-        build().executeForRecordAsync(r -> onSuccess.accept((T) this, r), e -> onError.accept((T) this, e));
-    }
-
-    // FIXME: This is duplicated from Transaction
-
-    @Override
-    protected Channel getChannel() {
-        Objects.requireNonNull(client, "TransactionBuilder.client must not be null in normal usage");
-        return getChannel(client);
     }
 
     @Override

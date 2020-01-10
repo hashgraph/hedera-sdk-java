@@ -47,7 +47,7 @@ public final class ContractBytecodeQuery extends QueryBuilder<ContractGetBytecod
     }
 
     @Override
-    protected ContractGetBytecodeResponse fromResponse(Response raw) {
+    protected ContractGetBytecodeResponse extractResponse(Response raw) {
         return raw.getContractGetBytecodeResponse();
     }
 }

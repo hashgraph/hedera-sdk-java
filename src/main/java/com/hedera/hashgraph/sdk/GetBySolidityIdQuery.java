@@ -47,7 +47,7 @@ public final class GetBySolidityIdQuery extends QueryBuilder<GetBySolidityIDResp
     }
 
     @Override
-    protected GetBySolidityIDResponse fromResponse(Response raw) {
+    protected GetBySolidityIDResponse extractResponse(Response raw) {
         return raw.getGetBySolidityID();
     }
 

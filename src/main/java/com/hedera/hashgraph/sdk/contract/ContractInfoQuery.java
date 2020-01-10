@@ -39,7 +39,7 @@ public final class ContractInfoQuery extends QueryBuilder<ContractInfo, Contract
     }
 
     @Override
-    protected ContractInfo fromResponse(Response raw) {
+    protected ContractInfo extractResponse(Response raw) {
         return ContractInfo.fromResponse(raw);
     }
 

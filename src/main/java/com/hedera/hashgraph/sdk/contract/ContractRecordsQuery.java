@@ -42,7 +42,7 @@ public class ContractRecordsQuery extends QueryBuilder<ContractGetRecordsRespons
     }
 
     @Override
-    protected ContractGetRecordsResponse fromResponse(Response raw) {
+    protected ContractGetRecordsResponse extractResponse(Response raw) {
         return raw.getContractGetRecordsResponse();
     }
 

@@ -39,7 +39,7 @@ public class FileInfoQuery extends QueryBuilder<FileInfo, FileInfoQuery> {
     }
 
     @Override
-    protected FileInfo fromResponse(Response raw) {
+    protected FileInfo extractResponse(Response raw) {
         return FileInfo.fromResponse(raw);
     }
 

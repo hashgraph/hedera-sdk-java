@@ -40,7 +40,7 @@ public final class TransactionRecord {
      * the transaction, or by a smart contract it calls, or by the creation of threshold
      * records that it triggers.
      */
-    public final List<com.hedera.hashgraph.sdk.Transfer> transfers;
+    public final List<Transfer> transfers;
 
     private final com.hedera.hashgraph.proto.TransactionRecord inner;
 
@@ -65,38 +65,6 @@ public final class TransactionRecord {
             : Collections.emptyList();
     }
 
-    @Deprecated
-    public TransactionId getTransactionId() {
-        return transactionId;
-    }
-
-    @Deprecated
-    public long getTransactionFee() {
-        return transactionFee;
-    }
-
-    @Deprecated
-    public TransactionReceipt getReceipt() {
-        return receipt;
-    }
-
-    @Deprecated
-    public byte[] getTransactionHash() {
-        return transactionHash;
-    }
-
-    @Deprecated
-    @Nullable
-    public Instant getConsensusTimestamp() {
-        return consensusTimestamp;
-    }
-
-    @Deprecated
-    @Nullable
-    public String getMemo() {
-        return transactionMemo;
-    }
-
     /**
      * Record of the value returned by the smart contract function (if it completed and didn't fail)
      * from {@link com.hedera.hashgraph.sdk.contract.ContractExecuteTransaction}.
@@ -119,64 +87,5 @@ public final class TransactionRecord {
         }
 
         return new ContractFunctionResult(inner.getContractCreateResultOrBuilder());
-    }
-
-    /**
-     * @deprecated use {@link #getContractExecuteResult()} instead.
-     */
-    @Deprecated
-    @Nullable
-    public FunctionResult getCallResult() {
-        if (!inner.hasContractCallResult()) {
-            return null;
-        }
-
-        return new FunctionResult(inner.getContractCallResultOrBuilder());
-    }
-
-    /**
-     * @deprecated use {@link #getContractCreateResult()} instead.
-     */
-    @Deprecated
-    @Nullable
-    public FunctionResult getCreateResult() {
-        if (!inner.hasContractCreateResult()) {
-            return null;
-        }
-
-        return new FunctionResult(inner.getContractCreateResultOrBuilder());
-    }
-
-    /**
-     * All Hbar transfers as a result of this transaction, such as fees, or transfers performed by the
-     * transaction, or by a smart contract it calls, or by the creation of threshold
-     * records that it triggers.
-     *
-     * @deprecated available as field {@link #transfers}; note the {@code Transfer} class is
-     * different.
-     */
-    @Deprecated
-    public List<TransactionRecord.Transfer> getTransfers() {
-        return inner.hasTransferList()
-            ? inner.getTransferList()
-            .getAccountAmountsList()
-            .stream()
-            .map(Transfer::new)
-            .collect(Collectors.toList())
-            : Collections.emptyList();
-    }
-
-    /**
-     * @deprecated this class is being hoisted to a top level class in 1.0.
-     */
-    @Deprecated
-    public final static class Transfer {
-        public final AccountId account;
-        public final long amount;
-
-        private Transfer(AccountAmountOrBuilder accountAmount) {
-            account = new AccountId(accountAmount.getAccountIDOrBuilder());
-            amount = accountAmount.getAmount();
-        }
     }
 }

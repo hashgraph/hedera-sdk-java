@@ -42,7 +42,7 @@ public class FileContentsQuery extends QueryBuilder<FileGetContentsResponse, Fil
     }
 
     @Override
-    protected FileGetContentsResponse fromResponse(Response raw) {
+    protected FileGetContentsResponse extractResponse(Response raw) {
         return raw.getFileGetContents();
     }
 

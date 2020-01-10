@@ -15,14 +15,6 @@ public final class SystemUndeleteTransaction extends TransactionBuilder<SystemUn
 
     private final SystemUndeleteTransactionBody.Builder builder = bodyBuilder.getSystemUndeleteBuilder();
 
-    /**
-     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
-     */
-    @Deprecated
-    public SystemUndeleteTransaction(@Nullable Client client) {
-        super(client);
-    }
-
     public SystemUndeleteTransaction() { super(); }
 
     public SystemUndeleteTransaction setID(FileId fileId) {

@@ -7,7 +7,6 @@ import com.hedera.hashgraph.proto.QueryHeader;
 import com.hedera.hashgraph.proto.Response;
 import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.FunctionResult;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hashgraph.sdk.HederaThrowable;
@@ -19,18 +18,13 @@ import io.grpc.MethodDescriptor;
 
 /**
  * Call a function without updating its state or requiring concensus.
- *
- * @deprecated the result type of {@link FunctionResult} returned from the various
- * {@code execute[Async](...)} methods is changing in 1.0 to {@link ContractFunctionResult}, which
- * is a breaking change. This class is not being removed.
  */
-@Deprecated
 // `ContractCallLocalQuery`
-public class ContractCallQuery extends QueryBuilder<FunctionResult, ContractCallQuery> {
+public class ContractCallQuery extends QueryBuilder<ContractFunctionResult, ContractCallQuery> {
     private final ContractCallLocalQuery.Builder builder = inner.getContractCallLocalBuilder();
 
     public ContractCallQuery() {
-        super(null);
+        super();
     }
 
     @Override
@@ -41,17 +35,6 @@ public class ContractCallQuery extends QueryBuilder<FunctionResult, ContractCall
     @Override
     protected MethodDescriptor<Query, Response> getMethod() {
         return SmartContractServiceGrpc.getContractCallLocalMethodMethod();
-    }
-
-    @Override
-    protected FunctionResult fromResponse(Response raw) {
-        if (!raw.hasContractCallLocal()) {
-            throw new IllegalArgumentException("response was not `ContractCallLocal`");
-        }
-
-        return new FunctionResult(
-                raw.getContractCallLocal()
-                    .getFunctionResultOrBuilder());
     }
 
     public ContractCallQuery setContractId(ContractId id) {
@@ -118,5 +101,14 @@ public class ContractCallQuery extends QueryBuilder<FunctionResult, ContractCall
     @Override
     protected void doValidate() {
         require(builder.hasContractID(), ".setContractId() required");
+    }
+
+    @Override
+    protected ContractFunctionResult extractResponse(Response raw) {
+        if (raw.hasContractCallLocal()) {
+            return new ContractFunctionResult(raw.getContractCallLocal().getFunctionResultOrBuilder());
+        } else {
+            throw new IllegalStateException("response case not ContractCallLocal: " + raw.getResponseCase());
+        }
     }
 }

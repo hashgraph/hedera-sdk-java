@@ -30,9 +30,6 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
     @Internal
     public abstract Req toProto();
 
-    @Deprecated
-    protected abstract Channel getChannel();
-
     protected abstract Channel getChannel(Client client);
 
     protected abstract Resp mapResponse(RawResp raw) throws HederaException;
@@ -65,31 +62,6 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
             .tryWhile(this::shouldRetry, tryProduce);
     }
 
-    /**
-     * @deprecated use {@link #execute(Client)} instead.
-     */
-    @Deprecated
-    public Resp execute() throws HederaException, HederaNetworkException {
-        return execute(getDefaultTimeout());
-    }
-
-    /**
-     * @deprecated use {@link #execute(Client, Duration)} instead.
-     */
-    @Deprecated
-    public Resp execute(Duration retryTimeout) throws HederaException, HederaNetworkException {
-        if (isExecuted) {
-            throw new IllegalStateException("call already executed");
-        }
-        isExecuted = true;
-
-        final Backoff.FallibleProducer<Resp, HederaException> tryProduce = () ->
-            mapResponse(ClientCalls.blockingUnaryCall(getChannel().newCall(getMethod(), CallOptions.DEFAULT), toProto()));
-
-        return new Backoff(RETRY_DELAY, retryTimeout)
-            .tryWhile(this::shouldRetry, tryProduce);
-    }
-
     public final void executeAsync(Client client, Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError) {
         executeAsync(client, getDefaultTimeout(), onSuccess, onError);
     }
@@ -107,56 +79,6 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
             .asyncTryWhile(this::shouldRetry, executeCall, onError);
     }
 
-    /**
-     * @deprecated use {@link #executeAsync(Client, Consumer, Consumer)} instead.
-     */
-    @Deprecated
-    public final void executeAsync(Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError) {
-        executeAsync(getDefaultTimeout(), onSuccess, onError);
-    }
-
-    /**
-     * @deprecated use {@link #executeAsync(Client, Duration, Consumer, Consumer)} instead.
-     */
-    @Deprecated
-    public void executeAsync(Duration retryTimeout, Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError) {
-        if (isExecuted) {
-            throw new IllegalStateException("call already executed");
-        }
-        isExecuted = true;
-
-        final Consumer<Consumer<HederaThrowable>> executeCall = (onError2) -> ClientCalls.asyncUnaryCall(getChannel().newCall(getMethod(), CallOptions.DEFAULT), toProto(),
-            new CallStreamObserver(onSuccess, onError2));
-
-        new Backoff(RETRY_DELAY, retryTimeout)
-            .asyncTryWhile(this::shouldRetry, executeCall, onError);
-    }
-
-    /**
-     * Equivalent to {@link #executeAsync(Consumer, Consumer)} but providing {@code this}
-     * to the callback for additional context.
-     *
-     *
-     */
-    @Deprecated
-    public final void executeAsync(BiConsumer<T, Resp> onSuccess, BiConsumer<T, HederaThrowable> onError) {
-        executeAsync(getDefaultTimeout(), onSuccess, onError);
-    }
-
-    /**
-     * Equivalent to {@link #executeAsync(Duration, Consumer, Consumer)} but providing {@code this}
-     * to the callback for additional context.
-     */
-    public final void executeAsync(Duration timeout, BiConsumer<T, Resp> onSuccess, BiConsumer<T, HederaThrowable> onError) {
-        //noinspection unchecked
-        executeAsync(timeout, resp -> onSuccess.accept((T) this, resp), err -> onError.accept((T) this, err));
-    }
-
-    /**
-     * @deprecated this method is being removed because it has limited utility for users;
-     * most implementations cannot guarantee that passing validation means the transaction
-     * or query will always succeed, so the method name is misleading at best.
-     */
     @VisibleForTesting
     public final void validate() {
         localValidate();
@@ -182,7 +104,7 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
         }
     }
 
-    protected void require(@Nullable List setValue, String errMsg) {
+    protected void require(@Nullable List<?> setValue, String errMsg) {
         require(setValue != null && !setValue.isEmpty(), errMsg);
     }
 
