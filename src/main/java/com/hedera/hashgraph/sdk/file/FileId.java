@@ -54,21 +54,6 @@ public final class FileId implements Entity {
         return SolidityUtil.parseAddress(address, FileId::new);
     }
 
-    @Deprecated
-    public long getShardNum() {
-        return shard;
-    }
-
-    @Deprecated
-    public long getRealmNum() {
-        return realm;
-    }
-
-    @Deprecated
-    public long getFileNum() {
-        return file;
-    }
-
     @Override
     public int hashCode() {
         return Objects.hash(shard, realm, file);

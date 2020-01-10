@@ -19,16 +19,8 @@ import io.grpc.MethodDescriptor;
 public class FileInfoQuery extends QueryBuilder<FileInfo, FileInfoQuery> {
     private final FileGetInfoQuery.Builder builder = inner.getFileGetInfoBuilder();
 
-    /**
-     * @deprecated {@link Client} should now be provided to {@link #execute(Client)}
-     */
-    @Deprecated
-    public FileInfoQuery(Client client) {
-        super(client);
-    }
-
     public FileInfoQuery() {
-        super(null);
+        super();
     }
 
     @Override
