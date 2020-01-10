@@ -135,10 +135,23 @@ enum ResponseCodeEnum {
   FEE_SCHEDULE_FILE_PART_UPLOADED = 104; // Fee Schedule Proto File Part uploaded
   EXCHANGE_RATE_CHANGE_LIMIT_EXCEEDED = 105; // The change on Exchange Rate exceeds Exchange_Rate_Allowed_Percentage
   MAX_CONTRACT_STORAGE_EXCEEDED = 106;  // Contract permanent storage exceeded the currently allowable limit
-  TRANSAFER_ACCOUNT_SAME_AS_DELETE_ACCOUNT = 107; // Transfer Account should not be same as Account to be deleted
+  TRANSFER_ACCOUNT_SAME_AS_DELETE_ACCOUNT = 107; // Transfer Account should not be same as Account to be deleted
   TOTAL_LEDGER_BALANCE_INVALID = 108;
   EXPIRATION_REDUCTION_NOT_ALLOWED = 110; // The expiration date/time on a smart contract may not be reduced
-
   MAX_GAS_LIMIT_EXCEEDED = 111; //Gas exceeded currently allowable gas limit per transaction
   MAX_FILE_SIZE_EXCEEDED = 112;  // File size exceeded the currently allowable limit
+  INVALID_TOPIC_ID = 150; // The Topic ID specified is not in the system.
+  INVALID_ADMIN_KEY = 155;
+  INVALID_SUBMIT_KEY = 156;
+  UNAUTHORIZED = 157; // An attempted operation was not authorized (ie - a deleteTopic for a topic with no adminKey).
+  INVALID_TOPIC_MESSAGE = 158; // A ConsensusService message is empty.
+  INVALID_AUTORENEW_ACCOUNT = 159; // The autoRenewAccount specified is not a valid, active account.
+
+  // An adminKey was not specified on the topic, so there must not be an autoRenewAccount.
+  AUTORENEW_ACCOUNT_NOT_ALLOWED = 160;
+
+  // The topic has expired, was not automatically renewed, and is in a 7 day grace period before the topic will be
+  // deleted unrecoverably. This error response code will not be returned until autoRenew functionality is supported
+  // by HAPI.
+  TOPIC_EXPIRED = 162;
 }
