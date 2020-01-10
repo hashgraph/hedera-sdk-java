@@ -46,7 +46,7 @@ public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalance
     }
 
     @Override
-    protected Long fromResponse(Response raw) {
+    protected Long extractResponse(Response raw) {
         return raw.getCryptogetAccountBalance().getBalance();
     }
 }

@@ -26,37 +26,18 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     protected final Query.Builder inner = Query.newBuilder();
 
     @Nullable
-    protected final Client client;
-
-    @Nullable
     private AccountId nodeId;
 
     private long paymentAmount;
     private long maxPayment = 0;
 
-    protected QueryBuilder(@Nullable Client client) {
-        this.client = client;
-    }
-
-    protected QueryBuilder() {
-        this.client = null;
-    }
+    protected QueryBuilder() { }
 
     protected abstract QueryHeader.Builder getHeaderBuilder();
 
     @Override
-    protected Channel getChannel() {
-        return getNode(requireClient()).getChannel();
-    }
-
-    @Override
     protected Channel getChannel(Client client) {
         return getNode(client).getChannel();
-    }
-
-    protected Client requireClient() {
-        return Objects.requireNonNull(client,
-            "QueryBuilder.client must be non-null in regular use");
     }
 
     private Node getNode(Client client) {
@@ -101,24 +82,6 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         return inner.build();
     }
 
-    /**
-     * Explicitly specify that the operator account is paying for the query and set payment
-     * with the given amount.
-     * <p>
-     * Only takes effect if payment is required, has not been set yet, and an operator ID
-     * was provided to the {@link Client} used to construct this instance.
-     *
-     * @return {@code this} for fluent usage.
-     * @deprecated use {@link #setPaymentAmount(long)} instead.
-     */
-    @Deprecated
-    public T setPaymentDefault(long paymentAmount) {
-        setPaymentAmount(paymentAmount);
-        if (client != null) generatePayment(client);
-        //noinspection unchecked
-        return (T) this;
-    }
-
     public T setMaxQueryPayment(Hbar maxPayment) {
         this.maxPayment = maxPayment.asTinybar();
 
@@ -159,34 +122,6 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     }
 
     /**
-     * Explicitly specify that the operator account is paying for the query; when the query is
-     * executed a payment transaction will be constructed with a transfer of this amount
-     * from the operator account to the node which will handle the query.
-     *
-     * @return {@code this} for fluent usage.
-     *
-     * @deprecated renamed to {@link #setQueryPayment()} for consistency with {@link #setMaxQueryPayment()}.
-     */
-    @Deprecated
-    public T setPaymentAmount(Hbar paymentAmount) {
-        return setQueryPayment(paymentAmount);
-    }
-
-    /**
-     * Explicitly specify that the operator account is paying for the query with an amount in
-     * tinybar; when the query is executed a payment transaction will be constructed with a transfer
-     * of this amount from the operator account to the node which will handle the query.
-     *
-     * @return {@code this} for fluent usage.
-     *
-     * @deprecated renamed to {@link #setQueryPayment()} for consistency with {@link #setMaxQueryPayment()}.
-     */
-    @Deprecated
-    public T setPaymentAmount(long paymentAmount) {
-        return setQueryPayment(paymentAmount);
-    }
-
-    /**
      * Explicitly set a payment for this query.
      *
      * The payment must only be a single payer and a single payee.
@@ -200,22 +135,6 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         return (T) this;
     }
 
-    /**
-     * Explicitly set a payment for this query.
-     *
-     * The payment must only be a single payer and a single payee.
-     *
-     * @param transaction
-     * @return {@code this} for fluent usage.
-     *
-     * @deprecated renamed to {@link #setPaymentTransaction()} to make it clear that we are setting the actual
-     *             transaction here.
-     */
-    @Deprecated
-    public T setPayment(Transaction transaction) {
-        return setPaymentTransaction(transaction);
-    }
-
     public long getCost(Client client) throws HederaException, HederaNetworkException {
         // set which node we're going to be working with
         return new CostQuery(client).execute(client);
@@ -223,22 +142,6 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     public void getCostAsync(Client client, Consumer<Long> withCost, Consumer<HederaThrowable> onError) {
         new CostQuery(client).executeAsync(client, withCost, onError);
-    }
-
-    /**
-     * @deprecated renamed to {@link #getCost(Client)}
-     */
-    public final long queryCost() throws HederaException, HederaNetworkException {
-        getNode(requireClient());
-        return new CostQuery(requireClient()).execute();
-    }
-
-    /**
-     * @deprecated renamed to {@link #getCostAsync(Client, Consumer, Consumer)}
-     */
-    public final void queryCostAsync(Consumer<Long> withCost, Consumer<HederaThrowable> onError) {
-        getNode(requireClient());
-        new CostQuery(requireClient()).executeAsync(withCost, onError);
     }
 
     private void generatePayment(Client client) {
@@ -254,7 +157,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
                 .addRecipient(nodeId, paymentAmount)
                 .build(client);
 
-            setPayment(txPayment);
+            setPaymentTransaction(txPayment);
         }
     }
 
@@ -295,18 +198,6 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         } else {
             super.executeAsync(client, timeout, onSuccess, onError);
         }
-    }
-
-    @Deprecated
-    @Override
-    public Resp execute(Duration timeout) throws HederaException, HederaNetworkException {
-        return execute(requireClient(), timeout);
-    }
-
-    @Deprecated
-    @Override
-    public void executeAsync(Duration timeout, Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError) {
-        executeAsync(requireClient(), timeout, onSuccess, onError);
     }
 
     protected abstract void doValidate();
@@ -381,10 +272,10 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
             default:
         }
 
-        return fromResponse(raw);
+        return extractResponse(raw);
     }
 
-    protected abstract Resp fromResponse(Response raw);
+    protected abstract Resp extractResponse(Response raw);
 
     private final class CostQuery extends HederaCall<Query, Response, Long, CostQuery> {
         private final Client client;
@@ -434,11 +325,6 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         }
 
         @Override
-        protected Channel getChannel() {
-            return QueryBuilder.this.getChannel();
-        }
-
-        @Override
         protected Channel getChannel(Client client) {
             return QueryBuilder.this.getChannel(client);
         }
@@ -462,7 +348,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     }
 
     public static final class MaxPaymentExceededException extends RuntimeException implements HederaThrowable {
-        private MaxPaymentExceededException(QueryBuilder builder, long cost, long maxQueryPayment) {
+        private MaxPaymentExceededException(QueryBuilder<?, ?> builder, long cost, long maxQueryPayment) {
             super(String.format(
                 "cost of %s (%d) without explicit payment is greater than "
                     + "Client.maxQueryPayment (%d)",

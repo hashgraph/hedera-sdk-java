@@ -16,14 +16,6 @@ import io.grpc.MethodDescriptor;
 public final class SystemDeleteTransaction extends TransactionBuilder<SystemDeleteTransaction> {
     private final SystemDeleteTransactionBody.Builder builder = bodyBuilder.getSystemDeleteBuilder();
 
-    /**
-     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
-     */
-    @Deprecated
-    public SystemDeleteTransaction(@Nullable Client client) {
-        super(client);
-    }
-
     public SystemDeleteTransaction() { super(); }
 
     public SystemDeleteTransaction setID(FileId fileId) {

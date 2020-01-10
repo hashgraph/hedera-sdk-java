@@ -26,20 +26,16 @@ public final class TransactionId {
     @Nullable
     private static Instant lastInstant;
 
-    // `synchronized` is necessary for correctness with multiple threads
-    private static synchronized Instant getIncreasingInstant() {
-        // Allows the transaction to be accepted as long as the
-        // server is not more than 10 seconds behind us
-        final Instant instant = Clock.systemUTC()
-            .instant()
-            .minusSeconds(10);
+    private TransactionId(AccountId accountId, Instant transactionValidStart) {
+        inner = TransactionID.newBuilder()
+            .setAccountID(accountId.toProto())
+            .setTransactionValidStart(
+                Timestamp.newBuilder()
+                    .setSeconds(transactionValidStart.getEpochSecond())
+                    .setNanos(transactionValidStart.getNano()));
 
-        // ensures every instant is at least always greater than the last
-        lastInstant = lastInstant != null && instant.compareTo(lastInstant) <= 0
-            ? lastInstant.plusNanos(1)
-            : instant;
-
-        return lastInstant;
+        this.accountId = accountId;
+        this.validStart = transactionValidStart;
     }
 
     /**
@@ -51,33 +47,6 @@ public final class TransactionId {
      */
     public TransactionId(AccountId accountId) {
         this(accountId, getIncreasingInstant());
-    }
-
-    /**
-     * Generate a transaction ID with a given account ID and valid start time.
-     *
-     * <i>Nota bene</i>: executing transactions with the same ID (account ID & account start time)
-     * will throw {@link HederaException} with code {@code DUPLICATE_TRANSACTION}.
-     * <p>
-     * Use the other constructor to get an ID with a known-valid {@code transactionValidStart}.
-     *
-     * @param accountId
-     * @param transactionValidStart the time by which the transaction takes effect; must be in the
-     *                              past by the time it is submitted to the network.
-     *
-     * @deprecated use {@link #withValidStart} instead.
-     */
-    @Deprecated
-    public TransactionId(AccountId accountId, Instant transactionValidStart) {
-        inner = TransactionID.newBuilder()
-            .setAccountID(accountId.toProto())
-            .setTransactionValidStart(
-                Timestamp.newBuilder()
-                    .setSeconds(transactionValidStart.getEpochSecond())
-                    .setNanos(transactionValidStart.getNano()));
-
-        this.accountId = accountId;
-        this.validStart = transactionValidStart;
     }
 
     /**
@@ -104,22 +73,6 @@ public final class TransactionId {
 
         accountId = new AccountId(transactionId.getAccountIDOrBuilder());
         validStart = TimestampHelper.timestampTo(transactionId.getTransactionValidStart());
-    }
-
-    /**
-     * @deprecated use {@link #accountId} instead.
-     */
-    @Deprecated
-    public AccountId getAccountId() {
-        return accountId;
-    }
-
-    /**
-     * @deprecated use {@link #validStart} instead.
-     */
-    @Deprecated
-    public Instant getValidStart() {
-        return validStart;
     }
 
     @Internal
@@ -196,5 +149,21 @@ public final class TransactionId {
                 .setTransactionId(this)
                 .executeAsync(client, timeout, onRecord, onError);
         }, onError);
+    }
+
+    // `synchronized` is necessary for correctness with multiple threads
+    private static synchronized Instant getIncreasingInstant() {
+        // Allows the transaction to be accepted as long as the
+        // server is not more than 10 seconds behind us
+        final Instant instant = Clock.systemUTC()
+            .instant()
+            .minusSeconds(10);
+
+        // ensures every instant is at least always greater than the last
+        lastInstant = lastInstant != null && instant.compareTo(lastInstant) <= 0
+            ? lastInstant.plusNanos(1)
+            : instant;
+
+        return lastInstant;
     }
 }

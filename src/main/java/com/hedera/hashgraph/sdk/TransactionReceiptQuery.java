@@ -13,16 +13,8 @@ import io.grpc.MethodDescriptor;
 public final class TransactionReceiptQuery extends QueryBuilder<TransactionReceipt, TransactionReceiptQuery> {
     private final TransactionGetReceiptQuery.Builder builder = inner.getTransactionGetReceiptBuilder();
 
-    /**
-     * @deprecated {@link Client} should now be provided to {@link #execute(Client)}
-     */
-    @Deprecated
-    public TransactionReceiptQuery(Client client) {
-        super(client);
-    }
-
     public TransactionReceiptQuery() {
-        super(null);
+        super();
     }
 
     @Override
@@ -61,7 +53,7 @@ public final class TransactionReceiptQuery extends QueryBuilder<TransactionRecei
     }
 
     @Override
-    protected TransactionReceipt fromResponse(Response raw) {
+    protected TransactionReceipt extractResponse(Response raw) {
         return new TransactionReceipt(raw);
     }
 

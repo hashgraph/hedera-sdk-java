@@ -47,7 +47,7 @@ public class AccountRecordsQuery extends QueryBuilder<CryptoGetAccountRecordsRes
     }
 
     @Override
-    protected CryptoGetAccountRecordsResponse fromResponse(Response raw) {
+    protected CryptoGetAccountRecordsResponse extractResponse(Response raw) {
         return raw.getCryptoGetAccountRecords();
     }
 }

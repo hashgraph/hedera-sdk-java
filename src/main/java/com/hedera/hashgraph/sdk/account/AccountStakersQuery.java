@@ -47,7 +47,7 @@ public class AccountStakersQuery extends QueryBuilder<CryptoGetStakersResponse, 
     }
 
     @Override
-    protected CryptoGetStakersResponse fromResponse(Response raw) {
+    protected CryptoGetStakersResponse extractResponse(Response raw) {
         return raw.getCryptoGetProxyStakers();
     }
 }
