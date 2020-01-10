@@ -5,12 +5,13 @@ import com.hedera.hashgraph.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.proto.Query;
 import com.hedera.hashgraph.proto.QueryHeader;
 import com.hedera.hashgraph.proto.Response;
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.QueryBuilder;
 
 import io.grpc.MethodDescriptor;
 
 // `CryptoGetAccountBalanceQuery`
-public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalanceQuery> {
+public final class AccountBalanceQuery extends QueryBuilder<Hbar, AccountBalanceQuery> {
     private final CryptoGetAccountBalanceQuery.Builder builder = inner.getCryptogetAccountBalanceBuilder();
 
     public AccountBalanceQuery() {
@@ -46,7 +47,7 @@ public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalance
     }
 
     @Override
-    protected Long extractResponse(Response raw) {
-        return raw.getCryptogetAccountBalance().getBalance();
+    protected Hbar extractResponse(Response raw) {
+        return Hbar.fromTinybar(raw.getCryptogetAccountBalance().getBalance());
     }
 }

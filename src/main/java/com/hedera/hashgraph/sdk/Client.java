@@ -358,13 +358,13 @@ public final class Client implements AutoCloseable {
             .executeAsync(this, onSuccess, onError);
     }
 
-    public long getAccountBalance(AccountId id) throws HederaException, HederaNetworkException {
+    public Hbar getAccountBalance(AccountId id) throws HederaException, HederaNetworkException {
         return new AccountBalanceQuery()
             .setAccountId(id)
             .execute(this);
     }
 
-    public void getAccountBalanceAsync(AccountId id, Consumer<Long> onSuccess, Consumer<HederaThrowable> onError) {
+    public void getAccountBalanceAsync(AccountId id, Consumer<Hbar> onSuccess, Consumer<HederaThrowable> onError) {
         new AccountBalanceQuery()
             .setAccountId(id)
             .executeAsync(this, onSuccess, onError);
