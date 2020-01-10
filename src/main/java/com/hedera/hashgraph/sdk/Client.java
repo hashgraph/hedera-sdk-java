@@ -2,12 +2,9 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.gson.Gson;
 import com.hedera.hashgraph.sdk.account.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.account.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.AccountInfo;
 import com.hedera.hashgraph.sdk.account.AccountInfoQuery;
-import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
-import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
 import java.io.File;
@@ -18,7 +15,6 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -67,16 +63,6 @@ public final class Client implements AutoCloseable {
 
     @Nullable
     private Ed25519PrivateKey operatorKey;
-
-    /**
-     * @deprecated use {@link #forMainnet()} or {@link #forTestnet()} as the most convenient
-     * ways to get a Client.
-     */
-    @Deprecated
-    public Client(AccountId nodeAccountId, String nodeUrl) {
-        nodes = new HashMap<>();
-        putNode(nodeAccountId, nodeUrl);
-    }
 
     public Client(Map<AccountId, String> nodes) {
         if (nodes.isEmpty()) {
@@ -187,33 +173,6 @@ public final class Client implements AutoCloseable {
      */
     public static Client fromFile(File file) throws FileNotFoundException {
         return fromJson(new FileReader(file));
-    }
-
-    /**
-     * Insert or update a node in the client.
-     * <p>
-     * If a replaced node is already being used by some transaction or query, this call will cause
-     * that transaction/query to return an error on execute.
-     *
-     * @param nodeAccountId
-     * @param nodeUrl
-     * @return
-     * @deprecated superceded by {@link #forMainnet()} or {@link #forTestnet()} which construct
-     * a Client with all the nodes for their respective networks, and {@link #replaceNodes(Map)} for
-     * replacing existing nodes in the client.
-     */
-    @Deprecated
-    public Client putNode(AccountId nodeAccountId, String nodeUrl) {
-        final Node replaced = nodes.put(nodeAccountId, new Node(nodeAccountId, nodeUrl));
-
-        if (replaced != null) {
-            // only `.shutdown()` is necessary to silence the error, we just don't want to
-            // exit prematurely if the whole client is going to be garbage collected
-            // which is why we await termination in close() below
-            replaced.closeChannel();
-        }
-
-        return this;
     }
 
     /**
@@ -384,86 +343,28 @@ public final class Client implements AutoCloseable {
     // Simplified interface intended for high-level, opinionated operation
     //
 
-    /**
-     * @deprecated hides useful configuration parameters for accounts and makes it difficult to
-     * handle errors properly; if an error occurs while fetching the receipt for the
-     * {@link AccountCreateTransaction} then the transaction ID is lost.
-     * <p>
-     * You should build and execute your own {@link AccountCreateTransaction} instead.
-     */
-    @Deprecated
-    public AccountId createAccount(PublicKey publicKey, long initialBalance) throws HederaException, HederaNetworkException {
-        TransactionReceipt receipt = new AccountCreateTransaction(this).setKey(publicKey)
-            .setInitialBalance(initialBalance)
-            .executeForReceipt();
-
-        return receipt.getAccountId();
-    }
-
-    /**
-     * @deprecated hides useful configuration parameters for accounts and makes it difficult to
-     * handle errors properly; if an error occurs while fetching the receipt for the
-     * {@link AccountCreateTransaction} then the transaction ID is lost.
-     * <p>
-     * You should build and execute your own {@link AccountCreateTransaction} instead.
-     */
-    @Deprecated
-    public void createAccountAsync(PublicKey publicKey, long initialBalance, Consumer<AccountId> onSuccess, Consumer<HederaThrowable> onError) {
-        new AccountCreateTransaction(this).setKey(publicKey)
-            .setInitialBalance(initialBalance)
-            .executeForReceiptAsync(receipt -> onSuccess.accept(receipt.getAccountId()), onError);
-    }
-
     public AccountInfo getAccount(AccountId id) throws HederaException, HederaNetworkException {
-        return new AccountInfoQuery(this)
+        return new AccountInfoQuery()
             .setAccountId(id)
-            .execute();
+            .execute(this);
     }
 
     public void getAccountAsync(AccountId id, Consumer<AccountInfo> onSuccess, Consumer<HederaThrowable> onError) {
-        new AccountInfoQuery(this)
+        new AccountInfoQuery()
             .setAccountId(id)
-            .executeAsync(onSuccess, onError);
+            .executeAsync(this, onSuccess, onError);
     }
 
     public long getAccountBalance(AccountId id) throws HederaException, HederaNetworkException {
-        return new AccountBalanceQuery(this)
+        return new AccountBalanceQuery()
             .setAccountId(id)
-            .execute();
+            .execute(this);
     }
 
     public void getAccountBalanceAsync(AccountId id, Consumer<Long> onSuccess, Consumer<HederaThrowable> onError) {
-        new AccountBalanceQuery(this)
+        new AccountBalanceQuery()
             .setAccountId(id)
-            .executeAsync(onSuccess, onError);
-    }
-
-    /**
-     * @deprecated difficult to overload for multi-party transfers; additionally,
-     * if an error occurs while fetching the receipt for the {@link CryptoTransferTransaction} then
-     * the transaction ID is lost.
-     * <p>
-     * You should build and execute your own {@link CryptoTransferTransaction} instead.
-     */
-    @Deprecated
-    public TransactionId transferCryptoTo(AccountId recipient, long amount) throws HederaException, HederaNetworkException {
-        return new CryptoTransferTransaction(this).addSender(Objects.requireNonNull(operatorId), amount)
-            .addRecipient(recipient, amount)
-            .execute();
-    }
-
-    /**
-     * @deprecated difficult to overload for multi-party transfers; additionally,
-     * if an error occurs while fetching the receipt for the {@link CryptoTransferTransaction} then
-     * the transaction ID is lost.
-     * <p>
-     * You should build and execute your own {@link CryptoTransferTransaction} instead.
-     */
-    @Deprecated
-    public void transferCryptoToAsync(AccountId recipient, long amount, Consumer<TransactionId> onSuccess, Consumer<HederaThrowable> onError) {
-        new CryptoTransferTransaction(this).addSender(Objects.requireNonNull(operatorId), amount)
-            .addRecipient(recipient, amount)
-            .executeAsync(onSuccess, onError);
+            .executeAsync(this, onSuccess, onError);
     }
 
     /**
@@ -513,24 +414,6 @@ public final class Client implements AutoCloseable {
             // this also calls `.shutdown()` which should be safe to call multiple times
             node.awaitChannelTermination(nextTimeoutMs, TimeUnit.MILLISECONDS);
         }
-    }
-
-    /**
-     * Wait for all channels to finish their calls to their respective nodes.
-     * <p>
-     * Any new transactions or queries executed with this client after this call will return an
-     * error.
-     *
-     * @deprecated renamed to {@link #close(long, TimeUnit)}
-     *
-     * @param timeout  the timeout amount for the entire shutdown operation (not per channel).
-     * @param timeUnit the unit of the timeout amount.
-     * @throws InterruptedException if the thread is interrupted during shutdown.
-     * @throws TimeoutException     if the timeout elapses before all channels are shutdown.
-     */
-    @Deprecated
-    public void awaitChannelShutdown(long timeout, TimeUnit timeUnit) throws InterruptedException, TimeoutException {
-        close(timeout, timeUnit);
     }
 
     private static class Config {
