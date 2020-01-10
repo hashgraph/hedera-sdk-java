@@ -1,7 +1,6 @@
 package com.hedera.hashgraph.sdk.file;
 
 import com.hedera.hashgraph.proto.FileGetContentsQuery;
-import com.hedera.hashgraph.proto.FileGetContentsResponse;
 import com.hedera.hashgraph.proto.FileServiceGrpc;
 import com.hedera.hashgraph.proto.Query;
 import com.hedera.hashgraph.proto.QueryHeader;
@@ -12,18 +11,13 @@ import io.grpc.MethodDescriptor;
 
 /**
  * Get the contents of a file.
- *
- * @deprecated the result type of {@link FileGetContentsResponse} returned from the various
- * {@code execute[Async](...)} methods is changing in 1.0 to {@code byte[]}, which
- * is a breaking change. This class is not being removed.
  */
-@Deprecated
 // `FileGetContentsQuery`
-public class FileContentsQuery extends QueryBuilder<FileGetContentsResponse, FileContentsQuery> {
+public class FileContentsQuery extends QueryBuilder<byte[], FileContentsQuery> {
     private final FileGetContentsQuery.Builder builder = inner.getFileGetContentsBuilder();
 
     public FileContentsQuery() {
-        super(null);
+        super();
     }
 
     @Override
@@ -42,8 +36,8 @@ public class FileContentsQuery extends QueryBuilder<FileGetContentsResponse, Fil
     }
 
     @Override
-    protected FileGetContentsResponse extractResponse(Response raw) {
-        return raw.getFileGetContents();
+    protected byte[] extractResponse(Response raw) {
+        return raw.getFileGetContents().toByteArray();
     }
 
     @Override
