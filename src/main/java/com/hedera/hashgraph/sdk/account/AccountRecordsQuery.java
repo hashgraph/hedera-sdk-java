@@ -17,7 +17,7 @@ import io.grpc.MethodDescriptor;
  * Get a list of {@link com.hedera.hashgraph.sdk.TransactionRecord}s involved with an account.
  */
 // `CryptoGetAccountRecordsQuery`
-public class AccountRecordsQuery extends QueryBuilder<List<TransactionRecord>, AccountRecordsQuery> {
+public final class AccountRecordsQuery extends QueryBuilder<List<TransactionRecord>, AccountRecordsQuery> {
     private final CryptoGetAccountRecordsQuery.Builder builder = inner.getCryptoGetAccountRecordsBuilder();
 
     public AccountRecordsQuery() {
