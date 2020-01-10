@@ -1,29 +1,27 @@
 package com.hedera.hashgraph.sdk.account;
 
 import com.hedera.hashgraph.proto.CryptoGetAccountRecordsQuery;
-import com.hedera.hashgraph.proto.CryptoGetAccountRecordsResponse;
 import com.hedera.hashgraph.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.proto.Query;
 import com.hedera.hashgraph.proto.QueryHeader;
 import com.hedera.hashgraph.proto.Response;
 import com.hedera.hashgraph.sdk.QueryBuilder;
+import com.hedera.hashgraph.sdk.TransactionRecord;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import io.grpc.MethodDescriptor;
 
 /**
  * Get a list of {@link com.hedera.hashgraph.sdk.TransactionRecord}s involved with an account.
- *
- * @deprecated the result type of {@link CryptoGetAccountRecordsResponse} returned from the various
- * {@code execute[Async](...)} methods is changing in 1.0 to {@code List<TransactionRecord>}, which
- * is a breaking change. This class is not being removed.
  */
-@Deprecated
 // `CryptoGetAccountRecordsQuery`
-public class AccountRecordsQuery extends QueryBuilder<CryptoGetAccountRecordsResponse, AccountRecordsQuery> {
+public class AccountRecordsQuery extends QueryBuilder<List<TransactionRecord>, AccountRecordsQuery> {
     private final CryptoGetAccountRecordsQuery.Builder builder = inner.getCryptoGetAccountRecordsBuilder();
 
     public AccountRecordsQuery() {
-        super(null);
+        super();
     }
 
     public AccountRecordsQuery setAccountId(AccountId accountId) {
@@ -47,7 +45,11 @@ public class AccountRecordsQuery extends QueryBuilder<CryptoGetAccountRecordsRes
     }
 
     @Override
-    protected CryptoGetAccountRecordsResponse extractResponse(Response raw) {
-        return raw.getCryptoGetAccountRecords();
+    protected List<TransactionRecord> extractResponse(Response raw) {
+        return raw.getCryptoGetAccountRecords()
+            .getRecordsList()
+            .stream()
+            .map(TransactionRecord::new)
+            .collect(Collectors.toList());
     }
 }
