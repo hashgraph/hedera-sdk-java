@@ -91,7 +91,7 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
             // if the decoded bytes matches the length of a private key, try that
             privKeyParams = new Ed25519PrivateKeyParameters(keyBytes, 0);
         } else if (keyBytes.length == Ed25519.SECRET_KEY_SIZE + Ed25519.PUBLIC_KEY_SIZE) {
-            // some legacy code delivers private and public key pairs concatted together
+            // some legacy code delivers raw private and public key pairs concatted together
             // this is how we read only the first 32 bytes
             privKeyParams = new Ed25519PrivateKeyParameters(keyBytes, 0);
             // read the remaining 32 bytes as the public key
@@ -117,7 +117,11 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
             }
         }
 
-        return new Ed25519PrivateKey(privKeyParams, pubKeyParams);
+        if (pubKeyParams != null) {
+            return new Ed25519PrivateKey(privKeyParams, pubKeyParams);
+        } else {
+            return new Ed25519PrivateKey(privKeyParams);
+        }
     }
 
     /**
@@ -264,22 +268,6 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
      * @throws IOException            if any occurs while reading from the inputstream
      * @throws KeystoreParseException if there is a problem with the keystore; most likely
      *                                is if the passphrase is incorrect.
-     * @deprecated renamed to {@link #readKeystore(InputStream, String)}
-     */
-    @Deprecated
-    public static Ed25519PrivateKey fromKeystore(InputStream inputStream, String passphrase) throws IOException {
-        return Keystore.fromStream(inputStream, passphrase).getEd25519();
-    }
-
-    /**
-     * Recover a private key from an encrypted keystore file.
-     *
-     * @param inputStream the inputstream to read the keystore from
-     * @param passphrase  the passphrase used to encrypt the keystore
-     * @return the recovered key
-     * @throws IOException            if any occurs while reading from the inputstream
-     * @throws KeystoreParseException if there is a problem with the keystore; most likely
-     *                                is if the passphrase is incorrect.
      */
     public static Ed25519PrivateKey readKeystore(InputStream inputStream, String passphrase) throws IOException {
         return Keystore.fromStream(inputStream, passphrase).getEd25519();
@@ -325,16 +313,6 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
         byte[] deriveData = new byte[64];
         secureRandom.nextBytes(deriveData);
         return Ed25519PrivateKey.derivableKey(deriveData);
-    }
-
-    /**
-     * @return the public key counterpart of this private key to share with the hashgraph
-     *
-     * @deprecated available as {@link #publicKey}.
-     */
-    @Deprecated
-    public Ed25519PublicKey getPublicKey() {
-        return publicKey;
     }
 
     @Override
@@ -387,22 +365,7 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
     /**
      * Export a keystore file to the given {@link OutputStream} encrypted with a given passphrase.
      * <p>
-     * You can recover this key later with {@link #fromKeystore(InputStream, String)}.
-     *
-     * @param outputStream the OutputStream to write the keystore to.
-     * @param passphrase   the passphrase to encrypt the keystore with.
-     * @throws IOException if any occurs while writing to the OutputStream
-     * @deprecated renamed to {@link #writeKeystore(OutputStream, String)}
-     */
-    @Deprecated
-    public void exportKeystore(OutputStream outputStream, String passphrase) throws IOException {
-        writeKeystore(outputStream, passphrase);
-    }
-
-    /**
-     * Export a keystore file to the given {@link OutputStream} encrypted with a given passphrase.
-     * <p>
-     * You can recover this key later with {@link #fromKeystore(InputStream, String)}.
+     * You can recover this key later with {@link #readKeystore(InputStream, String)}.
      *
      * @param outputStream the OutputStream to write the keystore to.
      * @param passphrase   the passphrase to encrypt the keystore with.
@@ -415,7 +378,7 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
     /**
      * Export a keystore file to a byte array encrypted with a given passphrase.
      * <p>
-     * You can recover this key later with {@link #fromKeystore(InputStream, String)}.
+     * You can recover this key later with {@link #fromKeystore(byte[], String)}.
      *
      * @param passphrase the passphrase to encrypt the keystore with.
      */

@@ -25,15 +25,6 @@ public class KeyList extends PublicKey {
         return this;
     }
 
-    /**
-     * @deprecated renamed to {@link #add(PublicKey)}.
-     */
-    @Deprecated
-    public KeyList addKey(PublicKey key) {
-        keyListBuilder.addKeys(key.toKeyProto());
-        return this;
-    }
-
     @Override
     public com.hedera.hashgraph.proto.Key toKeyProto() {
         com.hedera.hashgraph.proto.Key.Builder key = com.hedera.hashgraph.proto.Key.newBuilder();

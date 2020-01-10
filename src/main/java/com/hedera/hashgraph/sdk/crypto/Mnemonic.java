@@ -25,13 +25,6 @@ import io.github.novacrypto.bip39.wordlists.English;
 public final class Mnemonic {
     /**
      * The list of words in this mnemonic.
-     * @deprecated renamed to {@link #words}
-     */
-    @Deprecated
-    public final List<CharSequence> wordList;
-
-    /**
-     * The list of words in this mnemonic.
      */
     public final List<CharSequence> words;
 
@@ -48,7 +41,6 @@ public final class Mnemonic {
         }
 
         this.words = Collections.unmodifiableList(wordList);;
-        this.wordList = this.words;
     }
 
     public static Mnemonic fromString(String mnemonicString) {
@@ -101,7 +93,7 @@ public final class Mnemonic {
     @Override
     public String toString() {
         if (asString == null) {
-            asString = String.join(" ", wordList);
+            asString = String.join(" ", words);
         }
 
         return asString;
