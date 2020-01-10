@@ -1,10 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.proto.Query;
 import com.hedera.hashgraph.proto.QueryHeader;
 import com.hedera.hashgraph.proto.Response;
 import com.hedera.hashgraph.proto.TransactionGetReceiptQuery;
-import com.hedera.hashgraph.proto.CryptoServiceGrpc;
 
 import java.time.Duration;
 
@@ -42,13 +42,13 @@ public final class TransactionReceiptQuery extends QueryBuilder<TransactionRecei
             return false;
         }
 
-        switch (((HederaException) e).responseCode) {
+        switch (((HederaException) e).status) {
             // still in the node's queue
-            case UNKNOWN:
+            case Unknown:
             // accepted but has not reached consensus
-            case OK:
+            case Ok:
             // node queue is full
-            case BUSY:
+            case Busy:
                 return true;
             default:
                 return false;

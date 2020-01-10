@@ -2,7 +2,6 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.proto.ResponseCodeEnum;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -43,7 +42,7 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
     }
 
     protected boolean shouldRetry(HederaThrowable e) {
-        return e instanceof HederaException && ((HederaException) e).responseCode == ResponseCodeEnum.BUSY;
+        return e instanceof HederaException && ((HederaException) e).status == Status.Busy;
     }
 
     public final Resp execute(Client client) throws HederaException, HederaNetworkException {

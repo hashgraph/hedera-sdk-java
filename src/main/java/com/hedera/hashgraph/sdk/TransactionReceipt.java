@@ -1,13 +1,12 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.proto.Response;
-import com.hedera.hashgraph.proto.ResponseCodeEnum;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.contract.ContractId;
 import com.hedera.hashgraph.sdk.file.FileId;
 
 public final class TransactionReceipt {
-    public final ResponseCodeEnum status;
+    public final Status status;
 
     private final com.hedera.hashgraph.proto.TransactionReceipt inner;
 
@@ -19,21 +18,13 @@ public final class TransactionReceipt {
         inner = response.getTransactionGetReceipt()
             .getReceipt();
 
-        status = inner.getStatus();
+        status = Status.valueOf(inner.getStatus());
     }
 
     TransactionReceipt(com.hedera.hashgraph.proto.TransactionReceipt inner) {
         this.inner = inner;
 
-        status = inner.getStatus();
-    }
-
-    /**
-     * @deprecated use {@link #status} instead.
-     */
-    @Deprecated
-    public ResponseCodeEnum getStatus() {
-        return inner.getStatus();
+        status = Status.valueOf(inner.getStatus());
     }
 
     public AccountId getAccountId() {

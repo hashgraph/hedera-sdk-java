@@ -3,22 +3,18 @@ package com.hedera.hashgraph.sdk;
 import com.hedera.hashgraph.proto.ResponseCodeEnum;
 
 public class HederaException extends Exception implements HederaThrowable {
-    public final ResponseCodeEnum responseCode;
+    public final Status status;
 
     HederaException(ResponseCodeEnum responseCode) {
-        if (!isCodeExceptional(responseCode, true)) {
+        if (!isCodeExceptional(responseCode)) {
             throw new IllegalArgumentException("code not exceptional: " + responseCode);
         }
 
-        this.responseCode = responseCode;
+        this.status = Status.valueOf(responseCode);
     }
 
-    static boolean isCodeExceptional(ResponseCodeEnum responseCode, boolean unknownIsExceptional) {
+    static boolean isCodeExceptional(ResponseCodeEnum responseCode) {
         switch (responseCode) {
-        case UNKNOWN:
-        case RECEIPT_NOT_FOUND:
-        case RECORD_NOT_FOUND:
-            return unknownIsExceptional;
         case SUCCESS:
         case OK:
             return false;
@@ -30,17 +26,13 @@ public class HederaException extends Exception implements HederaThrowable {
     }
 
     static void throwIfExceptional(ResponseCodeEnum responseCode) throws HederaException {
-        throwIfExceptional(responseCode, true);
-    }
-
-    static void throwIfExceptional(ResponseCodeEnum responseCode, boolean throwIfUnknown) throws HederaException {
-        if (isCodeExceptional(responseCode, throwIfUnknown)) {
+        if (isCodeExceptional(responseCode)) {
             throw new HederaException(responseCode);
         }
     }
 
     @Override
     public String getMessage() {
-        return responseCode.toString();
+        return status.toString();
     }
 }

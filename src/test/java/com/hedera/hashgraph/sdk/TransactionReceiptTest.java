@@ -1,9 +1,8 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.proto.Response;
-import com.hedera.hashgraph.proto.ResponseCodeEnum;
 import com.hedera.hashgraph.proto.TransactionGetReceiptResponse;
+import com.hedera.hashgraph.sdk.account.AccountId;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,7 +35,7 @@ class TransactionReceiptTest {
 
         final TransactionReceipt receipt = new TransactionReceipt(response);
 
-        assertEquals(receipt.getStatus(), ResponseCodeEnum.OK);
+        assertEquals(receipt.status, Status.Ok);
 
         assertThrows(
             IllegalStateException.class,
