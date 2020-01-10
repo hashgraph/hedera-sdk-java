@@ -16,11 +16,7 @@ public final class FileInfo {
     public final boolean isDeleted;
     public final List<PublicKey> keys;
 
-    /**
-     * @deprecated this constructor is being hidden in 1.0.
-     */
-    @Deprecated
-    public FileInfo(FileGetInfoResponse.FileInfoOrBuilder info) {
+    FileInfo(FileGetInfoResponse.FileInfoOrBuilder info) {
         if (!info.hasKeys() || info.getKeys().getKeysList().isEmpty()) {
             throw new IllegalArgumentException("`FileGetInfoResponse` missing keys");
         }
@@ -40,30 +36,5 @@ public final class FileInfo {
         if (!response.hasFileGetInfo()) throw new IllegalArgumentException("response was not `fileGetInfo`");
 
         return new FileInfo(response.getFileGetInfo().getFileInfoOrBuilder());
-    }
-
-    @Deprecated
-    public FileId getFileId() {
-        return fileId;
-    }
-
-    @Deprecated
-    public long getSize() {
-        return size;
-    }
-
-    @Deprecated
-    public Instant getExpirationTime() {
-        return expirationTime;
-    }
-
-    @Deprecated
-    public boolean isDeleted() {
-        return isDeleted;
-    }
-
-    @Deprecated
-    public List<PublicKey> getKeys() {
-        return keys;
     }
 }

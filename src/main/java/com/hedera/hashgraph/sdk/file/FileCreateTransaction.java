@@ -14,27 +14,16 @@ import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import java.time.Duration;
 import java.time.Instant;
 
-import javax.annotation.Nullable;
-
 import io.grpc.MethodDescriptor;
 
 public final class FileCreateTransaction extends TransactionBuilder<FileCreateTransaction> {
     private final FileCreateTransactionBody.Builder builder = bodyBuilder.getFileCreateBuilder();
     private final KeyList.Builder keyList = builder.getKeysBuilder();
 
-    /**
-     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
-     */
-    @Deprecated
-    public FileCreateTransaction(@Nullable Client client) {
-        super(client);
-
+    public FileCreateTransaction() {
+        super();
         // Default expiration time to an acceptable value
         setExpirationTime(Instant.now().plus(Duration.ofMillis(7890000000L)));
-    }
-
-    public FileCreateTransaction() {
-        this(null);
     }
 
     public FileCreateTransaction setExpirationTime(Instant expiration) {
@@ -66,16 +55,6 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
      */
     public FileCreateTransaction setContents(String text) {
         builder.setContents(ByteString.copyFromUtf8(text));
-        return this;
-    }
-
-    /**
-     * @deprecated shards and realms are not yet implemented on Hedera so this method won't
-     * do anything. It will be restored when the network functionality is available.
-     */
-    @Deprecated
-    public FileCreateTransaction setNewRealmAdminKey(PublicKey key) {
-        builder.setNewRealmAdminKey(key.toKeyProto());
         return this;
     }
 

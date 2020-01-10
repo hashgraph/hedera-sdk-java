@@ -8,20 +8,10 @@ import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 
-import javax.annotation.Nullable;
-
 import io.grpc.MethodDescriptor;
 
 public final class FileAppendTransaction extends TransactionBuilder<FileAppendTransaction> {
     private final FileAppendTransactionBody.Builder builder = bodyBuilder.getFileAppendBuilder();
-
-    /**
-     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
-     */
-    @Deprecated
-    public FileAppendTransaction(@Nullable Client client) {
-        super(client);
-    }
 
     public FileAppendTransaction() { super(); }
 

@@ -13,21 +13,11 @@ import com.hedera.hashgraph.sdk.crypto.PublicKey;
 
 import java.time.Instant;
 
-import javax.annotation.Nullable;
-
 import io.grpc.MethodDescriptor;
 
 public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransaction> {
     private final FileUpdateTransactionBody.Builder builder = bodyBuilder.getFileUpdateBuilder();
     private final KeyList.Builder keyList = builder.getKeysBuilder();
-
-    /**
-     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
-     */
-    @Deprecated
-    public FileUpdateTransaction(@Nullable Client client) {
-        super(client);
-    }
 
     public FileUpdateTransaction() { super(); }
 
