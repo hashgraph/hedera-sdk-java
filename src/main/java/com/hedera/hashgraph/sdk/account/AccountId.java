@@ -38,21 +38,6 @@ public final class AccountId implements Entity {
         return SolidityUtil.parseAddress(address, AccountId::new);
     }
 
-    @Deprecated
-    public long getShardNum() {
-        return shard;
-    }
-
-    @Deprecated
-    public long getRealmNum() {
-        return realm;
-    }
-
-    @Deprecated
-    public long getAccountNum() {
-        return account;
-    }
-
     @Override
     public String toString() {
         return "" + shard + "." + realm + "." + account;

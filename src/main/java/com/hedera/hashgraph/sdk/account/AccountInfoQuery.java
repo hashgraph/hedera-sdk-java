@@ -18,15 +18,6 @@ import io.grpc.MethodDescriptor;
 public final class AccountInfoQuery extends QueryBuilder<AccountInfo, AccountInfoQuery> {
     private final com.hedera.hashgraph.proto.CryptoGetInfoQuery.Builder builder;
 
-    /**
-     * @deprecated {@link Client} should now be provided to {@link #execute(Client)}
-     */
-    @Deprecated
-    public AccountInfoQuery(Client client) {
-        super(client);
-        builder = inner.getCryptoGetInfoBuilder();
-    }
-
     public AccountInfoQuery() {
         super();
         builder = inner.getCryptoGetInfoBuilder();
