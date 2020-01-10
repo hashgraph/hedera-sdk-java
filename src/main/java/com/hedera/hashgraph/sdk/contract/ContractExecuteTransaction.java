@@ -5,13 +5,10 @@ import com.hedera.hashgraph.proto.ContractCallTransactionBody;
 import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
-import com.hedera.hashgraph.sdk.CallParams;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.TransactionRecord;
-
-import javax.annotation.Nullable;
 
 import io.grpc.MethodDescriptor;
 
@@ -25,14 +22,6 @@ import io.grpc.MethodDescriptor;
 // `ContractCallTransaction`
 public final class ContractExecuteTransaction extends TransactionBuilder<ContractExecuteTransaction> {
     private final ContractCallTransactionBody.Builder builder = bodyBuilder.getContractCallBuilder();
-
-    /**
-     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
-     */
-    @Deprecated
-    public ContractExecuteTransaction(@Nullable Client client) {
-        super(client);
-    }
 
     public ContractExecuteTransaction() { super(); }
 
@@ -83,15 +72,6 @@ public final class ContractExecuteTransaction extends TransactionBuilder<Contrac
     }
 
     /**
-     * @deprecated renamed to {@link #setFunctionParams(byte[])}.
-     */
-    @Deprecated
-    public ContractExecuteTransaction setFunctionParameters(byte[] functionParameters) {
-        builder.setFunctionParameters(ByteString.copyFrom(functionParameters));
-        return this;
-    }
-
-    /**
      * Set the function parameters (selector plus arguments) as a raw byte array.
      *
      * @param parameters
@@ -99,16 +79,6 @@ public final class ContractExecuteTransaction extends TransactionBuilder<Contrac
      */
     public ContractExecuteTransaction setFunctionParams(byte[] parameters) {
         builder.setFunctionParameters(ByteString.copyFrom(parameters));
-        return this;
-    }
-
-    /**
-     * @deprecated Associated class is being removed; use {@link #setFunction(String, ContractFunctionParams)}
-     * and see {@link ContractFunctionParams} for new API.
-     */
-    @Deprecated
-    public ContractExecuteTransaction setFunctionParameters(CallParams<CallParams.Function> parameters) {
-        builder.setFunctionParameters(parameters.toProto());
         return this;
     }
 

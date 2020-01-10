@@ -6,7 +6,6 @@ import com.hedera.hashgraph.proto.Query;
 import com.hedera.hashgraph.proto.QueryHeader;
 import com.hedera.hashgraph.proto.Response;
 import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
-import com.hedera.hashgraph.sdk.CallParams;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.FunctionResult;
 import com.hedera.hashgraph.sdk.HederaException;
@@ -29,14 +28,6 @@ import io.grpc.MethodDescriptor;
 // `ContractCallLocalQuery`
 public class ContractCallQuery extends QueryBuilder<FunctionResult, ContractCallQuery> {
     private final ContractCallLocalQuery.Builder builder = inner.getContractCallLocalBuilder();
-
-    /**
-     * @deprecated {@link Client} should now be provided to {@link #execute(Client)}
-     */
-    @Deprecated
-    public ContractCallQuery(Client client) {
-        super(client);
-    }
 
     public ContractCallQuery() {
         super(null);
@@ -86,15 +77,6 @@ public class ContractCallQuery extends QueryBuilder<FunctionResult, ContractCall
     }
 
     /**
-     * @deprecated renamed to {@link #setFunctionParams(byte[])}.
-     */
-    @Deprecated
-    public ContractCallQuery setFunctionParameters(byte[] parameters) {
-        builder.setFunctionParameters(ByteString.copyFrom(parameters));
-        return this;
-    }
-
-    /**
      * Set the function parameters (selector plus arguments) as a raw byte array.
      *
      * @param parameters
@@ -102,16 +84,6 @@ public class ContractCallQuery extends QueryBuilder<FunctionResult, ContractCall
      */
     public ContractCallQuery setFunctionParams(byte[] parameters) {
         builder.setFunctionParameters(ByteString.copyFrom(parameters));
-        return this;
-    }
-
-    /**
-     * @deprecated Associated class is being removed; use {@link #setFunction(String, ContractFunctionParams)}
-     * and see {@link ContractFunctionParams} for new API.
-     */
-    @Deprecated
-    public ContractCallQuery setFunctionParameters(CallParams<CallParams.Function> parameters) {
-        builder.setFunctionParameters(parameters.toProto());
         return this;
     }
 

@@ -2,12 +2,9 @@ package com.hedera.hashgraph.sdk.contract;
 
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.proto.ContractCreateTransactionBody;
-import com.hedera.hashgraph.proto.RealmID;
-import com.hedera.hashgraph.proto.ShardID;
 import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
-import com.hedera.hashgraph.sdk.CallParams;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.Hbar;
@@ -18,8 +15,6 @@ import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hedera.hashgraph.sdk.file.FileId;
 
 import java.time.Duration;
-
-import javax.annotation.Nullable;
 
 import io.grpc.MethodDescriptor;
 
@@ -38,28 +33,11 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
         setAutoRenewPeriod(Duration.ofMinutes(131_500));
     }
 
-    /**
-     * @deprecated use the no-arg constructor and pass the client to {@link #build(Client)} instead.
-     */
-    @Deprecated
-    public ContractCreateTransaction(@Nullable Client client) {
-        super(client);
-    }
-
     public ContractCreateTransaction() { super(); }
 
     @Override
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return SmartContractServiceGrpc.getCreateContractMethod();
-    }
-
-    /**
-     * @deprecated renamed to {@link #setBytecodeFileId(FileId)}
-     */
-    @Deprecated
-    public ContractCreateTransaction setBytecodeFile(FileId fileId) {
-        builder.setFileID(fileId.toProto());
-        return this;
     }
 
     // more descriptive name than `setFileId`
@@ -118,52 +96,8 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
         return this;
     }
 
-    /**
-     * @deprecated Associated class is being removed; use {@link #setConstructorParams(ContractFunctionParams)}
-     * and see {@link ContractFunctionParams} for new API.
-     */
-    @Deprecated
-    public ContractCreateTransaction setConstructorParams(CallParams<CallParams.Constructor> constructorParams) {
-        builder.setConstructorParameters(constructorParams.toProto());
-        return this;
-    }
-
     public ContractCreateTransaction setConstructorParams(ContractFunctionParams constructorParams) {
         builder.setConstructorParameters(constructorParams.toBytes(null));
-        return this;
-    }
-
-    /**
-     * @deprecated shards and realms are not yet implemented on Hedera so this method won't
-     * function as expected. It will be restored when the network functionality is available.
-     */
-    @Deprecated
-    public ContractCreateTransaction setShard(long shardId) {
-        builder.setShardID(
-            ShardID.newBuilder()
-                .setShardNum(shardId));
-        return this;
-    }
-
-    /**
-     * @deprecated shards and realms are not yet implemented on Hedera so this method won't
-     * function as expected. It will be restored when the network functionality is available.
-     */
-    @Deprecated
-    public ContractCreateTransaction setRealm(long realmId) {
-        builder.setRealmID(
-            RealmID.newBuilder()
-                .setRealmNum(realmId));
-        return this;
-    }
-
-    /**
-     * @deprecated shards and realms are not yet implemented on Hedera so this method won't
-     * function as expected. It will be restored when the network functionality is available.
-     */
-    @Deprecated
-    public ContractCreateTransaction setNewRealmAdminKey(PublicKey newRealmAdminKey) {
-        builder.setNewRealmAdminKey(newRealmAdminKey.toKeyProto());
         return this;
     }
 

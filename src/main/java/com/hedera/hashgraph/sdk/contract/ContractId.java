@@ -34,21 +34,6 @@ public final class ContractId extends PublicKey implements Entity {
         return SolidityUtil.parseAddress(address, ContractId::new);
     }
 
-    @Deprecated
-    public long getShardNum() {
-        return shard;
-    }
-
-    @Deprecated
-    public long getRealmNum() {
-        return realm;
-    }
-
-    @Deprecated
-    public long getContractNum() {
-        return contract;
-    }
-
     @Override
     public com.hedera.hashgraph.proto.Key toKeyProto() {
         return com.hedera.hashgraph.proto.Key.newBuilder()
