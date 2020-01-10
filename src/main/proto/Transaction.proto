@@ -6,6 +6,7 @@ option java_package = "com.hedera.hashgraph.proto";
 option java_multiple_files = true;
 
 
+import "Duration.proto";
 import "BasicTypes.proto";
 import "TransactionBody.proto";
 
