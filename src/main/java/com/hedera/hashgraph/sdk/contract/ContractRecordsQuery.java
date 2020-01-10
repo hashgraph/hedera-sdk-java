@@ -1,29 +1,27 @@
 package com.hedera.hashgraph.sdk.contract;
 
 import com.hedera.hashgraph.proto.ContractGetRecordsQuery;
-import com.hedera.hashgraph.proto.ContractGetRecordsResponse;
 import com.hedera.hashgraph.proto.Query;
 import com.hedera.hashgraph.proto.QueryHeader;
 import com.hedera.hashgraph.proto.Response;
 import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.QueryBuilder;
+import com.hedera.hashgraph.sdk.TransactionRecord;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import io.grpc.MethodDescriptor;
 
 /**
  * Get a list of {@link com.hedera.hashgraph.sdk.TransactionRecord}s involved with a contract.
- *
- * @deprecated the result type of {@link ContractGetRecordsResponse} returned from the various
- * {@code execute[Async](...)} methods is changing in 1.0 to {@code List<TransactionRecord>}, which
- * is a breaking change. This class is not being removed.
  */
-@Deprecated
 // `ContractGetRecordsQuery`
-public class ContractRecordsQuery extends QueryBuilder<ContractGetRecordsResponse, ContractRecordsQuery> {
+public class ContractRecordsQuery extends QueryBuilder<List<TransactionRecord>, ContractRecordsQuery> {
     private final ContractGetRecordsQuery.Builder builder = inner.getContractGetRecordsBuilder();
 
     public ContractRecordsQuery() {
-        super(null);
+        super();
     }
 
     public ContractRecordsQuery setContractId(ContractId contractId) {
@@ -42,8 +40,12 @@ public class ContractRecordsQuery extends QueryBuilder<ContractGetRecordsRespons
     }
 
     @Override
-    protected ContractGetRecordsResponse extractResponse(Response raw) {
-        return raw.getContractGetRecordsResponse();
+    protected List<TransactionRecord> extractResponse(Response raw) {
+        return raw.getContractGetRecordsResponse()
+            .getRecordsList()
+            .stream()
+            .map(TransactionRecord::new)
+            .collect(Collectors.toList());
     }
 
     @Override
