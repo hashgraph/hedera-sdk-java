@@ -1,12 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.proto.FileServiceGrpc;
 import com.hedera.hashgraph.proto.FreezeServiceGrpc;
-import com.hedera.hashgraph.proto.ResponseCodeEnum;
 import com.hedera.hashgraph.proto.SignatureMap;
 import com.hedera.hashgraph.proto.SignatureMapOrBuilder;
 import com.hedera.hashgraph.proto.SignaturePair;
@@ -16,18 +14,15 @@ import com.hedera.hashgraph.proto.TransactionBody;
 import com.hedera.hashgraph.proto.TransactionBodyOrBuilder;
 import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
-import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519Signature;
+import com.hedera.hashgraph.sdk.crypto.PrivateKey;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 
 import org.bouncycastle.util.encoders.Hex;
 
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-
-import javax.annotation.Nullable;
 
 import io.grpc.Channel;
 import io.grpc.MethodDescriptor;
@@ -68,32 +63,19 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
         return new Transaction(inner.toBuilder(), body, methodForTxnBody(body));
     }
 
-    public Transaction sign(Ed25519PrivateKey privateKey) {
-        ByteString pubKey = ByteString.copyFrom(privateKey.publicKey.toBytes());
-
+    public Transaction sign(PrivateKey<? extends PublicKey> privateKey) {
         SignatureMap.Builder sigMap = inner.getSigMapBuilder();
 
-        for (int i = 0; i < sigMap.getSigPairCount(); i++) {
-            ByteString pubKeyPrefix = sigMap.getSigPair(i)
-                .getPubKeyPrefix();
+        for (SignaturePair sigPair : sigMap.getSigPairList()) {
+            ByteString pubKeyPrefix = sigPair.getPubKeyPrefix();
 
-            if (pubKey.startsWith(pubKeyPrefix)) {
+            if (privateKey.publicKey.hasPrefix(pubKeyPrefix)) {
                 throw new IllegalArgumentException(
                     "transaction already signed with key: " + privateKey.toString());
             }
         }
 
-        byte[] signature = Ed25519Signature.forMessage(
-            privateKey,
-            inner.getBodyBytes()
-                .toByteArray())
-            .toBytes();
-
-        sigMap.addSigPair(
-            SignaturePair.newBuilder()
-                .setPubKeyPrefix(pubKey)
-                .setEd25519(ByteString.copyFrom(signature))
-                .build());
+        sigMap.addSigPair(privateKey.sign(inner.getBodyBytes().toByteArray()));
 
         return this;
     }

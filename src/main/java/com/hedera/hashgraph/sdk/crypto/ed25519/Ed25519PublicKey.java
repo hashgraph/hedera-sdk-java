@@ -71,8 +71,6 @@ public final class Ed25519PublicKey extends PublicKey {
             throw new RuntimeException(e);
         }
 
-        // I'd love to dedup this with the code in `Ed25519PrivateKey.toString()`
-        // but there's no way to do that without creating an entirely public class
         byte[] encoded;
 
         try {
@@ -82,6 +80,11 @@ public final class Ed25519PublicKey extends PublicKey {
         }
 
         return Hex.toHexString(encoded);
+    }
+
+    @Override
+    public boolean hasPrefix(ByteString prefix) {
+        return ByteString.copyFrom(toBytes()).startsWith(prefix);
     }
 
     @Override

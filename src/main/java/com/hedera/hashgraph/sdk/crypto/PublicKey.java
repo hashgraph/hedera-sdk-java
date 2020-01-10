@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk.crypto;
 
+import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.proto.ContractIDOrBuilder;
 import com.hedera.hashgraph.proto.KeyOrBuilder;
 import com.hedera.hashgraph.sdk.Internal;
@@ -15,6 +16,11 @@ import org.bouncycastle.util.encoders.Hex;
 public abstract class PublicKey {
     @Internal
     public abstract com.hedera.hashgraph.proto.Key toKeyProto();
+
+    @Internal
+    public boolean hasPrefix(ByteString prefix) {
+        return false;
+    }
 
     @Internal
     public static PublicKey fromProtoKey(KeyOrBuilder key) {

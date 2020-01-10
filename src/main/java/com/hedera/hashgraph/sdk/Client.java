@@ -5,6 +5,8 @@ import com.hedera.hashgraph.sdk.account.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.AccountInfo;
 import com.hedera.hashgraph.sdk.account.AccountInfoQuery;
+import com.hedera.hashgraph.sdk.crypto.PrivateKey;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
 import java.io.File;
@@ -39,8 +41,7 @@ import javax.annotation.Nullable;
  * with the try-with-resources syntax) which waits at most a few seconds for channels to finish
  * their calls and terminate.
  * <p>
- * Alternatively, you may call {@link #awaitChannelShutdown(long, TimeUnit)} directly with a
- * custom timeout.
+ * Alternatively, you may call {@link #close(long, TimeUnit)} with a custom timeout.
  * <p>
  * This is only necessary when you're completely finished with the Client; it can and should be
  * reused between multiple queries and transactions. The Client may not be reused once its
@@ -62,7 +63,7 @@ public final class Client implements AutoCloseable {
     private AccountId operatorId;
 
     @Nullable
-    private Ed25519PrivateKey operatorKey;
+    private PrivateKey<? extends PublicKey> operatorKey;
 
     public Client(Map<AccountId, String> nodes) {
         if (nodes.isEmpty()) {
@@ -78,7 +79,7 @@ public final class Client implements AutoCloseable {
      * Get a Client configured for Hedera mainnet access.
      * <p>
      * Most users will also want to set an operator account with
-     * {@link #setOperator(AccountId, Ed25519PrivateKey)} so transactions can be automatically
+     * {@link #setOperator(AccountId, PrivateKey)} so transactions can be automatically
      * given {@link TransactionId}s and signed.
      *
      * @return a Client configured for Hedera mainnet access
@@ -104,7 +105,7 @@ public final class Client implements AutoCloseable {
      * Get a Client configured for Hedera public testnet access.
      * <p>
      * Most users will also want to set an operator account with
-     * {@link #setOperator(AccountId, Ed25519PrivateKey)} so transactions can be automatically
+     * {@link #setOperator(AccountId, PrivateKey)} so transactions can be automatically
      * given {@link TransactionId}s and signed.
      *
      * @return a Client configured for Hedera testnet access
@@ -243,8 +244,9 @@ public final class Client implements AutoCloseable {
     /**
      * Set the maximum default payment allowable for queries.
      * <p>
-     * When a query is executed without an explicit {@link QueryBuilder#setPayment(Transaction)}
-     * or {@link QueryBuilder#setPaymentDefault(long)} call, the client will first request the cost
+     * When a query is executed without an explicit
+     * {@link QueryBuilder#setPaymentTransaction(Transaction)}
+     * or {@link QueryBuilder#setQueryPayment(Hbar)} call, the client will first request the cost
      * of the given query from the node it will be submitted to and attach a payment for that amount
      * from the operator account on the client.
      * <p>
@@ -265,8 +267,9 @@ public final class Client implements AutoCloseable {
     /**
      * Set the maximum default payment, in tinybar, allowable for queries.
      * <p>
-     * When a query is executed without an explicit {@link QueryBuilder#setPayment(Transaction)}
-     * or {@link QueryBuilder#setPaymentDefault(long)} call, the client will first request the cost
+     * When a query is executed without an explicit
+     * {@link QueryBuilder#setPaymentTransaction(Transaction)}
+     * or {@link QueryBuilder#setQueryPayment(Hbar)} call, the client will first request the cost
      * of the given query from the node it will be submitted to and attach a payment for that amount
      * from the operator account on the client.
      * <p>
@@ -289,7 +292,7 @@ public final class Client implements AutoCloseable {
         return this;
     }
 
-    public Client setOperator(AccountId operatorId, Ed25519PrivateKey operatorKey) {
+    public Client setOperator(AccountId operatorId, PrivateKey<? extends PublicKey> operatorKey) {
         this.operatorId = operatorId;
         this.operatorKey = operatorKey;
         return this;
@@ -309,7 +312,7 @@ public final class Client implements AutoCloseable {
     }
 
     @Nullable
-    Ed25519PrivateKey getOperatorKey() {
+    PrivateKey<? extends PublicKey> getOperatorKey() {
         return operatorKey;
     }
 

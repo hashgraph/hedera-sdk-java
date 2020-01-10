@@ -1,5 +1,7 @@
 package com.hedera.hashgraph.sdk.crypto.ed25519;
 
+import com.google.protobuf.ByteString;
+import com.hedera.hashgraph.proto.SignaturePair;
 import com.hedera.hashgraph.sdk.crypto.Keystore;
 import com.hedera.hashgraph.sdk.crypto.KeystoreParseException;
 import com.hedera.hashgraph.sdk.crypto.Mnemonic;
@@ -25,17 +27,13 @@ import org.bouncycastle.util.io.pem.PemWriter;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 
@@ -47,39 +45,29 @@ import javax.annotation.Nullable;
  * <p>To obtain an instance, see {@link #generate()} or {@link #fromString(String)}.
  */
 @SuppressWarnings("Duplicates")
-public final class Ed25519PrivateKey extends PrivateKey {
+public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
     public static final String TYPE_PRIVATE_KEY = "PRIVATE KEY";
     final Ed25519PrivateKeyParameters privKeyParams;
-
-    /**
-     * The public-key half of this private key.
-     */
-    public final Ed25519PublicKey publicKey;
 
     @Nullable
     private final KeyParameter chainCode;
 
     private Ed25519PrivateKey(Ed25519PrivateKeyParameters privKeyParams) {
+        super(new Ed25519PublicKey(privKeyParams.generatePublicKey()));
         this.privKeyParams = privKeyParams;
-        this.publicKey = new Ed25519PublicKey(privKeyParams.generatePublicKey());
         this.chainCode = null;
     }
 
     private Ed25519PrivateKey(Ed25519PrivateKeyParameters privKeyParams, KeyParameter chainCode) {
+        super(new Ed25519PublicKey(privKeyParams.generatePublicKey()));
         this.privKeyParams = privKeyParams;
-        this.publicKey = new Ed25519PublicKey(privKeyParams.generatePublicKey());
         this.chainCode = chainCode;
     }
 
-    private Ed25519PrivateKey(Ed25519PrivateKeyParameters privKeyParams, @Nullable Ed25519PublicKeyParameters pubKeyParams) {
+    private Ed25519PrivateKey(Ed25519PrivateKeyParameters privKeyParams, Ed25519PublicKeyParameters pubKeyParams) {
+        super(new Ed25519PublicKey(pubKeyParams));
         this.privKeyParams = privKeyParams;
         this.chainCode = null;
-
-        if (pubKeyParams != null) {
-            this.publicKey = new Ed25519PublicKey(pubKeyParams);
-        } else {
-            this.publicKey = new Ed25519PublicKey(privKeyParams.generatePublicKey());
-        }
     }
 
     private static Ed25519PrivateKey derivableKey(byte[] deriveData) {
@@ -231,35 +219,13 @@ public final class Ed25519PrivateKey extends PrivateKey {
     }
 
     /**
-     * Parse a private key from a PEM encoded file using the default system charset to decode.
-     * <p>
-     * This will read the first "PRIVATE KEY" section in the file as an Ed25519 private key.
-     *
-     * @throws IOException if one occurred while reading or if no "PRIVATE KEY" section was found
-     */
-    public static Ed25519PrivateKey fromPemFile(File pemFile) throws IOException {
-        return fromPemFile(pemFile, Charset.defaultCharset());
-    }
-
-    /**
-     * Parse a private key from a PEM encoded file using the given {@link Charset} to decode.
-     * <p>
-     * This will read the first "PRIVATE KEY" section in the file as an Ed25519 private key.
-     *
-     * @throws IOException if one occurred while reading or if no "PRIVATE KEY" section was found
-     */
-    public static Ed25519PrivateKey fromPemFile(File pemFile, Charset charset) throws IOException {
-        return fromPemFile(new InputStreamReader(new FileInputStream(pemFile), charset));
-    }
-
-    /**
      * Parse a private key from a PEM encoded reader.
      * <p>
      * This will read the first "PRIVATE KEY" section in the stream as an Ed25519 private key.
      *
      * @throws IOException if one occurred while reading or if no "PRIVATE KEY" section was found
      */
-    public static Ed25519PrivateKey fromPemFile(Reader pemFile) throws IOException {
+    public static Ed25519PrivateKey fromPem(Reader pemFile) throws IOException {
         final PemReader pemReader = new PemReader(pemFile);
 
         PemObject readObject;
@@ -374,6 +340,17 @@ public final class Ed25519PrivateKey extends PrivateKey {
     @Override
     public byte[] toBytes() {
         return privKeyParams.getEncoded();
+    }
+
+    @Override
+    public SignaturePair sign(byte[] message, int messageOffset, int messageLen) {
+        byte[] secret = privKeyParams.getEncoded();
+        byte[] sigBytes = new byte[Ed25519.SIGNATURE_SIZE];
+        Ed25519.sign(secret, 0, message, messageOffset, messageLen, sigBytes, 0);
+        return SignaturePair.newBuilder()
+            .setPubKeyPrefix(ByteString.copyFrom(publicKey.toBytes()))
+            .setEd25519(ByteString.copyFrom(sigBytes))
+            .build();
     }
 
     private byte[] encodeDER() {
