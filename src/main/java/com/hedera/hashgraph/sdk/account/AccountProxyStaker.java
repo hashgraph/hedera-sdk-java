@@ -8,7 +8,7 @@ import com.hedera.hashgraph.sdk.Hbar;
  *
  * Returned in a list from {@link AccountStakersQuery}.
  */
-public class AccountProxyStaker {
+public final class AccountProxyStaker {
     public final AccountId accountId;
     public final Hbar amount;
 

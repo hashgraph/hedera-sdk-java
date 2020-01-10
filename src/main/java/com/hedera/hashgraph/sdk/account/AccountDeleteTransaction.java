@@ -9,7 +9,7 @@ import com.hedera.hashgraph.sdk.TransactionBuilder;
 import io.grpc.MethodDescriptor;
 
 // `CryptoDeleteTransaction`
-public class AccountDeleteTransaction extends TransactionBuilder<AccountDeleteTransaction> {
+public final class AccountDeleteTransaction extends TransactionBuilder<AccountDeleteTransaction> {
     private final CryptoDeleteTransactionBody.Builder builder = bodyBuilder.getCryptoDeleteBuilder();
 
     public AccountDeleteTransaction() {

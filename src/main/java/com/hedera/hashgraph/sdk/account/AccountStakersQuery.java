@@ -16,7 +16,7 @@ import io.grpc.MethodDescriptor;
  * Get all the accounts that are proxy staking to a given account.
  */
 // `CryptoGetStakersQuery`
-public class AccountStakersQuery extends QueryBuilder<List<AccountProxyStaker>, AccountStakersQuery> {
+public final class AccountStakersQuery extends QueryBuilder<List<AccountProxyStaker>, AccountStakersQuery> {
     private final CryptoGetStakersQuery.Builder builder = inner.getCryptoGetProxyStakersBuilder();
 
     public AccountStakersQuery() {
