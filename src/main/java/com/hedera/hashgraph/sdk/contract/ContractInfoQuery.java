@@ -61,7 +61,7 @@ public final class ContractInfoQuery extends QueryBuilder<ContractInfo, Contract
         // deleted contracts return a COST_ANSWER of zero which triggers `INSUFFICIENT_TX_FEE`
         // if you set that as the query payment; 25 tinybar seems to be enough to get
         // `CONTRACT_DELETED` back instead.
-        return Math.min(super.getCost(client), 25);
+        return Math.max(super.getCost(client), 25);
     }
 
     @Override
