@@ -78,6 +78,15 @@ public final class ContractFunctionResult {
         return getDynamicBytes(valIndex).toByteArray();
     }
 
+    /**
+     * Get the nth fixed-width 32-byte value in the result.
+     *
+     * This is the native word size for the Solidity ABI.
+     */
+    public byte[] getBytes32(int valIndex) {
+        return getByteString(valIndex * 32, (valIndex + 1) * 32).toByteArray();
+    }
+
     private ByteString getDynamicBytes(int valIndex) {
         int offset = getInt32(valIndex);
         int len = getIntValueAt(offset);
@@ -88,7 +97,22 @@ public final class ContractFunctionResult {
      * Get the nth value as a boolean.
      */
     public boolean getBool(int valIndex) {
-        return getByteBuffer(valIndex * 32 + 31).get() != 0;
+        return getInt8(valIndex) != 0;
+    }
+
+    /**
+     * Get the nth returned value as an 8-bit integer.
+     * <p>
+     * If the actual value is wider it will be truncated to the last byte (similar to Java's
+     * integer narrowing semantics).
+     *
+     * If you are developing a contract and intending to return more than one of these values from a
+     * Solidity function, consider using the {@code bytes32} Solidity type instead as that will be a
+     * more compact representation which will save on gas. (Each individual {@code int8} value is
+     * padded to 32 bytes in the ABI.)
+     */
+    public byte getInt8(int valIndex) {
+        return getByteBuffer(valIndex * 32 + 31).get();
     }
 
     /**
@@ -118,7 +142,26 @@ public final class ContractFunctionResult {
      * This type can represent the full width of Solidity integers.
      */
     public BigInteger getInt256(int valIndex) {
-        return new BigInteger(getByteString(valIndex * 32, (valIndex + 1) * 32).toByteArray());
+        return new BigInteger(getBytes32(valIndex));
+    }
+
+    /**
+     * Get the nth returned value as a 8-bit unsigned integer.
+     * <p>
+     * If the actual value is wider it will be truncated to the last byte (similar to Java's
+     * integer narrowing semantics).
+     * <p>
+     * Because Java does not have native unsigned integers, this is semantically identical to
+     * {@link #getInt8(int)}. To treat the value as unsigned in the range {@code [0, 255]}, use
+     * {@link Byte#toUnsignedInt(byte)} to widen to {@code int} without sign-extension.
+     *
+     * If you are developing a contract and intending to return more than one of these values from a
+     * Solidity function, consider using the {@code bytes32} Solidity type instead as that will be a
+     * more compact representation which will save on gas. (Each individual {@code uint8} value is
+     * padded to 32 bytes in the ABI.)
+     */
+    public byte getUint8(int valIndex) {
+        return getInt8(valIndex);
     }
 
     /**
