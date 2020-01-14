@@ -51,8 +51,20 @@ public final class ContractFunctionSelector {
         return addParamType("bytes[]");
     }
 
+    public ContractFunctionSelector addBytes32() {
+        return addParamType("bytes32");
+    }
+
+    public ContractFunctionSelector addBytes32Array() {
+        return addParamType("bytes32[]");
+    }
+
     public ContractFunctionSelector addBool() {
         return addParamType("bool");
+    }
+
+    public ContractFunctionSelector addInt8() {
+        return addParamType("int8");
     }
 
     public ContractFunctionSelector addInt32() {
@@ -65,6 +77,10 @@ public final class ContractFunctionSelector {
 
     public ContractFunctionSelector addInt256() {
         return addParamType("int256");
+    }
+
+    public ContractFunctionSelector addInt8Array() {
+        return addParamType("int8[]");
     }
 
     public ContractFunctionSelector addInt32Array() {

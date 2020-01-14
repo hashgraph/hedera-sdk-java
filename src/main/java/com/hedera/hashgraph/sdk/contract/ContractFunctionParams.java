@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.annotation.Nonnegative;
@@ -106,9 +107,42 @@ public final class ContractFunctionParams {
         return this;
     }
 
+    /**
+     * Add a parameter of type {@code bytes32}, a 32-byte byte-string.
+     */
+    public ContractFunctionParams addBytes32(byte[] param) {
+        args.add(new Argument("bytes32", encodeBytes32(param), false));
+
+        return this;
+    }
+
+    /**
+     * Add a parameter of type {@code bytes32[]}, an array of 32-byte byte-strings.
+     */
+    public ContractFunctionParams addBytes32Array(byte[][] param) {
+        final List<ByteString> byteArrays = Arrays.stream(param)
+            .map(ContractFunctionParams::encodeBytes32)
+            .collect(Collectors.toList());
+
+        args.add(new Argument("bytes32[]", encodeDynArr(byteArrays), true));
+
+        return this;
+    }
+
     public ContractFunctionParams addBool(boolean bool) {
         // boolean encodes to `uint8` of values [0, 1]
         args.add(new Argument("bool", int256(bool ? 1 : 0, 8), false));
+        return this;
+    }
+
+    /**
+     * Add an 8-bit integer.
+     *
+     * @implNote The implementation is wasteful as we must pad to 32-bytes to store 1 byte.
+     */
+    public ContractFunctionParams addInt8(byte value) {
+        args.add(new Argument("int8", int256(value, 32), false));
+
         return this;
     }
 
@@ -139,6 +173,25 @@ public final class ContractFunctionParams {
     public ContractFunctionParams addInt256(BigInteger bigInt) {
         checkBigInt(bigInt);
         args.add(new Argument("int256", int256(bigInt), false));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 8-bit integers.
+     *
+     * @implNote The implementation is wasteful as we must pad to 32-bytes to store 1 byte.
+     */
+    public ContractFunctionParams addInt8Array(byte[] intArray) {
+        IntStream intStream = IntStream.range(0, intArray.length).map(idx -> intArray[idx]);
+
+        ByteString arrayBytes = ByteString.copyFrom(
+            intStream.mapToObj(i -> int256(i, 32))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int8[]", arrayBytes, true));
 
         return this;
     }
@@ -192,6 +245,17 @@ public final class ContractFunctionParams {
     }
 
     /**
+     * Add an unsigned 8-bit integer.
+     *
+     * @implNote The implementation is wasteful as we must pad to 32-bytes to store 1 byte.
+     */
+    public ContractFunctionParams addUint8(byte value) {
+        args.add(new Argument("uint8", uint256(value, 32), false));
+
+        return this;
+    }
+
+    /**
      * Add a 32-bit unsigned integer.
      *
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -228,6 +292,25 @@ public final class ContractFunctionParams {
     public ContractFunctionParams addUint256(@Nonnegative BigInteger bigUint) {
         checkBigUint(bigUint);
         args.add(new Argument("uint256", uint256(bigUint), false));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of unsigned 8-bit integers.
+     *
+     * @implNote The implementation is wasteful as we must pad to 32-bytes to store 1 byte.
+     */
+    public ContractFunctionParams addUint8Array(byte[] intArray) {
+        IntStream intStream = IntStream.range(0, intArray.length).map(idx -> intArray[idx]);
+
+        ByteString arrayBytes = ByteString.copyFrom(
+            intStream.mapToObj(i -> int256(i, 32))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint8[]", arrayBytes, true));
 
         return this;
     }
@@ -411,6 +494,10 @@ public final class ContractFunctionParams {
     private static ByteString encodeBytes(byte[] bytes) {
         return int256(bytes.length, 32)
             .concat(rightPad32(ByteString.copyFrom(bytes)));
+    }
+
+    private static ByteString encodeBytes32(byte[] bytes) {
+        return rightPad32(ByteString.copyFrom(bytes, 0, 32));
     }
 
     private static ByteString encodeArray(Stream<ByteString> elements) {
