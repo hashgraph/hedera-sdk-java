@@ -74,8 +74,7 @@ public class ConsensusClient implements AutoCloseable {
         return startStreamingCall(topicId, consensusStartTime, listener);
     }
 
-    private Subscription startStreamingCall(ConsensusTopicId topicId, @Nullable Instant startTime,
-                                            Consumer<ConsensusMessage> listener) {
+    private Subscription startStreamingCall(ConsensusTopicId topicId, @Nullable Instant startTime, Consumer<ConsensusMessage> listener) {
         final ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call =
             channel.newCall(ConsensusServiceGrpc.getSubscribeTopicMethod(), CallOptions.DEFAULT);
 
