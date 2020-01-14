@@ -17,12 +17,12 @@ public final class SystemUndeleteTransaction extends TransactionBuilder<SystemUn
 
     public SystemUndeleteTransaction() { super(); }
 
-    public SystemUndeleteTransaction setID(FileId fileId) {
+    public SystemUndeleteTransaction setFileId(FileId fileId) {
         builder.setFileID(fileId.toProto());
         return this;
     }
 
-    public SystemUndeleteTransaction setID(ContractId contractId) {
+    public SystemUndeleteTransaction setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProto());
         return this;
     }
