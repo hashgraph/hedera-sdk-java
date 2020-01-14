@@ -1,5 +1,11 @@
 package com.hedera.hashgraph.sdk.account;
 
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.DurationHelper;
+import com.hedera.hashgraph.sdk.HederaConstants;
+import com.hedera.hashgraph.sdk.TransactionBuilder;
+import com.hedera.hashgraph.sdk.TransactionId;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hedera.hashgraph.proto.CryptoCreateTransactionBody;
 import com.hedera.hashgraph.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.proto.Transaction;
@@ -16,8 +22,8 @@ import io.grpc.MethodDescriptor;
 // Corresponds to `CryptoCreateTransaction`
 public final class AccountCreateTransaction extends TransactionBuilder<AccountCreateTransaction> {
     private final CryptoCreateTransactionBody.Builder builder = bodyBuilder.getCryptoCreateAccountBuilder()
-        // Required fixed autorenew duration (roughly 1/4 year)
-        .setAutoRenewPeriod(DurationHelper.durationFrom(Duration.ofMinutes(131_500)))
+        // Required fixed autorenew duration.
+        .setAutoRenewPeriod(DurationHelper.durationFrom(HederaConstants.DEFAULT_AUTORENEW_DURATION))
         // Default to maximum values for record thresholds. Without this records would be
         // auto-created whenever a send or receive transaction takes place for this new account. This should
         // be an explicit ask.

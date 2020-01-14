@@ -16,8 +16,8 @@ public class ConsensusMessageSubmitTransaction extends TransactionBuilder<Consen
         super();
     }
 
-    public ConsensusMessageSubmitTransaction setTopicId(ConsensusTopicId topic) {
-        builder.setTopicID(topic.toProto());
+    public ConsensusMessageSubmitTransaction setTopicId(ConsensusTopicId topicId) {
+        builder.setTopicID(topicId.toProto());
         return this;
     }
 

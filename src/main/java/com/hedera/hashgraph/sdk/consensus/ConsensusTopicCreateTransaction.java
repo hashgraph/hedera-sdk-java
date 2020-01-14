@@ -5,6 +5,7 @@ import com.hedera.hashgraph.proto.ConsensusServiceGrpc;
 import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.DurationHelper;
+import com.hedera.hashgraph.sdk.HederaConstants;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
@@ -18,6 +19,9 @@ public class ConsensusTopicCreateTransaction extends TransactionBuilder<Consensu
 
     public ConsensusTopicCreateTransaction() {
         super();
+
+        // Set the required autorenew duration.
+        builder.setAutoRenewPeriod(DurationHelper.durationFrom(HederaConstants.DEFAULT_AUTORENEW_DURATION));
     }
 
     public ConsensusTopicCreateTransaction setTopicMemo(String topicMemo) {
