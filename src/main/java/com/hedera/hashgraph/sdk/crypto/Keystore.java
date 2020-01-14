@@ -57,27 +57,27 @@ public final class Keystore {
         this.keyBytes = privateKey.toBytes();
     }
 
-    public static Keystore fromStream(InputStream stream, String passphrase) throws IOException, KeystoreParseException {
+    public static Keystore fromStream(InputStream stream, String passphrase) throws IOException, BadKeyException {
         try {
             final JsonObject jsonObject = jsonParser.parse(new InputStreamReader(stream, StandardCharsets.UTF_8))
                 .getAsJsonObject();
             return fromJson(jsonObject, passphrase);
         } catch (IllegalStateException e) {
-            throw new KeystoreParseException(Optional.ofNullable(e.getMessage()).orElse("failed to parse Keystore"));
+            throw new BadKeyException(Optional.ofNullable(e.getMessage()).orElse("failed to parse Keystore"));
         } catch (JsonIOException e) {
             // RFC (@abonander): I'm all for keeping this as an unchecked exception
             // but I want consistency with export() so this may involve creating our own exception
             // because JsonIOException is kinda leaking implementation details.
             throw (IOException) Objects.requireNonNull(e.getCause());
         } catch (JsonSyntaxException e) {
-            throw new KeystoreParseException(e);
+            throw new BadKeyException(e);
         }
     }
 
     /**
      * Get the decoded key from this keystore as an {@link Ed25519PrivateKey}.
      *
-     * @throws IllegalArgumentException if the key bytes are of an incorrect length for a raw
+     * @throws BadKeyException if the key bytes are of an incorrect length for a raw
      * private key or private key + public key, or do not represent a DER encoded Ed25519
      * private key.
      */
@@ -93,7 +93,7 @@ public final class Keystore {
             case 1:
                 return parseKeystoreV1(expectObject(object, "crypto"), passphrase);
             default:
-                throw new KeystoreParseException("unsupported keystore version: " + version);
+                throw new BadKeyException("unsupported keystore version: " + version);
         }
     }
 
@@ -149,11 +149,11 @@ public final class Keystore {
         final String macString = expectString(crypto, "mac");
 
         if (!cipher.equals("aes-128-ctr")) {
-            throw new KeystoreParseException("unsupported keystore cipher: " + cipher);
+            throw new BadKeyException("unsupported keystore cipher: " + cipher);
         }
 
         if (!kdf.equals("pbkdf2")) {
-            throw new KeystoreParseException("unsuppported KDF: " + kdf);
+            throw new BadKeyException("unsuppported KDF: " + kdf);
         }
 
         final int dkLen = expectInt(kdfParams, "dkLen");
@@ -162,7 +162,7 @@ public final class Keystore {
         final String prf = expectString(kdfParams, "prf");
 
         if (!prf.equals("hmac-sha256")) {
-            throw new KeystoreParseException("unsupported KDF hash function: " + prf);
+            throw new BadKeyException("unsupported KDF hash function: " + prf);
         }
 
         final byte[] cipherBytes = Hex.decode(ciphertext);
@@ -175,7 +175,7 @@ public final class Keystore {
         final byte[] testHmac = calcHmacSha384(cipherKey, cipherBytes);
 
         if (!Arrays.equals(mac, testHmac)) {
-            throw new KeystoreParseException("HMAC mismatch; passphrase is incorrect");
+            throw new BadKeyException("HMAC mismatch; passphrase is incorrect");
         }
 
         return new Keystore(decrypt(cipherKey, iv, cipherBytes));
@@ -185,7 +185,7 @@ public final class Keystore {
         try {
             return object.get(key).getAsJsonObject();
         } catch (ClassCastException | NullPointerException e) {
-            throw new KeystoreParseException("expected key '" + key + "' to be an object");
+            throw new BadKeyException("expected key '" + key + "' to be an object");
         }
     }
 
@@ -193,7 +193,7 @@ public final class Keystore {
         try {
             return object.get(key).getAsInt();
         } catch (ClassCastException | NullPointerException e) {
-            throw new KeystoreParseException("expected key '" + key + "' to be an integer");
+            throw new BadKeyException("expected key '" + key + "' to be an integer");
         }
     }
 
@@ -201,7 +201,7 @@ public final class Keystore {
         try {
             return object.get(key).getAsString();
         } catch (ClassCastException | NullPointerException e) {
-            throw new KeystoreParseException("expected key '" + key + "' to be a string");
+            throw new BadKeyException("expected key '" + key + "' to be a string");
         }
     }
 
