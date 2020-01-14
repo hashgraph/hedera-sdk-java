@@ -186,7 +186,7 @@ public final class ContractFunctionParams {
         IntStream intStream = IntStream.range(0, intArray.length).map(idx -> intArray[idx]);
 
         ByteString arrayBytes = ByteString.copyFrom(
-            intStream.mapToObj(i -> int256(i, 32))
+            intStream.mapToObj(i -> int256(i, 8))
                 .collect(Collectors.toList()));
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
@@ -250,7 +250,7 @@ public final class ContractFunctionParams {
      * @implNote The implementation is wasteful as we must pad to 32-bytes to store 1 byte.
      */
     public ContractFunctionParams addUint8(byte value) {
-        args.add(new Argument("uint8", uint256(value, 32), false));
+        args.add(new Argument("uint8", uint256(value, 8), false));
 
         return this;
     }
@@ -305,7 +305,7 @@ public final class ContractFunctionParams {
         IntStream intStream = IntStream.range(0, intArray.length).map(idx -> intArray[idx]);
 
         ByteString arrayBytes = ByteString.copyFrom(
-            intStream.mapToObj(i -> int256(i, 32))
+            intStream.mapToObj(i -> uint256(i, 8))
                 .collect(Collectors.toList()));
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
