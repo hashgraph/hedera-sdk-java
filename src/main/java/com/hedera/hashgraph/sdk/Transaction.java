@@ -80,34 +80,66 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
         return this;
     }
 
+    /**
+     * @deprecated {use {@link TransactionId#getReceipt}}
+     */
+    @Deprecated
     public TransactionReceipt getReceipt(Client client) throws HederaStatusException {
         return id.getReceipt(client);
     }
 
+    /**
+     * @deprecated {use {@link TransactionId#getReceipt}}
+     */
+    @Deprecated
     public TransactionReceipt getReceipt(Client client, Duration timeout) throws HederaStatusException {
         return id.getReceipt(client, timeout);
     }
 
+    /**
+     * @deprecated {use {@link TransactionId#getReceiptAsync}}
+     */
+    @Deprecated
     public void getReceiptAsync(Client client, Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError) {
         id.getReceiptAsync(client, onReceipt, onError);
     }
 
+    /**
+     * @deprecated {use {@link TransactionId#getReceiptAsync}}
+     */
+    @Deprecated
     public void getReceiptAsync(Client client, Duration timeout, Consumer<TransactionReceipt> onReceipt, Consumer<HederaThrowable> onError) {
         id.getReceiptAsync(client, timeout, onReceipt, onError);
     }
 
+    /**
+     * @deprecated {use {@link TransactionId#getRecord}}
+     */
+    @Deprecated
     public TransactionRecord getRecord(Client client) throws HederaStatusException, HederaNetworkException {
         return id.getRecord(client);
     }
 
+    /**
+     * @deprecated {use {@link TransactionId#getRecord}}
+     */
+    @Deprecated
     public TransactionRecord getRecord(Client client, Duration timeout) throws HederaStatusException {
         return id.getRecord(client, timeout);
     }
 
+    /**
+     * @deprecated {use {@link TransactionId#getRecordAsync}}
+     */
+    @Deprecated
     public void getRecordAsync(Client client, Consumer<TransactionRecord> onRecord, Consumer<HederaThrowable> onError) {
         id.getRecordAsync(client, onRecord, onError);
     }
 
+    /**
+     * @deprecated {use {@link TransactionId#getRecordAsync}}
+     */
+    @Deprecated
     public void getRecordAsync(Client client, Duration timeout, Consumer<TransactionRecord> onRecord, Consumer<HederaThrowable> onError) {
         id.getRecordAsync(client, timeout, onRecord, onError);
     }
@@ -118,6 +150,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
         return inner.build();
     }
 
+    @Internal
     public com.hedera.hashgraph.proto.Transaction toProto(boolean requireSignature) {
         validate(requireSignature);
         return inner.build();
@@ -137,7 +170,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
     }
 
     @Override
-    public final void localValidate() {
+    protected final void localValidate() {
         SignatureMapOrBuilder sigMap = inner.getSigMapOrBuilder();
 
         if (sigMap.getSigPairCount() < 2) {
@@ -185,6 +218,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
         return toProto().toByteArray();
     }
 
+    @Deprecated
     public byte[] toBytes(boolean requiresSignature) {
         return toProto(requiresSignature).toByteArray();
     }
