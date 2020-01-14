@@ -33,8 +33,8 @@ public final class TransferCrypto {
         AccountId recipientId = AccountId.fromString("0.0.3");
         Hbar amount = Hbar.fromTinybar(10_000);
 
-        long senderBalanceBefore = client.getAccountBalance(OPERATOR_ID);
-        long receiptBalanceBefore = client.getAccountBalance(recipientId);
+        Hbar senderBalanceBefore = client.getAccountBalance(OPERATOR_ID);
+        Hbar receiptBalanceBefore = client.getAccountBalance(recipientId);
 
         System.out.println("" + OPERATOR_ID + " balance = " + senderBalanceBefore);
         System.out.println("" + recipientId + " balance = " + receiptBalanceBefore);
@@ -53,11 +53,11 @@ public final class TransferCrypto {
 
         System.out.println("transferred " + amount + "...");
 
-        long senderBalanceAfter = client.getAccountBalance(OPERATOR_ID);
-        long receiptBalanceAfter = client.getAccountBalance(recipientId);
+        Hbar senderBalanceAfter = client.getAccountBalance(OPERATOR_ID);
+        Hbar receiptBalanceAfter = client.getAccountBalance(recipientId);
 
         System.out.println("" + OPERATOR_ID + " balance = " + senderBalanceAfter);
         System.out.println("" + recipientId + " balance = " + receiptBalanceAfter);
-        System.out.println("Transfer memo: " + record.getMemo());
+        System.out.println("Transfer memo: " + record.transactionMemo);
     }
 }

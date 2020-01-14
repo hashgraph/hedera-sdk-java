@@ -9,6 +9,7 @@ import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.file.FileContentsQuery;
 import com.hedera.hashgraph.sdk.file.FileId;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -42,9 +43,9 @@ public final class GetAddressBook {
 
         fileQuery.setMaxQueryPayment(Hbar.of(1));
 
-        final ByteString contents = fileQuery.execute(client).getFileContents().getContents();
+        final byte[] contents = fileQuery.execute(client);
 
-        Files.copy(contents.newInput(),
+        Files.copy(new ByteArrayInputStream(contents),
             FileSystems.getDefault().getPath("address-book.proto.bin"));
     }
 }

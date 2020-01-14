@@ -3,15 +3,9 @@ package com.hedera.hashgraph.sdk.examples.advanced;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.hedera.hashgraph.proto.ResponseCodeEnum;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.HederaStatusException;
-import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.contract.ContractCallQuery;
-import com.hedera.hashgraph.sdk.contract.ContractCreateTransaction;
-import com.hedera.hashgraph.sdk.contract.ContractDeleteTransaction;
-import com.hedera.hashgraph.sdk.contract.ContractId;
+import com.hedera.hashgraph.sdk.contract.*;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.file.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.file.FileId;
@@ -76,7 +70,7 @@ public final class CreateSimpleContract {
         // create the contract itself
         TransactionId contractTxId = new ContractCreateTransaction().setAutoRenewPeriod(Duration.ofHours(1))
             .setGas(217000)
-            .setBytecodeFile(newFileId)
+            .setBytecodeFileId(newFileId)
             // set an admin key so we can delete the contract later
             .setAdminKey(OPERATOR_KEY.publicKey)
             .execute(client);
@@ -89,14 +83,14 @@ public final class CreateSimpleContract {
 
         System.out.println("new contract ID: " + newContractId);
 
-        FunctionResult contractCallResult = new ContractCallQuery()
+        ContractFunctionResult contractCallResult = new ContractCallQuery()
             .setGas(30000)
             .setContractId(newContractId)
             .setFunction("greet")
             .execute(client);
 
-        if (contractCallResult.getErrorMessage() != null) {
-            System.out.println("error calling contract: " + contractCallResult.getErrorMessage());
+        if (contractCallResult.errorMessage != null) {
+            System.out.println("error calling contract: " + contractCallResult.errorMessage);
             return;
         }
 
@@ -110,8 +104,8 @@ public final class CreateSimpleContract {
 
         TransactionReceipt contractDeleteResult = contractDeleteTxnId.getReceipt(client);
 
-        if (contractDeleteResult.getStatus() != ResponseCodeEnum.SUCCESS) {
-            System.out.println("error deleting contract: " + contractDeleteResult.getStatus());
+        if (contractDeleteResult.status != Status.Success) {
+            System.out.println("error deleting contract: " + contractDeleteResult.status);
             return;
         }
         System.out.println("Contract successfully deleted");

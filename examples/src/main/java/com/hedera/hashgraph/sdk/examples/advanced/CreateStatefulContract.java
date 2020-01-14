@@ -8,11 +8,7 @@ import com.hedera.hashgraph.sdk.HederaStatusException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.contract.ContractCallQuery;
-import com.hedera.hashgraph.sdk.contract.ContractCreateTransaction;
-import com.hedera.hashgraph.sdk.contract.ContractExecuteTransaction;
-import com.hedera.hashgraph.sdk.contract.ContractFunctionParams;
-import com.hedera.hashgraph.sdk.contract.ContractId;
+import com.hedera.hashgraph.sdk.contract.*;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.file.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.file.FileId;
@@ -76,7 +72,7 @@ public final class CreateStatefulContract {
         System.out.println("contract bytecode file: " + newFileId);
 
         TransactionId contractTxId = new ContractCreateTransaction()
-            .setBytecodeFile(newFileId)
+            .setBytecodeFileId(newFileId)
             .setGas(100_000_000)
             .setConstructorParams(
                 new ContractFunctionParams()
@@ -88,14 +84,14 @@ public final class CreateStatefulContract {
 
         System.out.println("new contract ID: " + newContractId);
 
-        FunctionResult contractCallResult = new ContractCallQuery()
+        ContractFunctionResult contractCallResult = new ContractCallQuery()
             .setContractId(newContractId)
             .setGas(1000)
             .setFunction("get_message")
             .execute(client);
 
-        if (contractCallResult.getErrorMessage() != null) {
-            System.out.println("error calling contract: " + contractCallResult.getErrorMessage());
+        if (contractCallResult.errorMessage != null) {
+            System.out.println("error calling contract: " + contractCallResult.errorMessage);
             return;
         }
 
@@ -113,14 +109,14 @@ public final class CreateStatefulContract {
         contractExecTxnId.getReceipt(client);
 
         // now query contract
-        FunctionResult contractUpdateResult = new ContractCallQuery()
+        ContractFunctionResult contractUpdateResult = new ContractCallQuery()
             .setContractId(newContractId)
             .setGas(100_000_000)
             .setFunction("get_message")
             .execute(client);
 
-        if (contractUpdateResult.getErrorMessage() != null) {
-            System.out.println("error calling contract: " + contractUpdateResult.getErrorMessage());
+        if (contractUpdateResult.errorMessage != null) {
+            System.out.println("error calling contract: " + contractUpdateResult.errorMessage);
             return;
         }
 
