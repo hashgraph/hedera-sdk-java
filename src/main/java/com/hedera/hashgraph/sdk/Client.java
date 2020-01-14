@@ -251,7 +251,7 @@ public final class Client implements AutoCloseable {
      * from the operator account on the client.
      * <p>
      * If the returned value is greater than this value, a
-     * {@link QueryBuilder.MaxPaymentExceededException} will be thrown from
+     * {@link MaxQueryPaymentExceededException} will be thrown from
      * {@link QueryBuilder#execute(Client)} or returned in the second callback of
      * {@link QueryBuilder#executeAsync(Client, Consumer, Consumer)}.
      * <p>
@@ -274,7 +274,7 @@ public final class Client implements AutoCloseable {
      * from the operator account on the client.
      * <p>
      * If the returned value is greater than this value, a
-     * {@link QueryBuilder.MaxPaymentExceededException} will be thrown from
+     * {@link MaxQueryPaymentExceededException} will be thrown from
      * {@link QueryBuilder#execute(Client)} or returned in the second callback of
      * {@link QueryBuilder#executeAsync(Client, Consumer, Consumer)}.
      * <p>

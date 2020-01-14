@@ -169,7 +169,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
             if (paymentAmount == 0) {
                 final long cost = getCost(client);
                 if (cost > maxQueryPayment) {
-                    throw new MaxPaymentExceededException(this, cost, maxQueryPayment);
+                    throw new MaxQueryPaymentExceededException(this, cost, maxQueryPayment);
                 }
 
                 this.paymentAmount = cost;
@@ -188,7 +188,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         if (!getHeaderBuilder().hasPayment() && isPaymentRequired() && maxQueryPayment > 0) {
             getCostAsync(client, cost -> {
                 if (cost > maxQueryPayment) {
-                    onError.accept(new MaxPaymentExceededException(this, cost, maxQueryPayment));
+                    onError.accept(new MaxQueryPaymentExceededException(this, cost, maxQueryPayment));
                     return;
                 }
                 paymentAmount = cost;
@@ -347,14 +347,4 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         }
     }
 
-    public static final class MaxPaymentExceededException extends RuntimeException implements HederaThrowable {
-        private MaxPaymentExceededException(QueryBuilder<?, ?> builder, long cost, long maxQueryPayment) {
-            super(String.format(
-                "cost of %s (%d) without explicit payment is greater than "
-                    + "Client.maxQueryPayment (%d)",
-                builder.getClass().getSimpleName(),
-                cost,
-                maxQueryPayment));
-        }
-    }
 }
