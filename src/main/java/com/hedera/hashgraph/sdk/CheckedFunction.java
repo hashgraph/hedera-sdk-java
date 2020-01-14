@@ -2,5 +2,5 @@ package com.hedera.hashgraph.sdk;
 
 @FunctionalInterface
 interface CheckedFunction<T, R> {
-    R apply(T t) throws HederaException, HederaNetworkException;
+    R apply(T t) throws HederaStatusException, HederaNetworkException;
 }

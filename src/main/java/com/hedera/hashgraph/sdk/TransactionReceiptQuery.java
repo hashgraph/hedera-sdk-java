@@ -30,11 +30,11 @@ public final class TransactionReceiptQuery extends QueryBuilder<TransactionRecei
 
     @Override
     protected boolean shouldRetry(HederaThrowable e) {
-        if (!(e instanceof HederaException)) {
+        if (!(e instanceof HederaStatusException)) {
             return false;
         }
 
-        switch (((HederaException) e).status) {
+        switch (((HederaStatusException) e).status) {
             // still in the node's queue
             case Unknown:
             // accepted but has not reached consensus

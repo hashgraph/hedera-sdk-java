@@ -80,11 +80,11 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
         return this;
     }
 
-    public TransactionReceipt getReceipt(Client client) throws HederaException {
+    public TransactionReceipt getReceipt(Client client) throws HederaStatusException {
         return id.getReceipt(client);
     }
 
-    public TransactionReceipt getReceipt(Client client, Duration timeout) throws HederaException {
+    public TransactionReceipt getReceipt(Client client, Duration timeout) throws HederaStatusException {
         return id.getReceipt(client, timeout);
     }
 
@@ -96,11 +96,11 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
         id.getReceiptAsync(client, timeout, onReceipt, onError);
     }
 
-    public TransactionRecord getRecord(Client client) throws HederaException, HederaNetworkException {
+    public TransactionRecord getRecord(Client client) throws HederaStatusException, HederaNetworkException {
         return id.getRecord(client);
     }
 
-    public TransactionRecord getRecord(Client client, Duration timeout) throws HederaException {
+    public TransactionRecord getRecord(Client client, Duration timeout) throws HederaStatusException {
         return id.getRecord(client, timeout);
     }
 
@@ -171,8 +171,8 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
     }
 
     @Override
-    protected TransactionId mapResponse(TransactionResponse response) throws HederaException {
-        HederaException.throwIfExceptional(response.getNodeTransactionPrecheckCode());
+    protected TransactionId mapResponse(TransactionResponse response) throws HederaStatusException {
+        HederaStatusException.throwIfExceptional(response.getNodeTransactionPrecheckCode());
         return new TransactionId(txnIdProto);
     }
 

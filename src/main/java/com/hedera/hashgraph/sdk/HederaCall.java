@@ -6,7 +6,6 @@ import com.google.protobuf.ByteString;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
@@ -32,21 +31,21 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
 
     protected abstract Channel getChannel(Client client);
 
-    protected abstract Resp mapResponse(RawResp raw) throws HederaException;
+    protected abstract Resp mapResponse(RawResp raw) throws HederaStatusException;
 
     protected Duration getDefaultTimeout() {
         return Duration.ZERO;
     }
 
     protected boolean shouldRetry(HederaThrowable e) {
-        return e instanceof HederaException && ((HederaException) e).status == Status.Busy;
+        return e instanceof HederaStatusException && ((HederaStatusException) e).status == Status.Busy;
     }
 
-    public final Resp execute(Client client) throws HederaException, HederaNetworkException {
+    public final Resp execute(Client client) throws HederaStatusException, HederaNetworkException {
         return execute(client, getDefaultTimeout());
     }
 
-    public Resp execute(Client client, Duration retryTimeout) throws HederaException, HederaNetworkException {
+    public Resp execute(Client client, Duration retryTimeout) throws HederaStatusException, HederaNetworkException {
         if (isExecuted) {
             throw new IllegalStateException("call already executed");
         }
@@ -55,7 +54,7 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
         // N.B. only QueryBuilder used onPreExecute() so instead it should just override this
         // method instead
 
-        final Backoff.FallibleProducer<Resp, HederaException> tryProduce = () ->
+        final Backoff.FallibleProducer<Resp, HederaStatusException> tryProduce = () ->
             mapResponse(ClientCalls.blockingUnaryCall(getChannel(client).newCall(getMethod(), CallOptions.DEFAULT), toProto()));
 
         return new Backoff(RETRY_DELAY, retryTimeout)
@@ -153,7 +152,7 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
             try {
                 Resp response = mapResponse(value);
                 onSuccess.accept(response);
-            } catch (HederaException e) {
+            } catch (HederaStatusException e) {
                 onError.accept(e);
             }
         }

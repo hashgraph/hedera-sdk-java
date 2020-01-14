@@ -5,8 +5,6 @@ import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.account.AccountId;
 
 import java.time.Duration;
-import java.util.Objects;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
@@ -171,7 +169,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     }
 
     @Override
-    public TransactionId execute(Client client, Duration retryTimeout) throws HederaException, HederaNetworkException {
+    public TransactionId execute(Client client, Duration retryTimeout) throws HederaStatusException, HederaNetworkException {
         return build(client).execute(client, retryTimeout);
     }
 
@@ -202,8 +200,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     }
 
     @Override
-    protected TransactionId mapResponse(TransactionResponse response) throws HederaException {
-        HederaException.throwIfExceptional(response.getNodeTransactionPrecheckCode());
+    protected TransactionId mapResponse(TransactionResponse response) throws HederaStatusException {
+        HederaStatusException.throwIfExceptional(response.getNodeTransactionPrecheckCode());
         return new TransactionId(
             bodyBuilder.getTransactionIDOrBuilder());
     }
