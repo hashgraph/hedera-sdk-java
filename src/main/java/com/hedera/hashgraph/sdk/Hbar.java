@@ -43,13 +43,13 @@ public final class Hbar implements Comparable<Hbar> {
      * @param amount the amount in the given unit, may be negative.
      * @param unit   the unit to multiply the amount by.
      * @return the calculated hbar value.
-     * @throws IllegalArgumentException if the tinybar equivalent does not fit in a {@code long}.
+     * @throws HbarRangeException if the tinybar equivalent does not fit in a {@code long}.
      */
     public static Hbar from(long amount, HbarUnit unit) {
         try {
             return new Hbar(amount * unit.tinybar, unit);
         } catch (ArithmeticException e) {
-            throw new IllegalArgumentException(amount + " " + unit + " is out of range for Hbar");
+            throw new HbarRangeException(amount + " " + unit + " is out of range for Hbar");
         }
     }
 
@@ -66,7 +66,7 @@ public final class Hbar implements Comparable<Hbar> {
      * @param amount the amount in the given unit, may be fractional and/or negative.
      * @param unit   the unit to multiply the amount by.
      * @return the calculated hbar value.
-     * @throws IllegalArgumentException if the tinybar equivalent is not an integer
+     * @throws HbarRangeException if the tinybar equivalent is not an integer
      *                                  or does not fit in a {@code long}.
      */
     public static Hbar from(BigDecimal amount, HbarUnit unit) {
@@ -77,7 +77,7 @@ public final class Hbar implements Comparable<Hbar> {
                 // longValueExact() does this operation internally
                 tinybar = amount.toBigIntegerExact();
             } catch (ArithmeticException e) {
-                throw new IllegalArgumentException("tinybar amount is not an integer: " + amount);
+                throw new HbarRangeException("tinybar amount is not an integer: " + amount);
             }
         } else {
             BigDecimal tinybarDecimal = amount.multiply(new BigDecimal(unit.tinybar));
@@ -85,7 +85,7 @@ public final class Hbar implements Comparable<Hbar> {
             try {
                 tinybar = tinybarDecimal.toBigIntegerExact();
             } catch (ArithmeticException e) {
-                throw new IllegalArgumentException("tinybar equivalent of " + amount + " "
+                throw new HbarRangeException("tinybar equivalent of " + amount + " "
                     + unit + " (" + tinybarDecimal + ") is not an integer");
             }
         }
@@ -93,7 +93,7 @@ public final class Hbar implements Comparable<Hbar> {
         try {
             return new Hbar(tinybar.longValueExact(), unit);
         } catch (ArithmeticException e) {
-            throw new IllegalArgumentException(amount + " " + unit + " is out of range for Hbar");
+            throw new HbarRangeException(amount + " " + unit + " is out of range for Hbar");
         }
     }
 
@@ -112,7 +112,7 @@ public final class Hbar implements Comparable<Hbar> {
      *
      * @param amount the amount in hbar, may be negative.
      * @return the wrapped hbar value.
-     * @throws IllegalArgumentException if the tinybar equivalent does not fit in a {@code long}.
+     * @throws HbarRangeException if the tinybar equivalent does not fit in a {@code long}.
      */
     public static Hbar of(long amount) {
         return from(amount, HbarUnit.Hbar);
@@ -128,7 +128,7 @@ public final class Hbar implements Comparable<Hbar> {
      *
      * @param amount the amount in hbar, may be fractional and/or negative.
      * @return the calculated hbar value.
-     * @throws IllegalArgumentException if the tinybar equivalent is not an integer
+     * @throws HbarRangeException if the tinybar equivalent is not an integer
      *                                  or does not fit in a {@code long}.
      */
     public static Hbar of(BigDecimal amount) {
