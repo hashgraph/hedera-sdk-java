@@ -1,8 +1,11 @@
 package com.hedera.hashgraph.sdk.consensus;
 
 import com.google.protobuf.StringValue;
+import com.hedera.hashgraph.proto.AccountID;
 import com.hedera.hashgraph.proto.ConsensusServiceGrpc;
 import com.hedera.hashgraph.proto.ConsensusUpdateTopicTransactionBody;
+import com.hedera.hashgraph.proto.Key;
+import com.hedera.hashgraph.proto.KeyList;
 import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.DurationHelper;
@@ -33,13 +36,40 @@ public class ConsensusTopicUpdateTransaction extends TransactionBuilder<Consensu
         return this;
     }
 
+    /**
+     * Explicitly clear any memo on the topic.
+     * @return
+     */
+    public ConsensusTopicUpdateTransaction clearTopicMemo() {
+        builder.setMemo(StringValue.of(""));
+        return this;
+    }
+
     public ConsensusTopicUpdateTransaction setAdminKey(PublicKey key) {
         builder.setAdminKey(key.toKeyProto());
         return this;
     }
 
+    /**
+     * Explicitly clear any adminKey on the topic.
+     * @return
+     */
+    public ConsensusTopicUpdateTransaction clearAdminKey() {
+        builder.setAdminKey(Key.newBuilder().setKeyList(KeyList.getDefaultInstance()));
+        return this;
+    }
+
     public ConsensusTopicUpdateTransaction setSubmitKey(PublicKey key) {
         builder.setSubmitKey(key.toKeyProto());
+        return this;
+    }
+
+    /**
+     * Explicitly clear any submitKey on the topic.
+     * @return
+     */
+    public ConsensusTopicUpdateTransaction clearSubmitKey() {
+        builder.setSubmitKey(Key.newBuilder().setKeyList(KeyList.getDefaultInstance()));
         return this;
     }
 
@@ -55,6 +85,15 @@ public class ConsensusTopicUpdateTransaction extends TransactionBuilder<Consensu
 
     public ConsensusTopicUpdateTransaction setAutoRenewAccountId(AccountId autoRenewAccountId) {
         builder.setAutoRenewAccount(autoRenewAccountId.toProto());
+        return this;
+    }
+
+    /**
+     * Explicitly clear any auto renew account ID on the topic.
+     * @return
+     */
+    public ConsensusTopicUpdateTransaction clearAutoRenewAccountId() {
+        builder.setAutoRenewAccount(AccountID.getDefaultInstance());
         return this;
     }
 

@@ -4,6 +4,7 @@ import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.CallParams;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.DurationHelper;
+import com.hedera.hashgraph.sdk.HederaConstants;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
@@ -25,8 +26,8 @@ public class ContractCreateTransaction extends TransactionBuilder<ContractCreate
     private final ContractCreateTransactionBody.Builder builder = bodyBuilder.getContractCreateInstanceBuilder();
 
     {
-        // Required fixed autorenew duration (roughly 1/4 year)
-        setAutoRenewPeriod(Duration.ofMinutes(131_500));
+        // Required fixed autorenew duration.
+        setAutoRenewPeriod(HederaConstants.DEFAULT_AUTORENEW_DURATION);
     }
 
     /**
