@@ -79,11 +79,11 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
     }
 
     @VisibleForTesting
-    public final void validate() {
+    public final void validate() throws LocalValidationException {
         localValidate();
     }
 
-    protected abstract void localValidate();
+    protected abstract void localValidate() throws LocalValidationException;
 
     protected void addValidationError(String errMsg) {
         if (validationErrors == null) validationErrors = new ArrayList<>();
@@ -94,7 +94,7 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
         if (validationErrors == null) return;
         List<String> errors = validationErrors;
         validationErrors = null;
-        throw new IllegalStateException(prologue + ":\n" + String.join("\n", errors));
+        throw new LocalValidationException(prologue + ":\n" + String.join("\n", errors));
     }
 
     protected final void require(boolean mustBeTrue, String errMsg) {
