@@ -13,7 +13,8 @@ import javax.annotation.Nullable;
 import io.grpc.Channel;
 
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
-    extends HederaCall<com.hedera.hashgraph.proto.Transaction, TransactionResponse, TransactionId, T> {
+    extends HederaCall<com.hedera.hashgraph.proto.Transaction, TransactionResponse, TransactionId, T>
+{
     protected final com.hedera.hashgraph.proto.Transaction.Builder inner = com.hedera.hashgraph.proto.Transaction.newBuilder();
     protected final TransactionBody.Builder bodyBuilder = TransactionBody.newBuilder();
 
