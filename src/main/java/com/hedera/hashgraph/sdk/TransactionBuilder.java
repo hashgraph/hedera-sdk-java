@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.hedera.hashgraph.proto.TransactionBody;
 import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.account.AccountId;
+import com.hedera.hashgraph.sdk.crypto.PrivateKey;
 
 import java.time.Duration;
 import java.util.function.Consumer;
@@ -12,8 +13,7 @@ import javax.annotation.Nullable;
 import io.grpc.Channel;
 
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
-    extends HederaCall<com.hedera.hashgraph.proto.Transaction, TransactionResponse, TransactionId, T>
-{
+    extends HederaCall<com.hedera.hashgraph.proto.Transaction, TransactionResponse, TransactionId, T> {
     protected final com.hedera.hashgraph.proto.Transaction.Builder inner = com.hedera.hashgraph.proto.Transaction.newBuilder();
     protected final TransactionBody.Builder bodyBuilder = TransactionBody.newBuilder();
 
@@ -133,7 +133,36 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         checkValidationErrors("transaction builder failed local validation");
     }
 
-    public final Transaction build(@Nullable Client client) {
+    /**
+     * Construct the final, immutable transaction.
+     * <p>
+     * If {@code client} is not null, then some defaults are added if they are not otherwise
+     * set:
+     *
+     * <ul>
+     *     <li>{@link #setNodeAccountId(AccountId)}, if not manually set, is set with a random node
+     *     chosen from the set that {@link Client} was constructed with</li>
+     *     <li>{@link #setMaxTransactionFee(Hbar)}, if not manually set, is set
+     *     with the value of {@link Client#getMaxTransactionFee()}</li>
+     *     <li>{@link #setTransactionId(TransactionId)} is set by calling
+     *     {@link TransactionId#TransactionId(AccountId)} with the operator account
+     *     if perviously set by {@link Client#setOperator(AccountId, PrivateKey)}.</li>
+     *     <li>{@link Transaction#sign(PrivateKey)} is called with the operator private key
+     *     if also previously set by {@link Client#setOperator(AccountId, PrivateKey)}
+     *     (but only if {@link #setTransactionId(TransactionId)} was not called with a different
+     *     account ID in the transaction ID).</li>
+     * </ul>
+     *
+     * The last two items imply that the operator account set with
+     * {@link Client#setOperator(AccountId, PrivateKey)} will be paying the fee for this transaction
+     * if not otherwise specified.
+     *
+     * @param client the client to retrieve defaults from.
+     * @return the built {@link Transaction}, signed by the operator key in the client if
+     * applicable.
+     * @throws LocalValidationException if the transaction fails local sanity checks.
+     */
+    public final Transaction build(@Nullable Client client) throws LocalValidationException {
         if (client != null && bodyBuilder.getTransactionFee() == 0) {
             setMaxTransactionFee(client.getMaxTransactionFee());
         }
