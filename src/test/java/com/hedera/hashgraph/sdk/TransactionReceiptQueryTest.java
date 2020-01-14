@@ -1,9 +1,9 @@
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.proto.Query;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
-import com.hedera.hashgraph.proto.Query;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,12 +25,13 @@ class TransactionReceiptQueryTest {
         .setTransactionId(TransactionId.withValidStart(USER_ACCOUNT, Instant.parse("2019-04-05T12:00:00Z")))
         .addSender(USER_ACCOUNT, 10000)
         .addRecipient(NODE_ACCOUNT, 10000)
-        .setTransactionFee(100_000)
+        .setMaxTransactionFee(100_000)
+        .build(null)
         .sign(privateKey);
 
     static final TransactionReceiptQuery query = new TransactionReceiptQuery()
         .setTransactionId(TransactionId.withValidStart(USER_ACCOUNT, Instant.parse("2019-04-05T11:00:00Z")))
-        .setPayment(paymentTxn);
+        .setPaymentTransaction(paymentTxn);
 
     static final Query builtQuery = query.inner.build();
 

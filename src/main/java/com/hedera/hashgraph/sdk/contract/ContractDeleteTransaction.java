@@ -14,7 +14,7 @@ public final class ContractDeleteTransaction extends TransactionBuilder<Contract
     private final ContractDeleteTransactionBody.Builder builder = bodyBuilder.getContractDeleteInstanceBuilder();
 
     public ContractDeleteTransaction() {
-        super(null);
+        super();
     }
 
     public ContractDeleteTransaction setContractId(ContractId contractId) {

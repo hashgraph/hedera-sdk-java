@@ -1,16 +1,21 @@
 package com.hedera.hashgraph.sdk.crypto.ed25519;
 
+import com.hedera.hashgraph.proto.SignaturePair;
 import com.hedera.hashgraph.sdk.crypto.Mnemonic;
 
+import org.bouncycastle.math.ec.rfc8032.Ed25519;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -94,7 +99,7 @@ class Ed25519PrivateKeyTest {
     @DisplayName("private key can be decoded from a PEM file")
     void keyFromPem() throws IOException {
         final StringReader stringReader = new StringReader(testKeyPem);
-        final Ed25519PrivateKey privateKey = Ed25519PrivateKey.fromPemFile(stringReader);
+        final Ed25519PrivateKey privateKey = Ed25519PrivateKey.fromPem(stringReader);
 
         assertEquals(privateKey.toString(), testKeyStr);
     }
@@ -146,8 +151,37 @@ class Ed25519PrivateKeyTest {
 
         final byte[] messageToSign = "this is a test message".getBytes(StandardCharsets.UTF_8);
 
-        final Ed25519Signature signature = Ed25519Signature.forMessage(privateKey, messageToSign);
+        final SignaturePair signature = privateKey.sign(messageToSign);
 
-        assertTrue(signature.verify(privateKey.publicKey, messageToSign));
+        assertTrue(Ed25519.verify(signature.getEd25519().toByteArray(), 0, privateKey.publicKey.toBytes(), 0, messageToSign, 0, messageToSign.length));
+    }
+
+    private static final String messageStr = "This is a message about the world.";
+    private static final byte[] messageBytes = messageStr.getBytes(StandardCharsets.UTF_8);
+    private static final String sigStr = "73bea53f31ca9c42a422ecb7516ec08d0bbd1a6bfd630ccf10ec1872454814d29f4a8011129cd007eab544af01a75f508285b591e5bed24b68f927751e49e30e";
+
+    @SuppressWarnings("unused")
+    private static Stream<String> privKeyStrings() {
+        return Stream.of(
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10",
+            // raw hex (concatenated private + public key)
+            "db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10" +
+                "e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7",
+            // raw hex (just private key)
+            "db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10"
+        );
+    }
+
+    @ParameterizedTest
+    @DisplayName("reproducible signature can be computed")
+    @MethodSource("privKeyStrings")
+    void reproducibleSignature(String keyStr) {
+        final Ed25519PrivateKey key = Ed25519PrivateKey.fromString(keyStr);
+        final SignaturePair signature = key.sign(messageBytes);
+
+        assertEquals(
+            sigStr,
+            Hex.toHexString(signature.getEd25519().toByteArray())
+        );
     }
 }

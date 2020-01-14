@@ -1,8 +1,8 @@
 package com.hedera.hashgraph.sdk.account;
 
+import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
-import com.hedera.hashgraph.proto.Transaction;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,12 +35,11 @@ class AccountDeleteTransactionTest {
         final Ed25519PrivateKey key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962");
         final TransactionId txnId = TransactionId.withValidStart(new AccountId(2), now);
         final Transaction txn = new AccountDeleteTransaction()
-            .setNodeAccountId(new AccountId(3))
-            .setTransactionId(txnId)
-            .setTransferAccountId(new AccountId(4))
-            .setDeleteAccountId(new AccountId(1))
-            .setMaxTransactionFee(100_000)
-            .build()
+                .setNodeAccountId(new AccountId(3))
+                .setTransactionId(txnId)
+                .setTransferAccountId(new AccountId(4))
+                .setDeleteAccountId(new AccountId(1))
+                .setMaxTransactionFee(100_000).build(null)
             .sign(key)
             .toProto();
 

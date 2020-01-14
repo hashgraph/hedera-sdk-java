@@ -41,8 +41,9 @@ class FileUpdateTransactionTest {
             .setFileId(new FileId(1, 2, 3))
             .setExpirationTime(Instant.ofEpochSecond(1554158728))
             .setContents(new byte[]{1, 2, 3, 4, 5})
-            .setTransactionFee(100_000)
+            .setMaxTransactionFee(100_000)
             .addKey(key.publicKey)
+            .build(null)
             .sign(key)
             .toProto();
 

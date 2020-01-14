@@ -26,10 +26,9 @@ class TransactionTest {
 
     // a different instance for each test
     private final Transaction txn = new FileDeleteTransaction()
-        .setTransactionId(txnId)
-        .setNodeAccountId(nodeAcctId)
-        .setFileId(new FileId(0, 0, 0))
-        .build();
+            .setTransactionId(txnId)
+            .setNodeAccountId(nodeAcctId)
+            .setFileId(new FileId(0, 0, 0)).build(null);
 
     @Test
     @DisplayName("validate() requires a signature")

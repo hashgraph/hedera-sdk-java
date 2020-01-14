@@ -28,14 +28,13 @@ class AccountInfoQueryTest {
     @DisplayName("Query can be built")
     void correctQuery() {
         final AccountInfoQuery query = new AccountInfoQuery()
-            .setPayment(
+            .setPaymentTransaction(
                 new CryptoTransferTransaction()
-                    .setTransactionId(TransactionId.withValidStart(new AccountId(2), Instant.ofEpochSecond(1559868457)))
-                    .setNodeAccountId(new AccountId(3))
-                    .addSender(new AccountId(2), 10000)
-                    .addRecipient(new AccountId(3), 10000)
-                    .setMaxTransactionFee(100_000)
-                    .build()
+                        .setTransactionId(TransactionId.withValidStart(new AccountId(2), Instant.ofEpochSecond(1559868457)))
+                        .setNodeAccountId(new AccountId(3))
+                        .addSender(new AccountId(2), 10000)
+                        .addRecipient(new AccountId(3), 10000)
+                        .setMaxTransactionFee(100_000).build(null)
                     .sign(key))
             .setAccountId(new AccountId(5));
 

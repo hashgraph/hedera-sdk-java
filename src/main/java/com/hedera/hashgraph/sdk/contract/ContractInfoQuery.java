@@ -20,7 +20,7 @@ public final class ContractInfoQuery extends QueryBuilder<ContractInfo, Contract
     private final ContractGetInfoQuery.Builder builder = inner.getContractGetInfoBuilder();
 
     public ContractInfoQuery() {
-        super(null);
+        super();
     }
 
     @Override

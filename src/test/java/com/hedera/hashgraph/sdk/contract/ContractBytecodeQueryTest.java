@@ -35,14 +35,13 @@ class ContractBytecodeQueryTest {
     @DisplayName("correct query can be built")
     void correctBuilder() {
         final ContractBytecodeQuery query = new ContractBytecodeQuery()
-            .setPayment(
+            .setPaymentTransaction(
                 new CryptoTransferTransaction()
-                    .setTransactionId(TransactionId.withValidStart(new AccountId(2), Instant.ofEpochSecond(1559868457)))
-                    .setNodeAccountId(new AccountId(3))
-                    .addSender(new AccountId(2), 10000)
-                    .addRecipient(new AccountId(3), 10000)
-                    .setMaxTransactionFee(100_000)
-                    .build()
+                        .setTransactionId(TransactionId.withValidStart(new AccountId(2), Instant.ofEpochSecond(1559868457)))
+                        .setNodeAccountId(new AccountId(3))
+                        .addSender(new AccountId(2), 10000)
+                        .addRecipient(new AccountId(3), 10000)
+                        .setMaxTransactionFee(100_000).build(null)
                     .sign(key))
             .setContractId(new ContractId(0, 0, 0));
 
