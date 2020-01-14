@@ -76,20 +76,25 @@ class ContractFunctionParamsTest {
             .addInt256(BigInteger.valueOf(0xdeadbeef).shiftLeft(8))
             .addString("Hello, world!")
             .addBytes(new byte[]{-1, -18, 63, 127})
-            .addBool(true);
+            .addBool(true)
+            .addUint8Array(new byte[]{-1, 127});
 
         final String paramsHex = Hex.toHexString(params.toBytes("foo").toByteArray());
 
         assertEquals(
-            "be0d49d2"
+            "6a5bb8f2"
                 + "ffffffffffffffffffffffffffffffffffffffffffffffffffffffdeadbeef00"
-                + "0000000000000000000000000000000000000000000000000000000000000080"
-                + "00000000000000000000000000000000000000000000000000000000000000c0"
+                + "00000000000000000000000000000000000000000000000000000000000000a0"
+                + "00000000000000000000000000000000000000000000000000000000000000e0"
                 + "0000000000000000000000000000000000000000000000000000000000000001"
+                + "0000000000000000000000000000000000000000000000000000000000000120"
                 + "000000000000000000000000000000000000000000000000000000000000000d"
                 + "48656c6c6f2c20776f726c642100000000000000000000000000000000000000"
                 + "0000000000000000000000000000000000000000000000000000000000000004"
-                + "ffee3f7f00000000000000000000000000000000000000000000000000000000",
+                + "ffee3f7f00000000000000000000000000000000000000000000000000000000"
+                + "0000000000000000000000000000000000000000000000000000000000000002"
+                + "00000000000000000000000000000000000000000000000000000000000000ff"
+                + "000000000000000000000000000000000000000000000000000000000000007f",
             paramsHex
         );
     }
@@ -195,6 +200,36 @@ class ContractFunctionParamsTest {
         assertEquals(
             hexString,
             Hex.toHexString(ContractFunctionParams.int256(val, 64).toByteArray())
+        );
+    }
+
+    private static Stream<Arguments> uInt256Arguments() {
+        return Stream.of(
+            Arguments.of(0, "0000000000000000000000000000000000000000000000000000000000000000", 8),
+            Arguments.of(2, "0000000000000000000000000000000000000000000000000000000000000002", 8),
+            Arguments.of(255, "00000000000000000000000000000000000000000000000000000000000000ff", 8),
+            Arguments.of(4095, "0000000000000000000000000000000000000000000000000000000000000fff", 32),
+            Arguments.of(127 << 24, "000000000000000000000000000000000000000000000000000000007f000000", 32),
+            Arguments.of(2047 << 20, "000000000000000000000000000000000000000000000000000000007ff00000", 32),
+            // deadbeef as an integer literal is negative
+            Arguments.of(0xdeadbeef, "00000000000000000000000000000000000000000000000000000000deadbeef", 32),
+            Arguments.of(-1, "000000000000000000000000000000000000000000000000ffffffffffffffff", 64),
+            Arguments.of(-2, "000000000000000000000000000000000000000000000000fffffffffffffffe", 64),
+            Arguments.of(-256, "000000000000000000000000000000000000000000000000ffffffffffffff00", 64),
+            Arguments.of(-4096, "000000000000000000000000000000000000000000000000fffffffffffff000", 64),
+            Arguments.of(255 << 24, "000000000000000000000000000000000000000000000000ffffffffff000000", 64),
+            Arguments.of(4095 << 20, "000000000000000000000000000000000000000000000000fffffffffff00000", 64),
+            Arguments.of(0xdeadbeefL, "00000000000000000000000000000000000000000000000000000000deadbeef", 64)
+        );
+    }
+
+    @ParameterizedTest
+    @DisplayName("uint256() encodes correctly")
+    @MethodSource("uInt256Arguments")
+    void uInt256EncodesCorrectly(long val, String hexString, int bitWidth) {
+        assertEquals(
+            hexString,
+            Hex.toHexString(ContractFunctionParams.uint256(val, bitWidth).toByteArray())
         );
     }
 }
