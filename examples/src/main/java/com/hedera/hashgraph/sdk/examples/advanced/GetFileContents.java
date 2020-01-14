@@ -48,12 +48,12 @@ public final class GetFileContents {
         System.out.println("The new file ID is " + newFileId.toString());
 
         // Get file contents
-        FileGetContentsResponse contents = new FileContentsQuery()
+        byte[] contents = new FileContentsQuery()
             .setFileId(newFileId)
             .execute(client);
 
         // Prints query results to console
-        System.out.println("File content query results: " + contents.getFileContents().getContents().toStringUtf8());
+        System.out.println("File content query results: " + new String(contents));
     }
 
 }

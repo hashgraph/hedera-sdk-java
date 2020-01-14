@@ -37,7 +37,7 @@ public final class CreateAccountThresholdKey {
             keys.add(Ed25519PrivateKey.generate());
         }
 
-        final List<Ed25519PublicKey> pubKeys = keys.stream().map(Ed25519PrivateKey::getPublicKey)
+        final List<Ed25519PublicKey> pubKeys = keys.stream().map((key) -> key.publicKey)
             .collect(Collectors.toList());
 
         System.out.println("private keys: \n"
@@ -80,7 +80,7 @@ public final class CreateAccountThresholdKey {
         // (important!) wait for the transfer to go to consensus
         tsfrTxnId.getReceipt(client);
 
-        Long balanceAfter = new AccountBalanceQuery()
+        Hbar balanceAfter = new AccountBalanceQuery()
             .setAccountId(newAccountId)
             .execute(client);
 

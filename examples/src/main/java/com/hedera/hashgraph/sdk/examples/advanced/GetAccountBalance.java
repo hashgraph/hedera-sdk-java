@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk.examples.advanced;
 
 import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaStatusException;
 import com.hedera.hashgraph.sdk.account.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.account.AccountId;
@@ -27,7 +28,7 @@ public final class GetAccountBalance {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        Long balance = new AccountBalanceQuery()
+        Hbar balance = new AccountBalanceQuery()
             .setAccountId(OPERATOR_ID)
             .execute(client);
 

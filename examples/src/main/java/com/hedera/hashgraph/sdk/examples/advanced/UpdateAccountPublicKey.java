@@ -55,6 +55,7 @@ public final class UpdateAccountPublicKey {
         TransactionId transactionId = new AccountUpdateTransaction()
             .setAccountId(accountId)
             .setKey(newKey.publicKey)
+            .build(client)
             // Sign with the previous key and the new key
             .sign(originalKey)
             .sign(newKey)

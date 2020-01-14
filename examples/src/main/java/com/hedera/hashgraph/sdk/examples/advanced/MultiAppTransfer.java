@@ -11,9 +11,11 @@ import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
-import java.util.Objects;
+import java.util.*;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class MultiAppTransfer {
 
@@ -37,7 +39,11 @@ public final class MultiAppTransfer {
     static {
         // To improve responsiveness, you should specify multiple nodes using the
         // `Client(<Map<AccountId, String>>)` constructor instead
-        client = new Client(NODE_ID, NODE_ADDRESS);
+        client = new Client(new HashMap<AccountId, String>() {
+            {
+                put(NODE_ID, NODE_ADDRESS);
+            }
+        });
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
@@ -82,8 +88,8 @@ public final class MultiAppTransfer {
 
         System.out.println("transferred " + transferAmount + "...");
 
-        long senderBalanceAfter = client.getAccountBalance(OPERATOR_ID);
-        long receiptBalanceAfter = client.getAccountBalance(exchangeAccountId);
+        Hbar senderBalanceAfter = client.getAccountBalance(OPERATOR_ID);
+        Hbar receiptBalanceAfter = client.getAccountBalance(exchangeAccountId);
 
         System.out.println("" + OPERATOR_ID + " balance = " + senderBalanceAfter);
         System.out.println("" + exchangeAccountId + " balance = " + receiptBalanceAfter);
