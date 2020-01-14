@@ -27,13 +27,14 @@ class TransactionRecordQueryTest {
         .setNodeAccountId(NODE_ACCOUNT)
         .addSender(USER_ACCT, 10000)
         .addRecipient(NODE_ACCOUNT, 10000)
-        .setTransactionFee(100_000)
+        .setMaxTransactionFee(100_000)
+        .build(null)
         .sign(privateKey);
 
     // new instance for every test
     final TransactionRecordQuery query = new TransactionRecordQuery()
         .setTransactionId(TransactionId.withValidStart(USER_ACCT, Instant.parse("2019-04-05T11:00:00Z")))
-        .setPayment(paymentTxn);
+        .setPaymentTransaction(paymentTxn);
 
     static final String queryString = "transactionGetRecord {\n" +
         "  header {\n" +

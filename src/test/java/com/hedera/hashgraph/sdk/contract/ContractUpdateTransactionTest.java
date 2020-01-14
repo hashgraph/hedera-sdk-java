@@ -1,9 +1,9 @@
 package com.hedera.hashgraph.sdk.contract;
 
+import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
-import com.hedera.hashgraph.proto.Transaction;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,9 +39,8 @@ class ContractUpdateTransactionTest {
             .setNodeAccountId(new AccountId(3))
             .setTransactionId(txnId)
             .setContractId(new ContractId(1, 2, 3))
-            .setMaxTransactionFee(100_000)
-                    .build()
-                    .sign(key)
+            .setMaxTransactionFee(100_000).build(null)
+            .sign(key)
             .toProto();
 
         assertEquals(

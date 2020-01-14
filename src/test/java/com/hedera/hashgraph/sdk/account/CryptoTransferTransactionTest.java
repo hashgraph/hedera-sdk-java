@@ -1,8 +1,8 @@
 package com.hedera.hashgraph.sdk.account;
 
+import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
-import com.hedera.hashgraph.proto.Transaction;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,13 +36,12 @@ class CryptoTransferTransactionTest {
         final Ed25519PrivateKey key = Ed25519PrivateKey.fromString("302e020100300506032b6570042204203b054fade7a2b0869c6bd4a63b7017cbae7855d12acc357bea718e2c3e805962");
         final TransactionId txnId = TransactionId.withValidStart(new AccountId(2), now);
         final Transaction txn = new CryptoTransferTransaction()
-            .setTransactionId(txnId)
-            .setNodeAccountId(new AccountId(2))
-            .addSender(new AccountId(4), 800)
-            .addRecipient(new AccountId(55), 400)
-            .addTransfer(new AccountId(78), 400)
-            .setMaxTransactionFee(100_000)
-            .build()
+                .setTransactionId(txnId)
+                .setNodeAccountId(new AccountId(2))
+                .addSender(new AccountId(4), 800)
+                .addRecipient(new AccountId(55), 400)
+                .addTransfer(new AccountId(78), 400)
+                .setMaxTransactionFee(100_000).build(null)
             .sign(key)
             .toProto();
 

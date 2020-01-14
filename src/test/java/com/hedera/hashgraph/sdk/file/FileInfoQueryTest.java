@@ -35,14 +35,13 @@ class FileInfoQueryTest {
     @DisplayName("correct query can be built")
     void correctBuilder() {
         final FileInfoQuery query = new FileInfoQuery()
-            .setPayment(
+            .setPaymentTransaction(
                 new CryptoTransferTransaction()
-                    .setTransactionId(TransactionId.withValidStart(new AccountId(2), Instant.ofEpochSecond(1559868457)))
-                    .setNodeAccountId(new AccountId(3))
-                    .addSender(new AccountId(2), 10000)
-                    .addRecipient(new AccountId(3), 10000)
-                    .setMaxTransactionFee(100_000)
-                    .build()
+                        .setTransactionId(TransactionId.withValidStart(new AccountId(2), Instant.ofEpochSecond(1559868457)))
+                        .setNodeAccountId(new AccountId(3))
+                        .addSender(new AccountId(2), 10000)
+                        .addRecipient(new AccountId(3), 10000)
+                        .setMaxTransactionFee(100_000).build(null)
                     .sign(key))
             .setFileId(new FileId(1, 2, 3));
 

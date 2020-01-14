@@ -20,32 +20,32 @@ class FreezeTransactionTest {
         final TransactionId txnId = TransactionId.withValidStart(new AccountId(2), now);
         final AccountId nodeAcctId = new AccountId(3);
 
+        // start and end times being 0:00 is technically correct
         new FreezeTransaction()
             .setTransactionId(txnId)
             .setNodeAccountId(nodeAcctId)
-            // start and end times being 0:00 is technically correct
-            .build();
+            .build(null);
 
-            new FreezeTransaction()
-                .setTransactionId(txnId)
-                .setNodeAccountId(nodeAcctId)
-                .setStartTime(OffsetTime.of(0, 0, 0, 0, ZoneOffset.UTC))
-                .setEndTime(OffsetTime.of(23, 59, 0, 0, ZoneOffset.UTC))
-                .build();
+        new FreezeTransaction()
+            .setTransactionId(txnId)
+            .setNodeAccountId(nodeAcctId)
+            .setStartTime(OffsetTime.of(0, 0, 0, 0, ZoneOffset.UTC))
+            .setEndTime(OffsetTime.of(23, 59, 0, 0, ZoneOffset.UTC))
+            .build(null);
 
         new FreezeTransaction()
             .setTransactionId(txnId)
             .setNodeAccountId(nodeAcctId)
             .setStartTime(OffsetTime.of(0, 0, 0, 0, ZoneOffset.UTC))
             .setEndTime(OffsetTime.of(0, 0, 0, 0, ZoneOffset.UTC))
-            .build();
+            .build(null);
 
         new FreezeTransaction()
             .setTransactionId(txnId)
             .setNodeAccountId(nodeAcctId)
             .setStartTime(OffsetTime.of(23, 59, 0, 0, ZoneOffset.UTC))
             .setEndTime(OffsetTime.of(23, 59, 0, 0, ZoneOffset.UTC))
-            .build();
+            .build(null);
     }
 
     @Test
@@ -58,8 +58,7 @@ class FreezeTransactionTest {
             .setNodeAccountId(new AccountId(3))
             .setStartTime(OffsetTime.of(0, 0, 0, 0, ZoneOffset.UTC))
             .setEndTime(OffsetTime.of(23, 59, 0, 0, ZoneOffset.UTC))
-            .setMaxTransactionFee(100_000_000)
-            .build()
+            .setMaxTransactionFee(100_000_000).build(null)
             .sign(key);
 
         Assertions.assertEquals(

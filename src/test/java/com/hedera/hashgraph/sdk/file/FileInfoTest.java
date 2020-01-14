@@ -57,9 +57,9 @@ class FileInfoTest {
 
         final FileInfo fileInfo = FileInfo.fromResponse(response);
 
-        assertEquals(fileInfo.getFileId(), new FileId(0, 0, 0));
-        assertFalse(fileInfo.isDeleted());
-        assertEquals(fileInfo.getSize(), 1024);
-        assertEquals(fileInfo.getKeys().get(0).toKeyProto(), publicKey.toKeyProto());
+        assertEquals(fileInfo.fileId, new FileId(0, 0, 0));
+        assertFalse(fileInfo.isDeleted);
+        assertEquals(fileInfo.size, 1024);
+        assertEquals(fileInfo.keys.get(0).toKeyProto(), publicKey.toKeyProto());
     }
 }

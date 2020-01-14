@@ -7,8 +7,6 @@ import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -55,7 +53,6 @@ class AccountInfoTest {
         assertEquals(accountInfo.accountId, new AccountId(0));
         assertEquals(accountInfo.contractAccountId, "");
         assertNull(accountInfo.proxyAccountId);
-        assertEquals(accountInfo.getClaims(), new ArrayList<>());
     }
 
 }
