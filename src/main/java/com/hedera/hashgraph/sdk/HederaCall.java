@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
+import com.hedera.hashgraph.sdk.account.AccountId;
 import io.grpc.CallOptions;
 import io.grpc.Channel;
 import io.grpc.StatusRuntimeException;

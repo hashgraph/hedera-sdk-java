@@ -321,14 +321,12 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
     }
 
     @Override
-    public SignaturePair sign(byte[] message, int messageOffset, int messageLen) {
+    public byte[] sign(byte[] message, int messageOffset, int messageLen) {
         byte[] secret = privKeyParams.getEncoded();
         byte[] sigBytes = new byte[Ed25519.SIGNATURE_SIZE];
         Ed25519.sign(secret, 0, message, messageOffset, messageLen, sigBytes, 0);
-        return SignaturePair.newBuilder()
-            .setPubKeyPrefix(ByteString.copyFrom(publicKey.toBytes()))
-            .setEd25519(ByteString.copyFrom(sigBytes))
-            .build();
+
+        return sigBytes;
     }
 
     private byte[] encodeDER() {

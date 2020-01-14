@@ -57,6 +57,7 @@ public final class Ed25519PublicKey extends PublicKey {
                 .getBytes());
     }
 
+    @Override
     public byte[] toBytes() {
         return pubKeyParams.getEncoded();
     }

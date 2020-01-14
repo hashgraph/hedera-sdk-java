@@ -21,6 +21,7 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnegative;
@@ -63,7 +64,10 @@ public final class Client implements AutoCloseable {
     private AccountId operatorId;
 
     @Nullable
-    private PrivateKey<? extends PublicKey> operatorKey;
+    private PublicKey operatorPublicKey;
+
+    @Nullable
+    private Function<byte[], byte[]> operatorSigner;
 
     public Client(Map<AccountId, String> nodes) {
         if (nodes.isEmpty()) {
@@ -294,7 +298,17 @@ public final class Client implements AutoCloseable {
 
     public Client setOperator(AccountId operatorId, PrivateKey<? extends PublicKey> operatorKey) {
         this.operatorId = operatorId;
-        this.operatorKey = operatorKey;
+        this.operatorPublicKey = operatorKey.publicKey;
+        this.operatorSigner = operatorKey::sign;
+
+        return this;
+    }
+
+    public Client setOperatorWith(AccountId accountId, PublicKey publicKey, Function<byte[], byte[]> signer) {
+        this.operatorId = accountId;
+        this.operatorPublicKey = publicKey;
+        this.operatorSigner = signer;
+
         return this;
     }
 
@@ -312,8 +326,13 @@ public final class Client implements AutoCloseable {
     }
 
     @Nullable
-    PrivateKey<? extends PublicKey> getOperatorKey() {
-        return operatorKey;
+    PublicKey getOperatorPublicKey() {
+        return operatorPublicKey;
+    }
+
+    @Nullable
+    Function<byte[], byte[]> getOperatorSigner() {
+        return operatorSigner;
     }
 
     Node pickNode() {
