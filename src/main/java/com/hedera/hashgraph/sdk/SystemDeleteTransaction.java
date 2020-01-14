@@ -18,12 +18,12 @@ public final class SystemDeleteTransaction extends TransactionBuilder<SystemDele
 
     public SystemDeleteTransaction() { super(); }
 
-    public SystemDeleteTransaction setID(FileId fileId) {
+    public SystemDeleteTransaction setFileId(FileId fileId) {
         builder.setFileID(fileId.toProto());
         return this;
     }
 
-    public SystemDeleteTransaction setID(ContractId contractId) {
+    public SystemDeleteTransaction setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProto());
         return this;
     }
