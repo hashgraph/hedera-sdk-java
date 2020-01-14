@@ -346,7 +346,7 @@ public final class Client implements AutoCloseable {
     // Simplified interface intended for high-level, opinionated operation
     //
 
-    public AccountInfo getAccount(AccountId id) throws HederaException, HederaNetworkException {
+    public AccountInfo getAccount(AccountId id) throws HederaStatusException, HederaNetworkException {
         return new AccountInfoQuery()
             .setAccountId(id)
             .execute(this);
@@ -358,7 +358,7 @@ public final class Client implements AutoCloseable {
             .executeAsync(this, onSuccess, onError);
     }
 
-    public Hbar getAccountBalance(AccountId id) throws HederaException, HederaNetworkException {
+    public Hbar getAccountBalance(AccountId id) throws HederaStatusException, HederaNetworkException {
         return new AccountBalanceQuery()
             .setAccountId(id)
             .execute(this);

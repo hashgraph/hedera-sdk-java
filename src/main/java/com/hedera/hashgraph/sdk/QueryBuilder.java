@@ -135,7 +135,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         return (T) this;
     }
 
-    public long getCost(Client client) throws HederaException, HederaNetworkException {
+    public long getCost(Client client) throws HederaStatusException, HederaNetworkException {
         // set which node we're going to be working with
         return new CostQuery(client).execute(client);
     }
@@ -162,7 +162,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     }
 
     @Override
-    public final Resp execute(Client client, Duration timeout) throws HederaException, HederaNetworkException {
+    public final Resp execute(Client client, Duration timeout) throws HederaStatusException, HederaNetworkException {
         final long maxQueryPayment = client.getMaxQueryPayment();
 
         if (!getHeaderBuilder().hasPayment() && isPaymentRequired() && maxQueryPayment > 0) {
@@ -258,16 +258,16 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     }
 
     @Override
-    protected final Resp mapResponse(Response raw) throws HederaException {
+    protected final Resp mapResponse(Response raw) throws HederaStatusException {
         final ResponseCodeEnum precheckCode = getResponseHeader(raw).getNodeTransactionPrecheckCode();
-        HederaException.throwIfExceptional(precheckCode);
+        HederaStatusException.throwIfExceptional(precheckCode);
 
         switch (raw.getResponseCase()) {
             case TRANSACTIONGETRECEIPT:
-                HederaException.throwIfExceptional(raw.getTransactionGetReceipt().getReceipt().getStatus());
+                HederaStatusException.throwIfExceptional(raw.getTransactionGetReceipt().getReceipt().getStatus());
                 break;
             case TRANSACTIONGETRECORD:
-                HederaException.throwIfExceptional(raw.getTransactionGetRecord().getTransactionRecord().getReceipt().getStatus());
+                HederaStatusException.throwIfExceptional(raw.getTransactionGetRecord().getTransactionRecord().getReceipt().getStatus());
                 break;
             default:
         }
@@ -335,7 +335,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         }
 
         @Override
-        protected Long mapResponse(Response raw) throws HederaException {
+        protected Long mapResponse(Response raw) throws HederaStatusException {
             return getResponseHeader(raw).getCost();
         }
 

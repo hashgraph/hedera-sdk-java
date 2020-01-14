@@ -7,8 +7,8 @@ import com.hedera.hashgraph.proto.QueryHeader;
 import com.hedera.hashgraph.proto.Response;
 import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
+import com.hedera.hashgraph.sdk.HederaStatusException;
 import com.hedera.hashgraph.sdk.HederaThrowable;
 import com.hedera.hashgraph.sdk.QueryBuilder;
 
@@ -48,7 +48,7 @@ public class ContractCallQuery extends QueryBuilder<ContractFunctionResult, Cont
     }
 
     @Override
-    public long getCost(Client client) throws HederaException, HederaNetworkException {
+    public long getCost(Client client) throws HederaStatusException, HederaNetworkException {
         // network bug: ContractCallLocal cost estimate is too low
         return (long) (super.getCost(client) * 1.1);
     }

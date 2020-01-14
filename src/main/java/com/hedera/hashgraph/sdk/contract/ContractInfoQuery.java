@@ -6,8 +6,8 @@ import com.hedera.hashgraph.proto.QueryHeader;
 import com.hedera.hashgraph.proto.Response;
 import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
+import com.hedera.hashgraph.sdk.HederaStatusException;
 import com.hedera.hashgraph.sdk.HederaThrowable;
 import com.hedera.hashgraph.sdk.QueryBuilder;
 
@@ -49,7 +49,7 @@ public final class ContractInfoQuery extends QueryBuilder<ContractInfo, Contract
     }
 
     @Override
-    public long getCost(Client client) throws HederaException, HederaNetworkException {
+    public long getCost(Client client) throws HederaStatusException, HederaNetworkException {
         // deleted contracts return a COST_ANSWER of zero which triggers `INSUFFICIENT_TX_FEE`
         // if you set that as the query payment; 25 tinybar seems to be enough to get
         // `CONTRACT_DELETED` back instead.

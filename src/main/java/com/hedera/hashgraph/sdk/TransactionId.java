@@ -53,7 +53,7 @@ public final class TransactionId {
      * Generate a transaction ID with a given account ID and valid start time.
      *
      * <i>Nota bene</i>: executing transactions with the same ID (account ID & account start time)
-     * will throw {@link HederaException} with code {@code DUPLICATE_TRANSACTION}.
+     * will throw {@link HederaStatusException} with code {@code DUPLICATE_TRANSACTION}.
      * <p>
      *
      * Use the primary constructor to get an ID with a known-valid {@code transactionValidStart}.
@@ -95,13 +95,13 @@ public final class TransactionId {
         return accountId.equals(otherId.accountId) && validStart.equals(otherId.validStart);
     }
 
-    public TransactionReceipt getReceipt(Client client) throws HederaException {
+    public TransactionReceipt getReceipt(Client client) throws HederaStatusException {
         return new TransactionReceiptQuery()
             .setTransactionId(this)
             .execute(client);
     }
 
-    public TransactionReceipt getReceipt(Client client, Duration timeout) throws HederaException {
+    public TransactionReceipt getReceipt(Client client, Duration timeout) throws HederaStatusException {
         return new TransactionReceiptQuery()
             .setTransactionId(this)
             .execute(client, timeout);
@@ -119,7 +119,7 @@ public final class TransactionId {
             .executeAsync(client, timeout, onReceipt, onError);
     }
 
-    public TransactionRecord getRecord(Client client) throws HederaException, HederaNetworkException {
+    public TransactionRecord getRecord(Client client) throws HederaStatusException, HederaNetworkException {
         getReceipt(client);
 
         return new TransactionRecordQuery()
@@ -127,7 +127,7 @@ public final class TransactionId {
             .execute(client);
     }
 
-    public TransactionRecord getRecord(Client client, Duration timeout) throws HederaException {
+    public TransactionRecord getRecord(Client client, Duration timeout) throws HederaStatusException {
         getReceipt(client, timeout);
 
         return new TransactionRecordQuery()

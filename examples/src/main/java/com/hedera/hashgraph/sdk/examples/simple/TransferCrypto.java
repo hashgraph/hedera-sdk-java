@@ -2,7 +2,7 @@ package com.hedera.hashgraph.sdk.examples.simple;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.HederaException;
+import com.hedera.hashgraph.sdk.HederaStatusException;
 import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
@@ -21,7 +21,7 @@ public final class TransferCrypto {
 
     private TransferCrypto() { }
 
-    public static void main(String[] args) throws HederaException {
+    public static void main(String[] args) throws HederaStatusException {
         // `Client.forMainnet()` is provided for connecting to Hedera mainnet
         Client client = Client.forTestnet();
 

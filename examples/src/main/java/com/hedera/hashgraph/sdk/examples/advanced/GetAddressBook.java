@@ -3,7 +3,7 @@ package com.hedera.hashgraph.sdk.examples.advanced;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.HederaException;
+import com.hedera.hashgraph.sdk.HederaStatusException;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.file.FileContentsQuery;
@@ -26,7 +26,7 @@ public final class GetAddressBook {
 
     private GetAddressBook() { }
 
-    public static void main(String[] args) throws HederaException, IOException {
+    public static void main(String[] args) throws HederaStatusException, IOException {
         // `Client.forMainnet()` is provided for connecting to Hedera mainnet
         Client client = Client.forTestnet();
 

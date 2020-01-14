@@ -3,7 +3,7 @@ package com.hedera.hashgraph.sdk.examples.advanced;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.HederaException;
+import com.hedera.hashgraph.sdk.HederaStatusException;
 import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountCreateTransaction;
@@ -44,7 +44,7 @@ public final class MultiAppTransfer {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
     }
 
-    public static void main(String[] args) throws HederaException, InvalidProtocolBufferException {
+    public static void main(String[] args) throws HederaStatusException, InvalidProtocolBufferException {
         Hbar transferAmount = Hbar.fromTinybar(10_000);
 
         // the exchange creates an account for the user to transfer funds to

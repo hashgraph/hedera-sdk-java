@@ -5,8 +5,8 @@ import com.hedera.hashgraph.proto.Query;
 import com.hedera.hashgraph.proto.QueryHeader;
 import com.hedera.hashgraph.proto.Response;
 import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
+import com.hedera.hashgraph.sdk.HederaStatusException;
 import com.hedera.hashgraph.sdk.HederaThrowable;
 import com.hedera.hashgraph.sdk.QueryBuilder;
 
@@ -49,7 +49,7 @@ public final class AccountInfoQuery extends QueryBuilder<AccountInfo, AccountInf
     }
 
     @Override
-    public long getCost(Client client) throws HederaException, HederaNetworkException {
+    public long getCost(Client client) throws HederaStatusException, HederaNetworkException {
         // deleted accounts return a COST_ANSWER of zero which triggers `INSUFFICIENT_TX_FEE`
         // if you set that as the query payment; 25 tinybar seems to be enough to get
         // `ACCOUNT_DELETED` back instead.
