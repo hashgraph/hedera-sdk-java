@@ -181,8 +181,8 @@ public final class Hbar implements Comparable<Hbar> {
     public String toString() {
         // print with the original unit if we did a conversion, possibly more useful for debugging
         if (originalUnit != HbarUnit.Tinybar) {
-            return as(originalUnit) + " " + originalUnit.getSymbol() +
-                " (" + tinybar + " " + HbarUnit.Tinybar.getSymbol() + ")";
+            return as(originalUnit) + " " + originalUnit.getSymbol()
+                + " (" + tinybar + " " + HbarUnit.Tinybar.getSymbol() + ")";
         }
 
          return tinybar + " " + HbarUnit.Tinybar.getSymbol();
