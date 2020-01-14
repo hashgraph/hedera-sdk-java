@@ -2,8 +2,8 @@ package com.hedera.hashgraph.sdk.crypto.ed25519;
 
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.proto.SignaturePair;
+import com.hedera.hashgraph.sdk.crypto.BadKeyException;
 import com.hedera.hashgraph.sdk.crypto.Keystore;
-import com.hedera.hashgraph.sdk.crypto.KeystoreParseException;
 import com.hedera.hashgraph.sdk.crypto.Mnemonic;
 import com.hedera.hashgraph.sdk.crypto.PrivateKey;
 
@@ -79,7 +79,7 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
     /**
      * Construct an Ed25519PrivateKey from a raw byte array.
      *
-     * @throws IllegalArgumentException if the key bytes are of an incorrect length for a raw
+     * @throws BadKeyException if the key bytes are of an incorrect length for a raw
      *                                  private key or private key + public key, or do not represent a DER encoded Ed25519
      *                                  private key.
      */
@@ -113,7 +113,7 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
                 }
 
             } catch (IOException e) {
-                throw new IllegalArgumentException(e);
+                throw new BadKeyException(e);
             }
         }
 
@@ -266,7 +266,7 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
      * @param passphrase  the passphrase used to encrypt the keystore
      * @return the recovered key
      * @throws IOException            if any occurs while reading from the inputstream
-     * @throws KeystoreParseException if there is a problem with the keystore; most likely
+     * @throws BadKeyException if there is a problem with the keystore; most likely
      *                                is if the passphrase is incorrect.
      */
     public static Ed25519PrivateKey readKeystore(InputStream inputStream, String passphrase) throws IOException {
@@ -279,7 +279,7 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
      * @param bytes      the binary-encoded keystore
      * @param passphrase the passphrase used to encrypt the keystore
      * @return the recovered key
-     * @throws KeystoreParseException if there is a problem with the keystore; most likely
+     * @throws BadKeyException if there is a problem with the keystore; most likely
      *                                is if the passphrase is incorrect.
      */
     public static Ed25519PrivateKey fromKeystore(byte[] bytes, String passphrase) {
