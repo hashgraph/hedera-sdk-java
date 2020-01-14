@@ -55,7 +55,7 @@ public final class CreateAccountThresholdKey {
         Transaction tx = new AccountCreateTransaction()
             // require 2 of the 3 keys we generated to sign on anything modifying this account
             .setKey(new ThresholdKey(2).addAll(pubKeys))
-            .setInitialBalance(Hbar.fromTinybar(1000))
+            .setInitialBalance(new Hbar(10))
             .build(client);
 
         tx.execute(client);
@@ -68,8 +68,8 @@ public final class CreateAccountThresholdKey {
         System.out.println("account = " + newAccountId);
 
         TransactionId tsfrTxnId = new CryptoTransferTransaction()
-            .addSender(newAccountId, Hbar.of(10))
-            .addRecipient(AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("NODE_ID"))), Hbar.of(10))
+            .addSender(newAccountId, new Hbar(10))
+            .addRecipient(new AccountId(3), new Hbar(10))
             // To manually sign, you must explicitly build the Transaction
             .build(client)
             // we sign with 2 of the 3 keys
