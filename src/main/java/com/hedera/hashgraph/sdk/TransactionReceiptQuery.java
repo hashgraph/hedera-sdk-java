@@ -39,6 +39,8 @@ public final class TransactionReceiptQuery extends QueryBuilder<TransactionRecei
             case Unknown:
             // accepted but has not reached consensus
             case Ok:
+            // has reached consensus but not generated
+            case ReceiptNotFound:
             // node queue is full
             case Busy:
                 return true;
