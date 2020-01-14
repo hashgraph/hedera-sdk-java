@@ -13,6 +13,34 @@ public final class Hbar implements Comparable<Hbar> {
     private final long tinybar;
     private final HbarUnit originalUnit;
 
+    /**
+     * Wrap some amount of hbar.
+     *
+     * @param amount the amount in hbar, may be negative.
+     * @throws HbarRangeException if the tinybar equivalent does not fit in a {@code long}.
+     */
+    public Hbar(long amount) {
+        this.tinybar = Hbar.from(amount, HbarUnit.Hbar).tinybar;
+        this.originalUnit = HbarUnit.Hbar;
+    }
+
+    /**
+     * Wrap a possibly fractional amount of hbar.
+     * <p>
+     * The equivalent amount in tinybar must be an integer and fit in a {@code long}
+     * (64-bit signed integer) as that is required by the Hedera network.
+     * <p>
+     * E.g. 1.23456789 is a valid amount of hbar but 0.123456789 is not.
+     *
+     * @param amount the amount in hbar, may be fractional and/or negative.
+     * @throws HbarRangeException if the tinybar equivalent is not an integer
+     *                            or does not fit in a {@code long}.
+     */
+    public Hbar(BigDecimal amount) {
+        this.tinybar = Hbar.from(amount, HbarUnit.Hbar).tinybar;
+        this.originalUnit = HbarUnit.Hbar;
+    }
+
     private Hbar(long tinybar, HbarUnit originalUnit) {
         this.tinybar = tinybar;
         this.originalUnit = originalUnit;
@@ -108,29 +136,17 @@ public final class Hbar implements Comparable<Hbar> {
     }
 
     /**
-     * Wrap some amount of hbar.
-     *
-     * @param amount the amount in hbar, may be negative.
-     * @return the wrapped hbar value.
-     * @throws HbarRangeException if the tinybar equivalent does not fit in a {@code long}.
+     * @deprecated use {@code new Hbar()} to create a value of this in Hbar.
      */
+    @Deprecated
     public static Hbar of(long amount) {
         return from(amount, HbarUnit.Hbar);
     }
 
     /**
-     * Wrap a possibly fractional amount of hbar.
-     * <p>
-     * The equivalent amount in tinybar must be an integer and fit in a {@code long}
-     * (64-bit signed integer) as that is required by the Hedera network.
-     * <p>
-     * E.g. 1.23456789 is a valid amount of hbar but 0.123456789 is not.
-     *
-     * @param amount the amount in hbar, may be fractional and/or negative.
-     * @return the calculated hbar value.
-     * @throws HbarRangeException if the tinybar equivalent is not an integer
-     *                                  or does not fit in a {@code long}.
+     * @deprecated use {@code new Hbar()} to create a value of this in Hbar.
      */
+    @Deprecated
     public static Hbar of(BigDecimal amount) {
         return from(amount, HbarUnit.Hbar);
     }
