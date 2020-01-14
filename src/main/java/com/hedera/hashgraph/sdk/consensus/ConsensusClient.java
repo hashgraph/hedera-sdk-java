@@ -74,23 +74,24 @@ public class ConsensusClient implements AutoCloseable {
         return startStreamingCall(topicId, consensusStartTime, listener);
     }
 
-    private Subscription startStreamingCall(ConsensusTopicId topic, @Nullable Instant startTime, Consumer<ConsensusMessage> listener) {
+    private Subscription startStreamingCall(ConsensusTopicId topicId, @Nullable Instant startTime,
+                                            Consumer<ConsensusMessage> listener) {
         final ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call =
             channel.newCall(ConsensusServiceGrpc.getSubscribeTopicMethod(), CallOptions.DEFAULT);
 
         final ConsensusTopicQuery.Builder topicQuery = ConsensusTopicQuery.newBuilder()
-            .setTopicID(topic.toProto());
+            .setTopicID(topicId.toProto());
 
         if (startTime != null) {
             topicQuery.setConsensusStartTime(TimestampHelper.timestampFrom(startTime));
         }
 
-        final Subscription subscription = new Subscription(topic, startTime, call);
+        final Subscription subscription = new Subscription(topicId, startTime, call);
 
         ClientCalls.asyncServerStreamingCall(call, topicQuery.build(), new StreamObserver<ConsensusTopicResponse>() {
             @Override
             public void onNext(ConsensusTopicResponse message) {
-                listener.accept(new ConsensusMessage(topic, message));
+                listener.accept(new ConsensusMessage(topicId, message));
             }
 
             @Override
@@ -113,14 +114,14 @@ public class ConsensusClient implements AutoCloseable {
      * Get a blocking iterator which returns messages for the given topic with consensus timestamps
      * between two {@link Instant}s.
      *
-     * @param topic
+     * @param topicId
      * @param startTime the lower bound for timestamps (inclusive), may be in the past or future.
      * @param endTime the upper bound for timestamps (exclusive), may also be in the past or future.
      * @return
      */
-    public Iterator<ConsensusMessage> getMessages(ConsensusTopicId topic, Instant startTime, Instant endTime) {
+    public Iterator<ConsensusMessage> getMessages(ConsensusTopicId topicId, Instant startTime, Instant endTime) {
         final ConsensusTopicQuery topicQuery = ConsensusTopicQuery.newBuilder()
-            .setTopicID(topic.toProto())
+            .setTopicID(topicId.toProto())
             .setConsensusStartTime(TimestampHelper.timestampFrom(startTime))
             .setConsensusEndTime(TimestampHelper.timestampFrom(endTime))
             .build();
@@ -131,20 +132,20 @@ public class ConsensusClient implements AutoCloseable {
             CallOptions.DEFAULT,
             topicQuery);
 
-        return Iterators.transform(iter, message -> new ConsensusMessage(topic, Objects.requireNonNull(message)));
+        return Iterators.transform(iter, message -> new ConsensusMessage(topicId, Objects.requireNonNull(message)));
     }
 
     /**
      * Get a blocking iterator which returns messages for the given topic with consensus timestamps
      * starting now and continuing until the given {@link Instant}.
      *
-     * @param topic
+     * @param topicId
      * @param endTime the upper bound for timestamps (exclusive), may be in the past or future.
      * @return
      */
-    public Iterator<ConsensusMessage> getMessagesUntil(ConsensusTopicId topic, Instant endTime) {
+    public Iterator<ConsensusMessage> getMessagesUntil(ConsensusTopicId topicId, Instant endTime) {
         final ConsensusTopicQuery topicQuery = ConsensusTopicQuery.newBuilder()
-            .setTopicID(topic.toProto())
+            .setTopicID(topicId.toProto())
             .setConsensusEndTime(TimestampHelper.timestampFrom(endTime))
             .build();
 
@@ -154,7 +155,7 @@ public class ConsensusClient implements AutoCloseable {
             CallOptions.DEFAULT,
             topicQuery);
 
-        return Iterators.transform(iter, message -> new ConsensusMessage(topic, Objects.requireNonNull(message)));
+        return Iterators.transform(iter, message -> new ConsensusMessage(topicId, Objects.requireNonNull(message)));
     }
 
     @Override
