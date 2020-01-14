@@ -26,6 +26,11 @@ public class KeyList extends PublicKey {
     }
 
     @Override
+    public byte[] toBytes() {
+        return toKeyProto().toByteArray();
+    }
+
+    @Override
     public com.hedera.hashgraph.proto.Key toKeyProto() {
         com.hedera.hashgraph.proto.Key.Builder key = com.hedera.hashgraph.proto.Key.newBuilder();
         key.setKeyList(keyListBuilder.build());

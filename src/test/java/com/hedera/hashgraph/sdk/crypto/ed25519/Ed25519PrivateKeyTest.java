@@ -151,9 +151,9 @@ class Ed25519PrivateKeyTest {
 
         final byte[] messageToSign = "this is a test message".getBytes(StandardCharsets.UTF_8);
 
-        final SignaturePair signature = privateKey.sign(messageToSign);
+        final byte[] signature = privateKey.sign(messageToSign);
 
-        assertTrue(Ed25519.verify(signature.getEd25519().toByteArray(), 0, privateKey.publicKey.toBytes(), 0, messageToSign, 0, messageToSign.length));
+        assertTrue(Ed25519.verify(signature, 0, privateKey.publicKey.toBytes(), 0, messageToSign, 0, messageToSign.length));
     }
 
     private static final String messageStr = "This is a message about the world.";
@@ -177,11 +177,11 @@ class Ed25519PrivateKeyTest {
     @MethodSource("privKeyStrings")
     void reproducibleSignature(String keyStr) {
         final Ed25519PrivateKey key = Ed25519PrivateKey.fromString(keyStr);
-        final SignaturePair signature = key.sign(messageBytes);
+        final byte[] signature = key.sign(messageBytes);
 
         assertEquals(
             sigStr,
-            Hex.toHexString(signature.getEd25519().toByteArray())
+            Hex.toHexString(signature)
         );
     }
 }

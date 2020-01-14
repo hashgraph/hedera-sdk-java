@@ -57,6 +57,11 @@ public final class ContractId extends PublicKey {
             && contract == otherId.contract;
     }
 
+    @Override
+    public byte[] toBytes() {
+        return toProto().toByteArray();
+    }
+
     @Internal
     public ContractID toProto() {
         return ContractID.newBuilder()

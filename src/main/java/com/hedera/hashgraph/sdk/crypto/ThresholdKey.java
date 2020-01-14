@@ -41,6 +41,11 @@ public class ThresholdKey extends PublicKey {
         return this;
     }
 
+    @Override
+    public byte[] toBytes() {
+        return toKeyProto().toByteArray();
+    }
+
     /**
      * @throws IllegalStateException if fewer keys have been added than the threshold set in {@link #ThresholdKey(int)}
      */

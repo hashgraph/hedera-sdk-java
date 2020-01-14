@@ -23,6 +23,7 @@ import java.time.Duration;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import io.grpc.Channel;
 import io.grpc.MethodDescriptor;
@@ -64,20 +65,43 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
     }
 
     public Transaction sign(PrivateKey<? extends PublicKey> privateKey) {
+        return signWith(privateKey.publicKey, privateKey::sign);
+    }
+
+    public Transaction signWith(PublicKey publicKey, Function<byte[], byte[]> signer) {
         SignatureMap.Builder sigMap = inner.getSigMapBuilder();
 
         for (SignaturePair sigPair : sigMap.getSigPairList()) {
             ByteString pubKeyPrefix = sigPair.getPubKeyPrefix();
 
-            if (privateKey.publicKey.hasPrefix(pubKeyPrefix)) {
+            if (publicKey.hasPrefix(pubKeyPrefix)) {
                 throw new IllegalArgumentException(
-                    "transaction already signed with key: " + privateKey.toString());
+                    "transaction already signed with key: " + publicKey.toString());
             }
         }
 
-        sigMap.addSigPair(privateKey.sign(inner.getBodyBytes().toByteArray()));
+        byte[] signatureBytes = signer.apply(inner.getBodyBytes().toByteArray());
+
+        sigMap.addSigPair(SignaturePair.newBuilder()
+            .setPubKeyPrefix(ByteString.copyFrom(publicKey.toBytes()))
+            .setEd25519(ByteString.copyFrom(signatureBytes))
+            .build());
 
         return this;
+    }
+
+    @Override
+    public final TransactionId execute(Client client, Duration timeout) throws HederaStatusException, HederaNetworkException, LocalValidationException {
+        // Sign with the operator if there is a client; the client has an operator; and, the transaction
+        // has a transaction ID that matches that operator ( which it would unless overridden ).
+        if (client.getOperatorPublicKey() != null && client.getOperatorSigner() != null
+            && client.getOperatorId() != null
+            && client.getOperatorId().equals(new AccountId(txnIdProto.getAccountID())))
+        {
+            signWith(client.getOperatorPublicKey(), client.getOperatorSigner());
+        }
+
+        return super.execute(client, timeout);
     }
 
     /**

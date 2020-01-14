@@ -30,10 +30,10 @@ public abstract class PrivateKey<PubKey extends PublicKey> {
     public abstract byte[] toBytes();
 
     @Internal
-    public abstract SignaturePair sign(byte[] message, int messageOffset, int messageLen);
+    public abstract byte[] sign(byte[] message, int messageOffset, int messageLen);
 
     @Internal
-    public SignaturePair sign(byte[] message) {
+    public byte[] sign(byte[] message) {
         return sign(message, 0, message.length);
     }
 }

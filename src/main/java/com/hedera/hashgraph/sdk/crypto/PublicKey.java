@@ -37,6 +37,8 @@ public abstract class PublicKey {
         }
     }
 
+    public abstract byte[] toBytes();
+
     public static PublicKey fromString(String keyString) {
         SubjectPublicKeyInfo pubKeyInfo;
 
