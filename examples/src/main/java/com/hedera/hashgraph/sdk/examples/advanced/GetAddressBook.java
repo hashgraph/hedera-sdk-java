@@ -41,7 +41,7 @@ public final class GetAddressBook {
         final long cost = fileQuery.getCost(client);
         System.out.println("file contents cost: " + cost);
 
-        fileQuery.setMaxQueryPayment(Hbar.of(1));
+        fileQuery.setMaxQueryPayment(new Hbar(1));
 
         final byte[] contents = fileQuery.execute(client);
 

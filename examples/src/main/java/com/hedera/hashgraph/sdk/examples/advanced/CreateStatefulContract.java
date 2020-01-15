@@ -56,8 +56,8 @@ public final class CreateStatefulContract {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // default max fee for all transactions executed by this client
-        client.setMaxTransactionFee(Hbar.of(100));
-        client.setMaxQueryPayment(Hbar.of(10));
+        client.setMaxTransactionFee(new Hbar(100));
+        client.setMaxQueryPayment(new Hbar(10));
 
         // create the contract's bytecode file
         TransactionId fileTxId = new FileCreateTransaction()

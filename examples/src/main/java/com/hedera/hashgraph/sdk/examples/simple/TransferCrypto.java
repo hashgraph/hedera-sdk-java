@@ -31,8 +31,8 @@ public final class TransferCrypto {
 
         // Transfer X hbar from the operator of the client to the given account ID
         Transaction transaction = new CryptoTransferTransaction()
-            .addSender(OPERATOR_ID, Hbar.of(1))
-            .addRecipient(AccountId.fromString("0.0.3"), Hbar.of(1))
+            .addSender(OPERATOR_ID, new Hbar(1))
+            .addRecipient(AccountId.fromString("0.0.3"), new Hbar(1))
             .build(client);
 
         transaction.execute(client);

@@ -38,9 +38,9 @@ public final class CreateAccount {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         Transaction transaction = new AccountCreateTransaction()
-            .setMaxTransactionFee(Hbar.of(10))
+            .setMaxTransactionFee(new Hbar(10))
             .setKey(newPublicKey)
-            .setInitialBalance(Hbar.of(1))
+            .setInitialBalance(new Hbar(1))
             .build(client);
 
         transaction.execute(client);

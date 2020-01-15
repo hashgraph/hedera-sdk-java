@@ -41,7 +41,7 @@ public final class DeleteFile {
         TransactionId txId = new FileCreateTransaction()
             .addKey(OPERATOR_KEY.publicKey)
             .setContents(fileContents)
-            .setMaxTransactionFee(Hbar.of(2))
+            .setMaxTransactionFee(new Hbar(2))
             .execute(client);
 
         TransactionReceipt receipt = txId.getReceipt(client);

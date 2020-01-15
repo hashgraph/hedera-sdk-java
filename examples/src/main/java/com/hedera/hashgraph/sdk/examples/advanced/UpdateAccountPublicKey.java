@@ -39,7 +39,7 @@ public final class UpdateAccountPublicKey {
         TransactionId acctTransactionId = new AccountCreateTransaction()
             .setMaxTransactionFee(1_000_000_000)
             .setKey(originalKey.publicKey)
-            .setInitialBalance(Hbar.of(1))
+            .setInitialBalance(new Hbar(1))
             .execute(client);
 
         System.out.println("transaction ID: " + acctTransactionId);

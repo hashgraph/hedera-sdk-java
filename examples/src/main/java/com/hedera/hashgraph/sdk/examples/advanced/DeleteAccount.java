@@ -44,7 +44,7 @@ public final class DeleteAccount {
         TransactionId txId = new AccountCreateTransaction()
             // The only _required_ property here is `key`
             .setKey(newKey.publicKey)
-            .setInitialBalance(Hbar.of(2))
+            .setInitialBalance(new Hbar(2))
             .execute(client);
 
         // This will wait for the receipt to become available
