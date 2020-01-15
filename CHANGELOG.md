@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.0.0
+
+Removed all deprecated APIs from v1.0.0.
+
+### Changed
+
+ * Instead of returning `ResponseCodeEnum` from the generated protos, return a new `Status` type
+   that wraps that and provides some Java conveniences.
+
+ * Rename `HederaException` to `HederaStatusException`
+
+ * Rename `QueryBuilder.MaxPaymentExceededException` to `MaxQueryPaymentExceededException`
+
+ * Change `AccountBalanceQuery` to return `Hbar` (instead of `Long`)
+
+ * Change `ContractGetBytecodeQuery` to return `byte[]` (instead of the internal proto type)
+
+ * Remove `GetBySolidityIdQuery`. Instead, you should use `AccountId.toSolidityAddress`.
+
+ * Change `ContractRecordsQuery` to return `TransactionRecord[]`
+
 ## v0.9.0
 
 ### Changed
@@ -43,7 +64,7 @@ All changes are not immediately breaking as the previous method still should exi
 
  * Rename `getCallResult` and `getCreateResult` to `getContractExecuteResult` and `getContractCreateResult` for consistency
 
- * `TransactionBuilder.setMemo` is renamed to `TransactionBuilder.setTransactionMemo` to avoid confusion 
+ * `TransactionBuilder.setMemo` is renamed to `TransactionBuilder.setTransactionMemo` to avoid confusion
    as there are 2 other kinds of memos on transactions
 
  * `CallParams` is removed in favor of `ContractFunctionParams` and closely mirrors type names from solidity
@@ -73,9 +94,9 @@ All changes are not immediately breaking as the previous method still should exi
     ```java
     System.setPropery("com.hedera.hashgraph.sdk.experimental", "true")
     ```
-    
+
  * `Client.forTestnet` makes a new client configured to talk to TestNet (use `.setOperator` to set an operater)
- 
+
  * `Client.forMainnet` makes a new client configured to talk to Mainnet (use `.setOperator` to set an operater)
 
 ### Fixes
