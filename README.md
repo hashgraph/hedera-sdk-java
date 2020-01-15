@@ -53,7 +53,7 @@ available in the [hashgraph/hedera-protobuf] repository.
 #### Gradle
 
 ```groovy
-implementation 'com.hedera.hashgraph:sdk:0.8.1'
+implementation 'com.hedera.hashgraph:sdk:1.0.1'
 
 // SELECT ONE:
 // netty transport (for high throughput applications)
