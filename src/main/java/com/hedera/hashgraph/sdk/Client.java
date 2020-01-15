@@ -7,7 +7,9 @@ import com.hedera.hashgraph.sdk.account.AccountInfo;
 import com.hedera.hashgraph.sdk.account.AccountInfoQuery;
 import com.hedera.hashgraph.sdk.crypto.PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
+import com.hedera.hashgraph.sdk.crypto.TransactionSigner;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
+import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,7 +23,6 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnegative;
@@ -67,7 +68,7 @@ public final class Client implements AutoCloseable {
     private PublicKey operatorPublicKey;
 
     @Nullable
-    private Function<byte[], byte[]> operatorSigner;
+    private TransactionSigner operatorSigner;
 
     public Client(Map<AccountId, String> nodes) {
         if (nodes.isEmpty()) {
@@ -296,6 +297,10 @@ public final class Client implements AutoCloseable {
         return this;
     }
 
+    /**
+     * Set the account that will, by default, be paying for transactions and queries built with
+     * this client, and the key with which to automatically sign transactions.
+     */
     public Client setOperator(AccountId operatorId, PrivateKey<? extends PublicKey> operatorKey) {
         this.operatorId = operatorId;
         this.operatorPublicKey = operatorKey.publicKey;
@@ -304,7 +309,15 @@ public final class Client implements AutoCloseable {
         return this;
     }
 
-    public Client setOperatorWith(AccountId accountId, PublicKey publicKey, Function<byte[], byte[]> signer) {
+    /**
+     * Set the account that will, by default, be paying for transactions and queries built with
+     * this client, and a callback that will be invoked when a transaction needs to be signed.
+     *
+     * Currently only {@link Ed25519PublicKey} is allowed.
+     *
+     * @see TransactionSigner
+     */
+    public Client setOperatorWith(AccountId accountId, PublicKey publicKey, TransactionSigner signer) {
         this.operatorId = accountId;
         this.operatorPublicKey = publicKey;
         this.operatorSigner = signer;
@@ -331,7 +344,7 @@ public final class Client implements AutoCloseable {
     }
 
     @Nullable
-    Function<byte[], byte[]> getOperatorSigner() {
+    TransactionSigner getOperatorSigner() {
         return operatorSigner;
     }
 
