@@ -72,14 +72,14 @@ public class ConsensusTopicInfo {
      */
     @Override
     public String toString() {
-        return "topic ID: " + id +
-            " sequence number: " + sequenceNumber +
-            " running hash: " + Hex.toHexString(runningHash) +
-            " expiration time: " + expirationTime +
-            " admin key: " + adminKey +
-            " submit key: " + submitKey +
-            " auto-renew period: " + autoRenewPeriod +
-            " auto-renew account: " + autoRenewAccount +
-            " memo: " + memo;
+        return "topic ID: " + id
+            + " sequence number: " + sequenceNumber
+            + " running hash: " + Hex.toHexString(runningHash)
+            + " expiration time: " + expirationTime
+            + " admin key: " + adminKey
+            + " submit key: " + submitKey
+            + " auto-renew period: " + autoRenewPeriod
+            + " auto-renew account: " + autoRenewAccount
+            + " memo: " + memo;
     }
 }
