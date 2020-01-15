@@ -1,13 +1,10 @@
-package com.hedera.hashgraph.sdk.examples.advanced;
+package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaStatusException;
 import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.account.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.account.AccountInfo;
-import com.hedera.hashgraph.sdk.account.AccountUpdateTransaction;
+import com.hedera.hashgraph.sdk.account.*;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
 import java.util.Objects;
@@ -69,7 +66,9 @@ public final class UpdateAccountPublicKey {
         // Now we fetch the account information to check if the key was changed
         System.out.println(" :: getAccount and check our current key");
 
-        AccountInfo info = client.getAccount(accountId);
+        AccountInfo info = new AccountInfoQuery()
+            .setAccountId(accountId)
+            .execute(client);
 
         System.out.println("key = " + info.key);
     }

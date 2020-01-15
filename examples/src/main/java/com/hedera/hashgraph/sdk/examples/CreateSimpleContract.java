@@ -1,8 +1,7 @@
-package com.hedera.hashgraph.sdk.examples.advanced;
+package com.hedera.hashgraph.sdk.examples;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.hedera.hashgraph.proto.ResponseCodeEnum;
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.contract.*;

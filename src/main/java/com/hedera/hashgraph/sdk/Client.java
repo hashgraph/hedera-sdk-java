@@ -374,28 +374,28 @@ public final class Client implements AutoCloseable {
         return selectedChannel;
     }
 
-    //
-    // Simplified interface intended for high-level, opinionated operation
-    //
-
+    @Deprecated
     public AccountInfo getAccount(AccountId id) throws HederaStatusException, HederaNetworkException {
         return new AccountInfoQuery()
             .setAccountId(id)
             .execute(this);
     }
 
+    @Deprecated
     public void getAccountAsync(AccountId id, Consumer<AccountInfo> onSuccess, Consumer<HederaThrowable> onError) {
         new AccountInfoQuery()
             .setAccountId(id)
             .executeAsync(this, onSuccess, onError);
     }
 
+    @Deprecated
     public Hbar getAccountBalance(AccountId id) throws HederaStatusException, HederaNetworkException {
         return new AccountBalanceQuery()
             .setAccountId(id)
             .execute(this);
     }
 
+    @Deprecated
     public void getAccountBalanceAsync(AccountId id, Consumer<Hbar> onSuccess, Consumer<HederaThrowable> onError) {
         new AccountBalanceQuery()
             .setAccountId(id)

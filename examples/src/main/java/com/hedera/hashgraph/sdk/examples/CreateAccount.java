@@ -1,30 +1,36 @@
-package com.hedera.hashgraph.sdk.examples.advanced;
+package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.proto.FileGetContentsResponse;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaStatusException;
 import com.hedera.hashgraph.sdk.TransactionId;
+import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hedera.hashgraph.sdk.account.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
-import com.hedera.hashgraph.sdk.file.FileContentsQuery;
-import com.hedera.hashgraph.sdk.file.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.file.FileId;
+import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 
 import java.util.Objects;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
-public final class GetFileContents {
+public final class CreateAccount {
 
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final Ed25519PrivateKey OPERATOR_KEY = Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
-    private GetFileContents() { }
+    private CreateAccount() { }
 
     public static void main(String[] args) throws HederaStatusException {
+        // Generate a Ed25519 private, public key pair
+        Ed25519PrivateKey newKey = Ed25519PrivateKey.generate();
+        Ed25519PublicKey newPublicKey = newKey.publicKey;
+
+        System.out.println("private key = " + newKey);
+        System.out.println("public key = " + newPublicKey);
+
         // `Client.forMainnet()` is provided for connecting to Hedera mainnet
         Client client = Client.forTestnet();
 
@@ -32,28 +38,17 @@ public final class GetFileContents {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        // Content to be stored in the file
-        byte[] fileContents = ("Hedera is great!").getBytes();
-
-        // Create the new file and set its properties
-        TransactionId newFileTxId = new FileCreateTransaction()
-            .addKey(OPERATOR_KEY.publicKey) // The public key of the owner of the file
-            .setContents(fileContents) // Contents of the file
-            .setMaxTransactionFee(new Hbar(2))
+        TransactionId txId = new AccountCreateTransaction()
+            // The only _required_ property here is `key`
+            .setKey(newKey.publicKey)
+            .setInitialBalance(Hbar.fromTinybar(1000))
             .execute(client);
 
-        FileId newFileId = newFileTxId.getReceipt(client).getFileId();
+        // This will wait for the receipt to become available
+        TransactionReceipt receipt = txId.getReceipt(client);
 
-        //Print the file ID to console
-        System.out.println("The new file ID is " + newFileId.toString());
+        AccountId newAccountId = receipt.getAccountId();
 
-        // Get file contents
-        byte[] contents = new FileContentsQuery()
-            .setFileId(newFileId)
-            .execute(client);
-
-        // Prints query results to console
-        System.out.println("File content query results: " + new String(contents));
+        System.out.println("account = " + newAccountId);
     }
-
 }

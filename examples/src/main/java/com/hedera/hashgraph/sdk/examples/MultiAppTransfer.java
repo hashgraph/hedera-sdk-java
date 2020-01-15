@@ -1,4 +1,4 @@
-package com.hedera.hashgraph.sdk.examples.advanced;
+package com.hedera.hashgraph.sdk.examples;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.Client;

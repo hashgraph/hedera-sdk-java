@@ -1,25 +1,24 @@
-package com.hedera.hashgraph.sdk.examples.simple;
+package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaStatusException;
-import com.hedera.hashgraph.sdk.Transaction;
+import com.hedera.hashgraph.sdk.account.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
 import java.util.Objects;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
-public final class TransferCrypto {
+public final class GetAccountBalance {
 
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final Ed25519PrivateKey OPERATOR_KEY = Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
-    private TransferCrypto() { }
+    private GetAccountBalance() { }
 
     public static void main(String[] args) throws HederaStatusException {
         // `Client.forMainnet()` is provided for connecting to Hedera mainnet
@@ -29,16 +28,10 @@ public final class TransferCrypto {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        // Transfer X hbar from the operator of the client to the given account ID
-        Transaction transaction = new CryptoTransferTransaction()
-            .addSender(OPERATOR_ID, new Hbar(1))
-            .addRecipient(AccountId.fromString("0.0.3"), new Hbar(1))
-            .build(client);
+        Hbar balance = new AccountBalanceQuery()
+            .setAccountId(OPERATOR_ID)
+            .execute(client);
 
-        transaction.execute(client);
-        // queryReceipt() waits for consensus
-        transaction.getReceipt(client);
-
-        System.out.println("transferred 10_000 tinybar...");
+        System.out.println("balance = " + balance);
     }
 }

@@ -1,4 +1,4 @@
-package com.hedera.hashgraph.sdk.examples.advanced;
+package com.hedera.hashgraph.sdk.examples;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;

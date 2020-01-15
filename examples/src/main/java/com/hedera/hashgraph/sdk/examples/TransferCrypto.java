@@ -1,10 +1,11 @@
-package com.hedera.hashgraph.sdk.examples.advanced;
+package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaStatusException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionRecord;
+import com.hedera.hashgraph.sdk.account.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
@@ -33,8 +34,13 @@ public final class TransferCrypto {
         AccountId recipientId = AccountId.fromString("0.0.3");
         Hbar amount = Hbar.fromTinybar(10_000);
 
-        Hbar senderBalanceBefore = client.getAccountBalance(OPERATOR_ID);
-        Hbar receiptBalanceBefore = client.getAccountBalance(recipientId);
+        Hbar senderBalanceBefore = new AccountBalanceQuery()
+            .setAccountId(OPERATOR_ID)
+            .execute(client);
+
+        Hbar receiptBalanceBefore = new AccountBalanceQuery()
+            .setAccountId(recipientId)
+            .execute(client);
 
         System.out.println("" + OPERATOR_ID + " balance = " + senderBalanceBefore);
         System.out.println("" + recipientId + " balance = " + receiptBalanceBefore);
@@ -53,8 +59,13 @@ public final class TransferCrypto {
 
         System.out.println("transferred " + amount + "...");
 
-        Hbar senderBalanceAfter = client.getAccountBalance(OPERATOR_ID);
-        Hbar receiptBalanceAfter = client.getAccountBalance(recipientId);
+        Hbar senderBalanceAfter = new AccountBalanceQuery()
+            .setAccountId(OPERATOR_ID)
+            .execute(client);
+
+        Hbar receiptBalanceAfter = new AccountBalanceQuery()
+            .setAccountId(recipientId)
+            .execute(client);
 
         System.out.println("" + OPERATOR_ID + " balance = " + senderBalanceAfter);
         System.out.println("" + recipientId + " balance = " + receiptBalanceAfter);
