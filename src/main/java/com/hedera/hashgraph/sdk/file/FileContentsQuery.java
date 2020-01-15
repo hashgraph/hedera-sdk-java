@@ -37,7 +37,7 @@ public class FileContentsQuery extends QueryBuilder<byte[], FileContentsQuery> {
 
     @Override
     protected byte[] extractResponse(Response raw) {
-        return raw.getFileGetContents().toByteArray();
+        return raw.getFileGetContents().getFileContents().getContents().toByteArray();
     }
 
     @Override
