@@ -2,6 +2,7 @@ package com.hedera.hashgraph.sdk.contract;
 
 import com.hedera.hashgraph.proto.ContractID;
 import com.hedera.hashgraph.proto.ContractIDOrBuilder;
+import com.hedera.hashgraph.proto.SignaturePair;
 import com.hedera.hashgraph.sdk.IdUtil;
 import com.hedera.hashgraph.sdk.Internal;
 import com.hedera.hashgraph.sdk.SolidityUtil;
@@ -78,5 +79,10 @@ public final class ContractId extends PublicKey {
 
     public String toSolidityAddress() {
         return SolidityUtil.addressFor(this);
+    }
+
+    @Override
+    public SignaturePair.SignatureCase getSignatureCase() {
+        throw new IllegalArgumentException("ContractId cannot be used with Transaction.signWith()");
     }
 }

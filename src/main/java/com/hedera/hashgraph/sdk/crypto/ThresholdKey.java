@@ -1,5 +1,7 @@
 package com.hedera.hashgraph.sdk.crypto;
 
+import com.hedera.hashgraph.proto.SignaturePair;
+
 import java.util.Collection;
 
 import javax.annotation.Nonnegative;
@@ -58,5 +60,10 @@ public class ThresholdKey extends PublicKey {
         final com.hedera.hashgraph.proto.Key.Builder key = com.hedera.hashgraph.proto.Key.newBuilder();
         key.setThresholdKey(inner);
         return key.build();
+    }
+
+    @Override
+    public SignaturePair.SignatureCase getSignatureCase() {
+        throw new IllegalArgumentException("TresholdKey cannot be used with Transaction.signWith()");
     }
 }

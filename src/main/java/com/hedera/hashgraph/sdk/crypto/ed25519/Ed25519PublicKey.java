@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk.crypto.ed25519;
 
 import com.google.protobuf.ByteString;
+import com.hedera.hashgraph.proto.SignaturePair;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
 
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -15,7 +16,7 @@ import java.io.IOException;
  * An ed25519 public key.
  *
  * <p>Can be constructed from a byte array or obtained from a private key {@link
- * Ed25519PrivateKey#getPublicKey()}.
+ * Ed25519PrivateKey#publicKey}.
  */
 @SuppressWarnings("Duplicates") // difficult to factor out common code for all algos without exposing it
 public final class Ed25519PublicKey extends PublicKey {
@@ -60,6 +61,11 @@ public final class Ed25519PublicKey extends PublicKey {
     @Override
     public byte[] toBytes() {
         return pubKeyParams.getEncoded();
+    }
+
+    @Override
+    public SignaturePair.SignatureCase getSignatureCase() {
+        return SignaturePair.SignatureCase.ED25519;
     }
 
     @Override

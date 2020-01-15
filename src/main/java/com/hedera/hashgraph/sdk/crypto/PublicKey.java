@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk.crypto;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.proto.ContractIDOrBuilder;
 import com.hedera.hashgraph.proto.KeyOrBuilder;
+import com.hedera.hashgraph.proto.SignaturePair;
 import com.hedera.hashgraph.sdk.Internal;
 import com.hedera.hashgraph.sdk.contract.ContractId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
@@ -38,6 +39,9 @@ public abstract class PublicKey {
     }
 
     public abstract byte[] toBytes();
+
+    @Internal
+    public abstract SignaturePair.SignatureCase getSignatureCase();
 
     public static PublicKey fromString(String keyString) {
         SubjectPublicKeyInfo pubKeyInfo;

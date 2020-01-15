@@ -16,6 +16,8 @@ import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
+import com.hedera.hashgraph.sdk.crypto.TransactionSigner;
+import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 
 import org.bouncycastle.util.encoders.Hex;
 
@@ -23,7 +25,6 @@ import java.time.Duration;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import io.grpc.Channel;
 import io.grpc.MethodDescriptor;
@@ -68,7 +69,16 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
         return signWith(privateKey.publicKey, privateKey::sign);
     }
 
-    public Transaction signWith(PublicKey publicKey, Function<byte[], byte[]> signer) {
+    /**
+     * Sign the transaction with a callback that may block waiting for user confirmation.
+     *
+     * @param publicKey the public key that pairs with the signature.
+     *                  Currently only {@link Ed25519PublicKey} is allowed.
+     * @param signer the labmda to generate the signature.
+     * @return {@code this} for fluent usage.
+     * @see TransactionSigner
+     */
+    public Transaction signWith(PublicKey publicKey, TransactionSigner signer) {
         SignatureMap.Builder sigMap = inner.getSigMapBuilder();
 
         for (SignaturePair sigPair : sigMap.getSigPairList()) {
@@ -80,12 +90,29 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
             }
         }
 
-        byte[] signatureBytes = signer.apply(inner.getBodyBytes().toByteArray());
+        ByteString signatureBytes = ByteString.copyFrom(
+            signer.signTransaction(inner.getBodyBytes().toByteArray()));
 
-        sigMap.addSigPair(SignaturePair.newBuilder()
-            .setPubKeyPrefix(ByteString.copyFrom(publicKey.toBytes()))
-            .setEd25519(ByteString.copyFrom(signatureBytes))
-            .build());
+        SignaturePair.Builder sigPairBuilder = SignaturePair.newBuilder()
+            .setPubKeyPrefix(ByteString.copyFrom(publicKey.toBytes()));
+
+        switch (publicKey.getSignatureCase()) {
+            case CONTRACT:
+                throw new UnsupportedOperationException("contract signatures are not currently supported");
+            case ED25519:
+                sigPairBuilder.setEd25519(signatureBytes);
+                break;
+            case RSA_3072:
+                sigPairBuilder.setRSA3072(signatureBytes);
+                break;
+            case ECDSA_384:
+                sigPairBuilder.setECDSA384(signatureBytes);
+                break;
+            case SIGNATURE_NOT_SET:
+                throw new IllegalStateException("PublicKey.getSignatureCase() returned SIGNATURE_NOT_SET");
+        }
+
+        sigMap.addSigPair(sigPairBuilder);
 
         return this;
     }

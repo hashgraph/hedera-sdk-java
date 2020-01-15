@@ -1,5 +1,7 @@
 package com.hedera.hashgraph.sdk.crypto;
 
+import com.hedera.hashgraph.proto.SignaturePair;
+
 /**
  * Builder for a list of keys which, if set on an account, must all sign transactions created by
  * that account.
@@ -28,6 +30,11 @@ public class KeyList extends PublicKey {
     @Override
     public byte[] toBytes() {
         return toKeyProto().toByteArray();
+    }
+
+    @Override
+    public SignaturePair.SignatureCase getSignatureCase() {
+        throw new IllegalArgumentException("KeyList cannot be used with Transaction.signWith()");
     }
 
     @Override
