@@ -26,7 +26,7 @@ available in the [hashgraph/hedera-protobuf] repository.
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>sdk</artifactId>
-  <version>0.8.1</version>
+  <version>1.0.0</version>
 </dependency>
 
 <!-- SELECT ONE: -->
