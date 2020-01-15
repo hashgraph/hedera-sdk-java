@@ -81,6 +81,13 @@ public final class TransactionId {
     }
 
     @Override
+    public String toString() {
+        Timestamp timestampProto = TimestampHelper.timestampFrom(validStart);
+
+        return accountId.toString() + "@" + timestampProto.getSeconds() + "." + timestampProto.getNanos();
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(accountId, validStart);
     }
