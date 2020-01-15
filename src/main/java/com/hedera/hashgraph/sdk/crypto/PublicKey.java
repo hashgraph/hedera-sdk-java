@@ -23,6 +23,18 @@ public abstract class PublicKey {
         case CONTRACTID:
             ContractIDOrBuilder id = key.getContractIDOrBuilder();
             return new ContractId(id.getShardNum(), id.getRealmNum(), id.getContractNum());
+        case THRESHOLDKEY:
+            ThresholdKey thresholdKey = new ThresholdKey(key.getThresholdKey().getThreshold());
+            key.getThresholdKey().getKeys().getKeysList().forEach(k -> {
+               thresholdKey.add(PublicKey.fromProtoKey(k));
+            });
+            return thresholdKey;
+        case KEYLIST:
+            KeyList keyList = new KeyList();
+            key.getKeyList().getKeysList().forEach(k -> {
+                keyList.addKey(PublicKey.fromProtoKey(k));
+            });
+            return keyList;
         default:
             throw new IllegalStateException("Unchecked Key Case");
         }

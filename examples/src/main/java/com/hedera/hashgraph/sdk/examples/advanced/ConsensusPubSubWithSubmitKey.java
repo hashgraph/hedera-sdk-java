@@ -1,9 +1,7 @@
 package com.hedera.hashgraph.sdk.examples.advanced;
 
-import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusClient;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicCreateTransaction;
@@ -12,7 +10,6 @@ import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import io.github.cdimascio.dotenv.Dotenv;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Random;
@@ -24,34 +21,19 @@ import java.util.Random;
  * Subscribes to the topic (no key required).
  * Publishes a number of messages to the topic signed by the submitKey.
  */
-public final class ConsensusPubSubWithSubmitKey {
-    // see `.env.sample` in the repository root for how to specify these value or set environment variables with the
-    // same names.
-
-    // The Hedera Hashgrpah node's IP address, port, and account ID.
-    private static final AccountId NODE_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("NODE_ID")));
-    private static final String NODE_ADDRESS = Objects.requireNonNull(Dotenv.load().get("NODE_ADDRESS"));
-
-    // Transaction payer's account ID and ED25519 private key.
-    private static final AccountId OPERATOR_ID
-        = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
-    private static final Ed25519PrivateKey OPERATOR_KEY
-        = Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
-
-    // Mirror node GRPC API's IP address and port.
-    private static final String MIRROR_NODE_ADDRESS = Objects.requireNonNull(Dotenv.load().get("MIRROR_NODE_ADDRESS"));
-
-    private Client hapiClient;
+class ConsensusPubSubWithSubmitKey extends AdvancedExample {
     private ConsensusClient mirrorNodeClient;
 
-    private ConsensusTopicId topicId;
-    private Ed25519PrivateKey submitKey;
     private int messagesToPublish;
     private int millisBetweenMessages;
 
-    private ConsensusPubSubWithSubmitKey(int messagesToPublish, int millisBetweenMessages) {
+    private ConsensusTopicId topicId;
+    private Ed25519PrivateKey submitKey;
+
+    public ConsensusPubSubWithSubmitKey(int messagesToPublish, int millisBetweenMessages) {
         this.messagesToPublish = messagesToPublish;
         this.millisBetweenMessages = millisBetweenMessages;
+        setupMirrorNodeClient();
     }
 
     public static void main(String[] args) throws HederaException, InterruptedException {
@@ -59,8 +41,6 @@ public final class ConsensusPubSubWithSubmitKey {
     }
 
     public void execute() throws HederaException, InterruptedException {
-        setupConnections();
-
         createTopicWithSubmitKey();
 
         subscribeToTopic();
@@ -68,16 +48,9 @@ public final class ConsensusPubSubWithSubmitKey {
         publishMessagesToTopic();
     }
 
-    private void setupConnections() {
-        // Interface used to publish messages on the HCS topic.
-        hapiClient = new Client(NODE_ID, NODE_ADDRESS);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for by this
-        // account and be signed by this key
-        hapiClient.setOperator(OPERATOR_ID, OPERATOR_KEY);
-
+    private void setupMirrorNodeClient() {
         // Interface used to subscribe to messages on the HCS topic.
-        mirrorNodeClient = new ConsensusClient(MIRROR_NODE_ADDRESS)
+        mirrorNodeClient = new ConsensusClient(Objects.requireNonNull(Dotenv.load().get("MIRROR_NODE_ADDRESS")))
             .setErrorHandler(e -> System.out.println("Error in ConsensusClient: " + e));
     }
 
@@ -89,9 +62,9 @@ public final class ConsensusPubSubWithSubmitKey {
         final TransactionId transactionId = new ConsensusTopicCreateTransaction()
             .setMaxTransactionFee(20_000_000L)
             .setSubmitKey(submitPublicKey)
-            .execute(hapiClient);
+            .execute(getHapiClient());
 
-        topicId = transactionId.getReceipt(hapiClient).getConsensusTopicId();
+        topicId = transactionId.getReceipt(getHapiClient()).getConsensusTopicId();
         System.out.println("Created new topic " + topicId + " with ED25519 submitKey of " + submitKey);
     }
 
@@ -113,14 +86,14 @@ public final class ConsensusPubSubWithSubmitKey {
             new ConsensusMessageSubmitTransaction()
                 .setTopicId(topicId)
                 .setMessage(message)
-                .build(hapiClient)
+                .build(getHapiClient())
 
                 // The transaction is automatically signed by the payer.
                 // Due to the topic having a submitKey requirement, additionally sign the transaction with that key.
                 .sign(submitKey)
 
-                .execute(hapiClient)
-                .getReceipt(hapiClient);
+                .execute(getHapiClient())
+                .getReceipt(getHapiClient());
 
             Thread.sleep(millisBetweenMessages);
         }

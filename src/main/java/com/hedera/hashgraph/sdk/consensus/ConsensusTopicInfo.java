@@ -5,6 +5,7 @@ import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -64,5 +65,18 @@ public class ConsensusTopicInfo {
         }
 
         return new ConsensusTopicInfo(response.getConsensusGetTopicInfo());
+    }
+
+    @Override
+    public String toString() {
+        return "topic ID: " + id +
+            " sequence number: " + sequenceNumber +
+            " running hash: " + Hex.toHexString(runningHash) +
+            " expiration time: " + expirationTime +
+            " admin key: " + adminKey +
+            " submit key: " + submitKey +
+            " auto-renew period: " + autoRenewPeriod +
+            " auto-renew account: " + autoRenewAccount +
+            " memo: " + memo;
     }
 }
