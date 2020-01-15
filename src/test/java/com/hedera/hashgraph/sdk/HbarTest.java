@@ -18,9 +18,9 @@ public class HbarTest {
     private final long fiftyGTinybar = 5_000_000_000L;
     private final Hbar fiftyHbar = Hbar.fromTinybar(fiftyGTinybar);
 
-    private final Hbar hundredHbar = Hbar.of(100);
+    private final Hbar hundredHbar = new Hbar(100);
 
-    private final Hbar negativeFiftyHbar = Hbar.of(-50);
+    private final Hbar negativeFiftyHbar = new Hbar(-50);
 
     @Test
     @DisplayName("factory method checks")
@@ -28,7 +28,7 @@ public class HbarTest {
         assertEquals(fiftyHbar.asTinybar(), fiftyGTinybar);
         assertEquals(fiftyHbar.as(HbarUnit.Hbar), new BigDecimal(50));
 
-        assertEquals(Hbar.of(50).asTinybar(), fiftyGTinybar);
+        assertEquals(new Hbar(50).asTinybar(), fiftyGTinybar);
         assertEquals(Hbar.fromTinybar(fiftyGTinybar).asTinybar(), fiftyGTinybar);
         assertEquals(Hbar.ZERO.asTinybar(), 0);
     }
@@ -59,7 +59,7 @@ public class HbarTest {
         assertNotEquals(fiftyHbar, hundredHbar);
         assertNotEquals(fiftyHbar, Hbar.ZERO);
 
-        assertEquals(fiftyHbar.compareTo(Hbar.of(50)), 0);
+        assertEquals(fiftyHbar.compareTo(new Hbar(50)), 0);
 
         assertTrue(fiftyHbar.compareTo(Hbar.MIN) > 0);
         assertTrue(fiftyHbar.compareTo(Hbar.ZERO) > 0);

@@ -46,11 +46,14 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
         return execute(client, getDefaultTimeout());
     }
 
-    public Resp execute(Client client, Duration retryTimeout) throws HederaStatusException, HederaNetworkException {
+    public Resp execute(Client client, Duration retryTimeout) throws HederaStatusException, HederaNetworkException, LocalValidationException {
         if (isExecuted) {
             throw new IllegalStateException("call already executed");
         }
         isExecuted = true;
+
+        // Run local validator just before execute
+        localValidate();
 
         // N.B. only QueryBuilder used onPreExecute() so instead it should just override this
         // method instead
@@ -71,6 +74,9 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
             throw new IllegalStateException("call already executed");
         }
         isExecuted = true;
+
+        // Run local validator just before execute
+        localValidate();
 
         final Consumer<Consumer<HederaThrowable>> executeCall = (onError2) -> ClientCalls.asyncUnaryCall(getChannel(client).newCall(getMethod(), CallOptions.DEFAULT), toProto(),
             new CallStreamObserver(onSuccess, onError2));

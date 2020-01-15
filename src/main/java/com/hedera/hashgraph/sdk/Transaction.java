@@ -197,13 +197,11 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
 
     @Override
     public com.hedera.hashgraph.proto.Transaction toProto() {
-        localValidate();
         return inner.build();
     }
 
     @Internal
     public com.hedera.hashgraph.proto.Transaction toProto(boolean requireSignature) {
-        validate(requireSignature);
         return inner.build();
     }
 

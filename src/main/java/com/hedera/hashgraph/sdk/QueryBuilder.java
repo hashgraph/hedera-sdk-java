@@ -19,6 +19,8 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
+import com.hedera.hashgraph.sdk.crypto.TransactionSigner;
 import io.grpc.Channel;
 import io.grpc.MethodDescriptor;
 
@@ -146,7 +148,8 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     private void generatePayment(Client client) {
         if (isPaymentRequired() && !getHeaderBuilder().hasPayment()
-            && client.getOperatorId() != null)
+            && client.getOperatorId() != null && client.getOperatorSigner() != null
+            && client.getOperatorPublicKey() != null)
         {
             AccountId operatorId = client.getOperatorId();
             AccountId nodeId = getNode(client).accountId;
@@ -155,7 +158,8 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
                 .setTransactionId(new TransactionId(operatorId))
                 .addSender(operatorId, paymentAmount)
                 .addRecipient(nodeId, paymentAmount)
-                .build(client);
+                .build(client)
+                .signWith(client.getOperatorPublicKey(), client.getOperatorSigner());
 
             setPaymentTransaction(txPayment);
         }
@@ -300,11 +304,16 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
                 client.getOperatorId(),
                 "COST_ANSWER requires an operator ID to be set");
 
+            final PublicKey operatorPublicKey = Objects.requireNonNull(client.getOperatorPublicKey());
+
+            final TransactionSigner operatorSigner = Objects.requireNonNull(client.getOperatorSigner());
+
             // COST_ANSWER requires a payment to pass validation but doesn't actually process it
             final com.hedera.hashgraph.proto.Transaction fakePayment = new CryptoTransferTransaction()
                 .addRecipient(Objects.requireNonNull(nodeId), 0)
                 .addSender(operatorId, 0)
                 .build(client)
+                .signWith(operatorPublicKey, operatorSigner)
                 .toProto();
 
             // set our fake values, build and then reset
@@ -341,9 +350,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
         @Override
         public void localValidate() {
-            // skip payment validation
-            doValidate();
-            QueryBuilder.this.checkValidationErrors("cannot get cost for incomplete query");
+            // Skip validation for COST_ANSWER
         }
     }
 
