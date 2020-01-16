@@ -67,6 +67,9 @@ public class ConsensusTopicInfo {
         return new ConsensusTopicInfo(response.getConsensusGetTopicInfo());
     }
 
+    /**
+     * The output of this function is solely for debugging purposes and its format is explicitly not stable.
+     */
     @Override
     public String toString() {
         return "topic ID: " + id +
