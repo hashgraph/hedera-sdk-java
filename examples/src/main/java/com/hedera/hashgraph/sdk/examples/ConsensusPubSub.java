@@ -1,7 +1,7 @@
-package com.hedera.hashgraph.sdk.examples.advanced;
+package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.HederaException;
+import com.hedera.hashgraph.sdk.HederaStatusException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusClient;
@@ -10,6 +10,7 @@ import com.hedera.hashgraph.sdk.consensus.ConsensusTopicCreateTransaction;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
+import java.util.HashMap;
 import java.util.Objects;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -28,13 +29,16 @@ public final class ConsensusPubSub {
 
     private ConsensusPubSub() { }
 
-    public static void main(String[] args) throws InterruptedException, HederaException {
+    public static void main(String[] args) throws InterruptedException, HederaStatusException {
         final ConsensusClient consensusClient = new ConsensusClient(MIRROR_NODE_ADDRESS)
             .setErrorHandler(e -> System.out.println("error in consensus client: " + e));
 
-        // To improve responsiveness, you should specify multiple nodes using the
-        // `Client(<Map<AccountId, String>>)` constructor instead
-        Client client = new Client(NODE_ID, NODE_ADDRESS);
+        // To improve responsiveness, you should specify multiple nodes
+        Client client = new Client(new HashMap<AccountId, String>() {
+            {
+                put(NODE_ID, NODE_ADDRESS);
+            }
+        });
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
