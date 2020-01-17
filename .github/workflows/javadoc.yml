@@ -2,8 +2,8 @@ name: Javadoc
 
 on:
   push:
-    branches: 
-      - master
+    branches:
+    - master
 
 jobs:
   doc:
@@ -27,12 +27,12 @@ jobs:
 
     - name: Generate
       run: mvn -B javadoc:javadoc --file pom.xml
-    
+
     - name: Publish
       uses: JamesIves/github-pages-deploy-action@releases/v3
       with:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        BASE_BRANCH: master 
+        BASE_BRANCH: master
         BRANCH: gh-pages
-        FOLDER: target/site/apidocs 
+        FOLDER: target/site/apidocs
         CLEAN: true
