@@ -6,3 +6,4 @@ com.hedera.hashgraph.sdk.contract
 com.hedera.hashgraph.sdk.crypto
 com.hedera.hashgraph.sdk.crypto.ed25519
 com.hedera.hashgraph.sdk.file
+com.hedera.hashgraph.sdk.mirror
