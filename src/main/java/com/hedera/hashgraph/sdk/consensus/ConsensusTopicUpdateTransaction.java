@@ -38,7 +38,7 @@ public class ConsensusTopicUpdateTransaction extends TransactionBuilder<Consensu
 
     /**
      * Explicitly clear any memo on the topic.
-     * @return
+     * @return {@code this} for fluent usage.
      */
     public ConsensusTopicUpdateTransaction clearTopicMemo() {
         builder.setMemo(StringValue.of(""));
@@ -52,7 +52,7 @@ public class ConsensusTopicUpdateTransaction extends TransactionBuilder<Consensu
 
     /**
      * Explicitly clear any adminKey on the topic.
-     * @return
+     * @return {@code this} for fluent usage.
      */
     public ConsensusTopicUpdateTransaction clearAdminKey() {
         builder.setAdminKey(Key.newBuilder().setKeyList(KeyList.getDefaultInstance()));
@@ -66,7 +66,7 @@ public class ConsensusTopicUpdateTransaction extends TransactionBuilder<Consensu
 
     /**
      * Explicitly clear any submitKey on the topic.
-     * @return
+     * @return {@code this} for fluent usage.
      */
     public ConsensusTopicUpdateTransaction clearSubmitKey() {
         builder.setSubmitKey(Key.newBuilder().setKeyList(KeyList.getDefaultInstance()));
@@ -90,7 +90,7 @@ public class ConsensusTopicUpdateTransaction extends TransactionBuilder<Consensu
 
     /**
      * Explicitly clear any auto renew account ID on the topic.
-     * @return
+     * @return {@code this} for fluent usage.
      */
     public ConsensusTopicUpdateTransaction clearAutoRenewAccountId() {
         builder.setAutoRenewAccount(AccountID.getDefaultInstance());
