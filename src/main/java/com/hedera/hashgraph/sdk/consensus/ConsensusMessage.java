@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Arrays;
 
+@Deprecated
 public class ConsensusMessage {
     public final ConsensusTopicId topicId;
 

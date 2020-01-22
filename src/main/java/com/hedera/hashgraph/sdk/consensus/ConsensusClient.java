@@ -21,6 +21,10 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
 
+/**
+ * @deprecated use {@link com.hedera.hashgraph.sdk.mirror.MirrorClient} instead
+ */
+@Deprecated
 public class ConsensusClient implements AutoCloseable {
     private final ManagedChannel channel;
 
