@@ -16,7 +16,7 @@ public class ConsensusTopicInfo {
     public final ConsensusTopicId id;
 
     @Nullable
-    public final String memo;
+    public final String topicMemo;
 
     public final long sequenceNumber;
 
@@ -34,7 +34,7 @@ public class ConsensusTopicInfo {
     public final Duration autoRenewPeriod;
 
     @Nullable
-    public final AccountId autoRenewAccount;
+    public final AccountId autoRenewAccountId;
 
     public ConsensusTopicInfo(com.hedera.hashgraph.proto.ConsensusGetTopicInfoResponse response) {
         id = new ConsensusTopicId(response.getTopicIDOrBuilder());
@@ -52,11 +52,11 @@ public class ConsensusTopicInfo {
         submitKey = info.hasSubmitKey() ? PublicKey.fromProtoKey(info.getSubmitKey()) : null;
 
         String memo = info.getMemo();
-        this.memo = memo.isEmpty() ? null : memo;
+        this.topicMemo = memo.isEmpty() ? null : memo;
 
         autoRenewPeriod = DurationHelper.durationTo(info.getAutoRenewPeriod());
 
-        autoRenewAccount = info.hasAutoRenewAccount() ? new AccountId(info.getAutoRenewAccount()) : null;
+        autoRenewAccountId = info.hasAutoRenewAccount() ? new AccountId(info.getAutoRenewAccount()) : null;
     }
 
     static ConsensusTopicInfo fromResponse(Response response) {
@@ -79,7 +79,7 @@ public class ConsensusTopicInfo {
             + " admin key: " + adminKey
             + " submit key: " + submitKey
             + " auto-renew period: " + autoRenewPeriod
-            + " auto-renew account: " + autoRenewAccount
-            + " memo: " + memo;
+            + " auto-renew account: " + autoRenewAccountId
+            + " memo: " + topicMemo;
     }
 }
