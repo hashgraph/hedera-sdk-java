@@ -4,17 +4,18 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaStatusException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.consensus.ConsensusClient;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicCreateTransaction;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
+import com.hedera.hashgraph.sdk.mirror.MirrorClient;
+import com.hedera.hashgraph.sdk.mirror.MirrorConsensusTopicQuery;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.spongycastle.util.encoders.Hex;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.Random;
 
@@ -27,7 +28,7 @@ import java.util.Random;
  */
 public class ConsensusPubSubWithSubmitKey {
     private Client hapiClient;
-    private ConsensusClient mirrorNodeClient;
+    private MirrorClient mirrorNodeClient;
 
     private int messagesToPublish;
     private int millisBetweenMessages;
@@ -55,24 +56,13 @@ public class ConsensusPubSubWithSubmitKey {
     }
 
     private void setupHapiClient() {
-        // see `.env.sample` in the repository root for how to specify these values or set environment variables with
-        // the same names
-
-        // The Hedera Hashgraph node's IP address, port, and account ID.
-        AccountId nodeAccountId = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("NODE_ID")));
-        String nodeAddress = Objects.requireNonNull(Dotenv.load().get("NODE_ADDRESS"));
-
         // Transaction payer's account ID and ED25519 private key.
         AccountId payerId = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
         Ed25519PrivateKey payerPrivateKey =
             Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
         // Interface used to publish messages on the HCS topic.
-        hapiClient = new Client(new HashMap<AccountId, String>() {
-            {
-                put(nodeAccountId, nodeAddress);
-            }
-        });
+        hapiClient = Client.forTestnet();
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for by this
         // account and be signed by this key
@@ -81,8 +71,7 @@ public class ConsensusPubSubWithSubmitKey {
 
     private void setupMirrorNodeClient() {
         // Interface used to subscribe to messages on the HCS topic.
-        mirrorNodeClient = new ConsensusClient(Objects.requireNonNull(Dotenv.load().get("MIRROR_NODE_ADDRESS")))
-            .setErrorHandler(e -> System.out.println("Error in ConsensusClient: " + e));
+        mirrorNodeClient = new MirrorClient(Objects.requireNonNull(Dotenv.load().get("MIRROR_NODE_ADDRESS")));
     }
 
     /**
@@ -99,7 +88,6 @@ public class ConsensusPubSubWithSubmitKey {
         Ed25519PublicKey submitPublicKey = submitKey.publicKey;
 
         final TransactionId transactionId = new ConsensusTopicCreateTransaction()
-            .setMaxTransactionFee(20_000_000L)
             .setTopicMemo("HCS topic with submit key")
             .setSubmitKey(submitPublicKey)
             .execute(hapiClient);
@@ -113,12 +101,17 @@ public class ConsensusPubSubWithSubmitKey {
      * Hedera mirror node.
      */
     private void subscribeToTopic() {
-        mirrorNodeClient.subscribe(topicId, Instant.ofEpochSecond(0), message -> {
-            System.out.println("Received message: " + message.getMessageString()
-                + " consensus timestamp: " + message.consensusTimestamp
-                + " topic sequence number: " + message.sequenceNumber
-                + " topic running hash: " + Hex.toHexString(message.runningHash));
-        });
+        new MirrorConsensusTopicQuery()
+            .setTopicId(topicId)
+            .setStartTime(Instant.ofEpochSecond(0))
+            .subscribe(mirrorNodeClient, message -> {
+                System.out.println("Received message: " + new String(message.message, StandardCharsets.UTF_8)
+                    + " consensus timestamp: " + message.consensusTimestamp
+                    + " topic sequence number: " + message.sequenceNumber
+                    + " topic running hash: " + Hex.toHexString(message.runningHash));
+            },
+                // On gRPC error, print the stack trace
+                Throwable::printStackTrace);
     }
 
     /**

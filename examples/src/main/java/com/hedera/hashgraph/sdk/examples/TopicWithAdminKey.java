@@ -15,7 +15,6 @@ import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -47,24 +46,13 @@ class TopicWithAdminKey {
     }
 
     private void setupHapiClient() {
-        // see `.env.sample` in the repository root for how to specify these values or set environment variables with
-        // the same names
-
-        // The Hedera Hashgraph node's IP address, port, and account ID.
-        AccountId nodeAccountId = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("NODE_ID")));
-        String nodeAddress = Objects.requireNonNull(Dotenv.load().get("NODE_ADDRESS"));
-
         // Transaction payer's account ID and ED25519 private key.
         AccountId payerId = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
         Ed25519PrivateKey payerPrivateKey =
             Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
         // Interface used to publish messages on the HCS topic.
-        hapiClient = new Client(new HashMap<AccountId, String>() {
-            {
-                put(nodeAccountId, nodeAddress);
-            }
-        });
+        hapiClient = Client.forTestnet();
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for by this
         // account and be signed by this key
@@ -84,7 +72,6 @@ class TopicWithAdminKey {
                 .collect(Collectors.toList()));
 
         Transaction transaction = new ConsensusTopicCreateTransaction()
-            .setMaxTransactionFee(50_000_000L)
             .setTopicMemo("demo topic")
             .setAdminKey(thresholdKey)
             .build(hapiClient);
@@ -115,7 +102,6 @@ class TopicWithAdminKey {
                 .collect(Collectors.toList()));
 
         Transaction transaction = new ConsensusTopicUpdateTransaction()
-            .setMaxTransactionFee(50_000_000L)
             .setTopicId(topicId)
             .setTopicMemo("updated demo topic")
             .setAdminKey(thresholdKey)
