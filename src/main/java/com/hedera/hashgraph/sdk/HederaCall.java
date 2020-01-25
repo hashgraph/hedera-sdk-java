@@ -21,8 +21,6 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
     private @Nullable
     List<String> validationErrors;
 
-    private boolean isExecuted = false;
-
     private static final Duration RETRY_DELAY = Duration.ofMillis(500);
 
     protected abstract io.grpc.MethodDescriptor<Req, RawResp> getMethod();
@@ -47,11 +45,6 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
     }
 
     public Resp execute(Client client, Duration retryTimeout) throws HederaStatusException, HederaNetworkException, LocalValidationException {
-        if (isExecuted) {
-            throw new IllegalStateException("call already executed");
-        }
-        isExecuted = true;
-
         // Run local validator just before execute
         localValidate();
 
@@ -70,11 +63,6 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
     }
 
     public void executeAsync(Client client, Duration retryTimeout, Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError) {
-        if (isExecuted) {
-            throw new IllegalStateException("call already executed");
-        }
-        isExecuted = true;
-
         // Run local validator just before execute
         localValidate();
 
