@@ -1,7 +1,7 @@
 # Hedera Java SDK
 [![Actions Status](https://github.com/hashgraph/hedera-sdk-java/workflows/Java/badge.svg
 )](https://github.com/hashgraph/hedera-sdk-java/actions?query=workflow%3AJava)
-![Maven](https://img.shields.io/maven-central/v/com.hedera.hashgraph/sdk/0.8)
+![Maven](https://img.shields.io/maven-central/v/com.hedera.hashgraph/sdk)
 [![Documentation](https://img.shields.io/badge/javadoc-reference-informational)](https://hashgraph.github.io/hedera-sdk-java/)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-green)](https://github.com/hashgraph/hedera-sdk-java/blob/master/LICENSE)
 
