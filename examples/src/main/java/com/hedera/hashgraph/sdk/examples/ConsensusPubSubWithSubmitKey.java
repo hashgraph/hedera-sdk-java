@@ -7,7 +7,6 @@ import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicCreateTransaction;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
-import com.hedera.hashgraph.sdk.consensus.ConsensusTopicRunningHash;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import com.hedera.hashgraph.sdk.mirror.MirrorClient;
@@ -27,7 +26,7 @@ import java.util.Random;
  * Subscribes to the topic (no key required).
  * Publishes a number of messages to the topic signed by the submitKey.
  */
-public final class ConsensusPubSubWithSubmitKey {
+public class ConsensusPubSubWithSubmitKey {
     private Client hapiClient;
     private MirrorClient mirrorNodeClient;
 
@@ -36,7 +35,6 @@ public final class ConsensusPubSubWithSubmitKey {
 
     private ConsensusTopicId topicId;
     private Ed25519PrivateKey submitKey;
-    private ConsensusTopicRunningHash runningHash;
 
     public ConsensusPubSubWithSubmitKey(int messagesToPublish, int millisBetweenMessages) {
         this.messagesToPublish = messagesToPublish;
@@ -96,7 +94,6 @@ public final class ConsensusPubSubWithSubmitKey {
 
         topicId = transactionId.getReceipt(hapiClient).getConsensusTopicId();
         System.out.println("Created new topic " + topicId + " with ED25519 submitKey of " + submitKey);
-        runningHash = new ConsensusTopicRunningHash(topicId);
     }
 
     /**
@@ -112,18 +109,6 @@ public final class ConsensusPubSubWithSubmitKey {
                     + " consensus timestamp: " + message.consensusTimestamp
                     + " topic sequence number: " + message.sequenceNumber
                     + " topic running hash: " + Hex.toHexString(message.runningHash));
-
-                // Verify the returned running hash.
-                long expectedSequenceNumber = runningHash.sequenceNumber + 1;
-                if (message.sequenceNumber == expectedSequenceNumber) {
-                    ConsensusTopicRunningHash expectedRunningHash = runningHash.getUpdatedRunningHash(message.message,
-                        message.consensusTimestamp);
-                    System.out.println("Received expected running hash: " + Hex.toHexString(expectedRunningHash.runningHash));
-                    runningHash = expectedRunningHash;
-                } else {
-                    System.out.println("Expecting sequence number " + expectedSequenceNumber + " but received "
-                        + message.sequenceNumber);
-                }
             },
                 // On gRPC error, print the stack trace
                 Throwable::printStackTrace);
