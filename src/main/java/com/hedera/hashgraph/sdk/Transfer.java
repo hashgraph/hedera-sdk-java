@@ -11,7 +11,26 @@ public final class Transfer {
     public final Hbar amount;
 
     Transfer(AccountAmountOrBuilder accountAmount) {
-        accountId = new AccountId(accountAmount.getAccountIDOrBuilder());
-        amount = Hbar.fromTinybar(accountAmount.getAmount());
+        this(
+            new AccountId(accountAmount.getAccountIDOrBuilder()),
+            Hbar.fromTinybar(accountAmount.getAmount()));
+    }
+
+    Transfer(AccountId accountId, Hbar amount) {
+        this.accountId = accountId;
+        this.amount = amount;
+    }
+
+    /**
+     * Get a debug printout of this transfer.
+     *
+     * The format is not considered part of the stable API.
+     */
+    @Override
+    public String toString() {
+        return "Transfer{"
+            + "accountId=" + accountId
+            + ", amount=" + amount
+            + '}';
     }
 }
