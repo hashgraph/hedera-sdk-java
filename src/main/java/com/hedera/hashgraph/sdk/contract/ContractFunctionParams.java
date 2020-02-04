@@ -385,7 +385,7 @@ public final class ContractFunctionParams {
     public ContractFunctionParams addAddress(String address) {
         final byte[] addressBytes = decodeAddress(address);
 
-        args.add(new Argument("address", ByteString.copyFrom(addressBytes).concat(padding.substring(19)), false));
+        args.add(new Argument("address", leftPad32(ByteString.copyFrom(addressBytes)), false));
 
         return this;
     }
