@@ -64,7 +64,7 @@ class ContractFunctionParamsTest {
                 + "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000"
                 // zero-padded
                 + "000000000000000000000000000000000000000000000000ffffffffffff0000"
-                + "00112233445566778899aabbccddeeff00112233000000000000000000000000",
+                + "00000000000000000000000000112233445566778899aabbccddeeff00112233",
             paramsHex
         );
     }
