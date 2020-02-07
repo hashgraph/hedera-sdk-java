@@ -2,8 +2,18 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.proto.*;
+import com.hedera.hashgraph.proto.ConsensusServiceGrpc;
+import com.hedera.hashgraph.proto.CryptoServiceGrpc;
+import com.hedera.hashgraph.proto.FileServiceGrpc;
 import com.hedera.hashgraph.proto.FreezeServiceGrpc;
+import com.hedera.hashgraph.proto.SignatureMap;
+import com.hedera.hashgraph.proto.SignatureMapOrBuilder;
+import com.hedera.hashgraph.proto.SignaturePair;
+import com.hedera.hashgraph.proto.SignaturePairOrBuilder;
+import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
+import com.hedera.hashgraph.proto.TransactionBody;
+import com.hedera.hashgraph.proto.TransactionBodyOrBuilder;
+import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
@@ -120,6 +130,20 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
         }
 
         return super.execute(client, timeout);
+    }
+
+    @Override
+    public void executeAsync(Client client, Duration retryTimeout, Consumer<TransactionId> onSuccess, Consumer<HederaThrowable> onError) {
+        // Sign with the operator if there is a client; the client has an operator; and, the transaction
+        // has a transaction ID that matches that operator ( which it would unless overridden ).
+        if (client.getOperatorPublicKey() != null && client.getOperatorSigner() != null
+            && client.getOperatorId() != null
+            && client.getOperatorId().equals(new AccountId(txnIdProto.getAccountID())))
+        {
+            signWith(client.getOperatorPublicKey(), client.getOperatorSigner());
+        }
+
+        super.executeAsync(client, retryTimeout, onSuccess, onError);
     }
 
     /**
