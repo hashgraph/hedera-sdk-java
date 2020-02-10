@@ -5,7 +5,7 @@ import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.TransactionBuilder;
-
+import com.hedera.hashgraph.sdk.account.AccountId;
 import io.grpc.MethodDescriptor;
 
 /** Delete a smart contract instance. */
@@ -19,6 +19,16 @@ public final class ContractDeleteTransaction extends TransactionBuilder<Contract
 
     public ContractDeleteTransaction setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProto());
+        return this;
+    }
+
+    public ContractDeleteTransaction setTransferAccountId(AccountId transferAccountId) {
+        builder.setTransferAccountID(transferAccountId.toProto());
+        return this;
+    }
+
+    public ContractDeleteTransaction setTransferContractId(ContractId transferContractId) {
+        builder.setTransferContractID(transferContractId.toProto());
         return this;
     }
 
