@@ -55,7 +55,7 @@ public final class TransactionId {
      * <i>Nota bene</i>: executing transactions with the same ID (account ID & account start time)
      * will throw {@link HederaStatusException} with code {@code DUPLICATE_TRANSACTION}.
      * <p>
-     *
+     * <p>
      * Use the primary constructor to get an ID with a known-valid {@code transactionValidStart}.
      *
      * @param accountId
@@ -84,7 +84,8 @@ public final class TransactionId {
     public String toString() {
         Timestamp timestampProto = TimestampHelper.timestampFrom(validStart);
 
-        return accountId.toString() + "@" + timestampProto.getSeconds() + "." + timestampProto.getNanos();
+        return accountId.toString() + "@" + timestampProto.getSeconds() + "."
+            + timestampProto.getNanos();
     }
 
     @Override
@@ -100,6 +101,45 @@ public final class TransactionId {
 
         TransactionId otherId = (TransactionId) other;
         return accountId.equals(otherId.accountId) && validStart.equals(otherId.validStart);
+    }
+
+    // RFC: do we want to expose this method and its async version?
+    void waitForConsensus(Client client, @Nullable Duration timeout) throws HederaStatusException {
+        try {
+            // use the receipt query to wait for consensus
+            if (timeout != null) {
+                getReceipt(client, timeout);
+            } else {
+                getReceipt(client);
+            }
+        } catch (HederaReceiptStatusException e) {
+            // these errors mean the transaction was dropped or timed out, we need to bubble them up
+            if (e.status.equalsAny(Status.Busy, Status.Unknown)) {
+                throw e;
+            }
+            // otherwise ignore the status in the receipt; for failed transactions the record might
+            // contain useful context that we don't want to lose/discard
+        }
+    }
+
+    void waitForConsensusAsync(Client client, @Nullable Duration timeout, Runnable onSuccess, Consumer<HederaThrowable> onError) {
+        // same motivation as synchronous version above
+        Consumer<HederaThrowable> onError2 = e -> {
+            if (e instanceof HederaReceiptStatusException) {
+                // these errors mean the transaction was dropped
+                if (((HederaReceiptStatusException) e).status.equalsAny(Status.Busy, Status.Unknown)) {
+                    onError.accept(e);
+                } else {
+                    onSuccess.run();
+                }
+            }
+        };
+
+        if (timeout != null) {
+            getReceiptAsync(client, timeout, r -> onSuccess.run(), onError2);
+        } else {
+            getReceiptAsync(client, r -> onSuccess.run(), onError2);
+        }
     }
 
     public TransactionReceipt getReceipt(Client client) throws HederaStatusException {
@@ -127,7 +167,7 @@ public final class TransactionId {
     }
 
     public TransactionRecord getRecord(Client client) throws HederaStatusException, HederaNetworkException {
-        getReceipt(client);
+        waitForConsensus(client, null);
 
         return new TransactionRecordQuery()
             .setTransactionId(this)
@@ -135,7 +175,7 @@ public final class TransactionId {
     }
 
     public TransactionRecord getRecord(Client client, Duration timeout) throws HederaStatusException {
-        getReceipt(client, timeout);
+        waitForConsensus(client, timeout);
 
         return new TransactionRecordQuery()
             .setTransactionId(this)
@@ -143,7 +183,7 @@ public final class TransactionId {
     }
 
     public void getRecordAsync(Client client, Consumer<TransactionRecord> onRecord, Consumer<HederaThrowable> onError) {
-        getReceiptAsync(client, (receipt) -> {
+        waitForConsensusAsync(client, null, () -> {
             new TransactionRecordQuery()
                 .setTransactionId(this)
                 .executeAsync(client, onRecord, onError);
@@ -151,7 +191,7 @@ public final class TransactionId {
     }
 
     public void getRecordAsync(Client client, Duration timeout, Consumer<TransactionRecord> onRecord, Consumer<HederaThrowable> onError) {
-        getReceiptAsync(client, timeout, (receipt) -> {
+        waitForConsensusAsync(client, timeout, () -> {
             new TransactionRecordQuery()
                 .setTransactionId(this)
                 .executeAsync(client, timeout, onRecord, onError);

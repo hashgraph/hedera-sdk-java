@@ -11,6 +11,8 @@ import com.hedera.hashgraph.proto.ResponseType;
 import com.hedera.hashgraph.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
+import com.hedera.hashgraph.sdk.crypto.PublicKey;
+import com.hedera.hashgraph.sdk.crypto.TransactionSigner;
 
 import java.time.Duration;
 import java.util.List;
@@ -19,8 +21,6 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
-import com.hedera.hashgraph.sdk.crypto.PublicKey;
-import com.hedera.hashgraph.sdk.crypto.TransactionSigner;
 import io.grpc.Channel;
 import io.grpc.MethodDescriptor;
 
@@ -29,6 +29,9 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     @Nullable
     private AccountId nodeId;
+
+    @Nullable
+    private TransactionId paymentTransactionId;
 
     private long paymentAmount;
     private long maxPayment = 0;
@@ -133,6 +136,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
      */
     public T setPaymentTransaction(Transaction transaction) {
         getHeaderBuilder().setPayment(transaction.toProto());
+        paymentTransactionId = transaction.id;
         // noinspection unchecked
         return (T) this;
     }
@@ -266,14 +270,18 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     @Override
     protected final Resp mapResponse(Response raw) throws HederaStatusException {
         final ResponseCodeEnum precheckCode = getResponseHeader(raw).getNodeTransactionPrecheckCode();
-        HederaStatusException.throwIfExceptional(precheckCode);
+        HederaPrecheckStatusException.throwIfExceptional(precheckCode, Objects.requireNonNull(paymentTransactionId));
 
         switch (raw.getResponseCase()) {
             case TRANSACTIONGETRECEIPT:
-                HederaStatusException.throwIfExceptional(raw.getTransactionGetReceipt().getReceipt().getStatus());
+                HederaReceiptStatusException.throwIfExceptional(
+                    // look at the query for the transaction ID
+                    inner.getTransactionGetReceipt(),
+                    raw.getTransactionGetReceipt());
                 break;
             case TRANSACTIONGETRECORD:
-                HederaStatusException.throwIfExceptional(raw.getTransactionGetRecord().getTransactionRecord().getReceipt().getStatus());
+                // record response has everything we need
+                HederaRecordStatusException.throwIfExceptional(raw.getTransactionGetRecord());
                 break;
             default:
         }
