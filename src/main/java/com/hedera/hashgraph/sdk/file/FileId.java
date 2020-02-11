@@ -49,6 +49,10 @@ public final class FileId {
         return IdUtil.parseIdString(account, FileId::new);
     }
 
+    /**
+     * @deprecated the Solidity VM has no concept of files, so this method has limited utility.
+     */
+    @Deprecated
     public static FileId fromSolidityAddress(String address) {
         return SolidityUtil.parseAddress(address, FileId::new);
     }
@@ -82,6 +86,10 @@ public final class FileId {
         return "" + shard + "." + realm + "." + file;
     }
 
+    /**
+     * @deprecated the Solidity VM has no concept of files, so this method has limited utility.
+     */
+    @Deprecated
     public String toSolidityAddress() {
         return SolidityUtil.addressFor(this);
     }
