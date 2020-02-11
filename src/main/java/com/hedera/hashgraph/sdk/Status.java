@@ -2,6 +2,8 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.proto.ResponseCodeEnum;
 
+import java.util.Arrays;
+
 public enum Status {
     Ok(ResponseCodeEnum.OK),
     InvalidTransaction(ResponseCodeEnum.INVALID_TRANSACTION),
@@ -135,6 +137,10 @@ public enum Status {
 
     public String toString() {
         return responseCode.toString();
+    }
+
+    boolean equalsAny(Status... statuses) {
+        return Arrays.asList(statuses).contains(this);
     }
 
     static Status valueOf(ResponseCodeEnum responseCode) {
