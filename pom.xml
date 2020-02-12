@@ -251,15 +251,6 @@
                             </excludes>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>default-integration-test</id>
-                        <phase>integration-test</phase>
-                        <goals><goal>test</goal></goals>
-                        <!--
-                            can't exclude unit tests and still run integration tests
-                            but unit tests are idempotent so it's not the end of the world
-                         -->
-                    </execution>
                 </executions>
             </plugin>
 
@@ -478,6 +469,30 @@
                                 </arg>
                             </compilerArgs>
                         </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>integration-testing</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <!-- Surefire configured for integration testing as a separate profile -->
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>3.0.0-M3</version>
+                        <executions>
+                            <execution>
+                                <id>default-integration-test</id>
+                                <phase>integration-test</phase>
+                                <goals><goal>test</goal></goals>
+                                <!--
+                                    can't exclude unit tests and still run integration tests
+                                    but unit tests are idempotent so it's not the end of the world
+                                 -->
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>

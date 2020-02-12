@@ -70,6 +70,7 @@ jobs:
 
     - name: install SDK
       run: mvn install # implicitly runs tests
+      # TODO: turn on `integration-testing` profile when we have testnet account for CI
 
     - name: Build Android Example
       working-directory: android-example
