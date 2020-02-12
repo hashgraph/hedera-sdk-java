@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.hedera.hashgraph</groupId>
     <artifactId>sdk</artifactId>
@@ -51,7 +51,8 @@
 
     <scm>
         <connection>scm:git:https://github.com/hashgraph/hedera-sdk-java.git</connection>
-        <developerConnection>scm:git:ssh://github.com:hashgraph/hedera-sdk-java.git</developerConnection>
+        <developerConnection>scm:git:ssh://github.com:hashgraph/hedera-sdk-java.git
+        </developerConnection>
         <url>https://github.com/hashgraph/hedera-sdk-java</url>
     </scm>
 
@@ -130,6 +131,20 @@
             <artifactId>spotbugs-annotations</artifactId>
             <scope>provided</scope>
             <version>${spotbugs.version}</version>
+        </dependency>
+
+        <!-- integration test dependencies -->
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>java-dotenv</artifactId>
+            <version>5.0.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty-shaded</artifactId>
+            <version>${grpc.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -223,6 +238,29 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M3</version>
+                <executions>
+                    <execution>
+                        <id>default-test</id>
+                        <phase>test</phase>
+                        <goals><goal>test</goal></goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>
+                                    **/integration_tests/*.*
+                                </exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>default-integration-test</id>
+                        <phase>integration-test</phase>
+                        <goals><goal>test</goal></goals>
+                        <!--
+                            can't exclude unit tests and still run integration tests
+                            but unit tests are idempotent so it's not the end of the world
+                         -->
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -309,10 +347,12 @@
                 <artifactId>protobuf-maven-plugin</artifactId>
                 <version>${protobuf.plugin.version}</version>
                 <configuration>
-                    <protocArtifact>com.google.protobuf:protoc:${protoc.version}:exe:${os.detected.classifier}
+                    <protocArtifact>
+                        com.google.protobuf:protoc:${protoc.version}:exe:${os.detected.classifier}
                     </protocArtifact>
                     <pluginId>grpc-java</pluginId>
-                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}
+                    <pluginArtifact>
+                        io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}
                     </pluginArtifact>
                     <additionalProtoPathElements>
                         <element>
@@ -332,9 +372,9 @@
         </plugins>
     </build>
     <profiles>
-     <!-- shade profile which adds the possibility to shade the .jar file.
-        Call "mvn clean install -Pshade" to invoke this additional
-        plugin in the maven build -->
+        <!-- shade profile which adds the possibility to shade the .jar file.
+           Call "mvn clean install -Pshade" to invoke this additional
+           plugin in the maven build -->
         <profile>
             <id>shade</id>
             <build>

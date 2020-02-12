@@ -269,7 +269,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
 
     @Override
     protected TransactionId mapResponse(TransactionResponse response) throws HederaStatusException {
-        HederaPrecheckStatusException.throwIfExceptional(response.getNodeTransactionPrecheckCode());
+        HederaPrecheckStatusException.throwIfExceptional(response.getNodeTransactionPrecheckCode(), id);
         return new TransactionId(txnIdProto);
     }
 

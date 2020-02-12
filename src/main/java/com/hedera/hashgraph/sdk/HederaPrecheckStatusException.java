@@ -26,6 +26,6 @@ public class HederaPrecheckStatusException extends HederaStatusException {
 
     @Override
     public String getMessage() {
-        return "transaction " + transactionId + " failed precheck with error status " + status;
+        return "transaction " + transactionId + " failed precheck with status " + status;
     }
 }
