@@ -269,8 +269,11 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     @Override
     protected final Resp mapResponse(Response raw) throws HederaStatusException {
-        final ResponseCodeEnum precheckCode = getResponseHeader(raw).getNodeTransactionPrecheckCode();
-        HederaPrecheckStatusException.throwIfExceptional(precheckCode, Objects.requireNonNull(paymentTransactionId));
+        if (paymentTransactionId != null) {
+            // precheck code for transaction only matters if we have a payment attached
+            final ResponseCodeEnum precheckCode = getResponseHeader(raw).getNodeTransactionPrecheckCode();
+            HederaPrecheckStatusException.throwIfExceptional(precheckCode, paymentTransactionId);
+        }
 
         switch (raw.getResponseCase()) {
             case TRANSACTIONGETRECEIPT:
