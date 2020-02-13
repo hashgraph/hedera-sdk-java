@@ -15,10 +15,15 @@ public class TestEnv {
     public final Client client;
 
     public TestEnv() {
-        final Dotenv dotenv = Dotenv.load();
+        final Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
 
-        operatorId = AccountId.fromString(Objects.requireNonNull(dotenv.get("OPERATOR_ID")));
-        operatorKey = Ed25519PrivateKey.fromString(Objects.requireNonNull(dotenv.get("OPERATOR_KEY")));
+        operatorId = AccountId.fromString(Objects.requireNonNull(
+            dotenv.get("OPERATOR_ID"),
+            "OPERATOR_ID must be set in environment or .env"));
+
+        operatorKey = Ed25519PrivateKey.fromString(Objects.requireNonNull(
+            dotenv.get("OPERATOR_KEY"),
+            "OPERATOR_KEY must be set in environment or .env"));
 
         client = Client.forTestnet().setOperator(operatorId, operatorKey);
     }
