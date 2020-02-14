@@ -42,15 +42,27 @@ public final class ContractFunctionResult {
 
     public final List<ContractLogInfo> logs;
 
+    private static final ByteString errorPrefix = ByteString.copyFrom(new byte[]{8, -61, 121, -96});
+
     @Internal
     // exposed for use in `TransactionRecord`
     public ContractFunctionResult(ContractFunctionResultOrBuilder inner) {
-        rawResult = inner.getContractCallResult();
-
         contractId = new ContractId(inner.getContractIDOrBuilder());
 
         String errMsg = inner.getErrorMessage();
         errorMessage = !errMsg.isEmpty() ? errMsg : null;
+
+        ByteString callResult = inner.getContractCallResult();
+
+        // if an exception was thrown, the call result is encoded like the params
+        // for a function `Error(string)`
+        // https://solidity.readthedocs.io/en/v0.6.2/control-structures.html#revert
+        if (errorMessage != null && callResult.startsWith(errorPrefix)) {
+            // trim off the function selector bytes
+            rawResult = callResult.substring(4);
+        } else {
+            rawResult = callResult;
+        }
 
         bloom = inner.getBloom().toByteArray();
 
@@ -229,9 +241,12 @@ public final class ContractFunctionResult {
     }
 
     private ByteBuffer getByteBuffer(int offset) {
-        // **NB** `.asReadOnlyByteBuffer()` on a substring reads from the start of the parent,
-        // not the substring (bug)
-        return (ByteBuffer) rawResult.asReadOnlyByteBuffer().position(offset);
+        // **NB** `.asReadOnlyByteBuffer()` on a substring returns a `ByteBuffer` with the
+        // offset set as `position()`, so be sure to advance the buffer relative to that
+        ByteBuffer byteBuffer = rawResult.asReadOnlyByteBuffer();
+        byteBuffer.position(byteBuffer.position() + offset);
+
+        return byteBuffer;
     }
 
     private ByteString getByteString(int startIndex, int endIndex) {
