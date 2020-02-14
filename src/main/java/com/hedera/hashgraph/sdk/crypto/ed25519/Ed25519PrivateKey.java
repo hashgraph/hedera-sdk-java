@@ -1,10 +1,10 @@
 package com.hedera.hashgraph.sdk.crypto.ed25519;
 
-import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.proto.SignaturePair;
 import com.hedera.hashgraph.sdk.crypto.BadKeyException;
+import com.hedera.hashgraph.sdk.crypto.CryptoUtils;
 import com.hedera.hashgraph.sdk.crypto.Keystore;
 import com.hedera.hashgraph.sdk.crypto.Mnemonic;
+import com.hedera.hashgraph.sdk.crypto.PemUtils;
 import com.hedera.hashgraph.sdk.crypto.PrivateKey;
 
 import org.bouncycastle.asn1.ASN1BitString;
@@ -22,7 +22,6 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.util.io.pem.PemObject;
-import org.bouncycastle.util.io.pem.PemReader;
 import org.bouncycastle.util.io.pem.PemWriter;
 
 import java.io.ByteArrayInputStream;
@@ -31,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -46,7 +46,7 @@ import javax.annotation.Nullable;
  */
 @SuppressWarnings("Duplicates")
 public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
-    public static final String TYPE_PRIVATE_KEY = "PRIVATE KEY";
+
     final Ed25519PrivateKeyParameters privKeyParams;
 
     @Nullable
@@ -76,45 +76,22 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
         return new Ed25519PrivateKey(privateKeyParameters, chainCode);
     }
 
-    /**
-     * Construct an Ed25519PrivateKey from a raw byte array.
-     *
-     * @throws BadKeyException if the key bytes are of an incorrect length for a raw
-     *                                  private key or private key + public key, or do not represent a DER encoded Ed25519
-     *                                  private key.
-     */
-    public static Ed25519PrivateKey fromBytes(byte[] keyBytes) {
+    private static Ed25519PrivateKey fromPrivateKeyInfo(PrivateKeyInfo privateKeyInfo) {
         Ed25519PrivateKeyParameters privKeyParams;
         Ed25519PublicKeyParameters pubKeyParams = null;
 
-        if (keyBytes.length == Ed25519.SECRET_KEY_SIZE) {
-            // if the decoded bytes matches the length of a private key, try that
-            privKeyParams = new Ed25519PrivateKeyParameters(keyBytes, 0);
-        } else if (keyBytes.length == Ed25519.SECRET_KEY_SIZE + Ed25519.PUBLIC_KEY_SIZE) {
-            // some legacy code delivers raw private and public key pairs concatted together
-            // this is how we read only the first 32 bytes
-            privKeyParams = new Ed25519PrivateKeyParameters(keyBytes, 0);
-            // read the remaining 32 bytes as the public key
-            pubKeyParams = new Ed25519PublicKeyParameters(keyBytes, Ed25519.SECRET_KEY_SIZE);
+        try {
+            ASN1Encodable privateKey = privateKeyInfo.parsePrivateKey();
+            privKeyParams = new Ed25519PrivateKeyParameters(((ASN1OctetString) privateKey).getOctets(), 0);
 
-            return new Ed25519PrivateKey(privKeyParams, pubKeyParams);
-        } else {
-            // decode a properly DER-encoded private key descriptor
-            PrivateKeyInfo privateKeyInfo = PrivateKeyInfo.getInstance(keyBytes);
+            ASN1BitString pubKeyData = privateKeyInfo.getPublicKeyData();
 
-            try {
-                ASN1Encodable privateKey = privateKeyInfo.parsePrivateKey();
-                privKeyParams = new Ed25519PrivateKeyParameters(((ASN1OctetString) privateKey).getOctets(), 0);
-
-                ASN1BitString pubKeyData = privateKeyInfo.getPublicKeyData();
-
-                if (pubKeyData != null) {
-                    pubKeyParams = new Ed25519PublicKeyParameters(pubKeyData.getOctets(), 0);
-                }
-
-            } catch (IOException e) {
-                throw new BadKeyException(e);
+            if (pubKeyData != null) {
+                pubKeyParams = new Ed25519PublicKeyParameters(pubKeyData.getOctets(), 0);
             }
+
+        } catch (IOException e) {
+            throw new BadKeyException(e);
         }
 
         if (pubKeyParams != null) {
@@ -125,8 +102,33 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
     }
 
     /**
-     * Recover a private key from a generated mnemonic phrase and a passphrase.
+     * Construct an Ed25519PrivateKey from a raw byte array.
      *
+     * @throws BadKeyException if the key bytes are of an incorrect length for a raw
+     *                         private key or private key + public key, or do not represent a DER encoded Ed25519
+     *                         private key.
+     */
+    public static Ed25519PrivateKey fromBytes(byte[] keyBytes) {
+        if (keyBytes.length == Ed25519.SECRET_KEY_SIZE) {
+            // if the decoded bytes matches the length of a private key, try that
+            return new Ed25519PrivateKey(new Ed25519PrivateKeyParameters(keyBytes, 0));
+        } else if (keyBytes.length == Ed25519.SECRET_KEY_SIZE + Ed25519.PUBLIC_KEY_SIZE) {
+            // some legacy code delivers raw private and public key pairs concatted together
+            return new Ed25519PrivateKey(
+                // this is how we read only the first 32 bytes
+                new Ed25519PrivateKeyParameters(keyBytes, 0),
+                // read the remaining 32 bytes as the public key
+                new Ed25519PublicKeyParameters(keyBytes, Ed25519.SECRET_KEY_SIZE));
+        } else {
+            // decode a properly DER-encoded private key descriptor
+            PrivateKeyInfo privateKeyInfo = PrivateKeyInfo.getInstance(keyBytes);
+            return fromPrivateKeyInfo(privateKeyInfo);
+        }
+    }
+
+    /**
+     * Recover a private key from a generated mnemonic phrase and a passphrase.
+     * <p>
      * This is not compatible with the phrases generated by the Android and iOS wallets;
      * use the no-passphrase version instead.
      *
@@ -228,21 +230,81 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
      * This will read the first "PRIVATE KEY" section in the stream as an Ed25519 private key.
      *
      * @throws IOException if one occurred while reading or if no "PRIVATE KEY" section was found
+     * @deprecated renamed to {@link #readPem(Reader)}.
      */
+    @Deprecated
     public static Ed25519PrivateKey fromPem(Reader pemFile) throws IOException {
-        final PemReader pemReader = new PemReader(pemFile);
+        return readPem(pemFile);
+    }
 
-        PemObject readObject;
+    /**
+     * Parse a private key from a PEM encoded reader.
+     * <p>
+     * This will read the first "PRIVATE KEY" section in the stream as an Ed25519 private key.
+     *
+     * @throws IOException     if one occurred while reading.
+     * @throws BadKeyException if no "PRIVATE KEY" section was found or the key was not an Ed25519
+     *                         private key.
+     */
+    public static Ed25519PrivateKey readPem(Reader pemFile) throws IOException {
+        return readPem(pemFile, null);
+    }
 
-        do {
-            readObject = pemReader.readPemObject();
-        } while (readObject != null && !readObject.getType().equals(TYPE_PRIVATE_KEY));
+    /**
+     * Parse a private key from a PEM encoded stream. The key may be encrypted, e.g. if it was
+     * generated by OpenSSL.
+     * <p>
+     * If <i>password</i> is not null or empty, this will read the first "ENCRYPTED PRIVATE KEY"
+     * section in the stream as a PKCS#8
+     * <a href="https://tools.ietf.org/html/rfc5208#page-4">EncryptedPrivateKeyInfo</a> structure
+     * and use that algorithm to decrypt the private key with the given password. Otherwise,
+     * it will read the first "PRIVATE KEY" section as DER-encoded Ed25519 private key.
+     * <p>
+     * To generate an encrypted private key with OpenSSL, open a terminal and enter the following
+     * command:
+     * <pre>
+     * openssl genpkey -algorithm ed25519 -aes-128-cbc > key.pem
+     * </pre>
+     * <p>
+     * Then enter your password of choice when prompted. When the command completes, your encrypted
+     * key will be saved as `key.pem` in the working directory of your terminal.
+     *
+     * @param pemFile  the PEM encoded file
+     * @param password the password to decrypt the PEM file; if null or empty, no decryption is performed.
+     * @throws IOException     if one occurred while reading the PEM file
+     * @throws BadKeyException if no "ENCRYPTED PRIVATE KEY" or "PRIVATE KEY" section was found,
+     *                         if the passphrase is wrong or the key was not an Ed25519 private key.
+     */
+    public static Ed25519PrivateKey readPem(Reader pemFile, @Nullable String password) throws IOException {
+        return fromPrivateKeyInfo(PemUtils.readPrivateKey(pemFile, password));
+    }
 
-        if (readObject != null && readObject.getType().equals(TYPE_PRIVATE_KEY)) {
-            return fromBytes(readObject.getContent());
-        }
+    /**
+     * Parse a private key from a PEM encoded string.
+     *
+     * @throws IOException     if the PEM string was improperly encoded
+     * @throws BadKeyException if no "PRIVATE KEY" section was found or the key was not an Ed25519
+     *                         private key.
+     * @see #readPem(Reader)
+     */
+    public static Ed25519PrivateKey fromPem(String pemEncoded) throws IOException {
+        return readPem(new StringReader(pemEncoded));
+    }
 
-        throw new IOException("pem file did not contain a private key");
+    /**
+     * Parse a private key from a PEM encoded string.
+     * <p>
+     * The private key may be encrypted, e.g. if it was generated by OpenSSL.
+     *
+     * @param encodedPem the encoded PEM string
+     * @param password   the password to decrypt the PEM file; if null or empty, no decryption is performed.
+     * @throws IOException     if the PEM string was improperly encoded
+     * @throws BadKeyException if no "ENCRYPTED PRIVATE KEY" or "PRIVATE KEY" section was found,
+     *                         if the passphrase is wrong or the key was not an Ed25519 private key.
+     * @see #readPem(Reader, String)
+     */
+    public static Ed25519PrivateKey fromPem(String encodedPem, @Nullable String password) throws IOException {
+        return readPem(new StringReader(encodedPem), password);
     }
 
     /**
@@ -265,9 +327,9 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
      * @param inputStream the inputstream to read the keystore from
      * @param passphrase  the passphrase used to encrypt the keystore
      * @return the recovered key
-     * @throws IOException            if any occurs while reading from the inputstream
+     * @throws IOException     if any occurs while reading from the inputstream
      * @throws BadKeyException if there is a problem with the keystore; most likely
-     *                                is if the passphrase is incorrect.
+     *                         is if the passphrase is incorrect.
      */
     public static Ed25519PrivateKey readKeystore(InputStream inputStream, String passphrase) throws IOException {
         return Keystore.fromStream(inputStream, passphrase).getEd25519();
@@ -280,7 +342,7 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
      * @param passphrase the passphrase used to encrypt the keystore
      * @return the recovered key
      * @throws BadKeyException if there is a problem with the keystore; most likely
-     *                                is if the passphrase is incorrect.
+     *                         is if the passphrase is incorrect.
      */
     public static Ed25519PrivateKey fromKeystore(byte[] bytes, String passphrase) {
         ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
@@ -299,7 +361,7 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
      * @return a new private key using {@link java.security.SecureRandom}.
      */
     public static Ed25519PrivateKey generate() {
-        return generate(secureRandom);
+        return generate(CryptoUtils.secureRandom);
     }
 
     /**
@@ -330,17 +392,20 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
     }
 
     private byte[] encodeDER() {
-        PrivateKeyInfo privateKeyInfo;
-
-        try {
-            privateKeyInfo = new PrivateKeyInfo(
-                new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519), new DEROctetString(privKeyParams.getEncoded()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        PrivateKeyInfo privateKeyInfo = toPrivateKeyInfo();
 
         try {
             return privateKeyInfo.getEncoded("DER");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private PrivateKeyInfo toPrivateKeyInfo() {
+        try {
+            return new PrivateKeyInfo(
+                new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519),
+                new DEROctetString(privKeyParams.getEncoded()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -353,10 +418,14 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
 
     /**
      * Write out a PEM encoded version of this private key.
+     *
+     * @deprecated for removal; exporting unencrypted PEMs is very insecure and has dubious
+     * utility.
      */
+    @Deprecated
     public void writePem(Writer out) throws IOException {
         final PemWriter pemWriter = new PemWriter(out);
-        pemWriter.writeObject(new PemObject(TYPE_PRIVATE_KEY, encodeDER()));
+        pemWriter.writeObject(new PemObject(PemUtils.TYPE_PRIVATE_KEY, encodeDER()));
         pemWriter.flush();
     }
 

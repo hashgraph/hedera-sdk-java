@@ -9,10 +9,6 @@ import com.google.gson.stream.JsonWriter;
 import com.hedera.hashgraph.sdk.Internal;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
-import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.digests.SHA384Digest;
-import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
-import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -22,30 +18,14 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.ShortBufferException;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 
 @Internal
 public final class Keystore {
     private static final Gson gson = new Gson();
     private static final JsonParser jsonParser = new JsonParser();
-
-    private static final int IV_LEN = 16;
-    private static final int COUNT = 262144;
-    private static final int SALT_LEN = 32;
-    private static final int DK_LEN = 32;
 
     private byte[] keyBytes;
 
@@ -111,23 +91,23 @@ public final class Keystore {
         crypto.addProperty("cipher", "aes-128-ctr");
         crypto.addProperty("kdf", "pbkdf2");
 
-        final byte[] salt = randomBytes(SALT_LEN);
+        final byte[] salt = CryptoUtils.randomBytes(CryptoUtils.SALT_LEN);
 
-        final KeyParameter cipherKey = deriveKeySha256(passphrase, salt, COUNT, DK_LEN);
+        final KeyParameter cipherKey = CryptoUtils.deriveKeySha256(passphrase, salt, CryptoUtils.ITERATIONS, CryptoUtils.DK_LEN);
 
-        final byte[] iv = randomBytes(IV_LEN);
+        final byte[] iv = CryptoUtils.randomBytes(CryptoUtils.IV_LEN);
 
-        final byte[] cipherBytes = encrypt(cipherKey, iv, keyBytes);
+        final byte[] cipherBytes = CryptoUtils.encryptAesCtr128(cipherKey, iv, keyBytes);
 
-        final byte[] mac = calcHmacSha384(cipherKey, cipherBytes);
+        final byte[] mac = CryptoUtils.calcHmacSha384(cipherKey, cipherBytes);
 
         final JsonObject cipherParams = new JsonObject();
         cipherParams.addProperty("iv", Hex.toHexString(iv));
 
         final JsonObject kdfParams = new JsonObject();
-        kdfParams.addProperty("dkLen", DK_LEN);
+        kdfParams.addProperty("dkLen", CryptoUtils.DK_LEN);
         kdfParams.addProperty("salt", Hex.toHexString(salt));
-        kdfParams.addProperty("c", COUNT);
+        kdfParams.addProperty("c", CryptoUtils.ITERATIONS);
         kdfParams.addProperty("prf", "hmac-sha256");
 
         crypto.add("cipherparams", cipherParams);
@@ -170,15 +150,15 @@ public final class Keystore {
         final byte[] mac = Hex.decode(macString);
         final byte[] salt = Hex.decode(saltStr);
 
-        final KeyParameter cipherKey = deriveKeySha256(passphrase, salt, count, dkLen);
+        final KeyParameter cipherKey = CryptoUtils.deriveKeySha256(passphrase, salt, count, dkLen);
 
-        final byte[] testHmac = calcHmacSha384(cipherKey, cipherBytes);
+        final byte[] testHmac = CryptoUtils.calcHmacSha384(cipherKey, cipherBytes);
 
         if (!Arrays.equals(mac, testHmac)) {
             throw new BadKeyException("HMAC mismatch; passphrase is incorrect");
         }
 
-        return new Keystore(decrypt(cipherKey, iv, cipherBytes));
+        return new Keystore(CryptoUtils.decryptAesCtr128(cipherKey, iv, cipherBytes));
     }
 
     private static JsonObject expectObject(JsonObject object, String key) {
@@ -205,72 +185,4 @@ public final class Keystore {
         }
     }
 
-    private static KeyParameter deriveKeySha256(String passphrase, byte[] salt, int count, int dkLenBytes) {
-        final PKCS5S2ParametersGenerator gen = new PKCS5S2ParametersGenerator(new SHA256Digest());
-        gen.init(passphrase.getBytes(StandardCharsets.UTF_8), salt, count);
-
-        return (KeyParameter) gen.generateDerivedParameters(dkLenBytes * 8);
-    }
-
-    private static Cipher initAesCipher(KeyParameter cipherKey, byte[] iv, boolean forDecrypt) {
-        final Cipher aesCipher;
-
-        try {
-            aesCipher = Cipher.getInstance("AES/CTR/PKCS5Padding");
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-            throw new Error("platform does not support AES-CTR ciphers");
-        }
-
-        final int mode = forDecrypt ? Cipher.DECRYPT_MODE : Cipher.ENCRYPT_MODE;
-
-        try {
-            aesCipher.init(mode, new SecretKeySpec(cipherKey.getKey(), 0, 16, "AES"),
-                new IvParameterSpec(iv));
-        } catch (InvalidKeyException e) {
-            throw new Error("platform does not support AES-128 ciphers");
-        } catch (InvalidAlgorithmParameterException e) {
-            throw new Error(e);
-        }
-
-        return aesCipher;
-    }
-
-    private static byte[] encrypt(KeyParameter cipherKey, byte[] iv, byte[] input) {
-        final Cipher aesCipher = initAesCipher(cipherKey, iv, false);
-        return runCipher(aesCipher, input);
-    }
-
-    private static byte[] decrypt(KeyParameter cipherKey, byte[] iv, byte[] input) {
-        final Cipher aesCipher = initAesCipher(cipherKey, iv, true);
-        return runCipher(aesCipher, input);
-    }
-
-    private static byte[] runCipher(Cipher cipher, byte[] input) {
-        final byte[] output = new byte[cipher.getOutputSize(input.length)];
-
-        try {
-            cipher.doFinal(input, 0, input.length, output);
-        } catch (ShortBufferException | IllegalBlockSizeException | BadPaddingException e) {
-            throw new Error(e);
-        }
-
-        return output;
-    }
-
-    private static byte[] calcHmacSha384(KeyParameter cipherKey, byte[] input) {
-        final HMac hmacSha384 = new HMac(new SHA384Digest());
-        final byte[] output = new byte[hmacSha384.getMacSize()];
-
-        hmacSha384.init(new KeyParameter(cipherKey.getKey(), 16, 16));
-        hmacSha384.update(input, 0, input.length);
-        hmacSha384.doFinal(output, 0);
-
-        return output;
-    }
-
-    private static byte[] randomBytes(int len) {
-        final byte[] out = new byte[len];
-        PrivateKey.secureRandom.nextBytes(out);
-        return out;
-    }
 }

@@ -1,6 +1,6 @@
 package com.hedera.hashgraph.sdk.crypto.ed25519;
 
-import com.hedera.hashgraph.proto.SignaturePair;
+import com.hedera.hashgraph.sdk.crypto.BadKeyException;
 import com.hedera.hashgraph.sdk.crypto.Mnemonic;
 
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class Ed25519PrivateKeyTest {
@@ -43,6 +44,21 @@ class Ed25519PrivateKeyTest {
     private static final String androidMnemonicString = "ramp april job flavor surround pyramid fish sea good know blame gate village viable include mixed term draft among monitor swear swing novel track";
     // private key for "default account", should be index 0
     private static final String androidDefaultPrivateKey = "c284c25b3a1458b59423bc289e83703b125c8eefec4d5aa1b393c2beb9f2bae66188a344ba75c43918ab12fa2ea4a92960eca029a2320d8c6a1c3b94e06c9985";
+
+    private static final String pemPassphrase = "this is a passphrase";
+
+    /*
+        # enter passphrase "this is a passphrase"
+        echo '302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10' \
+        | xxd -r -p \
+        | openssl pkey -inform der -aes-128-cbc
+     */
+    private static final String encryptedPem = "-----BEGIN ENCRYPTED PRIVATE KEY-----\n"
+        + "MIGbMFcGCSqGSIb3DQEFDTBKMCkGCSqGSIb3DQEFDDAcBAi8WY7Gy2tThQICCAAw\n"
+        + "DAYIKoZIhvcNAgkFADAdBglghkgBZQMEAQIEEOq46NPss58chbjUn20NoK0EQG1x\n"
+        + "R88hIXcWDOECttPTNlMXWJt7Wufm1YwBibrxmCq1QykIyTYhy1TZMyxyPxlYW6aV\n"
+        + "9hlo4YEh3uEaCmfJzWM=\n"
+        + "-----END ENCRYPTED PRIVATE KEY-----\n";
 
     @Test
     @DisplayName("private key generates successfully")
@@ -154,6 +170,39 @@ class Ed25519PrivateKeyTest {
         final byte[] signature = privateKey.sign(messageToSign);
 
         assertTrue(Ed25519.verify(signature, 0, privateKey.publicKey.toBytes(), 0, messageToSign, 0, messageToSign.length));
+    }
+/*
+    // punting on encrypted PEM generation for now; see PemUtils for reason
+    @Test
+    @DisplayName("toEncryptedPem/fromEncryptedPem are inverses")
+    void keyToEncryptedPemAndBack() throws IOException {
+        Ed25519PrivateKey privateKey = Ed25519PrivateKey.fromString(testKeyStr);
+
+        StringWriter writer = new StringWriter();
+        privateKey.writePem(writer, pemPassphrase);
+
+        String encodedPem = writer.toString();
+        StringReader reader = new StringReader(encodedPem);
+
+        Ed25519PrivateKey fromPem = Ed25519PrivateKey.readPem(reader, pemPassphrase);
+
+        assertArrayEquals(privateKey.toBytes(), fromPem.toBytes());
+    }
+*/
+
+    @Test
+    @DisplayName("fromPem() with passphrase produces same key")
+    void keyFromEncryptedPem() throws IOException {
+        Ed25519PrivateKey privateKey = Ed25519PrivateKey.fromPem(encryptedPem, pemPassphrase);
+        assertEquals(privateKey.toString(), testKeyStr);
+    }
+
+    @Test
+    @DisplayName("fromPem() with encrypted key without a passphrase throws useful error")
+    void errorKeyFromEncryptedPemNoPassphrase() {
+        assertEquals(
+            "PEM file contained an encrypted private key but no passphrase was given",
+            assertThrows(BadKeyException.class, () -> Ed25519PrivateKey.fromPem(encryptedPem)).getMessage());
     }
 
     private static final String messageStr = "This is a message about the world.";
