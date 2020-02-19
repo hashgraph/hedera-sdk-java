@@ -6,12 +6,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v1.1.3
 
+### Added
+
+ * Add additional error classes to allow more introspection on errors:
+    * `HederaPrecheckStatusException` - Thrown when the transaction fails at the node (the precheck)
+    * `HederaReceiptStatusException` - Thrown when the receipt is checked and has a failing status. The error object contains the full receipt.
+    * `HederaRecordStatusException` - Thrown when the record is checked and it has a failing status. The error object contains the full record.
+
 ### Fixed
 
  * Add missing `setTransferAccountId` and `setTransferContractId` methods to
    `ContractDeleteTransaction`
 
  * Override `executeAsync` to sign by the operator (if not already)
+
+### Deprecated
+
+ * Deprecate `toSolidityAddress` and `fromSolidityAddress` on `FileId`
 
 ## v1.1.2
 
