@@ -12,7 +12,9 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -35,18 +37,68 @@ public final class Mnemonic {
 
     private static final SecureRandom secureRandom = new SecureRandom();
 
-    public Mnemonic(List<CharSequence> wordList) {
-        if (wordList.size() != 24) {
-            throw new IllegalArgumentException("wordList must have length 24");
+    private static final Set<CharSequence> wordList;
+
+    static {
+        // the BIP39 lib doesn't give us direct access to the word list
+        HashSet<String> newWordList = new HashSet<>(2048);
+
+        for (int i = 0; i < 2048; i++) {
+            newWordList.add(English.INSTANCE.getWord(i));
         }
 
-        this.words = Collections.unmodifiableList(wordList);;
+        wordList = Collections.unmodifiableSet(newWordList);
     }
 
+    /**
+     * Construct a mnemonic from a 24-word list.
+     *
+     * @throws BadMnemonicError if {@code words.size() != 24} or if any words in the list do not
+     * exist in the BIP-39 standard English word list (as typo detection).
+     *
+     * @param words the 24-word list that constitutes a mnemonic phrase.
+     */
+    public Mnemonic(List<? extends CharSequence> words) {
+        if (words.size() != 24) {
+            throw new BadMnemonicError("expected 24-word mnemonic, got " + words.size() + " words");
+        }
+
+        ArrayList<Integer> unknownIndices = new ArrayList<>();
+
+        for (int i = 0; i < words.size(); i++) {
+            if (!wordList.contains(words.get(i))) {
+                unknownIndices.add(i);
+            }
+        }
+
+        if (!unknownIndices.isEmpty()) {
+            String unknownWords = String.join(
+                ", ",
+                unknownIndices.stream().map(i -> (CharSequence) words.get(i))::iterator);
+
+            throw new BadMnemonicError(
+                "the following words in the mnemonic were not in the word list: " + unknownWords,
+                unknownIndices);
+        }
+
+        this.words = Collections.unmodifiableList(words);
+    }
+
+    /**
+     * Recover a mnemonic from a string, splitting on spaces.
+     *
+     * @throws BadMnemonicError if the string does not contain 24 words or if any words in the string
+     * do not exist in the BIP-39 standard English word list (as typo detection).
+     * @param mnemonicString
+     * @return
+     */
     public static Mnemonic fromString(String mnemonicString) {
         return new Mnemonic(Arrays.asList(mnemonicString.split(" ")));
     }
 
+    /**
+     * @return a new random 24-word mnemonic from the BIP-39 standard English word list.
+     */
     public static Mnemonic generate() {
         final byte[] entropy = new byte[32];
         secureRandom.nextBytes(entropy);
