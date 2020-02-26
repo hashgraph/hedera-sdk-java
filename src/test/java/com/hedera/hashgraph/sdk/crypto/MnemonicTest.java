@@ -2,24 +2,55 @@ package com.hedera.hashgraph.sdk.crypto;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MnemonicTest {
-    // happy paths are covered by Ed25519PrivateKeyTest
+    @Test
+    @DisplayName("Mnemonic.generate() creates a valid mnemonic")
+    void generateValidMnemonic() {
+        Mnemonic mnemonic = Mnemonic.generate();
+
+        MnemonicValidationResult validationResult = mnemonic.validate();
+
+        assertEquals(validationResult.status, MnemonicValidationStatus.Ok);
+        assertNull(validationResult.unknownIndices);
+        assertTrue(validationResult.isOk());
+    }
+
+    @ParameterizedTest
+    @DisplayName("Mnemonic.validate() passes on known-good mnemonics")
+    @ValueSource(strings = {
+        "inmate flip alley wear offer often piece magnet surge toddler submit right radio absent pear floor belt raven price stove replace reduce plate home",
+        "tiny denial casual grass skull spare awkward indoor ethics dash enough flavor good daughter early hard rug staff capable swallow raise flavor empty angle",
+        "ramp april job flavor surround pyramid fish sea good know blame gate village viable include mixed term draft among monitor swear swing novel track",
+    })
+    void knownGoodMnemonics(String mnemonicStr) {
+        Mnemonic mnemonic = Mnemonic.fromString(mnemonicStr);
+
+        MnemonicValidationResult validationResult = mnemonic.validate();
+
+        assertEquals(validationResult.status, MnemonicValidationStatus.Ok);
+        assertNull(validationResult.unknownIndices);
+        assertTrue(validationResult.isOk());
+    }
 
     @Test
     @DisplayName("Mnemonic.validate() throws on short word list")
     void shortWordList() {
         Mnemonic mnemonic = new Mnemonic(Arrays.asList("lorem", "ipsum", "dolor"));
+        MnemonicValidationResult validationResult = mnemonic.validate();
 
-        assertEquals(
-            "expected 24-word mnemonic, got 3 words",
-            assertThrows(BadMnemonicException.class, mnemonic::validate).getMessage());
+        assertEquals(MnemonicValidationStatus.BadLength, validationResult.status);
+        assertNull(validationResult.unknownIndices);
+        assertFalse(validationResult.isOk());
     }
 
     @Test
@@ -52,11 +83,11 @@ public class MnemonicTest {
             "actual"
         ));
 
-        BadMnemonicException error = assertThrows(BadMnemonicException.class, mnemonic::validate);
-        assertEquals(Arrays.asList(6, 12, 17), error.unknownIndices);
-        assertEquals(
-            "the following words in the mnemonic were not in the word list: adsorb, acount, acquired",
-            error.getMessage());
+        MnemonicValidationResult validationResult = mnemonic.validate();
+
+        assertEquals(MnemonicValidationStatus.UnknownWords, validationResult.status);
+        assertEquals(Arrays.asList(6, 12, 17), validationResult.unknownIndices);
+        assertFalse(validationResult.isOk());
     }
 
     @Test
@@ -90,8 +121,10 @@ public class MnemonicTest {
             "actual"
         ));
 
-        BadMnemonicException error = assertThrows(BadMnemonicException.class, mnemonic::validate);
-        assertNull(error.unknownIndices);
-        assertEquals("mnemonic failed checksum, expected 0xff, got 0x02", error.getMessage());
+        MnemonicValidationResult validationResult = mnemonic.validate();
+
+        assertEquals(MnemonicValidationStatus.ChecksumMismatch, validationResult.status);
+        assertNull(validationResult.unknownIndices);
+        assertFalse(validationResult.isOk());
     }
 }
