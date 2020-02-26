@@ -23,7 +23,7 @@ public final class ConsensusTopicState {
      * Sequence number of messages on the topic. At topic creation, the sequenceNumber is 0. The topic number is
      * incremented by 1 each time a successful ConsensusMessageSubmitTransaction achieves consensus.
      */
-    public long sequenceNumber;
+    private long sequenceNumber;
 
     /**
      * Running hash of fields from successful ConsensusMessageSubmitTransactions on the topic. A running SHA-384
@@ -31,7 +31,7 @@ public final class ConsensusTopicState {
      * (incremented from 0 after every successful ConsensusSubmitMessage), and consensusTimestamp when that
      * ConsensusMessageSubmitTransaction reached consensus.
      */
-    public byte[] runningHash;
+    private byte[] runningHash;
 
     /**
      * State of a ConsensusTopic at a specific point in the life of a topic, relating to the Topic's sequence and
@@ -64,6 +64,14 @@ public final class ConsensusTopicState {
         return new ConsensusTopicState(topicInfo.id, topicInfo.sequenceNumber, topicInfo.runningHash.clone());
     }
 
+    public long getSequenceNumber() {
+        return sequenceNumber;
+    }
+
+    public byte[] getRunningHash() {
+        return runningHash;
+    }
+
     /**
      * Are the message, runningHash, sequenceNumber, and consensusTimestamp of a message the correct next values for
      * this topic?
@@ -74,7 +82,8 @@ public final class ConsensusTopicState {
      * @return
      */
     public boolean verify(byte[] nextMessage, long nextSequenceNumber, byte[] nextRunningHash,
-                          Instant consensusTimestamp) {
+                          Instant consensusTimestamp)
+    {
         if ((sequenceNumber + 1) != nextSequenceNumber) {
             return false;
         }
@@ -91,7 +100,8 @@ public final class ConsensusTopicState {
      * @throws HederaTopicMessageException
      */
     public void update(byte[] nextMessage, long nextSequenceNumber, byte[] nextRunningHash,
-                       Instant consensusTimestamp) throws HederaTopicMessageException {
+                       Instant consensusTimestamp) throws HederaTopicMessageException
+    {
         if (!verify(nextMessage, nextSequenceNumber, nextRunningHash, consensusTimestamp)) {
             throw new HederaTopicMessageException(topicId, consensusTimestamp);
         }

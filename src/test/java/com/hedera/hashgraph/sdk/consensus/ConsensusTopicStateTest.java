@@ -16,8 +16,8 @@ class ConsensusTopicStateTest {
         ConsensusTopicId topicId = new ConsensusTopicId(1, 2, 3);
         ConsensusTopicState cut = ConsensusTopicState.forNewTopic(topicId);
         assertAll(() -> { assertEquals(topicId, cut.topicId); },
-            () -> { assertEquals(0, cut.sequenceNumber); },
-            () -> { assertArrayEquals(new byte[48], cut.runningHash); }
+            () -> { assertEquals(0, cut.getSequenceNumber()); },
+            () -> { assertArrayEquals(new byte[48], cut.getRunningHash()); }
             );
     }
 
@@ -38,8 +38,8 @@ class ConsensusTopicStateTest {
         );
 
         assertAll(
-            () -> { assertEquals(sequenceNumber, topicState.sequenceNumber); },
-            () -> { assertArrayEquals(expectedNextRunningHash, topicState.runningHash); }
+            () -> { assertEquals(sequenceNumber, topicState.getSequenceNumber()); },
+            () -> { assertArrayEquals(expectedNextRunningHash, topicState.getRunningHash()); }
         );
     }
 
