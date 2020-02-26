@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 /**
  * Thrown by {@link Mnemonic#Mnemonic(List)} on validation error.
  */
-public class BadMnemonicError extends RuntimeException {
+public class BadMnemonicException extends RuntimeException {
 
     /**
      * If not null, these are the indices in the original word
@@ -17,11 +17,11 @@ public class BadMnemonicError extends RuntimeException {
     @Nullable
     public final List<Integer> unknownIndices;
 
-    BadMnemonicError(String message) {
+    BadMnemonicException(String message) {
         this(message, null);
     }
 
-    BadMnemonicError(String message, @Nullable List<Integer> unknownIndices) {
+    BadMnemonicException(String message, @Nullable List<Integer> unknownIndices) {
         super(message);
         this.unknownIndices = unknownIndices;
     }
