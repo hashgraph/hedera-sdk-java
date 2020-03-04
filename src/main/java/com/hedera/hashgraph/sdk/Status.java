@@ -266,8 +266,14 @@ public enum Status {
             case AUTORENEW_ACCOUNT_NOT_ALLOWED: return AutorenewAccountNotAllowed;
             case TOPIC_EXPIRED: return TopicExpired;
 
+            case UNRECOGNIZED:
+                // protobufs won't give us the actual value that was unexpected, unfortunately
+                throw new IllegalArgumentException(
+                    "network returned unrecognized response code; your SDK may be out of date");
+
             default:
-                throw new IllegalArgumentException("unexpected response code: " + responseCode);
+                throw new IllegalArgumentException(
+                    "(BUG) unhandled response code: " + responseCode);
         }
     }
 }
