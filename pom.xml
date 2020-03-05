@@ -14,20 +14,11 @@
     <url>https://github.com/hashgraph/hedera-sdk-java</url>
 
     <repositories>
-        <!-- explicitly pull from Maven Central first -->
         <repository>
             <id>central</id>
             <name>Central Repository</name>
             <url>https://repo.maven.apache.org/maven2</url>
             <layout>default</layout>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>com.bintray.jcenter</id>
-            <url>https://jcenter.bintray.com/</url>
-            <name>JCenter</name>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -83,11 +74,6 @@
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
             <version>1.64</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.novacrypto</groupId>
-            <artifactId>BIP39</artifactId>
-            <version>2019.01.27</version>
         </dependency>
         <dependency>
             <groupId>com.google.protobuf</groupId>
