@@ -59,6 +59,8 @@
         <nullaway.version>0.7.2</nullaway.version>
         <spotbugs.version>3.1.12</spotbugs.version>
 
+        <bouncycastle.version>1.64</bouncycastle.version>
+
         <protobuf.plugin.version>0.6.1</protobuf.plugin.version>
         <protoc.version>3.11.2</protoc.version>
     </properties>
@@ -73,7 +75,12 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.64</version>
+            <version>${bouncycastle.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk15on</artifactId>
+            <version>${bouncycastle.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.protobuf</groupId>
