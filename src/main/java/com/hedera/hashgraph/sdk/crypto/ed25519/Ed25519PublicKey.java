@@ -11,6 +11,7 @@ import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * An ed25519 public key.
@@ -87,6 +88,24 @@ public final class Ed25519PublicKey extends PublicKey {
         }
 
         return Hex.toHexString(encoded);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Ed25519PublicKey that = (Ed25519PublicKey) o;
+
+        // redundant copy, consider not using `Ed25519PublicKeyParameters`
+        return Arrays.equals(
+            pubKeyParams.getEncoded(),
+            that.pubKeyParams.getEncoded());
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(pubKeyParams.getEncoded());
     }
 
     @Override

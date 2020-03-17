@@ -51,9 +51,9 @@ public class FileInfoQuery extends QueryBuilder<FileInfo, FileInfoQuery> {
     @Override
     public long getCost(Client client) throws HederaStatusException, HederaNetworkException {
         // deleted files return a COST_ANSWER of zero which triggers `INSUFFICIENT_TX_FEE`
-        // if you set that as the query payment; 25 tinybar seems to be the minimum to get
+        // if you set that as the query payment; 50 tinybar seems to be the minimum to get
         // `FILE_DELETED` back instead.
-        return Math.max(super.getCost(client), 25);
+        return Math.max(super.getCost(client), 50);
     }
 
     @Override

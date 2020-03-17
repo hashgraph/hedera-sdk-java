@@ -5,6 +5,9 @@ import com.hedera.hashgraph.proto.FileServiceGrpc;
 import com.hedera.hashgraph.proto.Query;
 import com.hedera.hashgraph.proto.QueryHeader;
 import com.hedera.hashgraph.proto.Response;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.HederaNetworkException;
+import com.hedera.hashgraph.sdk.HederaStatusException;
 import com.hedera.hashgraph.sdk.QueryBuilder;
 
 import io.grpc.MethodDescriptor;
@@ -33,6 +36,14 @@ public class FileContentsQuery extends QueryBuilder<byte[], FileContentsQuery> {
     @Override
     protected MethodDescriptor<Query, Response> getMethod() {
         return FileServiceGrpc.getGetFileContentMethod();
+    }
+
+    @Override
+    public long getCost(Client client) throws HederaStatusException, HederaNetworkException {
+        // deleted files return a COST_ANSWER of zero which triggers `INSUFFICIENT_TX_FEE`
+        // if you set that as the query payment; 50 tinybar seems to be the minimum to get
+        // `FILE_DELETED` back instead.
+        return Math.max(super.getCost(client), 50);
     }
 
     @Override

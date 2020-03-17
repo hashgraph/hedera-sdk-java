@@ -29,6 +29,10 @@ public class HederaReceiptStatusException extends HederaStatusException {
         this.receipt = receipt;
     }
 
+    static boolean isCodeExceptional(ResponseCodeEnum responseCode) {
+        return responseCode != ResponseCodeEnum.SUCCESS;
+    }
+
     static void throwIfExceptional(TransactionGetReceiptQuery receiptQuery, TransactionGetReceiptResponse receiptResponse) throws HederaReceiptStatusException {
         ResponseCodeEnum status = receiptResponse.getReceipt().getStatus();
 
