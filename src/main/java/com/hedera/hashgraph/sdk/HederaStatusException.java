@@ -22,10 +22,6 @@ public class HederaStatusException extends Exception implements HederaThrowable 
     public final Status status;
 
     HederaStatusException(ResponseCodeEnum responseCode) {
-        if (!isCodeExceptional(responseCode)) {
-            throw new IllegalArgumentException("code not exceptional: " + responseCode);
-        }
-
         this.status = Status.valueOf(responseCode);
     }
 
@@ -39,12 +35,6 @@ public class HederaStatusException extends Exception implements HederaThrowable 
         }
 
         return true;
-    }
-
-    static void throwIfExceptional(ResponseCodeEnum responseCode) throws HederaStatusException {
-        if (isCodeExceptional(responseCode)) {
-            throw new HederaStatusException(responseCode);
-        }
     }
 
     @Override

@@ -221,8 +221,10 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
 
     @Override
     protected TransactionId mapResponse(TransactionResponse response) throws HederaStatusException {
-        HederaPrecheckStatusException.throwIfExceptional(response.getNodeTransactionPrecheckCode());
-        return new TransactionId(
+        TransactionId transactionId = new TransactionId(
             bodyBuilder.getTransactionIDOrBuilder());
+        HederaPrecheckStatusException.throwIfExceptional(response.getNodeTransactionPrecheckCode(),
+            transactionId);
+        return transactionId;
     }
 }
