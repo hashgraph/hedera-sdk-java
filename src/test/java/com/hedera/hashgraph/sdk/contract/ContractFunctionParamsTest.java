@@ -1,7 +1,6 @@
 package com.hedera.hashgraph.sdk.contract;
 
 import com.google.protobuf.ByteString;
-
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -108,8 +107,99 @@ class ContractFunctionParamsTest {
             .addInt256Array(new BigInteger[]{BigInteger.valueOf(0x1111)});
 
         assertEquals(
-            "025838fc",
-            Hex.toHexString(params.toBytes("foo").toByteArray()).substring(0, 8)
+            "025838fc" +
+                "0000000000000000000000000000000000000000000000000000000000000060" +
+                "00000000000000000000000000000000000000000000000000000000000001a0" +
+                "0000000000000000000000000000000000000000000000000000000000000240" +
+                "0000000000000000000000000000000000000000000000000000000000000003" +
+                "0000000000000000000000000000000000000000000000000000000000000060" +
+                "00000000000000000000000000000000000000000000000000000000000000a0" +
+                "00000000000000000000000000000000000000000000000000000000000000e0" +
+                "0000000000000000000000000000000000000000000000000000000000000005" +
+                "68656c6c6f000000000000000000000000000000000000000000000000000000" +
+                "0000000000000000000000000000000000000000000000000000000000000001" +
+                "2c00000000000000000000000000000000000000000000000000000000000000" +
+                "0000000000000000000000000000000000000000000000000000000000000006" +
+                "776f726c64210000000000000000000000000000000000000000000000000000" +
+                "0000000000000000000000000000000000000000000000000000000000000004" +
+                "0000000000000000000000000000000000000000000000000000000000000088" +
+                "0000000000000000000000000000000000000000000000000000000000000099" +
+                "00000000000000000000000000000000000000000000000000000000000000aa" +
+                "00000000000000000000000000000000000000000000000000000000000000bb" +
+                "0000000000000000000000000000000000000000000000000000000000000001" +
+                "0000000000000000000000000000000000000000000000000000000000001111",
+            Hex.toHexString(params.toBytes("foo").toByteArray())
+        );
+    }
+
+    @Test
+    @DisplayName("bytes32[] encodes correctly")
+    void fixedBytesArrayEncoding() {
+        // each string should be padded to 32 bytes and have no length prefix
+
+        final ContractFunctionParams params = new ContractFunctionParams()
+            .addBytes32Array(new byte[][] {
+                "Hello".getBytes(StandardCharsets.UTF_8),
+                ",".getBytes(StandardCharsets.UTF_8),
+                "world!".getBytes(StandardCharsets.UTF_8)
+            });
+
+        assertEquals(
+            "0000000000000000000000000000000000000000000000000000000000000020" +
+                "0000000000000000000000000000000000000000000000000000000000000003" + // length of array
+                "48656c6c6f000000000000000000000000000000000000000000000000000000" + // "Hello" UTF-8 encoded
+                "2c00000000000000000000000000000000000000000000000000000000000000" + // "," UTF-8 encoded
+                "776f726c64210000000000000000000000000000000000000000000000000000", // "world!" UTF-8 encoded
+            Hex.toHexString(params.toBytes(null).toByteArray())
+        );
+    }
+
+    @Test
+    @DisplayName("bytes[] encodes correctly")
+    void dynBytesArrayEncoding() {
+        // result should be the exact same as the strings test below
+        final ContractFunctionParams params = new ContractFunctionParams()
+            .addBytesArray(new byte[][] {
+                "Hello".getBytes(StandardCharsets.UTF_8),
+                ",".getBytes(StandardCharsets.UTF_8),
+                "world!".getBytes(StandardCharsets.UTF_8)
+            });
+
+        assertEquals(
+            "0000000000000000000000000000000000000000000000000000000000000020" + // offset to array
+                "0000000000000000000000000000000000000000000000000000000000000003" + // length of array
+                "0000000000000000000000000000000000000000000000000000000000000060" + // first element offset, relative to beginning of this list (after length)
+                "00000000000000000000000000000000000000000000000000000000000000a0" + // second element offset
+                "00000000000000000000000000000000000000000000000000000000000000e0" + // third element offset
+                "0000000000000000000000000000000000000000000000000000000000000005" + // "Hello".length
+                "48656c6c6f000000000000000000000000000000000000000000000000000000" + // "Hello" UTF-8 encoded
+                "0000000000000000000000000000000000000000000000000000000000000001" + // ",".length
+                "2c00000000000000000000000000000000000000000000000000000000000000" + // "," UTF-8 encoded
+                "0000000000000000000000000000000000000000000000000000000000000006" + // "world!".length
+                "776f726c64210000000000000000000000000000000000000000000000000000", // "world!" UTF-8 encoded
+            Hex.toHexString(params.toBytes(null).toByteArray())
+        );
+    }
+
+    @Test
+    @DisplayName("issue 376: string[] encodes correctly")
+    void stringArrayEncoding() {
+        final ContractFunctionParams params = new ContractFunctionParams()
+            .addStringArray(new String[]{"Hello", ",", "world!"});
+
+        assertEquals(
+            "0000000000000000000000000000000000000000000000000000000000000020" + // offset to array
+                "0000000000000000000000000000000000000000000000000000000000000003" + // length of array
+                "0000000000000000000000000000000000000000000000000000000000000060" + // first element offset, relative to beginning of this list (after length)
+                "00000000000000000000000000000000000000000000000000000000000000a0" + // second element offset
+                "00000000000000000000000000000000000000000000000000000000000000e0" + // third element offset
+                "0000000000000000000000000000000000000000000000000000000000000005" + // "Hello".length
+                "48656c6c6f000000000000000000000000000000000000000000000000000000" + // "Hello" UTF-8 encoded
+                "0000000000000000000000000000000000000000000000000000000000000001" + // ",".length
+                "2c00000000000000000000000000000000000000000000000000000000000000" + // "," UTF-8 encoded
+                "0000000000000000000000000000000000000000000000000000000000000006" + // "world!".length
+                "776f726c64210000000000000000000000000000000000000000000000000000", // "world!" UTF-8 encoded
+            Hex.toHexString(params.toBytes(null).toByteArray())
         );
     }
 
