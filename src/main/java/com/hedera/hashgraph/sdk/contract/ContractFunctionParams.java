@@ -109,6 +109,10 @@ public final class ContractFunctionParams {
 
     /**
      * Add a parameter of type {@code bytes32}, a 32-byte byte-string.
+     *
+     * If applicable, the array will be right-padded with zero bytes to a length of 32 bytes.
+     *
+     * @throws IllegalArgumentException if the length of the byte array is greater than 32.
      */
     public ContractFunctionParams addBytes32(byte[] param) {
         args.add(new Argument("bytes32", encodeBytes32(param), false));
@@ -118,13 +122,17 @@ public final class ContractFunctionParams {
 
     /**
      * Add a parameter of type {@code bytes32[]}, an array of 32-byte byte-strings.
+     *
+     * Each byte array will be right-padded with zero bytes to a length of 32 bytes.
+     *
+     * @throws IllegalArgumentException if the length of any byte array is greater than 32.
      */
     public ContractFunctionParams addBytes32Array(byte[][] param) {
-        final List<ByteString> byteArrays = Arrays.stream(param)
-            .map(ContractFunctionParams::encodeBytes32)
-            .collect(Collectors.toList());
+        // array of fixed-size elements
+        final Stream<ByteString> byteArrays = Arrays.stream(param)
+            .map(ContractFunctionParams::encodeBytes32);
 
-        args.add(new Argument("bytes32[]", encodeDynArr(byteArrays), true));
+        args.add(new Argument("bytes32[]", encodeArray(byteArrays), true));
 
         return this;
     }
@@ -497,7 +505,11 @@ public final class ContractFunctionParams {
     }
 
     private static ByteString encodeBytes32(byte[] bytes) {
-        return rightPad32(ByteString.copyFrom(bytes, 0, 32));
+        if (bytes.length > 32) {
+            throw new IllegalArgumentException("byte32 encoding forbids byte array length greater than 32");
+        }
+
+        return rightPad32(ByteString.copyFrom(bytes));
     }
 
     private static ByteString encodeArray(Stream<ByteString> elements) {
@@ -508,21 +520,22 @@ public final class ContractFunctionParams {
     }
 
     private static ByteString encodeDynArr(List<ByteString> elements) {
-        final int offsetsLen = elements.size() + 1;
+        final int offsetsLen = elements.size();
 
-        final ArrayList<ByteString> offsets = new ArrayList<ByteString>(offsetsLen);
+        // [len, offset[0], offset[1], ... offset[len - 1]]
+        final ArrayList<ByteString> head = new ArrayList<>(offsetsLen + 1);
 
-        offsets.add(uint256(elements.size(), 32));
+        head.add(uint256(elements.size(), 32));
 
-        // points to start of dynamic segment
+        // points to start of dynamic segment, *not* including the length of the array
         long currOffset = offsetsLen * 32L;
 
         for (final ByteString elem : elements) {
-            offsets.add(uint256(currOffset, 64));
+            head.add(uint256(currOffset, 64));
             currOffset += elem.size();
         }
 
-        return ByteString.copyFrom(offsets).concat(ByteString.copyFrom(elements));
+        return ByteString.copyFrom(head).concat(ByteString.copyFrom(elements));
     }
 
     private static void checkBigInt(BigInteger val) {
