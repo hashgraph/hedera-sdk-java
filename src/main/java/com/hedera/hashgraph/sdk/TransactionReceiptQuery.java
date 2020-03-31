@@ -30,7 +30,9 @@ public final class TransactionReceiptQuery extends QueryBuilder<TransactionRecei
 
     @Override
     protected boolean shouldRetry(HederaThrowable e) {
-        if (!(e instanceof HederaStatusException)) {
+        if (super.shouldRetry(e)) {
+            return true;
+        } else if (!(e instanceof HederaStatusException)) {
             return false;
         }
 
@@ -41,8 +43,7 @@ public final class TransactionReceiptQuery extends QueryBuilder<TransactionRecei
             case Ok:
             // has reached consensus but not generated
             case ReceiptNotFound:
-            // node queue is full
-            case Busy:
+            // BUSY is covered by super call
                 return true;
             default:
                 return false;

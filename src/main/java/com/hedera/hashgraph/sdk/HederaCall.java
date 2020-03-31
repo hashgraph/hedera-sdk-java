@@ -37,7 +37,18 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
     }
 
     protected boolean shouldRetry(HederaThrowable e) {
-        return e instanceof HederaStatusException && ((HederaStatusException) e).status == Status.Busy;
+        if (e instanceof HederaStatusException) {
+            return ((HederaStatusException) e).status == Status.Busy;
+        }
+
+        if (e instanceof HederaNetworkException) {
+            io.grpc.Status status = ((HederaNetworkException) e).cause.getStatus();
+
+            // retry with backoff if the node is temporarily unavailable
+            return status == io.grpc.Status.UNAVAILABLE || status == io.grpc.Status.RESOURCE_EXHAUSTED;
+        }
+
+        return false;
     }
 
     public final Resp execute(Client client) throws HederaStatusException, HederaNetworkException {
@@ -51,8 +62,13 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
         // N.B. only QueryBuilder used onPreExecute() so instead it should just override this
         // method instead
 
-        final Backoff.FallibleProducer<Resp, HederaStatusException> tryProduce = () ->
-            mapResponse(ClientCalls.blockingUnaryCall(getChannel(client).newCall(getMethod(), CallOptions.DEFAULT), toProto()));
+        final Backoff.FallibleProducer<Resp, HederaStatusException> tryProduce = () -> {
+            try {
+                return mapResponse(ClientCalls.blockingUnaryCall(getChannel(client).newCall(getMethod(), CallOptions.DEFAULT), toProto()));
+            } catch (StatusRuntimeException e) {
+                throw new HederaNetworkException(e);
+            }
+        };
 
         return new Backoff(RETRY_DELAY, retryTimeout)
             .tryWhile(this::shouldRetry, tryProduce);
