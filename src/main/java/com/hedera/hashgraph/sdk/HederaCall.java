@@ -42,7 +42,13 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
         }
 
         if (e instanceof HederaNetworkException) {
-            io.grpc.Status status = ((HederaNetworkException) e).cause.getStatus();
+            StatusRuntimeException cause = ((HederaNetworkException) e).cause;
+
+            if (cause == null) {
+                return false;
+            }
+
+            io.grpc.Status status = cause.getStatus();
 
             // retry with backoff if the node is temporarily unavailable
             return status == io.grpc.Status.UNAVAILABLE || status == io.grpc.Status.RESOURCE_EXHAUSTED;

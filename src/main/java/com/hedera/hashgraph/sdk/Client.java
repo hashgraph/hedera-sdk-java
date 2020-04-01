@@ -16,10 +16,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Random;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
@@ -57,6 +56,8 @@ public final class Client implements AutoCloseable {
 
     // todo: transaction fees should be defaulted to whatever the transaction fee schedule is
     private long maxTransactionFee = DEFAULT_MAX_TXN_FEE;
+
+    private static final Duration healthCheckCooldown = Duration.ofMinutes(1);
 
     // also 1 hbar
     private long maxQueryPayment = 100_000_000;
@@ -333,6 +334,20 @@ public final class Client implements AutoCloseable {
         return maxQueryPayment;
     }
 
+    /**
+     * Ping a given node by account ID; if it answers successfully, this method will return without throwing.
+     *
+     * @param nodeAccountId the account ID of the node to ping.
+     * @throws HederaNetworkException if the node fails to respond or returns a GRPC error.
+     * @throws HederaStatusException if the node returns any exceptional status code.
+     * @throws IllegalArgumentException if {@code nodeAccountId} does not exist in the client.
+     */
+    public void ping(AccountId nodeAccountId) throws HederaNetworkException, HederaStatusException {
+        // Implemented by a CryptoGetAccountBalance query to the node in question for its own account ID
+        // Balance queries are free
+        getNodeForId(nodeAccountId).healthCheck();
+    }
+
     @Nullable
     AccountId getOperatorId() {
         return operatorId;
@@ -353,15 +368,48 @@ public final class Client implements AutoCloseable {
             throw new IllegalStateException("List of channels has become empty");
         }
 
-        int r = random.nextInt(nodes.size());
-        Iterator<Node> channelIter = nodes.values()
-            .iterator();
+        // in most cases we shouldn't have to try another node so don't allocate
+        BitSet triedNodes = null;
+        // ideally we'd use `triedNodes.size()` but `BitSet.size()` doesn't return the number of one-bits
+        // like you might expect, and `.cardinality()` does a scan of the bitset every time
+        int deadNodes = 0;
 
-        for (int i = 1; i < r; i++) {
-            channelIter.next();
+        while (deadNodes < nodes.size()) {
+            int r = random.nextInt(nodes.size());
+
+            if (triedNodes != null && triedNodes.get(r)) {
+                continue;
+            }
+
+            Iterator<Node> channelIter = nodes.values()
+                .iterator();
+
+            for (int i = 1; i < r; i++) {
+                channelIter.next();
+            }
+
+            Node node = channelIter.next();
+
+            Instant lastHealthCheck = node.getLastHealthCheck();
+
+            if (lastHealthCheck == null || lastHealthCheck.plus(healthCheckCooldown).isBefore(Instant.now())) {
+                try {
+                    node.healthCheck();
+                } catch (HederaNetworkException | HederaStatusException e) {
+                    if (triedNodes == null) {
+                        triedNodes = new BitSet(nodes.size());
+                    }
+
+                    triedNodes.set(r);
+                    deadNodes += 1;
+                    continue;
+                }
+            }
+
+            return node;
         }
 
-        return channelIter.next();
+        throw new HederaNetworkException("all nodes failed their health checks");
     }
 
     Node getNodeForId(AccountId node) {
