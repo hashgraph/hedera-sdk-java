@@ -74,7 +74,7 @@ class TransactionTest {
 
         final Transaction txn2 = Transaction.fromBytes(txn1Bytes);
 
-        assertEquals(txn.inner.build(), txn2.inner.build());
+        assertEquals(txn.txns.build(), txn2.txns.build());
         assertEquals(txn.nodeAccountId, txn2.nodeAccountId);
         assertEquals(txn.txnIdProto, txn2.txnIdProto);
     }

@@ -6,7 +6,12 @@ import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.PrivateKey;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -15,7 +20,6 @@ import io.grpc.Channel;
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     extends HederaCall<com.hedera.hashgraph.proto.Transaction, TransactionResponse, TransactionId, T>
 {
-    protected final com.hedera.hashgraph.proto.Transaction.Builder inner = com.hedera.hashgraph.proto.Transaction.newBuilder();
     protected final TransactionBody.Builder bodyBuilder = TransactionBody.newBuilder();
 
     {
@@ -128,7 +132,6 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         TransactionBody.Builder bodyBuilder = this.bodyBuilder;
 
         require(bodyBuilder.hasTransactionID(), ".setTransactionId() required");
-        require(bodyBuilder.hasNodeAccountID(), ".setNodeAccountId() required");
 
         doValidate();
         checkValidationErrors("transaction builder failed local validation");
@@ -168,24 +171,34 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
             setMaxTransactionFee(client.getMaxTransactionFee());
         }
 
-        if (!bodyBuilder.hasNodeAccountID()) {
-            Node channel = client != null ? client.pickNode() : null;
-            if (channel != null) {
-                bodyBuilder.setNodeAccountID(channel.accountId.toProto());
-            }
-        }
-
         if (!bodyBuilder.hasTransactionID() && client != null
             && client.getOperatorId() != null)
         {
             bodyBuilder.setTransactionID(new TransactionId(client.getOperatorId()).toProto());
         }
 
+        if (client == null && !bodyBuilder.hasNodeAccountID()) {
+            addValidationError("`.setNodeAccountId()` required or a client must be provided");
+        }
+
         localValidate();
 
-        inner.setBodyBytes(bodyBuilder.build().toByteString());
+        List<TransactionBody> txns;
 
-        return new Transaction(inner, bodyBuilder, getMethod());
+        if (!bodyBuilder.hasNodeAccountID()) {
+            // for high availability in the general case, we generate a transaction for each configured node
+            // so if one fails due to BUSY or a GRPC exception, we try the next in the list
+            txns = Objects.requireNonNull(client).nodes().stream()
+                .map(node -> bodyBuilder.clone().setNodeAccountID(node.accountId.toProto()).build())
+                .collect(Collectors.toCollection(ArrayList::new));
+
+            // shuffle the list so we don't always hit the same node first
+            Collections.shuffle(txns);
+        } else {
+            txns = Collections.singletonList(bodyBuilder.build());
+        }
+
+        return new Transaction(txns, getMethod());
     }
 
     @Override
@@ -212,19 +225,11 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
 
     @Override
     protected Channel getChannel(Client client) {
-        if (bodyBuilder.hasNodeAccountID()) {
-            return client.getNodeForId(new AccountId(bodyBuilder.getNodeAccountID())).getChannel();
-        } else {
-            return client.pickNode().getChannel();
-        }
+        throw new UnsupportedOperationException("execution should be delegated to Transaction");
     }
 
     @Override
     protected TransactionId mapResponse(TransactionResponse response) throws HederaStatusException {
-        TransactionId transactionId = new TransactionId(
-            bodyBuilder.getTransactionIDOrBuilder());
-        HederaPrecheckStatusException.throwIfExceptional(response.getNodeTransactionPrecheckCode(),
-            transactionId);
-        return transactionId;
+        throw new UnsupportedOperationException("execution should be delegated to Transaction");
     }
 }

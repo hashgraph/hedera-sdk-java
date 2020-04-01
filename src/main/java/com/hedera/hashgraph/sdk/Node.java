@@ -1,17 +1,16 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.proto.*;
-import com.hedera.hashgraph.sdk.account.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.account.AccountId;
 
-import java.time.Instant;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
-import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import io.grpc.Channel;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -25,9 +24,6 @@ class Node {
     // volatile is required for correct double-checked locking
     @Nullable
     private volatile ManagedChannel channel = null;
-
-    @Nullable
-    private Instant lastHealthCheck = null;
 
     Node(AccountId accountId, String address) {
         this.accountId = accountId;
@@ -48,15 +44,14 @@ class Node {
         return channel;
     }
 
-    @Nullable
-    Instant getLastHealthCheck() {
-        return lastHealthCheck;
-    }
-
     synchronized void healthCheck() throws HederaNetworkException, HederaStatusException {
         //noinspection ConstantConditions
-        new HealthCheck().execute(null);
-        lastHealthCheck = Instant.now();
+        new Ping().execute(null);
+    }
+
+    void healthCheckAsync(Runnable onSuccess, Consumer<HederaThrowable> onError) {
+        //noinspection ConstantConditions
+        new Ping().executeAsync(null, (v) -> onSuccess.run(), onError);
     }
 
     void closeChannel() {
@@ -78,10 +73,24 @@ class Node {
         }
     }
 
-    private final class HealthCheck extends HederaCall<Query, Response, Void, HealthCheck> {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Node)) return false;
+        Node node = (Node) o;
+        return accountId.equals(node.accountId) &&
+            address.equals(node.address);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(accountId, address);
+    }
+
+    private final class Ping extends HederaCall<Query, Response, Void, Ping> {
         private final Query.Builder queryBuilder = Query.newBuilder();
 
-        private HealthCheck() {
+        private Ping() {
             super();
             CryptoGetAccountBalanceQuery.Builder balanceQueryBuilder = queryBuilder
                 .getCryptogetAccountBalanceBuilder();
@@ -110,7 +119,7 @@ class Node {
                 .getNodeTransactionPrecheckCode();
 
             if (HederaStatusException.isCodeExceptional(code)) {
-                throw new HederaStatusException(code);
+                throw new HederaStatusException(accountId, code);
             }
 
             return null;

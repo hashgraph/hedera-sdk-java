@@ -1,28 +1,21 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.proto.AccountAmount;
-import com.hedera.hashgraph.proto.Query;
-import com.hedera.hashgraph.proto.QueryHeader;
-import com.hedera.hashgraph.proto.Response;
-import com.hedera.hashgraph.proto.ResponseCodeEnum;
-import com.hedera.hashgraph.proto.ResponseHeader;
-import com.hedera.hashgraph.proto.ResponseType;
-import com.hedera.hashgraph.proto.TransactionBody;
+import com.hedera.hashgraph.proto.*;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hedera.hashgraph.sdk.crypto.TransactionSigner;
+import io.grpc.Channel;
+import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
 import java.time.Duration;
+import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
-
-import javax.annotation.Nullable;
-
-import io.grpc.Channel;
-import io.grpc.MethodDescriptor;
 
 public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extends HederaCall<Query, Response, Resp, T> {
     protected final Query.Builder inner = Query.newBuilder();
@@ -36,7 +29,8 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     private long paymentAmount;
     private long maxPayment = 0;
 
-    protected QueryBuilder() { }
+    protected QueryBuilder() {
+    }
 
     protected abstract QueryHeader.Builder getHeaderBuilder();
 
@@ -68,9 +62,9 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         }
 
         if (nodeId != null) {
-            return client.getNodeForId(nodeId);
+            return client.getNodeById(nodeId);
         } else {
-            Node node = client.pickNode();
+            Node node = client.randomNode();
             nodeId = node.accountId;
             return node;
         }
@@ -128,7 +122,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     /**
      * Explicitly set a payment for this query.
-     *
+     * <p>
      * The payment must only be a single payer and a single payee.
      *
      * @param transaction
@@ -153,8 +147,7 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     private void generatePayment(Client client) {
         if (isPaymentRequired() && !getHeaderBuilder().hasPayment()
             && client.getOperatorId() != null && client.getOperatorSigner() != null
-            && client.getOperatorPublicKey() != null)
-        {
+            && client.getOperatorPublicKey() != null) {
             AccountId operatorId = client.getOperatorId();
             AccountId nodeId = getNode(client).accountId;
             Transaction txPayment = new CryptoTransferTransaction()
@@ -174,17 +167,61 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
         final long maxQueryPayment = client.getMaxQueryPayment();
 
         if (!getHeaderBuilder().hasPayment() && isPaymentRequired() && maxQueryPayment > 0) {
-            if (paymentAmount == 0) {
-                final long cost = getCost(client);
-                if (cost > maxQueryPayment) {
-                    throw new MaxQueryPaymentExceededException(this, cost, maxQueryPayment);
+            final HashSet<Node> triedNodes = new HashSet<>();
+            final Instant callExpires = Instant.now().plus(timeout);
+
+            for (;;) {
+                getHeaderBuilder().clearPayment();
+
+                final Duration remainingTimeout = Duration.between(Instant.now(), callExpires);
+
+                Node node = getNode(client);
+
+                // sets the node to one we haven't attempted yet
+                while (triedNodes.contains(node)) {
+                    this.nodeId = null;
+                    node = getNode(client);
                 }
 
-                this.paymentAmount = cost;
+                try {
+                    return executeAutoPay(client, remainingTimeout);
+                } catch (HederaNetworkException e) {
+                    if (Instant.now().isAfter(callExpires)) {
+                        throw e;
+                    } else if (triedNodes.size() < client.nodes().size() / 3) {
+                        // only try 1/3 of the nodes; if that many fail then the network is down
+                        triedNodes.add(node);
+                    } else {
+                        throw e;
+                    }
+                } catch (HederaStatusException e) {
+                    if (Instant.now().isAfter(callExpires)) {
+                        throw e;
+                    } else if (e.status == Status.Busy && triedNodes.size() < client.nodes().size() / 3) {
+                        triedNodes.add(node);
+                    } else {
+                        throw e;
+                    }
+                }
+            }
+        }
+
+        return super.execute(client, timeout);
+    }
+
+    private Resp executeAutoPay(Client client, Duration timeout) throws HederaStatusException, HederaNetworkException {
+        final long maxQueryPayment = client.getMaxQueryPayment();
+
+        if (paymentAmount == 0) {
+            final long cost = getCost(client);
+            if (cost > maxQueryPayment) {
+                throw new MaxQueryPaymentExceededException(this, cost, maxQueryPayment);
             }
 
-            generatePayment(client);
+            this.paymentAmount = cost;
         }
+
+        generatePayment(client);
 
         return super.execute(client, timeout);
     }
@@ -200,6 +237,8 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
                     return;
                 }
                 paymentAmount = cost;
+
+                generatePayment(client);
 
                 super.executeAsync(client, timeout, onSuccess, onError);
             }, onError);
@@ -269,22 +308,25 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     @Override
     protected final Resp mapResponse(Response raw) throws HederaStatusException {
+        AccountId nodeId = Objects.requireNonNull(this.nodeId, "nodeId should have been set by this point");
+
         if (paymentTransactionId != null) {
             // precheck code for transaction only matters if we have a payment attached
             final ResponseCodeEnum precheckCode = getResponseHeader(raw).getNodeTransactionPrecheckCode();
-            HederaPrecheckStatusException.throwIfExceptional(precheckCode, paymentTransactionId);
+            HederaPrecheckStatusException.throwIfExceptional(nodeId, precheckCode, paymentTransactionId);
         }
 
         switch (raw.getResponseCase()) {
             case TRANSACTIONGETRECEIPT:
                 HederaReceiptStatusException.throwIfExceptional(
+                    nodeId,
                     // look at the query for the transaction ID
                     inner.getTransactionGetReceipt(),
                     raw.getTransactionGetReceipt());
                 break;
             case TRANSACTIONGETRECORD:
                 // record response has everything we need
-                HederaRecordStatusException.throwIfExceptional(raw.getTransactionGetRecord());
+                HederaRecordStatusException.throwIfExceptional(nodeId, raw.getTransactionGetRecord());
                 break;
             default:
         }

@@ -10,7 +10,6 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
-import com.hedera.hashgraph.sdk.account.AccountId;
 import io.grpc.CallOptions;
 import io.grpc.Channel;
 import io.grpc.StatusRuntimeException;
@@ -72,7 +71,7 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
             try {
                 return mapResponse(ClientCalls.blockingUnaryCall(getChannel(client).newCall(getMethod(), CallOptions.DEFAULT), toProto()));
             } catch (StatusRuntimeException e) {
-                throw new HederaNetworkException(e);
+                throw new HederaNetworkException(nodeId, e);
             }
         };
 
@@ -179,7 +178,7 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
             HederaThrowable exception;
 
             if (t instanceof StatusRuntimeException) {
-                exception = new HederaNetworkException((StatusRuntimeException) t);
+                exception = new HederaNetworkException(nodeId, (StatusRuntimeException) t);
             } else if (t instanceof HederaThrowable) {
                 exception = (HederaThrowable) t;
             } else {

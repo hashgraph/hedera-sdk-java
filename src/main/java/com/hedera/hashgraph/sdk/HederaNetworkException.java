@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.account.AccountId;
 import io.grpc.StatusRuntimeException;
 
 import javax.annotation.Nullable;
@@ -11,13 +12,20 @@ public class HederaNetworkException extends RuntimeException implements HederaTh
     @Nullable
     final StatusRuntimeException cause;
 
-    HederaNetworkException(StatusRuntimeException cause) {
+    /**
+     * The ID of the node which returned the network error.
+     */
+    public final AccountId nodeId;
+
+    HederaNetworkException(AccountId nodeId, StatusRuntimeException cause) {
         super("transport error occurred while accessing the Hedera network", cause);
+        this.nodeId = nodeId;
         this.cause = cause;
     }
 
-    HederaNetworkException(String message) {
+    HederaNetworkException(AccountId nodeId, String message) {
         super(message);
+        this.nodeId = nodeId;
         cause = null;
     }
 }

@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.proto.ResponseCodeEnum;
+import com.hedera.hashgraph.sdk.account.AccountId;
 
 /**
  * A {@link HederaStatusException}, thrown specifically by a transaction precheck (validation
@@ -13,14 +14,14 @@ public class HederaPrecheckStatusException extends HederaStatusException {
      */
     public final TransactionId transactionId;
 
-    HederaPrecheckStatusException(ResponseCodeEnum responseCode, TransactionId transactionId) {
-        super(responseCode);
+    HederaPrecheckStatusException(AccountId nodeId, ResponseCodeEnum responseCode, TransactionId transactionId) {
+        super(nodeId, responseCode);
         this.transactionId = transactionId;
     }
 
-    static void throwIfExceptional(ResponseCodeEnum responseCode, TransactionId transactionId) throws HederaPrecheckStatusException {
+    static void throwIfExceptional(AccountId nodeId, ResponseCodeEnum responseCode, TransactionId transactionId) throws HederaPrecheckStatusException {
         if (isCodeExceptional(responseCode)) {
-            throw new HederaPrecheckStatusException(responseCode, transactionId);
+            throw new HederaPrecheckStatusException(nodeId, responseCode, transactionId);
         }
     }
 

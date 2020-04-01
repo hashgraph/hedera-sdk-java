@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.hedera.hashgraph.proto.ResponseCodeEnum;
 import com.hedera.hashgraph.proto.TransactionGetReceiptQuery;
 import com.hedera.hashgraph.proto.TransactionGetReceiptResponse;
+import com.hedera.hashgraph.sdk.account.AccountId;
 
 /**
  * A {@link HederaStatusException}, thrown on error status by {@link TransactionId#getReceipt(Client)}.
@@ -23,8 +24,8 @@ public class HederaReceiptStatusException extends HederaStatusException {
      */
     public final TransactionReceipt receipt;
 
-    HederaReceiptStatusException(ResponseCodeEnum responseCode, TransactionId transactionId, TransactionReceipt receipt) {
-        super(responseCode);
+    HederaReceiptStatusException(AccountId nodeId, ResponseCodeEnum responseCode, TransactionId transactionId, TransactionReceipt receipt) {
+        super(nodeId, responseCode);
         this.transactionId = transactionId;
         this.receipt = receipt;
     }
@@ -33,11 +34,12 @@ public class HederaReceiptStatusException extends HederaStatusException {
         return responseCode != ResponseCodeEnum.SUCCESS;
     }
 
-    static void throwIfExceptional(TransactionGetReceiptQuery receiptQuery, TransactionGetReceiptResponse receiptResponse) throws HederaReceiptStatusException {
+    static void throwIfExceptional(AccountId nodeId, TransactionGetReceiptQuery receiptQuery, TransactionGetReceiptResponse receiptResponse) throws HederaReceiptStatusException {
         ResponseCodeEnum status = receiptResponse.getReceipt().getStatus();
 
         if (isCodeExceptional(receiptResponse.getReceipt().getStatus())) {
             throw new HederaReceiptStatusException(
+                nodeId,
                 status,
                 new TransactionId(receiptQuery.getTransactionIDOrBuilder()),
                 new TransactionReceipt(receiptResponse.getReceipt()));

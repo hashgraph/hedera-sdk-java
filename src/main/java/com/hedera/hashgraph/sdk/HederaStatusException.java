@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.proto.ResponseCodeEnum;
+import com.hedera.hashgraph.sdk.account.AccountId;
 
 /**
  * Base class for exceptions thrown from HAPI calls that result in a {@link Status} code that
@@ -21,7 +22,13 @@ public class HederaStatusException extends Exception implements HederaThrowable 
      */
     public final Status status;
 
-    HederaStatusException(ResponseCodeEnum responseCode) {
+    /**
+     * The ID of the node that returned the unsuccessful status code.
+     */
+    public final AccountId nodeId;
+
+    HederaStatusException(AccountId nodeId, ResponseCodeEnum responseCode) {
+        this.nodeId = nodeId;
         this.status = Status.valueOf(responseCode);
     }
 
