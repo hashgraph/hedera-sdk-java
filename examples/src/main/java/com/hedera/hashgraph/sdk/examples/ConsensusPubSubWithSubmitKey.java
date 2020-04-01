@@ -12,7 +12,7 @@ import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import com.hedera.hashgraph.sdk.mirror.MirrorClient;
 import com.hedera.hashgraph.sdk.mirror.MirrorConsensusTopicQuery;
 import io.github.cdimascio.dotenv.Dotenv;
-import org.spongycastle.util.encoders.Hex;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
