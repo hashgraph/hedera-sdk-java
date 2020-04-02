@@ -18,7 +18,7 @@ public class HederaNetworkException extends RuntimeException implements HederaTh
     public final AccountId nodeId;
 
     HederaNetworkException(AccountId nodeId, StatusRuntimeException cause) {
-        super("transport error occurred while accessing the Hedera network", cause);
+        super("transport error occurred while accessing the Hedera network using node " + nodeId, cause);
         this.nodeId = nodeId;
         this.cause = cause;
     }

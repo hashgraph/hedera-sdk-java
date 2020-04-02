@@ -4,14 +4,19 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.ByteString;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
+import com.hedera.hashgraph.sdk.account.AccountId;
 import io.grpc.CallOptions;
 import io.grpc.Channel;
+import io.grpc.ClientCall;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
@@ -19,6 +24,8 @@ import io.grpc.stub.StreamObserver;
 public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, RawResp, Resp, T>> {
     private @Nullable
     List<String> validationErrors;
+
+    private int attempt = 0;
 
     private static final Duration RETRY_DELAY = Duration.ofMillis(500);
 
@@ -29,10 +36,26 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
 
     protected abstract Channel getChannel(Client client);
 
+    // Should return the node ID that was last used to execute
+    protected abstract AccountId getNodeId();
+
     protected abstract Resp mapResponse(RawResp raw) throws HederaStatusException;
 
     protected Duration getDefaultTimeout() {
         return Duration.ZERO;
+    }
+
+    protected Optional<Duration> getNextDelay(Instant timeout) {
+        attempt += 1;
+
+        final Duration nextDelay = RETRY_DELAY.multipliedBy(
+            ThreadLocalRandom.current().nextLong(1L << attempt));
+
+        if (Instant.now().plus(nextDelay).isBefore(timeout)) {
+            return Optional.of(nextDelay);
+        } else {
+            return Optional.empty();
+        }
     }
 
     protected boolean shouldRetry(HederaThrowable e) {
@@ -50,7 +73,7 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
             io.grpc.Status status = cause.getStatus();
 
             // retry with backoff if the node is temporarily unavailable
-            return status == io.grpc.Status.UNAVAILABLE || status == io.grpc.Status.RESOURCE_EXHAUSTED;
+            return status.getCode() == io.grpc.Status.UNAVAILABLE.getCode() || status.getCode() == io.grpc.Status.RESOURCE_EXHAUSTED.getCode();
         }
 
         return false;
@@ -66,17 +89,15 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
 
         // N.B. only QueryBuilder used onPreExecute() so instead it should just override this
         // method instead
+        try {
+            final Channel chan = getChannel(client);
+            final ClientCall<Req, RawResp> call = chan.newCall(getMethod(), CallOptions.DEFAULT);
+            final RawResp resp = ClientCalls.blockingUnaryCall(call, toProto());
 
-        final Backoff.FallibleProducer<Resp, HederaStatusException> tryProduce = () -> {
-            try {
-                return mapResponse(ClientCalls.blockingUnaryCall(getChannel(client).newCall(getMethod(), CallOptions.DEFAULT), toProto()));
-            } catch (StatusRuntimeException e) {
-                throw new HederaNetworkException(nodeId, e);
-            }
-        };
-
-        return new Backoff(RETRY_DELAY, retryTimeout)
-            .tryWhile(this::shouldRetry, tryProduce);
+            return mapResponse(resp);
+        } catch (StatusRuntimeException e) {
+            throw new HederaNetworkException(getNodeId(), e);
+        }
     }
 
     public final void executeAsync(Client client, Consumer<Resp> onSuccess, Consumer<HederaThrowable> onError) {
@@ -178,7 +199,7 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
             HederaThrowable exception;
 
             if (t instanceof StatusRuntimeException) {
-                exception = new HederaNetworkException(nodeId, (StatusRuntimeException) t);
+                exception = new HederaNetworkException(getNodeId(), (StatusRuntimeException) t);
             } else if (t instanceof HederaThrowable) {
                 exception = (HederaThrowable) t;
             } else {

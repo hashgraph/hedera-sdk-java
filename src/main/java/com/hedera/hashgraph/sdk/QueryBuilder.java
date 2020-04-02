@@ -12,14 +12,15 @@ import io.grpc.MethodDescriptor;
 import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extends HederaCall<Query, Response, Resp, T> {
     protected final Query.Builder inner = Query.newBuilder();
 
+    // Intended to be _removed_ after executeAsync is using new flow to generate N/3 transactions
+    // Used in executeAsync > generatePayment > getNode
     @Nullable
     private AccountId nodeId;
 
@@ -33,6 +34,15 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     }
 
     protected abstract QueryHeader.Builder getHeaderBuilder();
+
+    // The last node ID that was used to execute a (payment) transaction.
+    @Nullable
+    private AccountId lastNodeId;
+
+    @Override
+    public AccountId getNodeId() {
+        return Objects.requireNonNull(lastNodeId);
+    }
 
     @Override
     protected Channel getChannel(Client client) {
@@ -52,7 +62,6 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
             List<AccountAmount> transfers = paymentBody.getCryptoTransfer()
                 .getTransfers().getAccountAmountsList();
 
-            //
             for (AccountAmount transfer : transfers) {
                 if (transfer.getAmount() > 0) {
                     nodeId = new AccountId(transfer.getAccountID());
@@ -61,13 +70,17 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
             }
         }
 
+        Node node;
+
         if (nodeId != null) {
-            return client.getNodeById(nodeId);
+            node = client.getNodeById(nodeId);
         } else {
-            Node node = client.randomNode();
-            nodeId = node.accountId;
-            return node;
+            // Always pick a new node if one is not set in stone
+            node = client.randomNode();
         }
+
+        lastNodeId = node.accountId;
+        return node;
     }
 
     private long getMaxPayment(Client client) {
@@ -149,81 +162,92 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
             && client.getOperatorId() != null && client.getOperatorSigner() != null
             && client.getOperatorPublicKey() != null) {
             AccountId operatorId = client.getOperatorId();
-            AccountId nodeId = getNode(client).accountId;
-            Transaction txPayment = new CryptoTransferTransaction()
-                .setNodeAccountId(nodeId)
-                .setTransactionId(new TransactionId(operatorId))
-                .addSender(operatorId, paymentAmount)
-                .addRecipient(nodeId, paymentAmount)
-                .build(client)
-                .signWith(client.getOperatorPublicKey(), client.getOperatorSigner());
+            TransactionId transactionId = new TransactionId(operatorId);
+            Transaction txPayment = generatePaymentForNode(client, transactionId, getNode(client));
 
             setPaymentTransaction(txPayment);
         }
     }
 
+    private Transaction generatePaymentForNode(Client client, TransactionId transactionId, Node node) {
+        AccountId operatorId = client.getOperatorId();
+        AccountId nodeId = node.accountId;
+
+        // NOTE: This is called in a context where these conditions are always true
+        assert operatorId != null;
+        assert client.getOperatorSigner() != null;
+        assert client.getOperatorPublicKey() != null;
+
+        return new CryptoTransferTransaction()
+            .setNodeAccountId(nodeId)
+            .setTransactionId(transactionId)
+            .addSender(operatorId, paymentAmount)
+            .addRecipient(nodeId, paymentAmount)
+            .build(client)
+            .signWith(client.getOperatorPublicKey(), client.getOperatorSigner());
+    }
+
     @Override
     public final Resp execute(Client client, Duration timeout) throws HederaStatusException, HederaNetworkException, LocalValidationException {
         final long maxQueryPayment = client.getMaxQueryPayment();
+        final ArrayList<Transaction> paymentTransactions = new ArrayList<>();
+        List<Node> nodes = new ArrayList<>(client.nodes());
 
-        if (!getHeaderBuilder().hasPayment() && isPaymentRequired() && maxQueryPayment > 0) {
-            final HashSet<Node> triedNodes = new HashSet<>();
-            final Instant callExpires = Instant.now().plus(timeout);
+        // We need to pick N/3 nodes at random
+        Collections.shuffle(nodes);
+        nodes = nodes.subList(0, (nodes.size() / 3) + 1);
 
-            for (;;) {
-                getHeaderBuilder().clearPayment();
+        if (!getHeaderBuilder().hasPayment() && isPaymentRequired() && maxQueryPayment > 0 && client.getOperatorId() != null) {
+            // If we were not given an explicit payment amount we need to go ask Hedera
+            // how much this is going to cost
 
-                final Duration remainingTimeout = Duration.between(Instant.now(), callExpires);
+            if (paymentAmount == 0) {
+                final long cost = getCost(client);
+                if (cost > maxQueryPayment) {
+                    throw new MaxQueryPaymentExceededException(this, cost, maxQueryPayment);
+                }
 
-                Node node = getNode(client);
+                this.paymentAmount = cost;
+            }
 
-                // sets the node to one we haven't attempted yet
-                while (triedNodes.contains(node)) {
-                    this.nodeId = null;
-                    node = getNode(client);
+            // If we were not given an explicit payment and a payment is required, we need to pre-generate N/3 payment
+            // transactions. Then we use each one until we have none left.
+
+            final TransactionId paymentTransactionId = new TransactionId(client.getOperatorId());
+
+            for (Node node : nodes) {
+                // NOTE: It's critical that each transaction is completely identical except for the node ID
+                paymentTransactions.add(generatePaymentForNode(client, paymentTransactionId, node));
+            }
+        }
+
+        for (;;) {
+            int nodeIndex = 0;
+
+            for (Node node : nodes) {
+                final Instant callExpires = Instant.now().plus(timeout);
+
+                if (!paymentTransactions.isEmpty()) {
+                    setPaymentTransaction(paymentTransactions.get(nodeIndex));
+                    nodeIndex += 1;
                 }
 
                 try {
-                    return executeAutoPay(client, remainingTimeout);
-                } catch (HederaNetworkException e) {
+                    this.nodeId = node.accountId;
+                    return super.execute(client, timeout);
+                } catch (HederaNetworkException | HederaStatusException e) {
                     if (Instant.now().isAfter(callExpires)) {
-                        throw e;
-                    } else if (triedNodes.size() < client.nodes().size() / 3) {
-                        // only try 1/3 of the nodes; if that many fail then the network is down
-                        triedNodes.add(node);
-                    } else {
                         throw e;
                     }
-                } catch (HederaStatusException e) {
-                    if (Instant.now().isAfter(callExpires)) {
-                        throw e;
-                    } else if (e.status == Status.Busy && triedNodes.size() < client.nodes().size() / 3) {
-                        triedNodes.add(node);
-                    } else {
+
+                    if (!shouldRetry(e)) {
                         throw e;
                     }
                 }
+
+                getNextDelay(callExpires).ifPresent(ThreadUtil::sleepDuration);
             }
         }
-
-        return super.execute(client, timeout);
-    }
-
-    private Resp executeAutoPay(Client client, Duration timeout) throws HederaStatusException, HederaNetworkException {
-        final long maxQueryPayment = client.getMaxQueryPayment();
-
-        if (paymentAmount == 0) {
-            final long cost = getCost(client);
-            if (cost > maxQueryPayment) {
-                throw new MaxQueryPaymentExceededException(this, cost, maxQueryPayment);
-            }
-
-            this.paymentAmount = cost;
-        }
-
-        generatePayment(client);
-
-        return super.execute(client, timeout);
     }
 
     @Override
@@ -308,12 +332,12 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
     @Override
     protected final Resp mapResponse(Response raw) throws HederaStatusException {
-        AccountId nodeId = Objects.requireNonNull(this.nodeId, "nodeId should have been set by this point");
+        AccountId nodeId = Objects.requireNonNull(this.lastNodeId, "lastNodeId should have been set by this point");
 
         if (paymentTransactionId != null) {
             // precheck code for transaction only matters if we have a payment attached
             final ResponseCodeEnum precheckCode = getResponseHeader(raw).getNodeTransactionPrecheckCode();
-            HederaPrecheckStatusException.throwIfExceptional(nodeId, precheckCode, paymentTransactionId);
+            HederaPrecheckStatusException.throwIfExceptional(lastNodeId, precheckCode, paymentTransactionId);
         }
 
         switch (raw.getResponseCase()) {
@@ -365,10 +389,8 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
 
             // COST_ANSWER requires a payment to pass validation but doesn't actually process it
             final com.hedera.hashgraph.proto.Transaction fakePayment = new CryptoTransferTransaction()
-                .addRecipient(Objects.requireNonNull(nodeId), 0)
                 .addSender(operatorId, 0)
                 .build(client)
-                .signWith(operatorPublicKey, operatorSigner)
                 .toProto();
 
             // set our fake values, build and then reset
@@ -386,6 +408,11 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
             header.setResponseType(origResponseType);
 
             return built;
+        }
+
+        @Override
+        protected AccountId getNodeId() {
+            return QueryBuilder.this.getNodeId();
         }
 
         @Override

@@ -194,6 +194,10 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
 
             // shuffle the list so we don't always hit the same node first
             Collections.shuffle(txns);
+
+            // Only take N/3 of them
+            // If more than that many nodes are dead, the whole network is down anyway
+            txns = txns.subList(0, (txns.size() / 3) + 1);
         } else {
             txns = Collections.singletonList(bodyBuilder.build());
         }
@@ -216,6 +220,11 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     @SuppressWarnings("unchecked")
     private T self() {
         return (T) this;
+    }
+
+    @Override
+    protected AccountId getNodeId() {
+        throw new UnsupportedOperationException("execution should be delegated to Transaction");
     }
 
     @Override

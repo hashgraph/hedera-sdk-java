@@ -21,7 +21,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Transaction, TransactionResponse, TransactionId, Transaction> {
-
     static final Duration MAX_VALID_DURATION = Duration.ofMinutes(2);
 
     private final io.grpc.MethodDescriptor<com.hedera.hashgraph.proto.Transaction, com.hedera.hashgraph.proto.TransactionResponse> methodDescriptor;
@@ -141,25 +140,25 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
 
             try {
                 txn.execute(client, timeout);
-            } catch (HederaNetworkException e) {
-                lastException = e;
+                return id;
             } catch (HederaStatusException e) {
                 if (e.status == Status.Busy) {
                     lastException = e;
                 } else {
                     throw e;
                 }
+            } catch (Exception e) {
+                lastException = e;
             }
         }
 
         if (lastException instanceof HederaNetworkException) {
             throw (HederaNetworkException) lastException;
-        } else if (lastException != null) {
+        } else if (lastException instanceof HederaStatusException) {
             throw (HederaStatusException) lastException;
         } else {
             throw new RuntimeException("BUG loop did not save an exception to throw");
         }
-
     }
 
     @Override
@@ -295,6 +294,11 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
     }
 
     @Override
+    protected AccountId getNodeId() {
+        throw new UnsupportedOperationException("execution should delegate to RealTransaction");
+    }
+
+    @Override
     protected TransactionId mapResponse(TransactionResponse response) throws HederaStatusException {
         throw new UnsupportedOperationException("execution should delegate to RealTransaction");
     }
@@ -393,6 +397,11 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
         private final com.hedera.hashgraph.proto.Transaction.Builder transaction;
         private final TransactionBody body;
         private final AccountId nodeAccountId;
+
+        @Override
+        protected AccountId getNodeId() {
+            return nodeAccountId;
+        }
 
         private RealTransaction(com.hedera.hashgraph.proto.Transaction.Builder transaction) {
             this.transaction = transaction;

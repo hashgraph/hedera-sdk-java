@@ -109,6 +109,11 @@ class Node {
         }
 
         @Override
+        protected AccountId getNodeId() {
+            return accountId;
+        }
+
+        @Override
         protected Channel getChannel(Client client) {
             return Node.this.getChannel();
         }

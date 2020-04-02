@@ -31,16 +31,14 @@ final class Backoff {
         }
     }
 
-    <T, E extends Exception> T tryWhile(Predicate<E> shouldRetry, FallibleProducer<T, E> producer) throws E {
+    <T> T tryWhile(Predicate<HederaThrowable> shouldRetry, FallibleProducer<T> producer) throws HederaStatusException, HederaNetworkException {
         for (;;) {
             try {
                 return producer.tryProduce();
             } catch (Exception e) {
                 final Optional<Duration> nextDelay = getNextDelay();
 
-                // `producer` can only throw `E` as a checked exception
-                // noinspection unchecked
-                if (!(e instanceof RuntimeException) && shouldRetry.test((E) e) && nextDelay.isPresent()) {
+                if (shouldRetry.test((HederaThrowable) e) && nextDelay.isPresent()) {
                     ThreadUtil.sleepDuration(nextDelay.get());
                 } else {
                     throw e;
@@ -64,7 +62,7 @@ final class Backoff {
     }
 
     @FunctionalInterface
-    interface FallibleProducer<T, E extends Exception> {
-        T tryProduce() throws E;
+    interface FallibleProducer<T> {
+        T tryProduce() throws HederaStatusException, HederaNetworkException;
     }
 }

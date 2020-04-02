@@ -20,13 +20,13 @@ class FileAppendTransactionTest {
     void emptyBuilder() {
         assertEquals(
             "transaction builder failed local validation:\n"
+                + "`.setNodeAccountId()` required or a client must be provided\n"
                 + ".setTransactionId() required\n"
-                + ".setNodeAccountId() required\n"
                 + ".setFileId() required\n"
                 + ".setContents() required",
             assertThrows(
                 IllegalStateException.class,
-                () -> new FileAppendTransaction().validate()
+                () -> new FileAppendTransaction().build(null)
             ).getMessage());
     }
 

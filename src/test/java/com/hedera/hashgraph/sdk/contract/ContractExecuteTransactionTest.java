@@ -20,12 +20,12 @@ class ContractExecuteTransactionTest {
     void emptyBuilder() {
         assertEquals(
             "transaction builder failed local validation:\n"
+                + "`.setNodeAccountId()` required or a client must be provided\n"
                 + ".setTransactionId() required\n"
-                + ".setNodeAccountId() required\n"
                 + ".setContractId() required",
             assertThrows(
                 IllegalStateException.class,
-                () -> new ContractExecuteTransaction().validate()
+                () -> new ContractExecuteTransaction().build(null)
             ).getMessage()
         );
     }

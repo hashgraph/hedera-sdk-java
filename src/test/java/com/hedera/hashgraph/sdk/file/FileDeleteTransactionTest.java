@@ -20,12 +20,12 @@ class FileDeleteTransactionTest {
     void emptyBuilder() {
         assertEquals(
             "transaction builder failed local validation:\n"
+                + "`.setNodeAccountId()` required or a client must be provided\n"
                 + ".setTransactionId() required\n"
-                + ".setNodeAccountId() required\n"
                 + ".setFileId() required",
             assertThrows(
                 IllegalStateException.class,
-                () -> new FileDeleteTransaction().validate()
+                () -> new FileDeleteTransaction().build(null)
             ).getMessage());
     }
 

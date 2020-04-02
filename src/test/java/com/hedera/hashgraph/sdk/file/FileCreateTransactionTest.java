@@ -20,12 +20,12 @@ class FileCreateTransactionTest {
     void emptyBuilder() {
         assertEquals(
             "transaction builder failed local validation:\n"
+                + "`.setNodeAccountId()` required or a client must be provided\n"
                 + ".setTransactionId() required\n"
-                + ".setNodeAccountId() required\n"
                 + "network currently requires files to have at least one key",
             assertThrows(
                 IllegalStateException.class,
-                () -> new FileCreateTransaction().validate()
+                () -> new FileCreateTransaction().build(null)
             ).getMessage());
     }
 

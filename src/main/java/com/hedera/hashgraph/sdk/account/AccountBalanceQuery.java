@@ -42,16 +42,21 @@ public final class AccountBalanceQuery extends QueryBuilder<Hbar, AccountBalance
         require(builder.hasAccountID() || builder.hasContractID(),
             ".setAccountId() or .setContractId() required");
 
-        require(getHeaderBuilder().hasPayment(),
-            "AccountBalanceQuery requires a payment for validation but it is not processed; "
-                + "one would have been created automatically but the given Client did not have "
-                + "an operator ID or key set. You must instead manually create, sign and then set "
-                + "a payment transaction with .setPayment().");
+//        require(getHeaderBuilder().hasPayment(),
+//            "AccountBalanceQuery requires a payment for validation but it is not processed; "
+//                + "one would have been created automatically but the given Client did not have "
+//                + "an operator ID or key set. You must instead manually create, sign and then set "
+//                + "a payment transaction with .setPayment().");
     }
 
     @Override
     protected MethodDescriptor<Query, Response> getMethod() {
         return CryptoServiceGrpc.getCryptoGetBalanceMethod();
+    }
+
+    @Override
+    protected boolean isPaymentRequired() {
+        return false;
     }
 
     @Override

@@ -19,12 +19,12 @@ class CryptoTransferTransactionTest {
     void emptyBuilder() {
         assertEquals(
             "transaction builder failed local validation:\n" +
+                "`.setNodeAccountId()` required or a client must be provided\n" +
                 ".setTransactionId() required\n" +
-                ".setNodeAccountId() required\n" +
                 "at least one transfer required",
             assertThrows(
                 IllegalStateException.class,
-                () -> new CryptoTransferTransaction().validate()
+                () -> new CryptoTransferTransaction().build(null)
             ).getMessage()
         );
     }

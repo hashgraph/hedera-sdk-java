@@ -57,8 +57,6 @@ public final class Client implements AutoCloseable {
     // todo: transaction fees should be defaulted to whatever the transaction fee schedule is
     private long maxTransactionFee = DEFAULT_MAX_TXN_FEE;
 
-    private static final Duration healthCheckCooldown = Duration.ofMinutes(1);
-
     // also 1 hbar
     private long maxQueryPayment = 100_000_000;
 

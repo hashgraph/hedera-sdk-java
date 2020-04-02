@@ -19,13 +19,13 @@ class AccountDeleteTransactionTest {
     void emptyBuilder() {
         assertEquals(
             "transaction builder failed local validation:\n" +
+                "`.setNodeAccountId()` required or a client must be provided\n" +
                 ".setTransactionId() required\n" +
-                ".setNodeAccountId() required\n" +
                 ".setTransferAccountId() required\n" +
                 ".setDeleteAccountId() required",
             assertThrows(
                 IllegalStateException.class,
-                () -> new AccountDeleteTransaction().validate()).getMessage());
+                () -> new AccountDeleteTransaction().build(null)).getMessage());
     }
 
     @Test
