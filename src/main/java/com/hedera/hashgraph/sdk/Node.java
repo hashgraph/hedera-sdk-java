@@ -78,8 +78,8 @@ class Node {
         if (this == o) return true;
         if (!(o instanceof Node)) return false;
         Node node = (Node) o;
-        return accountId.equals(node.accountId) &&
-            address.equals(node.address);
+        return accountId.equals(node.accountId)
+            && address.equals(node.address);
     }
 
     @Override

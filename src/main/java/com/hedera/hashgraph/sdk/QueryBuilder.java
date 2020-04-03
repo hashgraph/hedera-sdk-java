@@ -160,7 +160,8 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
     private void generatePayment(Client client) {
         if (isPaymentRequired() && !getHeaderBuilder().hasPayment()
             && client.getOperatorId() != null && client.getOperatorSigner() != null
-            && client.getOperatorPublicKey() != null) {
+            && client.getOperatorPublicKey() != null)
+        {
             AccountId operatorId = client.getOperatorId();
             TransactionId transactionId = new TransactionId(operatorId);
             Transaction txPayment = generatePaymentForNode(client, transactionId, getNode(client));
