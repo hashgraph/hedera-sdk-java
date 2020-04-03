@@ -1,0 +1,17 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.hedera.hashgraph</groupId>
+    <artifactId>sdk</artifactId>
+    <packaging>jar</packaging>
+    <version>2.0.0-SNAPSHOT</version>
+    <name>Hedera™ Hashgraph SDK for Java</name>
+    <url>https://github.com/hashgraph/hedera-sdk-java</url>
+    <description>
+        The Java SDK for interacting with Hedera Hashgraph: the official distributed consensus platform built
+        using the hashgraph consensus algorithm for fast, fair and secure transactions. Hedera enables and empowers
+        developers to build an entirely new class of decentralized applications.
+    </description>
+</project>
