@@ -5,10 +5,7 @@ import com.hedera.hashgraph.sdk.proto.SignatureMap;
 import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.CallOptions;
-import io.grpc.ClientCall;
-import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import io.grpc.MethodDescriptor;
 import io.grpc.stub.ClientCalls;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.BiConsumer;
@@ -43,7 +40,7 @@ public final class Transaction {
     }
 
     public Transaction signWith(PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
-        byte[] signatureBytes = transactionSigner.apply(raw[0].getBodyBytes().toByteArray());
+        var signatureBytes = transactionSigner.apply(raw[0].getBodyBytes().toByteArray());
 
         SignaturePair signature = publicKey.toSignaturePairProtobuf(signatureBytes);
 
@@ -60,14 +57,14 @@ public final class Transaction {
     // TODO: Return <TransactionId>
     public CompletableFuture<TransactionResponse> executeAsync() {
         // TODO: Move to <Client>
-        ManagedChannel chan = ManagedChannelBuilder.forTarget("0.testnet.hedera.com:50211")
+        var chan = ManagedChannelBuilder.forTarget("0.testnet.hedera.com:50211")
             .usePlaintext()
             // TODO: Inject project version
             .userAgent("hedera-sdk-java/2.0.0-SNAPSHOT")
             .build();
 
-        MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> method = CryptoServiceGrpc.getCreateAccountMethod();
-        ClientCall<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> call = chan.newCall(method, CallOptions.DEFAULT);
+        var method = CryptoServiceGrpc.getCreateAccountMethod();
+        var call = chan.newCall(method, CallOptions.DEFAULT);
 
         return toCompletableFuture(ClientCalls.futureUnaryCall(call, toProtobuf()));
     }
