@@ -4,19 +4,21 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import org.threeten.bp.Duration;
 
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
-    // Maximum number of characters that all memo fields share
-    protected final static int MAX_MEMO_LENGTH = 100;
+    // Default auto renew duration for accounts, contracts, topics, and files (entities)
+    protected final static Duration DEFAULT_AUTO_RENEW_PERIOD = Duration.ofDays(90);
 
-    protected final TransactionBody.Builder bodyBuilder;
+    // Default transaction duration
+    private final static Duration DEFAULT_TRANSACTION_VALID_DURATION = Duration.ofSeconds(120);
+
+    private final TransactionBody.Builder bodyBuilder;
 
     private final com.hedera.hashgraph.sdk.proto.Transaction.Builder builder;
 
-    public TransactionBuilder() {
+    TransactionBuilder() {
         builder = com.hedera.hashgraph.sdk.proto.Transaction.newBuilder();
         bodyBuilder = TransactionBody.newBuilder();
 
-        // Default valid duration to 120s
-        setTransactionValidDuration(Duration.ofSeconds(120));
+        setTransactionValidDuration(DEFAULT_TRANSACTION_VALID_DURATION);
     }
 
     /**
@@ -30,9 +32,10 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
      * Normally, you should not use this method. Just before a transaction is executed, a transaction ID will
      * be generated from the operator on the client.
      *
+     * @return {@code this}.
      * @see TransactionId
      */
-    public T setTransactionId(TransactionId transactionId) {
+    public final T setTransactionId(TransactionId transactionId) {
         bodyBuilder.setTransactionID(transactionId.toProtobuf());
 
         // noinspection unchecked
@@ -45,8 +48,10 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
      * Providing an explicit node account ID interferes with client-side load balancing of the network. By default,
      * the SDK will pre-generate a transaction for 1/3 of the nodes on the network. If a node is down, busy, or
      * otherwise reports a fatal error, the SDK will try again with a different node.
+     *
+     * @return {@code this}.
      */
-    public T setNodeAccountId(AccountId nodeAccountId) {
+    public final T setNodeAccountId(AccountId nodeAccountId) {
         bodyBuilder.setNodeAccountID(nodeAccountId.toProtobuf());
 
         // noinspection unchecked
@@ -57,6 +62,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
      * Sets the duration that this transaction is valid for.
      * <p>
      * This is defaulted by the SDK to 120 seconds (or two minutes).
+     *
+     * @return {@code this}.
      */
     public final T setTransactionValidDuration(Duration validDuration) {
         bodyBuilder.setTransactionValidDuration(DurationConverter.toProtobuf(validDuration));
@@ -65,6 +72,12 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
         return (T) this;
     }
 
+    /**
+     * Set the maximum transaction fee the operator (paying account) is willing to pay.
+     *
+     * @param maxTransactionFee the maximum transaction fee, in tinybars.
+     * @return {@code this}.
+     */
     public final T setMaxTransactionFee(long maxTransactionFee) {
         bodyBuilder.setTransactionFee(maxTransactionFee);
 
@@ -72,11 +85,32 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
         return (T) this;
     }
 
-    public Transaction build() {
+    /**
+     * Set a note or description that should be recorded in the transaction record (maximum length of 100 characters).
+     *
+     * @param memo any notes or descriptions for this transaction.
+     * @return {@code this}.
+     */
+    public final T setTransactionMemo(String memo) {
+        bodyBuilder.setMemo(memo);
+
+        // noinspection unchecked
+        return (T) this;
+    }
+
+    public final Transaction build() {
+        onBuild(bodyBuilder);
+
         // Emplace the body into the transaction wrapper
         // This wrapper object contains the bytes for the body and signatures of the body
         builder.setBodyBytes(bodyBuilder.build().toByteString());
 
         return new Transaction(new com.hedera.hashgraph.sdk.proto.Transaction.Builder[]{builder});
     }
+
+    /**
+     * Called in {@link #build} just before the transaction body is built.
+     * The intent is for the derived class to assign their data variant to the transaction body.
+     */
+    protected abstract void onBuild(TransactionBody.Builder bodyBuilder);
 }
