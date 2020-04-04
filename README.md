@@ -1,3 +1,5 @@
+![](https://img.shields.io/badge/java-8%2B-blue)
+
 # Hedera™ Hashgraph Java SDK
 
 > The Java SDK for interacting with Hedera Hashgraph: the official distributed
@@ -7,7 +9,15 @@
 
 ## ⚠️ Disclaimer
 
-This project is currently under active development.
+This project is currently under a re-development effort. The goals are as follows:
+
+ * Native support for Android
+
+ * Native support for the Corda DJVM
+
+ * Usage of modern Java techniques (such as futures) to reduce internal control flow complexities
+
+ * End-to-end test coverage
 
 Join the [Hedera discord](https://hedera.com/discord) for the latest updates and announcements.
 
