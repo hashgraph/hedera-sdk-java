@@ -22,7 +22,7 @@ public final class PublicKey extends Key {
     }
 
     @Override
-    com.hedera.hashgraph.sdk.proto.Key toProtobuf() {
+    com.hedera.hashgraph.sdk.proto.Key toKeyProtobuf() {
         return com.hedera.hashgraph.sdk.proto.Key.newBuilder()
                 .setEd25519(ByteString.copyFrom(keyData))
                 .build();

@@ -95,9 +95,9 @@ public final class PrivateKey extends Key {
     }
 
     @Override
-    com.hedera.hashgraph.sdk.proto.Key toProtobuf() {
+    com.hedera.hashgraph.sdk.proto.Key toKeyProtobuf() {
         // Forward to the corresponding public key.
-        return getPublicKey().toProtobuf();
+        return getPublicKey().toKeyProtobuf();
     }
 
     @Override

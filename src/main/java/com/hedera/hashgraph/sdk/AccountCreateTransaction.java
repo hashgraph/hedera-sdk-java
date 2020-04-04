@@ -27,7 +27,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
      * @return {@code this}.
      */
     public AccountCreateTransaction setKey(Key key) {
-        builder.setKey(key.toProtobuf());
+        builder.setKey(key.toKeyProtobuf());
         return this;
     }
 
