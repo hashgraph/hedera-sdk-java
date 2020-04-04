@@ -2,6 +2,7 @@ plugins {
     id "java"
     id "idea"
     id "com.google.protobuf" version "0.8.12"
+    id "net.ltgt.errorprone" version "1.1.1"
 }
 
 group = "com.hedera.hashgraph"
@@ -18,7 +19,12 @@ configurations {
 }
 
 dependencies {
-    implementation "javax.annotation:javax.annotation-api:1.3.2"
+    // https://github.com/google/error-prone
+    // https://errorprone.info/
+    errorprone "com.google.errorprone:error_prone_core:2.3.4"
+
+    // https://github.com/eclipse-ee4j/common-annotations-api
+    implementation "jakarta.annotation:jakarta.annotation-api:1.3.5"
 
     // Converts between Java 8 CompletableFuture and Guava ListenableFuture
     // https://guava.dev/releases/25.0-jre/api/docs/com/google/common/util/concurrent/FluentFuture.html
@@ -69,8 +75,13 @@ protobuf {
     }
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
+    options.errorprone {
+        // Ignore generated and protobuf code
+        disableWarningsInGeneratedCode = true
+        excludedPaths = ".*generated.*"
+    }
 }
 
 sourceSets {
