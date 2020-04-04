@@ -4,6 +4,11 @@ import com.hedera.hashgraph.sdk.proto.AccountID;
 import javax.annotation.Nonnegative;
 
 public final class AccountId extends EntityId {
+    public AccountId(@Nonnegative long num) {
+        super(0, 0, num);
+    }
+
+    @SuppressWarnings("InconsistentOverloads")
     public AccountId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num) {
         super(shard, realm, num);
     }

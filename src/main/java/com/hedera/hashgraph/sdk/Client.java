@@ -1,20 +1,31 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.collect.Iterables;
 import com.google.errorprone.annotations.Var;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /** Managed client for use on the Hedera Hashgraph network. */
-public class Client implements AutoCloseable {
+public final class Client implements AutoCloseable {
+    private final Iterator<AccountId> nodes;
     private final Map<AccountId, String> network;
     private Map<AccountId, ManagedChannel> channels;
 
     protected Client(Map<AccountId, String> network) {
         this.network = network;
         this.channels = new HashMap<>(network.size());
+
+        // Take all given node account IDs, shuffle, and prepare an infinite iterator for use in
+        // [getNextNodeId]
+        var allNodes = new ArrayList<>(network.keySet());
+        Collections.shuffle(allNodes, ThreadLocalSecureRandom.current());
+        nodes = Iterables.cycle(allNodes).iterator();
     }
 
     /**
@@ -99,6 +110,12 @@ public class Client implements AutoCloseable {
         channels.clear();
     }
 
+    // Get the next node ID, following a round-robin distribution with a randomized start point
+    synchronized AccountId getNextNodeId() {
+        return nodes.next();
+    }
+
+    // Return or establish a channel for a given node ID
     synchronized ManagedChannel getChannel(AccountId nodeId) {
         @Var var channel = channels.get(nodeId);
 

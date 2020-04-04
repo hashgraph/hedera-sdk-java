@@ -5,15 +5,14 @@ import java.security.SecureRandom;
 class ThreadLocalSecureRandom {
     @SuppressWarnings("AnonymousHasLambdaAlternative")
     private static final ThreadLocal<SecureRandom> secureRandom =
-        new ThreadLocal<SecureRandom>() {
-            @Override
-            protected SecureRandom initialValue() {
-                return new SecureRandom();
-            }
-        };
+            new ThreadLocal<SecureRandom>() {
+                @Override
+                protected SecureRandom initialValue() {
+                    return new SecureRandom();
+                }
+            };
 
-    private ThreadLocalSecureRandom() {
-    }
+    private ThreadLocalSecureRandom() {}
 
     static SecureRandom current() {
         return secureRandom.get();
