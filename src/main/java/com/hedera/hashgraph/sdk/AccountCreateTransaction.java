@@ -11,16 +11,13 @@ import com.hedera.hashgraph.sdk.proto.CryptoCreateTransactionBody;
 /**
  * Create a new Hedera™ account.
  */
-public final class AccountCreateTransaction extends TransactionBuilder {
+public final class AccountCreateTransaction extends TransactionBuilder<AccountCreateTransaction> {
     private final CryptoCreateTransactionBody.Builder builder;
 
     public AccountCreateTransaction() {
-        super();
-
         // TODO: Default auto-renew duration
         // TODO: Default thresholds
         builder = CryptoCreateTransactionBody.newBuilder();
-        bodyBuilder.setCryptoCreateAccount(builder);
     }
 
     /**
@@ -44,5 +41,11 @@ public final class AccountCreateTransaction extends TransactionBuilder {
     public AccountCreateTransaction setInitialBalance(long initialBalance) {
         builder.setInitialBalance(initialBalance);
         return this;
+    }
+
+    @Override
+    public Transaction build() {
+        bodyBuilder.setCryptoCreateAccount(builder);
+        return super.build();
     }
 }

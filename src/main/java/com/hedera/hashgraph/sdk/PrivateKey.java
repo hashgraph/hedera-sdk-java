@@ -1,8 +1,15 @@
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.proto.SignaturePair;
+import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
+import org.bouncycastle.util.encoders.Hex;
 
+import javax.annotation.Nullable;
+import java.io.IOException;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 // TODO: Multiple algorithms
 // TODO: #fromString
@@ -23,6 +30,10 @@ public final class PrivateKey extends Key {
 
     private final byte[] keyData;
 
+    // Cache the derivation of the public key
+    @Nullable
+    private PublicKey publicKey;
+
     PrivateKey(byte[] keyData) {
         this.keyData = keyData;
     }
@@ -39,6 +50,31 @@ public final class PrivateKey extends Key {
         return new PrivateKey(keyData);
     }
 
+    public static PrivateKey fromString(String privateKey) {
+        return fromBytes(Hex.decode(privateKey));
+    }
+
+    public static PrivateKey fromBytes(byte[] privateKey) {
+        if ((privateKey.length == Ed25519.SECRET_KEY_SIZE)
+            || (privateKey.length == Ed25519.SECRET_KEY_SIZE + Ed25519.PUBLIC_KEY_SIZE)) {
+            // If this is a 32 or 64 byte string, assume an Ed25519 private key
+            return new PrivateKey(Arrays.copyOfRange(privateKey, 0, Ed25519.SECRET_KEY_SIZE));
+        }
+
+        // Assume a DER-encoded private key descriptor
+        return PrivateKey.fromPrivateKeyInfo(PrivateKeyInfo.getInstance(privateKey));
+    }
+
+    private static PrivateKey fromPrivateKeyInfo(PrivateKeyInfo privateKeyInfo) {
+        try {
+            ASN1OctetString privateKey = (ASN1OctetString) privateKeyInfo.parsePrivateKey();
+            return new PrivateKey(privateKey.getOctets());
+        } catch (IOException e) {
+            // TODO: Throw [BadKeyException]
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Derive a public key from this private key.
      * <p>
@@ -48,10 +84,15 @@ public final class PrivateKey extends Key {
      * @return the corresponding public key for this private key.
      */
     public PublicKey getPublicKey() {
+        if (publicKey != null) {
+            return publicKey;
+        }
+
         byte[] publicKeyData = new byte[Ed25519.PUBLIC_KEY_SIZE];
         Ed25519.generatePublicKey(keyData, 0, publicKeyData, 0);
 
-        return new PublicKey(publicKeyData);
+        publicKey = new PublicKey(publicKeyData);
+        return publicKey;
     }
 
     /**
@@ -68,7 +109,13 @@ public final class PrivateKey extends Key {
 
     @Override
     com.hedera.hashgraph.sdk.proto.Key toProtobuf() {
-        // Forward to [toProtobuf] on the corresponding public key.
+        // Forward to the corresponding public key.
         return getPublicKey().toProtobuf();
+    }
+
+    @Override
+    SignaturePair toSignaturePairProtobuf(byte[] signature) {
+        // Forward to the corresponding public key.
+        return getPublicKey().toSignaturePairProtobuf(signature);
     }
 }

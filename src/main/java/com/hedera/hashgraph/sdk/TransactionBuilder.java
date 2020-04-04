@@ -1,8 +1,9 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import org.threeten.bp.Duration;
 
-public abstract class TransactionBuilder {
+public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     // Maximum number of characters that all memo fields share
     protected final static int MAX_MEMO_LENGTH = 100;
 
@@ -13,13 +14,69 @@ public abstract class TransactionBuilder {
     public TransactionBuilder() {
         builder = com.hedera.hashgraph.sdk.proto.Transaction.newBuilder();
         bodyBuilder = TransactionBody.newBuilder();
+
+        // Default valid duration to 120s
+        setTransactionValidDuration(Duration.ofSeconds(120));
     }
 
-    public final Transaction build() {
+    /**
+     * Set the ID for this transaction.
+     * <p>
+     * The transaction ID includes the operator's account (
+     * the account paying the transaction fee). If two transactions have the same
+     * transaction ID, they won't both have an effect. One will complete normally and the other
+     * will fail with a duplicate transaction status.
+     * <p>
+     * Normally, you should not use this method. Just before a transaction is executed, a transaction ID will
+     * be generated from the operator on the client.
+     *
+     * @see TransactionId
+     */
+    public T setTransactionId(TransactionId transactionId) {
+        bodyBuilder.setTransactionID(transactionId.toProtobuf());
+
+        // noinspection unchecked
+        return (T) this;
+    }
+
+    /**
+     * Set the account ID of the node that this transaction will be submitted to.
+     * <p>
+     * Providing an explicit node account ID interferes with client-side load balancing of the network. By default,
+     * the SDK will pre-generate a transaction for 1/3 of the nodes on the network. If a node is down, busy, or
+     * otherwise reports a fatal error, the SDK will try again with a different node.
+     */
+    public T setNodeAccountId(AccountId nodeAccountId) {
+        bodyBuilder.setNodeAccountID(nodeAccountId.toProtobuf());
+
+        // noinspection unchecked
+        return (T) this;
+    }
+
+    /**
+     * Sets the duration that this transaction is valid for.
+     * <p>
+     * This is defaulted by the SDK to 120 seconds (or two minutes).
+     */
+    public final T setTransactionValidDuration(Duration validDuration) {
+        bodyBuilder.setTransactionValidDuration(DurationConverter.toProtobuf(validDuration));
+
+        // noinspection unchecked
+        return (T) this;
+    }
+
+    public final T setMaxTransactionFee(long maxTransactionFee) {
+        bodyBuilder.setTransactionFee(maxTransactionFee);
+
+        // noinspection unchecked
+        return (T) this;
+    }
+
+    public Transaction build() {
         // Emplace the body into the transaction wrapper
         // This wrapper object contains the bytes for the body and signatures of the body
         builder.setBodyBytes(bodyBuilder.build().toByteString());
 
-        return new Transaction(new com.hedera.hashgraph.sdk.proto.Transaction[]{builder.build()});
+        return new Transaction(new com.hedera.hashgraph.sdk.proto.Transaction.Builder[]{builder});
     }
 }
