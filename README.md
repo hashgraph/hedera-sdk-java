@@ -26,7 +26,7 @@ Join the [Hedera discord](https://hedera.com/discord) for the latest updates and
 
 ### Dependencies
 
- * [Java Development Kit (JDK)](https://adoptopenjdk.net/) v8+
+ * [Java Development Kit (JDK)](https://adoptopenjdk.net/) v12
 
 ### Compile
 

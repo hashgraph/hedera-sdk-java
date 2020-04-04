@@ -11,8 +11,11 @@ group = "com.hedera.hashgraph"
 version = "2.0.0-SNAPSHOT"
 description = "Hedera™ Hashgraph SDK for Java"
 
+sourceCompatibility = 12
+
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 configurations {
@@ -30,6 +33,9 @@ dependencies {
 
     // https://github.com/grpc/grpc-java-api-checker
     errorprone "io.grpc:grpc-java-api-checker:1.1.0"
+
+    // https://github.com/bsideup/jabel
+    annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:0.2.0'
 
     // https://github.com/eclipse-ee4j/common-annotations-api
     implementation "jakarta.annotation:jakarta.annotation-api:1.3.5"
@@ -89,6 +95,14 @@ protobuf {
 }
 
 tasks.withType(JavaCompile).configureEach {
+    // https://github.com/gradle/gradle/issues/2510#issuecomment-604986414
+    // release = 8
+    compileJava {
+        options.compilerArgs = [
+                "--release", "8" // Avoid using Java 12 APIs
+        ]
+    }
+
     options.encoding = "UTF-8"
     options.errorprone {
         // https://github.com/uber/NullAway
