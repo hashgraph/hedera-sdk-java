@@ -13,7 +13,7 @@ import java.security.SecureRandom;
 /**
  * A private key on the Hedera™ network.
  */
-public class PrivateKey {
+public final class PrivateKey extends Key {
     private static final ThreadLocal<SecureRandom> secureRandom = ThreadLocal.withInitial(() -> {
         try {
             return SecureRandom.getInstanceStrong();
@@ -65,5 +65,11 @@ public class PrivateKey {
         Ed25519.sign(keyData, 0, message, 0, message.length, signature, 0);
 
         return signature;
+    }
+
+    @Override
+    com.hedera.hashgraph.sdk.proto.Key toProtobuf() {
+        // Forward to [toProtobuf] on the corresponding public key.
+        return getPublicKey().toProtobuf();
     }
 }
