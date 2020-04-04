@@ -5,6 +5,10 @@ plugins {
     id "idea"
     id "com.google.protobuf" version "0.8.12"
     id "net.ltgt.errorprone" version "1.1.1"
+
+    // Gradle plugin to discover dependency updates
+    // <https://github.com/ben-manes/gradle-versions-plugin>
+    id "com.github.ben-manes.versions" version "0.28.0"
 }
 
 group = "com.hedera.hashgraph"
@@ -68,6 +72,7 @@ dependencies {
     integrationTestRuntimeOnly "io.grpc:grpc-netty-shaded:1.28.1"
 }
 
+// https://github.com/google/protobuf-gradle-plugin
 protobuf {
     protoc {
         artifact = "com.google.protobuf:protoc:3.11.4"
