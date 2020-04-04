@@ -6,6 +6,10 @@ plugins {
     id "com.google.protobuf" version "0.8.12"
     id "net.ltgt.errorprone" version "1.1.1"
 
+    // Spotless: Keep your code spotless with Gradle
+    // https://github.com/diffplug/spotless
+    id "com.diffplug.gradle.spotless" version "3.28.1"
+
     // Gradle plugin to discover dependency updates
     // <https://github.com/ben-manes/gradle-versions-plugin>
     id "com.github.ben-manes.versions" version "0.28.0"
@@ -168,5 +172,11 @@ tasks.withType(Test) {
     testLogging {
         exceptionFormat = 'full'
         events "passed", "skipped", "failed", "standardOut", "standardError"
+    }
+}
+
+spotless {
+    java {
+        googleJavaFormat().aosp()
     }
 }

@@ -1,5 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
+import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.SignatureMap;
@@ -8,21 +10,19 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.CallOptions;
 import io.grpc.stub.ClientCalls;
+import java.util.ArrayList;
+import java.util.List;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.BiConsumer;
 import java8.util.function.Function;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
-
 // TODO: Handle multiple raw transactions
 
 public final class Transaction {
-    // A SDK [Transaction] is composed of multiple, raw protobuf transactions. These should be functionally identical,
-    // with the exception of pointing to different nodes. When retrying a transaction after a network error or
-    // retry-able status response, we try a different transaction and thus a different node.
+    // A SDK [Transaction] is composed of multiple, raw protobuf transactions. These should be
+    // functionally identical, with the exception of pointing to different nodes. When retrying a
+    // transaction after a network error or retry-able status response, we try a
+    // different transaction and thus a different node.
     private final List<com.hedera.hashgraph.sdk.proto.Transaction.Builder> transactions;
 
     // The parsed transaction body for the corresponding transaction.
@@ -56,7 +56,8 @@ public final class Transaction {
     }
 
     public Transaction signWith(PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
-        var signatureBytes = transactionSigner.apply(transactions.get(0).getBodyBytes().toByteArray());
+        var bodyBytes = transactions.get(0).getBodyBytes().toByteArray();
+        var signatureBytes = transactionSigner.apply(bodyBytes);
 
         SignaturePair signature = publicKey.toSignaturePairProtobuf(signatureBytes);
 

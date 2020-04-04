@@ -14,13 +14,14 @@ class AccountCreateTransactionIntegrationTest {
         var newKey = PrivateKey.generateEd25519();
 
         try (var client = Client.forTestnet()) {
-            var transaction = new AccountCreateTransaction()
-                .setTransactionId(TransactionId.generate(operatorId))
-                .setNodeAccountId(new AccountId(0, 0, 3))
-                .setInitialBalance(10)
-                .setMaxTransactionFee(50_000_000)
-                .setKey(newKey)
-                .build();
+            var transaction =
+                    new AccountCreateTransaction()
+                            .setTransactionId(TransactionId.generate(operatorId))
+                            .setNodeAccountId(new AccountId(0, 0, 3))
+                            .setInitialBalance(10)
+                            .setMaxTransactionFee(50_000_000)
+                            .setKey(newKey)
+                            .build();
 
             transaction.sign(operatorKey);
 
