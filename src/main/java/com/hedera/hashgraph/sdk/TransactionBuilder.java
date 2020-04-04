@@ -3,6 +3,8 @@ package com.hedera.hashgraph.sdk;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import org.threeten.bp.Duration;
 
+import java.util.Collections;
+
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     // Default auto renew duration for accounts, contracts, topics, and files (entities)
     protected final static Duration DEFAULT_AUTO_RENEW_PERIOD = Duration.ofDays(90);
@@ -105,7 +107,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
         // This wrapper object contains the bytes for the body and signatures of the body
         builder.setBodyBytes(bodyBuilder.build().toByteString());
 
-        return new Transaction(new com.hedera.hashgraph.sdk.proto.Transaction.Builder[]{builder});
+        return new Transaction(Collections.singletonList(builder));
     }
 
     /**

@@ -1,11 +1,12 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.SignatureMap;
 import com.hedera.hashgraph.sdk.proto.SignaturePair;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.CallOptions;
-import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.ClientCalls;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.BiConsumer;
@@ -22,17 +23,32 @@ public final class Transaction {
     // A SDK [Transaction] is composed of multiple, raw protobuf transactions. These should be functionally identical,
     // with the exception of pointing to different nodes. When retrying a transaction after a network error or
     // retry-able status response, we try a different transaction and thus a different node.
-    private final com.hedera.hashgraph.sdk.proto.Transaction.Builder[] raw;
-    private final List<SignatureMap.Builder> signatureMaps;
+    private final List<com.hedera.hashgraph.sdk.proto.Transaction.Builder> transactions;
 
-    Transaction(com.hedera.hashgraph.sdk.proto.Transaction.Builder[] raw) {
-        signatureMaps = new ArrayList<>(raw.length);
+    // The parsed transaction body for the corresponding transaction.
+    private final List<com.hedera.hashgraph.sdk.proto.TransactionBody> transactionBodies;
 
-        for (int i = 0; i < raw.length; i++) {
-            signatureMaps.add(SignatureMap.newBuilder());
+    // The signature builder for the corresponding transaction.
+    private final List<SignatureMap.Builder> signatureBuilders;
+
+    Transaction(List<com.hedera.hashgraph.sdk.proto.Transaction.Builder> transactions) {
+        this.transactions = transactions;
+        this.signatureBuilders = new ArrayList<>(transactions.size());
+        this.transactionBodies = new ArrayList<>(transactions.size());
+
+        for (var tx : transactions) {
+            var bodyBytes = tx.getBodyBytes();
+            TransactionBody body;
+
+            try {
+                body = TransactionBody.parseFrom(bodyBytes);
+            } catch (InvalidProtocolBufferException e) {
+                throw new RuntimeException(e);
+            }
+
+            transactionBodies.add(body);
+            signatureBuilders.add(SignatureMap.newBuilder());
         }
-
-        this.raw = raw;
     }
 
     public Transaction sign(PrivateKey privateKey) {
@@ -40,43 +56,39 @@ public final class Transaction {
     }
 
     public Transaction signWith(PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
-        var signatureBytes = transactionSigner.apply(raw[0].getBodyBytes().toByteArray());
+        var signatureBytes = transactionSigner.apply(transactions.get(0).getBodyBytes().toByteArray());
 
         SignaturePair signature = publicKey.toSignaturePairProtobuf(signatureBytes);
 
-        signatureMaps.get(0).addSigPair(signature);
+        signatureBuilders.get(0).addSigPair(signature);
 
         return this;
     }
 
     // TODO: Return <TransactionId>
-    public TransactionResponse execute() {
-        return executeAsync().join();
+    public TransactionResponse execute(Client client) {
+        return executeAsync(client).join();
     }
 
     // TODO: Return <TransactionId>
-    public CompletableFuture<TransactionResponse> executeAsync() {
-        // TODO: Move to <Client>
-        var chan = ManagedChannelBuilder.forTarget("0.testnet.hedera.com:50211")
-            .usePlaintext()
-            // TODO: Inject project version
-            .userAgent("hedera-sdk-java/2.0.0-SNAPSHOT")
-            .build();
-
+    public CompletableFuture<TransactionResponse> executeAsync(Client client) {
+        var nodeId = AccountId.fromProtobuf(transactionBodies.get(0).getNodeAccountID());
         var method = CryptoServiceGrpc.getCreateAccountMethod();
-        var call = chan.newCall(method, CallOptions.DEFAULT);
+
+        var channel = client.getChannel(nodeId);
+        var call = channel.newCall(method, CallOptions.DEFAULT);
 
         return toCompletableFuture(ClientCalls.futureUnaryCall(call, toProtobuf()));
     }
 
     // TODO: Return <TransactionId>
     @SuppressWarnings("FutureReturnValueIgnored")
-    public void executeAsync(BiConsumer<TransactionResponse, Throwable> callback) {
-        executeAsync().whenComplete(callback);
+    public void executeAsync(Client client, BiConsumer<TransactionResponse, Throwable> callback) {
+        executeAsync(client).whenComplete(callback);
     }
 
     private com.hedera.hashgraph.sdk.proto.Transaction toProtobuf() {
-        raw[0].setSigMap(signatureMaps.get(0));
-        return raw[0].build();
+        transactions.get(0).setSigMap(signatureBuilders.get(0));
+        return transactions.get(0).build();
     }
 }
