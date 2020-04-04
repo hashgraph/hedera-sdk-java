@@ -8,6 +8,8 @@ import com.hedera.hashgraph.sdk.proto.Response;
 /**
  * Get the balance of a Hedera crypto-currency account. This returns only the balance, so it is a
  * smaller and faster reply than {@link AccountInfoQuery}.
+ *
+ * <p>This query is free.
  */
 public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalanceQuery> {
     private final CryptoGetAccountBalanceQuery.Builder builder;

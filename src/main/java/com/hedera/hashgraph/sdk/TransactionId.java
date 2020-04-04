@@ -57,10 +57,21 @@ public final class TransactionId {
         return lastInstant;
     }
 
+    static TransactionId fromProtobuf(TransactionID transactionID) {
+        return new TransactionId(
+                AccountId.fromProtobuf(transactionID.getAccountID()),
+                InstantConverter.fromProtobuf(transactionID.getTransactionValidStart()));
+    }
+
     TransactionID toProtobuf() {
         return TransactionID.newBuilder()
                 .setAccountID(accountId.toProtobuf())
                 .setTransactionValidStart(InstantConverter.toProtobuf(validStart))
                 .build();
+    }
+
+    @Override
+    public String toString() {
+        return "" + accountId + "@" + validStart.getEpochSecond() + "." + validStart.getNano();
     }
 }

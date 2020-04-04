@@ -1,0 +1,23 @@
+package com.hedera.hashgraph.sdk;
+
+import com.hedera.hashgraph.sdk.proto.TopicID;
+import javax.annotation.Nonnegative;
+
+public final class TopicId extends EntityId {
+    public TopicId(@Nonnegative long num) {
+        super(0, 0, num);
+    }
+
+    @SuppressWarnings("InconsistentOverloads")
+    public TopicId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num) {
+        super(shard, realm, num);
+    }
+
+    static TopicId fromProtobuf(TopicID fileId) {
+        return new TopicId(fileId.getShardNum(), fileId.getRealmNum(), fileId.getTopicNum());
+    }
+
+    TopicID toProtobuf() {
+        return TopicID.newBuilder().setShardNum(shard).setRealmNum(realm).setTopicNum(num).build();
+    }
+}

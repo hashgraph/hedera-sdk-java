@@ -7,7 +7,6 @@ import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.SignatureMap;
 import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.CallOptions;
 import io.grpc.stub.ClientCalls;
 import java.util.ArrayList;
@@ -66,25 +65,27 @@ public final class Transaction {
         return this;
     }
 
-    // TODO: Return <TransactionId>
-    public TransactionResponse execute(Client client) {
+    public TransactionId execute(Client client) {
         return executeAsync(client).join();
     }
 
-    // TODO: Return <TransactionId>
-    public CompletableFuture<TransactionResponse> executeAsync(Client client) {
-        var nodeId = AccountId.fromProtobuf(transactionBodies.get(0).getNodeAccountID());
+    public CompletableFuture<TransactionId> executeAsync(Client client) {
+        var transactionBody = transactionBodies.get(0);
+
+        var nodeId = AccountId.fromProtobuf(transactionBody.getNodeAccountID());
         var method = CryptoServiceGrpc.getCreateAccountMethod();
 
         var channel = client.getChannel(nodeId);
         var call = channel.newCall(method, CallOptions.DEFAULT);
 
-        return toCompletableFuture(ClientCalls.futureUnaryCall(call, toProtobuf()));
+        return toCompletableFuture(ClientCalls.futureUnaryCall(call, toProtobuf()))
+                .thenApply(
+                        (response) ->
+                                TransactionId.fromProtobuf(transactionBody.getTransactionID()));
     }
 
-    // TODO: Return <TransactionId>
     @SuppressWarnings("FutureReturnValueIgnored")
-    public void executeAsync(Client client, BiConsumer<TransactionResponse, Throwable> callback) {
+    public void executeAsync(Client client, BiConsumer<TransactionId, Throwable> callback) {
         executeAsync(client).whenComplete(callback);
     }
 

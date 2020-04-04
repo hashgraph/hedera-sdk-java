@@ -3,6 +3,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransactionId;
+import com.hedera.hashgraph.sdk.TransactionReceiptQuery;
 import org.junit.jupiter.api.Test;
 
 class AccountCreateTransactionIntegrationTest {
@@ -25,9 +26,14 @@ class AccountCreateTransactionIntegrationTest {
 
             transaction.sign(operatorKey);
 
-            var transactionResponse = transaction.execute(client);
+            var transactionId = transaction.execute(client);
 
-            System.err.println("response = " + transactionResponse.toString());
+            System.err.println("response = " + transactionId.toString());
+
+            var transactionReceipt =
+                    new TransactionReceiptQuery().setTransactionId(transactionId).execute(client);
+
+            System.err.println(transactionReceipt);
         }
     }
 }
