@@ -28,13 +28,18 @@ dependencies {
     // https://github.com/uber/NullAway
     errorprone "com.uber.nullaway:nullaway:0.7.9"
 
+    // https://github.com/grpc/grpc-java-api-checker
+    errorprone "io.grpc:grpc-java-api-checker:1.1.0"
+
     // https://github.com/eclipse-ee4j/common-annotations-api
     implementation "jakarta.annotation:jakarta.annotation-api:1.3.5"
 
-    // Converts between Java 8 CompletableFuture and Guava ListenableFuture
-    // https://guava.dev/releases/25.0-jre/api/docs/com/google/common/util/concurrent/FluentFuture.html
-    // https://github.com/lukas-krecan/future-converter#java8-guava
-    implementation "net.javacrumbs.future-converter:future-converter-java8-guava:1.2.0"
+    // NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
+    //       use CompletableFuture directly.
+    // https://github.com/stefan-zobel/streamsupport
+    // https://developer.android.com/about/dashboards/index.html
+    implementation 'net.sourceforge.streamsupport:streamsupport:1.7.2'
+    implementation 'net.sourceforge.streamsupport:streamsupport-cfuture:1.7.2'
 
     // NOTE: BouncyCastle is frozen at v1.60 for compatibility with Corda <https://www.corda.net/>
     // <https://github.com/corda/corda/blob/2c10b6c3b9dace7831b5da73a065c3269a703d85/constants.properties#L23>
@@ -87,6 +92,16 @@ tasks.withType(JavaCompile).configureEach {
         check("NullAway", CheckSeverity.ERROR)
         option("NullAway:AnnotatedPackages", "com.hedera.hashgraph.sdk")
         option("NullAway:TreatGeneratedAsUnannotated", "true")
+
+        // https://github.com/grpc/grpc-java-api-checker
+        check("GrpcExperimentalApi", CheckSeverity.ERROR)
+        check("GrpcInternal", CheckSeverity.ERROR)
+
+        // Enable _all_ error prone checks then selectively disble
+        // Checks that are default-disabled are enabled as warnings
+        allDisabledChecksAsWarnings = true
+        disable("TryFailRefactoring")
+        disable("ThrowSpecificExceptions")
 
         // Ignore generated and protobuf code
         disableWarningsInGeneratedCode = true

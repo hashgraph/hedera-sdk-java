@@ -2,13 +2,15 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import io.grpc.*;
+import io.grpc.CallOptions;
+import io.grpc.ClientCall;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import io.grpc.MethodDescriptor;
 import io.grpc.stub.ClientCalls;
+import java8.util.concurrent.CompletableFuture;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-
-import static net.javacrumbs.futureconverter.java8guava.FutureConverter.toCompletableFuture;
+import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
 
 public final class Transaction {
     // A SDK [Transaction] is composed of multiple, raw protobuf transactions. These should be functionally identical,
@@ -30,7 +32,6 @@ public final class Transaction {
         // TODO: Move to <Client>
         ManagedChannel chan = ManagedChannelBuilder.forTarget("0.testnet.hedera.com:50211")
             .usePlaintext()
-            .directExecutor()
             // TODO: Inject project version
             .userAgent("hedera-sdk-java/2.0.0-SNAPSHOT")
             .build();

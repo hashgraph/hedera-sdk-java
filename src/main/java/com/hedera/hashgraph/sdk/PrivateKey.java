@@ -2,7 +2,6 @@ package com.hedera.hashgraph.sdk;
 
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 // TODO: Multiple algorithms
@@ -14,13 +13,13 @@ import java.security.SecureRandom;
  * A private key on the Hedera™ network.
  */
 public final class PrivateKey extends Key {
-    private static final ThreadLocal<SecureRandom> secureRandom = ThreadLocal.withInitial(() -> {
-        try {
-            return SecureRandom.getInstanceStrong();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+    @SuppressWarnings("AnonymousHasLambdaAlternative")
+    private static final ThreadLocal<SecureRandom> secureRandom = new ThreadLocal<SecureRandom>() {
+        @Override
+        protected SecureRandom initialValue() {
+            return new SecureRandom();
         }
-    });
+    };
 
     private final byte[] keyData;
 
