@@ -4,6 +4,7 @@ import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.concurrent.ThreadLocalRandom;
 import javax.annotation.Nullable;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -17,15 +18,6 @@ import org.bouncycastle.util.encoders.Hex;
 
 /** A private key on the Hedera™ network. */
 public final class PrivateKey extends Key {
-    @SuppressWarnings("AnonymousHasLambdaAlternative")
-    private static final ThreadLocal<SecureRandom> secureRandom =
-            new ThreadLocal<SecureRandom>() {
-                @Override
-                protected SecureRandom initialValue() {
-                    return new SecureRandom();
-                }
-            };
-
     private final byte[] keyData;
 
     // Cache the derivation of the public key
@@ -42,7 +34,7 @@ public final class PrivateKey extends Key {
      */
     public static PrivateKey generateEd25519() {
         byte[] keyData = new byte[Ed25519.SECRET_KEY_SIZE];
-        secureRandom.get().nextBytes(keyData);
+        ThreadLocalSecureRandom.current().nextBytes(keyData);
 
         return new PrivateKey(keyData);
     }
