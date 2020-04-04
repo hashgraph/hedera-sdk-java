@@ -11,6 +11,24 @@ This project is currently under active development.
 
 Join the [Hedera discord](https://hedera.com/discord) for the latest updates and announcements.
 
+## Development
+
+### Dependencies
+
+ * [Java Development Kit (JDK)](https://adoptopenjdk.net/) v8+
+
+### Compile
+
+```sh
+$ ./gradlew compileJava
+```
+
+### Test
+
+```sh
+$ ./gradlew test
+```
+
 ## Contributing to this Project
 
 We welcome participation from all developers!
