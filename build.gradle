@@ -1,18 +1,18 @@
 import net.ltgt.gradle.errorprone.CheckSeverity
 
 plugins {
-    id "java"
-    id "idea"
-    id "com.google.protobuf" version "0.8.12"
-    id "net.ltgt.errorprone" version "1.1.1"
+	id "java"
+	id "idea"
+	id "com.google.protobuf" version "0.8.12"
+	id "net.ltgt.errorprone" version "1.1.1"
 
-    // Spotless: Keep your code spotless with Gradle
-    // https://github.com/diffplug/spotless
-    id "com.diffplug.gradle.spotless" version "3.28.1"
+	// Spotless: Keep your code spotless with Gradle
+	// https://github.com/diffplug/spotless
+	id "com.diffplug.gradle.spotless" version "3.28.1"
 
-    // Gradle plugin to discover dependency updates
-    // <https://github.com/ben-manes/gradle-versions-plugin>
-    id "com.github.ben-manes.versions" version "0.28.0"
+	// Gradle plugin to discover dependency updates
+	// <https://github.com/ben-manes/gradle-versions-plugin>
+	id "com.github.ben-manes.versions" version "0.28.0"
 }
 
 group = "com.hedera.hashgraph"
@@ -22,161 +22,166 @@ description = "Hedera™ Hashgraph SDK for Java"
 sourceCompatibility = 12
 
 repositories {
-    mavenCentral()
-    maven { url 'https://jitpack.io' }
+	mavenCentral()
+	maven { url 'https://jitpack.io' }
 }
 
 configurations {
-    integrationTestImplementation.extendsFrom testImplementation
-    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+	integrationTestImplementation.extendsFrom testImplementation
+	integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 dependencies {
-    // https://github.com/google/error-prone
-    // https://errorprone.info/
-    errorprone "com.google.errorprone:error_prone_core:2.3.4"
+	// https://github.com/google/error-prone
+	// https://errorprone.info/
+	errorprone "com.google.errorprone:error_prone_core:2.3.4"
 
-    // https://github.com/uber/NullAway
-    errorprone "com.uber.nullaway:nullaway:0.7.9"
+	// https://github.com/uber/NullAway
+	errorprone "com.uber.nullaway:nullaway:0.7.9"
 
-    // https://github.com/grpc/grpc-java-api-checker
-    errorprone "io.grpc:grpc-java-api-checker:1.1.0"
+	// https://github.com/grpc/grpc-java-api-checker
+	errorprone "io.grpc:grpc-java-api-checker:1.1.0"
 
-    // https://github.com/bsideup/jabel
-    annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:0.2.0'
+	// https://github.com/bsideup/jabel
+	annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:0.2.0'
 
-    // https://github.com/eclipse-ee4j/common-annotations-api
-    implementation "jakarta.annotation:jakarta.annotation-api:2.0.0-RC1"
+	// https://github.com/eclipse-ee4j/common-annotations-api
+	implementation "jakarta.annotation:jakarta.annotation-api:2.0.0-RC1"
 
-    // NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
-    //       use CompletableFuture directly.
-    // https://github.com/stefan-zobel/streamsupport
-    // https://developer.android.com/about/dashboards/index.html
-    implementation "net.sourceforge.streamsupport:streamsupport:1.7.2"
-    implementation "net.sourceforge.streamsupport:streamsupport-cfuture:1.7.2"
+	// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
+	//       use CompletableFuture directly.
+	// https://github.com/stefan-zobel/streamsupport
+	// https://developer.android.com/about/dashboards/index.html
+	implementation "net.sourceforge.streamsupport:streamsupport:1.7.2"
+	implementation "net.sourceforge.streamsupport:streamsupport-cfuture:1.7.2"
 
-    // NOTE: This is to support Android API < 26.
-    implementation "org.threeten:threetenbp:1.4.2"
+	// NOTE: This is to support Android API < 26.
+	implementation "org.threeten:threetenbp:1.4.2"
 
-    // NOTE: BouncyCastle is frozen at v1.60 for compatibility with Corda <https://www.corda.net/>
-    // <https://github.com/corda/corda/blob/2c10b6c3b9dace7831b5da73a065c3269a703d85/constants.properties#L23>
-    implementation "org.bouncycastle:bcprov-jdk15on:1.60"
+	// NOTE: BouncyCastle is frozen at v1.60 for compatibility with Corda <https://www.corda.net/>
+	// <https://github.com/corda/corda/blob/2c10b6c3b9dace7831b5da73a065c3269a703d85/constants.properties#L23>
+	implementation "org.bouncycastle:bcprov-jdk15on:1.60"
 
-    // Protobuf Lite is used to maintain easy compatibility with Android
-    // https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
-    implementation "com.google.protobuf:protobuf-javalite:3.11.4"
+	// Protobuf Lite is used to maintain easy compatibility with Android
+	// https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
+	implementation "com.google.protobuf:protobuf-javalite:3.11.4"
 
-    implementation "io.grpc:grpc-api:1.28.1"
-    implementation "io.grpc:grpc-protobuf-lite:1.28.1"
-    implementation "io.grpc:grpc-stub:1.28.1"
+	implementation "io.grpc:grpc-api:1.28.1"
+	implementation "io.grpc:grpc-protobuf-lite:1.28.1"
+	implementation "io.grpc:grpc-stub:1.28.1"
 
-    testImplementation "org.junit.jupiter:junit-jupiter-engine:5.6.1"
-    testImplementation "org.assertj:assertj-core:3.15.0"
+	testImplementation "org.junit.jupiter:junit-jupiter-engine:5.6.1"
+	testImplementation "org.assertj:assertj-core:3.15.0"
 
-    integrationTestRuntimeOnly "io.grpc:grpc-netty-shaded:1.28.1"
+	integrationTestRuntimeOnly "io.grpc:grpc-netty-shaded:1.28.1"
 }
 
 // https://github.com/google/protobuf-gradle-plugin
 protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:3.11.4"
-    }
-    plugins {
-        grpc {
-            artifact = "io.grpc:protoc-gen-grpc-java:1.28.1"
-        }
-    }
-    generateProtoTasks {
-        all().each { task ->
-            task.builtins {
-                java {
-                    option "lite"
-                }
-            }
+	protoc {
+		artifact = "com.google.protobuf:protoc:3.11.4"
+	}
+	plugins {
+		grpc {
+			artifact = "io.grpc:protoc-gen-grpc-java:1.28.1"
+		}
+	}
+	generateProtoTasks {
+		all().each { task ->
+			task.builtins {
+				java {
+					option "lite"
+				}
+			}
 
-            task.plugins {
-                grpc {
-                    option "lite"
-                }
-            }
-        }
-    }
+			task.plugins {
+				grpc {
+					option "lite"
+				}
+			}
+		}
+	}
 }
 
 tasks.withType(JavaCompile).configureEach {
-    // https://github.com/gradle/gradle/issues/2510#issuecomment-604986414
-    // release = 8
-    compileJava {
-        options.compilerArgs = [
-                "--release", "8" // Avoid using Java 12 APIs
-        ]
-    }
+	// https://github.com/gradle/gradle/issues/2510#issuecomment-604986414
+	// release = 8
+	compileJava {
+		options.compilerArgs = [
+			"--release",
+			"8" // Avoid using Java 12 APIs
+		]
+	}
 
-    options.encoding = "UTF-8"
-    options.errorprone {
-        // https://github.com/uber/NullAway
-        check("NullAway", CheckSeverity.ERROR)
-        option("NullAway:AnnotatedPackages", "com.hedera.hashgraph.sdk")
-        option("NullAway:TreatGeneratedAsUnannotated", "true")
+	options.encoding = "UTF-8"
+	options.errorprone {
+		// https://github.com/uber/NullAway
+		check("NullAway", CheckSeverity.ERROR)
+		option("NullAway:AnnotatedPackages", "com.hedera.hashgraph.sdk")
+		option("NullAway:TreatGeneratedAsUnannotated", "true")
 
-        // https://github.com/grpc/grpc-java-api-checker
-        check("GrpcExperimentalApi", CheckSeverity.ERROR)
-        check("GrpcInternal", CheckSeverity.ERROR)
+		// https://github.com/grpc/grpc-java-api-checker
+		check("GrpcExperimentalApi", CheckSeverity.ERROR)
+		check("GrpcInternal", CheckSeverity.ERROR)
 
-        // Enable _all_ error prone checks then selectively disble
-        // Checks that are default-disabled are enabled as warnings
-        allDisabledChecksAsWarnings = true
-        disable("TryFailRefactoring")
-        disable("ThrowSpecificExceptions")
+		// Enable _all_ error prone checks then selectively disble
+		// Checks that are default-disabled are enabled as warnings
+		allDisabledChecksAsWarnings = true
+		disable("TryFailRefactoring")
+		disable("ThrowSpecificExceptions")
 
-        // Ignore generated and protobuf code
-        disableWarningsInGeneratedCode = true
-        excludedPaths = ".*generated.*"
-    }
+		// Ignore generated and protobuf code
+		disableWarningsInGeneratedCode = true
+		excludedPaths = ".*generated.*"
+	}
 }
 
 sourceSets {
-    integrationTest {
-        java.srcDir "$projectDir/src/integrationTest/java"
+	integrationTest {
+		java.srcDir "$projectDir/src/integrationTest/java"
 
-        compileClasspath += sourceSets.main.output
-        runtimeClasspath += sourceSets.main.output
-    }
+		compileClasspath += sourceSets.main.output
+		runtimeClasspath += sourceSets.main.output
+	}
 }
 
 idea {
-    module {
-        sourceDirs -= file("src/integrationTest/java")
-        testSourceDirs += file("src/integrationTest/java")
-    }
+	module {
+		sourceDirs -= file("src/integrationTest/java")
+		testSourceDirs += file("src/integrationTest/java")
+	}
 }
 
 task integrationTest(type: Test) {
-    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    classpath = sourceSets.integrationTest.runtimeClasspath
+	testClassesDirs = sourceSets.integrationTest.output.classesDirs
+	classpath = sourceSets.integrationTest.runtimeClasspath
 }
 
 tasks.withType(Test) {
-    useJUnitPlatform()
+	useJUnitPlatform()
 
-    // this task will fail on the first failed test
-    failFast = true
+	// this task will fail on the first failed test
+	failFast = true
 
-    // maximum number of test processes
-    maxParallelForks = Runtime.runtime.availableProcessors() / 2
+	// maximum number of test processes
+	maxParallelForks = Runtime.runtime.availableProcessors() / 2
 
-    // maximum heap size for the process
-    maxHeapSize = "1G"
+	// maximum heap size for the process
+	maxHeapSize = "1G"
 
-    // emit logs per passed or failed test
-    testLogging {
-        exceptionFormat = 'full'
-        events "passed", "skipped", "failed", "standardOut", "standardError"
-    }
+	// emit logs per passed or failed test
+	testLogging {
+		exceptionFormat = 'full'
+		events "passed", "skipped", "failed", "standardOut", "standardError"
+	}
 }
 
 spotless {
-    java {
-        googleJavaFormat().aosp()
-    }
+	java {
+		googleJavaFormat().aosp()
+	}
+	groovyGradle {
+		target "*.gradle"
+		greclipse()
+	}
 }
