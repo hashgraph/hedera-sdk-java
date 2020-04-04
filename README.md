@@ -1,4 +1,5 @@
 ![](https://img.shields.io/badge/java-8%2B-blue)
+![](https://img.shields.io/badge/android-19%2B-blue)
 
 # Hedera™ Hashgraph Java SDK
 
