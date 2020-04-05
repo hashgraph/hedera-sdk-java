@@ -669,13 +669,13 @@ public enum Status {
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
                         "network return unrecognized response code; update your SDK or open an issue");
-
-            default:
-                throw new IllegalArgumentException(
-                        "response code "
-                                + code.name()
-                                + " is unhandled by the SDK; update your SDK or open an issue");
         }
+
+        // NOTE: This should be unreachable as error prone has enum exhaustiveness checking
+        throw new IllegalArgumentException(
+                "response code "
+                        + code.name()
+                        + " is unhandled by the SDK; update your SDK or open an issue");
     }
 
     @Override

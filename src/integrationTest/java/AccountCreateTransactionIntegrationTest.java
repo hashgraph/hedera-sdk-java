@@ -6,6 +6,8 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceiptQuery;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 class AccountCreateTransactionIntegrationTest {
     @Test
     void createsAccount() {
@@ -28,12 +30,10 @@ class AccountCreateTransactionIntegrationTest {
 
             var transactionId = transaction.execute(client);
 
-            System.err.println("response = " + transactionId.toString());
-
             var transactionReceipt =
                     new TransactionReceiptQuery().setTransactionId(transactionId).execute(client);
 
-            System.err.println(transactionReceipt);
+            assertThat(transactionReceipt.accountId.isPresent()).isTrue();
         }
     }
 }

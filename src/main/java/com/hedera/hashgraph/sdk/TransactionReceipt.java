@@ -5,9 +5,7 @@ import java8.util.Optional;
 public final class TransactionReceipt {
     public final Status status;
 
-    public final ExchangeRate currentExchangeRate;
-
-    public final ExchangeRate nextExchangeRate;
+    public final ExchangeRate exchangeRate;
 
     public final Optional<AccountId> accountId;
 
@@ -23,8 +21,7 @@ public final class TransactionReceipt {
 
     TransactionReceipt(
             Status status,
-            ExchangeRate currentExchangeRate,
-            ExchangeRate nextExchangeRate,
+            ExchangeRate exchangeRate,
             Optional<AccountId> accountId,
             Optional<FileId> fileId,
             Optional<ContractId> contractId,
@@ -32,8 +29,7 @@ public final class TransactionReceipt {
             Optional<Long> topicSequenceNumber,
             Optional<byte[]> topicRunningHash) {
         this.status = status;
-        this.currentExchangeRate = currentExchangeRate;
-        this.nextExchangeRate = nextExchangeRate;
+        this.exchangeRate = exchangeRate;
         this.accountId = accountId;
         this.fileId = fileId;
         this.contractId = contractId;
@@ -46,13 +42,12 @@ public final class TransactionReceipt {
         var status = Status.valueOf(pb.getStatus());
 
         var rate = pb.getExchangeRate();
-        var currentExchangeRate = ExchangeRate.fromProtobuf(rate.getCurrentRate());
-        var nextExchangeRate = ExchangeRate.fromProtobuf(rate.getNextRate());
+        var exchangeRate = ExchangeRate.fromProtobuf(rate.getCurrentRate());
 
-        var accountId = Optional.ofNullable(pb.getAccountID()).map(AccountId::fromProtobuf);
-        var fileId = Optional.ofNullable(pb.getFileID()).map(FileId::fromProtobuf);
-        var contractId = Optional.ofNullable(pb.getContractID()).map(ContractId::fromProtobuf);
-        var topicId = Optional.ofNullable(pb.getTopicID()).map(TopicId::fromProtobuf);
+        var accountId = pb.hasAccountID() ? Optional.of(AccountId.fromProtobuf(pb.getAccountID())) : Optional.<AccountId>empty();
+        var fileId = pb.hasFileID() ? Optional.of(FileId.fromProtobuf(pb.getFileID())) : Optional.<FileId>empty();
+        var contractId = pb.hasContractID() ? Optional.of(ContractId.fromProtobuf(pb.getContractID())) : Optional.<ContractId>empty();
+        var topicId = pb.hasTopicID() ? Optional.of(TopicId.fromProtobuf(pb.getTopicID())) : Optional.<TopicId>empty();
 
         var topicSequenceNumber =
                 pb.getTopicSequenceNumber() == 0
@@ -66,8 +61,7 @@ public final class TransactionReceipt {
 
         return new TransactionReceipt(
                 status,
-                currentExchangeRate,
-                nextExchangeRate,
+                exchangeRate,
                 accountId,
                 fileId,
                 contractId,
@@ -81,10 +75,8 @@ public final class TransactionReceipt {
         return "TransactionReceipt{"
                 + "status="
                 + status
-                + ", currentExchangeRate="
-                + currentExchangeRate
-                + ", nextExchangeRate="
-                + nextExchangeRate
+                + ", exchangeRate="
+                + exchangeRate
                 + ", accountId="
                 + accountId
                 + ", fileId="

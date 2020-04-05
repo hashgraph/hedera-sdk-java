@@ -1,9 +1,12 @@
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
+import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.TransactionGetReceiptQuery;
+import io.grpc.MethodDescriptor;
 
 /**
  * Get the receipt of a transaction, given its transaction ID.
@@ -27,6 +30,7 @@ public final class TransactionReceiptQuery
      * @return {@code this}.
      */
     public TransactionReceiptQuery setTransactionId(TransactionId transactionId) {
+        System.out.println("asking for ID " + transactionId);
         builder.setTransactionID(transactionId.toProtobuf());
         return this;
     }
@@ -39,5 +43,36 @@ public final class TransactionReceiptQuery
     @Override
     protected TransactionReceipt mapResponse(Response response) {
         return TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt());
+    }
+
+    @Override
+    protected ResponseHeader getResponseHeader(Response response) {
+        return response.getTransactionGetReceipt().getHeader();
+    }
+
+    @Override
+    protected MethodDescriptor<Query, Response> getMethodDescriptor() {
+        return CryptoServiceGrpc.getGetTransactionReceiptsMethod();
+    }
+
+    @Override
+    protected boolean shouldRetry(Response response) {
+        if (super.shouldRetry(response)) return true;
+
+        var receiptStatus = Status.valueOf(response.getTransactionGetReceipt().getReceipt().getStatus());
+        switch (receiptStatus) {
+            case Busy:
+                // node is busy
+            case Unknown:
+                // still in the node's queue
+            case Ok:
+                // accepted but has not reached consensus
+            case ReceiptNotFound:
+                // has reached consensus but not generated
+                return true;
+
+            default:
+                return false;
+        }
     }
 }
