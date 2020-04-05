@@ -19,7 +19,7 @@ import java8.util.function.BiConsumer;
 import org.threeten.bp.Duration;
 
 public abstract class QueryBuilder<R, T extends QueryBuilder<R, T>> {
-    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(10);
+    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(30);
 
     private final Query.Builder builder;
 

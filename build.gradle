@@ -66,12 +66,17 @@ dependencies {
 	// https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
 	implementation "com.google.protobuf:protobuf-javalite:3.11.4"
 
+	// https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+	implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
+
 	implementation "io.grpc:grpc-api:1.28.1"
 	implementation "io.grpc:grpc-protobuf-lite:1.28.1"
 	implementation "io.grpc:grpc-stub:1.28.1"
 
 	testImplementation "org.junit.jupiter:junit-jupiter-engine:5.6.1"
 	testImplementation "org.assertj:assertj-core:3.15.0"
+
+	testRuntimeOnly "org.slf4j:slf4j-simple:2.0.0-alpha1"
 
 	integrationTestRuntimeOnly "io.grpc:grpc-netty-shaded:1.28.1"
 }
@@ -159,6 +164,9 @@ task integrationTest(type: Test) {
 
 tasks.withType(Test) {
 	useJUnitPlatform()
+
+	// NOTE: Uncomment to enable trace logs in the SDK during tests
+	// jvmArgs "-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace"
 
 	// this task will fail on the first failed test
 	failFast = true
