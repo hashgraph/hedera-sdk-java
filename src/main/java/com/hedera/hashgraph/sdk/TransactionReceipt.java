@@ -44,10 +44,25 @@ public final class TransactionReceipt {
         var rate = pb.getExchangeRate();
         var exchangeRate = ExchangeRate.fromProtobuf(rate.getCurrentRate());
 
-        var accountId = pb.hasAccountID() ? Optional.of(AccountId.fromProtobuf(pb.getAccountID())) : Optional.<AccountId>empty();
-        var fileId = pb.hasFileID() ? Optional.of(FileId.fromProtobuf(pb.getFileID())) : Optional.<FileId>empty();
-        var contractId = pb.hasContractID() ? Optional.of(ContractId.fromProtobuf(pb.getContractID())) : Optional.<ContractId>empty();
-        var topicId = pb.hasTopicID() ? Optional.of(TopicId.fromProtobuf(pb.getTopicID())) : Optional.<TopicId>empty();
+        var accountId =
+                pb.hasAccountID()
+                        ? Optional.of(AccountId.fromProtobuf(pb.getAccountID()))
+                        : Optional.<AccountId>empty();
+
+        var fileId =
+                pb.hasFileID()
+                        ? Optional.of(FileId.fromProtobuf(pb.getFileID()))
+                        : Optional.<FileId>empty();
+
+        var contractId =
+                pb.hasContractID()
+                        ? Optional.of(ContractId.fromProtobuf(pb.getContractID()))
+                        : Optional.<ContractId>empty();
+
+        var topicId =
+                pb.hasTopicID()
+                        ? Optional.of(TopicId.fromProtobuf(pb.getTopicID()))
+                        : Optional.<TopicId>empty();
 
         var topicSequenceNumber =
                 pb.getTopicSequenceNumber() == 0

@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.collect.Iterables;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.errorprone.annotations.Var;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -9,15 +10,23 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /** Managed client for use on the Hedera Hashgraph network. */
 public final class Client implements AutoCloseable {
+    final ExecutorService executor;
     private final Iterator<AccountId> nodes;
     private final Map<AccountId, String> network;
     private Map<AccountId, ManagedChannel> channels;
 
     protected Client(Map<AccountId, String> network) {
+        this.executor =
+                Executors.newFixedThreadPool(
+                        Runtime.getRuntime().availableProcessors(),
+                        new ThreadFactoryBuilder().setNameFormat("hedera-sdk-%d").build());
+
         this.network = network;
         this.channels = new HashMap<>(network.size());
 
@@ -130,6 +139,7 @@ public final class Client implements AutoCloseable {
                         .usePlaintext()
                         // TODO: Get the actual project version
                         .userAgent("hedera-sdk-java/2.0.0-SNAPSHOT")
+                        .executor(executor)
                         .build();
 
         channels.put(nodeId, channel);

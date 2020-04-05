@@ -59,7 +59,8 @@ public final class TransactionReceiptQuery
     protected boolean shouldRetry(Response response) {
         if (super.shouldRetry(response)) return true;
 
-        var receiptStatus = Status.valueOf(response.getTransactionGetReceipt().getReceipt().getStatus());
+        var receiptStatus =
+                Status.valueOf(response.getTransactionGetReceipt().getReceipt().getStatus());
         switch (receiptStatus) {
             case Busy:
                 // node is busy
