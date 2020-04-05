@@ -2,9 +2,11 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import java.util.Collections;
+import java8.util.concurrent.CompletableFuture;
 import org.threeten.bp.Duration;
 
-public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
+public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
+        extends Executable<TransactionId> {
     // Default auto renew duration for accounts, contracts, topics, and files (entities)
     protected static final Duration DEFAULT_AUTO_RENEW_PERIOD = Duration.ofDays(90);
 
@@ -108,6 +110,11 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
         builder.setBodyBytes(bodyBuilder.build().toByteString());
 
         return new Transaction(Collections.singletonList(builder));
+    }
+
+    @Override
+    public CompletableFuture<TransactionId> executeAsync(Client client) {
+        return build().executeAsync(client);
     }
 
     /**

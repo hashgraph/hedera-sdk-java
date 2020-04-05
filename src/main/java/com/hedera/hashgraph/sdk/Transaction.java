@@ -12,12 +12,11 @@ import io.grpc.stub.ClientCalls;
 import java.util.ArrayList;
 import java.util.List;
 import java8.util.concurrent.CompletableFuture;
-import java8.util.function.BiConsumer;
 import java8.util.function.Function;
 
 // TODO: Handle multiple raw transactions
 
-public final class Transaction {
+public final class Transaction extends Executable<TransactionId> {
     // A SDK [Transaction] is composed of multiple, raw protobuf transactions. These should be
     // functionally identical, with the exception of pointing to different nodes. When retrying a
     // transaction after a network error or retry-able status response, we try a
@@ -65,10 +64,7 @@ public final class Transaction {
         return this;
     }
 
-    public TransactionId execute(Client client) {
-        return executeAsync(client).join();
-    }
-
+    @Override
     public CompletableFuture<TransactionId> executeAsync(Client client) {
         var transactionBody = transactionBodies.get(0);
 
@@ -82,11 +78,6 @@ public final class Transaction {
                 .thenApply(
                         (response) ->
                                 TransactionId.fromProtobuf(transactionBody.getTransactionID()));
-    }
-
-    @SuppressWarnings("FutureReturnValueIgnored")
-    public void executeAsync(Client client, BiConsumer<TransactionId, Throwable> callback) {
-        executeAsync(client).whenComplete(callback);
     }
 
     private com.hedera.hashgraph.sdk.proto.Transaction toProtobuf() {
