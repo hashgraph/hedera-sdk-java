@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 import java8.util.concurrent.CompletableFuture;
 import org.threeten.bp.Duration;
 
-class Delayer {
+final class Delayer {
     private static final Duration MIN_DELAY = Duration.ofMillis(500);
 
     private Delayer() {}

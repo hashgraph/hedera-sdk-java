@@ -2,7 +2,7 @@ package com.hedera.hashgraph.sdk;
 
 import java.security.SecureRandom;
 
-class ThreadLocalSecureRandom {
+final class ThreadLocalSecureRandom {
     @SuppressWarnings("AnonymousHasLambdaAlternative")
     private static final ThreadLocal<SecureRandom> secureRandom =
             new ThreadLocal<SecureRandom>() {
