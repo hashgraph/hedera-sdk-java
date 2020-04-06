@@ -22,6 +22,9 @@ This project is currently under a re-development effort. The goals are as follow
 
  * Minimal breaking changes
 
+Note that at the end of the effort the changes will be squashed to a single commit  on top of `master`
+to preserve development history.
+
 If you are trying this out and notice something missing from master, feel free to open an issue. It's likely
 it was simply overlooked.
 
