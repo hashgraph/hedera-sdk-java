@@ -2,6 +2,7 @@ import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TransactionReceiptQuery;
 import org.junit.jupiter.api.Test;
 
@@ -33,6 +34,7 @@ class AccountTransactionIntegrationTest {
                     .execute(client);
 
                 assertThat(transactionReceipt.accountId.isPresent()).isTrue();
+                assertThat(transactionReceipt.status).isEqualTo(Status.Success);
                 assertThat(transactionReceipt.accountId.get().num).isGreaterThan(0);
 
                 // TODO: Fetch the account info of this account

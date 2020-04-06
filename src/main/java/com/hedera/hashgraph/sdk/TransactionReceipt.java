@@ -1,36 +1,36 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
-import java8.util.Optional;
-import org.bouncycastle.util.encoders.Hex;
-import org.bouncycastle.util.encoders.HexEncoder;
+
+import javax.annotation.Nullable;
 
 public final class TransactionReceipt {
     public final Status status;
 
     public final ExchangeRate exchangeRate;
 
-    public final Optional<AccountId> accountId;
+    public final AccountId accountId;
 
-    public final Optional<FileId> fileId;
+    public final FileId fileId;
 
-    public final Optional<ContractId> contractId;
+    public final ContractId contractId;
 
-    public final Optional<TopicId> topicId;
+    public final TopicId topicId;
 
-    public final Optional<Long> topicSequenceNumber;
+    public final Long topicSequenceNumber;
 
-    public final Optional<byte[]> topicRunningHash;
+    public final byte[] topicRunningHash;
 
-    TransactionReceipt(
-            Status status,
-            ExchangeRate exchangeRate,
-            Optional<AccountId> accountId,
-            Optional<FileId> fileId,
-            Optional<ContractId> contractId,
-            Optional<TopicId> topicId,
-            Optional<Long> topicSequenceNumber,
-            Optional<byte[]> topicRunningHash) {
+    private TransactionReceipt(
+        Status status,
+        ExchangeRate exchangeRate,
+        @Nullable AccountId accountId,
+        @Nullable FileId fileId,
+        @Nullable ContractId contractId,
+        @Nullable TopicId topicId,
+        @Nullable Long topicSequenceNumber,
+        @Nullable byte[] topicRunningHash
+    ) {
         this.status = status;
         this.exchangeRate = exchangeRate;
         this.accountId = accountId;
@@ -41,51 +41,52 @@ public final class TransactionReceipt {
         this.topicRunningHash = topicRunningHash;
     }
 
-    static TransactionReceipt fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionReceipt pb) {
-        var status = Status.valueOf(pb.getStatus());
+    static TransactionReceipt fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionReceipt transactionReceipt) {
+        var status = Status.valueOf(transactionReceipt.getStatus());
 
-        var rate = pb.getExchangeRate();
+        var rate = transactionReceipt.getExchangeRate();
         var exchangeRate = ExchangeRate.fromProtobuf(rate.getCurrentRate());
 
         var accountId =
-                pb.hasAccountID()
-                        ? Optional.of(AccountId.fromProtobuf(pb.getAccountID()))
-                        : Optional.<AccountId>empty();
+            transactionReceipt.hasAccountID()
+                ? AccountId.fromProtobuf(transactionReceipt.getAccountID())
+                : null;
 
         var fileId =
-                pb.hasFileID()
-                        ? Optional.of(FileId.fromProtobuf(pb.getFileID()))
-                        : Optional.<FileId>empty();
+            transactionReceipt.hasFileID()
+                ? FileId.fromProtobuf(transactionReceipt.getFileID())
+                : null;
 
         var contractId =
-                pb.hasContractID()
-                        ? Optional.of(ContractId.fromProtobuf(pb.getContractID()))
-                        : Optional.<ContractId>empty();
+            transactionReceipt.hasContractID()
+                ? ContractId.fromProtobuf(transactionReceipt.getContractID())
+                : null;
 
         var topicId =
-                pb.hasTopicID()
-                        ? Optional.of(TopicId.fromProtobuf(pb.getTopicID()))
-                        : Optional.<TopicId>empty();
+            transactionReceipt.hasTopicID()
+                ? TopicId.fromProtobuf(transactionReceipt.getTopicID())
+                : null;
 
         var topicSequenceNumber =
-                pb.getTopicSequenceNumber() == 0
-                        ? Optional.<Long>empty()
-                        : Optional.of(pb.getTopicSequenceNumber());
+            transactionReceipt.getTopicSequenceNumber() == 0
+                ? null
+                : transactionReceipt.getTopicSequenceNumber();
 
         var topicRunningHash =
-                pb.getTopicRunningHash().isEmpty()
-                        ? Optional.<byte[]>empty()
-                        : Optional.of(pb.getTopicRunningHash().toByteArray());
+            transactionReceipt.getTopicRunningHash().isEmpty()
+                ? null
+                : transactionReceipt.getTopicRunningHash().toByteArray();
 
         return new TransactionReceipt(
-                status,
-                exchangeRate,
-                accountId,
-                fileId,
-                contractId,
-                topicId,
-                topicSequenceNumber,
-                topicRunningHash);
+            status,
+            exchangeRate,
+            accountId,
+            fileId,
+            contractId,
+            topicId,
+            topicSequenceNumber,
+            topicRunningHash
+        );
     }
 
     @Override
