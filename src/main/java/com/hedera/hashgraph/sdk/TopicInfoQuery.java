@@ -13,7 +13,12 @@ public final class TopicInfoQuery extends QueryBuilder<TopicInfo, TopicInfoQuery
 
     @Override
     protected ResponseHeader mapResponseHeader(Response response) {
-        return null;
+        return response.getConsensusGetTopicInfo().getHeader();
+    }
+
+    @Override
+    protected QueryHeader mapRequestHeader(Query request) {
+        return request.getConsensusGetTopicInfo().getHeader();
     }
 
     @Override

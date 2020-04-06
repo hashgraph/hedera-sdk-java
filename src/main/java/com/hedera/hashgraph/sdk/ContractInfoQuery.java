@@ -13,7 +13,12 @@ public final class ContractInfoQuery extends QueryBuilder<ContractInfo, Contract
 
     @Override
     protected ResponseHeader mapResponseHeader(Response response) {
-        return null;
+        return response.getContractGetInfo().getHeader();
+    }
+
+    @Override
+    protected QueryHeader mapRequestHeader(Query request) {
+        return request.getContractGetInfo().getHeader();
     }
 
     @Override

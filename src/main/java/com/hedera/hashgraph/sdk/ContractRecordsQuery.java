@@ -16,7 +16,12 @@ public final class ContractRecordsQuery extends QueryBuilder<List<Void>, Contrac
 
     @Override
     protected ResponseHeader mapResponseHeader(Response response) {
-        return null;
+        return response.getContractGetRecordsResponse().getHeader();
+    }
+
+    @Override
+    protected QueryHeader mapRequestHeader(Query request) {
+        return request.getContractGetRecords().getHeader();
     }
 
     @Override

@@ -14,7 +14,12 @@ public final class TransactionRecordQuery extends QueryBuilder<Void, Transaction
 
     @Override
     protected ResponseHeader mapResponseHeader(Response response) {
-        return null;
+        return response.getTransactionGetRecord().getHeader();
+    }
+
+    @Override
+    protected QueryHeader mapRequestHeader(Query request) {
+        return request.getTransactionGetRecord().getHeader();
     }
 
     @Override

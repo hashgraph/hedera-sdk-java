@@ -10,6 +10,16 @@ public final class AccountDeleteTransaction extends TransactionBuilder<AccountDe
         builder = CryptoDeleteTransactionBody.newBuilder();
     }
 
+    public AccountDeleteTransaction setDeleteAccountId(AccountId deleteAccountId) {
+        builder.setDeleteAccountID(deleteAccountId.toProtobuf());
+        return this;
+    }
+
+    public AccountDeleteTransaction setTransferAccountId(AccountId transferAccountId) {
+        builder.setTransferAccountID(transferAccountId.toProtobuf());
+        return this;
+    }
+
     @Override
     protected void onBuild(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setCryptoDelete(builder);

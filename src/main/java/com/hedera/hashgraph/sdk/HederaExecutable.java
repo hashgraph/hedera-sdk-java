@@ -34,7 +34,7 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
         var channel = client.getChannel(nodeId);
         var methodDescriptor = getMethodDescriptor();
         var call = channel.newCall(methodDescriptor, CallOptions.DEFAULT);
-        var request = makeRequest();
+        var request = makeRequest(client);
         var startAt = System.nanoTime();
 
         logger.atTrace()
@@ -89,7 +89,7 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
         }).thenCompose(x -> x);
     }
 
-    protected abstract RequestT makeRequest();
+    protected abstract RequestT makeRequest(Client client);
 
     /**
      * Called after receiving the query response from Hedera. The derived class should map into its

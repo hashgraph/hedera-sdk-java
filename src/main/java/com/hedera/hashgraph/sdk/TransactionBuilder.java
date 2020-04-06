@@ -116,7 +116,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
 
             } else {
                 // no client means there must be an explicitly set node ID and transaction ID
-                throw new IllegalArgumentException(
+                throw new IllegalStateException(
                     "`client` must have an `operator` or `transactionId` must be set");
 
             }
@@ -150,7 +150,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
             return new Transaction(transactions);
         }
 
-        throw new IllegalArgumentException(
+        throw new IllegalStateException(
             "`client` must not be NULL or both a `nodeAccountId` and `transactionId` must be set");
     }
 

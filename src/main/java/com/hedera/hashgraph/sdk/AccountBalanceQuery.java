@@ -38,6 +38,11 @@ public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalance
     }
 
     @Override
+    protected boolean isPaymentRequired() {
+        return false;
+    }
+
+    @Override
     protected void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setCryptogetAccountBalance(builder.setHeader(header));
     }
@@ -50,6 +55,11 @@ public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalance
     @Override
     protected ResponseHeader mapResponseHeader(Response response) {
         return response.getCryptogetAccountBalance().getHeader();
+    }
+
+    @Override
+    protected QueryHeader mapRequestHeader(Query request) {
+        return request.getCryptogetAccountBalance().getHeader();
     }
 
     @Override

@@ -16,7 +16,12 @@ public final class AccountRecordsQuery extends QueryBuilder<List<Void>, AccountR
 
     @Override
     protected ResponseHeader mapResponseHeader(Response response) {
-        return null;
+        return response.getCryptoGetAccountRecords().getHeader();
+    }
+
+    @Override
+    protected QueryHeader mapRequestHeader(Query request) {
+        return request.getCryptoGetAccountRecords().getHeader();
     }
 
     @Override

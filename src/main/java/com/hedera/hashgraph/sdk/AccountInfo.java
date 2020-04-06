@@ -112,7 +112,7 @@ public final class AccountInfo {
     static AccountInfo fromProtobuf(CryptoGetInfoResponse.AccountInfo accountInfo) {
         var accountId = AccountId.fromProtobuf(accountInfo.getAccountID());
 
-        var proxyAccountId = accountInfo.hasProxyAccountID()
+        var proxyAccountId = accountInfo.getProxyAccountID().getAccountNum() > 0
             ? AccountId.fromProtobuf(accountInfo.getProxyAccountID())
             : null;
 

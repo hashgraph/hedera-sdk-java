@@ -14,6 +14,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
         builder = CryptoCreateTransactionBody.newBuilder();
 
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
+        setSendRecordThreshold(DEFAULT_RECORD_THRESHOLD);
         setReceiveRecordThreshold(DEFAULT_RECORD_THRESHOLD);
     }
 

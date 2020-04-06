@@ -14,7 +14,12 @@ public final class AccountStakersQuery extends QueryBuilder<Void, AccountStakers
 
     @Override
     protected ResponseHeader mapResponseHeader(Response response) {
-        return null;
+        return response.getCryptoGetProxyStakers().getHeader();
+    }
+
+    @Override
+    protected QueryHeader mapRequestHeader(Query request) {
+        return request.getCryptoGetProxyStakers().getHeader();
     }
 
     @Override

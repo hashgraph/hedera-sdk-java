@@ -14,7 +14,12 @@ public final class ContractByteCodeQuery extends QueryBuilder<ByteString, Contra
 
     @Override
     protected ResponseHeader mapResponseHeader(Response response) {
-        return null;
+        return response.getContractGetBytecodeResponse().getHeader();
+    }
+
+    @Override
+    protected QueryHeader mapRequestHeader(Query request) {
+        return request.getContractGetBytecode().getHeader();
     }
 
     @Override

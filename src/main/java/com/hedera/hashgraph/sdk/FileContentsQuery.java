@@ -14,7 +14,12 @@ public final class FileContentsQuery extends QueryBuilder<ByteString, FileConten
 
     @Override
     protected ResponseHeader mapResponseHeader(Response response) {
-        return null;
+        return response.getFileGetContents().getHeader();
+    }
+
+    @Override
+    protected QueryHeader mapRequestHeader(Query request) {
+        return request.getFileGetContents().getHeader();
     }
 
     @Override

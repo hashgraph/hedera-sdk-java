@@ -14,7 +14,12 @@ public final class ContractCallQuery extends QueryBuilder<Void, ContractCallQuer
 
     @Override
     protected ResponseHeader mapResponseHeader(Response response) {
-        return null;
+        return response.getContractCallLocal().getHeader();
+    }
+
+    @Override
+    protected QueryHeader mapRequestHeader(Query request) {
+        return request.getContractCallLocal().getHeader();
     }
 
     @Override

@@ -35,6 +35,11 @@ public final class TransactionReceiptQuery
     }
 
     @Override
+    protected boolean isPaymentRequired() {
+        return false;
+    }
+
+    @Override
     protected void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setTransactionGetReceipt(builder.setHeader(header));
     }
@@ -42,6 +47,11 @@ public final class TransactionReceiptQuery
     @Override
     protected TransactionReceipt mapResponse(Response response) {
         return TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt());
+    }
+
+    @Override
+    protected QueryHeader mapRequestHeader(Query request) {
+        return request.getTransactionGetReceipt().getHeader();
     }
 
     @Override

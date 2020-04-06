@@ -231,7 +231,7 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     }
 
     @Override
-    protected final com.hedera.hashgraph.sdk.proto.Transaction makeRequest() {
+    protected final com.hedera.hashgraph.sdk.proto.Transaction makeRequest(Client client) {
         // emplace the signatures on the transaction and build the transaction
         var tx = transactions.get(nextIndex).setSigMap(signatureBuilders.get(nextIndex)).build();
 

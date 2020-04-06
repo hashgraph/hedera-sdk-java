@@ -13,7 +13,12 @@ public final class FileInfoQuery extends QueryBuilder<FileInfo, FileInfoQuery> {
 
     @Override
     protected ResponseHeader mapResponseHeader(Response response) {
-        return null;
+        return response.getFileGetInfo().getHeader();
+    }
+
+    @Override
+    protected QueryHeader mapRequestHeader(Query request) {
+        return request.getFileGetInfo().getHeader();
     }
 
     @Override
