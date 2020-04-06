@@ -134,6 +134,7 @@ tasks.withType(JavaCompile).configureEach {
 		allDisabledChecksAsWarnings = true
 		disable("TryFailRefactoring")
 		disable("ThrowSpecificExceptions")
+		disable("FutureReturnValueIgnored")
 
 		// Ignore generated and protobuf code
 		disableWarningsInGeneratedCode = true
