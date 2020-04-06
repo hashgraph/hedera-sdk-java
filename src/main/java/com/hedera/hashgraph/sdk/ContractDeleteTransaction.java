@@ -10,6 +10,21 @@ public final class ContractDeleteTransaction extends TransactionBuilder<Contract
         builder = ContractDeleteTransactionBody.newBuilder();
     }
 
+    public ContractDeleteTransaction setContractId(ContractId contractId) {
+        builder.setContractID(contractId.toProtobuf());
+        return this;
+    }
+
+    public ContractDeleteTransaction setTransferAccountId(AccountId transferAccountId) {
+        builder.setTransferAccountID(transferAccountId.toProtobuf());
+        return this;
+    }
+
+    public ContractDeleteTransaction setTransferContractId(ContractId transferContractId) {
+        builder.setTransferContractID(transferContractId.toProtobuf());
+        return this;
+    }
+
     @Override
     protected void onBuild(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setContractDeleteInstance(builder);

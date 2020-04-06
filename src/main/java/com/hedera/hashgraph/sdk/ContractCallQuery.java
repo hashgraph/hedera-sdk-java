@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.ContractCallLocalQuery;
 import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
@@ -8,8 +9,7 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import io.grpc.MethodDescriptor;
 
-// TODO: ContractFunctionResult
-public final class ContractCallQuery extends QueryBuilder<Void, ContractCallQuery> {
+public final class ContractCallQuery extends QueryBuilder<ContractFunctionResult, ContractCallQuery> {
     private final ContractCallLocalQuery.Builder builder;
 
     public ContractCallQuery() {
@@ -18,6 +18,29 @@ public final class ContractCallQuery extends QueryBuilder<Void, ContractCallQuer
 
     public ContractCallQuery setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProtobuf());
+        return this;
+    }
+
+    public ContractCallQuery setGas(long gas) {
+        builder.setGas(gas);
+        return this;
+    }
+
+    public ContractCallQuery setFunctionParameters(ByteString functionParameters) {
+        builder.setFunctionParameters(functionParameters);
+        return this;
+    }
+
+    public ContractCallQuery setFunction(String name) {
+        return setFunction(name, new ContractFunctionParams());
+    }
+
+    public ContractCallQuery setFunction(String name, ContractFunctionParams params) {
+        return setFunctionParameters(params.toBytes(name));
+    }
+
+    public ContractCallQuery setMaxResultSize(long size) {
+        builder.setMaxResultSize(size);
         return this;
     }
 
@@ -37,8 +60,8 @@ public final class ContractCallQuery extends QueryBuilder<Void, ContractCallQuer
     }
 
     @Override
-    protected Void mapResponse(Response response) {
-        return null;
+    protected ContractFunctionResult mapResponse(Response response) {
+        return new ContractFunctionResult(response.getContractCallLocal().getFunctionResult());
     }
 
     @Override
