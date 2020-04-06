@@ -8,6 +8,8 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.ResponseType;
 import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import io.grpc.MethodDescriptor;
+import java8.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -36,8 +38,6 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
     QueryBuilder() {
         builder = Query.newBuilder();
         headerBuilder = QueryHeader.newBuilder();
-
-        headerBuilder.setResponseType(ResponseType.ANSWER_ONLY);
     }
 
     public T setQueryPayment(long queryPayment) {
@@ -66,53 +66,64 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
     protected abstract QueryHeader mapRequestHeader(Query request);
 
     @Override
-    protected void onExecute(Client client) {
+    protected CompletableFuture<Void> onExecuteAsync(Client client) {
+        if ((paymentTransactions != null) || !isPaymentRequired()) {
+            return CompletableFuture.completedFuture(null);
+        }
+
         // Generate payment transactions if one was
         // not set and payment is required
-        if (paymentTransactions == null && isPaymentRequired()) {
-            var operator = client.getOperator();
 
-            if (operator == null) {
-                throw new IllegalStateException(
-                    "`client` must have an `operator` or an explicit payment transaction must be provided");
-            }
+        var operator = client.getOperator();
 
-            if (queryPayment == null) {
-                // TODO: Go out and try to get the cost
-                throw new IllegalStateException("unhandled need cost query");
-            }
-
-            paymentTransactionId = TransactionId.generate(operator.accountId);
-
-            // Like how TransactionBuilder has to build (N / 3) native transactions to handle multi-node retry,
-            // so too does the QueryBuilder for payment transactions
-
-            var size = client.getNumberOfNodesForSuperMajority();
-            paymentTransactions = new ArrayList<>(size);
-            paymentTransactionNodeIds = new ArrayList<>(size);
-
-            for (var i = 0; i < size; ++i) {
-                var nodeId = client.getNextNodeId();
-
-                paymentTransactionNodeIds.add(nodeId);
-                paymentTransactions.add(new CryptoTransferTransaction()
-                    .setTransactionId(paymentTransactionId)
-                    .setNodeAccountId(nodeId)
-                    .setMaxTransactionFee(100000000) // 1 Hbar
-                    .addSender(operator.accountId, queryPayment)
-                    .addRecipient(nodeId, queryPayment)
-                    .build(null)
-                    .signWith(operator.publicKey, operator.transactionSigner)
-                    .makeRequest(client)
-                );
-            }
+        if (operator == null) {
+            throw new IllegalStateException(
+                "`client` must have an `operator` or an explicit payment transaction must be provided");
         }
+
+        return CompletableFuture.supplyAsync(() -> {
+            if (queryPayment == null) {
+                // No payment was specified so we need to go ask
+                // This is a query in its own right so we use a nested future here
+
+                return new QueryCostQuery().executeAsync(client);
+            }
+
+            return CompletableFuture.completedFuture(queryPayment);
+        }, client.executor)
+            .thenCompose(x -> x)
+            .thenAccept((paymentAmount) -> {
+                paymentTransactionId = TransactionId.generate(operator.accountId);
+
+                // Like how TransactionBuilder has to build (N / 3) native transactions to handle multi-node retry,
+                // so too does the QueryBuilder for payment transactions
+
+                var size = client.getNumberOfNodesForSuperMajority();
+                paymentTransactions = new ArrayList<>(size);
+                paymentTransactionNodeIds = new ArrayList<>(size);
+
+                for (var i = 0; i < size; ++i) {
+                    var nodeId = client.getNextNodeId();
+
+                    paymentTransactionNodeIds.add(nodeId);
+                    paymentTransactions.add(new CryptoTransferTransaction()
+                        .setTransactionId(paymentTransactionId)
+                        .setNodeAccountId(nodeId)
+                        .setMaxTransactionFee(100000000) // 1 Hbar
+                        .addSender(operator.accountId, paymentAmount)
+                        .addRecipient(nodeId, paymentAmount)
+                        .build(null)
+                        .signWith(operator.publicKey, operator.transactionSigner)
+                        .makeRequest(client)
+                    );
+                }
+            });
     }
 
     @Override
     protected final Query makeRequest(Client client) {
         // If payment is required, set the next payment transaction on the query
-        if (isPaymentRequired()) {
+        if (isPaymentRequired() && paymentTransactions != null) {
             headerBuilder.setPayment(paymentTransactions.get(nextPaymentTransactionIndex));
 
             // each time we move our cursor to the next transaction
@@ -122,7 +133,7 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
 
         // Delegate to the derived class to apply the header because the common header struct is
         // within the nested type
-        onMakeRequest(builder, headerBuilder.build());
+        onMakeRequest(builder, headerBuilder.setResponseType(ResponseType.ANSWER_ONLY).build());
 
         return builder.build();
     }
@@ -170,5 +181,39 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
         }
 
         return builder.toString();
+    }
+
+    private class QueryCostQuery extends QueryBuilder<Long, QueryCostQuery> {
+        @Override
+        protected void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+            QueryBuilder.this.onMakeRequest(queryBuilder,
+                headerBuilder.setResponseType(ResponseType.COST_ANSWER).build());
+        }
+
+        @Override
+        protected ResponseHeader mapResponseHeader(Response response) {
+            return QueryBuilder.this.mapResponseHeader(response);
+        }
+
+        @Override
+        protected QueryHeader mapRequestHeader(Query request) {
+            return QueryBuilder.this.mapRequestHeader(request);
+        }
+
+        @Override
+        protected Long mapResponse(Response response) {
+            return mapResponseHeader(response).getCost();
+        }
+
+        @Override
+        protected MethodDescriptor<Query, Response> getMethodDescriptor() {
+            return QueryBuilder.this.getMethodDescriptor();
+        }
+
+        @Override
+        protected boolean isPaymentRequired() {
+            // combo breaker
+            return false;
+        }
     }
 }

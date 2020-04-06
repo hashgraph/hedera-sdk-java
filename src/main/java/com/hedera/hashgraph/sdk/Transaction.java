@@ -13,6 +13,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import com.hederahashgraph.service.proto.java.FreezeServiceGrpc;
 import io.grpc.MethodDescriptor;
+import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Function;
 
 import java.util.ArrayList;
@@ -136,10 +137,12 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     }
 
     @Override
-    protected void onExecute(Client client) {
+    protected CompletableFuture<Void> onExecuteAsync(Client client) {
         // On execute, sign each transaction with the operator, if present
         var operator = client.getOperator();
         if (operator != null) signWith(operator.publicKey, operator.transactionSigner);
+
+        return CompletableFuture.completedFuture(null);
     }
 
     @Override

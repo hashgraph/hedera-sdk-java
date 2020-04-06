@@ -18,15 +18,11 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
     HederaExecutable() {
     }
 
-    protected void onExecute(Client client) {
-        // Do nothing in base class, this is an optional hook
-    }
+    protected abstract CompletableFuture<Void> onExecuteAsync(Client client);
 
     @Override
     public final CompletableFuture<O> executeAsync(Client client) {
-        onExecute(client);
-
-        return executeAsync(client, 1);
+        return onExecuteAsync(client).thenCompose((v) -> executeAsync(client, 1));
     }
 
     private CompletableFuture<O> executeAsync(Client client, int attempt) {

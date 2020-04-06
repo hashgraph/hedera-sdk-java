@@ -28,8 +28,8 @@ class AccountTransactionIntegrationTest {
                 // Create a new Hedera account with a small initial balance
 
                 @Var var transactionId = new AccountCreateTransaction()
-                    .setInitialBalance(200000000) // 2 Hbar
-                    .setMaxTransactionFee(50_000_000)
+                    .setInitialBalance(200_000_000) // 2 Hbar
+                    .setMaxTransactionFee(100_000_000) // 1 Hbar
                     .setKey(newKey)
                     .execute(client);
 
@@ -44,7 +44,6 @@ class AccountTransactionIntegrationTest {
                 // Fetch the account info for this account
 
                 var accountInfo = new AccountInfoQuery()
-                    .setQueryPayment(30)
                     .setAccountId(transactionReceipt.accountId)
                     .execute(client);
 
@@ -64,7 +63,6 @@ class AccountTransactionIntegrationTest {
                 client.setOperator(accountInfo.accountId, newKey);
 
                 var accountInfo2 = new AccountInfoQuery()
-                    .setQueryPayment(30)
                     .setAccountId(transactionReceipt.accountId)
                     .execute(client);
 
@@ -73,7 +71,7 @@ class AccountTransactionIntegrationTest {
                 // Now delete the account (and give everything back to the original operator)
 
                 transactionId = new AccountDeleteTransaction()
-                    .setMaxTransactionFee(100000000) // 1 Hbar
+                    .setMaxTransactionFee(100_000_000) // 1 Hbar
                     .setDeleteAccountId(accountInfo.accountId)
                     .setTransferAccountId(operatorId)
                     .execute(client);
