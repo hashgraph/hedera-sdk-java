@@ -12,7 +12,7 @@
 
 This project is currently under a re-development effort. The goals are as follows:
 
- * Native support for Android
+ * Native support for Android 19+
 
  * Native support for the Corda DJVM
 
@@ -20,13 +20,18 @@ This project is currently under a re-development effort. The goals are as follow
 
  * End-to-end test coverage
 
+ * Minimal breaking changes
+
+If you are trying this out and notice something missing from master, feel free to open an issue. It's likely
+it was simply overlooked.
+
 Join the [Hedera discord](https://hedera.com/discord) for the latest updates and announcements.
 
 ## Development
 
 ### Dependencies
 
- * [Java Development Kit (JDK)](https://adoptopenjdk.net/) v12
+ * [Java Development Kit (JDK)](https://adoptopenjdk.net/) v12+ (note this is to _build_, not run)
 
 ### Compile
 
@@ -34,10 +39,22 @@ Join the [Hedera discord](https://hedera.com/discord) for the latest updates and
 $ ./gradlew compileJava
 ```
 
-### Test
+### Unit Test
 
 ```sh
 $ ./gradlew test
+```
+
+### Integration Test
+
+Requires `OPERATOR_ID` and `OPERATOR_KEY` to be in the environment. Integration tests run against
+the Hedera test network.
+
+```sh
+$ export OEPRATOR_ID="..."
+$ export OPERATOR_KEY="..."
+
+$ ./gradlew integrationTest
 ```
 
 ## Contributing to this Project
