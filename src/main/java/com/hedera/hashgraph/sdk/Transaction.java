@@ -13,14 +13,13 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import com.hederahashgraph.service.proto.java.FreezeServiceGrpc;
 import io.grpc.MethodDescriptor;
+import java8.util.function.Function;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java8.util.function.Function;
 
-public final class Transaction
-        extends HederaExecutable<
-                com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse, TransactionId> {
+public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse, TransactionId> {
     public final TransactionId id;
 
     // A SDK [Transaction] is composed of multiple, raw protobuf transactions. These should be
@@ -48,7 +47,7 @@ public final class Transaction
 
         if (transactions.isEmpty()) {
             throw new IllegalArgumentException(
-                    "SDK transaction must have at least 1 protobuf transaction");
+                "SDK transaction must have at least 1 protobuf transaction");
         }
 
         // For each transaction constructed from the builder we need to
@@ -79,12 +78,46 @@ public final class Transaction
         this.id = Objects.requireNonNull(transactionId);
     }
 
+    private static MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptorForSystemDelete(SystemDeleteTransactionBody.IdCase idCase) {
+        switch (idCase) {
+            case FILEID:
+                return FileServiceGrpc.getSystemUndeleteMethod();
+
+            case CONTRACTID:
+                return SmartContractServiceGrpc.getSystemUndeleteMethod();
+
+            case ID_NOT_SET:
+                // Should be caught elsewhere
+                throw new IllegalStateException("SystemDeleteTransaction requires an ID to be set");
+        }
+
+        // Should be impossible as Error Prone does enum exhaustiveness checks
+        throw new IllegalStateException("(unreachable) id case unhandled");
+    }
+
+    private static MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptorForSystemUndelete(SystemUndeleteTransactionBody.IdCase idCase) {
+        switch (idCase) {
+            case FILEID:
+                return FileServiceGrpc.getSystemUndeleteMethod();
+
+            case CONTRACTID:
+                return SmartContractServiceGrpc.getSystemUndeleteMethod();
+
+            case ID_NOT_SET:
+                // Should be caught elsewhere
+                throw new IllegalStateException(
+                    "SystemUndeleteTransaction requires an ID to be set");
+        }
+
+        // Should be impossible as Error Prone does enum exhaustiveness checks
+        throw new IllegalStateException("(unreachable) id case unhandled");
+    }
+
     public final Transaction sign(PrivateKey privateKey) {
         return signWith(privateKey.getPublicKey(), privateKey::sign);
     }
 
-    public final Transaction signWith(
-            PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
+    public final Transaction signWith(PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
         for (var index = 0; index < transactions.size(); ++index) {
             var bodyBytes = transactions.get(index).getBodyBytes().toByteArray();
 
@@ -95,11 +128,18 @@ public final class Transaction
             var signatureBytes = transactionSigner.apply(bodyBytes);
 
             signatureBuilders
-                    .get(index)
-                    .addSigPair(publicKey.toSignaturePairProtobuf(signatureBytes));
+                .get(index)
+                .addSigPair(publicKey.toSignaturePairProtobuf(signatureBytes));
         }
 
         return this;
+    }
+
+    @Override
+    protected void onExecute(Client client) {
+        // On execute, sign each transaction with the operator, if present
+        var operator = client.getOperator();
+        if (operator != null) signWith(operator.publicKey, operator.transactionSigner);
     }
 
     @Override
@@ -113,9 +153,7 @@ public final class Transaction
     }
 
     @Override
-    protected final MethodDescriptor<
-                    com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse>
-            getMethodDescriptor() {
+    protected final MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         var transactionBody = transactionBodies.get(nextIndex);
         switch (transactionBody.getDataCase()) {
             case CONTRACTCALL:
@@ -162,11 +200,11 @@ public final class Transaction
 
             case SYSTEMDELETE:
                 return getMethodDescriptorForSystemDelete(
-                        transactionBody.getSystemDelete().getIdCase());
+                    transactionBody.getSystemDelete().getIdCase());
 
             case SYSTEMUNDELETE:
                 return getMethodDescriptorForSystemUndelete(
-                        transactionBody.getSystemUndelete().getIdCase());
+                    transactionBody.getSystemUndelete().getIdCase());
 
             case FREEZE:
                 return FreezeServiceGrpc.getFreezeMethod();
@@ -192,43 +230,6 @@ public final class Transaction
         throw new IllegalStateException("(unreachable) transaction type unhandled");
     }
 
-    private static MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse>
-            getMethodDescriptorForSystemDelete(SystemDeleteTransactionBody.IdCase idCase) {
-        switch (idCase) {
-            case FILEID:
-                return FileServiceGrpc.getSystemUndeleteMethod();
-
-            case CONTRACTID:
-                return SmartContractServiceGrpc.getSystemUndeleteMethod();
-
-            case ID_NOT_SET:
-                // Should be caught elsewhere
-                throw new IllegalStateException("SystemDeleteTransaction requires an ID to be set");
-        }
-
-        // Should be impossible as Error Prone does enum exhaustiveness checks
-        throw new IllegalStateException("(unreachable) id case unhandled");
-    }
-
-    private static MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse>
-            getMethodDescriptorForSystemUndelete(SystemUndeleteTransactionBody.IdCase idCase) {
-        switch (idCase) {
-            case FILEID:
-                return FileServiceGrpc.getSystemUndeleteMethod();
-
-            case CONTRACTID:
-                return SmartContractServiceGrpc.getSystemUndeleteMethod();
-
-            case ID_NOT_SET:
-                // Should be caught elsewhere
-                throw new IllegalStateException(
-                        "SystemUndeleteTransaction requires an ID to be set");
-        }
-
-        // Should be impossible as Error Prone does enum exhaustiveness checks
-        throw new IllegalStateException("(unreachable) id case unhandled");
-    }
-
     @Override
     protected final com.hedera.hashgraph.sdk.proto.Transaction makeRequest() {
         // emplace the signatures on the transaction and build the transaction
@@ -249,5 +250,14 @@ public final class Transaction
     @Override
     protected final Status mapResponseStatus(TransactionResponse transactionResponse) {
         return Status.valueOf(transactionResponse.getNodeTransactionPrecheckCode());
+    }
+
+    @Override
+    protected String debugToString(com.hedera.hashgraph.sdk.proto.Transaction request) {
+        try {
+            return TransactionBody.parseFrom(request.getBodyBytes()).toString();
+        } catch (InvalidProtocolBufferException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

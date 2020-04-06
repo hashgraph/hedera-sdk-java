@@ -5,6 +5,9 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.errorprone.annotations.Var;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import java8.util.function.Function;
+
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,24 +17,30 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-/** Managed client for use on the Hedera Hashgraph network. */
+/**
+ * Managed client for use on the Hedera Hashgraph network.
+ */
 public final class Client implements AutoCloseable {
     final ExecutorService executor;
+
     private final Iterator<AccountId> nodes;
+
     private final Map<AccountId, String> network;
+
     private Map<AccountId, ManagedChannel> channels;
 
+    @Nullable
+    private Operator operator;
+
     protected Client(Map<AccountId, String> network) {
-        this.executor =
-                Executors.newFixedThreadPool(
-                        Runtime.getRuntime().availableProcessors(),
-                        new ThreadFactoryBuilder().setNameFormat("hedera-sdk-%d").build());
+        this.executor = Executors.newFixedThreadPool(
+            Runtime.getRuntime().availableProcessors(),
+            new ThreadFactoryBuilder().setNameFormat("hedera-sdk-%d").build());
 
         this.network = network;
         this.channels = new HashMap<>(network.size());
 
-        // Take all given node account IDs, shuffle, and prepare an infinite iterator for use in
-        // [getNextNodeId]
+        // Take all given node account IDs, shuffle, and prepare an infinite iterator for use in [getNextNodeId]
         var allNodes = new ArrayList<>(network.keySet());
         Collections.shuffle(allNodes, ThreadLocalSecureRandom.current());
         nodes = Iterables.cycle(allNodes).iterator();
@@ -89,6 +98,30 @@ public final class Client implements AutoCloseable {
     }
 
     /**
+     * Set the account that will, by default, be paying for transactions and queries built with
+     * this client.
+     * <p>
+     * The operator account ID is used to generate the default transaction ID for all transactions executed with
+     * this client.
+     * <p>
+     * The operator private key is used to sign all transactions executed by this client.
+     *
+     * @return {@code this}.
+     */
+    public Client setOperator(AccountId accountId, PrivateKey privateKey) {
+        return setOperatorWith(accountId, privateKey.getPublicKey(), privateKey::sign);
+    }
+
+    public Client setOperatorWith(AccountId accountId, PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
+        this.operator = new Operator(accountId, publicKey, transactionSigner);
+        return this;
+    }
+
+    @Nullable Operator getOperator() {
+        return this.operator;
+    }
+
+    /**
      * Initiates an orderly shutdown of all channels (to the Hedera network) in which preexisting
      * transactions or queries continue but more would be immediately cancelled.
      *
@@ -138,16 +171,27 @@ public final class Client implements AutoCloseable {
 
         var address = network.get(nodeId);
 
-        channel =
-                ManagedChannelBuilder.forTarget(address)
-                        .usePlaintext()
-                        // TODO: Get the actual project version
-                        .userAgent("hedera-sdk-java/2.0.0-SNAPSHOT")
-                        .executor(executor)
-                        .build();
+        channel = ManagedChannelBuilder.forTarget(address)
+            .usePlaintext()
+            // TODO: Get the actual project version
+            .userAgent("hedera-sdk-java/2.0.0-SNAPSHOT")
+            .executor(executor)
+            .build();
 
         channels.put(nodeId, channel);
 
         return channel;
+    }
+
+    static class Operator {
+        final AccountId accountId;
+        final PublicKey publicKey;
+        final Function<byte[], byte[]> transactionSigner;
+
+        Operator(AccountId accountId, PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
+            this.accountId = accountId;
+            this.publicKey = publicKey;
+            this.transactionSigner = transactionSigner;
+        }
     }
 }

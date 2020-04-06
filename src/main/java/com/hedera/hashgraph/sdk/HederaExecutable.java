@@ -18,8 +18,14 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
     HederaExecutable() {
     }
 
+    protected void onExecute(Client client) {
+        // Do nothing in base class, this is an optional hook
+    }
+
     @Override
-    public CompletableFuture<O> executeAsync(Client client) {
+    public final CompletableFuture<O> executeAsync(Client client) {
+        onExecute(client);
+
         return executeAsync(client, 1);
     }
 
@@ -34,7 +40,7 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
         logger.atTrace()
             .addKeyValue("node", nodeId)
             .addKeyValue("attempt", attempt)
-            .log("sending request \n{}", request);
+            .log("sending request \n{}", debugToString(request));
 
         return toCompletableFuture(ClientCalls.futureUnaryCall(call, request)).handle((response, error) -> {
             var latency = (double) (System.nanoTime() - startAt) / 1000000000.0;
@@ -119,5 +125,9 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
      */
     protected boolean shouldRetry(Status status, ResponseT response) {
         return status == Status.Busy;
+    }
+
+    protected String debugToString(RequestT request) {
+        return request.toString();
     }
 }

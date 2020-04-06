@@ -1,14 +1,15 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import java.util.ArrayList;
-import java.util.Collections;
 import java8.util.concurrent.CompletableFuture;
-import javax.annotation.Nullable;
 import org.threeten.bp.Duration;
 
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
+
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
-        extends Executable<TransactionId> {
+    extends Executable<TransactionId> {
     // Default auto renew duration for accounts, contracts, topics, and files (entities)
     protected static final Duration DEFAULT_AUTO_RENEW_PERIOD = Duration.ofDays(90);
 
@@ -107,31 +108,50 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     public final Transaction build(@Nullable Client client) {
         onBuild(bodyBuilder);
 
-        if (bodyBuilder.hasNodeAccountID()) {
+        if (!bodyBuilder.hasTransactionID() && client != null) {
+            var operator = client.getOperator();
+            if (operator != null) {
+                // Set a default transaction ID, generated from the operator account ID
+                setTransactionId(TransactionId.generate(operator.accountId));
+
+            } else {
+                // no client means there must be an explicitly set node ID and transaction ID
+                throw new IllegalArgumentException(
+                    "`client` must have an `operator` or `transactionId` must be set");
+
+            }
+        }
+
+        if (bodyBuilder.hasTransactionID() && bodyBuilder.hasNodeAccountID()) {
             // Emplace the body into the transaction wrapper
             // This wrapper object contains the bytes for the body and signatures of the body
+
             builder.setBodyBytes(bodyBuilder.build().toByteString());
 
             return new Transaction(Collections.singletonList(builder));
         }
 
-        if (client != null) {
+        if (bodyBuilder.hasTransactionID() && client != null) {
             // Pick N / 3 nodes from the client and build that many transactions
             // This is for fail-over so we can cycle through nodes
 
             var size = client.getNumberOfNodesForSuperMajority();
             var transactions =
-                    new ArrayList<com.hedera.hashgraph.sdk.proto.Transaction.Builder>(size);
+                new ArrayList<com.hedera.hashgraph.sdk.proto.Transaction.Builder>(size);
 
             for (var i = 0; i < size; ++i) {
-                transactions.add(builder.setBodyBytes(bodyBuilder.build().toByteString()).clone());
+                transactions.add(builder.setBodyBytes(bodyBuilder
+                    .setNodeAccountID(client.getNextNodeId().toProtobuf())
+                    .build()
+                    .toByteString()
+                ).clone());
             }
 
             return new Transaction(transactions);
         }
 
         throw new IllegalArgumentException(
-                "`client` must not be NULL or a `nodeAccountId` must be set");
+            "`client` must not be NULL or both a `nodeAccountId` and `transactionId` must be set");
     }
 
     @Override
