@@ -30,13 +30,12 @@ public final class TransactionReceiptQuery
      * @return {@code this}.
      */
     public TransactionReceiptQuery setTransactionId(TransactionId transactionId) {
-        System.out.println("asking for ID " + transactionId);
         builder.setTransactionID(transactionId.toProtobuf());
         return this;
     }
 
     @Override
-    protected void onBuild(Query.Builder queryBuilder, QueryHeader header) {
+    protected void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setTransactionGetReceipt(builder.setHeader(header));
     }
 
@@ -46,7 +45,7 @@ public final class TransactionReceiptQuery
     }
 
     @Override
-    protected ResponseHeader getResponseHeader(Response response) {
+    protected ResponseHeader mapResponseHeader(Response response) {
         return response.getTransactionGetReceipt().getHeader();
     }
 
@@ -56,11 +55,12 @@ public final class TransactionReceiptQuery
     }
 
     @Override
-    protected boolean shouldRetry(Response response) {
-        if (super.shouldRetry(response)) return true;
+    protected boolean shouldRetry(Status status, Response response) {
+        if (super.shouldRetry(status, response)) return true;
 
         var receiptStatus =
                 Status.valueOf(response.getTransactionGetReceipt().getReceipt().getStatus());
+
         switch (receiptStatus) {
             case Busy:
                 // node is busy

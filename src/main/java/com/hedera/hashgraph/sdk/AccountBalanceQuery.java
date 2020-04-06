@@ -21,20 +21,24 @@ public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalance
         builder = CryptoGetAccountBalanceQuery.newBuilder();
     }
 
-    /** The account ID for which the balance is being requested. */
+    /**
+     * The account ID for which the balance is being requested.
+     */
     public AccountBalanceQuery setAccountId(AccountId accountId) {
         builder.setAccountID(accountId.toProtobuf());
         return this;
     }
 
-    /** The contract ID for which the balance is being requested. */
+    /**
+     * The contract ID for which the balance is being requested.
+     */
     public AccountBalanceQuery setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProtobuf());
         return this;
     }
 
     @Override
-    protected void onBuild(Query.Builder queryBuilder, QueryHeader header) {
+    protected void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setCryptogetAccountBalance(builder.setHeader(header));
     }
 
@@ -44,7 +48,7 @@ public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalance
     }
 
     @Override
-    protected ResponseHeader getResponseHeader(Response response) {
+    protected ResponseHeader mapResponseHeader(Response response) {
         return response.getCryptogetAccountBalance().getHeader();
     }
 

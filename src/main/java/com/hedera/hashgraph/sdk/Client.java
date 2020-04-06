@@ -124,6 +124,10 @@ public final class Client implements AutoCloseable {
         return nodes.next();
     }
 
+    int getNumberOfNodesForSuperMajority() {
+        return (network.size() + 3 - 1) / 3;
+    }
+
     // Return or establish a channel for a given node ID
     synchronized ManagedChannel getChannel(AccountId nodeId) {
         @Var var channel = channels.get(nodeId);

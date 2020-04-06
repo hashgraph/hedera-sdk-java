@@ -7,28 +7,29 @@ import java8.util.concurrent.CompletableFuture;
 import java8.util.function.BiConsumer;
 import org.threeten.bp.Duration;
 
-public abstract class Executable<R> {
+public abstract class Executable<O> {
     public static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(30);
 
-    public abstract CompletableFuture<R> executeAsync(Client client);
+    Executable() {}
 
-    @SuppressWarnings("FutureReturnValueIgnored")
-    public void executeAsync(Client client, BiConsumer<R, Throwable> callback) {
+    public abstract CompletableFuture<O> executeAsync(Client client);
+
+    public void executeAsync(Client client, BiConsumer<O, Throwable> callback) {
         executeAsync(client, DEFAULT_TIMEOUT, callback);
     }
 
-    @SuppressWarnings({"FutureReturnValueIgnored", "InconsistentOverloads"})
-    public void executeAsync(Client client, Duration timeout, BiConsumer<R, Throwable> callback) {
+    @SuppressWarnings("InconsistentOverloads")
+    public void executeAsync(Client client, Duration timeout, BiConsumer<O, Throwable> callback) {
         executeAsync(client)
                 .orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS)
                 .whenComplete(callback);
     }
 
-    public R execute(Client client) throws TimeoutException {
+    public O execute(Client client) throws TimeoutException {
         return execute(client, DEFAULT_TIMEOUT);
     }
 
-    public R execute(Client client, Duration timeout) throws TimeoutException {
+    public O execute(Client client, Duration timeout) throws TimeoutException {
         try {
             return executeAsync(client).get(timeout.toMillis(), TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {

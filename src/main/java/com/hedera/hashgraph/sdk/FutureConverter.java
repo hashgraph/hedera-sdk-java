@@ -177,7 +177,6 @@ final class FutureConverter {
                 super(completableFuture);
             }
 
-            @SuppressWarnings("FutureReturnValueIgnored")
             @Override
             public void addCallbacks(
                     Consumer<T> successCallback, Consumer<Throwable> failureCallback) {

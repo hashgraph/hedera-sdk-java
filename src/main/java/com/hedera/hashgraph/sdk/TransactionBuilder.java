@@ -1,8 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import java.util.ArrayList;
 import java.util.Collections;
 import java8.util.concurrent.CompletableFuture;
+import javax.annotation.Nullable;
 import org.threeten.bp.Duration;
 
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
@@ -102,19 +104,39 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         return (T) this;
     }
 
-    public final Transaction build() {
+    public final Transaction build(@Nullable Client client) {
         onBuild(bodyBuilder);
 
-        // Emplace the body into the transaction wrapper
-        // This wrapper object contains the bytes for the body and signatures of the body
-        builder.setBodyBytes(bodyBuilder.build().toByteString());
+        if (bodyBuilder.hasNodeAccountID()) {
+            // Emplace the body into the transaction wrapper
+            // This wrapper object contains the bytes for the body and signatures of the body
+            builder.setBodyBytes(bodyBuilder.build().toByteString());
 
-        return new Transaction(Collections.singletonList(builder));
+            return new Transaction(Collections.singletonList(builder));
+        }
+
+        if (client != null) {
+            // Pick N / 3 nodes from the client and build that many transactions
+            // This is for fail-over so we can cycle through nodes
+
+            var size = client.getNumberOfNodesForSuperMajority();
+            var transactions =
+                    new ArrayList<com.hedera.hashgraph.sdk.proto.Transaction.Builder>(size);
+
+            for (var i = 0; i < size; ++i) {
+                transactions.add(builder.setBodyBytes(bodyBuilder.build().toByteString()).clone());
+            }
+
+            return new Transaction(transactions);
+        }
+
+        throw new IllegalArgumentException(
+                "`client` must not be NULL or a `nodeAccountId` must be set");
     }
 
     @Override
-    public CompletableFuture<TransactionId> executeAsync(Client client) {
-        return build().executeAsync(client);
+    public final CompletableFuture<TransactionId> executeAsync(Client client) {
+        return build(client).executeAsync(client);
     }
 
     /**
