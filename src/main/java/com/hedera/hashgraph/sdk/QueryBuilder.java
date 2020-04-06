@@ -6,8 +6,7 @@ import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.ResponseType;
 
-public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>>
-        extends HederaExecutable<Query, Response, O> {
+public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends HederaExecutable<Query, Response, O> {
     private final Query.Builder builder;
 
     private final QueryHeader.Builder headerBuilder;
@@ -25,7 +24,9 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>>
      */
     protected abstract void onMakeRequest(Query.Builder queryBuilder, QueryHeader header);
 
-    /** The derived class should access its response header and return. */
+    /**
+     * The derived class should access its response header and return.
+     */
     protected abstract ResponseHeader mapResponseHeader(Response response);
 
     @Override
