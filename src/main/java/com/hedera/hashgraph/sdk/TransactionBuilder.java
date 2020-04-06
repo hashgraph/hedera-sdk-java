@@ -84,8 +84,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * @param maxTransactionFee the maximum transaction fee, in tinybars.
      * @return {@code this}.
      */
-    public final T setMaxTransactionFee(long maxTransactionFee) {
-        bodyBuilder.setTransactionFee(maxTransactionFee);
+    public final T setMaxTransactionFee(Hbar maxTransactionFee) {
+        bodyBuilder.setTransactionFee(maxTransactionFee.asTinybar());
 
         // noinspection unchecked
         return (T) this;

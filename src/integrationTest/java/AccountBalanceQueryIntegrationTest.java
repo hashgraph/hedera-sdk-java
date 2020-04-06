@@ -18,7 +18,7 @@ class AccountBalanceQueryIntegrationTest {
                         .execute(client);
 
                 // The network is in serious trouble if genesis hits zero
-                assertThat(balance).isGreaterThan(0);
+                assertThat(balance.asTinybar()).isGreaterThan(0);
             }
         }).doesNotThrowAnyException();
     }

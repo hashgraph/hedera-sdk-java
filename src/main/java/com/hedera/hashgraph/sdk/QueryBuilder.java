@@ -109,7 +109,7 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
                     paymentTransactions.add(new CryptoTransferTransaction()
                         .setTransactionId(paymentTransactionId)
                         .setNodeAccountId(nodeId)
-                        .setMaxTransactionFee(new Hbar(1).asTinybar()) // 1 Hbar
+                        .setMaxTransactionFee(new Hbar(1)) // 1 Hbar
                         .addSender(operator.accountId, paymentAmount)
                         .addRecipient(nodeId, paymentAmount)
                         .build(null)

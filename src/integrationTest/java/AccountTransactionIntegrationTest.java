@@ -1,12 +1,5 @@
 import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.AccountInfoQuery;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TransactionReceiptQuery;
+import com.hedera.hashgraph.sdk.*;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
 
@@ -25,11 +18,14 @@ class AccountTransactionIntegrationTest {
             try (var client = Client.forTestnet()) {
                 client.setOperator(operatorId, operatorKey);
 
+                var initialBalance = new Hbar(2);
+                var maxTransactionFee = new Hbar(1);
+
                 // Create a new Hedera account with a small initial balance
 
                 @Var var transactionId = new AccountCreateTransaction()
-                    .setInitialBalance(200_000_000) // 2 Hbar
-                    .setMaxTransactionFee(100_000_000) // 1 Hbar
+                    .setInitialBalance(initialBalance) // 2 Hbar
+                    .setMaxTransactionFee(maxTransactionFee) // 1 Hbar
                     .setKey(newKey)
                     .execute(client);
 
@@ -49,12 +45,12 @@ class AccountTransactionIntegrationTest {
 
                 assertThat(accountInfo.accountId).isEqualTo(transactionReceipt.accountId);
                 assertThat(accountInfo.autoRenewPeriod).isEqualTo(Duration.ofDays(90));
-                assertThat(accountInfo.balance).isEqualTo(200000000);
+                assertThat(accountInfo.balance).isEqualTo(initialBalance);
                 assertThat(accountInfo.receiveRecordThreshold).isEqualTo(Long.MAX_VALUE);
                 assertThat(accountInfo.sendRecordThreshold).isEqualTo(Long.MAX_VALUE);
                 assertThat(accountInfo.key).isEqualTo(newKey.getPublicKey());
                 assertThat(accountInfo.proxyAccountId).isNull();
-                assertThat(accountInfo.proxyReceived).isZero();
+                assertThat(accountInfo.proxyReceived).isEqualTo(Hbar.ZERO);
 
                 // Now fetch it again but as the new account
                 // to be doubly sure that the
@@ -71,7 +67,7 @@ class AccountTransactionIntegrationTest {
                 // Now delete the account (and give everything back to the original operator)
 
                 transactionId = new AccountDeleteTransaction()
-                    .setMaxTransactionFee(100_000_000) // 1 Hbar
+                    .setMaxTransactionFee(maxTransactionFee) // 1 Hbar
                     .setDeleteAccountId(accountInfo.accountId)
                     .setTransferAccountId(operatorId)
                     .execute(client);
