@@ -1,15 +1,28 @@
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
+import com.hedera.hashgraph.sdk.proto.TransactionGetRecordQuery;
 import io.grpc.MethodDescriptor;
 
-// TODO: TransactionRecord
-public final class TransactionRecordQuery extends QueryBuilder<Void, TransactionRecordQuery> {
+public final class TransactionRecordQuery extends QueryBuilder<TransactionRecord, TransactionRecordQuery> {
+    private final TransactionGetRecordQuery.Builder builder;
+
+    public TransactionRecordQuery() {
+        this.builder = TransactionGetRecordQuery.newBuilder();
+    }
+
+    public TransactionRecordQuery setTransactionId(TransactionId transactionId) {
+        builder.setTransactionID(transactionId.toProtobuf());
+        return this;
+    }
+
     @Override
     protected void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+        queryBuilder.setTransactionGetRecord(builder.setHeader(header));
     }
 
     @Override
@@ -23,12 +36,12 @@ public final class TransactionRecordQuery extends QueryBuilder<Void, Transaction
     }
 
     @Override
-    protected Void mapResponse(Response response) {
-        return null;
+    protected TransactionRecord mapResponse(Response response) {
+        return TransactionRecord.fromProtobuf(response.getTransactionGetRecord().getTransactionRecord());
     }
 
     @Override
     protected MethodDescriptor<Query, Response> getMethodDescriptor() {
-        return null;
+        return CryptoServiceGrpc.getGetTxRecordByTxIDMethod();
     }
 }

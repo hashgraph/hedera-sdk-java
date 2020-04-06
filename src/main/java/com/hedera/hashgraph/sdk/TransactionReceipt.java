@@ -9,16 +9,22 @@ public final class TransactionReceipt {
 
     public final ExchangeRate exchangeRate;
 
+    @Nullable
     public final AccountId accountId;
 
+    @Nullable
     public final FileId fileId;
 
+    @Nullable
     public final ContractId contractId;
 
+    @Nullable
     public final TopicId topicId;
 
+    @Nullable
     public final Long topicSequenceNumber;
 
+    @Nullable
     public final byte[] topicRunningHash;
 
     private TransactionReceipt(

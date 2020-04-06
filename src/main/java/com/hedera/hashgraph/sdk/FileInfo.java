@@ -46,9 +46,10 @@ public final class FileInfo {
     }
 
     static FileInfo fromProtobuf(FileGetInfoResponse.FileInfo fileInfo) {
-        var keys = fileInfo.getKeys().getKeysList().stream()
-            .map(Key::fromProtobuf)
-            .toArray(Key[]::new);
+        var keys = new Key[fileInfo.getKeys().getKeysCount()];
+        for (var i = 0; i < keys.length; ++i) {
+            keys[i] = Key.fromProtobuf(fileInfo.getKeys().getKeys(i));
+        }
 
         return new FileInfo(
             FileId.fromProtobuf(fileInfo.getFileID()),

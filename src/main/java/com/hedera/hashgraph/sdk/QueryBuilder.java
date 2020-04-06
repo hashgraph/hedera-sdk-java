@@ -183,6 +183,7 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
         return builder.toString();
     }
 
+    @SuppressWarnings("NullableDereference")
     private class QueryCostQuery extends QueryBuilder<Long, QueryCostQuery> {
         @Override
         protected void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {

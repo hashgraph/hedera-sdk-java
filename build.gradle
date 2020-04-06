@@ -121,13 +121,13 @@ tasks.withType(JavaCompile).configureEach {
 	options.encoding = "UTF-8"
 	options.errorprone {
 		// https://github.com/uber/NullAway
-		check("NullAway", CheckSeverity.ERROR)
+		check("NullAway", CheckSeverity.WARN)
 		option("NullAway:AnnotatedPackages", "com.hedera.hashgraph.sdk")
 		option("NullAway:TreatGeneratedAsUnannotated", "true")
 
 		// https://github.com/grpc/grpc-java-api-checker
-		check("GrpcExperimentalApi", CheckSeverity.ERROR)
-		check("GrpcInternal", CheckSeverity.ERROR)
+		check("GrpcExperimentalApi", CheckSeverity.WARN)
+		check("GrpcInternal", CheckSeverity.WARN)
 
 		// Enable _all_ error prone checks then selectively disble
 		// Checks that are default-disabled are enabled as warnings
@@ -135,6 +135,7 @@ tasks.withType(JavaCompile).configureEach {
 		disable("TryFailRefactoring")
 		disable("ThrowSpecificExceptions")
 		disable("FutureReturnValueIgnored")
+		disable("ReturnMissingNullable")
 
 		// Ignore generated and protobuf code
 		disableWarningsInGeneratedCode = true
