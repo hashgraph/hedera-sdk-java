@@ -184,14 +184,3 @@ tasks.withType(Test) {
 		events "passed", "skipped", "failed", "standardOut", "standardError"
 	}
 }
-
-spotless {
-	java {
-		googleJavaFormat().aosp()
-		paddedCell()
-	}
-	groovyGradle {
-		target "*.gradle"
-		greclipse()
-	}
-}
