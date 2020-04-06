@@ -253,6 +253,7 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     }
 
     @Override
+    @SuppressWarnings("LiteProtoToString")
     protected String debugToString(com.hedera.hashgraph.sdk.proto.Transaction request) {
         try {
             return TransactionBody.parseFrom(request.getBodyBytes()).toString();

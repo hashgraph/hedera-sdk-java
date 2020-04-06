@@ -1,6 +1,9 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.base.MoreObjects;
 import java8.util.Optional;
+import org.bouncycastle.util.encoders.Hex;
+import org.bouncycastle.util.encoders.HexEncoder;
 
 public final class TransactionReceipt {
     public final Status status;
@@ -87,23 +90,14 @@ public final class TransactionReceipt {
 
     @Override
     public String toString() {
-        return "TransactionReceipt{"
-                + "status="
-                + status
-                + ", exchangeRate="
-                + exchangeRate
-                + ", accountId="
-                + accountId
-                + ", fileId="
-                + fileId
-                + ", contractId="
-                + contractId
-                + ", topicId="
-                + topicId
-                + ", topicSequenceNumber="
-                + topicSequenceNumber
-                + ", topicRunningHash="
-                + topicRunningHash
-                + '}';
+        return MoreObjects.toStringHelper(this)
+            .add("status", status)
+            .add("exchangeRate", exchangeRate)
+            .add("accountId", accountId)
+            .add("fileId", fileId)
+            .add("contractId", contractId)
+            .add("topicId", topicId)
+            .add("topicSequenceNumber", topicSequenceNumber)
+            .toString();
     }
 }
