@@ -5,12 +5,16 @@ import io.grpc.MethodDescriptor;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
 import java8.util.concurrent.CompletableFuture;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 
 import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
 
 public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executable<O> {
+    private static final Logger logger = LoggerFactory.getLogger(HederaExecutable.class);
+
     HederaExecutable() {
     }
 
@@ -25,21 +29,40 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
         var methodDescriptor = getMethodDescriptor();
         var call = channel.newCall(methodDescriptor, CallOptions.DEFAULT);
         var request = makeRequest();
+        var startAt = System.nanoTime();
+
+        logger.atTrace()
+            .addKeyValue("node", nodeId)
+            .addKeyValue("attempt", attempt)
+            .log("sending request \n{}", request);
 
         return toCompletableFuture(ClientCalls.futureUnaryCall(call, request)).handle((response, error) -> {
+            var latency = (double) (System.nanoTime() - startAt) / 1000000000.0;
+
             if (shouldRetryExceptionally(error)) {
+                logger.atError()
+                    .addKeyValue("node", nodeId)
+                    .addKeyValue("attempt", attempt)
+                    .setCause(error)
+                    .log("caught error, retrying");
+
                 // the transaction had a network failure reaching Hedera
                 return Delayer.delayBackOff(attempt, client.executor)
                     .thenCompose((v) -> executeAsync(client, attempt + 1));
             }
 
             if (error != null) {
-                // not a network failure, some other weirdness going on; just fail
-                // fast
+                // not a network failure, some other weirdness going on; just fail fast
                 return CompletableFuture.<O>failedFuture(error);
             }
 
             var responseStatus = mapResponseStatus(response);
+
+            logger.atTrace()
+                .addKeyValue("node", nodeId)
+                .addKeyValue("attempt", attempt)
+                .addKeyValue("status", responseStatus)
+                .log("received response in {}s\n{}", latency, response);
 
             if (shouldRetry(responseStatus, response)) {
                 // the response has been identified as failing or otherwise
