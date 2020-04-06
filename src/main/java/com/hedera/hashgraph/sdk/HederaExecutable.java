@@ -81,10 +81,10 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
 
     protected boolean shouldRetryExceptionally(@Nullable Throwable error) {
         if (error instanceof StatusRuntimeException) {
-            var status = ((StatusRuntimeException) error).getStatus();
+            var status = ((StatusRuntimeException) error).getStatus().getCode();
 
-            return status.equals(io.grpc.Status.UNAVAILABLE)
-                || status.equals(io.grpc.Status.RESOURCE_EXHAUSTED);
+            return status.equals(io.grpc.Status.UNAVAILABLE.getCode())
+                || status.equals(io.grpc.Status.RESOURCE_EXHAUSTED.getCode());
         }
 
         return false;
