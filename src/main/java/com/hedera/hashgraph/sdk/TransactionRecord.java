@@ -17,7 +17,7 @@ public final class TransactionRecord {
 
     public final String memo;
 
-    public final long transactionFee;
+    public final Hbar transactionFee;
 
     public final Void contractFunctionResult;
 
@@ -40,7 +40,7 @@ public final class TransactionRecord {
         this.transactionId = transactionId;
         this.transfers = transfers;
         this.contractFunctionResult = contractFunctionResult;
-        this.transactionFee = transactionFee;
+        this.transactionFee = Hbar.fromTinybar(transactionFee);
     }
 
     static TransactionRecord fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord) {

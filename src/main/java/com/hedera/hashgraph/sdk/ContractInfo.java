@@ -62,7 +62,7 @@ public final class ContractInfo {
     /**
      * The current balance of the contract.
      */
-    public final long balance;
+    public final Hbar balance;
 
     private ContractInfo(
         ContractId contractId,
@@ -83,7 +83,7 @@ public final class ContractInfo {
         this.autoRenewPeriod = autoRenewPeriod;
         this.storage = storage;
         this.contractMemo = contractMemo;
-        this.balance = balance;
+        this.balance = Hbar.fromTinybar(balance);
     }
 
     static ContractInfo fromProtobuf(ContractGetInfoResponse.ContractInfo contractInfo) {

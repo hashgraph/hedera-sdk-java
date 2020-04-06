@@ -33,14 +33,14 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
     private int nextPaymentTransactionIndex = 0;
 
     @Nullable
-    private Long queryPayment;
+    private Hbar queryPayment;
 
     QueryBuilder() {
         builder = Query.newBuilder();
         headerBuilder = QueryHeader.newBuilder();
     }
 
-    public T setQueryPayment(long queryPayment) {
+    public T setQueryPayment(Hbar queryPayment) {
         this.queryPayment = queryPayment;
 
         // noinspection unchecked
@@ -109,7 +109,7 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
                     paymentTransactions.add(new CryptoTransferTransaction()
                         .setTransactionId(paymentTransactionId)
                         .setNodeAccountId(nodeId)
-                        .setMaxTransactionFee(100000000) // 1 Hbar
+                        .setMaxTransactionFee(new Hbar(1).asTinybar()) // 1 Hbar
                         .addSender(operator.accountId, paymentAmount)
                         .addRecipient(nodeId, paymentAmount)
                         .build(null)
@@ -184,7 +184,7 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
     }
 
     @SuppressWarnings("NullableDereference")
-    private class QueryCostQuery extends QueryBuilder<Long, QueryCostQuery> {
+    private class QueryCostQuery extends QueryBuilder<Hbar, QueryCostQuery> {
         @Override
         protected void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
             QueryBuilder.this.onMakeRequest(queryBuilder,
@@ -202,8 +202,8 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
         }
 
         @Override
-        protected Long mapResponse(Response response) {
-            return mapResponseHeader(response).getCost();
+        protected Hbar mapResponse(Response response) {
+            return Hbar.fromTinybar(mapResponseHeader(response).getCost());
         }
 
         @Override

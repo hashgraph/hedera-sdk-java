@@ -3,11 +3,11 @@ package com.hedera.hashgraph.sdk;
 public final class ProxyStaker {
     public final AccountId accountId;
 
-    public final long amount;
+    public final Hbar amount;
 
     private ProxyStaker(AccountId accountId, long amount) {
         this.accountId = accountId;
-        this.amount = amount;
+        this.amount = Hbar.fromTinybar(amount);
     }
 
     static ProxyStaker fromProtobuf(com.hedera.hashgraph.sdk.proto.ProxyStaker proxyStaker) {

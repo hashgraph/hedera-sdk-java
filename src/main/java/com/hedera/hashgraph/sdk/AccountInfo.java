@@ -39,7 +39,7 @@ public final class AccountInfo {
     /**
      * The total proxy staked to this account.
      */
-    public final long proxyReceived;
+    public final Hbar proxyReceived;
 
     /**
      * The key for the account, which must sign in order to transfer out, or to modify the account
@@ -50,19 +50,19 @@ public final class AccountInfo {
     /**
      * The current balance of account.
      */
-    public final long balance;
+    public final Hbar balance;
 
     /**
      * The threshold amount for which an account record is created (and this account
      * charged for them) for any send/withdraw transaction.
      */
-    public final long sendRecordThreshold;
+    public final Hbar sendRecordThreshold;
 
     /**
      * The threshold amount for which an account record is created
      * (and this account charged for them) for any transaction above this amount.
      */
-    public final long receiveRecordThreshold;
+    public final Hbar receiveRecordThreshold;
 
     /**
      * If true, no transaction can transfer to this account unless signed by this account's key.
@@ -99,11 +99,11 @@ public final class AccountInfo {
         this.contractAccountId = contractAccountId;
         this.deleted = deleted;
         this.proxyAccountId = proxyAccountId;
-        this.proxyReceived = proxyReceived;
+        this.proxyReceived = Hbar.fromTinybar(proxyReceived);
         this.key = key;
-        this.balance = balance;
-        this.sendRecordThreshold = sendRecordThreshold;
-        this.receiveRecordThreshold = receiveRecordThreshold;
+        this.balance = Hbar.fromTinybar(balance);
+        this.sendRecordThreshold = Hbar.fromTinybar(sendRecordThreshold);
+        this.receiveRecordThreshold = Hbar.fromTinybar(receiveRecordThreshold);
         this.receiverSignatureRequired = receiverSignatureRequired;
         this.expirationTime = expirationTime;
         this.autoRenewPeriod = autoRenewPeriod;

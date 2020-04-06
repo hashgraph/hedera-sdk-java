@@ -16,19 +16,21 @@ public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTr
         transfersBuilder = TransferList.newBuilder();
     }
 
-    public CryptoTransferTransaction addSender(AccountId senderId, @Nonnegative long value) {
-        return addTransfer(senderId, value * -1L);
+    public CryptoTransferTransaction addSender(AccountId senderId, Hbar value) {
+        // fixme: assert non-negative?
+        return addTransfer(senderId, Hbar.fromTinybar(value.asTinybar() * -1L));
     }
 
-    public CryptoTransferTransaction addRecipient(AccountId recipientId, @Nonnegative long value) {
+    public CryptoTransferTransaction addRecipient(AccountId recipientId, Hbar value) {
+        // fixme: assert non-negative?
         return addTransfer(recipientId, value);
     }
 
-    public CryptoTransferTransaction addTransfer(AccountId accountId, long value) {
+    public CryptoTransferTransaction addTransfer(AccountId accountId, Hbar value) {
         transfersBuilder.addAccountAmounts(
             AccountAmount.newBuilder()
                 .setAccountID(accountId.toProtobuf())
-                .setAmount(value)
+                .setAmount(value.asTinybar())
                 .build()
         );
 

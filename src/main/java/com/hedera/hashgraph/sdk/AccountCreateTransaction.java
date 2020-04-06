@@ -6,7 +6,7 @@ import org.threeten.bp.Duration;
 
 /** Create a new Hedera™ account. */
 public final class AccountCreateTransaction extends TransactionBuilder<AccountCreateTransaction> {
-    private static final long DEFAULT_RECORD_THRESHOLD = Long.MAX_VALUE;
+    private static final Hbar DEFAULT_RECORD_THRESHOLD = Hbar.MAX;
 
     private final CryptoCreateTransactionBody.Builder builder;
 
@@ -35,11 +35,11 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
     /**
      * Set the initial amount to transfer into this account.
      *
-     * @param initialBalance the initial balance in tinybars.
+     * @param initialBalance the initial balance.
      * @return {@code this}.
      */
-    public AccountCreateTransaction setInitialBalance(long initialBalance) {
-        builder.setInitialBalance(initialBalance);
+    public AccountCreateTransaction setInitialBalance(Hbar initialBalance) {
+        builder.setInitialBalance(initialBalance.asTinybar());
         return this;
     }
 
@@ -47,15 +47,15 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
      * Set the threshold amount for which a transaction record is created for any transfer of hbars
      * from this account.
      *
-     * <p>This is defaulted to {@code Long.MAX_VALUE} by the SDK as the fee for threshold records
+     * <p>This is defaulted to {@code Hbar.MAX} by the SDK as the fee for threshold records
      * can be surprising. Do not adjust the threshold unless you understand that you be charged an
      * additional (small) fee any time your account sends money.
      *
-     * @param sendRecordThreshold the threshold amount in tinybars.
+     * @param sendRecordThreshold the threshold amount.
      * @return {@code this}.
      */
-    public AccountCreateTransaction setSendRecordThreshold(long sendRecordThreshold) {
-        builder.setSendRecordThreshold(sendRecordThreshold);
+    public AccountCreateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
+        builder.setSendRecordThreshold(sendRecordThreshold.asTinybar());
         return this;
     }
 
@@ -63,15 +63,15 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
      * Set the threshold amount for which a transaction record is created for any transfer of hbars
      * <b>to this account</b>.
      *
-     * <p>This is defaulted to {@code Long.MAX_VALUE} by the SDK as the fee for threshold records
+     * <p>This is defaulted to {@code Hbar.MAX} by the SDK as the fee for threshold records
      * can be surprising. Do not adjust the threshold unless you understand that you be charged an
      * additional (small) fee any time your account <b>receives</b> money.
      *
-     * @param receiveRecordThreshold the threshold amount in tinybars.
+     * @param receiveRecordThreshold the threshold amount.
      * @return {@code this}.
      */
-    public AccountCreateTransaction setReceiveRecordThreshold(long receiveRecordThreshold) {
-        builder.setReceiveRecordThreshold(receiveRecordThreshold);
+    public AccountCreateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
+        builder.setReceiveRecordThreshold(receiveRecordThreshold.asTinybar());
         return this;
     }
 

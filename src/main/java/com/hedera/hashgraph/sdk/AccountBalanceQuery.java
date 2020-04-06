@@ -14,7 +14,7 @@ import io.grpc.MethodDescriptor;
  *
  * <p>This query is free.
  */
-public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalanceQuery> {
+public final class AccountBalanceQuery extends QueryBuilder<Hbar, AccountBalanceQuery> {
     private final CryptoGetAccountBalanceQuery.Builder builder;
 
     public AccountBalanceQuery() {
@@ -48,8 +48,8 @@ public final class AccountBalanceQuery extends QueryBuilder<Long, AccountBalance
     }
 
     @Override
-    protected Long mapResponse(Response response) {
-        return response.getCryptogetAccountBalance().getBalance();
+    protected Hbar mapResponse(Response response) {
+        return Hbar.fromTinybar(response.getCryptogetAccountBalance().getBalance());
     }
 
     @Override
