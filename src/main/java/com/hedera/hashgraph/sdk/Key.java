@@ -8,8 +8,13 @@ public abstract class Key {
             case ED25519:
                 return new PublicKey(key.getEd25519().toByteArray());
 
+            case KEYLIST:
+                return KeyList.fromProtobuf(key.getKeyList(), null);
+
+            case THRESHOLDKEY:
+                return KeyList.fromProtobuf(key.getThresholdKey().getKeys(), key.getThresholdKey().getThreshold());
+
             default:
-                // TODO: Handle more key cases
                 throw new IllegalStateException("Key#fromProtobuf: unhandled key case: " + key.getKeyCase());
         }
     }
