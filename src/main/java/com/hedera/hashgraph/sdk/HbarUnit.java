@@ -58,7 +58,7 @@ public enum HbarUnit {
     /**
      * Get the name of this unit.
      */
-    public String toString() {
+    @Override public String toString() {
         return name().toLowerCase();
     }
 }
