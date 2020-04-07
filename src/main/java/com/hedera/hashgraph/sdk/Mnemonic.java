@@ -1,6 +1,8 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.Joiner;
+import com.google.errorprone.annotations.Var;
+
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
@@ -77,8 +79,8 @@ public final class Mnemonic {
         var wordList = getWordList();
         var words = new ArrayList<String>(24);
 
-        var scratch = 0;
-        var offset = 0;
+        @Var var scratch = 0;
+        @Var var offset = 0;
 
         for (var b : bytes) {
             // shift `bytes` into `scratch`, popping off 11-bit indices when we can
@@ -261,8 +263,8 @@ public final class Mnemonic {
         ByteBuffer buffer = ByteBuffer.allocate(33);
 
         // reverse algorithm of `entropyToWords()` below
-        int scratch = 0;
-        int offset = 0;
+        @Var int scratch = 0;
+        @Var int offset = 0;
         for (CharSequence word : words) {
             int index = getWordIndex(word);
 

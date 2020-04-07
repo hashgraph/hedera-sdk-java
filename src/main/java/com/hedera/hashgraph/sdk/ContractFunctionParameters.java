@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import java8.util.J8Arrays;
 import java8.util.stream.Collectors;
@@ -90,7 +91,7 @@ public final class ContractFunctionParameters {
         head.add(uint256(elements.size(), 32));
 
         // points to start of dynamic segment, *not* including the length of the array
-        long currOffset = offsetsLen * 32L;
+        @Var long currOffset = offsetsLen * 32L;
 
         for (ByteString elem : elements) {
             head.add(uint256(currOffset, 64));
@@ -126,7 +127,7 @@ public final class ContractFunctionParameters {
         return int256(val, bitWidth, true);
     }
 
-    static ByteString int256(long val, int bitWidth, boolean signed) {
+    static ByteString int256(long val, @Var int bitWidth, boolean signed) {
         // don't try to get wider than a `long` as it should just be filled with padding
         bitWidth = Math.min(bitWidth, 64);
         ByteString.Output output = ByteString.newOutput(bitWidth / 8);
@@ -338,7 +339,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt8Array(byte[] intArray) {
         IntStream intStream = IntStreams.range(0, intArray.length).map(idx -> intArray[idx]);
 
-        ByteString arrayBytes = ByteString.copyFrom(
+        @Var ByteString arrayBytes = ByteString.copyFrom(
             intStream.mapToObj(i -> int256(i, 8))
                 .collect(Collectors.toList()));
 
@@ -353,7 +354,7 @@ public final class ContractFunctionParameters {
      * Add a dynamic array of 32-bit integers.
      */
     public ContractFunctionParameters addInt32Array(int[] intArray) {
-        ByteString arrayBytes = ByteString.copyFrom(
+        @Var ByteString arrayBytes = ByteString.copyFrom(
             J8Arrays.stream(intArray).mapToObj(i -> int256(i, 32))
                 .collect(Collectors.toList()));
 
@@ -368,7 +369,7 @@ public final class ContractFunctionParameters {
      * Add a dynamic array of 64-bit integers.
      */
     public ContractFunctionParameters addInt64Array(long[] intArray) {
-        ByteString arrayBytes = ByteString.copyFrom(
+        @Var ByteString arrayBytes = ByteString.copyFrom(
             J8Arrays.stream(intArray).mapToObj(i -> int256(i, 64))
                 .collect(Collectors.toList()));
 
@@ -386,7 +387,7 @@ public final class ContractFunctionParameters {
      *                                  (max range including the sign bit).
      */
     public ContractFunctionParameters addInt256Array(BigInteger[] intArray) {
-        ByteString arrayBytes = ByteString.copyFrom(
+        @Var ByteString arrayBytes = ByteString.copyFrom(
             J8Arrays.stream(intArray).map(ContractFunctionParameters::int256)
                 .collect(Collectors.toList()));
 
@@ -457,7 +458,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint8Array(byte[] intArray) {
         IntStream intStream = IntStreams.range(0, intArray.length).map(idx -> intArray[idx]);
 
-        ByteString arrayBytes = ByteString.copyFrom(
+        @Var ByteString arrayBytes = ByteString.copyFrom(
             intStream.mapToObj(i -> uint256(i, 8))
                 .collect(Collectors.toList()));
 
@@ -475,7 +476,7 @@ public final class ContractFunctionParameters {
      * sign-extended to 32 bytes).
      */
     public ContractFunctionParameters addUint32Array(int[] intArray) {
-        ByteString arrayBytes = ByteString.copyFrom(
+        @Var ByteString arrayBytes = ByteString.copyFrom(
             J8Arrays.stream(intArray).mapToObj(i -> uint256(i, 32))
                 .collect(Collectors.toList()));
 
@@ -493,7 +494,7 @@ public final class ContractFunctionParameters {
      * sign-extended to 32 bytes).
      */
     public ContractFunctionParameters addUint64Array(long[] intArray) {
-        ByteString arrayBytes = ByteString.copyFrom(
+        @Var ByteString arrayBytes = ByteString.copyFrom(
             J8Arrays.stream(intArray).mapToObj(i -> uint256(i, 64))
                 .collect(Collectors.toList()));
 
@@ -514,7 +515,7 @@ public final class ContractFunctionParameters {
      *                                  (max range including the sign bit) or is negative.
      */
     public ContractFunctionParameters addUint256Array(BigInteger[] intArray) {
-        ByteString arrayBytes = ByteString.copyFrom(
+        @Var ByteString arrayBytes = ByteString.copyFrom(
             J8Arrays.stream(intArray).map(ContractFunctionParameters::uint256)
                 .collect(Collectors.toList()));
 
@@ -601,7 +602,7 @@ public final class ContractFunctionParameters {
      */
     ByteString toBytes(@Nullable String funcName) {
         // offset for dynamic-length data, immediately after value arguments
-        var dynamicOffset = args.size() * 32;
+        @Var var dynamicOffset = args.size() * 32;
 
         var paramsBytes = new ArrayList<ByteString>(args.size() + 1);
 

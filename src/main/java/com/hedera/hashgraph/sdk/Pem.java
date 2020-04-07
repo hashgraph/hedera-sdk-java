@@ -18,6 +18,9 @@ import org.bouncycastle.util.io.pem.PemWriter;
 
 import javax.annotation.Nullable;
 import javax.crypto.Cipher;
+
+import com.google.errorprone.annotations.Var;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Reader;
@@ -77,7 +80,7 @@ final class Pem {
     static PrivateKeyInfo readPrivateKey(Reader input, @Nullable String passphrase) throws IOException {
         PemReader pemReader = new PemReader(input);
 
-        PemObject readObject = null;
+        @Var PemObject readObject = null;
 
         for (; ; ) {
             PemObject nextObject = pemReader.readPemObject();
