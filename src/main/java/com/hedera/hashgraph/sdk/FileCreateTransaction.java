@@ -4,17 +4,19 @@ import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.FileCreateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 
-import java.time.Duration;
-import java.time.Instant;
+import org.threeten.bp.Duration;
+import org.threeten.bp.Instant;
 
 public final class FileCreateTransaction extends TransactionBuilder<FileCreateTransaction> {
+    // Default expiration time to an acceptable value, 1/4 of a Julian year
+    private static final Duration DEFAULT_AUTO_RENEW_PERIOD = Duration.ofMillis(7890000000L);
+
     private final FileCreateTransactionBody.Builder builder;
 
     public FileCreateTransaction() {
         builder = FileCreateTransactionBody.newBuilder();
 
-        // Default expiration time to an acceptable value, 1/4 of a Julian year
-        setExpirationTime(Instant.now().plus(Duration.ofMillis(7890000000L)));
+        setExpirationTime(Instant.now().plus(DEFAULT_AUTO_RENEW_PERIOD));
     }
 
     @Override
@@ -33,10 +35,10 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
      * <p>May be extended using {@link FileUpdateTransaction#setExpirationTime(Instant)}.
      *
      * @param expirationTime the {@link Instant} at which this file should expire.
-     * @return {@code this} for fluent API usage.
+     * @return {@code this}
      */
     public FileCreateTransaction setExpirationTime(Instant expirationTime) {
-        builder.setExpirationTime(TimestampHelper.timestampFrom(expirationTime));
+        builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
 
         return this;
     }
@@ -56,7 +58,7 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
      * <p>The network currently requires a file to have at least one key (or key list or threshold key)
      * but this requirement may be lifted in the future.
      *
-     * @return {@code this} for fluent API usage.
+     * @return {@code this}
      */
     public FileCreateTransaction addKey(PublicKey key) {
         // fixme: Implement this after keylist is added and properly update the comments above.
@@ -77,7 +79,7 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
      * {@link FileAppendTransaction#setContents(byte[])} for the remaining chunks.
      *
      * @param bytes the contents of the file.
-     * @return {@code this} for fluent API usage.
+     * @return {@code this}
      */
     public FileCreateTransaction setContents(byte[] bytes) {
         builder.setContents(ByteString.copyFrom(bytes));
@@ -102,7 +104,7 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
      * {@link FileAppendTransaction#setContents(String)} for the remaining chunks.
      *
      * @param text the contents of the file.
-     * @return {@code this} for fluent API usage.
+     * @return {@code this}
      */
     public FileCreateTransaction setContents(String text) {
         builder.setContents(ByteString.copyFromUtf8(text));
