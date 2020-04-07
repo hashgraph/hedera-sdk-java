@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.base.Joiner;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
@@ -230,7 +231,7 @@ public final class Mnemonic {
     @Override
     public String toString() {
         if (asString == null) {
-            asString = String.join(" ", words);
+            asString = Joiner.on(' ').join(words);
         }
 
         return asString;

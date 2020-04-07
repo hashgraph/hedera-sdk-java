@@ -143,6 +143,8 @@ allprojects {
 			disable("ReturnMissingNullable")
 			disable("FieldCanBeFinal")
 			disable("Finally")
+			disable("BooleanParameter")
+			disable("ThreadJoinLoop")
 
 			// Ignore generated and protobuf code
 			disableWarningsInGeneratedCode = true

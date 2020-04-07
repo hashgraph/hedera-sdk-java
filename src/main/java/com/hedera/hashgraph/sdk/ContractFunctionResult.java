@@ -2,13 +2,14 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.ContractFunctionResultOrBuilder;
+import java8.util.stream.Collectors;
+import java8.util.stream.StreamSupport;
 import org.bouncycastle.util.encoders.Hex;
 
 import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Result of invoking a contract via {@link ContractCallQuery},
@@ -59,7 +60,7 @@ public final class ContractFunctionResult {
 
         gasUsed = inner.getGasUsed();
 
-        logs = inner.getLogInfoList().stream().map(ContractLogInfo::fromProtobuf).collect(Collectors.toList());
+        logs = StreamSupport.stream(inner.getLogInfoList()).map(ContractLogInfo::fromProtobuf).collect(Collectors.toList());
     }
 
     /**
