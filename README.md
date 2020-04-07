@@ -60,6 +60,19 @@ $ export OPERATOR_KEY="..."
 $ ./gradlew integrationTest
 ```
 
+### Example
+
+Requires `OPERATOR_ID` and `OPERATOR_KEY` to be in the environment. Integration tests run against
+the Hedera test network.
+
+```sh
+$ export OEPRATOR_ID="..."
+$ export OPERATOR_KEY="..."
+
+$ ./gradlew example:run<NameOfExample>
+$ ./gradlew example:run:generateKeys
+```
+
 ## Contributing to this Project
 
 We welcome participation from all developers!

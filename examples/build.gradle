@@ -1,0 +1,23 @@
+import com.google.common.io.Files
+import com.google.common.base.CaseFormat
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	// implementation "com.hedera.hashgraph:sdk:2.0.0-alpha1"
+	implementation project(":")
+
+	implementation "org.slf4j:slf4j-simple:2.0.0-alpha1"
+	implementation "io.grpc:grpc-netty-shaded:1.28.1"
+}
+
+tasks.addRule("Pattern: run<Example>: Runs an example.") { String taskName ->
+	if (taskName.startsWith("run")) {
+		task(taskName, type: JavaExec) {
+			classpath = sourceSets.main.runtimeClasspath
+			main = (taskName - "run") + "Example"
+		}
+	}
+}

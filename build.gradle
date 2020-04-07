@@ -1,18 +1,18 @@
 import net.ltgt.gradle.errorprone.CheckSeverity
 
 plugins {
-	id "java"
 	id "idea"
 	id "com.google.protobuf" version "0.8.12"
-	id "net.ltgt.errorprone" version "1.1.1"
-
-	// Spotless: Keep your code spotless with Gradle
-	// https://github.com/diffplug/spotless
-	id "com.diffplug.gradle.spotless" version "3.28.1"
+	id "net.ltgt.errorprone" version "1.1.1" apply false
 
 	// Gradle plugin to discover dependency updates
 	// <https://github.com/ben-manes/gradle-versions-plugin>
 	id "com.github.ben-manes.versions" version "0.28.0"
+}
+
+allprojects {
+	apply plugin: "java"
+	apply plugin: "net.ltgt.errorprone"
 }
 
 group = "com.hedera.hashgraph"
@@ -31,22 +31,26 @@ configurations {
 	integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
+allprojects {
+	dependencies {
+		// https://github.com/google/error-prone
+		// https://errorprone.info/
+		errorprone "com.google.errorprone:error_prone_core:2.3.4"
+
+		// https://github.com/uber/NullAway
+		errorprone "com.uber.nullaway:nullaway:0.7.9"
+
+		// https://github.com/grpc/grpc-java-api-checker
+		errorprone "io.grpc:grpc-java-api-checker:1.1.0"
+
+		// https://github.com/eclipse-ee4j/common-annotations-api
+		implementation "jakarta.annotation:jakarta.annotation-api:2.0.0-RC1"
+	}
+}
+
 dependencies {
-	// https://github.com/google/error-prone
-	// https://errorprone.info/
-	errorprone "com.google.errorprone:error_prone_core:2.3.4"
-
-	// https://github.com/uber/NullAway
-	errorprone "com.uber.nullaway:nullaway:0.7.9"
-
-	// https://github.com/grpc/grpc-java-api-checker
-	errorprone "io.grpc:grpc-java-api-checker:1.1.0"
-
 	// https://github.com/bsideup/jabel
 	annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:0.2.0'
-
-	// https://github.com/eclipse-ee4j/common-annotations-api
-	implementation "jakarta.annotation:jakarta.annotation-api:2.0.0-RC1"
 
 	// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
 	//       use CompletableFuture directly.
@@ -74,7 +78,6 @@ dependencies {
 	implementation "io.grpc:grpc-stub:1.28.1"
 
 	testImplementation "org.junit.jupiter:junit-jupiter-engine:5.6.1"
-	testImplementation "org.assertj:assertj-core:3.15.0"
 
 	testRuntimeOnly "org.slf4j:slf4j-simple:2.0.0-alpha1"
 
@@ -108,38 +111,41 @@ protobuf {
 	}
 }
 
-tasks.withType(JavaCompile).configureEach {
-	// https://github.com/gradle/gradle/issues/2510#issuecomment-604986414
-	// release = 8
-	compileJava {
-		options.compilerArgs = [
-			"--release",
-			"8" // Avoid using Java 12 APIs
-		]
-	}
+allprojects {
+	tasks.withType(JavaCompile).configureEach {
+		// https://github.com/gradle/gradle/issues/2510#issuecomment-604986414
+		// release = 8
+		compileJava {
+			options.compilerArgs = [
+				"--release",
+				"8" // Avoid using Java 12 APIs
+			]
+		}
 
-	options.encoding = "UTF-8"
-	options.errorprone {
-		// https://github.com/uber/NullAway
-		check("NullAway", CheckSeverity.WARN)
-		option("NullAway:AnnotatedPackages", "com.hedera.hashgraph.sdk")
-		option("NullAway:TreatGeneratedAsUnannotated", "true")
+		options.encoding = "UTF-8"
+		options.errorprone {
+			// https://github.com/uber/NullAway
+			check("NullAway", CheckSeverity.WARN)
+			option("NullAway:AnnotatedPackages", "com.hedera.hashgraph.sdk")
+			option("NullAway:TreatGeneratedAsUnannotated", "true")
 
-		// https://github.com/grpc/grpc-java-api-checker
-		check("GrpcExperimentalApi", CheckSeverity.WARN)
-		check("GrpcInternal", CheckSeverity.WARN)
+			// https://github.com/grpc/grpc-java-api-checker
+			check("GrpcExperimentalApi", CheckSeverity.WARN)
+			check("GrpcInternal", CheckSeverity.WARN)
 
-		// Enable _all_ error prone checks then selectively disble
-		// Checks that are default-disabled are enabled as warnings
-		allDisabledChecksAsWarnings = true
-		disable("TryFailRefactoring")
-		disable("ThrowSpecificExceptions")
-		disable("FutureReturnValueIgnored")
-		disable("ReturnMissingNullable")
+			// Enable _all_ error prone checks then selectively disble
+			// Checks that are default-disabled are enabled as warnings
+			allDisabledChecksAsWarnings = true
+			disable("TryFailRefactoring")
+			disable("ThrowSpecificExceptions")
+			disable("FutureReturnValueIgnored")
+			disable("ReturnMissingNullable")
+			disable("FieldCanBeFinal")
 
-		// Ignore generated and protobuf code
-		disableWarningsInGeneratedCode = true
-		excludedPaths = ".*generated.*"
+			// Ignore generated and protobuf code
+			disableWarningsInGeneratedCode = true
+			excludedPaths = ".*generated.*"
+		}
 	}
 }
 
