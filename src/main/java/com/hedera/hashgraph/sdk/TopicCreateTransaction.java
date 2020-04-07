@@ -9,6 +9,8 @@ public final class TopicCreateTransaction extends TransactionBuilder<TopicCreate
 
     public TopicCreateTransaction() {
         builder = ConsensusCreateTopicTransactionBody.newBuilder();
+
+        setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
     }
 
     /**
