@@ -129,13 +129,13 @@ final class Pem {
         }
 
         int keyLength = kdfParams.getKeyLength() != null
-            ? kdfParams.getKeyLength().intValueExact()
+            ? kdfParams.getKeyLength().intValue()
             : Crypto.CBC_DK_LEN;
 
         KeyParameter derivedKey = Crypto.deriveKeySha256(
             passphrase,
             kdfParams.getSalt(),
-            kdfParams.getIterationCount().intValueExact(),
+            kdfParams.getIterationCount().intValue(),
             keyLength);
 
         AlgorithmParameters aesParams;
