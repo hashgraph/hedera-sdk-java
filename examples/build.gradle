@@ -1,6 +1,3 @@
-import com.google.common.io.Files
-import com.google.common.base.CaseFormat
-
 repositories {
 	mavenCentral()
 }

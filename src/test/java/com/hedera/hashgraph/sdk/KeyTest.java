@@ -18,7 +18,7 @@ class KeyTest {
     @DisplayName("can sign and verify a message")
     void signatureVerified() {
         var message = "Hello, World".getBytes(UTF_8);
-        var privateKey = PrivateKey.generateEd25519();
+        var privateKey = PrivateKey.generate();
         var publicKey = privateKey.getPublicKey();
         var signature = privateKey.sign(message);
 

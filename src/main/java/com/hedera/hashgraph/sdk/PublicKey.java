@@ -2,7 +2,6 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.SignaturePair;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
@@ -69,7 +68,7 @@ public final class PublicKey extends Key {
         try {
             return new SubjectPublicKeyInfo(
                 new AlgorithmIdentifier(ID_ED25519),
-                new DEROctetString(keyData)
+                keyData
             ).getEncoded("DER");
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -13,7 +13,7 @@ class AccountTransactionIntegrationTest {
             var operatorKey = PrivateKey.fromString(System.getenv("OPERATOR_KEY"));
             var operatorId = new AccountId(147722);
 
-            var newKey = PrivateKey.generateEd25519();
+            var newKey = PrivateKey.generate();
 
             try (var client = Client.forTestnet()) {
                 client.setOperator(operatorId, operatorKey);

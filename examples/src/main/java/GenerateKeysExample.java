@@ -6,7 +6,7 @@ class GenerateKeysExample {
     }
 
     public static void main(String[] args) {
-        PrivateKey privateKey = PrivateKey.generateEd25519();
+        PrivateKey privateKey = PrivateKey.generate();
         PublicKey publicKey = privateKey.getPublicKey();
 
         System.out.println("private = " + privateKey);
