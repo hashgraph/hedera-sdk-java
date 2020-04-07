@@ -1,8 +1,8 @@
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 
-class GenerateKeysExample {
-    private GenerateKeysExample() {
+class GenerateKeyExample {
+    private GenerateKeyExample() {
     }
 
     public static void main(String[] args) {

@@ -69,8 +69,8 @@ the Hedera test network.
 $ export OEPRATOR_ID="..."
 $ export OPERATOR_KEY="..."
 
-$ ./gradlew example:run<NameOfExample>
-$ ./gradlew example:run:generateKeys
+$ ./gradlew -q example:run<NameOfExample>
+$ ./gradlew -q example:runGenerateKey
 ```
 
 ## Contributing to this Project
