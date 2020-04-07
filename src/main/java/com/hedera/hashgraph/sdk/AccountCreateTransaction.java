@@ -6,7 +6,7 @@ import org.threeten.bp.Duration;
 
 /** Create a new Hedera™ account. */
 public final class AccountCreateTransaction extends TransactionBuilder<AccountCreateTransaction> {
-    private static final Hbar DEFAULT_RECORD_THRESHOLD = Hbar.MAX;
+    private static final Hbar DEFAULT_RECORD_THRESHOLD = Hbar.fromTinybar(Long.MAX_VALUE);
 
     private final CryptoCreateTransactionBody.Builder builder;
 
