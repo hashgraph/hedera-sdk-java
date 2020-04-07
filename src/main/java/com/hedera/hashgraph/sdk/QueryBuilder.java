@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
@@ -35,6 +36,9 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
     @Nullable
     private Hbar queryPayment;
 
+    @Nullable
+    private Hbar maxQueryPayment;
+
     QueryBuilder() {
         builder = Query.newBuilder();
         headerBuilder = QueryHeader.newBuilder();
@@ -42,6 +46,13 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
 
     public T setQueryPayment(Hbar queryPayment) {
         this.queryPayment = queryPayment;
+
+        // noinspection unchecked
+        return (T) this;
+    }
+
+    public T setMaxQueryPayment(Hbar maxQueryPayment) {
+        this.maxQueryPayment = maxQueryPayment;
 
         // noinspection unchecked
         return (T) this;
@@ -66,6 +77,11 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
     protected abstract QueryHeader mapRequestHeader(Query request);
 
     @Override
+    protected Executable<Hbar> getCostExecutable(Client client) {
+        return new QueryCostQuery();
+    }
+
+    @Override
     protected CompletableFuture<Void> onExecuteAsync(Client client) {
         if ((paymentTransactions != null) || !isPaymentRequired()) {
             return CompletableFuture.completedFuture(null);
@@ -86,7 +102,20 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
                 // No payment was specified so we need to go ask
                 // This is a query in its own right so we use a nested future here
 
-                return new QueryCostQuery().executeAsync(client);
+                return getCostAsync(client).thenCompose(cost -> {
+                    // Check if this is below our configured maximum query payment
+                    var maxCost = MoreObjects.firstNonNull(maxQueryPayment, client.maxQueryPayment);
+
+                    if (cost.compareTo(maxCost) > 0) {
+                        return CompletableFuture.failedFuture(new MaxQueryPaymentExceededException(
+                            this,
+                            cost,
+                            maxCost
+                        ));
+                    }
+
+                    return CompletableFuture.completedFuture(cost);
+                });
             }
 
             return CompletableFuture.completedFuture(queryPayment);

@@ -1,16 +1,19 @@
 package com.hedera.hashgraph.sdk;
 
+import java8.util.concurrent.CompletableFuture;
+import java8.util.function.BiConsumer;
+import java8.util.function.Consumer;
+import org.threeten.bp.Duration;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java8.util.concurrent.CompletableFuture;
-import java8.util.function.BiConsumer;
-import org.threeten.bp.Duration;
 
 public abstract class Executable<O> {
     public static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(30);
 
-    Executable() {}
+    Executable() {
+    }
 
     public abstract CompletableFuture<O> executeAsync(Client client);
 
@@ -18,11 +21,25 @@ public abstract class Executable<O> {
         executeAsync(client, DEFAULT_TIMEOUT, callback);
     }
 
+    public void executeAsync(Client client, Consumer<O> onSuccess, Consumer<Throwable> onFailure) {
+        executeAsync(client, DEFAULT_TIMEOUT, onSuccess, onFailure);
+    }
+
     @SuppressWarnings("InconsistentOverloads")
     public void executeAsync(Client client, Duration timeout, BiConsumer<O, Throwable> callback) {
         executeAsync(client)
-                .orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS)
-                .whenComplete(callback);
+            .orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS)
+            .whenComplete(callback);
+    }
+
+    @SuppressWarnings("InconsistentOverloads")
+    public void executeAsync(Client client, Duration timeout, Consumer<O> onSuccess, Consumer<Throwable> onFailure) {
+        executeAsync(client)
+            .orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS)
+            .whenComplete((response, error) -> {
+                if (error != null) onFailure.accept(error);
+                else onSuccess.accept(response);
+            });
     }
 
     public O execute(Client client) throws TimeoutException {

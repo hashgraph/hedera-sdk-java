@@ -108,6 +108,10 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     public final Transaction build(@Nullable Client client) {
         onBuild(bodyBuilder);
 
+        if (client != null && bodyBuilder.getTransactionFee() == 0) {
+            bodyBuilder.setTransactionFee(client.maxTransactionFee.asTinybar());
+        }
+
         if (!bodyBuilder.hasTransactionID() && client != null) {
             var operator = client.getOperator();
             if (operator != null) {

@@ -5,6 +5,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.errorprone.annotations.Var;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import java8.util.function.Consumer;
 import java8.util.function.Function;
 
 import javax.annotation.Nullable;
@@ -21,6 +22,10 @@ import java.util.concurrent.TimeUnit;
  * Managed client for use on the Hedera Hashgraph network.
  */
 public final class Client implements AutoCloseable {
+    private static Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
+
+    private static Hbar DEFAULT_MAX_TRANSACTION_FEE = new Hbar(1);
+
     final ExecutorService executor;
 
     private final Iterator<AccountId> nodes;
@@ -28,6 +33,10 @@ public final class Client implements AutoCloseable {
     private final Map<AccountId, String> network;
 
     private Map<AccountId, ManagedChannel> channels;
+
+    Hbar maxTransactionFee = DEFAULT_MAX_QUERY_PAYMENT;
+
+    Hbar maxQueryPayment = DEFAULT_MAX_TRANSACTION_FEE;
 
     @Nullable
     private Operator operator;
@@ -114,6 +123,51 @@ public final class Client implements AutoCloseable {
 
     public Client setOperatorWith(AccountId accountId, PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
         this.operator = new Operator(accountId, publicKey, transactionSigner);
+        return this;
+    }
+
+    /**
+     * Set the maximum fee to be paid for transactions executed by this client.
+     * <p>
+     * Because transaction fees are always maximums, this will simply add a call to
+     * {@link TransactionBuilder#setMaxTransactionFee(Hbar)} on every new transaction. The actual
+     * fee assessed for a given transaction may be less than this value, but never greater.
+     *
+     * @return {@code this}.
+     */
+    public Client setMaxTransactionFee(Hbar maxTransactionFee) {
+        if (maxTransactionFee.asTinybar() < 0) {
+            throw new IllegalArgumentException("maxTransactionFee must be non-negative");
+        }
+
+        this.maxTransactionFee = maxTransactionFee;
+        return this;
+    }
+
+    /**
+     * Set the maximum default payment allowable for queries.
+     * <p>
+     * When a query is executed without an explicit
+     * {@link QueryBuilder#setPaymentTransaction(Transaction)}
+     * or {@link QueryBuilder#setQueryPayment(Hbar)} call, the client will first request the cost
+     * of the given query from the node it will be submitted to and attach a payment for that amount
+     * from the operator account on the client.
+     * <p>
+     * If the returned value is greater than this value, a
+     * {@link MaxQueryPaymentExceededException} will be thrown from
+     * {@link QueryBuilder#execute(Client)} or returned in the second callback of
+     * {@link QueryBuilder#executeAsync(Client, Consumer, Consumer)}.
+     * <p>
+     * Set to 0 to disable automatic implicit payments.
+     *
+     * @return {@code this}.
+     */
+    public Client setMaxQueryPayment(Hbar maxQueryPayment) {
+        if (maxQueryPayment.asTinybar() < 0) {
+            throw new IllegalArgumentException("maxQueryPayment must be non-negative");
+        }
+
+        this.maxQueryPayment = maxQueryPayment;
         return this;
     }
 
