@@ -281,7 +281,7 @@ public final class Mnemonic {
 
             while (offset >= 8) {
                 // truncation is what we want here
-                buffer.put((byte) (scratch >> offset - 8));
+                buffer.put((byte) (scratch >> (offset - 8)));
                 offset -= 8;
             }
         }
