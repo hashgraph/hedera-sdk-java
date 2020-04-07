@@ -53,12 +53,11 @@ public final class CreateSimpleContract {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // create the contract's bytecode file
-        TransactionId fileTxId = new FileCreateTransaction().setExpirationTime(
-            Instant.now()
-                .plus(Duration.ofSeconds(3600)))
+        TransactionId fileTxId = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file
             .addKey(OPERATOR_KEY.publicKey)
             .setContents(byteCodeHex.getBytes())
+            .setMaxTransactionFee(2000000000)
             .execute(client);
 
         TransactionReceipt fileReceipt = fileTxId.getReceipt(client);
@@ -67,11 +66,12 @@ public final class CreateSimpleContract {
         System.out.println("contract bytecode file: " + newFileId);
 
         // create the contract itself
-        TransactionId contractTxId = new ContractCreateTransaction().setAutoRenewPeriod(Duration.ofHours(1))
+        TransactionId contractTxId = new ContractCreateTransaction()
             .setGas(217000)
             .setBytecodeFileId(newFileId)
             // set an admin key so we can delete the contract later
             .setAdminKey(OPERATOR_KEY.publicKey)
+            .setMaxTransactionFee(2000000000)
             .execute(client);
 
         TransactionReceipt contractReceipt = contractTxId.getReceipt(client);
