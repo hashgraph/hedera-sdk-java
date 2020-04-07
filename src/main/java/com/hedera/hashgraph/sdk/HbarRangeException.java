@@ -7,4 +7,8 @@ public class HbarRangeException extends IllegalArgumentException {
     HbarRangeException(String message) {
         super(message);
     }
+
+    HbarRangeException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }
