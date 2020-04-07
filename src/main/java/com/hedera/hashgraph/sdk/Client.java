@@ -117,7 +117,8 @@ public final class Client implements AutoCloseable {
         return this;
     }
 
-    @Nullable Operator getOperator() {
+    @Nullable
+    Operator getOperator() {
         return this.operator;
     }
 
@@ -171,10 +172,14 @@ public final class Client implements AutoCloseable {
 
         var address = network.get(nodeId);
 
+        // Build a user agent that species our SDK version for Hedera
+        var thePackage = getClass().getPackage();
+        var implementationVersion = thePackage != null ? thePackage.getImplementationVersion() : null;
+        var userAgent = "hedera-sdk-java/" + ((implementationVersion != null) ? ("v" + implementationVersion) : ("DEV"));
+
         channel = ManagedChannelBuilder.forTarget(address)
             .usePlaintext()
-            // TODO: Get the actual project version
-            .userAgent("hedera-sdk-java/2.0.0-SNAPSHOT")
+            .userAgent(userAgent)
             .executor(executor)
             .build();
 
