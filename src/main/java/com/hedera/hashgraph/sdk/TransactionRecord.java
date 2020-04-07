@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import org.threeten.bp.Instant;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,8 @@ public final class TransactionRecord {
 
     public final Hbar transactionFee;
 
-    public final Void contractFunctionResult;
+    @Nullable
+    public final ContractFunctionResult contractFunctionResult;
 
     public final List<Transfer> transfers;
 
@@ -30,7 +32,7 @@ public final class TransactionRecord {
         TransactionId transactionId,
         String memo,
         long transactionFee,
-        Void contractFunctionResult,
+        @Nullable ContractFunctionResult contractFunctionResult,
         List<Transfer> transfers
     ) {
         this.receipt = transactionReceipt;
@@ -49,6 +51,13 @@ public final class TransactionRecord {
             transfers.add(Transfer.fromProtobuf(accountAmount));
         }
 
+        // HACK: This is a bit bad, any takers to clean this up
+        var contractFunctionResult = transactionRecord.hasContractCallResult() ?
+            new ContractFunctionResult(transactionRecord.getContractCallResult()) :
+            transactionRecord.hasContractCreateResult() ?
+                new ContractFunctionResult(transactionRecord.getContractCreateResult()) :
+                null;
+
         return new TransactionRecord(
             TransactionReceipt.fromProtobuf(transactionRecord.getReceipt()),
             transactionRecord.getTransactionHash().toByteArray(),
@@ -56,7 +65,7 @@ public final class TransactionRecord {
             TransactionId.fromProtobuf(transactionRecord.getTransactionID()),
             transactionRecord.getMemo(),
             transactionRecord.getTransactionFee(),
-            null,
+            contractFunctionResult,
             transfers
         );
     }
