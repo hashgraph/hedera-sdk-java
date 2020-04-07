@@ -5,8 +5,6 @@ import com.hedera.hashgraph.sdk.proto.CryptoTransferTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransferList;
 
-import javax.annotation.Nonnegative;
-
 public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTransferTransaction> {
     private final CryptoTransferTransactionBody.Builder builder;
     private final TransferList.Builder transfersBuilder;

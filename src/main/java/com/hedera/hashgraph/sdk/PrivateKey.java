@@ -1,25 +1,26 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.SignaturePair;
-import java.io.IOException;
-import java.util.Arrays;
-import javax.annotation.Nullable;
 import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
 
-// TODO: Multiple algorithms
-// TODO: #fromString
-// TODO: #fromBytes
-// TODO: #fromMnemonic
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.Arrays;
 
-/** A private key on the Hedera™ network. */
+/**
+ * A private key on the Hedera™ network.
+ */
 public final class PrivateKey extends Key {
     private final byte[] keyData;
 
     // Cache the derivation of the public key
-    @Nullable private PublicKey publicKey;
+    @Nullable
+    private PublicKey publicKey;
 
     PrivateKey(byte[] keyData) {
         this.keyData = keyData;
@@ -43,7 +44,7 @@ public final class PrivateKey extends Key {
 
     public static PrivateKey fromBytes(byte[] privateKey) {
         if ((privateKey.length == Ed25519.SECRET_KEY_SIZE)
-                || (privateKey.length == Ed25519.SECRET_KEY_SIZE + Ed25519.PUBLIC_KEY_SIZE)) {
+            || (privateKey.length == Ed25519.SECRET_KEY_SIZE + Ed25519.PUBLIC_KEY_SIZE)) {
             // If this is a 32 or 64 byte string, assume an Ed25519 private key
             return new PrivateKey(Arrays.copyOfRange(privateKey, 0, Ed25519.SECRET_KEY_SIZE));
         }
@@ -92,6 +93,26 @@ public final class PrivateKey extends Key {
         Ed25519.sign(keyData, 0, message, 0, message.length, signature, 0);
 
         return signature;
+    }
+
+    public byte[] toBytes() {
+        return keyData;
+    }
+
+    private byte[] toDER() {
+        try {
+            return new PrivateKeyInfo(
+                new AlgorithmIdentifier(ID_ED25519),
+                new DEROctetString(keyData)
+            ).getEncoded("DER");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return Hex.toHexString(toDER());
     }
 
     @Override

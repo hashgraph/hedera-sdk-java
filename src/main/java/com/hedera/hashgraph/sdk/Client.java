@@ -22,9 +22,9 @@ import java.util.concurrent.TimeUnit;
  * Managed client for use on the Hedera Hashgraph network.
  */
 public final class Client implements AutoCloseable {
-    private static Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
+    private static final Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
 
-    private static Hbar DEFAULT_MAX_TRANSACTION_FEE = new Hbar(1);
+    private static final Hbar DEFAULT_MAX_TRANSACTION_FEE = new Hbar(1);
 
     final ExecutorService executor;
 
@@ -229,7 +229,7 @@ public final class Client implements AutoCloseable {
         // Build a user agent that species our SDK version for Hedera
         var thePackage = getClass().getPackage();
         var implementationVersion = thePackage != null ? thePackage.getImplementationVersion() : null;
-        var userAgent = "hedera-sdk-java/" + ((implementationVersion != null) ? ("v" + implementationVersion) : ("DEV"));
+        var userAgent = "hedera-sdk-java/" + ((implementationVersion != null) ? ("v" + implementationVersion) : "DEV");
 
         channel = ManagedChannelBuilder.forTarget(address)
             .usePlaintext()

@@ -1,8 +1,11 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.SignaturePair;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
 public abstract class Key {
+    static final ASN1ObjectIdentifier ID_ED25519 = new ASN1ObjectIdentifier("1.3.101.112");
+
     static Key fromProtobuf(com.hedera.hashgraph.sdk.proto.Key key) {
         switch (key.getKeyCase()) {
             case ED25519:
