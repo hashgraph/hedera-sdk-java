@@ -1,16 +1,25 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.base.MoreObjects;
 import org.threeten.bp.Instant;
 
-/** Denotes a conversion between Hbars and cents (USD). */
+/**
+ * Denotes a conversion between Hbars and cents (USD).
+ */
 public final class ExchangeRate {
-    /** Denotes Hbar equivalent to cents (USD) */
+    /**
+     * Denotes Hbar equivalent to cents (USD)
+     */
     public final int hbars;
 
-    /** Denotes cents (USD) equivalent to Hbar */
+    /**
+     * Denotes cents (USD) equivalent to Hbar
+     */
     public final int cents;
 
-    /** Expiration time of this exchange rate */
+    /**
+     * Expiration time of this exchange rate
+     */
     public final Instant expirationTime;
 
     private ExchangeRate(int hbars, int cents, Instant expirationTime) {
@@ -21,20 +30,18 @@ public final class ExchangeRate {
 
     static ExchangeRate fromProtobuf(com.hedera.hashgraph.sdk.proto.ExchangeRate pb) {
         return new ExchangeRate(
-                pb.getHbarEquiv(),
-                pb.getCentEquiv(),
-                InstantConverter.fromProtobuf(pb.getExpirationTime()));
+            pb.getHbarEquiv(),
+            pb.getCentEquiv(),
+            InstantConverter.fromProtobuf(pb.getExpirationTime())
+        );
     }
 
     @Override
     public String toString() {
-        return "ExchangeRate{"
-                + "hbars="
-                + hbars
-                + ", cents="
-                + cents
-                + ", expirationTime="
-                + expirationTime
-                + '}';
+        return MoreObjects.toStringHelper(this)
+            .add("hbars", hbars)
+            .add("cents", cents)
+            .add("expirationTime", expirationTime)
+            .toString();
     }
 }
