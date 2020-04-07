@@ -416,7 +416,7 @@ public enum Status {
      */
     TopicExpired(ResponseCodeEnum.TOPIC_EXPIRED);
 
-    private final ResponseCodeEnum code;
+    final ResponseCodeEnum code;
 
     Status(ResponseCodeEnum code) {
         this.code = code;
@@ -668,7 +668,7 @@ public enum Status {
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
-                        "network return unrecognized response code; update your SDK or open an issue");
+                        "network returned unrecognized response code; your SDK may be out of date");
         }
 
         // NOTE: This should be unreachable as error prone has enum exhaustiveness checking
