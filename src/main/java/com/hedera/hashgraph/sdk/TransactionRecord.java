@@ -16,7 +16,7 @@ public final class TransactionRecord {
 
     public final TransactionId transactionId;
 
-    public final String memo;
+    public final String transactionMemo;
 
     public final Hbar transactionFee;
 
@@ -30,7 +30,7 @@ public final class TransactionRecord {
         byte[] transactionHash,
         Instant consensusTimestamp,
         TransactionId transactionId,
-        String memo,
+        String transactionMemo,
         long transactionFee,
         @Nullable ContractFunctionResult contractFunctionResult,
         List<Transfer> transfers
@@ -38,7 +38,7 @@ public final class TransactionRecord {
         this.receipt = transactionReceipt;
         this.transactionHash = transactionHash;
         this.consensusTimestamp = consensusTimestamp;
-        this.memo = memo;
+        this.transactionMemo = transactionMemo;
         this.transactionId = transactionId;
         this.transfers = transfers;
         this.contractFunctionResult = contractFunctionResult;
@@ -77,7 +77,7 @@ public final class TransactionRecord {
             .add("transactionHash", transactionHash)
             .add("consensusTimestamp", consensusTimestamp)
             .add("transactionId", transactionId)
-            .add("memo", memo)
+            .add("transactionMemo", transactionMemo)
             .add("transactionFee", transactionFee)
             .add("contractFunctionResult", contractFunctionResult)
             .add("transfers", transfers)
