@@ -43,10 +43,10 @@ public class MirrorTopicQuery {
         Consumer<MirrorTopicResponse> onNext,
         Consumer<Throwable> onError
     ) {
-        final ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call =
+        ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call =
             mirrorClient.channel.newCall(ConsensusServiceGrpc.getSubscribeTopicMethod(), CallOptions.DEFAULT);
 
-        final MirrorSubscriptionHandle subscriptionHandle = new MirrorSubscriptionHandle(() -> {
+        MirrorSubscriptionHandle subscriptionHandle = new MirrorSubscriptionHandle(() -> {
             call.cancel("unsubscribed", null);
         });
 

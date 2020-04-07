@@ -238,16 +238,16 @@ public final class Mnemonic {
     }
 
     byte[] toSeed(String passphrase) {
-        final String salt = "mnemonic" + passphrase;
+        String salt = "mnemonic" + passphrase;
 
         // BIP-39 seed generation
-        final PKCS5S2ParametersGenerator pbkdf2 = new PKCS5S2ParametersGenerator(new SHA512Digest());
+        PKCS5S2ParametersGenerator pbkdf2 = new PKCS5S2ParametersGenerator(new SHA512Digest());
         pbkdf2.init(
             toString().getBytes(UTF_8),
             salt.getBytes(UTF_8),
             2048);
 
-        final KeyParameter key = (KeyParameter) pbkdf2.generateDerivedParameters(512);
+        KeyParameter key = (KeyParameter) pbkdf2.generateDerivedParameters(512);
         return key.getKey();
     }
 

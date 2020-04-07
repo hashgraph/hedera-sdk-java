@@ -47,7 +47,7 @@ public final class ContractFunctionParameters {
     private static final ByteString negativePadding;
 
     static {
-        final byte[] fill = new byte[31];
+        byte[] fill = new byte[31];
         Arrays.fill(fill, (byte) 0xFF);
         negativePadding = ByteString.copyFrom(fill);
     }
@@ -55,7 +55,7 @@ public final class ContractFunctionParameters {
     private final ArrayList<Argument> args = new ArrayList<>();
 
     private static ByteString encodeString(String string) {
-        final ByteString strBytes = ByteString.copyFromUtf8(string);
+        ByteString strBytes = ByteString.copyFromUtf8(string);
         // prepend the size of the string in UTF-8 bytes
         return int256(strBytes.size(), 32)
             .concat(rightPad32(strBytes));
@@ -75,24 +75,24 @@ public final class ContractFunctionParameters {
     }
 
     private static ByteString encodeArray(Stream<ByteString> elements) {
-        final List<ByteString> list = elements.collect(Collectors.toList());
+        List<ByteString> list = elements.collect(Collectors.toList());
 
         return int256(list.size(), 32)
             .concat(ByteString.copyFrom(list));
     }
 
     private static ByteString encodeDynArr(List<ByteString> elements) {
-        final int offsetsLen = elements.size();
+        int offsetsLen = elements.size();
 
         // [len, offset[0], offset[1], ... offset[len - 1]]
-        final ArrayList<ByteString> head = new ArrayList<>(offsetsLen + 1);
+        ArrayList<ByteString> head = new ArrayList<>(offsetsLen + 1);
 
         head.add(uint256(elements.size(), 32));
 
         // points to start of dynamic segment, *not* including the length of the array
         long currOffset = offsetsLen * 32L;
 
-        for (final ByteString elem : elements) {
+        for (ByteString elem : elements) {
             head.add(uint256(currOffset, 64));
             currOffset += elem.size();
         }
@@ -129,13 +129,13 @@ public final class ContractFunctionParameters {
     static ByteString int256(long val, int bitWidth, boolean signed) {
         // don't try to get wider than a `long` as it should just be filled with padding
         bitWidth = Math.min(bitWidth, 64);
-        final ByteString.Output output = ByteString.newOutput(bitWidth / 8);
+        ByteString.Output output = ByteString.newOutput(bitWidth / 8);
 
         // write bytes in big-endian order
         for (int i = bitWidth - 8; i >= 0; i -= 8) {
             // widening conversion sign-extends so we don't have to do anything special when
             // truncating a previously widened value
-            final byte u8 = (byte) (val >> i);
+            byte u8 = (byte) (val >> i);
             output.write(u8);
         }
 
@@ -219,11 +219,11 @@ public final class ContractFunctionParameters {
      * @throws NullPointerException if any value in `strings` is null
      */
     public ContractFunctionParameters addStringArray(String[] strings) {
-        final List<ByteString> byteStrings = J8Arrays.stream(strings)
+        List<ByteString> byteStrings = J8Arrays.stream(strings)
             .map(ContractFunctionParameters::encodeString)
             .collect(Collectors.toList());
 
-        final ByteString argBytes = encodeDynArr(byteStrings);
+        ByteString argBytes = encodeDynArr(byteStrings);
 
         args.add(new Argument("string[]", argBytes, true));
 
@@ -243,7 +243,7 @@ public final class ContractFunctionParameters {
      * Add a parameter of type {@code bytes[]}, an array of byte-strings.
      */
     public ContractFunctionParameters addBytesArray(byte[][] param) {
-        final List<ByteString> byteArrays = J8Arrays.stream(param)
+        List<ByteString> byteArrays = J8Arrays.stream(param)
             .map(ContractFunctionParameters::encodeBytes)
             .collect(Collectors.toList());
 
@@ -274,7 +274,7 @@ public final class ContractFunctionParameters {
      */
     public ContractFunctionParameters addBytes32Array(byte[][] param) {
         // array of fixed-size elements
-        final Stream<ByteString> byteArrays = J8Arrays.stream(param)
+        Stream<ByteString> byteArrays = J8Arrays.stream(param)
             .map(ContractFunctionParameters::encodeBytes32);
 
         args.add(new Argument("bytes32[]", encodeArray(byteArrays), true));
@@ -536,7 +536,7 @@ public final class ContractFunctionParameters {
      *                                  characters long or fails to decode as hexadecimal.
      */
     public ContractFunctionParameters addAddress(String address) {
-        final byte[] addressBytes = decodeAddress(address);
+        byte[] addressBytes = decodeAddress(address);
 
         args.add(new Argument("address", leftPad32(ByteString.copyFrom(addressBytes)), false));
 
@@ -552,9 +552,9 @@ public final class ContractFunctionParameters {
      * @throws NullPointerException     if any value in the array is null.
      */
     public ContractFunctionParameters addAddressArray(String[] addresses) {
-        final ByteString addressArray = encodeArray(
+        ByteString addressArray = encodeArray(
             J8Arrays.stream(addresses).map(a -> {
-                final byte[] address = decodeAddress(a);
+                byte[] address = decodeAddress(a);
                 checkAddressLen(address);
                 return leftPad32(ByteString.copyFrom(address));
             }));
@@ -607,7 +607,7 @@ public final class ContractFunctionParameters {
 
         var dynamicArgs = new ArrayList<ByteString>();
 
-        final ContractFunctionSelector functionSelector = funcName != null
+        ContractFunctionSelector functionSelector = funcName != null
             ? new ContractFunctionSelector(funcName) : null;
 
         // iterate the arguments and determine whether they are dynamic or not

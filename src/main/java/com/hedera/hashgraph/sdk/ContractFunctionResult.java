@@ -225,7 +225,7 @@ public final class ContractFunctionResult {
      * Get the nth returned value as a Solidity address.
      */
     public String getAddress(int valIndex) {
-        final int offset = valIndex * 32;
+        int offset = valIndex * 32;
         // address is a uint160
         return Hex.toHexString(getByteString(offset + 12, offset + 32).toByteArray());
     }

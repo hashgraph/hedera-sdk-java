@@ -75,7 +75,7 @@ final class Pem {
     }
 
     static PrivateKeyInfo readPrivateKey(Reader input, @Nullable String passphrase) throws IOException {
-        final PemReader pemReader = new PemReader(input);
+        PemReader pemReader = new PemReader(input);
 
         PemObject readObject = null;
 

@@ -32,14 +32,14 @@ final class Crypto {
     }
 
     static KeyParameter deriveKeySha256(String passphrase, byte[] salt, int iterations, int dkLenBytes) {
-        final PKCS5S2ParametersGenerator gen = new PKCS5S2ParametersGenerator(new SHA256Digest());
+        PKCS5S2ParametersGenerator gen = new PKCS5S2ParametersGenerator(new SHA256Digest());
         gen.init(passphrase.getBytes(StandardCharsets.UTF_8), salt, iterations);
 
         return (KeyParameter) gen.generateDerivedParameters(dkLenBytes * 8);
     }
 
     static Cipher initAesCtr128(KeyParameter cipherKey, byte[] iv, boolean forDecrypt) {
-        final Cipher aesCipher;
+        Cipher aesCipher;
 
         try {
             aesCipher = Cipher.getInstance("AES/CTR/PKCS5Padding");
@@ -51,7 +51,7 @@ final class Crypto {
     }
 
     static Cipher initAesCbc128Encrypt(KeyParameter cipherKey, byte[] iv) {
-        final Cipher aesCipher;
+        Cipher aesCipher;
 
         try {
             aesCipher = Cipher.getInstance("AES/CBC/NoPadding");
@@ -63,7 +63,7 @@ final class Crypto {
     }
 
     static Cipher initAesCbc128Decrypt(KeyParameter cipherKey, AlgorithmParameters parameters) {
-        final Cipher aesCipher;
+        Cipher aesCipher;
 
         try {
             aesCipher = Cipher.getInstance("AES/CBC/NoPadding");
@@ -83,7 +83,7 @@ final class Crypto {
     }
 
     private static Cipher initAesCipher(Cipher aesCipher, KeyParameter cipherKey, byte[] iv, boolean forDecrypt) {
-        final int mode = forDecrypt ? Cipher.DECRYPT_MODE : Cipher.ENCRYPT_MODE;
+        int mode = forDecrypt ? Cipher.DECRYPT_MODE : Cipher.ENCRYPT_MODE;
 
         try {
             aesCipher.init(mode, new SecretKeySpec(cipherKey.getKey(), 0, 16, "AES"),
@@ -98,17 +98,17 @@ final class Crypto {
     }
 
     static byte[] encryptAesCtr128(KeyParameter cipherKey, byte[] iv, byte[] input) {
-        final Cipher aesCipher = initAesCtr128(cipherKey, iv, false);
+        Cipher aesCipher = initAesCtr128(cipherKey, iv, false);
         return runCipher(aesCipher, input);
     }
 
     static byte[] decryptAesCtr128(KeyParameter cipherKey, byte[] iv, byte[] input) {
-        final Cipher aesCipher = initAesCtr128(cipherKey, iv, true);
+        Cipher aesCipher = initAesCtr128(cipherKey, iv, true);
         return runCipher(aesCipher, input);
     }
 
     static byte[] runCipher(Cipher cipher, byte[] input) {
-        final byte[] output = new byte[cipher.getOutputSize(input.length)];
+        byte[] output = new byte[cipher.getOutputSize(input.length)];
 
         try {
             cipher.doFinal(input, 0, input.length, output);
@@ -120,8 +120,8 @@ final class Crypto {
     }
 
     static byte[] calcHmacSha384(KeyParameter cipherKey, byte[] input) {
-        final HMac hmacSha384 = new HMac(new SHA384Digest());
-        final byte[] output = new byte[hmacSha384.getMacSize()];
+        HMac hmacSha384 = new HMac(new SHA384Digest());
+        byte[] output = new byte[hmacSha384.getMacSize()];
 
         hmacSha384.init(new KeyParameter(cipherKey.getKey(), 16, 16));
         hmacSha384.update(input, 0, input.length);
@@ -131,7 +131,7 @@ final class Crypto {
     }
 
     static byte[] randomBytes(int len) {
-        final byte[] out = new byte[len];
+        byte[] out = new byte[len];
         ThreadLocalSecureRandom.current().nextBytes(out);
 
         return out;
