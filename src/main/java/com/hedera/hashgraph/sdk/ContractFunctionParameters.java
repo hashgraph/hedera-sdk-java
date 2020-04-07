@@ -119,10 +119,6 @@ public final class ContractFunctionParameters {
         }
     }
 
-    static ByteString uint256(long val, int bitWidth) {
-        return int256(val, bitWidth, false);
-    }
-
     static ByteString int256(long val, int bitWidth) {
         return int256(val, bitWidth, true);
     }
@@ -144,6 +140,14 @@ public final class ContractFunctionParameters {
         return leftPad32(output.toByteString(), signed && val < 0);
     }
 
+    static ByteString int256(BigInteger bigInt) {
+        return leftPad32(bigInt.toByteArray(), bigInt.signum() < 0);
+    }
+
+    static ByteString uint256(long val, int bitWidth) {
+        return int256(val, bitWidth, false);
+    }
+
     static ByteString uint256(BigInteger bigInt) {
         if (bigInt.bitLength() == 256) {
             // we have to chop off the sign bit or else we'll have a 33 byte value
@@ -152,10 +156,6 @@ public final class ContractFunctionParameters {
         }
 
         return leftPad32(bigInt.toByteArray(), false);
-    }
-
-    static ByteString int256(BigInteger bigInt) {
-        return leftPad32(bigInt.toByteArray(), bigInt.signum() < 0);
     }
 
     static ByteString leftPad32(ByteString input) {
@@ -593,6 +593,23 @@ public final class ContractFunctionParameters {
         return addFunction(decodeAddress(address), selector.finish());
     }
 
+    private ContractFunctionParameters addFunction(byte[] address, byte[] selector) {
+        checkAddressLen(address);
+
+        if (selector.length != SELECTOR_LEN) {
+            throw new IllegalArgumentException("function selectors must be 4 bytes or 8 hex chars");
+        }
+
+        var output = ByteString.newOutput(ADDRESS_LEN + SELECTOR_LEN);
+        output.write(address, 0, address.length);
+        output.write(selector, 0, selector.length);
+
+        // function reference encodes as `bytes24`
+        args.add(new Argument("function", rightPad32(output.toByteString()), false));
+
+        return this;
+    }
+
     /**
      * Get the encoding of the currently added parameters as a {@link ByteString}.
      * <p>
@@ -636,23 +653,6 @@ public final class ContractFunctionParameters {
         paramsBytes.addAll(dynamicArgs);
 
         return ByteString.copyFrom(paramsBytes);
-    }
-
-    private ContractFunctionParameters addFunction(byte[] address, byte[] selector) {
-        checkAddressLen(address);
-
-        if (selector.length != SELECTOR_LEN) {
-            throw new IllegalArgumentException("function selectors must be 4 bytes or 8 hex chars");
-        }
-
-        var output = ByteString.newOutput(ADDRESS_LEN + SELECTOR_LEN);
-        output.write(address, 0, address.length);
-        output.write(selector, 0, selector.length);
-
-        // function reference encodes as `bytes24`
-        args.add(new Argument("function", rightPad32(output.toByteString()), false));
-
-        return this;
     }
 
     private final static class Argument {
