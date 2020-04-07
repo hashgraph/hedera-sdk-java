@@ -23,7 +23,7 @@ import java.util.stream.Stream;
  * If you require a type which is not supported here, please let us know on
  * <a href="https://github.com/hashgraph/hedera-sdk-java/issues/298>this Github issue</a>.
  */
-public final class ContractFunctionParams {
+public final class ContractFunctionParameters {
     /**
      * The length of a Solidity address in bytes.
      */
@@ -205,7 +205,7 @@ public final class ContractFunctionParams {
      *
      * @return {@code this} for fluent usage
      */
-    public ContractFunctionParams addString(String param) {
+    public ContractFunctionParameters addString(String param) {
         args.add(new Argument("string", encodeString(param), true));
 
         return this;
@@ -216,9 +216,9 @@ public final class ContractFunctionParams {
      *
      * @throws NullPointerException if any value in `strings` is null
      */
-    public ContractFunctionParams addStringArray(String[] strings) {
+    public ContractFunctionParameters addStringArray(String[] strings) {
         final List<ByteString> byteStrings = Arrays.stream(strings)
-            .map(ContractFunctionParams::encodeString)
+            .map(ContractFunctionParameters::encodeString)
             .collect(Collectors.toList());
 
         final ByteString argBytes = encodeDynArr(byteStrings);
@@ -231,7 +231,7 @@ public final class ContractFunctionParams {
     /**
      * Add a parameter of type {@code bytes}, a byte-string.
      */
-    public ContractFunctionParams addBytes(byte[] param) {
+    public ContractFunctionParameters addBytes(byte[] param) {
         args.add(new Argument("bytes", encodeBytes(param), true));
 
         return this;
@@ -240,9 +240,9 @@ public final class ContractFunctionParams {
     /**
      * Add a parameter of type {@code bytes[]}, an array of byte-strings.
      */
-    public ContractFunctionParams addBytesArray(byte[][] param) {
+    public ContractFunctionParameters addBytesArray(byte[][] param) {
         final List<ByteString> byteArrays = Arrays.stream(param)
-            .map(ContractFunctionParams::encodeBytes)
+            .map(ContractFunctionParameters::encodeBytes)
             .collect(Collectors.toList());
 
         args.add(new Argument("bytes[]", encodeDynArr(byteArrays), true));
@@ -257,7 +257,7 @@ public final class ContractFunctionParams {
      *
      * @throws IllegalArgumentException if the length of the byte array is greater than 32.
      */
-    public ContractFunctionParams addBytes32(byte[] param) {
+    public ContractFunctionParameters addBytes32(byte[] param) {
         args.add(new Argument("bytes32", encodeBytes32(param), false));
 
         return this;
@@ -270,17 +270,17 @@ public final class ContractFunctionParams {
      *
      * @throws IllegalArgumentException if the length of any byte array is greater than 32.
      */
-    public ContractFunctionParams addBytes32Array(byte[][] param) {
+    public ContractFunctionParameters addBytes32Array(byte[][] param) {
         // array of fixed-size elements
         final Stream<ByteString> byteArrays = Arrays.stream(param)
-            .map(ContractFunctionParams::encodeBytes32);
+            .map(ContractFunctionParameters::encodeBytes32);
 
         args.add(new Argument("bytes32[]", encodeArray(byteArrays), true));
 
         return this;
     }
 
-    public ContractFunctionParams addBool(boolean bool) {
+    public ContractFunctionParameters addBool(boolean bool) {
         // boolean encodes to `uint8` of values [0, 1]
         args.add(new Argument("bool", int256(bool ? 1 : 0, 8), false));
         return this;
@@ -291,7 +291,7 @@ public final class ContractFunctionParams {
      *
      * @implNote The implementation is wasteful as we must pad to 32-bytes to store 1 byte.
      */
-    public ContractFunctionParams addInt8(byte value) {
+    public ContractFunctionParameters addInt8(byte value) {
         args.add(new Argument("int8", int256(value, 32), false));
 
         return this;
@@ -300,7 +300,7 @@ public final class ContractFunctionParams {
     /**
      * Add a 32-bit integer.
      */
-    public ContractFunctionParams addInt32(int value) {
+    public ContractFunctionParameters addInt32(int value) {
         args.add(new Argument("int32", int256(value, 32), false));
 
         return this;
@@ -309,7 +309,7 @@ public final class ContractFunctionParams {
     /**
      * Add a 64-bit integer.
      */
-    public ContractFunctionParams addInt64(long value) {
+    public ContractFunctionParameters addInt64(long value) {
         args.add(new Argument("int64", int256(value, 64), false));
 
         return this;
@@ -321,7 +321,7 @@ public final class ContractFunctionParams {
      * @throws IllegalArgumentException if {@code bigInt.bitLength() > 255}
      *                                  (max range including the sign bit).
      */
-    public ContractFunctionParams addInt256(BigInteger bigInt) {
+    public ContractFunctionParameters addInt256(BigInteger bigInt) {
         checkBigInt(bigInt);
         args.add(new Argument("int256", int256(bigInt), false));
 
@@ -333,7 +333,7 @@ public final class ContractFunctionParams {
      *
      * @implNote The implementation is wasteful as we must pad to 32-bytes to store 1 byte.
      */
-    public ContractFunctionParams addInt8Array(byte[] intArray) {
+    public ContractFunctionParameters addInt8Array(byte[] intArray) {
         IntStream intStream = IntStream.range(0, intArray.length).map(idx -> intArray[idx]);
 
         ByteString arrayBytes = ByteString.copyFrom(
@@ -350,7 +350,7 @@ public final class ContractFunctionParams {
     /**
      * Add a dynamic array of 32-bit integers.
      */
-    public ContractFunctionParams addInt32Array(int[] intArray) {
+    public ContractFunctionParameters addInt32Array(int[] intArray) {
         ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> int256(i, 32))
                 .collect(Collectors.toList()));
@@ -365,7 +365,7 @@ public final class ContractFunctionParams {
     /**
      * Add a dynamic array of 64-bit integers.
      */
-    public ContractFunctionParams addInt64Array(long[] intArray) {
+    public ContractFunctionParameters addInt64Array(long[] intArray) {
         ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> int256(i, 64))
                 .collect(Collectors.toList()));
@@ -383,9 +383,9 @@ public final class ContractFunctionParams {
      * @throws IllegalArgumentException if any value's {@code .bitLength() > 255}
      *                                  (max range including the sign bit).
      */
-    public ContractFunctionParams addInt256Array(BigInteger[] intArray) {
+    public ContractFunctionParameters addInt256Array(BigInteger[] intArray) {
         ByteString arrayBytes = ByteString.copyFrom(
-            Arrays.stream(intArray).map(ContractFunctionParams::int256)
+            Arrays.stream(intArray).map(ContractFunctionParameters::int256)
                 .collect(Collectors.toList()));
 
         arrayBytes = uint256(intArray.length, 256).concat(arrayBytes);
@@ -400,7 +400,7 @@ public final class ContractFunctionParams {
      *
      * @implNote The implementation is wasteful as we must pad to 32-bytes to store 1 byte.
      */
-    public ContractFunctionParams addUint8(byte value) {
+    public ContractFunctionParameters addUint8(byte value) {
         args.add(new Argument("uint8", uint256(value, 8), false));
 
         return this;
@@ -412,7 +412,7 @@ public final class ContractFunctionParams {
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
      * sign-extended to 32 bytes).
      */
-    public ContractFunctionParams addUint32(int value) {
+    public ContractFunctionParameters addUint32(int value) {
         args.add(new Argument("uint32", uint256(value, 32), false));
 
         return this;
@@ -424,7 +424,7 @@ public final class ContractFunctionParams {
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
      * sign-extended to 32 bytes).
      */
-    public ContractFunctionParams addUint64(long value) {
+    public ContractFunctionParameters addUint64(long value) {
         args.add(new Argument("uint64", uint256(value, 64), false));
 
         return this;
@@ -440,7 +440,7 @@ public final class ContractFunctionParams {
      *                                  (max range including the sign bit) or
      *                                  {@code bigUint.signum() < 0}.
      */
-    public ContractFunctionParams addUint256(@Nonnegative BigInteger bigUint) {
+    public ContractFunctionParameters addUint256(@Nonnegative BigInteger bigUint) {
         checkBigUint(bigUint);
         args.add(new Argument("uint256", uint256(bigUint), false));
 
@@ -452,7 +452,7 @@ public final class ContractFunctionParams {
      *
      * @implNote The implementation is wasteful as we must pad to 32-bytes to store 1 byte.
      */
-    public ContractFunctionParams addUint8Array(byte[] intArray) {
+    public ContractFunctionParameters addUint8Array(byte[] intArray) {
         IntStream intStream = IntStream.range(0, intArray.length).map(idx -> intArray[idx]);
 
         ByteString arrayBytes = ByteString.copyFrom(
@@ -472,7 +472,7 @@ public final class ContractFunctionParams {
      * Each value will be treated as unsigned during encoding (it will be zero-padded instead of
      * sign-extended to 32 bytes).
      */
-    public ContractFunctionParams addUint32Array(int[] intArray) {
+    public ContractFunctionParameters addUint32Array(int[] intArray) {
         ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> uint256(i, 32))
                 .collect(Collectors.toList()));
@@ -490,7 +490,7 @@ public final class ContractFunctionParams {
      * Each value will be treated as unsigned during encoding (it will be zero-padded instead of
      * sign-extended to 32 bytes).
      */
-    public ContractFunctionParams addUint64Array(long[] intArray) {
+    public ContractFunctionParameters addUint64Array(long[] intArray) {
         ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> uint256(i, 64))
                 .collect(Collectors.toList()));
@@ -511,9 +511,9 @@ public final class ContractFunctionParams {
      * @throws IllegalArgumentException if any value has a {@code .bitLength() > 256}
      *                                  (max range including the sign bit) or is negative.
      */
-    public ContractFunctionParams addUint256Array(BigInteger[] intArray) {
+    public ContractFunctionParameters addUint256Array(BigInteger[] intArray) {
         ByteString arrayBytes = ByteString.copyFrom(
-            Arrays.stream(intArray).map(ContractFunctionParams::uint256)
+            Arrays.stream(intArray).map(ContractFunctionParameters::uint256)
                 .collect(Collectors.toList()));
 
         arrayBytes = uint256(intArray.length, 256).concat(arrayBytes);
@@ -533,7 +533,7 @@ public final class ContractFunctionParams {
      * @throws IllegalArgumentException if the address is not exactly {@value ADDRESS_LEN_HEX}
      *                                  characters long or fails to decode as hexadecimal.
      */
-    public ContractFunctionParams addAddress(String address) {
+    public ContractFunctionParameters addAddress(String address) {
         final byte[] addressBytes = decodeAddress(address);
 
         args.add(new Argument("address", leftPad32(ByteString.copyFrom(addressBytes)), false));
@@ -549,7 +549,7 @@ public final class ContractFunctionParams {
      *                                  characters long or fails to decode as hexadecimal.
      * @throws NullPointerException     if any value in the array is null.
      */
-    public ContractFunctionParams addAddressArray(String[] addresses) {
+    public ContractFunctionParameters addAddressArray(String[] addresses) {
         final ByteString addressArray = encodeArray(
             Arrays.stream(addresses).map(a -> {
                 final byte[] address = decodeAddress(a);
@@ -572,7 +572,7 @@ public final class ContractFunctionParams {
      *                                  characters or {@code selector} is not
      *                                  {@value SELECTOR_LEN} bytes.
      */
-    public ContractFunctionParams addFunction(String address, byte[] selector) {
+    public ContractFunctionParameters addFunction(String address, byte[] selector) {
         return addFunction(decodeAddress(address), selector);
     }
 
@@ -585,7 +585,7 @@ public final class ContractFunctionParams {
      * @throws IllegalArgumentException if {@code address} is not {@value ADDRESS_LEN_HEX}
      *                                  characters.
      */
-    public ContractFunctionParams addFunction(String address, ContractFunctionSelector selector) {
+    public ContractFunctionParameters addFunction(String address, ContractFunctionSelector selector) {
         // allow the `FunctionSelector` to be reused multiple times
         return addFunction(decodeAddress(address), selector.finish());
     }
@@ -635,7 +635,7 @@ public final class ContractFunctionParams {
         return ByteString.copyFrom(paramsBytes);
     }
 
-    private ContractFunctionParams addFunction(byte[] address, byte[] selector) {
+    private ContractFunctionParameters addFunction(byte[] address, byte[] selector) {
         checkAddressLen(address);
 
         if (selector.length != SELECTOR_LEN) {

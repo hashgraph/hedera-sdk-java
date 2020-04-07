@@ -32,10 +32,10 @@ public final class ContractExecuteTransaction extends TransactionBuilder<Contrac
     }
 
     public ContractExecuteTransaction setFunction(String name) {
-        return setFunction(name, new ContractFunctionParams());
+        return setFunction(name, new ContractFunctionParameters());
     }
 
-    public ContractExecuteTransaction setFunction(String name, ContractFunctionParams params) {
+    public ContractExecuteTransaction setFunction(String name, ContractFunctionParameters params) {
         return setFunctionParameters(params.toBytes(name));
     }
 

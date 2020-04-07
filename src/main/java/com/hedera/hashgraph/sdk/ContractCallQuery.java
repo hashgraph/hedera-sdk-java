@@ -32,10 +32,10 @@ public final class ContractCallQuery extends QueryBuilder<ContractFunctionResult
     }
 
     public ContractCallQuery setFunction(String name) {
-        return setFunction(name, new ContractFunctionParams());
+        return setFunction(name, new ContractFunctionParameters());
     }
 
-    public ContractCallQuery setFunction(String name, ContractFunctionParams params) {
+    public ContractCallQuery setFunction(String name, ContractFunctionParameters params) {
         return setFunctionParameters(params.toBytes(name));
     }
 
