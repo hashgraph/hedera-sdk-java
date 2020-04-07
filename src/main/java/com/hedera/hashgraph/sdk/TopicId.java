@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.TopicID;
+
 import javax.annotation.Nonnegative;
 
 public final class TopicId extends EntityId {
@@ -11,6 +12,10 @@ public final class TopicId extends EntityId {
     @SuppressWarnings("InconsistentOverloads")
     public TopicId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num) {
         super(shard, realm, num);
+    }
+
+    public static TopicId fromString(String id) {
+        return EntityId.fromString(id, TopicId::new);
     }
 
     static TopicId fromProtobuf(TopicID fileId) {

@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.FileID;
+
 import javax.annotation.Nonnegative;
 
 public final class FileId extends EntityId {
@@ -11,6 +12,10 @@ public final class FileId extends EntityId {
     @SuppressWarnings("InconsistentOverloads")
     public FileId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num) {
         super(shard, realm, num);
+    }
+
+    public static FileId fromString(String id) {
+        return EntityId.fromString(id, FileId::new);
     }
 
     static FileId fromProtobuf(FileID fileId) {

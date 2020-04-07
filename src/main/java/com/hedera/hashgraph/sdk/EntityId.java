@@ -1,26 +1,100 @@
 package com.hedera.hashgraph.sdk;
 
-import java.util.Objects;
+import com.google.common.base.Splitter;
+import java8.lang.FunctionalInterface;
+import org.bouncycastle.util.encoders.DecoderException;
+import org.bouncycastle.util.encoders.Hex;
+
 import javax.annotation.Nonnegative;
+import java.nio.ByteBuffer;
+import java.util.Objects;
 
-// TODO: fromString
-// TODO: toSolidityAddress
-// TODO: fromSolidityAddress
+class EntityId {
+    /**
+     * The length of a Solidity address in bytes.
+     */
+    static final int SOLIDITY_ADDRESS_LEN = 20;
 
-abstract class EntityId {
-    /** The shard number */
-    @Nonnegative public final long shard;
+    /**
+     * The length of a hexadecimal-encoded Solidity address, in ASCII characters (bytes).
+     */
+    static final int SOLIDITY_ADDRESS_LEN_HEX = SOLIDITY_ADDRESS_LEN * 2;
 
-    /** The realm number */
-    @Nonnegative public final long realm;
+    /**
+     * The shard number
+     */
+    @Nonnegative
+    public final long shard;
 
-    /** The account number */
-    @Nonnegative public final long num;
+    /**
+     * The realm number
+     */
+    @Nonnegative
+    public final long realm;
+
+    /**
+     * The account number
+     */
+    @Nonnegative
+    public final long num;
 
     EntityId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num) {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
+    }
+
+    static <R> R fromString(String id, WithIdNums<R> withIdNums) {
+        var nums = Splitter.on('.').split(id).iterator();
+
+        var shard = Long.parseLong(nums.next());
+        var realm = Long.parseLong(nums.next());
+        var num = Long.parseLong(nums.next());
+
+        return withIdNums.apply(shard, realm, num);
+    }
+
+    private static void checkAddressLen(byte[] address) {
+        if (address.length != SOLIDITY_ADDRESS_LEN) {
+            throw new IllegalArgumentException(
+                "Solidity addresses must be 20 bytes or 40 hex chars");
+        }
+    }
+
+    static <R> R fromSolidityAddress(String address, WithIdNums<R> withAddress) {
+        return fromSolidityAddress(decodeSolidityAddress(address), withAddress);
+    }
+
+    private static <R> R fromSolidityAddress(byte[] address, WithIdNums<R> withAddress) {
+        checkAddressLen(address);
+        var buf = ByteBuffer.wrap(address);
+        return withAddress.apply(buf.getInt(), buf.getLong(), buf.getLong());
+    }
+
+    private static byte[] decodeSolidityAddress(String address) {
+        if (address.length() != SOLIDITY_ADDRESS_LEN_HEX) {
+            throw new IllegalArgumentException(
+                "Solidity addresses must be 20 bytes or 40 hex chars");
+        }
+
+        try {
+            return Hex.decode(address);
+        } catch (DecoderException e) {
+            throw new IllegalArgumentException("failed to decode Solidity address as hex", e);
+        }
+    }
+
+    protected String toSolidityAddress() {
+        if (Long.highestOneBit(shard) > 32) {
+            throw new IllegalStateException("shard out of 32-bit range " + shard);
+        }
+
+        return Hex.toHexString(
+            ByteBuffer.allocate(20)
+                .putInt((int) shard)
+                .putLong(realm)
+                .putLong(num)
+                .array());
     }
 
     @Override
@@ -40,5 +114,10 @@ abstract class EntityId {
     @Override
     public int hashCode() {
         return Objects.hash(shard, realm, num);
+    }
+
+    @FunctionalInterface
+    interface WithIdNums<R> {
+        R apply(long shard, long realm, long num);
     }
 }

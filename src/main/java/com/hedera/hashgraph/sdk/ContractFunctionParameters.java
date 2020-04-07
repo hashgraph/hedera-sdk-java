@@ -6,6 +6,7 @@ import org.bouncycastle.util.encoders.Hex;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
+import javax.swing.text.html.parser.Entity;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,11 +28,11 @@ public final class ContractFunctionParameters {
     /**
      * The length of a Solidity address in bytes.
      */
-    public static final int ADDRESS_LEN = SolidityUtil.ADDRESS_LEN;
+    public static final int ADDRESS_LEN = EntityId.SOLIDITY_ADDRESS_LEN;
     /**
      * The length of a hexadecimal-encoded Solidity address, in ASCII characters (bytes).
      */
-    public static final int ADDRESS_LEN_HEX = SolidityUtil.ADDRESS_LEN_HEX;
+    public static final int ADDRESS_LEN_HEX = EntityId.SOLIDITY_ADDRESS_LEN_HEX;
     /**
      * Function selector length in bytes
      */
