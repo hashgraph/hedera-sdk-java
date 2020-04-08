@@ -44,7 +44,7 @@ final class Crypto {
         try {
             aesCipher = Cipher.getInstance("AES/CTR/PKCS5Padding");
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-            throw new Error("platform does not support AES-CTR ciphers");
+            throw new Error("platform does not support AES-CTR ciphers", e);
         }
 
         return initAesCipher(aesCipher, cipherKey, iv, forDecrypt);
@@ -56,7 +56,7 @@ final class Crypto {
         try {
             aesCipher = Cipher.getInstance("AES/CBC/NoPadding");
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-            throw new Error("platform does not support AES-CBC ciphers");
+            throw new Error("platform does not support AES-CBC ciphers", e);
         }
 
         return initAesCipher(aesCipher, cipherKey, iv, false);
@@ -68,13 +68,13 @@ final class Crypto {
         try {
             aesCipher = Cipher.getInstance("AES/CBC/NoPadding");
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-            throw new Error("platform does not support AES-CBC ciphers");
+            throw new Error("platform does not support AES-CBC ciphers", e);
         }
 
         try {
             aesCipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(cipherKey.getKey(), 0, 16, "AES"), parameters);
         } catch (InvalidKeyException e) {
-            throw new Error("platform does not support AES-128 ciphers");
+            throw new Error("platform does not support AES-128 ciphers", e);
         } catch (InvalidAlgorithmParameterException e) {
             throw new Error(e);
         }
@@ -89,7 +89,7 @@ final class Crypto {
             aesCipher.init(mode, new SecretKeySpec(cipherKey.getKey(), 0, 16, "AES"),
                 new IvParameterSpec(iv));
         } catch (InvalidKeyException e) {
-            throw new Error("platform does not support AES-128 ciphers");
+            throw new Error("platform does not support AES-128 ciphers", e);
         } catch (InvalidAlgorithmParameterException e) {
             throw new Error(e);
         }
