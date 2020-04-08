@@ -49,7 +49,6 @@ public final class FileAppendTransaction extends TransactionBuilder<FileAppendTr
      * @return {@code this}
      */
     public FileAppendTransaction setContents(byte[] contents) {
-        // fixme: it's still unknown if there is a maximum length for contents
         builder.setContents(ByteString.copyFrom(contents));
         return this;
     }
