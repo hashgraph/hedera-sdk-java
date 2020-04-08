@@ -109,6 +109,7 @@ public final class ContractFunctionSelector {
      * @return {@code this} for fluent usage.
      * @throws IllegalStateException if {@link #finish()} has already been called.
      */
+    @SuppressWarnings({"NullableDereference"})
     ContractFunctionSelector addParamType(String typeName) {
         if (finished != null) {
             throw new IllegalStateException("FunctionSelector already finished");
@@ -136,6 +137,7 @@ public final class ContractFunctionSelector {
      *
      * @return the computed selector bytes.
      */
+    @SuppressWarnings({"NullableDereference"})
     byte[] finish() {
         if (finished == null) {
             Objects.requireNonNull(digest);
