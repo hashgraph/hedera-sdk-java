@@ -1,109 +1,111 @@
 import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.AccountInfoQuery;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TransactionReceiptQuery;
+import com.hedera.hashgraph.sdk.*;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.Objects;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class AccountIntegrationTest {
     @Test
-    void getBalanceForGenesis() {
+    void test() {
         assertDoesNotThrow(() -> {
-            try (var client = Client.forTestnet()) {
-                var genesisAccountId = new AccountId(2);
-                var balance = new AccountBalanceQuery()
-                    .setAccountId(genesisAccountId)
-                    .execute(client);
-
-                // The network is in serious trouble if genesis hits zero
-                assertTrue(balance.asTinybar() > 0);
-            }
-        });
-    }
-
-    @Test
-    void createThenDeleteAccount() {
-        assertDoesNotThrow(() -> {
-            // TODO: Share this setting somehow
             var operatorKey = PrivateKey.fromString("302e020100300506032b65700422042091dad4f120ca225ce66deb1d6fb7ecad0e53b5e879aa45b0c5e0db7923f26d08");
             var operatorId = new AccountId(147722);
 
-            var newKey = PrivateKey.generate();
+            var client = Client.forTestnet()
+                .setOperator(operatorId, operatorKey);
 
-            try (var client = Client.forTestnet()) {
-                client.setOperator(operatorId, operatorKey);
+            var key1 = PrivateKey.generate();
+            var key2 = PrivateKey.generate();
 
-                var initialBalance = new Hbar(2);
-                var maxTransactionFee = new Hbar(1);
+            @Var var transactionId = new AccountCreateTransaction()
+                .setKey(key1)
+                .setMaxTransactionFee(new Hbar(2))
+                .setInitialBalance(new Hbar(1))
+                .execute(client);
 
-                // Create a new Hedera account with a small initial balance
+            var receipt = new TransactionReceiptQuery()
+                .setTransactionId(transactionId)
+                .execute(client);
 
-                @Var var transactionId = new AccountCreateTransaction()
-                    .setInitialBalance(initialBalance) // 2 Hbar
-                    .setMaxTransactionFee(maxTransactionFee) // 1 Hbar
-                    .setKey(newKey)
+            assertNotNull(receipt.accountId);
+            assertEquals(receipt.status, Status.Success);
+            assertTrue(Objects.requireNonNull(receipt.accountId).num > 0);
+
+            var account = receipt.accountId;
+
+            @Var var balance = new AccountBalanceQuery()
+                .setAccountId(account)
+                .execute(client);
+
+            assertEquals(balance, new Hbar(1));
+
+            var info = new AccountInfoQuery()
+                .setAccountId(account)
+                .execute(client);
+
+            assertEquals(info.accountId, account);
+            assertFalse(info.deleted);
+            assertEquals(info.key.toString(), key1.toString());
+            assertEquals(info.balance, new Hbar(1));
+            assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
+            assertEquals(info.receiveRecordThreshold.asTinybar(), Long.MAX_VALUE);
+            assertEquals(info.sendRecordThreshold.asTinybar(), Long.MAX_VALUE);
+            assertNull(info.proxyAccountId);
+            assertEquals(info.proxyReceived, Hbar.ZERO);
+
+            new AccountRecordsQuery()
+                .setAccountId(account)
+                .setMaxQueryPayment(new Hbar(1))
+                .execute(client);
+
+            assertThrows(Exception.class, () -> {
+                new AccountStakersQuery()
+                    .setAccountId(account)
+                    .setMaxQueryPayment(new Hbar(1))
                     .execute(client);
+            });
 
-                var transactionReceipt = new TransactionReceiptQuery()
-                    .setTransactionId(transactionId)
+            transactionId = new AccountUpdateTransaction()
+                .setAccountId(account)
+                .setKey(key2.getPublicKey())
+                .setMaxTransactionFee(new Hbar(1))
+                .build(client)
+                .sign(key1)
+                .sign(key2)
+                .execute(client);
+
+            new TransactionReceiptQuery()
+                .setTransactionId(transactionId)
+                .execute(client);
+
+            balance = new AccountBalanceQuery()
+                .setAccountId(account)
+                .setMaxQueryPayment(new Hbar(1))
+                .execute(client);
+
+            assertTrue(balance.asTinybar() < new Hbar(1).asTinybar());
+
+            transactionId = new AccountDeleteTransaction()
+                .setDeleteAccountId(account)
+                .setTransferAccountId(operatorId)
+                .setMaxTransactionFee(Hbar.fromTinybar(balance.asTinybar() / 2))
+                .setTransactionId(TransactionId.generate(account))
+                .build(client)
+                .sign(key2)
+                .execute(client);
+
+            new TransactionReceiptQuery()
+                .setTransactionId(transactionId)
+                .execute(client);
+
+            assertThrows(Exception.class, () -> {
+                new AccountInfoQuery()
+                    .setAccountId(account)
                     .execute(client);
-
-                assertNotNull(transactionReceipt.accountId);
-                assertEquals(transactionReceipt.status, Status.Success);
-                assertTrue(transactionReceipt.accountId.num > 0);
-
-                // Fetch the account info for this account
-
-                var accountInfo = new AccountInfoQuery()
-                    .setAccountId(transactionReceipt.accountId)
-                    .execute(client);
-
-                assertEquals(accountInfo.accountId, transactionReceipt.accountId);
-                assertEquals(accountInfo.autoRenewPeriod, Duration.ofDays(90));
-                assertEquals(accountInfo.balance, initialBalance);
-                assertEquals(accountInfo.receiveRecordThreshold.asTinybar(), Long.MAX_VALUE);
-                assertEquals(accountInfo.sendRecordThreshold.asTinybar(), Long.MAX_VALUE);
-                assertEquals(accountInfo.key, newKey.getPublicKey());
-                assertNull(accountInfo.proxyAccountId);
-                assertEquals(accountInfo.proxyReceived, Hbar.ZERO);
-
-                // Now fetch it again but as the new account
-                // to be doubly sure that the
-                // new account is actually usable
-
-                client.setOperator(accountInfo.accountId, newKey);
-
-                var accountInfo2 = new AccountInfoQuery()
-                    .setAccountId(transactionReceipt.accountId)
-                    .execute(client);
-
-                assertEquals(accountInfo2.accountId, accountInfo.accountId);
-
-                // Now delete the account (and give everything back to the original operator)
-
-                transactionId = new AccountDeleteTransaction()
-                    .setMaxTransactionFee(maxTransactionFee) // 1 Hbar
-                    .setDeleteAccountId(accountInfo.accountId)
-                    .setTransferAccountId(operatorId)
-                    .execute(client);
-
-                new TransactionReceiptQuery()
-                    .setTransactionId(transactionId)
-                    .execute(client);
-            }
+            });
         });
     }
 }
