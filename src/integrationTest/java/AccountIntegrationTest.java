@@ -1,18 +1,37 @@
 import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.AccountBalanceQuery;
+import com.hedera.hashgraph.sdk.AccountCreateTransaction;
+import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.AccountInfoQuery;
+import com.hedera.hashgraph.sdk.AccountRecordsQuery;
+import com.hedera.hashgraph.sdk.AccountStakersQuery;
+import com.hedera.hashgraph.sdk.AccountUpdateTransaction;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.Status;
+import com.hedera.hashgraph.sdk.TransactionId;
+import com.hedera.hashgraph.sdk.TransactionReceiptQuery;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AccountIntegrationTest {
     @Test
     void test() {
         assertDoesNotThrow(() -> {
-            var operatorKey = PrivateKey.fromString("302e020100300506032b65700422042091dad4f120ca225ce66deb1d6fb7ecad0e53b5e879aa45b0c5e0db7923f26d08");
-            var operatorId = new AccountId(147722);
+            var operatorKey = PrivateKey.fromString("302e020100300506032b6570042204207ce25f7ac7a4fa7284efa8453f153922e16ede6004c36778d3870c93d5dfbee5");
+            var operatorId = new AccountId(1035);
 
             var client = Client.forTestnet()
                 .setOperator(operatorId, operatorKey);
@@ -26,7 +45,7 @@ class AccountIntegrationTest {
                 .setInitialBalance(new Hbar(1))
                 .execute(client);
 
-            var receipt = new TransactionReceiptQuery()
+            @Var var receipt = new TransactionReceiptQuery()
                 .setTransactionId(transactionId)
                 .execute(client);
 
@@ -48,7 +67,7 @@ class AccountIntegrationTest {
 
             assertEquals(info.accountId, account);
             assertFalse(info.deleted);
-            assertEquals(info.key.toString(), key1.toString());
+            assertEquals(info.key.toString(), key1.getPublicKey().toString());
             assertEquals(info.balance, new Hbar(1));
             assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
             assertEquals(info.receiveRecordThreshold.asTinybar(), Long.MAX_VALUE);
@@ -77,16 +96,18 @@ class AccountIntegrationTest {
                 .sign(key2)
                 .execute(client);
 
-            new TransactionReceiptQuery()
+            receipt = new TransactionReceiptQuery()
                 .setTransactionId(transactionId)
                 .execute(client);
+
+            assertEquals(Status.Success, receipt.status);
 
             balance = new AccountBalanceQuery()
                 .setAccountId(account)
                 .setMaxQueryPayment(new Hbar(1))
                 .execute(client);
 
-            assertTrue(balance.asTinybar() < new Hbar(1).asTinybar());
+            assertEquals(balance, new Hbar(1));
 
             transactionId = new AccountDeleteTransaction()
                 .setDeleteAccountId(account)
@@ -97,9 +118,11 @@ class AccountIntegrationTest {
                 .sign(key2)
                 .execute(client);
 
-            new TransactionReceiptQuery()
+            receipt = new TransactionReceiptQuery()
                 .setTransactionId(transactionId)
                 .execute(client);
+
+            assertEquals(Status.Success, receipt.status);
 
             assertThrows(Exception.class, () -> {
                 new AccountInfoQuery()

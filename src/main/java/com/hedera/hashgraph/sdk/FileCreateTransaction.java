@@ -3,7 +3,6 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.FileCreateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
-
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
@@ -52,16 +51,20 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
      * paying for the transaction). Only one key must sign to delete the file, however.
      *
      * <p>To require more than one key to sign to delete a file, add them to a
-     * {@link com.hedera.hashgraph.sdk.crypto.ThresholdKey} and pass that here; to require all of
-     * them to sign, add them to a {@link com.hedera.hashgraph.sdk.crypto.KeyList} and pass that.
+     * {@link com.hedera.hashgraph.sdk.ThresholdKey} and pass that here; to require all of
+     * them to sign, add them to a {@link com.hedera.hashgraph.sdk.KeyList} and pass that.
      *
      * <p>The network currently requires a file to have at least one key (or key list or threshold key)
      * but this requirement may be lifted in the future.
      *
      * @return {@code this}
      */
-    public FileCreateTransaction addKey(PublicKey key) {
-        // fixme: Implement this after keylist is added and properly update the comments above.
+    public FileCreateTransaction setKeys(Key... keys) {
+        var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
+        for (Key key: keys) {
+            keyList.addKeys(key.toKeyProtobuf());
+        }
+        builder.setKeys(keyList);
         return this;
     }
 
