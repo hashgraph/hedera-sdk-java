@@ -137,12 +137,6 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     }
 
     @Override
-    protected Executable<Hbar> getCostExecutable(Client client) {
-        // TODO: implement getCost
-        throw new IllegalStateException("not implemented: Transaction#getCost");
-    }
-
-    @Override
     protected CompletableFuture<Void> onExecuteAsync(Client client) {
         // On execute, sign each transaction with the operator, if present
         var operator = client.getOperator();

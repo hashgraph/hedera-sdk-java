@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends HederaExecutable<Query, Response, O> {
+public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends HederaExecutable<Query, Response, O> implements WithGetCost<Hbar> {
     private final Query.Builder builder;
 
     private final QueryHeader.Builder headerBuilder;
@@ -58,6 +58,12 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
         return (T) this;
     }
 
+    @Override
+    @FunctionalExecutable
+    public CompletableFuture<Hbar> getCostAsync(Client client) {
+        return getCostExecutable().executeAsync(client);
+    }
+
     protected boolean isPaymentRequired() {
         // nearly all queries require a payment
         return true;
@@ -76,8 +82,7 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
 
     protected abstract QueryHeader mapRequestHeader(Query request);
 
-    @Override
-    protected Executable<Hbar> getCostExecutable(Client client) {
+    private Executable<Hbar> getCostExecutable() {
         return new QueryCostQuery();
     }
 

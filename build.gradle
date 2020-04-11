@@ -52,6 +52,10 @@ dependencies {
 	// https://github.com/bsideup/jabel
 	annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:0.2.0'
 
+	// custom annotation processor to help generate methods around executables
+	annotationProcessor project(":executable-processor")
+	compileOnly project(":executable-annotation")
+
 	// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
 	//       use CompletableFuture directly.
 	// https://github.com/stefan-zobel/streamsupport

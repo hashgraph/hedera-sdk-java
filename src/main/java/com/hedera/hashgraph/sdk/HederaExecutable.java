@@ -5,14 +5,10 @@ import io.grpc.MethodDescriptor;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
 import java8.util.concurrent.CompletableFuture;
-import java8.util.function.BiConsumer;
-import java8.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
-import java.util.concurrent.TimeoutException;
 
 import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
 
@@ -87,38 +83,6 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
             // successful response from Hedera
             return CompletableFuture.completedFuture(mapResponse(response));
         }).thenCompose(x -> x);
-    }
-
-    protected abstract Executable<Hbar> getCostExecutable(Client client);
-
-    public CompletableFuture<Hbar> getCostAsync(Client client) {
-        return getCostExecutable(client).executeAsync(client);
-    }
-
-    public void getCostAsync(Client client, BiConsumer<Hbar, Throwable> callback) {
-        getCostExecutable(client).executeAsync(client, callback);
-    }
-
-    public void getCostAsync(Client client, Consumer<Hbar> onSuccess, Consumer<Throwable> onFailure) {
-        getCostExecutable(client).executeAsync(client, onSuccess, onFailure);
-    }
-
-    @SuppressWarnings("InconsistentOverloads")
-    public void getCostAsync(Client client, Duration timeout, BiConsumer<Hbar, Throwable> callback) {
-        getCostExecutable(client).executeAsync(client, timeout, callback);
-    }
-
-    @SuppressWarnings("InconsistentOverloads")
-    public void getCostAsync(Client client, Duration timeout, Consumer<Hbar> onSuccess, Consumer<Throwable> onFailure) {
-        getCostExecutable(client).executeAsync(client, timeout, onSuccess, onFailure);
-    }
-
-    public Hbar getCost(Client client) throws TimeoutException {
-        return getCostExecutable(client).execute(client);
-    }
-
-    public Hbar getCost(Client client, Duration timeout) throws TimeoutException {
-        return getCostExecutable(client).execute(client, timeout);
     }
 
     protected abstract RequestT makeRequest(Client client);
