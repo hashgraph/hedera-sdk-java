@@ -21,17 +21,17 @@ description = "Hedera™ Hashgraph SDK for Java"
 
 sourceCompatibility = 12
 
-repositories {
-	mavenCentral()
-	maven { url 'https://jitpack.io' }
-}
-
 configurations {
 	integrationTestImplementation.extendsFrom testImplementation
 	integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 allprojects {
+	repositories {
+		mavenCentral()
+		maven { url 'https://jitpack.io' }
+	}
+
 	dependencies {
 		// https://github.com/google/error-prone
 		// https://errorprone.info/
@@ -117,7 +117,7 @@ allprojects {
 		// https://github.com/gradle/gradle/issues/2510#issuecomment-604986414
 		// release = 8
 		compileJava {
-			options.compilerArgs = [
+			options.compilerArgs += [
 				"--release",
 				"8" // Avoid using Java 12 APIs
 			]
