@@ -1,9 +1,14 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.TransactionID;
-import javax.annotation.Nullable;
+import java8.util.concurrent.CompletableFuture;
 import org.threeten.bp.Clock;
 import org.threeten.bp.Instant;
+
+import javax.annotation.Nullable;
+
+import static java8.util.concurrent.CompletableFuture.completedFuture;
+import static java8.util.concurrent.CompletableFuture.failedFuture;
 
 /**
  * The client-generated ID for a transaction.
@@ -12,10 +17,13 @@ import org.threeten.bp.Instant;
  * right after creating it, for instantiating a smart contract with bytecode in a file just created,
  * and internally by the network for detecting when duplicate transactions are submitted.
  */
-public final class TransactionId {
-    @Nullable private static Instant lastInstant = null;
+public final class TransactionId implements WithGetReceipt<TransactionReceipt>, WithGetRecord<TransactionRecord> {
+    @Nullable
+    private static Instant lastInstant = null;
 
-    /** The Account ID that paid for this transaction. */
+    /**
+     * The Account ID that paid for this transaction.
+     */
     public final AccountId accountId;
 
     /**
@@ -50,24 +58,49 @@ public final class TransactionId {
 
         // ensures every instant is at least greater than the last
         lastInstant =
-                lastInstant != null && start.compareTo(lastInstant) <= 0
-                        ? lastInstant.plusNanos(1)
-                        : start;
+            lastInstant != null && start.compareTo(lastInstant) <= 0
+                ? lastInstant.plusNanos(1)
+                : start;
 
         return lastInstant;
     }
 
     static TransactionId fromProtobuf(TransactionID transactionID) {
         return new TransactionId(
-                AccountId.fromProtobuf(transactionID.getAccountID()),
-                InstantConverter.fromProtobuf(transactionID.getTransactionValidStart()));
+            AccountId.fromProtobuf(transactionID.getAccountID()),
+            InstantConverter.fromProtobuf(transactionID.getTransactionValidStart()));
+    }
+
+    @Override
+    @FunctionalExecutable
+    public CompletableFuture<TransactionReceipt> getReceiptAsync(Client client) {
+        return new TransactionReceiptQuery()
+            .setTransactionId(this)
+            .executeAsync(client)
+            .thenCompose(receipt -> {
+                if (receipt.status != Status.Success) {
+                    // TODO: Throw a HederaReceiptStatusException
+                    return failedFuture(new RuntimeException("bad receipt status: " + receipt.status));
+                }
+
+                return completedFuture(receipt);
+            });
+    }
+
+    @Override
+    @FunctionalExecutable
+    public CompletableFuture<TransactionRecord> getRecordAsync(Client client) {
+        // note: we get the receipt first to ensure consensus has been reached
+        return getReceiptAsync(client).thenCompose(receipt -> new TransactionRecordQuery()
+            .setTransactionId(this)
+            .executeAsync(client));
     }
 
     TransactionID toProtobuf() {
         return TransactionID.newBuilder()
-                .setAccountID(accountId.toProtobuf())
-                .setTransactionValidStart(InstantConverter.toProtobuf(validStart))
-                .build();
+            .setAccountID(accountId.toProtobuf())
+            .setTransactionValidStart(InstantConverter.toProtobuf(validStart))
+            .build();
     }
 
     @Override
