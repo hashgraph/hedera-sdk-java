@@ -48,6 +48,16 @@ allprojects {
 
 		// https://github.com/eclipse-ee4j/common-annotations-api
 		implementation "jakarta.annotation:jakarta.annotation-api:2.0.0-RC1"
+
+		// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
+		//       use CompletableFuture directly.
+		// https://github.com/stefan-zobel/streamsupport
+		// https://developer.android.com/about/dashboards/index.html
+		implementation "net.sourceforge.streamsupport:streamsupport:1.7.2"
+		implementation "net.sourceforge.streamsupport:streamsupport-cfuture:1.7.2"
+
+		// NOTE: This is to support Android API < 26.
+		implementation "org.threeten:threetenbp:1.4.2"
 	}
 }
 
@@ -58,16 +68,6 @@ dependencies {
 	// custom annotation processor to help generate methods around executables
 	annotationProcessor project(":executable-processor")
 	compileOnly project(":executable-annotation")
-
-	// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
-	//       use CompletableFuture directly.
-	// https://github.com/stefan-zobel/streamsupport
-	// https://developer.android.com/about/dashboards/index.html
-	implementation "net.sourceforge.streamsupport:streamsupport:1.7.2"
-	implementation "net.sourceforge.streamsupport:streamsupport-cfuture:1.7.2"
-
-	// NOTE: This is to support Android API < 26.
-	implementation "org.threeten:threetenbp:1.4.2"
 
 	// NOTE: BouncyCastle is frozen at v1.60 for compatibility with Corda <https://www.corda.net/>
 	// <https://github.com/corda/corda/blob/2c10b6c3b9dace7831b5da73a065c3269a703d85/constants.properties#L23>
