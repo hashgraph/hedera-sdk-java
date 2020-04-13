@@ -16,7 +16,6 @@ import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -36,8 +35,6 @@ public class FunctionalExecutableProcessor extends AbstractProcessor {
         var preCheckStatusException = ClassName.get("com.hedera.hashgraph.sdk", "HederaPreCheckStatusException");
 
         for (var element : roundEnv.getElementsAnnotatedWith(FunctionalExecutable.class)) {
-            var annotation = element.getAnnotation(FunctionalExecutable.class);
-
             // expecting {name}Async
             var methodAsyncName = element.getSimpleName().toString();
             var methodName = methodAsyncName.replace("Async", "");

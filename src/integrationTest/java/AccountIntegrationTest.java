@@ -10,9 +10,7 @@ import com.hedera.hashgraph.sdk.AccountUpdateTransaction;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.TransactionReceiptQuery;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
 
@@ -39,18 +37,14 @@ class AccountIntegrationTest {
             var key1 = PrivateKey.generate();
             var key2 = PrivateKey.generate();
 
-            @Var var transactionId = new AccountCreateTransaction()
+            var receipt = new AccountCreateTransaction()
                 .setKey(key1)
                 .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
-                .execute(client);
-
-            @Var var receipt = new TransactionReceiptQuery()
-                .setTransactionId(transactionId)
-                .execute(client);
+                .execute(client)
+                .getReceipt(client);
 
             assertNotNull(receipt.accountId);
-            assertEquals(receipt.status, Status.Success);
             assertTrue(Objects.requireNonNull(receipt.accountId).num > 0);
 
             var account = receipt.accountId;
@@ -87,20 +81,15 @@ class AccountIntegrationTest {
                     .execute(client);
             });
 
-            transactionId = new AccountUpdateTransaction()
+            new AccountUpdateTransaction()
                 .setAccountId(account)
                 .setKey(key2.getPublicKey())
                 .setMaxTransactionFee(new Hbar(1))
                 .build(client)
                 .sign(key1)
                 .sign(key2)
-                .execute(client);
-
-            receipt = new TransactionReceiptQuery()
-                .setTransactionId(transactionId)
-                .execute(client);
-
-            assertEquals(Status.Success, receipt.status);
+                .execute(client)
+                .getReceipt(client);
 
             balance = new AccountBalanceQuery()
                 .setAccountId(account)
@@ -109,20 +98,15 @@ class AccountIntegrationTest {
 
             assertEquals(balance, new Hbar(1));
 
-            transactionId = new AccountDeleteTransaction()
+            new AccountDeleteTransaction()
                 .setDeleteAccountId(account)
                 .setTransferAccountId(operatorId)
                 .setMaxTransactionFee(Hbar.fromTinybar(balance.asTinybar() / 2))
                 .setTransactionId(TransactionId.generate(account))
                 .build(client)
                 .sign(key2)
-                .execute(client);
-
-            receipt = new TransactionReceiptQuery()
-                .setTransactionId(transactionId)
-                .execute(client);
-
-            assertEquals(Status.Success, receipt.status);
+                .execute(client)
+                .getReceipt(client);
 
             assertThrows(Exception.class, () -> {
                 new AccountInfoQuery()

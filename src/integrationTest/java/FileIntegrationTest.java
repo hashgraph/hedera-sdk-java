@@ -9,8 +9,6 @@ import com.hedera.hashgraph.sdk.FileInfoQuery;
 import com.hedera.hashgraph.sdk.FileUpdateTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TransactionReceiptQuery;
 import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
@@ -32,17 +30,13 @@ public class FileIntegrationTest {
             var client = Client.forTestnet()
                 .setOperator(operatorId, operatorKey);
 
-            @Var var transactionId = new FileCreateTransaction()
+            var receipt = new FileCreateTransaction()
                 .setKeys(operatorKey.getPublicKey())
                 .setContents("[e2e::FileCreateTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
-                .execute(client);
+                .execute(client)
+                .getReceipt(client);
 
-            @Var var receipt = new TransactionReceiptQuery()
-                .setTransactionId(transactionId)
-                .execute(client);
-
-            assertEquals(Status.Success, receipt.status);
             assertNotNull(receipt.fileId);
             assertTrue(Objects.requireNonNull(receipt.fileId).num > 0);
 
@@ -58,17 +52,12 @@ public class FileIntegrationTest {
             assertFalse(info.deleted);
             assertEquals(info.keys[0].toString(), operatorKey.getPublicKey().toString());
 
-            transactionId = new FileAppendTransaction()
+            new FileAppendTransaction()
                 .setFileId(file)
                 .setContents("[e2e::FileAppendTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
-                .execute(client);
-
-            receipt = new TransactionReceiptQuery()
-                .setTransactionId(transactionId)
-                .execute(client);
-
-            assertEquals(Status.Success, receipt.status);
+                .execute(client)
+                .getReceipt(client);
 
             info = new FileInfoQuery()
                 .setFileId(file)
@@ -87,17 +76,12 @@ public class FileIntegrationTest {
 
             assertEquals(contents.toStringUtf8(), "[e2e::FileCreateTransaction][e2e::FileAppendTransaction]");
 
-            transactionId = new FileUpdateTransaction()
+            new FileUpdateTransaction()
                 .setFileId(file)
                 .setContents("[e2e::FileUpdateTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
-                .execute(client);
-
-            receipt = new TransactionReceiptQuery()
-                .setTransactionId(transactionId)
-                .execute(client);
-
-            assertEquals(Status.Success, receipt.status);
+                .execute(client)
+                .getReceipt(client);
 
             info = new FileInfoQuery()
                 .setFileId(file)
@@ -109,16 +93,11 @@ public class FileIntegrationTest {
             assertFalse(info.deleted);
             assertEquals(info.keys[0].toString(), operatorKey.getPublicKey().toString());
 
-            transactionId = new FileDeleteTransaction()
+            new FileDeleteTransaction()
                 .setFileID(file)
                 .setMaxTransactionFee(new Hbar(5))
-                .execute(client);
-
-            receipt = new TransactionReceiptQuery()
-                .setTransactionId(transactionId)
-                .execute(client);
-
-            assertEquals(Status.Success, receipt.status);
+                .execute(client)
+                .getReceipt(client);
 
             assertThrows(Exception.class, () -> {
                 new FileInfoQuery()
