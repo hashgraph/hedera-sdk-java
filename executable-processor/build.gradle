@@ -1,6 +1,3 @@
-sourceCompatibility = 12
-targetCompatibility = 12
-
 dependencies {
 	implementation project(":executable-annotation")
 	implementation 'com.squareup:javapoet:1.12.1'

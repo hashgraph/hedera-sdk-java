@@ -19,7 +19,10 @@ group = "com.hedera.hashgraph"
 version = "2.0.0-SNAPSHOT"
 description = "Hedera™ Hashgraph SDK for Java"
 
-sourceCompatibility = 12
+allprojects {
+	sourceCompatibility = 12
+	targetCompatibility = 12
+}
 
 configurations {
 	integrationTestImplementation.extendsFrom testImplementation
@@ -116,17 +119,19 @@ protobuf {
 	}
 }
 
+tasks.withType(JavaCompile).configureEach {
+	// https://github.com/gradle/gradle/issues/2510#issuecomment-604986414
+	// release = 8
+	compileJava {
+		options.compilerArgs += [
+			"--release",
+			"8" // Avoid using Java 12 APIs
+		]
+	}
+}
+
 allprojects {
 	tasks.withType(JavaCompile).configureEach {
-		// https://github.com/gradle/gradle/issues/2510#issuecomment-604986414
-		// release = 8
-		compileJava {
-			options.compilerArgs += [
-				"--release",
-				"8" // Avoid using Java 12 APIs
-			]
-		}
-
 		options.encoding = "UTF-8"
 		options.errorprone {
 			// https://github.com/uber/NullAway
