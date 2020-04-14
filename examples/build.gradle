@@ -12,6 +12,9 @@ tasks.addRule("Pattern: run<Example>: Runs an example.") { String taskName ->
 		task(taskName, type: JavaExec) {
 			classpath = sourceSets.main.runtimeClasspath
 			main = (taskName - "run") + "Example"
+
+			// NOTE: Uncomment to enable trace logs in the SDK during tests
+			// jvmArgs "-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace"
 		}
 	}
 }
