@@ -13,6 +13,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import com.hederahashgraph.service.proto.java.FreezeServiceGrpc;
 import io.grpc.MethodDescriptor;
+import java8.util.Lists;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Function;
 
@@ -68,7 +69,12 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
             }
 
             transactionBodies.add(body);
-            signatureBuilders.add(SignatureMap.newBuilder());
+
+            if (tx.hasSigMap()) {
+                signatureBuilders.add(tx.getSigMap().toBuilder());
+            } else {
+                signatureBuilders.add(SignatureMap.newBuilder());
+            }
 
             if (transactionId == null) {
                 transactionId = TransactionId.fromProtobuf(body.getTransactionID());
@@ -77,6 +83,12 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
 
         // There should only be one, shared transaction ID between each transaction
         this.id = Objects.requireNonNull(transactionId);
+    }
+
+    public static Transaction fromBytes(byte[] bytes) throws Exception {
+        com.hedera.hashgraph.sdk.proto.Transaction inner = com.hedera.hashgraph.sdk.proto.Transaction.parseFrom(bytes);
+
+        return new Transaction(Lists.of(inner.toBuilder()));
     }
 
     private static MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptorForSystemDelete(SystemDeleteTransactionBody.IdCase idCase) {
@@ -153,6 +165,10 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     @Override
     protected final TransactionId getTransactionId() {
         return id;
+    }
+
+    public byte[] toBytes() {
+        return transactions.get(0).clone().setSigMap(signatureBuilders.get(0)).build().toByteArray();
     }
 
     @Override
