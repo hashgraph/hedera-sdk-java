@@ -45,12 +45,12 @@ public final class GetFileContentsExample {
         System.out.println("The new file ID is " + newFileId.toString());
 
         // Get file contents
-//        var contents = new FileContentsQuery()
-//            .setFileId(newFileId)
-//            .execute(client);
+        var contents = new FileContentsQuery()
+            .setFileId(newFileId)
+            .execute(client);
 
         // Prints query results to console
-//        System.out.println("File content query results: " + contents);
+        System.out.println("File content query results: " + contents.toStringUtf8());
     }
 
 }
