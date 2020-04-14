@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.base.MoreObjects;
 import com.hedera.hashgraph.sdk.proto.ConsensusGetTopicInfoResponse;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
@@ -97,5 +98,20 @@ public final class TopicInfo {
             DurationConverter.fromProtobuf(topicInfo.getAutoRenewPeriod()),
             autoRenewAccountId
         );
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("topicId", topicId)
+            .add("topicMemo", topicMemo)
+            .add("runningHash", runningHash)
+            .add("sequenceNumber", sequenceNumber)
+            .add("expirationTime", expirationTime)
+            .add("adminKey", adminKey)
+            .add("submitKey", submitKey)
+            .add("autoRenewPeriod", autoRenewPeriod)
+            .add("autoRenewAccountId", autoRenewAccountId)
+            .toString();
     }
 }

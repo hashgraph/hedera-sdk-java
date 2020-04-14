@@ -4,6 +4,8 @@ import com.google.common.base.MoreObjects;
 import com.hedera.hashgraph.sdk.proto.mirror.ConsensusTopicResponse;
 import org.threeten.bp.Instant;
 
+import java.nio.charset.StandardCharsets;
+
 public class MirrorTopicResponse {
     public final Instant consensusTimestamp;
 
@@ -24,7 +26,7 @@ public class MirrorTopicResponse {
     public String toString() {
         return MoreObjects.toStringHelper(this)
             .add("consensusTimestamp", consensusTimestamp)
-            .add("message", message)
+            .add("message", new String(message, StandardCharsets.UTF_8))
             .add("runningHash", runningHash)
             .add("sequenceNumber", sequenceNumber)
             .toString();
