@@ -221,8 +221,20 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
     private class QueryCostQuery extends QueryBuilder<Hbar, QueryCostQuery> {
         @Override
         protected void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
-            QueryBuilder.this.onMakeRequest(queryBuilder,
-                headerBuilder.setResponseType(ResponseType.COST_ANSWER).build());
+            headerBuilder.setResponseType(ResponseType.COST_ANSWER);
+
+            // COST_ANSWER requires a payment to pass validation but doesn't actually process it
+            // yes, this transaction is completely invalid
+            // that is okay
+            // now go back to sleep
+            // without this, an error of MISSING_QUERY_HEADER is returned
+            headerBuilder.setPayment(new CryptoTransferTransaction()
+                .setNodeAccountId(new AccountId(0))
+                .setTransactionId(new TransactionId(new AccountId(0), Instant.ofEpochSecond(0)))
+                .build(null)
+                .makeRequest());
+
+            QueryBuilder.this.onMakeRequest(queryBuilder, headerBuilder.build());
         }
 
         @Override
