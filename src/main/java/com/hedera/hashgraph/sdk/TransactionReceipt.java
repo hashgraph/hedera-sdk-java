@@ -95,6 +95,38 @@ public final class TransactionReceipt {
         );
     }
 
+    public AccountId getAccountId() {
+        if (this.accountId == null) {
+            throw new IllegalStateException("receipt does not contain an account ID");
+        }
+
+        return this.accountId;
+    }
+
+    public FileId getFileId() {
+        if (this.fileId == null) {
+            throw new IllegalStateException("receipt does not contain an file ID");
+        }
+
+        return this.fileId;
+    }
+
+    public ContractId getContractId() {
+        if (this.contractId == null) {
+            throw new IllegalStateException("receipt does not contain an contract ID");
+        }
+
+        return this.contractId;
+    }
+
+    public TopicId getTopicId() {
+        if (this.topicId == null) {
+            throw new IllegalStateException("receipt does not contain an topic ID");
+        }
+
+        return this.topicId;
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
