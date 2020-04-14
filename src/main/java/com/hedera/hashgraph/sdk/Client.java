@@ -42,9 +42,14 @@ public final class Client implements AutoCloseable {
     private Operator operator;
 
     protected Client(Map<AccountId, String> network) {
+        var threadFactory = new ThreadFactoryBuilder()
+            .setNameFormat("hedera-sdk-%d")
+            .setDaemon(true)
+            .build();
+
         this.executor = Executors.newFixedThreadPool(
             Runtime.getRuntime().availableProcessors(),
-            new ThreadFactoryBuilder().setNameFormat("hedera-sdk-%d").build());
+            threadFactory);
 
         this.network = network;
         this.channels = new HashMap<>(network.size());
