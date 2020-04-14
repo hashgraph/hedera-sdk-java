@@ -30,7 +30,7 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
         var channel = client.getChannel(nodeId);
         var methodDescriptor = getMethodDescriptor();
         var call = channel.newCall(methodDescriptor, CallOptions.DEFAULT);
-        var request = makeRequest(client);
+        var request = makeRequest();
         var startAt = System.nanoTime();
 
         logger.atTrace()
@@ -75,6 +75,8 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
 
             if (responseStatus != Status.Ok) {
                 // request to hedera failed in a non-recoverable way
+                System.err.println("response status failed with " + responseStatus);
+
                 return CompletableFuture.<O>failedFuture(
                     new HederaPreCheckStatusException(
                         responseStatus, getTransactionId()));
@@ -85,7 +87,7 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
         }).thenCompose(x -> x);
     }
 
-    protected abstract RequestT makeRequest(Client client);
+    protected abstract RequestT makeRequest();
 
     /**
      * Called after receiving the query response from Hedera. The derived class should map into its

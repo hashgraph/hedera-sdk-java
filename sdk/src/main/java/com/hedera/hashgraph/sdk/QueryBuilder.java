@@ -11,6 +11,7 @@ import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
+import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -148,14 +149,14 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
                         .addRecipient(nodeId, paymentAmount)
                         .build(null)
                         .signWith(operator.publicKey, operator.transactionSigner)
-                        .makeRequest(client)
+                        .makeRequest()
                     );
                 }
             });
     }
 
     @Override
-    protected final Query makeRequest(Client client) {
+    protected final Query makeRequest() {
         // If payment is required, set the next payment transaction on the query
         if (isPaymentRequired() && paymentTransactions != null) {
             headerBuilder.setPayment(paymentTransactions.get(nextPaymentTransactionIndex));
