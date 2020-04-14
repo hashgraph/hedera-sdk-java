@@ -31,9 +31,6 @@ public final class CreateAccountThresholdKeyExample {
             keys[i] = PrivateKey.generate();
         }
 
-//        final List<PublicKey> pubKeys = keys.stream().map(PrivateKey::getPublicKey)
-//            .collect(Collectors.toList());
-
         System.out.println("private keys: ");
         for (Key key : keys) {
             System.out.println(key);
