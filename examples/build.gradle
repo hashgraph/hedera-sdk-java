@@ -1,6 +1,6 @@
 dependencies {
 	// implementation "com.hedera.hashgraph:sdk:2.0.0-alpha1"
-	implementation project(":")
+	implementation project(":sdk")
 
 	implementation "org.slf4j:slf4j-simple:2.0.0-alpha1"
 	implementation "io.grpc:grpc-netty-shaded:1.28.1"

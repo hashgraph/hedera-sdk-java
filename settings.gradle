@@ -1,4 +1,4 @@
-rootProject.name = 'sdk'
+include 'sdk'
 include 'examples'
 include 'executable-annotation'
 include 'executable-processor'
