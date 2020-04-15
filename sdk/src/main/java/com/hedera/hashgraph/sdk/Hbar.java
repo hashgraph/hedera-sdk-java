@@ -16,14 +16,17 @@ public final class Hbar implements Comparable<Hbar> {
      * Singleton value representing zero hbar.
      */
     public static final Hbar ZERO = new Hbar(0);
+
     /**
      * Singleton value for the minimum (negative) value this wrapper may contain.
      */
     public static final Hbar MIN = new Hbar(-50_000_000_000L);
+
     /**
      * Singleton value for the maximum (positive) value this wrapper may contain.
      */
     public static final Hbar MAX = new Hbar(50_000_000_000L);
+
     private final long tinybar;
 
     /**
@@ -126,22 +129,6 @@ public final class Hbar implements Comparable<Hbar> {
      */
     public static Hbar fromTinybar(long amount) {
         return new Hbar(null, amount);
-    }
-
-    /**
-     * @deprecated use {@code new Hbar()} to create a value of this in Hbar.
-     */
-    @Deprecated
-    public static Hbar of(long amount) {
-        return from(amount, HbarUnit.Hbar);
-    }
-
-    /**
-     * @deprecated use {@code new Hbar()} to create a value of this in Hbar.
-     */
-    @Deprecated
-    public static Hbar of(BigDecimal amount) {
-        return from(amount, HbarUnit.Hbar);
     }
 
     /**
