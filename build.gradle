@@ -59,6 +59,10 @@ allprojects {
 			disable("BooleanParameter")
 			disable("ThreadJoinLoop")
 
+			// Uncomment do disable Android + JDK7 checks
+			// disable("Java7ApiChecker")
+			// disable("AndroidJdkLibsChecker")
+
 			// Ignore generated and protobuf code
 			disableWarningsInGeneratedCode = true
 			excludedPaths = ".*generated.*"
