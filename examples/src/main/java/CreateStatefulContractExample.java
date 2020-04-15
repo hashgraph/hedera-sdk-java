@@ -1,5 +1,10 @@
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+import java.util.concurrent.TimeoutException;
+
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.ContractCallQuery;
@@ -17,13 +22,8 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-import java.util.concurrent.TimeoutException;
-
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public final class CreateStatefulContractExample {

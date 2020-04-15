@@ -1,3 +1,6 @@
+import java.util.Objects;
+import java.util.concurrent.TimeoutException;
+
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
@@ -11,11 +14,9 @@ import com.hedera.hashgraph.sdk.TopicInfoQuery;
 import com.hedera.hashgraph.sdk.TopicUpdateTransaction;
 import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionId;
-import io.github.cdimascio.dotenv.Dotenv;
-import java8.util.J8Arrays;
 
-import java.util.Objects;
-import java.util.concurrent.TimeoutException;
+import java8.util.J8Arrays;
+import io.github.cdimascio.dotenv.Dotenv;
 
 /**
  * An example of HCS topic management using a threshold key as the adminKey and going through a key rotation to a new

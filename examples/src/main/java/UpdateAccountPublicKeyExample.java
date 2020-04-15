@@ -1,3 +1,6 @@
+import java.util.Objects;
+import java.util.concurrent.TimeoutException;
+
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.AccountInfo;
@@ -9,10 +12,8 @@ import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransactionId;
-import io.github.cdimascio.dotenv.Dotenv;
 
-import java.util.Objects;
-import java.util.concurrent.TimeoutException;
+import io.github.cdimascio.dotenv.Dotenv;
 
 public final class UpdateAccountPublicKeyExample {
 

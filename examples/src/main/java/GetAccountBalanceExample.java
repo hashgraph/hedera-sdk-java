@@ -1,13 +1,13 @@
+import java.util.Objects;
+import java.util.concurrent.TimeoutException;
+
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
-
-import java.util.Objects;
-import java.util.concurrent.TimeoutException;
-
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
+
 import io.github.cdimascio.dotenv.Dotenv;
 
 public final class GetAccountBalanceExample {

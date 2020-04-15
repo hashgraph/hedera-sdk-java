@@ -1,9 +1,3 @@
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.FileContentsQuery;
-import com.hedera.hashgraph.sdk.FileId;
-import com.hedera.hashgraph.sdk.Hbar;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -11,8 +5,15 @@ import java.nio.file.Files;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.FileContentsQuery;
+import com.hedera.hashgraph.sdk.FileId;
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
+
+import com.google.protobuf.ByteString;
 import io.github.cdimascio.dotenv.Dotenv;
 
 /** Get the network address book for inspecting the node public keys, among other things */
@@ -33,15 +34,17 @@ public final class GetAddressBookExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        var fileQuery = new FileContentsQuery()
+        FileContentsQuery fileQuery = new FileContentsQuery()
             .setFileId(FileId.ADDRESS_BOOK);
 
-        var cost = fileQuery.getCost(client);
+        Hbar cost = fileQuery.getCost(client);
         System.out.println("file contents cost: " + cost);
 
         fileQuery.setMaxQueryPayment(new Hbar(1));
 
-        var contents = fileQuery.execute(client);
+        ByteString contents = fileQuery.execute(client);
+
+        Files.deleteIfExists(FileSystems.getDefault().getPath("address-book.proto.bin"));
 
         Files.copy(new ByteArrayInputStream(contents.toByteArray()),
             FileSystems.getDefault().getPath("address-book.proto.bin"));

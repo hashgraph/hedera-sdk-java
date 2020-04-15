@@ -1,3 +1,6 @@
+import java.util.Objects;
+import java.util.concurrent.TimeoutException;
+
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
@@ -7,11 +10,9 @@ import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
-
-import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -27,7 +28,7 @@ public final class DeleteAccountExample {
     public static void main(String[] args) throws TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException {
         // Generate a Ed25519 private, public key pair
         PrivateKey newKey = PrivateKey.generate();
-        var newPublicKey = newKey.getPublicKey();
+        PublicKey newPublicKey = newKey.getPublicKey();
 
         System.out.println("private key = " + newKey);
         System.out.println("public key = " + newPublicKey);

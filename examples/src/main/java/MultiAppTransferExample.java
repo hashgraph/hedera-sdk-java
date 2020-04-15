@@ -1,5 +1,6 @@
-import com.google.errorprone.annotations.Var;
-import com.google.protobuf.InvalidProtocolBufferException;
+import java.util.Objects;
+import java.util.concurrent.TimeoutException;
+
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
@@ -11,10 +12,9 @@ import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionId;
-import io.github.cdimascio.dotenv.Dotenv;
 
-import java.util.Objects;
-import java.util.concurrent.TimeoutException;
+import com.google.protobuf.InvalidProtocolBufferException;
+import io.github.cdimascio.dotenv.Dotenv;
 
 public final class MultiAppTransferExample {
     // see `.env.sample` in the repository root for how to specify these values
@@ -70,9 +70,9 @@ public final class MultiAppTransferExample {
         byte[] signedTxnBytes = exchangeSignsTransaction(transferTxn.toBytes());
 
         // we execute the signed transaction and wait for it to be accepted
-        var signedTransferTxn = Transaction.fromBytes(signedTxnBytes);
+        Transaction signedTransferTxn = Transaction.fromBytes(signedTxnBytes);
 
-        @Var var transactionId = signedTransferTxn.execute(client);
+        TransactionId transactionId = signedTransferTxn.execute(client);
         // (important!) wait for consensus by querying for the receipt
         transactionId.getReceipt(client);
 

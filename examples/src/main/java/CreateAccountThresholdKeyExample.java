@@ -1,3 +1,6 @@
+import java.util.Objects;
+import java.util.concurrent.TimeoutException;
+
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
@@ -11,10 +14,8 @@ import com.hedera.hashgraph.sdk.KeyList;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
-import io.github.cdimascio.dotenv.Dotenv;
 
-import java.util.Objects;
-import java.util.concurrent.TimeoutException;
+import io.github.cdimascio.dotenv.Dotenv;
 
 public final class CreateAccountThresholdKeyExample {
 

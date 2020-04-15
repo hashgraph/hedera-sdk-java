@@ -1,3 +1,7 @@
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+import java.util.concurrent.TimeoutException;
+
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.FileContentsQuery;
@@ -8,11 +12,9 @@ import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransactionId;
-import io.github.cdimascio.dotenv.Dotenv;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-import java.util.concurrent.TimeoutException;
+import com.google.protobuf.ByteString;
+import io.github.cdimascio.dotenv.Dotenv;
 
 public final class GetFileContentsExample {
 
@@ -48,7 +50,7 @@ public final class GetFileContentsExample {
         System.out.println("The new file ID is " + newFileId.toString());
 
         // Get file contents
-        var contents = new FileContentsQuery()
+        ByteString contents = new FileContentsQuery()
             .setFileId(newFileId)
             .execute(client);
 

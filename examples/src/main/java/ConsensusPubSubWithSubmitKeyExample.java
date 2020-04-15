@@ -1,3 +1,7 @@
+import java.util.Objects;
+import java.util.Random;
+import java.util.concurrent.TimeoutException;
+
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
@@ -10,12 +14,9 @@ import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicId;
 import com.hedera.hashgraph.sdk.TransactionId;
+
 import io.github.cdimascio.dotenv.Dotenv;
 import org.threeten.bp.Instant;
-
-import java.util.Objects;
-import java.util.Random;
-import java.util.concurrent.TimeoutException;
 
 /**
  * An example of an HCS topic that utilizes a submitKey to limit who can submit messages on the topic.
