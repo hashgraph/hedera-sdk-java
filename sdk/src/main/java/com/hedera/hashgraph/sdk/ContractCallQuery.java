@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import io.grpc.MethodDescriptor;
+import java8.util.concurrent.CompletableFuture;
 
 public final class ContractCallQuery extends QueryBuilder<ContractFunctionResult, ContractCallQuery> {
     private final ContractCallLocalQuery.Builder builder;
@@ -24,6 +25,12 @@ public final class ContractCallQuery extends QueryBuilder<ContractFunctionResult
     public ContractCallQuery setGas(long gas) {
         builder.setGas(gas);
         return this;
+    }
+
+    @Override
+    public CompletableFuture<Hbar> getCostAsync(Client client) {
+        // network bug: ContractCallLocal cost estimate is too low
+        return super.getCostAsync(client).thenApply(cost -> Hbar.fromTinybar((long) (cost.asTinybar() * 1.1)));
     }
 
     public ContractCallQuery setFunctionParameters(ByteString functionParameters) {
