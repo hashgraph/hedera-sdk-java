@@ -10,7 +10,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionGetReceiptResponse;
  * The receipt is included, though only the {@link TransactionReceipt#status} field will be
  * initialized; all the getters should throw.
  */
-public class HederaReceiptStatusException extends Exception {
+public final class HederaReceiptStatusException extends Exception {
 
     public final ResponseCodeEnum responseCode;
     /**

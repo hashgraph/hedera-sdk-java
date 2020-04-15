@@ -6,7 +6,7 @@ import org.threeten.bp.Instant;
 
 import java.nio.charset.StandardCharsets;
 
-public class MirrorTopicResponse {
+public final class MirrorTopicResponse {
     public final Instant consensusTimestamp;
 
     public final byte[] message;

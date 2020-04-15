@@ -5,7 +5,7 @@ import io.grpc.ManagedChannelBuilder;
 
 import java.util.concurrent.TimeUnit;
 
-public class MirrorClient implements AutoCloseable {
+public final class MirrorClient implements AutoCloseable {
     final ManagedChannel channel;
 
     public MirrorClient(String endpoint) {

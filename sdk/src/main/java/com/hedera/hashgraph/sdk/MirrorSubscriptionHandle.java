@@ -1,6 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
-public class MirrorSubscriptionHandle {
+public final class MirrorSubscriptionHandle {
     private final Runnable onUnsubscribe;
 
     MirrorSubscriptionHandle(Runnable onUnsubscribe) {

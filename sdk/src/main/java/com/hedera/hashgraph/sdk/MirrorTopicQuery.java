@@ -10,7 +10,7 @@ import io.grpc.stub.StreamObserver;
 import java8.util.function.Consumer;
 import org.threeten.bp.Instant;
 
-public class MirrorTopicQuery {
+public final class MirrorTopicQuery {
     private final ConsensusTopicQuery.Builder builder;
 
     public MirrorTopicQuery() {
