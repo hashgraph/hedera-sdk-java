@@ -11,7 +11,7 @@ public final class FreezeTransaction extends TransactionBuilder<FreezeTransactio
     }
 
     @Override
-    protected void onBuild(TransactionBody.Builder bodyBuilder) {
+    void onBuild(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setFreeze(builder);
     }
 }

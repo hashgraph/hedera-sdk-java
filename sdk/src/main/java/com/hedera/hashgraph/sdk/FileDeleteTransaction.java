@@ -21,7 +21,7 @@ public final class FileDeleteTransaction extends TransactionBuilder<FileDeleteTr
     }
 
     @Override
-    protected void onBuild(TransactionBody.Builder bodyBuilder) {
+    void onBuild(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setFileDelete(builder);
     }
 

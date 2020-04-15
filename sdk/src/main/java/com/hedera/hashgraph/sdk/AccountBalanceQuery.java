@@ -42,32 +42,32 @@ public final class AccountBalanceQuery extends QueryBuilder<Hbar, AccountBalance
     }
 
     @Override
-    protected boolean isPaymentRequired() {
+    boolean isPaymentRequired() {
         return false;
     }
 
     @Override
-    protected void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setCryptogetAccountBalance(builder.setHeader(header));
     }
 
     @Override
-    protected Hbar mapResponse(Response response) {
+    Hbar mapResponse(Response response) {
         return Hbar.fromTinybar(response.getCryptogetAccountBalance().getBalance());
     }
 
     @Override
-    protected ResponseHeader mapResponseHeader(Response response) {
+    ResponseHeader mapResponseHeader(Response response) {
         return response.getCryptogetAccountBalance().getHeader();
     }
 
     @Override
-    protected QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(Query request) {
         return request.getCryptogetAccountBalance().getHeader();
     }
 
     @Override
-    protected MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<Query, Response> getMethodDescriptor() {
         return CryptoServiceGrpc.getCryptoGetBalanceMethod();
     }
 }

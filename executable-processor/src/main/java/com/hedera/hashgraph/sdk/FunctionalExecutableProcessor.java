@@ -215,6 +215,7 @@ O execute(Client client, Duration timeout) throws TimeoutException {
             var ty = interfaceBuilder(interfaceName)
                 // TODO: type variable should be optional
                 .addTypeVariable(outputType)
+                .addModifiers(Modifier.PUBLIC)
                 .addMethod(methodAsync)
                 .addMethod(methodAsyncBiConsumer)
                 .addMethod(methodAsyncBiConsumerWithTimeout)

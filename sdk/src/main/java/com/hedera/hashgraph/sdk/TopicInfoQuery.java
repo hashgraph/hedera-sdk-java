@@ -22,27 +22,27 @@ public final class TopicInfoQuery extends QueryBuilder<TopicInfo, TopicInfoQuery
     }
 
     @Override
-    protected void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setConsensusGetTopicInfo(builder.setHeader(header));
     }
 
     @Override
-    protected ResponseHeader mapResponseHeader(Response response) {
+    ResponseHeader mapResponseHeader(Response response) {
         return response.getConsensusGetTopicInfo().getHeader();
     }
 
     @Override
-    protected QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(Query request) {
         return request.getConsensusGetTopicInfo().getHeader();
     }
 
     @Override
-    protected TopicInfo mapResponse(Response response) {
+    TopicInfo mapResponse(Response response) {
         return TopicInfo.fromProtobuf(response.getConsensusGetTopicInfo());
     }
 
     @Override
-    protected MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<Query, Response> getMethodDescriptor() {
         return ConsensusServiceGrpc.getGetTopicInfoMethod();
     }
 }

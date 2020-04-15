@@ -149,7 +149,7 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     }
 
     @Override
-    protected CompletableFuture<Void> onExecuteAsync(Client client) {
+    CompletableFuture<Void> onExecuteAsync(Client client) {
         // On execute, sign each transaction with the operator, if present
         var operator = client.getOperator();
         if (operator != null) signWith(operator.publicKey, operator.transactionSigner);
@@ -158,12 +158,12 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     }
 
     @Override
-    protected final AccountId getNodeId(Client client) {
+    final AccountId getNodeId(Client client) {
         return AccountId.fromProtobuf(transactionBodies.get(nextIndex).getNodeAccountID());
     }
 
     @Override
-    protected final TransactionId getTransactionId() {
+    final TransactionId getTransactionId() {
         return id;
     }
 
@@ -172,7 +172,7 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     }
 
     @Override
-    protected final MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
+    final MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         var transactionBody = transactionBodies.get(nextIndex);
         switch (transactionBody.getDataCase()) {
             case CONTRACTCALL:
@@ -250,7 +250,7 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     }
 
     @Override
-    protected final com.hedera.hashgraph.sdk.proto.Transaction makeRequest() {
+    final com.hedera.hashgraph.sdk.proto.Transaction makeRequest() {
         // emplace the signatures on the transaction and build the transaction
         var tx = transactions.get(nextIndex).setSigMap(signatureBuilders.get(nextIndex)).build();
 
@@ -262,18 +262,18 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     }
 
     @Override
-    protected final TransactionId mapResponse(TransactionResponse transactionResponse) {
+    final TransactionId mapResponse(TransactionResponse transactionResponse) {
         return id;
     }
 
     @Override
-    protected final Status mapResponseStatus(TransactionResponse transactionResponse) {
+    final Status mapResponseStatus(TransactionResponse transactionResponse) {
         return Status.valueOf(transactionResponse.getNodeTransactionPrecheckCode());
     }
 
     @Override
     @SuppressWarnings("LiteProtoToString")
-    protected String debugToString(com.hedera.hashgraph.sdk.proto.Transaction request) {
+    String debugToString(com.hedera.hashgraph.sdk.proto.Transaction request) {
         try {
             return TransactionBody.parseFrom(request.getBodyBytes()).toString();
         } catch (InvalidProtocolBufferException e) {

@@ -45,27 +45,27 @@ public final class ContractCallQuery extends QueryBuilder<ContractFunctionResult
     }
 
     @Override
-    protected void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setContractCallLocal(builder.setHeader(header));
     }
 
     @Override
-    protected ResponseHeader mapResponseHeader(Response response) {
+    ResponseHeader mapResponseHeader(Response response) {
         return response.getContractCallLocal().getHeader();
     }
 
     @Override
-    protected QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(Query request) {
         return request.getContractCallLocal().getHeader();
     }
 
     @Override
-    protected ContractFunctionResult mapResponse(Response response) {
+    ContractFunctionResult mapResponse(Response response) {
         return new ContractFunctionResult(response.getContractCallLocal().getFunctionResult());
     }
 
     @Override
-    protected MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<Query, Response> getMethodDescriptor() {
         return SmartContractServiceGrpc.getContractCallLocalMethodMethod();
     }
 }

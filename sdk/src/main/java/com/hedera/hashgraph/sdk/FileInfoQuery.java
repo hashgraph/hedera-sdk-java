@@ -22,27 +22,27 @@ public final class FileInfoQuery extends QueryBuilder<FileInfo, FileInfoQuery> {
     }
 
     @Override
-    protected void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setFileGetInfo(builder.setHeader(header));
     }
 
     @Override
-    protected ResponseHeader mapResponseHeader(Response response) {
+    ResponseHeader mapResponseHeader(Response response) {
         return response.getFileGetInfo().getHeader();
     }
 
     @Override
-    protected QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(Query request) {
         return request.getFileGetInfo().getHeader();
     }
 
     @Override
-    protected FileInfo mapResponse(Response response) {
+    FileInfo mapResponse(Response response) {
         return FileInfo.fromProtobuf(response.getFileGetInfo().getFileInfo());
     }
 
     @Override
-    protected MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<Query, Response> getMethodDescriptor() {
         return FileServiceGrpc.getGetFileInfoMethod();
     }
 }

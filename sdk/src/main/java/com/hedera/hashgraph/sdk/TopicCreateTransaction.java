@@ -86,7 +86,7 @@ public final class TopicCreateTransaction extends TransactionBuilder<TopicCreate
     }
 
     @Override
-    protected void onBuild(TransactionBody.Builder bodyBuilder) {
+    void onBuild(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setConsensusCreateTopic(builder);
     }
 }

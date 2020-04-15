@@ -42,7 +42,7 @@ public final class MessageSubmitTransaction extends TransactionBuilder<MessageSu
     }
 
     @Override
-    protected void onBuild(TransactionBody.Builder bodyBuilder) {
+    void onBuild(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setConsensusSubmitMessage(builder);
     }
 }

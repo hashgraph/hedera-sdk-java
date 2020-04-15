@@ -121,7 +121,7 @@ public final class TopicUpdateTransaction extends TransactionBuilder<TopicUpdate
     }
 
     @Override
-    protected void onBuild(TransactionBody.Builder bodyBuilder) {
+    void onBuild(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setConsensusUpdateTopic(builder);
     }
 }

@@ -40,7 +40,7 @@ public final class ContractExecuteTransaction extends TransactionBuilder<Contrac
     }
 
     @Override
-    protected void onBuild(TransactionBody.Builder bodyBuilder) {
+    void onBuild(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setContractCall(builder);
     }
 }

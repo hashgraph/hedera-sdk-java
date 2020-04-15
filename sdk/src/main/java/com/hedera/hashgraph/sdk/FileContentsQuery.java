@@ -22,27 +22,27 @@ public final class FileContentsQuery extends QueryBuilder<ByteString, FileConten
     }
 
     @Override
-    protected void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setFileGetContents(builder.setHeader(header));
     }
 
     @Override
-    protected ResponseHeader mapResponseHeader(Response response) {
+    ResponseHeader mapResponseHeader(Response response) {
         return response.getFileGetContents().getHeader();
     }
 
     @Override
-    protected QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(Query request) {
         return request.getFileGetContents().getHeader();
     }
 
     @Override
-    protected ByteString mapResponse(Response response) {
+    ByteString mapResponse(Response response) {
         return response.getFileGetContents().getFileContents().getContents();
     }
 
     @Override
-    protected MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<Query, Response> getMethodDescriptor() {
         return FileServiceGrpc.getGetFileContentMethod();
     }
 }

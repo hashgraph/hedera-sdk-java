@@ -36,7 +36,7 @@ public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTr
     }
 
     @Override
-    protected void onBuild(TransactionBody.Builder bodyBuilder) {
+    void onBuild(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setCryptoTransfer(builder.setTransfers(transfersBuilder));
     }
 }

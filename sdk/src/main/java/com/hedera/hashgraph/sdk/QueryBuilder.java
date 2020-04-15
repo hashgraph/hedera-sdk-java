@@ -65,7 +65,7 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
         return getCostExecutable().executeAsync(client);
     }
 
-    protected boolean isPaymentRequired() {
+    boolean isPaymentRequired() {
         // nearly all queries require a payment
         return true;
     }
@@ -74,21 +74,21 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
      * Called in {@link #makeRequest} just before the query is built. The intent is for the derived
      * class to assign their data variant to the query.
      */
-    protected abstract void onMakeRequest(Query.Builder queryBuilder, QueryHeader header);
+    abstract void onMakeRequest(Query.Builder queryBuilder, QueryHeader header);
 
     /**
      * The derived class should access its response header and return.
      */
-    protected abstract ResponseHeader mapResponseHeader(Response response);
+    abstract ResponseHeader mapResponseHeader(Response response);
 
-    protected abstract QueryHeader mapRequestHeader(Query request);
+    abstract QueryHeader mapRequestHeader(Query request);
 
     private Executable<Hbar> getCostExecutable() {
         return new QueryCostQuery();
     }
 
     @Override
-    protected CompletableFuture<Void> onExecuteAsync(Client client) {
+    CompletableFuture<Void> onExecuteAsync(Client client) {
         if ((paymentTransactions != null) || !isPaymentRequired()) {
             return CompletableFuture.completedFuture(null);
         }
@@ -156,7 +156,7 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
     }
 
     @Override
-    protected final Query makeRequest() {
+    final Query makeRequest() {
         // If payment is required, set the next payment transaction on the query
         if (isPaymentRequired() && paymentTransactions != null) {
             headerBuilder.setPayment(paymentTransactions.get(nextPaymentTransactionIndex));
@@ -174,14 +174,14 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
     }
 
     @Override
-    protected final Status mapResponseStatus(Response response) {
+    final Status mapResponseStatus(Response response) {
         var preCheckCode = mapResponseHeader(response).getNodeTransactionPrecheckCode();
 
         return Status.valueOf(preCheckCode);
     }
 
     @Override
-    protected final AccountId getNodeId(Client client) {
+    final AccountId getNodeId(Client client) {
         if (paymentTransactionNodeIds != null) {
             // If this query needs a payment transaction we need to pick the node ID from the next
             // payment transaction
@@ -193,7 +193,7 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
     }
 
     @Override
-    protected TransactionId getTransactionId() {
+    TransactionId getTransactionId() {
         // this is only called on an error about either the payment transaction or missing a payment transaction
         // as we make sure the latter can't happen, this will never be null
         return Objects.requireNonNull(paymentTransactionId);
@@ -201,7 +201,7 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
 
     @Override
     @SuppressWarnings("LiteProtoToString")
-    protected String debugToString(Query request) {
+    String debugToString(Query request) {
         StringBuilder builder = new StringBuilder(request.toString());
 
         var queryHeader = mapRequestHeader(request);
@@ -221,7 +221,7 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
     @SuppressWarnings("NullableDereference")
     private class QueryCostQuery extends QueryBuilder<Hbar, QueryCostQuery> {
         @Override
-        protected void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+        void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
             headerBuilder.setResponseType(ResponseType.COST_ANSWER);
 
             // COST_ANSWER requires a payment to pass validation but doesn't actually process it
@@ -239,27 +239,27 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
         }
 
         @Override
-        protected ResponseHeader mapResponseHeader(Response response) {
+        ResponseHeader mapResponseHeader(Response response) {
             return QueryBuilder.this.mapResponseHeader(response);
         }
 
         @Override
-        protected QueryHeader mapRequestHeader(Query request) {
+        QueryHeader mapRequestHeader(Query request) {
             return QueryBuilder.this.mapRequestHeader(request);
         }
 
         @Override
-        protected Hbar mapResponse(Response response) {
+        Hbar mapResponse(Response response) {
             return Hbar.fromTinybar(mapResponseHeader(response).getCost());
         }
 
         @Override
-        protected MethodDescriptor<Query, Response> getMethodDescriptor() {
+        MethodDescriptor<Query, Response> getMethodDescriptor() {
             return QueryBuilder.this.getMethodDescriptor();
         }
 
         @Override
-        protected boolean isPaymentRequired() {
+        boolean isPaymentRequired() {
             // combo breaker
             return false;
         }

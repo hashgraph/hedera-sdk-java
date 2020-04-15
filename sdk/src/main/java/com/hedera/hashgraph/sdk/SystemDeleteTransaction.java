@@ -11,7 +11,7 @@ public final class SystemDeleteTransaction extends TransactionBuilder<SystemDele
     }
 
     @Override
-    protected void onBuild(TransactionBody.Builder bodyBuilder) {
+    void onBuild(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setSystemDelete(builder);
     }
 }

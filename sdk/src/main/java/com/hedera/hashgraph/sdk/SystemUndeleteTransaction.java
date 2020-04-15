@@ -11,7 +11,7 @@ public final class SystemUndeleteTransaction extends TransactionBuilder<SystemUn
     }
 
     @Override
-    protected void onBuild(TransactionBody.Builder bodyBuilder) {
+    void onBuild(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setSystemUndelete(builder);
     }
 }

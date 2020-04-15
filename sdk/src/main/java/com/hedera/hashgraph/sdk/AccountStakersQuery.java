@@ -21,22 +21,22 @@ public final class AccountStakersQuery extends QueryBuilder<ProxyStaker[], Accou
     }
 
     @Override
-    protected void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setCryptoGetProxyStakers(builder.setHeader(header));
     }
 
     @Override
-    protected ResponseHeader mapResponseHeader(Response response) {
+    ResponseHeader mapResponseHeader(Response response) {
         return response.getCryptoGetProxyStakers().getHeader();
     }
 
     @Override
-    protected QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(Query request) {
         return request.getCryptoGetProxyStakers().getHeader();
     }
 
     @Override
-    protected ProxyStaker[] mapResponse(Response response) {
+    ProxyStaker[] mapResponse(Response response) {
         var rawStakers = response.getCryptoGetProxyStakers().getStakers();
         var stakers = new ProxyStaker[rawStakers.getProxyStakerCount()];
 
@@ -48,7 +48,7 @@ public final class AccountStakersQuery extends QueryBuilder<ProxyStaker[], Accou
     }
 
     @Override
-    protected MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<Query, Response> getMethodDescriptor() {
         return CryptoServiceGrpc.getGetStakersByAccountIDMethod();
     }
 }

@@ -26,7 +26,7 @@ public final class ContractDeleteTransaction extends TransactionBuilder<Contract
     }
 
     @Override
-    protected void onBuild(TransactionBody.Builder bodyBuilder) {
+    void onBuild(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setContractDeleteInstance(builder);
     }
 }

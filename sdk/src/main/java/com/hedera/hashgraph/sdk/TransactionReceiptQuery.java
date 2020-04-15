@@ -35,37 +35,37 @@ public final class TransactionReceiptQuery
     }
 
     @Override
-    protected boolean isPaymentRequired() {
+    boolean isPaymentRequired() {
         return false;
     }
 
     @Override
-    protected void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setTransactionGetReceipt(builder.setHeader(header));
     }
 
     @Override
-    protected TransactionReceipt mapResponse(Response response) {
+    TransactionReceipt mapResponse(Response response) {
         return TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt());
     }
 
     @Override
-    protected QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(Query request) {
         return request.getTransactionGetReceipt().getHeader();
     }
 
     @Override
-    protected ResponseHeader mapResponseHeader(Response response) {
+    ResponseHeader mapResponseHeader(Response response) {
         return response.getTransactionGetReceipt().getHeader();
     }
 
     @Override
-    protected MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<Query, Response> getMethodDescriptor() {
         return CryptoServiceGrpc.getGetTransactionReceiptsMethod();
     }
 
     @Override
-    protected boolean shouldRetry(Status status, Response response) {
+    boolean shouldRetry(Status status, Response response) {
         if (super.shouldRetry(status, response)) return true;
 
         var receiptStatus =

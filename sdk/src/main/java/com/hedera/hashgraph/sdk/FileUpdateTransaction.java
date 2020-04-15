@@ -13,7 +13,7 @@ public final class FileUpdateTransaction extends TransactionBuilder<FileUpdateTr
     }
 
     @Override
-    protected void onBuild(TransactionBody.Builder bodyBuilder) {
+    void onBuild(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setFileUpdate(builder);
     }
 

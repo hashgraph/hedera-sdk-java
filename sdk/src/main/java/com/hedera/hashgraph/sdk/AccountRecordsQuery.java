@@ -24,22 +24,22 @@ public final class AccountRecordsQuery extends QueryBuilder<List<TransactionReco
     }
 
     @Override
-    protected void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setCryptoGetAccountRecords(builder.setHeader(header));
     }
 
     @Override
-    protected ResponseHeader mapResponseHeader(Response response) {
+    ResponseHeader mapResponseHeader(Response response) {
         return response.getCryptoGetAccountRecords().getHeader();
     }
 
     @Override
-    protected QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(Query request) {
         return request.getCryptoGetAccountRecords().getHeader();
     }
 
     @Override
-    protected List<TransactionRecord> mapResponse(Response response) {
+    List<TransactionRecord> mapResponse(Response response) {
         var rawTransactionRecords = response.getCryptoGetAccountRecords().getRecordsList();
         var transactionRecords = new ArrayList<TransactionRecord>(rawTransactionRecords.size());
 
@@ -51,7 +51,7 @@ public final class AccountRecordsQuery extends QueryBuilder<List<TransactionReco
     }
 
     @Override
-    protected MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<Query, Response> getMethodDescriptor() {
         return CryptoServiceGrpc.getGetAccountRecordsMethod();
     }
 }

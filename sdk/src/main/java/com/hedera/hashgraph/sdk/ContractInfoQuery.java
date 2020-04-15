@@ -22,27 +22,27 @@ public final class ContractInfoQuery extends QueryBuilder<ContractInfo, Contract
     }
 
     @Override
-    protected void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setContractGetInfo(builder.setHeader(header));
     }
 
     @Override
-    protected ResponseHeader mapResponseHeader(Response response) {
+    ResponseHeader mapResponseHeader(Response response) {
         return response.getContractGetInfo().getHeader();
     }
 
     @Override
-    protected QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(Query request) {
         return request.getContractGetInfo().getHeader();
     }
 
     @Override
-    protected ContractInfo mapResponse(Response response) {
+    ContractInfo mapResponse(Response response) {
         return ContractInfo.fromProtobuf(response.getContractGetInfo().getContractInfo());
     }
 
     @Override
-    protected MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<Query, Response> getMethodDescriptor() {
         return SmartContractServiceGrpc.getGetContractInfoMethod();
     }
 }

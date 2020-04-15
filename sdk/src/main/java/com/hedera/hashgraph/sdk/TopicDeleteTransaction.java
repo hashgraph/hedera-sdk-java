@@ -21,7 +21,7 @@ public final class TopicDeleteTransaction extends TransactionBuilder<TopicDelete
     }
 
     @Override
-    protected void onBuild(TransactionBody.Builder bodyBuilder) {
+    void onBuild(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setConsensusDeleteTopic(builder);
     }
 }

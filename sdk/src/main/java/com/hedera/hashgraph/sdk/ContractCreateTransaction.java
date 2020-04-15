@@ -60,7 +60,7 @@ public final class ContractCreateTransaction extends TransactionBuilder<Contract
     }
 
     @Override
-    protected void onBuild(TransactionBody.Builder bodyBuilder) {
+    void onBuild(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setContractCreateInstance(builder);
     }
 }

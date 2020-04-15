@@ -113,6 +113,10 @@ task integrationTest(type: Test) {
 	classpath = sourceSets.integrationTest.runtimeClasspath
 }
 
+tasks.withType(Javadoc) {
+	source = sourceSets.main.allJava + file("$buildDir/generated/sources/annotationProcessor/java/main")
+}
+
 tasks.withType(Test) {
 	useJUnitPlatform()
 
@@ -134,3 +138,4 @@ tasks.withType(Test) {
 		events "passed", "skipped", "failed", "standardOut", "standardError"
 	}
 }
+

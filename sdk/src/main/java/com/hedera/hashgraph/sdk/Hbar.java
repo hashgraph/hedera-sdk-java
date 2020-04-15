@@ -122,7 +122,7 @@ public final class Hbar implements Comparable<Hbar> {
     }
 
     /**
-     * Wrap an amount of tinybar; not to be confused with {@link #of(long)}.
+     * Wrap an amount of tinybar.
      *
      * @param amount the amount, in tinybar; may be negative.
      * @return the wrapped hbar value.

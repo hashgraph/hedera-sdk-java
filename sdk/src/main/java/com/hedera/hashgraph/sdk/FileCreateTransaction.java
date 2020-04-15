@@ -15,7 +15,7 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
     }
 
     @Override
-    protected void onBuild(TransactionBody.Builder bodyBuilder) {
+    void onBuild(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setFileCreate(builder);
     }
 

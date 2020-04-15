@@ -21,27 +21,27 @@ public final class TransactionRecordQuery extends QueryBuilder<TransactionRecord
     }
 
     @Override
-    protected void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setTransactionGetRecord(builder.setHeader(header));
     }
 
     @Override
-    protected ResponseHeader mapResponseHeader(Response response) {
+    ResponseHeader mapResponseHeader(Response response) {
         return response.getTransactionGetRecord().getHeader();
     }
 
     @Override
-    protected QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(Query request) {
         return request.getTransactionGetRecord().getHeader();
     }
 
     @Override
-    protected TransactionRecord mapResponse(Response response) {
+    TransactionRecord mapResponse(Response response) {
         return TransactionRecord.fromProtobuf(response.getTransactionGetRecord().getTransactionRecord());
     }
 
     @Override
-    protected MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<Query, Response> getMethodDescriptor() {
         return CryptoServiceGrpc.getGetTxRecordByTxIDMethod();
     }
 }

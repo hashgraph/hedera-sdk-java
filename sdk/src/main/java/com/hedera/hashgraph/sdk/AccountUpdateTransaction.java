@@ -55,7 +55,7 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
     }
 
     @Override
-    protected void onBuild(TransactionBody.Builder bodyBuilder) {
+    void onBuild(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setCryptoUpdateAccount(builder);
     }
 }

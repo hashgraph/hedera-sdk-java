@@ -41,7 +41,7 @@ public final class Client implements AutoCloseable {
     @Nullable
     private Operator operator;
 
-    protected Client(Map<AccountId, String> network) {
+    Client(Map<AccountId, String> network) {
         var threadFactory = new ThreadFactoryBuilder()
             .setNameFormat("hedera-sdk-%d")
             .setDaemon(true)

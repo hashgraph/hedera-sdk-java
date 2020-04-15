@@ -32,7 +32,7 @@ final class FutureConverter {
     // https://github.com/lukas-krecan/future-converter/blob/master/common/src/main/java/net/javacrumbs/futureconverter/common/internal/ValueSourceFuture.java
     private abstract static class ValueSourceFuture<T> extends FutureWrapper<T>
             implements ValueSource<T> {
-        protected ValueSourceFuture(Future<T> wrappedFuture) {
+        ValueSourceFuture(Future<T> wrappedFuture) {
             super(wrappedFuture);
         }
     }
@@ -41,7 +41,7 @@ final class FutureConverter {
     private static class FutureWrapper<T> implements Future<T> {
         private final Future<T> wrappedFuture;
 
-        protected FutureWrapper(Future<T> wrappedFuture) {
+        FutureWrapper(Future<T> wrappedFuture) {
             this.wrappedFuture = wrappedFuture;
         }
 
@@ -71,7 +71,7 @@ final class FutureConverter {
             return wrappedFuture.get(timeout, unit);
         }
 
-        protected Future<T> getWrappedFuture() {
+        Future<T> getWrappedFuture() {
             return wrappedFuture;
         }
     }
@@ -95,7 +95,7 @@ final class FutureConverter {
             }
 
             @Override
-            protected ValueSourceFuture<T> getWrappedFuture() {
+            ValueSourceFuture<T> getWrappedFuture() {
                 return (ValueSourceFuture<T>) super.getWrappedFuture();
             }
 
@@ -134,7 +134,7 @@ final class FutureConverter {
             }
 
             @Override
-            protected ListenableFuture<T> getWrappedFuture() {
+            ListenableFuture<T> getWrappedFuture() {
                 return (ListenableFuture<T>) super.getWrappedFuture();
             }
         }
@@ -192,7 +192,7 @@ final class FutureConverter {
             }
 
             @Override
-            protected CompletableFuture<T> getWrappedFuture() {
+            CompletableFuture<T> getWrappedFuture() {
                 return (CompletableFuture<T>) super.getWrappedFuture();
             }
         }

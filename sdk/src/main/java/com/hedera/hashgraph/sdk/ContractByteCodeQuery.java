@@ -22,27 +22,27 @@ public final class ContractByteCodeQuery extends QueryBuilder<ByteString, Contra
     }
 
     @Override
-    protected void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setContractGetBytecode(builder.setHeader(header));
     }
 
     @Override
-    protected ResponseHeader mapResponseHeader(Response response) {
+    ResponseHeader mapResponseHeader(Response response) {
         return response.getContractGetBytecodeResponse().getHeader();
     }
 
     @Override
-    protected QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(Query request) {
         return request.getContractGetBytecode().getHeader();
     }
 
     @Override
-    protected ByteString mapResponse(Response response) {
+    ByteString mapResponse(Response response) {
         return response.getContractGetBytecodeResponse().getBytecode();
     }
 
     @Override
-    protected MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<Query, Response> getMethodDescriptor() {
         return SmartContractServiceGrpc.getContractGetBytecodeMethod();
     }
 }

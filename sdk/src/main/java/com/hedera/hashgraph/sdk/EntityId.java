@@ -84,7 +84,7 @@ class EntityId {
         }
     }
 
-    protected String toSolidityAddress() {
+    String toSolidityAddress() {
         if (Long.highestOneBit(shard) > 32) {
             throw new IllegalStateException("shard out of 32-bit range " + shard);
         }

@@ -18,7 +18,7 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
     HederaExecutable() {
     }
 
-    protected abstract CompletableFuture<Void> onExecuteAsync(Client client);
+    abstract CompletableFuture<Void> onExecuteAsync(Client client);
 
     @Override
     public final CompletableFuture<O> executeAsync(Client client) {
@@ -87,26 +87,26 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
         }).thenCompose(x -> x);
     }
 
-    protected abstract RequestT makeRequest();
+    abstract RequestT makeRequest();
 
     /**
      * Called after receiving the query response from Hedera. The derived class should map into its
      * output type.
      */
-    protected abstract O mapResponse(ResponseT response);
+    abstract O mapResponse(ResponseT response);
 
-    protected abstract Status mapResponseStatus(ResponseT response);
+    abstract Status mapResponseStatus(ResponseT response);
 
     /**
      * Called to direct the invocation of the query to the appropriate gRPC service.
      */
-    protected abstract MethodDescriptor<RequestT, ResponseT> getMethodDescriptor();
+    abstract MethodDescriptor<RequestT, ResponseT> getMethodDescriptor();
 
-    protected abstract AccountId getNodeId(Client client);
+    abstract AccountId getNodeId(Client client);
 
-    protected abstract TransactionId getTransactionId();
+    abstract TransactionId getTransactionId();
 
-    protected boolean shouldRetryExceptionally(@Nullable Throwable error) {
+    boolean shouldRetryExceptionally(@Nullable Throwable error) {
         if (error instanceof StatusRuntimeException) {
             var status = ((StatusRuntimeException) error).getStatus().getCode();
 
@@ -121,11 +121,11 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
      * Called just after receiving the query response from Hedera. By default it triggers a retry
      * when the pre-check status is {@code BUSY}.
      */
-    protected boolean shouldRetry(Status status, ResponseT response) {
+    boolean shouldRetry(Status status, ResponseT response) {
         return status == Status.Busy;
     }
 
-    protected String debugToString(RequestT request) {
+    String debugToString(RequestT request) {
         return request.toString();
     }
 }

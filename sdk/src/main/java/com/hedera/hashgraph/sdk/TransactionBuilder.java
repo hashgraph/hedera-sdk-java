@@ -11,7 +11,7 @@ import java.util.Collections;
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     extends Executable<TransactionId> {
     // Default auto renew duration for accounts, contracts, topics, and files (entities)
-    protected static final Duration DEFAULT_AUTO_RENEW_PERIOD = Duration.ofDays(90);
+    static final Duration DEFAULT_AUTO_RENEW_PERIOD = Duration.ofDays(90);
 
     // Default transaction duration
     private static final Duration DEFAULT_TRANSACTION_VALID_DURATION = Duration.ofSeconds(120);
@@ -167,5 +167,5 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * Called in {@link #build} just before the transaction body is built. The intent is for the
      * derived class to assign their data variant to the transaction body.
      */
-    protected abstract void onBuild(TransactionBody.Builder bodyBuilder);
+    abstract void onBuild(TransactionBody.Builder bodyBuilder);
 }
