@@ -19,7 +19,6 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
         bodyBuilder.setFileCreate(builder);
     }
 
-
     /**
      * <p>Set the instant at which this file will expire, after which its contents will no longer be
      * available.
@@ -37,7 +36,6 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
 
         return this;
     }
-
 
     /**
      * <p>Add a key which must sign any transactions modifying this file. Required.

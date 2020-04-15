@@ -31,7 +31,7 @@ public final class FileDeleteTransaction extends TransactionBuilder<FileDeleteTr
      * @param fileId the ID of the file to delete.
      * @return {@code this}.
      */
-    public FileDeleteTransaction setFileID(FileId fileId) {
+    public FileDeleteTransaction setFileId(FileId fileId) {
         builder.setFileID(fileId.toProtobuf());
         return this;
     }

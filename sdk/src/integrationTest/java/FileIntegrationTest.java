@@ -94,7 +94,7 @@ public class FileIntegrationTest {
             assertEquals(info.keys[0].toString(), operatorKey.getPublicKey().toString());
 
             new FileDeleteTransaction()
-                .setFileID(file)
+                .setFileId(file)
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
                 .getReceipt(client);

@@ -22,7 +22,6 @@ public final class FileAppendTransaction extends TransactionBuilder<FileAppendTr
         bodyBuilder.setFileAppend(builder);
     }
 
-
     /**
      * <p>Set the ID of the file to append to. Required.
      *
