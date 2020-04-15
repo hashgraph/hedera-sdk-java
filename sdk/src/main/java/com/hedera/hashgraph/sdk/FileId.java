@@ -5,6 +5,13 @@ import com.hedera.hashgraph.sdk.proto.FileID;
 import javax.annotation.Nonnegative;
 
 public final class FileId extends EntityId {
+    /**
+     * The public node address book for the current network.
+     *
+     * This file can be decoded using {@link com.hedera.hashgraph.sdk.proto.NodeAddressBook}.
+     */
+    public static final FileId ADDRESS_BOOK = new FileId(0, 0, 102);
+
     public FileId(@Nonnegative long num) {
         super(0, 0, num);
     }
