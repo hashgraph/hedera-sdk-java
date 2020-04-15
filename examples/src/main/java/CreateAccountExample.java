@@ -1,16 +1,17 @@
-import java.util.Objects;
-import java.util.concurrent.TimeoutException;
-
+import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
+import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
-import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import io.github.cdimascio.dotenv.Dotenv;
+
+import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 
 public final class CreateAccountExample {
 
@@ -19,9 +20,10 @@ public final class CreateAccountExample {
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
-    private CreateAccountExample() { }
+    private CreateAccountExample() {
+    }
 
-    public static void main(String[] args) throws TimeoutException, HederaPreCheckStatusException {
+    public static void main(String[] args) throws TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException {
         // Generate a Ed25519 private, public key pair
         PrivateKey newKey = PrivateKey.generate();
         PublicKey newPublicKey = newKey.getPublicKey();

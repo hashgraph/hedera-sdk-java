@@ -1,5 +1,7 @@
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
+import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.KeyList;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
@@ -13,11 +15,12 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java8.util.J8Arrays;
 
 import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 
 /**
  * An example of HCS topic management using a threshold key as the adminKey and going through a key rotation to a new
  * set of keys.
- *
+ * <p>
  * Creates a new HCS topic with a 2-of-3 threshold key for the adminKey.
  * Updates the HCS topic to a 3-of-4 threshold key for the adminKey.
  */
@@ -32,11 +35,11 @@ class TopicWithAdminKeyExample {
         setupHapiClient();
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws HederaReceiptStatusException, TimeoutException, HederaPreCheckStatusException {
         new TopicWithAdminKeyExample().execute();
     }
 
-    public void execute() throws Exception {
+    public void execute() throws HederaReceiptStatusException, TimeoutException, HederaPreCheckStatusException {
         createTopicWithAdminKey();
 
         updateTopicAdminKeyAndMemo();
@@ -56,7 +59,7 @@ class TopicWithAdminKeyExample {
         hapiClient.setOperator(payerId, payerPrivateKey);
     }
 
-    private void createTopicWithAdminKey() throws Exception {
+    private void createTopicWithAdminKey() throws TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException {
         // Generate the initial keys that are part of the adminKey's thresholdKey.
         // 3 ED25519 keys part of a 2-of-3 threshold key.
         initialAdminKeys = new PrivateKey[3];
@@ -83,7 +86,7 @@ class TopicWithAdminKeyExample {
         System.out.println("Created new topic " + topicId + " with 2-of-3 threshold key as adminKey.");
     }
 
-    private void updateTopicAdminKeyAndMemo() throws Exception {
+    private void updateTopicAdminKeyAndMemo() throws TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException {
         // Generate the new keys that are part of the adminKey's thresholdKey.
         // 4 ED25519 keys part of a 3-of-4 threshold key.
         PrivateKey[] newAdminKeys = new PrivateKey[4];

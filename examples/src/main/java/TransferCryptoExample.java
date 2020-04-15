@@ -3,12 +3,15 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.CryptoTransferTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
+import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 
 public final class TransferCryptoExample {
 
@@ -17,9 +20,10 @@ public final class TransferCryptoExample {
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
-    private TransferCryptoExample() { }
+    private TransferCryptoExample() {
+    }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException {
         // `Client.forMainnet()` is provided for connecting to Hedera mainnet
         Client client = Client.forTestnet();
 

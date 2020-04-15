@@ -17,7 +17,7 @@ import static java8.util.concurrent.CompletableFuture.failedFuture;
  * right after creating it, for instantiating a smart contract with bytecode in a file just created,
  * and internally by the network for detecting when duplicate transactions are submitted.
  */
-public final class TransactionId implements WithGetReceipt<TransactionReceipt>, WithGetRecord<TransactionRecord> {
+public final class TransactionId implements WithGetReceipt, WithGetRecord {
     @Nullable
     private static Instant lastInstant = null;
 
@@ -72,15 +72,14 @@ public final class TransactionId implements WithGetReceipt<TransactionReceipt>, 
     }
 
     @Override
-    @FunctionalExecutable
+    @FunctionalExecutable(type = "TransactionReceipt", exceptionTypes = {"HederaReceiptStatusException"})
     public CompletableFuture<TransactionReceipt> getReceiptAsync(Client client) {
         return new TransactionReceiptQuery()
             .setTransactionId(this)
             .executeAsync(client)
             .thenCompose(receipt -> {
                 if (receipt.status != Status.Success) {
-                    // TODO: Throw a HederaReceiptStatusException
-                    return failedFuture(new RuntimeException("bad receipt status: " + receipt.status));
+                    return failedFuture(new HederaReceiptStatusException(this, receipt));
                 }
 
                 return completedFuture(receipt);
@@ -88,7 +87,7 @@ public final class TransactionId implements WithGetReceipt<TransactionReceipt>, 
     }
 
     @Override
-    @FunctionalExecutable
+    @FunctionalExecutable(type = "TransactionRecord", exceptionTypes = {"HederaReceiptStatusException"})
     public CompletableFuture<TransactionRecord> getRecordAsync(Client client) {
         // note: we get the receipt first to ensure consensus has been reached
         return getReceiptAsync(client).thenCompose(receipt -> new TransactionRecordQuery()

@@ -4,13 +4,15 @@ import com.hedera.hashgraph.sdk.FileContentsQuery;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
+import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransactionId;
+import io.github.cdimascio.dotenv.Dotenv;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
-
-import io.github.cdimascio.dotenv.Dotenv;
+import java.util.concurrent.TimeoutException;
 
 public final class GetFileContentsExample {
 
@@ -19,9 +21,10 @@ public final class GetFileContentsExample {
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
-    private GetFileContentsExample() { }
+    private GetFileContentsExample() {
+    }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws HederaReceiptStatusException, TimeoutException, HederaPreCheckStatusException {
         // `Client.forMainnet()` is provided for connecting to Hedera mainnet
         Client client = Client.forTestnet();
 

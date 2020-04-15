@@ -1,22 +1,24 @@
 import com.google.errorprone.annotations.Var;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.CryptoTransferTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
+import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionId;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 
 public final class MultiAppTransferExample {
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names
-//    private static final AccountId NODE_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("NODE_ID")));
-//    private static final String NODE_ADDRESS = Objects.requireNonNull(Dotenv.load().get("NODE_ADDRESS"));
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
@@ -38,7 +40,7 @@ public final class MultiAppTransferExample {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws HederaReceiptStatusException, TimeoutException, HederaPreCheckStatusException, InvalidProtocolBufferException {
         Hbar transferAmount = Hbar.fromTinybar(10_000);
 
         // the exchange creates an account for the user to transfer funds to
@@ -87,7 +89,7 @@ public final class MultiAppTransferExample {
         System.out.println("" + exchangeAccountId + " balance = " + receiptBalanceAfter);
     }
 
-    private static byte[] exchangeSignsTransaction(byte[] transactionData) throws Exception {
+    private static byte[] exchangeSignsTransaction(byte[] transactionData) throws InvalidProtocolBufferException {
         return Transaction.fromBytes(transactionData)
             .sign(exchangeKey)
             .toBytes();

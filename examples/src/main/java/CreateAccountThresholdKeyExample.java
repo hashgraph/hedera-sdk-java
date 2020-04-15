@@ -1,6 +1,3 @@
-import java.util.Objects;
-import java.util.concurrent.TimeoutException;
-
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
@@ -8,12 +5,16 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.CryptoTransferTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
+import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.Key;
 import com.hedera.hashgraph.sdk.KeyList;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import io.github.cdimascio.dotenv.Dotenv;
+
+import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 
 public final class CreateAccountThresholdKeyExample {
 
@@ -22,9 +23,10 @@ public final class CreateAccountThresholdKeyExample {
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
-    private CreateAccountThresholdKeyExample() { }
+    private CreateAccountThresholdKeyExample() {
+    }
 
-    public static void main(String[] args) throws HederaPreCheckStatusException, TimeoutException {
+    public static void main(String[] args) throws HederaPreCheckStatusException, TimeoutException, HederaReceiptStatusException {
         // Generate three new Ed25519 private, public key pairs
         PrivateKey[] keys = new PrivateKey[3];
         for (int i = 0; i < 3; i++) {

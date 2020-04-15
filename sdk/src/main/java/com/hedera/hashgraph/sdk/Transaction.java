@@ -85,7 +85,7 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
         this.id = Objects.requireNonNull(transactionId);
     }
 
-    public static Transaction fromBytes(byte[] bytes) throws Exception {
+    public static Transaction fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         com.hedera.hashgraph.sdk.proto.Transaction inner = com.hedera.hashgraph.sdk.proto.Transaction.parseFrom(bytes);
 
         return new Transaction(Lists.of(inner.toBuilder()));

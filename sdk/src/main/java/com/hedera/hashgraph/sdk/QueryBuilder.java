@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends HederaExecutable<Query, Response, O> implements WithGetCost<Hbar> {
+public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends HederaExecutable<Query, Response, O> implements WithGetCost {
     private final Query.Builder builder;
 
     private final QueryHeader.Builder headerBuilder;
@@ -60,7 +60,7 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
     }
 
     @Override
-    @FunctionalExecutable
+    @FunctionalExecutable(type = "Hbar")
     public CompletableFuture<Hbar> getCostAsync(Client client) {
         return getCostExecutable().executeAsync(client);
     }

@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
+import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
@@ -22,7 +23,7 @@ public final class CreateFileExample {
 
     private CreateFileExample() { }
 
-    public static void main(String[] args) throws TimeoutException, HederaPreCheckStatusException {
+    public static void main(String[] args) throws TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException {
         // `Client.forMainnet()` is provided for connecting to Hedera mainnet
         Client client = Client.forTestnet();
 

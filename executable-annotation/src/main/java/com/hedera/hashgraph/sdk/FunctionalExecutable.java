@@ -8,6 +8,9 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.SOURCE)
 public @interface FunctionalExecutable {
+    // additional exception types that we can throw
+    String[] exceptionTypes() default {};
+
     // empty string means make this generic
     String type() default "";
 }
