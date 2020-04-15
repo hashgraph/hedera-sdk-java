@@ -139,3 +139,7 @@ tasks.withType(Test) {
 	}
 }
 
+jar {
+	exclude "**/*.proto"
+	includeEmptyDirs = false
+}
