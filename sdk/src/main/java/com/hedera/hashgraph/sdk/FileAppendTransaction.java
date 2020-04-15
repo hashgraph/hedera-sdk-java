@@ -8,7 +8,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
  * <p>A transaction specifically to append data to a file on the network.
  *
  * <p>If a file has multiple keys, all keys must sign to modify its contents.
- * (See {@link FileCreateTransaction#addKey(PublicKey)} for more information.)
+ * (See {@link FileCreateTransaction#setKeys(Key...)} for more information.)
  */
 public final class FileAppendTransaction extends TransactionBuilder<FileAppendTransaction> {
     private final FileAppendTransactionBody.Builder builder;
@@ -38,7 +38,7 @@ public final class FileAppendTransaction extends TransactionBuilder<FileAppendTr
      * <p>Set the contents to append to the file as identified by {@link #setFileId(FileId)}.
      *
      * <p>Note that total size for a given transaction is limited to 6KiB (as of March 2020) by the
-     * network; if you exceed this you may receive a {@link com.hedera.hashgraph.sdk.HederaStatusException}
+     * network; if you exceed this you may receive a {@link com.hedera.hashgraph.sdk.HederaPreCheckStatusException}
      * with {@link com.hedera.hashgraph.sdk.Status#TransactionOversize}.
      *
      * <p>If you want to append more than ~6KiB of data, you will need to break it into multiple chunks
@@ -63,7 +63,7 @@ public final class FileAppendTransaction extends TransactionBuilder<FileAppendTr
      * {@link java.nio.charset.StandardCharsets#UTF_8}.
      *
      * <p>Note that total size for a given transaction is limited to 6KiB (as of March 2020) by the
-     * network; if you exceed this you may receive a {@link com.hedera.hashgraph.sdk.HederaStatusException}
+     * network; if you exceed this you may receive a {@link com.hedera.hashgraph.sdk.HederaPreCheckStatusException}
      * with {@link com.hedera.hashgraph.sdk.Status#TransactionOversize}.
      *
      * <p>If you want to append more than ~6KiB of data, you will need to break it into multiple chunks

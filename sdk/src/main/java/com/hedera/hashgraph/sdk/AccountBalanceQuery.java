@@ -9,7 +9,7 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
 
 /**
- * Get the balance of a Hedera crypto-currency account. This returns only the balance, so it is a
+ * Get the balance of a Hedera™ crypto-currency account. This returns only the balance, so it is a
  * smaller and faster reply than {@link AccountInfoQuery}.
  *
  * <p>This query is free.
@@ -23,6 +23,8 @@ public final class AccountBalanceQuery extends QueryBuilder<Hbar, AccountBalance
 
     /**
      * The account ID for which the balance is being requested.
+     *
+     * This is mutually exclusive with {@link #setContractId(ContractId)}.
      */
     public AccountBalanceQuery setAccountId(AccountId accountId) {
         builder.setAccountID(accountId.toProtobuf());
@@ -31,6 +33,8 @@ public final class AccountBalanceQuery extends QueryBuilder<Hbar, AccountBalance
 
     /**
      * The contract ID for which the balance is being requested.
+     *
+     * This is mutually exclusive with {@link #setAccountId(AccountId)}.
      */
     public AccountBalanceQuery setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProtobuf());

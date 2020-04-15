@@ -152,9 +152,8 @@ public final class Client implements AutoCloseable {
     /**
      * Set the maximum default payment allowable for queries.
      * <p>
-     * When a query is executed without an explicit
-     * {@link QueryBuilder#setPaymentTransaction(Transaction)}
-     * or {@link QueryBuilder#setQueryPayment(Hbar)} call, the client will first request the cost
+     * When a query is executed without an explicit {@link QueryBuilder#setQueryPayment(Hbar)} call,
+     * the client will first request the cost
      * of the given query from the node it will be submitted to and attach a payment for that amount
      * from the operator account on the client.
      * <p>

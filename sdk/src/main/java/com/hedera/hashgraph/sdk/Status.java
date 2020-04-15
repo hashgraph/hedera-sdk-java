@@ -352,7 +352,7 @@ public enum Status {
     /**
      * Violating one of these rules: 1) treasury account can update all entities below 0.0.1000, 2)
      * account 0.0.50 can update all entities from 0.0.51 - 0.0.80, 3) Network Function Master
-     * Account A/c 0.0.50 - Update all Network Function accounts & perform all the Network Functions
+     * Account A/c 0.0.50 - Update all Network Function accounts &amp; perform all the Network Functions
      * listed below, 4) Network Function Accounts: i) A/c 0.0.55 - Update Address Book files
      * (0.0.101/102), ii) A/c 0.0.56 - Update Fee schedule (0.0.111), iii) A/c 0.0.57 - Update
      * Exchange Rate (0.0.112).

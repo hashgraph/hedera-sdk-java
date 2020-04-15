@@ -3,13 +3,9 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.FileCreateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 public final class FileCreateTransaction extends TransactionBuilder<FileCreateTransaction> {
-    // Default expiration time to an acceptable value, 1/4 of a Julian year
-    private static final Duration DEFAULT_AUTO_RENEW_PERIOD = Duration.ofMillis(7890000000L);
-
     private final FileCreateTransactionBody.Builder builder;
 
     public FileCreateTransaction() {
@@ -51,8 +47,7 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
      * paying for the transaction). Only one key must sign to delete the file, however.
      *
      * <p>To require more than one key to sign to delete a file, add them to a
-     * {@link com.hedera.hashgraph.sdk.ThresholdKey} and pass that here; to require all of
-     * them to sign, add them to a {@link com.hedera.hashgraph.sdk.KeyList} and pass that.
+     * {@link com.hedera.hashgraph.sdk.KeyList} and pass that here.
      *
      * <p>The network currently requires a file to have at least one key (or key list or threshold key)
      * but this requirement may be lifted in the future.
@@ -74,7 +69,7 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
      * <p>This may be omitted to create an empty file.
      *
      * <p>Note that total size for a given transaction is limited to 6KiB (as of March 2020) by the
-     * network; if you exceed this you may receive a {@link com.hedera.hashgraph.sdk.HederaStatusException}
+     * network; if you exceed this you may receive a {@link com.hedera.hashgraph.sdk.HederaPreCheckStatusException}
      * with {@link com.hedera.hashgraph.sdk.Status#TransactionOversize}.
      *
      * <p>In this case, you will need to break the data into chunks of less than ~6KiB and execute this
@@ -99,7 +94,7 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
      * {@link java.nio.charset.StandardCharsets#UTF_8}.
      *
      * <p>Note that total size for a given transaction is limited to 6KiB (as of March 2020) by the
-     * network; if you exceed this you may receive a {@link com.hedera.hashgraph.sdk.HederaStatusException}
+     * network; if you exceed this you may receive a {@link com.hedera.hashgraph.sdk.HederaPreCheckStatusException}
      * with {@link com.hedera.hashgraph.sdk.Status#TransactionOversize}.
      *
      * <p>In this case, you will need to break the data into chunks of less than ~6KiB and execute this

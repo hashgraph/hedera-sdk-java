@@ -17,7 +17,7 @@ import java.util.List;
  * by {@link ContractCreateTransaction}.
  * <p>
  * If you require a type which is not supported here, please let us know on
- * <a href="https://github.com/hashgraph/hedera-sdk-java/issues/298>this Github issue</a>.
+ * <a href="https://github.com/hashgraph/hedera-sdk-java/issues/298">this Github issue</a>.
  */
 public final class ContractFunctionResult {
     private static final ByteString errorPrefix = ByteString.copyFrom(new byte[]{8, -61, 121, -96});

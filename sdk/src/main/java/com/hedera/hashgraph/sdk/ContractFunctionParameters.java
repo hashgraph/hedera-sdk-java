@@ -24,25 +24,29 @@ import java.util.List;
  * Builder for encoding parameters for a Solidity contract constructor/function call.
  * <p>
  * If you require a type which is not supported here, please let us know on
- * <a href="https://github.com/hashgraph/hedera-sdk-java/issues/298>this Github issue</a>.
+ * <a href="https://github.com/hashgraph/hedera-sdk-java/issues/298">this Github issue</a>.
  */
 public final class ContractFunctionParameters {
     /**
      * The length of a Solidity address in bytes.
      */
     public static final int ADDRESS_LEN = EntityId.SOLIDITY_ADDRESS_LEN;
+
     /**
      * The length of a hexadecimal-encoded Solidity address, in ASCII characters (bytes).
      */
     public static final int ADDRESS_LEN_HEX = EntityId.SOLIDITY_ADDRESS_LEN_HEX;
+
     /**
      * Function selector length in bytes
      */
     public static final int SELECTOR_LEN = 4;
+
     /**
      * Function selector length in hex characters
      */
     public static final int SELECTOR_LEN_HEX = 8;
+
     // padding that we can substring without new allocations
     private static final ByteString padding = ByteString.copyFrom(new byte[31]);
     private static final ByteString negativePadding;
@@ -291,8 +295,8 @@ public final class ContractFunctionParameters {
 
     /**
      * Add an 8-bit integer.
-     *
-     * @implNote The implementation is wasteful as we must pad to 32-bytes to store 1 byte.
+     * <p>
+     * The implementation is wasteful as we must pad to 32-bytes to store 1 byte.
      */
     public ContractFunctionParameters addInt8(byte value) {
         args.add(new Argument("int8", int256(value, 32), false));
@@ -333,8 +337,8 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 8-bit integers.
-     *
-     * @implNote The implementation is wasteful as we must pad to 32-bytes to store 1 byte.
+     * <p>
+     * The implementation is wasteful as we must pad to 32-bytes to store 1 byte.
      */
     public ContractFunctionParameters addInt8Array(byte[] intArray) {
         IntStream intStream = IntStreams.range(0, intArray.length).map(idx -> intArray[idx]);
@@ -400,8 +404,8 @@ public final class ContractFunctionParameters {
 
     /**
      * Add an unsigned 8-bit integer.
-     *
-     * @implNote The implementation is wasteful as we must pad to 32-bytes to store 1 byte.
+     * <p>
+     * The implementation is wasteful as we must pad to 32-bytes to store 1 byte.
      */
     public ContractFunctionParameters addUint8(byte value) {
         args.add(new Argument("uint8", uint256(value, 8), false));
@@ -452,8 +456,8 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of unsigned 8-bit integers.
-     *
-     * @implNote The implementation is wasteful as we must pad to 32-bytes to store 1 byte.
+     * <p>
+     * The implementation is wasteful as we must pad to 32-bytes to store 1 byte.
      */
     public ContractFunctionParameters addUint8Array(byte[] intArray) {
         IntStream intStream = IntStreams.range(0, intArray.length).map(idx -> intArray[idx]);
