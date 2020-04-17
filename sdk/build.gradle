@@ -52,6 +52,8 @@ dependencies {
 
 	// NOTE: This is to support Android API < 26.
 	api "org.threeten:threetenbp:1.4.2"
+
+	implementation "com.google.code.gson:gson:2.8.6"
 }
 
 // https://github.com/google/protobuf-gradle-plugin

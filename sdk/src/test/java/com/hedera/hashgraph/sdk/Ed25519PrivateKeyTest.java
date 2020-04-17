@@ -190,7 +190,14 @@ class Ed25519PrivateKeyTest {
 
     @ParameterizedTest
     @DisplayName("reproducible signature can be computed")
-    @MethodSource("privKeyStrings")
+    @ValueSource(strings = {
+        TEST_KEY_STR,
+        // raw hex (concatenated private + public key)
+        "db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10" +
+            "e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7",
+        // raw hex (just private key)
+        "db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10"
+    })
     void reproducibleSignature(String keyStr) {
         PrivateKey key = PrivateKey.fromString(keyStr);
         byte[] signature = key.sign(MESSAGE_BYTES);
