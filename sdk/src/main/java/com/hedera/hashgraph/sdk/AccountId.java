@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.AccountID;
 
 import javax.annotation.Nonnegative;
@@ -38,5 +39,15 @@ public final class AccountId extends EntityId {
             .setRealmNum(realm)
             .setAccountNum(num)
             .build();
+    }
+
+    public byte[] toBytes() {
+        return this.toProtobuf().toByteArray();
+    }
+
+    public static AccountId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        com.hedera.hashgraph.sdk.proto.AccountID inner = com.hedera.hashgraph.sdk.proto.AccountID.parseFrom(bytes);
+
+        return fromProtobuf(inner.toBuilder().build());
     }
 }
