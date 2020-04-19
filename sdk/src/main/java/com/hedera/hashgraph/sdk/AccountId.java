@@ -46,7 +46,7 @@ public final class AccountId extends EntityId {
     }
 
     public static AccountId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        com.hedera.hashgraph.sdk.proto.AccountID inner = com.hedera.hashgraph.sdk.proto.AccountID.parseFrom(bytes);
+        AccountID inner = AccountID.parseFrom(bytes);
 
         return fromProtobuf(inner.toBuilder().build());
     }
