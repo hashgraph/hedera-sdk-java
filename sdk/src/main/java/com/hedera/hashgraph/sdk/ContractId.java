@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ContractID;
 
 import javax.annotation.Nonnegative;
@@ -38,5 +39,13 @@ public final class ContractId extends EntityId {
             .setRealmNum(realm)
             .setContractNum(num)
             .build();
+    }
+
+    byte[] toBytes() {
+        return this.toProtobuf().toByteArray();
+    }
+
+    ContractId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        return fromProtobuf(ContractID.parseFrom(bytes).toBuilder().build());
     }
 }
