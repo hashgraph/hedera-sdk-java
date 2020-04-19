@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class AccountIdTest {
+class TopicIdTest {
     @Test
     @DisplayName("using toBytes and fromBytes will produce the correct Id")
     void keyGenerates() throws InvalidProtocolBufferException {

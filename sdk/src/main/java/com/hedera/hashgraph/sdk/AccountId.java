@@ -46,8 +46,6 @@ public final class AccountId extends EntityId {
     }
 
     public static AccountId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        AccountID inner = AccountID.parseFrom(bytes);
-
-        return fromProtobuf(inner.toBuilder().build());
+        return fromProtobuf(AccountID.parseFrom(bytes).toBuilder().build());
     }
 }

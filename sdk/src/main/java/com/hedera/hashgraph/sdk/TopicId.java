@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TopicID;
 
 import javax.annotation.Nonnegative;
@@ -24,5 +25,13 @@ public final class TopicId extends EntityId {
 
     TopicID toProtobuf() {
         return TopicID.newBuilder().setShardNum(shard).setRealmNum(realm).setTopicNum(num).build();
+    }
+
+    byte[] toBytes() {
+        return this.toProtobuf().toByteArray();
+    }
+
+    TopicId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        return fromProtobuf(TopicID.parseFrom(bytes).toBuilder().build());
     }
 }
