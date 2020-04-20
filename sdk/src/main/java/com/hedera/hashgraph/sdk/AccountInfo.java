@@ -132,6 +132,31 @@ public final class AccountInfo {
         );
     }
 
+    CryptoGetInfoResponse.AccountInfo toProtoBuf() {
+        var accountInfoBuilder = CryptoGetInfoResponse.AccountInfo.newBuilder()
+            .setAccountID(this.accountId.toProtobuf())
+            .setDeleted(this.deleted)
+            .setProxyReceived(this.proxyReceived.asTinybar())
+            .setKey(this.key.toKeyProtobuf())
+            .setBalance(this.balance.asTinybar())
+            .setGenerateSendRecordThreshold(this.sendRecordThreshold.asTinybar())
+            .setGenerateReceiveRecordThreshold(this.receiveRecordThreshold.asTinybar())
+            .setReceiverSigRequired(this.receiverSignatureRequired)
+            .setExpirationTime(InstantConverter.toProtobuf(this.expirationTime))
+            .setAutoRenewPeriod(DurationConverter.toProtobuf(this.autoRenewPeriod));
+
+
+        if(this.contractAccountId != null) {
+            accountInfoBuilder.setContractAccountID(this.contractAccountId);
+        }
+
+        if(this.proxyAccountId != null) {
+            accountInfoBuilder.setProxyAccountID(this.proxyAccountId.toProtobuf());
+        }
+
+        return accountInfoBuilder.build();
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
