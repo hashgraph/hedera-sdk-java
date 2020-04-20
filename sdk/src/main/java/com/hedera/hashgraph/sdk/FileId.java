@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.FileID;
 
 import javax.annotation.Nonnegative;
@@ -31,5 +32,13 @@ public final class FileId extends EntityId {
 
     FileID toProtobuf() {
         return FileID.newBuilder().setShardNum(shard).setRealmNum(realm).setFileNum(num).build();
+    }
+
+    byte[] toBytes() {
+        return this.toProtobuf().toByteArray();
+    }
+
+    FileId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        return fromProtobuf(FileID.parseFrom(bytes).toBuilder().build());
     }
 }
