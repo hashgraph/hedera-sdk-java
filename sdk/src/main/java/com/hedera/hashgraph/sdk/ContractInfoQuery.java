@@ -7,6 +7,10 @@ import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import io.grpc.MethodDescriptor;
+import java8.util.concurrent.CompletableFuture;
+import java8.util.function.Consumer;
+
+import java.util.concurrent.TimeoutException;
 
 public final class ContractInfoQuery extends QueryBuilder<ContractInfo, ContractInfoQuery> {
     private final ContractGetInfoQuery.Builder builder;
@@ -44,5 +48,13 @@ public final class ContractInfoQuery extends QueryBuilder<ContractInfo, Contract
     @Override
     MethodDescriptor<Query, Response> getMethodDescriptor() {
         return SmartContractServiceGrpc.getGetContractInfoMethod();
+    }
+
+    @Override
+    public CompletableFuture<Hbar> getCostAsync(Client client) {
+        // deleted accounts return a COST_ANSWER of zero which triggers `INSUFFICIENT_TX_FEE`
+        // if you set that as the query payment; 25 tinybar seems to be enough to get
+        // `CONTRACT_DELETED` back instead.
+        return super.getCostAsync(client).thenApply((cost) -> Hbar.fromTinybar(Math.min(cost.asTinybar(), 25)));
     }
 }
