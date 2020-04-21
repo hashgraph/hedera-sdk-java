@@ -11,11 +11,12 @@ import java.util.List;
 
 public final class KeyList extends Key {
     @Nullable
-    public Integer threshold;
+    public final Integer threshold;
 
-    public List<Key> keys = new ArrayList<>();
+    public final List<Key> keys = new ArrayList<>();
 
     public KeyList() {
+        this(0);
     }
 
     private KeyList(int threshold) {

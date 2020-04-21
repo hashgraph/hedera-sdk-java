@@ -108,11 +108,11 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
         return "" + accountId + "@" + validStart.getEpochSecond() + "." + validStart.getNano();
     }
 
-    byte[] toBytes() {
+    public byte[] toBytes() {
         return this.toProtobuf().toByteArray();
     }
 
-    TransactionId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+    public static TransactionId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(TransactionID.parseFrom(bytes).toBuilder().build());
     }
 }

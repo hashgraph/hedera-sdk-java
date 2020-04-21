@@ -168,7 +168,7 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     }
 
     public byte[] toBytes() {
-        return transactions.get(0).clone().setSigMap(signatureBuilders.get(0)).build().toByteArray();
+        return transactions.get(0).setSigMap(signatureBuilders.get(0)).build().toByteArray();
     }
 
     @Override

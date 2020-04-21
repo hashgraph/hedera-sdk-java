@@ -8,10 +8,18 @@ import javax.annotation.Nonnegative;
 public final class FileId extends EntityId {
     /**
      * The public node address book for the current network.
-     *
-     * This file can be decoded using {@link com.hedera.hashgraph.sdk.proto.NodeAddressBook}.
      */
     public static final FileId ADDRESS_BOOK = new FileId(0, 0, 102);
+
+    /**
+     * The current fee schedule for the network.
+     */
+    public static final FileId FEE_SCHEDULE = new FileId(0, 0, 111);
+
+    /**
+     * The current exchange rate of HBAR to USD.
+     */
+    public static final FileId EXCHANGE_RATES = new FileId(0, 0, 112);
 
     public FileId(@Nonnegative long num) {
         super(0, 0, num);
@@ -26,19 +34,19 @@ public final class FileId extends EntityId {
         return EntityId.fromString(id, FileId::new);
     }
 
+    public static FileId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        return fromProtobuf(FileID.parseFrom(bytes).toBuilder().build());
+    }
+
     static FileId fromProtobuf(FileID fileId) {
         return new FileId(fileId.getShardNum(), fileId.getRealmNum(), fileId.getFileNum());
     }
 
-    FileID toProtobuf() {
-        return FileID.newBuilder().setShardNum(shard).setRealmNum(realm).setFileNum(num).build();
-    }
-
-    byte[] toBytes() {
+    public byte[] toBytes() {
         return this.toProtobuf().toByteArray();
     }
 
-    FileId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(FileID.parseFrom(bytes).toBuilder().build());
+    FileID toProtobuf() {
+        return FileID.newBuilder().setShardNum(shard).setRealmNum(realm).setFileNum(num).build();
     }
 }

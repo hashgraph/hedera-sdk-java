@@ -76,7 +76,7 @@ public final class CreateSimpleContractExample {
         // create the contract itself
         TransactionId contractTxId = new ContractCreateTransaction()
             .setGas(500)
-            .setByteCodeFileId(newFileId)
+            .setBytecodeFileId(newFileId)
             // set an admin key so we can delete the contract later
             .setAdminKey(OPERATOR_KEY)
             .setMaxTransactionFee(new Hbar(16))

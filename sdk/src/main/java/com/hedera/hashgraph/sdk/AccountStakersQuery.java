@@ -8,7 +8,10 @@ import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
 
-public final class AccountStakersQuery extends QueryBuilder<ProxyStaker[], AccountStakersQuery> {
+import java.util.ArrayList;
+import java.util.List;
+
+public final class AccountStakersQuery extends QueryBuilder<List<ProxyStaker>, AccountStakersQuery> {
     private final CryptoGetStakersQuery.Builder builder;
 
     public AccountStakersQuery() {
@@ -36,12 +39,12 @@ public final class AccountStakersQuery extends QueryBuilder<ProxyStaker[], Accou
     }
 
     @Override
-    ProxyStaker[] mapResponse(Response response) {
+    List<ProxyStaker> mapResponse(Response response) {
         var rawStakers = response.getCryptoGetProxyStakers().getStakers();
-        var stakers = new ProxyStaker[rawStakers.getProxyStakerCount()];
+        var stakers = new ArrayList<ProxyStaker>(rawStakers.getProxyStakerCount());
 
-        for (var i = 0; i < stakers.length; ++i) {
-            stakers[i] = ProxyStaker.fromProtobuf(rawStakers.getProxyStaker(i));
+        for (var i = 0; i < rawStakers.getProxyStakerCount(); ++i) {
+            stakers.add(ProxyStaker.fromProtobuf(rawStakers.getProxyStaker(i)));
         }
 
         return stakers;

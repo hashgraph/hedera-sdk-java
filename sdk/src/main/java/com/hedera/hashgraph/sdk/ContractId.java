@@ -41,11 +41,11 @@ public final class ContractId extends EntityId {
             .build();
     }
 
-    byte[] toBytes() {
+    public byte[] toBytes() {
         return this.toProtobuf().toByteArray();
     }
 
-    ContractId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+    public ContractId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(ContractID.parseFrom(bytes).toBuilder().build());
     }
 }

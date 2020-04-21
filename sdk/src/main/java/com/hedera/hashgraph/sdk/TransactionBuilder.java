@@ -139,7 +139,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
             // Pick N / 3 nodes from the client and build that many transactions
             // This is for fail-over so we can cycle through nodes
 
-            var size = client.getNumberOfNodesForSuperMajority();
+            var size = client.getNumberOfNodesForTransaction();
             var transactions =
                 new ArrayList<com.hedera.hashgraph.sdk.proto.Transaction.Builder>(size);
 

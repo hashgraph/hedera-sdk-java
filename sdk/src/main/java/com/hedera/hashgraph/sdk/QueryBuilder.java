@@ -133,7 +133,7 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
                 // Like how TransactionBuilder has to build (N / 3) native transactions to handle multi-node retry,
                 // so too does the QueryBuilder for payment transactions
 
-                var size = client.getNumberOfNodesForSuperMajority();
+                var size = client.getNumberOfNodesForTransaction();
                 paymentTransactions = new ArrayList<>(size);
                 paymentTransactionNodeIds = new ArrayList<>(size);
 

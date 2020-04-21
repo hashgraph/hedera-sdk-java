@@ -18,8 +18,8 @@ public final class ContractRecordsQuery extends QueryBuilder<List<TransactionRec
         this.builder = ContractGetRecordsQuery.newBuilder();
     }
 
-    public ContractRecordsQuery setContractId(ContractId accountId) {
-        builder.setContractID(accountId.toProtobuf());
+    public ContractRecordsQuery setContractId(ContractId contractId) {
+        builder.setContractID(contractId.toProtobuf());
         return this;
     }
 

@@ -84,7 +84,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
      * @param receiveSignatureRequired true to require a signature when receiving hbars.
      * @return {@code this}.
      */
-    public AccountCreateTransaction setReceiveSignatureRequired(boolean receiveSignatureRequired) {
+    public AccountCreateTransaction setReceiverSignatureRequired(boolean receiveSignatureRequired) {
         builder.setReceiverSigRequired(receiveSignatureRequired);
         return this;
     }

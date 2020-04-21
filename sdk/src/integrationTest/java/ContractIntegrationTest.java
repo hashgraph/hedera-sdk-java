@@ -51,7 +51,7 @@ public class ContractIntegrationTest {
                 .setAdminKey(operatorKey.getPublicKey())
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
-                .setByteCodeFileId(file)
+                .setBytecodeFileId(file)
                 .setContractMemo("[e2e::ContractCreateTransaction]")
                 .setMaxTransactionFee(new Hbar(20))
                 .execute(client)

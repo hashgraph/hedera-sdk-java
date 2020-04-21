@@ -28,6 +28,10 @@ public final class AccountId extends EntityId {
             accountId.getShardNum(), accountId.getRealmNum(), accountId.getAccountNum());
     }
 
+    public static AccountId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        return fromProtobuf(AccountID.parseFrom(bytes).toBuilder().build());
+    }
+
     @Override
     public String toSolidityAddress() {
         return super.toSolidityAddress();
@@ -43,9 +47,5 @@ public final class AccountId extends EntityId {
 
     public byte[] toBytes() {
         return this.toProtobuf().toByteArray();
-    }
-
-    public static AccountId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(AccountID.parseFrom(bytes).toBuilder().build());
     }
 }

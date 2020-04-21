@@ -19,19 +19,19 @@ public final class TopicId extends EntityId {
         return EntityId.fromString(id, TopicId::new);
     }
 
-    static TopicId fromProtobuf(TopicID fileId) {
-        return new TopicId(fileId.getShardNum(), fileId.getRealmNum(), fileId.getTopicNum());
+    static TopicId fromProtobuf(TopicID topicId) {
+        return new TopicId(topicId.getShardNum(), topicId.getRealmNum(), topicId.getTopicNum());
     }
 
     TopicID toProtobuf() {
         return TopicID.newBuilder().setShardNum(shard).setRealmNum(realm).setTopicNum(num).build();
     }
 
-    byte[] toBytes() {
+    public byte[] toBytes() {
         return this.toProtobuf().toByteArray();
     }
 
-    TopicId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+    public static TopicId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(TopicID.parseFrom(bytes).toBuilder().build());
     }
 }

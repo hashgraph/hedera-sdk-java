@@ -20,11 +20,6 @@ public final class FileDeleteTransaction extends TransactionBuilder<FileDeleteTr
         builder = FileDeleteTransactionBody.newBuilder();
     }
 
-    @Override
-    void onBuild(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setFileDelete(builder);
-    }
-
     /**
      * <p>Set the ID of the file to delete. Required.
      *
@@ -34,5 +29,10 @@ public final class FileDeleteTransaction extends TransactionBuilder<FileDeleteTr
     public FileDeleteTransaction setFileId(FileId fileId) {
         builder.setFileID(fileId.toProtobuf());
         return this;
+    }
+
+    @Override
+    void onBuild(TransactionBody.Builder bodyBuilder) {
+        bodyBuilder.setFileDelete(builder);
     }
 }

@@ -14,7 +14,7 @@ public final class ContractCreateTransaction extends TransactionBuilder<Contract
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
     }
 
-    public ContractCreateTransaction setByteCodeFileId(FileId byteCodeFileId) {
+    public ContractCreateTransaction setBytecodeFileId(FileId byteCodeFileId) {
         builder.setFileID(byteCodeFileId.toProtobuf());
         return this;
     }

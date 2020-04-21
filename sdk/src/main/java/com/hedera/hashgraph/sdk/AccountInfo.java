@@ -17,7 +17,6 @@ public final class AccountInfo {
      * The Contract Account ID comprising of both the contract instance and the cryptocurrency
      * account owned by the contract instance, in the format used by Solidity.
      */
-    @Nullable
     public final String contractAccountId;
 
     /**
@@ -83,7 +82,7 @@ public final class AccountInfo {
 
     private AccountInfo(
         AccountId accountId,
-        @Nullable String contractAccountId,
+        String contractAccountId,
         boolean deleted,
         @Nullable AccountId proxyAccountId,
         long proxyReceived,
@@ -145,12 +144,11 @@ public final class AccountInfo {
             .setExpirationTime(InstantConverter.toProtobuf(this.expirationTime))
             .setAutoRenewPeriod(DurationConverter.toProtobuf(this.autoRenewPeriod));
 
-
-        if(this.contractAccountId != null) {
+        if (this.contractAccountId != null) {
             accountInfoBuilder.setContractAccountID(this.contractAccountId);
         }
 
-        if(this.proxyAccountId != null) {
+        if (this.proxyAccountId != null) {
             accountInfoBuilder.setProxyAccountID(this.proxyAccountId.toProtobuf());
         }
 

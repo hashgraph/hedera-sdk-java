@@ -5,6 +5,8 @@ import com.hedera.hashgraph.sdk.proto.FileCreateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import org.threeten.bp.Instant;
 
+import java.util.ArrayList;
+
 public final class FileCreateTransaction extends TransactionBuilder<FileCreateTransaction> {
     private final FileCreateTransactionBody.Builder builder;
 

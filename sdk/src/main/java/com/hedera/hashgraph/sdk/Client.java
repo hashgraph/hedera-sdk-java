@@ -216,7 +216,7 @@ public final class Client implements AutoCloseable {
         return nodes.next();
     }
 
-    int getNumberOfNodesForSuperMajority() {
+    int getNumberOfNodesForTransaction() {
         return (network.size() + 3 - 1) / 3;
     }
 

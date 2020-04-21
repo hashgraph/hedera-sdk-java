@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
+import com.google.protobuf.ByteString;
 
 import javax.annotation.Nullable;
 
@@ -25,7 +26,7 @@ public final class TransactionReceipt {
     public final Long topicSequenceNumber;
 
     @Nullable
-    public final byte[] topicRunningHash;
+    public final ByteString topicRunningHash;
 
     private TransactionReceipt(
         Status status,
@@ -35,7 +36,7 @@ public final class TransactionReceipt {
         @Nullable ContractId contractId,
         @Nullable TopicId topicId,
         @Nullable Long topicSequenceNumber,
-        @Nullable byte[] topicRunningHash
+        @Nullable ByteString topicRunningHash
     ) {
         this.status = status;
         this.exchangeRate = exchangeRate;
@@ -81,7 +82,7 @@ public final class TransactionReceipt {
         var topicRunningHash =
             transactionReceipt.getTopicRunningHash().isEmpty()
                 ? null
-                : transactionReceipt.getTopicRunningHash().toByteArray();
+                : transactionReceipt.getTopicRunningHash();
 
         return new TransactionReceipt(
             status,
@@ -93,38 +94,6 @@ public final class TransactionReceipt {
             topicSequenceNumber,
             topicRunningHash
         );
-    }
-
-    public AccountId getAccountId() {
-        if (this.accountId == null) {
-            throw new IllegalStateException("receipt does not contain an account ID");
-        }
-
-        return this.accountId;
-    }
-
-    public FileId getFileId() {
-        if (this.fileId == null) {
-            throw new IllegalStateException("receipt does not contain an file ID");
-        }
-
-        return this.fileId;
-    }
-
-    public ContractId getContractId() {
-        if (this.contractId == null) {
-            throw new IllegalStateException("receipt does not contain an contract ID");
-        }
-
-        return this.contractId;
-    }
-
-    public TopicId getTopicId() {
-        if (this.topicId == null) {
-            throw new IllegalStateException("receipt does not contain an topic ID");
-        }
-
-        return this.topicId;
     }
 
     @Override

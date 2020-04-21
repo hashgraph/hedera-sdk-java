@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
+import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.ConsensusGetTopicInfoResponse;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
@@ -21,7 +22,7 @@ public final class TopicInfo {
     /**
      * SHA-384 running hash of (previousRunningHash, topicId, consensusTimestamp, sequenceNumber, message).
      */
-    public final byte[] runningHash;
+    public final ByteString runningHash;
 
     /**
      * Sequence number (starting at 1 for the first submitMessage) of messages on the topic.
@@ -53,7 +54,7 @@ public final class TopicInfo {
     private TopicInfo(
         TopicId topicId,
         String topicMemo,
-        byte[] runningHash,
+        ByteString runningHash,
         long sequenceNumber,
         Instant expirationTime,
         @Nullable Key adminKey,
@@ -90,7 +91,7 @@ public final class TopicInfo {
         return new TopicInfo(
             TopicId.fromProtobuf(topicInfoResponse.getTopicID()),
             topicInfo.getMemo(),
-            topicInfo.getRunningHash().toByteArray(),
+            topicInfo.getRunningHash(),
             topicInfo.getSequenceNumber(),
             InstantConverter.fromProtobuf(topicInfo.getExpirationTime()),
             adminKey,

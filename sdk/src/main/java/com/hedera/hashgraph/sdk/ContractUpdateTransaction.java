@@ -37,7 +37,7 @@ public final class ContractUpdateTransaction extends TransactionBuilder<Contract
         return this;
     }
 
-    public ContractUpdateTransaction setByteCodeFileId(FileId byteCodeFileId) {
+    public ContractUpdateTransaction setBytecodeFileId(FileId byteCodeFileId) {
         builder.setFileID(byteCodeFileId.toProtobuf());
         return this;
     }

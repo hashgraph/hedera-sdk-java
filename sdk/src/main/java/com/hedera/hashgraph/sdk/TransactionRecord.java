@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
+import com.google.protobuf.ByteString;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
@@ -10,7 +11,7 @@ import java.util.List;
 public final class TransactionRecord {
     public final TransactionReceipt receipt;
 
-    public final byte[] transactionHash;
+    public final ByteString transactionHash;
 
     public final Instant consensusTimestamp;
 
@@ -27,7 +28,7 @@ public final class TransactionRecord {
 
     private TransactionRecord(
         TransactionReceipt transactionReceipt,
-        byte[] transactionHash,
+        ByteString transactionHash,
         Instant consensusTimestamp,
         TransactionId transactionId,
         String transactionMemo,
@@ -60,7 +61,7 @@ public final class TransactionRecord {
 
         return new TransactionRecord(
             TransactionReceipt.fromProtobuf(transactionRecord.getReceipt()),
-            transactionRecord.getTransactionHash().toByteArray(),
+            transactionRecord.getTransactionHash(),
             InstantConverter.fromProtobuf(transactionRecord.getConsensusTimestamp()),
             TransactionId.fromProtobuf(transactionRecord.getTransactionID()),
             transactionRecord.getMemo(),

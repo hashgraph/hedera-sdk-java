@@ -78,7 +78,7 @@ public final class CreateStatefulContractExample {
         System.out.println("contract bytecode file: " + newFileId);
 
         TransactionId contractTxId = new ContractCreateTransaction()
-            .setByteCodeFileId(newFileId)
+            .setBytecodeFileId(newFileId)
             .setGas(100_000_000)
             .setConstructorParameters(
                 new ContractFunctionParameters()
