@@ -23,15 +23,15 @@ public final class TopicId extends EntityId {
         return new TopicId(topicId.getShardNum(), topicId.getRealmNum(), topicId.getTopicNum());
     }
 
+    public static TopicId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        return fromProtobuf(TopicID.parseFrom(bytes).toBuilder().build());
+    }
+
     TopicID toProtobuf() {
         return TopicID.newBuilder().setShardNum(shard).setRealmNum(realm).setTopicNum(num).build();
     }
 
     public byte[] toBytes() {
         return this.toProtobuf().toByteArray();
-    }
-
-    public static TopicId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(TopicID.parseFrom(bytes).toBuilder().build());
     }
 }

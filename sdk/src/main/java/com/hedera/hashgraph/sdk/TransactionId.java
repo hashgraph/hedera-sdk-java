@@ -72,6 +72,10 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
             InstantConverter.fromProtobuf(transactionID.getTransactionValidStart()));
     }
 
+    public static TransactionId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        return fromProtobuf(TransactionID.parseFrom(bytes).toBuilder().build());
+    }
+
     @Override
     @FunctionalExecutable(type = "TransactionReceipt", exceptionTypes = {"HederaReceiptStatusException"})
     public CompletableFuture<TransactionReceipt> getReceiptAsync(Client client) {
@@ -110,9 +114,5 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
 
     public byte[] toBytes() {
         return this.toProtobuf().toByteArray();
-    }
-
-    public static TransactionId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(TransactionID.parseFrom(bytes).toBuilder().build());
     }
 }

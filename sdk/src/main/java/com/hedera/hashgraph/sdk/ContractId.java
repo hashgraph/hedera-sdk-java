@@ -28,6 +28,10 @@ public final class ContractId extends EntityId {
             contractId.getShardNum(), contractId.getRealmNum(), contractId.getContractNum());
     }
 
+    public static ContractId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        return fromProtobuf(ContractID.parseFrom(bytes).toBuilder().build());
+    }
+
     @Override
     public String toSolidityAddress() {
         return super.toSolidityAddress();
@@ -43,9 +47,5 @@ public final class ContractId extends EntityId {
 
     public byte[] toBytes() {
         return this.toProtobuf().toByteArray();
-    }
-
-    public ContractId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(ContractID.parseFrom(bytes).toBuilder().build());
     }
 }
