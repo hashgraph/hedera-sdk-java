@@ -16,7 +16,7 @@ public final class KeyList extends Key {
     public final List<Key> keys = new ArrayList<>();
 
     public KeyList() {
-        this(0);
+        this.threshold = null;
     }
 
     private KeyList(int threshold) {
