@@ -29,6 +29,20 @@ public final class FileUpdateTransaction extends TransactionBuilder<FileUpdateTr
     }
 
     /**
+     * <p>Set the keys which must sign any transactions modifying this file. Required.
+     *
+     * @return {@code this}
+     */
+    public FileUpdateTransaction setKeys(Key... keys) {
+        var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
+        for (Key key: keys) {
+            keyList.addKeys(key.toKeyProtobuf());
+        }
+        builder.setKeys(keyList);
+        return this;
+    }
+
+    /**
      * If set, update the expiration time of the file.
      * <p>
      * Must be in the future (may only be used to extend the expiration).

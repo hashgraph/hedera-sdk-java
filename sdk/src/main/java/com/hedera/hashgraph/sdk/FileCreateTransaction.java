@@ -40,7 +40,7 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
     }
 
     /**
-     * <p>Add a key which must sign any transactions modifying this file. Required.
+     * <p>Set the keys which must sign any transactions modifying this file. Required.
      *
      * <p>All keys must sign to modify the file's contents or keys. No key is required
      * to sign for extending the expiration time (except the one for the operator account
