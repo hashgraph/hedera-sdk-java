@@ -45,7 +45,7 @@ public final class CreateFileExample {
             .execute(client);
 
         TransactionReceipt receipt = txId.getReceipt(client);
-        FileId newFileId = receipt.getFileId();
+        FileId newFileId = receipt.fileId;
 
         System.out.println("file: " + newFileId);
     }

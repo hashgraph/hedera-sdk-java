@@ -46,7 +46,7 @@ public final class MultiAppTransferExample {
         // the exchange creates an account for the user to transfer funds to
         TransactionId createExchangeAccountTxnId = new AccountCreateTransaction()
             // the exchange only accepts transfers that it validates through a side channel (e.g. REST API)
-            .setReceiveSignatureRequired(true)
+            .setReceiverSignatureRequired(true)
             .setKey(exchangeKey.getPublicKey())
             // The owner key has to sign this transaction
             // when setReceiverSignatureRequired is true
@@ -54,7 +54,7 @@ public final class MultiAppTransferExample {
             .sign(exchangeKey)
             .execute(client);
 
-        AccountId exchangeAccountId = createExchangeAccountTxnId.getReceipt(client).getAccountId();
+        AccountId exchangeAccountId = Objects.requireNonNull(createExchangeAccountTxnId.getReceipt(client).accountId);
 
         Transaction transferTxn = new CryptoTransferTransaction()
             .addSender(OPERATOR_ID, transferAmount)

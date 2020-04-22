@@ -45,7 +45,7 @@ public final class DeleteFileExample {
             .execute(client);
 
         TransactionReceipt receipt = txId.getReceipt(client);
-        FileId newFileId = receipt.getFileId();
+        FileId newFileId = Objects.requireNonNull(receipt.fileId);
 
         System.out.println("file: " + newFileId);
 

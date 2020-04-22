@@ -73,7 +73,7 @@ public final class CreateStatefulContractExample {
             .execute(client);
 
         TransactionReceipt fileReceipt = fileTxId.getReceipt(client);
-        FileId newFileId = fileReceipt.getFileId();
+        FileId newFileId = Objects.requireNonNull(fileReceipt.fileId);
 
         System.out.println("contract bytecode file: " + newFileId);
 
@@ -86,7 +86,7 @@ public final class CreateStatefulContractExample {
             .execute(client);
 
         TransactionReceipt contractReceipt = contractTxId.getReceipt(client);
-        ContractId newContractId = contractReceipt.getContractId();
+        ContractId newContractId = Objects.requireNonNull(contractReceipt.contractId);
 
         System.out.println("new contract ID: " + newContractId);
 

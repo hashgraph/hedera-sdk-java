@@ -89,7 +89,8 @@ public class ConsensusPubSubWithSubmitKeyExample {
             .setSubmitKey(submitPublicKey)
             .execute(hapiClient);
 
-        topicId = transactionId.getReceipt(hapiClient).getTopicId();
+
+        topicId = Objects.requireNonNull(transactionId.getReceipt(hapiClient).topicId);
         System.out.println("Created new topic " + topicId + " with ED25519 submitKey of " + submitKey);
     }
 

@@ -44,7 +44,7 @@ public final class GetFileContentsExample {
             .setMaxTransactionFee(new Hbar(2))
             .execute(client);
 
-        FileId newFileId = newFileTxId.getReceipt(client).getFileId();
+        FileId newFileId = Objects.requireNonNull(newFileTxId.getReceipt(client).fileId);
 
         //Print the file ID to console
         System.out.println("The new file ID is " + newFileId.toString());
