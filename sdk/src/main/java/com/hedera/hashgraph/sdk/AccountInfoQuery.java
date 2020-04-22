@@ -12,6 +12,10 @@ import java8.util.function.Consumer;
 
 import java.util.concurrent.TimeoutException;
 
+/**
+ * Get all the information about an account, including the balance.
+ * This does not get the list of account records.
+ */
 public final class AccountInfoQuery extends QueryBuilder<AccountInfo, AccountInfoQuery> {
     private final CryptoGetInfoQuery.Builder builder;
 
@@ -19,6 +23,11 @@ public final class AccountInfoQuery extends QueryBuilder<AccountInfo, AccountInf
         builder = CryptoGetInfoQuery.newBuilder();
     }
 
+    /**
+     * Sets the account ID for which information is requested.
+     *
+     * @return {@code this}
+     */
     public AccountInfoQuery setAccountId(AccountId accountId) {
         builder.setAccountID(accountId.toProtobuf());
         return this;

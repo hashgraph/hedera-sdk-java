@@ -31,13 +31,9 @@ public final class Client implements AutoCloseable {
     private final Iterator<AccountId> nodes;
 
     private final Map<AccountId, String> network;
-
-    private Map<AccountId, ManagedChannel> channels;
-
     Hbar maxTransactionFee = DEFAULT_MAX_QUERY_PAYMENT;
-
     Hbar maxQueryPayment = DEFAULT_MAX_TRANSACTION_FEE;
-
+    private Map<AccountId, ManagedChannel> channels;
     @Nullable
     private Operator operator;
 
@@ -126,6 +122,17 @@ public final class Client implements AutoCloseable {
         return setOperatorWith(accountId, privateKey.getPublicKey(), privateKey::sign);
     }
 
+    /**
+     * Sets the account that will, by default, by paying for transactions and queries built with
+     * this client.
+     * <p>
+     * The operator account ID is used to generate a default transaction ID for all transactions
+     * executed with this client.
+     * <p>
+     * The `transactionSigner` is invoked to sign all transactions executed by this client.
+     *
+     * @return {@code this}
+     */
     public Client setOperatorWith(AccountId accountId, PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
         this.operator = new Operator(accountId, publicKey, transactionSigner);
         return this;

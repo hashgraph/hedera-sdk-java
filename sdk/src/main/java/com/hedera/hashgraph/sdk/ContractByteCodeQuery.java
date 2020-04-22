@@ -9,6 +9,9 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import io.grpc.MethodDescriptor;
 
+/**
+ * Get the bytecode for a smart contract instance.
+ */
 public final class ContractByteCodeQuery extends QueryBuilder<ByteString, ContractByteCodeQuery> {
     private final ContractGetBytecodeQuery.Builder builder;
 
@@ -16,6 +19,11 @@ public final class ContractByteCodeQuery extends QueryBuilder<ByteString, Contra
         this.builder = ContractGetBytecodeQuery.newBuilder();
     }
 
+    /**
+     * Sets the contract ID for which information is requested.
+     *
+     * @return {@code this}
+     */
     public ContractByteCodeQuery setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProtobuf());
         return this;

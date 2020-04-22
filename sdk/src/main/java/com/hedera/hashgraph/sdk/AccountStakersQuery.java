@@ -11,6 +11,12 @@ import io.grpc.MethodDescriptor;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Get all the accounts that are proxy staking to this account.
+ * For each of them, give the amount currently staked.
+ *
+ * This is not yet implemented, but will be in a future version of the API.
+ */
 public final class AccountStakersQuery extends QueryBuilder<List<ProxyStaker>, AccountStakersQuery> {
     private final CryptoGetStakersQuery.Builder builder;
 
@@ -18,6 +24,11 @@ public final class AccountStakersQuery extends QueryBuilder<List<ProxyStaker>, A
         builder = CryptoGetStakersQuery.newBuilder();
     }
 
+    /**
+     * Sets the Account ID for which the records should be retrieved.
+     *
+     * @return {@code this}
+     */
     public AccountStakersQuery setAccountId(AccountId accountId) {
         builder.setAccountID(accountId.toProtobuf());
         return this;

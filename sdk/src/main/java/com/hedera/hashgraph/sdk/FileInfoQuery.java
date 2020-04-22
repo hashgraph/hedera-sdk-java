@@ -12,6 +12,16 @@ import java8.util.function.Consumer;
 
 import java.util.concurrent.TimeoutException;
 
+/**
+ * Get all of the information about a file, except for its contents.
+ *
+ * When a file expires, it no longer exists, and there will be no info about it, and the fileInfo field
+ * will be blank.
+ *
+ * If a transaction or smart contract deletes the file, but it has not yet expired, then the
+ * fileInfo field will be non-empty, the deleted field will be true, its size will be 0,
+ * and its contents will be empty. Note that each file has a FileID, but does not have a filename.
+ */
 public final class FileInfoQuery extends QueryBuilder<FileInfo, FileInfoQuery> {
     private final FileGetInfoQuery.Builder builder;
 
@@ -19,6 +29,11 @@ public final class FileInfoQuery extends QueryBuilder<FileInfo, FileInfoQuery> {
         builder = FileGetInfoQuery.newBuilder();
     }
 
+    /**
+     * Sets the file ID for which information is requested.
+     *
+     * @return {@code this}
+     */
     public FileInfoQuery setFileId(FileId fileId) {
         builder.setFileID(fileId.toProtobuf());
 

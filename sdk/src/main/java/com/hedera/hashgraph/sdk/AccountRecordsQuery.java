@@ -11,6 +11,10 @@ import io.grpc.MethodDescriptor;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Get all the records for an account for any transfers into it and out of it,
+ * that were above the threshold, during the last 25 hours.
+ */
 public final class AccountRecordsQuery extends QueryBuilder<List<TransactionRecord>, AccountRecordsQuery> {
     private final CryptoGetAccountRecordsQuery.Builder builder;
 
@@ -18,6 +22,11 @@ public final class AccountRecordsQuery extends QueryBuilder<List<TransactionReco
         this.builder = CryptoGetAccountRecordsQuery.newBuilder();
     }
 
+    /**
+     * Sets the account ID for which the records should be retrieved.
+     *
+     * @return {@code this}
+     */
     public AccountRecordsQuery setAccountId(AccountId accountId) {
         builder.setAccountID(accountId.toProtobuf());
         return this;

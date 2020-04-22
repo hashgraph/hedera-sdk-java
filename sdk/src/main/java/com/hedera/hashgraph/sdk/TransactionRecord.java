@@ -9,21 +9,51 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class TransactionRecord {
+    /**
+     * The status (reach consensus, or failed, or is unknown) and the ID of
+     * any new account/file/instance created.
+     */
     public final TransactionReceipt receipt;
 
+    /**
+     * The hash of the Transaction that executed (not the hash of any Transaction that failed for
+     * having a duplicate TransactionID).
+     */
     public final ByteString transactionHash;
 
+    /**
+     * The consensus timestamp (or null if didn't reach consensus yet).
+     */
     public final Instant consensusTimestamp;
 
+    /**
+     * The ID of the transaction this record represents.
+     */
     public final TransactionId transactionId;
 
+    /**
+     * The memo that was submitted as part of the transaction (max 100 bytes).
+     */
     public final String transactionMemo;
 
+    /**
+     * The actual transaction fee charged, not the original
+     * transactionFee value from TransactionBody.
+     */
     public final Hbar transactionFee;
 
+    /**
+     * Record of the value returned by the smart contract
+     * function or constructor.
+     */
     @Nullable
     public final ContractFunctionResult contractFunctionResult;
 
+    /**
+     * All hbar transfers as a result of this transaction, such as fees, or
+     * transfers performed by the transaction, or by a smart contract it calls,
+     * or by the creation of threshold records that it triggers.
+     */
     public final List<Transfer> transfers;
 
     private TransactionRecord(

@@ -1,8 +1,17 @@
 package com.hedera.hashgraph.sdk;
 
+/**
+ * Information about a single account that is proxy staking.
+ */
 public final class ProxyStaker {
+    /**
+     * The Account ID that is proxy staking.
+     */
     public final AccountId accountId;
 
+    /**
+     * The number of hbars that are currently proxy staked.
+     */
     public final Hbar amount;
 
     private ProxyStaker(AccountId accountId, long amount) {

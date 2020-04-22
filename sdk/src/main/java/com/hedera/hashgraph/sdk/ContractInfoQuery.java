@@ -12,6 +12,12 @@ import java8.util.function.Consumer;
 
 import java.util.concurrent.TimeoutException;
 
+/**
+ * Get information about a smart contract instance.
+ *
+ * This includes the account that it uses, the file containing its bytecode,
+ * and the time when it will expire.
+ */
 public final class ContractInfoQuery extends QueryBuilder<ContractInfo, ContractInfoQuery> {
     private final ContractGetInfoQuery.Builder builder;
 
@@ -19,10 +25,23 @@ public final class ContractInfoQuery extends QueryBuilder<ContractInfo, Contract
         builder = ContractGetInfoQuery.newBuilder();
     }
 
+    /**
+     * Sets the contract ID for which information is requested.
+     *
+     * @return {@code this}
+     */
     public ContractInfoQuery setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProtobuf());
 
         return this;
+    }
+
+    @Override
+    public CompletableFuture<Hbar> getCostAsync(Client client) {
+        // deleted accounts return a COST_ANSWER of zero which triggers `INSUFFICIENT_TX_FEE`
+        // if you set that as the query payment; 25 tinybar seems to be enough to get
+        // `CONTRACT_DELETED` back instead.
+        return super.getCostAsync(client).thenApply((cost) -> Hbar.fromTinybar(Math.min(cost.asTinybar(), 25)));
     }
 
     @Override
@@ -48,13 +67,5 @@ public final class ContractInfoQuery extends QueryBuilder<ContractInfo, Contract
     @Override
     MethodDescriptor<Query, Response> getMethodDescriptor() {
         return SmartContractServiceGrpc.getGetContractInfoMethod();
-    }
-
-    @Override
-    public CompletableFuture<Hbar> getCostAsync(Client client) {
-        // deleted accounts return a COST_ANSWER of zero which triggers `INSUFFICIENT_TX_FEE`
-        // if you set that as the query payment; 25 tinybar seems to be enough to get
-        // `CONTRACT_DELETED` back instead.
-        return super.getCostAsync(client).thenApply((cost) -> Hbar.fromTinybar(Math.min(cost.asTinybar(), 25)));
     }
 }

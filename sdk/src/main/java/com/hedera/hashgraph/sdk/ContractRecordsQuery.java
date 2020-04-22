@@ -11,6 +11,10 @@ import io.grpc.MethodDescriptor;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Get all the records for a smart contract instance, for any function
+ * call (or the constructor call) during the last 25 hours, for which a Record was requested.
+ */
 public final class ContractRecordsQuery extends QueryBuilder<List<TransactionRecord>, ContractRecordsQuery> {
     private final ContractGetRecordsQuery.Builder builder;
 
@@ -18,6 +22,11 @@ public final class ContractRecordsQuery extends QueryBuilder<List<TransactionRec
         this.builder = ContractGetRecordsQuery.newBuilder();
     }
 
+    /**
+     * Sets the smart contract instance for which the records should be retrieved.
+     *
+     * @return {@code this}
+     */
     public ContractRecordsQuery setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProtobuf());
         return this;
