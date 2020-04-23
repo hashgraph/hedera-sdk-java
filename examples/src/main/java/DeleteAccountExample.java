@@ -56,7 +56,7 @@ public final class DeleteAccountExample {
         new AccountDeleteTransaction()
             // note the transaction ID has to use the ID of the account being deleted
             .setTransactionId(TransactionId.generate(newAccountId))
-            .setDeleteAccountId(newAccountId)
+            .setAccountId(newAccountId)
             .setTransferAccountId(OPERATOR_ID)
             .build(client)
             .sign(newKey)
