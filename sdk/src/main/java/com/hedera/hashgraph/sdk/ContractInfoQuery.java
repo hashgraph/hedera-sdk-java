@@ -8,13 +8,10 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
-import java8.util.function.Consumer;
-
-import java.util.concurrent.TimeoutException;
 
 /**
  * Get information about a smart contract instance.
- *
+ * <p>
  * This includes the account that it uses, the file containing its bytecode,
  * and the time when it will expire.
  */

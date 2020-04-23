@@ -7,6 +7,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import java8.util.function.Consumer;
 import java8.util.function.Function;
+import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -31,11 +32,17 @@ public final class Client implements AutoCloseable {
     private final Iterator<AccountId> nodes;
 
     private final Map<AccountId, String> network;
+
     Hbar maxTransactionFee = DEFAULT_MAX_QUERY_PAYMENT;
+
     Hbar maxQueryPayment = DEFAULT_MAX_TRANSACTION_FEE;
+
     private Map<AccountId, ManagedChannel> channels;
+
     @Nullable
     private Operator operator;
+
+    Duration requestTimeout = Duration.ofSeconds(30);
 
     Client(Map<AccountId, String> network) {
         var threadFactory = new ThreadFactoryBuilder()
@@ -179,6 +186,11 @@ public final class Client implements AutoCloseable {
         }
 
         this.maxQueryPayment = maxQueryPayment;
+        return this;
+    }
+
+    public Client setRequestTimeout(Duration requestTimeout) {
+        this.requestTimeout = requestTimeout;
         return this;
     }
 

@@ -5,8 +5,6 @@ import com.hedera.hashgraph.sdk.proto.FileCreateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import org.threeten.bp.Instant;
 
-import java.util.ArrayList;
-
 public final class FileCreateTransaction extends TransactionBuilder<FileCreateTransaction> {
     private final FileCreateTransactionBody.Builder builder;
 
@@ -56,7 +54,7 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
      */
     public FileCreateTransaction setKeys(Key... keys) {
         var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
-        for (Key key: keys) {
+        for (Key key : keys) {
             keyList.addKeys(key.toKeyProtobuf());
         }
         builder.setKeys(keyList);

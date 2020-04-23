@@ -79,7 +79,7 @@ public class FunctionalExecutableProcessor extends AbstractProcessor {
                 .addParameter(clientClazz, "client")
                 .addParameter(biCallbackTy, "callback")
                 .addModifiers(Modifier.DEFAULT, Modifier.PUBLIC)
-                .addStatement("$L (client, $T.ofSeconds(30), callback)", methodAsyncName, Duration.class)
+                .addStatement("$L (client, client.requestTimeout, callback)", methodAsyncName)
                 .returns(void.class)
                 .build();
 
@@ -100,7 +100,7 @@ public class FunctionalExecutableProcessor extends AbstractProcessor {
                 .addParameter(outCallbackTy, "onSuccess")
                 .addParameter(errCallbackTy, "onFailure")
                 .addModifiers(Modifier.DEFAULT, Modifier.PUBLIC)
-                .addStatement("$L (client, $T.ofSeconds(30), onSuccess, onFailure)", methodAsyncName, Duration.class)
+                .addStatement("$L (client, client.requestTimeout, onSuccess, onFailure)", methodAsyncName)
                 .returns(void.class)
                 .build();
 
@@ -126,7 +126,7 @@ public class FunctionalExecutableProcessor extends AbstractProcessor {
                 .addException(preCheckStatusException)
                 .addExceptions(Arrays.asList(moreExceptions))
                 .addModifiers(Modifier.DEFAULT, Modifier.PUBLIC)
-                .addStatement("return $L (client, $T.ofSeconds(30))", methodName, Duration.class)
+                .addStatement("return $L (client, client.requestTimeout)", methodName)
                 .returns(outputType)
                 .build();
 
