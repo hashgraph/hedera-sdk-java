@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 class ClientTest {
     @Test
@@ -17,7 +18,7 @@ class ClientTest {
 
         Assertions.assertNotNull(clientConfig);
 
-        Client.fromJson(new InputStreamReader(clientConfig));
+        Client.fromJson(new InputStreamReader(clientConfig, StandardCharsets.UTF_8));
 
         // put it in a file for nicer formatting
         InputStream clientConfigWithOperator = ClientTest.class.getClassLoader()
@@ -25,6 +26,6 @@ class ClientTest {
 
         Assertions.assertNotNull(clientConfigWithOperator);
 
-        Client.fromJson(new InputStreamReader(clientConfigWithOperator));
+        Client.fromJson(new InputStreamReader(clientConfigWithOperator, StandardCharsets.UTF_8));
     }
 }

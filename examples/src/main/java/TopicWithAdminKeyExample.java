@@ -18,6 +18,8 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import java8.util.J8Arrays;
 import io.github.cdimascio.dotenv.Dotenv;
 
+import javax.annotation.Nullable;
+
 /**
  * An example of HCS topic management using a threshold key as the adminKey and going through a key rotation to a new
  * set of keys.
@@ -28,6 +30,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 class TopicWithAdminKeyExample {
     private Client hapiClient;
 
+    @Nullable
     private TopicId topicId;
 
     private PrivateKey[] initialAdminKeys;

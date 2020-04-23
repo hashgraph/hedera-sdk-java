@@ -50,7 +50,7 @@ public class FileIntegrationTest {
             assertEquals(info.fileId, file);
             assertEquals(info.size, 28);
             assertFalse(info.deleted);
-            assertEquals(info.keys[0].toString(), operatorKey.getPublicKey().toString());
+            assertEquals(info.keys.get(0).toString(), operatorKey.getPublicKey().toString());
 
             new FileAppendTransaction()
                 .setFileId(file)
@@ -67,7 +67,7 @@ public class FileIntegrationTest {
             assertEquals(info.fileId, file);
             assertEquals(info.size, 56);
             assertFalse(info.deleted);
-            assertEquals(info.keys[0].toString(), operatorKey.getPublicKey().toString());
+            assertEquals(info.keys.get(0).toString(), operatorKey.getPublicKey().toString());
 
             var contents = new FileContentsQuery()
                 .setFileId(file)
@@ -91,7 +91,7 @@ public class FileIntegrationTest {
             assertEquals(info.fileId, file);
             assertEquals(info.size, 28);
             assertFalse(info.deleted);
-            assertEquals(info.keys[0].toString(), operatorKey.getPublicKey().toString());
+            assertEquals(info.keys.get(0).toString(), operatorKey.getPublicKey().toString());
 
             new FileDeleteTransaction()
                 .setFileId(file)

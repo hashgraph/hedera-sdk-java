@@ -12,10 +12,11 @@ import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -139,11 +140,11 @@ public final class Client implements AutoCloseable {
             nodes.put(AccountId.fromString(entry.getKey()), entry.getValue());
         }
 
-        final Client client = new Client(nodes);
+        Client client = new Client(nodes);
 
         if (config.operator != null) {
-            final AccountId operatorAccount = AccountId.fromString(config.operator.accountId);
-            final PrivateKey privateKey = PrivateKey.fromString(config.operator.privateKey);
+            AccountId operatorAccount = AccountId.fromString(config.operator.accountId);
+            PrivateKey privateKey = PrivateKey.fromString(config.operator.privateKey);
 
             client.setOperator(operatorAccount, privateKey);
         }
@@ -154,15 +155,15 @@ public final class Client implements AutoCloseable {
     /**
      * Configure a client based on a JSON file at the given path.
      */
-    public static Client fromJsonFile(String fileName) throws FileNotFoundException {
+    public static Client fromJsonFile(String fileName) throws IOException {
         return fromJsonFile(new File(fileName));
     }
 
     /**
      * Configure a client based on a JSON file.
      */
-    public static Client fromJsonFile(File file) throws FileNotFoundException {
-        return fromJson(new FileReader(file));
+    public static Client fromJsonFile(File file) throws IOException {
+        return fromJson(Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8));
     }
 
     /**
@@ -340,18 +341,13 @@ public final class Client implements AutoCloseable {
     }
 
     private static class Config {
-        private HashMap<String, String> network;
+        private HashMap<String, String> network = new HashMap<>();
         @Nullable
         private ConfigOperator operator;
 
-        private Config(HashMap<String, String> network, @Nullable ConfigOperator operator) {
-            this.network = network;
-            this.operator = operator;
-        }
-
         private static class ConfigOperator {
-            private String accountId;
-            private String privateKey;
+            private String accountId = "";
+            private String privateKey = "";
         }
     }
 }

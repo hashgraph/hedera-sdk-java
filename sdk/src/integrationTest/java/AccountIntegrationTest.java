@@ -99,7 +99,7 @@ class AccountIntegrationTest {
             assertEquals(balance, new Hbar(1));
 
             new AccountDeleteTransaction()
-                .setDeleteAccountId(account)
+                .setAccountId(account)
                 .setTransferAccountId(operatorId)
                 .setMaxTransactionFee(Hbar.fromTinybar(balance.asTinybar() / 2))
                 .setTransactionId(TransactionId.generate(account))
