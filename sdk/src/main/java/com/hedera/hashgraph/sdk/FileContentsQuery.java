@@ -35,7 +35,7 @@ public final class FileContentsQuery extends QueryBuilder<ByteString, FileConten
         // deleted accounts return a COST_ANSWER of zero which triggers `INSUFFICIENT_TX_FEE`
         // if you set that as the query payment; 25 tinybar seems to be enough to get
         // `FILE_DELETED` back instead.
-        return super.getCostAsync(client).thenApply((cost) -> Hbar.fromTinybar(Math.min(cost.asTinybar(), 25)));
+        return super.getCostAsync(client).thenApply((cost) -> Hbar.fromTinybar(Math.max(cost.asTinybar(), 25)));
     }
 
     @Override
