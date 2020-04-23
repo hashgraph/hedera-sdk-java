@@ -82,7 +82,7 @@ class TopicWithAdminKeyExample {
 
         TransactionId transactionId = transaction.execute(hapiClient);
 
-        topicId = Objects.requireNonNull(transactionId.getReceipt(hapiClient).topicId);
+        topicId = transactionId.getReceipt(hapiClient).topicId;
 
         System.out.println("Created new topic " + topicId + " with 2-of-3 threshold key as adminKey.");
     }

@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.errorprone.annotations.Var;
+import com.google.gson.Gson;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import java8.util.function.Consumer;
@@ -10,6 +11,11 @@ import java8.util.function.Function;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -112,6 +118,51 @@ public final class Client implements AutoCloseable {
         network.put(new AccountId(6), "3.testnet.hedera.com:50211");
 
         return Client.forNetwork(network);
+    }
+
+    /**
+     * Configure a client based off the given JSON string.
+     */
+    public static Client fromJson(String json) {
+        return fromJson(new StringReader(json));
+    }
+
+    /**
+     * Configure a client based off the given JSON reader.
+     */
+    public static Client fromJson(Reader json) {
+        Config config = new Gson().fromJson(json, Config.class);
+
+        Map<AccountId, String> nodes = new HashMap<>(config.network.size());
+
+        for (Map.Entry<String, String> entry : config.network.entrySet()) {
+            nodes.put(AccountId.fromString(entry.getKey()), entry.getValue());
+        }
+
+        final Client client = new Client(nodes);
+
+        if (config.operator != null) {
+            final AccountId operatorAccount = AccountId.fromString(config.operator.accountId);
+            final PrivateKey privateKey = PrivateKey.fromString(config.operator.privateKey);
+
+            client.setOperator(operatorAccount, privateKey);
+        }
+
+        return client;
+    }
+
+    /**
+     * Configure a client based on a JSON file at the given path.
+     */
+    public static Client fromJsonFile(String fileName) throws FileNotFoundException {
+        return fromJsonFile(new File(fileName));
+    }
+
+    /**
+     * Configure a client based on a JSON file.
+     */
+    public static Client fromJsonFile(File file) throws FileNotFoundException {
+        return fromJson(new FileReader(file));
     }
 
     /**
@@ -285,6 +336,22 @@ public final class Client implements AutoCloseable {
             this.accountId = accountId;
             this.publicKey = publicKey;
             this.transactionSigner = transactionSigner;
+        }
+    }
+
+    private static class Config {
+        private HashMap<String, String> network;
+        @Nullable
+        private ConfigOperator operator;
+
+        private Config(HashMap<String, String> network, @Nullable ConfigOperator operator) {
+            this.network = network;
+            this.operator = operator;
+        }
+
+        private static class ConfigOperator {
+            private String accountId;
+            private String privateKey;
         }
     }
 }
