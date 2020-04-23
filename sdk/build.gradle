@@ -1,6 +1,7 @@
 plugins {
 	id "java-library"
 	id "idea"
+	id "maven-publish"
 	id "com.google.protobuf" version "0.8.12"
 }
 
@@ -144,4 +145,25 @@ tasks.withType(Test) {
 jar {
 	exclude "**/*.proto"
 	includeEmptyDirs = false
+}
+
+publishing {
+	publications {
+		maven(MavenPublication) {
+			artifact("build/libs/sdk-$version" + ".jar") {
+				extension "jar"
+			}
+		}
+	}
+
+	repositories {
+		maven {
+			name "nexus"
+			url "https://oss.sonatype.org/repository/maven-releases/"
+			credentials {
+				username project.repoUser
+				password project.repoPassword
+			}
+		}
+	}
 }

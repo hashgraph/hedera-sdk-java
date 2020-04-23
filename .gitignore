@@ -1,7 +1,5 @@
 build/
-
 .gradle/
-
 .idea/
-
 .env
+gradle.properties
