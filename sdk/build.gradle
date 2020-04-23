@@ -1,7 +1,9 @@
 plugins {
 	id "java-library"
 	id "idea"
-	id "maven-publish"
+	// id "signing"
+	id "maven"
+	id "com.bmuschko.nexus" version "2.3.1"
 	id "com.google.protobuf" version "0.8.12"
 }
 
@@ -144,26 +146,50 @@ tasks.withType(Test) {
 
 jar {
 	exclude "**/*.proto"
+	archiveBaseName = "sdk-corda"
 	includeEmptyDirs = false
 }
 
-publishing {
-	publications {
-		maven(MavenPublication) {
-			artifact("build/libs/sdk-$version" + ".jar") {
-				extension "jar"
+modifyPom {
+	project {
+		description 'Hedera™ Hashgraph SDK for Java'
+		name 'sdk'
+		url 'https://github.com/hashgraph/hedera-sdk-java'
+		organization {
+			name 'Hedera Hashgraph'
+			url 'https://www.hedera.com'
+		}
+		issueManagement {
+			system 'GitHub'
+			url 'https://github.com/hashgraph/hedera-sdk-java/issues'
+		}
+		licenses {
+			license {
+				name 'Apache License, Version 2.0'
+				url 'https://github.com/hashgraph/hedera-sdk-java/blob/master/LICENSE'
+				distribution 'repo'
+			}
+		}
+		scm {
+			url 'https://github.com/hashgraph/hedera-sdk-java'
+			connection 'scm:git:https://github.com/hashgraph/hedera-sdk-java.git'
+			developerConnection 'scm:git:ssh://github.com:hashgraph/hedera-sdk-java.git'
+		}
+		developers {
+			developer {
+				name 'Ryan Leckey'
 			}
 		}
 	}
+}
 
-	repositories {
-		maven {
-			name "nexus"
-			url "https://oss.sonatype.org/repository/maven-releases/"
-			credentials {
-				username project.repoUser
-				password project.repoPassword
-			}
-		}
-	}
+extraArchive {
+	sources = true
+	tests = false
+	javadoc = true
+}
+
+nexus {
+	sign = true
+	repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
 }
