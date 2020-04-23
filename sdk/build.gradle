@@ -32,16 +32,16 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.slf4j/slf4j-api
 	implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
 
-	implementation "io.grpc:grpc-api:1.28.1"
-	implementation "io.grpc:grpc-protobuf-lite:1.28.1"
-	implementation "io.grpc:grpc-stub:1.28.1"
+	implementation "io.grpc:grpc-api:1.29.0"
+	implementation "io.grpc:grpc-protobuf-lite:1.29.0"
+	implementation "io.grpc:grpc-stub:1.29.0"
 
 	testImplementation "org.junit.jupiter:junit-jupiter-engine:5.6.1"
 	testImplementation "org.junit.jupiter:junit-jupiter-params:5.6.1"
 
 	testRuntimeOnly "org.slf4j:slf4j-simple:2.0.0-alpha1"
 
-	integrationTestRuntimeOnly "io.grpc:grpc-netty-shaded:1.28.1"
+	integrationTestRuntimeOnly "io.grpc:grpc-netty-shaded:1.29.0"
 
 	// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
 	//       use CompletableFuture directly.
@@ -51,7 +51,7 @@ dependencies {
 	api "net.sourceforge.streamsupport:streamsupport-cfuture:1.7.2"
 
 	// NOTE: This is to support Android API < 26.
-	api "org.threeten:threetenbp:1.4.2"
+	api "org.threeten:threetenbp:1.4.3"
 
 	implementation "com.google.code.gson:gson:2.8.6"
 }
@@ -63,7 +63,7 @@ protobuf {
 	}
 	plugins {
 		grpc {
-			artifact = "io.grpc:protoc-gen-grpc-java:1.28.1"
+			artifact = "io.grpc:protoc-gen-grpc-java:1.29.0"
 		}
 	}
 	generateProtoTasks {
