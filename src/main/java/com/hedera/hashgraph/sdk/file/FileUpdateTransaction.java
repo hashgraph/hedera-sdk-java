@@ -25,7 +25,6 @@ import io.grpc.MethodDescriptor;
  */
 public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransaction> {
     private final FileUpdateTransactionBody.Builder builder = bodyBuilder.getFileUpdateBuilder();
-    private com.hedera.hashgraph.proto.KeyList.Builder keyList = builder.getKeysBuilder();
 
     public FileUpdateTransaction() { super(); }
 
@@ -71,6 +70,7 @@ public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransact
      * @see FileCreateTransaction#addKey(PublicKey) for information on keys associated with files.
      */
     public FileUpdateTransaction addKey(PublicKey key) {
+        com.hedera.hashgraph.proto.KeyList.Builder keyList = builder.getKeysBuilder();
         keyList.addKeys(key.toKeyProto());
         return this;
     }
