@@ -208,6 +208,17 @@ public final class Client implements AutoCloseable {
      */
     @Override
     public synchronized void close() {
+        close(Duration.ofSeconds(30));
+    }
+
+    /**
+     * Initiates an orderly shutdown of all channels (to the Hedera network) in which preexisting
+     * transactions or queries continue but more would be immediately cancelled.
+     *
+     * <p>After this method returns, this client can be re-used. Channels will be re-established as
+     * needed.
+     */
+    public void close(Duration timeout) {
         var channels = this.channels;
         this.channels = new HashMap<>(network.size());
 
@@ -220,7 +231,7 @@ public final class Client implements AutoCloseable {
         // wait for all channels to shutdown
         for (var channel : channels.values()) {
             try {
-                channel.awaitTermination(0, TimeUnit.SECONDS);
+                channel.awaitTermination(timeout.getSeconds(), TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
