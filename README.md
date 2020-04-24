@@ -26,7 +26,7 @@ available in the [hashgraph/hedera-protobuf] repository.
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>sdk</artifactId>
-  <version>1.1.4</version>
+  <version>1.1.5</version>
 </dependency>
 
 <!-- SELECT ONE: -->
@@ -53,7 +53,7 @@ available in the [hashgraph/hedera-protobuf] repository.
 #### Gradle
 
 ```groovy
-implementation 'com.hedera.hashgraph:sdk:1.1.4'
+implementation 'com.hedera.hashgraph:sdk:1.1.5'
 
 // SELECT ONE:
 // netty transport (for high throughput applications)
