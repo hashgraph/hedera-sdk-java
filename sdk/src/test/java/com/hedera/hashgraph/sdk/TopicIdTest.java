@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class TopicIdTest {
     @Test
     @DisplayName("using toBytes and fromBytes will produce the correct Id")
-    void keyGenerates() throws InvalidProtocolBufferException {
+    void toFromBytes() throws InvalidProtocolBufferException {
         AccountId id = AccountId.fromString("0.0.5005");
 
         assertNotNull(id);
