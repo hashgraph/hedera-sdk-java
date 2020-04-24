@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoGetInfoResponse;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
@@ -171,5 +172,13 @@ public final class AccountInfo {
             .add("expirationTime", expirationTime)
             .add("autoRenewPeriod", autoRenewPeriod)
             .toString();
+    }
+
+    public static AccountInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        return fromProtobuf(CryptoGetInfoResponse.AccountInfo.parseFrom(bytes).toBuilder().build());
+    }
+
+    public byte[] toBytes() {
+        return this.toProtoBuf().toByteArray();
     }
 }
