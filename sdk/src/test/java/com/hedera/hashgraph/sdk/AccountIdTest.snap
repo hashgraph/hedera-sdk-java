@@ -1,0 +1,21 @@
+com.hedera.hashgraph.sdk.AccountIdTest.badAccountId=[
+  "Invalid Id format, should be in format {shardNum}.{realmNum}.{idNum}"
+]
+
+
+com.hedera.hashgraph.sdk.AccountIdTest.fromString=[
+  {
+    "shard": 0,
+    "realm": 0,
+    "num": 5005
+  }
+]
+
+
+com.hedera.hashgraph.sdk.AccountIdTest.toFromBytes=[
+  {
+    "shard": 0,
+    "realm": 0,
+    "num": 5005
+  }
+]
