@@ -47,11 +47,18 @@ class EntityId {
     static <R> R fromString(String id, WithIdNums<R> withIdNums) {
         var nums = Splitter.on('.').split(id).iterator();
 
-        var shard = Long.parseLong(nums.next());
-        var realm = Long.parseLong(nums.next());
-        var num = Long.parseLong(nums.next());
+        R newId;
 
-        return withIdNums.apply(shard, realm, num);
+        try {
+            var shard = Long.parseLong(nums.next());
+            var realm = Long.parseLong(nums.next());
+            var num = Long.parseLong(nums.next());
+            newId = withIdNums.apply(shard, realm, num);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid Id format, should be in format {shardNum}.{realmNum}.{idNum}", e);
+        }
+
+        return newId;
     }
 
     private static void checkAddressLen(byte[] address) {
