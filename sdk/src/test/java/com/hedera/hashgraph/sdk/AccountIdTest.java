@@ -1,33 +1,23 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.protobuf.InvalidProtocolBufferException;
+import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static io.github.jsonSnapshot.SnapshotMatcher.expect;
-import static io.github.jsonSnapshot.SnapshotMatcher.start;
-import static io.github.jsonSnapshot.SnapshotMatcher.validateSnapshots;
 
 class AccountIdTest {
     @BeforeAll
     public static void beforeAll() {
-        start();
+        SnapshotMatcher.start();
     }
 
     @AfterClass
     public static void afterAll() {
-        validateSnapshots();
-    }
-
-    AccountId setId() {
-        return AccountId.fromString("0.0.5005");
+        SnapshotMatcher.validateSnapshots();
     }
 
     @Test
-    @DisplayName("object to be sent matches snapshot")
-    void matchesSnap(){
-        expect(setId().toProtobuf()).toMatchSnapshot();
+    void shouldSerialize() {
+        SnapshotMatcher.expect(AccountId.fromString("0.0.5005").toProtobuf().toString()).toMatchSnapshot();
     }
 }
