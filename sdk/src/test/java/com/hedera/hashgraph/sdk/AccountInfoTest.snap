@@ -1,0 +1,37 @@
+com.hedera.hashgraph.sdk.AccountInfoTest.fromProtobuf=[
+  {
+    "accountId": {
+      "shard": 0,
+      "realm": 0,
+      "num": 0
+    },
+    "contractAccountId": "",
+    "deleted": false,
+    "proxyReceived": {
+      "tinybar": 0
+    },
+    "key": {
+      "keyData": "4MjsJ1ilh5/6wiahPAxRa3mecuNRQaDdgo+U03mIpLc="
+    },
+    "balance": {
+      "tinybar": 0
+    },
+    "sendRecordThreshold": {
+      "tinybar": 0
+    },
+    "receiveRecordThreshold": {
+      "tinybar": 0
+    },
+    "receiverSignatureRequired": false,
+    "expirationTime": {
+      "seconds": 0,
+      "nanos": 0
+    },
+    "autoRenewPeriod": {
+      "seconds": 0,
+      "nanos": 0,
+      "zero": true,
+      "negative": false
+    }
+  }
+]
