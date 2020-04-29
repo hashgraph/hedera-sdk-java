@@ -1,33 +1,26 @@
 package com.hedera.hashgraph.sdk;
 
+import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static io.github.jsonSnapshot.SnapshotMatcher.expect;
-import static io.github.jsonSnapshot.SnapshotMatcher.start;
-import static io.github.jsonSnapshot.SnapshotMatcher.validateSnapshots;
 
 public class AccountBalanceQueryTest {
     @BeforeAll
     public static void beforeAll() {
-        start();
+        SnapshotMatcher.start();
     }
 
     @AfterClass
     public static void afterAll() {
-        validateSnapshots();
-    }
-
-    AccountBalanceQuery setQuery() {
-        return new AccountBalanceQuery()
-            .setAccountId(AccountId.fromString("0.0.5005"));
+        SnapshotMatcher.validateSnapshots();
     }
 
     @Test
-    @DisplayName("object to be sent matches snapshot")
-    void matchesSnap() {
-        expect(setQuery().makeRequest()).toMatchSnapshot();
+    void shouldSerialize() {
+        SnapshotMatcher.expect(new AccountBalanceQuery()
+            .setAccountId(AccountId.fromString("0.0.5005"))
+            .toString()
+        ).toMatchSnapshot();
     }
 }
