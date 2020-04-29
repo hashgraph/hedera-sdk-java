@@ -252,13 +252,7 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     @Override
     final com.hedera.hashgraph.sdk.proto.Transaction makeRequest() {
         // emplace the signatures on the transaction and build the transaction
-        var tx = transactions.get(nextIndex).setSigMap(signatureBuilders.get(nextIndex)).build();
-
-        // each time buildNext is called we move our cursor to the next transaction
-        // wrapping around to ensure we are cycling
-        nextIndex = (nextIndex + 1) % transactions.size();
-
-        return tx;
+        return transactions.get(nextIndex).setSigMap(signatureBuilders.get(nextIndex)).build();
     }
 
     @Override
@@ -272,12 +266,25 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     }
 
     @Override
+    void advanceRequest() {
+        // each time buildNext is called we move our cursor to the next transaction
+        // wrapping around to ensure we are cycling
+        nextIndex = (nextIndex + 1) % transactions.size();
+    }
+
+    @Override
     @SuppressWarnings("LiteProtoToString")
-    String debugToString(com.hedera.hashgraph.sdk.proto.Transaction request) {
+    public String toString() {
+        var request = makeRequest();
+        var builder = new StringBuilder(request.toString());
+
         try {
-            return TransactionBody.parseFrom(request.getBodyBytes()).toString();
+            builder.append("\n");
+            builder.append(TransactionBody.parseFrom(request.getBodyBytes()).toString());
         } catch (InvalidProtocolBufferException e) {
             throw new RuntimeException(e);
         }
+
+        return builder.toString();
     }
 }

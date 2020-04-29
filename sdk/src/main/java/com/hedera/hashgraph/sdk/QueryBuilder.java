@@ -156,14 +156,19 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
     }
 
     @Override
+    final void advanceRequest() {
+        if (isPaymentRequired() && paymentTransactions != null) {
+            // each time we move our cursor to the next transaction
+            // wrapping around to ensure we are cycling
+            nextPaymentTransactionIndex = (nextPaymentTransactionIndex + 1) % paymentTransactions.size();
+        }
+    }
+
+    @Override
     final Query makeRequest() {
         // If payment is required, set the next payment transaction on the query
         if (isPaymentRequired() && paymentTransactions != null) {
             headerBuilder.setPayment(paymentTransactions.get(nextPaymentTransactionIndex));
-
-            // each time we move our cursor to the next transaction
-            // wrapping around to ensure we are cycling
-            nextPaymentTransactionIndex = (nextPaymentTransactionIndex + 1) % paymentTransactions.size();
         }
 
         // Delegate to the derived class to apply the header because the common header struct is
@@ -201,7 +206,9 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
 
     @Override
     @SuppressWarnings("LiteProtoToString")
-    String debugToString(Query request) {
+    public String toString() {
+        var request = makeRequest();
+
         StringBuilder builder = new StringBuilder(request.toString());
 
         var queryHeader = mapRequestHeader(request);

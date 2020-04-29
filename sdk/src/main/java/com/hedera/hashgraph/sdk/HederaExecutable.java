@@ -27,16 +27,23 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
 
     private CompletableFuture<O> executeAsync(Client client, int attempt) {
         var nodeId = getNodeId(client);
-        var channel = client.getChannel(nodeId);
-        var methodDescriptor = getMethodDescriptor();
-        var call = channel.newCall(methodDescriptor, CallOptions.DEFAULT);
-        var request = makeRequest();
-        var startAt = System.nanoTime();
 
         logger.atTrace()
             .addKeyValue("node", nodeId)
             .addKeyValue("attempt", attempt)
-            .log("sending request \n{}", debugToString(request));
+            .log("sending request \n{}", this);
+
+        var channel = client.getChannel(nodeId);
+        var methodDescriptor = getMethodDescriptor();
+        var call = channel.newCall(methodDescriptor, CallOptions.DEFAULT);
+        var request = makeRequest();
+
+        // advance the internal index
+        // non-free queries and transactions map to more than 1 actual transaction and this will cause
+        // the next invocation of makeRequest to return the _next_ transaction
+        advanceRequest();
+
+        var startAt = System.nanoTime();
 
         return toCompletableFuture(ClientCalls.futureUnaryCall(call, request)).handle((response, error) -> {
             var latency = (double) (System.nanoTime() - startAt) / 1000000000.0;
@@ -89,6 +96,8 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
 
     abstract RequestT makeRequest();
 
+    abstract void advanceRequest();
+
     /**
      * Called after receiving the query response from Hedera. The derived class should map into its
      * output type.
@@ -123,9 +132,5 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
      */
     boolean shouldRetry(Status status, ResponseT response) {
         return status == Status.Busy;
-    }
-
-    String debugToString(RequestT request) {
-        return request.toString();
     }
 }
