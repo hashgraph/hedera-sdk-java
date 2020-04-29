@@ -132,6 +132,10 @@ public final class AccountInfo {
         );
     }
 
+    public static AccountInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        return fromProtobuf(CryptoGetInfoResponse.AccountInfo.parseFrom(bytes).toBuilder().build());
+    }
+
     CryptoGetInfoResponse.AccountInfo toProtoBuf() {
         var accountInfoBuilder = CryptoGetInfoResponse.AccountInfo.newBuilder()
             .setAccountID(this.accountId.toProtobuf())
@@ -172,10 +176,6 @@ public final class AccountInfo {
             .add("expirationTime", expirationTime)
             .add("autoRenewPeriod", autoRenewPeriod)
             .toString();
-    }
-
-    public static AccountInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(CryptoGetInfoResponse.AccountInfo.parseFrom(bytes).toBuilder().build());
     }
 
     public byte[] toBytes() {
