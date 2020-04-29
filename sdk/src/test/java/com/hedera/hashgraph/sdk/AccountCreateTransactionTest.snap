@@ -1,0 +1,60 @@
+com.hedera.hashgraph.sdk.AccountCreateTransactionTest.matchesSnap=[
+  {
+    "memoizedHashCode": 0,
+    "unknownFields": {
+      "count": 0,
+      "tags": [ ],
+      "objects": [ ],
+      "memoizedSerializedSize": 0,
+      "isMutable": false
+    },
+    "memoizedSerializedSize": -1,
+    "bodyDataCase_": 4,
+    "bodyData_": {
+      "hash": 0,
+      "bytes": "Cg0KBgjOp4rlBRIDGI4nEgMYjScYoI0GIgIIeFpJCiISIODI7CdYpYef+sImoTwMUWt5nnLjUUGg3YKPlNN5iKS3EMIDGgMY6Qcw//////////9/OP//////////f0ABSgUIgM7aAw==",
+      "validUtf8": false,
+      "empty": false
+    },
+    "sigMap_": {
+      "memoizedHashCode": 0,
+      "unknownFields": {
+        "count": 0,
+        "tags": [ ],
+        "objects": [ ],
+        "memoizedSerializedSize": 0,
+        "isMutable": false
+      },
+      "memoizedSerializedSize": -1,
+      "sigPair_": [
+        {
+          "memoizedHashCode": 0,
+          "unknownFields": {
+            "count": 0,
+            "tags": [ ],
+            "objects": [ ],
+            "memoizedSerializedSize": 0,
+            "isMutable": false
+          },
+          "memoizedSerializedSize": -1,
+          "signatureCase_": 3,
+          "signature_": {
+            "hash": 0,
+            "bytes": "N9Ec4sARVkzbw+TFyEvbBeB//N9eIws+TSfZxNHBnnr1T+3OM4Iel0x+qY9VOFlYPRzFnX3sJi9ScUWNkSjeCA==",
+            "validUtf8": false,
+            "empty": false
+          },
+          "pubKeyPrefix_": {
+            "hash": 0,
+            "bytes": "4MjsJ1ilh5/6wiahPAxRa3mecuNRQaDdgo+U03mIpLc=",
+            "validUtf8": false,
+            "empty": false
+          },
+          "initialized": true
+        }
+      ],
+      "initialized": true
+    },
+    "initialized": true
+  }
+]
