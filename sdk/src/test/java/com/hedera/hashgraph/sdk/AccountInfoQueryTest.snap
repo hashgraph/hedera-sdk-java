@@ -1,0 +1,55 @@
+com.hedera.hashgraph.sdk.AccountInfoQueryTest.matchesSnap=[
+  {
+    "memoizedHashCode": 0,
+    "unknownFields": {
+      "count": 0,
+      "tags": [ ],
+      "objects": [ ],
+      "memoizedSerializedSize": 0,
+      "isMutable": false
+    },
+    "memoizedSerializedSize": -1,
+    "queryCase_": 9,
+    "query_": {
+      "memoizedHashCode": 0,
+      "unknownFields": {
+        "count": 0,
+        "tags": [ ],
+        "objects": [ ],
+        "memoizedSerializedSize": 0,
+        "isMutable": false
+      },
+      "memoizedSerializedSize": -1,
+      "header_": {
+        "memoizedHashCode": 0,
+        "unknownFields": {
+          "count": 0,
+          "tags": [ ],
+          "objects": [ ],
+          "memoizedSerializedSize": 0,
+          "isMutable": false
+        },
+        "memoizedSerializedSize": -1,
+        "responseType_": 0,
+        "initialized": true
+      },
+      "accountID_": {
+        "memoizedHashCode": 0,
+        "unknownFields": {
+          "count": 0,
+          "tags": [ ],
+          "objects": [ ],
+          "memoizedSerializedSize": 0,
+          "isMutable": false
+        },
+        "memoizedSerializedSize": -1,
+        "shardNum_": 0,
+        "realmNum_": 0,
+        "accountNum_": 5005,
+        "initialized": true
+      },
+      "initialized": true
+    },
+    "initialized": true
+  }
+]
