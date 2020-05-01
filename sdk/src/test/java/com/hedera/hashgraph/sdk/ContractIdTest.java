@@ -1,24 +1,23 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import org.junit.jupiter.api.DisplayName;
+import io.github.jsonSnapshot.SnapshotMatcher;
+import org.junit.AfterClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 class ContractIdTest {
+    @BeforeAll
+    public static void beforeAll() {
+        SnapshotMatcher.start();
+    }
+
+    @AfterClass
+    public static void afterAll() {
+        SnapshotMatcher.validateSnapshots();
+    }
+
     @Test
-    @DisplayName("using toBytes and fromBytes will produce the correct Id")
-    void toFromBytes() throws InvalidProtocolBufferException {
-        AccountId id = AccountId.fromString("0.0.5005");
-
-        assertNotNull(id);
-        assertNotNull(id.toBytes());
-
-        byte[] idBytes = id.toBytes();
-        AccountId newId = AccountId.fromBytes(idBytes);
-
-        assertEquals(id, newId);
+    void shouldSerialize() {
+        SnapshotMatcher.expect(ContractId.fromString("0.0.5005").toProtobuf().toString()).toMatchSnapshot();
     }
 }

@@ -1,0 +1,3 @@
+com.hedera.hashgraph.sdk.FileIdTest.shouldSerialize=[
+  "# com.hedera.hashgraph.sdk.proto.FileID@bc8a0\nfile_num: 5005\nrealm_num: 0\nshard_num: 0"
+]

@@ -1,0 +1,3 @@
+com.hedera.hashgraph.sdk.TopicIdTest.shouldSerialize=[
+  "# com.hedera.hashgraph.sdk.proto.TopicID@bc8a0\nrealm_num: 0\nshard_num: 0\ntopic_num: 5005"
+]
