@@ -2,7 +2,9 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ConsensusGetTopicInfoResponse;
+import com.hedera.hashgraph.sdk.proto.ConsensusTopicInfo;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
@@ -101,6 +103,36 @@ public final class TopicInfo {
         );
     }
 
+    public static TopicInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        return fromProtobuf(ConsensusGetTopicInfoResponse.parseFrom(bytes).toBuilder().build());
+    }
+
+    ConsensusGetTopicInfoResponse toProtoBuf() {
+        var topicInfoResponseBuilder = ConsensusGetTopicInfoResponse.newBuilder()
+            .setTopicID(this.topicId.toProtobuf());
+
+        var topicInfoBuilder = ConsensusTopicInfo.newBuilder()
+            .setMemo(this.topicMemo)
+            .setRunningHash(this.runningHash)
+            .setSequenceNumber(this.sequenceNumber)
+            .setExpirationTime(InstantConverter.toProtobuf(this.expirationTime))
+            .setAutoRenewPeriod(DurationConverter.toProtobuf(this.autoRenewPeriod));
+
+        if (this.adminKey != null) {
+            topicInfoBuilder.setAdminKey(this.adminKey.toKeyProtobuf());
+        }
+
+        if (this.submitKey != null) {
+            topicInfoBuilder.setSubmitKey(this.submitKey.toKeyProtobuf());
+        }
+
+        if (this.autoRenewAccountId != null) {
+            topicInfoBuilder.setAutoRenewAccount(this.autoRenewAccountId.toProtobuf());
+        }
+
+        return topicInfoResponseBuilder.setTopicInfo(topicInfoBuilder).build();
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -114,5 +146,9 @@ public final class TopicInfo {
             .add("autoRenewPeriod", autoRenewPeriod)
             .add("autoRenewAccountId", autoRenewAccountId)
             .toString();
+    }
+
+    public byte[] toBytes() {
+        return this.toProtoBuf().toByteArray();
     }
 }
