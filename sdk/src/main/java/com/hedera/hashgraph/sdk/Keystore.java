@@ -22,7 +22,7 @@ import java.util.Objects;
 
 import java8.util.Optional;
 
-public final class Keystore {
+final class Keystore {
     private static final Gson gson = new Gson();
     private static final JsonParser jsonParser = new JsonParser();
 
