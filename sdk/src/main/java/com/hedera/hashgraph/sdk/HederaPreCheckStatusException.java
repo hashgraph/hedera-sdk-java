@@ -2,13 +2,21 @@ package com.hedera.hashgraph.sdk;
 
 import javax.annotation.Nullable;
 
+/**
+ * Signals that a transaction has failed the pre-check.
+ * <p>
+ * Before a node submits a transaction to the rest of the network,
+ * it attempts some cheap assertions. This process is called the "pre-check".
+ */
 public final class HederaPreCheckStatusException extends Exception {
-    /** The status of the failing transaction */
+    /**
+     * The status of the failing transaction
+     */
     public final Status status;
 
     /**
      * The ID of the transaction that failed.
-     *
+     * <p>
      * This can be `null` if a query fails pre-check without an
      * associated payment transaction.
      */
