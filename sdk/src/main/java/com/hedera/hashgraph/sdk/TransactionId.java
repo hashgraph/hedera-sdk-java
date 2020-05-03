@@ -8,8 +8,6 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 
-import java.util.Arrays;
-
 import static java8.util.concurrent.CompletableFuture.completedFuture;
 import static java8.util.concurrent.CompletableFuture.failedFuture;
 

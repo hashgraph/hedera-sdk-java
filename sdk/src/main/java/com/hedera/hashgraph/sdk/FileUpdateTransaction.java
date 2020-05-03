@@ -64,7 +64,7 @@ public final class FileUpdateTransaction extends TransactionBuilder<FileUpdateTr
      * be truncated.
      * <p>
      * Note that total size for a given transaction is limited to 6KiB (as of March 2020) by the
-     * network; if you exceed this you may receive a {@link Status#TransactionOversize}.
+     * network; if you exceed this you may receive a {@link Status#TRANSACTION_OVERSIZE}.
      * <p>
      * In this case, you will need to break the data into chunks of less than ~6KiB and execute this
      * transaction with the first chunk and then use {@link FileAppendTransaction} with
@@ -93,7 +93,7 @@ public final class FileUpdateTransaction extends TransactionBuilder<FileUpdateTr
      * {@link java.nio.charset.StandardCharsets#UTF_8}.
      * <p>
      * Note that total size for a given transaction is limited to 6KiB (as of March 2020) by the
-     * network; if you exceed this you may receive a  {@link Status#TransactionOversize}.
+     * network; if you exceed this you may receive a  {@link Status#TRANSACTION_OVERSIZE}.
      * <p>
      * In this case, you will need to break the data into chunks of less than ~6KiB and execute this
      * transaction with the first chunk and then use {@link FileAppendTransaction} with

@@ -22,6 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * A prepared Transaction that is about to be submitted to Hedera.
+ *
+ * The {@link TransactionBuilder} type becomes this to freeze its contents so they can be signed without allowing
+ * further modifications.
+ */
 public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse, TransactionId> {
     public final TransactionId id;
 

@@ -8,8 +8,14 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * Base class for all transactions that may be built and submitted to Hedera.
+ *
+ * @param <T> The type of the transaction. Used to enable chaining.
+ */
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     extends Executable<TransactionId> {
+
     // Default auto renew duration for accounts, contracts, topics, and files (entities)
     static final Duration DEFAULT_AUTO_RENEW_PERIOD = Duration.ofDays(90);
 
@@ -29,12 +35,12 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
 
     /**
      * Set the ID for this transaction.
-     *
-     * <p>The transaction ID includes the operator's account ( the account paying the transaction
+     * <p>
+     * The transaction ID includes the operator's account ( the account paying the transaction
      * fee). If two transactions have the same transaction ID, they won't both have an effect. One
      * will complete normally and the other will fail with a duplicate transaction status.
-     *
-     * <p>Normally, you should not use this method. Just before a transaction is executed, a
+     * <p>
+     * Normally, you should not use this method. Just before a transaction is executed, a
      * transaction ID will be generated from the operator on the client.
      *
      * @return {@code this}
@@ -49,8 +55,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
 
     /**
      * Set the account ID of the node that this transaction will be submitted to.
-     *
-     * <p>Providing an explicit node account ID interferes with client-side load balancing of the
+     * <p>
+     * Providing an explicit node account ID interferes with client-side load balancing of the
      * network. By default, the SDK will pre-generate a transaction for 1/3 of the nodes on the
      * network. If a node is down, busy, or otherwise reports a fatal error, the SDK will try again
      * with a different node.
@@ -66,8 +72,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
 
     /**
      * Sets the duration that this transaction is valid for.
-     *
-     * <p>This is defaulted by the SDK to 120 seconds (or two minutes).
+     * <p>
+     * This is defaulted by the SDK to 120 seconds (or two minutes).
      *
      * @return {@code this}
      */
@@ -105,6 +111,9 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         return (T) this;
     }
 
+    /**
+     * Build this transaction to prepare for for signing or serialization.
+     */
     public final Transaction build(@Nullable Client client) {
         onBuild(bodyBuilder);
 
@@ -158,6 +167,11 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
             "`client` must not be NULL or both a `nodeAccountId` and `transactionId` must be set");
     }
 
+    /**
+     * Build and execute this transaction.
+     * <p>
+     * This transaction will be automatically signed by the configured operator, see {@link Client#setOperator}.
+     */
     @Override
     public final CompletableFuture<TransactionId> executeAsync(Client client) {
         return build(client).executeAsync(client);

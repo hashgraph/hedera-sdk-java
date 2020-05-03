@@ -38,7 +38,7 @@ public final class FileAppendTransaction extends TransactionBuilder<FileAppendTr
      *
      * <p>Note that total size for a given transaction is limited to 6KiB (as of March 2020) by the
      * network; if you exceed this you may receive a {@link com.hedera.hashgraph.sdk.HederaPreCheckStatusException}
-     * with {@link com.hedera.hashgraph.sdk.Status#TransactionOversize}.
+     * with {@link com.hedera.hashgraph.sdk.Status#TRANSACTION_OVERSIZE}.
      *
      * <p>If you want to append more than ~6KiB of data, you will need to break it into multiple chunks
      * and use a separate {@link FileAppendTransaction} for each.
@@ -63,7 +63,7 @@ public final class FileAppendTransaction extends TransactionBuilder<FileAppendTr
      *
      * <p>Note that total size for a given transaction is limited to 6KiB (as of March 2020) by the
      * network; if you exceed this you may receive a {@link com.hedera.hashgraph.sdk.HederaPreCheckStatusException}
-     * with {@link com.hedera.hashgraph.sdk.Status#TransactionOversize}.
+     * with {@link com.hedera.hashgraph.sdk.Status#TRANSACTION_OVERSIZE}.
      *
      * <p>If you want to append more than ~6KiB of data, you will need to break it into multiple chunks
      * and use a separate {@link FileAppendTransaction} for each.

@@ -68,7 +68,7 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
      *
      * <p>Note that total size for a given transaction is limited to 6KiB (as of March 2020) by the
      * network; if you exceed this you may receive a {@link com.hedera.hashgraph.sdk.HederaPreCheckStatusException}
-     * with {@link com.hedera.hashgraph.sdk.Status#TransactionOversize}.
+     * with {@link com.hedera.hashgraph.sdk.Status#TRANSACTION_OVERSIZE}.
      *
      * <p>In this case, you will need to break the data into chunks of less than ~6KiB and execute this
      * transaction with the first chunk and then use {@link FileAppendTransaction} with
@@ -93,7 +93,7 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
      *
      * <p>Note that total size for a given transaction is limited to 6KiB (as of March 2020) by the
      * network; if you exceed this you may receive a {@link com.hedera.hashgraph.sdk.HederaPreCheckStatusException}
-     * with {@link com.hedera.hashgraph.sdk.Status#TransactionOversize}.
+     * with {@link com.hedera.hashgraph.sdk.Status#TRANSACTION_OVERSIZE}.
      *
      * <p>In this case, you will need to break the data into chunks of less than ~6KiB and execute this
      * transaction with the first chunk and then use {@link FileAppendTransaction} with

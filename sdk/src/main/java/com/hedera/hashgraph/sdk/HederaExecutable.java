@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 
 import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
 
-public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executable<O> {
+abstract class HederaExecutable<RequestT, ResponseT, O> extends Executable<O> {
     private static final Logger logger = LoggerFactory.getLogger(HederaExecutable.class);
 
     HederaExecutable() {

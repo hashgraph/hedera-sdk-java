@@ -8,7 +8,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
  *
  * <p>When deleted, a file's contents are truncated to zero length and it can no longer be updated
  * or appended to, or its expiration time extended. {@link FileContentsQuery} and {@link FileInfoQuery}
- * will throw {@link HederaPreCheckStatusException} with a status of {@link Status#FileDeleted}.
+ * will throw {@link HederaPreCheckStatusException} with a status of {@link Status#FILE_DELETED}.
  *
  * <p>Only one of the file's keys needs to sign to delete the file, unless the key you have is part
  * of a {@link com.hedera.hashgraph.sdk.KeyList}.

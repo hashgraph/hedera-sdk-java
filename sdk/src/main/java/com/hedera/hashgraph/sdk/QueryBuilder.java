@@ -17,6 +17,12 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Base class for all queries that can be submitted to Hedera.
+ *
+ * @param <O> The output type of the query.
+ * @param <T> The type of the query itself. Used to enable chaining.
+ */
 public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends HederaExecutable<Query, Response, O> implements WithGetCost {
     private final Query.Builder builder;
 
