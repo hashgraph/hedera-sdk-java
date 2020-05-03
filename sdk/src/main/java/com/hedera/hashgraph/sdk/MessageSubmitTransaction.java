@@ -4,6 +4,17 @@ import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.ConsensusSubmitMessageTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 
+/**
+ * Submit a message for consensus.
+ * <p>
+ * Valid and authorized messages on valid topics will be ordered by the consensus service, gossipped to the
+ * mirror net, and published (in order) to all subscribers (from the mirror net) on this topic.
+ * <p>
+ * The submitKey (if any) must sign this transaction.
+ * <p>
+ * On success, the resulting TransactionReceipt contains the topic's updated topicSequenceNumber and
+ * topicRunningHash.
+ */
 public final class MessageSubmitTransaction extends TransactionBuilder<MessageSubmitTransaction> {
     private final ConsensusSubmitMessageTransactionBody.Builder builder;
 
