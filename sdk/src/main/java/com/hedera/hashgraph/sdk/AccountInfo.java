@@ -136,7 +136,7 @@ public final class AccountInfo {
         return fromProtobuf(CryptoGetInfoResponse.AccountInfo.parseFrom(bytes).toBuilder().build());
     }
 
-    CryptoGetInfoResponse.AccountInfo toProtoBuf() {
+    CryptoGetInfoResponse.AccountInfo toProtobuf() {
         var accountInfoBuilder = CryptoGetInfoResponse.AccountInfo.newBuilder()
             .setAccountID(this.accountId.toProtobuf())
             .setDeleted(this.deleted)
@@ -179,6 +179,6 @@ public final class AccountInfo {
     }
 
     public byte[] toBytes() {
-        return this.toProtoBuf().toByteArray();
+        return this.toProtobuf().toByteArray();
     }
 }

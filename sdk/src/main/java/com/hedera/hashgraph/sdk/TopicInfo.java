@@ -107,7 +107,7 @@ public final class TopicInfo {
         return fromProtobuf(ConsensusGetTopicInfoResponse.parseFrom(bytes).toBuilder().build());
     }
 
-    ConsensusGetTopicInfoResponse toProtoBuf() {
+    ConsensusGetTopicInfoResponse toProtobuf() {
         var topicInfoResponseBuilder = ConsensusGetTopicInfoResponse.newBuilder()
             .setTopicID(this.topicId.toProtobuf());
 
@@ -149,6 +149,6 @@ public final class TopicInfo {
     }
 
     public byte[] toBytes() {
-        return this.toProtoBuf().toByteArray();
+        return this.toProtobuf().toByteArray();
     }
 }
