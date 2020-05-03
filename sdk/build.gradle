@@ -54,7 +54,7 @@ dependencies {
 	api "net.sourceforge.streamsupport:streamsupport-cfuture:1.7.2"
 
 	// NOTE: This is to support Android API < 26.
-	api "org.threeten:threetenbp:1.4.3"
+	api "org.threeten:threetenbp:1.4.4"
 
 	implementation "com.google.code.gson:gson:2.8.6"
 
