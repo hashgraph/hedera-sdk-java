@@ -210,7 +210,7 @@ public final class ContractFunctionParameters {
      * <p>
      * For Solidity addresses, use {@link #addAddress(String)}.
      *
-     * @return {@code this} for fluent usage
+     * @return {@code this}
      */
     public ContractFunctionParameters addString(String param) {
         args.add(new Argument("string", encodeString(param), true));
@@ -588,7 +588,7 @@ public final class ContractFunctionParameters {
      * constructed {@link ContractFunctionSelector}. The {@link ContractFunctionSelector}
      * may not be modified after this call.
      *
-     * @return {@code this} for fluent usage.
+     * @return {@code this}
      * @throws IllegalArgumentException if {@code address} is not {@value ADDRESS_LEN_HEX}
      *                                  characters.
      */

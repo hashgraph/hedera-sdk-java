@@ -27,7 +27,7 @@ public final class TransactionReceiptQuery
     /**
      * Set the ID of the transaction for which the receipt is being requested.
      *
-     * @return {@code this}.
+     * @return {@code this}
      */
     public TransactionReceiptQuery setTransactionId(TransactionId transactionId) {
         builder.setTransactionID(transactionId.toProtobuf());

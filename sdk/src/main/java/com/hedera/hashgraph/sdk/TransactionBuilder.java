@@ -37,7 +37,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * <p>Normally, you should not use this method. Just before a transaction is executed, a
      * transaction ID will be generated from the operator on the client.
      *
-     * @return {@code this}.
+     * @return {@code this}
      * @see TransactionId
      */
     public final T setTransactionId(TransactionId transactionId) {
@@ -55,7 +55,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * network. If a node is down, busy, or otherwise reports a fatal error, the SDK will try again
      * with a different node.
      *
-     * @return {@code this}.
+     * @return {@code this}
      */
     public final T setNodeAccountId(AccountId nodeAccountId) {
         bodyBuilder.setNodeAccountID(nodeAccountId.toProtobuf());
@@ -69,7 +69,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      *
      * <p>This is defaulted by the SDK to 120 seconds (or two minutes).
      *
-     * @return {@code this}.
+     * @return {@code this}
      */
     public final T setTransactionValidDuration(Duration validDuration) {
         bodyBuilder.setTransactionValidDuration(DurationConverter.toProtobuf(validDuration));
@@ -82,7 +82,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * Set the maximum transaction fee the operator (paying account) is willing to pay.
      *
      * @param maxTransactionFee the maximum transaction fee, in tinybars.
-     * @return {@code this}.
+     * @return {@code this}
      */
     public final T setMaxTransactionFee(Hbar maxTransactionFee) {
         bodyBuilder.setTransactionFee(maxTransactionFee.asTinybar());
@@ -96,7 +96,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * of 100 characters).
      *
      * @param memo any notes or descriptions for this transaction.
-     * @return {@code this}.
+     * @return {@code this}
      */
     public final T setTransactionMemo(String memo) {
         bodyBuilder.setMemo(memo);

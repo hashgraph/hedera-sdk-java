@@ -26,7 +26,7 @@ public final class FileAppendTransaction extends TransactionBuilder<FileAppendTr
      * <p>Set the ID of the file to append to. Required.
      *
      * @param fileId the ID of the file to append to.
-     * @return {@code this} for fluent API usage.
+     * @return {@code this}
      */
     public FileAppendTransaction setFileId(FileId fileId) {
         builder.setFileID(fileId.toProtobuf());

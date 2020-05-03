@@ -25,7 +25,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
      * true, then it must also sign any transfer into the account.
      *
      * @param key the key for this account.
-     * @return {@code this}.
+     * @return {@code this}
      */
     public AccountCreateTransaction setKey(Key key) {
         builder.setKey(key.toKeyProtobuf());
@@ -36,7 +36,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
      * Set the initial amount to transfer into this account.
      *
      * @param initialBalance the initial balance.
-     * @return {@code this}.
+     * @return {@code this}
      */
     public AccountCreateTransaction setInitialBalance(Hbar initialBalance) {
         builder.setInitialBalance(initialBalance.asTinybar());
@@ -52,7 +52,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
      * additional (small) fee any time your account sends money.
      *
      * @param sendRecordThreshold the threshold amount.
-     * @return {@code this}.
+     * @return {@code this}
      */
     public AccountCreateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
         builder.setSendRecordThreshold(sendRecordThreshold.asTinybar());
@@ -68,7 +68,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
      * additional (small) fee any time your account <b>receives</b> money.
      *
      * @param receiveRecordThreshold the threshold amount.
-     * @return {@code this}.
+     * @return {@code this}
      */
     public AccountCreateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
         builder.setReceiveRecordThreshold(receiveRecordThreshold.asTinybar());
@@ -82,7 +82,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
      * transfers to this account.
      *
      * @param receiveSignatureRequired true to require a signature when receiving hbars.
-     * @return {@code this}.
+     * @return {@code this}
      */
     public AccountCreateTransaction setReceiverSignatureRequired(boolean receiveSignatureRequired) {
         builder.setReceiverSigRequired(receiveSignatureRequired);
@@ -93,7 +93,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
      * Set the ID of the account to which this account is proxy staked.
      *
      * @param proxyAccountId the proxy account ID.
-     * @return {@code this}.
+     * @return {@code this}
      */
     public AccountCreateTransaction setProxyAccountId(AccountId proxyAccountId) {
         builder.setProxyAccountID(proxyAccountId.toProtobuf());
@@ -110,7 +110,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
      * <p>This is defaulted to 3 months by the SDK.
      *
      * @param autoRenewPeriod the auto renew period for this account.
-     * @return {@code this}.
+     * @return {@code this}
      */
     public AccountCreateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));

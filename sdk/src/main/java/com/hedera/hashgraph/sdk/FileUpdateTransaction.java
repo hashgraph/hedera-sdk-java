@@ -71,7 +71,7 @@ public final class FileUpdateTransaction extends TransactionBuilder<FileUpdateTr
      * {@link FileAppendTransaction#setContents(byte[])} for the remaining chunks.
      *
      * @param bytes the bytes to replace the contents of the file with.
-     * @return {@code this} for fluent API usage.
+     * @return {@code this}
      * @see #setContents(String) for an overload which takes a {@link String}.
      * @see FileAppendTransaction if you merely want to add data to a file's existing contents.
      */
@@ -100,7 +100,7 @@ public final class FileUpdateTransaction extends TransactionBuilder<FileUpdateTr
      * {@link FileAppendTransaction#setContents(String)} for the remaining chunks.
      *
      * @param text the string to replace the contents of the file with.
-     * @return {@code this} for fluent API usage.
+     * @return {@code this}
      * @see #setContents(byte[]) for replacing the contents with arbitrary data.
      * @see FileAppendTransaction if you merely want to add data to a file's existing contents.
      */

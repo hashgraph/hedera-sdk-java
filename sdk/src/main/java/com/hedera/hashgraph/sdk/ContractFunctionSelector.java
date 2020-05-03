@@ -106,7 +106,7 @@ public final class ContractFunctionSelector {
      * {@see https://solidity.readthedocs.io/en/v0.5.9/types.html}
      *
      * @param typeName the name of the Solidity type for a parameter.
-     * @return {@code this} for fluent usage.
+     * @return {@code this}
      * @throws IllegalStateException if {@link #finish()} has already been called.
      */
     @SuppressWarnings({"NullableDereference"})

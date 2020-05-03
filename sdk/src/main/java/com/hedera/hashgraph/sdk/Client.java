@@ -175,7 +175,7 @@ public final class Client implements AutoCloseable {
      * <p>
      * The operator private key is used to sign all transactions executed by this client.
      *
-     * @return {@code this}.
+     * @return {@code this}
      */
     public Client setOperator(AccountId accountId, PrivateKey privateKey) {
         return setOperatorWith(accountId, privateKey.getPublicKey(), privateKey::sign);
@@ -204,7 +204,7 @@ public final class Client implements AutoCloseable {
      * {@link TransactionBuilder#setMaxTransactionFee(Hbar)} on every new transaction. The actual
      * fee assessed for a given transaction may be less than this value, but never greater.
      *
-     * @return {@code this}.
+     * @return {@code this}
      */
     public Client setMaxTransactionFee(Hbar maxTransactionFee) {
         if (maxTransactionFee.asTinybar() < 0) {
@@ -230,7 +230,7 @@ public final class Client implements AutoCloseable {
      * <p>
      * Set to 0 to disable automatic implicit payments.
      *
-     * @return {@code this}.
+     * @return {@code this}
      */
     public Client setMaxQueryPayment(Hbar maxQueryPayment) {
         if (maxQueryPayment.asTinybar() < 0) {

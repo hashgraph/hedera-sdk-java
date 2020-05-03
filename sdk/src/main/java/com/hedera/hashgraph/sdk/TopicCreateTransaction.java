@@ -4,6 +4,15 @@ import com.hedera.hashgraph.sdk.proto.ConsensusCreateTopicTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import org.threeten.bp.Duration;
 
+/**
+ * Create a topic to be used for consensus.
+ * <p>
+ * If an autoRenewAccount is specified, that account must also sign this transaction.
+ * <p>
+ * If an adminKey is specified, the adminKey must sign the transaction.
+ * <p>
+ * On success, the resulting TransactionReceipt contains the newly created TopicId.
+ */
 public final class TopicCreateTransaction extends TransactionBuilder<TopicCreateTransaction> {
     private final ConsensusCreateTopicTransactionBody.Builder builder;
 
@@ -16,7 +25,7 @@ public final class TopicCreateTransaction extends TransactionBuilder<TopicCreate
     /**
      * Set a short publicly visible memo on the new topic.
      *
-     * @return {@code this}.
+     * @return {@code this}
      */
     public TopicCreateTransaction setTopicMemo(String memo) {
         builder.setMemo(memo);
@@ -32,7 +41,7 @@ public final class TopicCreateTransaction extends TransactionBuilder<TopicCreate
      * If no adminKey is specified, updateTopic may only be used to extend the topic's expirationTime, and deleteTopic
      * is disallowed.
      *
-     * @return {@code this}.
+     * @return {@code this}
      */
     public TopicCreateTransaction setAdminKey(Key adminKey) {
         builder.setAdminKey(adminKey.toKeyProtobuf());
@@ -45,7 +54,7 @@ public final class TopicCreateTransaction extends TransactionBuilder<TopicCreate
      * Access control for submitMessage.
      * If unspecified, no access control is performed on ConsensusService.submitMessage (all submissions are allowed).
      *
-     * @return {@code this}.
+     * @return {@code this}
      */
     public TopicCreateTransaction setSubmitKey(Key submitKey) {
         builder.setSubmitKey(submitKey.toKeyProtobuf());
@@ -59,7 +68,7 @@ public final class TopicCreateTransaction extends TransactionBuilder<TopicCreate
      * automatically at the topic's expirationTime, if the autoRenewAccount is configured (once autoRenew functionality
      * is supported by HAPI).
      *
-     * @return {@code this}.
+     * @return {@code this}
      */
     public TopicCreateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
@@ -78,7 +87,7 @@ public final class TopicCreateTransaction extends TransactionBuilder<TopicCreate
      * <p>
      * If specified, there must be an adminKey and the autoRenewAccount must sign this transaction.
      *
-     * @return {@code this}.
+     * @return {@code this}
      */
     public TopicCreateTransaction setAutoRenewAccountId(AccountId autoRenewAccountId) {
         builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());

@@ -27,7 +27,7 @@ public final class TopicUpdateTransaction extends TransactionBuilder<TopicUpdate
     /**
      * Set the topic ID to update.
      *
-     * @return {@code this}.
+     * @return {@code this}
      */
     public TopicUpdateTransaction setTopicId(TopicId topicId) {
         builder.setTopicID(topicId.toProtobuf());
@@ -37,7 +37,7 @@ public final class TopicUpdateTransaction extends TransactionBuilder<TopicUpdate
     /**
      * Set a new memo for this topic.
      *
-     * @return {@code this}.
+     * @return {@code this}
      */
     public TopicUpdateTransaction setTopicMemo(String memo) {
         builder.setMemo(StringValue.of(memo));
@@ -47,7 +47,7 @@ public final class TopicUpdateTransaction extends TransactionBuilder<TopicUpdate
     /**
      * Clear the memo for this topic.
      *
-     * @return {@code this}.
+     * @return {@code this}
      */
     public TopicUpdateTransaction clearTopicMemo() {
         builder.setMemo(StringValue.of(""));
@@ -57,7 +57,7 @@ public final class TopicUpdateTransaction extends TransactionBuilder<TopicUpdate
     /**
      * Set a new admin key for this topic.
      *
-     * @return {@code this}.
+     * @return {@code this}
      */
     public TopicUpdateTransaction setAdminKey(Key adminKey) {
         builder.setAdminKey(adminKey.toKeyProtobuf());
@@ -67,7 +67,7 @@ public final class TopicUpdateTransaction extends TransactionBuilder<TopicUpdate
     /**
      * Clear the admin key for this topic.
      *
-     * @return {@code this}.
+     * @return {@code this}
      */
     public TopicUpdateTransaction clearAdminKey() {
         builder.setAdminKey(com.hedera.hashgraph.sdk.proto.Key.newBuilder()
@@ -80,7 +80,7 @@ public final class TopicUpdateTransaction extends TransactionBuilder<TopicUpdate
     /**
      * Set a new submit key for this topic.
      *
-     * @return {@code this}.
+     * @return {@code this}
      */
     public TopicUpdateTransaction setSubmitKey(Key submitKey) {
         builder.setSubmitKey(submitKey.toKeyProtobuf());
@@ -90,7 +90,7 @@ public final class TopicUpdateTransaction extends TransactionBuilder<TopicUpdate
     /**
      * Clear the submit key for this topic.
      *
-     * @return {@code this}.
+     * @return {@code this}
      */
     public TopicUpdateTransaction clearSubmitKey() {
         builder.setSubmitKey(com.hedera.hashgraph.sdk.proto.Key.newBuilder()
@@ -103,7 +103,7 @@ public final class TopicUpdateTransaction extends TransactionBuilder<TopicUpdate
     /**
      * Set a new auto renew period for this topic.
      *
-     * @return {@code this}.
+     * @return {@code this}
      */
     public TopicUpdateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
@@ -113,7 +113,7 @@ public final class TopicUpdateTransaction extends TransactionBuilder<TopicUpdate
     /**
      * Set a new auto renew account ID for this topic.
      *
-     * @return {@code this}.
+     * @return {@code this}
      */
     public TopicUpdateTransaction setAutoRenewAccountId(AccountId autoRenewAccountId) {
         builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
@@ -123,7 +123,7 @@ public final class TopicUpdateTransaction extends TransactionBuilder<TopicUpdate
     /**
      * Clear the auto renew account ID for this topic.
      *
-     * @return {@code this}.
+     * @return {@code this}
      */
     public TopicUpdateTransaction clearAutoRenewAccountId(AccountId autoRenewAccountId) {
         builder.setAutoRenewAccount(AccountID.getDefaultInstance());
