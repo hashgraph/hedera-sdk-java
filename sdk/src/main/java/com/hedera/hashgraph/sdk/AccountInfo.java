@@ -8,6 +8,9 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 
+/**
+ * Current information about an account, including the balance.
+ */
 public final class AccountInfo {
     /**
      * The account ID for which this information applies.

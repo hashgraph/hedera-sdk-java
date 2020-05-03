@@ -5,6 +5,9 @@ import com.hedera.hashgraph.sdk.proto.TopicID;
 
 import javax.annotation.Nonnegative;
 
+/**
+ * Unique identifier for a topic (used by the consensus service).
+ */
 public final class TopicId extends EntityId {
     public TopicId(@Nonnegative long num) {
         super(0, 0, num);

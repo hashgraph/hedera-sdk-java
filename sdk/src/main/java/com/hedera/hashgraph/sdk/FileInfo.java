@@ -8,6 +8,9 @@ import org.threeten.bp.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Current information for a file, including its size.
+ */
 public final class FileInfo {
     /**
      * The ID of the file for which information is requested.

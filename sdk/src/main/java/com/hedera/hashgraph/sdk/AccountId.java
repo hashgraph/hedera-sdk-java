@@ -5,6 +5,9 @@ import com.hedera.hashgraph.sdk.proto.AccountID;
 
 import javax.annotation.Nonnegative;
 
+/**
+ * The ID for an a crypto-currency account on Hedera.
+ */
 public final class AccountId extends EntityId {
     public AccountId(@Nonnegative long num) {
         super(0, 0, num);

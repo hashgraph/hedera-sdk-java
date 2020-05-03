@@ -5,6 +5,9 @@ import com.hedera.hashgraph.sdk.proto.FileID;
 
 import javax.annotation.Nonnegative;
 
+/**
+ * The ID for a file on Hedera.
+ */
 public final class FileId extends EntityId {
     /**
      * The public node address book for the current network.

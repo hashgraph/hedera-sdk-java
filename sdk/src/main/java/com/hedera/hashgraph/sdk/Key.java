@@ -3,6 +3,12 @@ package com.hedera.hashgraph.sdk;
 import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
+/**
+ * A common base for the signing authority or key that entities in Hedera may have.
+ *
+ * @see KeyList
+ * @see PublicKey
+ */
 public abstract class Key {
     static final ASN1ObjectIdentifier ID_ED25519 = new ASN1ObjectIdentifier("1.3.101.112");
 

@@ -8,6 +8,9 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 
+/**
+ * Current information on the smart contract instance, including its balance.
+ */
 public final class ContractInfo {
     /**
      * ID of the contract instance, in the format used in transactions.

@@ -5,6 +5,9 @@ import com.hedera.hashgraph.sdk.proto.ContractID;
 
 import javax.annotation.Nonnegative;
 
+/**
+ * The ID for a smart contract instance on Hedera.
+ */
 public final class ContractId extends EntityId {
     public ContractId(@Nonnegative long num) {
         super(0, 0, num);

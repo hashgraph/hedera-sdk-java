@@ -5,14 +5,16 @@ import com.hedera.hashgraph.sdk.proto.ContractCreateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import org.threeten.bp.Duration;
 
-/* Start a new smart contract instance. After the instance is created,
+/**
+ * Start a new smart contract instance.
+ * After the instance is created,
  * the ContractID for it is in the receipt.
- *
+ * <p>
  * The instance will exist for autoRenewPeriod seconds. When that is reached, it will renew itself for another
  * autoRenewPeriod seconds by charging its associated cryptocurrency account (which it creates here).
  * If it has insufficient cryptocurrency to extend that long, it will extend as long as it can.
  * If its balance is zero, the instance will be deleted.
- *
+ * <p>
  * A smart contract instance normally enforces rules, so "the code is law". For example, an
  * ERC-20 contract prevents a transfer from being undone without a signature by the recipient of the transfer.
  * This is always enforced if the contract instance was created with the adminKeys being null.
@@ -24,20 +26,20 @@ import org.threeten.bp.Duration;
  * The admin keys can also be used to change the autoRenewPeriod, and change the adminKeys field itself.
  * The API currently does not implement this ability. But it does allow the adminKeys field to be set and
  * queried, and will in the future implement such admin abilities for any instance that has a non-null adminKeys.
- *
+ * <p>
  * If this constructor stores information, it is charged gas to store it. There is a fee in hbars to
  * maintain that storage until the expiration time, and that fee is added as part of the transaction fee.
- *
+ * <p>
  * An entity (account, file, or smart contract instance) must be created in a particular realm.
  * If the realmID is left null, then a new realm will be created with the given admin key. If a new realm has
  * a null adminKey, then anyone can create/modify/delete entities in that realm. But if an admin key is given,
  * then any transaction to create/modify/delete an entity in that realm must be signed by that key,
  * though anyone can still call functions on smart contract instances that exist in that realm.
  * A realm ceases to exist when everything within it has expired and no longer exists.
- *
+ * <p>
  * The current API ignores shardID, realmID, and newRealmAdminKey, and creates everything in shard 0 and realm 0,
  * with a null key. Future versions of the API will support multiple realms and multiple shards.
- *
+ * <p>
  * The optional memo field can contain a string whose length is up to 100 bytes. That is the size after Unicode
  * NFD then UTF-8 conversion. This field can be used to describe the smart contract. It could also be used for
  * other purposes. One recommended purpose is to hold a hexadecimal string that is the SHA-384 hash of a
@@ -58,10 +60,10 @@ public final class ContractCreateTransaction extends TransactionBuilder<Contract
 
     /**
      * Sets the file containing the smart contract byte code.
-     *
+     * <p>
      * A copy will be made and held by the contract instance, and have the same expiration time as
      * the instance.
-     *
+     * <p>
      * The file must be the ASCII hexadecimal representation of the smart contract bytecode.
      *
      * @return {@code this}
@@ -108,10 +110,10 @@ public final class ContractCreateTransaction extends TransactionBuilder<Contract
 
     /**
      * Sets the ID of the account to which this account is proxy staked.
-     *
+     * <p>
      * If proxyAccountID is null, or is an invalid account, or is an account that isn't a node,
      * then this account is automatically proxy staked to a node chosen by the network, but without earning payments.
-     *
+     * <p>
      * If the proxyAccountID account refuses to accept proxy staking , or if it is not currently running a node,
      * then it will behave as if  proxyAccountID was null.
      *

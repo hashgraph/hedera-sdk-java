@@ -1,3 +1,4 @@
+import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
@@ -69,8 +70,8 @@ class TopicWithAdminKeyExample {
         initialAdminKeys = new PrivateKey[3];
         J8Arrays.setAll(initialAdminKeys, i -> PrivateKey.generate());
 
-        KeyList thresholdKey = KeyList.withThreshold(2)
-            .addAll(initialAdminKeys);
+        KeyList thresholdKey = KeyList.withThreshold(2);
+        Collections.addAll(thresholdKey, initialAdminKeys);
 
         Transaction transaction = new TopicCreateTransaction()
             .setTopicMemo("demo topic")
@@ -96,8 +97,8 @@ class TopicWithAdminKeyExample {
         PrivateKey[] newAdminKeys = new PrivateKey[4];
         J8Arrays.setAll(newAdminKeys, i -> PrivateKey.generate());
 
-        KeyList thresholdKey = KeyList.withThreshold(3)
-            .addAll(newAdminKeys);
+        KeyList thresholdKey = KeyList.withThreshold(3);
+        Collections.addAll(thresholdKey, newAdminKeys);
 
         Transaction transaction = new TopicUpdateTransaction()
             .setTopicId(topicId)

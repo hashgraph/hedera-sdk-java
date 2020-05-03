@@ -5,6 +5,9 @@ import com.hedera.hashgraph.sdk.proto.FileUpdateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import org.threeten.bp.Instant;
 
+/**
+ * Updates a file by submitting the transaction.
+ */
 public final class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransaction> {
     private final FileUpdateTransactionBody.Builder builder;
 

@@ -1,6 +1,3 @@
-import java.util.Objects;
-import java.util.concurrent.TimeoutException;
-
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
@@ -14,8 +11,11 @@ import com.hedera.hashgraph.sdk.KeyList;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
-
 import io.github.cdimascio.dotenv.Dotenv;
+
+import java.util.Collections;
+import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 
 public final class CreateAccountThresholdKeyExample {
 
@@ -46,9 +46,12 @@ public final class CreateAccountThresholdKeyExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
+        // require 2 of the 3 keys we generated to sign on anything modifying this account
+        var tKey = KeyList.withThreshold(2);
+        Collections.addAll(tKey, keys);
+
         TransactionId txId = new AccountCreateTransaction()
-            // require 2 of the 3 keys we generated to sign on anything modifying this account
-            .setKey(KeyList.withThreshold(2).addAll(keys))
+            .setKey(tKey)
             .setInitialBalance(new Hbar(10))
             .execute(client);
 
