@@ -10,6 +10,9 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 
+/**
+ * Current state of a topic.
+ */
 public final class TopicInfo {
     /**
      * The ID of the topic for which information is requested.

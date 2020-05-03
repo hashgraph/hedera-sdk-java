@@ -7,6 +7,16 @@ import com.hedera.hashgraph.sdk.proto.KeyList;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import org.threeten.bp.Duration;
 
+/**
+ * Update a topic.
+ * <p>
+ * If there is no adminKey, the only authorized update (available to anyone) is to extend the expirationTime.
+ * Otherwise transaction must be signed by the adminKey.
+ * <p>
+ * If an adminKey is updated, the transaction must be signed by the pre-update adminKey and post-update adminKey.
+ * <p>
+ * If a new autoRenewAccount is specified (not just being removed), that account must also sign the transaction.
+ */
 public final class TopicUpdateTransaction extends TransactionBuilder<TopicUpdateTransaction> {
     private final ConsensusUpdateTopicTransactionBody.Builder builder;
 

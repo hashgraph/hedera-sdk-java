@@ -8,6 +8,11 @@ import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
 
+/**
+ * Retrieve the latest state of a topic.
+ * <p>
+ * This method is unrestricted and allowed on any topic by any payer account.
+ */
 public final class TopicInfoQuery extends QueryBuilder<TopicInfo, TopicInfoQuery> {
     private final ConsensusGetTopicInfoQuery.Builder builder;
 
@@ -15,6 +20,11 @@ public final class TopicInfoQuery extends QueryBuilder<TopicInfo, TopicInfoQuery
         builder = ConsensusGetTopicInfoQuery.newBuilder();
     }
 
+    /**
+     * Set the topic to retrieve info about (the parameters and running state of).
+     *
+     * @return {@code this}
+     */
     public TopicInfoQuery setTopicId(TopicId topicId) {
         builder.setTopicID(topicId.toProtobuf());
 
