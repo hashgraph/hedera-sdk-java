@@ -8,6 +8,8 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 
+import java.util.Arrays;
+
 import static java8.util.concurrent.CompletableFuture.completedFuture;
 import static java8.util.concurrent.CompletableFuture.failedFuture;
 
@@ -70,6 +72,29 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
         return new TransactionId(
             AccountId.fromProtobuf(transactionID.getAccountID()),
             InstantConverter.fromProtobuf(transactionID.getTransactionValidStart()));
+    }
+
+    public static TransactionId fromString(String s) {
+        System.out.println("#fromString ? " + s);
+        var parts = s.split("@", 2);
+
+        if (parts.length != 2) {
+            throw new IllegalArgumentException("expecting {account}@{seconds}.{nanos}");
+        }
+
+        var accountId = AccountId.fromString(parts[0]);
+
+        var validStartParts = parts[1].split("\\.", 2);
+
+        if (validStartParts.length != 2) {
+            throw new IllegalArgumentException("expecting {account}@{seconds}.{nanos}");
+        }
+
+        var validStart = Instant.ofEpochSecond(
+            Long.parseLong(validStartParts[0]),
+            Long.parseLong(validStartParts[1]));
+
+        return new TransactionId(accountId, validStart);
     }
 
     public static TransactionId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
