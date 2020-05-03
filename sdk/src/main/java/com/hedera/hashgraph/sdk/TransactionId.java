@@ -108,7 +108,7 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
             .setTransactionId(this)
             .executeAsync(client)
             .thenCompose(receipt -> {
-                if (receipt.status != Status.Success) {
+                if (receipt.status != Status.SUCCESS) {
                     return failedFuture(new HederaReceiptStatusException(this, receipt));
                 }
 

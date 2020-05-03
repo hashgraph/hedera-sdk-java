@@ -72,13 +72,13 @@ public final class TransactionReceiptQuery
                 Status.valueOf(response.getTransactionGetReceipt().getReceipt().getStatus());
 
         switch (receiptStatus) {
-            case Busy:
+            case BUSY:
                 // node is busy
-            case Unknown:
+            case UNKNOWN:
                 // still in the node's queue
-            case Ok:
+            case OK:
                 // accepted but has not reached consensus
-            case ReceiptNotFound:
+            case RECEIPT_NOT_FOUND:
                 // has reached consensus but not generated
                 return true;
 

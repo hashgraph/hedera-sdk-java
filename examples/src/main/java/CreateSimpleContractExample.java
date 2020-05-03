@@ -113,7 +113,7 @@ public final class CreateSimpleContractExample {
 
         TransactionReceipt contractDeleteResult = contractDeleteTxnId.getReceipt(client);
 
-        if (contractDeleteResult.status != Status.Success) {
+        if (contractDeleteResult.status != Status.SUCCESS) {
             System.out.println("error deleting contract: " + contractDeleteResult.status);
             return;
         }

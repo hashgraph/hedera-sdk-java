@@ -80,7 +80,7 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
                     .thenCompose((v) -> executeAsync(client, attempt + 1));
             }
 
-            if (responseStatus != Status.Ok) {
+            if (responseStatus != Status.OK) {
                 // request to hedera failed in a non-recoverable way
                 return CompletableFuture.<O>failedFuture(
                     new HederaPreCheckStatusException(
@@ -130,6 +130,6 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
      * when the pre-check status is {@code BUSY}.
      */
     boolean shouldRetry(Status status, ResponseT response) {
-        return status == Status.Busy;
+        return status == Status.BUSY;
     }
 }
