@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ContractGetInfoResponse;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
@@ -104,6 +105,28 @@ public final class ContractInfo {
         );
     }
 
+    public static ContractInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        return fromProtobuf(ContractGetInfoResponse.ContractInfo.parseFrom(bytes).toBuilder().build());
+    }
+
+    ContractGetInfoResponse.ContractInfo toProtobuf() {
+        var contractInfoBuilder = ContractGetInfoResponse.ContractInfo.newBuilder()
+            .setContractID(this.contractId.toProtobuf())
+            .setAccountID(this.accountId.toProtobuf())
+            .setContractAccountID(this.contractAccountId)
+            .setExpirationTime(InstantConverter.toProtobuf(this.expirationTime))
+            .setAutoRenewPeriod(DurationConverter.toProtobuf(this.autoRenewPeriod))
+            .setStorage(this.storage)
+            .setMemo(this.contractMemo)
+            .setBalance(this.balance.asTinybar());
+
+        if (this.adminKey != null) {
+            contractInfoBuilder.setAdminKey(this.adminKey.toKeyProtobuf());
+        }
+
+        return contractInfoBuilder.build();
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -117,5 +140,9 @@ public final class ContractInfo {
             .add("contractMemo", contractMemo)
             .add("balance", balance)
             .toString();
+    }
+
+    public byte[] toBytes() {
+        return this.toProtobuf().toByteArray();
     }
 }
