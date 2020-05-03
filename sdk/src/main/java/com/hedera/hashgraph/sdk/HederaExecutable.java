@@ -82,8 +82,6 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
 
             if (responseStatus != Status.Ok) {
                 // request to hedera failed in a non-recoverable way
-                System.err.println("response status failed with " + responseStatus);
-
                 return CompletableFuture.<O>failedFuture(
                     new HederaPreCheckStatusException(
                         responseStatus, getTransactionId()));
