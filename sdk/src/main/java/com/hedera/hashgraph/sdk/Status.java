@@ -2,14 +2,27 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
 
+/**
+ * Returned in {@link TransactionReceipt}, {@link HederaPreCheckStatusException}
+ * and {@link HederaReceiptStatusException}.
+ * <p>
+ * The success variant is {@link #SUCCESS} which is what a {@link TransactionReceipt} will contain for a
+ * successful transaction.
+ */
 public enum Status {
-    /** The transaction passed the pre-check validation. */
+    /**
+     * The transaction passed the pre-check validation.
+     */
     OK(ResponseCodeEnum.OK),
 
-    /** For any error not handled by specific error codes listed below. */
+    /**
+     * For any error not handled by specific error codes listed below.
+     */
     INVALID_TRANSACTION(ResponseCodeEnum.INVALID_TRANSACTION),
 
-    /** Payer account does not exist. */
+    /**
+     * Payer account does not exist.
+     */
     PAYER_ACCOUNT_NOT_FOUND(ResponseCodeEnum.PAYER_ACCOUNT_NOT_FOUND),
 
     /**
@@ -24,22 +37,34 @@ public enum Status {
      */
     TRANSACTION_EXPIRED(ResponseCodeEnum.TRANSACTION_EXPIRED),
 
-    /** Transaction start time is greater than current consensus time */
+    /**
+     * Transaction start time is greater than current consensus time
+     */
     INVALID_TRANSACTION_START(ResponseCodeEnum.INVALID_TRANSACTION_START),
 
-    /** valid transaction duration is a positive non zero number that does not exceed 120 seconds */
+    /**
+     * valid transaction duration is a positive non zero number that does not exceed 120 seconds
+     */
     INVALID_TRANSACTION_DURATION(ResponseCodeEnum.INVALID_TRANSACTION_DURATION),
 
-    /** The transaction signature is not valid */
+    /**
+     * The transaction signature is not valid
+     */
     INVALID_SIGNATURE(ResponseCodeEnum.INVALID_SIGNATURE),
 
-    /** Transaction memo size exceeded 100 bytes */
+    /**
+     * Transaction memo size exceeded 100 bytes
+     */
     MEMO_TOO_LONG(ResponseCodeEnum.MEMO_TOO_LONG),
 
-    /** The fee provided in the transaction is insufficient for this type of transaction */
+    /**
+     * The fee provided in the transaction is insufficient for this type of transaction
+     */
     INSUFFICIENT_TX_FEE(ResponseCodeEnum.INSUFFICIENT_TX_FEE),
 
-    /** The payer account has insufficient cryptocurrency to pay the transaction fee */
+    /**
+     * The payer account has insufficient cryptocurrency to pay the transaction fee
+     */
     INSUFFICIENT_PAYER_BALANCE(ResponseCodeEnum.INSUFFICIENT_PAYER_BALANCE),
 
     /**
@@ -48,37 +73,59 @@ public enum Status {
      */
     DUPLICATE_TRANSACTION(ResponseCodeEnum.DUPLICATE_TRANSACTION),
 
-    /** If API is throttled out */
+    /**
+     * If API is throttled out
+     */
     BUSY(ResponseCodeEnum.BUSY),
 
-    /** The API is not currently supported */
+    /**
+     * The API is not currently supported
+     */
     NOT_SUPPORTED(ResponseCodeEnum.NOT_SUPPORTED),
 
-    /** The file id is invalid or does not exist */
+    /**
+     * The file id is invalid or does not exist
+     */
     INVALID_FILE_ID(ResponseCodeEnum.INVALID_FILE_ID),
 
-    /** The account id is invalid or does not exist */
+    /**
+     * The account id is invalid or does not exist
+     */
     INVALID_ACCOUNT_ID(ResponseCodeEnum.INVALID_ACCOUNT_ID),
 
-    /** The contract id is invalid or does not exist */
+    /**
+     * The contract id is invalid or does not exist
+     */
     INVALID_CONTRACT_ID(ResponseCodeEnum.INVALID_CONTRACT_ID),
 
-    /** Transaction id is not valid */
+    /**
+     * Transaction id is not valid
+     */
     INVALID_TRANSACTION_ID(ResponseCodeEnum.INVALID_TRANSACTION_ID),
 
-    /** Receipt for given transaction id does not exist */
+    /**
+     * Receipt for given transaction id does not exist
+     */
     RECEIPT_NOT_FOUND(ResponseCodeEnum.RECEIPT_NOT_FOUND),
 
-    /** Record for given transaction id does not exist */
+    /**
+     * Record for given transaction id does not exist
+     */
     RECORD_NOT_FOUND(ResponseCodeEnum.RECORD_NOT_FOUND),
 
-    /** The solidity id is invalid or entity with this solidity id does not exist */
+    /**
+     * The solidity id is invalid or entity with this solidity id does not exist
+     */
     INVALID_SOLIDITY_ID(ResponseCodeEnum.INVALID_SOLIDITY_ID),
 
-    /** Transaction hasn't yet reached consensus, or has already expired */
+    /**
+     * Transaction hasn't yet reached consensus, or has already expired
+     */
     UNKNOWN(ResponseCodeEnum.UNKNOWN),
 
-    /** The transaction succeeded */
+    /**
+     * The transaction succeeded
+     */
     SUCCESS(ResponseCodeEnum.SUCCESS),
 
     /**
@@ -86,19 +133,29 @@ public enum Status {
      */
     FAIL_INVALID(ResponseCodeEnum.FAIL_INVALID),
 
-    /** There was a system error while performing fee calculation, reserved for future. */
+    /**
+     * There was a system error while performing fee calculation, reserved for future.
+     */
     FAIL_FEE(ResponseCodeEnum.FAIL_FEE),
 
-    /** There was a system error while performing balance checks, reserved for future. */
+    /**
+     * There was a system error while performing balance checks, reserved for future.
+     */
     FAIL_BALANCE(ResponseCodeEnum.FAIL_BALANCE),
 
-    /** Key not provided in the transaction body */
+    /**
+     * Key not provided in the transaction body
+     */
     KEY_REQUIRED(ResponseCodeEnum.KEY_REQUIRED),
 
-    /** Unsupported algorithm/encoding used for keys in the transaction */
+    /**
+     * Unsupported algorithm/encoding used for keys in the transaction
+     */
     BAD_ENCODING(ResponseCodeEnum.BAD_ENCODING),
 
-    /** When the account balance is not sufficient for the transfer */
+    /**
+     * When the account balance is not sufficient for the transfer
+     */
     INSUFFICIENT_ACCOUNT_BALANCE(ResponseCodeEnum.INSUFFICIENT_ACCOUNT_BALANCE),
 
     /**
@@ -106,16 +163,24 @@ public enum Status {
      */
     INVALID_SOLIDITY_ADDRESS(ResponseCodeEnum.INVALID_SOLIDITY_ADDRESS),
 
-    /** Not enough gas was supplied to execute transaction */
+    /**
+     * Not enough gas was supplied to execute transaction
+     */
     INSUFFICIENT_GAS(ResponseCodeEnum.INSUFFICIENT_GAS),
 
-    /** contract byte code size is over the limit */
+    /**
+     * contract byte code size is over the limit
+     */
     CONTRACT_SIZE_LIMIT_EXCEEDED(ResponseCodeEnum.CONTRACT_SIZE_LIMIT_EXCEEDED),
 
-    /** local execution (query) is requested for a function which changes state */
+    /**
+     * local execution (query) is requested for a function which changes state
+     */
     LOCAL_CALL_MODIFICATION_EXCEPTION(ResponseCodeEnum.LOCAL_CALL_MODIFICATION_EXCEPTION),
 
-    /** Contract REVERT OPCODE executed */
+    /**
+     * Contract REVERT OPCODE executed
+     */
     CONTRACT_REVERT_EXECUTED(ResponseCodeEnum.CONTRACT_REVERT_EXECUTED),
 
     /**
@@ -129,49 +194,79 @@ public enum Status {
      */
     INVALID_RECEIVING_NODE_ACCOUNT(ResponseCodeEnum.INVALID_RECEIVING_NODE_ACCOUNT),
 
-    /** Header is missing in Query request */
+    /**
+     * Header is missing in Query request
+     */
     MISSING_QUERY_HEADER(ResponseCodeEnum.MISSING_QUERY_HEADER),
 
-    /** The update of the account failed */
+    /**
+     * The update of the account failed
+     */
     ACCOUNT_UPDATE_FAILED(ResponseCodeEnum.ACCOUNT_UPDATE_FAILED),
 
-    /** Provided key encoding was not supported by the system */
+    /**
+     * Provided key encoding was not supported by the system
+     */
     INVALID_KEY_ENCODING(ResponseCodeEnum.INVALID_KEY_ENCODING),
 
-    /** null solidity address */
+    /**
+     * null solidity address
+     */
     NULL_SOLIDITY_ADDRESS(ResponseCodeEnum.NULL_SOLIDITY_ADDRESS),
 
-    /** update of the contract failed */
+    /**
+     * update of the contract failed
+     */
     CONTRACT_UPDATE_FAILED(ResponseCodeEnum.CONTRACT_UPDATE_FAILED),
 
-    /** the query header is invalid */
+    /**
+     * the query header is invalid
+     */
     INVALID_QUERY_HEADER(ResponseCodeEnum.INVALID_QUERY_HEADER),
 
-    /** Invalid fee submitted */
+    /**
+     * Invalid fee submitted
+     */
     INVALID_FEE_SUBMITTED(ResponseCodeEnum.INVALID_FEE_SUBMITTED),
 
-    /** Payer signature is invalid */
+    /**
+     * Payer signature is invalid
+     */
     INVALID_PAYER_SIGNATURE(ResponseCodeEnum.INVALID_PAYER_SIGNATURE),
 
-    /** The keys were not provided in the request. */
+    /**
+     * The keys were not provided in the request.
+     */
     KEY_NOT_PROVIDED(ResponseCodeEnum.KEY_NOT_PROVIDED),
 
-    /** Expiration time provided in the transaction was invalid. */
+    /**
+     * Expiration time provided in the transaction was invalid.
+     */
     INVALID_EXPIRATION_TIME(ResponseCodeEnum.INVALID_EXPIRATION_TIME),
 
-    /** WriteAccess Control Keys are not provided for the file */
+    /**
+     * WriteAccess Control Keys are not provided for the file
+     */
     NO_WACL_KEY(ResponseCodeEnum.NO_WACL_KEY),
 
-    /** The contents of file are provided as empty. */
+    /**
+     * The contents of file are provided as empty.
+     */
     FILE_CONTENT_EMPTY(ResponseCodeEnum.FILE_CONTENT_EMPTY),
 
-    /** The crypto transfer credit and debit do not sum equal to 0 */
+    /**
+     * The crypto transfer credit and debit do not sum equal to 0
+     */
     INVALID_ACCOUNT_AMOUNTS(ResponseCodeEnum.INVALID_ACCOUNT_AMOUNTS),
 
-    /** Transaction body provided is empty */
+    /**
+     * Transaction body provided is empty
+     */
     EMPTY_TRANSACTION_BODY(ResponseCodeEnum.EMPTY_TRANSACTION_BODY),
 
-    /** Invalid transaction body provided */
+    /**
+     * Invalid transaction body provided
+     */
     INVALID_TRANSACTION_BODY(ResponseCodeEnum.INVALID_TRANSACTION_BODY),
 
     /**
@@ -187,52 +282,84 @@ public enum Status {
      */
     INVALID_SIGNATURE_COUNT_MISMATCHING_KEY(ResponseCodeEnum.INVALID_SIGNATURE_COUNT_MISMATCHING_KEY),
 
-    /** the claim body is empty */
+    /**
+     * the claim body is empty
+     */
     EMPTY_CLAIM_BODY(ResponseCodeEnum.EMPTY_CLAIM_BODY),
 
-    /** the hash for the claim is empty */
+    /**
+     * the hash for the claim is empty
+     */
     EMPTY_CLAIM_HASH(ResponseCodeEnum.EMPTY_CLAIM_HASH),
 
-    /** the key list is empty */
+    /**
+     * the key list is empty
+     */
     EMPTY_CLAIM_KEYS(ResponseCodeEnum.EMPTY_CLAIM_KEYS),
 
-    /** the size of the claim hash is not 48 bytes */
+    /**
+     * the size of the claim hash is not 48 bytes
+     */
     INVALID_CLAIM_HASH_SIZE(ResponseCodeEnum.INVALID_CLAIM_HASH_SIZE),
 
-    /** the query body is empty */
+    /**
+     * the query body is empty
+     */
     EMPTY_QUERY_BODY(ResponseCodeEnum.EMPTY_QUERY_BODY),
 
-    /** the crypto claim query is empty */
+    /**
+     * the crypto claim query is empty
+     */
     EMPTY_CLAIM_QUERY(ResponseCodeEnum.EMPTY_CLAIM_QUERY),
 
-    /** the crypto claim doesn't exists in the file system. It expired or was never persisted. */
+    /**
+     * the crypto claim doesn't exists in the file system. It expired or was never persisted.
+     */
     CLAIM_NOT_FOUND(ResponseCodeEnum.CLAIM_NOT_FOUND),
 
-    /** the account id passed has not yet been created. */
+    /**
+     * the account id passed has not yet been created.
+     */
     ACCOUNT_ID_DOES_NOT_EXIST(ResponseCodeEnum.ACCOUNT_ID_DOES_NOT_EXIST),
 
-    /** the claim hash already exists */
+    /**
+     * the claim hash already exists
+     */
     CLAIM_ALREADY_EXISTS(ResponseCodeEnum.CLAIM_ALREADY_EXISTS),
 
-    /** File WACL keys are invalid */
+    /**
+     * File WACL keys are invalid
+     */
     INVALID_FILE_WACL(ResponseCodeEnum.INVALID_FILE_WACL),
 
-    /** Serialization failure */
+    /**
+     * Serialization failure
+     */
     SERIALIZATION_FAILED(ResponseCodeEnum.SERIALIZATION_FAILED),
 
-    /** The size of the Transaction is greater than transactionMaxBytes */
+    /**
+     * The size of the Transaction is greater than transactionMaxBytes
+     */
     TRANSACTION_OVERSIZE(ResponseCodeEnum.TRANSACTION_OVERSIZE),
 
-    /** The Transaction has more than 50 levels */
+    /**
+     * The Transaction has more than 50 levels
+     */
     TRANSACTION_TOO_MANY_LAYERS(ResponseCodeEnum.TRANSACTION_TOO_MANY_LAYERS),
 
-    /** Contract is marked as deleted */
+    /**
+     * Contract is marked as deleted
+     */
     CONTRACT_DELETED(ResponseCodeEnum.CONTRACT_DELETED),
 
-    /** the platform node is either disconnected or lagging behind. */
+    /**
+     * the platform node is either disconnected or lagging behind.
+     */
     PLATFORM_NOT_ACTIVE(ResponseCodeEnum.PLATFORM_NOT_ACTIVE),
 
-    /** one public key matches more than one prefixes on the signature map */
+    /**
+     * one public key matches more than one prefixes on the signature map
+     */
     KEY_PREFIX_MISMATCH(ResponseCodeEnum.KEY_PREFIX_MISMATCH),
 
     /**
@@ -241,22 +368,34 @@ public enum Status {
      */
     PLATFORM_TRANSACTION_NOT_CREATED(ResponseCodeEnum.PLATFORM_TRANSACTION_NOT_CREATED),
 
-    /** auto renewal period is not a positive number of seconds */
+    /**
+     * auto renewal period is not a positive number of seconds
+     */
     INVALID_RENEWAL_PERIOD(ResponseCodeEnum.INVALID_RENEWAL_PERIOD),
 
-    /** the response code when a smart contract id is passed for a crypto API request */
+    /**
+     * the response code when a smart contract id is passed for a crypto API request
+     */
     INVALID_PAYER_ACCOUNT_ID(ResponseCodeEnum.INVALID_PAYER_ACCOUNT_ID),
 
-    /** the account has been marked as deleted */
+    /**
+     * the account has been marked as deleted
+     */
     ACCOUNT_DELETED(ResponseCodeEnum.ACCOUNT_DELETED),
 
-    /** the file has been marked as deleted */
+    /**
+     * the file has been marked as deleted
+     */
     FILE_DELETED(ResponseCodeEnum.FILE_DELETED),
 
-    /** same accounts repeated in the transfer account list */
+    /**
+     * same accounts repeated in the transfer account list
+     */
     ACCOUNT_REPEATED_IN_ACCOUNT_AMOUNTS(ResponseCodeEnum.ACCOUNT_REPEATED_IN_ACCOUNT_AMOUNTS),
 
-    /** attempting to set negative balance value for crypto account */
+    /**
+     * attempting to set negative balance value for crypto account
+     */
     SETTING_NEGATIVE_ACCOUNT_BALANCE(ResponseCodeEnum.SETTING_NEGATIVE_ACCOUNT_BALANCE),
 
     /**
@@ -271,7 +410,9 @@ public enum Status {
      */
     OBTAINER_SAME_CONTRACT_ID(ResponseCodeEnum.OBTAINER_SAME_CONTRACT_ID),
 
-    /** transferAccountId or transferContractId specified for contract delete does not exist */
+    /**
+     * transferAccountId or transferContractId specified for contract delete does not exist
+     */
     OBTAINER_DOES_NOT_EXIST(ResponseCodeEnum.OBTAINER_DOES_NOT_EXIST),
 
     /**
@@ -280,10 +421,14 @@ public enum Status {
      */
     MODIFYING_IMMUTABLE_CONTRACT(ResponseCodeEnum.MODIFYING_IMMUTABLE_CONTRACT),
 
-    /** Unexpected exception thrown by file system functions */
+    /**
+     * Unexpected exception thrown by file system functions
+     */
     FILE_SYSTEM_EXCEPTION(ResponseCodeEnum.FILE_SYSTEM_EXCEPTION),
 
-    /** the duration is not a subset of [MINIMUM_AUTORENEW_DURATION,MAXIMUM_AUTORENEW_DURATION] */
+    /**
+     * the duration is not a subset of [MINIMUM_AUTORENEW_DURATION,MAXIMUM_AUTORENEW_DURATION]
+     */
     AUTORENEW_DURATION_NOT_IN_RANGE(ResponseCodeEnum.AUTORENEW_DURATION_NOT_IN_RANGE),
 
     /**
@@ -292,19 +437,29 @@ public enum Status {
      */
     ERROR_DECODING_BYTESTRING(ResponseCodeEnum.ERROR_DECODING_BYTESTRING),
 
-    /** File to create a smart contract was of length zero */
+    /**
+     * File to create a smart contract was of length zero
+     */
     CONTRACT_FILE_EMPTY(ResponseCodeEnum.CONTRACT_FILE_EMPTY),
 
-    /** Bytecode for smart contract is of length zero */
+    /**
+     * Bytecode for smart contract is of length zero
+     */
     CONTRACT_BYTECODE_EMPTY(ResponseCodeEnum.CONTRACT_BYTECODE_EMPTY),
 
-    /** Attempt to set negative initial balance */
+    /**
+     * Attempt to set negative initial balance
+     */
     INVALID_INITIAL_BALANCE(ResponseCodeEnum.INVALID_INITIAL_BALANCE),
 
-    /** attempt to set negative receive record threshold */
+    /**
+     * attempt to set negative receive record threshold
+     */
     INVALID_RECEIVE_RECORD_THRESHOLD(ResponseCodeEnum.INVALID_RECEIVE_RECORD_THRESHOLD),
 
-    /** attempt to set negative send record threshold */
+    /**
+     * attempt to set negative send record threshold
+     */
     INVALID_SEND_RECORD_THRESHOLD(ResponseCodeEnum.INVALID_SEND_RECORD_THRESHOLD),
 
     /**
@@ -313,40 +468,64 @@ public enum Status {
      */
     ACCOUNT_IS_NOT_GENESIS_ACCOUNT(ResponseCodeEnum.ACCOUNT_IS_NOT_GENESIS_ACCOUNT),
 
-    /** The fee payer account doesn't have permission to submit such Transaction */
+    /**
+     * The fee payer account doesn't have permission to submit such Transaction
+     */
     PAYER_ACCOUNT_UNAUTHORIZED(ResponseCodeEnum.PAYER_ACCOUNT_UNAUTHORIZED),
 
-    /** FreezeTransactionBody is invalid */
+    /**
+     * FreezeTransactionBody is invalid
+     */
     INVALID_FREEZE_TRANSACTION_BODY(ResponseCodeEnum.INVALID_FREEZE_TRANSACTION_BODY),
 
-    /** FreezeTransactionBody does not exist */
+    /**
+     * FreezeTransactionBody does not exist
+     */
     FREEZE_TRANSACTION_BODY_NOT_FOUND(ResponseCodeEnum.FREEZE_TRANSACTION_BODY_NOT_FOUND),
 
-    /** Exceeded the number of accounts (both from and to) allowed for crypto transfer list */
+    /**
+     * Exceeded the number of accounts (both from and to) allowed for crypto transfer list
+     */
     TRANSFER_LIST_SIZE_LIMIT_EXCEEDED(ResponseCodeEnum.TRANSFER_LIST_SIZE_LIMIT_EXCEEDED),
 
-    /** Smart contract result size greater than specified maxResultSize */
+    /**
+     * Smart contract result size greater than specified maxResultSize
+     */
     RESULT_SIZE_LIMIT_EXCEEDED(ResponseCodeEnum.RESULT_SIZE_LIMIT_EXCEEDED),
 
-    /** The payer account is not a special account(account 0.0.55) */
+    /**
+     * The payer account is not a special account(account 0.0.55)
+     */
     NOT_SPECIAL_ACCOUNT(ResponseCodeEnum.NOT_SPECIAL_ACCOUNT),
 
-    /** Negative gas was offered in smart contract call */
+    /**
+     * Negative gas was offered in smart contract call
+     */
     CONTRACT_NEGATIVE_GAS(ResponseCodeEnum.CONTRACT_NEGATIVE_GAS),
 
-    /** Negative value / initial balance was specified in a smart contract call / create */
+    /**
+     * Negative value / initial balance was specified in a smart contract call / create
+     */
     CONTRACT_NEGATIVE_VALUE(ResponseCodeEnum.CONTRACT_NEGATIVE_VALUE),
 
-    /** Failed to update fee file */
+    /**
+     * Failed to update fee file
+     */
     INVALID_FEE_FILE(ResponseCodeEnum.INVALID_FEE_FILE),
 
-    /** Failed to update exchange rate file */
+    /**
+     * Failed to update exchange rate file
+     */
     INVALID_EXCHANGE_RATE_FILE(ResponseCodeEnum.INVALID_EXCHANGE_RATE_FILE),
 
-    /** Payment tendered for contract local call cannot cover both the fee and the gas */
+    /**
+     * Payment tendered for contract local call cannot cover both the fee and the gas
+     */
     INSUFFICIENT_LOCAL_CALL_GAS(ResponseCodeEnum.INSUFFICIENT_LOCAL_CALL_GAS),
 
-    /** Entities with Entity ID below 1000 are not allowed to be deleted */
+    /**
+     * Entities with Entity ID below 1000 are not allowed to be deleted
+     */
     ENTITY_NOT_ALLOWED_TO_DELETE(ResponseCodeEnum.ENTITY_NOT_ALLOWED_TO_DELETE),
 
     /**
@@ -359,36 +538,56 @@ public enum Status {
      */
     AUTHORIZATION_FAILED(ResponseCodeEnum.AUTHORIZATION_FAILED),
 
-    /** Fee Schedule Proto uploaded but not valid (append or update is required) */
+    /**
+     * Fee Schedule Proto uploaded but not valid (append or update is required)
+     */
     FILE_UPLOADED_PROTO_INVALID(ResponseCodeEnum.FILE_UPLOADED_PROTO_INVALID),
 
-    /** Fee Schedule Proto uploaded but not valid (append or update is required) */
+    /**
+     * Fee Schedule Proto uploaded but not valid (append or update is required)
+     */
     FILE_UPLOADED_PROTO_NOT_SAVED_TO_DISK(ResponseCodeEnum.FILE_UPLOADED_PROTO_NOT_SAVED_TO_DISK),
 
-    /** Fee Schedule Proto File Part uploaded */
+    /**
+     * Fee Schedule Proto File Part uploaded
+     */
     FEE_SCHEDULE_FILE_PART_UPLOADED(ResponseCodeEnum.FEE_SCHEDULE_FILE_PART_UPLOADED),
 
-    /** The change on Exchange Rate exceeds Exchange_Rate_Allowed_Percentage */
+    /**
+     * The change on Exchange Rate exceeds Exchange_Rate_Allowed_Percentage
+     */
     EXCHANGE_RATE_CHANGE_LIMIT_EXCEEDED(ResponseCodeEnum.EXCHANGE_RATE_CHANGE_LIMIT_EXCEEDED),
 
-    /** Contract permanent storage exceeded the currently allowable limit */
+    /**
+     * Contract permanent storage exceeded the currently allowable limit
+     */
     MAX_CONTRACT_STORAGE_EXCEEDED(ResponseCodeEnum.MAX_CONTRACT_STORAGE_EXCEEDED),
 
-    /** Transfer Account should not be same as Account to be deleted */
+    /**
+     * Transfer Account should not be same as Account to be deleted
+     */
     TRANSFER_ACCOUNT_SAME_AS_DELETE_ACCOUNT(ResponseCodeEnum.TRANSFER_ACCOUNT_SAME_AS_DELETE_ACCOUNT),
 
     TOTAL_LEDGER_BALANCE_INVALID(ResponseCodeEnum.TOTAL_LEDGER_BALANCE_INVALID),
 
-    /** The expiration date/time on a smart contract may not be reduced */
+    /**
+     * The expiration date/time on a smart contract may not be reduced
+     */
     EXPIRATION_REDUCTION_NOT_ALLOWED(ResponseCodeEnum.EXPIRATION_REDUCTION_NOT_ALLOWED),
 
-    /** Gas exceeded currently allowable gas limit per transaction */
+    /**
+     * Gas exceeded currently allowable gas limit per transaction
+     */
     MAX_GAS_LIMIT_EXCEEDED(ResponseCodeEnum.MAX_GAS_LIMIT_EXCEEDED),
 
-    /** File size exceeded the currently allowable limit */
+    /**
+     * File size exceeded the currently allowable limit
+     */
     MAX_FILE_SIZE_EXCEEDED(ResponseCodeEnum.MAX_FILE_SIZE_EXCEEDED),
 
-    /** The Topic ID specified is not in the system. */
+    /**
+     * The Topic ID specified is not in the system.
+     */
     INVALID_TOPIC_ID(ResponseCodeEnum.INVALID_TOPIC_ID),
 
     INVALID_ADMIN_KEY(ResponseCodeEnum.INVALID_ADMIN_KEY),
@@ -400,13 +599,19 @@ public enum Status {
      */
     UNAUTHORIZED(ResponseCodeEnum.UNAUTHORIZED),
 
-    /** A ConsensusService message is empty. */
+    /**
+     * A ConsensusService message is empty.
+     */
     INVALID_TOPIC_MESSAGE(ResponseCodeEnum.INVALID_TOPIC_MESSAGE),
 
-    /** The autoRenewAccount specified is not a valid, active account. */
+    /**
+     * The autoRenewAccount specified is not a valid, active account.
+     */
     INVALID_AUTORENEW_ACCOUNT(ResponseCodeEnum.INVALID_AUTORENEW_ACCOUNT),
 
-    /** An adminKey was not specified on the topic, so there must not be an autoRenewAccount. */
+    /**
+     * An adminKey was not specified on the topic, so there must not be an autoRenewAccount.
+     */
     AUTORENEW_ACCOUNT_NOT_ALLOWED(ResponseCodeEnum.AUTORENEW_ACCOUNT_NOT_ALLOWED),
 
     /**
@@ -668,14 +873,14 @@ public enum Status {
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
-                        "network returned unrecognized response code; your SDK may be out of date");
+                    "network returned unrecognized response code; your SDK may be out of date");
         }
 
         // NOTE: This should be unreachable as error prone has enum exhaustiveness checking
         throw new IllegalArgumentException(
-                "response code "
-                        + code.name()
-                        + " is unhandled by the SDK; update your SDK or open an issue");
+            "response code "
+            + code.name()
+            + " is unhandled by the SDK; update your SDK or open an issue");
     }
 
     @Override
