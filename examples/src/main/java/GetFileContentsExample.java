@@ -17,7 +17,6 @@ import com.google.protobuf.ByteString;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public final class GetFileContentsExample {
-
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
@@ -57,5 +56,4 @@ public final class GetFileContentsExample {
         // Prints query results to console
         System.out.println("File content query results: " + contents.toStringUtf8());
     }
-
 }
