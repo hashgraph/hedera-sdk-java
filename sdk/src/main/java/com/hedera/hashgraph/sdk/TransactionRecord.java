@@ -8,6 +8,14 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The complete record for a transaction on Hedera that has reached consensus.
+ * <p>
+ * This is not-free to request and is available for 1 hour after a transaction reaches consensus.
+ * <p>
+ * A {@link TransactionReceipt} can be thought of as a light-weight record which is free to ask for if you just
+ * need what it contains. A receipt however lasts for only 180 seconds.
+ */
 public final class TransactionRecord {
     /**
      * The status (reach consensus, or failed, or is unknown) and the ID of
