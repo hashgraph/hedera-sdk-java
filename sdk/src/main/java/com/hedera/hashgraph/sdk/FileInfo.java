@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.FileGetInfoResponse;
 import org.threeten.bp.Instant;
 
@@ -63,6 +64,26 @@ public final class FileInfo {
         );
     }
 
+    public static FileInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        return fromProtobuf(FileGetInfoResponse.FileInfo.parseFrom(bytes).toBuilder().build());
+    }
+
+    FileGetInfoResponse.FileInfo toProtobuf() {
+        var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
+        for (Key key : keys) {
+            keyList.addKeys(key.toKeyProtobuf());
+        }
+
+        var fileInfoBuilder = FileGetInfoResponse.FileInfo.newBuilder()
+            .setFileID(this.fileId.toProtobuf())
+            .setSize(this.size)
+            .setExpirationTime(InstantConverter.toProtobuf(this.expirationTime))
+            .setDeleted(this.deleted)
+            .setKeys(keyList);
+
+        return fileInfoBuilder.build();
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -72,5 +93,9 @@ public final class FileInfo {
             .add("deleted", deleted)
             .add("keys", keys)
             .toString();
+    }
+
+    public byte[] toBytes() {
+        return this.toProtobuf().toByteArray();
     }
 }
