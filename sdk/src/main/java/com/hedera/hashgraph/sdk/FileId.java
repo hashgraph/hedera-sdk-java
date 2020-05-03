@@ -42,11 +42,15 @@ public final class FileId extends EntityId {
         return new FileId(fileId.getShardNum(), fileId.getRealmNum(), fileId.getFileNum());
     }
 
-    public byte[] toBytes() {
-        return this.toProtobuf().toByteArray();
+    FileID toProtobuf() {
+        return FileID.newBuilder()
+            .setShardNum(shard)
+            .setRealmNum(realm)
+            .setFileNum(num)
+            .build();
     }
 
-    FileID toProtobuf() {
-        return FileID.newBuilder().setShardNum(shard).setRealmNum(realm).setFileNum(num).build();
+    public byte[] toBytes() {
+        return this.toProtobuf().toByteArray();
     }
 }

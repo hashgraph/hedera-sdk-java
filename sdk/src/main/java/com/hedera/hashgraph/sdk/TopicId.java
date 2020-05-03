@@ -28,7 +28,11 @@ public final class TopicId extends EntityId {
     }
 
     TopicID toProtobuf() {
-        return TopicID.newBuilder().setShardNum(shard).setRealmNum(realm).setTopicNum(num).build();
+        return TopicID.newBuilder()
+            .setShardNum(shard)
+            .setRealmNum(realm)
+            .setTopicNum(num)
+            .build();
     }
 
     public byte[] toBytes() {
