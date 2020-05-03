@@ -111,6 +111,7 @@ public abstract class HederaExecutable<RequestT, ResponseT, O> extends Executabl
 
     abstract AccountId getNodeId(Client client);
 
+    @Nullable
     abstract TransactionId getTransactionId();
 
     boolean shouldRetryExceptionally(@Nullable Throwable error) {

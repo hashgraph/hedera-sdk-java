@@ -17,6 +17,7 @@ import java8.util.Lists;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Function;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -163,6 +164,7 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     }
 
     @Override
+    @Nullable
     final TransactionId getTransactionId() {
         return id;
     }
