@@ -59,4 +59,28 @@ public final class TransactionRecordQuery extends QueryBuilder<TransactionRecord
     MethodDescriptor<Query, Response> getMethodDescriptor() {
         return CryptoServiceGrpc.getGetTxRecordByTxIDMethod();
     }
+
+    @Override
+    boolean shouldRetry(Status status, Response response) {
+        if (super.shouldRetry(status, response)) return true;
+
+        var receiptStatus =
+            Status.valueOf(response.getTransactionGetRecord().getTransactionRecord().getReceipt().getStatus());
+
+        switch (receiptStatus) {
+            case BUSY:
+                // node is busy
+            case UNKNOWN:
+                // still in the node's queue
+            case OK:
+                // accepted but has not reached consensus
+            case RECEIPT_NOT_FOUND:
+            case RECORD_NOT_FOUND:
+                // has reached consensus but not generated
+                return true;
+
+            default:
+                return false;
+        }
+    }
 }
