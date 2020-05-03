@@ -8,6 +8,16 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.TransactionGetRecordQuery;
 import io.grpc.MethodDescriptor;
 
+/**
+ * Get the record for a transaction.
+ * <p>
+ * If the transaction requested a record, then the record lasts for one hour, and a state proof is available for it.
+ * If the transaction created an account, file, or smart contract instance, then the record will contain the ID for
+ * what it created. If the transaction called a smart contract function, then the record contains the result of
+ * that call. If the transaction was a cryptocurrency transfer, then the record includes the TransferList
+ * which gives the details of that transfer. If the transaction didn't return anything that should be
+ * in the record, then the results field will be set to nothing.
+ */
 public final class TransactionRecordQuery extends QueryBuilder<TransactionRecord, TransactionRecordQuery> {
     private final TransactionGetRecordQuery.Builder builder;
 
@@ -15,6 +25,11 @@ public final class TransactionRecordQuery extends QueryBuilder<TransactionRecord
         this.builder = TransactionGetRecordQuery.newBuilder();
     }
 
+    /**
+     * Set the ID of the transaction for which the record is requested.
+     *
+     * @return {code this}
+     */
     public TransactionRecordQuery setTransactionId(TransactionId transactionId) {
         builder.setTransactionID(transactionId.toProtobuf());
         return this;
