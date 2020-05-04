@@ -2,6 +2,9 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.sdk.proto.ExchangeRateSet;
+import com.hedera.hashgraph.sdk.proto.TimestampSeconds;
 
 import javax.annotation.Nullable;
 
@@ -126,6 +129,50 @@ public final class TransactionReceipt {
         );
     }
 
+    public static TransactionReceipt fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        return fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionReceipt.parseFrom(bytes).toBuilder().build());
+    }
+
+    com.hedera.hashgraph.sdk.proto.TransactionReceipt toProtobuf() {
+        var transactionReceiptBuilder = com.hedera.hashgraph.sdk.proto.TransactionReceipt.newBuilder()
+            .setStatus(status.code)
+            .setExchangeRate(ExchangeRateSet.newBuilder()
+                .setCurrentRate(com.hedera.hashgraph.sdk.proto.ExchangeRate.newBuilder()
+                    .setHbarEquiv(exchangeRate.hbars)
+                    .setCentEquiv(exchangeRate.cents)
+                    .setExpirationTime(TimestampSeconds.newBuilder()
+                        .setSeconds(exchangeRate.expirationTime.getEpochSecond())
+                    )
+                )
+            );
+
+        if (accountId != null) {
+            transactionReceiptBuilder.setAccountID(accountId.toProtobuf());
+        }
+
+        if (fileId != null) {
+            transactionReceiptBuilder.setFileID(fileId.toProtobuf());
+        }
+
+        if (contractId != null) {
+            transactionReceiptBuilder.setContractID(contractId.toProtobuf());
+        }
+
+        if (topicId != null) {
+            transactionReceiptBuilder.setTopicID(topicId.toProtobuf());
+        }
+
+        if (topicSequenceNumber != null) {
+            transactionReceiptBuilder.setTopicSequenceNumber(topicSequenceNumber);
+        }
+
+        if (topicRunningHash != null) {
+            transactionReceiptBuilder.setTopicRunningHash(topicRunningHash);
+        }
+
+        return transactionReceiptBuilder.build();
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -137,5 +184,9 @@ public final class TransactionReceipt {
             .add("topicId", topicId)
             .add("topicSequenceNumber", topicSequenceNumber)
             .toString();
+    }
+
+    public byte[] toBytes() {
+        return toProtobuf().toByteArray();
     }
 }
