@@ -78,10 +78,10 @@ public final class FileInfo {
         }
 
         var fileInfoBuilder = FileGetInfoResponse.FileInfo.newBuilder()
-            .setFileID(this.fileId.toProtobuf())
-            .setSize(this.size)
-            .setExpirationTime(InstantConverter.toProtobuf(this.expirationTime))
-            .setDeleted(this.deleted)
+            .setFileID(fileId.toProtobuf())
+            .setSize(size)
+            .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
+            .setDeleted(deleted)
             .setKeys(keyList);
 
         return fileInfoBuilder.build();
@@ -99,6 +99,6 @@ public final class FileInfo {
     }
 
     public byte[] toBytes() {
-        return this.toProtobuf().toByteArray();
+        return toProtobuf().toByteArray();
     }
 }

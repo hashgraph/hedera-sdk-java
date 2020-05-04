@@ -49,6 +49,6 @@ public final class AccountId extends EntityId {
     }
 
     public byte[] toBytes() {
-        return this.toProtobuf().toByteArray();
+        return toProtobuf().toByteArray();
     }
 }

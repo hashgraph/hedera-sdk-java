@@ -54,6 +54,6 @@ public final class FileId extends EntityId {
     }
 
     public byte[] toBytes() {
-        return this.toProtobuf().toByteArray();
+        return toProtobuf().toByteArray();
     }
 }

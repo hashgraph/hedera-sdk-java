@@ -112,25 +112,25 @@ public final class TopicInfo {
 
     ConsensusGetTopicInfoResponse toProtobuf() {
         var topicInfoResponseBuilder = ConsensusGetTopicInfoResponse.newBuilder()
-            .setTopicID(this.topicId.toProtobuf());
+            .setTopicID(topicId.toProtobuf());
 
         var topicInfoBuilder = ConsensusTopicInfo.newBuilder()
-            .setMemo(this.topicMemo)
-            .setRunningHash(this.runningHash)
-            .setSequenceNumber(this.sequenceNumber)
-            .setExpirationTime(InstantConverter.toProtobuf(this.expirationTime))
-            .setAutoRenewPeriod(DurationConverter.toProtobuf(this.autoRenewPeriod));
+            .setMemo(topicMemo)
+            .setRunningHash(runningHash)
+            .setSequenceNumber(sequenceNumber)
+            .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
+            .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
 
-        if (this.adminKey != null) {
-            topicInfoBuilder.setAdminKey(this.adminKey.toKeyProtobuf());
+        if (adminKey != null) {
+            topicInfoBuilder.setAdminKey(adminKey.toKeyProtobuf());
         }
 
-        if (this.submitKey != null) {
-            topicInfoBuilder.setSubmitKey(this.submitKey.toKeyProtobuf());
+        if (submitKey != null) {
+            topicInfoBuilder.setSubmitKey(submitKey.toKeyProtobuf());
         }
 
-        if (this.autoRenewAccountId != null) {
-            topicInfoBuilder.setAutoRenewAccount(this.autoRenewAccountId.toProtobuf());
+        if (autoRenewAccountId != null) {
+            topicInfoBuilder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
         }
 
         return topicInfoResponseBuilder.setTopicInfo(topicInfoBuilder).build();
@@ -152,6 +152,6 @@ public final class TopicInfo {
     }
 
     public byte[] toBytes() {
-        return this.toProtobuf().toByteArray();
+        return toProtobuf().toByteArray();
     }
 }

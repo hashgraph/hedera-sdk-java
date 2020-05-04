@@ -136,6 +136,6 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
     }
 
     public byte[] toBytes() {
-        return this.toProtobuf().toByteArray();
+        return toProtobuf().toByteArray();
     }
 }

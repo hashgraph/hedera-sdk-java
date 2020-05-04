@@ -114,17 +114,17 @@ public final class ContractInfo {
 
     ContractGetInfoResponse.ContractInfo toProtobuf() {
         var contractInfoBuilder = ContractGetInfoResponse.ContractInfo.newBuilder()
-            .setContractID(this.contractId.toProtobuf())
-            .setAccountID(this.accountId.toProtobuf())
-            .setContractAccountID(this.contractAccountId)
-            .setExpirationTime(InstantConverter.toProtobuf(this.expirationTime))
-            .setAutoRenewPeriod(DurationConverter.toProtobuf(this.autoRenewPeriod))
-            .setStorage(this.storage)
-            .setMemo(this.contractMemo)
-            .setBalance(this.balance.asTinybar());
+            .setContractID(contractId.toProtobuf())
+            .setAccountID(accountId.toProtobuf())
+            .setContractAccountID(contractAccountId)
+            .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
+            .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod))
+            .setStorage(storage)
+            .setMemo(contractMemo)
+            .setBalance(balance.asTinybar());
 
-        if (this.adminKey != null) {
-            contractInfoBuilder.setAdminKey(this.adminKey.toKeyProtobuf());
+        if (adminKey != null) {
+            contractInfoBuilder.setAdminKey(adminKey.toKeyProtobuf());
         }
 
         return contractInfoBuilder.build();
@@ -146,6 +146,6 @@ public final class ContractInfo {
     }
 
     public byte[] toBytes() {
-        return this.toProtobuf().toByteArray();
+        return toProtobuf().toByteArray();
     }
 }

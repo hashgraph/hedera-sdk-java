@@ -141,23 +141,23 @@ public final class AccountInfo {
 
     CryptoGetInfoResponse.AccountInfo toProtobuf() {
         var accountInfoBuilder = CryptoGetInfoResponse.AccountInfo.newBuilder()
-            .setAccountID(this.accountId.toProtobuf())
-            .setDeleted(this.deleted)
-            .setProxyReceived(this.proxyReceived.asTinybar())
-            .setKey(this.key.toKeyProtobuf())
-            .setBalance(this.balance.asTinybar())
-            .setGenerateSendRecordThreshold(this.sendRecordThreshold.asTinybar())
-            .setGenerateReceiveRecordThreshold(this.receiveRecordThreshold.asTinybar())
-            .setReceiverSigRequired(this.receiverSignatureRequired)
-            .setExpirationTime(InstantConverter.toProtobuf(this.expirationTime))
-            .setAutoRenewPeriod(DurationConverter.toProtobuf(this.autoRenewPeriod));
+            .setAccountID(accountId.toProtobuf())
+            .setDeleted(deleted)
+            .setProxyReceived(proxyReceived.asTinybar())
+            .setKey(key.toKeyProtobuf())
+            .setBalance(balance.asTinybar())
+            .setGenerateSendRecordThreshold(sendRecordThreshold.asTinybar())
+            .setGenerateReceiveRecordThreshold(receiveRecordThreshold.asTinybar())
+            .setReceiverSigRequired(receiverSignatureRequired)
+            .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
+            .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
 
-        if (this.contractAccountId != null) {
-            accountInfoBuilder.setContractAccountID(this.contractAccountId);
+        if (contractAccountId != null) {
+            accountInfoBuilder.setContractAccountID(contractAccountId);
         }
 
-        if (this.proxyAccountId != null) {
-            accountInfoBuilder.setProxyAccountID(this.proxyAccountId.toProtobuf());
+        if (proxyAccountId != null) {
+            accountInfoBuilder.setProxyAccountID(proxyAccountId.toProtobuf());
         }
 
         return accountInfoBuilder.build();
@@ -182,6 +182,6 @@ public final class AccountInfo {
     }
 
     public byte[] toBytes() {
-        return this.toProtobuf().toByteArray();
+        return toProtobuf().toByteArray();
     }
 }

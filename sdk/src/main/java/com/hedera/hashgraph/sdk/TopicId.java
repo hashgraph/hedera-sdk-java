@@ -39,6 +39,6 @@ public final class TopicId extends EntityId {
     }
 
     public byte[] toBytes() {
-        return this.toProtobuf().toByteArray();
+        return toProtobuf().toByteArray();
     }
 }

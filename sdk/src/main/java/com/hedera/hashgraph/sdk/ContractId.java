@@ -49,6 +49,6 @@ public final class ContractId extends EntityId {
     }
 
     public byte[] toBytes() {
-        return this.toProtobuf().toByteArray();
+        return toProtobuf().toByteArray();
     }
 }
