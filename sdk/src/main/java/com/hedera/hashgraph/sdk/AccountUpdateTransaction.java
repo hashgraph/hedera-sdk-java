@@ -75,7 +75,7 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
      * @return {@code this}
      */
     public AccountUpdateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
-        builder.setSendRecordThresholdWrapper(UInt64Value.of(sendRecordThreshold.asTinybar()));
+        builder.setSendRecordThresholdWrapper(UInt64Value.of(sendRecordThreshold.toTinybars()));
         return this;
     }
 
@@ -86,7 +86,7 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
      * @return {@code this}
      */
     public AccountUpdateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
-        builder.setReceiveRecordThresholdWrapper(UInt64Value.of(receiveRecordThreshold.asTinybar()));
+        builder.setReceiveRecordThresholdWrapper(UInt64Value.of(receiveRecordThreshold.toTinybars()));
         return this;
     }
 

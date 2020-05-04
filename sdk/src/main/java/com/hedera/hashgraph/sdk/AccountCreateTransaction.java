@@ -6,7 +6,7 @@ import org.threeten.bp.Duration;
 
 /** Create a new Hedera™ account. */
 public final class AccountCreateTransaction extends TransactionBuilder<AccountCreateTransaction> {
-    private static final Hbar DEFAULT_RECORD_THRESHOLD = Hbar.fromTinybar(Long.MAX_VALUE);
+    private static final Hbar DEFAULT_RECORD_THRESHOLD = Hbar.fromTinybars(Long.MAX_VALUE);
 
     private final CryptoCreateTransactionBody.Builder builder;
 
@@ -39,7 +39,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
      * @return {@code this}
      */
     public AccountCreateTransaction setInitialBalance(Hbar initialBalance) {
-        builder.setInitialBalance(initialBalance.asTinybar());
+        builder.setInitialBalance(initialBalance.toTinybars());
         return this;
     }
 
@@ -55,7 +55,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
      * @return {@code this}
      */
     public AccountCreateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
-        builder.setSendRecordThreshold(sendRecordThreshold.asTinybar());
+        builder.setSendRecordThreshold(sendRecordThreshold.toTinybars());
         return this;
     }
 
@@ -71,7 +71,7 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
      * @return {@code this}
      */
     public AccountCreateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
-        builder.setReceiveRecordThreshold(receiveRecordThreshold.asTinybar());
+        builder.setReceiveRecordThreshold(receiveRecordThreshold.toTinybars());
         return this;
     }
 

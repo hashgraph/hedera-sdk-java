@@ -46,7 +46,7 @@ public final class ContractExecuteTransaction extends TransactionBuilder<Contrac
      * @return {@code this}
      */
     public ContractExecuteTransaction setPayableAmount(Hbar amount) {
-        builder.setAmount(amount.asTinybar());
+        builder.setAmount(amount.toTinybars());
         return this;
     }
 

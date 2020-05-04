@@ -81,7 +81,7 @@ public final class TransactionRecord {
         this.transactionId = transactionId;
         this.transfers = transfers;
         this.contractFunctionResult = contractFunctionResult;
-        this.transactionFee = Hbar.fromTinybar(transactionFee);
+        this.transactionFee = Hbar.fromTinybars(transactionFee);
     }
 
     static TransactionRecord fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord) {

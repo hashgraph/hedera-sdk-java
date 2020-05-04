@@ -29,7 +29,7 @@ public class FreezeTransactionTest {
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setStartTime(0, 0)
             .setEndTime(23, 59)
-            .setMaxTransactionFee(Hbar.fromTinybar(100_000))
+            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .build(Client.forTestnet())
             .sign(unusedPrivateKey)
             .toString()

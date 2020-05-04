@@ -33,7 +33,7 @@ public final class TransferCryptoExample {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         AccountId recipientId = AccountId.fromString("0.0.3");
-        Hbar amount = Hbar.fromTinybar(10_000);
+        Hbar amount = Hbar.fromTinybars(10_000);
 
         Hbar senderBalanceBefore = new AccountBalanceQuery()
             .setAccountId(OPERATOR_ID)

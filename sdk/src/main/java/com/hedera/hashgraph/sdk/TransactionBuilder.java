@@ -91,7 +91,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * @return {@code this}
      */
     public final T setMaxTransactionFee(Hbar maxTransactionFee) {
-        bodyBuilder.setTransactionFee(maxTransactionFee.asTinybar());
+        bodyBuilder.setTransactionFee(maxTransactionFee.toTinybars());
 
         // noinspection unchecked
         return (T) this;
@@ -118,7 +118,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
         onBuild(bodyBuilder);
 
         if (client != null && bodyBuilder.getTransactionFee() == 0) {
-            bodyBuilder.setTransactionFee(client.maxTransactionFee.asTinybar());
+            bodyBuilder.setTransactionFee(client.maxTransactionFee.toTinybars());
         }
 
         if (!bodyBuilder.hasTransactionID() && client != null) {

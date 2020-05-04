@@ -104,7 +104,7 @@ public final class ContractCreateTransaction extends TransactionBuilder<Contract
      * @return {@code this}
      */
     public ContractCreateTransaction setInitialBalance(Hbar initialBalance) {
-        builder.setInitialBalance(initialBalance.asTinybar());
+        builder.setInitialBalance(initialBalance.toTinybars());
         return this;
     }
 

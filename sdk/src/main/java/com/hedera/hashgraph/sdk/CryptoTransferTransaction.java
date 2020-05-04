@@ -41,8 +41,7 @@ public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTr
      * @return {@code this}
      */
     public CryptoTransferTransaction addSender(AccountId senderId, Hbar value) {
-        // fixme: assert non-negative?
-        return addTransfer(senderId, Hbar.fromTinybar(value.asTinybar() * -1L));
+        return addTransfer(senderId, value.negate());
     }
 
     /**
@@ -51,7 +50,6 @@ public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTr
      * @return {@code this}
      */
     public CryptoTransferTransaction addRecipient(AccountId recipientId, Hbar value) {
-        // fixme: assert non-negative?
         return addTransfer(recipientId, value);
     }
 
@@ -59,7 +57,7 @@ public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTr
         transfersBuilder.addAccountAmounts(
             AccountAmount.newBuilder()
                 .setAccountID(accountId.toProtobuf())
-                .setAmount(value.asTinybar())
+                .setAmount(value.toTinybars())
                 .build()
         );
 

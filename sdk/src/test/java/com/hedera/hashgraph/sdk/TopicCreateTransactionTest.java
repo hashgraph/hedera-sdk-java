@@ -32,7 +32,7 @@ public class TopicCreateTransactionTest {
             .setAdminKey(unusedPrivateKey)
             .setAutoRenewAccountId(AccountId.fromString("0.0.5007"))
             .setAutoRenewPeriod(Duration.ofHours(24))
-            .setMaxTransactionFee(Hbar.fromTinybar(100_000))
+            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .build(Client.forTestnet())
             .sign(unusedPrivateKey)
             .toString()

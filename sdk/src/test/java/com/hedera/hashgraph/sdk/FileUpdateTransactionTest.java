@@ -30,7 +30,7 @@ public class FileUpdateTransactionTest {
             .setFileId(FileId.fromString("0.0.6006"))
             .setExpirationTime(Instant.ofEpochSecond(1554158728))
             .setContents(new byte[]{1, 2, 3, 4, 5})
-            .setMaxTransactionFee(Hbar.fromTinybar(100_000))
+            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .setKeys(unusedPrivateKey)
             .build(Client.forTestnet())
             .sign(unusedPrivateKey)

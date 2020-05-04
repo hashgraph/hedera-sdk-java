@@ -64,8 +64,8 @@ class AccountIntegrationTest {
             assertEquals(info.key.toString(), key1.getPublicKey().toString());
             assertEquals(info.balance, new Hbar(1));
             assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
-            assertEquals(info.receiveRecordThreshold.asTinybar(), Long.MAX_VALUE);
-            assertEquals(info.sendRecordThreshold.asTinybar(), Long.MAX_VALUE);
+            assertEquals(info.receiveRecordThreshold.toTinybars(), Long.MAX_VALUE);
+            assertEquals(info.sendRecordThreshold.toTinybars(), Long.MAX_VALUE);
             assertNull(info.proxyAccountId);
             assertEquals(info.proxyReceived, Hbar.ZERO);
 
@@ -101,7 +101,6 @@ class AccountIntegrationTest {
             new AccountDeleteTransaction()
                 .setAccountId(account)
                 .setTransferAccountId(operatorId)
-                .setMaxTransactionFee(Hbar.fromTinybar(balance.asTinybar() / 2))
                 .setTransactionId(TransactionId.generate(account))
                 .build(client)
                 .sign(key2)

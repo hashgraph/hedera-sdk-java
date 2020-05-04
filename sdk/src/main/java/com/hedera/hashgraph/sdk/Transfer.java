@@ -24,6 +24,6 @@ public final class Transfer {
     }
 
     static Transfer fromProtobuf(AccountAmount accountAmount) {
-        return new Transfer(AccountId.fromProtobuf(accountAmount.getAccountID()), Hbar.fromTinybar(accountAmount.getAmount()));
+        return new Transfer(AccountId.fromProtobuf(accountAmount.getAccountID()), Hbar.fromTinybars(accountAmount.getAmount()));
     }
 }

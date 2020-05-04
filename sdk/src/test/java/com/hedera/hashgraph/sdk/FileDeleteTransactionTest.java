@@ -28,7 +28,7 @@ public class FileDeleteTransactionTest {
             .setNodeAccountId(AccountId.fromString("0.0.5005"))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setFileId(FileId.fromString("0.0.6006"))
-            .setMaxTransactionFee(Hbar.fromTinybar(100_000))
+            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .build(Client.forTestnet())
             .sign(unusedPrivateKey)
             .toString()

@@ -55,7 +55,7 @@ public final class ContractCallQuery extends QueryBuilder<ContractFunctionResult
     @Override
     public CompletableFuture<Hbar> getCostAsync(Client client) {
         // network bug: ContractCallLocal cost estimate is too low
-        return super.getCostAsync(client).thenApply(cost -> Hbar.fromTinybar((long) (cost.asTinybar() * 1.1)));
+        return super.getCostAsync(client).thenApply(cost -> Hbar.fromTinybars((long) (cost.toTinybars() * 1.1)));
     }
 
     /**

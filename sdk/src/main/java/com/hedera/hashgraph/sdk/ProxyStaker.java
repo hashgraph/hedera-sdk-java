@@ -16,7 +16,7 @@ public final class ProxyStaker {
 
     private ProxyStaker(AccountId accountId, long amount) {
         this.accountId = accountId;
-        this.amount = Hbar.fromTinybar(amount);
+        this.amount = Hbar.fromTinybars(amount);
     }
 
     static ProxyStaker fromProtobuf(com.hedera.hashgraph.sdk.proto.ProxyStaker proxyStaker) {

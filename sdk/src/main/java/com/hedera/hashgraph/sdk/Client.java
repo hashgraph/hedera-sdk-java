@@ -207,7 +207,7 @@ public final class Client implements AutoCloseable {
      * @return {@code this}
      */
     public Client setMaxTransactionFee(Hbar maxTransactionFee) {
-        if (maxTransactionFee.asTinybar() < 0) {
+        if (maxTransactionFee.toTinybars() < 0) {
             throw new IllegalArgumentException("maxTransactionFee must be non-negative");
         }
 
@@ -233,7 +233,7 @@ public final class Client implements AutoCloseable {
      * @return {@code this}
      */
     public Client setMaxQueryPayment(Hbar maxQueryPayment) {
-        if (maxQueryPayment.asTinybar() < 0) {
+        if (maxQueryPayment.toTinybars() < 0) {
             throw new IllegalArgumentException("maxQueryPayment must be non-negative");
         }
 

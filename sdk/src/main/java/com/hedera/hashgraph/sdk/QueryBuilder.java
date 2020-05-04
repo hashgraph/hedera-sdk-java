@@ -263,7 +263,7 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
 
         @Override
         Hbar mapResponse(Response response) {
-            return Hbar.fromTinybar(mapResponseHeader(response).getCost());
+            return Hbar.fromTinybars(mapResponseHeader(response).getCost());
         }
 
         @Override

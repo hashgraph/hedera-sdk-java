@@ -102,11 +102,11 @@ public final class AccountInfo {
         this.contractAccountId = contractAccountId;
         this.deleted = deleted;
         this.proxyAccountId = proxyAccountId;
-        this.proxyReceived = Hbar.fromTinybar(proxyReceived);
+        this.proxyReceived = Hbar.fromTinybars(proxyReceived);
         this.key = key;
-        this.balance = Hbar.fromTinybar(balance);
-        this.sendRecordThreshold = Hbar.fromTinybar(sendRecordThreshold);
-        this.receiveRecordThreshold = Hbar.fromTinybar(receiveRecordThreshold);
+        this.balance = Hbar.fromTinybars(balance);
+        this.sendRecordThreshold = Hbar.fromTinybars(sendRecordThreshold);
+        this.receiveRecordThreshold = Hbar.fromTinybars(receiveRecordThreshold);
         this.receiverSignatureRequired = receiverSignatureRequired;
         this.expirationTime = expirationTime;
         this.autoRenewPeriod = autoRenewPeriod;
@@ -143,11 +143,11 @@ public final class AccountInfo {
         var accountInfoBuilder = CryptoGetInfoResponse.AccountInfo.newBuilder()
             .setAccountID(accountId.toProtobuf())
             .setDeleted(deleted)
-            .setProxyReceived(proxyReceived.asTinybar())
+            .setProxyReceived(proxyReceived.toTinybars())
             .setKey(key.toKeyProtobuf())
-            .setBalance(balance.asTinybar())
-            .setGenerateSendRecordThreshold(sendRecordThreshold.asTinybar())
-            .setGenerateReceiveRecordThreshold(receiveRecordThreshold.asTinybar())
+            .setBalance(balance.toTinybars())
+            .setGenerateSendRecordThreshold(sendRecordThreshold.toTinybars())
+            .setGenerateReceiveRecordThreshold(receiveRecordThreshold.toTinybars())
             .setReceiverSigRequired(receiverSignatureRequired)
             .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
             .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));

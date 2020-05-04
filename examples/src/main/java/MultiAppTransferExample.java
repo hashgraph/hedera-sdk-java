@@ -41,7 +41,7 @@ public final class MultiAppTransferExample {
     }
 
     public static void main(String[] args) throws HederaReceiptStatusException, TimeoutException, HederaPreCheckStatusException, InvalidProtocolBufferException {
-        Hbar transferAmount = Hbar.fromTinybar(10_000);
+        Hbar transferAmount = Hbar.fromTinybars(10_000);
 
         // the exchange creates an account for the user to transfer funds to
         TransactionId createExchangeAccountTxnId = new AccountCreateTransaction()

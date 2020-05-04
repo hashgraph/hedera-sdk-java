@@ -87,7 +87,7 @@ public final class ContractInfo {
         this.autoRenewPeriod = autoRenewPeriod;
         this.storage = storage;
         this.contractMemo = contractMemo;
-        this.balance = Hbar.fromTinybar(balance);
+        this.balance = Hbar.fromTinybars(balance);
     }
 
     static ContractInfo fromProtobuf(ContractGetInfoResponse.ContractInfo contractInfo) {
@@ -121,7 +121,7 @@ public final class ContractInfo {
             .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod))
             .setStorage(storage)
             .setMemo(contractMemo)
-            .setBalance(balance.asTinybar());
+            .setBalance(balance.toTinybars());
 
         if (adminKey != null) {
             contractInfoBuilder.setAdminKey(adminKey.toKeyProtobuf());

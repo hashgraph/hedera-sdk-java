@@ -20,7 +20,7 @@ public class AccountInfoQueryTest {
     void shouldSerialize() {
         SnapshotMatcher.expect(new AccountInfoQuery()
             .setAccountId(AccountId.fromString("0.0.5005"))
-            .setMaxQueryPayment(Hbar.fromTinybar(100_000))
+            .setMaxQueryPayment(Hbar.fromTinybars(100_000))
             .toString()
         ).toMatchSnapshot();
     }

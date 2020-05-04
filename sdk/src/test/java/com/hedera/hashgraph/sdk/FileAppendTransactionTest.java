@@ -29,7 +29,7 @@ public class FileAppendTransactionTest {
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setFileId(FileId.fromString("0.0.6006"))
             .setContents(new byte[]{1, 2, 3, 4})
-            .setMaxTransactionFee(Hbar.fromTinybar(100_000))
+            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .build(Client.forTestnet())
             .sign(unusedPrivateKey)
             .toString()

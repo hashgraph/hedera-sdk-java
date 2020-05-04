@@ -30,7 +30,7 @@ public class FileCreateTransactionTest {
             .setContents(new byte[]{1, 2, 3, 4})
             .setExpirationTime(Instant.ofEpochSecond(1554158728))
             .setKeys(unusedPrivateKey)
-            .setMaxTransactionFee(Hbar.fromTinybar(100_000))
+            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .build(Client.forTestnet())
             .sign(unusedPrivateKey)
             .toString()

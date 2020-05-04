@@ -32,6 +32,7 @@ public class AccountInfoTest {
             )
             .build();
 
-        SnapshotMatcher.expect(AccountInfo.fromProtobuf(response.getCryptoGetInfo().getAccountInfo())).toMatchSnapshot();
+        SnapshotMatcher.expect(AccountInfo.fromProtobuf(response.getCryptoGetInfo().getAccountInfo()).toString())
+            .toMatchSnapshot();
     }
 }
