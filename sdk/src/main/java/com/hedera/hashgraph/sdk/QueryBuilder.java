@@ -11,6 +11,7 @@ import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
+import java8.util.function.Consumer;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
@@ -50,6 +51,14 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
         headerBuilder = QueryHeader.newBuilder();
     }
 
+    /**
+     * Set an explicit payment amount for this query.
+     * <p>
+     * The client will submit exactly this amount for the payment of this query. Hedera
+     * will not return any remainder.
+     *
+     * @return {@code this}
+     */
     public T setQueryPayment(Hbar queryPayment) {
         this.queryPayment = queryPayment;
 
@@ -57,6 +66,23 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
         return (T) this;
     }
 
+    /**
+     * Set the maximum payment allowable for this query.
+     * <p>
+     * When a query is executed without an explicit {@link QueryBuilder#setQueryPayment(Hbar)} call,
+     * the client will first request the cost
+     * of the given query from the node it will be submitted to and attach a payment for that amount
+     * from the operator account on the client.
+     * <p>
+     * If the returned value is greater than this value, a
+     * {@link MaxQueryPaymentExceededException} will be thrown from
+     * {@link QueryBuilder#execute(Client)} or returned in the second callback of
+     * {@link QueryBuilder#executeAsync(Client, Consumer, Consumer)}.
+     * <p>
+     * Set to 0 to disable automatic implicit payments.
+     *
+     * @return {@code this}
+     */
     public T setMaxQueryPayment(Hbar maxQueryPayment) {
         this.maxQueryPayment = maxQueryPayment;
 
