@@ -44,8 +44,11 @@ public class HbarTest {
     @Test
     void shouldDisplay() {
         assertEquals("50 ℏ", fiftyHbar.toString());
+        assertEquals("-50 ℏ", negativeFiftyHbar.toString());
         assertEquals("1 tℏ", Hbar.fromTinybars(1).toString());
+        assertEquals("-1 tℏ", Hbar.fromTinybars(1).negate().toString());
         assertEquals("1000 tℏ", Hbar.fromTinybars(1000).toString());
+        assertEquals("-1000 tℏ", Hbar.fromTinybars(1000).negate().toString());
     }
 
     @ParameterizedTest

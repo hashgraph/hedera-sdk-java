@@ -133,7 +133,7 @@ public final class Hbar implements Comparable<Hbar> {
 
     @Override
     public String toString() {
-        if (valueInTinybar < 10_000) {
+        if (valueInTinybar < 10_000 && valueInTinybar > -10_000) {
             return Long.toString(this.valueInTinybar) + " " + HbarUnit.TINYBAR.getSymbol();
         }
 
