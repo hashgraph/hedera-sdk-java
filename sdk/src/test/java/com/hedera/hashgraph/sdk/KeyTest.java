@@ -22,6 +22,7 @@ class KeyTest {
         var publicKey = privateKey.getPublicKey();
         var signature = privateKey.sign(message);
 
+        assertEquals(signature.length, 64);
         assertTrue(publicKey.verify(message, signature));
     }
 
