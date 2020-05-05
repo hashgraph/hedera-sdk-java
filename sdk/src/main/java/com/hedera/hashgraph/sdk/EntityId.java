@@ -33,7 +33,7 @@ class EntityId {
     public final long realm;
 
     /**
-     * The account number
+     * The id number
      */
     @Nonnegative
     public final long num;
@@ -61,19 +61,16 @@ class EntityId {
         return newId;
     }
 
-    private static void checkAddressLen(byte[] address) {
-        if (address.length != SOLIDITY_ADDRESS_LEN) {
-            throw new IllegalArgumentException(
-                "Solidity addresses must be 20 bytes or 40 hex chars");
-        }
-    }
-
     static <R> R fromSolidityAddress(String address, WithIdNums<R> withAddress) {
         return fromSolidityAddress(decodeSolidityAddress(address), withAddress);
     }
 
     private static <R> R fromSolidityAddress(byte[] address, WithIdNums<R> withAddress) {
-        checkAddressLen(address);
+        if (address.length != SOLIDITY_ADDRESS_LEN) {
+            throw new IllegalArgumentException(
+                "Solidity addresses must be 20 bytes or 40 hex chars");
+        }
+
         var buf = ByteBuffer.wrap(address);
         return withAddress.apply(buf.getInt(), buf.getLong(), buf.getLong());
     }
