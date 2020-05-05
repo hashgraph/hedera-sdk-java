@@ -7,7 +7,6 @@ import com.hedera.hashgraph.sdk.proto.ThresholdKey;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,7 +18,7 @@ public final class KeyList extends Key implements Collection<Key> {
     @Nullable
     public final Integer threshold;
 
-    public final List<Key> keys = new ArrayList<>();
+    private final List<Key> keys = new ArrayList<>();
 
     /**
      * Create a new key list where all keys that are added will be required to sign.
