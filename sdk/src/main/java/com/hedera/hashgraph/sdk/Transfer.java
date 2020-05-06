@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.base.MoreObjects;
 import com.hedera.hashgraph.sdk.proto.AccountAmount;
 
 /**
@@ -25,5 +26,20 @@ public final class Transfer {
 
     static Transfer fromProtobuf(AccountAmount accountAmount) {
         return new Transfer(AccountId.fromProtobuf(accountAmount.getAccountID()), Hbar.fromTinybars(accountAmount.getAmount()));
+    }
+
+    AccountAmount toProtobuf() {
+        return AccountAmount.newBuilder()
+            .setAccountID(accountId.toProtobuf())
+            .setAmount(amount.toTinybars())
+            .build();
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("accoundId", accountId)
+            .add("amount", amount)
+            .toString();
     }
 }

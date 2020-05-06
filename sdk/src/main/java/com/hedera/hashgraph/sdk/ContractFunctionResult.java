@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.ContractFunctionResultOrBuilder;
 import java8.util.stream.Collectors;
@@ -30,7 +31,7 @@ public final class ContractFunctionResult {
     @Nullable
     public final String errorMessage;
 
-    public final byte[] bloom;
+    public final ByteString bloom;
 
     public final long gasUsed;
 
@@ -56,7 +57,7 @@ public final class ContractFunctionResult {
             rawResult = callResult;
         }
 
-        bloom = inner.getBloom().toByteArray();
+        bloom = inner.getBloom();
 
         gasUsed = inner.getGasUsed();
 
@@ -247,4 +248,33 @@ public final class ContractFunctionResult {
         return rawResult.substring(startIndex, endIndex);
     }
 
+    com.hedera.hashgraph.sdk.proto.ContractFunctionResult toProto() {
+        var contractFunctionResult = com.hedera.hashgraph.sdk.proto.ContractFunctionResult.newBuilder()
+            .setContractID(contractId.toProtobuf())
+            .setContractCallResult(rawResult)
+            .setBloom(bloom)
+            .setGasUsed(gasUsed);
+
+        if (errorMessage != null) {
+            contractFunctionResult.setErrorMessage(errorMessage);
+        }
+
+        for (ContractLogInfo log : logs) {
+            contractFunctionResult.addLogInfo(log.toProto());
+        }
+
+        return contractFunctionResult.build();
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("contractId", contractId)
+            .add("rawResult", Hex.toHexString(rawResult.toByteArray()))
+            .add("bloom", Hex.toHexString(bloom.toByteArray()))
+            .add("gasUsed", gasUsed)
+            .add("errorMessage", errorMessage)
+            .add("logs", logs)
+            .toString();
+    }
 }

@@ -1,8 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.proto.ContractLoginfo;
+import org.bouncycastle.util.encoders.Hex;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,12 +39,41 @@ public final class ContractLogInfo {
         this.data = data;
     }
 
-    static ContractLogInfo fromProtobuf(ContractLoginfo logInfo) {
+    static ContractLogInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.ContractLoginfo logInfo) {
         return new ContractLogInfo(
             ContractId.fromProtobuf(logInfo.getContractID()),
             logInfo.getBloom(),
             logInfo.getTopicList(),
             logInfo.getData()
         );
+    }
+
+    com.hedera.hashgraph.sdk.proto.ContractLoginfo toProto() {
+        var contractLogInfo = com.hedera.hashgraph.sdk.proto.ContractLoginfo.newBuilder()
+            .setContractID(contractId.toProtobuf())
+            .setBloom(bloom);
+
+        for (ByteString topic : topics) {
+            contractLogInfo.addTopic(topic);
+        }
+
+        return contractLogInfo.build();
+    }
+
+    @Override
+    public String toString() {
+        var stringHelper = MoreObjects.toStringHelper(this)
+            .add("contractId", contractId)
+            .add("bloom", Hex.toHexString(bloom.toByteArray()));
+
+        var topicList = new ArrayList<>();
+
+        for (var topic : topics) {
+            topicList.add(Hex.toHexString(topic.toByteArray()));
+        }
+
+        return stringHelper
+            .add("topics", topicList)
+            .toString();
     }
 }

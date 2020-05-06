@@ -2,6 +2,9 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.sdk.proto.TransferList;
+import org.bouncycastle.util.encoders.Hex;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
@@ -109,11 +112,37 @@ public final class TransactionRecord {
         );
     }
 
+    public static TransactionRecord fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        return fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord.parseFrom(bytes).toBuilder().build());
+    }
+
+    com.hedera.hashgraph.sdk.proto.TransactionRecord toProtobuf() {
+        var transferList = TransferList.newBuilder();
+        for (Transfer transfer : transfers) {
+            transferList.addAccountAmounts(transfer.toProtobuf());
+        }
+
+        var transactionRecord = com.hedera.hashgraph.sdk.proto.TransactionRecord.newBuilder()
+            .setReceipt(receipt.toProtobuf())
+            .setTransactionHash(transactionHash)
+            .setConsensusTimestamp(InstantConverter.toProtobuf(consensusTimestamp))
+            .setTransactionID(transactionId.toProtobuf())
+            .setMemo(transactionMemo)
+            .setTransactionFee(transactionFee.toTinybars())
+            .setTransferList(transferList);
+
+        if (contractFunctionResult != null) {
+            transactionRecord.setContractCallResult(contractFunctionResult.toProto());
+        }
+
+        return transactionRecord.build();
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
             .add("receipt", receipt)
-            .add("transactionHash", transactionHash)
+            .add("transactionHash", Hex.toHexString(transactionHash.toByteArray()))
             .add("consensusTimestamp", consensusTimestamp)
             .add("transactionId", transactionId)
             .add("transactionMemo", transactionMemo)
@@ -121,5 +150,9 @@ public final class TransactionRecord {
             .add("contractFunctionResult", contractFunctionResult)
             .add("transfers", transfers)
             .toString();
+    }
+
+    public byte[] toBytes() {
+        return toProtobuf().toByteArray();
     }
 }
