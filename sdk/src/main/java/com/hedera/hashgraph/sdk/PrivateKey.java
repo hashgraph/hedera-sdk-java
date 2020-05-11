@@ -1,7 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -305,11 +304,5 @@ public final class PrivateKey extends Key {
     com.hedera.hashgraph.sdk.proto.Key toKeyProtobuf() {
         // Forward to the corresponding public key.
         return getPublicKey().toKeyProtobuf();
-    }
-
-    @Override
-    SignaturePair toSignaturePairProtobuf(byte[] signature) {
-        // Forward to the corresponding public key.
-        return getPublicKey().toSignaturePairProtobuf(signature);
     }
 }

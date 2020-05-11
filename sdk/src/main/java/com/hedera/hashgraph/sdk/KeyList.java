@@ -1,7 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
-import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import com.hedera.hashgraph.sdk.proto.ThresholdKey;
 
 import javax.annotation.Nullable;
@@ -77,7 +76,7 @@ public final class KeyList extends Key implements Collection<Key> {
     @Override
     public <T> T[] toArray(T[] ts) {
         // noinspection unchecked,SuspiciousToArrayCall
-        return (T[]) keys.toArray((Key[])ts);
+        return (T[]) keys.toArray((Key[]) ts);
     }
 
     @Override
@@ -133,11 +132,6 @@ public final class KeyList extends Key implements Collection<Key> {
         return com.hedera.hashgraph.sdk.proto.Key.newBuilder()
             .setKeyList(protoKeyList)
             .build();
-    }
-
-    @Override
-    SignaturePair toSignaturePairProtobuf(byte[] signature) {
-        throw new IllegalStateException("KeyList cannot be used with Transaction#signWith");
     }
 
     @Override

@@ -52,7 +52,9 @@ public final class PublicKey extends Key {
             .build();
     }
 
-    @Override
+    /**
+     * Serialize this key as a SignaturePair protobuf object
+     */
     SignaturePair toSignaturePairProtobuf(byte[] signature) {
         return SignaturePair.newBuilder()
             .setPubKeyPrefix(ByteString.copyFrom(keyData))
