@@ -48,7 +48,7 @@ public final class ContractLogInfo {
         );
     }
 
-    com.hedera.hashgraph.sdk.proto.ContractLoginfo toProto() {
+    com.hedera.hashgraph.sdk.proto.ContractLoginfo toProtobuf() {
         var contractLogInfo = com.hedera.hashgraph.sdk.proto.ContractLoginfo.newBuilder()
             .setContractID(contractId.toProtobuf())
             .setBloom(bloom);

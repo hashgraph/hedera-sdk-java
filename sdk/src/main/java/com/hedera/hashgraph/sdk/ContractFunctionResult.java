@@ -248,7 +248,7 @@ public final class ContractFunctionResult {
         return rawResult.substring(startIndex, endIndex);
     }
 
-    com.hedera.hashgraph.sdk.proto.ContractFunctionResult toProto() {
+    com.hedera.hashgraph.sdk.proto.ContractFunctionResult toProtobuf() {
         var contractFunctionResult = com.hedera.hashgraph.sdk.proto.ContractFunctionResult.newBuilder()
             .setContractID(contractId.toProtobuf())
             .setContractCallResult(rawResult)
@@ -260,7 +260,7 @@ public final class ContractFunctionResult {
         }
 
         for (ContractLogInfo log : logs) {
-            contractFunctionResult.addLogInfo(log.toProto());
+            contractFunctionResult.addLogInfo(log.toProtobuf());
         }
 
         return contractFunctionResult.build();

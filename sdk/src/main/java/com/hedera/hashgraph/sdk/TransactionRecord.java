@@ -132,7 +132,7 @@ public final class TransactionRecord {
             .setTransferList(transferList);
 
         if (contractFunctionResult != null) {
-            transactionRecord.setContractCallResult(contractFunctionResult.toProto());
+            transactionRecord.setContractCallResult(contractFunctionResult.toProtobuf());
         }
 
         return transactionRecord.build();
