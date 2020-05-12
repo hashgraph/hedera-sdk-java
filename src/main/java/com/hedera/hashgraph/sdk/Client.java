@@ -357,7 +357,7 @@ public final class Client implements AutoCloseable {
         Iterator<Node> channelIter = nodes.values()
             .iterator();
 
-        for (int i = 1; i < r; i++) {
+        for (int i = 0; i < r; i++) {
             channelIter.next();
         }
 
