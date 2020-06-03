@@ -48,15 +48,19 @@ abstract class HederaExecutable<RequestT, ResponseT, O> extends Executable<O> {
         return toCompletableFuture(ClientCalls.futureUnaryCall(call, request)).handle((response, error) -> {
             var latency = (double) (System.nanoTime() - startAt) / 1000000000.0;
 
+            // Exponential back-off for Delayer: 250ms, 500ms, 1s, 2s, 4s, 8s, 16s, ...16s
+            long delay = (long) Math.min(250 * Math.pow(2, attempt - 1), 16000);
+
             if (shouldRetryExceptionally(error)) {
                 logger.atError()
                     .addKeyValue("node", nodeId)
                     .addKeyValue("attempt", attempt)
+                    .addKeyValue("delay:", delay)
                     .setCause(error)
                     .log("caught error, retrying");
 
                 // the transaction had a network failure reaching Hedera
-                return Delayer.delayBackOff(attempt, client.executor)
+                return Delayer.delayFor(delay, client.executor)
                     .thenCompose((v) -> executeAsync(client, attempt + 1));
             }
 
@@ -76,7 +80,7 @@ abstract class HederaExecutable<RequestT, ResponseT, O> extends Executable<O> {
             if (shouldRetry(responseStatus, response)) {
                 // the response has been identified as failing or otherwise
                 // needing a retry let's do this again after a delay
-                return Delayer.delayBackOff(attempt, client.executor)
+                return Delayer.delayFor(delay, client.executor)
                     .thenCompose((v) -> executeAsync(client, attempt + 1));
             }
 
