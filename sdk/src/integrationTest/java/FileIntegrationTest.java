@@ -17,15 +17,14 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FileIntegrationTest {
     @Test
     void test() {
         assertDoesNotThrow(() -> {
-            var operatorKey = PrivateKey.fromString("302e020100300506032b6570042204207ce25f7ac7a4fa7284efa8453f153922e16ede6004c36778d3870c93d5dfbee5");
-            var operatorId = new AccountId(1035);
+            var operatorKey = PrivateKey.fromString(System.getProperty("OPERATOR_KEY"));
+            var operatorId = AccountId.fromString(System.getProperty("OPERATOR_ID"));
 
             var client = Client.forTestnet()
                 .setOperator(operatorId, operatorKey);
@@ -99,12 +98,14 @@ public class FileIntegrationTest {
                 .execute(client)
                 .getReceipt(client);
 
-            assertThrows(Exception.class, () -> {
-                new FileInfoQuery()
-                    .setFileId(file)
-                    .setQueryPayment(new Hbar(1))
-                    .execute(client);
-            });
+            info = new FileInfoQuery()
+                .setFileId(file)
+                .setQueryPayment(new Hbar(1))
+                .execute(client);
+
+            assertEquals(info.fileId, file);
+            assertTrue(info.deleted);
+            assertEquals(info.keys.get(0).toString(), operatorKey.getPublicKey().toString());
         });
     }
 }

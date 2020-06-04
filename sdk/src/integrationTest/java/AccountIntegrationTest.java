@@ -28,8 +28,8 @@ class AccountIntegrationTest {
     @Test
     void test() {
         assertDoesNotThrow(() -> {
-            var operatorKey = PrivateKey.fromString("302e020100300506032b6570042204207ce25f7ac7a4fa7284efa8453f153922e16ede6004c36778d3870c93d5dfbee5");
-            var operatorId = new AccountId(1035);
+            var operatorKey = PrivateKey.fromString(System.getProperty("OPERATOR_KEY"));
+            var operatorId = AccountId.fromString(System.getProperty("OPERATOR_ID"));
 
             var client = Client.forTestnet()
                 .setOperator(operatorId, operatorKey);

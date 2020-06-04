@@ -144,6 +144,9 @@ tasks.withType(Test) {
 		exceptionFormat = 'full'
 		events "passed", "skipped", "failed", "standardOut", "standardError"
 	}
+
+	systemProperty "OPERATOR_ID", findProperty("OPERATOR_ID")
+	systemProperty "OPERATOR_KEY", findProperty("OPERATOR_KEY")
 }
 
 jar {

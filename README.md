@@ -50,14 +50,11 @@ $ ./gradlew test
 
 ### Integration Test
 
-Requires `OPERATOR_ID` and `OPERATOR_KEY` to be in the environment. Integration tests run against
+Requires passing `OPERATOR_ID` and `OPERATOR_KEY` to system properties. Integration tests run against
 the Hedera test network.
 
 ```sh
-$ export OEPRATOR_ID="..."
-$ export OPERATOR_KEY="..."
-
-$ ./gradlew integrationTest
+$ ./gradlew integrationTest -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>"
 ```
 
 ### Example
