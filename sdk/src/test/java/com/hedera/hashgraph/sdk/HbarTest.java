@@ -11,6 +11,7 @@ import java.util.Iterator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HbarTest {
@@ -36,9 +37,13 @@ public class HbarTest {
     void shouldConstruct() {
         assertEquals(fiftyHbar.toTinybars(), fiftyGTinybar);
         assertEquals(fiftyHbar.to(HbarUnit.HBAR), new BigDecimal(50));
-
         assertEquals(new Hbar(50).toTinybars(), fiftyGTinybar);
         assertEquals(Hbar.fromTinybars(fiftyGTinybar).toTinybars(), fiftyGTinybar);
+    }
+
+    @Test
+    void shouldNotConstruct() {
+        assertThrows(Exception.class, () -> new Hbar(new BigDecimal("0.1"), HbarUnit.TINYBAR));
     }
 
     @Test

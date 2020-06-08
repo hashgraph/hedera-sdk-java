@@ -35,8 +35,14 @@ public final class Hbar implements Comparable<Hbar> {
         this(amount, HbarUnit.HBAR);
     }
 
-    Hbar(BigDecimal amount, HbarUnit unit) {
-        valueInTinybar = amount.multiply(BigDecimal.valueOf(unit.tinybar)).longValue();
+    public Hbar(BigDecimal amount, HbarUnit unit) {
+        var tinybars = amount.multiply(BigDecimal.valueOf(unit.tinybar));
+
+        if (tinybars.doubleValue() % 1 != 0) {
+            throw new IllegalArgumentException("Amount and Unit combination results in a fractional value for tinybar.  Ensure tinybar value is a whole number.");
+        }
+
+        valueInTinybar = tinybars.longValue();
     }
 
     /**
