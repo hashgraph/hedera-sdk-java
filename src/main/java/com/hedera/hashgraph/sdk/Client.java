@@ -184,31 +184,15 @@ public final class Client implements AutoCloseable {
     /**
      * Replace all nodes in this Client with a new set of nodes (e.g. for an Address Book update).
      * <p>
-     * If a node URL for a given account ID is the same, it is not replaced.
      *
      * @param nodes a map of node account ID to node URL.
      * @return {@code this} for fluent API usage.
      */
     public Client replaceNodes(Map<AccountId, String> nodes) {
-        this.nodes.replaceAll((nodeAcct, node) -> {
-            String newNodeUrl = nodes.get(nodeAcct);
-
-            // node hasn't changed
-            if (node.address.equals(newNodeUrl)) {
-                return node;
-            }
-
-            // replace or remove node
-            node.closeChannel();
-
-            // replace node
-            if (newNodeUrl != null) {
-                return new Node(nodeAcct, newNodeUrl);
-            }
-
-            // remove
-            return null;
-        });
+        this.nodes = new HashMap<>();
+        for (Map.Entry<AccountId, String> node : nodes.entrySet()) {
+            this.nodes.put(node.getKey(), new Node(node.getKey(), node.getValue()));
+        }
 
         return this;
     }
