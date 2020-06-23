@@ -189,6 +189,12 @@ public final class Client implements AutoCloseable {
      * @return {@code this} for fluent API usage.
      */
     public Client replaceNodes(Map<AccountId, String> nodes) {
+        for (Map.Entry<AccountId, Node> node: this.nodes.entrySet()) {
+            if (!nodes.containsKey(node.getKey())) {
+                node.getValue().closeChannel();
+            }
+        }
+
         this.nodes = new HashMap<>();
         for (Map.Entry<AccountId, String> node : nodes.entrySet()) {
             this.nodes.put(node.getKey(), new Node(node.getKey(), node.getValue()));
