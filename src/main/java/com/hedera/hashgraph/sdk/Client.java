@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -189,13 +190,30 @@ public final class Client implements AutoCloseable {
      * @return {@code this} for fluent API usage.
      */
     public Client replaceNodes(Map<AccountId, String> nodes) {
-        for (Map.Entry<AccountId, Node> node: this.nodes.entrySet()) {
-            if (!nodes.containsKey(node.getKey())) {
-                node.getValue().closeChannel();
-            }
-        }
+        this.nodes.replaceAll((nodeAcct, node) -> {
+            String newNodeUrl = nodes.get(nodeAcct);
 
-        this.nodes = new HashMap<>();
+            // node hasn't changed
+            if (node.address.equals(newNodeUrl)) {
+                return node;
+            }
+
+            // close node channel
+            node.closeChannel();
+
+            // replace node
+            if (newNodeUrl != null) {
+                return new Node(nodeAcct, newNodeUrl);
+            }
+
+            // make null for removal
+            return null;
+        });
+
+        // remove
+        this.nodes.values().removeAll(Collections.singleton(null));
+
+        // add new nodes
         for (Map.Entry<AccountId, String> node : nodes.entrySet()) {
             this.nodes.put(node.getKey(), new Node(node.getKey(), node.getValue()));
         }
