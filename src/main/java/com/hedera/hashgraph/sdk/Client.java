@@ -185,6 +185,7 @@ public final class Client implements AutoCloseable {
     /**
      * Replace all nodes in this Client with a new set of nodes (e.g. for an Address Book update).
      * <p>
+     * If a node URL for a given account ID is the same, it is not replaced.
      *
      * @param nodes a map of node account ID to node URL.
      * @return {@code this} for fluent API usage.
