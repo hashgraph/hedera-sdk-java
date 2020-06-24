@@ -6,6 +6,8 @@ plugins {
 	// Gradle plugin to discover dependency updates
 	// <https://github.com/ben-manes/gradle-versions-plugin>
 	id "com.github.ben-manes.versions" version "0.28.0"
+
+	id "jacoco"
 }
 
 allprojects {
@@ -33,6 +35,15 @@ allprojects {
 
 		// https://github.com/eclipse-ee4j/common-annotations-api
 		implementation "jakarta.annotation:jakarta.annotation-api:2.0.0-RC1"
+	}
+
+	jacoco {
+		reportsDir = file("$buildDir/jacoco")
+		toolVersion = "0.8.5"
+	}
+
+	tasks.withType(Test) {
+		apply plugin: "jacoco"
 	}
 
 	tasks.withType(JavaCompile).configureEach {

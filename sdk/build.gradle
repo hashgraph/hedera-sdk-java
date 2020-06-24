@@ -115,6 +115,29 @@ idea {
 	}
 }
 
+jacocoTestReport {
+	// make sure to use any/all test coverage data for the report
+	executionData fileTree(dir: buildDir, include: "jacoco/*.exec")
+
+	// remove generated proto files from report
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: '**/proto/**')
+        }))
+    }
+
+	// configure it so only xml is generated for the report
+	reports {
+		xml.enabled true
+		xml.destination file("$buildDir/reports/jacoco/report.xml")
+		html.enabled false
+		csv.enabled false
+	}
+
+	// make sure we run all tests before this report is made
+	dependsOn tasks.withType(Test)
+}
+
 task integrationTest(type: Test) {
 	testClassesDirs = sourceSets.integrationTest.output.classesDirs
 	classpath = sourceSets.integrationTest.runtimeClasspath
