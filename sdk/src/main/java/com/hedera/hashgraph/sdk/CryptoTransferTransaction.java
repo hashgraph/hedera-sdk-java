@@ -41,7 +41,7 @@ public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTr
      * @return {@code this}
      */
     public CryptoTransferTransaction addSender(AccountId senderId, Hbar value) {
-        return addTransfer(senderId, value.negate());
+        return addTransfer(senderId, value.negated());
     }
 
     /**

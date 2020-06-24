@@ -133,7 +133,7 @@ public final class Hbar implements Comparable<Hbar> {
     /**
      * Returns a Hbar whose value is {@code -this}.
      */
-    public Hbar negate() {
+    public Hbar negated() {
         return Hbar.fromTinybars(-valueInTinybar);
     }
 
