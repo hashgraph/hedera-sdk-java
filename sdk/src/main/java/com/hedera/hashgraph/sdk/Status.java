@@ -285,22 +285,22 @@ public enum Status {
     /**
      * the claim body is empty
      */
-    EMPTY_CLAIM_BODY(ResponseCodeEnum.EMPTY_CLAIM_BODY),
+    EMPTY_LIVE_HASH_BODY(ResponseCodeEnum.EMPTY_LIVE_HASH_BODY),
 
     /**
      * the hash for the claim is empty
      */
-    EMPTY_CLAIM_HASH(ResponseCodeEnum.EMPTY_CLAIM_HASH),
+    EMPTY_LIVE_HASH_HASH(ResponseCodeEnum.EMPTY_LIVE_HASH),
 
     /**
      * the key list is empty
      */
-    EMPTY_CLAIM_KEYS(ResponseCodeEnum.EMPTY_CLAIM_KEYS),
+    EMPTY_LIVE_HASH_KEYS(ResponseCodeEnum.EMPTY_LIVE_HASH_KEYS),
 
     /**
      * the size of the claim hash is not 48 bytes
      */
-    INVALID_CLAIM_HASH_SIZE(ResponseCodeEnum.INVALID_CLAIM_HASH_SIZE),
+    INVALID_LIVE_HASH_HASH_SIZE(ResponseCodeEnum.INVALID_LIVE_HASH_SIZE),
 
     /**
      * the query body is empty
@@ -310,12 +310,12 @@ public enum Status {
     /**
      * the crypto claim query is empty
      */
-    EMPTY_CLAIM_QUERY(ResponseCodeEnum.EMPTY_CLAIM_QUERY),
+    EMPTY_LIVE_HASH_QUERY(ResponseCodeEnum.EMPTY_LIVE_HASH_QUERY),
 
     /**
      * the crypto claim doesn't exists in the file system. It expired or was never persisted.
      */
-    CLAIM_NOT_FOUND(ResponseCodeEnum.CLAIM_NOT_FOUND),
+    LIVE_HASH_NOT_FOUND(ResponseCodeEnum.LIVE_HASH_NOT_FOUND),
 
     /**
      * the account id passed has not yet been created.
@@ -325,7 +325,7 @@ public enum Status {
     /**
      * the claim hash already exists
      */
-    CLAIM_ALREADY_EXISTS(ResponseCodeEnum.CLAIM_ALREADY_EXISTS),
+    LIVE_HASH_ALREADY_EXISTS(ResponseCodeEnum.LIVE_HASH_ALREADY_EXISTS),
 
     /**
      * File WACL keys are invalid
@@ -735,24 +735,24 @@ public enum Status {
                 return INVALID_SIGNATURE_TYPE_MISMATCHING_KEY;
             case INVALID_SIGNATURE_COUNT_MISMATCHING_KEY:
                 return INVALID_SIGNATURE_COUNT_MISMATCHING_KEY;
-            case EMPTY_CLAIM_BODY:
-                return EMPTY_CLAIM_BODY;
-            case EMPTY_CLAIM_HASH:
-                return EMPTY_CLAIM_HASH;
-            case EMPTY_CLAIM_KEYS:
-                return EMPTY_CLAIM_KEYS;
-            case INVALID_CLAIM_HASH_SIZE:
-                return INVALID_CLAIM_HASH_SIZE;
+            case EMPTY_LIVE_HASH_BODY:
+                return EMPTY_LIVE_HASH_BODY;
+            case EMPTY_LIVE_HASH:
+                return EMPTY_LIVE_HASH_HASH;
+            case EMPTY_LIVE_HASH_KEYS:
+                return EMPTY_LIVE_HASH_KEYS;
+            case INVALID_LIVE_HASH_SIZE:
+                return INVALID_LIVE_HASH_HASH_SIZE;
             case EMPTY_QUERY_BODY:
                 return EMPTY_QUERY_BODY;
-            case EMPTY_CLAIM_QUERY:
-                return EMPTY_CLAIM_QUERY;
-            case CLAIM_NOT_FOUND:
-                return CLAIM_NOT_FOUND;
+            case EMPTY_LIVE_HASH_QUERY:
+                return EMPTY_LIVE_HASH_QUERY;
+            case LIVE_HASH_NOT_FOUND:
+                return LIVE_HASH_NOT_FOUND;
             case ACCOUNT_ID_DOES_NOT_EXIST:
                 return ACCOUNT_ID_DOES_NOT_EXIST;
-            case CLAIM_ALREADY_EXISTS:
-                return CLAIM_ALREADY_EXISTS;
+            case LIVE_HASH_ALREADY_EXISTS:
+                return LIVE_HASH_ALREADY_EXISTS;
             case INVALID_FILE_WACL:
                 return INVALID_FILE_WACL;
             case SERIALIZATION_FAILED:

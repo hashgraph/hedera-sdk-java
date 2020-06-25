@@ -7,6 +7,7 @@ option java_multiple_files = true;
 
 import "Duration.proto";
 import "Timestamp.proto";
+import "BasicTypes.proto";
 
 /* Set the freezing period in which the platform will stop creating events and accepting transactions. This is used before safely shut down the platform for maintenance. */
 message FreezeTransactionBody {
@@ -14,4 +15,5 @@ message FreezeTransactionBody {
     int32 startMin = 2; // The start minute (in UTC time), a value between 0 and 59
     int32 endHour = 3; // The end hour (in UTC time), a value between 0 and 23
     int32 endMin = 4; // The end minute (in UTC time), a value between 0 and 59
+    FileID updateFile = 5; // The ID of the file needs to be updated during a freeze transaction
 }

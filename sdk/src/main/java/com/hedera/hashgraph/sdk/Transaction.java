@@ -11,7 +11,7 @@ import com.hedera.hashgraph.sdk.proto.SystemDeleteTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SystemUndeleteTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import com.hederahashgraph.service.proto.java.FreezeServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.FreezeServiceGrpc;
 import io.grpc.MethodDescriptor;
 import java8.util.Lists;
 import java8.util.concurrent.CompletableFuture;
@@ -195,8 +195,8 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
             case CONTRACTDELETEINSTANCE:
                 return SmartContractServiceGrpc.getDeleteContractMethod();
 
-            case CRYPTOADDCLAIM:
-                return CryptoServiceGrpc.getAddClaimMethod();
+            case CRYPTOADDLIVEHASH:
+                return CryptoServiceGrpc.getAddLiveHashMethod();
 
             case CRYPTOCREATEACCOUNT:
                 return CryptoServiceGrpc.getCreateAccountMethod();
@@ -204,8 +204,8 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
             case CRYPTODELETE:
                 return CryptoServiceGrpc.getCryptoDeleteMethod();
 
-            case CRYPTODELETECLAIM:
-                return CryptoServiceGrpc.getDeleteClaimMethod();
+            case CRYPTODELETELIVEHASH:
+                return CryptoServiceGrpc.getDeleteLiveHashMethod();
 
             case CRYPTOTRANSFER:
                 return CryptoServiceGrpc.getCryptoTransferMethod();

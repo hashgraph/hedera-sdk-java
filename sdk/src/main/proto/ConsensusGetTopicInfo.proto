@@ -16,7 +16,8 @@ message ConsensusGetTopicInfoQuery {
     // (cost, state proof, both, or neither).
     QueryHeader header = 1;
 
-    TopicID topicID = 2; // Topic to retrieve info about (the parameters and running state of).
+    // The Topic for which information is being requested
+    TopicID topicID = 2;
 }
 
 // Retrieve the parameters of and state of a consensus topic.
