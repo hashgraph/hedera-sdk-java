@@ -284,11 +284,11 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     @SuppressWarnings("LiteProtoToString")
     public String toString() {
         var request = makeRequest();
-        var builder = new StringBuilder(request.toString());
+        var builder = new StringBuilder(request.toString().replaceAll("(?m)^# com.hedera.hashgraph.sdk.proto.Transaction.*", ""));
 
         try {
             builder.append("\n");
-            builder.append(TransactionBody.parseFrom(request.getBodyBytes()).toString());
+            builder.append(TransactionBody.parseFrom(request.getBodyBytes()).toString().replaceAll("(?m)^# com.hedera.hashgraph.sdk.proto.TransactionBuilder.*", ""));
         } catch (InvalidProtocolBufferException e) {
             throw new RuntimeException(e);
         }
