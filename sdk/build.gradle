@@ -43,7 +43,7 @@ dependencies {
 	testImplementation "org.junit.jupiter:junit-jupiter-params:5.6.1"
 
 	testRuntimeOnly "org.slf4j:slf4j-simple:2.0.0-alpha1"
-
+	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.29.0"
 	integrationTestRuntimeOnly "io.grpc:grpc-netty-shaded:1.29.0"
 
 	// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and

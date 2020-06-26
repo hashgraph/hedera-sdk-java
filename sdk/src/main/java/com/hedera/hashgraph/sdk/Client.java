@@ -64,10 +64,14 @@ public final class Client implements AutoCloseable {
         this.network = network;
         this.channels = new HashMap<>(network.size());
 
+        this.nodes = setNodes(network);
+    }
+
+    private static Iterator<AccountId> setNodes(Map<AccountId, String> network) {
         // Take all given node account IDs, shuffle, and prepare an infinite iterator for use in [getNextNodeId]
         var allNodes = new ArrayList<>(network.keySet());
         Collections.shuffle(allNodes, ThreadLocalSecureRandom.current());
-        nodes = Iterables.cycle(allNodes).iterator();
+        return Iterables.cycle(allNodes).iterator();
     }
 
     /**
@@ -164,6 +168,53 @@ public final class Client implements AutoCloseable {
      */
     public static Client fromJsonFile(File file) throws IOException {
         return fromJson(Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8));
+    }
+
+    /**
+     * Replace all nodes in this Client with a new set of nodes (e.g. for an Address Book update).
+     * <p>
+     *
+     * @param nodes a map of node account ID to node URL.
+     * @return {@code this} for fluent API usage.
+     */
+    public Client setNetwork(Map<AccountId, String> nodes) {
+        setNodes(nodes);
+        @Var ManagedChannel channel = null;
+
+        for (Map.Entry<AccountId, String> node: this.network.entrySet()) {
+            String newNodeUrl = nodes.get(node.getKey());
+
+            // node hasn't changed
+            if (node.getValue().equals(newNodeUrl)) {
+                continue;
+            }
+
+            // Set new node address
+            node.setValue(newNodeUrl);
+
+            if (newNodeUrl == null) {
+                // Else null for removal, should be changed to just remove
+                channels.put(node.getKey(), null);
+            } else if (channels.get(node.getKey()) != null && !channels.get(node.getKey()).authority().equals(newNodeUrl)) {
+                // Shutdown channel before replacing address
+                channels.get(node.getKey()).shutdown();
+                channel = buildChannel(newNodeUrl);
+                channels.put(node.getKey(), channel);
+            }
+        }
+
+        // remove
+        this.network.values().removeAll(Collections.singleton(null));
+        this.channels.values().removeAll(Collections.singleton(null));
+
+        // add new nodes
+        for (Map.Entry<AccountId, String> node : nodes.entrySet()) {
+            this.network.put(node.getKey(), node.getValue());
+            // .getChannel() will add the node and channel from network
+            this.getChannel(node.getKey());
+        }
+
+        return this;
     }
 
     /**
@@ -312,20 +363,31 @@ public final class Client implements AutoCloseable {
 
         var address = network.get(nodeId);
 
-        // Build a user agent that species our SDK version for Hedera
+        if (address != null) {
+
+            channel = buildChannel(address);
+
+            channels.put(nodeId, channel);
+        }
+
+        if (channel == null) {
+            throw new IllegalArgumentException("Node Id does not exist");
+        }
+
+        return channel;
+    }
+
+    // Build a user agent that specifies our SDK version for Hedera
+    private ManagedChannel buildChannel(String address) {
         var thePackage = getClass().getPackage();
         var implementationVersion = thePackage != null ? thePackage.getImplementationVersion() : null;
         var userAgent = "hedera-sdk-java/" + ((implementationVersion != null) ? ("v" + implementationVersion) : "DEV");
 
-        channel = ManagedChannelBuilder.forTarget(address)
+        return ManagedChannelBuilder.forTarget(address)
             .usePlaintext()
             .userAgent(userAgent)
             .executor(executor)
             .build();
-
-        channels.put(nodeId, channel);
-
-        return channel;
     }
 
     static class Operator {
@@ -350,4 +412,6 @@ public final class Client implements AutoCloseable {
             private String privateKey = "";
         }
     }
+
+
 }
