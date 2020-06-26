@@ -1,14 +1,9 @@
 package com.hedera.hashgraph.sdk;
 
 /**
- * Possible statuses for {@link Mnemonic#validate()}.
+ * Possible reason why a {@link Mnemonic} failed validation.
  */
-public enum MnemonicValidationStatus {
-    /**
-     * The mnemonic passed validation.
-     */
-    Ok,
-
+public enum BadMnemonicReason {
     /**
      * The mnemonic did not contain exactly 24 words.
      */
@@ -17,7 +12,7 @@ public enum MnemonicValidationStatus {
     /**
      * The mnemonic contained words which were not found in the BIP-39 standard English word list.
      * <p>
-     * {@link MnemonicValidationResult#unknownIndices} will be set with the list of word indices
+     * {@link BadMnemonicException#unknownWordIndices} will be set with the list of word indices
      * in {@link Mnemonic#words} which were not found in the standard word list.
      *
      * @see <a href="https://github.com/bitcoin/bips/blob/master/bip-0039/english.txt">BIP-39

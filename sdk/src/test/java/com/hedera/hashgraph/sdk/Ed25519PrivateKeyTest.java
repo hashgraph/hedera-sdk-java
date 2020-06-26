@@ -17,6 +17,7 @@ import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -137,7 +138,7 @@ class Ed25519PrivateKeyTest {
     @Test
     @DisplayName("private key can be recovered from a mnemonic")
     void keyFromMnemonic() {
-        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_STRING);
+        Mnemonic mnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(MNEMONIC_STRING));
         PrivateKey key = PrivateKey.fromMnemonic(mnemonic);
         PrivateKey key2 = PrivateKey.fromString(MNEMONIC_PRIVATE_KEY);
         assertArrayEquals(key2.toBytes(), key.toBytes());
@@ -146,7 +147,7 @@ class Ed25519PrivateKeyTest {
     @Test
     @DisplayName("derived key matches that of the mobile wallets")
     void deriveKeyIndex0() {
-        Mnemonic iosMnemonic = Mnemonic.fromString(IOS_MNEMONIC_STRING);
+        Mnemonic iosMnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(IOS_MNEMONIC_STRING));
         PrivateKey iosKey = PrivateKey.fromMnemonic(iosMnemonic);
 
         PrivateKey iosDerivedKey = iosKey.derive(0);
@@ -154,7 +155,7 @@ class Ed25519PrivateKeyTest {
 
         assertArrayEquals(iosDerivedKey.toBytes(), iosExpectedKey.toBytes());
 
-        Mnemonic androidMnemonic = Mnemonic.fromString(ANDROID_MNEMONIC_STRING);
+        Mnemonic androidMnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(ANDROID_MNEMONIC_STRING));
         PrivateKey androidKey = PrivateKey.fromMnemonic(androidMnemonic);
 
         PrivateKey androidDerivedKey = androidKey.derive(0);

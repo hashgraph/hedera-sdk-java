@@ -40,20 +40,34 @@ public final class Mnemonic {
     @Nullable
     private String asString;
 
+    private Mnemonic(List<? extends CharSequence> words) {
+        this.words = Collections.unmodifiableList(words);
+    }
+
     /**
-     * Construct a mnemonic from a 24-word list.
+     * Construct a mnemonic from a 24-word list. {@link Mnemonic#validate()}
+     * is called before returning, and it will throw an exception if it
+     * does not pass validation. An invalid mnemonic can still create valid
+     * Ed25519 private keys, so the exception will contain the mnemonic in case
+     * the user wants to ignore the outcome of the validation.
      *
      * @param words the 24-word list that constitutes a mnemonic phrase.
+     * @see #validate() the function that validates the mnemonic.
+     * @throws BadMnemonicException if the mnemonic does not pass validation.
      */
-    public Mnemonic(List<? extends CharSequence> words) {
-        this.words = Collections.unmodifiableList(words);
+    public static Mnemonic fromWords(List<? extends CharSequence> words) throws BadMnemonicException {
+        Mnemonic mnemonic = new Mnemonic(words);
+
+        mnemonic.validate();
+
+        return mnemonic;
     }
 
     /**
      * Recover a mnemonic from a string, splitting on spaces.
      */
-    public static Mnemonic fromString(String mnemonicString) {
-        return new Mnemonic(Arrays.asList(mnemonicString.split(" ")));
+    public static Mnemonic fromString(String mnemonicString) throws BadMnemonicException {
+        return Mnemonic.fromWords(Arrays.asList(mnemonicString.split(" ")));
     }
 
     /**
@@ -187,11 +201,11 @@ public final class Mnemonic {
      *     <li>The calculated checksum for the mnemonic equals the checksum encoded in the mnemonic.</li>
      * </ol>
      * <p>
-     * If all of these checks pass, {@link MnemonicValidationResult} is returned with
-     * {@link MnemonicValidationResult#status} set to {@link MnemonicValidationStatus#Ok}.
+     * If one of these checks do not pass, a {@link BadMnemonicException} is thrown containing the mnemonic
+     * and the reason why it failed validation.
      *
-     * @return the result of the validation.
-     * @see MnemonicValidationStatus
+     * @see BadMnemonicException
+     * @see BadMnemonicReason
      * @see <a href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki">
      * Bitcoin Improvement Project proposal 39 (BIP-39)
      * </a>
@@ -199,9 +213,9 @@ public final class Mnemonic {
      * BIP-39 English word list
      * </a>.
      */
-    public MnemonicValidationResult validate() {
+    public void validate() throws BadMnemonicException {
         if (words.size() != 24) {
-            return new MnemonicValidationResult(MnemonicValidationStatus.BadLength);
+            throw new BadMnemonicException(this, BadMnemonicReason.BadLength);
         }
 
         ArrayList<Integer> unknownIndices = new ArrayList<>();
@@ -213,7 +227,7 @@ public final class Mnemonic {
         }
 
         if (!unknownIndices.isEmpty()) {
-            return new MnemonicValidationResult(MnemonicValidationStatus.UnknownWords, unknownIndices);
+            throw new BadMnemonicException(this, BadMnemonicReason.UnknownWords, unknownIndices);
         }
 
         // test the checksum encoded in the mnemonic
@@ -224,10 +238,8 @@ public final class Mnemonic {
         byte givenChecksum = entropyAndChecksum[32];
 
         if (givenChecksum != expectedChecksum) {
-            return new MnemonicValidationResult(MnemonicValidationStatus.ChecksumMismatch);
+            throw new BadMnemonicException(this, BadMnemonicReason.ChecksumMismatch);
         }
-
-        return new MnemonicValidationResult(MnemonicValidationStatus.Ok);
     }
 
     @Override

@@ -7,10 +7,11 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Arrays;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MnemonicTest {
     @Test
@@ -18,11 +19,7 @@ public class MnemonicTest {
     void generateValidMnemonic() {
         Mnemonic mnemonic = Mnemonic.generate();
 
-        MnemonicValidationResult validationResult = mnemonic.validate();
-
-        assertEquals(validationResult.status, MnemonicValidationStatus.Ok);
-        assertNull(validationResult.unknownIndices);
-        assertTrue(validationResult.isOk());
+        assertDoesNotThrow(() -> mnemonic.validate());
     }
 
     @ParameterizedTest
@@ -33,30 +30,21 @@ public class MnemonicTest {
         "ramp april job flavor surround pyramid fish sea good know blame gate village viable include mixed term draft among monitor swear swing novel track",
     })
     void knownGoodMnemonics(String mnemonicStr) {
-        Mnemonic mnemonic = Mnemonic.fromString(mnemonicStr);
-
-        MnemonicValidationResult validationResult = mnemonic.validate();
-
-        assertEquals(validationResult.status, MnemonicValidationStatus.Ok);
-        assertNull(validationResult.unknownIndices);
-        assertTrue(validationResult.isOk());
+        assertDoesNotThrow(() -> Mnemonic.fromString(mnemonicStr));
     }
 
     @Test
     @DisplayName("Mnemonic.validate() throws on short word list")
     void shortWordList() {
-        Mnemonic mnemonic = new Mnemonic(Arrays.asList("lorem", "ipsum", "dolor"));
-        MnemonicValidationResult validationResult = mnemonic.validate();
-
-        assertEquals(MnemonicValidationStatus.BadLength, validationResult.status);
-        assertNull(validationResult.unknownIndices);
-        assertFalse(validationResult.isOk());
+        BadMnemonicException exception = assertThrows(BadMnemonicException.class, () -> Mnemonic.fromWords(Arrays.asList("lorem", "ipsum", "dolor")));
+        assertEquals(BadMnemonicReason.BadLength, exception.reason);
+        assertNull(exception.unknownWordIndices);
     }
 
     @Test
     @DisplayName("Mnemonic.validate() throws on unknown words")
     void unknownWords() {
-        Mnemonic mnemonic = new Mnemonic(Arrays.asList(
+        BadMnemonicException exception = assertThrows(BadMnemonicException.class, () -> Mnemonic.fromWords(Arrays.asList(
             "abandon",
             "ability",
             "able",
@@ -81,20 +69,17 @@ public class MnemonicTest {
             "actor",
             "actress",
             "actual"
-        ));
+        )));
 
-        MnemonicValidationResult validationResult = mnemonic.validate();
-
-        assertEquals(MnemonicValidationStatus.UnknownWords, validationResult.status);
-        assertEquals(Arrays.asList(6, 12, 17), validationResult.unknownIndices);
-        assertFalse(validationResult.isOk());
+        assertEquals(BadMnemonicReason.UnknownWords, exception.reason);
+        assertEquals(Arrays.asList(6, 12, 17), exception.unknownWordIndices);
     }
 
     @Test
     @DisplayName("Mnemonic.validate() throws on checksum mismatch")
     void checksumMismatch() {
         // this mnemonic was just made up, the checksum should definitely not match
-        Mnemonic mnemonic = new Mnemonic(Arrays.asList(
+        BadMnemonicException exception = assertThrows(BadMnemonicException.class, () -> Mnemonic.fromWords(Arrays.asList(
             "abandon",
             "ability",
             "able",
@@ -119,12 +104,42 @@ public class MnemonicTest {
             "actor",
             "actress",
             "actual"
-        ));
+        )));
 
-        MnemonicValidationResult validationResult = mnemonic.validate();
+        assertEquals(BadMnemonicReason.ChecksumMismatch, exception.reason);
+        assertNull(exception.unknownWordIndices);
+    }
 
-        assertEquals(MnemonicValidationStatus.ChecksumMismatch, validationResult.status);
-        assertNull(validationResult.unknownIndices);
-        assertFalse(validationResult.isOk());
+    @Test
+    @DisplayName("Invalid Mnemonic can still be used to generate a private key")
+    void invalidToPrivateKey() {
+        Mnemonic mnemonic = assertThrows(BadMnemonicException.class, () -> Mnemonic.fromWords(Arrays.asList(
+            "abandon",
+            "ability",
+            "able",
+            "about",
+            "above",
+            "absent",
+            "absorb",
+            "abstract",
+            "absurd",
+            "abuse",
+            "access",
+            "accident",
+            "account",
+            "accuse",
+            "achieve",
+            "acid",
+            "acoustic",
+            "acquire",
+            "across",
+            "act",
+            "action",
+            "actor",
+            "actress",
+            "actual"
+        ))).mnemonic;
+
+        assertNotNull(mnemonic);
     }
 }
