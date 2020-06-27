@@ -10,6 +10,7 @@ import org.bouncycastle.util.encoders.Hex;
 import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -76,6 +77,24 @@ public final class ContractFunctionResult {
      */
     public String getString(int valIndex) {
         return getDynamicBytes(valIndex).toStringUtf8();
+    }
+
+    /**
+     * Get the nth returned value as a list of strings
+     */
+    public List<String> getStringArray(int index) {
+        var offset = getInt32(index);
+        var count = getIntValueAt(offset);
+        var strings = new ArrayList<String>();
+
+        for (int i = 0; i < count; i++) {
+            var str_offset = getIntValueAt(offset + 32 + (i * 32));
+            var len = getIntValueAt(offset + str_offset + 32);
+            var str = getByteString(offset + str_offset + 32 + 32, offset + str_offset + 32 + 32 + len).toStringUtf8();
+            strings.add(str);
+        }
+
+        return strings;
     }
 
     /**
