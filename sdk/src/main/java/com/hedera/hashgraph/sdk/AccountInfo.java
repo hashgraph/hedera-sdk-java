@@ -3,10 +3,13 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoGetInfoResponse;
+import java8.util.J8Arrays;
+import java8.util.stream.Collectors;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * Current information about an account, including the balance.
@@ -84,6 +87,8 @@ public final class AccountInfo {
      */
     public final Duration autoRenewPeriod;
 
+    public final List<LiveHash> liveHashes;
+
     private AccountInfo(
         AccountId accountId,
         String contractAccountId,
@@ -96,7 +101,8 @@ public final class AccountInfo {
         long receiveRecordThreshold,
         boolean receiverSignatureRequired,
         Instant expirationTime,
-        Duration autoRenewPeriod
+        Duration autoRenewPeriod,
+        List<LiveHash> liveHashes
     ) {
         this.accountId = accountId;
         this.contractAccountId = contractAccountId;
@@ -110,6 +116,7 @@ public final class AccountInfo {
         this.receiverSignatureRequired = receiverSignatureRequired;
         this.expirationTime = expirationTime;
         this.autoRenewPeriod = autoRenewPeriod;
+        this.liveHashes = liveHashes;
     }
 
     static AccountInfo fromProtobuf(CryptoGetInfoResponse.AccountInfo accountInfo) {
@@ -118,6 +125,10 @@ public final class AccountInfo {
         var proxyAccountId = accountInfo.getProxyAccountID().getAccountNum() > 0
             ? AccountId.fromProtobuf(accountInfo.getProxyAccountID())
             : null;
+
+        var liveHashes = J8Arrays.stream((com.hedera.hashgraph.sdk.proto.LiveHash[])accountInfo.getLiveHashesList().toArray())
+            .map(LiveHash::fromProtobuf)
+            .collect(Collectors.toList());
 
         return new AccountInfo(
             accountId,
@@ -131,7 +142,8 @@ public final class AccountInfo {
             accountInfo.getGenerateReceiveRecordThreshold(),
             accountInfo.getReceiverSigRequired(),
             InstantConverter.fromProtobuf(accountInfo.getExpirationTime()),
-            DurationConverter.fromProtobuf(accountInfo.getAutoRenewPeriod())
+            DurationConverter.fromProtobuf(accountInfo.getAutoRenewPeriod()),
+            liveHashes
         );
     }
 
@@ -140,6 +152,10 @@ public final class AccountInfo {
     }
 
     CryptoGetInfoResponse.AccountInfo toProtobuf() {
+        var hashes = J8Arrays.stream((LiveHash[])liveHashes.toArray())
+            .map(LiveHash::toProtobuf)
+            .collect(Collectors.toList());
+
         var accountInfoBuilder = CryptoGetInfoResponse.AccountInfo.newBuilder()
             .setAccountID(accountId.toProtobuf())
             .setDeleted(deleted)
@@ -160,6 +176,10 @@ public final class AccountInfo {
             accountInfoBuilder.setProxyAccountID(proxyAccountId.toProtobuf());
         }
 
+        for (int i = 0; i < hashes.size(); i++) {
+            accountInfoBuilder.setLiveHashes(i, hashes.get(i));
+        }
+
         return accountInfoBuilder.build();
     }
 
@@ -178,6 +198,7 @@ public final class AccountInfo {
             .add("receiverSignatureRequired", receiverSignatureRequired)
             .add("expirationTime", expirationTime)
             .add("autoRenewPeriod", autoRenewPeriod)
+            .add("liveHashes", liveHashes)
             .toString();
     }
 
