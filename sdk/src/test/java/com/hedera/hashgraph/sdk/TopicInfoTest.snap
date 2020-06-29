@@ -1,0 +1,144 @@
+com.hedera.hashgraph.sdk.TopicInfoTest.fromBytes=[
+  "TopicInfo{topicId=0.0.0, topicMemo=1, runningHash=<ByteString@4bc1bc18 size=1 contents=\"\\002\">, sequenceNumber=3, expirationTime=1970-01-01T00:00:00.004Z, adminKey=302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7, submitKey=302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7, autoRenewPeriod=PT120H, autoRenewAccountId=0.0.4}"
+]
+
+
+com.hedera.hashgraph.sdk.TopicInfoTest.fromProtobuf=[
+  "TopicInfo{topicId=0.0.0, topicMemo=1, runningHash=<ByteString@90bba695 size=1 contents=\"\\002\">, sequenceNumber=3, expirationTime=1970-01-01T00:00:00.004Z, adminKey=302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7, submitKey=302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7, autoRenewPeriod=PT120H, autoRenewAccountId=0.0.4}"
+]
+
+
+com.hedera.hashgraph.sdk.TopicInfoTest.toBytes=[
+  "EgAqYQoBMRIBAhgDIgUQgJL0ASoiEiDgyOwnWKWHn/rCJqE8DFFreZ5y41FBoN2Cj5TTeYiktzIiEiDgyOwnWKWHn/rCJqE8DFFreZ5y41FBoN2Cj5TTeYiktzoECICvGkICGAQ="
+]
+
+
+com.hedera.hashgraph.sdk.TopicInfoTest.toProtobuf=[
+  {
+    "memoizedHashCode": 0,
+    "unknownFields": {
+      "count": 0,
+      "tags": [ ],
+      "objects": [ ],
+      "memoizedSerializedSize": 0,
+      "isMutable": false
+    },
+    "memoizedSerializedSize": -1,
+    "topicID_": {
+      "memoizedHashCode": 0,
+      "unknownFields": {
+        "count": 0,
+        "tags": [ ],
+        "objects": [ ],
+        "memoizedSerializedSize": 0,
+        "isMutable": false
+      },
+      "memoizedSerializedSize": -1,
+      "shardNum_": 0,
+      "realmNum_": 0,
+      "topicNum_": 0,
+      "initialized": true
+    },
+    "topicInfo_": {
+      "memoizedHashCode": 0,
+      "unknownFields": {
+        "count": 0,
+        "tags": [ ],
+        "objects": [ ],
+        "memoizedSerializedSize": 0,
+        "isMutable": false
+      },
+      "memoizedSerializedSize": -1,
+      "memo_": "1",
+      "runningHash_": {
+        "hash": 0,
+        "bytes": "Ag==",
+        "validUtf8": true,
+        "empty": false
+      },
+      "sequenceNumber_": 3,
+      "expirationTime_": {
+        "memoizedHashCode": 0,
+        "unknownFields": {
+          "count": 0,
+          "tags": [ ],
+          "objects": [ ],
+          "memoizedSerializedSize": 0,
+          "isMutable": false
+        },
+        "memoizedSerializedSize": -1,
+        "seconds_": 0,
+        "nanos_": 4000000,
+        "initialized": true
+      },
+      "adminKey_": {
+        "memoizedHashCode": 0,
+        "unknownFields": {
+          "count": 0,
+          "tags": [ ],
+          "objects": [ ],
+          "memoizedSerializedSize": 0,
+          "isMutable": false
+        },
+        "memoizedSerializedSize": -1,
+        "keyCase_": 2,
+        "key_": {
+          "hash": 0,
+          "bytes": "4MjsJ1ilh5/6wiahPAxRa3mecuNRQaDdgo+U03mIpLc=",
+          "validUtf8": false,
+          "empty": false
+        },
+        "initialized": true
+      },
+      "submitKey_": {
+        "memoizedHashCode": 0,
+        "unknownFields": {
+          "count": 0,
+          "tags": [ ],
+          "objects": [ ],
+          "memoizedSerializedSize": 0,
+          "isMutable": false
+        },
+        "memoizedSerializedSize": -1,
+        "keyCase_": 2,
+        "key_": {
+          "hash": 0,
+          "bytes": "4MjsJ1ilh5/6wiahPAxRa3mecuNRQaDdgo+U03mIpLc=",
+          "validUtf8": false,
+          "empty": false
+        },
+        "initialized": true
+      },
+      "autoRenewPeriod_": {
+        "memoizedHashCode": 0,
+        "unknownFields": {
+          "count": 0,
+          "tags": [ ],
+          "objects": [ ],
+          "memoizedSerializedSize": 0,
+          "isMutable": false
+        },
+        "memoizedSerializedSize": -1,
+        "seconds_": 432000,
+        "initialized": true
+      },
+      "autoRenewAccount_": {
+        "memoizedHashCode": 0,
+        "unknownFields": {
+          "count": 0,
+          "tags": [ ],
+          "objects": [ ],
+          "memoizedSerializedSize": 0,
+          "isMutable": false
+        },
+        "memoizedSerializedSize": -1,
+        "shardNum_": 0,
+        "realmNum_": 0,
+        "accountNum_": 4,
+        "initialized": true
+      },
+      "initialized": true
+    },
+    "initialized": true
+  }
+]
