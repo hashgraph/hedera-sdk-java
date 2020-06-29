@@ -1,6 +1,8 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.Splitter;
+import com.google.errorprone.annotations.Var;
+
 import java8.lang.FunctionalInterface;
 import org.bouncycastle.util.encoders.DecoderException;
 import org.bouncycastle.util.encoders.Hex;
@@ -75,7 +77,9 @@ class EntityId {
         return withAddress.apply(buf.getInt(), buf.getLong(), buf.getLong());
     }
 
-    private static byte[] decodeSolidityAddress(String address) {
+    private static byte[] decodeSolidityAddress(@Var String address) {
+        address = address.startsWith("0x") ? address.substring(2) : address;
+
         if (address.length() != SOLIDITY_ADDRESS_LEN_HEX) {
             throw new IllegalArgumentException(
                 "Solidity addresses must be 20 bytes or 40 hex chars");

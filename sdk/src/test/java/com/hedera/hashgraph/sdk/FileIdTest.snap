@@ -1,3 +1,22 @@
+com.hedera.hashgraph.sdk.FileIdTest.fromBytes=[
+  {
+    "shard": 0,
+    "realm": 0,
+    "num": 5005
+  }
+]
+
+
 com.hedera.hashgraph.sdk.FileIdTest.shouldSerialize=[
   "# com.hedera.hashgraph.sdk.proto.FileID@bc8a0\nfile_num: 5005\nrealm_num: 0\nshard_num: 0"
+]
+
+
+com.hedera.hashgraph.sdk.FileIdTest.shouldSerializeFromString=[
+  "# com.hedera.hashgraph.sdk.proto.FileID@bc8a0\nfile_num: 5005\nrealm_num: 0\nshard_num: 0"
+]
+
+
+com.hedera.hashgraph.sdk.FileIdTest.toBytes=[
+  "GI0n"
 ]

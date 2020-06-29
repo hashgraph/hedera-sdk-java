@@ -1,3 +1,52 @@
+com.hedera.hashgraph.sdk.ContractIdTest.fromBytes=[
+  {
+    "shard": 0,
+    "realm": 0,
+    "num": 5005
+  }
+]
+
+
+com.hedera.hashgraph.sdk.ContractIdTest.fromSolidityAddress=[
+  "# com.hedera.hashgraph.sdk.proto.ContractID@bc8a0\ncontract_num: 5005\nrealm_num: 0\nshard_num: 0"
+]
+
+
+com.hedera.hashgraph.sdk.ContractIdTest.fromSolidityAddressWith0x=[
+  "# com.hedera.hashgraph.sdk.proto.ContractID@bc8a0\ncontract_num: 5005\nrealm_num: 0\nshard_num: 0"
+]
+
+
+com.hedera.hashgraph.sdk.ContractIdTest.fromString=[
+  "# com.hedera.hashgraph.sdk.proto.ContractID@bc8a0\ncontract_num: 5005\nrealm_num: 0\nshard_num: 0"
+]
+
+
 com.hedera.hashgraph.sdk.ContractIdTest.shouldSerialize=[
   "# com.hedera.hashgraph.sdk.proto.ContractID@bc8a0\ncontract_num: 5005\nrealm_num: 0\nshard_num: 0"
+]
+
+
+com.hedera.hashgraph.sdk.ContractIdTest.shouldSerializeFromSolidityAddress=[
+  "# com.hedera.hashgraph.sdk.proto.ContractID@bc8a0\ncontract_num: 5005\nrealm_num: 0\nshard_num: 0"
+]
+
+
+com.hedera.hashgraph.sdk.ContractIdTest.shouldSerializeFromSolidityAddressWith0x=[
+  "# com.hedera.hashgraph.sdk.proto.ContractID@bc8a0\ncontract_num: 5005\nrealm_num: 0\nshard_num: 0"
+]
+
+
+com.hedera.hashgraph.sdk.ContractIdTest.shouldSerializeFromString=[
+  "# com.hedera.hashgraph.sdk.proto.ContractID@bc8a0\ncontract_num: 5005\nrealm_num: 0\nshard_num: 0"
+]
+
+
+com.hedera.hashgraph.sdk.ContractIdTest.toBytes=[
+  "GI0n"
+]
+
+
+com.hedera.hashgraph.sdk.ContractIdTest.toSolidityAddress=[
+  "000000000000000000000000000000000000138d"
 ]
