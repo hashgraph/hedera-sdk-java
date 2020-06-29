@@ -126,8 +126,8 @@ public final class AccountInfo {
             ? AccountId.fromProtobuf(accountInfo.getProxyAccountID())
             : null;
 
-        var liveHashes = J8Arrays.stream((com.hedera.hashgraph.sdk.proto.LiveHash[])accountInfo.getLiveHashesList().toArray())
-            .map(LiveHash::fromProtobuf)
+        var liveHashes = J8Arrays.stream(accountInfo.getLiveHashesList().toArray())
+            .map((liveHash) -> LiveHash.fromProtobuf((com.hedera.hashgraph.sdk.proto.LiveHash)liveHash))
             .collect(Collectors.toList());
 
         return new AccountInfo(
@@ -152,8 +152,8 @@ public final class AccountInfo {
     }
 
     CryptoGetInfoResponse.AccountInfo toProtobuf() {
-        var hashes = J8Arrays.stream((LiveHash[])liveHashes.toArray())
-            .map(LiveHash::toProtobuf)
+        var hashes = J8Arrays.stream(liveHashes.toArray())
+            .map((liveHash) -> ((LiveHash)liveHash).toProtobuf())
             .collect(Collectors.toList());
 
         var accountInfoBuilder = CryptoGetInfoResponse.AccountInfo.newBuilder()

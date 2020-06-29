@@ -10,6 +10,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.errorprone.annotations.Var;
+
 class ClientTest {
     @Test
     @DisplayName("fromJson() functions correctly")
@@ -34,7 +36,7 @@ class ClientTest {
     @Test
     @DisplayName("setNetwork() functions correctly")
     void testReplaceNodes() {
-        Map<AccountId, String> nodes = new HashMap<>();
+        @Var Map<AccountId, String> nodes = new HashMap<>();
         nodes.put(new AccountId(3), "0.testnet.hedera.com:50211");
         nodes.put(new AccountId(4), "1.testnet.hedera.com:50211");
 

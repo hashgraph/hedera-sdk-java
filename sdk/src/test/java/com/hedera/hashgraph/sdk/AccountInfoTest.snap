@@ -1,3 +1,103 @@
+com.hedera.hashgraph.sdk.AccountInfoTest.fromBytes=[
+  "AccountInfo{accountId=0.0.1, contractAccountId=, deleted=true, proxyAccountId=null, proxyReceived=2 tℏ, key=302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7, balance=3 tℏ, sendRecordThreshold=4 tℏ, receiveRecordThreshold=5 tℏ, receiverSignatureRequired=true, expirationTime=1970-01-01T00:00:00.006Z, autoRenewPeriod=PT168H, liveHashes=[]}"
+]
+
+
 com.hedera.hashgraph.sdk.AccountInfoTest.fromProtobuf=[
-  "AccountInfo{accountId=0.0.0, contractAccountId=, deleted=false, proxyAccountId=null, proxyReceived=0 tℏ, key=302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7, balance=0 tℏ, sendRecordThreshold=0 tℏ, receiveRecordThreshold=0 tℏ, receiverSignatureRequired=false, expirationTime=1970-01-01T00:00:00Z, autoRenewPeriod=PT0S}"
+  "AccountInfo{accountId=0.0.0, contractAccountId=, deleted=false, proxyAccountId=null, proxyReceived=0 tℏ, key=302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7, balance=0 tℏ, sendRecordThreshold=0 tℏ, receiveRecordThreshold=0 tℏ, receiverSignatureRequired=false, expirationTime=1970-01-01T00:00:00Z, autoRenewPeriod=PT0S, liveHashes=[]}"
+]
+
+
+com.hedera.hashgraph.sdk.AccountInfoTest.fromProtobufWithOtherOptions=[
+  "AccountInfo{accountId=0.0.1, contractAccountId=, deleted=true, proxyAccountId=null, proxyReceived=2 tℏ, key=302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7, balance=3 tℏ, sendRecordThreshold=4 tℏ, receiveRecordThreshold=5 tℏ, receiverSignatureRequired=true, expirationTime=1970-01-01T00:00:00.006Z, autoRenewPeriod=PT168H, liveHashes=[]}"
+]
+
+
+com.hedera.hashgraph.sdk.AccountInfoTest.toBytes=[
+  "CgIYARgBMAI6IhIg4MjsJ1ilh5/6wiahPAxRa3mecuNRQaDdgo+U03mIpLdAA0gEUAVYAWIFEICb7gJqBAiA9SQ="
+]
+
+
+com.hedera.hashgraph.sdk.AccountInfoTest.toProtobuf=[
+  {
+    "memoizedHashCode": 0,
+    "unknownFields": {
+      "count": 0,
+      "tags": [ ],
+      "objects": [ ],
+      "memoizedSerializedSize": 0,
+      "isMutable": false
+    },
+    "memoizedSerializedSize": -1,
+    "accountID_": {
+      "memoizedHashCode": 0,
+      "unknownFields": {
+        "count": 0,
+        "tags": [ ],
+        "objects": [ ],
+        "memoizedSerializedSize": 0,
+        "isMutable": false
+      },
+      "memoizedSerializedSize": -1,
+      "shardNum_": 0,
+      "realmNum_": 0,
+      "accountNum_": 1,
+      "initialized": true
+    },
+    "contractAccountID_": "",
+    "deleted_": true,
+    "proxyReceived_": 2,
+    "key_": {
+      "memoizedHashCode": 0,
+      "unknownFields": {
+        "count": 0,
+        "tags": [ ],
+        "objects": [ ],
+        "memoizedSerializedSize": 0,
+        "isMutable": false
+      },
+      "memoizedSerializedSize": -1,
+      "keyCase_": 2,
+      "key_": {
+        "hash": 0,
+        "bytes": "4MjsJ1ilh5/6wiahPAxRa3mecuNRQaDdgo+U03mIpLc=",
+        "validUtf8": false,
+        "empty": false
+      },
+      "initialized": true
+    },
+    "balance_": 3,
+    "generateSendRecordThreshold_": 4,
+    "generateReceiveRecordThreshold_": 5,
+    "receiverSigRequired_": true,
+    "expirationTime_": {
+      "memoizedHashCode": 0,
+      "unknownFields": {
+        "count": 0,
+        "tags": [ ],
+        "objects": [ ],
+        "memoizedSerializedSize": 0,
+        "isMutable": false
+      },
+      "memoizedSerializedSize": -1,
+      "seconds_": 0,
+      "nanos_": 6000000,
+      "initialized": true
+    },
+    "autoRenewPeriod_": {
+      "memoizedHashCode": 0,
+      "unknownFields": {
+        "count": 0,
+        "tags": [ ],
+        "objects": [ ],
+        "memoizedSerializedSize": 0,
+        "isMutable": false
+      },
+      "memoizedSerializedSize": -1,
+      "seconds_": 604800,
+      "initialized": true
+    },
+    "liveHashes_": [ ],
+    "initialized": true
+  }
 ]
