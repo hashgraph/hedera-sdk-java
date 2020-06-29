@@ -166,7 +166,8 @@ public final class AccountInfo {
             .setGenerateReceiveRecordThreshold(receiveRecordThreshold.toTinybars())
             .setReceiverSigRequired(receiverSignatureRequired)
             .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
-            .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
+            .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod))
+            .addAllLiveHashes(hashes);
 
         if (contractAccountId != null) {
             accountInfoBuilder.setContractAccountID(contractAccountId);
@@ -174,10 +175,6 @@ public final class AccountInfo {
 
         if (proxyAccountId != null) {
             accountInfoBuilder.setProxyAccountID(proxyAccountId.toProtobuf());
-        }
-
-        for (int i = 0; i < hashes.size(); i++) {
-            accountInfoBuilder.setLiveHashes(i, hashes.get(i));
         }
 
         return accountInfoBuilder.build();
