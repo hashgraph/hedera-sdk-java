@@ -2,6 +2,8 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.sdk.proto.ContractLoginfo;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.util.ArrayList;
@@ -58,6 +60,14 @@ public final class ContractLogInfo {
         }
 
         return contractLogInfo.build();
+    }
+
+    public static ContractLogInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        return fromProtobuf(ContractLoginfo.parseFrom(bytes));
+    }
+
+    public byte[] toBytes() {
+        return toProtobuf().toByteArray();
     }
 
     @Override
