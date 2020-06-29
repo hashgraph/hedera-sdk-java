@@ -1,0 +1,90 @@
+com.hedera.hashgraph.sdk.ContractInfoTest.fromBytes=[
+  "CgIYARICGAIaATMqBRCAkvQBMgQIgK8aOAZCATdICA=="
+]
+
+
+com.hedera.hashgraph.sdk.ContractInfoTest.fromProtobuf=[
+  "ContractInfo{contractId=0.0.1, accountId=0.0.2, contractAccountId=3, adminKey=null, expirationTime=1970-01-01T00:00:00.004Z, autoRenewPeriod=PT120H, storage=6, contractMemo=7, balance=8 tℏ}"
+]
+
+
+com.hedera.hashgraph.sdk.ContractInfoTest.toBytes=[
+  "CgIYARICGAIaATMqBRCAkvQBMgQIgK8aOAZCATdICA=="
+]
+
+
+com.hedera.hashgraph.sdk.ContractInfoTest.toProtobuf=[
+  {
+    "memoizedHashCode": 0,
+    "unknownFields": {
+      "count": 0,
+      "tags": [ ],
+      "objects": [ ],
+      "memoizedSerializedSize": 0,
+      "isMutable": false
+    },
+    "memoizedSerializedSize": -1,
+    "contractID_": {
+      "memoizedHashCode": 0,
+      "unknownFields": {
+        "count": 0,
+        "tags": [ ],
+        "objects": [ ],
+        "memoizedSerializedSize": 0,
+        "isMutable": false
+      },
+      "memoizedSerializedSize": -1,
+      "shardNum_": 0,
+      "realmNum_": 0,
+      "contractNum_": 1,
+      "initialized": true
+    },
+    "accountID_": {
+      "memoizedHashCode": 0,
+      "unknownFields": {
+        "count": 0,
+        "tags": [ ],
+        "objects": [ ],
+        "memoizedSerializedSize": 0,
+        "isMutable": false
+      },
+      "memoizedSerializedSize": -1,
+      "shardNum_": 0,
+      "realmNum_": 0,
+      "accountNum_": 2,
+      "initialized": true
+    },
+    "contractAccountID_": "3",
+    "expirationTime_": {
+      "memoizedHashCode": 0,
+      "unknownFields": {
+        "count": 0,
+        "tags": [ ],
+        "objects": [ ],
+        "memoizedSerializedSize": 0,
+        "isMutable": false
+      },
+      "memoizedSerializedSize": -1,
+      "seconds_": 0,
+      "nanos_": 4000000,
+      "initialized": true
+    },
+    "autoRenewPeriod_": {
+      "memoizedHashCode": 0,
+      "unknownFields": {
+        "count": 0,
+        "tags": [ ],
+        "objects": [ ],
+        "memoizedSerializedSize": 0,
+        "isMutable": false
+      },
+      "memoizedSerializedSize": -1,
+      "seconds_": 432000,
+      "initialized": true
+    },
+    "storage_": 6,
+    "memo_": "7",
+    "balance_": 8,
+    "initialized": true
+  }
+]
