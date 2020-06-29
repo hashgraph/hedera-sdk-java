@@ -32,7 +32,7 @@ class ClientTest {
     }
 
     @Test
-    @DisplayName("replaceNodes() functions correctly")
+    @DisplayName("setNetwork() functions correctly")
     void testReplaceNodes() {
         Map<AccountId, String> nodes = new HashMap<>();
         nodes.put(new AccountId(3), "0.testnet.hedera.com:50211");

@@ -36,7 +36,7 @@ public final class Client implements AutoCloseable {
 
     final ExecutorService executor;
 
-    private final Iterator<AccountId> nodes;
+    private Iterator<AccountId> nodes;
 
     private final Map<AccountId, String> network;
 
@@ -64,14 +64,14 @@ public final class Client implements AutoCloseable {
         this.network = network;
         this.channels = new HashMap<>(network.size());
 
-        this.nodes = setNodes(network);
+        setNodes(network);
     }
 
-    private static Iterator<AccountId> setNodes(Map<AccountId, String> network) {
+    private void setNodes(Map<AccountId, String> network) {
         // Take all given node account IDs, shuffle, and prepare an infinite iterator for use in [getNextNodeId]
         var allNodes = new ArrayList<>(network.keySet());
         Collections.shuffle(allNodes, ThreadLocalSecureRandom.current());
-        return Iterables.cycle(allNodes).iterator();
+        this.nodes = Iterables.cycle(allNodes).iterator();
     }
 
     /**
@@ -193,7 +193,7 @@ public final class Client implements AutoCloseable {
             node.setValue(newNodeUrl);
 
             if (newNodeUrl == null) {
-                // Else null for removal, should be changed to just remove
+                // set null for removal, should be fixed here to just remove instead of setting null then removing
                 channels.put(node.getKey(), null);
             } else if (channels.get(node.getKey()) != null && !channels.get(node.getKey()).authority().equals(newNodeUrl)) {
                 // Shutdown channel before replacing address
