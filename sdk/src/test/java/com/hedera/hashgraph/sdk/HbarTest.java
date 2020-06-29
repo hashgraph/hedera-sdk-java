@@ -75,4 +75,39 @@ public class HbarTest {
 
         assertTrue(fiftyHbar.compareTo(negativeFiftyHbar) > 0);
     }
+
+    @Test
+    void constructorWorks() {
+        new Hbar(1);
+    }
+
+    @Test
+    void fromString() {
+        assertEquals(Hbar.fromString("1").toTinybars(), 100000000);
+    }
+
+    @Test
+    void fromStringUnit() {
+        assertEquals(Hbar.fromString("1", HbarUnit.TINYBAR).toTinybars(), 1);
+    }
+
+    @Test
+    void from() {
+        assertEquals(Hbar.from(1).toTinybars(), 100000000);
+    }
+
+    @Test
+    void fromUnit() {
+        assertEquals(Hbar.from(1, HbarUnit.TINYBAR).toTinybars(), 1);
+    }
+
+    @Test
+    void getValue() {
+        assertEquals(new Hbar(1).getValue(), BigDecimal.valueOf(1));
+    }
+
+    @Test
+    void hasHashCode() {
+        assertEquals(new Hbar(1).hashCode(), 100000031);
+    }
 }
