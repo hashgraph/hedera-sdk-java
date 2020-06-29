@@ -9,9 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class KeyTest {
     @Test
@@ -100,5 +98,13 @@ class KeyTest {
         assertEquals(2, actual.getKeys().getKeysCount());
         assertArrayEquals(keyBytes[0], actual.getKeys().getKeys(0).getEd25519().toByteArray());
         assertArrayEquals(keyBytes[1], actual.getKeys().getKeys(1).getEd25519().toByteArray());
+    }
+
+    @Test
+    @DisplayName("Throws given unsupported key")
+    void throwsUnsupportedKey() {
+        byte[] keyBytes = {0, 1, 2};
+        var protoKey = Key.newBuilder().setRSA3072(ByteString.copyFrom(keyBytes)).build();
+        assertThrows(IllegalStateException.class, () -> com.hedera.hashgraph.sdk.Key.fromProtobuf(protoKey));
     }
 }
