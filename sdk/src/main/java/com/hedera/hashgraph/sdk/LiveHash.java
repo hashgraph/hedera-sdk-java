@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.threeten.bp.Duration;
@@ -46,5 +47,15 @@ public class LiveHash {
 
     public static LiveHash fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.LiveHash.parseFrom(bytes).toBuilder().build());
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("accountId", accountId)
+            .add("hash", hash.toByteArray())
+            .add("keys", keys)
+            .add("duration", duration)
+            .toString();
     }
 }
