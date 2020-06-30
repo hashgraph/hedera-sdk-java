@@ -4,10 +4,11 @@ import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 public class ContractUpdateTransactionTest {
-    private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
+    private static final PrivateKey privateKey = PrivateKey.fromString(
         "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
 
     final Instant validStart = Instant.ofEpochSecond(1554158542);
@@ -28,9 +29,15 @@ public class ContractUpdateTransactionTest {
             .setNodeAccountId(AccountId.fromString("0.0.5005"))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setContractId(ContractId.fromString("0.0.5007"))
+            .setAdminKey(privateKey)
+            .setAutoRenewPeriod(Duration.ofDays(1))
+            .setBytecodeFileId(new FileId(2))
+            .setContractMemo("3")
+            .setExpirationTime(Instant.ofEpochMilli(4))
+            .setProxyAccountId(new AccountId(4))
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .build(Client.forTestnet())
-            .sign(unusedPrivateKey)
+            .sign(privateKey)
             .toString()
         ).toMatchSnapshot();
     }

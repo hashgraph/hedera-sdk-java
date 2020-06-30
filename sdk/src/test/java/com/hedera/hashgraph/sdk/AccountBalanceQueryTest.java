@@ -17,7 +17,7 @@ public class AccountBalanceQueryTest {
     }
 
     @Test
-    void shouldSerializeWithAccount() {
+    void shouldSerializeWithAccountId() {
         SnapshotMatcher.expect(new AccountBalanceQuery()
             .setAccountId(AccountId.fromString("0.0.5005"))
             .toString()
@@ -25,7 +25,7 @@ public class AccountBalanceQueryTest {
     }
 
     @Test
-    void shouldSerializeWithContract() {
+    void shouldSerializeWithContractId() {
         SnapshotMatcher.expect(new AccountBalanceQuery()
             .setContractId(ContractId.fromString("0.0.5005"))
             .toString()

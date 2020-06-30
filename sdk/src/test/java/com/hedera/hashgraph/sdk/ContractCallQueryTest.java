@@ -35,4 +35,20 @@ public class ContractCallQueryTest {
             .toString()
         ).toMatchSnapshot();
     }
+
+    @Test
+    void setFunctionParameters() {
+        SnapshotMatcher.expect(new ContractCallQuery()
+            .setContractId(ContractId.fromString("0.0.5005"))
+            .setGas(1541)
+            .setFunctionParameters(
+                new ContractFunctionParameters()
+                    .addString("Hello")
+                    .addString("world!")
+                    .toBytes(null)
+                    .toByteArray())
+            .setMaxResultSize(4444444)
+            .toString()
+        ).toMatchSnapshot();
+    }
 }

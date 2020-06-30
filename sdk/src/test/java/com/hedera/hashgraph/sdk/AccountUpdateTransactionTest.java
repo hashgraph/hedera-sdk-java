@@ -35,6 +35,7 @@ public class AccountUpdateTransactionTest {
             .setReceiveRecordThreshold(Hbar.fromTinybars(6))
             .setAutoRenewPeriod(Duration.ofHours(10))
             .setExpirationTime(Instant.ofEpochSecond(1554158543))
+            .setReceiverSignatureRequired(false)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .build(Client.forTestnet())
             .sign(unusedPrivateKey)

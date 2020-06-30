@@ -107,4 +107,31 @@ class KeyTest {
         var protoKey = Key.newBuilder().setRSA3072(ByteString.copyFrom(keyBytes)).build();
         assertThrows(IllegalStateException.class, () -> com.hedera.hashgraph.sdk.Key.fromProtobuf(protoKey));
     }
+
+    @Test
+    @DisplayName("PublicKey equals")
+    void keyEquals() {
+        var key1 = PrivateKey.fromString(
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
+
+        var key2 = PrivateKey.fromString(
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
+
+        assertEquals(key1, key2);
+        assertEquals(key1, key1);
+        assertEquals(key2, key2);
+        assertEquals(key1.getPublicKey(), key2.getPublicKey());
+        assertEquals(key1.getPublicKey(), key1.getPublicKey());
+        assertEquals(key2.getPublicKey(), key2.getPublicKey());
+        assertNotEquals(key1.getPublicKey(), "random string");
+    }
+
+    @Test
+    @DisplayName("PublicKey equals")
+    void keyHash() {
+        var key = PrivateKey.fromString(
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
+
+        assertDoesNotThrow(() -> key.hashCode());
+    }
 }
