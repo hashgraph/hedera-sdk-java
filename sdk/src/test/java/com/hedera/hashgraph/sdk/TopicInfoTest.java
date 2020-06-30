@@ -5,6 +5,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ConsensusGetTopicInfoResponse;
 import com.hedera.hashgraph.sdk.proto.ConsensusTopicInfo;
 import io.github.jsonSnapshot.SnapshotMatcher;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -61,7 +62,7 @@ public class TopicInfoTest {
 
     @Test
     void toBytes() {
-        SnapshotMatcher.expect(TopicInfo.fromProtobuf(info).toBytes())
+        SnapshotMatcher.expect(Hex.toHexString(TopicInfo.fromProtobuf(info).toBytes()))
             .toMatchSnapshot();
     }
 }

@@ -141,7 +141,7 @@ public final class TopicInfo {
         return MoreObjects.toStringHelper(this)
             .add("topicId", topicId)
             .add("topicMemo", topicMemo)
-            .add("runningHash", runningHash)
+            .add("runningHash", runningHash.toByteArray())
             .add("sequenceNumber", sequenceNumber)
             .add("expirationTime", expirationTime)
             .add("adminKey", adminKey)

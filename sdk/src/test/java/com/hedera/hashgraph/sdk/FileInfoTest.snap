@@ -9,7 +9,7 @@ com.hedera.hashgraph.sdk.FileInfoTest.fromProtobuf=[
 
 
 com.hedera.hashgraph.sdk.FileInfoTest.toBytes=[
-  "CgIYARACGgUQwI23ASABKiQKIhIg4MjsJ1ilh5/6wiahPAxRa3mecuNRQaDdgo+U03mIpLc="
+  "0a02180110021a0510c08db70120012a240a221220e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7"
 ]
 
 

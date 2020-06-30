@@ -4,6 +4,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.FileGetInfoResponse;
 import com.hedera.hashgraph.sdk.proto.KeyList;
 import io.github.jsonSnapshot.SnapshotMatcher;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -53,7 +54,7 @@ public class FileInfoTest {
 
     @Test
     void toBytes() {
-        SnapshotMatcher.expect(FileInfo.fromProtobuf(info).toBytes())
+        SnapshotMatcher.expect(Hex.toHexString(FileInfo.fromProtobuf(info).toBytes()))
             .toMatchSnapshot();
     }
 }
