@@ -4,6 +4,7 @@ import io.github.jsonSnapshot.SnapshotMatcher;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -21,27 +22,27 @@ class ContractIdTest {
 
     @Test
     void fromString() {
-        SnapshotMatcher.expect(ContractId.fromString("0.0.5005").toProtobuf().toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(ContractId.fromString("0.0.5005").toString()).toMatchSnapshot();
     }
 
     @Test
     void fromSolidityAddress() {
-        SnapshotMatcher.expect(ContractId.fromSolidityAddress("000000000000000000000000000000000000138D").toProtobuf().toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(ContractId.fromSolidityAddress("000000000000000000000000000000000000138D").toString()).toMatchSnapshot();
     }
 
     @Test
     void fromSolidityAddressWith0x() {
-        SnapshotMatcher.expect(ContractId.fromSolidityAddress("0x000000000000000000000000000000000000138D").toProtobuf().toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(ContractId.fromSolidityAddress("0x000000000000000000000000000000000000138D").toString()).toMatchSnapshot();
     }
 
     @Test
     void toBytes() throws InvalidProtocolBufferException {
-        SnapshotMatcher.expect(new ContractId(5005).toBytes()).toMatchSnapshot();
+        SnapshotMatcher.expect(Hex.toHexString(new ContractId(5005).toBytes())).toMatchSnapshot();
     }
 
     @Test
     void fromBytes() throws InvalidProtocolBufferException {
-        SnapshotMatcher.expect(ContractId.fromBytes(new ContractId(5005).toBytes())).toMatchSnapshot();
+        SnapshotMatcher.expect(ContractId.fromBytes(new ContractId(5005).toBytes()).toString()).toMatchSnapshot();
     }
 
     @Test

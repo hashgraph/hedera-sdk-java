@@ -1,22 +1,13 @@
 com.hedera.hashgraph.sdk.TopicIdTest.fromBytes=[
-  {
-    "shard": 0,
-    "realm": 0,
-    "num": 5005
-  }
-]
-
-
-com.hedera.hashgraph.sdk.TopicIdTest.shouldSerialize=[
-  "# com.hedera.hashgraph.sdk.proto.TopicID@bc8a0\nrealm_num: 0\nshard_num: 0\ntopic_num: 5005"
+  "0.0.5005"
 ]
 
 
 com.hedera.hashgraph.sdk.TopicIdTest.shouldSerializeFromString=[
-  "# com.hedera.hashgraph.sdk.proto.TopicID@bc8a0\nrealm_num: 0\nshard_num: 0\ntopic_num: 5005"
+  "0.0.5005"
 ]
 
 
 com.hedera.hashgraph.sdk.TopicIdTest.toBytes=[
-  "GI0n"
+  "188d27"
 ]
