@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ContractGetInfoResponse;
 import io.github.jsonSnapshot.SnapshotMatcher;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -47,13 +48,13 @@ public class ContractInfoTest {
 
     @Test
     void toBytes() {
-        SnapshotMatcher.expect(ContractInfo.fromProtobuf(info).toBytes())
+        SnapshotMatcher.expect(Hex.toHexString(ContractInfo.fromProtobuf(info).toBytes()))
             .toMatchSnapshot();
     }
 
     @Test
     void fromBytes() throws InvalidProtocolBufferException {
-        SnapshotMatcher.expect(ContractInfo.fromBytes(info.toByteArray()).toBytes())
+        SnapshotMatcher.expect(ContractInfo.fromBytes(info.toByteArray()).toString())
             .toMatchSnapshot();
     }
 }
