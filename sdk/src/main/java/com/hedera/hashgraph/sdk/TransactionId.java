@@ -6,8 +6,6 @@ import java8.util.concurrent.CompletableFuture;
 import org.threeten.bp.Clock;
 import org.threeten.bp.Instant;
 
-import javax.annotation.Nullable;
-
 import static java8.util.concurrent.CompletableFuture.completedFuture;
 import static java8.util.concurrent.CompletableFuture.failedFuture;
 
@@ -19,9 +17,6 @@ import static java8.util.concurrent.CompletableFuture.failedFuture;
  * and internally by the network for detecting when duplicate transactions are submitted.
  */
 public final class TransactionId implements WithGetReceipt, WithGetRecord {
-    @Nullable
-    private static Instant lastInstant = null;
-
     /**
      * The Account ID that paid for this transaction.
      */
@@ -49,21 +44,8 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
      * @param accountId the ID of the Hedera account that will be charge the transaction fees.
      */
     public static TransactionId generate(AccountId accountId) {
-        return new TransactionId(accountId, getIncreasingInstant());
-    }
-
-    private static synchronized Instant getIncreasingInstant() {
-        // allows the transaction to be accepted as long as the
-        // server is not more than 10 seconds behind us
-        Instant start = Clock.systemUTC().instant().minusSeconds(10);
-
-        // ensures every instant is at least greater than the last
-        lastInstant =
-            lastInstant != null && start.compareTo(lastInstant) <= 0
-                ? lastInstant.plusNanos(1)
-                : start;
-
-        return lastInstant;
+        Instant instant = Clock.systemUTC().instant().minusNanos((long) (Math.random() * 5000000000L + 8000000000L));
+        return new TransactionId(accountId, instant);
     }
 
     static TransactionId fromProtobuf(TransactionID transactionID) {
