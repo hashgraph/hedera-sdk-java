@@ -241,14 +241,15 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
     public String toString() {
         var request = makeRequest();
 
-        StringBuilder builder = new StringBuilder(request.toString());
+        StringBuilder builder = new StringBuilder(request.toString().replaceAll("(?m)^# com.hedera.hashgraph.sdk.proto.Query.*", ""));
 
         var queryHeader = mapRequestHeader(request);
         if (queryHeader.hasPayment()) {
             builder.append("\n");
 
             try {
-                builder.append(TransactionBody.parseFrom(queryHeader.getPayment().getBodyBytes()).toString());
+                // the replaceAll() is for removing the class name from Transaction Body
+                builder.append(TransactionBody.parseFrom(queryHeader.getPayment().getBodyBytes()).toString().replaceAll("(?m)^# com.hedera.hashgraph.sdk.proto.TransactionBuilder.*", ""));
             } catch (InvalidProtocolBufferException e) {
                 throw new RuntimeException(e);
             }

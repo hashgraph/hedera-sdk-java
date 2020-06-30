@@ -1,3 +1,3 @@
 com.hedera.hashgraph.sdk.AccountInfoQueryTest.shouldSerialize=[
-  "# com.hedera.hashgraph.sdk.proto.Query@b01fa486\ncrypto_get_info {\n  account_i_d {\n    account_num: 5005\n    realm_num: 0\n    shard_num: 0\n  }\n  header {\n  }\n}"
+  "\ncrypto_get_info {\n  account_i_d {\n    account_num: 5005\n    realm_num: 0\n    shard_num: 0\n  }\n  header {\n  }\n}"
 ]
