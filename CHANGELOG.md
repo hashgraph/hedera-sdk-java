@@ -6,12 +6,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.0.0
 
+### General changes
+
+  * No longer support the use of `long` for `Hbar` parameters. Meaning you can no longer do
+    `AccountCreateTransaction().setInitialBalance(5)` and instead **must**
+    `AccountCreateTransaction().setInitialBalance(new Hbar(5))`. This of course applies to more than just
+    `setInitialBalance()`.
+  * Any method that used to require a `PublicKey` will now require `Key`.
+    * `AccountCreateTransaction.setKey(PublicKey)` is now `AccountCreateTransaction.setKey(Key)` as an example.
+  * All `Id` types (`Account`, `File`, `Contract`, `Topic`, and `TransactionId`)
+    * Support `fromBytes()` and `toBytes()`
+    * No longer have the `toProto()` method.
+  * The use of `Duration` in the SDK will be either `java.time.Duration` or `org.threeten.bp.Duration` depending
+    on which JDK and platform you're developing on.
+  * The use of `Instant` in the SDK will be either `java.time.Instant` or `org.threeten.bp.Instant` depending
+    on which JDK and platform you're developing on.
+  * All transactions and queries will now attempt to execute on more than one node.
+  * More `getCostAsync` and `executeAsync` variants
+    * `void executeAsync(Client)`
+    * `Future executeAsync(Client, BiConsumer<O, T>)`
+    * `void executeAsync(Client, Duration timeout, BiConsumer<O, T>)`
+    * `void getCostAsync(Client)`
+    * `Future getCostAsync(Client, BiConsumer<O, T>)`
+    * `void getCostAsync(Client, Duration timeout, BiConsumer<O, T>)`
+  * Building different types from a protobuf type is no longer supported. Use `fromBytes` instead.
+  * `getSignatureCase()` is no longer accessible
+  * Field which were `byte[]` are now `ByteString` to prevent extra copy operation. This includes
+    the response type of `FileContentsQuery`
+
+### Renamed Classes
+
+  * `ConsensusSubmitMessageTransaction` -> `MessageSubmitTransaction`
+  * `ConsensusTopicCreateTransaction` -> `TopicCreateTransaction`
+  * `ConsensusTopicDeleteTransaction` -> `TopicDeleteTransaction`
+  * `ConsensusTopicUpdateTransaction` -> `TopicUpdateTransaction`
+  * `ConsensusTopicId` -> `TopicId`
+  * `Ed25519PublicKey` -> `PublicKey`
+  * `Ed25519PrivateKey` -> `PrivateKey`
+
 ### Removed Classes
 
-  * HederaNetworkException
-  * MnemonicValidationResult
-  * HederaConstants
-  * ThresholdKey
+  * `HederaNetworkException`
+  * `MnemonicValidationResult`
+  * `HederaConstants`
+  * `ThresholdKey` use `KeyList.withThreshold()` instead.
 
 ### New Classes
 
@@ -26,7 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * `Client.fromFile()` -> `Client.fromJsonFile()`
   * `Client.replaceNodes()` -> `Client.setNetwork()`
 
-### Ed25519PrivateKey -> PrivateKey
+### PrivateKey
 
 #### Changes
 
@@ -36,15 +74,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   * `writePem()`
 
-### Ed25519PublicKey -> PublicKey
+### PublicKey
 
 #### Added
 
-  * `verify()` verfies message was signed by public key
-
-#### Removed
-
-  * `getSignatureCase()`
+  * `verify()` verifies the message was signed by public key
 
 ### Hbar
 
@@ -66,10 +100,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * `Hbar.from(BigDecimal)`
   * `Hbar.of()`
 
-### ThresholdKey -> KeyList
-
-  * `ThresholdKey` no longer exists, it is now built into `KeyList` using `KeyList.withThreshold()`
-
 ### KeyList
 
 #### Added
@@ -87,42 +117,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * `clear()`
   * `toString()`
 
-#### Removed
-
-  * `toBytes()`
-  * `getSignatureCase()`
-
 ### Mnemonic
 
 #### Renamed
 
   * `Mnemonic(List<? extends CharSequence>)` -> `Mnemonic.fromWords() throws BadMnemonicException`
 
-### AccountId
-
-#### Added
-
-  * `toBytes()`
-  * `fromBytes()`
-
-#### Removed
-
-  * `Account(AccountIDOrBuilder)`
-  * `toProto()`
-
 ### ContractId
 
 #### Added
 
   * `ContractId(long)`
-  * `fromBytes()`
 
 #### Removed
 
-  * `Contract(ContractIDOrBuilder)`
   * `toKeyProto()`
-  * `toProto()`
-  * `getSignatureCase()`
   * `implements PublicKey` meaning it can no longer be used in place of a Key
 
 ### FileId
@@ -130,27 +139,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Added
 
   * `FileId(long)`
-  * `toBytes()`
-  * `fromBytes()`
 
 #### Removed
 
-  * `File(FileIDOrBuilder)`
   * `fromSolidityAddress()`
-  * `toProto()`
   * `toSolidityAddress()`
-
-### ConsensusTopicId -> TopicId
-
-#### Added
-
-  * `toBytes()`
-  * `fromBytes()`
-
-#### Removed
-
-  * `Topic(TopicIDOrBuilder)`
-  * `toProto()`
 
 ### TransactionId
 
@@ -158,10 +151,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   * `Transaction.withValidStart()`
   * `Transaction.generate()`
-
-#### Removed
-
-  * `toProto()`
 
 ### Transaction
 
@@ -175,14 +164,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Removed
 
   * `toProto()`
-  * `setQueryPayment(long)`
   * `setPaymentTransaction()`
 
 ### TransactionBuilder
-
-#### Removed
-
-  * `setMaxTransactionFee(long)`
 
 ### AccountInfo
 
@@ -190,185 +174,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   * `List<LiveHash> liveHashes`
 
-### Transactions
+### AccountDeleteTransaction
 
-#### AccountCreateTransaction
-
-##### Changes
-
-  * `setAutoRenewPeriod(Duration)` Depending on which platform and JDK version you're using `Duration`
-     will be either `java.time.Duration` or `org.threeten.bp.Duration`
-  * `setKey(PublicKey)` -> `setKey(Key)`
-
-##### Removed
-
-  * `setInitialBalance(long)`
-  * `setSendRecordThreshold(long)`
-  * `setReceiveRecordThreshold(long)`
-
-#### AccountDeleteTransaction
-
-##### Renamed
+#### Renamed
 
   * `setDeleteAccountId()` -> `setAccountId()`
+  * Removed `addKey()`, use `setKeys(Key...)` instead.
 
-#### AccountUpdateTransaction
+### FileUpdateTransaction
 
-##### Changes
-
-  * `setAutoRenewPeriod(Duration)` Depending on which platform and JDK version you're using `Duration`
-     will be either `java.time.Duration` or `org.threeten.bp.Duration`
-  * `setExpirationTime(Instant)` Depending on which platform and JDK version you're using `Instant`
-     will be either `java.time.Instant` or `org.threeten.bp.Instant`
-  * `setKey(PublicKey)` -> `setKey(Key)`
-
-##### Removed
-
-  * `setSendRecordThreshold(long)`
-  * `setReceiveRecordThreshold(long)`
-
-#### CryptoTransferTransaction
-
-##### Removed
-
-  * `addSender(AccountId, long)`
-  * `addRecipient(AccountId, long)`
-  * `addTransfer(AccountId, long)`
-
-#### ContractCreateTransaction
-
-##### Changes
-
-  * `setAutoRenewPeriod(Duration)` Depending on which platform and JDK version you're using `Duration`
-     will be either `java.time.Duration` or `org.threeten.bp.Duration`
-  * `setAdminKey(PublicKey)` -> `setAdminKey(Key)`
-
-##### Removed
-
-  * `setInitialBalance(long)`
-
-#### ContractExecuteTransaction
-
-##### Removed
-
-  * `setPayableAmount(long)`
-
-#### ContractUpdateTransaction
-
-##### Changes
-
-  * `setAutoRenewPeriod(Duration)` Depending on which platform and JDK version you're using `Duration`
-     will be either `java.time.Duration` or `org.threeten.bp.Duration`
-  * `setExpirationTime(Instant)` Depending on which platform and JDK version you're using `Instant`
-     will be either `java.time.Instant` or `org.threeten.bp.Instant`
-  * `setAdminKey(PublicKey)` -> `setAdminKey(Key)`
-
-#### FileCreateTransaction
-
-##### Changes
-
-  * `setExpirationTime(Instant)` Depending on which platform and JDK version you're using `Instant`
-     will be either `java.time.Instant` or `org.threeten.bp.Instant`
-
-##### Removed
-
-  * `addKey()`
-
-##### Added
-
-  * `setKeys(Key...)`
-
-#### FileUpdateTransaction
-
-##### Changes
-
-  * `setExpirationTime(Instant)` Depending on which platform and JDK version you're using `Instant`
-     will be either `java.time.Instant` or `org.threeten.bp.Instant`
-
-##### Removed
-
-  * `addKey()`
-
-##### Added
-
-  * `setKeys(Key...)`
-
-#### ConsensusSubmitMessageTransaction -> MessageSubmitTransaction
-
-#### ConsensusTopicCreateTransaction -> TopicCreateTransaction
-
-##### Changes
-
-  * `setAdminKey(PublicKey)` -> `setAdminKey(Key)`
-  * `setSubmitKey(PublicKey)` -> `setSubmitKey(Key)`
-  * `setAutoRenewPeriod(Duration)` Depending on which platform and JDK version you're using `Duration`
-     will be either `java.time.Duration` or `org.threeten.bp.Duration`
-
-#### ConsensusTopicDeleteTransaction -> TopicDeleteTransaction
-
-#### ConsensusTopicUpdateTransaction -> TopicUpdateTransaction
-
-##### Changes
-
-  * `setAdminKey(PublicKey)` -> `setAdminKey(Key)`
-  * `setSubmitKey(PublicKey)` -> `setSubmitKey(Key)`
-  * `setAutoRenewPeriod(Duration)` Depending on which platform and JDK version you're using `Duration`
-     will be either `java.time.Duration` or `org.threeten.bp.Duration`
-  * `setExpirationTime(Instant)` Depending on which platform and JDK version you're using `Instant`
-     will be either `java.time.Instant` or `org.threeten.bp.Instant`
-
-### Queries
-
-#### AccountInfoQuery
-
-##### Added
-  * `void getCostAsync(Client)`
-  * `Future getCostAsync(Client, BiConsumer<O, T>)`
-  * `void getCostAsync(Client, Duration timeout, BiConsumer<O, T>)`
-
-#### ContractCallQuery
-
-##### Added
-  * `void getCostAsync(Client)`
-  * `Future getCostAsync(Client, BiConsumer<O, T>)`
-  * `void getCostAsync(Client, Duration timeout, BiConsumer<O, T>)`
-
-#### ContractInfoQuery
-
-##### Added
-
-  * `void getCostAsync(Client)`
-  * `Future getCostAsync(Client, BiConsumer<O, T>)`
-  * `void getCostAsync(Client, Duration timeout, BiConsumer<O, T>)`
-
-#### FileContentsQuery
-
-##### Changes
-
-  * Executing query results in a `ByteString` instead of `byte[]` to prevent copy operation
-
-##### Added
-
-  * `void getCostAsync(Client)`
-  * `Future getCostAsync(Client, BiConsumer<O, T>)`
-  * `void getCostAsync(Client, Duration timeout, BiConsumer<O, T>)`
-
-#### FileInfoQuery
-
-##### Added
-
-  * `void getCostAsync(Client)`
-  * `Future getCostAsync(Client, BiConsumer<O, T>)`
-  * `void getCostAsync(Client, Duration timeout, BiConsumer<O, T>)`
-
-### All Transactions and Queries
-
-#### Added
-
-  * `void executeAsync(Client)`
-  * `Future executeAsync(Client, BiConsumer<O, T>)`
-  * `void executeAsync(Client, Duration timeout, BiConsumer<O, T>)`
-  * Support for using multiple nodes if one or more fail or are unavailable.
+  * Removed `addKey()`, use `setKeys(Key...)` instead.
 
 ## v1.1.4
 

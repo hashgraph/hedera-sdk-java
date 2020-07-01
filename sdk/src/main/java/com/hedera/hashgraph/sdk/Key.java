@@ -31,4 +31,8 @@ public abstract class Key {
      * Serialize this key as a protobuf object
      */
     abstract com.hedera.hashgraph.sdk.proto.Key toKeyProtobuf();
+
+    public byte[] toBytes() {
+        return toKeyProtobuf().toByteArray();
+    }
 }
