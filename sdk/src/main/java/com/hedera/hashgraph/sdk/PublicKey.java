@@ -66,6 +66,7 @@ public final class PublicKey extends Key {
             .build();
     }
 
+    @Override
     public byte[] toBytes() {
         return keyData;
     }

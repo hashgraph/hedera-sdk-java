@@ -289,6 +289,7 @@ public final class PrivateKey extends Key {
         return signature;
     }
 
+    @Override
     public byte[] toBytes() {
         return keyData;
     }
