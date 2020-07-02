@@ -1,34 +1,95 @@
-![](https://img.shields.io/badge/java-8%2B-blue)
-![](https://img.shields.io/badge/android-19%2B-blue)
-
 # Hedera™ Hashgraph Java SDK
+
+![](https://img.shields.io/badge/java-7%2B-blue)
+![](https://img.shields.io/badge/android-19%2B-blue)
 
 > The Java SDK for interacting with Hedera Hashgraph: the official distributed
 > consensus platform built using the hashgraph consensus algorithm for fast,
 > fair and secure transactions. Hedera enables and empowers developers to
 > build an entirely new class of decentralized applications.
 
-## ⚠️ Disclaimer
+## Install
 
-This project is currently under a re-development effort. The goals are as follows:
+#### Gradle
 
- * Native support for Android 19+
+Select _one_ of the following depending on your target platform.
 
- * Native support for the Corda DJVM
+```groovy
+// Android, Corda DJVM, Java 7+
+implementation 'com.hedera.hashgraph:sdk-jdk7:2.0.0-beta.2'
 
- * Usage of modern Java techniques (such as futures) to reduce internal control flow complexities
+// Java 9+, Kotlin
+implementation 'com.hedera.hashgraph:sdk:2.0.0-beta.2'
+```
 
- * End-to-end test coverage
+Select _one_ of the following to provide the gRPC implementation.
 
- * Minimal breaking changes
+```groovy
+// netty transport (for high throughput applications)
+implementation 'io.grpc:grpc-netty-shaded:1.24.0'
 
-Note that at the end of the effort the changes will be squashed to a single commit  on top of `master`
-to preserve development history.
+// netty transport, unshaded (if you have a matching Netty dependency already)
+implementation 'io.grpc:grpc-netty:1.24.0'
 
-If you are trying this out and notice something missing from master, feel free to open an issue. It's likely
-it was simply overlooked.
+// okhttp transport (for lighter-weight applications or Android)
+implementation 'io.grpc:grpc-okhttp:1.24.0'
+```
 
-Join the [Hedera discord](https://hedera.com/discord) for the latest updates and announcements.
+#### Maven
+
+Select _one_ of the following depending on your target platform.
+
+```xml
+<!-- Android, Corda DJVM, Java 7+ -->
+<dependency>
+  <groupId>com.hedera.hashgraph</groupId>
+  <artifactId>sdk-jdk7</artifactId>
+  <version>2.0.0-beta.2</version>
+</dependency>
+
+<!-- Java 9+, Kotlin -->
+<dependency>
+  <groupId>com.hedera.hashgraph</groupId>
+  <artifactId>sdk</artifactId>
+  <version>2.0.0-beta.2</version>
+</dependency>
+```
+
+Select _one_ of the following to provide the gRPC implementation.
+
+```xml
+<!-- netty transport (for server or desktop applications) -->
+<dependency>
+  <groupId>io.grpc</groupId>
+  <artifactId>grpc-netty-shaded</artifactId>
+  <version>1.24.0</version>
+</dependency>
+
+<!-- netty transport, unshaded (if you have a matching Netty dependency already) -->
+<dependency>
+  <groupId>io.grpc</groupId>
+  <artifactId>grpc-netty</artifactId>
+  <version>1.24.0</version>
+</dependency>
+
+<!-- okhttp transport (for lighter-weight applications or Android) -->
+<dependency>
+  <groupId>io.grpc</groupId>
+  <artifactId>grpc-okhttp</artifactId>
+  <version>1.24.0</version>
+</dependency>
+```
+
+## Usage
+
+Examples of several potential use cases and workflows are available
+within the repository in [`examples/`](./examples/src/main/java).
+
+ * [Create Account](./examples/src/main/java/CreateAccountExample.java)
+
+ * [Transfer Hbar](./examples/src/main/java/TransferCryptoExample.java)
+
+ * [Hedera Consensus Service (HCS)](./examples/src/main/java/ConsensusPubSubExample.java)
 
 ## Development
 
@@ -57,7 +118,7 @@ the Hedera test network.
 $ ./gradlew integrationTest -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>"
 ```
 
-### Example
+### Examples
 
 Requires `OPERATOR_ID` and `OPERATOR_KEY` to be in the environment. Integration tests run against
 the Hedera test network.
