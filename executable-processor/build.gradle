@@ -1,9 +1,9 @@
 dependencies {
 	implementation project(":executable-annotation")
 
-	implementation 'com.squareup:javapoet:1.12.1'
+	implementation 'com.squareup:javapoet:1.13.0'
 
-	implementation "org.threeten:threetenbp:1.4.3"
+	implementation "org.threeten:threetenbp:1.4.4"
 
 	implementation "net.sourceforge.streamsupport:streamsupport:1.7.2"
 	implementation "net.sourceforge.streamsupport:streamsupport-cfuture:1.7.2"

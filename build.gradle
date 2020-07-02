@@ -1,7 +1,7 @@
 import net.ltgt.gradle.errorprone.CheckSeverity
 
 plugins {
-	id "net.ltgt.errorprone" version "1.1.1" apply false
+	id "net.ltgt.errorprone" version "1.2.1" apply false
 
 	// Gradle plugin to discover dependency updates
 	// <https://github.com/ben-manes/gradle-versions-plugin>
@@ -14,8 +14,8 @@ allprojects {
 	apply plugin: "java"
 	apply plugin: "net.ltgt.errorprone"
 
-	sourceCompatibility = 12
-	targetCompatibility = 12
+	sourceCompatibility = 14
+	targetCompatibility = 14
 
 	repositories {
 		mavenCentral()

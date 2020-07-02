@@ -2,8 +2,9 @@ dependencies {
 	// implementation "com.hedera.hashgraph:sdk:2.0.0-alpha1"
 	implementation project(":sdk")
 
+	implementation "com.google.code.gson:gson:2.8.6"
 	implementation "org.slf4j:slf4j-simple:2.0.0-alpha1"
-	implementation "io.grpc:grpc-netty-shaded:1.29.0"
+	implementation "io.grpc:grpc-netty-shaded:1.30.2"
 	implementation "io.github.cdimascio:java-dotenv:5.3.1"
 }
 
