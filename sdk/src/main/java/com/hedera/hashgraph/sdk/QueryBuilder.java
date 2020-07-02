@@ -58,6 +58,7 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
      * will not return any remainder.
      *
      * @return {@code this}
+     * @param queryPayment The explicit payment amount to set
      */
     public T setQueryPayment(Hbar queryPayment) {
         this.queryPayment = queryPayment;
@@ -82,6 +83,7 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
      * Set to 0 to disable automatic implicit payments.
      *
      * @return {@code this}
+     * @param maxQueryPayment The maximum payment amount to set
      */
     public T setMaxQueryPayment(Hbar maxQueryPayment) {
         this.maxQueryPayment = maxQueryPayment;

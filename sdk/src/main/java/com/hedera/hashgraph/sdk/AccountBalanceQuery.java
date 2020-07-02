@@ -25,6 +25,8 @@ public final class AccountBalanceQuery extends QueryBuilder<Hbar, AccountBalance
      * The account ID for which the balance is being requested.
      *
      * This is mutually exclusive with {@link #setContractId(ContractId)}.
+     * @return This AccountBalanceQuery for chaining
+     * @param accountId The AccountId to set
      */
     public AccountBalanceQuery setAccountId(AccountId accountId) {
         builder.setAccountID(accountId.toProtobuf());
