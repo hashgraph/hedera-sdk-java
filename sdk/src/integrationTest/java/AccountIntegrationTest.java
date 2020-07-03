@@ -108,6 +108,8 @@ class AccountIntegrationTest {
                     .setAccountId(account)
                     .execute(client);
             });
+
+            client.close();
         });
     }
 }

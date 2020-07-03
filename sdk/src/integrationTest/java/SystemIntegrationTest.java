@@ -47,6 +47,8 @@ public class SystemIntegrationTest {
                     .setFileId(new FileId(10))
                     .execute(client);
             });
+
+            client.close();
         });
     }
 }

@@ -139,6 +139,8 @@ public class ContractIntegrationTest {
                     .setMaxQueryPayment(new Hbar(2))
                     .execute(client);
             });
+
+            client.close();
         });
     }
 }

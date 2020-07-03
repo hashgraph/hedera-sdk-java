@@ -97,6 +97,8 @@ class LiveHashIntegrationTest {
                 .setAccountId(account)
                 .setTransferAccountId(operatorId)
                 .execute(client);
+
+            client.close();
         });
     }
 }

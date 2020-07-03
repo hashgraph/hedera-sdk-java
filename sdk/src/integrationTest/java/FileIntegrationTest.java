@@ -102,6 +102,8 @@ public class FileIntegrationTest {
             assertEquals(info.fileId, file);
             assertTrue(info.deleted);
             assertEquals(info.keys.get(0).toString(), client.getOperatorKey().toString());
+
+            client.close();
         });
     }
 }
