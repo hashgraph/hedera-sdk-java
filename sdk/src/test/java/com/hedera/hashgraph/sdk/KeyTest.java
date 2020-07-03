@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.Key;
 import com.hedera.hashgraph.sdk.proto.KeyList;
@@ -8,13 +9,10 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class KeyTest {
     @Test
@@ -134,5 +132,55 @@ class KeyTest {
             "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
 
         assertDoesNotThrow(() -> key.hashCode());
+    }
+
+    @Test
+    @DisplayName("KeyList methods")
+    void keyListMethods() {
+        var key1 = PrivateKey.fromString(
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
+
+        var key2 = PrivateKey.fromString(
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e11");
+
+        var key3 = PrivateKey.fromString(
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e12");
+
+        var keyList = com.hedera.hashgraph.sdk.KeyList.withThreshold(1);
+        keyList.add(key1);
+        keyList.addAll(List.of(key2, key3));
+
+        assertFalse(keyList.isEmpty());
+        assertEquals(keyList.size(), 3);
+        assertTrue(keyList.contains(key1));
+        assertTrue(keyList.contains(key2));
+        assertTrue(keyList.contains(key3));
+
+        @Var var arr = keyList.toArray();
+        assertEquals(arr[0], key1);
+        assertEquals(arr[1], key2);
+        assertEquals(arr[2], key3);
+
+        arr = new com.hedera.hashgraph.sdk.Key[]{null, null, null};
+        keyList.toArray(arr);
+        assertEquals(arr[0], key1);
+        assertEquals(arr[1], key2);
+        assertEquals(arr[2], key3);
+
+        keyList.remove(key2);
+        assertEquals(keyList.size(), 2);
+
+        keyList.clear();
+
+        keyList.addAll(List.of(key1, key2, key3));
+        assertEquals(keyList.size(), 3);
+
+        keyList.retainAll(List.of(key2, key3));
+
+        assertEquals(keyList.size(), 2);
+        assertTrue(keyList.containsAll(List.of(key2, key3)));
+
+        keyList.removeAll(List.of(key2, key3));
+        assertTrue(keyList.isEmpty());
     }
 }
