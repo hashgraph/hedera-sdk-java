@@ -185,14 +185,9 @@ public final class ContractFunctionParameters {
         return rem == 32 ? input : input.concat(padding.substring(0, rem));
     }
 
-    private static void checkAddressLen(byte[] address) {
-        if (address.length != ADDRESS_LEN) {
-            throw new IllegalArgumentException(
-                "Solidity addresses must be 20 bytes or 40 hex chars");
-        }
-    }
+    private static byte[] decodeAddress(@Var String address) {
+        address = address.startsWith("0x") ? address.substring(2) : address;
 
-    private static byte[] decodeAddress(String address) {
         if (address.length() != ADDRESS_LEN_HEX) {
             throw new IllegalArgumentException(
                 "Solidity addresses must be 40 hex chars");
@@ -624,7 +619,6 @@ public final class ContractFunctionParameters {
         ByteString addressArray = encodeArray(
             J8Arrays.stream(addresses).map(a -> {
                 byte[] address = decodeAddress(a);
-                checkAddressLen(address);
                 return leftPad32(ByteString.copyFrom(address));
             }));
 
@@ -667,8 +661,6 @@ public final class ContractFunctionParameters {
     }
 
     private ContractFunctionParameters addFunction(byte[] address, byte[] selector) {
-        checkAddressLen(address);
-
         if (selector.length != SELECTOR_LEN) {
             throw new IllegalArgumentException("function selectors must be 4 bytes or 8 hex chars");
         }
