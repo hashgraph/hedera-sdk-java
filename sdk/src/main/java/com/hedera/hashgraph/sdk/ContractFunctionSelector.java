@@ -91,6 +91,38 @@ public final class ContractFunctionSelector {
         return addParamType("int256[]");
     }
 
+    public ContractFunctionSelector addUint8() {
+        return addParamType("uint8");
+    }
+
+    public ContractFunctionSelector addUint32() {
+        return addParamType("uint32");
+    }
+
+    public ContractFunctionSelector addUint64() {
+        return addParamType("uint64");
+    }
+
+    public ContractFunctionSelector addUint256() {
+        return addParamType("uint256");
+    }
+
+    public ContractFunctionSelector addUint8Array() {
+        return addParamType("uint8[]");
+    }
+
+    public ContractFunctionSelector addUint32Array() {
+        return addParamType("uint32[]");
+    }
+
+    public ContractFunctionSelector addUint64Array() {
+        return addParamType("uint64[]");
+    }
+
+    public ContractFunctionSelector addUint256Array() {
+        return addParamType("uint256[]");
+    }
+
     public ContractFunctionSelector addAddress() {
         return addParamType("address");
     }
