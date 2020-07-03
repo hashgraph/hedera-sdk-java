@@ -4,19 +4,20 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
-import com.hedera.hashgraph.sdk.LiveHash;
 import com.hedera.hashgraph.sdk.LiveHashAddTransaction;
 import com.hedera.hashgraph.sdk.LiveHashDeleteTransaction;
 import com.hedera.hashgraph.sdk.LiveHashQuery;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LiveHashIntegrationTest {
     private static final byte[] hash = Hex.decode("100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002");
@@ -73,7 +74,7 @@ class LiveHashIntegrationTest {
             });
 
             assertDoesNotThrow(() -> {
-               LiveHash liveHash = new LiveHashQuery()
+                new LiveHashQuery()
                    .setAccountId(account)
                    .setHash(hash)
                    .execute(client);
