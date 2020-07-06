@@ -28,30 +28,7 @@ class AccountIntegrationTest {
     @Test
     void test() {
         assertDoesNotThrow(() -> {
-            @Var Client c;
-
-            try {
-                c = Client.fromJsonFile("./src/integrationTest/resources/client-config-with-operator.json");
-                System.out.println("Using client from config file");
-            } catch (Exception e) {
-                System.out.println("Failed to use client network. Using testnet instead.");
-                c = Client.forTestnet();
-            }
-
-            try {
-                var operatorKey = PrivateKey.fromString(System.getProperty("OPERATOR_KEY"));
-                var operatorId = AccountId.fromString(System.getProperty("OPERATOR_ID"));
-
-                c.setOperator(operatorId, operatorKey);
-            } catch (Exception e) {
-                System.out.println("Did not find `OPERATOR_KEY` or `OPERATOR_ID` environment variables.");
-                System.out.println("Using operator within the config.");
-            }
-
-            var client = c;
-
-            assertNotNull(client.getOperatorId());
-            assertNotNull(client.getOperatorKey());
+            var client = IntegrationTestClientManager.getClient();
 
             var key1 = PrivateKey.generate();
             var key2 = PrivateKey.generate();
