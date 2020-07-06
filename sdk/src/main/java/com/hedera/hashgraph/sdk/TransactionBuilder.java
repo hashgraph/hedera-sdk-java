@@ -44,6 +44,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * transaction ID will be generated from the operator on the client.
      *
      * @return {@code this}
+     * @param transactionId The TransactionId to be set
      * @see TransactionId
      */
     public final T setTransactionId(TransactionId transactionId) {
@@ -62,6 +63,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * with a different node.
      *
      * @return {@code this}
+     * @param nodeAccountId The node AccountId to be set
      */
     public final T setNodeAccountId(AccountId nodeAccountId) {
         bodyBuilder.setNodeAccountID(nodeAccountId.toProtobuf());
@@ -76,6 +78,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * This is defaulted by the SDK to 120 seconds (or two minutes).
      *
      * @return {@code this}
+     * @param validDuration The duration to be set
      */
     public final T setTransactionValidDuration(Duration validDuration) {
         bodyBuilder.setTransactionValidDuration(DurationConverter.toProtobuf(validDuration));
@@ -113,6 +116,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
 
     /**
      * Build this transaction to prepare for for signing or serialization.
+     * @param client The Client to build the transaction for
+     * @return {@link com.hedera.hashgraph.sdk.Transaction}
      */
     public final Transaction build(@Nullable Client client) {
         onBuild(bodyBuilder);

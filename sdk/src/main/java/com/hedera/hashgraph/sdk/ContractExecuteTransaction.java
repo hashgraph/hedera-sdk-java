@@ -24,6 +24,7 @@ public final class ContractExecuteTransaction extends TransactionBuilder<Contrac
      * Sets the contract instance to call.
      *
      * @return {@code this}
+     * @param contractId The ContractId to be set
      */
     public ContractExecuteTransaction setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProtobuf());
@@ -34,6 +35,7 @@ public final class ContractExecuteTransaction extends TransactionBuilder<Contrac
      * Sets the maximum amount of gas to use for the call.
      *
      * @return {@code this}
+     * @param gas The long to be set as gas
      */
     public ContractExecuteTransaction setGas(long gas) {
         builder.setGas(gas);
@@ -44,6 +46,7 @@ public final class ContractExecuteTransaction extends TransactionBuilder<Contrac
      * Sets the number of hbars sent with this function call.
      *
      * @return {@code this}
+     * @param amount The Hbar to be set
      */
     public ContractExecuteTransaction setPayableAmount(Hbar amount) {
         builder.setAmount(amount.toTinybars());
@@ -57,6 +60,7 @@ public final class ContractExecuteTransaction extends TransactionBuilder<Contrac
      * pre-encoded a solidity function call.
      *
      * @return {@code this}
+     * @param functionParameters The function parameters to be set
      */
     public ContractExecuteTransaction setFunctionParameters(ByteString functionParameters) {
         builder.setFunctionParameters(functionParameters);
@@ -70,6 +74,7 @@ public final class ContractExecuteTransaction extends TransactionBuilder<Contrac
      * to call a function with parameters.
      *
      * @return {@code this}
+     * @param name The String to be set as the function name
      */
     public ContractExecuteTransaction setFunction(String name) {
         return setFunction(name, new ContractFunctionParameters());
@@ -79,6 +84,8 @@ public final class ContractExecuteTransaction extends TransactionBuilder<Contrac
      * Sets the function to call, and the parameters to pass to the function.
      *
      * @return {@code this}
+     * @param name The String to be set as the function name
+     * @param params The function parameters to be set
      */
     public ContractExecuteTransaction setFunction(String name, ContractFunctionParameters params) {
         return setFunctionParameters(params.toBytes(name));

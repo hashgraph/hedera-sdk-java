@@ -29,6 +29,7 @@ public final class SystemDeleteTransaction extends TransactionBuilder<SystemDele
      * Mutually exclusive with {@link #setContractId(ContractId)}.
      *
      * @return {@code this}
+     * @param fileId The FileId to be set
      */
     public SystemDeleteTransaction setFileId(FileId fileId) {
         builder.setFileID(fileId.toProtobuf());
@@ -41,6 +42,7 @@ public final class SystemDeleteTransaction extends TransactionBuilder<SystemDele
      * Mutually exclusive with {@link #setFileId(FileId)}.
      *
      * @return {@code this}
+     * @param contractId The ContractId to be set
      */
     public SystemDeleteTransaction setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProtobuf());
@@ -52,6 +54,7 @@ public final class SystemDeleteTransaction extends TransactionBuilder<SystemDele
      * truly be permanently deleted.
      *
      * @return {@code this}
+     * @param expirationTime The Instant to be set as expiration time
      */
     public SystemDeleteTransaction setExpirationTime(Instant expirationTime) {
         builder.setExpirationTime(TimestampSeconds.newBuilder()

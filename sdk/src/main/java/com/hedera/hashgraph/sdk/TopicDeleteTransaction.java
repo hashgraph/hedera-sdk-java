@@ -22,6 +22,7 @@ public final class TopicDeleteTransaction extends TransactionBuilder<TopicDelete
      * Set the topic ID to delete.
      *
      * @return {@code this}
+     * @param topicId The TopicId to be set
      */
     public TopicDeleteTransaction setTopicId(TopicId topicId) {
         builder.setTopicID(topicId.toProtobuf());

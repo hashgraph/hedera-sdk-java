@@ -21,7 +21,10 @@ public final class LiveHashQuery extends QueryBuilder<LiveHash, LiveHashQuery> {
 
     /**
      * The account to which the livehash is associated
-;     */
+     *
+     * @param accountId The AccountId to be set
+     * @return {@code this}
+     */
     public LiveHashQuery setAccountId(AccountId accountId) {
         builder.setAccountID(accountId.toProtobuf());
         return this;
@@ -29,6 +32,9 @@ public final class LiveHashQuery extends QueryBuilder<LiveHash, LiveHashQuery> {
 
     /**
      * The SHA-384 data in the livehash
+     *
+     * @param hash The array of bytes to be set as hash
+     * @return {@code this}
      */
     public LiveHashQuery setHash(byte[] hash) {
         builder.setHash(ByteString.copyFrom(hash));

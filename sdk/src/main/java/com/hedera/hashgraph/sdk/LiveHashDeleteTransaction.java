@@ -19,6 +19,7 @@ public final class LiveHashDeleteTransaction extends TransactionBuilder<LiveHash
      * The account owning the livehash
      *
      * @return {@code this}
+     * @param accountId The AccountId to be set
      */
     public LiveHashDeleteTransaction setAccountId(AccountId accountId) {
         builder.setAccountOfLiveHash(accountId.toProtobuf());
@@ -29,6 +30,7 @@ public final class LiveHashDeleteTransaction extends TransactionBuilder<LiveHash
      * The SHA-384 livehash to delete from the account
      *
      * @return {@code this}
+     * @param hash The array of bytes to be set as hash
      */
     public LiveHashDeleteTransaction setHash(byte[] hash) {
         builder.setLiveHashToDelete(ByteString.copyFrom(hash));

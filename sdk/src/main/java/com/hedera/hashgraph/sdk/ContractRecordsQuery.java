@@ -26,6 +26,7 @@ public final class ContractRecordsQuery extends QueryBuilder<List<TransactionRec
      * Sets the smart contract instance for which the records should be retrieved.
      *
      * @return {@code this}
+     * @param contractId The ContractId to be set
      */
     public ContractRecordsQuery setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProtobuf());

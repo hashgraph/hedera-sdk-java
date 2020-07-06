@@ -35,6 +35,7 @@ public final class FileUpdateTransaction extends TransactionBuilder<FileUpdateTr
      * <p>Set the keys which must sign any transactions modifying this file. Required.
      *
      * @return {@code this}
+     * @param keys The Key or Keys to be set
      */
     public FileUpdateTransaction setKeys(Key... keys) {
         var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();

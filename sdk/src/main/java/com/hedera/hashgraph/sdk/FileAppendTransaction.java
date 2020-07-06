@@ -70,6 +70,7 @@ public final class FileAppendTransaction extends TransactionBuilder<FileAppendTr
      *
      * @see #setContents(byte[]) for appending arbitrary data.
      * @return {@code this}
+     * @param text The String to be set as the contents of the file
      */
     public FileAppendTransaction setContents(String text) {
         builder.setContents(ByteString.copyFromUtf8(text));

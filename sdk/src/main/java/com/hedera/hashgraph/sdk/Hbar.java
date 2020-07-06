@@ -15,6 +15,8 @@ public final class Hbar implements Comparable<Hbar> {
 
     /**
      * Constructs a new Hbar of the specified value.
+     *
+     * @param amount The amount of Hbar
      */
     public Hbar(long amount) {
         this(amount, HbarUnit.HBAR);
@@ -30,6 +32,8 @@ public final class Hbar implements Comparable<Hbar> {
      * The equivalent amount in tinybar must be an integer and fit in a {@code long} (64-bit signed integer).
      * <p>
      * E.g., {@code 1.23456789} is a valid amount of hbar but {@code 0.123456789} is not.
+     *
+     * @param amount The amount of Hbar
      */
     public Hbar(BigDecimal amount) {
         this(amount, HbarUnit.HBAR);
@@ -62,6 +66,9 @@ public final class Hbar implements Comparable<Hbar> {
 
     /**
      * Converts the provided string into an amount of hbars.
+     *
+     * @param text The string representing the amount of Hbar
+     * @return {@link com.hedera.hashgraph.sdk.Hbar}
      */
     public static Hbar fromString(CharSequence text) {
         return new Hbar(new BigDecimal(text.toString()), HbarUnit.HBAR);
@@ -69,6 +76,10 @@ public final class Hbar implements Comparable<Hbar> {
 
     /**
      * Converts the provided string into an amount of hbars.
+     *
+     * @param text The string representing the amount of set units
+     * @param unit The unit to convert from to Hbar
+     * @return {@link com.hedera.hashgraph.sdk.Hbar}
      */
     public static Hbar fromString(CharSequence text, HbarUnit unit) {
         return new Hbar(new BigDecimal(text.toString()), unit);
@@ -76,6 +87,9 @@ public final class Hbar implements Comparable<Hbar> {
 
     /**
      * Returns an Hbar whose value is equal to the specified long.
+     *
+     * @param hbars The value of Hbar
+     * @return {@link com.hedera.hashgraph.sdk.Hbar}
      */
     public static Hbar from(long hbars) {
         return new Hbar(hbars, HbarUnit.HBAR);
@@ -83,6 +97,10 @@ public final class Hbar implements Comparable<Hbar> {
 
     /**
      * Returns an Hbar representing the value in the given units.
+     *
+     * @param amount The long representing the amount of set units
+     * @param unit The unit to convert from to Hbar
+     * @return {@link com.hedera.hashgraph.sdk.Hbar}
      */
     public static Hbar from(long amount, HbarUnit unit) {
         return new Hbar(amount, unit);
@@ -90,6 +108,9 @@ public final class Hbar implements Comparable<Hbar> {
 
     /**
      * Returns an Hbar whose value is equal to the specified long.
+     *
+     * @param hbars The BigDecimal representing the amount of Hbar
+     * @return {@link com.hedera.hashgraph.sdk.Hbar}
      */
     public static Hbar from(BigDecimal hbars) {
         return new Hbar(hbars, HbarUnit.HBAR);
@@ -97,6 +118,10 @@ public final class Hbar implements Comparable<Hbar> {
 
     /**
      * Returns an Hbar representing the value in the given units.
+     *
+     * @param amount The BigDecimal representing the amount of set units
+     * @param unit The unit to convert from to Hbar
+     * @return {@link com.hedera.hashgraph.sdk.Hbar}
      */
     public static Hbar from(BigDecimal amount, HbarUnit unit) {
         return new Hbar(amount, unit);
@@ -104,6 +129,9 @@ public final class Hbar implements Comparable<Hbar> {
 
     /**
      * Returns an Hbar converted from the specified number of tinybars.
+     *
+     * @param tinybars The long representing the amount of tinybar
+     * @return {@link com.hedera.hashgraph.sdk.Hbar}
      */
     public static Hbar fromTinybars(long tinybars) {
         return new Hbar(tinybars, HbarUnit.TINYBAR);
@@ -111,6 +139,9 @@ public final class Hbar implements Comparable<Hbar> {
 
     /**
      * Convert this hbar value to a different unit.
+     *
+     * @param unit The unit to convert to from Hbar
+     * @return BigDecimal
      */
     public BigDecimal to(HbarUnit unit) {
         return BigDecimal.valueOf(valueInTinybar).divide(BigDecimal.valueOf(unit.tinybar), MathContext.UNLIMITED);
@@ -118,6 +149,8 @@ public final class Hbar implements Comparable<Hbar> {
 
     /**
      * Convert this hbar value to Tinybars.
+     *
+     * @return long
      */
     public long toTinybars() {
         return valueInTinybar;
@@ -125,6 +158,8 @@ public final class Hbar implements Comparable<Hbar> {
 
     /**
      * Returns the number of Hbars.
+     *
+     * @return BigDecimal
      */
     public BigDecimal getValue() {
         return to(HbarUnit.HBAR);
@@ -132,6 +167,8 @@ public final class Hbar implements Comparable<Hbar> {
 
     /**
      * Returns a Hbar whose value is {@code -this}.
+     *
+     * @return Hbar
      */
     public Hbar negated() {
         return Hbar.fromTinybars(-valueInTinybar);

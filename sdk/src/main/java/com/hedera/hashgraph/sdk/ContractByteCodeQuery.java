@@ -23,6 +23,7 @@ public final class ContractByteCodeQuery extends QueryBuilder<ByteString, Contra
      * Sets the contract ID for which information is requested.
      *
      * @return {@code this}
+     * @param contractId The ContractId to be set
      */
     public ContractByteCodeQuery setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProtobuf());

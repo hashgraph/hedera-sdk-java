@@ -17,6 +17,7 @@ public final class ContractDeleteTransaction extends TransactionBuilder<Contract
      * Sets the contract ID which should be deleted.
      *
      * @return {@code this}
+     * @param contractId The ContractId to be set
      */
     public ContractDeleteTransaction setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProtobuf());
@@ -29,6 +30,7 @@ public final class ContractDeleteTransaction extends TransactionBuilder<Contract
      * This is mutually exclusive with {@link #setTransferContractId(ContractId)}.
      *
      * @return {@code this}
+     * @param transferAccountId The AccountId to be set
      */
     public ContractDeleteTransaction setTransferAccountId(AccountId transferAccountId) {
         builder.setTransferAccountID(transferAccountId.toProtobuf());
@@ -41,6 +43,7 @@ public final class ContractDeleteTransaction extends TransactionBuilder<Contract
      * This is mutually exclusive with {@link #setTransferAccountId(AccountId)}.
      *
      * @return {@code this}
+     * @param transferContractId The ContractId to be set
      */
     public ContractDeleteTransaction setTransferContractId(ContractId transferContractId) {
         builder.setTransferContractID(transferContractId.toProtobuf());

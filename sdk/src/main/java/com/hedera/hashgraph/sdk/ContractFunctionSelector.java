@@ -22,6 +22,8 @@ public final class ContractFunctionSelector {
 
     /**
      * Start building a selector for a function with a given name.
+     *
+     * @param funcName The name of the function
      */
     public ContractFunctionSelector(String funcName) {
         digest = new Keccak.Digest256();

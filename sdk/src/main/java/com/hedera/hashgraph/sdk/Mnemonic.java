@@ -54,6 +54,7 @@ public final class Mnemonic {
      * @param words the 24-word list that constitutes a mnemonic phrase.
      * @see #validate() the function that validates the mnemonic.
      * @throws BadMnemonicException if the mnemonic does not pass validation.
+     * @return {@code this}
      */
     public static Mnemonic fromWords(List<? extends CharSequence> words) throws BadMnemonicException {
         Mnemonic mnemonic = new Mnemonic(words);
@@ -65,6 +66,10 @@ public final class Mnemonic {
 
     /**
      * Recover a mnemonic from a string, splitting on spaces.
+     *
+     * @param mnemonicString The string to recover the mnemonic from
+     * @return {@code this}
+     * @throws BadMnemonicException if the mnemonic does not pass validation.
      */
     public static Mnemonic fromString(String mnemonicString) throws BadMnemonicException {
         return Mnemonic.fromWords(Arrays.asList(mnemonicString.split(" ")));
@@ -72,6 +77,7 @@ public final class Mnemonic {
 
     /**
      * Returns a new random 24-word mnemonic from the BIP-39 standard English word list.
+     * @return {@code this}
      */
     public static Mnemonic generate() {
         var entropy = new byte[32];
@@ -212,6 +218,7 @@ public final class Mnemonic {
      * @see <a href="https://github.com/bitcoin/bips/blob/master/bip-0039/english.txt">
      * BIP-39 English word list
      * </a>.
+     * @throws BadMnemonicException if the mnemonic does not pass validation.
      */
     public void validate() throws BadMnemonicException {
         if (words.size() != 24) {

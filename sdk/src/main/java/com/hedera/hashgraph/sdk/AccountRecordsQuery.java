@@ -26,6 +26,7 @@ public final class AccountRecordsQuery extends QueryBuilder<List<TransactionReco
      * Sets the account ID for which the records should be retrieved.
      *
      * @return {@code this}
+     * @param accountId The AccountId to be set
      */
     public AccountRecordsQuery setAccountId(AccountId accountId) {
         builder.setAccountID(accountId.toProtobuf());

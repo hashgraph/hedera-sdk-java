@@ -85,6 +85,7 @@ public final class Client implements AutoCloseable {
      * tried.
      *
      * @param network the map of node IDs to node addresses that make up the network.
+     * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forNetwork(Map<AccountId, String> network) {
         return new Client(network);
@@ -94,6 +95,8 @@ public final class Client implements AutoCloseable {
      * Construct a Hedera client pre-configured for <a
      * href="https://docs.hedera.com/guides/mainnet/address-book#mainnet-address-book">Mainnet
      * access</a>.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forMainnet() {
         var network = new HashMap<AccountId, String>();
@@ -114,6 +117,8 @@ public final class Client implements AutoCloseable {
     /**
      * Construct a Hedera client pre-configured for <a
      * href="https://docs.hedera.com/guides/testnet/nodes">Testnet access</a>.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forTestnet() {
         var network = new HashMap<AccountId, String>();
@@ -127,6 +132,9 @@ public final class Client implements AutoCloseable {
 
     /**
      * Configure a client based off the given JSON string.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.Client}
+     * @param json The json string containing the client configuration
      */
     public static Client fromJson(String json) {
         return fromJson(new StringReader(json));
@@ -134,6 +142,9 @@ public final class Client implements AutoCloseable {
 
     /**
      * Configure a client based off the given JSON reader.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.Client}
+     * @param json The Reader containing the client configuration
      */
     public static Client fromJson(Reader json) {
         Config config = new Gson().fromJson(json, Config.class);
@@ -158,6 +169,10 @@ public final class Client implements AutoCloseable {
 
     /**
      * Configure a client based on a JSON file at the given path.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.Client}
+     * @param fileName The string containing the file path
+     * @throws IOException if IO operations fail
      */
     public static Client fromJsonFile(String fileName) throws IOException {
         return fromJsonFile(new File(fileName));
@@ -165,6 +180,10 @@ public final class Client implements AutoCloseable {
 
     /**
      * Configure a client based on a JSON file.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.Client}
+     * @param file The file containing the client configuration
+     * @throws IOException if IO operations fail
      */
     public static Client fromJsonFile(File file) throws IOException {
         return fromJson(Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8));
@@ -227,6 +246,8 @@ public final class Client implements AutoCloseable {
      * The operator private key is used to sign all transactions executed by this client.
      *
      * @return {@code this}
+     * @param accountId The AccountId of the operator
+     * @param privateKey The PrivateKey of the operator
      */
     public Client setOperator(AccountId accountId, PrivateKey privateKey) {
         return setOperatorWith(accountId, privateKey.getPublicKey(), privateKey::sign);
@@ -242,6 +263,9 @@ public final class Client implements AutoCloseable {
      * The `transactionSigner` is invoked to sign all transactions executed by this client.
      *
      * @return {@code this}
+     * @param accountId The AccountId of the operator
+     * @param publicKey The PrivateKey of the operator
+     * @param transactionSigner The signer for the operator
      */
     public Client setOperatorWith(AccountId accountId, PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
         this.operator = new Operator(accountId, publicKey, transactionSigner);
@@ -256,6 +280,7 @@ public final class Client implements AutoCloseable {
      * fee assessed for a given transaction may be less than this value, but never greater.
      *
      * @return {@code this}
+     * @param maxTransactionFee The Hbar to be set
      */
     public Client setMaxTransactionFee(Hbar maxTransactionFee) {
         if (maxTransactionFee.toTinybars() < 0) {
@@ -282,6 +307,7 @@ public final class Client implements AutoCloseable {
      * Set to 0 to disable automatic implicit payments.
      *
      * @return {@code this}
+     * @param maxQueryPayment The Hbar to be set
      */
     public Client setMaxQueryPayment(Hbar maxQueryPayment) {
         if (maxQueryPayment.toTinybars() < 0) {
@@ -320,6 +346,8 @@ public final class Client implements AutoCloseable {
      *
      * <p>After this method returns, this client can be re-used. Channels will be re-established as
      * needed.
+     *
+     * @param timeout The Duration to be set
      */
     public void close(Duration timeout) {
         var channels = this.channels;

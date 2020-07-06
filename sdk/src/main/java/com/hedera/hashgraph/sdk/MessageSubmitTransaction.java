@@ -26,6 +26,7 @@ public final class MessageSubmitTransaction extends TransactionBuilder<MessageSu
      * Set the topic ID to submit the message to.
      *
      * @return {@code this}
+     * @param topicId The TopicId to be set
      */
     public MessageSubmitTransaction setTopicId(TopicId topicId) {
         builder.setTopicID(topicId.toProtobuf());
@@ -36,6 +37,7 @@ public final class MessageSubmitTransaction extends TransactionBuilder<MessageSu
      * Set the message to submit, as a UTF-8 string.
      *
      * @return {@code this}
+     * @param message The String to be set as message
      */
     public MessageSubmitTransaction setMessage(String message) {
         builder.setMessage(ByteString.copyFromUtf8(message));
@@ -46,6 +48,7 @@ public final class MessageSubmitTransaction extends TransactionBuilder<MessageSu
      * Set the message to submit, as a byte array.
      *
      * @return {@code this}
+     * @param message The array of bytes to be set as message
      */
     public MessageSubmitTransaction setMessage(byte[] message) {
         builder.setMessage(ByteString.copyFrom(message));

@@ -21,6 +21,7 @@ public final class AccountDeleteTransaction extends TransactionBuilder<AccountDe
      * Sets the account ID which should be deleted.
      *
      * @return {@code this}
+     * @param deleteAccountId The AccountId to be set
      */
     public AccountDeleteTransaction setAccountId(AccountId deleteAccountId) {
         builder.setDeleteAccountID(deleteAccountId.toProtobuf());
@@ -31,6 +32,7 @@ public final class AccountDeleteTransaction extends TransactionBuilder<AccountDe
      * Sets the account ID which will receive all remaining hbars.
      *
      * @return {@code this}
+     * @param transferAccountId The AccountId to be set
      */
     public AccountDeleteTransaction setTransferAccountId(AccountId transferAccountId) {
         builder.setTransferAccountID(transferAccountId.toProtobuf());

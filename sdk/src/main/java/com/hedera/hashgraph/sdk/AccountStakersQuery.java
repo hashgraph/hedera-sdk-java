@@ -28,6 +28,7 @@ public final class AccountStakersQuery extends QueryBuilder<List<ProxyStaker>, A
      * Sets the Account ID for which the records should be retrieved.
      *
      * @return {@code this}
+     * @param accountId The AccountId to be set
      */
     public AccountStakersQuery setAccountId(AccountId accountId) {
         builder.setAccountID(accountId.toProtobuf());

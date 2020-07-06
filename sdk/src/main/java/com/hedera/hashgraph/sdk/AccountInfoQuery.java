@@ -24,6 +24,7 @@ public final class AccountInfoQuery extends QueryBuilder<AccountInfo, AccountInf
      * Sets the account ID for which information is requested.
      *
      * @return {@code this}
+     * @param accountId  The AccountId to be set
      */
     public AccountInfoQuery setAccountId(AccountId accountId) {
         builder.setAccountID(accountId.toProtobuf());

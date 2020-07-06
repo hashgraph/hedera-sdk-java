@@ -34,6 +34,7 @@ public final class ContractCallQuery extends QueryBuilder<ContractFunctionResult
      * Sets the contract instance to call, in the format used in transactions.
      *
      * @return {@code this}
+     * @param contractId The ContractId to be set
      */
     public ContractCallQuery setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProtobuf());
@@ -46,6 +47,7 @@ public final class ContractCallQuery extends QueryBuilder<ContractFunctionResult
      * All of the gas offered will be charged for.
      *
      * @return {@code this}
+     * @param gas The long to be set as gas
      */
     public ContractCallQuery setGas(long gas) {
         builder.setGas(gas);
@@ -65,6 +67,7 @@ public final class ContractCallQuery extends QueryBuilder<ContractFunctionResult
      * pre-encoded a solidity function call.
      *
      * @return {@code this}
+     * @param functionParameters The function parameters to be set
      */
     public ContractCallQuery setFunctionParameters(byte[] functionParameters) {
         builder.setFunctionParameters(ByteString.copyFrom(functionParameters));
@@ -78,6 +81,7 @@ public final class ContractCallQuery extends QueryBuilder<ContractFunctionResult
      * to call a function with parameters.
      *
      * @return {@code this}
+     * @param name The function name to be set
      */
     public ContractCallQuery setFunction(String name) {
         return setFunction(name, new ContractFunctionParameters());
@@ -87,6 +91,8 @@ public final class ContractCallQuery extends QueryBuilder<ContractFunctionResult
      * Sets the function to call, and the parameters to pass to the function.
      *
      * @return {@code this}
+     * @param name The function name to be set
+     * @param params The parameters to pass
      */
     public ContractCallQuery setFunction(String name, ContractFunctionParameters params) {
         builder.setFunctionParameters(params.toBytes(name));
@@ -98,6 +104,7 @@ public final class ContractCallQuery extends QueryBuilder<ContractFunctionResult
      * The run will fail if it would have returned more than this number of bytes.
      *
      * @return {@code this}
+     * @param size The long to be set as size
      */
     public ContractCallQuery setMaxResultSize(long size) {
         builder.setMaxResultSize(size);

@@ -26,6 +26,7 @@ public final class ContractInfoQuery extends QueryBuilder<ContractInfo, Contract
      * Sets the contract ID for which information is requested.
      *
      * @return {@code this}
+     * @param contractId The ContractId to be set
      */
     public ContractInfoQuery setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProtobuf());

@@ -24,6 +24,7 @@ public final class TopicInfoQuery extends QueryBuilder<TopicInfo, TopicInfoQuery
      * Set the topic to retrieve info about (the parameters and running state of).
      *
      * @return {@code this}
+     * @param topicId The TopicId to be set
      */
     public TopicInfoQuery setTopicId(TopicId topicId) {
         builder.setTopicID(topicId.toProtobuf());

@@ -39,6 +39,8 @@ public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTr
      * Adds hbar to the transfer from the given account.
      *
      * @return {@code this}
+     * @param value The Hbar value to be transferred
+     * @param senderId The AccountId of the sender
      */
     public CryptoTransferTransaction addSender(AccountId senderId, Hbar value) {
         return addTransfer(senderId, value.negated());
@@ -48,6 +50,8 @@ public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTr
      * Removes hbar from the transfer to the given account.
      *
      * @return {@code this}
+     * @param value The Hbar value to be received
+     * @param recipientId The AccountId of the recipient
      */
     public CryptoTransferTransaction addRecipient(AccountId recipientId, Hbar value) {
         return addTransfer(recipientId, value);

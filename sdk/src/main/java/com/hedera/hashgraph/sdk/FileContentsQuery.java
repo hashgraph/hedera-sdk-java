@@ -24,6 +24,7 @@ public final class FileContentsQuery extends QueryBuilder<ByteString, FileConten
      * Sets the file ID of the file whose contents are requested.
      *
      * @return {@code this}
+     * @param fileId The FileId to be set
      */
     public FileContentsQuery setFileId(FileId fileId) {
         builder.setFileID(fileId.toProtobuf());

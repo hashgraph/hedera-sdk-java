@@ -34,6 +34,7 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
      * Sets the account ID which is being updated in this transaction.
      *
      * @return {@code this}
+     * @param accountId The AccountId to be set
      */
     public AccountUpdateTransaction setAccountId(AccountId accountId) {
         builder.setAccountIDToUpdate(accountId.toProtobuf());
@@ -44,6 +45,7 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
      * Sets the new key.
      *
      * @return {@code this}
+     * @param key The Key to be set
      */
     public AccountUpdateTransaction setKey(Key key) {
         builder.setKey(key.toKeyProtobuf());
@@ -62,6 +64,7 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
      * will behave as if proxyAccountID was null.
      *
      * @return {@code this}
+     * @param proxyAccountId The AccountId to be set
      */
     public AccountUpdateTransaction setProxyAccountId(AccountId proxyAccountId) {
         builder.setProxyAccountID(proxyAccountId.toProtobuf());
@@ -73,6 +76,7 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
      * for any send/withdraw transaction.
      *
      * @return {@code this}
+     * @param sendRecordThreshold The Hbar to be set as the threshold
      */
     public AccountUpdateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
         builder.setSendRecordThresholdWrapper(UInt64Value.of(sendRecordThreshold.toTinybars()));
@@ -84,6 +88,7 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
      * for any receive/deposit transaction.
      *
      * @return {@code this}
+     * @param receiveRecordThreshold The Hbar to be set as the threshold
      */
     public AccountUpdateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
         builder.setReceiveRecordThresholdWrapper(UInt64Value.of(receiveRecordThreshold.toTinybars()));
@@ -95,6 +100,7 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
      * before the current one).
      *
      * @return {@code this}
+     * @param expirationTime The Instant to be set as the expiration time
      */
     public AccountUpdateTransaction setExpirationTime(Instant expirationTime) {
         builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
@@ -108,6 +114,7 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
      * If it is empty when it expires, then it is deleted.
      *
      * @return {@code this}
+     * @param autoRenewPeriod The Duration to be set for auto renewal
      */
     public AccountUpdateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
@@ -119,6 +126,7 @@ public final class AccountUpdateTransaction extends TransactionBuilder<AccountUp
      * depositing into this account (in addition to all withdrawals).
      *
      * @return {@code this}
+     * @param receiverSignatureRequired The bool to be set
      */
     public AccountUpdateTransaction setReceiverSignatureRequired(boolean receiverSignatureRequired) {
         builder.setReceiverSigRequiredWrapper(BoolValue.of(receiverSignatureRequired));

@@ -34,6 +34,7 @@ public final class KeyList extends Key implements Collection<Key> {
      * Create a new key list where at least {@code threshold} keys must sign.
      *
      * @param threshold the minimum number of keys that must sign
+     * @return KeyList
      */
     public static KeyList withThreshold(int threshold) {
         return new KeyList(threshold);

@@ -30,6 +30,7 @@ public final class FileInfoQuery extends QueryBuilder<FileInfo, FileInfoQuery> {
      * Sets the file ID for which information is requested.
      *
      * @return {@code this}
+     * @param fileId The FileId to be set
      */
     public FileInfoQuery setFileId(FileId fileId) {
         builder.setFileID(fileId.toProtobuf());

@@ -39,6 +39,7 @@ public final class ContractUpdateTransaction extends TransactionBuilder<Contract
      * Sets the Contract ID instance to update.
      *
      * @return {@code this}
+     * @param contractId The ContractId to be set
      */
     public ContractUpdateTransaction setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProtobuf());
@@ -50,6 +51,7 @@ public final class ContractUpdateTransaction extends TransactionBuilder<Contract
      * no effect if it already is this time or later).
      *
      * @return {@code this}
+     * @param expirationTime The Instant to be set for expiration time
      */
     public ContractUpdateTransaction setExpirationTime(Instant expirationTime) {
         builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
@@ -60,6 +62,7 @@ public final class ContractUpdateTransaction extends TransactionBuilder<Contract
      * Sets a new admin key for this contract.
      *
      * @return {@code this}
+     * @param adminKey The Key to be set
      */
     public ContractUpdateTransaction setAdminKey(Key adminKey) {
         builder.setAdminKey(adminKey.toKeyProtobuf());
@@ -77,6 +80,7 @@ public final class ContractUpdateTransaction extends TransactionBuilder<Contract
      * not currently running a node, then it will behave as if proxyAccountID was null.
      *
      * @return {@code this}
+     * @param proxyAccountId The AccountId to be set
      */
     public ContractUpdateTransaction setProxyAccountId(AccountId proxyAccountId) {
         builder.setProxyAccountID(proxyAccountId.toProtobuf());
@@ -87,6 +91,7 @@ public final class ContractUpdateTransaction extends TransactionBuilder<Contract
      * Sets the auto renew period for this contract.
      *
      * @return {@code this}
+     * @param autoRenewPeriod The Duration to be set for auto renewal
      */
     public ContractUpdateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
@@ -100,6 +105,7 @@ public final class ContractUpdateTransaction extends TransactionBuilder<Contract
      * time as the instance.
      *
      * @return {@code this}
+     * @param byteCodeFileId The FileId to be set
      */
     public ContractUpdateTransaction setBytecodeFileId(FileId byteCodeFileId) {
         builder.setFileID(byteCodeFileId.toProtobuf());
@@ -110,6 +116,7 @@ public final class ContractUpdateTransaction extends TransactionBuilder<Contract
      * Sets the memo associated with the contract (max: 100 bytes).
      *
      * @return {@code this}
+     * @param memo The memo to be set
      */
     public ContractUpdateTransaction setContractMemo(String memo) {
         builder.setMemo(memo);

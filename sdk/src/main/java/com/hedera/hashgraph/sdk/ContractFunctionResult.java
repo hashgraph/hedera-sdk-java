@@ -67,6 +67,8 @@ public final class ContractFunctionResult {
 
     /**
      * Get the whole raw function result.
+     *
+     * @return byte[]
      */
     public byte[] asBytes() {
         return rawResult.toByteArray();
@@ -74,6 +76,9 @@ public final class ContractFunctionResult {
 
     /**
      * Get the nth returned value as a string
+     *
+     * @return String
+     * @param valIndex The index of the string to be retrieved
      */
     public String getString(int valIndex) {
         return getDynamicBytes(valIndex).toStringUtf8();
@@ -81,6 +86,9 @@ public final class ContractFunctionResult {
 
     /**
      * Get the nth returned value as a list of strings
+     *
+     * @return A List of Strings
+     * @param index The index of the list of strings to be retrieved
      */
     public List<String> getStringArray(int index) {
         var offset = getInt32(index);
@@ -99,6 +107,9 @@ public final class ContractFunctionResult {
 
     /**
      * Get the nth value in the result as a dynamic byte array.
+     *
+     * @param valIndex The index of the array of bytes to be retrieved
+     * @return byte[]
      */
     public byte[] getBytes(int valIndex) {
         return getDynamicBytes(valIndex).toByteArray();
@@ -108,6 +119,9 @@ public final class ContractFunctionResult {
      * Get the nth fixed-width 32-byte value in the result.
      * <p>
      * This is the native word size for the Solidity ABI.
+     *
+     * @param valIndex The index of the array of bytes to be retrieved
+     * @return byte[]
      */
     public byte[] getBytes32(int valIndex) {
         return getByteString(valIndex * 32, (valIndex + 1) * 32).toByteArray();
@@ -121,6 +135,9 @@ public final class ContractFunctionResult {
 
     /**
      * Get the nth value as a boolean.
+     *
+     * @param valIndex The index of the boolean to be retrieved
+     * @return boolean
      */
     public boolean getBool(int valIndex) {
         return getInt8(valIndex) != 0;
@@ -136,6 +153,9 @@ public final class ContractFunctionResult {
      * Solidity function, consider using the {@code bytes32} Solidity type instead as that will be a
      * more compact representation which will save on gas. (Each individual {@code int8} value is
      * padded to 32 bytes in the ABI.)
+     *
+     * @param valIndex The index of the value to be retrieved
+     * @return byte
      */
     public byte getInt8(int valIndex) {
         return getByteBuffer(valIndex * 32 + 31).get();
@@ -146,6 +166,9 @@ public final class ContractFunctionResult {
      * <p>
      * If the actual value is wider it will be truncated to the last 4 bytes (similar to Java's
      * integer narrowing semantics).
+     *
+     * @param valIndex The index of the value to be retrieved
+     * @return int
      */
     public int getInt32(int valIndex) {
         // int will be the last 4 bytes in the "value"
@@ -157,6 +180,9 @@ public final class ContractFunctionResult {
      * <p>
      * If the actual value is wider it will be truncated to the last 8 bytes (similar to Java's
      * integer narrowing semantics).
+     *
+     * @param valIndex The index of the value to be retrieved
+     * @return long
      */
     public long getInt64(int valIndex) {
         return getByteBuffer(valIndex * 32 + 24).getLong();
@@ -166,6 +192,9 @@ public final class ContractFunctionResult {
      * Get the nth returned value as a 256-bit integer.
      * <p>
      * This type can represent the full width of Solidity integers.
+     *
+     * @param valIndex The index of the value to be retrieved
+     * @return BigInteger
      */
     public BigInteger getInt256(int valIndex) {
         return new BigInteger(getBytes32(valIndex));
@@ -185,6 +214,9 @@ public final class ContractFunctionResult {
      * Solidity function, consider using the {@code bytes32} Solidity type instead as that will be a
      * more compact representation which will save on gas. (Each individual {@code uint8} value is
      * padded to 32 bytes in the ABI.)
+     *
+     * @param valIndex The index of the value to be retrieved
+     * @return byte
      */
     public byte getUint8(int valIndex) {
         return getInt8(valIndex);
@@ -200,6 +232,9 @@ public final class ContractFunctionResult {
      * {@link #getInt32(int)}. The {@link Integer} class has static methods for treating an
      * {@code int} as unsigned where the difference between signed and unsigned actually matters
      * (comparison, division, printing and widening to {@code long}).
+     *
+     * @param valIndex The index of the value to be retrieved
+     * @return int
      */
     public int getUint32(int valIndex) {
         return getInt32(valIndex);
@@ -215,6 +250,9 @@ public final class ContractFunctionResult {
      * {@link #getInt64(int)}. The {@link Long} class has static methods for treating a
      * {@code long} as unsigned where the difference between signed and unsigned actually matters
      * (comparison, division and printing).
+     *
+     * @param valIndex The index of the value to be retrieved
+     * @return long
      */
     public long getUint64(int valIndex) {
         return getInt64(valIndex);
@@ -228,6 +266,9 @@ public final class ContractFunctionResult {
      * whether the most significant bit is set or not.
      * <p>
      * This type can represent the full width of Solidity integers.
+     *
+     * @param valIndex The index of the value to be retrieved
+     * @return BigInteger
      */
     public BigInteger getUint256(int valIndex) {
         // prepend a zero byte so that `BigInteger` finds a zero sign bit and treats it as positive
@@ -243,6 +284,9 @@ public final class ContractFunctionResult {
 
     /**
      * Get the nth returned value as a Solidity address.
+     *
+     * @param valIndex The index of the value to be retrieved
+     * @return String
      */
     public String getAddress(int valIndex) {
         int offset = valIndex * 32;

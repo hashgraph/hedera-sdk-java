@@ -140,6 +140,8 @@ public final class PrivateKey extends Key {
      * @throws IOException     if one occurred while reading.
      * @throws BadKeyException if no "PRIVATE KEY" section was found or the key was not an Ed25519
      *                         private key.
+     * @param pemFile The Reader containing the pem file
+     * @return {@link com.hedera.hashgraph.sdk.PrivateKey}
      */
     public static PrivateKey readPem(Reader pemFile) throws IOException {
         return readPem(pemFile, null);
@@ -169,6 +171,7 @@ public final class PrivateKey extends Key {
      * @throws IOException     if one occurred while reading the PEM file
      * @throws BadKeyException if no "ENCRYPTED PRIVATE KEY" or "PRIVATE KEY" section was found,
      *                         if the passphrase is wrong or the key was not an Ed25519 private key.
+     * @return {@link com.hedera.hashgraph.sdk.PrivateKey}
      */
     public static PrivateKey readPem(Reader pemFile, @Nullable String password) throws IOException {
         return fromPrivateKeyInfo(Pem.readPrivateKey(pemFile, password));
@@ -181,6 +184,8 @@ public final class PrivateKey extends Key {
      * @throws BadKeyException if no "PRIVATE KEY" section was found or the key was not an Ed25519
      *                         private key.
      * @see #readPem(Reader)
+     * @param pemEncoded The String containing the pem
+     * @return {@link com.hedera.hashgraph.sdk.PrivateKey}
      */
     public static PrivateKey fromPem(String pemEncoded) throws IOException {
         return readPem(new StringReader(pemEncoded));
@@ -197,6 +202,7 @@ public final class PrivateKey extends Key {
      * @throws BadKeyException if no "ENCRYPTED PRIVATE KEY" or "PRIVATE KEY" section was found,
      *                         if the passphrase is wrong or the key was not an Ed25519 private key.
      * @see #readPem(Reader, String)
+     * @return {@link com.hedera.hashgraph.sdk.PrivateKey}
      */
     public static PrivateKey fromPem(String encodedPem, @Nullable String password) throws IOException {
         return readPem(new StringReader(encodedPem), password);
@@ -206,6 +212,8 @@ public final class PrivateKey extends Key {
      * Check if this private key supports derivation.
      * <p>
      * This is currently only the case if this private key was created from a mnemonic.
+     *
+     * @return boolean
      */
     public boolean supportsDerivation() {
         return this.chainCode != null;
@@ -272,6 +280,7 @@ public final class PrivateKey extends Key {
      * Sign a message with this private key.
      *
      * @return the signature of the message.
+     * @param message The array of bytes to sign with
      */
     public byte[] sign(byte[] message) {
         byte[] signature = new byte[Ed25519.SIGNATURE_SIZE];

@@ -67,6 +67,7 @@ public final class ContractCreateTransaction extends TransactionBuilder<Contract
      * The file must be the ASCII hexadecimal representation of the smart contract bytecode.
      *
      * @return {@code this}
+     * @param byteCodeFileId The FileId to be set
      */
     public ContractCreateTransaction setBytecodeFileId(FileId byteCodeFileId) {
         builder.setFileID(byteCodeFileId.toProtobuf());
@@ -81,6 +82,7 @@ public final class ContractCreateTransaction extends TransactionBuilder<Contract
      * there can never be any admin keys for that instance.
      *
      * @return {@code this}
+     * @param adminKey The Key to be set
      */
     public ContractCreateTransaction setAdminKey(Key adminKey) {
         builder.setAdminKey(adminKey.toKeyProtobuf());
@@ -91,6 +93,7 @@ public final class ContractCreateTransaction extends TransactionBuilder<Contract
      * Sets the gas to run the constructor.
      *
      * @return {@code this}
+     * @param gas The long to be set as gas
      */
     public ContractCreateTransaction setGas(long gas) {
         builder.setGas(gas);
@@ -102,6 +105,7 @@ public final class ContractCreateTransaction extends TransactionBuilder<Contract
      * associated with and owned by the smart contract.
      *
      * @return {@code this}
+     * @param initialBalance The Hbar to be set as the initial balance
      */
     public ContractCreateTransaction setInitialBalance(Hbar initialBalance) {
         builder.setInitialBalance(initialBalance.toTinybars());
@@ -118,6 +122,7 @@ public final class ContractCreateTransaction extends TransactionBuilder<Contract
      * then it will behave as if  proxyAccountID was null.
      *
      * @return {@code this}
+     * @param proxyAccountId The AccountId to be set
      */
     public ContractCreateTransaction setProxyAccountId(AccountId proxyAccountId) {
         builder.setProxyAccountID(proxyAccountId.toProtobuf());
@@ -128,6 +133,7 @@ public final class ContractCreateTransaction extends TransactionBuilder<Contract
      * Sets the period that the instance will charge its account every this many seconds to renew.
      *
      * @return {@code this}
+     * @param autoRenewPeriod The Duration to be set for auto renewal
      */
     public ContractCreateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
@@ -141,6 +147,7 @@ public final class ContractCreateTransaction extends TransactionBuilder<Contract
      * pre-encoded a solidity function call.
      *
      * @return {@code this}
+     * @param constructorParameters The constructor parameters
      */
     public ContractCreateTransaction setConstructorParameters(byte[] constructorParameters) {
         builder.setConstructorParameters(ByteString.copyFrom(constructorParameters));
@@ -151,6 +158,7 @@ public final class ContractCreateTransaction extends TransactionBuilder<Contract
      * Sets the parameters to pass to the constructor.
      *
      * @return {@code this}
+     * @param constructorParameters The contructor parameters
      */
     public ContractCreateTransaction setConstructorParameters(ContractFunctionParameters constructorParameters) {
         builder.setConstructorParameters(constructorParameters.toBytes(null));
@@ -161,6 +169,7 @@ public final class ContractCreateTransaction extends TransactionBuilder<Contract
      * Sets the memo to be associated with this contract.
      *
      * @return {@code this}
+     * @param memo The String to be set as the memo
      */
     public ContractCreateTransaction setContractMemo(String memo) {
         builder.setMemo(memo);

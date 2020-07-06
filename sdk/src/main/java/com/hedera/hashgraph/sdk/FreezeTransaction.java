@@ -18,6 +18,8 @@ public final class FreezeTransaction extends TransactionBuilder<FreezeTransactio
      * Sets the start time (in UTC).
      *
      * @return {@code this}
+     * @param hour The hour to be set
+     * @param minute The minute to be set
      */
     public FreezeTransaction setStartTime(int hour, int minute) {
         builder.setStartHour(hour);
@@ -30,6 +32,8 @@ public final class FreezeTransaction extends TransactionBuilder<FreezeTransactio
      * Sets the end time (in UTC).
      *
      * @return {@code this}
+     * @param hour The hour to be set
+     * @param minute The minute to be set
      */
     public FreezeTransaction setEndTime(int hour, int minute) {
         builder.setEndHour(hour);

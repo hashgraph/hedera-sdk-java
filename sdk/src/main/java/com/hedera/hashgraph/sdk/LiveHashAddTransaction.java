@@ -24,6 +24,7 @@ public final class LiveHashAddTransaction extends TransactionBuilder<LiveHashAdd
      * The account to which the livehash is attached
      *
      * @return {@code this}
+     * @param accountId The AccountId to be set
      */
     public LiveHashAddTransaction setAccountId(AccountId accountId) {
         liveHash.setAccountId(accountId.toProtobuf());
@@ -34,6 +35,7 @@ public final class LiveHashAddTransaction extends TransactionBuilder<LiveHashAdd
      * The SHA-384 hash of a credential or certificate
      *
      * @return {@code this}
+     * @param hash The array of bytes to be set as the hash
      */
     public LiveHashAddTransaction setHash(byte[] hash) {
         liveHash.setHash(ByteString.copyFrom(hash));
@@ -45,6 +47,7 @@ public final class LiveHashAddTransaction extends TransactionBuilder<LiveHashAdd
      * account, and any one of which can later delete it.
      *
      * @return {@code this}
+     * @param keys The Key or Keys to be set
      */
     public LiveHashAddTransaction setKeys(Key... keys) {
         var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
@@ -59,6 +62,7 @@ public final class LiveHashAddTransaction extends TransactionBuilder<LiveHashAdd
      * The duration for which the livehash will remain valid
      *
      * @return {@code this}
+     * @param duration The Duration to be set
      */
     public LiveHashAddTransaction setDuration(Duration duration) {
         liveHash.setDuration(DurationConverter.toProtobuf(duration));

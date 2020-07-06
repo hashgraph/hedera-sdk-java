@@ -29,6 +29,7 @@ public final class TransactionRecordQuery extends QueryBuilder<TransactionRecord
      * Set the ID of the transaction for which the record is requested.
      *
      * @return {@code this}
+     * @param transactionId The TransactionId to be set
      */
     public TransactionRecordQuery setTransactionId(TransactionId transactionId) {
         builder.setTransactionID(transactionId.toProtobuf());

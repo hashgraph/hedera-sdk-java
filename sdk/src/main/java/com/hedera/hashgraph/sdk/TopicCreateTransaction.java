@@ -26,6 +26,7 @@ public final class TopicCreateTransaction extends TransactionBuilder<TopicCreate
      * Set a short publicly visible memo on the new topic.
      *
      * @return {@code this}
+     * @param memo The memo to be set
      */
     public TopicCreateTransaction setTopicMemo(String memo) {
         builder.setMemo(memo);
@@ -42,6 +43,7 @@ public final class TopicCreateTransaction extends TransactionBuilder<TopicCreate
      * is disallowed.
      *
      * @return {@code this}
+     * @param adminKey The Key to be set
      */
     public TopicCreateTransaction setAdminKey(Key adminKey) {
         builder.setAdminKey(adminKey.toKeyProtobuf());
@@ -55,6 +57,7 @@ public final class TopicCreateTransaction extends TransactionBuilder<TopicCreate
      * If unspecified, no access control is performed on ConsensusService.submitMessage (all submissions are allowed).
      *
      * @return {@code this}
+     * @param submitKey The Key to be set
      */
     public TopicCreateTransaction setSubmitKey(Key submitKey) {
         builder.setSubmitKey(submitKey.toKeyProtobuf());
@@ -69,6 +72,7 @@ public final class TopicCreateTransaction extends TransactionBuilder<TopicCreate
      * is supported by HAPI).
      *
      * @return {@code this}
+     * @param autoRenewPeriod The Duration to be set for auto renewal
      */
     public TopicCreateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
@@ -88,6 +92,7 @@ public final class TopicCreateTransaction extends TransactionBuilder<TopicCreate
      * If specified, there must be an adminKey and the autoRenewAccount must sign this transaction.
      *
      * @return {@code this}
+     * @param autoRenewAccountId The AccountId to be set for auto renewal
      */
     public TopicCreateTransaction setAutoRenewAccountId(AccountId autoRenewAccountId) {
         builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());

@@ -42,6 +42,7 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
      * that will be charged the transaction fees for the transaction.
      *
      * @param accountId the ID of the Hedera account that will be charge the transaction fees.
+     * @return {@link com.hedera.hashgraph.sdk.TransactionId}
      */
     public static TransactionId generate(AccountId accountId) {
         Instant instant = Clock.systemUTC().instant().minusNanos((long) (Math.random() * 5000000000L + 8000000000L));

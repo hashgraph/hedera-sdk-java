@@ -54,6 +54,7 @@ public final class FileCreateTransaction extends TransactionBuilder<FileCreateTr
      * but this requirement may be lifted in the future.
      *
      * @return {@code this}
+     * @param keys The Key or Keys to be set
      */
     public FileCreateTransaction setKeys(Key... keys) {
         var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();

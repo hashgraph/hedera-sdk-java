@@ -28,6 +28,7 @@ public final class TopicUpdateTransaction extends TransactionBuilder<TopicUpdate
      * Set the topic ID to update.
      *
      * @return {@code this}
+     * @param topicId The TopicId to be set
      */
     public TopicUpdateTransaction setTopicId(TopicId topicId) {
         builder.setTopicID(topicId.toProtobuf());
@@ -38,6 +39,7 @@ public final class TopicUpdateTransaction extends TransactionBuilder<TopicUpdate
      * Set a new memo for this topic.
      *
      * @return {@code this}
+     * @param memo The memo to be set
      */
     public TopicUpdateTransaction setTopicMemo(String memo) {
         builder.setMemo(StringValue.of(memo));
@@ -58,6 +60,7 @@ public final class TopicUpdateTransaction extends TransactionBuilder<TopicUpdate
      * Set a new admin key for this topic.
      *
      * @return {@code this}
+     * @param adminKey The Key to be set
      */
     public TopicUpdateTransaction setAdminKey(Key adminKey) {
         builder.setAdminKey(adminKey.toKeyProtobuf());
@@ -81,6 +84,7 @@ public final class TopicUpdateTransaction extends TransactionBuilder<TopicUpdate
      * Set a new submit key for this topic.
      *
      * @return {@code this}
+     * @param submitKey The Key to be set
      */
     public TopicUpdateTransaction setSubmitKey(Key submitKey) {
         builder.setSubmitKey(submitKey.toKeyProtobuf());
@@ -104,6 +108,7 @@ public final class TopicUpdateTransaction extends TransactionBuilder<TopicUpdate
      * Set a new auto renew period for this topic.
      *
      * @return {@code this}
+     * @param autoRenewPeriod The Duration to be set for auto renewal
      */
     public TopicUpdateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
@@ -114,6 +119,7 @@ public final class TopicUpdateTransaction extends TransactionBuilder<TopicUpdate
      * Set a new auto renew account ID for this topic.
      *
      * @return {@code this}
+     * @param autoRenewAccountId The AccountId to be set for auto renewal
      */
     public TopicUpdateTransaction setAutoRenewAccountId(AccountId autoRenewAccountId) {
         builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
@@ -124,6 +130,7 @@ public final class TopicUpdateTransaction extends TransactionBuilder<TopicUpdate
      * Clear the auto renew account ID for this topic.
      *
      * @return {@code this}
+     * @param autoRenewAccountId The AccountId to be cleared for auto renewal
      */
     public TopicUpdateTransaction clearAutoRenewAccountId(AccountId autoRenewAccountId) {
         builder.setAutoRenewAccount(AccountID.getDefaultInstance());

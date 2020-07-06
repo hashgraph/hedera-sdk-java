@@ -19,6 +19,7 @@ public final class SystemUndeleteTransaction extends TransactionBuilder<SystemUn
      * Mutually exclusive with {@link #setContractId(ContractId)}.
      *
      * @return {@code this}
+     * @param fileId The FileId to be set
      */
     public SystemUndeleteTransaction setFileId(FileId fileId) {
         builder.setFileID(fileId.toProtobuf());
@@ -31,6 +32,7 @@ public final class SystemUndeleteTransaction extends TransactionBuilder<SystemUn
      * Mutually exclusive with {@link #setFileId(FileId)}.
      *
      * @return {@code this}
+     * @param contractId The ContractId to be set
      */
     public SystemUndeleteTransaction setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProtobuf());
