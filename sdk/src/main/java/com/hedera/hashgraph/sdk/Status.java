@@ -619,7 +619,17 @@ public enum Status {
      * the topic will be deleted unrecoverably. This error response code will not be returned until
      * autoRenew functionality is supported by HAPI.
      */
-    TOPIC_EXPIRED(ResponseCodeEnum.TOPIC_EXPIRED);
+    TOPIC_EXPIRED(ResponseCodeEnum.TOPIC_EXPIRED),
+
+    /**
+     * chunk number must be from 1 to total (chunks) inclusive.
+     */
+    INVALID_CHUNK_NUMBER(ResponseCodeEnum.INVALID_CHUNK_NUMBER),
+
+    /**
+     * For every chunk, the payer account that is part of initialTransactionID must match the Payer Account of this transaction. The entire initialTransactionID should match the transactionID of the first chunk, but this is not checked or enforced by Hedera except when the chunk number is 1.
+     */
+    INVALID_CHUNK_TRANSACTION_ID(ResponseCodeEnum.INVALID_CHUNK_TRANSACTION_ID);
 
     final ResponseCodeEnum code;
 
@@ -869,6 +879,10 @@ public enum Status {
                 return AUTORENEW_ACCOUNT_NOT_ALLOWED;
             case TOPIC_EXPIRED:
                 return TOPIC_EXPIRED;
+            case INVALID_CHUNK_NUMBER:
+                return INVALID_CHUNK_NUMBER;
+            case INVALID_CHUNK_TRANSACTION_ID:
+                return INVALID_CHUNK_TRANSACTION_ID;
 
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
