@@ -273,6 +273,32 @@ public final class Client implements AutoCloseable {
     }
 
     /**
+     * Get the ID of the operator. Useful when the client was constructed from file.
+     *
+     * @return {AccountId}
+     */
+    public AccountId getOperatorId() {
+        if (operator == null) {
+            return null;
+        }
+
+        return operator.accountId;
+    }
+
+    /**
+     * Get the key ofthe operator. Useful when the client was constructed from file.
+     *
+     * @return {PublicKey}
+     */
+    public PublicKey getOperatorKey() {
+        if (operator == null) {
+            return null;
+        }
+
+        return operator.publicKey;
+    }
+
+    /**
      * Set the maximum fee to be paid for transactions executed by this client.
      * <p>
      * Because transaction fees are always maximums, this will simply add a call to

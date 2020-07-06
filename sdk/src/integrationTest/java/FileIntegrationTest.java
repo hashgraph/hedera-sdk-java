@@ -23,14 +23,33 @@ public class FileIntegrationTest {
     @Test
     void test() {
         assertDoesNotThrow(() -> {
-            var operatorKey = PrivateKey.fromString(System.getProperty("OPERATOR_KEY"));
-            var operatorId = AccountId.fromString(System.getProperty("OPERATOR_ID"));
+            @Var Client c;
 
-            var client = Client.forTestnet()
-                .setOperator(operatorId, operatorKey);
+            try {
+                c = Client.fromJsonFile("./src/integrationTest/resources/client-config-with-operator.json");
+                System.out.println("Using client from config file");
+            } catch (Exception e) {
+                System.out.println("Failed to use client network. Using testnet instead.");
+                c = Client.forTestnet();
+            }
+
+            try {
+                var operatorKey = PrivateKey.fromString(System.getProperty("OPERATOR_KEY"));
+                var operatorId = AccountId.fromString(System.getProperty("OPERATOR_ID"));
+
+                c.setOperator(operatorId, operatorKey);
+            } catch (Exception e) {
+                System.out.println("Did not find `OPERATOR_KEY` or `OPERATOR_ID` environment variables.");
+                System.out.println("Using operator within the config.");
+            }
+
+            var client = c;
+
+            assertNotNull(client.getOperatorId());
+            assertNotNull(client.getOperatorKey());
 
             var receipt = new FileCreateTransaction()
-                .setKeys(operatorKey.getPublicKey())
+                .setKeys(client.getOperatorKey())
                 .setContents("[e2e::FileCreateTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
@@ -49,7 +68,7 @@ public class FileIntegrationTest {
             assertEquals(info.fileId, file);
             assertEquals(info.size, 28);
             assertFalse(info.deleted);
-            assertEquals(info.keys.get(0).toString(), operatorKey.getPublicKey().toString());
+            assertEquals(info.keys.get(0).toString(), client.getOperatorKey().toString());
 
             new FileAppendTransaction()
                 .setFileId(file)
@@ -66,7 +85,7 @@ public class FileIntegrationTest {
             assertEquals(info.fileId, file);
             assertEquals(info.size, 56);
             assertFalse(info.deleted);
-            assertEquals(info.keys.get(0).toString(), operatorKey.getPublicKey().toString());
+            assertEquals(info.keys.get(0).toString(), client.getOperatorKey().toString());
 
             var contents = new FileContentsQuery()
                 .setFileId(file)
@@ -90,7 +109,7 @@ public class FileIntegrationTest {
             assertEquals(info.fileId, file);
             assertEquals(info.size, 28);
             assertFalse(info.deleted);
-            assertEquals(info.keys.get(0).toString(), operatorKey.getPublicKey().toString());
+            assertEquals(info.keys.get(0).toString(), client.getOperatorKey().toString());
 
             new FileDeleteTransaction()
                 .setFileId(file)
@@ -105,7 +124,7 @@ public class FileIntegrationTest {
 
             assertEquals(info.fileId, file);
             assertTrue(info.deleted);
-            assertEquals(info.keys.get(0).toString(), operatorKey.getPublicKey().toString());
+            assertEquals(info.keys.get(0).toString(), client.getOperatorKey().toString());
         });
     }
 }
