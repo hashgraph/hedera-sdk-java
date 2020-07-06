@@ -78,11 +78,16 @@ public class ContractIntegrationTest {
 
             assertEquals(bytecode.size(), 798);
 
-            @Var var result = new ContractCallQuery()
+            var callQuery = new ContractCallQuery()
                 .setContractId(contract)
                 .setQueryPayment(new Hbar(1))
                 .setGas(2000)
-                .setFunction("getMessage")
+                .setFunction("getMessage");
+
+            var cost = callQuery.getCost(client);
+
+            @Var var result = callQuery
+                .setMaxQueryPayment(Objects.requireNonNull(cost))
                 .execute(client);
 
             assertEquals("Hello from Hedera.", result.getString(0));
