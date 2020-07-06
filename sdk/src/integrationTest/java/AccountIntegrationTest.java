@@ -9,6 +9,7 @@ import com.hedera.hashgraph.sdk.AccountStakersQuery;
 import com.hedera.hashgraph.sdk.AccountUpdateTransaction;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransactionId;
 import org.junit.jupiter.api.Test;
@@ -70,7 +71,7 @@ class AccountIntegrationTest {
                 .setMaxQueryPayment(new Hbar(1))
                 .execute(client);
 
-            assertThrows(Exception.class, () -> {
+            assertThrows(HederaPreCheckStatusException.class, () -> {
                 new AccountStakersQuery()
                     .setAccountId(account)
                     .setMaxQueryPayment(new Hbar(1))
@@ -104,7 +105,7 @@ class AccountIntegrationTest {
                 .execute(client)
                 .getReceipt(client);
 
-            assertThrows(Exception.class, () -> {
+            assertThrows(HederaPreCheckStatusException.class, () -> {
                 new AccountInfoQuery()
                     .setAccountId(account)
                     .execute(client);
