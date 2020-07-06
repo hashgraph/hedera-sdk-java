@@ -98,6 +98,7 @@ class AccountIntegrationTest {
                 .setAccountId(account)
                 .setTransferAccountId(client.getOperatorId())
                 .setTransactionId(TransactionId.generate(account))
+                .setMaxTransactionFee(Hbar.fromTinybars(50000000))
                 .build(client)
                 .sign(key2)
                 .execute(client)
