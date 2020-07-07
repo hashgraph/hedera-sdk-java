@@ -1,22 +1,20 @@
+import com.google.errorprone.annotations.Var;
+import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.AccountInfoQuery;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransactionId;
 import org.junit.jupiter.api.Test;
-import org.threeten.bp.Duration;
 
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class AccountInfoIntegrationTest {
+class AccountBalanceIntegrationTest {
     @Test
     void test() {
         assertDoesNotThrow(() -> {
@@ -39,19 +37,11 @@ class AccountInfoIntegrationTest {
 
             var account = receipt.accountId;
 
-            var info = new AccountInfoQuery()
+            @Var var balance = new AccountBalanceQuery()
                 .setAccountId(account)
                 .execute(client);
 
-            assertEquals(info.accountId, account);
-            assertFalse(info.deleted);
-            assertEquals(info.key.toString(), key.getPublicKey().toString());
-            assertEquals(info.balance, new Hbar(1));
-            assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
-            assertEquals(info.receiveRecordThreshold.toTinybars(), Long.MAX_VALUE);
-            assertEquals(info.sendRecordThreshold.toTinybars(), Long.MAX_VALUE);
-            assertNull(info.proxyAccountId);
-            assertEquals(info.proxyReceived, Hbar.ZERO);
+            assertEquals(balance, new Hbar(1));
 
             new AccountDeleteTransaction()
                 .setAccountId(account)

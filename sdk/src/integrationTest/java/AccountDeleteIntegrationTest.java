@@ -1,13 +1,6 @@
-import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.AccountInfoQuery;
-import com.hedera.hashgraph.sdk.AccountRecordsQuery;
-import com.hedera.hashgraph.sdk.AccountStakersQuery;
-import com.hedera.hashgraph.sdk.AccountUpdateTransaction;
-import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransactionId;
@@ -21,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AccountDeleteIntegrationTest {
@@ -30,11 +22,10 @@ class AccountDeleteIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 
-            var key1 = PrivateKey.generate();
-            var key2 = PrivateKey.generate();
+            var key = PrivateKey.generate();
 
             var receipt = new AccountCreateTransaction()
-                .setKey(key1)
+                .setKey(key)
                 .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
                 .execute(client)
@@ -51,7 +42,7 @@ class AccountDeleteIntegrationTest {
 
             assertEquals(info.accountId, account);
             assertFalse(info.deleted);
-            assertEquals(info.key.toString(), key1.getPublicKey().toString());
+            assertEquals(info.key.toString(), key.getPublicKey().toString());
             assertEquals(info.balance, new Hbar(1));
             assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
             assertEquals(info.receiveRecordThreshold.toTinybars(), Long.MAX_VALUE);
@@ -64,7 +55,7 @@ class AccountDeleteIntegrationTest {
                 .setTransferAccountId(client.getOperatorId())
                 .setTransactionId(TransactionId.generate(account))
                 .build(client)
-                .sign(key2)
+                .sign(key)
                 .execute(client)
                 .getReceipt(client);
         });

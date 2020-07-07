@@ -1,6 +1,4 @@
 import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.FileAppendTransaction;
 import com.hedera.hashgraph.sdk.FileContentsQuery;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
@@ -8,7 +6,6 @@ import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.FileInfoQuery;
 import com.hedera.hashgraph.sdk.FileUpdateTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
 import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
