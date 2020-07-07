@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.errorprone.annotations.Var;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,10 +13,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.errorprone.annotations.Var;
-import org.threeten.bp.Duration;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ClientTest {
@@ -94,47 +91,20 @@ class ClientTest {
     @Test
     @DisplayName("setNetwork() functions correctly")
     void testReplaceNodes() {
-        assertDoesNotThrow(() -> {
-            @Var Map<AccountId, String> network = new HashMap<>();
-            network.put(new AccountId(3), "0.testnet.hedera.com:50211");
-            network.put(new AccountId(4), "1.testnet.hedera.com:50211");
+        @Var Map<AccountId, String> nodes = new HashMap<>();
+        nodes.put(new AccountId(3), "0.testnet.hedera.com:50211");
+        nodes.put(new AccountId(4), "1.testnet.hedera.com:50211");
 
-            var operatorKey = PrivateKey.fromString(System.getProperty("OPERATOR_KEY"));
-            var operatorId = AccountId.fromString(System.getProperty("OPERATOR_ID"));
-
-            var client = Client.forNetwork(network)
-                .setOperator(operatorId, operatorKey)
-                .setMaxQueryPayment(new Hbar(2))
-                .setRequestTimeout(Duration.ofMinutes(2));
+        Client client = new Client(nodes);
 
 
-            // Execute two simple queries so we create a channel for each network node.
-            new AccountBalanceQuery()
-                .setAccountId(operatorId)
-                .execute(client);
+        nodes = new HashMap<>();
+        nodes.put(new AccountId(5), "2.testnet.hedera.com:50211");
+        nodes.put(new AccountId(6), "3.testnet.hedera.com:50211");
 
-            new AccountBalanceQuery()
-                .setAccountId(operatorId)
-                .execute(client);
+        client.setNetwork(nodes);
 
-            network = new HashMap<>();
-            network.put(new AccountId(4), "1.testnet.hedera.com:50211");
-            network.put(new AccountId(5), "2.testnet.hedera.com:50211");
-
-            client.setNetwork(network);
-
-            Assertions.assertEquals(client.getChannel(new AccountId(4)).authority(), "1.testnet.hedera.com:50211");
-            Assertions.assertEquals(client.getChannel(new AccountId(5)).authority(), "2.testnet.hedera.com:50211");
-            assertThrows(IllegalArgumentException.class , () -> client.getChannel(new AccountId(3)));
-
-            network = new HashMap<>();
-            network.put(new AccountId(4), "35.186.191.247:50211");
-            network.put(new AccountId(5), "35.192.2.25:50211");
-
-            client.setNetwork(network);
-
-            Assertions.assertEquals(client.getChannel(new AccountId(4)).authority(), "35.186.191.247:50211");
-            Assertions.assertEquals(client.getChannel(new AccountId(5)).authority(), "35.192.2.25:50211");
-        });
+        Assertions.assertEquals(client.getChannel(new AccountId(5)).authority(), "2.testnet.hedera.com:50211");
+        Assertions.assertThrows(IllegalArgumentException.class , () -> client.getChannel(new AccountId(3)));
     }
 }
