@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.LiveHashAddTransaction;
 import com.hedera.hashgraph.sdk.LiveHashDeleteTransaction;
 import com.hedera.hashgraph.sdk.LiveHashQuery;
 import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.Status;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
@@ -15,8 +16,8 @@ import org.threeten.bp.Duration;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LiveHashIntegrationTest {
@@ -44,14 +45,16 @@ class LiveHashIntegrationTest {
 
             var account = receipt.accountId;
 
-            assertThrows(HederaPreCheckStatusException.class, () -> {
+            try {
                 new LiveHashAddTransaction()
                     .setAccountId(account)
                     .setDuration(Duration.ofDays(30))
                     .setHash(hash)
                     .setKeys(key)
                     .execute(client);
-            });
+            } catch (HederaPreCheckStatusException e) {
+                assertEquals(e.status, Status.NOT_SUPPORTED);
+            }
 
 //            @Var AccountInfo info = new AccountInfoQuery()
 //                .setAccountId(account)
@@ -66,12 +69,14 @@ class LiveHashIntegrationTest {
 //            assertEquals(keys.length, 1);
 //            assertEquals(keys[0], key.getPublicKey());
 
-            assertThrows(HederaPreCheckStatusException.class, () -> {
+            try {
                 new LiveHashDeleteTransaction()
                     .setAccountId(account)
                     .setHash(hash)
                     .execute(client);
-            });
+            } catch (HederaPreCheckStatusException e) {
+                assertEquals(e.status, Status.NOT_SUPPORTED);
+            }
 
             assertDoesNotThrow(() -> {
                 new LiveHashQuery()

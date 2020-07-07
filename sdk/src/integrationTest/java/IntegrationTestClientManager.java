@@ -6,6 +6,10 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class IntegrationTestClientManager {
+    IntegrationTestClientManager() {
+
+    }
+
     public static Client getClient() {
         @Var Client client;
 
