@@ -111,12 +111,24 @@ $ ./gradlew test
 
 ### Integration Test
 
-Requires passing `OPERATOR_ID` and `OPERATOR_KEY` to system properties. Integration tests run against
-the Hedera test network.
+Requires passing `OPERATOR_ID` and `OPERATOR_KEY` to system properties or by providing this information in a
+configuration file. Integration tests are run against the Hedera test network by default.
 
 ```sh
 $ ./gradlew integrationTest -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>"
 ```
+
+A configuration file can also be used to run the integration tests against a custom network.  The path for this
+configuration file is:
+
+```
+sdk/src/integrationTest/resources/client-config-with-operator.json
+```
+
+Either replace the file or replace the information in the file to proceed with integration tests against the chosen
+custom network.
+
+Note: system properties will take precedence over configuration operator information.
 
 ### Examples
 
