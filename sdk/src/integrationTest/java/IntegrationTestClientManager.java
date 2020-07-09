@@ -14,7 +14,7 @@ public class IntegrationTestClientManager {
         @Var Client client;
 
         try {
-            client = Client.fromJsonFile("./src/integrationTest/resources/client-config-with-operator.json");
+            client = Client.fromJsonFile(System.getProperty("CONFIG_FILE"));
             System.out.println("Using client from config file");
         } catch (Exception e) {
             System.out.println("Failed to use client network. Using testnet instead.");
