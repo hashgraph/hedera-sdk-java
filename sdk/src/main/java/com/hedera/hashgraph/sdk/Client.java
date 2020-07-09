@@ -152,7 +152,7 @@ public final class Client implements AutoCloseable {
         Map<AccountId, String> nodes = new HashMap<>(config.network.size());
 
         for (Map.Entry<String, String> entry : config.network.entrySet()) {
-            nodes.put(AccountId.fromString(entry.getKey()), entry.getValue());
+            nodes.put(AccountId.fromString(entry.getValue()), entry.getKey());
         }
 
         Client client = new Client(nodes);

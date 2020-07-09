@@ -111,8 +111,8 @@ $ ./gradlew test
 
 ### Integration Test
 
-Requires providing this information in a configuration file. Integration tests are run against the Hedera test network
-by default.
+The easiest way to run integration tests is by providing network and operator information in a configuration file.
+This configuration file is passed into system properties.
 
 ```sh
 $ ./gradlew integrationTest -PCONFIG_FILE="<ConfigurationFilePath>"
@@ -120,16 +120,14 @@ $ ./gradlew integrationTest -PCONFIG_FILE="<ConfigurationFilePath>"
 
 An example configuration file can be found in the repo here:
 
-```
-sdk/src/integrationTest/resources/client-config-with-operator.json
-```
+[sdk/src/test/resources/client-config.json](sdk/src/test/resources/client-config.json)
 
 The format of the configuration file should be as follows:
 
 ```
 {
     "network": {
-        "<NodeAccountId>": "<NodeAddress>",
+        "<NodeAddress>": "<NodeAccountId>",
         ...
     },
     "operator": {
@@ -139,6 +137,15 @@ The format of the configuration file should be as follows:
 }
 ```
 
+If a configuration file is not provided, `OPERATOR_ID` and `OPERATOR_KEY` must be passed into system properties
+and integration tests will run against the Hedera test network.
+
+```sh
+$ ./gradlew integrationTest -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>"
+```
+
+Note: It is also possible to use a custom network in a configuration file and pass `OPERATOR_ID` and `OPERATOR_KEY`
+into system properties.
 
 ### Examples
 
