@@ -22,13 +22,12 @@ public class ClientIntegrationTest {
             network.put(new AccountId(3), "0.testnet.hedera.com:50211");
             network.put(new AccountId(4), "1.testnet.hedera.com:50211");
 
-            var operatorKey = PrivateKey.fromString(System.getProperty("OPERATOR_KEY"));
-            var operatorId = AccountId.fromString(System.getProperty("OPERATOR_ID"));
-
-            var client = Client.forNetwork(network)
-                .setOperator(operatorId, operatorKey)
+            var client = IntegrationTestClientManager.getClient()
                 .setMaxQueryPayment(new Hbar(2))
                 .setRequestTimeout(Duration.ofMinutes(2));
+
+            var operatorId = client.getOperatorId();
+            assert operatorId != null;
 
             // Execute two simple queries so we create a channel for each network node.
             new AccountBalanceQuery()

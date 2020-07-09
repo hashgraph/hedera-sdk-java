@@ -25,11 +25,10 @@ class LiveHashIntegrationTest {
     @Test
     void test() {
         assertDoesNotThrow(() -> {
-            var operatorKey = PrivateKey.fromString(System.getProperty("OPERATOR_KEY"));
-            var operatorId = AccountId.fromString(System.getProperty("OPERATOR_ID"));
 
-            var client = Client.forTestnet()
-                .setOperator(operatorId, operatorKey);
+            var client = IntegrationTestClientManager.getClient();
+
+            var operatorId = client.getOperatorId();
 
             var key = PrivateKey.generate();
 
