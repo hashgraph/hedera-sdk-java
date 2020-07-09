@@ -120,7 +120,7 @@ $ ./gradlew integrationTest -PCONFIG_FILE="<ConfigurationFilePath>"
 
 An example configuration file can be found in the repo here:
 
-[sdk/src/test/resources/client-config.json](sdk/src/test/resources/client-config.json)
+[sdk/src/test/resources/client-config-with-operator.json](sdk/src/test/resources/client-config-with-operator.json)
 
 The format of the configuration file should be as follows:
 
@@ -146,6 +146,10 @@ $ ./gradlew integrationTest -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<P
 
 Note: It is also possible to use a custom network in a configuration file and pass `OPERATOR_ID` and `OPERATOR_KEY`
 into system properties.
+
+An example configuration file containing only network information can be found in the repo here:
+
+[sdk/src/test/resources/client-config.json](sdk/src/test/resources/client-config.json)
 
 ### Examples
 
