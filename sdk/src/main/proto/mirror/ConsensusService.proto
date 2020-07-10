@@ -27,6 +27,7 @@ option java_package = "com.hedera.hashgraph.sdk.proto.mirror";
 
 import "BasicTypes.proto";
 import "Timestamp.proto";
+import "ConsensusSubmitMessage.proto";
 
 message ConsensusTopicQuery {
     .proto.TopicID topicID = 1; // A required topic ID to retrieve messages for.
@@ -53,6 +54,8 @@ message ConsensusTopicResponse {
     uint64 sequenceNumber = 4; // Starts at 1 for first submitted message. Incremented on each submitted message.
 
     uint64 runningHashVersion = 5; // Version of the SHA-384 digest used to update the running hash.
+
+    .proto.ConsensusMessageChunkInfo chunkInfo = 6; // Optional information of the current chunk in a fragmented message.
 }
 
 //

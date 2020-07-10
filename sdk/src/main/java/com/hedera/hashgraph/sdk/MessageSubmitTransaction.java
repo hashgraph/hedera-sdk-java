@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
+import com.hedera.hashgraph.sdk.proto.ConsensusMessageChunkInfo;
 import com.hedera.hashgraph.sdk.proto.ConsensusSubmitMessageTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 
@@ -52,6 +53,16 @@ public final class MessageSubmitTransaction extends TransactionBuilder<MessageSu
      */
     public MessageSubmitTransaction setMessage(byte[] message) {
         builder.setMessage(ByteString.copyFrom(message));
+        return this;
+    }
+
+    public MessageSubmitTransaction setChunkInfo(TransactionId initialTransactionId, int total, int number) {
+        var chunkInfo = ConsensusMessageChunkInfo.newBuilder()
+            .setInitialTransactionID(initialTransactionId.toProtobuf())
+            .setTotal(total)
+            .setNumber(number)
+            .build();
+        builder.setChunkInfo(chunkInfo);
         return this;
     }
 
