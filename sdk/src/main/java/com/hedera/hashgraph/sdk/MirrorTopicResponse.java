@@ -4,7 +4,6 @@ import com.google.common.base.MoreObjects;
 import com.hedera.hashgraph.sdk.proto.mirror.ConsensusTopicResponse;
 import org.threeten.bp.Instant;
 
-import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
 
 final class ChunkInfo {
