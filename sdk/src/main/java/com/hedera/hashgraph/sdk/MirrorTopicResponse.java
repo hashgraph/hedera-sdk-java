@@ -4,6 +4,7 @@ import com.google.common.base.MoreObjects;
 import com.hedera.hashgraph.sdk.proto.mirror.ConsensusTopicResponse;
 import org.threeten.bp.Instant;
 
+import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
 
 public final class MirrorTopicResponse {
@@ -15,6 +16,7 @@ public final class MirrorTopicResponse {
 
     public final long sequenceNumber;
 
+    @Nullable
     public final MessageChunkInfo chunkInfo;
 
     MirrorTopicResponse(ConsensusTopicResponse response) {
