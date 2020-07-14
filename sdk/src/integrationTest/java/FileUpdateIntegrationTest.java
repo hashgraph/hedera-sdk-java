@@ -19,9 +19,10 @@ public class FileUpdateIntegrationTest {
     void test() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
+            var operatorKey = client.getOperatorKey();
 
             var receipt = new FileCreateTransaction()
-                .setKeys(client.getOperatorKey())
+                .setKeys(operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
@@ -40,7 +41,7 @@ public class FileUpdateIntegrationTest {
             assertEquals(info.fileId, file);
             assertEquals(info.size, 28);
             assertFalse(info.deleted);
-            assertEquals(info.keys.get(0).toString(), client.getOperatorKey().toString());
+            assertEquals(info.keys.get(0).toString(), Objects.requireNonNull(operatorKey).toString());
 
             new FileUpdateTransaction()
                 .setFileId(file)
@@ -57,7 +58,7 @@ public class FileUpdateIntegrationTest {
             assertEquals(info.fileId, file);
             assertEquals(info.size, 28);
             assertFalse(info.deleted);
-            assertEquals(info.keys.get(0).toString(), client.getOperatorKey().toString());
+            assertEquals(info.keys.get(0).toString(), Objects.requireNonNull(operatorKey).toString());
 
             new FileDeleteTransaction()
                 .setFileId(file)

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ClientIntegrationTest {
     @Test
@@ -25,7 +26,7 @@ public class ClientIntegrationTest {
                 .setRequestTimeout(Duration.ofMinutes(2));
 
             var operatorId = client.getOperatorId();
-            assert operatorId != null;
+            assertNotNull(operatorId);
 
             // Execute two simple queries so we create a channel for each network node.
             new AccountBalanceQuery()

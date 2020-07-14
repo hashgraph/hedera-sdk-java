@@ -25,7 +25,6 @@ class LiveHashIntegrationTest {
         assertDoesNotThrow(() -> {
 
             var client = IntegrationTestClientManager.getClient();
-
             var operatorId = client.getOperatorId();
 
             var key = PrivateKey.generate();

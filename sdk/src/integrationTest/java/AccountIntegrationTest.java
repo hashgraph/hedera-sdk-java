@@ -28,6 +28,7 @@ class AccountIntegrationTest {
     void test() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
+            var operatorId = client.getOperatorId();
 
             var key1 = PrivateKey.generate();
             var key2 = PrivateKey.generate();
@@ -95,7 +96,7 @@ class AccountIntegrationTest {
 
             new AccountDeleteTransaction()
                 .setAccountId(account)
-                .setTransferAccountId(client.getOperatorId())
+                .setTransferAccountId(operatorId)
                 .setTransactionId(TransactionId.generate(account))
                 .setMaxTransactionFee(Hbar.fromTinybars(50000000))
                 .build(client)

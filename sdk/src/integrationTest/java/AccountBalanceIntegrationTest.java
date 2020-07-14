@@ -19,9 +19,7 @@ class AccountBalanceIntegrationTest {
     void test() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
-
-            assertNotNull(client.getOperatorId());
-            assertNotNull(client.getOperatorKey());
+            var operatorId = client.getOperatorId();
 
             var key = PrivateKey.generate();
 
@@ -45,7 +43,7 @@ class AccountBalanceIntegrationTest {
 
             new AccountDeleteTransaction()
                 .setAccountId(account)
-                .setTransferAccountId(client.getOperatorId())
+                .setTransferAccountId(operatorId)
                 .setTransactionId(TransactionId.generate(account))
                 .build(client)
                 .sign(key)

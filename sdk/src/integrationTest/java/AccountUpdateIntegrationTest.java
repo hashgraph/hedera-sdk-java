@@ -23,6 +23,7 @@ class AccountUpdateIntegrationTest {
     void test() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
+            var operatorId = client.getOperatorId();
 
             var key1 = PrivateKey.generate();
             var key2 = PrivateKey.generate();
@@ -79,7 +80,7 @@ class AccountUpdateIntegrationTest {
 
             new AccountDeleteTransaction()
                 .setAccountId(account)
-                .setTransferAccountId(client.getOperatorId())
+                .setTransferAccountId(operatorId)
                 .setTransactionId(TransactionId.generate(account))
                 .build(client)
                 .sign(key2)

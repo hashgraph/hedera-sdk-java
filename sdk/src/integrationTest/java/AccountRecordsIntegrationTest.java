@@ -18,6 +18,7 @@ class AccountRecordsIntegrationTest {
     void test() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
+            var operatorId = client.getOperatorId();
 
             var key = PrivateKey.generate();
 
@@ -37,11 +38,11 @@ class AccountRecordsIntegrationTest {
 
             new CryptoTransferTransaction()
                 .addRecipient(account, new Hbar(1))
-                .addSender(client.getOperatorId(), new Hbar(1))
+                .addSender(operatorId, new Hbar(1))
                 .execute(client);
 
             var records = new AccountRecordsQuery()
-                .setAccountId(client.getOperatorId())
+                .setAccountId(operatorId)
                 .setMaxQueryPayment(new Hbar(1))
                 .execute(client);
 
@@ -49,7 +50,7 @@ class AccountRecordsIntegrationTest {
 
             new AccountDeleteTransaction()
                 .setAccountId(account)
-                .setTransferAccountId(client.getOperatorId())
+                .setTransferAccountId(operatorId)
                 .setTransactionId(TransactionId.generate(account))
                 .build(client)
                 .sign(key)

@@ -32,7 +32,7 @@ public class IntegrationTestClientManager {
         }
 
         assertNotNull(client.getOperatorId());
-        assertNotNull(client.getOperatorKey());
+        assertNotNull(client.getOperatorId());
 
         return client;
     }

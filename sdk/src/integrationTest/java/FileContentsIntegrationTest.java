@@ -16,9 +16,10 @@ public class FileContentsIntegrationTest {
     void test() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
+            var operatorKey = client.getOperatorKey();
 
             var receipt = new FileCreateTransaction()
-                .setKeys(client.getOperatorKey())
+                .setKeys(operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)

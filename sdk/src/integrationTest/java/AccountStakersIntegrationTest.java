@@ -12,10 +12,11 @@ class AccountStakersIntegrationTest {
     void test() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
+            var operatorId = client.getOperatorId();
 
             try {
                 new AccountStakersQuery()
-                    .setAccountId(client.getOperatorId())
+                    .setAccountId(operatorId)
                     .setMaxQueryPayment(new Hbar(1))
                     .execute(client);
             } catch (HederaPreCheckStatusException e) {
