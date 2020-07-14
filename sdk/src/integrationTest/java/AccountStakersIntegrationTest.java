@@ -21,6 +21,8 @@ class AccountStakersIntegrationTest {
             } catch (HederaPreCheckStatusException e) {
                 assertEquals(e.status, Status.NOT_SUPPORTED);
             }
+
+            client.close();
         });
     }
 }

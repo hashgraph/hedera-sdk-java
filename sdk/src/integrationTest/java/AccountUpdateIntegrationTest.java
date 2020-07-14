@@ -85,6 +85,8 @@ class AccountUpdateIntegrationTest {
                 .sign(key2)
                 .execute(client)
                 .getReceipt(client);
+
+            client.close();
         });
     }
 }

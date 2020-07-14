@@ -49,7 +49,7 @@ public final class Client implements AutoCloseable {
     @Nullable
     private Operator operator;
 
-    Duration requestTimeout = Duration.ofSeconds(30);
+    Duration requestTimeout = Duration.ofMinutes(2);
 
     Client(Map<AccountId, String> network) {
         var threadFactory = new ThreadFactoryBuilder()
@@ -196,7 +196,7 @@ public final class Client implements AutoCloseable {
      * @param nodes a map of node account ID to node URL.
      * @return {@code this} for fluent API usage.
      */
-    public Client setNetwork(Map<AccountId, String> nodes) {
+    public Client setNetwork(Map<AccountId, String> nodes) throws InterruptedException {
         setNodes(nodes);
         @Var ManagedChannel channel = null;
 
@@ -216,7 +216,7 @@ public final class Client implements AutoCloseable {
                 channels.put(node.getKey(), null);
             } else if (channels.get(node.getKey()) != null && !channels.get(node.getKey()).authority().equals(newNodeUrl)) {
                 // Shutdown channel before replacing address
-                channels.get(node.getKey()).shutdown();
+                channels.get(node.getKey()).shutdown().awaitTermination(30, TimeUnit.SECONDS);
                 channel = buildChannel(newNodeUrl);
                 channels.put(node.getKey(), channel);
             }
@@ -277,6 +277,7 @@ public final class Client implements AutoCloseable {
      *
      * @return {AccountId}
      */
+    @Nullable
     public AccountId getOperatorId() {
         if (operator == null) {
             return null;
@@ -290,6 +291,7 @@ public final class Client implements AutoCloseable {
      *
      * @return {PublicKey}
      */
+    @Nullable
     public PublicKey getOperatorKey() {
         if (operator == null) {
             return null;
@@ -396,6 +398,14 @@ public final class Client implements AutoCloseable {
 
         // preemptively clear memory for the channels map
         channels.clear();
+
+        executor.shutdown();
+
+        try {
+            executor.awaitTermination(timeout.getSeconds(), TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // Get the next node ID, following a round-robin distribution with a randomized start point

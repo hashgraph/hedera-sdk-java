@@ -51,6 +51,8 @@ class AccountBalanceIntegrationTest {
                 .sign(key)
                 .execute(client)
                 .getReceipt(client);
+
+            client.close();
         });
     }
 }

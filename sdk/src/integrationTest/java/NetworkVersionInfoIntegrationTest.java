@@ -1,12 +1,10 @@
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
-import com.hedera.hashgraph.sdk.NetworkVersionInfo;
 import com.hedera.hashgraph.sdk.NetworkVersionInfoQuery;
 import com.hedera.hashgraph.sdk.Status;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class NetworkVersionInfoIntegrationTest {
     @Test

@@ -1,9 +1,7 @@
 import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
@@ -49,6 +47,8 @@ public class ClientIntegrationTest {
             network.put(new AccountId(5), "35.192.2.25:50211");
 
             client.setNetwork(network);
+
+            client.close();
         });
     }
 }
