@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * Creates a new HCS topic with a 2-of-3 threshold key for the adminKey.
  * Updates the HCS topic to a 3-of-4 threshold key for the adminKey.
  */
-class TopicWithAdminKey {
+final class TopicWithAdminKey {
     private Client hapiClient;
 
     private ConsensusTopicId topicId;

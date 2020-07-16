@@ -60,8 +60,7 @@ public final class ConsensusPubSub {
             new ConsensusMessageSubmitTransaction()
                 .setTopicId(topicId)
                 .setMessage("hello, HCS! " + i)
-                .execute(client)
-                .getReceipt(client);
+                .execute(client);
 
             Thread.sleep(2500);
         }

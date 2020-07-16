@@ -12,8 +12,8 @@ import javax.annotation.Nullable;
 
 import io.grpc.Channel;
 
-public abstract class TransactionBuilder<O, T extends TransactionBuilder<O, T>>
-    extends HederaCall<com.hedera.hashgraph.proto.Transaction, TransactionResponse, TransactionId, T>
+public abstract class TransactionBuilder<Resp, O, T extends TransactionBuilder<Resp, O, T>>
+    extends HederaCall<com.hedera.hashgraph.proto.Transaction, TransactionResponse, Resp, T>
 {
     protected final com.hedera.hashgraph.proto.Transaction.Builder inner = com.hedera.hashgraph.proto.Transaction.newBuilder();
     protected final TransactionBody.Builder bodyBuilder = TransactionBody.newBuilder();
@@ -186,12 +186,5 @@ public abstract class TransactionBuilder<O, T extends TransactionBuilder<O, T>>
         }
     }
 
-    @Override
-    protected TransactionId mapResponse(TransactionResponse response) throws HederaStatusException {
-        TransactionId transactionId = new TransactionId(
-            bodyBuilder.getTransactionIDOrBuilder());
-        HederaPrecheckStatusException.throwIfExceptional(response.getNodeTransactionPrecheckCode(),
-            transactionId);
-        return transactionId;
-    }
+    protected abstract Resp mapResponse(TransactionResponse response) throws HederaStatusException;
 }

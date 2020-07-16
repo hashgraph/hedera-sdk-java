@@ -1,11 +1,13 @@
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.proto.TransactionResponse;
+
 import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.function.Consumer;
 
 @Internal
-public abstract class SingleTransactionBuilder<T extends SingleTransactionBuilder<T>> extends TransactionBuilder<Transaction, T> {
+public abstract class SingleTransactionBuilder<T extends SingleTransactionBuilder<T>> extends TransactionBuilder<TransactionId, Transaction, T> {
     @Override
     public Transaction build(@Nullable Client client) throws LocalValidationException {
         if (client != null && bodyBuilder.getTransactionFee() == 0) {
@@ -50,5 +52,16 @@ public abstract class SingleTransactionBuilder<T extends SingleTransactionBuilde
     @Internal
     public final com.hedera.hashgraph.proto.Transaction toProto(boolean requireSignature) {
         return build(null).toProto(requireSignature);
+    }
+
+    @Override
+    protected TransactionId mapResponse(TransactionResponse response) throws HederaStatusException {
+        TransactionId transactionId = new TransactionId(
+            bodyBuilder.getTransactionIDOrBuilder());
+
+        HederaPrecheckStatusException.throwIfExceptional(response.getNodeTransactionPrecheckCode(),
+            transactionId);
+
+        return transactionId;
     }
 }

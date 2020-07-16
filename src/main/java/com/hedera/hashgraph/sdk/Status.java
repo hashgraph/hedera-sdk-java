@@ -117,6 +117,15 @@ public enum Status {
     InvalidTopicMessage(ResponseCodeEnum.INVALID_TOPIC_MESSAGE),
     InvalidAutorenewAccount(ResponseCodeEnum.INVALID_AUTORENEW_ACCOUNT),
     AutorenewAccountNotAllowed(ResponseCodeEnum.AUTORENEW_ACCOUNT_NOT_ALLOWED),
+    EmptyLiveHash(ResponseCodeEnum.EMPTY_LIVE_HASH),
+    EmptyLiveHashQuery(ResponseCodeEnum.EMPTY_LIVE_HASH_QUERY),
+    EmptyLiveHashBody(ResponseCodeEnum.EMPTY_LIVE_HASH_BODY),
+    EmptyLiveHashKeys(ResponseCodeEnum.EMPTY_LIVE_HASH_KEYS),
+    InvalidLiveHashSize(ResponseCodeEnum.INVALID_LIVE_HASH_SIZE),
+    LiveHashNotFound(ResponseCodeEnum.LIVE_HASH_NOT_FOUND),
+    LiveHashAlreadyExists(ResponseCodeEnum.LIVE_HASH_ALREADY_EXISTS),
+    InvalidChunkNumber(ResponseCodeEnum.INVALID_CHUNK_NUMBER),
+    InvalidChunkTransactionId(ResponseCodeEnum.INVALID_CHUNK_TRANSACTION_ID),
     TopicExpired(ResponseCodeEnum.TOPIC_EXPIRED);
 
     private final ResponseCodeEnum responseCode;
@@ -186,6 +195,15 @@ public enum Status {
             case INVALID_EXPIRATION_TIME: return InvalidExpirationTime;
             case NO_WACL_KEY: return NoWaclKey;
             case FILE_CONTENT_EMPTY: return FileContentEmpty;
+            case EMPTY_LIVE_HASH_QUERY: return EmptyLiveHashQuery;
+            case EMPTY_LIVE_HASH_BODY: return EmptyLiveHashBody;
+            case EMPTY_LIVE_HASH: return EmptyLiveHash;
+            case EMPTY_LIVE_HASH_KEYS: return EmptyLiveHashKeys;
+            case INVALID_LIVE_HASH_SIZE: return InvalidLiveHashSize;
+            case LIVE_HASH_NOT_FOUND: return LiveHashNotFound;
+            case LIVE_HASH_ALREADY_EXISTS: return LiveHashAlreadyExists;
+            case INVALID_CHUNK_NUMBER: return InvalidChunkNumber;
+            case INVALID_CHUNK_TRANSACTION_ID: return InvalidChunkTransactionId;
             case INVALID_ACCOUNT_AMOUNTS: return InvalidAccountAmounts;
             case EMPTY_TRANSACTION_BODY: return EmptyTransactionBody;
             case INVALID_TRANSACTION_BODY: return InvalidTransactionBody;

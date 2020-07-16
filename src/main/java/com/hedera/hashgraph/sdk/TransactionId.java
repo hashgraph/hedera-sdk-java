@@ -66,7 +66,8 @@ public final class TransactionId {
         return new TransactionId(accountId, transactionValidStart);
     }
 
-    TransactionId(TransactionIDOrBuilder transactionId) {
+    @Internal
+    public TransactionId(TransactionIDOrBuilder transactionId) {
         inner = TransactionID.newBuilder()
             .setAccountID(transactionId.getAccountID())
             .setTransactionValidStart(transactionId.getTransactionValidStart());

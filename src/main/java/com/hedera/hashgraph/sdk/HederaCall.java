@@ -51,7 +51,7 @@ public abstract class HederaCall<Req, RawResp, Resp, T extends HederaCall<Req, R
         return false;
     }
 
-    public final Resp execute(Client client) throws HederaStatusException, HederaNetworkException {
+    public Resp execute(Client client) throws HederaStatusException, HederaNetworkException {
         return execute(client, getDefaultTimeout());
     }
 

@@ -343,7 +343,7 @@ public final class Client implements AutoCloseable {
     }
 
     @Nullable
-    AccountId getOperatorId() {
+    public AccountId getOperatorId() {
         return operatorId;
     }
 

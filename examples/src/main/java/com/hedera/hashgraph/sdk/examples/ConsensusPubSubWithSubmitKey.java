@@ -135,8 +135,7 @@ public class ConsensusPubSubWithSubmitKey {
                 // Due to the topic having a submitKey requirement, additionally sign the transaction with that key.
                 .sign(submitKey)
 
-                .execute(hapiClient)
-                .getReceipt(hapiClient);
+                .execute(hapiClient);
 
             Thread.sleep(millisBetweenMessages);
         }
