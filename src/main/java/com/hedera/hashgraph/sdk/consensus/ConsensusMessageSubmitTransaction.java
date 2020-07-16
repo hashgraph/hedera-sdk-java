@@ -129,7 +129,7 @@ public class ConsensusMessageSubmitTransaction extends TransactionBuilder<List<T
                 ConsensusMessageChunkInfo.newBuilder()
                     .setInitialTransactionID(initialTransactionId.toProto())
                     .setTotal((int) requiredChunks)
-                    .setNumber(i)
+                    .setNumber(i + 1) // 1..=total
                     .build(),
                 chunkMessage).build(client));
 
