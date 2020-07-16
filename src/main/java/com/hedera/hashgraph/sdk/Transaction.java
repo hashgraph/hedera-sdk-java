@@ -319,14 +319,10 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
 
             // Account / Crypto
 
-            case CRYPTOADDCLAIM:
-                return CryptoServiceGrpc.getAddClaimMethod();
             case CRYPTOCREATEACCOUNT:
                 return CryptoServiceGrpc.getCreateAccountMethod();
             case CRYPTODELETE:
                 return CryptoServiceGrpc.getCryptoDeleteMethod();
-            case CRYPTODELETECLAIM:
-                return CryptoServiceGrpc.getDeleteClaimMethod();
             case CRYPTOTRANSFER:
                 return CryptoServiceGrpc.getCryptoTransferMethod();
             case CRYPTOUPDATEACCOUNT:

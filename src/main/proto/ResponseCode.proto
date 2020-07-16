@@ -77,16 +77,16 @@ enum ResponseCodeEnum {
   INVALID_SIGNATURE_TYPE_MISMATCHING_KEY = 51; // the type of key (base ed25519 key, KeyList, or ThresholdKey) does not match the type of signature (base ed25519 signature, SignatureList, or ThresholdKeySignature)
   INVALID_SIGNATURE_COUNT_MISMATCHING_KEY = 52; // the number of key (KeyList, or ThresholdKey) does not match that of signature (SignatureList, or ThresholdKeySignature). e.g. if a keyList has 3 base keys, then the corresponding signatureList should also have 3 base signatures.
 
-  EMPTY_CLAIM_BODY = 53; // the claim body is empty
-  EMPTY_CLAIM_HASH = 54; //the hash for the claim is empty
-  EMPTY_CLAIM_KEYS = 55; // the key list is empty
-  INVALID_CLAIM_HASH_SIZE = 56; // the size of the claim hash is not 48 bytes
+  EMPTY_LIVE_HASH_BODY = 53; // the livehash body is empty
+  EMPTY_LIVE_HASH = 54; // the livehash data is missing
+  EMPTY_LIVE_HASH_KEYS = 55; // the keys for a livehash are missing
+  INVALID_LIVE_HASH_SIZE = 56; // the livehash data is not the output of a SHA-384 digest
 
   EMPTY_QUERY_BODY = 57; // the query body is empty
-  EMPTY_CLAIM_QUERY = 58; // the crypto claim query is empty
-  CLAIM_NOT_FOUND = 59; // the crypto claim doesn't exists in the file system. It expired or was never persisted.
+  EMPTY_LIVE_HASH_QUERY = 58; // the crypto livehash query is empty
+  LIVE_HASH_NOT_FOUND = 59; // the livehash is not present
   ACCOUNT_ID_DOES_NOT_EXIST = 60; // the account id passed has not yet been created.
-  CLAIM_ALREADY_EXISTS = 61; // the claim hash already exists
+  LIVE_HASH_ALREADY_EXISTS = 61; // the livehash already exists for a given account
 
 
   INVALID_FILE_WACL = 62; // File WACL keys are invalid
@@ -154,4 +154,6 @@ enum ResponseCodeEnum {
   // deleted unrecoverably. This error response code will not be returned until autoRenew functionality is supported
   // by HAPI.
   TOPIC_EXPIRED = 162;
+  INVALID_CHUNK_NUMBER = 163; // chunk number must be from 1 to total (chunks) inclusive.
+  INVALID_CHUNK_TRANSACTION_ID = 164; // For every chunk, the payer account that is part of initialTransactionID must match the Payer Account of this transaction. The entire initialTransactionID should match the transactionID of the first chunk, but this is not checked or enforced by Hedera except when the chunk number is 1.
 }

@@ -13,25 +13,28 @@ import "Timestamp.proto";
 message ConsensusCreateTopicTransactionBody {
     string memo = 1; // Short publicly visible memo about the topic. No guarantee of uniqueness.
 
-    // Access control for update/delete of the topic.
-    // If unspecified, anyone can increase the topic's expirationTime via ConsensusService.updateTopic().
+    // Access control for updateTopic/deleteTopic.
+    // Anyone can increase the topic's expirationTime via ConsensusService.updateTopic(), regardless of the adminKey.
+    // If no adminKey is specified, updateTopic may only be used to extend the topic's expirationTime, and deleteTopic
+    // is disallowed.
     Key adminKey = 2;
 
-    // Access control for ConsensusService.submitMessage.
+    // Access control for submitMessage.
     // If unspecified, no access control is performed on ConsensusService.submitMessage (all submissions are allowed).
     Key submitKey = 3;
 
-    Timestamp validStartTime = 4 [deprecated = true]; // Deprecated and to be removed before HCS release.
-    Timestamp expirationTime = 5 [deprecated = true]; // Deprecated and to be removed before HCS release.
-
-    // The initial lifetime of the topic and the amount of time to extend the topic's lifetime automatically at
-    // expirationTime if the autoRenewAccount is configured and has sufficient funds.
-    // Required. Limited to a maximum of 90 days (server-side configuration which may change).
+    // The initial lifetime of the topic and the amount of time to attempt to extend the topic's lifetime by
+    // automatically at the topic's expirationTime, if the autoRenewAccount is configured (once autoRenew functionality
+    // is supported by HAPI).
+    // Limited to MIN_AUTORENEW_PERIOD and MAX_AUTORENEW_PERIOD value by server-side configuration.
+    // Required.
     Duration autoRenewPeriod = 6;
 
-    // Optional account to be used at the topic's expirationTime to extend the life of the topic.
+    // Optional account to be used at the topic's expirationTime to extend the life of the topic (once autoRenew
+    // functionality is supported by HAPI).
     // The topic lifetime will be extended up to a maximum of the autoRenewPeriod or however long the topic
-    // can be extended using all funds on the account (whichever is the smaller duration/amount).
+    // can be extended using all funds on the account (whichever is the smaller duration/amount and if any extension
+    // is possible with the account's funds).
     // If specified, there must be an adminKey and the autoRenewAccount must sign this transaction.
     AccountID autoRenewAccount = 7;
 }

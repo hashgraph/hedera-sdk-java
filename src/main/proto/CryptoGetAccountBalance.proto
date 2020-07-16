@@ -9,7 +9,8 @@ import "BasicTypes.proto";
 import "QueryHeader.proto";
 import "ResponseHeader.proto";
 
-/* Get the balance of a cryptocurrency account. This returns only the balance, so it is a smaller and faster reply than CryptoGetInfo, which returns the balance plus additional information. */
+/* Get the balance of a cryptocurrency account. This returns only the balance, so it is a smaller
+reply than CryptoGetInfo, which returns the balance plus additional information. */
 message CryptoGetAccountBalanceQuery {
     QueryHeader header = 1; // Standard info sent from client to node, including the signed payment, and what kind of response is requested (cost, state proof, both, or neither).
     oneof balanceSource {

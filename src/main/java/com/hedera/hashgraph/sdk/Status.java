@@ -58,15 +58,8 @@ public enum Status {
     InvalidTransactionBody(ResponseCodeEnum.INVALID_TRANSACTION_BODY),
     InvalidSignatureTypeMismatchingKey(ResponseCodeEnum.INVALID_SIGNATURE_TYPE_MISMATCHING_KEY),
     InvalidSignatureCountMismatchingKey(ResponseCodeEnum.INVALID_SIGNATURE_COUNT_MISMATCHING_KEY),
-    EmptyClaimBody(ResponseCodeEnum.EMPTY_CLAIM_BODY),
-    EmptyClaimHash(ResponseCodeEnum.EMPTY_CLAIM_HASH),
-    EmptyClaimKeys(ResponseCodeEnum.EMPTY_CLAIM_KEYS),
-    InvalidClaimHashSize(ResponseCodeEnum.INVALID_CLAIM_HASH_SIZE),
     EmptyQueryBody(ResponseCodeEnum.EMPTY_QUERY_BODY),
-    EmptyClaimQuery(ResponseCodeEnum.EMPTY_CLAIM_QUERY),
-    ClaimNotFound(ResponseCodeEnum.CLAIM_NOT_FOUND),
     AccountIdDoesNotExist(ResponseCodeEnum.ACCOUNT_ID_DOES_NOT_EXIST),
-    ClaimAlreadyExists(ResponseCodeEnum.CLAIM_ALREADY_EXISTS),
     InvalidFileWacl(ResponseCodeEnum.INVALID_FILE_WACL),
     SerializationFailed(ResponseCodeEnum.SERIALIZATION_FAILED),
     TransactionOversize(ResponseCodeEnum.TRANSACTION_OVERSIZE),
@@ -198,15 +191,8 @@ public enum Status {
             case INVALID_TRANSACTION_BODY: return InvalidTransactionBody;
             case INVALID_SIGNATURE_TYPE_MISMATCHING_KEY: return InvalidSignatureTypeMismatchingKey;
             case INVALID_SIGNATURE_COUNT_MISMATCHING_KEY: return InvalidSignatureCountMismatchingKey;
-            case EMPTY_CLAIM_BODY: return EmptyClaimBody;
-            case EMPTY_CLAIM_HASH: return EmptyClaimHash;
-            case EMPTY_CLAIM_KEYS: return EmptyClaimKeys;
-            case INVALID_CLAIM_HASH_SIZE: return InvalidClaimHashSize;
             case EMPTY_QUERY_BODY: return EmptyQueryBody;
-            case EMPTY_CLAIM_QUERY: return EmptyClaimQuery;
-            case CLAIM_NOT_FOUND: return ClaimNotFound;
             case ACCOUNT_ID_DOES_NOT_EXIST: return AccountIdDoesNotExist;
-            case CLAIM_ALREADY_EXISTS: return ClaimAlreadyExists;
             case INVALID_FILE_WACL: return InvalidFileWacl;
             case SERIALIZATION_FAILED: return SerializationFailed;
             case TRANSACTION_OVERSIZE: return TransactionOversize;

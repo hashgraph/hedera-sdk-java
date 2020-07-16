@@ -18,10 +18,10 @@ message ConsensusUpdateTopicTransactionBody {
     // Short publicly visible memo about the topic. No guarantee of uniqueness. Null for "do not update".
     google.protobuf.StringValue memo = 2;
 
-    Timestamp validStartTime = 3 [deprecated = true]; // Deprecated and to be removed before HCS release.
-
     // Effective consensus timestamp at (and after) which all consensus transactions and queries will fail.
-    // The expirationTime may be no longer than 90 days from the consensus timestamp of this transaction.
+    // The expirationTime may be no longer than MAX_AUTORENEW_PERIOD (8000001 seconds) from the consensus timestamp of
+    // this transaction.
+    // On topics with no adminKey, extending the expirationTime is the only updateTopic option allowed on the topic.
     // If unspecified, no change.
     Timestamp expirationTime = 4;
 
@@ -36,14 +36,17 @@ message ConsensusUpdateTopicTransactionBody {
     Key submitKey = 7;
 
     // The amount of time to extend the topic's lifetime automatically at expirationTime if the autoRenewAccount is
-    // configured and has funds.
-    // Limited to a maximum of 90 days (server-side configuration which may change).
+    // configured and has funds (once autoRenew functionality is supported by HAPI).
+    // Limited to between MIN_AUTORENEW_PERIOD (6999999 seconds) and MAX_AUTORENEW_PERIOD (8000001 seconds) by
+    // servers-side configuration (which may change).
     // If unspecified, no change.
     Duration autoRenewPeriod = 8;
 
     // Optional account to be used at the topic's expirationTime to extend the life of the topic.
-    // The topic lifetime will be extended up to a maximum of the autoRenewPeriod or however long the topic
-    // can be extended using all funds on the account (whichever is the smaller duration/amount).
+    // Once autoRenew functionality is supported by HAPI, the topic lifetime will be extended up to a maximum of the
+    // autoRenewPeriod or however long the topic can be extended using all funds on the account (whichever is the
+    // smaller duration/amount).
     // If specified as the default value (0.0.0), the autoRenewAccount will be removed.
+    // If unspecified, no change.
     AccountID autoRenewAccount = 9;
 }

@@ -245,8 +245,6 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
                 return raw.getCryptoGetAccountRecords().getHeader();
             case CRYPTOGETINFO:
                 return raw.getCryptoGetInfo().getHeader();
-            case CRYPTOGETCLAIM:
-                return raw.getCryptoGetClaim().getHeader();
             case CRYPTOGETPROXYSTAKERS:
                 return raw.getCryptoGetProxyStakers().getHeader();
             case FILEGETCONTENTS:
