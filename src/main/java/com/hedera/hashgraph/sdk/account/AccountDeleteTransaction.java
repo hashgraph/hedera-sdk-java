@@ -4,12 +4,12 @@ import com.hedera.hashgraph.proto.CryptoDeleteTransactionBody;
 import com.hedera.hashgraph.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
-import com.hedera.hashgraph.sdk.TransactionBuilder;
+import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
 
 import io.grpc.MethodDescriptor;
 
 // `CryptoDeleteTransaction`
-public final class AccountDeleteTransaction extends TransactionBuilder<AccountDeleteTransaction> {
+public final class AccountDeleteTransaction extends SingleTransactionBuilder<AccountDeleteTransaction> {
     private final CryptoDeleteTransactionBody.Builder builder = bodyBuilder.getCryptoDeleteBuilder();
 
     public AccountDeleteTransaction() {

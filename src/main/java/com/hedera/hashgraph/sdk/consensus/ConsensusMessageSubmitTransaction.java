@@ -5,11 +5,11 @@ import com.hedera.hashgraph.proto.ConsensusServiceGrpc;
 import com.hedera.hashgraph.proto.ConsensusSubmitMessageTransactionBody;
 import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
-import com.hedera.hashgraph.sdk.TransactionBuilder;
+import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
 
 import io.grpc.MethodDescriptor;
 
-public class ConsensusMessageSubmitTransaction extends TransactionBuilder<ConsensusMessageSubmitTransaction> {
+public class ConsensusMessageSubmitTransaction extends SingleTransactionBuilder<ConsensusMessageSubmitTransaction> {
     private ConsensusSubmitMessageTransactionBody.Builder builder = bodyBuilder.getConsensusSubmitMessageBuilder();
 
     public ConsensusMessageSubmitTransaction() {

@@ -6,7 +6,7 @@ import com.hedera.hashgraph.proto.FileServiceGrpc;
 import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.TransactionBuilder;
+import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
 
 import io.grpc.MethodDescriptor;
@@ -17,7 +17,7 @@ import io.grpc.MethodDescriptor;
  * If a file has multiple keys, all keys must sign to modify its contents.
  * (See {@link FileCreateTransaction#addKey(PublicKey)} for more information.)
  */
-public final class FileAppendTransaction extends TransactionBuilder<FileAppendTransaction> {
+public final class FileAppendTransaction extends SingleTransactionBuilder<FileAppendTransaction> {
     private final FileAppendTransactionBody.Builder builder = bodyBuilder.getFileAppendBuilder();
 
     public FileAppendTransaction() { super(); }

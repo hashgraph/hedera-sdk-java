@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 
 import io.grpc.MethodDescriptor;
 
-public final class SystemUndeleteTransaction extends TransactionBuilder<SystemUndeleteTransaction> {
+public final class SystemUndeleteTransaction extends SingleTransactionBuilder<SystemUndeleteTransaction> {
 
     private final SystemUndeleteTransactionBody.Builder builder = bodyBuilder.getSystemUndeleteBuilder();
 

@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 
 import io.grpc.MethodDescriptor;
 
-public final class SystemDeleteTransaction extends TransactionBuilder<SystemDeleteTransaction> {
+public final class SystemDeleteTransaction extends SingleTransactionBuilder<SystemDeleteTransaction> {
     private final SystemDeleteTransactionBody.Builder builder = bodyBuilder.getSystemDeleteBuilder();
 
     public SystemDeleteTransaction() { super(); }

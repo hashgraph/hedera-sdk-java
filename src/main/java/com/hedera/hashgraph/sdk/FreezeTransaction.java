@@ -17,7 +17,7 @@ import io.grpc.MethodDescriptor;
  * This is used before safely shutting down the platform for maintenance.
  * For use by platform administrators only.
  */
-public class FreezeTransaction extends TransactionBuilder<FreezeTransaction> {
+public class FreezeTransaction extends SingleTransactionBuilder<FreezeTransaction> {
     private FreezeTransactionBody.Builder builder = FreezeTransactionBody.newBuilder();
 
     public FreezeTransaction() {

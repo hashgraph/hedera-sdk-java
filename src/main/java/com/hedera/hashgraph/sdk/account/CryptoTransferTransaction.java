@@ -8,13 +8,13 @@ import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.proto.TransferList;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.TransactionBuilder;
+import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
 
 import javax.annotation.Nonnegative;
 
 import io.grpc.MethodDescriptor;
 
-public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTransferTransaction> {
+public final class CryptoTransferTransaction extends SingleTransactionBuilder<CryptoTransferTransaction> {
     private final CryptoTransferTransactionBody.Builder builder = bodyBuilder.getCryptoTransferBuilder();
     private final TransferList.Builder transferList = builder.getTransfersBuilder();
 

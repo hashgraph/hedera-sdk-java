@@ -4,11 +4,11 @@ import com.hedera.hashgraph.proto.ConsensusDeleteTopicTransactionBody;
 import com.hedera.hashgraph.proto.ConsensusServiceGrpc;
 import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
-import com.hedera.hashgraph.sdk.TransactionBuilder;
+import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
 
 import io.grpc.MethodDescriptor;
 
-public class ConsensusTopicDeleteTransaction extends TransactionBuilder<ConsensusTopicDeleteTransaction> {
+public class ConsensusTopicDeleteTransaction extends SingleTransactionBuilder<ConsensusTopicDeleteTransaction> {
     private final ConsensusDeleteTopicTransactionBody.Builder builder = bodyBuilder.getConsensusDeleteTopicBuilder();
 
     public ConsensusTopicDeleteTransaction() {

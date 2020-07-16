@@ -6,7 +6,7 @@ import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.HederaPrecheckStatusException;
 import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TransactionBuilder;
+import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
 
 import io.grpc.MethodDescriptor;
 
@@ -22,7 +22,7 @@ import io.grpc.MethodDescriptor;
  * must still be satisfied, or a {@link com.hedera.hashgraph.sdk.crypto.KeyList}, in which
  * case all keys in the list must sign.
  */
-public final class FileDeleteTransaction extends TransactionBuilder<FileDeleteTransaction> {
+public final class FileDeleteTransaction extends SingleTransactionBuilder<FileDeleteTransaction> {
     private final FileDeleteTransactionBody.Builder builder = bodyBuilder.getFileDeleteBuilder();
 
     public FileDeleteTransaction() { super(); }

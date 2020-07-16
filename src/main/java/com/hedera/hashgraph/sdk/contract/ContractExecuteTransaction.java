@@ -7,7 +7,7 @@ import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.TransactionBuilder;
+import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 
 import io.grpc.MethodDescriptor;
@@ -20,7 +20,7 @@ import io.grpc.MethodDescriptor;
  * result of the function call.
  */
 // `ContractCallTransaction`
-public final class ContractExecuteTransaction extends TransactionBuilder<ContractExecuteTransaction> {
+public final class ContractExecuteTransaction extends SingleTransactionBuilder<ContractExecuteTransaction> {
     private final ContractCallTransactionBody.Builder builder = bodyBuilder.getContractCallBuilder();
 
     public ContractExecuteTransaction() { super(); }

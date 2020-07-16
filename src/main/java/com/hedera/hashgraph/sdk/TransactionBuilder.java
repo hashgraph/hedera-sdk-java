@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 
 import io.grpc.Channel;
 
-public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
+public abstract class TransactionBuilder<O, T extends TransactionBuilder<O, T>>
     extends HederaCall<com.hedera.hashgraph.proto.Transaction, TransactionResponse, TransactionId, T>
 {
     protected final com.hedera.hashgraph.proto.Transaction.Builder inner = com.hedera.hashgraph.proto.Transaction.newBuilder();
@@ -114,16 +114,6 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     protected abstract void doValidate();
 
     @Override
-    public final com.hedera.hashgraph.proto.Transaction toProto() {
-        return build(null).toProto();
-    }
-
-    @Internal
-    public final com.hedera.hashgraph.proto.Transaction toProto(boolean requireSignature) {
-        return build(null).toProto(requireSignature);
-    }
-
-    @Override
     protected final void localValidate() {
         TransactionBody.Builder bodyBuilder = this.bodyBuilder;
 
@@ -163,40 +153,17 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * applicable.
      * @throws LocalValidationException if the transaction fails local sanity checks.
      */
-    public final Transaction build(@Nullable Client client) throws LocalValidationException {
-        if (client != null && bodyBuilder.getTransactionFee() == 0) {
-            setMaxTransactionFee(client.getMaxTransactionFee());
-        }
+    public abstract O build(@Nullable Client client) throws LocalValidationException;
 
-        if (!bodyBuilder.hasNodeAccountID()) {
-            Node channel = client != null ? client.pickNode() : null;
-            if (channel != null) {
-                bodyBuilder.setNodeAccountID(channel.accountId.toProto());
-            }
-        }
-
-        if (!bodyBuilder.hasTransactionID() && client != null
-            && client.getOperatorId() != null)
-        {
-            bodyBuilder.setTransactionID(new TransactionId(client.getOperatorId()).toProto());
-        }
-
-        localValidate();
-
-        inner.setBodyBytes(bodyBuilder.build().toByteString());
-
-        return new Transaction(inner, bodyBuilder, getMethod());
-    }
-
-    @Override
-    public TransactionId execute(Client client, Duration retryTimeout) throws HederaStatusException, HederaNetworkException {
-        return build(client).execute(client, retryTimeout);
-    }
-
-    @Override
-    public void executeAsync(Client client, Duration retryTimeout, Consumer<TransactionId> onSuccess, Consumer<HederaThrowable> onError) {
-        build(client).executeAsync(client, retryTimeout, onSuccess, onError);
-    }
+//    @Override
+//    public TransactionId execute(Client client, Duration retryTimeout) throws HederaStatusException, HederaNetworkException {
+//        return build(client).execute(client, retryTimeout);
+//    }
+//
+//    @Override
+//    public void executeAsync(Client client, Duration retryTimeout, Consumer<TransactionId> onSuccess, Consumer<HederaThrowable> onError) {
+//        build(client).executeAsync(client, retryTimeout, onSuccess, onError);
+//    }
 
     // Work around for java not recognized that this is completely safe
     // as T is required to extend this

@@ -9,7 +9,7 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TimestampHelper;
-import com.hedera.hashgraph.sdk.TransactionBuilder;
+import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
 
 import java.time.Instant;
@@ -23,7 +23,7 @@ import io.grpc.MethodDescriptor;
  * If a file has multiple keys, all keys must sign to update the file.
  * (See {@link FileCreateTransaction#addKey(PublicKey)} for more information.)
  */
-public class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransaction> {
+public class FileUpdateTransaction extends SingleTransactionBuilder<FileUpdateTransaction> {
     private final FileUpdateTransactionBody.Builder builder = bodyBuilder.getFileUpdateBuilder();
 
     public FileUpdateTransaction() { super(); }

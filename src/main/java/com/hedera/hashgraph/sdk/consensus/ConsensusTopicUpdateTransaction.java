@@ -10,7 +10,7 @@ import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.TimestampHelper;
-import com.hedera.hashgraph.sdk.TransactionBuilder;
+import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
 
@@ -19,7 +19,7 @@ import java.time.Instant;
 
 import io.grpc.MethodDescriptor;
 
-public class ConsensusTopicUpdateTransaction extends TransactionBuilder<ConsensusTopicUpdateTransaction> {
+public class ConsensusTopicUpdateTransaction extends SingleTransactionBuilder<ConsensusTopicUpdateTransaction> {
     private final ConsensusUpdateTopicTransactionBody.Builder builder = bodyBuilder.getConsensusUpdateTopicBuilder();
 
     public ConsensusTopicUpdateTransaction() {

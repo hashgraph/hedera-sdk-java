@@ -9,7 +9,7 @@ import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.TimestampHelper;
-import com.hedera.hashgraph.sdk.TransactionBuilder;
+import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
 
 import java.time.Duration;
@@ -18,7 +18,7 @@ import java.time.Instant;
 import io.grpc.MethodDescriptor;
 
 // `CryptoUpdateTransaction`
-public final class AccountUpdateTransaction extends TransactionBuilder<AccountUpdateTransaction> {
+public final class AccountUpdateTransaction extends SingleTransactionBuilder<AccountUpdateTransaction> {
     private final CryptoUpdateTransactionBody.Builder builder = bodyBuilder.getCryptoUpdateAccountBuilder();
 
     public AccountUpdateTransaction() { super(); }

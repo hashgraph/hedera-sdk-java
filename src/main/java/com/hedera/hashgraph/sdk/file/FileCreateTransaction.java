@@ -8,7 +8,7 @@ import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TimestampHelper;
-import com.hedera.hashgraph.sdk.TransactionBuilder;
+import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
 
@@ -24,7 +24,7 @@ import io.grpc.MethodDescriptor;
  * {@link com.hedera.hashgraph.sdk.TransactionId#getReceipt(Client)}
  * and then {@link TransactionReceipt#getFileId()}.
  */
-public final class FileCreateTransaction extends TransactionBuilder<FileCreateTransaction> {
+public final class FileCreateTransaction extends SingleTransactionBuilder<FileCreateTransaction> {
     private final FileCreateTransactionBody.Builder builder = bodyBuilder.getFileCreateBuilder();
     private final KeyList.Builder keyList = builder.getKeysBuilder();
 

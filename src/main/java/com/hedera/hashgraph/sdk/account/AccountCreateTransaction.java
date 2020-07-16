@@ -1,26 +1,20 @@
 package com.hedera.hashgraph.sdk.account;
 
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.DurationHelper;
-import com.hedera.hashgraph.sdk.HederaConstants;
-import com.hedera.hashgraph.sdk.TransactionBuilder;
-import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hedera.hashgraph.proto.CryptoCreateTransactionBody;
 import com.hedera.hashgraph.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.TransactionBuilder;
+import com.hedera.hashgraph.sdk.HederaConstants;
+import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
+import io.grpc.MethodDescriptor;
 
 import java.time.Duration;
 
-import io.grpc.MethodDescriptor;
-
 // Corresponds to `CryptoCreateTransaction`
-public final class AccountCreateTransaction extends TransactionBuilder<AccountCreateTransaction> {
+public final class AccountCreateTransaction extends SingleTransactionBuilder<AccountCreateTransaction> {
     private final CryptoCreateTransactionBody.Builder builder = bodyBuilder.getCryptoCreateAccountBuilder()
         // Required fixed autorenew duration.
         .setAutoRenewPeriod(DurationHelper.durationFrom(HederaConstants.DEFAULT_AUTORENEW_DURATION))
@@ -30,7 +24,9 @@ public final class AccountCreateTransaction extends TransactionBuilder<AccountCr
         .setSendRecordThreshold(Long.MAX_VALUE)
         .setReceiveRecordThreshold(Long.MAX_VALUE);
 
-    public AccountCreateTransaction() { super(); }
+    public AccountCreateTransaction() {
+        super();
+    }
 
     public AccountCreateTransaction setKey(PublicKey publicKey) {
         builder.setKey(publicKey.toKeyProto());

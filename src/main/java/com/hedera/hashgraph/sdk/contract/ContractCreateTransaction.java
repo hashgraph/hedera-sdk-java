@@ -9,7 +9,7 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.DurationHelper;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaConstants;
-import com.hedera.hashgraph.sdk.TransactionBuilder;
+import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
@@ -26,7 +26,7 @@ import io.grpc.MethodDescriptor;
  * and {@link TransactionRecord#getContractCreateResult()} to get the
  * result of the constructor call.
  */
-public class ContractCreateTransaction extends TransactionBuilder<ContractCreateTransaction> {
+public class ContractCreateTransaction extends SingleTransactionBuilder<ContractCreateTransaction> {
     private final ContractCreateTransactionBody.Builder builder = bodyBuilder.getContractCreateInstanceBuilder();
 
     {
