@@ -21,30 +21,33 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Managed client for use on the Hedera Hashgraph network.
  */
 public final class Client implements AutoCloseable {
+    private static final String HEDERA_MIRROR_NODE = "";
     private static final Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
-
     private static final Hbar DEFAULT_MAX_TRANSACTION_FEE = new Hbar(1);
 
-    final ExecutorService executor;
-
-    private Iterator<AccountId> nodes;
-
-    private final Map<AccountId, String> network;
-
     Hbar maxTransactionFee = DEFAULT_MAX_QUERY_PAYMENT;
-
     Hbar maxQueryPayment = DEFAULT_MAX_TRANSACTION_FEE;
 
-    private Map<AccountId, ManagedChannel> channels;
+    private final Map<AccountId, String> network;
+    private Iterator<AccountId> nodes;
+
+    private Map<AccountId, ManagedChannel> nodeChannels;
+
+    private Map<String, ManagedChannel> mirrorChannels;
+    private Iterator<String> mirrors;
+
+    final ExecutorService executor;
 
     @Nullable
     private Operator operator;
@@ -62,12 +65,32 @@ public final class Client implements AutoCloseable {
             threadFactory);
 
         this.network = network;
-        this.channels = new HashMap<>(network.size());
+        this.nodeChannels = new HashMap<>(network.size());
 
-        setNodes(network);
+        this.mirrorChannels = new HashMap<>(1);
+        var mirrorChannel = ManagedChannelBuilder.forTarget(HEDERA_MIRROR_NODE)
+            .keepAliveTime(2, TimeUnit.MINUTES)
+            .usePlaintext()
+            .build();
+        this.mirrorChannels.put(HEDERA_MIRROR_NODE, mirrorChannel);
+
+        setNetworkNodes(network);
     }
 
-    private void setNodes(Map<AccountId, String> network) {
+    private void setNetworkNodes(Map<AccountId, String> network) {
+        // Take all given node account IDs, shuffle, and prepare an infinite iterator for use in [getNextNodeId]
+        var allNodes = new ArrayList<>(network.keySet());
+        Collections.shuffle(allNodes, ThreadLocalSecureRandom.current());
+        this.nodes = Iterables.cycle(allNodes).iterator();
+    }
+
+    private void setMirrorNetwork(List<String> mirrorNetwork) {
+        var mirrors = new ArrayList<String>(mirrorNetwork.size());
+        mirrors.addAll(mirrorNetwork);
+        Collections.shuffle(mirrors, ThreadLocalRandom.current());
+        this.mirrors = Iterables.cycle(mirrors).iterator();
+
+
         // Take all given node account IDs, shuffle, and prepare an infinite iterator for use in [getNextNodeId]
         var allNodes = new ArrayList<>(network.keySet());
         Collections.shuffle(allNodes, ThreadLocalSecureRandom.current());
@@ -197,7 +220,7 @@ public final class Client implements AutoCloseable {
      * @return {@code this} for fluent API usage.
      */
     public Client setNetwork(Map<AccountId, String> nodes) throws InterruptedException {
-        setNodes(nodes);
+        setNetworkNodes(nodes);
         @Var ManagedChannel channel = null;
 
         for (Map.Entry<AccountId, String> node: this.network.entrySet()) {
@@ -213,24 +236,24 @@ public final class Client implements AutoCloseable {
 
             if (newNodeUrl == null) {
                 // set null for removal, should be fixed here to just remove instead of setting null then removing
-                channels.put(node.getKey(), null);
-            } else if (channels.get(node.getKey()) != null && !channels.get(node.getKey()).authority().equals(newNodeUrl)) {
+                nodeChannels.put(node.getKey(), null);
+            } else if (nodeChannels.get(node.getKey()) != null && !nodeChannels.get(node.getKey()).authority().equals(newNodeUrl)) {
                 // Shutdown channel before replacing address
-                channels.get(node.getKey()).shutdown().awaitTermination(30, TimeUnit.SECONDS);
-                channel = buildChannel(newNodeUrl);
-                channels.put(node.getKey(), channel);
+                nodeChannels.get(node.getKey()).shutdown().awaitTermination(30, TimeUnit.SECONDS);
+                channel = buildNetworkChannel(newNodeUrl);
+                nodeChannels.put(node.getKey(), channel);
             }
         }
 
         // remove
         this.network.values().removeAll(Collections.singleton(null));
-        this.channels.values().removeAll(Collections.singleton(null));
+        this.nodeChannels.values().removeAll(Collections.singleton(null));
 
         // add new nodes
         for (Map.Entry<AccountId, String> node : nodes.entrySet()) {
             this.network.put(node.getKey(), node.getValue());
-            // .getChannel() will add the node and channel from network
-            this.getChannel(node.getKey());
+            // .getNetworkChannel() will add the node and channel from network
+            this.getNetworkChannel(node.getKey());
         }
 
         return this;
@@ -378,8 +401,8 @@ public final class Client implements AutoCloseable {
      * @param timeout The Duration to be set
      */
     public void close(Duration timeout) {
-        var channels = this.channels;
-        this.channels = new HashMap<>(network.size());
+        var channels = this.nodeChannels;
+        this.nodeChannels = new HashMap<>(network.size());
 
         // initialize shutdown for all channels
         // this should not block
@@ -412,14 +435,17 @@ public final class Client implements AutoCloseable {
     synchronized AccountId getNextNodeId() {
         return nodes.next();
     }
+    synchronized String getNextMirrorAddress() {
+        return mirrors.next();
+    }
 
     int getNumberOfNodesForTransaction() {
         return (network.size() + 3 - 1) / 3;
     }
 
     // Return or establish a channel for a given node ID
-    synchronized ManagedChannel getChannel(AccountId nodeId) {
-        @Var var channel = channels.get(nodeId);
+    synchronized ManagedChannel getNetworkChannel(AccountId nodeId) {
+        @Var var channel = nodeChannels.get(nodeId);
 
         if (channel != null) {
             return channel;
@@ -428,10 +454,13 @@ public final class Client implements AutoCloseable {
         var address = network.get(nodeId);
 
         if (address != null) {
+            channel = ManagedChannelBuilder.forTarget(address)
+                .usePlaintext()
+                .userAgent(getUserAgent())
+                .executor(executor)
+                .build();
 
-            channel = buildChannel(address);
-
-            channels.put(nodeId, channel);
+            nodeChannels.put(nodeId, channel);
         }
 
         if (channel == null) {
@@ -441,17 +470,36 @@ public final class Client implements AutoCloseable {
         return channel;
     }
 
-    // Build a user agent that specifies our SDK version for Hedera
-    private ManagedChannel buildChannel(String address) {
+    // Return or establish a channel for a given node ID
+    synchronized ManagedChannel getMirrorChannel(String address) {
+        @Var var channel = mirrorChannels.get(address);
+
+        if (channel != null) {
+            return channel;
+        }
+
+        if (address != null) {
+            channel = ManagedChannelBuilder.forTarget(address)
+                .keepAliveTime(2, TimeUnit.MINUTES)
+                .usePlaintext()
+                .userAgent(getUserAgent())
+                .executor(executor)
+                .build();
+
+            mirrorChannels.put(address, channel);
+        }
+
+        if (channel == null) {
+            throw new IllegalArgumentException("Mirror address does not exist");
+        }
+
+        return channel;
+    }
+
+    private String getUserAgent() {
         var thePackage = getClass().getPackage();
         var implementationVersion = thePackage != null ? thePackage.getImplementationVersion() : null;
-        var userAgent = "hedera-sdk-java/" + ((implementationVersion != null) ? ("v" + implementationVersion) : "DEV");
-
-        return ManagedChannelBuilder.forTarget(address)
-            .usePlaintext()
-            .userAgent(userAgent)
-            .executor(executor)
-            .build();
+        return "hedera-sdk-java/" + ((implementationVersion != null) ? ("v" + implementationVersion) : "DEV");
     }
 
     static class Operator {

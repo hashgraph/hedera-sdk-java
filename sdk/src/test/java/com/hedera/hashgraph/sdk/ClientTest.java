@@ -104,7 +104,7 @@ class ClientTest {
 
         client.setNetwork(nodes);
 
-        Assertions.assertEquals(client.getChannel(new AccountId(5)).authority(), "2.testnet.hedera.com:50211");
-        Assertions.assertThrows(IllegalArgumentException.class , () -> client.getChannel(new AccountId(3)));
+        Assertions.assertEquals(client.getNetworkChannel(new AccountId(5)).authority(), "2.testnet.hedera.com:50211");
+        Assertions.assertThrows(IllegalArgumentException.class , () -> client.getNetworkChannel(new AccountId(3)));
     }
 }

@@ -33,7 +33,7 @@ abstract class HederaExecutable<RequestT, ResponseT, O> extends Executable<O> {
             .addKeyValue("attempt", attempt)
             .log("sending request \n{}", this);
 
-        var channel = client.getChannel(nodeId);
+        var channel = client.getNetworkChannel(nodeId);
         var methodDescriptor = getMethodDescriptor();
         var call = channel.newCall(methodDescriptor, CallOptions.DEFAULT);
         var request = makeRequest();
