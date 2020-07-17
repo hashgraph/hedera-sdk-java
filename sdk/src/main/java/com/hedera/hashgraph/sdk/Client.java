@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.errorprone.annotations.Var;
 import com.google.gson.Gson;
@@ -401,17 +402,14 @@ public final class Client implements AutoCloseable {
      * @param timeout The Duration to be set
      */
     public void close(Duration timeout) {
-        var channels = this.nodeChannels;
-        this.nodeChannels = new HashMap<>(network.size());
-
         // initialize shutdown for all channels
         // this should not block
-        for (var channel : channels.values()) {
+        for (var channel : Iterables.concat(mirrorChannels.values(), mirrorChannels.values())) {
             channel.shutdown();
         }
 
         // wait for all channels to shutdown
-        for (var channel : channels.values()) {
+        for (var channel : Iterables.concat(mirrorChannels.values(), mirrorChannels.values())) {
             try {
                 channel.awaitTermination(timeout.getSeconds(), TimeUnit.SECONDS);
             } catch (InterruptedException e) {
@@ -420,7 +418,8 @@ public final class Client implements AutoCloseable {
         }
 
         // preemptively clear memory for the channels map
-        channels.clear();
+        nodeChannels.clear();
+        mirrorChannels.clear();
 
         executor.shutdown();
 
