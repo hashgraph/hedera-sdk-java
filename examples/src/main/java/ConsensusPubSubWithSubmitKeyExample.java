@@ -7,7 +7,7 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.MessageSubmitTransaction;
-import com.hedera.hashgraph.sdk.MirrorTopicQuery;
+import com.hedera.hashgraph.sdk.TopicQuery;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
@@ -95,7 +95,7 @@ public class ConsensusPubSubWithSubmitKeyExample {
      * Hedera mirror node.
      */
     private void subscribeToTopic() {
-        new MirrorTopicQuery()
+        new TopicQuery()
             .setTopicId(topicId)
             .setStartTime(Instant.ofEpochSecond(0))
             .subscribe(client, System.out::println,

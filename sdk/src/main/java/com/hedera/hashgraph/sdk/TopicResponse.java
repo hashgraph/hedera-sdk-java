@@ -7,7 +7,7 @@ import org.threeten.bp.Instant;
 import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
 
-public final class MirrorTopicResponse {
+public final class TopicResponse {
     public final Instant consensusTimestamp;
 
     public final byte[] message;
@@ -19,7 +19,7 @@ public final class MirrorTopicResponse {
     @Nullable
     public final MessageChunkInfo chunkInfo;
 
-    MirrorTopicResponse(ConsensusTopicResponse response) {
+    TopicResponse(ConsensusTopicResponse response) {
         this.consensusTimestamp = InstantConverter.fromProtobuf(response.getConsensusTimestamp());
         this.message = response.getMessage().toByteArray();
         this.runningHash = response.getRunningHash().toByteArray();

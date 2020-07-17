@@ -8,7 +8,7 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.MessageSubmitTransaction;
-import com.hedera.hashgraph.sdk.MirrorTopicQuery;
+import com.hedera.hashgraph.sdk.TopicQuery;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicId;
@@ -47,7 +47,7 @@ class ConsensusPubSubExample {
 
         Thread.sleep(5000);
 
-        new MirrorTopicQuery()
+        new TopicQuery()
             .setTopicId(topicId)
             .subscribe(client, resp -> {
                     String messageAsString = new String(resp.message, StandardCharsets.UTF_8);
