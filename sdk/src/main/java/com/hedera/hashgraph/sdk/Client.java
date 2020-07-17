@@ -1,7 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.errorprone.annotations.Var;
 import com.google.gson.Gson;
@@ -33,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  * Managed client for use on the Hedera Hashgraph network.
  */
 public final class Client implements AutoCloseable {
-    private static final String HEDERA_MIRROR_NODE = "";
+    private static final String HEDERA_TESTNET_MIRROR_NODE = "";
     private static final Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
     private static final Hbar DEFAULT_MAX_TRANSACTION_FEE = new Hbar(1);
 
@@ -68,13 +67,6 @@ public final class Client implements AutoCloseable {
         this.network = network;
         this.nodeChannels = new HashMap<>(network.size());
 
-        this.mirrorChannels = new HashMap<>(1);
-        var mirrorChannel = ManagedChannelBuilder.forTarget(HEDERA_MIRROR_NODE)
-            .keepAliveTime(2, TimeUnit.MINUTES)
-            .usePlaintext()
-            .build();
-        this.mirrorChannels.put(HEDERA_MIRROR_NODE, mirrorChannel);
-
         setNetworkNodes(network);
     }
 
@@ -86,16 +78,9 @@ public final class Client implements AutoCloseable {
     }
 
     private void setMirrorNetwork(List<String> mirrorNetwork) {
-        var mirrors = new ArrayList<String>(mirrorNetwork.size());
-        mirrors.addAll(mirrorNetwork);
+        var mirrors = new ArrayList<String>(mirrorNetwork);
         Collections.shuffle(mirrors, ThreadLocalRandom.current());
         this.mirrors = Iterables.cycle(mirrors).iterator();
-
-
-        // Take all given node account IDs, shuffle, and prepare an infinite iterator for use in [getNextNodeId]
-        var allNodes = new ArrayList<>(network.keySet());
-        Collections.shuffle(allNodes, ThreadLocalSecureRandom.current());
-        this.nodes = Iterables.cycle(allNodes).iterator();
     }
 
     /**
@@ -151,7 +136,9 @@ public final class Client implements AutoCloseable {
         network.put(new AccountId(5), "2.testnet.hedera.com:50211");
         network.put(new AccountId(6), "3.testnet.hedera.com:50211");
 
-        return Client.forNetwork(network);
+        var client = Client.forNetwork(network);
+        client.setMirrorNetwork(List.of(HEDERA_TESTNET_MIRROR_NODE));
+        return client;
     }
 
     /**
@@ -186,6 +173,10 @@ public final class Client implements AutoCloseable {
             PrivateKey privateKey = PrivateKey.fromString(config.operator.privateKey);
 
             client.setOperator(operatorAccount, privateKey);
+        }
+
+        if (config.mirrorNetwork != null) {
+            client.setMirrorNetwork(config.mirrorNetwork);
         }
 
         return client;
@@ -515,8 +506,12 @@ public final class Client implements AutoCloseable {
 
     private static class Config {
         private HashMap<String, String> network = new HashMap<>();
+
         @Nullable
         private ConfigOperator operator;
+
+        @Nullable
+        private List<String> mirrorNetwork = new ArrayList<>();
 
         private static class ConfigOperator {
             private String accountId = "";
