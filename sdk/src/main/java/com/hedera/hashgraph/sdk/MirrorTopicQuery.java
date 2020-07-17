@@ -39,12 +39,12 @@ public final class MirrorTopicQuery {
 
     // TODO: Refactor into a base class when we add more mirror query types
     public MirrorSubscriptionHandle subscribe(
-        MirrorClient mirrorClient,
+        Client client,
         Consumer<MirrorTopicResponse> onNext,
         Consumer<Throwable> onError
     ) {
         ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call =
-            mirrorClient.channel.newCall(ConsensusServiceGrpc.getSubscribeTopicMethod(), CallOptions.DEFAULT);
+            client.getNextMirrorChannel().newCall(ConsensusServiceGrpc.getSubscribeTopicMethod(), CallOptions.DEFAULT);
 
         MirrorSubscriptionHandle subscriptionHandle = new MirrorSubscriptionHandle(() -> {
             call.cancel("unsubscribed", null);

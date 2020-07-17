@@ -6,6 +6,7 @@ import com.google.errorprone.annotations.Var;
 import com.google.gson.Gson;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import java8.util.Lists;
 import java8.util.function.Consumer;
 import java8.util.function.Function;
 import org.threeten.bp.Duration;
@@ -32,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  * Managed client for use on the Hedera Hashgraph network.
  */
 public final class Client implements AutoCloseable {
-    private static final String HEDERA_TESTNET_MIRROR_NODE = "";
+    private static final String HEDERA_TESTNET_MIRROR_NODE = "hcs.testnet.mirrornode.hedera.com:5600";
     private static final Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
     private static final Hbar DEFAULT_MAX_TRANSACTION_FEE = new Hbar(1);
 
@@ -67,6 +68,9 @@ public final class Client implements AutoCloseable {
         this.network = network;
         this.nodeChannels = new HashMap<>(network.size());
 
+        this.mirrorChannels = new HashMap<>(1);
+        this.mirrors = this.mirrorChannels.keySet().iterator();
+
         setNetworkNodes(network);
     }
 
@@ -77,8 +81,8 @@ public final class Client implements AutoCloseable {
         this.nodes = Iterables.cycle(allNodes).iterator();
     }
 
-    private void setMirrorNetwork(List<String> mirrorNetwork) {
-        var mirrors = new ArrayList<String>(mirrorNetwork);
+    public void setMirrorNetwork(List<String> mirrorNetwork) {
+        var mirrors = new ArrayList<>(mirrorNetwork);
         Collections.shuffle(mirrors, ThreadLocalRandom.current());
         this.mirrors = Iterables.cycle(mirrors).iterator();
     }
@@ -137,15 +141,15 @@ public final class Client implements AutoCloseable {
         network.put(new AccountId(6), "3.testnet.hedera.com:50211");
 
         var client = Client.forNetwork(network);
-        client.setMirrorNetwork(List.of(HEDERA_TESTNET_MIRROR_NODE));
+        client.setMirrorNetwork(Lists.of(HEDERA_TESTNET_MIRROR_NODE));
         return client;
     }
 
     /**
      * Configure a client based off the given JSON string.
      *
-     * @return {@link com.hedera.hashgraph.sdk.Client}
      * @param json The json string containing the client configuration
+     * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client fromJson(String json) {
         return fromJson(new StringReader(json));
@@ -154,8 +158,8 @@ public final class Client implements AutoCloseable {
     /**
      * Configure a client based off the given JSON reader.
      *
-     * @return {@link com.hedera.hashgraph.sdk.Client}
      * @param json The Reader containing the client configuration
+     * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client fromJson(Reader json) {
         Config config = new Gson().fromJson(json, Config.class);
@@ -185,8 +189,8 @@ public final class Client implements AutoCloseable {
     /**
      * Configure a client based on a JSON file at the given path.
      *
-     * @return {@link com.hedera.hashgraph.sdk.Client}
      * @param fileName The string containing the file path
+     * @return {@link com.hedera.hashgraph.sdk.Client}
      * @throws IOException if IO operations fail
      */
     public static Client fromJsonFile(String fileName) throws IOException {
@@ -196,8 +200,8 @@ public final class Client implements AutoCloseable {
     /**
      * Configure a client based on a JSON file.
      *
-     * @return {@link com.hedera.hashgraph.sdk.Client}
      * @param file The file containing the client configuration
+     * @return {@link com.hedera.hashgraph.sdk.Client}
      * @throws IOException if IO operations fail
      */
     public static Client fromJsonFile(File file) throws IOException {
@@ -215,7 +219,7 @@ public final class Client implements AutoCloseable {
         setNetworkNodes(nodes);
         @Var ManagedChannel channel = null;
 
-        for (Map.Entry<AccountId, String> node: this.network.entrySet()) {
+        for (Map.Entry<AccountId, String> node : this.network.entrySet()) {
             String newNodeUrl = nodes.get(node.getKey());
 
             // node hasn't changed
@@ -232,7 +236,11 @@ public final class Client implements AutoCloseable {
             } else if (nodeChannels.get(node.getKey()) != null && !nodeChannels.get(node.getKey()).authority().equals(newNodeUrl)) {
                 // Shutdown channel before replacing address
                 nodeChannels.get(node.getKey()).shutdown().awaitTermination(30, TimeUnit.SECONDS);
-                channel = buildNetworkChannel(newNodeUrl);
+                channel = ManagedChannelBuilder.forTarget(newNodeUrl)
+                    .usePlaintext()
+                    .userAgent(getUserAgent())
+                    .executor(executor)
+                    .build();
                 nodeChannels.put(node.getKey(), channel);
             }
         }
@@ -260,9 +268,9 @@ public final class Client implements AutoCloseable {
      * <p>
      * The operator private key is used to sign all transactions executed by this client.
      *
-     * @return {@code this}
-     * @param accountId The AccountId of the operator
+     * @param accountId  The AccountId of the operator
      * @param privateKey The PrivateKey of the operator
+     * @return {@code this}
      */
     public Client setOperator(AccountId accountId, PrivateKey privateKey) {
         return setOperatorWith(accountId, privateKey.getPublicKey(), privateKey::sign);
@@ -277,10 +285,10 @@ public final class Client implements AutoCloseable {
      * <p>
      * The `transactionSigner` is invoked to sign all transactions executed by this client.
      *
-     * @return {@code this}
-     * @param accountId The AccountId of the operator
-     * @param publicKey The PrivateKey of the operator
+     * @param accountId         The AccountId of the operator
+     * @param publicKey         The PrivateKey of the operator
      * @param transactionSigner The signer for the operator
+     * @return {@code this}
      */
     public Client setOperatorWith(AccountId accountId, PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
         this.operator = new Operator(accountId, publicKey, transactionSigner);
@@ -322,8 +330,8 @@ public final class Client implements AutoCloseable {
      * {@link TransactionBuilder#setMaxTransactionFee(Hbar)} on every new transaction. The actual
      * fee assessed for a given transaction may be less than this value, but never greater.
      *
-     * @return {@code this}
      * @param maxTransactionFee The Hbar to be set
+     * @return {@code this}
      */
     public Client setMaxTransactionFee(Hbar maxTransactionFee) {
         if (maxTransactionFee.toTinybars() < 0) {
@@ -349,8 +357,8 @@ public final class Client implements AutoCloseable {
      * <p>
      * Set to 0 to disable automatic implicit payments.
      *
-     * @return {@code this}
      * @param maxQueryPayment The Hbar to be set
+     * @return {@code this}
      */
     public Client setMaxQueryPayment(Hbar maxQueryPayment) {
         if (maxQueryPayment.toTinybars() < 0) {
@@ -425,8 +433,9 @@ public final class Client implements AutoCloseable {
     synchronized AccountId getNextNodeId() {
         return nodes.next();
     }
-    synchronized String getNextMirrorAddress() {
-        return mirrors.next();
+
+    synchronized ManagedChannel getNextMirrorChannel() {
+        return getMirrorChannel(mirrors.next());
     }
 
     int getNumberOfNodesForTransaction() {

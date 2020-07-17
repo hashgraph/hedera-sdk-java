@@ -1,4 +1,5 @@
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
@@ -7,7 +8,6 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.MessageSubmitTransaction;
-import com.hedera.hashgraph.sdk.MirrorClient;
 import com.hedera.hashgraph.sdk.MirrorTopicQuery;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
@@ -28,10 +28,9 @@ class ConsensusPubSubExample {
 
     @SuppressWarnings("NullableDereference")
     public static void main(String[] args) throws TimeoutException, InterruptedException, HederaPreCheckStatusException, HederaReceiptStatusException {
-        MirrorClient mirrorClient = new MirrorClient(MIRROR_NODE_ADDRESS);
-
         // `Client.forMainnet()` is provided for connecting to Hedera mainnet
         Client client = Client.forTestnet();
+        client.setMirrorNetwork(List.of(MIRROR_NODE_ADDRESS));
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
@@ -46,9 +45,11 @@ class ConsensusPubSubExample {
 
         System.out.println("New topic created: " + topicId);
 
+        Thread.sleep(5000);
+
         new MirrorTopicQuery()
             .setTopicId(topicId)
-            .subscribe(mirrorClient, resp -> {
+            .subscribe(client, resp -> {
                     String messageAsString = new String(resp.message, StandardCharsets.UTF_8);
 
                     System.out.println(resp.consensusTimestamp + " received topic message: " + messageAsString);
