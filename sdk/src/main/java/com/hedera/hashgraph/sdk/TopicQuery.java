@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.proto.TransactionID;
 import com.hedera.hashgraph.sdk.proto.mirror.ConsensusServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.mirror.ConsensusTopicQuery;
 import com.hedera.hashgraph.sdk.proto.mirror.ConsensusTopicResponse;
@@ -9,6 +10,10 @@ import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
 import java8.util.function.Consumer;
 import org.threeten.bp.Instant;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
 
 public final class TopicQuery {
     private final ConsensusTopicQuery.Builder builder;
@@ -50,10 +55,33 @@ public final class TopicQuery {
             call.cancel("unsubscribed", null);
         });
 
+        HashMap<TransactionID, ArrayList<ConsensusTopicResponse>> pendingMessages = new HashMap<>();
+
         ClientCalls.asyncServerStreamingCall(call, builder.build(), new StreamObserver<ConsensusTopicResponse>() {
             @Override
             public void onNext(ConsensusTopicResponse consensusTopicResponse) {
-                onNext.accept(new TopicResponse(consensusTopicResponse));
+                if (!consensusTopicResponse.hasChunkInfo()) {
+                    // short circuit for no chunks
+                    onNext.accept(TopicResponse.ofSingle(consensusTopicResponse));
+                    return;
+                }
+
+                // get the list of chunks for this pending message
+                var initialTransactionID = consensusTopicResponse.getChunkInfo().getInitialTransactionID();
+                // Can't use `HashMap.putIfAbsent()` since that method is not available on Android
+                if (!pendingMessages.containsKey(initialTransactionID)) {
+                    pendingMessages.put(initialTransactionID, new ArrayList<>());
+                }
+                ArrayList<ConsensusTopicResponse> chunks = pendingMessages.get(initialTransactionID);
+
+                // not possible as we do [putIfAbsent]
+                // add our response to the pending chunk list
+                Objects.requireNonNull(chunks).add(consensusTopicResponse);
+
+                // if we now have enough chunks, emit
+                if (chunks.size() == consensusTopicResponse.getChunkInfo().getTotal()) {
+                    onNext.accept(TopicResponse.ofMany(chunks));
+                }
             }
 
             @Override
