@@ -28,7 +28,11 @@ public class TransactionList {
         return this;
     }
 
-    public final List<TransactionId> execute(Client client) throws HederaStatusException, HederaNetworkException, LocalValidationException {
+    public final TransactionId execute(Client client) throws HederaStatusException, HederaNetworkException, LocalValidationException {
+        return executeAll(client).get(0);
+    }
+
+    public final List<TransactionId> executeAll(Client client) throws HederaStatusException, HederaNetworkException, LocalValidationException {
         ArrayList<TransactionId> ids = new ArrayList<>();
 
         for (Transaction transaction : transactions) {

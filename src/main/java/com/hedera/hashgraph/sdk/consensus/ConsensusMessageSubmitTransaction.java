@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ConsensusMessageSubmitTransaction extends TransactionBuilder<List<TransactionId>, TransactionList, ConsensusMessageSubmitTransaction> {
+public class ConsensusMessageSubmitTransaction extends TransactionBuilder<TransactionId, TransactionList, ConsensusMessageSubmitTransaction> {
     private static final int CHUNK_SIZE = 4096;
 
     @Nullable
@@ -67,8 +67,12 @@ public class ConsensusMessageSubmitTransaction extends TransactionBuilder<List<T
         require(topicId != null, "setTopicId() required");
     }
 
+    public List<TransactionId> executeAll(Client client) throws HederaStatusException, HederaNetworkException {
+        return build(client).executeAll(client);
+    }
+
     @Override
-    public List<TransactionId> execute(Client client) throws HederaStatusException, HederaNetworkException {
+    public TransactionId execute(Client client) throws HederaStatusException, HederaNetworkException {
         return build(client).execute(client);
     }
 
@@ -151,7 +155,7 @@ public class ConsensusMessageSubmitTransaction extends TransactionBuilder<List<T
     }
 
     @Override
-    protected List<TransactionId> mapResponse(TransactionResponse response) throws HederaStatusException {
+    protected TransactionId mapResponse(TransactionResponse response) throws HederaStatusException {
         throw new IllegalStateException("do not call mapResponse() on ConsensusMessageSubmitTransaction; call build() first");
     }
 

@@ -75,7 +75,7 @@ public final class ConsensusPubSubChunked {
         System.out.println("about to send a message of " + bigContents.length() + " bytes");
 
         // send a message that would fit into more than one chunk (4-6k per chunk)
-        List<TransactionId> ids = new ConsensusMessageSubmitTransaction()
+        TransactionId initialId = new ConsensusMessageSubmitTransaction()
             .setMaxChunks(5) // this is 10 by default
             .setTopicId(newTopicId)
             .setMessage(bigContents.toString())
