@@ -16,10 +16,10 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
  * On success, the resulting TransactionReceipt contains the topic's updated topicSequenceNumber and
  * topicRunningHash.
  */
-public final class MessageSubmitTransaction extends TransactionBuilder<MessageSubmitTransaction> {
+public final class TopicMessageSubmitTransaction extends TransactionBuilder<TopicMessageSubmitTransaction> {
     private final ConsensusSubmitMessageTransactionBody.Builder builder;
 
-    public MessageSubmitTransaction() {
+    public TopicMessageSubmitTransaction() {
         builder = ConsensusSubmitMessageTransactionBody.newBuilder();
     }
 
@@ -29,7 +29,7 @@ public final class MessageSubmitTransaction extends TransactionBuilder<MessageSu
      * @return {@code this}
      * @param topicId The TopicId to be set
      */
-    public MessageSubmitTransaction setTopicId(TopicId topicId) {
+    public TopicMessageSubmitTransaction setTopicId(TopicId topicId) {
         builder.setTopicID(topicId.toProtobuf());
         return this;
     }
@@ -40,7 +40,7 @@ public final class MessageSubmitTransaction extends TransactionBuilder<MessageSu
      * @return {@code this}
      * @param message The String to be set as message
      */
-    public MessageSubmitTransaction setMessage(String message) {
+    public TopicMessageSubmitTransaction setMessage(String message) {
         builder.setMessage(ByteString.copyFromUtf8(message));
         return this;
     }
@@ -51,12 +51,12 @@ public final class MessageSubmitTransaction extends TransactionBuilder<MessageSu
      * @return {@code this}
      * @param message The array of bytes to be set as message
      */
-    public MessageSubmitTransaction setMessage(byte[] message) {
+    public TopicMessageSubmitTransaction setMessage(byte[] message) {
         builder.setMessage(ByteString.copyFrom(message));
         return this;
     }
 
-    public MessageSubmitTransaction setChunkInfo(TransactionId initialTransactionId, int total, int number) {
+    public TopicMessageSubmitTransaction setChunkInfo(TransactionId initialTransactionId, int total, int number) {
         var chunkInfo = ConsensusMessageChunkInfo.newBuilder()
             .setInitialTransactionID(initialTransactionId.toProtobuf())
             .setTotal(total)

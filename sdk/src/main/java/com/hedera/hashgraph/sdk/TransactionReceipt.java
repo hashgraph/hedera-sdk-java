@@ -49,14 +49,14 @@ public final class TransactionReceipt {
 
     /**
      * Updated sequence number for a consensus service topic.
-     * Set for {@link MessageSubmitTransaction}.
+     * Set for {@link TopicMessageSubmitTransaction}.
      */
     @Nullable
     public final Long topicSequenceNumber;
 
     /**
      * Updated running hash for a consensus service topic.
-     * Set for {@link MessageSubmitTransaction}.
+     * Set for {@link TopicMessageSubmitTransaction}.
      */
     @Nullable
     public final ByteString topicRunningHash;

@@ -6,8 +6,8 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
-import com.hedera.hashgraph.sdk.MessageSubmitTransaction;
-import com.hedera.hashgraph.sdk.TopicQuery;
+import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
+import com.hedera.hashgraph.sdk.TopicMessageQuery;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
@@ -95,12 +95,10 @@ public class ConsensusPubSubWithSubmitKeyExample {
      * Hedera mirror node.
      */
     private void subscribeToTopic() {
-        new TopicQuery()
+        new TopicMessageQuery()
             .setTopicId(topicId)
             .setStartTime(Instant.ofEpochSecond(0))
-            .subscribe(client, System.out::println,
-                // On gRPC error, print the stack trace
-                Throwable::printStackTrace);
+            .subscribe(client, System.out::println);
     }
 
     /**
@@ -113,7 +111,7 @@ public class ConsensusPubSubWithSubmitKeyExample {
 
             System.out.println("Publishing message: " + message);
 
-            new MessageSubmitTransaction()
+            new TopicMessageSubmitTransaction()
                 .setTopicId(topicId)
                 .setMessage(message)
                 .build(client)

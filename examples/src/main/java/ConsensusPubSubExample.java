@@ -7,8 +7,8 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
-import com.hedera.hashgraph.sdk.MessageSubmitTransaction;
-import com.hedera.hashgraph.sdk.TopicQuery;
+import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
+import com.hedera.hashgraph.sdk.TopicMessageQuery;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicId;
@@ -47,20 +47,18 @@ class ConsensusPubSubExample {
 
         Thread.sleep(5000);
 
-        new TopicQuery()
+        new TopicMessageQuery()
             .setTopicId(topicId)
             .subscribe(client, resp -> {
                     String messageAsString = new String(resp.message, StandardCharsets.UTF_8);
 
                     System.out.println(resp.consensusTimestamp + " received topic message: " + messageAsString);
-                },
-                // On gRPC error, print the stack trace
-                Throwable::printStackTrace);
+                });
 
         // keep the main thread from exiting because the listeners run on daemon threads
         // noinspection InfiniteLoopStatement
         for (int i = 0; ; i++) {
-            new MessageSubmitTransaction()
+            new TopicMessageSubmitTransaction()
                 .setTopicId(topicId)
                 .setMessage("hello, HCS! " + i)
                 .execute(client)

@@ -24,7 +24,7 @@ public class MessageSubmitTransactionTest {
 
     @Test
     void shouldSerialize() {
-        SnapshotMatcher.expect(new MessageSubmitTransaction()
+        SnapshotMatcher.expect(new TopicMessageSubmitTransaction()
             .setNodeAccountId(AccountId.fromString("0.0.5005"))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setTopicId(TopicId.fromString("0.0.5007"))

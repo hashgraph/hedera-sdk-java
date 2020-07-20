@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-public final class TopicResponse {
+public final class TopicMessage {
     public final Instant consensusTimestamp;
 
     public final byte[] message;
@@ -21,14 +21,14 @@ public final class TopicResponse {
     public final long sequenceNumber;
 
     @Nullable
-    public final MessageChunk[] chunks;
+    public final TopicMessageChunk[] chunks;
 
-    TopicResponse(
+    TopicMessage(
         Instant lastConsensusTimestamp,
         byte[] message,
         byte[] lastRunningHash,
         long lastSequenceNumber,
-        MessageChunk[] chunks
+        TopicMessageChunk[] chunks
     ) {
         this.consensusTimestamp = lastConsensusTimestamp;
         this.message = message;
@@ -37,26 +37,26 @@ public final class TopicResponse {
         this.chunks = chunks;
     }
 
-    static TopicResponse ofSingle(ConsensusTopicResponse response) {
-        return new TopicResponse(
+    static TopicMessage ofSingle(ConsensusTopicResponse response) {
+        return new TopicMessage(
             InstantConverter.fromProtobuf(response.getConsensusTimestamp()),
             response.getMessage().toByteArray(),
             response.getRunningHash().toByteArray(),
             response.getSequenceNumber(),
-            new MessageChunk[]{new MessageChunk(response)}
+            new TopicMessageChunk[]{new TopicMessageChunk(response)}
         );
     }
 
-    static TopicResponse ofMany(List<ConsensusTopicResponse> responses) {
+    static TopicMessage ofMany(List<ConsensusTopicResponse> responses) {
         // response should be in the order of oldest to newest (not chunk order)
-        @Var var chunks = new MessageChunk[responses.size()];
+        @Var var chunks = new TopicMessageChunk[responses.size()];
         var contents = new ByteString[responses.size()];
         @Var long totalSize = 0;
 
         for (ConsensusTopicResponse r : responses) {
             int index = r.getChunkInfo().getNumber() - 1;
 
-            chunks[index] = new MessageChunk(r);
+            chunks[index] = new TopicMessageChunk(r);
             contents[index] = r.getMessage();
             totalSize += r.getMessage().size();
         }
@@ -69,7 +69,7 @@ public final class TopicResponse {
 
         var lastReceived = responses.get(responses.size() - 1);
 
-        return new TopicResponse(
+        return new TopicMessage(
             InstantConverter.fromProtobuf(lastReceived.getConsensusTimestamp()),
             wholeMessage.array(),
             lastReceived.getRunningHash().toByteArray(),
