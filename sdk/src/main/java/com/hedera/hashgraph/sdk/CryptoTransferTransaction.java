@@ -26,7 +26,7 @@ import com.hedera.hashgraph.sdk.proto.TransferList;
  * The signatures are in the same order as the accounts,
  * skipping those accounts that don't need a signature.
  */
-public final class CryptoTransferTransaction extends TransactionBuilder<CryptoTransferTransaction> {
+public final class CryptoTransferTransaction extends SingleTransactionBuilder<CryptoTransferTransaction> {
     private final CryptoTransferTransactionBody.Builder builder;
     private final TransferList.Builder transfersBuilder;
 

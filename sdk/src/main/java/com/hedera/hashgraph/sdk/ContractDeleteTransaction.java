@@ -6,7 +6,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 /**
  * Marks a contract as deleted, moving all its current hbars to another account.
  */
-public final class ContractDeleteTransaction extends TransactionBuilder<ContractDeleteTransaction> {
+public final class ContractDeleteTransaction extends SingleTransactionBuilder<ContractDeleteTransaction> {
     private final ContractDeleteTransactionBody.Builder builder;
 
     public ContractDeleteTransaction() {

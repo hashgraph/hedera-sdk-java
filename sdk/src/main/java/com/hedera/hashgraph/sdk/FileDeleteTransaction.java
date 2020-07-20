@@ -13,7 +13,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
  * <p>Only one of the file's keys needs to sign to delete the file, unless the key you have is part
  * of a {@link com.hedera.hashgraph.sdk.KeyList}.
  */
-public final class FileDeleteTransaction extends TransactionBuilder<FileDeleteTransaction> {
+public final class FileDeleteTransaction extends SingleTransactionBuilder<FileDeleteTransaction> {
     private final FileDeleteTransactionBody.Builder builder;
 
     public FileDeleteTransaction() {

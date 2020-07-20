@@ -49,7 +49,7 @@ import org.threeten.bp.Duration;
  * be changed using the admin keys. If there are no admin keys, then it cannot be
  * changed after the smart contract is created.
  */
-public final class ContractCreateTransaction extends TransactionBuilder<ContractCreateTransaction> {
+public final class ContractCreateTransaction extends SingleTransactionBuilder<ContractCreateTransaction> {
     private final ContractCreateTransactionBody.Builder builder;
 
     public ContractCreateTransaction() {

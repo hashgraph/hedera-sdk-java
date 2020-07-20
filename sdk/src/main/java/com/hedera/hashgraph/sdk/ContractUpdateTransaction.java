@@ -28,7 +28,7 @@ import org.threeten.bp.Instant;
  * of smart contract behavior. But this is optional. If the smart contract is created
  * without an admin key, then such a key can never be added, and its bytecode will be immutable.
  */
-public final class ContractUpdateTransaction extends TransactionBuilder<ContractUpdateTransaction> {
+public final class ContractUpdateTransaction extends SingleTransactionBuilder<ContractUpdateTransaction> {
     private final ContractUpdateTransactionBody.Builder builder;
 
     public ContractUpdateTransaction() {

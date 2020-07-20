@@ -10,7 +10,7 @@ import org.threeten.bp.Duration;
  * A hash---presumably of some kind of credential or certificate---along with a list of keys,
  * each of which may be either a primitive or a threshold key.
  */
-public final class LiveHashAddTransaction extends TransactionBuilder<LiveHashAddTransaction> {
+public final class LiveHashAddTransaction extends SingleTransactionBuilder<LiveHashAddTransaction> {
     private final CryptoAddLiveHashTransactionBody.Builder builder;
     private final LiveHash.Builder liveHash;
 

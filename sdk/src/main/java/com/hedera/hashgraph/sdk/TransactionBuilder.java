@@ -5,16 +5,14 @@ import java8.util.concurrent.CompletableFuture;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
 
 /**
  * Base class for all transactions that may be built and submitted to Hedera.
  *
  * @param <T> The type of the transaction. Used to enable chaining.
  */
-public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
-    extends Executable<TransactionId> {
+public abstract class TransactionBuilder<RespT, O extends HederaExecutable, T extends TransactionBuilder<RespT, O, T>>
+    extends Executable<RespT> {
 
     // Default auto renew duration for accounts, contracts, topics, and files (entities)
     static final Duration DEFAULT_AUTO_RENEW_PERIOD = Duration.ofDays(90);
@@ -22,12 +20,12 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
     // Default transaction duration
     private static final Duration DEFAULT_TRANSACTION_VALID_DURATION = Duration.ofSeconds(120);
 
-    private final TransactionBody.Builder bodyBuilder;
+    protected final TransactionBody.Builder bodyBuilder;
 
-    private final com.hedera.hashgraph.sdk.proto.Transaction.Builder builder;
+    protected final com.hedera.hashgraph.sdk.proto.Transaction.Builder inner;
 
     TransactionBuilder() {
-        builder = com.hedera.hashgraph.sdk.proto.Transaction.newBuilder();
+        inner = com.hedera.hashgraph.sdk.proto.Transaction.newBuilder();
         bodyBuilder = TransactionBody.newBuilder();
 
         setTransactionValidDuration(DEFAULT_TRANSACTION_VALID_DURATION);
@@ -119,58 +117,13 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * @param client The Client to build the transaction for
      * @return {@link com.hedera.hashgraph.sdk.Transaction}
      */
-    public final Transaction build(@Nullable Client client) {
-        onBuild(bodyBuilder);
+    public abstract O build(@Nullable Client client);
 
-        if (client != null && bodyBuilder.getTransactionFee() == 0) {
-            bodyBuilder.setTransactionFee(client.maxTransactionFee.toTinybars());
-        }
-
-        if (!bodyBuilder.hasTransactionID() && client != null) {
-            var operator = client.getOperator();
-            if (operator != null) {
-                // Set a default transaction ID, generated from the operator account ID
-                setTransactionId(TransactionId.generate(operator.accountId));
-
-            } else {
-                // no client means there must be an explicitly set node ID and transaction ID
-                throw new IllegalStateException(
-                    "`client` must have an `operator` or `transactionId` must be set");
-
-            }
-        }
-
-        if (bodyBuilder.hasTransactionID() && bodyBuilder.hasNodeAccountID()) {
-            // Emplace the body into the transaction wrapper
-            // This wrapper object contains the bytes for the body and signatures of the body
-
-            builder.setBodyBytes(bodyBuilder.build().toByteString());
-
-            return new Transaction(Collections.singletonList(builder));
-        }
-
-        if (bodyBuilder.hasTransactionID() && client != null) {
-            // Pick N / 3 nodes from the client and build that many transactions
-            // This is for fail-over so we can cycle through nodes
-
-            var size = client.getNumberOfNodesForTransaction();
-            var transactions =
-                new ArrayList<com.hedera.hashgraph.sdk.proto.Transaction.Builder>(size);
-
-            for (var i = 0; i < size; ++i) {
-                transactions.add(builder.setBodyBytes(bodyBuilder
-                    .setNodeAccountID(client.getNextNodeId().toProtobuf())
-                    .build()
-                    .toByteString()
-                ).clone());
-            }
-
-            return new Transaction(transactions);
-        }
-
-        throw new IllegalStateException(
-            "`client` must not be NULL or both a `nodeAccountId` and `transactionId` must be set");
-    }
+    /**
+     * Called in {@link #build} just before the transaction body is built. The intent is for the
+     * derived class to assign their data variant to the transaction body.
+     */
+    abstract void onBuild(TransactionBody.Builder bodyBuilder);
 
     /**
      * Build and execute this transaction.
@@ -178,13 +131,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>>
      * This transaction will be automatically signed by the configured operator, see {@link Client#setOperator}.
      */
     @Override
-    public final CompletableFuture<TransactionId> executeAsync(Client client) {
+    public final CompletableFuture<RespT> executeAsync(Client client) {
         return build(client).executeAsync(client);
     }
-
-    /**
-     * Called in {@link #build} just before the transaction body is built. The intent is for the
-     * derived class to assign their data variant to the transaction body.
-     */
-    abstract void onBuild(TransactionBody.Builder bodyBuilder);
 }

@@ -10,7 +10,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
  * Transfers into it a deleted account fail. But a deleted account can still have its
  * expiration extended in the normal way.
  */
-public final class AccountDeleteTransaction extends TransactionBuilder<AccountDeleteTransaction> {
+public final class AccountDeleteTransaction extends SingleTransactionBuilder<AccountDeleteTransaction> {
     private final CryptoDeleteTransactionBody.Builder builder;
 
     public AccountDeleteTransaction() {

@@ -17,7 +17,7 @@ import org.threeten.bp.Duration;
  * <p>
  * If a new autoRenewAccount is specified (not just being removed), that account must also sign the transaction.
  */
-public final class TopicUpdateTransaction extends TransactionBuilder<TopicUpdateTransaction> {
+public final class TopicUpdateTransaction extends SingleTransactionBuilder<TopicUpdateTransaction> {
     private final ConsensusUpdateTopicTransactionBody.Builder builder;
 
     public TopicUpdateTransaction() {

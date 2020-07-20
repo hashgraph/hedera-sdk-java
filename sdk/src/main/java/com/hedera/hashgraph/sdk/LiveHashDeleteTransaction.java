@@ -8,7 +8,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
  * At consensus, deletes a livehash associated to the given account. The transaction must be signed
  * by either the key of the owning account, or at least one of the keys associated to the livehash.
  */
-public final class LiveHashDeleteTransaction extends TransactionBuilder<LiveHashDeleteTransaction> {
+public final class LiveHashDeleteTransaction extends SingleTransactionBuilder<LiveHashDeleteTransaction> {
     private final CryptoDeleteLiveHashTransactionBody.Builder builder;
 
     public LiveHashDeleteTransaction() {

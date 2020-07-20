@@ -13,7 +13,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
  * There is a fee in hbars to maintain that storage until the expiration time, and that fee is
  * added as part of the transaction fee.
  */
-public final class ContractExecuteTransaction extends TransactionBuilder<ContractExecuteTransaction> {
+public final class ContractExecuteTransaction extends SingleTransactionBuilder<ContractExecuteTransaction> {
     private final ContractCallTransactionBody.Builder builder;
 
     public ContractExecuteTransaction() {

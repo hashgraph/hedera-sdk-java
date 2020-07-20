@@ -7,7 +7,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
  * Set the freezing period in which the platform will stop creating events and accepting transactions.
  * This is used before safely shut down the platform for maintenance.
  */
-public final class FreezeTransaction extends TransactionBuilder<FreezeTransaction> {
+public final class FreezeTransaction extends SingleTransactionBuilder<FreezeTransaction> {
     private final FreezeTransactionBody.Builder builder;
 
     public FreezeTransaction() {

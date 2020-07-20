@@ -16,7 +16,7 @@ import org.threeten.bp.Instant;
  * When a smart contract is deleted, the cryptocurrency account within it continues
  * to exist, and is not affected by the expiration time here.
  */
-public final class SystemDeleteTransaction extends TransactionBuilder<SystemDeleteTransaction> {
+public final class SystemDeleteTransaction extends SingleTransactionBuilder<SystemDeleteTransaction> {
     private final SystemDeleteTransactionBody.Builder builder;
 
     public SystemDeleteTransaction() {

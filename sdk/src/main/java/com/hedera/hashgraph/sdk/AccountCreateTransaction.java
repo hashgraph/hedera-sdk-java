@@ -5,7 +5,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import org.threeten.bp.Duration;
 
 /** Create a new Hedera™ account. */
-public final class AccountCreateTransaction extends TransactionBuilder<AccountCreateTransaction> {
+public final class AccountCreateTransaction extends SingleTransactionBuilder<AccountCreateTransaction> {
     private static final Hbar DEFAULT_RECORD_THRESHOLD = Hbar.fromTinybars(Long.MAX_VALUE);
 
     private final CryptoCreateTransactionBody.Builder builder;

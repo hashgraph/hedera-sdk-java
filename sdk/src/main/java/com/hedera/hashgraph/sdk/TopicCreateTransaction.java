@@ -13,7 +13,7 @@ import org.threeten.bp.Duration;
  * <p>
  * On success, the resulting TransactionReceipt contains the newly created TopicId.
  */
-public final class TopicCreateTransaction extends TransactionBuilder<TopicCreateTransaction> {
+public final class TopicCreateTransaction extends SingleTransactionBuilder<TopicCreateTransaction> {
     private final ConsensusCreateTopicTransactionBody.Builder builder;
 
     public TopicCreateTransaction() {

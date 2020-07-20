@@ -16,7 +16,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
  * On success, the resulting TransactionReceipt contains the topic's updated topicSequenceNumber and
  * topicRunningHash.
  */
-public final class TopicMessageSubmitTransaction extends TransactionBuilder<TopicMessageSubmitTransaction> {
+public final class TopicMessageSubmitTransaction extends SingleTransactionBuilder<TopicMessageSubmitTransaction> {
     private final ConsensusSubmitMessageTransactionBody.Builder builder;
 
     public TopicMessageSubmitTransaction() {

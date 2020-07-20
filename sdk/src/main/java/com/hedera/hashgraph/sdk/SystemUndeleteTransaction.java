@@ -6,7 +6,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 /**
  * Undelete a file or smart contract that was deleted by AdminDelete - can only be done with a Hedera admin.
  */
-public final class SystemUndeleteTransaction extends TransactionBuilder<SystemUndeleteTransaction> {
+public final class SystemUndeleteTransaction extends SingleTransactionBuilder<SystemUndeleteTransaction> {
     private final SystemUndeleteTransactionBody.Builder builder;
 
     public SystemUndeleteTransaction() {

@@ -10,7 +10,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
  * <p>If a file has multiple keys, all keys must sign to modify its contents.
  * (See {@link FileCreateTransaction#setKeys(Key...)} for more information.)
  */
-public final class FileAppendTransaction extends TransactionBuilder<FileAppendTransaction> {
+public final class FileAppendTransaction extends SingleTransactionBuilder<FileAppendTransaction> {
     private final FileAppendTransactionBody.Builder builder;
 
     public FileAppendTransaction() {

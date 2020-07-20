@@ -23,7 +23,7 @@ import org.threeten.bp.Instant;
  * of the list of attached claims, and of the keys
  * associated with the claims and the account.
  */
-public final class AccountUpdateTransaction extends TransactionBuilder<AccountUpdateTransaction> {
+public final class AccountUpdateTransaction extends SingleTransactionBuilder<AccountUpdateTransaction> {
     private final CryptoUpdateTransactionBody.Builder builder;
 
     public AccountUpdateTransaction() {

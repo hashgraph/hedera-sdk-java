@@ -8,7 +8,7 @@ import org.threeten.bp.Instant;
 /**
  * Updates a file by submitting the transaction.
  */
-public final class FileUpdateTransaction extends TransactionBuilder<FileUpdateTransaction> {
+public final class FileUpdateTransaction extends SingleTransactionBuilder<FileUpdateTransaction> {
     private final FileUpdateTransactionBody.Builder builder;
 
     public FileUpdateTransaction() {

@@ -11,7 +11,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
  * If an {@code adminKey} is set, this transaction must be signed by that key.
  * If there is no {@code adminKey}, this transaction will fail with {@link Status#UNAUTHORIZED}.
  */
-public final class TopicDeleteTransaction extends TransactionBuilder<TopicDeleteTransaction> {
+public final class TopicDeleteTransaction extends SingleTransactionBuilder<TopicDeleteTransaction> {
     private final ConsensusDeleteTopicTransactionBody.Builder builder;
 
     public TopicDeleteTransaction() {
