@@ -50,7 +50,7 @@ class ConsensusPubSubExample {
         new TopicMessageQuery()
             .setTopicId(topicId)
             .subscribe(client, resp -> {
-                    String messageAsString = new String(resp.message, StandardCharsets.UTF_8);
+                    String messageAsString = new String(resp.contents, StandardCharsets.UTF_8);
 
                     System.out.println(resp.consensusTimestamp + " received topic message: " + messageAsString);
                 });

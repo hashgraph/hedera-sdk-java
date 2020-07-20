@@ -14,7 +14,7 @@ import java.util.List;
 public final class TopicMessage {
     public final Instant consensusTimestamp;
 
-    public final byte[] message;
+    public final byte[] contents;
 
     public final byte[] runningHash;
 
@@ -31,7 +31,7 @@ public final class TopicMessage {
         TopicMessageChunk[] chunks
     ) {
         this.consensusTimestamp = lastConsensusTimestamp;
-        this.message = message;
+        this.contents = message;
         this.runningHash = lastRunningHash;
         this.sequenceNumber = lastSequenceNumber;
         this.chunks = chunks;
@@ -81,7 +81,7 @@ public final class TopicMessage {
     public String toString() {
         return MoreObjects.toStringHelper(this)
             .add("consensusTimestamp", consensusTimestamp)
-            .add("message", new String(message, StandardCharsets.UTF_8))
+            .add("contents", new String(contents, StandardCharsets.UTF_8))
             .add("runningHash", runningHash)
             .add("sequenceNumber", sequenceNumber)
             .toString();
