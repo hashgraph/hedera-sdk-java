@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.base.MoreObjects;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Function;
 
@@ -50,5 +51,12 @@ public class TransactionList extends Executable<TransactionId> {
 
                 return ids;
             });
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("transactions", transactions)
+            .toString();
     }
 }
