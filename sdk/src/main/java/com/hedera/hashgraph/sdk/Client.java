@@ -83,7 +83,7 @@ public final class Client implements AutoCloseable {
 
     public void setMirrorNetwork(List<String> mirrorNetwork) {
         var mirrors = new ArrayList<>(mirrorNetwork);
-        Collections.shuffle(mirrors, ThreadLocalRandom.current());
+        Collections.shuffle(mirrors, ThreadLocalSecureRandom.current());
         this.mirrors = Iterables.cycle(mirrors).iterator();
     }
 
@@ -453,6 +453,7 @@ public final class Client implements AutoCloseable {
         var address = network.get(nodeId);
 
         if (address != null) {
+            // TODO: Determine if we should/should not have `keepAlive()` on this channel
             channel = ManagedChannelBuilder.forTarget(address)
                 .usePlaintext()
                 .userAgent(getUserAgent())
