@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ClientTest {
@@ -91,20 +92,22 @@ class ClientTest {
     @Test
     @DisplayName("setNetwork() functions correctly")
     void testReplaceNodes() {
-        @Var Map<AccountId, String> nodes = new HashMap<>();
-        nodes.put(new AccountId(3), "0.testnet.hedera.com:50211");
-        nodes.put(new AccountId(4), "1.testnet.hedera.com:50211");
+        assertDoesNotThrow(() -> {
+            @Var Map<AccountId, String> nodes = new HashMap<>();
+            nodes.put(new AccountId(3), "0.testnet.hedera.com:50211");
+            nodes.put(new AccountId(4), "1.testnet.hedera.com:50211");
 
-        Client client = new Client(nodes);
+            Client client = new Client(nodes);
 
 
-        nodes = new HashMap<>();
-        nodes.put(new AccountId(5), "2.testnet.hedera.com:50211");
-        nodes.put(new AccountId(6), "3.testnet.hedera.com:50211");
+            nodes = new HashMap<>();
+            nodes.put(new AccountId(5), "2.testnet.hedera.com:50211");
+            nodes.put(new AccountId(6), "3.testnet.hedera.com:50211");
 
-        client.setNetwork(nodes);
+            client.setNetwork(nodes);
 
-        Assertions.assertEquals(client.getNetworkChannel(new AccountId(5)).authority(), "2.testnet.hedera.com:50211");
-        Assertions.assertThrows(IllegalArgumentException.class , () -> client.getNetworkChannel(new AccountId(3)));
+            Assertions.assertEquals(client.getNetworkChannel(new AccountId(5)).authority(), "2.testnet.hedera.com:50211");
+            Assertions.assertThrows(IllegalArgumentException.class , () -> client.getNetworkChannel(new AccountId(3)));
+        });
     }
 }
