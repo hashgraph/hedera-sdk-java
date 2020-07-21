@@ -1,9 +1,14 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.ConsensusMessageChunkInfo;
 import com.hedera.hashgraph.sdk.proto.ConsensusSubmitMessageTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Submit a message for consensus.
@@ -16,11 +21,21 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
  * On success, the resulting TransactionReceipt contains the topic's updated topicSequenceNumber and
  * topicRunningHash.
  */
-public final class TopicMessageSubmitTransaction extends SingleTransactionBuilder<TopicMessageSubmitTransaction> {
-    private final ConsensusSubmitMessageTransactionBody.Builder builder;
+public final class TopicMessageSubmitTransaction extends TransactionBuilder<TransactionId, TransactionList, TopicMessageSubmitTransaction> {
+    private static final int CHUNK_SIZE = 4096;
+
+    @Nullable
+    private TopicId topicId;
+
+    @Nullable
+    private ConsensusMessageChunkInfo chunkInfo;
+
+    private ByteString message = ByteString.EMPTY;
+
+    private int maxChunks = 10;
 
     public TopicMessageSubmitTransaction() {
-        builder = ConsensusSubmitMessageTransactionBody.newBuilder();
+        super();
     }
 
     /**
@@ -30,7 +45,7 @@ public final class TopicMessageSubmitTransaction extends SingleTransactionBuilde
      * @param topicId The TopicId to be set
      */
     public TopicMessageSubmitTransaction setTopicId(TopicId topicId) {
-        builder.setTopicID(topicId.toProtobuf());
+        this.topicId = topicId;
         return this;
     }
 
@@ -41,7 +56,7 @@ public final class TopicMessageSubmitTransaction extends SingleTransactionBuilde
      * @param message The String to be set as message
      */
     public TopicMessageSubmitTransaction setMessage(String message) {
-        builder.setMessage(ByteString.copyFromUtf8(message));
+        this.message = ByteString.copyFromUtf8(message);
         return this;
     }
 
@@ -52,22 +67,114 @@ public final class TopicMessageSubmitTransaction extends SingleTransactionBuilde
      * @param message The array of bytes to be set as message
      */
     public TopicMessageSubmitTransaction setMessage(byte[] message) {
-        builder.setMessage(ByteString.copyFrom(message));
+        this.message = ByteString.copyFrom(message);
         return this;
     }
 
     public TopicMessageSubmitTransaction setChunkInfo(TransactionId initialTransactionId, int total, int number) {
-        var chunkInfo = ConsensusMessageChunkInfo.newBuilder()
+        this.chunkInfo = ConsensusMessageChunkInfo.newBuilder()
             .setInitialTransactionID(initialTransactionId.toProtobuf())
             .setTotal(total)
             .setNumber(number)
             .build();
-        builder.setChunkInfo(chunkInfo);
+        return this;
+    }
+
+    public TopicMessageSubmitTransaction setMaxChunks(int maxChunks) {
+        this.maxChunks = maxChunks;
         return this;
     }
 
     @Override
-    void onBuild(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setConsensusSubmitMessage(builder);
+    public TransactionList build(@Nullable Client client) {
+        if (chunkInfo != null) {
+            SingleMessageSubmitTransaction singleTransaction = new SingleMessageSubmitTransaction(
+                bodyBuilder.buildPartial(),
+                topicId,
+                chunkInfo,
+                message);
+
+            return new TransactionList(Collections.singleton(singleTransaction.build(client)));
+        }
+
+        // lock into a transaction ID
+        TransactionId initialTransactionId;
+        if (!bodyBuilder.hasTransactionID()) {
+            if (client == null || client.getOperatorId() == null) {
+                throw new IllegalStateException("client must have an operator or set a transaction ID to build a consensus message transaction");
+            }
+
+            initialTransactionId = TransactionId.generate(client.getOperatorId());
+        } else {
+            initialTransactionId = TransactionId.fromProtobuf(bodyBuilder.getTransactionID());
+        }
+
+        long totalMessageSize = this.message.size();
+        long requiredChunks = (totalMessageSize + (CHUNK_SIZE - 1)) / CHUNK_SIZE;
+
+        if (requiredChunks > maxChunks) {
+            throw new IllegalArgumentException(
+                "message of " + totalMessageSize + " bytes requires " + requiredChunks
+                    + " chunks but the maximum allowed chunks is " + maxChunks + ", try using setMaxChunks");
+        }
+
+        ArrayList<com.hedera.hashgraph.sdk.Transaction> txs = new ArrayList<>();
+        @Var TransactionId nextTransactionId = initialTransactionId;
+
+        for (int i = 0; i < requiredChunks; i += 1) {
+            @Var int startIndex = i * CHUNK_SIZE;
+            @Var int endIndex = startIndex + CHUNK_SIZE;
+
+            if (endIndex > totalMessageSize) {
+                endIndex = (int) totalMessageSize;
+            }
+
+            ByteString chunkMessage = message.substring(startIndex, endIndex);
+
+            bodyBuilder.setTransactionID(nextTransactionId.toProtobuf());
+
+            txs.add(new SingleMessageSubmitTransaction(
+                bodyBuilder.buildPartial(),
+                topicId,
+                ConsensusMessageChunkInfo.newBuilder()
+                    .setInitialTransactionID(initialTransactionId.toProtobuf())
+                    .setTotal((int) requiredChunks)
+                    .setNumber(i + 1) // 1..=total
+                    .build(),
+                chunkMessage).build(client));
+
+            // add 1 ns to make cascading transaction IDs
+            nextTransactionId = new TransactionId(nextTransactionId.accountId, nextTransactionId.validStart.plusNanos(1));
+        }
+
+        return new TransactionList(txs);
+    }
+
+    @Override
+    void onBuild(TransactionBody.Builder bodyBuilder) {}
+
+    static class SingleMessageSubmitTransaction extends SingleTransactionBuilder<SingleMessageSubmitTransaction> {
+        SingleMessageSubmitTransaction(
+            TransactionBody bodyBuilder,
+            @Nullable TopicId topicId,
+            ConsensusMessageChunkInfo chunkInfo,
+            ByteString message)
+        {
+            this.bodyBuilder.mergeFrom(bodyBuilder);
+
+            @SuppressWarnings("ModifiedButNotUsed")
+            ConsensusSubmitMessageTransactionBody.Builder builder = this.bodyBuilder.getConsensusSubmitMessage().toBuilder();
+
+            if (topicId != null) {
+                builder.setTopicID(topicId.toProtobuf());
+            }
+
+            builder.setChunkInfo(chunkInfo);
+            builder.setMessage(message);
+        }
+
+        @Override
+        void onBuild(TransactionBody.Builder bodyBuilder) {
+        }
     }
 }

@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
  *
  * @param <T> The type of the transaction. Used to enable chaining.
  */
-public abstract class TransactionBuilder<RespT, O extends HederaExecutable, T extends TransactionBuilder<RespT, O, T>>
+public abstract class TransactionBuilder<RespT, O extends Executable<RespT>, T extends TransactionBuilder<RespT, O, T>>
     extends Executable<RespT> {
 
     // Default auto renew duration for accounts, contracts, topics, and files (entities)
