@@ -118,7 +118,7 @@ public final class TopicMessageSubmitTransaction extends TransactionBuilder<Tran
                     + " chunks but the maximum allowed chunks is " + maxChunks + ", try using setMaxChunks");
         }
 
-        ArrayList<com.hedera.hashgraph.sdk.Transaction> txs = new ArrayList<>();
+        ArrayList<com.hedera.hashgraph.sdk.Transaction> transactions = new ArrayList<>();
         @Var TransactionId nextTransactionId = initialTransactionId;
 
         for (int i = 0; i < requiredChunks; i += 1) {
@@ -133,7 +133,7 @@ public final class TopicMessageSubmitTransaction extends TransactionBuilder<Tran
 
             bodyBuilder.setTransactionID(nextTransactionId.toProtobuf());
 
-            txs.add(new SingleMessageSubmitTransaction(
+            transactions.add(new SingleMessageSubmitTransaction(
                 bodyBuilder.buildPartial(),
                 topicId,
                 ConsensusMessageChunkInfo.newBuilder()
@@ -147,7 +147,7 @@ public final class TopicMessageSubmitTransaction extends TransactionBuilder<Tran
             nextTransactionId = new TransactionId(nextTransactionId.accountId, nextTransactionId.validStart.plusNanos(1));
         }
 
-        return new TransactionList(txs);
+        return new TransactionList(transactions);
     }
 
     @Override
