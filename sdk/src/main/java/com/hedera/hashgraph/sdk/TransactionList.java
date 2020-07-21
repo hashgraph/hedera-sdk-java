@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class TransactionList extends Executable<TransactionId> {
+public class TransactionList extends Executable<TransactionId> implements WithExecuteAll {
     private final Collection<Transaction> transactions;
 
     TransactionList(Collection<Transaction> transactions) {
@@ -29,12 +29,14 @@ public class TransactionList extends Executable<TransactionId> {
 
     @Override
     public final CompletableFuture<TransactionId> executeAsync(Client client) {
-        return executeAll(client).thenApply((list) -> {
+        return executeAllAsync(client).thenApply((list) -> {
             return list.get(0);
         });
     }
 
-    public final CompletableFuture<List<TransactionId>> executeAll(Client client) {
+    @Override
+    @FunctionalExecutable(type = "java.util.List<TransactionId>")
+    public final CompletableFuture<List<TransactionId>> executeAllAsync(Client client) {
         List<CompletableFuture<TransactionId>> futures = new ArrayList<>();
 
         for (Transaction transaction : transactions) {
