@@ -25,8 +25,8 @@ public class MirrorConsensusTopicResponse {
         byte[] message,
         byte[] lastRunningHash,
         long lastSequenceNumber,
-        MirrorConsensusMessageChunk[] chunks
-    ) {
+        MirrorConsensusMessageChunk[] chunks)
+    {
         this.consensusTimestamp = lastConsensusTimestamp;
         this.message = message;
         this.runningHash = lastRunningHash;
@@ -40,8 +40,7 @@ public class MirrorConsensusTopicResponse {
             response.getMessage().toByteArray(),
             response.getRunningHash().toByteArray(),
             response.getSequenceNumber(),
-            new MirrorConsensusMessageChunk[]{new MirrorConsensusMessageChunk(response)}
-        );
+            new MirrorConsensusMessageChunk[]{new MirrorConsensusMessageChunk(response)});
     }
 
     static MirrorConsensusTopicResponse ofMany(List<ConsensusTopicResponse> responses) {
@@ -71,8 +70,7 @@ public class MirrorConsensusTopicResponse {
             wholeMessage.array(),
             lastReceived.getRunningHash().toByteArray(),
             lastReceived.getSequenceNumber(),
-            chunks
-        );
+            chunks);
     }
 
     @Override

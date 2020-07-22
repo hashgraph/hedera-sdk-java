@@ -14,9 +14,7 @@ public final class MirrorConsensusMessageChunk {
 
     public final long sequenceNumber;
 
-    MirrorConsensusMessageChunk(
-        ConsensusTopicResponse response
-    ) {
+    MirrorConsensusMessageChunk(ConsensusTopicResponse response) {
         consensusTimestamp = TimestampHelper.timestampTo(response.getConsensusTimestamp());
         contentSize = response.getMessage().size();
         runningHash = response.getRunningHash().toByteArray();
