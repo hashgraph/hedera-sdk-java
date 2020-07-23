@@ -3,18 +3,19 @@ package com.hedera.hashgraph.sdk.mirror;
 import com.hedera.hashgraph.proto.TransactionID;
 import com.hedera.hashgraph.proto.mirror.ConsensusServiceGrpc;
 import com.hedera.hashgraph.proto.mirror.ConsensusTopicQuery;
-import com.hedera.hashgraph.proto.mirror.ConsensusTopicQueryOrBuilder;
 import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
+import io.grpc.StatusException;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import io.grpc.CallOptions;
 import io.grpc.ClientCall;
 import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
+import io.grpc.Status;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -46,23 +47,38 @@ public class MirrorConsensusTopicQuery {
     }
 
     // TODO: Refactor into a base class when we add more mirror query types
-    public MirrorSubscriptionHandle subscribe(
-        MirrorClient mirrorClient,
-        Consumer<MirrorConsensusTopicResponse> onNext,
-        Consumer<Throwable> onError)
+    public MirrorSubscriptionHandle subscribe(MirrorClient mirrorClient, Consumer<MirrorConsensusTopicResponse> onNext,
+                                              Consumer<Throwable> onError)
     {
-        final ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call =
-            mirrorClient.channel.newCall(ConsensusServiceGrpc.getSubscribeTopicMethod(), CallOptions.DEFAULT);
+        final ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call = mirrorClient.channel
+            .newCall(ConsensusServiceGrpc.getSubscribeTopicMethod(), CallOptions.DEFAULT);
 
         final MirrorSubscriptionHandle subscriptionHandle = new MirrorSubscriptionHandle(() -> {
             call.cancel("unsubscribed", null);
         });
 
-        final HashMap<TransactionID, ArrayList<ConsensusTopicResponse>> pendingMessages = new HashMap<>();
+        makeStreamingCall(call, builder.build(), onNext, onError, 0);
 
-        ClientCalls.asyncServerStreamingCall(call, builder.build(), new StreamObserver<ConsensusTopicResponse>() {
+        return subscriptionHandle;
+    }
+
+    private static void makeStreamingCall(ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call,
+                                          ConsensusTopicQuery query, Consumer<MirrorConsensusTopicResponse> onNext, Consumer<Throwable> onError,
+                                          int attempt)
+    {
+        if (attempt > 10) {
+            onError.accept(new Error("Failed to connect to mirror node"));
+        }
+
+        ConcurrentHashMap<TransactionID, ArrayList<ConsensusTopicResponse>> pendingMessages = new ConcurrentHashMap<>();
+
+        ClientCalls.asyncServerStreamingCall(call, query, new StreamObserver<ConsensusTopicResponse>() {
+            private boolean shouldRetry = true;
+
             @Override
             public void onNext(ConsensusTopicResponse consensusTopicResponse) {
+                shouldRetry = false;
+
                 if (!consensusTopicResponse.hasChunkInfo()) {
                     // short circuit for no chunks
                     onNext.accept(MirrorConsensusTopicResponse.ofSingle(consensusTopicResponse));
@@ -74,11 +90,9 @@ public class MirrorConsensusTopicQuery {
                 pendingMessages.putIfAbsent(initialTransactionID, new ArrayList<>());
                 ArrayList<ConsensusTopicResponse> chunks = pendingMessages.get(initialTransactionID);
 
-                // not possible as we do [putIfAbsent]
-                assert chunks != null;
-
+                // not possible to be null as we do [putIfAbsent]
                 // add our response to the pending chunk list
-                chunks.add(consensusTopicResponse);
+                Objects.requireNonNull(chunks).add(consensusTopicResponse);
 
                 // if we now have enough chunks, emit
                 if (chunks.size() == consensusTopicResponse.getChunkInfo().getTotal()) {
@@ -88,6 +102,24 @@ public class MirrorConsensusTopicQuery {
 
             @Override
             public void onError(Throwable throwable) {
+                if (shouldRetry) {
+                    if (throwable instanceof StatusException) {
+                        StatusException status = (StatusException) throwable;
+
+                        if (status.getStatus().equals(Status.NOT_FOUND) || status.getStatus().equals(Status.UNAVAILABLE)) {
+
+                            // Cannot use `CompletableFuture<U>` here since this future is never polled
+                            try {
+                                Thread.sleep(250 * (long) Math.pow(2, attempt));
+                            } catch (InterruptedException e) {
+                                // Do nothing
+                            }
+
+                            makeStreamingCall(call, query, onNext, onError, attempt + 1);
+                        }
+                    }
+                }
+
                 onError.accept(throwable);
             }
 
@@ -96,7 +128,5 @@ public class MirrorConsensusTopicQuery {
                 // Do nothing
             }
         });
-
-        return subscriptionHandle;
     }
 }
