@@ -127,6 +127,25 @@ public final class Client implements AutoCloseable {
     }
 
     /**
+     * Get a Client configured for Hedera public previewnet access.
+     * <p>
+     * Most users will also want to set an operator account with
+     * {@link #setOperator(AccountId, PrivateKey)} so transactions can be automatically
+     * given {@link TransactionId}s and signed.
+     *
+     * @return a Client configured for Hedera previewnet access
+     */
+    public static Client forPreviewnet() {
+        final HashMap<AccountId, String> nodes = new HashMap<>();
+        nodes.put(new AccountId(3), "0.previewnet.hedera.com:50211");
+        nodes.put(new AccountId(4), "1.previewnet.hedera.com:50211");
+        nodes.put(new AccountId(5), "2.previewnet.hedera.com:50211");
+        nodes.put(new AccountId(6), "3.previewnet.hedera.com:50211");
+
+        return new Client(nodes);
+    }
+
+    /**
      * Configure a client based off the given JSON string.
      *
      * @param json
