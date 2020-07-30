@@ -88,6 +88,7 @@ public final class TopicMessageSubmitTransaction extends TransactionBuilder<Tran
     @Override
     public TransactionList build(@Nullable Client client) {
         if (chunkInfo != null) {
+            System.out.println("Here");
             SingleMessageSubmitTransaction singleTransaction = new SingleMessageSubmitTransaction(
                 bodyBuilder.buildPartial(),
                 topicId,
@@ -163,7 +164,7 @@ public final class TopicMessageSubmitTransaction extends TransactionBuilder<Tran
             this.bodyBuilder.mergeFrom(bodyBuilder);
 
             @SuppressWarnings("ModifiedButNotUsed")
-            ConsensusSubmitMessageTransactionBody.Builder builder = this.bodyBuilder.getConsensusSubmitMessage().toBuilder();
+            var builder = this.bodyBuilder.getConsensusSubmitMessage().toBuilder();
 
             if (topicId != null) {
                 builder.setTopicID(topicId.toProtobuf());
@@ -171,6 +172,8 @@ public final class TopicMessageSubmitTransaction extends TransactionBuilder<Tran
 
             builder.setChunkInfo(chunkInfo);
             builder.setMessage(message);
+
+            this.bodyBuilder.setConsensusSubmitMessage(builder.build());
         }
 
         @Override
