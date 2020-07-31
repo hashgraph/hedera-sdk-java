@@ -3,7 +3,6 @@ package com.hedera.hashgraph.sdk;
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.ConsensusMessageChunkInfo;
-import com.hedera.hashgraph.sdk.proto.ConsensusSubmitMessageTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 
 import javax.annotation.Nullable;
@@ -88,7 +87,6 @@ public final class TopicMessageSubmitTransaction extends TransactionBuilder<Tran
     @Override
     public TransactionList build(@Nullable Client client) {
         if (chunkInfo != null) {
-            System.out.println("Here");
             SingleMessageSubmitTransaction singleTransaction = new SingleMessageSubmitTransaction(
                 bodyBuilder.buildPartial(),
                 topicId,

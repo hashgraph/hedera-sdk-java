@@ -88,8 +88,11 @@ public final class TopicMessageQuery {
                     var message = TopicMessage.ofSingle(consensusTopicResponse);
                     lock = startTimeLock.writeLock();
                     lock.lock();
-                    startTime[0] = message.consensusTimestamp;
-                    lock.unlock();
+                    try {
+                        startTime[0] = message.consensusTimestamp;
+                    } finally {
+                        lock.unlock();
+                    }
                     onNext.accept(message);
                     return;
                 }
@@ -111,8 +114,11 @@ public final class TopicMessageQuery {
                     var message = TopicMessage.ofMany(chunks);
                     lock = startTimeLock.writeLock();
                     lock.lock();
-                    startTime[0] = message.consensusTimestamp;
-                    lock.unlock();
+                    try {
+                        startTime[0] = message.consensusTimestamp;
+                    } finally {
+                        lock.unlock();
+                    }
                     System.out.println("After lock chunked");
                     onNext.accept(message);
                 }
@@ -132,8 +138,12 @@ public final class TopicMessageQuery {
                         }
 
                         var lock = startTimeLock.writeLock();
-                        startTime[0].plusNanos(1);
-                        lock.unlock();
+                        lock.lock();
+                        try {
+                            startTime[0].plusNanos(1);
+                        } finally {
+                            lock.unlock();
+                        }
                         makeStreamingCall(call, query, onNext, attempt + 1, startTime, startTimeLock);
                     }
                 }
