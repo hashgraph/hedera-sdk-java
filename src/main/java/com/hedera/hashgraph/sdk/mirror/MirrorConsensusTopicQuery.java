@@ -110,7 +110,8 @@ public class MirrorConsensusTopicQuery {
 
                             // Cannot use `CompletableFuture<U>` here since this future is never polled
                             try {
-                                Thread.sleep(250 * (long) Math.pow(2, attempt));
+                                long delay = Math.min(250 * (long) Math.pow(2, attempt), 16000);
+                                Thread.sleep(delay);
                             } catch (InterruptedException e) {
                                 // Do nothing
                             }
