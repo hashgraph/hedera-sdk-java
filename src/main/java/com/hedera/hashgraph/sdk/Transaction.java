@@ -21,6 +21,7 @@ import com.hedera.hashgraph.sdk.crypto.TransactionSigner;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 
 import org.bouncycastle.util.encoders.Hex;
+import org.bouncycastle.crypto.digests.SHA384Digest;
 
 import java.time.Duration;
 import java.util.HashSet;
@@ -116,6 +117,26 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
         sigMap.addSigPair(sigPairBuilder);
 
         return this;
+    }
+
+    /**
+     * Get the expected hash of the transaction
+     * @return the expected hash of the transaction
+     */
+    public byte[] hash() {
+        if (this.nodeAccountId == null) {
+            throw new IllegalStateException("transaction must have node id set");
+        }
+        if (this.inner.getSigMap().getSigPairList().size() == 0) {
+            throw new IllegalStateException("transaction must be signed");
+        }
+
+        SHA384Digest digest = new SHA384Digest();
+        byte[] hash = new byte[digest.getDigestSize()];
+        byte[] bytes = this.toBytes();
+        digest.update(bytes, 0, bytes.length);
+        digest.doFinal(hash, 0);
+        return hash;
     }
 
     @Override
