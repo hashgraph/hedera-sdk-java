@@ -120,7 +120,11 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
     }
 
     /**
-     * Get the expected hash of the transaction
+     * Calculate the expected hash of the transaction.
+     *
+     * The transaction must have all required signatures and have the node
+     * account id set in order to be accurate.
+     *
      * @return the expected hash of the transaction
      */
     public byte[] hash() {
