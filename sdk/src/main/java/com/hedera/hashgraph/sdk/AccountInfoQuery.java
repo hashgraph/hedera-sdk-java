@@ -47,7 +47,7 @@ public final class AccountInfoQuery extends QueryBuilder<AccountInfo, AccountInf
     }
 
     @Override
-    AccountInfo mapResponse(Response response) {
+    AccountInfo mapResponse(Response response, AccountId nodeId) {
         return AccountInfo.fromProtobuf(response.getCryptoGetInfo().getAccountInfo());
     }
 

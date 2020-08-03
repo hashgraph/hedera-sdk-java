@@ -28,7 +28,7 @@ import java.util.Objects;
  * The {@link TransactionBuilder} type becomes this to freeze its contents so they can be signed without allowing
  * further modifications.
  */
-public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse, TransactionId> {
+public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse, com.hedera.hashgraph.sdk.TransactionResponse> {
     public final TransactionId id;
 
     // A SDK [Transaction] is composed of multiple, raw protobuf transactions. These should be
@@ -40,7 +40,7 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     // The parsed transaction body for the corresponding transaction.
     private final List<com.hedera.hashgraph.sdk.proto.TransactionBody> transactionBodies;
 
-    // The signature builder for the corresponding transaction.
+    // The signature builder for the corresponding transaction.TransactionId
     private final List<SignatureMap.Builder> signatureBuilders;
 
     // The index of the _next_ transaction to be built and executed.
@@ -264,8 +264,10 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     }
 
     @Override
-    final TransactionId mapResponse(TransactionResponse transactionResponse) {
-        return id;
+    final com.hedera.hashgraph.sdk.TransactionResponse mapResponse(TransactionResponse transactionResponse, AccountId nodeId) {
+        byte[] transactionHash =  new byte[0];
+        var response = new com.hedera.hashgraph.sdk.TransactionResponse(nodeId, getTransactionId(),transactionHash);
+        return response;
     }
 
     @Override

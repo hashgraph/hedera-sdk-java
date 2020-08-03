@@ -49,7 +49,7 @@ public final class ContractRecordsQuery extends QueryBuilder<List<TransactionRec
     }
 
     @Override
-    List<TransactionRecord> mapResponse(Response response) {
+    List<TransactionRecord> mapResponse(Response response, AccountId nodeId) {
         var rawTransactionRecords = response.getContractGetRecordsResponse().getRecordsList();
         var transactionRecords = new ArrayList<TransactionRecord>(rawTransactionRecords.size());
 

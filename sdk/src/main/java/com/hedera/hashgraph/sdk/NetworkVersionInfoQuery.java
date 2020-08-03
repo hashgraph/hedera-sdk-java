@@ -31,7 +31,7 @@ public class NetworkVersionInfoQuery extends QueryBuilder<NetworkVersionInfo, Ne
     }
 
     @Override
-    NetworkVersionInfo mapResponse(Response response) {
+    NetworkVersionInfo mapResponse(Response response, AccountId nodeId) {
         return NetworkVersionInfo.fromProtobuf(response.getNetworkGetVersionInfo());
     }
 

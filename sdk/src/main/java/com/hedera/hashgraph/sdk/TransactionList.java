@@ -36,7 +36,7 @@ public class TransactionList extends Executable<TransactionId> implements WithEx
 
     @Override
     @FunctionalExecutable(type = "java.util.List<TransactionId>")
-    public final CompletableFuture<List<TransactionId>> executeAllAsync(Client client) {
+    public final CompletableFuture<List<TransactionResponse>> executeAllAsync(Client client) {
         List<CompletableFuture<TransactionId>> futures = new ArrayList<>();
 
         for (Transaction transaction : transactions) {
