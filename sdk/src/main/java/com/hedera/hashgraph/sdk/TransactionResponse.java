@@ -7,8 +7,10 @@ public class TransactionResponse {
 
     public final TransactionId transactionId;
 
-    TransactionResponse(AccountId nodeId, TransactionId transactionId) {
+    TransactionResponse(AccountId nodeId, TransactionId transactionId, byte[] transactionHash) {
         this.nodeId = nodeId;
         this.transactionId = transactionId;
+        this.transactionHash = transactionHash;
     }
 }
+

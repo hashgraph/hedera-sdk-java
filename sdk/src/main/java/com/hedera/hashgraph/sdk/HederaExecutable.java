@@ -92,7 +92,7 @@ abstract class HederaExecutable<RequestT, ResponseT, O> extends Executable<O> {
             }
 
             // successful response from Hedera
-            return CompletableFuture.completedFuture(mapResponse(response));
+            return CompletableFuture.completedFuture(mapResponse(response, nodeId));
         }).thenCompose(x -> x);
     }
 
@@ -104,7 +104,7 @@ abstract class HederaExecutable<RequestT, ResponseT, O> extends Executable<O> {
      * Called after receiving the query response from Hedera. The derived class should map into its
      * output type.
      */
-    abstract O mapResponse(ResponseT response);
+    abstract O mapResponse(ResponseT response, AccountId NodeId);
 
     abstract Status mapResponseStatus(ResponseT response);
 

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class TransactionList extends Executable<TransactionId> implements WithExecuteAll {
+public class TransactionList extends Executable<TransactionResponse> implements WithExecuteAll {
     private final Collection<Transaction> transactions;
 
     TransactionList(Collection<Transaction> transactions) {
@@ -28,7 +28,7 @@ public class TransactionList extends Executable<TransactionId> implements WithEx
     }
 
     @Override
-    public final CompletableFuture<TransactionId> executeAsync(Client client) {
+    public final CompletableFuture<TransactionResponse> executeAsync(Client client) {
         return executeAllAsync(client).thenApply((list) -> {
             return list.get(0);
         });
@@ -36,8 +36,8 @@ public class TransactionList extends Executable<TransactionId> implements WithEx
 
     @Override
     @FunctionalExecutable(type = "java.util.List<TransactionId>")
-    public final CompletableFuture<List<TransactionId>> executeAllAsync(Client client) {
-        List<CompletableFuture<TransactionId>> futures = new ArrayList<>();
+    public final CompletableFuture<List<TransactionResponse>> executeAllAsync(Client client) {
+        List<CompletableFuture<TransactionResponse>> futures = new ArrayList<>();
 
         for (Transaction transaction : transactions) {
             futures.add(transaction.executeAsync(client));
@@ -45,7 +45,7 @@ public class TransactionList extends Executable<TransactionId> implements WithEx
 
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
             .thenApply((v) -> {
-                List<TransactionId> ids = new ArrayList<>();
+                List<TransactionResponse> ids = new ArrayList<>();
 
                 for (var future: futures) {
                     ids.add(future.join());

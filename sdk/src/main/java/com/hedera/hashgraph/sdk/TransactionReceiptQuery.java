@@ -46,7 +46,7 @@ public final class TransactionReceiptQuery
     }
 
     @Override
-    TransactionReceipt mapResponse(Response response) {
+    TransactionReceipt mapResponse(Response response, AccountId nodeId) {
         return TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt());
     }
 

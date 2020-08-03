@@ -56,7 +56,7 @@ public final class AccountBalanceQuery extends QueryBuilder<Hbar, AccountBalance
     }
 
     @Override
-    Hbar mapResponse(Response response) {
+    Hbar mapResponse(Response response, AccountId nodeId) {
         return Hbar.fromTinybars(response.getCryptogetAccountBalance().getBalance());
     }
 
