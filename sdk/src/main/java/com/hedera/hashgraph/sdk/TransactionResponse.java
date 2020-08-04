@@ -2,7 +2,7 @@ package com.hedera.hashgraph.sdk;
 
 import javax.annotation.Nullable;
 
-public class TransactionResponse {
+public class TransactionResponse{
     public final AccountId nodeId;
 
     public final byte[] transactionHash;
@@ -12,8 +12,11 @@ public class TransactionResponse {
 
     TransactionResponse(AccountId nodeId,@Nullable TransactionId transactionId, byte[] transactionHash) {
         this.nodeId = nodeId;
+        if (transactionId == null) { throw new Error("Null Transaction"); }
         this.transactionId = transactionId;
         this.transactionHash = transactionHash;
     }
+
+
 }
 

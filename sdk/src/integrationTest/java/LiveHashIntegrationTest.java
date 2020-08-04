@@ -34,6 +34,7 @@ class LiveHashIntegrationTest {
                 .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             assertNotNull(receipt.accountId);

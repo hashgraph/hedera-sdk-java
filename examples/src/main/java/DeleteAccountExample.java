@@ -40,14 +40,16 @@ public final class DeleteAccountExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        TransactionId txId = new AccountCreateTransaction()
+        var txId = new AccountCreateTransaction()
             // The only _required_ property here is `key`
             .setKey(newKey)
             .setInitialBalance(new Hbar(2))
             .execute(client);
 
+        if (txId.transactionId == null) { throw new Error("Null Transaction"); }
+
         // This will wait for the receipt to become available
-        TransactionReceipt receipt = txId.getReceipt(client);
+        TransactionReceipt receipt = txId.transactionId.getReceipt(client);
 
         AccountId newAccountId = Objects.requireNonNull(receipt.accountId);
 
@@ -61,6 +63,7 @@ public final class DeleteAccountExample {
             .build(client)
             .sign(newKey)
             .execute(client)
+            .transactionId
             .getReceipt(client);
 
         new AccountInfoQuery()

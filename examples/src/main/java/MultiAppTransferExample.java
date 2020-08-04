@@ -11,7 +11,6 @@ import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Transaction;
-import com.hedera.hashgraph.sdk.TransactionId;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -44,7 +43,7 @@ public final class MultiAppTransferExample {
         Hbar transferAmount = Hbar.fromTinybars(10_000);
 
         // the exchange creates an account for the user to transfer funds to
-        TransactionId createExchangeAccountTxnId = new AccountCreateTransaction()
+        var createExchangeAccountTxnId = new AccountCreateTransaction()
             // the exchange only accepts transfers that it validates through a side channel (e.g. REST API)
             .setReceiverSignatureRequired(true)
             .setKey(exchangeKey.getPublicKey())
@@ -54,7 +53,9 @@ public final class MultiAppTransferExample {
             .sign(exchangeKey)
             .execute(client);
 
-        AccountId exchangeAccountId = Objects.requireNonNull(createExchangeAccountTxnId.getReceipt(client).accountId);
+        if (createExchangeAccountTxnId.transactionId == null) { throw new Error("Null Transaction"); }
+
+        AccountId exchangeAccountId = Objects.requireNonNull(createExchangeAccountTxnId.transactionId.getReceipt(client).accountId);
 
         Transaction transferTxn = new CryptoTransferTransaction()
             .addSender(OPERATOR_ID, transferAmount)
@@ -72,9 +73,12 @@ public final class MultiAppTransferExample {
         // we execute the signed transaction and wait for it to be accepted
         Transaction signedTransferTxn = Transaction.fromBytes(signedTxnBytes);
 
-        TransactionId transactionId = signedTransferTxn.execute(client);
+        var transactionResponse = signedTransferTxn.execute(client);
+
+        if (transactionResponse.transactionId == null) { throw new Error("Null Transaction"); }
+
         // (important!) wait for consensus by querying for the receipt
-        transactionId.getReceipt(client);
+        transactionResponse.transactionId.getReceipt(client);
 
         System.out.println("transferred " + transferAmount + "...");
 

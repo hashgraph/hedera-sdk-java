@@ -23,6 +23,7 @@ public class FileContentsIntegrationTest {
                 .setContents("[e2e::FileCreateTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             assertNotNull(receipt.fileId);
@@ -41,6 +42,7 @@ public class FileContentsIntegrationTest {
                 .setFileId(file)
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             client.close();

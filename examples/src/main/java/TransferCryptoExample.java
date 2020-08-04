@@ -9,7 +9,6 @@ import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -46,7 +45,7 @@ public final class TransferCryptoExample {
         System.out.println("" + OPERATOR_ID + " balance = " + senderBalanceBefore);
         System.out.println("" + recipientId + " balance = " + receiptBalanceBefore);
 
-        TransactionId transactionId = new CryptoTransferTransaction()
+        var transactionResponse = new CryptoTransferTransaction()
             // .addSender and .addRecipient can be called as many times as you want as long as the total sum from
             // both sides is equivalent
             .addSender(OPERATOR_ID, amount)
@@ -54,9 +53,11 @@ public final class TransferCryptoExample {
             .setTransactionMemo("transfer test")
             .execute(client);
 
-        System.out.println("transaction ID: " + transactionId);
+        if (transactionResponse.transactionId == null) { throw new Error("Null Transaction"); }
 
-        TransactionRecord record = transactionId.getRecord(client);
+        System.out.println("transaction ID: " + transactionResponse);
+
+        TransactionRecord record = transactionResponse.transactionId.getRecord(client);
 
         System.out.println("transferred " + amount + "...");
 

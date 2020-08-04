@@ -14,7 +14,6 @@ import com.hedera.hashgraph.sdk.TopicInfo;
 import com.hedera.hashgraph.sdk.TopicInfoQuery;
 import com.hedera.hashgraph.sdk.TopicUpdateTransaction;
 import com.hedera.hashgraph.sdk.Transaction;
-import com.hedera.hashgraph.sdk.TransactionId;
 
 import java8.util.J8Arrays;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -84,9 +83,11 @@ class TopicWithAdminKeyExample {
             transaction.sign(k);
         });
 
-        TransactionId transactionId = transaction.execute(hapiClient);
+        var transactionResponse = transaction.execute(hapiClient);
 
-        topicId = transactionId.getReceipt(hapiClient).topicId;
+        if (transactionResponse.transactionId == null) { throw new Error("Null Transaction"); }
+
+        topicId = transactionResponse.transactionId.getReceipt(hapiClient).topicId;
 
         System.out.println("Created new topic " + topicId + " with 2-of-3 threshold key as adminKey.");
     }
@@ -118,10 +119,12 @@ class TopicWithAdminKeyExample {
             transaction.sign(k);
         });
 
-        TransactionId transactionId = transaction.execute(hapiClient);
+        var transactionResponse = transaction.execute(hapiClient);
+
+        if (transactionResponse.transactionId == null) { throw new Error("Null Transaction"); }
 
         // Retrieve results post-consensus.
-        transactionId.getReceipt(hapiClient);
+        transactionResponse.transactionId.getReceipt(hapiClient);
 
         System.out.println("Updated topic " + topicId + " with 3-of-4 threshold key as adminKey");
 

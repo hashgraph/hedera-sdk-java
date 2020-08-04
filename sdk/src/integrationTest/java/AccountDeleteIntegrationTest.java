@@ -30,6 +30,7 @@ class AccountDeleteIntegrationTest {
                 .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             assertNotNull(receipt.accountId);
@@ -58,6 +59,7 @@ class AccountDeleteIntegrationTest {
                 .build(client)
                 .sign(key)
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             client.close();

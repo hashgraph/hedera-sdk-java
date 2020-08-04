@@ -1,5 +1,6 @@
 import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.ContractCreateTransaction;
+import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
 import com.hedera.hashgraph.sdk.ContractFunctionParameters;
 import com.hedera.hashgraph.sdk.ContractInfoQuery;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
@@ -28,6 +29,7 @@ public class ContractInfoIntegrationTest {
                 .setContents(smartContractBytecode)
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             assertNotNull(receipt.fileId);
@@ -43,6 +45,7 @@ public class ContractInfoIntegrationTest {
                 .setContractMemo("[e2e::ContractCreateTransaction]")
                 .setMaxTransactionFee(new Hbar(20))
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             assertNotNull(receipt.contractId);
@@ -63,9 +66,10 @@ public class ContractInfoIntegrationTest {
             assertEquals(info.storage, 926);
             assertEquals(info.contractMemo, "[e2e::ContractCreateTransaction]");
 
-            new com.hedera.hashgraph.sdk.ContractDeleteTransaction()
+            new ContractDeleteTransaction()
                 .setContractId(contract)
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             new FileDeleteTransaction()

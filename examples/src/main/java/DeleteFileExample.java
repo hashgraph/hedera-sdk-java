@@ -12,7 +12,6 @@ import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -38,24 +37,28 @@ public final class DeleteFileExample {
         // you can easily use the bytes of a file instead.
         byte[] fileContents = "Hedera hashgraph is great!".getBytes(StandardCharsets.UTF_8);
 
-        TransactionId txId = new FileCreateTransaction()
+        var txId = new FileCreateTransaction()
             .setKeys(OPERATOR_KEY)
             .setContents(fileContents)
             .setMaxTransactionFee(new Hbar(2))
             .execute(client);
 
-        TransactionReceipt receipt = txId.getReceipt(client);
+        if (txId.transactionId == null) { throw new Error("Null Transaction"); }
+
+        TransactionReceipt receipt = txId.transactionId.getReceipt(client);
         FileId newFileId = Objects.requireNonNull(receipt.fileId);
 
         System.out.println("file: " + newFileId);
 
         // now delete the file
-        TransactionId fileDeleteTxnId = new FileDeleteTransaction()
+        var fileDeleteTxnId = new FileDeleteTransaction()
             .setFileId(newFileId)
             .execute(client);
 
+        if (fileDeleteTxnId.transactionId == null) { throw new Error("Null Transaction"); }
+
         // if this doesn't throw then the transaction was a success
-        fileDeleteTxnId.getReceipt(client);
+        fileDeleteTxnId.transactionId.getReceipt(client);
 
         System.out.println("File deleted successfully.");
 

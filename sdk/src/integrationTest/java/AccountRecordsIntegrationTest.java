@@ -29,6 +29,7 @@ class AccountRecordsIntegrationTest {
                 .setReceiveRecordThreshold(Hbar.fromTinybars(1))
                 .setSendRecordThreshold(Hbar.fromTinybars(1))
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             assertNotNull(receipt.accountId);
@@ -55,6 +56,7 @@ class AccountRecordsIntegrationTest {
                 .build(client)
                 .sign(key)
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             client.close();

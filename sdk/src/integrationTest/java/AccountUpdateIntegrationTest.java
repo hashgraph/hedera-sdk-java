@@ -33,6 +33,7 @@ class AccountUpdateIntegrationTest {
                 .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             assertNotNull(receipt.accountId);
@@ -62,6 +63,7 @@ class AccountUpdateIntegrationTest {
                 .sign(key1)
                 .sign(key2)
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             info = new AccountInfoQuery()
@@ -85,6 +87,7 @@ class AccountUpdateIntegrationTest {
                 .build(client)
                 .sign(key2)
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             client.close();

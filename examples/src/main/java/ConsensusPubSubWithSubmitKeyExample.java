@@ -12,7 +12,6 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicId;
-import com.hedera.hashgraph.sdk.TransactionId;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import java8.util.Lists;
@@ -80,13 +79,14 @@ public class ConsensusPubSubWithSubmitKeyExample {
         submitKey = PrivateKey.generate();
         PublicKey submitPublicKey = submitKey.getPublicKey();
 
-        TransactionId transactionId = new TopicCreateTransaction()
+        var transactionResponse = new TopicCreateTransaction()
             .setTopicMemo("HCS topic with submit key")
             .setSubmitKey(submitPublicKey)
             .execute(client);
 
+        if (transactionResponse.transactionId == null) { throw new Error("Null Transaction"); }
 
-        topicId = Objects.requireNonNull(transactionId.getReceipt(client).topicId);
+        topicId = Objects.requireNonNull(transactionResponse.transactionId.getReceipt(client).topicId);
         System.out.println("Created new topic " + topicId + " with ED25519 submitKey of " + submitKey);
     }
 
@@ -121,6 +121,7 @@ public class ConsensusPubSubWithSubmitKeyExample {
                 .sign(submitKey)
 
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             Thread.sleep(millisBetweenMessages);

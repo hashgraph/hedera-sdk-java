@@ -19,7 +19,6 @@ import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 
 import com.google.gson.Gson;
@@ -66,18 +65,20 @@ public final class CreateStatefulContractExample {
         client.setMaxQueryPayment(new Hbar(10));
 
         // create the contract's bytecode file
-        TransactionId fileTxId = new FileCreateTransaction()
+        var fileTxId = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file
             .setKeys(OPERATOR_KEY)
             .setContents(byteCode)
             .execute(client);
 
-        TransactionReceipt fileReceipt = fileTxId.getReceipt(client);
+        if (fileTxId.transactionId == null) { throw new Error("Null Transaction"); }
+
+        TransactionReceipt fileReceipt = fileTxId.transactionId.getReceipt(client);
         FileId newFileId = Objects.requireNonNull(fileReceipt.fileId);
 
         System.out.println("contract bytecode file: " + newFileId);
 
-        TransactionId contractTxId = new ContractCreateTransaction()
+        var contractTxId = new ContractCreateTransaction()
             .setBytecodeFileId(newFileId)
             .setGas(100_000_000)
             .setConstructorParameters(
@@ -85,7 +86,9 @@ public final class CreateStatefulContractExample {
                     .addString("hello from hedera!"))
             .execute(client);
 
-        TransactionReceipt contractReceipt = contractTxId.getReceipt(client);
+        if (contractTxId.transactionId == null) { throw new Error("Null Transaction"); }
+
+        TransactionReceipt contractReceipt = contractTxId.transactionId.getReceipt(client);
         ContractId newContractId = Objects.requireNonNull(contractReceipt.contractId);
 
         System.out.println("new contract ID: " + newContractId);
@@ -104,15 +107,17 @@ public final class CreateStatefulContractExample {
         String message = contractCallResult.getString(0);
         System.out.println("contract returned message: " + message);
 
-        TransactionId contractExecTxnId = new ContractExecuteTransaction()
+        var contractExecTxnId = new ContractExecuteTransaction()
             .setContractId(newContractId)
             .setGas(100_000_000)
             .setFunction("set_message", new ContractFunctionParameters()
                 .addString("hello from hedera again!"))
             .execute(client);
 
+        if (contractExecTxnId.transactionId == null) { throw new Error("Null Transaction"); }
+
         // if this doesn't throw then we know the contract executed successfully
-        contractExecTxnId.getReceipt(client);
+        contractExecTxnId.transactionId.getReceipt(client);
 
         // now query contract
         ContractFunctionResult contractUpdateResult = new ContractCallQuery()

@@ -9,7 +9,6 @@ import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.Key;
 import com.hedera.hashgraph.sdk.KeyList;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -50,19 +49,20 @@ public final class CreateAccountThresholdKeyExample {
         var tKey = KeyList.withThreshold(2);
         Collections.addAll(tKey, keys);
 
-        TransactionId txId = new AccountCreateTransaction()
+        var txId = new AccountCreateTransaction()
             .setKey(tKey)
             .setInitialBalance(new Hbar(10))
             .execute(client);
 
+        if (txId.transactionId == null) { throw new Error("Null Transaction"); }
         // This will wait for the receipt to become available
-        TransactionReceipt receipt = txId.getReceipt(client);
+        TransactionReceipt receipt = txId.transactionId.getReceipt(client);
 
         AccountId newAccountId = Objects.requireNonNull(receipt.accountId);
 
         System.out.println("account = " + newAccountId);
 
-        TransactionId tsfrTxnId = new CryptoTransferTransaction()
+        var tsfrTxnId = new CryptoTransferTransaction()
             .addSender(newAccountId, new Hbar(10))
             .addRecipient(new AccountId(3), new Hbar(10))
             // To manually sign, you must explicitly build the Transaction
@@ -72,8 +72,10 @@ public final class CreateAccountThresholdKeyExample {
             .sign(keys[1])
             .execute(client);
 
+        if (tsfrTxnId.transactionId == null) { throw new Error("Null Transaction"); }
+
         // (important!) wait for the transfer to go to consensus
-        tsfrTxnId.getReceipt(client);
+        tsfrTxnId.transactionId.getReceipt(client);
 
         Hbar balanceAfter = new AccountBalanceQuery()
             .setAccountId(newAccountId)

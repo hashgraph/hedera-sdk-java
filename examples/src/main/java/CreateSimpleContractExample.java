@@ -19,7 +19,6 @@ import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 
 import com.google.gson.Gson;
@@ -61,20 +60,22 @@ public final class CreateSimpleContractExample {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // create the contract's bytecode file
-        TransactionId fileTxId = new FileCreateTransaction()
+        var fileTxId = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file
             .setKeys(OPERATOR_KEY)
             .setContents(byteCodeHex.getBytes(StandardCharsets.UTF_8))
             .setMaxTransactionFee(new Hbar(2))
             .execute(client);
 
-        TransactionReceipt fileReceipt = fileTxId.getReceipt(client);
+        if (fileTxId.transactionId == null) { throw new Error("Null Transaction"); }
+
+        TransactionReceipt fileReceipt = fileTxId.transactionId.getReceipt(client);
         FileId newFileId = Objects.requireNonNull(fileReceipt.fileId);
 
         System.out.println("contract bytecode file: " + newFileId);
 
         // create the contract itself
-        TransactionId contractTxId = new ContractCreateTransaction()
+        var contractTxId = new ContractCreateTransaction()
             .setGas(500)
             .setBytecodeFileId(newFileId)
             // set an admin key so we can delete the contract later
@@ -82,7 +83,9 @@ public final class CreateSimpleContractExample {
             .setMaxTransactionFee(new Hbar(16))
             .execute(client);
 
-        TransactionReceipt contractReceipt = contractTxId.getReceipt(client);
+        if (contractTxId.transactionId == null) { throw new Error("Null Transaction"); }
+
+        TransactionReceipt contractReceipt = contractTxId.transactionId.getReceipt(client);
 
         System.out.println(contractReceipt);
 
@@ -106,10 +109,10 @@ public final class CreateSimpleContractExample {
         System.out.println("contract message: " + message);
 
         // now delete the contract
-        TransactionId contractDeleteTxnId = new ContractDeleteTransaction()
+        var contractDeleteTxnId = new ContractDeleteTransaction()
             .setContractId(newContractId)
             .setMaxTransactionFee(new Hbar(1))
-            .execute(client);
+            .execute(client).transactionId;
 
         TransactionReceipt contractDeleteResult = contractDeleteTxnId.getReceipt(client);
 

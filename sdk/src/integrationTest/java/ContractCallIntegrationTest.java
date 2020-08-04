@@ -30,6 +30,7 @@ public class ContractCallIntegrationTest {
                 .setContents(smartContractBytecode)
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             assertNotNull(receipt.fileId);
@@ -45,6 +46,7 @@ public class ContractCallIntegrationTest {
                 .setContractMemo("[e2e::ContractCreateTransaction]")
                 .setMaxTransactionFee(new Hbar(20))
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             assertNotNull(receipt.contractId);
@@ -72,6 +74,7 @@ public class ContractCallIntegrationTest {
                 .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             result = new ContractCallQuery()
@@ -86,6 +89,7 @@ public class ContractCallIntegrationTest {
             new ContractDeleteTransaction()
                 .setContractId(contract)
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             new FileDeleteTransaction()

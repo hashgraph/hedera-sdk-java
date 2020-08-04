@@ -38,6 +38,7 @@ class AccountIntegrationTest {
                 .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             assertNotNull(receipt.accountId);
@@ -85,6 +86,7 @@ class AccountIntegrationTest {
                 .sign(key1)
                 .sign(key2)
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             balance = new AccountBalanceQuery()
@@ -102,6 +104,7 @@ class AccountIntegrationTest {
                 .build(client)
                 .sign(key2)
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             assertThrows(HederaPreCheckStatusException.class, () -> {

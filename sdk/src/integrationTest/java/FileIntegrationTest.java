@@ -28,6 +28,7 @@ public class FileIntegrationTest {
                 .setContents("[e2e::FileCreateTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             assertNotNull(receipt.fileId);
@@ -50,6 +51,7 @@ public class FileIntegrationTest {
                 .setContents("[e2e::FileAppendTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             info = new FileInfoQuery()
@@ -74,6 +76,7 @@ public class FileIntegrationTest {
                 .setContents("[e2e::FileUpdateTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             info = new FileInfoQuery()
@@ -90,6 +93,7 @@ public class FileIntegrationTest {
                 .setFileId(file)
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
+                .transactionId
                 .getReceipt(client);
 
             info = new FileInfoQuery()
