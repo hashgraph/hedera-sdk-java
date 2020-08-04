@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
@@ -21,10 +22,11 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.bouncycastle.crypto.digests.SHA384Digest;
 
 /**
  * A prepared Transaction that is about to be submitted to Hedera.
- *
+ * <p>
  * The {@link TransactionBuilder} type becomes this to freeze its contents so they can be signed without allowing
  * further modifications.
  */
@@ -138,6 +140,12 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     }
 
     public final Transaction signWith(PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
+        for (var sigPair : signatureBuilders.get(0).getSigPairList()) {
+            if (ByteString.copyFrom(publicKey.toBytes()).startsWith(sigPair.getPubKeyPrefix())) {
+                throw new IllegalArgumentException("transaction already signed with key: " + publicKey.toString());
+            }
+        }
+
         for (var index = 0; index < transactions.size(); ++index) {
             var bodyBytes = transactions.get(index).getBodyBytes().toByteArray();
 
@@ -155,11 +163,22 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
         return this;
     }
 
+    public final Transaction signWithOperator(Client client) {
+        var operator = client.getOperator();
+        return signWith(operator.publicKey, operator.transactionSigner);
+    }
+
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
         // On execute, sign each transaction with the operator, if present
         var operator = client.getOperator();
-        if (operator != null) signWith(operator.publicKey, operator.transactionSigner);
+        if (operator != null) {
+            try {
+                signWith(operator.publicKey, operator.transactionSigner);
+            } catch (IllegalArgumentException e) {
+                // ignore the error, it means the transaction has already been signed by the operator.
+            }
+        }
 
         return CompletableFuture.completedFuture(null);
     }
@@ -173,6 +192,23 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     @Nullable
     final TransactionId getTransactionId() {
         return id;
+    }
+
+    public byte[] hash() {
+        if (this.transactions.size() != 1) {
+            throw new IllegalStateException("transaction must have node id set");
+        }
+
+        if (this.signatureBuilders.get(0).getSigPairCount() == 0) {
+            throw new IllegalStateException("transaction must be signed");
+        }
+
+        var digest = new SHA384Digest();
+        var hash = new byte[digest.getDigestSize()];
+        var bytes = this.toBytes();
+        digest.update(bytes, 0, bytes.length);
+        digest.doFinal(hash, 0);
+        return hash;
     }
 
     public byte[] toBytes() {
