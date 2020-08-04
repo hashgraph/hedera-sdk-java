@@ -35,7 +35,7 @@ public class TransactionList extends Executable<TransactionResponse> implements 
     }
 
     @Override
-    @FunctionalExecutable(type = "java.util.List<TransactionId>")
+    @FunctionalExecutable(type = "java.util.List<TransactionResponse>")
     public final CompletableFuture<List<TransactionResponse>> executeAllAsync(Client client) {
         List<CompletableFuture<TransactionResponse>> futures = new ArrayList<>();
 

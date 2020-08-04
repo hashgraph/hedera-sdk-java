@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public abstract class SingleTransactionBuilder<T extends SingleTransactionBuilder<T>> extends TransactionBuilder<TransactionId, Transaction, T> {
+public abstract class SingleTransactionBuilder<T extends SingleTransactionBuilder<T>> extends TransactionBuilder<TransactionResponse, Transaction, T> {
     @Override
     public final Transaction build(@Nullable Client client) {
         onBuild(bodyBuilder);

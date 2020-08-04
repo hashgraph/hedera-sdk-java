@@ -21,7 +21,7 @@ import java.util.Collections;
  * On success, the resulting TransactionReceipt contains the topic's updated topicSequenceNumber and
  * topicRunningHash.
  */
-public final class TopicMessageSubmitTransaction extends TransactionBuilder<TransactionId, TransactionList, TopicMessageSubmitTransaction> {
+public final class TopicMessageSubmitTransaction extends TransactionBuilder<TransactionResponse, TransactionList, TopicMessageSubmitTransaction> {
     private static final int CHUNK_SIZE = 4096;
 
     @Nullable
