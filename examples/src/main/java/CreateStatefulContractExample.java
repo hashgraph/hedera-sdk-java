@@ -71,7 +71,6 @@ public final class CreateStatefulContractExample {
             .setContents(byteCode)
             .execute(client);
 
-        if (fileTxId.transactionId == null) { throw new Error("Null Transaction"); }
 
         TransactionReceipt fileReceipt = fileTxId.transactionId.getReceipt(client);
         FileId newFileId = Objects.requireNonNull(fileReceipt.fileId);
@@ -86,7 +85,6 @@ public final class CreateStatefulContractExample {
                     .addString("hello from hedera!"))
             .execute(client);
 
-        if (contractTxId.transactionId == null) { throw new Error("Null Transaction"); }
 
         TransactionReceipt contractReceipt = contractTxId.transactionId.getReceipt(client);
         ContractId newContractId = Objects.requireNonNull(contractReceipt.contractId);
@@ -114,7 +112,6 @@ public final class CreateStatefulContractExample {
                 .addString("hello from hedera again!"))
             .execute(client);
 
-        if (contractExecTxnId.transactionId == null) { throw new Error("Null Transaction"); }
 
         // if this doesn't throw then we know the contract executed successfully
         contractExecTxnId.transactionId.getReceipt(client);

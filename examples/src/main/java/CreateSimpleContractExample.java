@@ -67,7 +67,6 @@ public final class CreateSimpleContractExample {
             .setMaxTransactionFee(new Hbar(2))
             .execute(client);
 
-        if (fileTxId.transactionId == null) { throw new Error("Null Transaction"); }
 
         TransactionReceipt fileReceipt = fileTxId.transactionId.getReceipt(client);
         FileId newFileId = Objects.requireNonNull(fileReceipt.fileId);
@@ -83,7 +82,6 @@ public final class CreateSimpleContractExample {
             .setMaxTransactionFee(new Hbar(16))
             .execute(client);
 
-        if (contractTxId.transactionId == null) { throw new Error("Null Transaction"); }
 
         TransactionReceipt contractReceipt = contractTxId.transactionId.getReceipt(client);
 
@@ -112,7 +110,8 @@ public final class CreateSimpleContractExample {
         var contractDeleteTxnId = new ContractDeleteTransaction()
             .setContractId(newContractId)
             .setMaxTransactionFee(new Hbar(1))
-            .execute(client).transactionId;
+            .execute(client)
+            .transactionId;
 
         TransactionReceipt contractDeleteResult = contractDeleteTxnId.getReceipt(client);
 

@@ -16,18 +16,17 @@ import com.hedera.hashgraph.sdk.TransactionReceipt;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
-import javax.annotation.Nullable;
 
 class ConsensusPubSubExample {
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
-    @Nullable
+    @SuppressWarnings("FieldMissingNullable")
     private static final String MIRROR_NODE_ADDRESS = Objects.requireNonNull(Dotenv.load().get("MIRROR_NODE_ADDRESS"));
 
     private ConsensusPubSubExample() {
     }
 
-
+    @SuppressWarnings("FieldMissingNullable")
     public static void main(String[] args) throws TimeoutException, InterruptedException, HederaPreCheckStatusException, HederaReceiptStatusException {
         // `Client.forMainnet()` is provided for connecting to Hedera mainnet
         Client client = Client.forTestnet();
@@ -40,7 +39,6 @@ class ConsensusPubSubExample {
         var transactionResponse = new TopicCreateTransaction()
             .execute(client);
 
-        if (transactionResponse.transactionId == null) { throw new Error("Null Transaction"); }
 
         TransactionReceipt transactionReceipt = transactionResponse.transactionId.getReceipt(client);
 

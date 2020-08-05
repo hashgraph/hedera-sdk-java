@@ -48,7 +48,7 @@ public final class TopicInfoQuery extends QueryBuilder<TopicInfo, TopicInfoQuery
     }
 
     @Override
-    TopicInfo mapResponse(Response response, AccountId nodeId) {
+    TopicInfo mapResponse(Response response, AccountId nodeId, Query request) {
         return TopicInfo.fromProtobuf(response.getConsensusGetTopicInfo());
     }
 

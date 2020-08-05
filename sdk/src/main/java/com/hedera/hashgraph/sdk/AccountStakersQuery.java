@@ -51,7 +51,7 @@ public final class AccountStakersQuery extends QueryBuilder<List<ProxyStaker>, A
     }
 
     @Override
-    List<ProxyStaker> mapResponse(Response response, AccountId nodeId) {
+    List<ProxyStaker> mapResponse(Response response, AccountId nodeId, Query request) {
         var rawStakers = response.getCryptoGetProxyStakers().getStakers();
         var stakers = new ArrayList<ProxyStaker>(rawStakers.getProxyStakerCount());
 

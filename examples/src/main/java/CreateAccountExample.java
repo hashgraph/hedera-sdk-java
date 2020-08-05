@@ -44,8 +44,6 @@ public final class CreateAccountExample {
                 .setInitialBalance(Hbar.fromTinybars(1000))
                 .execute(client);
 
-            if (txId.transactionId == null) { throw new Error("Null Transaction"); }
-
             // This will wait for the receipt to become available
             TransactionReceipt receipt = txId.transactionId.getReceipt(client);
 

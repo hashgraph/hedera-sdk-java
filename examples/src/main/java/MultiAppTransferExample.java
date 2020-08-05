@@ -53,8 +53,6 @@ public final class MultiAppTransferExample {
             .sign(exchangeKey)
             .execute(client);
 
-        if (createExchangeAccountTxnId.transactionId == null) { throw new Error("Null Transaction"); }
-
         AccountId exchangeAccountId = Objects.requireNonNull(createExchangeAccountTxnId.transactionId.getReceipt(client).accountId);
 
         Transaction transferTxn = new CryptoTransferTransaction()
@@ -74,8 +72,6 @@ public final class MultiAppTransferExample {
         Transaction signedTransferTxn = Transaction.fromBytes(signedTxnBytes);
 
         var transactionResponse = signedTransferTxn.execute(client);
-
-        if (transactionResponse.transactionId == null) { throw new Error("Null Transaction"); }
 
         // (important!) wait for consensus by querying for the receipt
         transactionResponse.transactionId.getReceipt(client);

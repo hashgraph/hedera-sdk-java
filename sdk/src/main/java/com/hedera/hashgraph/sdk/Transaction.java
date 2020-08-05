@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
@@ -10,7 +11,6 @@ import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.SystemDeleteTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SystemUndeleteTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.proto.FreezeServiceGrpc;
 import io.grpc.MethodDescriptor;
 import java8.util.Lists;
@@ -22,13 +22,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.bouncycastle.crypto.digests.SHA384Digest;
+
 /**
  * A prepared Transaction that is about to be submitted to Hedera.
- *
+ * <p>
  * The {@link TransactionBuilder} type becomes this to freeze its contents so they can be signed without allowing
  * further modifications.
  */
-public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse, com.hedera.hashgraph.sdk.TransactionResponse> {
+public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk.proto.Transaction, com.hedera.hashgraph.sdk.proto.TransactionResponse, TransactionResponse> {
     public final TransactionId id;
 
     // A SDK [Transaction] is composed of multiple, raw protobuf transactions. These should be
@@ -98,7 +100,7 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
         return new Transaction(Lists.of(inner.toBuilder()));
     }
 
-    private static MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptorForSystemDelete(SystemDeleteTransactionBody.IdCase idCase) {
+    private static MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, com.hedera.hashgraph.sdk.proto.TransactionResponse> getMethodDescriptorForSystemDelete(SystemDeleteTransactionBody.IdCase idCase) {
         switch (idCase) {
             case FILEID:
                 return FileServiceGrpc.getSystemUndeleteMethod();
@@ -115,7 +117,7 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
         throw new IllegalStateException("(unreachable) id case unhandled");
     }
 
-    private static MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptorForSystemUndelete(SystemUndeleteTransactionBody.IdCase idCase) {
+    private static MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, com.hedera.hashgraph.sdk.proto.TransactionResponse> getMethodDescriptorForSystemUndelete(SystemUndeleteTransactionBody.IdCase idCase) {
         switch (idCase) {
             case FILEID:
                 return FileServiceGrpc.getSystemUndeleteMethod();
@@ -138,6 +140,12 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     }
 
     public final Transaction signWith(PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
+        for (var sigPair : signatureBuilders.get(0).getSigPairList()) {
+            if (ByteString.copyFrom(publicKey.toBytes()).startsWith(sigPair.getPubKeyPrefix())) {
+                throw new IllegalArgumentException("transaction already signed with key: " + publicKey.toString());
+            }
+        }
+
         for (var index = 0; index < transactions.size(); ++index) {
             var bodyBytes = transactions.get(index).getBodyBytes().toByteArray();
 
@@ -155,11 +163,22 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
         return this;
     }
 
+    public final Transaction signWithOperator(Client client) {
+        var operator = client.getOperator();
+        return signWith(operator.publicKey, operator.transactionSigner);
+    }
+
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
         // On execute, sign each transaction with the operator, if present
         var operator = client.getOperator();
-        if (operator != null) signWith(operator.publicKey, operator.transactionSigner);
+        if (operator != null) {
+            try {
+                signWith(operator.publicKey, operator.transactionSigner);
+            } catch (IllegalArgumentException e) {
+                // ignore the error, it means the transaction has already been signed by the operator.
+            }
+        }
 
         return CompletableFuture.completedFuture(null);
     }
@@ -175,12 +194,37 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
         return id;
     }
 
+    public byte[] hash() {
+        if (this.transactions.size() != 1) {
+            throw new IllegalStateException("transaction must have node id set");
+        }
+
+        if (this.signatureBuilders.get(0).getSigPairCount() == 0) {
+            throw new IllegalStateException("transaction must be signed");
+        }
+
+        var digest = new SHA384Digest();
+        var hash = new byte[digest.getDigestSize()];
+        var bytes = this.toBytes();
+        digest.update(bytes, 0, bytes.length);
+        digest.doFinal(hash, 0);
+        return hash;
+    }
+
+    private byte[] hash(byte[] bytes) {
+        var digest = new SHA384Digest();
+        var hash = new byte[digest.getDigestSize()];
+        digest.update(bytes, 0, bytes.length);
+        digest.doFinal(hash, 0);
+        return hash;
+    }
+
     public byte[] toBytes() {
         return transactions.get(0).setSigMap(signatureBuilders.get(0)).build().toByteArray();
     }
 
     @Override
-    final MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
+    final MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, com.hedera.hashgraph.sdk.proto.TransactionResponse> getMethodDescriptor() {
         var transactionBody = transactionBodies.get(nextIndex);
         switch (transactionBody.getDataCase()) {
             case CONTRACTCALL:
@@ -264,14 +308,14 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     }
 
     @Override
-    final com.hedera.hashgraph.sdk.TransactionResponse mapResponse(TransactionResponse transactionResponse, AccountId nodeId) {
-        byte[] transactionHash =  new byte[0];
-        var response = new com.hedera.hashgraph.sdk.TransactionResponse(nodeId, getTransactionId(),transactionHash);
+    final TransactionResponse mapResponse(com.hedera.hashgraph.sdk.proto.TransactionResponse transactionResponse, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Transaction transactionRequest) {
+        byte[] transactionHash = hash(transactionRequest.toByteArray());
+        var response = new com.hedera.hashgraph.sdk.TransactionResponse(nodeId, Objects.requireNonNull(id), transactionHash);
         return response;
     }
 
     @Override
-    final Status mapResponseStatus(TransactionResponse transactionResponse) {
+    final Status mapResponseStatus(com.hedera.hashgraph.sdk.proto.TransactionResponse transactionResponse) {
         return Status.valueOf(transactionResponse.getNodeTransactionPrecheckCode());
     }
 

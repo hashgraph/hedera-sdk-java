@@ -43,7 +43,6 @@ public final class CreateFileExample {
             .setMaxTransactionFee(new Hbar(2)) // 2 HBAR
             .execute(client);
 
-        if (txId.transactionId == null) { throw new Error("Null Transaction"); }
 
         TransactionReceipt receipt = txId.transactionId.getReceipt(client);
         FileId newFileId = receipt.fileId;

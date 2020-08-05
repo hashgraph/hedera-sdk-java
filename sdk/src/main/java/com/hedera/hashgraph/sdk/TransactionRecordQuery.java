@@ -52,7 +52,7 @@ public final class TransactionRecordQuery extends QueryBuilder<TransactionRecord
     }
 
     @Override
-    TransactionRecord mapResponse(Response response, AccountId nodeId) {
+    TransactionRecord mapResponse(Response response, AccountId nodeId, Query request) {
         return TransactionRecord.fromProtobuf(response.getTransactionGetRecord().getTransactionRecord());
     }
 

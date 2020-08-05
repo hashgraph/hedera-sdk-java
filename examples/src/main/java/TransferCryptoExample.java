@@ -53,8 +53,6 @@ public final class TransferCryptoExample {
             .setTransactionMemo("transfer test")
             .execute(client);
 
-        if (transactionResponse.transactionId == null) { throw new Error("Null Transaction"); }
-
         System.out.println("transaction ID: " + transactionResponse);
 
         TransactionRecord record = transactionResponse.transactionId.getRecord(client);

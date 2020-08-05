@@ -46,7 +46,7 @@ public final class ContractByteCodeQuery extends QueryBuilder<ByteString, Contra
     }
 
     @Override
-    ByteString mapResponse(Response response, AccountId nodeId) {
+    ByteString mapResponse(Response response, AccountId nodeId, Query request) {
         return response.getContractGetBytecodeResponse().getBytecode();
     }
 

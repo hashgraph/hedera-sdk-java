@@ -31,8 +31,6 @@ class AccountBalanceIntegrationTest {
                 .transactionId
                 .getReceipt(client);
 
-
-
             assertNotNull(receipt.accountId);
             assertTrue(Objects.requireNonNull(receipt.accountId).num > 0);
 

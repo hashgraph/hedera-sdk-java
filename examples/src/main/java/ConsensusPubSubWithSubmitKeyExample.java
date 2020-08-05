@@ -84,7 +84,6 @@ public class ConsensusPubSubWithSubmitKeyExample {
             .setSubmitKey(submitPublicKey)
             .execute(client);
 
-        if (transactionResponse.transactionId == null) { throw new Error("Null Transaction"); }
 
         topicId = Objects.requireNonNull(transactionResponse.transactionId.getReceipt(client).topicId);
         System.out.println("Created new topic " + topicId + " with ED25519 submitKey of " + submitKey);

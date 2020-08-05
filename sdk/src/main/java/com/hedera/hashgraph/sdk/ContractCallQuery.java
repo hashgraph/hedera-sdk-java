@@ -127,7 +127,7 @@ public final class ContractCallQuery extends QueryBuilder<ContractFunctionResult
     }
 
     @Override
-    ContractFunctionResult mapResponse(Response response, AccountId nodeId) {
+    ContractFunctionResult mapResponse(Response response, AccountId nodeId, Query request) {
         return new ContractFunctionResult(response.getContractCallLocal().getFunctionResult());
     }
 

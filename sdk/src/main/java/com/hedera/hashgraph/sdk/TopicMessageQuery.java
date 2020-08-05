@@ -16,6 +16,8 @@ import org.threeten.bp.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public final class TopicMessageQuery {
     private final ConsensusTopicQuery.Builder builder;
@@ -56,24 +58,42 @@ public final class TopicMessageQuery {
             call.cancel("unsubscribed", null);
         });
 
-        makeStreamingCall(call, builder.build(), onNext, 0);
+        makeStreamingCall(call, builder, onNext, 0, new Instant[]{null}, new ReentrantReadWriteLock());
 
         return subscriptionHandle;
     }
 
-    private static void makeStreamingCall(ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call, ConsensusTopicQuery query, Consumer<TopicMessage> onNext, int attempt) {
+    private static void makeStreamingCall(
+        ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call,
+        ConsensusTopicQuery.Builder query,
+        Consumer<TopicMessage> onNext,
+        int attempt,
+        // startTime must be `final` or `effectively final` to be used within closures.
+        Instant[] startTime,
+        ReentrantReadWriteLock startTimeLock
+    ) {
         if (attempt > 10) {
             throw new Error("Failed to connect to mirror node");
         }
 
         HashMap<TransactionID, ArrayList<ConsensusTopicResponse>> pendingMessages = new HashMap<>();
 
-        ClientCalls.asyncServerStreamingCall(call, query, new StreamObserver<ConsensusTopicResponse>() {
+        ClientCalls.asyncServerStreamingCall(call, query.build(), new StreamObserver<ConsensusTopicResponse>() {
             @Override
             public void onNext(ConsensusTopicResponse consensusTopicResponse) {
+                Lock lock;
+
                 if (!consensusTopicResponse.hasChunkInfo()) {
                     // short circuit for no chunks
-                    onNext.accept(TopicMessage.ofSingle(consensusTopicResponse));
+                    var message = TopicMessage.ofSingle(consensusTopicResponse);
+                    lock = startTimeLock.writeLock();
+                    lock.lock();
+                    try {
+                        startTime[0] = message.consensusTimestamp;
+                    } finally {
+                        lock.unlock();
+                    }
+                    onNext.accept(message);
                     return;
                 }
 
@@ -91,7 +111,16 @@ public final class TopicMessageQuery {
 
                 // if we now have enough chunks, emit
                 if (chunks.size() == consensusTopicResponse.getChunkInfo().getTotal()) {
-                    onNext.accept(TopicMessage.ofMany(chunks));
+                    var message = TopicMessage.ofMany(chunks);
+                    lock = startTimeLock.writeLock();
+                    lock.lock();
+                    try {
+                        startTime[0] = message.consensusTimestamp;
+                    } finally {
+                        lock.unlock();
+                    }
+                    System.out.println("After lock chunked");
+                    onNext.accept(message);
                 }
             }
 
@@ -108,7 +137,14 @@ public final class TopicMessageQuery {
                             // Do nothing
                         }
 
-                        makeStreamingCall(call, query, onNext, attempt + 1);
+                        var lock = startTimeLock.writeLock();
+                        lock.lock();
+                        try {
+                            startTime[0].plusNanos(1);
+                        } finally {
+                            lock.unlock();
+                        }
+                        makeStreamingCall(call, query, onNext, attempt + 1, startTime, startTimeLock);
                     }
                 }
             }

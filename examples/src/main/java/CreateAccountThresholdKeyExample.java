@@ -54,7 +54,6 @@ public final class CreateAccountThresholdKeyExample {
             .setInitialBalance(new Hbar(10))
             .execute(client);
 
-        if (txId.transactionId == null) { throw new Error("Null Transaction"); }
         // This will wait for the receipt to become available
         TransactionReceipt receipt = txId.transactionId.getReceipt(client);
 
@@ -72,7 +71,6 @@ public final class CreateAccountThresholdKeyExample {
             .sign(keys[1])
             .execute(client);
 
-        if (tsfrTxnId.transactionId == null) { throw new Error("Null Transaction"); }
 
         // (important!) wait for the transfer to go to consensus
         tsfrTxnId.transactionId.getReceipt(client);

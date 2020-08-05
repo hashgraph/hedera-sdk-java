@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Android Example</string>
+    <string name="tab_title_1">Private Key</string>
+    <string name="tab_1_button_text">Generate</string>
+    <string name="tab_1_private_key">Private Key:</string>
+    <string name="tab_1_public_key">Public Key:</string>
+
+    <string name="tab_title_2">Account Balance</string>
+    <string name="tab_2_button">Get account balance</string>
+    <string name="tab_2_account_id">Account ID</string>
+
+    <string name="tab_title_3">Crypto Transfer</string>
+    <string name="tab_3_recipient">Recipient AccountID</string>
+    <string name="tab_3_amount">Amount to Send</string>
+    <string name="tab_3_send">Send Hbar</string>
+
+    <!-- NOTE: These strings must be set to real values for the example to work -->
+    <string name="operator_id"></string>
+    <string name="operator_key"></string>
+
+</resources>

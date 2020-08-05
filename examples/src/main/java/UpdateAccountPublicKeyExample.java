@@ -63,8 +63,6 @@ public final class UpdateAccountPublicKeyExample {
             .sign(key2)
             .execute(client);
 
-        if (transactionResponse.transactionId == null) { throw new Error("Null Transaction"); }
-
         System.out.println("transaction ID: " + transactionResponse);
 
         // (important!) wait for the transaction to complete by querying the receipt

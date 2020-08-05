@@ -58,7 +58,7 @@ public final class ContractInfoQuery extends QueryBuilder<ContractInfo, Contract
     }
 
     @Override
-    ContractInfo mapResponse(Response response, AccountId nodeId) {
+    ContractInfo mapResponse(Response response, AccountId nodeId, Query request) {
         return ContractInfo.fromProtobuf(response.getContractGetInfo().getContractInfo());
     }
 

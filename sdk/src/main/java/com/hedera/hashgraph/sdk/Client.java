@@ -309,7 +309,7 @@ public final class Client implements AutoCloseable {
     }
 
     /**
-     * Get the key ofthe operator. Useful when the client was constructed from file.
+     * Get the key of the operator. Useful when the client was constructed from file.
      *
      * @return {PublicKey}
      */

@@ -55,7 +55,7 @@ public final class FileContentsQuery extends QueryBuilder<ByteString, FileConten
     }
 
     @Override
-    ByteString mapResponse(Response response, AccountId nodeId) {
+    ByteString mapResponse(Response response, AccountId nodeId, Query request) {
         return response.getFileGetContents().getFileContents().getContents();
     }
 

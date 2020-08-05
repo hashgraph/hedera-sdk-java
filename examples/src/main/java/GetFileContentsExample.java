@@ -42,8 +42,6 @@ public final class GetFileContentsExample {
             .setMaxTransactionFee(new Hbar(2))
             .execute(client);
 
-        if (newFileTxId.transactionId == null) { throw new Error("Null Transaction"); }
-
         FileId newFileId = Objects.requireNonNull(newFileTxId.transactionId.getReceipt(client).fileId);
 
         //Print the file ID to console

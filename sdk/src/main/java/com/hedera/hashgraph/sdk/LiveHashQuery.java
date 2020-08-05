@@ -47,7 +47,7 @@ public final class LiveHashQuery extends QueryBuilder<LiveHash, LiveHashQuery> {
     }
 
     @Override
-    LiveHash mapResponse(Response response, AccountId nodeId) {
+    LiveHash mapResponse(Response response, AccountId nodeId, Query request) {
         return LiveHash.fromProtobuf(response.getCryptoGetLiveHash().getLiveHash());
     }
 

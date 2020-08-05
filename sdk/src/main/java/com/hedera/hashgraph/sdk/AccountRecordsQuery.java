@@ -49,7 +49,7 @@ public final class AccountRecordsQuery extends QueryBuilder<List<TransactionReco
     }
 
     @Override
-    List<TransactionRecord> mapResponse(Response response, AccountId nodeId) {
+    List<TransactionRecord> mapResponse(Response response, AccountId nodeId, Query request) {
         var rawTransactionRecords = response.getCryptoGetAccountRecords().getRecordsList();
         var transactionRecords = new ArrayList<TransactionRecord>(rawTransactionRecords.size());
 

@@ -46,8 +46,6 @@ public final class DeleteAccountExample {
             .setInitialBalance(new Hbar(2))
             .execute(client);
 
-        if (txId.transactionId == null) { throw new Error("Null Transaction"); }
-
         // This will wait for the receipt to become available
         TransactionReceipt receipt = txId.transactionId.getReceipt(client);
 

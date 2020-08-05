@@ -54,7 +54,7 @@ public final class FileInfoQuery extends QueryBuilder<FileInfo, FileInfoQuery> {
     }
 
     @Override
-    FileInfo mapResponse(Response response, AccountId nodeId) {
+    FileInfo mapResponse(Response response, AccountId nodeId, Query request) {
         return FileInfo.fromProtobuf(response.getFileGetInfo().getFileInfo());
     }
 

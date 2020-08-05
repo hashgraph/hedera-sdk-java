@@ -43,8 +43,6 @@ public final class DeleteFileExample {
             .setMaxTransactionFee(new Hbar(2))
             .execute(client);
 
-        if (txId.transactionId == null) { throw new Error("Null Transaction"); }
-
         TransactionReceipt receipt = txId.transactionId.getReceipt(client);
         FileId newFileId = Objects.requireNonNull(receipt.fileId);
 
@@ -54,8 +52,6 @@ public final class DeleteFileExample {
         var fileDeleteTxnId = new FileDeleteTransaction()
             .setFileId(newFileId)
             .execute(client);
-
-        if (fileDeleteTxnId.transactionId == null) { throw new Error("Null Transaction"); }
 
         // if this doesn't throw then the transaction was a success
         fileDeleteTxnId.transactionId.getReceipt(client);
