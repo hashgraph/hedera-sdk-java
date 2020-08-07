@@ -13,8 +13,6 @@ import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransactionResponse;
-
-
 import io.github.cdimascio.dotenv.Dotenv;
 
 

@@ -13,6 +13,7 @@ import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicId;
 
+import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
 import java8.util.Lists;
 import org.threeten.bp.Instant;
@@ -79,7 +80,7 @@ public class ConsensusPubSubWithSubmitKeyExample {
         submitKey = PrivateKey.generate();
         PublicKey submitPublicKey = submitKey.getPublicKey();
 
-        var transactionResponse = new TopicCreateTransaction()
+        TransactionResponse transactionResponse = new TopicCreateTransaction()
             .setTopicMemo("HCS topic with submit key")
             .setSubmitKey(submitPublicKey)
             .execute(client);

@@ -19,10 +19,12 @@ import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Status;
+import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public final class CreateSimpleContractExample {
@@ -60,7 +62,7 @@ public final class CreateSimpleContractExample {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // create the contract's bytecode file
-        var fileTxId = new FileCreateTransaction()
+        TransactionResponse fileTransactionId = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file
             .setKeys(OPERATOR_KEY)
             .setContents(byteCodeHex.getBytes(StandardCharsets.UTF_8))
@@ -68,13 +70,13 @@ public final class CreateSimpleContractExample {
             .execute(client);
 
 
-        TransactionReceipt fileReceipt = fileTxId.transactionId.getReceipt(client);
+        TransactionReceipt fileReceipt = fileTransactionId.transactionId.getReceipt(client);
         FileId newFileId = Objects.requireNonNull(fileReceipt.fileId);
 
         System.out.println("contract bytecode file: " + newFileId);
 
         // create the contract itself
-        var contractTxId = new ContractCreateTransaction()
+        TransactionResponse contractTransactionId = new ContractCreateTransaction()
             .setGas(500)
             .setBytecodeFileId(newFileId)
             // set an admin key so we can delete the contract later
@@ -83,7 +85,7 @@ public final class CreateSimpleContractExample {
             .execute(client);
 
 
-        TransactionReceipt contractReceipt = contractTxId.transactionId.getReceipt(client);
+        TransactionReceipt contractReceipt = contractTransactionId.transactionId.getReceipt(client);
 
         System.out.println(contractReceipt);
 
@@ -107,13 +109,13 @@ public final class CreateSimpleContractExample {
         System.out.println("contract message: " + message);
 
         // now delete the contract
-        var contractDeleteTxnId = new ContractDeleteTransaction()
+        TransactionId contractDeleteTransactionId = new ContractDeleteTransaction()
             .setContractId(newContractId)
             .setMaxTransactionFee(new Hbar(1))
             .execute(client)
             .transactionId;
 
-        TransactionReceipt contractDeleteResult = contractDeleteTxnId.getReceipt(client);
+        TransactionReceipt contractDeleteResult = contractDeleteTransactionId.getReceipt(client);
 
         if (contractDeleteResult.status != Status.SUCCESS) {
             System.out.println("error deleting contract: " + contractDeleteResult.status);

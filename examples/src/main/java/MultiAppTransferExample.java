@@ -13,6 +13,7 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Transaction;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public final class MultiAppTransferExample {
@@ -43,7 +44,7 @@ public final class MultiAppTransferExample {
         Hbar transferAmount = Hbar.fromTinybars(10_000);
 
         // the exchange creates an account for the user to transfer funds to
-        var createExchangeAccountTxnId = new AccountCreateTransaction()
+        TransactionResponse createExchangeAccountTxnId = new AccountCreateTransaction()
             // the exchange only accepts transfers that it validates through a side channel (e.g. REST API)
             .setReceiverSignatureRequired(true)
             .setKey(exchangeKey.getPublicKey())
@@ -69,9 +70,9 @@ public final class MultiAppTransferExample {
         byte[] signedTxnBytes = exchangeSignsTransaction(transferTxn.toBytes());
 
         // we execute the signed transaction and wait for it to be accepted
-        Transaction signedTransferTxn = Transaction.fromBytes(signedTxnBytes);
+        Transaction signedTransferTransaction = Transaction.fromBytes(signedTxnBytes);
 
-        var transactionResponse = signedTransferTxn.execute(client);
+        TransactionResponse transactionResponse = signedTransferTransaction.execute(client);
 
         // (important!) wait for consensus by querying for the receipt
         transactionResponse.transactionId.getReceipt(client);
