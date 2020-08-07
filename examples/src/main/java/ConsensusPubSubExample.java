@@ -12,6 +12,7 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hedera.hashgraph.sdk.TransactionResponse;
 
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -36,7 +37,7 @@ class ConsensusPubSubExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        var transactionResponse = new TopicCreateTransaction()
+        TransactionResponse transactionResponse = new TopicCreateTransaction()
             .execute(client);
 
 
