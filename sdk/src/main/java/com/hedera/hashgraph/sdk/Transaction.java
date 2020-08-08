@@ -165,6 +165,10 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
 
     public final Transaction signWithOperator(Client client) {
         var operator = client.getOperator();
+        if(operator == null){
+            throw new IllegalStateException(
+                "`client` must have an `operator` to sign with the operator");
+        }
         return signWith(operator.publicKey, operator.transactionSigner);
     }
 
@@ -211,7 +215,7 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
         return hash;
     }
 
-    private byte[] hash(byte[] bytes) {
+    private static byte[] hash(byte[] bytes) {
         var digest = new SHA384Digest();
         var hash = new byte[digest.getDigestSize()];
         digest.update(bytes, 0, bytes.length);
