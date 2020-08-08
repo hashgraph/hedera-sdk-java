@@ -4,12 +4,15 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.NetworkGetVersionInfoResponse;
 
 public class NetworkVersionInfo {
-    public SemanticVersion hapiProtoVersion;
-    public SemanticVersion hederaServicesVersion;
+    /** Version of the protobuf schema in use by the network */
+    public final SemanticVersion protobufVersion;
+
+    /** Version of the Hedera services in use by the network */
+    public final SemanticVersion servicesVersion;
 
     NetworkVersionInfo(SemanticVersion hapi, SemanticVersion hedera) {
-        this.hapiProtoVersion = hapi;
-        this.hederaServicesVersion = hedera;
+        this.protobufVersion = hapi;
+        this.servicesVersion = hedera;
     }
 
     protected static NetworkVersionInfo fromProtobuf(NetworkGetVersionInfoResponse proto) {
@@ -21,8 +24,8 @@ public class NetworkVersionInfo {
 
     protected NetworkGetVersionInfoResponse toProtobuf() {
         return NetworkGetVersionInfoResponse.newBuilder()
-            .setHapiProtoVersion(hapiProtoVersion.toProtobuf())
-            .setHederaServicesVersion(hederaServicesVersion.toProtobuf())
+            .setHapiProtoVersion(protobufVersion.toProtobuf())
+            .setHederaServicesVersion(servicesVersion.toProtobuf())
             .build();
     }
 
