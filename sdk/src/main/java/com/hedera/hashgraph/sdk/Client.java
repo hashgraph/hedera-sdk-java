@@ -477,20 +477,14 @@ public final class Client implements AutoCloseable {
             return channel;
         }
 
-        if (address != null) {
-            channel = ManagedChannelBuilder.forTarget(address)
-                .keepAliveTime(2, TimeUnit.MINUTES)
-                .usePlaintext()
-                .userAgent(getUserAgent())
-                .executor(executor)
-                .build();
+        channel = ManagedChannelBuilder.forTarget(address)
+            .keepAliveTime(2, TimeUnit.MINUTES)
+            .usePlaintext()
+            .userAgent(getUserAgent())
+            .executor(executor)
+            .build();
 
-            mirrorChannels.put(address, channel);
-        }
-
-        if (channel == null) {
-            throw new IllegalArgumentException("Mirror address does not exist");
-        }
+        mirrorChannels.put(address, channel);
 
         return channel;
     }
@@ -527,6 +521,4 @@ public final class Client implements AutoCloseable {
             private String privateKey = "";
         }
     }
-
-
 }
