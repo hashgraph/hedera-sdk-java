@@ -61,7 +61,7 @@ dependencies {
 
 	implementation "com.google.code.gson:gson:2.8.6"
 
-	implementation "io.github.json-snapshot:json-snapshot:1.0.17"
+	testImplementation "io.github.json-snapshot:json-snapshot:1.0.17"
 }
 
 // https://github.com/google/protobuf-gradle-plugin
