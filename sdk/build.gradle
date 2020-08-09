@@ -178,7 +178,7 @@ tasks.withType(Test) {
 
 jar {
 	exclude "**/*.proto"
-	archiveBaseName = "sdk-corda"
+	archiveBaseName = "sdk-jdk7"
 	includeEmptyDirs = false
 }
 
