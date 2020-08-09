@@ -176,25 +176,23 @@ tasks.withType(Test) {
 	systemProperty "CONFIG_FILE", findProperty("CONFIG_FILE")
 }
 
-jar {
-	exclude "**/*.proto"
-	archiveBaseName = "sdk-jdk7"
-	includeEmptyDirs = false
-}
-
 modifyPom {
 	project {
 		description 'Hedera™ Hashgraph SDK for Java'
 		name 'sdk'
+
 		url 'https://github.com/hashgraph/hedera-sdk-java'
+
 		organization {
 			name 'Hedera Hashgraph'
 			url 'https://www.hedera.com'
 		}
+
 		issueManagement {
 			system 'GitHub'
 			url 'https://github.com/hashgraph/hedera-sdk-java/issues'
 		}
+
 		licenses {
 			license {
 				name 'Apache License, Version 2.0'
@@ -202,11 +200,13 @@ modifyPom {
 				distribution 'repo'
 			}
 		}
+
 		scm {
 			url 'https://github.com/hashgraph/hedera-sdk-java'
 			connection 'scm:git:https://github.com/hashgraph/hedera-sdk-java.git'
 			developerConnection 'scm:git:ssh://github.com:hashgraph/hedera-sdk-java.git'
 		}
+
 		developers {
 			developer {
 				name 'Ryan Leckey'
@@ -224,4 +224,13 @@ extraArchive {
 nexus {
 	sign = true
 	repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+}
+
+jar {
+	exclude "**/*.proto"
+}
+
+tasks.withType(Jar.class) {
+	archiveBaseName = "sdk-jdk7"
+	includeEmptyDirs = false
 }
