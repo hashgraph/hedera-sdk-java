@@ -38,16 +38,16 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.slf4j/slf4j-api
 	implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
 
-	implementation "io.grpc:grpc-api:1.30.2"
-	implementation "io.grpc:grpc-protobuf-lite:1.30.2"
-	implementation "io.grpc:grpc-stub:1.30.2"
+	implementation "io.grpc:grpc-api:1.31.0"
+	implementation "io.grpc:grpc-protobuf-lite:1.31.0"
+	implementation "io.grpc:grpc-stub:1.31.0"
 
 	testImplementation "org.junit.jupiter:junit-jupiter-engine:5.6.1"
 	testImplementation "org.junit.jupiter:junit-jupiter-params:5.6.1"
 
 	testRuntimeOnly "org.slf4j:slf4j-simple:2.0.0-alpha1"
-	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.30.2"
-	integrationTestRuntimeOnly "io.grpc:grpc-netty-shaded:1.30.2"
+	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.31.0"
+	integrationTestRuntimeOnly "io.grpc:grpc-netty-shaded:1.31.0"
 
 	// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
 	//       use CompletableFuture directly.
