@@ -3,7 +3,8 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.FileCreateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import org.threeten.bp.Instant;
+
+import java.time.Instant;
 
 /**
  * Creates a file with the content by submitting the transaction.

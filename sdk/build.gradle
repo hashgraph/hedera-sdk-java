@@ -29,7 +29,7 @@ dependencies {
 
 	// NOTE: BouncyCastle is frozen at v1.60 for compatibility with Corda <https://www.corda.net/>
 	// <https://github.com/corda/corda/blob/2c10b6c3b9dace7831b5da73a065c3269a703d85/constants.properties#L23>
-	implementation "org.bouncycastle:bcprov-jdk15on:1.60"
+	implementation "org.bouncycastle:bcprov-jdk15on:1.66"
 
 	// Protobuf Lite is used to maintain easy compatibility with Android
 	// https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
@@ -37,6 +37,8 @@ dependencies {
 
 	// https://mvnrepository.com/artifact/org.slf4j/slf4j-api
 	implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
+
+	implementation "net.javacrumbs.future-converter:future-converter-java8-guava:1.2.0"
 
 	implementation "io.grpc:grpc-api:1.31.0"
 	implementation "io.grpc:grpc-protobuf-lite:1.31.0"
@@ -49,16 +51,6 @@ dependencies {
 	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.31.0"
 	integrationTestRuntimeOnly "io.grpc:grpc-netty-shaded:1.31.0"
 
-	// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
-	//       use CompletableFuture directly.
-	// https://github.com/stefan-zobel/streamsupport
-	// https://developer.android.com/about/dashboards/index.html
-	api "net.sourceforge.streamsupport:streamsupport:1.7.2"
-	api "net.sourceforge.streamsupport:streamsupport-cfuture:1.7.2"
-
-	// NOTE: This is to support Android API < 26.
-	api "org.threeten:threetenbp:1.4.4"
-
 	implementation "com.google.code.gson:gson:2.8.6"
 
 	testImplementation "io.github.json-snapshot:json-snapshot:1.0.17"
@@ -67,11 +59,11 @@ dependencies {
 // https://github.com/google/protobuf-gradle-plugin
 protobuf {
 	protoc {
-		artifact = "com.google.protobuf:protoc:3.12.3"
+		artifact = "com.google.protobuf:protoc:3.12.4"
 	}
 	plugins {
 		grpc {
-			artifact = "io.grpc:protoc-gen-grpc-java:1.30.2"
+			artifact = "io.grpc:protoc-gen-grpc-java:1.31.0"
 		}
 	}
 	generateProtoTasks {
@@ -91,13 +83,14 @@ protobuf {
 	}
 }
 
+
 tasks.withType(JavaCompile).configureEach {
 	// https://github.com/gradle/gradle/issues/2510#issuecomment-604986414
-	// release = 8
+	// release = 9
 	compileJava {
 		options.compilerArgs += [
 			"--release",
-			"8" // Avoid using Java 12 APIs
+			"9" // Avoid using Java 12 APIs
 		]
 	}
 }
@@ -231,6 +224,6 @@ jar {
 }
 
 tasks.withType(Jar.class) {
-	archiveBaseName = "sdk-jdk7"
+	archiveBaseName = "sdk"
 	includeEmptyDirs = false
 }

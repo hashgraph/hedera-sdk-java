@@ -2,12 +2,13 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
-import java8.util.concurrent.CompletableFuture;
-import org.threeten.bp.Clock;
-import org.threeten.bp.Instant;
 
-import static java8.util.concurrent.CompletableFuture.completedFuture;
-import static java8.util.concurrent.CompletableFuture.failedFuture;
+import java.time.Clock;
+import java.time.Instant;
+import java.util.concurrent.CompletableFuture;
+
+import static java.util.concurrent.CompletableFuture.completedFuture;
+import static java.util.concurrent.CompletableFuture.failedFuture;
 
 /**
  * The client-generated ID for a transaction.

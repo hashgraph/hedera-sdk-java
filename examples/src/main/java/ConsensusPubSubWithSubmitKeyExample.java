@@ -1,3 +1,5 @@
+import java.time.Instant;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeoutException;
@@ -14,8 +16,6 @@ import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicId;
 
 import io.github.cdimascio.dotenv.Dotenv;
-import java8.util.Lists;
-import org.threeten.bp.Instant;
 
 /**
  * An example of an HCS topic that utilizes a submitKey to limit who can submit messages on the topic.
@@ -65,7 +65,7 @@ public class ConsensusPubSubWithSubmitKeyExample {
         // account and be signed by this key
         client.setOperator(payerId, payerPrivateKey);
 
-        client.setMirrorNetwork(Lists.of(Objects.requireNonNull(Dotenv.load().get("MIRROR_NODE_ADDRESS"))));
+        client.setMirrorNetwork(List.of(Objects.requireNonNull(Dotenv.load().get("MIRROR_NODE_ADDRESS"))));
     }
 
     /**

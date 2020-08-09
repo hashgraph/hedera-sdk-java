@@ -7,7 +7,8 @@ import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
-import java8.util.concurrent.CompletableFuture;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Get all the information about an account, including the balance.

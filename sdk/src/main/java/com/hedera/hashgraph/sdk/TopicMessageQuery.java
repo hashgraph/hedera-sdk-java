@@ -10,14 +10,14 @@ import io.grpc.Status;
 import io.grpc.StatusException;
 import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
-import java8.util.function.Consumer;
-import org.threeten.bp.Instant;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
 
 public final class TopicMessageQuery {
     private final ConsensusTopicQuery.Builder builder;

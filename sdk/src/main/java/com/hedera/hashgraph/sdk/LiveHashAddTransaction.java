@@ -4,7 +4,8 @@ import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.CryptoAddLiveHashTransactionBody;
 import com.hedera.hashgraph.sdk.proto.LiveHash;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import org.threeten.bp.Duration;
+
+import java.time.Duration;
 
 /**
  * A hash---presumably of some kind of credential or certificate---along with a list of keys,

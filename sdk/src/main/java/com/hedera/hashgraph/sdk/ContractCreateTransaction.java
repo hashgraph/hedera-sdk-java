@@ -3,7 +3,8 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.ContractCreateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import org.threeten.bp.Duration;
+
+import java.time.Duration;
 
 /**
  * Start a new smart contract instance.

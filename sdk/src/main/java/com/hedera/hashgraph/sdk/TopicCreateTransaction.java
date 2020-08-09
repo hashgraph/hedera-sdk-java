@@ -2,7 +2,8 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.ConsensusCreateTopicTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import org.threeten.bp.Duration;
+
+import java.time.Duration;
 
 /**
  * Create a topic to be used for consensus.

@@ -1,10 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import java8.util.concurrent.CompletableFuture;
-import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
+import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Base class for all transactions that may be built and submitted to Hedera.

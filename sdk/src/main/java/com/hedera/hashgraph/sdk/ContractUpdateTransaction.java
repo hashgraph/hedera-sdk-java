@@ -2,8 +2,9 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.ContractUpdateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import org.threeten.bp.Duration;
-import org.threeten.bp.Instant;
+
+import java.time.Duration;
+import java.time.Instant;
 
 /**
  * Modify a smart contract instance to have the given parameter values.

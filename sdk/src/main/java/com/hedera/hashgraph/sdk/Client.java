@@ -6,10 +6,6 @@ import com.google.errorprone.annotations.Var;
 import com.google.gson.Gson;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import java8.util.Lists;
-import java8.util.function.Consumer;
-import java8.util.function.Function;
-import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -18,6 +14,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,6 +24,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Managed client for use on the Hedera Hashgraph network.
@@ -140,7 +139,7 @@ public final class Client implements AutoCloseable {
         network.put(new AccountId(6), "3.testnet.hedera.com:50211");
 
         var client = Client.forNetwork(network);
-        client.setMirrorNetwork(Lists.of(HEDERA_TESTNET_MIRROR_NODE));
+        client.setMirrorNetwork(List.of(HEDERA_TESTNET_MIRROR_NODE));
         return client;
     }
 

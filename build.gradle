@@ -35,6 +35,7 @@ allprojects {
 
 		// https://github.com/eclipse-ee4j/common-annotations-api
 		implementation "jakarta.annotation:jakarta.annotation-api:2.0.0-RC1"
+		implementation "javax.annotation:javax.annotation-api:1.3.2"
 	}
 
 	jacoco {
@@ -71,8 +72,8 @@ allprojects {
 			disable("ThreadJoinLoop")
 
 			// Uncomment do disable Android + JDK7 checks
-			// disable("Java7ApiChecker")
-			// disable("AndroidJdkLibsChecker")
+			disable("Java7ApiChecker")
+			disable("AndroidJdkLibsChecker")
 
 			// Ignore generated and protobuf code
 			disableWarningsInGeneratedCode = true

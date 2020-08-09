@@ -3,7 +3,8 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.threeten.bp.Duration;
+
+import java.time.Duration;
 
 public class LiveHash {
     public final AccountId accountId;

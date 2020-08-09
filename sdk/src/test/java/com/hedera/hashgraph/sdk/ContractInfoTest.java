@@ -7,9 +7,9 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.threeten.bp.Duration;
-import org.threeten.bp.Instant;
 
+import java.time.Duration;
+import java.time.Instant;
 
 public class ContractInfoTest {
     private final ContractGetInfoResponse.ContractInfo info =

@@ -1,6 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
-import org.threeten.bp.Duration;
+import java.time.Duration;
 
 final class DurationConverter {
     private DurationConverter() {}

@@ -8,7 +8,8 @@ import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import io.grpc.MethodDescriptor;
-import java8.util.concurrent.CompletableFuture;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Call a function of the given smart contract instance, giving it functionParameters as its inputs.

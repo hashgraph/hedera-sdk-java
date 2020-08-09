@@ -1,7 +1,8 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.mirror.ConsensusTopicResponse;
-import org.threeten.bp.Instant;
+
+import java.time.Instant;
 
 final class TopicMessageChunk {
     public final Instant consensusTimestamp;

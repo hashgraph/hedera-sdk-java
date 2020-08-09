@@ -4,13 +4,14 @@ import io.grpc.CallOptions;
 import io.grpc.MethodDescriptor;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
-import java8.util.concurrent.CompletableFuture;
+import net.javacrumbs.futureconverter.guavacommon.GuavaFutureUtils;
+import net.javacrumbs.futureconverter.java8common.Java8FutureUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 
-import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
+import java.util.concurrent.CompletableFuture;
 
 abstract class HederaExecutable<RequestT, ResponseT, O> extends Executable<O> {
     private static final Logger logger = LoggerFactory.getLogger(HederaExecutable.class);
@@ -45,7 +46,7 @@ abstract class HederaExecutable<RequestT, ResponseT, O> extends Executable<O> {
 
         var startAt = System.nanoTime();
 
-        return toCompletableFuture(ClientCalls.futureUnaryCall(call, request)).handle((response, error) -> {
+        return Java8FutureUtils.createCompletableFuture(GuavaFutureUtils.createValueSource(ClientCalls.futureUnaryCall(call, request))).handle((response, error) -> {
             var latency = (double) (System.nanoTime() - startAt) / 1000000000.0;
 
             // Exponential back-off for Delayer: 250ms, 500ms, 1s, 2s, 4s, 8s, 16s, ...16s

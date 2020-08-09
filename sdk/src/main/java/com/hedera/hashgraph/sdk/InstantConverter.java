@@ -2,7 +2,8 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.Timestamp;
 import com.hedera.hashgraph.sdk.proto.TimestampSeconds;
-import org.threeten.bp.Instant;
+
+import java.time.Instant;
 
 final class InstantConverter {
     private InstantConverter() {}

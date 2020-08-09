@@ -3,7 +3,8 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.FileUpdateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import org.threeten.bp.Instant;
+
+import java.time.Instant;
 
 /**
  * Updates a file by submitting the transaction.

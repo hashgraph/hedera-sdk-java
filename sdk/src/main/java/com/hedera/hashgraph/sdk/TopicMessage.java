@@ -4,11 +4,11 @@ import com.google.common.base.MoreObjects;
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.mirror.ConsensusTopicResponse;
-import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.List;
 
 public final class TopicMessage {

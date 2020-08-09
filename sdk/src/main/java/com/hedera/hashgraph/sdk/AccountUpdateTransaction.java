@@ -4,8 +4,9 @@ import com.google.protobuf.BoolValue;
 import com.google.protobuf.UInt64Value;
 import com.hedera.hashgraph.sdk.proto.CryptoUpdateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import org.threeten.bp.Duration;
-import org.threeten.bp.Instant;
+
+import java.time.Duration;
+import java.time.Instant;
 
 /**
  * Change properties for the given account.

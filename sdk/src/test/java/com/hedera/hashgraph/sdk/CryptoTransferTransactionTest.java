@@ -4,7 +4,8 @@ import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.threeten.bp.Instant;
+
+import java.time.Instant;
 
 public class CryptoTransferTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(

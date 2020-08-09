@@ -13,14 +13,13 @@ import com.hedera.hashgraph.sdk.proto.SystemUndeleteTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.FreezeServiceGrpc;
 import io.grpc.MethodDescriptor;
-import java8.util.Lists;
-import java8.util.concurrent.CompletableFuture;
-import java8.util.function.Function;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import org.bouncycastle.crypto.digests.SHA384Digest;
 
@@ -97,7 +96,7 @@ public final class Transaction extends HederaExecutable<com.hedera.hashgraph.sdk
     public static Transaction fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         com.hedera.hashgraph.sdk.proto.Transaction inner = com.hedera.hashgraph.sdk.proto.Transaction.parseFrom(bytes);
 
-        return new Transaction(Lists.of(inner.toBuilder()));
+        return new Transaction(List.of(inner.toBuilder()));
     }
 
     private static MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, com.hedera.hashgraph.sdk.proto.TransactionResponse> getMethodDescriptorForSystemDelete(SystemDeleteTransactionBody.IdCase idCase) {

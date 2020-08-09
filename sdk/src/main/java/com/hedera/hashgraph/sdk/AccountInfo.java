@@ -3,13 +3,13 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoGetInfoResponse;
-import java8.util.J8Arrays;
-import java8.util.stream.Collectors;
-import org.threeten.bp.Duration;
-import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Current information about an account, including the balance.
@@ -126,7 +126,7 @@ public final class AccountInfo {
             ? AccountId.fromProtobuf(accountInfo.getProxyAccountID())
             : null;
 
-        var liveHashes = J8Arrays.stream(accountInfo.getLiveHashesList().toArray())
+        var liveHashes = Arrays.stream(accountInfo.getLiveHashesList().toArray())
             .map((liveHash) -> LiveHash.fromProtobuf((com.hedera.hashgraph.sdk.proto.LiveHash)liveHash))
             .collect(Collectors.toList());
 
@@ -152,7 +152,7 @@ public final class AccountInfo {
     }
 
     CryptoGetInfoResponse.AccountInfo toProtobuf() {
-        var hashes = J8Arrays.stream(liveHashes.toArray())
+        var hashes = Arrays.stream(liveHashes.toArray())
             .map((liveHash) -> ((LiveHash)liveHash).toProtobuf())
             .collect(Collectors.toList());
 

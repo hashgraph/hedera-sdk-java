@@ -10,13 +10,13 @@ import com.hedera.hashgraph.sdk.proto.ResponseType;
 import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import io.grpc.MethodDescriptor;
-import java8.util.concurrent.CompletableFuture;
-import java8.util.function.Consumer;
-import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 /**
  * Base class for all queries that can be submitted to Hedera.

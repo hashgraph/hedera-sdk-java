@@ -3,7 +3,8 @@ package com.hedera.hashgraph.sdk;
 import com.hedera.hashgraph.sdk.proto.SystemDeleteTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TimestampSeconds;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import org.threeten.bp.Instant;
+
+import java.time.Instant;
 
 /**
  * Delete a file or smart contract - can only be done with a Hedera admin.

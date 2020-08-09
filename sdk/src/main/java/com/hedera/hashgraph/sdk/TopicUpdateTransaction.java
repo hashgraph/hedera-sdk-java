@@ -5,7 +5,8 @@ import com.hedera.hashgraph.sdk.proto.AccountID;
 import com.hedera.hashgraph.sdk.proto.ConsensusUpdateTopicTransactionBody;
 import com.hedera.hashgraph.sdk.proto.KeyList;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import org.threeten.bp.Duration;
+
+import java.time.Duration;
 
 /**
  * Update a topic.
