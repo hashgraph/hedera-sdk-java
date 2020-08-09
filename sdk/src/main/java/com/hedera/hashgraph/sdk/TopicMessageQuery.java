@@ -140,10 +140,11 @@ public final class TopicMessageQuery {
                         var lock = startTimeLock.writeLock();
                         lock.lock();
                         try {
-                            startTime[0].plusNanos(1);
+                            startTime[0] = startTime[0].plusNanos(1);
                         } finally {
                             lock.unlock();
                         }
+
                         makeStreamingCall(call, query, onNext, attempt + 1, startTime, startTimeLock);
                     }
                 }
