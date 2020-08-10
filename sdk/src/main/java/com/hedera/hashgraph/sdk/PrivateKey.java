@@ -6,6 +6,7 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.digests.SHA512Digest;
+import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
@@ -48,7 +49,7 @@ public final class PrivateKey extends Key {
         byte[] data = new byte[Ed25519.SECRET_KEY_SIZE + 32];
         ThreadLocalSecureRandom.current().nextBytes(data);
 
-        return derivableKey(data);
+        return derivableKey(data, false);
     }
 
     /**
@@ -73,7 +74,7 @@ public final class PrivateKey extends Key {
         var derivedState = new byte[hmacSha512.getMacSize()];
         hmacSha512.doFinal(derivedState, 0);
 
-        @Var var derivedKey = derivableKey(derivedState);
+        @Var var derivedKey = derivableKey(derivedState, false);
 
         // BIP-44 path with the Hedera Hbar coin-type (omitting key index)
         // we pre-derive most of the path as the mobile wallets don't expose more than the index
@@ -85,7 +86,6 @@ public final class PrivateKey extends Key {
 
         return derivedKey;
     }
-
     /**
      * Recover a private key from a mnemonic phrase compatible with the iOS and Android wallets.
      * <p>
@@ -125,11 +125,16 @@ public final class PrivateKey extends Key {
         }
     }
 
-    private static PrivateKey derivableKey(byte[] deriveData) {
+    private static PrivateKey derivableKey(byte[] deriveData, boolean isLegacy) {
         var keyData = Arrays.copyOfRange(deriveData, 0, 32);
         var chainCode = new KeyParameter(deriveData, 32, 32);
 
-        return new PrivateKey(keyData, chainCode);
+        if(!isLegacy){
+            return new PrivateKey(keyData, chainCode);
+        }
+        else{
+            return new PrivateKey(keyData, null);
+        }
     }
 
     /**
@@ -253,7 +258,7 @@ public final class PrivateKey extends Key {
         var output = new byte[64];
         hmacSha512.doFinal(output, 0);
 
-        return derivableKey(output);
+        return derivableKey(output, false);
     }
 
     /**
@@ -329,5 +334,22 @@ public final class PrivateKey extends Key {
     com.hedera.hashgraph.sdk.proto.Key toKeyProtobuf() {
         // Forward to the corresponding public key.
         return getPublicKey().toKeyProtobuf();
+    }
+
+    public static PrivateKey fromLegacyMnemonic(byte[] entropy) {
+        byte[] seed = new byte[entropy.length + 8];
+        Arrays.fill(seed, entropy.length, entropy.length + 8, (byte)-1);
+        System.arraycopy(entropy, 0, seed, 0, entropy.length);
+
+        byte[] salt = new byte[1];
+        salt[0] = -1;
+        PKCS5S2ParametersGenerator pbkdf2 = new PKCS5S2ParametersGenerator(new SHA512Digest());
+        pbkdf2.init(
+            seed,
+            salt,
+            2048);
+
+        KeyParameter key = (KeyParameter) pbkdf2.generateDerivedParameters(256);
+        return derivableKey(key.getKey(), true);
     }
 }

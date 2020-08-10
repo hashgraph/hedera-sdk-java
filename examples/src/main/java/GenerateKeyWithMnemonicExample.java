@@ -1,3 +1,4 @@
+import com.hedera.hashgraph.sdk.BadMnemonicException;
 import com.hedera.hashgraph.sdk.Mnemonic;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
@@ -8,11 +9,23 @@ class GenerateKeyWithMnemonicExample {
 
     public static void main(String[] args) {
         Mnemonic mnemonic = Mnemonic.generate24();
-        PrivateKey privateKey = mnemonic.toPrivateKey();
+        PrivateKey privateKey;
+        try{
+            privateKey = mnemonic.toPrivateKey();
+        }
+        catch(BadMnemonicException e){
+            throw new Error(e.reason.toString());
+        }
         PublicKey publicKey = privateKey.getPublicKey();
 
         Mnemonic mnemonic12 = Mnemonic.generate12();
-        PrivateKey privateKey12 = mnemonic12.toPrivateKey();
+        PrivateKey privateKey12;
+        try{
+            privateKey12 = mnemonic12.toPrivateKey();
+        }
+        catch(BadMnemonicException e){
+            throw new Error(e.reason.toString());
+        }
         PublicKey publicKey12 = privateKey12.getPublicKey();
 
         System.out.println("mnemonic 24 word = " + mnemonic);
