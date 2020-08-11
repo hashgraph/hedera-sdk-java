@@ -45,7 +45,7 @@ public final class CreateAccountExample {
                 .execute(client);
 
             // This will wait for the receipt to become available
-            TransactionReceipt receipt = txId.transactionId.getReceipt(client);
+            TransactionReceipt receipt = txId.getReceipt(client);
 
             AccountId newAccountId = receipt.accountId;
 

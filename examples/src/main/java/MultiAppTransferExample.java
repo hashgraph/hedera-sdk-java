@@ -53,7 +53,7 @@ public final class MultiAppTransferExample {
             .sign(exchangeKey)
             .execute(client);
 
-        AccountId exchangeAccountId = Objects.requireNonNull(createExchangeAccountTxnId.transactionId.getReceipt(client).accountId);
+        AccountId exchangeAccountId = Objects.requireNonNull(createExchangeAccountTxnId.getReceipt(client).accountId);
 
         Transaction transferTxn = new CryptoTransferTransaction()
             .addSender(OPERATOR_ID, transferAmount)
@@ -74,7 +74,7 @@ public final class MultiAppTransferExample {
         var transactionResponse = signedTransferTxn.execute(client);
 
         // (important!) wait for consensus by querying for the receipt
-        transactionResponse.transactionId.getReceipt(client);
+        transactionResponse.getReceipt(client);
 
         System.out.println("transferred " + transferAmount + "...");
 

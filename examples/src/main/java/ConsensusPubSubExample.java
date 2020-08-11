@@ -40,7 +40,7 @@ class ConsensusPubSubExample {
             .execute(client);
 
 
-        TransactionReceipt transactionReceipt = transactionResponse.transactionId.getReceipt(client);
+        TransactionReceipt transactionReceipt = transactionResponse.getReceipt(client);
 
         TopicId topicId = Objects.requireNonNull(transactionReceipt.topicId);
 

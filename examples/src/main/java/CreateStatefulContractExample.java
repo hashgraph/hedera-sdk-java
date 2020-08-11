@@ -65,19 +65,19 @@ public final class CreateStatefulContractExample {
         client.setMaxQueryPayment(new Hbar(10));
 
         // create the contract's bytecode file
-        var fileTxId = new FileCreateTransaction()
+        var fileTransactionResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file
             .setKeys(OPERATOR_KEY)
             .setContents(byteCode)
             .execute(client);
 
 
-        TransactionReceipt fileReceipt = fileTxId.transactionId.getReceipt(client);
+        TransactionReceipt fileReceipt = fileTransactionResponse.getReceipt(client);
         FileId newFileId = Objects.requireNonNull(fileReceipt.fileId);
 
         System.out.println("contract bytecode file: " + newFileId);
 
-        var contractTxId = new ContractCreateTransaction()
+        var contractTransactionResponse = new ContractCreateTransaction()
             .setBytecodeFileId(newFileId)
             .setGas(100_000_000)
             .setConstructorParameters(
@@ -86,7 +86,7 @@ public final class CreateStatefulContractExample {
             .execute(client);
 
 
-        TransactionReceipt contractReceipt = contractTxId.transactionId.getReceipt(client);
+        TransactionReceipt contractReceipt = contractTransactionResponse.getReceipt(client);
         ContractId newContractId = Objects.requireNonNull(contractReceipt.contractId);
 
         System.out.println("new contract ID: " + newContractId);
@@ -105,7 +105,7 @@ public final class CreateStatefulContractExample {
         String message = contractCallResult.getString(0);
         System.out.println("contract returned message: " + message);
 
-        var contractExecTxnId = new ContractExecuteTransaction()
+        var contractExecTransactionResponse = new ContractExecuteTransaction()
             .setContractId(newContractId)
             .setGas(100_000_000)
             .setFunction("set_message", new ContractFunctionParameters()
@@ -114,7 +114,7 @@ public final class CreateStatefulContractExample {
 
 
         // if this doesn't throw then we know the contract executed successfully
-        contractExecTxnId.transactionId.getReceipt(client);
+        contractExecTransactionResponse.getReceipt(client);
 
         // now query contract
         ContractFunctionResult contractUpdateResult = new ContractCallQuery()

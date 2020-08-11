@@ -30,7 +30,7 @@ public class TransactionIntegrationTest {
 
             var txid = transaction.execute(client);
 
-            var record = txid.transactionId.getRecord(client);
+            var record = txid.getRecord(client);
 
             assertArrayEquals(expectedHash, record.transactionHash.toByteArray());
 

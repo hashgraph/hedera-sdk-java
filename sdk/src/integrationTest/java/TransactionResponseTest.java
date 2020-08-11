@@ -21,7 +21,7 @@ public class TransactionResponseTest {
                 .setKey(key)
                 .execute(client);
 
-            var record = transaction.transactionId.getRecord(client);
+            var record = transaction.getRecord(client);
 
             assertArrayEquals(record.transactionHash.toByteArray(), transaction.transactionHash);
 
