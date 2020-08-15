@@ -32,7 +32,6 @@ import java.util.concurrent.TimeUnit;
  * Managed client for use on the Hedera Hashgraph network.
  */
 public final class Client implements AutoCloseable {
-    private static final String HEDERA_TESTNET_MIRROR_NODE = "hcs.testnet.mirrornode.hedera.com:5600";
     private static final Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
     private static final Hbar DEFAULT_MAX_TRANSACTION_FEE = new Hbar(1);
 
@@ -140,7 +139,7 @@ public final class Client implements AutoCloseable {
         network.put(new AccountId(6), "3.testnet.hedera.com:50211");
 
         var client = Client.forNetwork(network);
-        client.setMirrorNetwork(Lists.of(HEDERA_TESTNET_MIRROR_NODE));
+        client.setMirrorNetwork(Lists.of("hcs.testnet.mirrornode.hedera.com:5600"));
         return client;
     }
 
@@ -452,7 +451,6 @@ public final class Client implements AutoCloseable {
         var address = network.get(nodeId);
 
         if (address != null) {
-            // TODO: Determine if we should/should not have `keepAlive()` on this channel
             channel = ManagedChannelBuilder.forTarget(address)
                 .usePlaintext()
                 .userAgent(getUserAgent())
