@@ -159,12 +159,6 @@ tasks.withType(Test) {
 	// this task will fail on the first failed test
 	failFast = true
 
-	// maximum number of test processes
-	maxParallelForks = Runtime.runtime.availableProcessors() / 2
-
-	// maximum heap size for the process
-	maxHeapSize = "1G"
-
 	// emit logs per passed or failed test
 	testLogging {
 		exceptionFormat = 'full'
