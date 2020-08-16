@@ -8,6 +8,11 @@ dependencies {
 	implementation "io.github.cdimascio:java-dotenv:5.3.1"
 }
 
+java {
+	sourceCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
+	targetCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
+}
+
 tasks.addRule("Pattern: run<Example>: Runs an example.") { String taskName ->
 	if (taskName.startsWith("run")) {
 		task(taskName, type: JavaExec) {

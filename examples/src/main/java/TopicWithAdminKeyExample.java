@@ -15,6 +15,7 @@ import com.hedera.hashgraph.sdk.TopicInfoQuery;
 import com.hedera.hashgraph.sdk.TopicUpdateTransaction;
 import com.hedera.hashgraph.sdk.Transaction;
 
+import com.hedera.hashgraph.sdk.TransactionResponse;
 import java8.util.J8Arrays;
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -83,7 +84,7 @@ class TopicWithAdminKeyExample {
             transaction.sign(k);
         });
 
-        var transactionResponse = transaction.execute(hapiClient);
+        TransactionResponse transactionResponse = transaction.execute(hapiClient);
 
         topicId = transactionResponse.getReceipt(hapiClient).topicId;
 
@@ -117,7 +118,7 @@ class TopicWithAdminKeyExample {
             transaction.sign(k);
         });
 
-        var transactionResponse = transaction.execute(hapiClient);
+        TransactionResponse transactionResponse = transaction.execute(hapiClient);
 
         // Retrieve results post-consensus.
         transactionResponse.getReceipt(hapiClient);

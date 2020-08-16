@@ -14,6 +14,7 @@ import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 
+import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public final class DeleteAccountExample {
@@ -40,7 +41,7 @@ public final class DeleteAccountExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        var transactionResponse = new AccountCreateTransaction()
+        TransactionResponse transactionResponse = new AccountCreateTransaction()
             // The only _required_ property here is `key`
             .setKey(newKey)
             .setInitialBalance(new Hbar(2))
@@ -61,7 +62,6 @@ public final class DeleteAccountExample {
             .freezeWith(client)
             .sign(newKey)
             .execute(client)
-            .transactionId
             .getReceipt(client);
 
         new AccountInfoQuery()

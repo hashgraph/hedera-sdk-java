@@ -54,7 +54,7 @@ public final class UpdateAccountPublicKeyExample {
         System.out.println(" :: update public key of account " + accountId);
         System.out.println("set key = " + key2.getPublicKey());
 
-        var accountUpdateTransactionResponse = new AccountUpdateTransaction()
+        TransactionResponse accountUpdateTransactionResponse = new AccountUpdateTransaction()
             .setAccountId(accountId)
             .setKey(key2.getPublicKey())
             .freezeWith(client)

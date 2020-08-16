@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.TopicId;
 import com.hedera.hashgraph.sdk.TopicMessageQuery;
 import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.nio.charset.StandardCharsets;
@@ -30,9 +31,8 @@ class ConsensusPubSubExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        var transactionResponse = new TopicCreateTransaction()
+        TransactionResponse transactionResponse = new TopicCreateTransaction()
             .execute(client);
-
 
         TransactionReceipt transactionReceipt = transactionResponse.getReceipt(client);
 

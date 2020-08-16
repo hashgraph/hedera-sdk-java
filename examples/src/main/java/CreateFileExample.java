@@ -12,6 +12,7 @@ import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 
+import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public final class CreateFileExample {
@@ -35,7 +36,7 @@ public final class CreateFileExample {
         // you can easily use the bytes of a file instead.
         byte[] fileContents = "Hedera hashgraph is great!".getBytes(StandardCharsets.UTF_8);
 
-        var txId = new FileCreateTransaction()
+        TransactionResponse transactionResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file
             .setKeys(OPERATOR_KEY.getPublicKey())
             .setContents(fileContents)
@@ -43,8 +44,7 @@ public final class CreateFileExample {
             .setMaxTransactionFee(new Hbar(2)) // 2 HBAR
             .execute(client);
 
-
-        TransactionReceipt receipt = txId.getReceipt(client);
+        TransactionReceipt receipt = transactionResponse.getReceipt(client);
         FileId newFileId = receipt.fileId;
 
         System.out.println("file: " + newFileId);

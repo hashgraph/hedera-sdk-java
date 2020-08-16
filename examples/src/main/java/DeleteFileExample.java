@@ -14,6 +14,7 @@ import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 
+import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public final class DeleteFileExample {
@@ -37,7 +38,7 @@ public final class DeleteFileExample {
         // you can easily use the bytes of a file instead.
         byte[] fileContents = "Hedera hashgraph is great!".getBytes(StandardCharsets.UTF_8);
 
-        var transactionResponse = new FileCreateTransaction()
+        TransactionResponse transactionResponse = new FileCreateTransaction()
             .setKeys(OPERATOR_KEY)
             .setContents(fileContents)
             .setMaxTransactionFee(new Hbar(2))
@@ -49,7 +50,7 @@ public final class DeleteFileExample {
         System.out.println("file: " + newFileId);
 
         // now delete the file
-        var fileDeleteTransactionResponse = new FileDeleteTransaction()
+        TransactionResponse fileDeleteTransactionResponse = new FileDeleteTransaction()
             .setFileId(newFileId)
             .execute(client);
 
