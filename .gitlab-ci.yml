@@ -1,0 +1,20 @@
+image: gradle:alpine
+
+variables:
+    GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+before_script:
+    - export GRADLE_USER_HOME=`pwd`/.gradle
+
+stages:
+    - build
+
+build:
+    stage: build
+    script: ./gradlew --build-cache assemble
+    cache:
+        key: "$CI_COMMIT_REF_NAME"
+        policy: push
+        paths:
+            - build
+            - .gradle
