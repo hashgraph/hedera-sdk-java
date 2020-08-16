@@ -209,7 +209,7 @@ public abstract class Query<O, T extends Query<O, T>> extends HederaExecutable<c
             });
     }
 
-    private Transaction makePaymentTransaction(
+    private static Transaction makePaymentTransaction(
         TransactionId paymentTransactionId,
         AccountId nodeId,
         Client.Operator operator,

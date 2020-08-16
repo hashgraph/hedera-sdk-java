@@ -199,6 +199,11 @@ public abstract class Transaction<T extends Transaction<T>>
         return null;
     }
 
+    @Override
+    final AccountId getNodeId(@Nullable Client client) {
+        return Objects.requireNonNull(getNodeId());
+    }
+
     /**
      * Set the account ID of the node that this transaction will be submitted to.
      * <p>
@@ -316,15 +321,6 @@ public abstract class Transaction<T extends Transaction<T>>
 
         // noinspection unchecked
         return (T) this;
-    }
-
-    @Override
-    final AccountId getNodeId(@Nullable Client client) {
-        if (!nodeIds.isEmpty()) {
-            return nodeIds.get(nextTransactionIndex);
-        }
-
-        return AccountId.fromProtobuf(bodyBuilder.getNodeAccountID());
     }
 
     public final T sign(PrivateKey privateKey) {

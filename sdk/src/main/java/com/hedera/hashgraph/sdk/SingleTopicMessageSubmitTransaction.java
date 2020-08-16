@@ -9,7 +9,6 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
-import java.util.Arrays;
 import java.util.List;
 
 class SingleTopicMessageSubmitTransaction extends Transaction<SingleTopicMessageSubmitTransaction> {

@@ -407,7 +407,7 @@ public final class Client implements AutoCloseable {
 
         // wait for all channels to shutdown
         for (var channel : Iterables.concat(nodeChannels.values(), mirrorChannels.values())) {
-            var isClosed = false;
+            @Var var isClosed = false;
 
             do {
                 try {
