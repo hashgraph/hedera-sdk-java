@@ -1,22 +1,21 @@
-import java.util.Objects;
-import java.util.Random;
-import java.util.concurrent.TimeoutException;
-
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
-import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
-import com.hedera.hashgraph.sdk.TopicMessageQuery;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicId;
-
+import com.hedera.hashgraph.sdk.TopicMessageQuery;
+import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
 import java8.util.Lists;
 import org.threeten.bp.Instant;
+
+import java.util.Objects;
+import java.util.Random;
+import java.util.concurrent.TimeoutException;
 
 /**
  * An example of an HCS topic that utilizes a submitKey to limit who can submit messages on the topic.
@@ -26,11 +25,9 @@ import org.threeten.bp.Instant;
  * Publishes a number of messages to the topic signed by the submitKey.
  */
 public class ConsensusPubSubWithSubmitKeyExample {
-    private Client client;
-
     private final int messagesToPublish;
     private final int millisBetweenMessages;
-
+    private Client client;
     private TopicId topicId;
     private PrivateKey submitKey;
 
@@ -75,7 +72,7 @@ public class ConsensusPubSubWithSubmitKeyExample {
      * Create a new topic with that key as the topic's submitKey; required to sign all future
      * ConsensusMessageSubmitTransactions for that topic.
      */
-    private void createTopicWithSubmitKey() throws TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException, InterruptedException {
+    private void createTopicWithSubmitKey() throws TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException {
         // Generate a Ed25519 private, public key pair
         submitKey = PrivateKey.generate();
         PublicKey submitPublicKey = submitKey.getPublicKey();

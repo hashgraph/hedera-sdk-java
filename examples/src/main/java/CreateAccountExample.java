@@ -1,6 +1,3 @@
-import java.util.Objects;
-import java.util.concurrent.TimeoutException;
-
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
@@ -10,9 +7,11 @@ import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
-
 import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
+
+import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 
 public final class CreateAccountExample {
 
@@ -46,7 +45,7 @@ public final class CreateAccountExample {
                 .execute(client);
 
             // This will wait for the receipt to become available
-            TransactionReceipt receipt = txId.getReceipt(client);
+            TransactionReceipt receipt = transactionResponse.getReceipt(client);
 
             AccountId newAccountId = receipt.accountId;
 

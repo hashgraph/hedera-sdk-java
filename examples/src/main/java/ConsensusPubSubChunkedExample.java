@@ -17,6 +17,8 @@ import java.io.InputStreamReader;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public final class ConsensusPubSubChunkedExample {
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
@@ -90,8 +92,11 @@ public final class ConsensusPubSubChunkedExample {
         // get the receipt to ensure there were no errors
         transaction.execute(clientWithoutOperator).transactionId.getReceipt(clientWithoutOperator);
 
-        for (int i = 0; ; i++) {
+        // noinspection InfiniteLoopStatement
+        while (true) {
             System.out.println("waiting ...");
+
+            // noinspection BusyWait
             Thread.sleep(2500);
         }
     }
@@ -100,7 +105,7 @@ public final class ConsensusPubSubChunkedExample {
         ClassLoader classLoader = ConsensusPubSubChunkedExample.class.getClassLoader();
         InputStream inputStream = classLoader.getResourceAsStream(filename);
         StringBuilder bigContents = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream), UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 bigContents.append(line).append("\n");
