@@ -1,7 +1,9 @@
 # Hedera™ Hashgraph Java SDK
 
-![](https://img.shields.io/badge/java-7%2B-blue)
-![](https://img.shields.io/badge/android-19%2B-blue)
+![](https://img.shields.io/badge/java-7%2B-blue?style=flat-square)
+![](https://img.shields.io/badge/android-19%2B-blue?style=flat-square)
+[![](https://img.shields.io/github/workflow/status/hashgraph/hedera-sdk-java/Java/develop?style=flat-square)](https://github.com/hashgraph/hedera-sdk-java/actions)
+[![](https://img.shields.io/maven-central/v/com.hedera.hashgraph/sdk/2?label=maven&style=flat-square)](https://search.maven.org/artifact/com.hedera.hashgraph/sdk)
 
 > The Java SDK for interacting with Hedera Hashgraph: the official distributed
 > consensus platform built using the hashgraph consensus algorithm for fast,
