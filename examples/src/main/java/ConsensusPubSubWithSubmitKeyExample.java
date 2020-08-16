@@ -85,7 +85,7 @@ public class ConsensusPubSubWithSubmitKeyExample {
             .execute(client);
 
 
-        topicId = Objects.requireNonNull(transactionResponse.transactionId.getReceipt(client).topicId);
+        topicId = Objects.requireNonNull(transactionResponse.getReceipt(client).topicId);
         System.out.println("Created new topic " + topicId + " with ED25519 submitKey of " + submitKey);
     }
 

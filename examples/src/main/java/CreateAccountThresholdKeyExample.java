@@ -55,7 +55,7 @@ public final class CreateAccountThresholdKeyExample {
             .execute(client);
 
         // This will wait for the receipt to become available
-        TransactionReceipt receipt = txId.transactionId.getReceipt(client);
+        TransactionReceipt receipt = txId.getReceipt(client);
 
         AccountId newAccountId = Objects.requireNonNull(receipt.accountId);
 
@@ -73,7 +73,7 @@ public final class CreateAccountThresholdKeyExample {
 
 
         // (important!) wait for the transfer to go to consensus
-        tsfrTxnId.transactionId.getReceipt(client);
+        tsfrTxnId.getReceipt(client);
 
         Hbar balanceAfter = new AccountBalanceQuery()
             .setAccountId(newAccountId)

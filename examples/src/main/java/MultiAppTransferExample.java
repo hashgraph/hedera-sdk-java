@@ -46,7 +46,6 @@ public final class MultiAppTransferExample {
             .freezeWith(client)
             .sign(exchangeKey)
             .execute(client)
-            .transactionId
             .getReceipt(client)
             .accountId;
 
@@ -58,7 +57,6 @@ public final class MultiAppTransferExample {
             .setInitialBalance(new Hbar(5))
             .setKey(userKey)
             .execute(client)
-            .transactionId
             .getReceipt(client)
             .accountId;
 
@@ -92,7 +90,7 @@ public final class MultiAppTransferExample {
         var transactionResponse = signedTransferTxn.execute(client);
 
         // (important!) wait for consensus by querying for the receipt
-        transactionResponse.transactionId.getReceipt(client);
+        transactionResponse.getReceipt(client);
 
         Hbar senderBalanceAfter = new AccountBalanceQuery()
             .setAccountId(userAccountId)

@@ -60,7 +60,7 @@ public final class CreateSimpleContractExample {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // create the contract's bytecode file
-        var fileTxId = new FileCreateTransaction()
+        var fileTransactionResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file
             .setKeys(OPERATOR_KEY)
             .setContents(byteCodeHex.getBytes(StandardCharsets.UTF_8))
@@ -68,13 +68,13 @@ public final class CreateSimpleContractExample {
             .execute(client);
 
 
-        TransactionReceipt fileReceipt = fileTxId.transactionId.getReceipt(client);
+        TransactionReceipt fileReceipt = fileTransactionResponse.getReceipt(client);
         FileId newFileId = Objects.requireNonNull(fileReceipt.fileId);
 
         System.out.println("contract bytecode file: " + newFileId);
 
         // create the contract itself
-        var contractTxId = new ContractCreateTransaction()
+        var contractTransactionResponse = new ContractCreateTransaction()
             .setGas(500)
             .setBytecodeFileId(newFileId)
             // set an admin key so we can delete the contract later
@@ -83,7 +83,7 @@ public final class CreateSimpleContractExample {
             .execute(client);
 
 
-        TransactionReceipt contractReceipt = contractTxId.transactionId.getReceipt(client);
+        TransactionReceipt contractReceipt = contractTransactionResponse.getReceipt(client);
 
         System.out.println(contractReceipt);
 

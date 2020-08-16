@@ -85,7 +85,7 @@ class TopicWithAdminKeyExample {
 
         var transactionResponse = transaction.execute(hapiClient);
 
-        topicId = transactionResponse.transactionId.getReceipt(hapiClient).topicId;
+        topicId = transactionResponse.getReceipt(hapiClient).topicId;
 
         System.out.println("Created new topic " + topicId + " with 2-of-3 threshold key as adminKey.");
     }
@@ -120,7 +120,7 @@ class TopicWithAdminKeyExample {
         var transactionResponse = transaction.execute(hapiClient);
 
         // Retrieve results post-consensus.
-        transactionResponse.transactionId.getReceipt(hapiClient);
+        transactionResponse.getReceipt(hapiClient);
 
         System.out.println("Updated topic " + topicId + " with 3-of-4 threshold key as adminKey");
 

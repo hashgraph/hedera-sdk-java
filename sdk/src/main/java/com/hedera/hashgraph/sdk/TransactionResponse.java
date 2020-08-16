@@ -1,6 +1,8 @@
 package com.hedera.hashgraph.sdk;
 
-public final class TransactionResponse {
+import java8.util.concurrent.CompletableFuture;
+
+public final class TransactionResponse implements WithGetReceipt, WithGetRecord {
     public final AccountId nodeId;
 
     public final byte[] transactionHash;
@@ -12,5 +14,14 @@ public final class TransactionResponse {
         this.transactionId = transactionId;
         this.transactionHash = transactionHash;
     }
-}
 
+    @Override
+    public CompletableFuture<TransactionReceipt> getReceiptAsync(Client client) {
+        return transactionId.getReceiptAsync(client);
+    }
+
+    @Override
+    public CompletableFuture<TransactionRecord> getRecordAsync(Client client) {
+        return transactionId.getRecordAsync(client);
+    }
+}

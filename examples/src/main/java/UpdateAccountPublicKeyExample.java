@@ -46,7 +46,7 @@ public final class UpdateAccountPublicKeyExample {
             .execute(client);
 
         System.out.println("transaction ID: " + acctTransactionResponse);
-        AccountId accountId = Objects.requireNonNull(acctTransactionResponse.transactionId.getReceipt(client).accountId);
+        AccountId accountId = Objects.requireNonNull(acctTransactionResponse.getReceipt(client).accountId);
         System.out.println("account = " + accountId);
         System.out.println("key = " + key1.getPublicKey());
         // Next, we update the key
@@ -54,7 +54,7 @@ public final class UpdateAccountPublicKeyExample {
         System.out.println(" :: update public key of account " + accountId);
         System.out.println("set key = " + key2.getPublicKey());
 
-        var transactionResponse = new AccountUpdateTransaction()
+        var accountUpdateTransactionResponse = new AccountUpdateTransaction()
             .setAccountId(accountId)
             .setKey(key2.getPublicKey())
             .freezeWith(client)
@@ -64,10 +64,10 @@ public final class UpdateAccountPublicKeyExample {
             // execute will implicitly sign with the operator
             .execute(client);
 
-        System.out.println("transaction ID: " + transactionResponse);
+        System.out.println("transaction ID: " + accountUpdateTransactionResponse);
 
         // (important!) wait for the transaction to complete by querying the receipt
-        transactionResponse.transactionId.getReceipt(client);
+        accountUpdateTransactionResponse.getReceipt(client);
 
         // Now we fetch the account information to check if the key was changed
         System.out.println(" :: getAccount and check our current key");
