@@ -325,7 +325,7 @@ public final class Client implements AutoCloseable {
      * Set the maximum fee to be paid for transactions executed by this client.
      * <p>
      * Because transaction fees are always maximums, this will simply add a call to
-     * {@link TransactionBuilder#setMaxTransactionFee(Hbar)} on every new transaction. The actual
+     * {@link Transaction#setMaxTransactionFee(Hbar)} on every new transaction. The actual
      * fee assessed for a given transaction may be less than this value, but never greater.
      *
      * @param maxTransactionFee The Hbar to be set
@@ -343,15 +343,15 @@ public final class Client implements AutoCloseable {
     /**
      * Set the maximum default payment allowable for queries.
      * <p>
-     * When a query is executed without an explicit {@link QueryBuilder#setQueryPayment(Hbar)} call,
+     * When a query is executed without an explicit {@link Query#setQueryPayment(Hbar)} call,
      * the client will first request the cost
      * of the given query from the node it will be submitted to and attach a payment for that amount
      * from the operator account on the client.
      * <p>
      * If the returned value is greater than this value, a
      * {@link MaxQueryPaymentExceededException} will be thrown from
-     * {@link QueryBuilder#execute(Client)} or returned in the second callback of
-     * {@link QueryBuilder#executeAsync(Client, Consumer, Consumer)}.
+     * {@link Query#execute(Client)} or returned in the second callback of
+     * {@link Query#executeAsync(Client, Consumer, Consumer)}.
      * <p>
      * Set to 0 to disable automatic implicit payments.
      *
@@ -401,30 +401,26 @@ public final class Client implements AutoCloseable {
     public void close(Duration timeout) {
         // initialize shutdown for all channels
         // this should not block
-        for (var channel : Iterables.concat(mirrorChannels.values(), mirrorChannels.values())) {
+        for (var channel : Iterables.concat(nodeChannels.values(), mirrorChannels.values())) {
             channel.shutdown();
         }
 
         // wait for all channels to shutdown
-        for (var channel : Iterables.concat(mirrorChannels.values(), mirrorChannels.values())) {
-            try {
-                channel.awaitTermination(timeout.getSeconds(), TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+        for (var channel : Iterables.concat(nodeChannels.values(), mirrorChannels.values())) {
+            var isClosed = false;
+
+            do {
+                try {
+                    isClosed = channel.awaitTermination(timeout.getSeconds(), TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            } while (!isClosed);
         }
 
         // preemptively clear memory for the channels map
         nodeChannels.clear();
         mirrorChannels.clear();
-
-        executor.shutdown();
-
-        try {
-            executor.awaitTermination(timeout.getSeconds(), TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     // Get the next node ID, following a round-robin distribution with a randomized start point

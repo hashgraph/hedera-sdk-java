@@ -1,7 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
-
-public class TransactionResponse {
+public final class TransactionResponse {
     public final AccountId nodeId;
 
     public final byte[] transactionHash;

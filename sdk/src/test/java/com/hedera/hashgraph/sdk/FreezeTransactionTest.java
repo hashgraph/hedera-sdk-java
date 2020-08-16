@@ -25,12 +25,12 @@ public class FreezeTransactionTest {
     @Test
     void shouldSerialize() {
         SnapshotMatcher.expect(new FreezeTransaction()
-            .setNodeAccountId(AccountId.fromString("0.0.5005"))
+            .setNodeId(AccountId.fromString("0.0.5005"))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setStartTime(0, 0)
             .setEndTime(23, 59)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .build(Client.forTestnet())
+            .freeze()
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();

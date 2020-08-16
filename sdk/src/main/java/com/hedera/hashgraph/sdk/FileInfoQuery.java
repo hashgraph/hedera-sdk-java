@@ -2,7 +2,6 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.FileGetInfoQuery;
 import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
@@ -19,7 +18,7 @@ import java8.util.concurrent.CompletableFuture;
  * fileInfo field will be non-empty, the deleted field will be true, its size will be 0,
  * and its contents will be empty. Note that each file has a FileID, but does not have a filename.
  */
-public final class FileInfoQuery extends QueryBuilder<FileInfo, FileInfoQuery> {
+public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
     private final FileGetInfoQuery.Builder builder;
 
     public FileInfoQuery() {
@@ -39,7 +38,7 @@ public final class FileInfoQuery extends QueryBuilder<FileInfo, FileInfoQuery> {
     }
 
     @Override
-    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setFileGetInfo(builder.setHeader(header));
     }
 
@@ -49,17 +48,17 @@ public final class FileInfoQuery extends QueryBuilder<FileInfo, FileInfoQuery> {
     }
 
     @Override
-    QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request) {
         return request.getFileGetInfo().getHeader();
     }
 
     @Override
-    FileInfo mapResponse(Response response, AccountId nodeId, Query request) {
+    FileInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
         return FileInfo.fromProtobuf(response.getFileGetInfo().getFileInfo());
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Query, Response> getMethodDescriptor() {
         return FileServiceGrpc.getGetFileInfoMethod();
     }
 

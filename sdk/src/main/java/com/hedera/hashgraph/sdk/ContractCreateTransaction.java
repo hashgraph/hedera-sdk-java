@@ -2,8 +2,13 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.ContractCreateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
+
+import javax.annotation.Nullable;
 
 /**
  * Start a new smart contract instance.
@@ -49,13 +54,24 @@ import org.threeten.bp.Duration;
  * be changed using the admin keys. If there are no admin keys, then it cannot be
  * changed after the smart contract is created.
  */
-public final class ContractCreateTransaction extends SingleTransactionBuilder<ContractCreateTransaction> {
+public final class ContractCreateTransaction extends Transaction<ContractCreateTransaction> {
     private final ContractCreateTransactionBody.Builder builder;
 
     public ContractCreateTransaction() {
         builder = ContractCreateTransactionBody.newBuilder();
 
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
+    }
+
+    ContractCreateTransaction(TransactionBody body) {
+        super(body);
+
+        builder = body.getContractCreateInstance().toBuilder();
+    }
+
+    @Nullable
+    public FileId getBytecodeFileId() {
+        return builder.hasFileID() ? FileId.fromProtobuf(builder.getFileID()) : null;
     }
 
     /**
@@ -66,12 +82,18 @@ public final class ContractCreateTransaction extends SingleTransactionBuilder<Co
      * <p>
      * The file must be the ASCII hexadecimal representation of the smart contract bytecode.
      *
-     * @return {@code this}
      * @param byteCodeFileId The FileId to be set
+     * @return {@code this}
      */
     public ContractCreateTransaction setBytecodeFileId(FileId byteCodeFileId) {
+        requireNotFrozen();
         builder.setFileID(byteCodeFileId.toProtobuf());
         return this;
+    }
+
+    @Nullable
+    public Key getAdminKey() {
+        return builder.hasAdminKey() ? Key.fromProtobuf(builder.getAdminKey()) : null;
     }
 
     /**
@@ -81,35 +103,51 @@ public final class ContractCreateTransaction extends SingleTransactionBuilder<Co
      * admin keys, then there is no administrator to authorize changing the admin keys, so
      * there can never be any admin keys for that instance.
      *
-     * @return {@code this}
      * @param adminKey The Key to be set
+     * @return {@code this}
      */
     public ContractCreateTransaction setAdminKey(Key adminKey) {
+        requireNotFrozen();
         builder.setAdminKey(adminKey.toKeyProtobuf());
         return this;
+    }
+
+    public long getGas() {
+        return builder.getGas();
     }
 
     /**
      * Sets the gas to run the constructor.
      *
-     * @return {@code this}
      * @param gas The long to be set as gas
+     * @return {@code this}
      */
     public ContractCreateTransaction setGas(long gas) {
+        requireNotFrozen();
         builder.setGas(gas);
         return this;
+    }
+
+    public Hbar getInitialBalance() {
+        return Hbar.fromTinybars(builder.getInitialBalance());
     }
 
     /**
      * Sets the initial number of hbars to put into the cryptocurrency account
      * associated with and owned by the smart contract.
      *
-     * @return {@code this}
      * @param initialBalance The Hbar to be set as the initial balance
+     * @return {@code this}
      */
     public ContractCreateTransaction setInitialBalance(Hbar initialBalance) {
+        requireNotFrozen();
         builder.setInitialBalance(initialBalance.toTinybars());
         return this;
+    }
+
+    @Nullable
+    public AccountId getProxyAccountId() {
+        return builder.hasProxyAccountID() ? AccountId.fromProtobuf(builder.getProxyAccountID()) : null;
     }
 
     /**
@@ -121,23 +159,34 @@ public final class ContractCreateTransaction extends SingleTransactionBuilder<Co
      * If the proxyAccountID account refuses to accept proxy staking , or if it is not currently running a node,
      * then it will behave as if  proxyAccountID was null.
      *
-     * @return {@code this}
      * @param proxyAccountId The AccountId to be set
+     * @return {@code this}
      */
     public ContractCreateTransaction setProxyAccountId(AccountId proxyAccountId) {
+        requireNotFrozen();
         builder.setProxyAccountID(proxyAccountId.toProtobuf());
         return this;
+    }
+
+    @Nullable
+    public Duration getAutoRenewPeriod() {
+        return builder.hasAutoRenewPeriod() ? DurationConverter.fromProtobuf(builder.getAutoRenewPeriod()) : null;
     }
 
     /**
      * Sets the period that the instance will charge its account every this many seconds to renew.
      *
-     * @return {@code this}
      * @param autoRenewPeriod The Duration to be set for auto renewal
+     * @return {@code this}
      */
     public ContractCreateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
+        requireNotFrozen();
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         return this;
+    }
+
+    public ByteString getConstructorParameters() {
+        return builder.getConstructorParameters();
     }
 
     /**
@@ -146,10 +195,11 @@ public final class ContractCreateTransaction extends SingleTransactionBuilder<Co
      * Use this instead of {@link #setConstructorParameters(ContractFunctionParameters)} if you have already
      * pre-encoded a solidity function call.
      *
-     * @return {@code this}
      * @param constructorParameters The constructor parameters
+     * @return {@code this}
      */
     public ContractCreateTransaction setConstructorParameters(byte[] constructorParameters) {
+        requireNotFrozen();
         builder.setConstructorParameters(ByteString.copyFrom(constructorParameters));
         return this;
     }
@@ -157,27 +207,39 @@ public final class ContractCreateTransaction extends SingleTransactionBuilder<Co
     /**
      * Sets the parameters to pass to the constructor.
      *
-     * @return {@code this}
      * @param constructorParameters The contructor parameters
+     * @return {@code this}
      */
     public ContractCreateTransaction setConstructorParameters(ContractFunctionParameters constructorParameters) {
+        requireNotFrozen();
         builder.setConstructorParameters(constructorParameters.toBytes(null));
         return this;
+    }
+
+    public String getContractMemo() {
+        return builder.getMemo();
     }
 
     /**
      * Sets the memo to be associated with this contract.
      *
-     * @return {@code this}
      * @param memo The String to be set as the memo
+     * @return {@code this}
      */
     public ContractCreateTransaction setContractMemo(String memo) {
+        requireNotFrozen();
         builder.setMemo(memo);
         return this;
     }
 
     @Override
-    void onBuild(TransactionBody.Builder bodyBuilder) {
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
+        return SmartContractServiceGrpc.getCreateContractMethod();
+    }
+
+    @Override
+    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setContractCreateInstance(builder);
+        return true;
     }
 }

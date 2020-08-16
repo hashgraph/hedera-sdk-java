@@ -25,11 +25,11 @@ public class TopicDeleteTransactionTest {
     @Test
     void shouldSerialize() {
         SnapshotMatcher.expect(new TopicDeleteTransaction()
-            .setNodeAccountId(AccountId.fromString("0.0.5005"))
+            .setNodeId(AccountId.fromString("0.0.5005"))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setTopicId(TopicId.fromString("0.0.5007"))
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .build(Client.forTestnet())
+            .freeze()
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();

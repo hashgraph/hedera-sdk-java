@@ -26,14 +26,14 @@ public class TopicCreateTransactionTest {
     @Test
     void shouldSerialize() {
         SnapshotMatcher.expect(new TopicCreateTransaction()
-            .setNodeAccountId(AccountId.fromString("0.0.5005"))
+            .setNodeId(AccountId.fromString("0.0.5005"))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setSubmitKey(unusedPrivateKey)
             .setAdminKey(unusedPrivateKey)
             .setAutoRenewAccountId(AccountId.fromString("0.0.5007"))
             .setAutoRenewPeriod(Duration.ofHours(24))
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .build(Client.forTestnet())
+            .freeze()
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();

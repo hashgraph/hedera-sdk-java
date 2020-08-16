@@ -21,7 +21,7 @@ abstract class HederaExecutable<RequestT, ResponseT, O> extends Executable<O> {
     abstract CompletableFuture<Void> onExecuteAsync(Client client);
 
     @Override
-    public final CompletableFuture<O> executeAsync(Client client) {
+    public CompletableFuture<O> executeAsync(Client client) {
         return onExecuteAsync(client).thenCompose((v) -> executeAsync(client, 1));
     }
 
@@ -113,7 +113,7 @@ abstract class HederaExecutable<RequestT, ResponseT, O> extends Executable<O> {
      */
     abstract MethodDescriptor<RequestT, ResponseT> getMethodDescriptor();
 
-    abstract AccountId getNodeId(Client client);
+    abstract AccountId getNodeId(@Nullable Client client);
 
     @Nullable
     abstract TransactionId getTransactionId();

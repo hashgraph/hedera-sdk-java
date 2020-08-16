@@ -31,7 +31,7 @@ public class TransactionResponseTest {
             new AccountDeleteTransaction()
                 .setAccountId(accountId)
                 .setTransferAccountId(operatorId)
-                .build(client)
+                .freezeWith(client)
                 .sign(key)
                 .execute(client);
 

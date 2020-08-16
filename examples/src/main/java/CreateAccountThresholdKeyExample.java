@@ -65,7 +65,7 @@ public final class CreateAccountThresholdKeyExample {
             .addSender(newAccountId, new Hbar(10))
             .addRecipient(new AccountId(3), new Hbar(10))
             // To manually sign, you must explicitly build the Transaction
-            .build(client)
+            .freezeWith(client)
             // we sign with 2 of the 3 keys
             .sign(keys[0])
             .sign(keys[1])

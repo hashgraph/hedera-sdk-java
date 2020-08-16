@@ -2,7 +2,6 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.ContractCallLocalQuery;
-import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
@@ -23,7 +22,7 @@ import java8.util.concurrent.CompletableFuture;
  * This is useful for calling getter functions, which purely read the state and don't change it.
  * It is faster and cheaper than a normal call, because it is purely local to a single  node.
  */
-public final class ContractCallQuery extends QueryBuilder<ContractFunctionResult, ContractCallQuery> {
+public final class ContractCallQuery extends Query<ContractFunctionResult, ContractCallQuery> {
     private final ContractCallLocalQuery.Builder builder;
 
     public ContractCallQuery() {
@@ -112,7 +111,7 @@ public final class ContractCallQuery extends QueryBuilder<ContractFunctionResult
     }
 
     @Override
-    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setContractCallLocal(builder.setHeader(header));
     }
 
@@ -122,17 +121,17 @@ public final class ContractCallQuery extends QueryBuilder<ContractFunctionResult
     }
 
     @Override
-    QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request) {
         return request.getContractCallLocal().getHeader();
     }
 
     @Override
-    ContractFunctionResult mapResponse(Response response, AccountId nodeId, Query request) {
+    ContractFunctionResult mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
         return new ContractFunctionResult(response.getContractCallLocal().getFunctionResult());
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Query, Response> getMethodDescriptor() {
         return SmartContractServiceGrpc.getContractCallLocalMethodMethod();
     }
 }

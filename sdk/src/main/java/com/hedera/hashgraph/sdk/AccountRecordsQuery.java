@@ -2,7 +2,6 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.CryptoGetAccountRecordsQuery;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
@@ -15,7 +14,7 @@ import java.util.List;
  * Get all the records for an account for any transfers into it and out of it,
  * that were above the threshold, during the last 25 hours.
  */
-public final class AccountRecordsQuery extends QueryBuilder<List<TransactionRecord>, AccountRecordsQuery> {
+public final class AccountRecordsQuery extends Query<List<TransactionRecord>, AccountRecordsQuery> {
     private final CryptoGetAccountRecordsQuery.Builder builder;
 
     public AccountRecordsQuery() {
@@ -34,7 +33,7 @@ public final class AccountRecordsQuery extends QueryBuilder<List<TransactionReco
     }
 
     @Override
-    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setCryptoGetAccountRecords(builder.setHeader(header));
     }
 
@@ -44,12 +43,12 @@ public final class AccountRecordsQuery extends QueryBuilder<List<TransactionReco
     }
 
     @Override
-    QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request) {
         return request.getCryptoGetAccountRecords().getHeader();
     }
 
     @Override
-    List<TransactionRecord> mapResponse(Response response, AccountId nodeId, Query request) {
+    List<TransactionRecord> mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
         var rawTransactionRecords = response.getCryptoGetAccountRecords().getRecordsList();
         var transactionRecords = new ArrayList<TransactionRecord>(rawTransactionRecords.size());
 
@@ -61,7 +60,7 @@ public final class AccountRecordsQuery extends QueryBuilder<List<TransactionReco
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Query, Response> getMethodDescriptor() {
         return CryptoServiceGrpc.getGetAccountRecordsMethod();
     }
 }

@@ -57,10 +57,11 @@ public final class UpdateAccountPublicKeyExample {
         var transactionResponse = new AccountUpdateTransaction()
             .setAccountId(accountId)
             .setKey(key2.getPublicKey())
-            .build(client)
-            // Sign with the previous key and the new key
+            .freezeWith(client)
+            // sign with the previous key and the new key
             .sign(key1)
             .sign(key2)
+            // execute will implicitly sign with the operator
             .execute(client);
 
         System.out.println("transaction ID: " + transactionResponse);

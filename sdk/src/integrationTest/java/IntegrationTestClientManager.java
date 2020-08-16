@@ -15,9 +15,7 @@ public class IntegrationTestClientManager {
 
         try {
             client = Client.fromJsonFile(System.getProperty("CONFIG_FILE"));
-            System.out.println("Using client from config file");
         } catch (Exception e) {
-            System.out.println("Failed to use client network. Using testnet instead.");
             client = Client.forTestnet();
         }
 

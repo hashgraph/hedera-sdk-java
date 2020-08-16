@@ -72,10 +72,10 @@ class TopicWithAdminKeyExample {
         KeyList thresholdKey = KeyList.withThreshold(2);
         Collections.addAll(thresholdKey, initialAdminKeys);
 
-        Transaction transaction = new TopicCreateTransaction()
+        Transaction<?> transaction = new TopicCreateTransaction()
             .setTopicMemo("demo topic")
             .setAdminKey(thresholdKey)
-            .build(hapiClient);
+            .freezeWith(hapiClient);
 
         // Sign the transaction with 2 of 3 keys that are part of the adminKey threshold key.
         J8Arrays.stream(initialAdminKeys, 0, 2).forEach(k -> {
@@ -99,11 +99,11 @@ class TopicWithAdminKeyExample {
         KeyList thresholdKey = KeyList.withThreshold(3);
         Collections.addAll(thresholdKey, newAdminKeys);
 
-        Transaction transaction = new TopicUpdateTransaction()
+        Transaction<?> transaction = new TopicUpdateTransaction()
             .setTopicId(topicId)
             .setTopicMemo("updated demo topic")
             .setAdminKey(thresholdKey)
-            .build(hapiClient);
+            .freezeWith(hapiClient);
 
         // Sign with the initial adminKey. 2 of the 3 keys already part of the topic's adminKey.
         J8Arrays.stream(initialAdminKeys, 0, 2).forEach(k -> {

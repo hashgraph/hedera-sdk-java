@@ -2,13 +2,12 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.NetworkGetVersionInfoQuery;
 import com.hedera.hashgraph.sdk.proto.NetworkServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
 
-public class NetworkVersionInfoQuery extends QueryBuilder<NetworkVersionInfo, NetworkVersionInfoQuery> {
+public class NetworkVersionInfoQuery extends Query<NetworkVersionInfo, NetworkVersionInfoQuery> {
     private final NetworkGetVersionInfoQuery.Builder builder;
 
     public NetworkVersionInfoQuery() {
@@ -16,7 +15,7 @@ public class NetworkVersionInfoQuery extends QueryBuilder<NetworkVersionInfo, Ne
     }
 
     @Override
-    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setNetworkGetVersionInfo(builder.setHeader(header));
     }
 
@@ -26,17 +25,17 @@ public class NetworkVersionInfoQuery extends QueryBuilder<NetworkVersionInfo, Ne
     }
 
     @Override
-    QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request) {
         return request.getNetworkGetVersionInfo().getHeader();
     }
 
     @Override
-    NetworkVersionInfo mapResponse(Response response, AccountId nodeId, Query request) {
+    NetworkVersionInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
         return NetworkVersionInfo.fromProtobuf(response.getNetworkGetVersionInfo());
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Query, Response> getMethodDescriptor() {
         return NetworkServiceGrpc.getGetVersionInfoMethod();
     }
 }

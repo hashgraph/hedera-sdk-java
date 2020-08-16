@@ -113,7 +113,7 @@ public class ConsensusPubSubWithSubmitKeyExample {
             new TopicMessageSubmitTransaction()
                 .setTopicId(topicId)
                 .setMessage(message)
-                .build(client)
+                .freezeWith(client)
 
                 // The transaction is automatically signed by the payer.
                 // Due to the topic having a submitKey requirement, additionally sign the transaction with that key.

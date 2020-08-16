@@ -46,7 +46,7 @@ class AccountBalanceIntegrationTest {
                 .setAccountId(account)
                 .setTransferAccountId(operatorId)
                 .setTransactionId(TransactionId.generate(account))
-                .build(client)
+                .freezeWith(client)
                 .sign(key)
                 .execute(client)
                 .transactionId

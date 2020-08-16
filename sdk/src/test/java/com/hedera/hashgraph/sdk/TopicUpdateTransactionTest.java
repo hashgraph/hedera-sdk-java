@@ -26,14 +26,14 @@ public class TopicUpdateTransactionTest {
     @Test
     void clearShouldSerialize() {
         SnapshotMatcher.expect(new TopicUpdateTransaction()
-            .setNodeAccountId(AccountId.fromString("0.0.5005"))
+            .setNodeId(AccountId.fromString("0.0.5005"))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setTopicId(TopicId.fromString("0.0.5007"))
             .clearAdminKey()
             .clearAutoRenewAccountId(AccountId.fromString("0.0.5008"))
             .clearSubmitKey()
             .clearTopicMemo()
-            .build(Client.forTestnet())
+            .freeze()
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();
@@ -42,14 +42,14 @@ public class TopicUpdateTransactionTest {
     @Test
     void setShouldSerialize() {
         SnapshotMatcher.expect(new TopicUpdateTransaction()
-            .setNodeAccountId(AccountId.fromString("0.0.5005"))
+            .setNodeId(AccountId.fromString("0.0.5005"))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setTopicId(TopicId.fromString("0.0.5007"))
             .setAdminKey(unusedPrivateKey)
             .setAutoRenewAccountId(AccountId.fromString("0.0.5009"))
             .setAutoRenewPeriod(Duration.ofHours(24))
             .setSubmitKey(unusedPrivateKey)
-            .build(Client.forTestnet())
+            .freeze()
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();

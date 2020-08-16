@@ -1,23 +1,35 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
+import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.FileUpdateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import io.grpc.MethodDescriptor;
 import org.threeten.bp.Instant;
+
+import javax.annotation.Nullable;
+import java.util.Collection;
 
 /**
  * Updates a file by submitting the transaction.
  */
-public final class FileUpdateTransaction extends SingleTransactionBuilder<FileUpdateTransaction> {
+public final class FileUpdateTransaction extends Transaction<FileUpdateTransaction> {
     private final FileUpdateTransactionBody.Builder builder;
 
     public FileUpdateTransaction() {
         builder = FileUpdateTransactionBody.newBuilder();
     }
 
-    @Override
-    void onBuild(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setFileUpdate(builder);
+    FileUpdateTransaction(TransactionBody body) {
+        super(body);
+
+        builder = body.getFileUpdate().toBuilder();
+    }
+
+    @Nullable
+    public FileId getFileId() {
+        return builder.hasFileID() ? FileId.fromProtobuf(builder.getFileID()) : null;
     }
 
     /**
@@ -27,8 +39,13 @@ public final class FileUpdateTransaction extends SingleTransactionBuilder<FileUp
      * @return {@code this}
      */
     public FileUpdateTransaction setFileId(FileId fileId) {
+        requireNotFrozen();
         builder.setFileID(fileId.toProtobuf());
         return this;
+    }
+
+    public Collection<Key> getKeys() {
+        return KeyList.fromProtobuf(builder.getKeys(), null);
     }
 
     /**
@@ -38,12 +55,22 @@ public final class FileUpdateTransaction extends SingleTransactionBuilder<FileUp
      * @param keys The Key or Keys to be set
      */
     public FileUpdateTransaction setKeys(Key... keys) {
+        requireNotFrozen();
+
         var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
+
         for (Key key: keys) {
             keyList.addKeys(key.toKeyProtobuf());
         }
+
         builder.setKeys(keyList);
+
         return this;
+    }
+
+    @Nullable
+    public Instant getExpirationTime() {
+        return builder.hasExpirationTime() ? InstantConverter.fromProtobuf(builder.getExpirationTime()) : null;
     }
 
     /**
@@ -56,8 +83,13 @@ public final class FileUpdateTransaction extends SingleTransactionBuilder<FileUp
      * @return {@code this}
      */
     public FileUpdateTransaction setExpirationTime(Instant expirationTime) {
+        requireNotFrozen();
         builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
         return this;
+    }
+
+    public ByteString getContents() {
+        return builder.getContents();
     }
 
     /**
@@ -80,6 +112,7 @@ public final class FileUpdateTransaction extends SingleTransactionBuilder<FileUp
      * @see FileAppendTransaction if you merely want to add data to a file's existing contents.
      */
     public FileUpdateTransaction setContents(byte[] bytes) {
+        requireNotFrozen();
         builder.setContents(ByteString.copyFrom(bytes));
 
         return this;
@@ -109,7 +142,19 @@ public final class FileUpdateTransaction extends SingleTransactionBuilder<FileUp
      * @see FileAppendTransaction if you merely want to add data to a file's existing contents.
      */
     public FileUpdateTransaction setContents(String text) {
+        requireNotFrozen();
         builder.setContents(ByteString.copyFromUtf8(text));
         return this;
+    }
+
+    @Override
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
+        return FileServiceGrpc.getUpdateFileMethod();
+    }
+
+    @Override
+    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+        bodyBuilder.setFileUpdate(builder);
+        return true;
     }
 }

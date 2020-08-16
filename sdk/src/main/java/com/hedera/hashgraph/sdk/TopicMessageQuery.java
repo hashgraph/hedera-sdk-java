@@ -119,7 +119,6 @@ public final class TopicMessageQuery {
                     } finally {
                         lock.unlock();
                     }
-                    System.out.println("After lock chunked");
                     onNext.accept(message);
                 }
             }

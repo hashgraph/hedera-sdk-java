@@ -25,14 +25,14 @@ public class AccountCreateTransactionTest {
     @Test
     void shouldSerialize() {
         SnapshotMatcher.expect(new AccountCreateTransaction()
-            .setNodeAccountId(AccountId.fromString("0.0.5005"))
+            .setNodeId(AccountId.fromString("0.0.5005"))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setKey(unusedPrivateKey)
             .setInitialBalance(Hbar.fromTinybars(450))
             .setProxyAccountId(AccountId.fromString("0.0.1001"))
             .setReceiverSignatureRequired(true)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .build(Client.forTestnet())
+            .freeze()
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();

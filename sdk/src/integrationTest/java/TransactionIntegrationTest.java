@@ -21,12 +21,12 @@ public class TransactionIntegrationTest {
 
             var transaction = new AccountCreateTransaction()
                 .setKey(key)
-                .setNodeAccountId(new AccountId(5))
+                .setNodeId(new AccountId(5))
                 .setMaxTransactionFee(new Hbar(2))
-                .build(client)
+                .freezeWith(client)
                 .signWithOperator(client);
 
-            var expectedHash = transaction.hash();
+            var expectedHash = transaction.getTransactionHash();
 
             var txid = transaction.execute(client);
 
@@ -41,7 +41,7 @@ public class TransactionIntegrationTest {
                 .setAccountId(accountId)
                 .setTransferAccountId(operatorId)
                 .setMaxTransactionFee(new Hbar(1))
-                .build(client)
+                .freezeWith(client)
                 .sign(key)
                 .execute(client)
                 .transactionId

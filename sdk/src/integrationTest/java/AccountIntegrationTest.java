@@ -82,7 +82,7 @@ class AccountIntegrationTest {
                 .setAccountId(account)
                 .setKey(key2.getPublicKey())
                 .setMaxTransactionFee(new Hbar(1))
-                .build(client)
+                .freezeWith(client)
                 .sign(key1)
                 .sign(key2)
                 .execute(client)
@@ -101,7 +101,7 @@ class AccountIntegrationTest {
                 .setTransferAccountId(operatorId)
                 .setTransactionId(TransactionId.generate(account))
                 .setMaxTransactionFee(Hbar.fromTinybars(50000000))
-                .build(client)
+                .freezeWith(client)
                 .sign(key2)
                 .execute(client)
                 .transactionId

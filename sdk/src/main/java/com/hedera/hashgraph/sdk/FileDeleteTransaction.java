@@ -1,7 +1,12 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.FileDeleteTransactionBody;
+import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import io.grpc.MethodDescriptor;
+
+import javax.annotation.Nullable;
 
 /**
  * <p>A transaction to delete a file on the Hedera network.
@@ -13,11 +18,22 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
  * <p>Only one of the file's keys needs to sign to delete the file, unless the key you have is part
  * of a {@link com.hedera.hashgraph.sdk.KeyList}.
  */
-public final class FileDeleteTransaction extends SingleTransactionBuilder<FileDeleteTransaction> {
+public final class FileDeleteTransaction extends Transaction<FileDeleteTransaction> {
     private final FileDeleteTransactionBody.Builder builder;
 
     public FileDeleteTransaction() {
         builder = FileDeleteTransactionBody.newBuilder();
+    }
+
+    FileDeleteTransaction(TransactionBody body) {
+        super(body);
+
+        builder = body.getFileDelete().toBuilder();
+    }
+
+    @Nullable
+    public FileId getFileId() {
+        return builder.hasFileID() ? FileId.fromProtobuf(builder.getFileID()) : null;
     }
 
     /**
@@ -27,12 +43,19 @@ public final class FileDeleteTransaction extends SingleTransactionBuilder<FileDe
      * @return {@code this}
      */
     public FileDeleteTransaction setFileId(FileId fileId) {
+        requireNotFrozen();
         builder.setFileID(fileId.toProtobuf());
         return this;
     }
 
     @Override
-    void onBuild(TransactionBody.Builder bodyBuilder) {
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
+        return FileServiceGrpc.getDeleteFileMethod();
+    }
+
+    @Override
+    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setFileDelete(builder);
+        return true;
     }
 }

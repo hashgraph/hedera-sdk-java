@@ -27,7 +27,7 @@ public class AccountUpdateTransactionTest {
     void shouldSerialize() {
         SnapshotMatcher.expect(new AccountUpdateTransaction()
             .setKey(unusedPrivateKey)
-            .setNodeAccountId(AccountId.fromString("0.0.5005"))
+            .setNodeId(AccountId.fromString("0.0.5005"))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setAccountId(AccountId.fromString("0.0.2002"))
             .setProxyAccountId(AccountId.fromString("0.0.1001"))
@@ -37,7 +37,7 @@ public class AccountUpdateTransactionTest {
             .setExpirationTime(Instant.ofEpochSecond(1554158543))
             .setReceiverSignatureRequired(false)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .build(Client.forTestnet())
+            .freeze()
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();

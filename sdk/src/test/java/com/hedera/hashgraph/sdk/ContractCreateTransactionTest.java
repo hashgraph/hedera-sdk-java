@@ -26,7 +26,7 @@ public class ContractCreateTransactionTest {
     @Test
     void shouldSerialize() {
         SnapshotMatcher.expect(new ContractCreateTransaction()
-            .setNodeAccountId(AccountId.fromString("0.0.5005"))
+            .setNodeId(AccountId.fromString("0.0.5005"))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setBytecodeFileId(FileId.fromString("0.0.3003"))
             .setAdminKey(unusedPrivateKey)
@@ -36,7 +36,7 @@ public class ContractCreateTransactionTest {
             .setAutoRenewPeriod(Duration.ofHours(10))
             .setConstructorParameters(new byte[]{10, 11, 12, 13, 25})
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .build(Client.forTestnet())
+            .freeze()
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();

@@ -58,7 +58,7 @@ public final class DeleteAccountExample {
             .setTransactionId(TransactionId.generate(newAccountId))
             .setAccountId(newAccountId)
             .setTransferAccountId(OPERATOR_ID)
-            .build(client)
+            .freezeWith(client)
             .sign(newKey)
             .execute(client)
             .transactionId
