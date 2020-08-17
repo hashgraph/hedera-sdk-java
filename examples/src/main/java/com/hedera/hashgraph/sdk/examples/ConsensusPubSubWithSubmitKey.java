@@ -50,6 +50,9 @@ public class ConsensusPubSubWithSubmitKey {
     public void execute() throws InterruptedException, HederaStatusException {
         createTopicWithSubmitKey();
 
+        // Let's wait a bit
+        System.out.println("wait 10s to propagate to the mirror ...");
+        Thread.sleep(10000);
         subscribeToTopic();
 
         publishMessagesToTopic();
@@ -62,6 +65,8 @@ public class ConsensusPubSubWithSubmitKey {
             Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
         // Interface used to publish messages on the HCS topic.
+        // `Client.forMainnet()` is provided for connecting to Hedera mainnet
+        // `Client.forPreviewnet()` is provided for connecting to Hedera previewNet
         hapiClient = Client.forTestnet();
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for by this
