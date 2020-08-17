@@ -32,6 +32,7 @@ public final class ConsensusPubSub {
         final MirrorClient mirrorClient = new MirrorClient(MIRROR_NODE_ADDRESS);
 
         // `Client.forMainnet()` is provided for connecting to Hedera mainnet
+        // `Client.forPreviewnet()` is provided for connecting to Hedera previewNet
         Client client = Client.forTestnet();
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
@@ -44,6 +45,8 @@ public final class ConsensusPubSub {
         final ConsensusTopicId topicId = transactionId.getReceipt(client).getConsensusTopicId();
         System.out.println("New topic created: " + topicId);
 
+        System.out.println("wait 10s to propagate to the mirror ...");
+        Thread.sleep(10000);
         new MirrorConsensusTopicQuery()
             .setTopicId(topicId)
             .subscribe(mirrorClient, resp -> {
@@ -61,6 +64,8 @@ public final class ConsensusPubSub {
                 .setTopicId(topicId)
                 .setMessage("hello, HCS! " + i)
                 .execute(client);
+
+            System.out.println("sent topic message: hello, HCS! " + i);
 
             Thread.sleep(2500);
         }
