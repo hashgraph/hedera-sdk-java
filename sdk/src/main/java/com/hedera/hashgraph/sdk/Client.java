@@ -122,7 +122,9 @@ public final class Client implements AutoCloseable {
         network.put(new AccountId(11), "35.240.118.96:50211");
         network.put(new AccountId(12), "35.204.86.32:50211");
 
-        return Client.forNetwork(network);
+        var client = Client.forNetwork(network);
+        client.setMirrorNetwork(Lists.of("hcs.mainnet.mirrornode.hedera.com:5600"));
+        return client;
     }
 
     /**
