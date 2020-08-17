@@ -21,8 +21,6 @@ public final class MultiAppTransfer {
 
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names
-    private static final AccountId NODE_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("NODE_ID")));
-    private static final String NODE_ADDRESS = Objects.requireNonNull(Dotenv.load().get("NODE_ADDRESS"));
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final Ed25519PrivateKey OPERATOR_KEY = Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
@@ -34,16 +32,12 @@ public final class MultiAppTransfer {
     // this is the only key we should actually possess
     private static final Ed25519PrivateKey userKey = Ed25519PrivateKey.generate();
 
-    private static final Client client;
+    private static Client client;
 
     static {
-        // To improve responsiveness, you should specify multiple nodes using the
-        // `Client(<Map<AccountId, String>>)` constructor instead
-        client = new Client(new HashMap<AccountId, String>() {
-            {
-                put(NODE_ID, NODE_ADDRESS);
-            }
-        });
+        // `Client.forMainnet()` is provided for connecting to Hedera mainnet
+        // `Client.forPreviewnet()` is provided for connecting to Hedera previewNet
+        client = Client.forTestnet();
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
