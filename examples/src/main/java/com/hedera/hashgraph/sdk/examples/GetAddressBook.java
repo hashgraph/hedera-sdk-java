@@ -10,9 +10,11 @@ import com.hedera.hashgraph.sdk.file.FileContentsQuery;
 import com.hedera.hashgraph.sdk.file.FileId;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Objects;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -29,6 +31,7 @@ public final class GetAddressBook {
 
     public static void main(String[] args) throws HederaStatusException, IOException {
         // `Client.forMainnet()` is provided for connecting to Hedera mainnet
+        // `Client.forPreviewnet()` is provided for connecting to Hedera previewNet
         Client client = Client.forTestnet();
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
@@ -45,7 +48,15 @@ public final class GetAddressBook {
 
         final byte[] contents = fileQuery.execute(client);
 
+        // delete the file if it exists
+        File outFile = FileSystems.getDefault().getPath("address-book.proto.bin").toFile();
+        if (outFile.exists()) {
+            outFile.delete();
+        }
+
         Files.copy(new ByteArrayInputStream(contents),
             FileSystems.getDefault().getPath("address-book.proto.bin"));
+
+        System.out.println("Address book writte to address-book.proto.bin file");
     }
 }
