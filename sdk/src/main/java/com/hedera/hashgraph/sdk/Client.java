@@ -145,6 +145,18 @@ public final class Client implements AutoCloseable {
         return client;
     }
 
+    public static Client forPreviewnet() {
+        var network = new HashMap<AccountId, String>();
+        network.put(new AccountId(3), "0.preview.hedera.com:50211");
+        network.put(new AccountId(4), "1.preview.hedera.com:50211");
+        network.put(new AccountId(5), "2.preview.hedera.com:50211");
+        network.put(new AccountId(6), "3.preview.hedera.com:50211");
+
+        var client = Client.forNetwork(network);
+        client.setMirrorNetwork(Lists.of("hcs.previewnet.mirrornode.hedera.com:5600"));
+        return client;
+    }
+
     /**
      * Configure a client based off the given JSON string.
      *
