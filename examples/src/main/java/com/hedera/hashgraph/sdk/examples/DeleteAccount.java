@@ -35,6 +35,7 @@ public final class DeleteAccount {
         System.out.println("public key = " + newPublicKey);
 
         // `Client.forMainnet()` is provided for connecting to Hedera mainnet
+        // `Client.forPreviewnet()` is provided for connecting to Hedera previewNet
         Client client = Client.forTestnet();
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
@@ -64,6 +65,7 @@ public final class DeleteAccount {
             .execute(client)
             .getReceipt(client);
 
+        System.out.println("Note: Error expected with ACCOUNT_DELETED due to known issue on Hedera");
         final AccountInfo accountInfo = new AccountInfoQuery()
             .setAccountId(newAccountId)
             .setQueryPayment(25)
