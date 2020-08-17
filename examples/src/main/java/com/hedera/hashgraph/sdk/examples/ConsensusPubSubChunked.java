@@ -34,6 +34,7 @@ public final class ConsensusPubSubChunked {
         final MirrorClient mirrorClient = new MirrorClient(MIRROR_NODE_ADDRESS);
 
         // `Client.forMainnet()` is provided for connecting to Hedera mainnet
+        // `Client.forPreviewnet()` is provided for connecting to Hedera previewNet
         Client client = Client.forTestnet();
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 

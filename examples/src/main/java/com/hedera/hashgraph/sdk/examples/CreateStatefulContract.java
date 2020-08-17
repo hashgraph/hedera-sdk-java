@@ -49,6 +49,7 @@ public final class CreateStatefulContract {
         byte[] byteCode = byteCodeHex.getBytes();
 
         // `Client.forMainnet()` is provided for connecting to Hedera mainnet
+        // `Client.forPreviewnet()` is provided for connecting to Hedera previewNet
         Client client = Client.forTestnet();
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
