@@ -87,8 +87,8 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
             ByteString pubKeyPrefix = sigPair.getPubKeyPrefix();
 
             if (publicKey.hasPrefix(pubKeyPrefix)) {
-                throw new IllegalArgumentException(
-                    "transaction already signed with key: " + publicKey.toString());
+                // already signed with this key, just return
+                return this;
             }
         }
 
