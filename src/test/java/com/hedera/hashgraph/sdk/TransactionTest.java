@@ -60,10 +60,8 @@ class TransactionTest {
     @Test
     @DisplayName("validate() forbids duplicate signing keys")
     void validateForbidsDuplicates() {
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> txn.sign(key1).sign(key1),
-            "transaction already signed with key: " + key1
+        assertDoesNotThrow(
+            () -> txn.sign(key1).sign(key1)
         );
     }
 
