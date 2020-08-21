@@ -4,6 +4,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.errorprone.annotations.Var;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import java8.util.Lists;
@@ -175,14 +177,32 @@ public final class Client implements AutoCloseable {
      */
     public static Client fromJson(Reader json) {
         Config config = new Gson().fromJson(json, Config.class);
+        Client client;
 
-        Map<AccountId, String> nodes = new HashMap<>(config.network.size());
-
-        for (Map.Entry<String, String> entry : config.network.entrySet()) {
-            nodes.put(AccountId.fromString(entry.getValue()), entry.getKey());
+        if (config.network.isJsonObject()) {
+            var networks = config.network.getAsJsonObject();
+            Map<AccountId, String> nodes = new HashMap<>(networks.size());
+            for (Map.Entry<String, JsonElement> entry : networks.entrySet()) {
+                nodes.put(AccountId.fromString(entry.getKey().toString().replace("\"", "")), entry.getValue().toString().replace("\"", ""));
+            }
+            client= new Client(nodes);
         }
-
-        Client client = new Client(nodes);
+        else{
+            String networks = config.network.getAsString();
+            switch (networks) {
+                case "mainnet":
+                    client = Client.forMainnet();
+                    break;
+                case "testnet":
+                    client = Client.forTestnet();
+                    break;
+                case "previewnet":
+                    client = Client.forPreviewnet();
+                    break;
+                default:
+                    throw new JsonParseException("Illegal argument for network.");
+            }
+        }
 
         if (config.operator != null) {
             AccountId operatorAccount = AccountId.fromString(config.operator.accountId);
@@ -191,8 +211,33 @@ public final class Client implements AutoCloseable {
             client.setOperator(operatorAccount, privateKey);
         }
 
+
+        //already set in previous set network if?
         if (config.mirrorNetwork != null) {
-            client.setMirrorNetwork(config.mirrorNetwork);
+            if (config.mirrorNetwork.isJsonArray()) {
+                var mirrors = config.mirrorNetwork.getAsJsonArray();
+                List<String>  listMirrors = new ArrayList<>(mirrors.size());
+                for ( var i = 0; i<mirrors.size(); i++) {
+                    listMirrors.add(mirrors.get(i).getAsString().replace("\"", ""));
+                }
+                client.setMirrorNetwork(listMirrors);
+            }
+            else{
+                String mirror = config.mirrorNetwork.getAsString();
+                switch (mirror) {
+                    case "mainnet":
+                        client.setMirrorNetwork(Lists.of("hcs.mainnet.mirrornode.hedera.com:5600"));
+                        break;
+                    case "testnet":
+                        client.setMirrorNetwork(Lists.of("hcs.testnet.mirrornode.hedera.com:5600"));
+                        break;
+                    case "previewnet":
+                        client.setMirrorNetwork(Lists.of("hcs.previewnet.mirrornode.hedera.com:5600"));
+                        break;
+                    default:
+                        throw new JsonParseException("Illegal argument for mirrorNetwork.");
+                }
+            }
         }
 
         return client;
@@ -516,13 +561,14 @@ public final class Client implements AutoCloseable {
     }
 
     private static class Config {
-        private HashMap<String, String> network = new HashMap<>();
+        @Nullable
+        private JsonElement network;
 
         @Nullable
         private ConfigOperator operator;
 
         @Nullable
-        private List<String> mirrorNetwork = new ArrayList<>();
+        private JsonElement mirrorNetwork;
 
         private static class ConfigOperator {
             private String accountId = "";
