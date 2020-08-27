@@ -347,7 +347,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
     public T signWith(PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
         if (!isFrozen()) {
-            freeze();
+            throw new IllegalStateException("Signing requires transaction to be frozen");
         }
 
         for (var index = 0; index < transactions.size(); ++index) {
