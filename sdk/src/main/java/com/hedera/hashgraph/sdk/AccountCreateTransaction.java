@@ -110,7 +110,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     public boolean getReceiverSignatureRequired() {
-        return builder.getReceiverSigRequired();
+        return builder.getIsReceiverSigRequired();
     }
 
     /**
@@ -124,7 +124,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
      */
     public AccountCreateTransaction setReceiverSignatureRequired(boolean receiveSignatureRequired) {
         requireNotFrozen();
-        builder.setReceiverSigRequired(receiveSignatureRequired);
+        builder.setIsReceiverSigRequired(receiveSignatureRequired);
         return this;
     }
 

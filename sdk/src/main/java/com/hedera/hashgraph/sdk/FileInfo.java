@@ -30,7 +30,7 @@ public final class FileInfo {
     /**
      * True if deleted but not yet expired.
      */
-    public final boolean deleted;
+    public final boolean isDeleted;
 
     /**
      * One of these keys must sign in order to delete the file.
@@ -42,13 +42,13 @@ public final class FileInfo {
         FileId fileId,
         long size,
         Instant expirationTime,
-        boolean deleted,
+        boolean isDeleted,
         List<Key> keys
     ) {
         this.fileId = fileId;
         this.size = size;
         this.expirationTime = expirationTime;
-        this.deleted = deleted;
+        this.isDeleted = isDeleted;
         this.keys = keys;
     }
 
@@ -62,7 +62,7 @@ public final class FileInfo {
             FileId.fromProtobuf(fileInfo.getFileID()),
             fileInfo.getSize(),
             InstantConverter.fromProtobuf(fileInfo.getExpirationTime()),
-            fileInfo.getDeleted(),
+            fileInfo.getIsDeleted(),
             keys
         );
     }
@@ -81,7 +81,7 @@ public final class FileInfo {
             .setFileID(fileId.toProtobuf())
             .setSize(size)
             .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
-            .setDeleted(deleted)
+            .setIsDeleted(isDeleted)
             .setKeys(keyList);
 
         return fileInfoBuilder.build();
@@ -93,7 +93,7 @@ public final class FileInfo {
             .add("fileId", fileId)
             .add("size", size)
             .add("expirationTime", expirationTime)
-            .add("deleted", deleted)
+            .add("isDeleted", isDeleted)
             .add("keys", keys)
             .toString();
     }

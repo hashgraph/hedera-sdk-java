@@ -42,7 +42,7 @@ public class FileAppendIntegrationTest {
 
             assertEquals(info.fileId, file);
             assertEquals(info.size, 28);
-            assertFalse(info.deleted);
+            assertFalse(info.isDeleted);
             assertEquals(info.keys.get(0).toString(), Objects.requireNonNull(operatorKey).toString());
 
             new FileAppendTransaction()
@@ -62,7 +62,7 @@ public class FileAppendIntegrationTest {
 
             assertEquals(info.fileId, file);
             assertEquals(info.size, 56);
-            assertFalse(info.deleted);
+            assertFalse(info.isDeleted);
             assertEquals(info.keys.get(0).toString(), Objects.requireNonNull(operatorKey).toString());
 
             new FileDeleteTransaction()
