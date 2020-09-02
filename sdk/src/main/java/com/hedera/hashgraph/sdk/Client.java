@@ -55,7 +55,7 @@ public final class Client implements AutoCloseable {
 
     Duration requestTimeout = Duration.ofMinutes(2);
 
-    Client(Map<AccountId, String> network) {
+    Client(Map<String, AccountId> network) {
         var threadFactory = new ThreadFactoryBuilder()
             .setNameFormat("hedera-sdk-%d")
             .setDaemon(true)
@@ -65,7 +65,11 @@ public final class Client implements AutoCloseable {
             Runtime.getRuntime().availableProcessors(),
             threadFactory);
 
-        this.network = network;
+        this.network = new HashMap<AccountId, String>();
+        for (Map.Entry<String, AccountId> entry : network.entrySet()){
+            this.network.put(entry.getValue(), entry.getKey());
+        }
+
         this.nodeChannels = new HashMap<>(network.size());
 
         this.mirrorChannels = new HashMap<>(1);
@@ -74,9 +78,9 @@ public final class Client implements AutoCloseable {
         setNetworkNodes(network);
     }
 
-    private void setNetworkNodes(Map<AccountId, String> network) {
+    private void setNetworkNodes(Map<String, AccountId> network) {
         // Take all given node account IDs, shuffle, and prepare an infinite iterator for use in [getNextNodeId]
-        var allNodes = new ArrayList<>(network.keySet());
+        var allNodes = new ArrayList<>(network.values());
         Collections.shuffle(allNodes, ThreadLocalSecureRandom.current());
         this.nodes = Iterables.cycle(allNodes).iterator();
     }
@@ -100,7 +104,7 @@ public final class Client implements AutoCloseable {
      * @param network the map of node IDs to node addresses that make up the network.
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
-    public static Client forNetwork(Map<AccountId, String> network) {
+    public static Client forNetwork(Map<String, AccountId> network) {
         return new Client(network);
     }
 
@@ -112,17 +116,17 @@ public final class Client implements AutoCloseable {
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forMainnet() {
-        var network = new HashMap<AccountId, String>();
-        network.put(new AccountId(3), "35.237.200.180:50211");
-        network.put(new AccountId(4), "35.186.191.247:50211");
-        network.put(new AccountId(5), "35.192.2.25:50211");
-        network.put(new AccountId(6), "35.199.161.108:50211");
-        network.put(new AccountId(7), "35.203.82.240:50211");
-        network.put(new AccountId(8), "35.236.5.219:50211");
-        network.put(new AccountId(9), "35.197.192.225:50211");
-        network.put(new AccountId(10), "35.242.233.154:50211");
-        network.put(new AccountId(11), "35.240.118.96:50211");
-        network.put(new AccountId(12), "35.204.86.32:50211");
+        var network = new HashMap<String, AccountId>();
+        network.put("35.237.200.180:50211", new AccountId(3));
+        network.put("35.186.191.247:50211", new AccountId(4));
+        network.put("35.192.2.25:50211", new AccountId(5));
+        network.put("35.199.161.108:50211", new AccountId(6));
+        network.put("35.203.82.240:50211", new AccountId(7));
+        network.put("35.236.5.219:50211", new AccountId(8));
+        network.put("35.197.192.225:50211", new AccountId(9));
+        network.put("35.242.233.154:50211", new AccountId(10));
+        network.put("35.240.118.96:50211", new AccountId(11));
+        network.put("35.204.86.32:50211", new AccountId(12));
 
         var client = Client.forNetwork(network);
         client.setMirrorNetwork(Lists.of("hcs.mainnet.mirrornode.hedera.com:5600"));
@@ -136,11 +140,11 @@ public final class Client implements AutoCloseable {
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forTestnet() {
-        var network = new HashMap<AccountId, String>();
-        network.put(new AccountId(3), "0.testnet.hedera.com:50211");
-        network.put(new AccountId(4), "1.testnet.hedera.com:50211");
-        network.put(new AccountId(5), "2.testnet.hedera.com:50211");
-        network.put(new AccountId(6), "3.testnet.hedera.com:50211");
+        var network = new HashMap<String, AccountId>();
+        network.put("0.testnet.hedera.com:50211", new AccountId(3));
+        network.put("1.testnet.hedera.com:50211", new AccountId(4));
+        network.put("2.testnet.hedera.com:50211", new AccountId(5));
+        network.put("3.testnet.hedera.com:50211", new AccountId(6));
 
         var client = Client.forNetwork(network);
         client.setMirrorNetwork(Lists.of("hcs.testnet.mirrornode.hedera.com:5600"));
@@ -148,11 +152,11 @@ public final class Client implements AutoCloseable {
     }
 
     public static Client forPreviewnet() {
-        var network = new HashMap<AccountId, String>();
-        network.put(new AccountId(3), "0.preview.hedera.com:50211");
-        network.put(new AccountId(4), "1.preview.hedera.com:50211");
-        network.put(new AccountId(5), "2.preview.hedera.com:50211");
-        network.put(new AccountId(6), "3.preview.hedera.com:50211");
+        var network = new HashMap<String, AccountId>();
+        network.put("0.preview.hedera.com:50211", new AccountId(3));
+        network.put("1.preview.hedera.com:50211", new AccountId(4));
+        network.put("2.preview.hedera.com:50211", new AccountId(5));
+        network.put("3.preview.hedera.com:50211", new AccountId(6));
 
         var client = Client.forNetwork(network);
         client.setMirrorNetwork(Lists.of("hcs.previewnet.mirrornode.hedera.com:5600"));
@@ -181,9 +185,9 @@ public final class Client implements AutoCloseable {
 
         if (config.network.isJsonObject()) {
             var networks = config.network.getAsJsonObject();
-            Map<AccountId, String> nodes = new HashMap<>(networks.size());
+            Map<String, AccountId> nodes = new HashMap<>(networks.size());
             for (Map.Entry<String, JsonElement> entry : networks.entrySet()) {
-                nodes.put(AccountId.fromString(entry.getKey().toString().replace("\"", "")), entry.getValue().toString().replace("\"", ""));
+                nodes.put(entry.getValue().toString().replace("\"", ""), AccountId.fromString(entry.getKey().toString().replace("\"", "")));
             }
             client= new Client(nodes);
         }
@@ -272,12 +276,17 @@ public final class Client implements AutoCloseable {
      * @param nodes a map of node account ID to node URL.
      * @return {@code this} for fluent API usage.
      */
-    public Client setNetwork(Map<AccountId, String> nodes) throws InterruptedException {
+    public Client setNetwork(Map<String, AccountId> nodes) throws InterruptedException {
+        @Var var inverted = new HashMap<AccountId, String>();
+        for (Map.Entry<String, AccountId> entry : nodes.entrySet()){
+            inverted.put(entry.getValue(), entry.getKey());
+        }
+
         setNetworkNodes(nodes);
         @Var ManagedChannel channel = null;
 
         for (Map.Entry<AccountId, String> node : this.network.entrySet()) {
-            String newNodeUrl = nodes.get(node.getKey());
+            String newNodeUrl = inverted.get(node.getKey());
 
             // node hasn't changed
             if (node.getValue().equals(newNodeUrl)) {
@@ -288,8 +297,7 @@ public final class Client implements AutoCloseable {
             node.setValue(newNodeUrl);
 
             if (newNodeUrl == null) {
-                // set null for removal, should be fixed here to just remove instead of setting null then removing
-                nodeChannels.put(node.getKey(), null);
+                this.nodeChannels.remove(node.getKey());
             } else if (nodeChannels.get(node.getKey()) != null && !nodeChannels.get(node.getKey()).authority().equals(newNodeUrl)) {
                 // Shutdown channel before replacing address
                 nodeChannels.get(node.getKey()).shutdown().awaitTermination(30, TimeUnit.SECONDS);
@@ -304,10 +312,10 @@ public final class Client implements AutoCloseable {
 
         // remove
         this.network.values().removeAll(Collections.singleton(null));
-        this.nodeChannels.values().removeAll(Collections.singleton(null));
+
 
         // add new nodes
-        for (Map.Entry<AccountId, String> node : nodes.entrySet()) {
+        for (Map.Entry<AccountId, String> node : inverted.entrySet()) {
             this.network.put(node.getKey(), node.getValue());
             // .getNetworkChannel() will add the node and channel from network
             this.getNetworkChannel(node.getKey());

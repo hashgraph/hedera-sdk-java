@@ -1,5 +1,6 @@
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
+import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.LiveHashAddTransaction;
@@ -33,6 +34,7 @@ class LiveHashIntegrationTest {
                 .setKey(key)
                 .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
+                .setNodeAccountId(new AccountId(5))
                 .execute(client)
                 .transactionId
                 .getReceipt(client);
@@ -46,6 +48,7 @@ class LiveHashIntegrationTest {
                 new LiveHashAddTransaction()
                     .setAccountId(account)
                     .setDuration(Duration.ofDays(30))
+                    .setNodeAccountId(new AccountId(5))
                     .setHash(hash)
                     .setKeys(key)
                     .execute(client);
@@ -69,6 +72,7 @@ class LiveHashIntegrationTest {
             try {
                 new LiveHashDeleteTransaction()
                     .setAccountId(account)
+                    .setNodeAccountId(new AccountId(5))
                     .setHash(hash)
                     .execute(client);
             } catch (HederaPreCheckStatusException e) {
@@ -77,9 +81,10 @@ class LiveHashIntegrationTest {
 
             assertDoesNotThrow(() -> {
                 new LiveHashQuery()
-                   .setAccountId(account)
-                   .setHash(hash)
-                   .execute(client);
+                    .setAccountId(account)
+                    .setNodeAccountId(new AccountId(5))
+                    .setHash(hash)
+                    .execute(client);
 //                assertEquals(liveHash.accountId, account);
 //                assertEquals(liveHash.duration, Duration.ofDays(30));
 //                assertEquals(liveHash.hash.toByteArray(), hash);
@@ -97,6 +102,7 @@ class LiveHashIntegrationTest {
 //
             new AccountDeleteTransaction()
                 .setAccountId(account)
+                .setNodeAccountId(new AccountId(5))
                 .setTransferAccountId(operatorId)
                 .execute(client);
 

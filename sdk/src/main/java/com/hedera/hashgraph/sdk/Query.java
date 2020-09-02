@@ -221,6 +221,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
             .setMaxTransactionFee(new Hbar(1)) // 1 Hbar
             .addSender(operator.accountId, paymentAmount)
             .addRecipient(nodeId, paymentAmount)
+            .freeze()
             .signWith(operator.publicKey, operator.transactionSigner)
             .makeRequest();
     }

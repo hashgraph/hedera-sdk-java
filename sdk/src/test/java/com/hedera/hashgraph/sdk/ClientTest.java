@@ -82,18 +82,18 @@ class ClientTest {
     @DisplayName("setNetwork() functions correctly")
     void testReplaceNodes() {
         assertDoesNotThrow(() -> {
-            @Var Map<AccountId, String> nodes = new HashMap<>();
-            nodes.put(new AccountId(3), "0.testnet.hedera.com:50211");
-            nodes.put(new AccountId(4), "1.testnet.hedera.com:50211");
+            @Var Map<String, AccountId> nodes = new HashMap<>();
+            nodes.put("0.testnet.hedera.com:50211", new AccountId(3));
+            nodes.put("1.testnet.hedera.com:50211", new AccountId(4));
 
             Client client = new Client(nodes);
 
 
-            nodes = new HashMap<>();
-            nodes.put(new AccountId(5), "2.testnet.hedera.com:50211");
-            nodes.put(new AccountId(6), "3.testnet.hedera.com:50211");
+            @Var Map<String, AccountId> setNetworkNodes = new HashMap<>();
+            setNetworkNodes.put("2.testnet.hedera.com:50211", new AccountId(5));
+            setNetworkNodes.put("3.testnet.hedera.com:50211", new AccountId(6));
 
-            client.setNetwork(nodes);
+            client.setNetwork(setNetworkNodes);
 
             Assertions.assertEquals(client.getNetworkChannel(new AccountId(5)).authority(), "2.testnet.hedera.com:50211");
             Assertions.assertThrows(IllegalArgumentException.class , () -> client.getNetworkChannel(new AccountId(3)));

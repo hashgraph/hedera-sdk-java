@@ -556,7 +556,9 @@ public abstract class Transaction<T extends Transaction<T>>
         AccountId nodeId,
         com.hedera.hashgraph.sdk.proto.Transaction request
     ) {
-        return new TransactionResponse(nodeId, Objects.requireNonNull(getTransactionId()), hash(request.toByteArray()));
+        freeze();
+        var transactionId = Objects.requireNonNull(getTransactionId());
+        return new TransactionResponse(nodeId, transactionId,  hash(request.toByteArray()));
     }
 
     @Override
