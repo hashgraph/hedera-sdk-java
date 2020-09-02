@@ -79,26 +79,48 @@ public final class Mnemonic {
      * Returns a new random 24-word mnemonic from the BIP-39 standard English word list.
      * @return {@code this}
      */
-    public static Mnemonic generate() {
+    public static Mnemonic generate24() {
         var entropy = new byte[32];
         ThreadLocalSecureRandom.current().nextBytes(entropy);
 
         return new Mnemonic(entropyToWords(entropy));
     }
+    /**
+     * Returns a new random 12-word mnemonic from the BIP-39 standard English word list.
+     * @return {@code this}
+     */
+    public static Mnemonic generate12() {
+        var entropy = new byte[16];
+        ThreadLocalSecureRandom.current().nextBytes(entropy);
+
+        Mnemonic k = new Mnemonic(entropyToWords(entropy));
+
+        return k;
+    }
 
     private static List<String> entropyToWords(byte[] entropy) {
-        // we only care to support 24 word mnemonics
-        if (entropy.length != 32) {
+        if (entropy.length != 16 && entropy.length != 32) {
             throw new IllegalArgumentException("invalid entropy byte length: " + entropy.length);
         }
 
         // checksum for 256 bits is one byte
-        var bytes = Arrays.copyOf(entropy, 33);
-        bytes[32] = checksum(entropy);
-
         var wordList = getWordList();
-        var words = new ArrayList<String>(24);
+        ArrayList<String> words;
+        byte[] bytes;
+        if(entropy.length == 16) {
+            bytes = Arrays.copyOf(entropy, 17);
+            bytes[16] = (byte)(checksum(entropy) & 0xF0);
 
+            wordList = getWordList();
+            words = new ArrayList<>(12);
+        }
+        else {
+            bytes = Arrays.copyOf(entropy, 33);
+            bytes[32] = checksum(entropy);
+
+            wordList = getWordList();
+            words = new ArrayList<>(24);
+        }
         @Var var scratch = 0;
         @Var var offset = 0;
 
@@ -125,7 +147,12 @@ public final class Mnemonic {
     private static byte checksum(byte[] entropy) {
         SHA256Digest digest = new SHA256Digest();
         // hash the first
-        digest.update(entropy, 0, 32);
+
+        if(entropy.length == 17 || entropy.length == 16){
+            digest.update(entropy, 0, 16);
+        }else {
+            digest.update(entropy, 0, 32);
+        }
 
         byte[] checksum = new byte[digest.getDigestSize()];
         digest.doFinal(checksum, 0);
@@ -192,9 +219,9 @@ public final class Mnemonic {
     public PrivateKey toPrivateKey() {
         return toPrivateKey("");
     }
-
+    
     private void validate() throws BadMnemonicException {
-        if (words.size() != 24) {
+        if (words.size() != 24 && words.size() != 12) {
             throw new BadMnemonicException(this, BadMnemonicReason.BadLength);
         }
 
@@ -214,8 +241,17 @@ public final class Mnemonic {
         byte[] entropyAndChecksum = wordsToEntropyAndChecksum();
 
         // ignores the 33rd byte
-        byte expectedChecksum = checksum(entropyAndChecksum);
-        byte givenChecksum = entropyAndChecksum[32];
+        byte expectedChecksum;
+        byte givenChecksum;
+
+        if(words.size() == 12) {
+            expectedChecksum = (byte)(checksum(entropyAndChecksum) & 0xF0);
+            givenChecksum = entropyAndChecksum[16];
+        }
+        else{
+            expectedChecksum = checksum(entropyAndChecksum);
+            givenChecksum = entropyAndChecksum[32];
+        }
 
         if (givenChecksum != expectedChecksum) {
             throw new BadMnemonicException(this, BadMnemonicReason.ChecksumMismatch);
@@ -246,14 +282,18 @@ public final class Mnemonic {
     }
 
     private byte[] wordsToEntropyAndChecksum() {
-        if (words.size() != 24) {
+        if (words.size() != 24 && words.size() != 12) {
             // should be checked in `validate()`
             throw new IllegalStateException(
                 "(BUG) expected 24-word mnemonic, got " + words.size() + " words");
         }
-
-        ByteBuffer buffer = ByteBuffer.allocate(33);
-
+        ByteBuffer buffer;
+        if(words.size() == 12) {
+            buffer = ByteBuffer.allocate(17);
+        }
+        else{
+            buffer = ByteBuffer.allocate(33);
+        }
         // reverse algorithm of `entropyToWords()` below
         @Var int scratch = 0;
         @Var int offset = 0;
@@ -276,6 +316,10 @@ public final class Mnemonic {
                 buffer.put((byte) (scratch >> (offset - 8)));
                 offset -= 8;
             }
+        }
+
+        if(offset != 0){
+            buffer.put((byte) (scratch << offset));
         }
 
         return buffer.array();

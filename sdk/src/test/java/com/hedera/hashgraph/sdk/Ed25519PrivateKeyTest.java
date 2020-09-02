@@ -83,7 +83,7 @@ class Ed25519PrivateKeyTest {
         assertNotNull(key.toBytes());
 
         // we generate the chain code at the same time
-        assertTrue(key.supportsDerivation(), "generated key must support generation");
+        assertTrue(key.isDerivable(), "generated key must support generation");
     }
 
     @Test
@@ -165,9 +165,22 @@ class Ed25519PrivateKeyTest {
     }
 
     @Test
-    @DisplayName("generated mnemonic can be turned into a working private key")
-    void keyFromGeneratedMnemonic() {
-        Mnemonic mnemonic = Mnemonic.generate();
+    @DisplayName("generated mnemonic24 can be turned into a working private key")
+    void keyFromGeneratedMnemonic24() {
+        Mnemonic mnemonic = Mnemonic.generate24();
+        PrivateKey privateKey = PrivateKey.fromMnemonic(mnemonic);
+
+        byte[] messageToSign = "this is a test message".getBytes(StandardCharsets.UTF_8);
+
+        byte[] signature = privateKey.sign(messageToSign);
+
+        assertTrue(Ed25519.verify(signature, 0, privateKey.getPublicKey().toBytes(), 0, messageToSign, 0, messageToSign.length));
+    }
+
+    @Test
+    @DisplayName("generated mnemonic12 can be turned into a working private key")
+    void keyFromGeneratedMnemonic12() {
+        Mnemonic mnemonic = Mnemonic.generate12();
         PrivateKey privateKey = PrivateKey.fromMnemonic(mnemonic);
 
         byte[] messageToSign = "this is a test message".getBytes(StandardCharsets.UTF_8);

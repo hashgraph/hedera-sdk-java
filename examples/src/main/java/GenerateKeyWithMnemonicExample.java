@@ -7,12 +7,20 @@ class GenerateKeyWithMnemonicExample {
     }
 
     public static void main(String[] args) {
-        Mnemonic mnemonic = Mnemonic.generate();
+        Mnemonic mnemonic = Mnemonic.generate24();
         PrivateKey privateKey = mnemonic.toPrivateKey();
         PublicKey publicKey = privateKey.getPublicKey();
 
-        System.out.println("mnemonic = " + mnemonic);
+        Mnemonic mnemonic12 = Mnemonic.generate12();
+        PrivateKey privateKey12 = mnemonic12.toPrivateKey();
+        PublicKey publicKey12 = privateKey12.getPublicKey();
+
+        System.out.println("mnemonic 24 word = " + mnemonic);
         System.out.println("private key = " + privateKey);
         System.out.println("public key = " + publicKey);
+
+        System.out.println("mnemonic 12 word = " + mnemonic12);
+        System.out.println("private key = " + privateKey12);
+        System.out.println("public key = " + publicKey12);
     }
 }
