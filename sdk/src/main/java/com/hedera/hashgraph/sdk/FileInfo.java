@@ -5,9 +5,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.FileGetInfoResponse;
 import org.threeten.bp.Instant;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Current information for a file, including its size.
  */
@@ -36,14 +33,14 @@ public final class FileInfo {
      * One of these keys must sign in order to delete the file.
      * All of these keys must sign in order to update the file.
      */
-    public final List<Key> keys;
+    public final KeyList keys;
 
     private FileInfo(
         FileId fileId,
         long size,
         Instant expirationTime,
         boolean isDeleted,
-        List<Key> keys
+        KeyList keys
     ) {
         this.fileId = fileId;
         this.size = size;
@@ -53,10 +50,7 @@ public final class FileInfo {
     }
 
     static FileInfo fromProtobuf(FileGetInfoResponse.FileInfo fileInfo) {
-        var keys = new ArrayList<Key>(fileInfo.getKeys().getKeysCount());
-        for (var i = 0; i < fileInfo.getKeys().getKeysCount(); ++i) {
-            keys.add(Key.fromProtobuf(fileInfo.getKeys().getKeys(i)));
-        }
+        KeyList keys = KeyList.fromProtobuf(fileInfo.getKeys(), fileInfo.getKeys().getKeysCount());
 
         return new FileInfo(
             FileId.fromProtobuf(fileInfo.getFileID()),

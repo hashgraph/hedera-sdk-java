@@ -3,6 +3,7 @@ import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.FileInfoQuery;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.KeyList;
 import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
@@ -42,7 +43,8 @@ public class FileDeleteIntegrationTest {
             assertEquals(info.fileId, file);
             assertEquals(info.size, 28);
             assertFalse(info.isDeleted);
-            assertEquals(info.keys.get(0).toString(), Objects.requireNonNull(operatorKey).toString());
+            var testKey = KeyList.of(Objects.requireNonNull(operatorKey)).setThreshold(info.keys.getThreshold());
+            assertEquals(info.keys.toString(), testKey.toString());
 
             new FileDeleteTransaction()
                 .setFileId(file)
