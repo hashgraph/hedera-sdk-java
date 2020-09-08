@@ -7,13 +7,14 @@ import com.hedera.hashgraph.sdk.TopicInfoQuery;
 import com.hedera.hashgraph.sdk.Hbar;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,8 +43,6 @@ public class TopicMessageIntegrationTest {
 
             var topic = receipt.topicId;
 
-            System.out.println("Topic: " + topic);
-
             @Var var info = new TopicInfoQuery()
                 .setTopicId(topic)
                 .setNodeId(response.nodeId)
@@ -55,27 +54,28 @@ public class TopicMessageIntegrationTest {
             assertEquals(info.sequenceNumber, 0);
             assertEquals(info.adminKey, operatorKey);
 
+            var receivedMessage = new boolean[]{false};
+            var start = Instant.now();
+
             var handle = new TopicMessageQuery()
               .setTopicId(topic)
               .subscribe(client, (message) -> {
-                  System.out.println("Received message");
-                  System.out.println(new String(message.contents, StandardCharsets.UTF_8));
+                  assertEquals(new String(message.contents, StandardCharsets.UTF_8), "Hello, from HCS!");
+                  receivedMessage[0] = true;
               });
 
-            for (var i = 0; i < 100; ++i) {
-                new TopicMessageSubmitTransaction()
-                  .setNodeId(response.nodeId)
-                  .setTopicId(topic)
-                  .setMessage("[ " + i + " ] Hello from HCS!")
-                  .execute(client);
+            new TopicMessageSubmitTransaction()
+              .setNodeId(response.nodeId)
+              .setTopicId(topic)
+              .setMessage("Hello, from HCS!")
+              .execute(client);
 
-                System.out.println("Sent #" + i);
-
-                try {
-                  Thread.sleep(2500);
-                } catch (InterruptedException e) {
-                  // Do nothing
+            while(!receivedMessage[0]) {
+                if (Duration.between(start, Instant.now()).compareTo(Duration.ofSeconds(10)) > 0) {
+                    throw new Exception("TopicMessage was not received in 5 seconds or less");
                 }
+
+                Thread.sleep(1000);
             }
 
             handle.unsubscribe();
