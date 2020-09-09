@@ -23,13 +23,13 @@ class AccountBalanceIntegrationTest {
 
             var key = PrivateKey.generate();
 
-            var receipt = new AccountCreateTransaction()
+            var response = new AccountCreateTransaction()
                 .setKey(key)
                 .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
-                .execute(client)
-                .transactionId
-                .getReceipt(client);
+                .execute(client);
+
+            var receipt = response.transactionId.getReceipt(client);
 
             assertNotNull(receipt.accountId);
             assertTrue(Objects.requireNonNull(receipt.accountId).num > 0);
@@ -38,12 +38,14 @@ class AccountBalanceIntegrationTest {
 
             @Var var balance = new AccountBalanceQuery()
                 .setAccountId(account)
+                .setNodeId(response.nodeId)
                 .execute(client);
 
             assertEquals(balance, new Hbar(1));
 
             new AccountDeleteTransaction()
                 .setAccountId(account)
+                .setNodeId(response.nodeId)
                 .setTransferAccountId(operatorId)
                 .setTransactionId(TransactionId.generate(account))
                 .freezeWith(client)

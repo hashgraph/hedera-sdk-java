@@ -28,9 +28,9 @@ public class TransactionIntegrationTest {
 
             var expectedHash = transaction.getTransactionHash();
 
-            var txid = transaction.execute(client);
+            var response = transaction.execute(client);
 
-            var record = txid.getRecord(client);
+            var record = response.getRecord(client);
 
             assertArrayEquals(expectedHash, record.transactionHash.toByteArray());
 

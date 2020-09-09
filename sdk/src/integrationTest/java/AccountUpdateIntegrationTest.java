@@ -28,13 +28,13 @@ class AccountUpdateIntegrationTest {
             var key1 = PrivateKey.generate();
             var key2 = PrivateKey.generate();
 
-            var receipt = new AccountCreateTransaction()
+            var response = new AccountCreateTransaction()
                 .setKey(key1)
                 .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
-                .execute(client)
-                .transactionId
-                .getReceipt(client);
+                .execute(client);
+
+            var receipt = response.transactionId.getReceipt(client);
 
             assertNotNull(receipt.accountId);
             assertTrue(Objects.requireNonNull(receipt.accountId).num > 0);
@@ -43,6 +43,7 @@ class AccountUpdateIntegrationTest {
 
             @Var var info = new AccountInfoQuery()
                 .setAccountId(account)
+                .setNodeId(response.nodeId)
                 .execute(client);
 
             assertEquals(info.accountId, account);
@@ -57,6 +58,7 @@ class AccountUpdateIntegrationTest {
 
             new AccountUpdateTransaction()
                 .setAccountId(account)
+                .setNodeId(response.nodeId)
                 .setKey(key2.getPublicKey())
                 .setMaxTransactionFee(new Hbar(1))
                 .freezeWith(client)
@@ -82,6 +84,7 @@ class AccountUpdateIntegrationTest {
 
             new AccountDeleteTransaction()
                 .setAccountId(account)
+                .setNodeId(response.nodeId)
                 .setTransferAccountId(operatorId)
                 .setTransactionId(TransactionId.generate(account))
                 .freezeWith(client)
