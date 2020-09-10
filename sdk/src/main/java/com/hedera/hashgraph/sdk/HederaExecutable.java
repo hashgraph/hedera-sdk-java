@@ -134,6 +134,10 @@ abstract class HederaExecutable<RequestT, ResponseT, O> extends Executable<O> {
      * when the pre-check status is {@code BUSY}.
      */
     boolean shouldRetry(Status status, ResponseT response) {
-        return status == Status.BUSY;
+        if(status == Status.PLATFORM_TRANSACTION_NOT_CREATED){
+            return true;
+        }else{
+            return status == Status.BUSY;
+        }
     }
 }
