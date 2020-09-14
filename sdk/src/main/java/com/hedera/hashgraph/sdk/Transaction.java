@@ -216,6 +216,7 @@ public abstract class Transaction<T extends Transaction<T>>
      * @return {@code this}
      */
     public final T setNodeId(AccountId nodeAccountId) {
+        requireNotFrozen();
         bodyBuilder.setNodeAccountID(nodeAccountId.toProtobuf());
 
         // noinspection unchecked
@@ -236,14 +237,24 @@ public abstract class Transaction<T extends Transaction<T>>
      * @return {@code this}
      */
     public final T setTransactionValidDuration(Duration validDuration) {
+        requireNotFrozen();
         bodyBuilder.setTransactionValidDuration(DurationConverter.toProtobuf(validDuration));
 
         // noinspection unchecked
         return (T) this;
     }
 
+    @Nullable
     public final Hbar getMaxTransactionFee() {
-        return Hbar.fromTinybars(bodyBuilder.getTransactionFee());
+        var transactionFee = bodyBuilder.getTransactionFee();
+
+        if (transactionFee == 0) {
+            // a zero max fee is assumed to be _no_
+            // max fee has been set
+            return null;
+        }
+
+        return Hbar.fromTinybars(transactionFee);
     }
 
     /**
@@ -253,6 +264,7 @@ public abstract class Transaction<T extends Transaction<T>>
      * @return {@code this}
      */
     public final T setMaxTransactionFee(Hbar maxTransactionFee) {
+        requireNotFrozen();
         bodyBuilder.setTransactionFee(maxTransactionFee.toTinybars());
 
         // noinspection unchecked
@@ -271,6 +283,7 @@ public abstract class Transaction<T extends Transaction<T>>
      * @return {@code this}
      */
     public final T setTransactionMemo(String memo) {
+        requireNotFrozen();
         bodyBuilder.setMemo(memo);
 
         // noinspection unchecked
@@ -317,6 +330,7 @@ public abstract class Transaction<T extends Transaction<T>>
      * @see TransactionId
      */
     public final T setTransactionId(TransactionId transactionId) {
+        requireNotFrozen();
         bodyBuilder.setTransactionID(transactionId.toProtobuf());
 
         // noinspection unchecked
