@@ -30,7 +30,7 @@ public final class AccountInfo {
      * If true, then this account has been deleted, it will disappear when it expires, and
      * all transactions for it will fail except the transaction to extend its expiration date.
      */
-    public final boolean deleted;
+    public final boolean isDeleted;
 
     /**
      * The Account ID of the account to which this is proxy staked. If proxyAccountID is null,
@@ -73,7 +73,7 @@ public final class AccountInfo {
     /**
      * If true, no transaction can transfer to this account unless signed by this account's key.
      */
-    public final boolean receiverSignatureRequired;
+    public final boolean isReceiverSignatureRequired;
 
     /**
      * The time at which this account is set to expire.
@@ -92,7 +92,7 @@ public final class AccountInfo {
     private AccountInfo(
         AccountId accountId,
         String contractAccountId,
-        boolean deleted,
+        boolean isDeleted,
         @Nullable AccountId proxyAccountId,
         long proxyReceived,
         Key key,
@@ -106,14 +106,14 @@ public final class AccountInfo {
     ) {
         this.accountId = accountId;
         this.contractAccountId = contractAccountId;
-        this.deleted = deleted;
+        this.isDeleted = isDeleted;
         this.proxyAccountId = proxyAccountId;
         this.proxyReceived = Hbar.fromTinybars(proxyReceived);
         this.key = key;
         this.balance = Hbar.fromTinybars(balance);
         this.sendRecordThreshold = Hbar.fromTinybars(sendRecordThreshold);
         this.receiveRecordThreshold = Hbar.fromTinybars(receiveRecordThreshold);
-        this.receiverSignatureRequired = receiverSignatureRequired;
+        this.isReceiverSignatureRequired = receiverSignatureRequired;
         this.expirationTime = expirationTime;
         this.autoRenewPeriod = autoRenewPeriod;
         this.liveHashes = liveHashes;
@@ -158,13 +158,13 @@ public final class AccountInfo {
 
         var accountInfoBuilder = CryptoGetInfoResponse.AccountInfo.newBuilder()
             .setAccountID(accountId.toProtobuf())
-            .setDeleted(deleted)
+            .setDeleted(isDeleted)
             .setProxyReceived(proxyReceived.toTinybars())
             .setKey(key.toKeyProtobuf())
             .setBalance(balance.toTinybars())
             .setGenerateSendRecordThreshold(sendRecordThreshold.toTinybars())
             .setGenerateReceiveRecordThreshold(receiveRecordThreshold.toTinybars())
-            .setReceiverSigRequired(receiverSignatureRequired)
+            .setReceiverSigRequired(isReceiverSignatureRequired)
             .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
             .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod))
             .addAllLiveHashes(hashes);
@@ -185,14 +185,14 @@ public final class AccountInfo {
         return MoreObjects.toStringHelper(this)
             .add("accountId", accountId)
             .add("contractAccountId", contractAccountId)
-            .add("deleted", deleted)
+            .add("deleted", isDeleted)
             .add("proxyAccountId", proxyAccountId)
             .add("proxyReceived", proxyReceived)
             .add("key", key)
             .add("balance", balance)
             .add("sendRecordThreshold", sendRecordThreshold)
             .add("receiveRecordThreshold", receiveRecordThreshold)
-            .add("receiverSignatureRequired", receiverSignatureRequired)
+            .add("receiverSignatureRequired", isReceiverSignatureRequired)
             .add("expirationTime", expirationTime)
             .add("autoRenewPeriod", autoRenewPeriod)
             .add("liveHashes", liveHashes)
