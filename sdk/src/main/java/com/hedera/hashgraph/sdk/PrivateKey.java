@@ -215,7 +215,7 @@ public final class PrivateKey extends Key {
      *
      * @return boolean
      */
-    public boolean supportsDerivation() {
+    public boolean isDerivable() {
         return this.chainCode != null;
     }
 
@@ -227,7 +227,7 @@ public final class PrivateKey extends Key {
      * @param index the wallet/account index of the account, 0 for the default account.
      * @return the derived key
      * @throws IllegalStateException if this key does not support derivation.
-     * @see #supportsDerivation()
+     * @see #isDerivable()
      */
     public PrivateKey derive(int index) {
         if (this.chainCode == null) {
