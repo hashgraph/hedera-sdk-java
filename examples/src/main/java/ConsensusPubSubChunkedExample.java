@@ -82,7 +82,7 @@ public final class ConsensusPubSubChunkedExample {
 
         // view out the message size from the parsed transaction
         // this can be useful to display what we are about to sign
-        var transactionMessageSize = ((TopicMessageSubmitTransaction)transaction).getMessage().size();
+        long transactionMessageSize = ((TopicMessageSubmitTransaction)transaction).getMessage().size();
         System.out.println("about to send a transaction with a message of " + transactionMessageSize + " bytes");
 
         // sign with that submit key

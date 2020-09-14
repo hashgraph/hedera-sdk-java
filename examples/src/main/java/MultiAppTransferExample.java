@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.TransactionResponse;
 import com.hedera.hashgraph.sdk.Transaction;
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -87,7 +88,7 @@ public final class MultiAppTransferExample {
         System.out.println("about to transfer " + transferAmount + "...");
 
         // we now execute the signed transaction and wait for it to be accepted
-        var transactionResponse = signedTransferTxn.execute(client);
+        TransactionResponse transactionResponse = signedTransferTxn.execute(client);
 
         // (important!) wait for consensus by querying for the receipt
         transactionResponse.getReceipt(client);
