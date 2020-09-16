@@ -41,8 +41,7 @@ public class ConsensusMessageSubmitTransaction extends TransactionBuilder<Transa
     public ConsensusMessageSubmitTransaction setChunkInfo(
         TransactionId initialTransactionId,
         int totalNumber,
-        int number)
-    {
+        int number) {
         this.chunkInfo = ConsensusMessageChunkInfo.newBuilder()
             .setInitialTransactionID(initialTransactionId.toProto())
             .setNumber(number)
@@ -130,11 +129,13 @@ public class ConsensusMessageSubmitTransaction extends TransactionBuilder<Transa
             txs.add(new SingleConsensusMessageSubmitTransaction(
                 bodyBuilder.buildPartial(),
                 topicId,
-                ConsensusMessageChunkInfo.newBuilder()
-                    .setInitialTransactionID(initialTransactionId.toProto())
-                    .setTotal((int) requiredChunks)
-                    .setNumber(i + 1) // 1..=total
-                    .build(),
+                requiredChunks > 1 ?
+                    ConsensusMessageChunkInfo.newBuilder()
+                        .setInitialTransactionID(initialTransactionId.toProto())
+                        .setTotal((int) requiredChunks)
+                        .setNumber(i + 1) // 1..=total
+                        .build() :
+                    null,
                 chunkMessage).build(client));
 
             // add 1 ns to make cascading transaction IDs
@@ -164,8 +165,7 @@ public class ConsensusMessageSubmitTransaction extends TransactionBuilder<Transa
             TransactionBody bodyBuilder,
             @Nullable ConsensusTopicId topicId,
             ConsensusMessageChunkInfo chunkInfo,
-            ByteString message)
-        {
+            ByteString message) {
             this.bodyBuilder.mergeFrom(bodyBuilder);
 
             ConsensusSubmitMessageTransactionBody.Builder builder = this.bodyBuilder.getConsensusSubmitMessageBuilder();
@@ -174,7 +174,9 @@ public class ConsensusMessageSubmitTransaction extends TransactionBuilder<Transa
                 builder.setTopicID(topicId.toProto());
             }
 
-            builder.setChunkInfo(chunkInfo);
+            if (chunkInfo != null) {
+                builder.setChunkInfo(chunkInfo);
+            }
 
             builder.setMessage(message);
         }

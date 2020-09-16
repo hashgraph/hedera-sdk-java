@@ -13,10 +13,12 @@ import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
 import io.grpc.Status;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class MirrorConsensusTopicQuery {
@@ -46,7 +48,6 @@ public class MirrorConsensusTopicQuery {
         return this;
     }
 
-    // TODO: Refactor into a base class when we add more mirror query types
     public MirrorSubscriptionHandle subscribe(MirrorClient mirrorClient, Consumer<MirrorConsensusTopicResponse> onNext,
                                               Consumer<Throwable> onError)
     {
@@ -70,7 +71,11 @@ public class MirrorConsensusTopicQuery {
             onError.accept(new Error("Failed to connect to mirror node"));
         }
 
-        ConcurrentHashMap<TransactionID, ArrayList<ConsensusTopicResponse>> pendingMessages = new ConcurrentHashMap<>();
+        // From our testing `ClientCalls.asyncServerStreamingCall` does *not* call `onNext` before the previous call
+        // to `onNext` finishes. Meaning, there is no use in having `ConcurrentHashmap` or `CopyOnWriteArrayList` since
+        // the callback is never run concurrently.
+        HashMap<TransactionID, Tuple<Instant, ArrayList<ConsensusTopicResponse>>> pendingMessages = new HashMap<>();
+        Instant[] lastInstantChecked = new Instant[]{null};
 
         ClientCalls.asyncServerStreamingCall(call, query, new StreamObserver<ConsensusTopicResponse>() {
             private boolean shouldRetry = true;
@@ -87,8 +92,8 @@ public class MirrorConsensusTopicQuery {
 
                 // get the list of chunks for this pending message
                 TransactionID initialTransactionID = consensusTopicResponse.getChunkInfo().getInitialTransactionID();
-                pendingMessages.putIfAbsent(initialTransactionID, new ArrayList<>());
-                ArrayList<ConsensusTopicResponse> chunks = pendingMessages.get(initialTransactionID);
+                pendingMessages.putIfAbsent(initialTransactionID, new Tuple<>(Instant.now(), new ArrayList<>()));
+                ArrayList<ConsensusTopicResponse> chunks = pendingMessages.get(initialTransactionID).second;
 
                 // not possible to be null as we do [putIfAbsent]
                 // add our response to the pending chunk list
@@ -96,7 +101,29 @@ public class MirrorConsensusTopicQuery {
 
                 // if we now have enough chunks, emit
                 if (chunks.size() == consensusTopicResponse.getChunkInfo().getTotal()) {
+                    // Remove message from pending
+                    pendingMessages.remove(initialTransactionID);
+
+                    // Send message to callback
                     onNext.accept(MirrorConsensusTopicResponse.ofMany(chunks));
+                }
+
+                // Remove transaction which have not been created for 5 minutes.
+                ArrayList<TransactionID> toRemoveTransactions = new ArrayList<>();
+                Instant now = Instant.now();
+
+                if (lastInstantChecked[0] == null || Duration.between(lastInstantChecked[0], now).compareTo(Duration.ofSeconds(10)) > 0) {
+                    lastInstantChecked[0] = now;
+
+                    for (Map.Entry<TransactionID, Tuple<Instant, ArrayList<ConsensusTopicResponse>>> entry: pendingMessages.entrySet()) {
+                        if (Duration.between(entry.getValue().first, now).compareTo(Duration.ofMinutes(5)) > 0) {
+                            toRemoveTransactions.add(entry.getKey());
+                        }
+                    }
+                }
+
+                for (TransactionID id : toRemoveTransactions) {
+                    pendingMessages.remove(id);
                 }
             }
 
@@ -129,5 +156,15 @@ public class MirrorConsensusTopicQuery {
                 // Do nothing
             }
         });
+    }
+
+    static class Tuple<T1, T2> {
+        T1 first;
+        T2 second;
+
+        Tuple(T1 first, T2 second) {
+            this.first = first;
+            this.second = second;
+        }
     }
 }
