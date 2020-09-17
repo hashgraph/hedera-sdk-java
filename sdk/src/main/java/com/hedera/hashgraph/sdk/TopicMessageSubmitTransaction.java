@@ -44,6 +44,8 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
     private int maxChunks = 10;
 
     public TopicMessageSubmitTransaction() {
+        super();
+
         builder = ConsensusSubmitMessageTransactionBody.newBuilder();
     }
 

@@ -59,7 +59,7 @@ class AccountIntegrationTest {
                 .execute(client);
 
             assertEquals(info.accountId, account);
-            assertFalse(info.deleted);
+            assertFalse(info.isDeleted);
             assertEquals(info.key.toString(), key1.getPublicKey().toString());
             assertEquals(info.balance, new Hbar(1));
             assertEquals(info.autoRenewPeriod, Duration.ofDays(90));

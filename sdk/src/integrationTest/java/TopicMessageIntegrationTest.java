@@ -71,8 +71,8 @@ public class TopicMessageIntegrationTest {
               .execute(client);
 
             while(!receivedMessage[0]) {
-                if (Duration.between(start, Instant.now()).compareTo(Duration.ofSeconds(20)) > 0) {
-                    throw new Exception("TopicMessage was not received in 20 seconds or less");
+                if (Duration.between(start, Instant.now()).compareTo(Duration.ofSeconds(30)) > 0) {
+                    throw new Exception("TopicMessage was not received in 30 seconds or less");
                 }
 
                 Thread.sleep(1000);

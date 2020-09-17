@@ -31,8 +31,8 @@ public final class TopicMessage {
         byte[] message,
         byte[] lastRunningHash,
         long lastSequenceNumber,
-        TopicMessageChunk[] chunks,
-        TransactionId transactionId
+        @Nullable TopicMessageChunk[] chunks,
+        @Nullable TransactionId transactionId
     ) {
         this.consensusTimestamp = lastConsensusTimestamp;
         this.contents = message;

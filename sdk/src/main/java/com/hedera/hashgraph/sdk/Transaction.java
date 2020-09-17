@@ -47,7 +47,10 @@ public abstract class Transaction<T extends Transaction<T>>
     Transaction() {
         bodyBuilder = TransactionBody.newBuilder();
 
-        setTransactionValidDuration(DEFAULT_TRANSACTION_VALID_DURATION);
+        // Cannot call `Transaction#setTranscationValidDuration()` because it calls `isFrozen()` and
+        // causes a `NullPointerException` in `TopicMessageSubmitTransaction#isFrozen()`. I assume the private
+        // fields are not being set before the `super()` call which is why that is happening.
+        bodyBuilder.setTransactionValidDuration(DurationConverter.toProtobuf(DEFAULT_TRANSACTION_VALID_DURATION));
     }
 
     Transaction(TransactionBody body) {
