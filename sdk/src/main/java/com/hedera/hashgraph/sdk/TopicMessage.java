@@ -23,18 +23,23 @@ public final class TopicMessage {
     @Nullable
     public final TopicMessageChunk[] chunks;
 
+    @Nullable
+    public final TransactionId transactionId;
+
     TopicMessage(
         Instant lastConsensusTimestamp,
         byte[] message,
         byte[] lastRunningHash,
         long lastSequenceNumber,
-        TopicMessageChunk[] chunks
+        TopicMessageChunk[] chunks,
+        TransactionId transactionId
     ) {
         this.consensusTimestamp = lastConsensusTimestamp;
         this.contents = message;
         this.runningHash = lastRunningHash;
         this.sequenceNumber = lastSequenceNumber;
         this.chunks = chunks;
+        this.transactionId = transactionId;
     }
 
     static TopicMessage ofSingle(ConsensusTopicResponse response) {
@@ -43,17 +48,25 @@ public final class TopicMessage {
             response.getMessage().toByteArray(),
             response.getRunningHash().toByteArray(),
             response.getSequenceNumber(),
-            new TopicMessageChunk[]{new TopicMessageChunk(response)}
+            new TopicMessageChunk[]{new TopicMessageChunk(response)},
+            response.hasChunkInfo() && response.getChunkInfo().hasInitialTransactionID() ?
+                TransactionId.fromProtobuf(response.getChunkInfo().getInitialTransactionID()) :
+                null
         );
     }
 
     static TopicMessage ofMany(List<ConsensusTopicResponse> responses) {
         // response should be in the order of oldest to newest (not chunk order)
         @Var var chunks = new TopicMessageChunk[responses.size()];
+        @Var TransactionId transactionId = null;
         var contents = new ByteString[responses.size()];
         @Var long totalSize = 0;
 
         for (ConsensusTopicResponse r : responses) {
+            if (transactionId == null && r.getChunkInfo().hasInitialTransactionID()) {
+                transactionId = TransactionId.fromProtobuf(r.getChunkInfo().getInitialTransactionID());
+            }
+
             int index = r.getChunkInfo().getNumber() - 1;
 
             chunks[index] = new TopicMessageChunk(r);
@@ -74,9 +87,11 @@ public final class TopicMessage {
             wholeMessage.array(),
             lastReceived.getRunningHash().toByteArray(),
             lastReceived.getSequenceNumber(),
-            chunks
+            chunks,
+            transactionId
         );
     }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
