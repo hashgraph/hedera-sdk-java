@@ -161,13 +161,10 @@ An example configuration file containing only network information can be found i
 
 ### Examples
 
-Requires `OPERATOR_ID` and `OPERATOR_KEY` to be in the environment. Integration tests run against
+Requires `OPERATOR_ID` and `OPERATOR_KEY` to be in a .env file in the examples directory.   Many examples run against
 the Hedera test network.
 
 ```sh
-$ export OEPRATOR_ID="..."
-$ export OPERATOR_KEY="..."
-
 $ ./gradlew -q example:run<NameOfExample>
 $ ./gradlew -q example:runGenerateKey
 ```
