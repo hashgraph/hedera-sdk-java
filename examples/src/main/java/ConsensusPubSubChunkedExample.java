@@ -9,6 +9,7 @@ import com.hedera.hashgraph.sdk.TopicMessageQuery;
 import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.Transaction;
 import io.github.cdimascio.dotenv.Dotenv;
+import com.google.errorprone.annotations.Var;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -65,7 +66,7 @@ public final class ConsensusPubSubChunkedExample {
         System.out.println("about to prepare a transaction to send a message of " + bigContents.length() + " bytes");
 
         // prepare a message send transaction that requires a submit key from "somewhere else"
-        Transaction<?> transaction = new TopicMessageSubmitTransaction()
+        @Var Transaction<?> transaction = new TopicMessageSubmitTransaction()
             .setMaxChunks(5) // this is 10 by default
             .setTopicId(newTopicId)
             .setMessage(bigContents)
@@ -106,7 +107,7 @@ public final class ConsensusPubSubChunkedExample {
         InputStream inputStream = classLoader.getResourceAsStream(filename);
         StringBuilder bigContents = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream), UTF_8))) {
-            String line;
+            @Var String line;
             while ((line = reader.readLine()) != null) {
                 bigContents.append(line).append("\n");
             }

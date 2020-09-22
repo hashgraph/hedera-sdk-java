@@ -169,7 +169,7 @@ public final class Client implements AutoCloseable {
      * @param json The json string containing the client configuration
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
-    public static Client fromJson(String json) {
+    public static Client fromJson(String json) throws Exception {
         return fromJson(new StringReader(json));
     }
 
@@ -179,11 +179,14 @@ public final class Client implements AutoCloseable {
      * @param json The Reader containing the client configuration
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
-    public static Client fromJson(Reader json) {
+    public static Client fromJson(Reader json) throws Exception {
         Config config = new Gson().fromJson(json, Config.class);
         Client client;
 
-        if (config.network.isJsonObject()) {
+        if (config.network == null) {
+            throw new Exception("Network is not set in provided json object");
+        }
+        else if (config.network.isJsonObject()) {
             var networks = config.network.getAsJsonObject();
             Map<String, AccountId> nodes = new HashMap<>(networks.size());
             for (Map.Entry<String, JsonElement> entry : networks.entrySet()) {
@@ -214,7 +217,6 @@ public final class Client implements AutoCloseable {
 
             client.setOperator(operatorAccount, privateKey);
         }
-
 
         //already set in previous set network if?
         if (config.mirrorNetwork != null) {
@@ -254,7 +256,7 @@ public final class Client implements AutoCloseable {
      * @return {@link com.hedera.hashgraph.sdk.Client}
      * @throws IOException if IO operations fail
      */
-    public static Client fromJsonFile(String fileName) throws IOException {
+    public static Client fromJsonFile(String fileName) throws Exception {
         return fromJsonFile(new File(fileName));
     }
 
@@ -265,7 +267,7 @@ public final class Client implements AutoCloseable {
      * @return {@link com.hedera.hashgraph.sdk.Client}
      * @throws IOException if IO operations fail
      */
-    public static Client fromJsonFile(File file) throws IOException {
+    public static Client fromJsonFile(File file) throws Exception {
         return fromJson(Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8));
     }
 
