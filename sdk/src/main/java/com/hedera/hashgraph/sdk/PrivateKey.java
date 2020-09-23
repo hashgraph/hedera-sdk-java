@@ -289,6 +289,21 @@ public final class PrivateKey extends Key {
         return signature;
     }
 
+    public byte[] signTransaction(Transaction transaction) {
+        transaction.requireExactNode();
+
+        if (!transaction.isFrozen()) {
+            transaction.freeze();
+        }
+
+        var builder = (com.hedera.hashgraph.sdk.proto.Transaction.Builder) transaction.transactions.get(0);
+        var signature = sign(builder.getBodyBytes().toByteArray());
+
+        transaction.addSignature(publicKey, signature);
+
+        return signature;
+    }
+
     @Override
     public byte[] toBytes() {
         return keyData;

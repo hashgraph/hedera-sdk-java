@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SignatureMap;
+import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Function;
@@ -378,17 +379,43 @@ public abstract class Transaction<T extends Transaction<T>>
             freezeWith(client);
         }
 
+        if (keyAlreadySigned(operator.publicKey)) {
+            // noinspection unchecked
+            return (T) this;
+        }
+
+        return signWith(operator.publicKey, operator.transactionSigner);
+    }
+
+    protected boolean keyAlreadySigned(PublicKey key) {
         if (!signatures.isEmpty()) {
             for (var sigPair : signatures.get(0).getSigPairList()) {
-                if (ByteString.copyFrom(operator.publicKey.toBytes()).startsWith(sigPair.getPubKeyPrefix())) {
+                if (ByteString.copyFrom(key.toBytes()).startsWith(sigPair.getPubKeyPrefix())) {
                     // transaction already signed with the operator
                     // noinspection unchecked
-                    return (T) this;
+                    return true;
                 }
             }
         }
 
-        return signWith(operator.publicKey, operator.transactionSigner);
+        return false;
+    }
+
+    public Transaction addSignature(PublicKey publicKey, byte[] signature) {
+        this.requireExactNode();
+
+        if (!isFrozen()) {
+            freeze();
+        }
+
+        if (keyAlreadySigned(publicKey)) {
+            // noinspection unchecked
+            return (T) this;
+        }
+
+        this.signatures.get(0).addSigPair(publicKey.toSignaturePairProtobuf(signature));
+
+        return this;
     }
 
     protected boolean isFrozen() {
@@ -398,6 +425,12 @@ public abstract class Transaction<T extends Transaction<T>>
     protected void requireNotFrozen() {
         if (isFrozen()) {
             throw new IllegalStateException("transaction is immutable; it has at least one signature or has been explicitly frozen");
+        }
+    }
+
+    protected void requireExactNode() {
+        if (isFrozen()) {
+            throw new IllegalStateException("transaction did not have an exact node ID set");
         }
     }
 
