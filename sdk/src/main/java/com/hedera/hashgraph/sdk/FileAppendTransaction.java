@@ -1,13 +1,17 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.proto.FileAppendTransactionBody;
-import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
+import java8.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 /**
  * <p>A transaction specifically to append data to a file on the network.
@@ -16,7 +20,17 @@ import javax.annotation.Nullable;
  * (See {@link FileCreateTransaction#setKeys(Key...)} for more information.)
  */
 public final class FileAppendTransaction extends Transaction<FileAppendTransaction> {
+    private static final int CHUNK_SIZE = 4096;
+
     private final FileAppendTransactionBody.Builder builder;
+
+    /**
+     * Maximum number of chunks this message will get broken up into when
+     * its frozen.
+     */
+    private int maxChunks = 10;
+
+    private List<Transaction<SingleFileAppendTransaction>> chunkTransactions = Collections.emptyList();
 
     public FileAppendTransaction() {
         builder = FileAppendTransactionBody.newBuilder();
@@ -103,7 +117,71 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setFileAppend(builder);
-        return true;
+        var initialTransactionId = bodyBuilder.getTransactionID();
+        var content = builder.getContents();
+        var fileId = builder.getFileID();
+        var totalContentSize = content.size();
+        var requiredChunks = (totalContentSize + (CHUNK_SIZE - 1)) / CHUNK_SIZE;
+
+        if (requiredChunks > maxChunks) {
+            throw new IllegalArgumentException(
+                "content of " + totalContentSize + " bytes requires " + requiredChunks
+                    + " chunks but the maximum allowed chunks is " + maxChunks + ", try using setMaxChunks");
+        }
+
+        chunkTransactions = new ArrayList<>(requiredChunks);
+        @Var var nextTransactionId = initialTransactionId.toBuilder();
+        for (int i = 0; i < requiredChunks; i++) {
+            @Var var startIndex = i * CHUNK_SIZE;
+            @Var var endIndex = startIndex + CHUNK_SIZE;
+
+            if (endIndex > totalContentSize) {
+                endIndex = totalContentSize;
+            }
+
+            var chunkMessage = content.substring(startIndex, endIndex);
+
+            bodyBuilder.setTransactionID(nextTransactionId.build());
+
+            chunkTransactions.add(new SingleFileAppendTransaction(
+                nodeIds,
+                bodyBuilder.clone(),
+                fileId,
+                chunkMessage));
+
+            // add 1 ns to the validStart to make cascading transaction IDs
+            var nextValidStart = nextTransactionId.getTransactionValidStart().toBuilder();
+            nextValidStart.setNanos(nextValidStart.getNanos() + 1);
+
+            nextTransactionId.setTransactionValidStart(nextValidStart);
+        }
+        return false;
+    }
+
+    @Override
+    CompletableFuture<Void> onExecuteAsync(Client client) {
+        if (!isFrozen()) {
+            freezeWith(client);
+        }
+
+        var operatorId = client.getOperatorId();
+
+        if (operatorId != null && operatorId.equals(getTransactionId().accountId)) {
+            // on execute, sign each transaction with the operator, if present
+            // and we are signing a transaction that used the default transaction ID
+            signWithOperator(client);
+        }
+
+        for (Transaction<SingleFileAppendTransaction> transaction : chunkTransactions) {
+            TransactionReceipt receipt = null;
+            try {
+                receipt = transaction.execute(client).getReceipt(client);
+            } catch (TimeoutException | HederaPreCheckStatusException | HederaReceiptStatusException e) {
+                e.printStackTrace();
+            }
+            System.out.println(receipt.toString());
+        }
+
+        return CompletableFuture.completedFuture(null);
     }
 }

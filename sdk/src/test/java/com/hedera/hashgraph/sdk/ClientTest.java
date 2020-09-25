@@ -44,7 +44,7 @@ class ClientTest {
 
     @Test
     @DisplayName("fromJsonFile() functions correctly")
-    void fromJsonFile() throws IOException {
+    void fromJsonFile() throws Exception {
         Client.fromJsonFile(new File("./src/test/resources/client-config.json"));
         Client.fromJsonFile(new File("./src/test/resources/client-config-with-operator.json"));
         Client.fromJsonFile("./src/test/resources/client-config.json");
@@ -53,7 +53,7 @@ class ClientTest {
 
     @Test
     @DisplayName("fromJson() functions correctly")
-    void testFromJson() {
+    void testFromJson() throws Exception {
         // Copied content of `client-config-with-operator.json`
         Client.fromJson("{\n" +
             "    \"network\":\"mainnet\",\n" +
