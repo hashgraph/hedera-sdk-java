@@ -26,8 +26,6 @@ class AccountRecordsIntegrationTest {
                 .setKey(key)
                 .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
-                .setReceiveRecordThreshold(Hbar.fromTinybars(1))
-                .setSendRecordThreshold(Hbar.fromTinybars(1))
                 .execute(client);
 
             var receipt = response.transactionId.getReceipt(client);

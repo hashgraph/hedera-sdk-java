@@ -67,7 +67,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         return this;
     }
 
-    public Hbar getSendRecordThreshold() {
+    Hbar getSendRecordThreshold() {
         return Hbar.fromTinybars(builder.getSendRecordThreshold());
     }
 
@@ -82,14 +82,13 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
      * @param sendRecordThreshold the threshold amount.
      * @return {@code this}
      */
-    @Deprecated
-    public AccountCreateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
+    AccountCreateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
         requireNotFrozen();
         builder.setSendRecordThreshold(sendRecordThreshold.toTinybars());
         return this;
     }
 
-    public Hbar getReceiveRecordThreshold() {
+    Hbar getReceiveRecordThreshold() {
         return Hbar.fromTinybars(builder.getReceiveRecordThreshold());
     }
 
@@ -104,8 +103,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
      * @param receiveRecordThreshold the threshold amount.
      * @return {@code this}
      */
-    @Deprecated
-    public AccountCreateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
+    AccountCreateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
         requireNotFrozen();
         builder.setReceiveRecordThreshold(receiveRecordThreshold.toTinybars());
         return this;

@@ -101,7 +101,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     @Nullable
-    public Hbar getSendRecordThreshold() {
+    Hbar getSendRecordThreshold() {
         return builder.hasSendRecordThresholdWrapper() ? Hbar.fromTinybars(builder.getSendRecordThresholdWrapper().getValue()) : null;
     }
 
@@ -112,15 +112,14 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @param sendRecordThreshold The Hbar to be set as the threshold
      * @return {@code this}
      */
-    @Deprecated
-    public AccountUpdateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
+    AccountUpdateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
         requireNotFrozen();
         builder.setSendRecordThresholdWrapper(UInt64Value.of(sendRecordThreshold.toTinybars()));
         return this;
     }
 
     @Nullable
-    public Hbar getReceiveRecordThreshold() {
+    Hbar getReceiveRecordThreshold() {
         return builder.hasReceiveRecordThresholdWrapper() ? Hbar.fromTinybars(builder.getReceiveRecordThresholdWrapper().getValue()) : null;
     }
 
@@ -131,8 +130,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @param receiveRecordThreshold The Hbar to be set as the threshold
      * @return {@code this}
      */
-    @Deprecated
-    public AccountUpdateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
+    AccountUpdateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
         requireNotFrozen();
         builder.setReceiveRecordThresholdWrapper(UInt64Value.of(receiveRecordThreshold.toTinybars()));
         return this;
