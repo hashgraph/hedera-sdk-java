@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
+import java8.util.function.Function;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ import java.util.concurrent.TimeoutException;
  * <p>If a file has multiple keys, all keys must sign to modify its contents.
  * (See {@link FileCreateTransaction#setKeys(Key...)} for more information.)
  */
-public final class FileAppendTransaction extends Transaction<FileAppendTransaction> {
+public final class FileAppendTransaction extends Transaction<FileAppendTransaction> implements WithExecuteAll {
     private static final int CHUNK_SIZE = 4096;
 
     private final FileAppendTransactionBody.Builder builder;
@@ -117,6 +118,18 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
     }
 
     @Override
+    public FileAppendTransaction signWith(PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
+        if (!isFrozen()) {
+            freeze();
+        }
+        
+        for (var transaction : chunkTransactions) {
+            transaction.signWith(publicKey, transactionSigner);
+        }
+        return this;
+    }
+
+    @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         var initialTransactionId = bodyBuilder.getTransactionID();
         var content = builder.getContents();
@@ -160,7 +173,12 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
     }
 
     @Override
-    CompletableFuture<Void> onExecuteAsync(Client client) {
+    public CompletableFuture<com.hedera.hashgraph.sdk.TransactionResponse> executeAsync(Client client) {
+        return executeAllAsync(client).thenApply(responses -> responses.get(0));
+    }
+
+    @Override
+    public CompletableFuture<List<com.hedera.hashgraph.sdk.TransactionResponse>> executeAllAsync(Client client) {
         if (!isFrozen()) {
             freezeWith(client);
         }
@@ -173,23 +191,38 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
             signWithOperator(client);
         }
 
-        CompletableFuture<com.hedera.hashgraph.sdk.TransactionResponse> completableFuture = null;
-        for (Transaction<SingleFileAppendTransaction> transaction : chunkTransactions) {
-            if (completableFuture == null) {
-                completableFuture = transaction.executeAsync(client);
-            } else {
-                completableFuture.thenCompose(f -> {
-                    System.out.println(f);
-                    return transaction.executeAsync(client);
-                });
-            }
-            completableFuture.thenCompose(f -> f.getReceiptAsync(client));
+        CompletableFuture<?>[] futures = new CompletableFuture[chunkTransactions.size()];
+
+        for (var i = 0; i < chunkTransactions.size(); i++) {
+            futures[i] = chunkTransactions.get(i).executeAsync(client)
+                .thenCompose(response -> response.getReceiptAsync(client)
+                    .thenCompose(receipt -> CompletableFuture.completedFuture(response)));
         }
 
-        completableFuture.thenCompose(f -> {
-            return null;
+        return CompletableFuture.allOf(futures).thenApply(v -> {
+            List<com.hedera.hashgraph.sdk.TransactionResponse> responses = new ArrayList<>(futures.length);
+
+            for (var fut : futures) {
+                responses.add((com.hedera.hashgraph.sdk.TransactionResponse) fut.join());
+            }
+
+            return responses;
         });
 
-        return completableFuture;
+//
+//        CompletableFuture<com.hedera.hashgraph.sdk.TransactionResponse> completableFuture = null;
+//        for (Transaction<SingleFileAppendTransaction> transaction : chunkTransactions.subList(0, chunkTransactions.size() - 1)) {
+//            if (completableFuture == null) {
+//                completableFuture = transaction.executeAsync(client);
+//            } else {
+//                completableFuture.thenCompose(f -> {
+//                    System.out.println(f);
+//                    return transaction.executeAsync(client);
+//                });
+//            }
+//            completableFuture.thenCompose(f -> f.getReceiptAsync(client));
+//        }
+//
+//        return completableFuture.thenCompose(f -> null);
     }
 }
