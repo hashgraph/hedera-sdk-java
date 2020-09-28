@@ -112,6 +112,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @param sendRecordThreshold The Hbar to be set as the threshold
      * @return {@code this}
      */
+    @Deprecated
     public AccountUpdateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
         requireNotFrozen();
         builder.setSendRecordThresholdWrapper(UInt64Value.of(sendRecordThreshold.toTinybars()));
@@ -130,6 +131,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @param receiveRecordThreshold The Hbar to be set as the threshold
      * @return {@code this}
      */
+    @Deprecated
     public AccountUpdateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
         requireNotFrozen();
         builder.setReceiveRecordThresholdWrapper(UInt64Value.of(receiveRecordThreshold.toTinybars()));
@@ -168,6 +170,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @param autoRenewPeriod The Duration to be set for auto renewal
      * @return {@code this}
      */
+    @Deprecated
     public AccountUpdateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         requireNotFrozen();
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
