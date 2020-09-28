@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -172,16 +173,23 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
             signWithOperator(client);
         }
 
+        CompletableFuture<com.hedera.hashgraph.sdk.TransactionResponse> completableFuture = null;
         for (Transaction<SingleFileAppendTransaction> transaction : chunkTransactions) {
-            TransactionReceipt receipt = null;
-            try {
-                receipt = transaction.execute(client).getReceipt(client);
-            } catch (TimeoutException | HederaPreCheckStatusException | HederaReceiptStatusException e) {
-                e.printStackTrace();
+            if (completableFuture == null) {
+                completableFuture = transaction.executeAsync(client);
+            } else {
+                completableFuture.thenCompose(f -> {
+                    System.out.println(f);
+                    return transaction.executeAsync(client);
+                });
             }
-            System.out.println(receipt.toString());
+            completableFuture.thenCompose(f -> f.getReceiptAsync(client));
         }
 
-        return CompletableFuture.completedFuture(null);
+        completableFuture.thenCompose(f -> {
+            return null;
+        });
+
+        return completableFuture;
     }
 }

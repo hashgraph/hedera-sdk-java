@@ -30,6 +30,6 @@ public class SingleFileAppendTransaction extends Transaction<SingleFileAppendTra
 
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
-        return ConsensusServiceGrpc.getSubmitMessageMethod();
+        return FileServiceGrpc.getAppendContentMethod();
     }
 }

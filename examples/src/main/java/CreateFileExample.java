@@ -34,7 +34,7 @@ public final class CreateFileExample {
 
         // The file is required to be a byte array,
         // you can easily use the bytes of a file instead.
-        byte[] fileContents = "Hedera hashgraph is great!".getBytes(StandardCharsets.UTF_8);
+        String fileContents = "Hedera hashgraph is great!";
 
         TransactionResponse transactionResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file
