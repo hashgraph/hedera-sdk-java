@@ -41,11 +41,13 @@ public final class AccountUpdateTransaction extends SingleTransactionBuilder<Acc
     /**
      * Set the threshold for generating records when sending currency, in tinybar.
      */
+    @Deprecated
     public AccountUpdateTransaction setSendRecordThreshold(long sendRecordThreshold) {
         builder.setSendRecordThresholdWrapper(UInt64Value.of(sendRecordThreshold));
         return this;
     }
 
+    @Deprecated
     public AccountUpdateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
         builder.setSendRecordThresholdWrapper(
             UInt64Value.of(sendRecordThreshold.asTinybar()));
@@ -55,11 +57,13 @@ public final class AccountUpdateTransaction extends SingleTransactionBuilder<Acc
     /**
      * Set the threshold for generating records when receiving currency, in tinybar.
      */
+    @Deprecated
     public AccountUpdateTransaction setReceiveRecordThreshold(long receiveRecordThreshold) {
         builder.setReceiveRecordThresholdWrapper(UInt64Value.of(receiveRecordThreshold));
         return this;
     }
 
+    @Deprecated
     public AccountUpdateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
         builder.setReceiveRecordThresholdWrapper(
             UInt64Value.of(receiveRecordThreshold.asTinybar()));

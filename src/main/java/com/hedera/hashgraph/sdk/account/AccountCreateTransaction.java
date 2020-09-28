@@ -63,11 +63,13 @@ public final class AccountCreateTransaction extends SingleTransactionBuilder<Acc
     /**
      * Set the threshold for generating records when sending currency, in tinybar.
      */
+    @Deprecated
     public AccountCreateTransaction setSendRecordThreshold(long sendRecordThreshold) {
         builder.setSendRecordThreshold(sendRecordThreshold);
         return this;
     }
 
+    @Deprecated
     public AccountCreateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
         builder.setSendRecordThreshold(sendRecordThreshold.asTinybar());
         return this;
@@ -76,11 +78,13 @@ public final class AccountCreateTransaction extends SingleTransactionBuilder<Acc
     /**
      * Set the threshold for generating records when receiving currency, in tinybar.
      */
+    @Deprecated
     public AccountCreateTransaction setReceiveRecordThreshold(long receiveRecordThreshold) {
         builder.setReceiveRecordThreshold(receiveRecordThreshold);
         return this;
     }
 
+    @Deprecated
     public AccountCreateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
         builder.setReceiveRecordThreshold(receiveRecordThreshold.asTinybar());
         return this;
