@@ -9,15 +9,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
-public class FileAppendExample {
+public class FileAppendChunkedExample {
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
-    private FileAppendExample() { }
+    private FileAppendChunkedExample() { }
 
-    public static void main(String[] args) throws TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException, IOException {
+    public static void main(String[] args) throws TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException {
         // `Client.forMainnet()` is provided for connecting to Hedera mainnet
         Client client = Client.forTestnet();
 
@@ -40,7 +40,7 @@ public class FileAppendExample {
         TransactionReceipt receipt = transactionResponse.getReceipt(client);
         FileId newFileId = receipt.fileId;
 
-        System.out.println("file: " + newFileId);
+        System.out.println("fileId: " + newFileId);
 
         String contents = "";
 
@@ -48,20 +48,14 @@ public class FileAppendExample {
             contents += "1";
         }
 
-        TransactionResponse fileAppendResponse = new FileAppendTransaction()
-            .setNodeId(new AccountId(3))
+        TransactionReceipt fileAppendReceipt = new FileAppendTransaction()
+            .setNodeId(transactionResponse.nodeId)
             .setFileId(newFileId)
             .setContents(contents)
             .setMaxTransactionFee(new Hbar(1000))
-            .execute(client);
+            .execute(client)
+            .getReceipt(client);
+
+        System.out.println(fileAppendReceipt.toString());
     }
 }
-
-// .setNodeId(AccountId.fromString("0.0.5005"))
-//            .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
-//            .setFileId(FileId.fromString("0.0.6006"))
-//            .setContents(new byte[]{1, 2, 3, 4})
-//            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-//            .freeze()
-//            .sign(unusedPrivateKey)
-//            .toString()

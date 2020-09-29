@@ -3,7 +3,6 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SignatureMap;
-import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Function;

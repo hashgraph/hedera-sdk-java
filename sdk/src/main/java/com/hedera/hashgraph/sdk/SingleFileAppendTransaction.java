@@ -1,7 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.FileAppendTransactionBody;
+import com.hedera.hashgraph.sdk.proto.FileID;
+import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 

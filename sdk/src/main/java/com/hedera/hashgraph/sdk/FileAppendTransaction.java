@@ -12,8 +12,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 /**
  * <p>A transaction specifically to append data to a file on the network.
@@ -122,7 +120,7 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
         if (!isFrozen()) {
             freeze();
         }
-        
+
         for (var transaction : chunkTransactions) {
             transaction.signWith(publicKey, transactionSigner);
         }
@@ -208,21 +206,5 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
 
             return responses;
         });
-
-//
-//        CompletableFuture<com.hedera.hashgraph.sdk.TransactionResponse> completableFuture = null;
-//        for (Transaction<SingleFileAppendTransaction> transaction : chunkTransactions.subList(0, chunkTransactions.size() - 1)) {
-//            if (completableFuture == null) {
-//                completableFuture = transaction.executeAsync(client);
-//            } else {
-//                completableFuture.thenCompose(f -> {
-//                    System.out.println(f);
-//                    return transaction.executeAsync(client);
-//                });
-//            }
-//            completableFuture.thenCompose(f -> f.getReceiptAsync(client));
-//        }
-//
-//        return completableFuture.thenCompose(f -> null);
     }
 }
