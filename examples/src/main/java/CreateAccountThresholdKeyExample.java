@@ -56,7 +56,7 @@ public final class CreateAccountThresholdKeyExample {
             .execute(client);
 
         // This will wait for the receipt to become available
-        TransactionReceipt receipt = transactionResponse.getReceipt(client);
+        TransactionReceipt receipt = transactionResponse.transactionId.getReceipt(client);
 
         AccountId newAccountId = Objects.requireNonNull(receipt.accountId);
 
