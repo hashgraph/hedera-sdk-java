@@ -21,6 +21,10 @@ public final class ContractRecordsQuery extends Query<List<TransactionRecord>, C
         this.builder = ContractGetRecordsQuery.newBuilder();
     }
 
+    public ContractId getContractId() {
+      return ContractId.fromProtobuf(builder.getContractID());
+    }
+
     /**
      * Sets the smart contract instance for which the records should be retrieved.
      *

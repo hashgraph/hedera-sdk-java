@@ -23,6 +23,10 @@ public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountS
         builder = CryptoGetStakersQuery.newBuilder();
     }
 
+    public AccountId getAccountId() {
+      return AccountId.fromProtobuf(builder.getAccountID());
+    }
+
     /**
      * Sets the Account ID for which the records should be retrieved.
      *

@@ -29,6 +29,10 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
         builder = ContractCallLocalQuery.newBuilder();
     }
 
+    public ContractId getContractId() {
+      return ContractId.fromProtobuf(builder.getContractID());
+    }
+
     /**
      * Sets the contract instance to call, in the format used in transactions.
      *
@@ -38,6 +42,10 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
     public ContractCallQuery setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProtobuf());
         return this;
+    }
+
+    public long getGas() {
+      return builder.getGas();
     }
 
     /**
@@ -59,6 +67,9 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
         return super.getCostAsync(client).thenApply(cost -> Hbar.fromTinybars((long) (cost.toTinybars() * 1.1)));
     }
 
+    public ByteString getFunctionParameters() {
+      return builder.getFunctionParameters();
+    }
     /**
      * Sets the function parameters as their raw bytes.
      * <p>

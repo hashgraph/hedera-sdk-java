@@ -19,6 +19,10 @@ public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery>
         builder = CryptoGetInfoQuery.newBuilder();
     }
 
+    public AccountId getAccountId() {
+      return AccountId.fromProtobuf(builder.getAccountID());
+    }
+
     /**
      * Sets the account ID for which information is requested.
      *

@@ -23,6 +23,10 @@ public final class TransactionReceiptQuery
         builder = TransactionGetReceiptQuery.newBuilder();
     }
 
+    public TransactionId getTransactionId() {
+      return TransactionId.fromProtobuf(builder.getTransactionID());
+    }
+
     /**
      * Set the ID of the transaction for which the receipt is being requested.
      *

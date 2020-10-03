@@ -19,6 +19,10 @@ public final class FileContentsQuery extends Query<ByteString, FileContentsQuery
         this.builder = FileGetContentsQuery.newBuilder();
     }
 
+    public FileId getFileId() {
+      return FileId.fromProtobuf(builder.getFileID());
+    }
+
     /**
      * Sets the file ID of the file whose contents are requested.
      *

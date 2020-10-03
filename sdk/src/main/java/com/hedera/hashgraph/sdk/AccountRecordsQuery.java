@@ -21,6 +21,10 @@ public final class AccountRecordsQuery extends Query<List<TransactionRecord>, Ac
         this.builder = CryptoGetAccountRecordsQuery.newBuilder();
     }
 
+    public AccountId getAccountId() {
+      return AccountId.fromProtobuf(builder.getAccountID());
+    }
+
     /**
      * Sets the account ID for which the records should be retrieved.
      *

@@ -24,6 +24,10 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
         this.builder = TransactionGetRecordQuery.newBuilder();
     }
 
+    public TransactionId getTransactionId() {
+      return TransactionId.fromProtobuf(builder.getTransactionID());
+    }
+
     /**
      * Set the ID of the transaction for which the record is requested.
      *

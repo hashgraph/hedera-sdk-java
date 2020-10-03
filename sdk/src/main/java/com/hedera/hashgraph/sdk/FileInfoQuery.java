@@ -25,6 +25,10 @@ public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
         builder = FileGetInfoQuery.newBuilder();
     }
 
+    public FileId getFileId() {
+      return FileId.fromProtobuf(builder.getFileID());
+    }
+
     /**
      * Sets the file ID for which information is requested.
      *

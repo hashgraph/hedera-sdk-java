@@ -20,6 +20,10 @@ public final class AccountBalanceQuery extends Query<Hbar, AccountBalanceQuery> 
         builder = CryptoGetAccountBalanceQuery.newBuilder();
     }
 
+    public AccountId getAccountId() {
+      return AccountId.fromProtobuf(builder.getAccountID());
+    }
+
     /**
      * The account ID for which the balance is being requested.
      *
@@ -30,6 +34,10 @@ public final class AccountBalanceQuery extends Query<Hbar, AccountBalanceQuery> 
     public AccountBalanceQuery setAccountId(AccountId accountId) {
         builder.setAccountID(accountId.toProtobuf());
         return this;
+    }
+
+    public ContractId getContractId() {
+      return ContractId.fromProtobuf(builder.getContractID());
     }
 
     /**

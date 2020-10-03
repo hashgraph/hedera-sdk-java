@@ -21,6 +21,10 @@ public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQue
         builder = ContractGetInfoQuery.newBuilder();
     }
 
+    public ContractId getContractId() {
+      return ContractId.fromProtobuf(builder.getContractID());
+    }
+
     /**
      * Sets the contract ID for which information is requested.
      *

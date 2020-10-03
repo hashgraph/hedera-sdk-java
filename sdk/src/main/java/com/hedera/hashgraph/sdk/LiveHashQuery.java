@@ -18,6 +18,10 @@ public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
         builder = CryptoGetLiveHashQuery.newBuilder();
     }
 
+    public AccountId getAccountId() {
+      return AccountId.fromProtobuf(builder.getAccountID());
+    }
+
     /**
      * The account to which the livehash is associated
      *
@@ -27,6 +31,10 @@ public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
     public LiveHashQuery setAccountId(AccountId accountId) {
         builder.setAccountID(accountId.toProtobuf());
         return this;
+    }
+
+    public ByteString getHash() {
+      return builder.getHash();
     }
 
     /**

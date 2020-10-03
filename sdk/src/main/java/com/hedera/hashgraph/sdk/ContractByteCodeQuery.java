@@ -18,6 +18,10 @@ public final class ContractByteCodeQuery extends Query<ByteString, ContractByteC
         this.builder = ContractGetBytecodeQuery.newBuilder();
     }
 
+    public ContractId getContractId() {
+      return ContractId.fromProtobuf(builder.getContractID());
+    }
+
     /**
      * Sets the contract ID for which information is requested.
      *

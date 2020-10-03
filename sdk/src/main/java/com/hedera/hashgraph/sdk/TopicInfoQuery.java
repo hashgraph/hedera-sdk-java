@@ -19,6 +19,10 @@ public final class TopicInfoQuery extends Query<TopicInfo, TopicInfoQuery> {
         builder = ConsensusGetTopicInfoQuery.newBuilder();
     }
 
+    public TopicId getTopicId() {
+      return TopicId.fromProtobuf(builder.getTopicID());
+    }
+
     /**
      * Set the topic to retrieve info about (the parameters and running state of).
      *
