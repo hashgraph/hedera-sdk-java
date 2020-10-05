@@ -22,7 +22,7 @@ import java.util.Objects;
  * @param <T> The type of the transaction. Used to enable chaining.
  */
 public abstract class Transaction<T extends Transaction<T>>
-    extends HederaExecutable<com.hedera.hashgraph.sdk.proto.Transaction, com.hedera.hashgraph.sdk.proto.TransactionResponse, TransactionResponse> {
+    extends Executable<com.hedera.hashgraph.sdk.proto.Transaction, com.hedera.hashgraph.sdk.proto.TransactionResponse, TransactionResponse> {
 
     // Default auto renew duration for accounts, contracts, topics, and files (entities)
     static final Duration DEFAULT_AUTO_RENEW_PERIOD = Duration.ofDays(90);

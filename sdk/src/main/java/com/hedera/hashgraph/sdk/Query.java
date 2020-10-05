@@ -23,7 +23,7 @@ import java.util.List;
  * @param <O> The output type of the query.
  * @param <T> The type of the query itself. Used to enable chaining.
  */
-public abstract class Query<O, T extends Query<O, T>> extends HederaExecutable<com.hedera.hashgraph.sdk.proto.Query, Response, O> implements WithGetCost {
+public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hedera.hashgraph.sdk.proto.Query, Response, O> implements WithGetCost {
     private final com.hedera.hashgraph.sdk.proto.Query.Builder builder;
 
     private final QueryHeader.Builder headerBuilder;
@@ -128,7 +128,7 @@ public abstract class Query<O, T extends Query<O, T>> extends HederaExecutable<c
 
     abstract QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request);
 
-    private Executable<Hbar> getCostExecutable() {
+    private Query<Hbar, QueryCostQuery> getCostExecutable() {
         return new QueryCostQuery();
     }
 
