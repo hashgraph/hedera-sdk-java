@@ -60,7 +60,7 @@ public class ContractIntegrationTest {
 
             @Var var info = new ContractInfoQuery()
                 .setContractId(contract)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setQueryPayment(new Hbar(1))
                 .execute(client);
 
@@ -74,7 +74,7 @@ public class ContractIntegrationTest {
 
             var bytecode = new ContractByteCodeQuery()
                 .setContractId(contract)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setQueryPayment(new Hbar(2))
                 .execute(client);
 
@@ -82,7 +82,7 @@ public class ContractIntegrationTest {
 
             var callQuery = new ContractCallQuery()
                 .setContractId(contract)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setQueryPayment(new Hbar(1))
                 .setGas(2000)
                 .setFunction("getMessage");
@@ -97,7 +97,7 @@ public class ContractIntegrationTest {
 
             new ContractExecuteTransaction()
                 .setContractId(contract)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setGas(10000)
                 .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
                 .setMaxTransactionFee(new Hbar(5))
@@ -107,7 +107,7 @@ public class ContractIntegrationTest {
 
             result = new ContractCallQuery()
                 .setContractId(contract)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setQueryPayment(new Hbar(5))
                 .setGas(2000)
                 .setFunction("getMessage")
@@ -117,13 +117,13 @@ public class ContractIntegrationTest {
 
             new ContractRecordsQuery()
                 .setContractId(contract)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setQueryPayment(new Hbar(5))
                 .execute(client);
 
             new ContractUpdateTransaction()
                 .setContractId(contract)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setContractMemo("[e2e::ContractUpdateTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
@@ -132,7 +132,7 @@ public class ContractIntegrationTest {
 
             info = new ContractInfoQuery()
                 .setContractId(contract)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setQueryPayment(new Hbar(5))
                 .execute(client);
 
@@ -145,7 +145,7 @@ public class ContractIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contract)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .execute(client)
                 .transactionId
                 .getReceipt(client);
@@ -153,7 +153,7 @@ public class ContractIntegrationTest {
             assertThrows(Exception.class, () -> {
                 new ContractInfoQuery()
                     .setContractId(contract)
-                    .setNodeId(response.nodeId)
+                    .setNodeAccountId(response.nodeId)
                     .setMaxQueryPayment(new Hbar(2))
                     .execute(client);
             });

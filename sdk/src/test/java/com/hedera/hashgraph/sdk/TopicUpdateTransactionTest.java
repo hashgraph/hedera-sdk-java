@@ -26,7 +26,7 @@ public class TopicUpdateTransactionTest {
     @Test
     void clearShouldSerialize() {
         SnapshotMatcher.expect(new TopicUpdateTransaction()
-            .setNodeId(AccountId.fromString("0.0.5005"))
+            .setNodeAccountId(AccountId.fromString("0.0.5005"))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setTopicId(TopicId.fromString("0.0.5007"))
             .clearAdminKey()
@@ -42,7 +42,7 @@ public class TopicUpdateTransactionTest {
     @Test
     void setShouldSerialize() {
         SnapshotMatcher.expect(new TopicUpdateTransaction()
-            .setNodeId(AccountId.fromString("0.0.5005"))
+            .setNodeAccountId(AccountId.fromString("0.0.5005"))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setTopicId(TopicId.fromString("0.0.5007"))
             .setAdminKey(unusedPrivateKey)

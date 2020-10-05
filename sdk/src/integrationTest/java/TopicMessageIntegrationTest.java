@@ -45,7 +45,7 @@ public class TopicMessageIntegrationTest {
 
             @Var var info = new TopicInfoQuery()
                 .setTopicId(topic)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setQueryPayment(new Hbar(22))
                 .execute(client);
 
@@ -65,7 +65,7 @@ public class TopicMessageIntegrationTest {
               });
 
             new TopicMessageSubmitTransaction()
-              .setNodeId(response.nodeId)
+              .setNodeAccountId(response.nodeId)
               .setTopicId(topic)
               .setMessage("Hello, from HCS!")
               .execute(client);

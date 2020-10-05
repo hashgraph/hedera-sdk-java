@@ -39,7 +39,7 @@ public class ContractBytecodeIntegrationTest {
 
             receipt = new ContractCreateTransaction()
                 .setAdminKey(operatorKey)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(file)
@@ -55,7 +55,7 @@ public class ContractBytecodeIntegrationTest {
             var contract = Objects.requireNonNull(receipt.contractId);
 
             var bytecode = new ContractByteCodeQuery()
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setContractId(contract)
                 .setQueryPayment(new Hbar(2))
                 .execute(client);
@@ -64,14 +64,14 @@ public class ContractBytecodeIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contract)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .execute(client)
                 .transactionId
                 .getReceipt(client);
 
             new FileDeleteTransaction()
                 .setFileId(file)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .execute(client);
 
             client.close();

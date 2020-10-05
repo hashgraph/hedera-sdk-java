@@ -47,14 +47,14 @@ class AccountIntegrationTest {
             var account = receipt.accountId;
 
             @Var var balance = new AccountBalanceQuery()
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setAccountId(account)
                 .execute(client);
 
             assertEquals(balance, new Hbar(1));
 
             var info = new AccountInfoQuery()
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setAccountId(account)
                 .execute(client);
 
@@ -69,21 +69,21 @@ class AccountIntegrationTest {
             assertEquals(info.proxyReceived, Hbar.ZERO);
 
             new AccountRecordsQuery()
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setAccountId(account)
                 .setMaxQueryPayment(new Hbar(1))
                 .execute(client);
 
             assertThrows(HederaPreCheckStatusException.class, () -> {
                 new AccountStakersQuery()
-                    .setNodeId(response.nodeId)
+                    .setNodeAccountId(response.nodeId)
                     .setAccountId(account)
                     .setMaxQueryPayment(new Hbar(1))
                     .execute(client);
             });
 
             new AccountUpdateTransaction()
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setAccountId(account)
                 .setKey(key2.getPublicKey())
                 .setMaxTransactionFee(new Hbar(1))
@@ -95,7 +95,7 @@ class AccountIntegrationTest {
                 .getReceipt(client);
 
             balance = new AccountBalanceQuery()
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setAccountId(account)
                 .setMaxQueryPayment(new Hbar(1))
                 .execute(client);
@@ -103,7 +103,7 @@ class AccountIntegrationTest {
             assertEquals(balance, new Hbar(1));
 
             new AccountDeleteTransaction()
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setAccountId(account)
                 .setTransferAccountId(operatorId)
                 .setTransactionId(TransactionId.generate(account))
@@ -116,7 +116,7 @@ class AccountIntegrationTest {
 
             assertThrows(HederaPreCheckStatusException.class, () -> {
                 new AccountInfoQuery()
-                    .setNodeId(response.nodeId)
+                    .setNodeAccountId(response.nodeId)
                     .setAccountId(account)
                     .execute(client);
             });

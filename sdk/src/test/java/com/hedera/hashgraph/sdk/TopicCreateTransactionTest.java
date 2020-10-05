@@ -26,7 +26,7 @@ public class TopicCreateTransactionTest {
     @Test
     void shouldSerialize() {
         SnapshotMatcher.expect(new TopicCreateTransaction()
-            .setNodeId(AccountId.fromString("0.0.5005"))
+            .setNodeAccountId(AccountId.fromString("0.0.5005"))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setSubmitKey(unusedPrivateKey)
             .setAdminKey(unusedPrivateKey)

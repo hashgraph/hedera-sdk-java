@@ -41,7 +41,7 @@ public class ContractUpdateIntegrationTest {
 
             receipt = new ContractCreateTransaction()
                 .setAdminKey(operatorKey)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(file)
@@ -58,7 +58,7 @@ public class ContractUpdateIntegrationTest {
 
             @Var var info = new ContractInfoQuery()
                 .setContractId(contract)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setQueryPayment(new Hbar(1))
                 .execute(client);
 
@@ -72,7 +72,7 @@ public class ContractUpdateIntegrationTest {
 
             new ContractUpdateTransaction()
                 .setContractId(contract)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setContractMemo("[e2e::ContractUpdateTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
@@ -81,7 +81,7 @@ public class ContractUpdateIntegrationTest {
 
             info = new ContractInfoQuery()
                 .setContractId(contract)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setQueryPayment(new Hbar(5))
                 .execute(client);
 
@@ -94,14 +94,14 @@ public class ContractUpdateIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contract)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .execute(client)
                 .transactionId
                 .getReceipt(client);
 
             new FileDeleteTransaction()
                 .setFileId(file)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .execute(client);
 
             client.close();

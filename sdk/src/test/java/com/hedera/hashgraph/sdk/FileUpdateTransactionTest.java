@@ -25,7 +25,7 @@ public class FileUpdateTransactionTest {
     @Test
     void shouldSerialize() {
         SnapshotMatcher.expect(new FileUpdateTransaction()
-            .setNodeId(AccountId.fromString("0.0.5005"))
+            .setNodeAccountId(AccountId.fromString("0.0.5005"))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setFileId(FileId.fromString("0.0.6006"))
             .setExpirationTime(Instant.ofEpochSecond(1554158728))

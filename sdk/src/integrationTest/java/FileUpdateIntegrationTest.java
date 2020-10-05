@@ -36,7 +36,7 @@ public class FileUpdateIntegrationTest {
 
             @Var var info = new FileInfoQuery()
                 .setFileId(file)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setQueryPayment(new Hbar(22))
                 .execute(client);
 
@@ -47,7 +47,7 @@ public class FileUpdateIntegrationTest {
 
             new FileUpdateTransaction()
                 .setFileId(file)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setContents("[e2e::FileUpdateTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
@@ -56,7 +56,7 @@ public class FileUpdateIntegrationTest {
 
             info = new FileInfoQuery()
                 .setFileId(file)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setQueryPayment(new Hbar(1))
                 .execute(client);
 
@@ -67,7 +67,7 @@ public class FileUpdateIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(file)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
                 .transactionId

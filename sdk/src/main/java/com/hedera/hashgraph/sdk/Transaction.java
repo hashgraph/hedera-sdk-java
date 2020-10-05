@@ -191,7 +191,7 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     @Nullable
-    public final AccountId getNodeId() {
+    public final AccountId getNodeAccountId() {
         if (!nodeIds.isEmpty()) {
             return nodeIds.get(nextTransactionIndex);
         }
@@ -204,8 +204,8 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     @Override
-    final AccountId getNodeId(@Nullable Client client) {
-        return Objects.requireNonNull(getNodeId());
+    final AccountId getNodeAccountId(@Nullable Client client) {
+        return Objects.requireNonNull(getNodeAccountId());
     }
 
     /**
@@ -219,7 +219,7 @@ public abstract class Transaction<T extends Transaction<T>>
      * @param nodeAccountId The node AccountId to be set
      * @return {@code this}
      */
-    public final T setNodeId(AccountId nodeAccountId) {
+    public final T setNodeAccountId(AccountId nodeAccountId) {
         requireNotFrozen();
         bodyBuilder.setNodeAccountID(nodeAccountId.toProtobuf());
 
@@ -304,7 +304,7 @@ public abstract class Transaction<T extends Transaction<T>>
         }
 
         if (this.transactions.size() != 1) {
-            throw new IllegalStateException("transaction must have an explicit node ID set, try calling `setNodeId`");
+            throw new IllegalStateException("transaction must have an explicit node ID set, try calling `setNodeAccountId`");
         }
 
         return hash(makeRequest().toByteArray());

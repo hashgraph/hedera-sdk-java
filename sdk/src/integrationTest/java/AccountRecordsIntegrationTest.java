@@ -36,13 +36,13 @@ class AccountRecordsIntegrationTest {
             var account = receipt.accountId;
 
             new CryptoTransferTransaction()
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .addRecipient(account, new Hbar(1))
                 .addSender(operatorId, new Hbar(1))
                 .execute(client);
 
             var records = new AccountRecordsQuery()
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setAccountId(operatorId)
                 .setMaxQueryPayment(new Hbar(1))
                 .execute(client);
@@ -50,7 +50,7 @@ class AccountRecordsIntegrationTest {
             assertTrue(records.isEmpty());
 
             new AccountDeleteTransaction()
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setAccountId(account)
                 .setTransferAccountId(operatorId)
                 .setTransactionId(TransactionId.generate(account))

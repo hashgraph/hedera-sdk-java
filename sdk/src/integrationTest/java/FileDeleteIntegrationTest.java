@@ -35,7 +35,7 @@ public class FileDeleteIntegrationTest {
 
             @Var var info = new FileInfoQuery()
                 .setFileId(file)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setQueryPayment(new Hbar(22))
                 .execute(client);
 
@@ -46,7 +46,7 @@ public class FileDeleteIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(file)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
                 .transactionId

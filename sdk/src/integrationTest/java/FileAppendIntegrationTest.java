@@ -35,7 +35,7 @@ public class FileAppendIntegrationTest {
             var file = receipt.fileId;
 
             @Var var info = new FileInfoQuery()
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setFileId(file)
                 .setQueryPayment(new Hbar(22))
                 .execute(client);
@@ -47,7 +47,7 @@ public class FileAppendIntegrationTest {
 
             new FileAppendTransaction()
                 .setFileId(file)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setContents("[e2e::FileAppendTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
@@ -56,7 +56,7 @@ public class FileAppendIntegrationTest {
 
             info = new FileInfoQuery()
                 .setFileId(file)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setQueryPayment(new Hbar(1))
                 .execute(client);
 
@@ -67,7 +67,7 @@ public class FileAppendIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(file)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
                 .transactionId

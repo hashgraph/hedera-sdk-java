@@ -84,7 +84,7 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
 
         for (var chunkTx : chunkTransactions) {
             if (firstNodeId == null) {
-                firstNodeId = chunkTx.getNodeId(null).toProtobuf();
+                firstNodeId = chunkTx.getNodeAccountId(null).toProtobuf();
             }
 
             if (initialTransactionID == null) {

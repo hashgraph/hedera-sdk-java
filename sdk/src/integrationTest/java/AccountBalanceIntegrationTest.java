@@ -38,14 +38,14 @@ class AccountBalanceIntegrationTest {
 
             @Var var balance = new AccountBalanceQuery()
                 .setAccountId(account)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .execute(client);
 
             assertEquals(balance, new Hbar(1));
 
             new AccountDeleteTransaction()
                 .setAccountId(account)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setTransferAccountId(operatorId)
                 .setTransactionId(TransactionId.generate(account))
                 .freezeWith(client)

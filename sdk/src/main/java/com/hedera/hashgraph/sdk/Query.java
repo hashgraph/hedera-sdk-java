@@ -56,7 +56,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
     /**
      * Set an explicit node ID to use for this query.
      */
-    public T setNodeId(AccountId nodeAccountId) {
+    public T setNodeAccountId(AccountId nodeAccountId) {
         this.nodeId = nodeAccountId;
 
         // noinspection unchecked
@@ -217,7 +217,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
     ) {
         return new CryptoTransferTransaction()
             .setTransactionId(paymentTransactionId)
-            .setNodeId(nodeId)
+            .setNodeAccountId(nodeId)
             .setMaxTransactionFee(new Hbar(1)) // 1 Hbar
             .addSender(operator.accountId, paymentAmount)
             .addRecipient(nodeId, paymentAmount)
@@ -256,7 +256,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
     }
 
     @Override
-    final AccountId getNodeId(@Nullable Client client) {
+    final AccountId getNodeAccountId(@Nullable Client client) {
         if (paymentTransactionNodeIds != null) {
             // If this query needs a payment transaction we need to pick the node ID from the next
             // payment transaction
@@ -318,7 +318,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
             // now go back to sleep
             // without this, an error of MISSING_QUERY_HEADER is returned
             headerBuilder.setPayment(new CryptoTransferTransaction()
-                .setNodeId(new AccountId(0))
+                .setNodeAccountId(new AccountId(0))
                 .setTransactionId(new TransactionId(new AccountId(0), Instant.ofEpochSecond(0)))
                 .freeze()
                 .makeRequest());

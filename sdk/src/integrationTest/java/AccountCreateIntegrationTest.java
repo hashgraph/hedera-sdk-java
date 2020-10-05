@@ -40,7 +40,7 @@ class AccountCreateIntegrationTest {
 
             var info = new AccountInfoQuery()
                 .setAccountId(account)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .execute(client);
 
             assertEquals(info.accountId, account);
@@ -55,7 +55,7 @@ class AccountCreateIntegrationTest {
 
             new AccountDeleteTransaction()
                 .setAccountId(account)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setTransferAccountId(operatorId)
                 .setTransactionId(TransactionId.generate(account))
                 .freezeWith(client)

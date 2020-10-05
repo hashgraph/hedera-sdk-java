@@ -38,7 +38,7 @@ public class FileIntegrationTest {
             var file = receipt.fileId;
 
             @Var var info = new FileInfoQuery()
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setFileId(file)
                 .setQueryPayment(new Hbar(22))
                 .execute(client);
@@ -49,7 +49,7 @@ public class FileIntegrationTest {
             assertEquals(info.keys.get(0).toString(), Objects.requireNonNull(operatorKey).toString());
 
             new FileAppendTransaction()
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setFileId(file)
                 .setContents("[e2e::FileAppendTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
@@ -58,7 +58,7 @@ public class FileIntegrationTest {
                 .getReceipt(client);
 
             info = new FileInfoQuery()
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setFileId(file)
                 .setQueryPayment(new Hbar(1))
                 .execute(client);
@@ -69,7 +69,7 @@ public class FileIntegrationTest {
             assertEquals(info.keys.get(0).toString(), Objects.requireNonNull(operatorKey).toString());
 
             var contents = new FileContentsQuery()
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setFileId(file)
                 .setQueryPayment(new Hbar(1))
                 .execute(client);
@@ -77,7 +77,7 @@ public class FileIntegrationTest {
             assertEquals(contents.toStringUtf8(), "[e2e::FileCreateTransaction][e2e::FileAppendTransaction]");
 
             new FileUpdateTransaction()
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setFileId(file)
                 .setContents("[e2e::FileUpdateTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
@@ -86,7 +86,7 @@ public class FileIntegrationTest {
                 .getReceipt(client);
 
             info = new FileInfoQuery()
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setFileId(file)
                 .setQueryPayment(new Hbar(1))
                 .execute(client);
@@ -97,7 +97,7 @@ public class FileIntegrationTest {
             assertEquals(info.keys.get(0).toString(), Objects.requireNonNull(operatorKey).toString());
 
             new FileDeleteTransaction()
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setFileId(file)
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
@@ -105,7 +105,7 @@ public class FileIntegrationTest {
                 .getReceipt(client);
 
             info = new FileInfoQuery()
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setFileId(file)
                 .setQueryPayment(new Hbar(1))
                 .execute(client);

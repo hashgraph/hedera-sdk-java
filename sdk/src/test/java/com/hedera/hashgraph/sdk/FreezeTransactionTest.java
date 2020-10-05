@@ -25,7 +25,7 @@ public class FreezeTransactionTest {
     @Test
     void shouldSerialize() {
         SnapshotMatcher.expect(new FreezeTransaction()
-            .setNodeId(AccountId.fromString("0.0.5005"))
+            .setNodeAccountId(AccountId.fromString("0.0.5005"))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setStartTime(0, 0)
             .setEndTime(23, 59)

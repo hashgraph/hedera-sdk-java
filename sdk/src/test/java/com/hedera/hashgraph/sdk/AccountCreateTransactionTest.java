@@ -25,7 +25,7 @@ public class AccountCreateTransactionTest {
     @Test
     void shouldSerialize() {
         SnapshotMatcher.expect(new AccountCreateTransaction()
-            .setNodeId(AccountId.fromString("0.0.5005"))
+            .setNodeAccountId(AccountId.fromString("0.0.5005"))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setKey(unusedPrivateKey)
             .setInitialBalance(Hbar.fromTinybars(450))

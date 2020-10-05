@@ -33,7 +33,7 @@ public class FileContentsIntegrationTest {
 
             var contents = new FileContentsQuery()
                 .setFileId(file)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setQueryPayment(new Hbar(1))
                 .execute(client);
 
@@ -41,7 +41,7 @@ public class FileContentsIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(file)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
                 .transactionId

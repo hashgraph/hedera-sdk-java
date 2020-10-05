@@ -38,7 +38,7 @@ public class ContractExecuteIntegrationTest {
 
             receipt = new ContractCreateTransaction()
                 .setAdminKey(operatorKey)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(file)
@@ -55,7 +55,7 @@ public class ContractExecuteIntegrationTest {
 
             new ContractExecuteTransaction()
                 .setContractId(contract)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setGas(10000)
                 .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
                 .setMaxTransactionFee(new Hbar(5))
@@ -65,14 +65,14 @@ public class ContractExecuteIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contract)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .execute(client)
                 .transactionId
                 .getReceipt(client);
 
             new FileDeleteTransaction()
                 .setFileId(file)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .execute(client);
 
             client.close();

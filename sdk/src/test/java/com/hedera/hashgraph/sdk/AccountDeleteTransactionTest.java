@@ -25,7 +25,7 @@ public class AccountDeleteTransactionTest {
     @Test
     void shouldSerialize() {
         SnapshotMatcher.expect(new AccountDeleteTransaction()
-            .setNodeId(AccountId.fromString("0.0.5005"))
+            .setNodeAccountId(AccountId.fromString("0.0.5005"))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setAccountId(AccountId.fromString("0.0.5007"))
             .setTransferAccountId(AccountId.fromString("0.0.5008"))

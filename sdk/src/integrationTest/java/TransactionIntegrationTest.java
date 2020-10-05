@@ -21,7 +21,7 @@ public class TransactionIntegrationTest {
 
             var transaction = new AccountCreateTransaction()
                 .setKey(key)
-                .setNodeId(new AccountId(5))
+                .setNodeAccountId(new AccountId(5))
                 .setMaxTransactionFee(new Hbar(2))
                 .freezeWith(client)
                 .signWithOperator(client);

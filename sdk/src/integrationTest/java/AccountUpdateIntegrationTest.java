@@ -43,7 +43,7 @@ class AccountUpdateIntegrationTest {
 
             @Var var info = new AccountInfoQuery()
                 .setAccountId(account)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .execute(client);
 
             assertEquals(info.accountId, account);
@@ -58,7 +58,7 @@ class AccountUpdateIntegrationTest {
 
             new AccountUpdateTransaction()
                 .setAccountId(account)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setKey(key2.getPublicKey())
                 .setMaxTransactionFee(new Hbar(1))
                 .freezeWith(client)
@@ -84,7 +84,7 @@ class AccountUpdateIntegrationTest {
 
             new AccountDeleteTransaction()
                 .setAccountId(account)
-                .setNodeId(response.nodeId)
+                .setNodeAccountId(response.nodeId)
                 .setTransferAccountId(operatorId)
                 .setTransactionId(TransactionId.generate(account))
                 .freezeWith(client)
