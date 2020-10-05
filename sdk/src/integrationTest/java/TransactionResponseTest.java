@@ -12,7 +12,7 @@ public class TransactionResponseTest {
     void test() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
-            var operatorId = client.getOperatorId();
+            var operatorId = client.getOperatorAccountId();
             Assert.assertNotNull(operatorId);
 
             var key = PrivateKey.generate();

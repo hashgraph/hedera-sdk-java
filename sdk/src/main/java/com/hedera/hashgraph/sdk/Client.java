@@ -358,7 +358,7 @@ public final class Client implements AutoCloseable {
      * @return {AccountId}
      */
     @Nullable
-    public AccountId getOperatorId() {
+    public AccountId getOperatorAccountId() {
         if (operator == null) {
             return null;
         }
@@ -372,7 +372,7 @@ public final class Client implements AutoCloseable {
      * @return {PublicKey}
      */
     @Nullable
-    public PublicKey getOperatorKey() {
+    public PublicKey getOperatorPublicKey() {
         if (operator == null) {
             return null;
         }

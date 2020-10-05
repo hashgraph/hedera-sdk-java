@@ -23,7 +23,7 @@ class AccountUpdateIntegrationTest {
     void test() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
-            var operatorId = client.getOperatorId();
+            var operatorId = client.getOperatorAccountId();
 
             var key1 = PrivateKey.generate();
             var key2 = PrivateKey.generate();

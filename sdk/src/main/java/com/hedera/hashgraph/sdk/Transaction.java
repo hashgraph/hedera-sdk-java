@@ -577,7 +577,7 @@ public abstract class Transaction<T extends Transaction<T>>
             freezeWith(client);
         }
 
-        var operatorId = client.getOperatorId();
+        var operatorId = client.getOperatorAccountId();
 
         if (operatorId != null && operatorId.equals(getTransactionId().accountId)) {
             // on execute, sign each transaction with the operator, if present

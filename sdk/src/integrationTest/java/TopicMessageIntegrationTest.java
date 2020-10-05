@@ -26,7 +26,7 @@ public class TopicMessageIntegrationTest {
 
             client.setMirrorNetwork(List.of("api.testnet.kabuto.sh:50211"));
 
-            var operatorKey = client.getOperatorKey();
+            var operatorKey = client.getOperatorPublicKey();
 
             var response = new TopicCreateTransaction()
                 .setAdminKey(operatorKey)

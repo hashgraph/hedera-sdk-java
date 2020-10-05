@@ -29,8 +29,8 @@ public class IntegrationTestClientManager {
             System.out.println("Using operator within the config.");
         }
 
-        assertNotNull(client.getOperatorId());
-        assertNotNull(client.getOperatorId());
+        assertNotNull(client.getOperatorAccountId());
+        assertNotNull(client.getOperatorAccountId());
 
         return client;
     }

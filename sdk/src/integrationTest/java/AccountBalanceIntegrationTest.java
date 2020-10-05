@@ -19,7 +19,7 @@ class AccountBalanceIntegrationTest {
     void test() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
-            var operatorId = client.getOperatorId();
+            var operatorId = client.getOperatorAccountId();
 
             var key = PrivateKey.generate();
 

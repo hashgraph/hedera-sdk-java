@@ -18,7 +18,7 @@ public class FileCreateIntegrationTest {
     void test() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
-            var operatorKey = client.getOperatorKey();
+            var operatorKey = client.getOperatorPublicKey();
 
             var response = new FileCreateTransaction()
                 .setKeys(operatorKey)
