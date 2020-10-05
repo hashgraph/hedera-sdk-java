@@ -1,7 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.CryptoCreateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
+import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
