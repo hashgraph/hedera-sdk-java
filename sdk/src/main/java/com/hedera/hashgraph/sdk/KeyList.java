@@ -15,7 +15,7 @@ import java.util.List;
  */
 public final class KeyList extends Key implements Collection<Key> {
     @Nullable
-    public final Integer threshold;
+    public Integer threshold;
 
     private final List<Key> keys = new ArrayList<>();
 
@@ -28,6 +28,16 @@ public final class KeyList extends Key implements Collection<Key> {
 
     private KeyList(int threshold) {
         this.threshold = threshold;
+    }
+
+    public static KeyList of(Key... keys) {
+        var list = new KeyList();
+
+        for (var key: keys) {
+          list.add(key);
+        }
+
+        return list;
     }
 
     /**
@@ -47,6 +57,27 @@ public final class KeyList extends Key implements Collection<Key> {
         }
 
         return keys;
+    }
+
+    /**
+     * Get the threshold for the KeyList.
+     *
+     * @return int
+     */
+    @Nullable
+    public Integer getThreshold() {
+        return threshold;
+    }
+
+    /**
+     * Set a threshold for the KeyList.
+     *
+     * @param threshold the minimum number of keys that must sign
+     * @return KeyList
+     */
+    public KeyList setThreshold(int threshold) {
+        this.threshold = threshold;
+        return this;
     }
 
     @Override
