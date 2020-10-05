@@ -4,6 +4,7 @@ import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.contract.ContractId;
 import com.hedera.hashgraph.sdk.file.FileId;
 
+import com.hedera.hashgraph.sdk.token.TokenId;
 import org.bouncycastle.util.encoders.DecoderException;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -55,6 +56,13 @@ public final class SolidityUtil {
             fileId.shard,
             fileId.realm,
             fileId.file);
+    }
+
+    public static String addressFor(TokenId tokenId) {
+        return addressForEntity(
+            tokenId.shard,
+            tokenId.realm,
+            tokenId.token);
     }
 
     public static <T> T parseAddress(String address, WithAddress<T> withAddress) {

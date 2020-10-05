@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.contract.ContractId;
 import com.hedera.hashgraph.sdk.file.FileId;
 import com.hedera.hashgraph.proto.Response;
 import com.hedera.hashgraph.proto.ResponseCodeEnum;
+import com.hedera.hashgraph.sdk.token.TokenId;
 
 public final class TransactionReceipt {
     public final Status status;
@@ -61,6 +62,15 @@ public final class TransactionReceipt {
         }
 
         return new ConsensusTopicId(inner.getTopicIDOrBuilder());
+    }
+
+    public TokenId getTokenId() {
+        // Should be present for [ConsensusTopicCreateTransaction]
+        if (!inner.hasTokenId()) {
+            throw new IllegalStateException("receipt does not contain a token ID");
+        }
+
+        return new TokenId(inner.getTokenIdOrBuilder());
     }
 
     public long getConsensusTopicSequenceNumber() {
