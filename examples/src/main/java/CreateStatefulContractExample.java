@@ -65,7 +65,7 @@ public final class CreateStatefulContractExample {
         client.setMaxQueryPayment(new Hbar(10));
 
         // create the contract's bytecode file
-        var fileTransactionResponse = new FileCreateTransaction()
+        TransactionResponse fileTransactionResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file
             .setKeys(OPERATOR_KEY)
             .setContents(byteCode)
@@ -77,7 +77,7 @@ public final class CreateStatefulContractExample {
 
         System.out.println("contract bytecode file: " + newFileId);
 
-        var contractTransactionResponse = new ContractCreateTransaction()
+        TransactionResponse contractTransactionResponse = new ContractCreateTransaction()
             .setBytecodeFileId(newFileId)
             .setGas(100_000_000)
             .setConstructorParameters(
@@ -105,7 +105,7 @@ public final class CreateStatefulContractExample {
         String message = contractCallResult.getString(0);
         System.out.println("contract returned message: " + message);
 
-        var contractExecTransactionResponse = new ContractExecuteTransaction()
+        TransactionResponse contractExecTransactionResponse = new ContractExecuteTransaction()
             .setContractId(newContractId)
             .setGas(100_000_000)
             .setFunction("set_message", new ContractFunctionParameters()
