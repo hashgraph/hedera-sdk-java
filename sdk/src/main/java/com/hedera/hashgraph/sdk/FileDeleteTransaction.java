@@ -4,6 +4,7 @@ import com.hedera.hashgraph.sdk.proto.FileDeleteTransactionBody;
 import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;

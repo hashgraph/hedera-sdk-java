@@ -629,7 +629,146 @@ public enum Status {
     /**
      * For every chunk, the payer account that is part of initialTransactionID must match the Payer Account of this transaction. The entire initialTransactionID should match the transactionID of the first chunk, but this is not checked or enforced by Hedera except when the chunk number is 1.
      */
-    INVALID_CHUNK_TRANSACTION_ID(ResponseCodeEnum.INVALID_CHUNK_TRANSACTION_ID);
+    INVALID_CHUNK_TRANSACTION_ID(ResponseCodeEnum.INVALID_CHUNK_TRANSACTION_ID),
+
+    /**
+     *  Account is frozen and cannot transact with the token
+     */
+    ACCOUNT_FROZEN_FOR_TOKEN(ResponseCodeEnum.ACCOUNT_FROZEN_FOR_TOKEN),
+
+    /**
+     * Maximum number of token relations for agiven account is exceeded
+     */
+    TOKENS_PER_ACCOUNT_LIMIT_EXCEEDED(ResponseCodeEnum.TOKENS_PER_ACCOUNT_LIMIT_EXCEEDED),
+
+    /**
+     * The token is invalid or does not exist
+     */
+    INVALID_TOKEN_ID(ResponseCodeEnum.INVALID_TOKEN_ID),
+
+    /**
+     * Invalid token decimals
+     */
+    INVALID_TOKEN_DECIMALS(ResponseCodeEnum.INVALID_TOKEN_DECIMALS),
+
+    /**
+     * Invalid token initial supply
+     */
+    INVALID_TOKEN_INITIAL_SUPPLY(ResponseCodeEnum.INVALID_TOKEN_INITIAL_SUPPLY) ,
+
+    /**
+     * Treasury Account does not exist or is deleted
+     */
+    INVALID_TREASURY_ACCOUNT_FOR_TOKEN(ResponseCodeEnum.INVALID_TREASURY_ACCOUNT_FOR_TOKEN),
+
+    /**
+     * Token Symbol is not UTF-8 capitalized alphabetical string
+     */
+    INVALID_TOKEN_SYMBOL(ResponseCodeEnum.INVALID_TOKEN_SYMBOL),
+
+    /**
+     * Freeze key is not set on token
+     */
+    TOKEN_HAS_NO_FREEZE_KEY(ResponseCodeEnum.TOKEN_HAS_NO_FREEZE_KEY),
+
+    /**
+     * Amounts in transfer list are not net zero
+     */
+    TRANSFERS_NOT_ZERO_SUM_FOR_TOKEN(ResponseCodeEnum.TRANSFERS_NOT_ZERO_SUM_FOR_TOKEN),
+
+    /**
+     * Token Symbol is not provided
+     */
+    MISSING_TOKEN_SYMBOL(ResponseCodeEnum.MISSING_TOKEN_SYMBOL),
+
+    /**
+     * Token Symbol is too long
+     */
+    TOKEN_SYMBOL_TOO_LONG(ResponseCodeEnum.TOKEN_SYMBOL_TOO_LONG),
+
+    /**
+     * KYC must be granted and account does not have KYC granted
+     */
+    ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN(ResponseCodeEnum.ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN),
+
+    /**
+     * KYC key is not set on token
+     */
+    TOKEN_HAS_NO_KYC_KEY(ResponseCodeEnum.TOKEN_HAS_NO_KYC_KEY),
+
+    /**
+     * Token balance is not sufficient for the transaction
+     */
+    INSUFFICIENT_TOKEN_BALANCE(ResponseCodeEnum.INSUFFICIENT_TOKEN_BALANCE),
+
+    /**
+     * Token transactions cannot be executed on deleted token
+     */
+    TOKEN_WAS_DELETED(ResponseCodeEnum.TOKEN_WAS_DELETED),
+
+    /**
+     * Supply key is not set on token
+     */
+    TOKEN_HAS_NO_SUPPLY_KEY(ResponseCodeEnum.TOKEN_HAS_NO_SUPPLY_KEY),
+
+    /**
+     * Wipe key is not set on token
+     */
+    TOKEN_HAS_NO_WIPE_KEY(ResponseCodeEnum.TOKEN_HAS_NO_WIPE_KEY),
+
+    INVALID_TOKEN_MINT_AMOUNT(ResponseCodeEnum.INVALID_TOKEN_MINT_AMOUNT),
+
+    INVALID_TOKEN_BURN_AMOUNT(ResponseCodeEnum.INVALID_TOKEN_BURN_AMOUNT),
+
+    TOKEN_NOT_ASSOCIATED_TO_ACCOUNT(ResponseCodeEnum.TOKEN_NOT_ASSOCIATED_TO_ACCOUNT),
+
+    /**
+     * Cannot execute wipe operation on treasury account
+     */
+    CANNOT_WIPE_TOKEN_TREASURY_ACCOUNT(ResponseCodeEnum.CANNOT_WIPE_TOKEN_TREASURY_ACCOUNT),
+
+    INVALID_KYC_KEY(ResponseCodeEnum.INVALID_KYC_KEY),
+
+    INVALID_WIPE_KEY(ResponseCodeEnum.INVALID_WIPE_KEY),
+
+    INVALID_FREEZE_KEY(ResponseCodeEnum.INVALID_FREEZE_KEY),
+
+    INVALID_SUPPLY_KEY(ResponseCodeEnum.INVALID_SUPPLY_KEY),
+
+    /**
+     * Token Name is not provided
+     */
+    MISSING_TOKEN_NAME(ResponseCodeEnum.MISSING_TOKEN_NAME),
+
+    /**
+     * Token Name is too long
+     */
+    TOKEN_NAME_TOO_LONG(ResponseCodeEnum.TOKEN_NAME_TOO_LONG),
+
+    /**
+     * The provided wipe amount must not be negative, zero or bigger than the token holder balance
+     */
+    INVALID_WIPING_AMOUNT(ResponseCodeEnum.INVALID_WIPING_AMOUNT),
+
+    /**
+     * Token does not have Admin key set, thus update/delete transactions cannot be performed
+     */
+    TOKEN_IS_IMMUTABLE(ResponseCodeEnum.TOKEN_IS_IMMUTABLE),
+
+    /**
+     * An <tt>associateToken</tt> operation specified a token already associated to the account
+     */
+    TOKEN_ALREADY_ASSOCIATED_TO_ACCOUNT(ResponseCodeEnum.TOKEN_ALREADY_ASSOCIATED_TO_ACCOUNT),
+
+    /**
+     * An attempted operation is invalid until all token balances for the target account are zero
+     */
+    TRANSACTION_REQUIRES_ZERO_TOKEN_BALANCES(ResponseCodeEnum.TRANSACTION_REQUIRES_ZERO_TOKEN_BALANCES),
+
+    /**
+     * An attempted operation is invalid because the account is a treasury;
+     */
+    ACCOUNT_IS_TREASURY(ResponseCodeEnum.ACCOUNT_IS_TREASURY);
 
     final ResponseCodeEnum code;
 

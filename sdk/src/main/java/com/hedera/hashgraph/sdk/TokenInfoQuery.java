@@ -5,7 +5,7 @@ import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
-import com.hederahashgraph.service.proto.java.TokenServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 
@@ -20,10 +20,10 @@ public class TokenInfoQuery extends com.hedera.hashgraph.sdk.Query<TokenInfo, To
      * Sets the Token ID for which information is requested.
      *
      * @return {@code this}
-     * @param TokenId The TokenId to be set
+     * @param tokenId The TokenId to be set
      */
-    public TokenInfoQuery setTokenId(TokenId TokenId) {
-        builder.setToken(TokenId.toProtobuf());
+    public TokenInfoQuery setTokenId(TokenId tokenId) {
+        builder.setToken(tokenId.toProtobuf());
 
         return this;
     }

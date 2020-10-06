@@ -4,7 +4,7 @@ import com.hedera.hashgraph.sdk.proto.TokenGrantKycTransactionBody;
 import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import com.hederahashgraph.service.proto.java.TokenServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 public class TokenGrantKycTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenGrantKycTransaction> {

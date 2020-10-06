@@ -21,7 +21,7 @@ package proto;
  * limitations under the License.
  *
  */
-option java_package = "com.hederahashgraph.service.proto.java";
+option java_package = "com.hedera.hashgraph.sdk.proto";
 
 import "TransactionResponse.proto";
 import "Transaction.proto";

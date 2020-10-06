@@ -3,7 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.hedera.hashgraph.sdk.proto.TokenUnfreezeAccountTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import com.hederahashgraph.service.proto.java.TokenServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 public class TokenUnfreezeAccountTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenUnfreezeAccountTransaction> {

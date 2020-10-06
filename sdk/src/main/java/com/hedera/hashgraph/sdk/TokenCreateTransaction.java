@@ -3,19 +3,16 @@ package com.hedera.hashgraph.sdk;
 import com.hedera.hashgraph.sdk.proto.TokenCreateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
-import com.hederahashgraph.service.proto.java.TokenServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> {
-    private static final Hbar DEFAULT_RECORD_THRESHOLD = Hbar.fromTinybars(Long.MAX_VALUE);
     private final TokenCreateTransactionBody.Builder builder;
 
     public TokenCreateTransaction() {
         builder = TokenCreateTransactionBody.newBuilder();
 
-        // TODO: Nanos or?
-        setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD.toNanos());
+        setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD.toMillis() / 1000);
     }
 
     TokenCreateTransaction(TransactionBody body) {

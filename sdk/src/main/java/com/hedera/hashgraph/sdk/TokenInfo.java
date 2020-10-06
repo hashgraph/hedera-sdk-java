@@ -2,11 +2,11 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.FileGetInfoResponse;
+import com.hedera.hashgraph.sdk.proto.TokenFreezeStatus;
 import com.hedera.hashgraph.sdk.proto.TokenGetInfoResponse;
+import com.hedera.hashgraph.sdk.proto.TokenKycStatus;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.annotation.Nullable;
 
 public class TokenInfo {
     /**
@@ -67,14 +67,12 @@ public class TokenInfo {
     /**
      *
      */
-    // TODO: implement tokenfreezestatus?
-    public final TokenFreezeStatus defaultFreezeStatus;
+    @Nullable public final Boolean defaultFreezeStatus;
 
     /**
      *
      */
-    // TODO: implement tokenkycstatus?
-    public final TokenKycStatus defaultKycStatus;
+    @Nullable public final Boolean defaultKycStatus;
 
     /**
      *
@@ -108,8 +106,8 @@ public class TokenInfo {
         Key freezeKey,
         Key wipeKey,
         Key supplyKey,
-        TokenFreezeStatus defaultFreezeStatus,
-        TokenKycStatus defaultKycStatus,
+        @Nullable Boolean defaultFreezeStatus,
+        @Nullable Boolean defaultKycStatus,
         boolean isDeleted,
         AccountId autoRenewAccount,
         long autoRenewPeriod,
@@ -134,6 +132,24 @@ public class TokenInfo {
         this.expiry = expiry;
     }
 
+    @Nullable static Boolean freezeStatusFromProtobuf(TokenFreezeStatus freezeStatus) {
+        if (freezeStatus == TokenFreezeStatus.Frozen) {
+            return true;
+        } else if (freezeStatus == TokenFreezeStatus.Unfrozen) {
+            return false;
+        }
+        return null;
+    }
+
+    @Nullable static Boolean kycStatusFromProtobuf(TokenKycStatus kycStatus) {
+        if (kycStatus == TokenKycStatus.Granted) {
+            return true;
+        } else if (kycStatus == TokenKycStatus.Revoked) {
+            return false;
+        }
+        return null;
+    }
+
     static TokenInfo fromProtobuf(TokenGetInfoResponse tokenInfo) {
         return new TokenInfo(
             TokenId.fromProtobuf(tokenInfo.getTokenInfo().getTokenId()),
@@ -147,9 +163,8 @@ public class TokenInfo {
             Key.fromProtobuf(tokenInfo.getTokenInfo().getFreezeKey()),
             Key.fromProtobuf(tokenInfo.getTokenInfo().getWipeKey()),
             Key.fromProtobuf(tokenInfo.getTokenInfo().getSupplyKey()),
-            //Todo
-            tokenInfo.getTokenInfo().getDefaultFreezeStatus(),
-            tokenInfo.getTokenInfo().getDefaultKycStatus(),
+            freezeStatusFromProtobuf(tokenInfo.getTokenInfo().getDefaultFreezeStatus()),
+            kycStatusFromProtobuf(tokenInfo.getTokenInfo().getDefaultKycStatus()),
             tokenInfo.getTokenInfo().getIsDeleted(),
             AccountId.fromProtobuf(tokenInfo.getTokenInfo().getAutoRenewAccount()),
             tokenInfo.getTokenInfo().getAutoRenewPeriod(),
@@ -157,12 +172,28 @@ public class TokenInfo {
         );
     }
 
-    // TODO: Check if this works
     public static TokenInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(TokenGetInfoResponse.parseFrom(bytes).toBuilder().build());
     }
 
-    // TODO: Check if this works
+    @Nullable static TokenFreezeStatus freezeStatusToProtobuf(@Nullable Boolean freezeStatus) {
+        if (freezeStatus == null) {
+            return TokenFreezeStatus.FreezeNotApplicable;
+        } else if (freezeStatus) {
+            return TokenFreezeStatus.Frozen;
+        }
+        return TokenFreezeStatus.Unfrozen;
+    }
+
+    @Nullable static TokenKycStatus kycStatusToProtobuf(@Nullable Boolean kycStatus) {
+        if (kycStatus == null) {
+            return TokenKycStatus.KycNotApplicable;
+        } else if (kycStatus) {
+            return TokenKycStatus.Granted;
+        }
+        return TokenKycStatus.Revoked;
+    }
+
     TokenGetInfoResponse toProtobuf() {
         var tokenInfoBuilder = TokenGetInfoResponse.newBuilder().setTokenInfo(
             com.hedera.hashgraph.sdk.proto.TokenInfo.newBuilder()
@@ -177,8 +208,8 @@ public class TokenInfo {
             .setFreezeKey(freezeKey.toKeyProtobuf())
             .setWipeKey(wipeKey.toKeyProtobuf())
             .setSupplyKey(supplyKey.toKeyProtobuf())
-            .setDefaultFreezeStatus(defaultFreezeStatus)
-            .setDefaultKycStatus(defaultKycStatus)
+            .setDefaultFreezeStatus(freezeStatusToProtobuf(defaultFreezeStatus))
+            .setDefaultKycStatus(kycStatusToProtobuf(defaultKycStatus))
             .setIsDeleted(isDeleted)
             .setAutoRenewAccount(autoRenewAccount.toProtobuf())
             .setAutoRenewPeriod(autoRenewPeriod)

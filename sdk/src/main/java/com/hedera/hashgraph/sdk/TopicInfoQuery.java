@@ -4,7 +4,7 @@ import com.hedera.hashgraph.sdk.proto.ConsensusGetTopicInfoQuery;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
-import com.hederahashgraph.service.proto.java.ConsensusServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 /**

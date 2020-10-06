@@ -1,11 +1,14 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.TokenAssociateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenID;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import com.hederahashgraph.service.proto.java.CryptoServiceGrpc;
-import com.hederahashgraph.service.proto.java.TokenServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TokenAssociateTransaction extends Transaction<TokenAssociateTransaction> {
     private final TokenAssociateTransactionBody.Builder builder;
@@ -30,7 +33,29 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
         return this;
     }
 
-    // Repeatable TokenID?
+    public List<TokenID> getTokens() {
+        return builder.getTokensList();
+    }
+
+    public TokenAssociateTransaction addTokens(List<TokenId> tokens) {
+        requireNotFrozen();
+        for (TokenId token : tokens) {
+            builder.addTokens(token.toProtobuf());
+        }
+        return this;
+    }
+
+    public TokenAssociateTransaction addToken(TokenId token) {
+        requireNotFrozen();
+        builder.addTokens(token.toProtobuf());
+        return this;
+    }
+
+    public TokenAssociateTransaction clearTokens() {
+        requireNotFrozen();
+        builder.clearTokens();
+        return this;
+    }
 
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
