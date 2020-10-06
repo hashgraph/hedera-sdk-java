@@ -756,7 +756,7 @@ public enum Status {
     TOKEN_IS_IMMUTABLE(ResponseCodeEnum.TOKEN_IS_IMMUTABLE),
 
     /**
-     * An <tt>associateToken</tt> operation specified a token already associated to the account
+     * An associateToken operation specified a token already associated to the account
      */
     TOKEN_ALREADY_ASSOCIATED_TO_ACCOUNT(ResponseCodeEnum.TOKEN_ALREADY_ASSOCIATED_TO_ACCOUNT),
 
