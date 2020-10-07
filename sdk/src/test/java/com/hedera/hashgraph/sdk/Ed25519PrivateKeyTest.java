@@ -148,15 +148,6 @@ class Ed25519PrivateKeyTest {
     }
 
     @Test
-    @DisplayName("private key can be recovered from a legacy mnemonic")
-    void keyFromLegacyMnemonic() {
-        Mnemonic mnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(MNEMONIC_LEGACY_STRING));
-        PrivateKey key = PrivateKey.fromMnemonic(mnemonic);
-        PrivateKey key2 = PrivateKey.fromString(MNEMONIC_LEGACY_PRIVATE_KEY);
-        assertArrayEquals(key2.toBytes(), key.toBytes());
-    }
-
-    @Test
     @DisplayName("derived key matches that of the mobile wallets")
     void deriveKeyIndex0() {
         Mnemonic iosMnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(IOS_MNEMONIC_STRING));
