@@ -6,6 +6,8 @@ import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import io.grpc.MethodDescriptor;
 
+import java.util.HashMap;
+
 import javax.annotation.Nonnegative;
 
 /**
@@ -21,25 +23,38 @@ import javax.annotation.Nonnegative;
 */
 public final class TokenTransferTransaction extends SingleTransactionBuilder<TokenTransferTransaction> {
     private final TokenTransfersTransactionBody.Builder builder = bodyBuilder.getTokenTransfersBuilder();
+    private HashMap<TokenId, Integer> tokenIndexes = new HashMap<>();
 
     public TokenTransferTransaction() {
         super();
     }
 
-    public TokenTransferTransaction addSender(AccountId accountId, @Nonnegative long amount) {
-        return addTransfer(accountId, -amount);
+    public TokenTransferTransaction addSender(TokenId tokenId, AccountId accountId, @Nonnegative long amount) {
+        return addTransfer(tokenId, accountId, -amount);
     }
 
-    public TokenTransferTransaction addRecipient(AccountId accountId, @Nonnegative long amount) {
-        return addTransfer(accountId, amount);
+    public TokenTransferTransaction addRecipient(TokenId tokenId, AccountId accountId, @Nonnegative long amount) {
+        return addTransfer(tokenId, accountId, amount);
     }
 
-    public TokenTransferTransaction addTransfer(AccountId accountId, long amount) {
-        builder.addTokenTransfers(TokenTransferList.newBuilder()
-                .addTransfers(AccountAmount.newBuilder()
-                    .setAccountID(accountId.toProto())
-                    .setAmount(amount)
-                ));
+    public TokenTransferTransaction addTransfer(TokenId tokenId, AccountId accountId, long amount) {
+        Integer index = tokenIndexes.get(tokenId);
+        int size = builder.getTokenTransfersCount();
+
+        TokenTransferList.Builder transfers;
+
+        if (index != null) {
+            transfers = builder.getTokenTransfers(index).toBuilder();
+        } else {
+            transfers = TokenTransferList.newBuilder();
+            builder.addTokenTransfers(transfers);
+            tokenIndexes.put(tokenId, size);
+        }
+
+        transfers.addTransfers(AccountAmount.newBuilder()
+            .setAccountID(accountId.toProto())
+            .setAmount(amount)
+        );
 
         return this;
     }

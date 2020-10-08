@@ -42,7 +42,7 @@ public final class TokenFreezeAccountTransaction extends SingleTransactionBuilde
      * @param accountId
      * @return TokenFreezeAccountTransaction
      */
-    public TokenFreezeAccountTransaction setAccount(AccountId accountId) {
+    public TokenFreezeAccountTransaction setAccountId(AccountId accountId) {
         builder.setAccount(accountId.toProto());
         return this;
     }

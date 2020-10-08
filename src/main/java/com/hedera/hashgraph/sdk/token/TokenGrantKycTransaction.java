@@ -42,7 +42,7 @@ public final class TokenGrantKycTransaction extends SingleTransactionBuilder<Tok
      * @param accountId
      * @return TokenGrantKycTransaction
      */
-    public TokenGrantKycTransaction setAccount(AccountId accountId) {
+    public TokenGrantKycTransaction setAccountId(AccountId accountId) {
         builder.setAccount(accountId.toProto());
         return this;
     }

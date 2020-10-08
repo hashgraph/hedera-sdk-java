@@ -42,7 +42,7 @@ public final class TokenRevokeKycTransaction extends SingleTransactionBuilder<To
      * @param accountId
      * @return TokenRevokeKycTransaction
      */
-    public TokenRevokeKycTransaction setAccount(AccountId accountId) {
+    public TokenRevokeKycTransaction setAccountId(AccountId accountId) {
         builder.setAccount(accountId.toProto());
         return this;
     }
