@@ -95,7 +95,7 @@ public class TokenInfo {
     /**
      *
      */
-    public final long expiry;
+    public final long expirationTime;
 
     private TokenInfo(
         TokenId tokenId,
@@ -114,7 +114,7 @@ public class TokenInfo {
         boolean isDeleted,
         AccountId autoRenewAccount,
         long autoRenewPeriod,
-        long expiry
+        long expirationTime
     ) {
         this.tokenId = tokenId;
         this.name = name;
@@ -132,7 +132,7 @@ public class TokenInfo {
         this.isDeleted = isDeleted;
         this.autoRenewAccount = autoRenewAccount;
         this.autoRenewPeriod = autoRenewPeriod;
-        this.expiry = expiry;
+        this.expirationTime = expirationTime;
     }
 
     @Nullable static Boolean freezeStatusFromProtobuf(TokenFreezeStatus freezeStatus) {
@@ -216,7 +216,7 @@ public class TokenInfo {
             .setIsDeleted(isDeleted)
             .setAutoRenewAccount(autoRenewAccount.toProtobuf())
             .setAutoRenewPeriod(autoRenewPeriod)
-            .setExpiry(expiry)
+            .setExpiry(expirationTime)
         );
 
         return tokenInfoBuilder.build();
@@ -241,7 +241,7 @@ public class TokenInfo {
             .add("isDeleted", isDeleted)
             .add("autoRenewAccount", autoRenewAccount)
             .add("autoRenewPeriod", autoRenewPeriod)
-            .add("expiry", expiry)
+            .add("expirationTime", expirationTime)
             .toString();
     }
 

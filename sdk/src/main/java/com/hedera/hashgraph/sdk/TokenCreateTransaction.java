@@ -135,9 +135,9 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return builder.getExpiry();
     }
 
-    public TokenCreateTransaction setExpiry(long expiry) {
+    public TokenCreateTransaction setExpirationTime(long expirationTime) {
         requireNotFrozen();
-        builder.setExpiry(expiry);
+        builder.setExpiry(expirationTime);
         return this;
     }
 
