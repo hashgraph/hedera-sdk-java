@@ -126,7 +126,146 @@ public enum Status {
     LiveHashAlreadyExists(ResponseCodeEnum.LIVE_HASH_ALREADY_EXISTS),
     InvalidChunkNumber(ResponseCodeEnum.INVALID_CHUNK_NUMBER),
     InvalidChunkTransactionId(ResponseCodeEnum.INVALID_CHUNK_TRANSACTION_ID),
-    TopicExpired(ResponseCodeEnum.TOPIC_EXPIRED);
+
+    /**
+     *  Account is frozen and cannot transact with the token
+     */
+    AccountFrozenForToken(ResponseCodeEnum.ACCOUNT_FROZEN_FOR_TOKEN),
+
+    /**
+     * Maximum number of token relations for agiven account is exceeded
+     */
+    TokensPerAccountLimitExceeded(ResponseCodeEnum.TOKENS_PER_ACCOUNT_LIMIT_EXCEEDED),
+
+    /**
+     * The token is invalid or does not exist
+     */
+    InvalidTokenId(ResponseCodeEnum.INVALID_TOKEN_ID),
+
+    /**
+     * Invalid token decimals
+     */
+    InvalidTokenDecimals(ResponseCodeEnum.INVALID_TOKEN_DECIMALS),
+
+    /**
+     * Invalid token initial supply
+     */
+    InvalidTokenInitialSupply(ResponseCodeEnum.INVALID_TOKEN_INITIAL_SUPPLY) ,
+
+    /**
+     * Treasury Account does not exist or is deleted
+     */
+    InvalidTreasuryAccountForToken(ResponseCodeEnum.INVALID_TREASURY_ACCOUNT_FOR_TOKEN),
+
+    /**
+     * Token Symbol is not UTF-8 capitalized alphabetical string
+     */
+    InvalidTokenSymbol(ResponseCodeEnum.INVALID_TOKEN_SYMBOL),
+
+    /**
+     * Freeze key is not set on token
+     */
+    TokenHasNoFreezeKey(ResponseCodeEnum.TOKEN_HAS_NO_FREEZE_KEY),
+
+    /**
+     * Amounts in transfer list are not net zero
+     */
+    TransfersNotZeroSumForToken(ResponseCodeEnum.TRANSFERS_NOT_ZERO_SUM_FOR_TOKEN),
+
+    /**
+     * Token Symbol is not provided
+     */
+    MissingTokenSymbol(ResponseCodeEnum.MISSING_TOKEN_SYMBOL),
+
+    /**
+     * Token Symbol is too long
+     */
+    TokenSymbolTooLong(ResponseCodeEnum.TOKEN_SYMBOL_TOO_LONG),
+
+    /**
+     * KYC must be granted and account does not have KYC granted
+     */
+    AccountKycNotGrantedForToken(ResponseCodeEnum.ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN),
+
+    /**
+     * KYC key is not set on token
+     */
+    TokenHasNoKycKey(ResponseCodeEnum.TOKEN_HAS_NO_KYC_KEY),
+
+    /**
+     * Token balance is not sufficient for the transaction
+     */
+    InsufficientTokenBalance(ResponseCodeEnum.INSUFFICIENT_TOKEN_BALANCE),
+
+    /**
+     * Token transactions cannot be executed on deleted token
+     */
+    TokenWasDeleted(ResponseCodeEnum.TOKEN_WAS_DELETED),
+
+    /**
+     * Supply key is not set on token
+     */
+    TokenHasNoSupplyKey(ResponseCodeEnum.TOKEN_HAS_NO_SUPPLY_KEY),
+
+    /**
+     * Wipe key is not set on token
+     */
+    TokenHasNoWipeKey(ResponseCodeEnum.TOKEN_HAS_NO_WIPE_KEY),
+
+    InvalidTokenMintAmount(ResponseCodeEnum.INVALID_TOKEN_MINT_AMOUNT),
+
+    InvalidTokenBurnAmount(ResponseCodeEnum.INVALID_TOKEN_BURN_AMOUNT),
+
+    TokenNotAssociatedToAccount(ResponseCodeEnum.TOKEN_NOT_ASSOCIATED_TO_ACCOUNT),
+
+    /**
+     * Cannot execute wipe operation on treasury account
+     */
+    CannotWipeTokenTreasuryAccount(ResponseCodeEnum.CANNOT_WIPE_TOKEN_TREASURY_ACCOUNT),
+
+    InvalidKycKey(ResponseCodeEnum.INVALID_KYC_KEY),
+
+    InvalidWipeKey(ResponseCodeEnum.INVALID_WIPE_KEY),
+
+    InvalidFreezeKey(ResponseCodeEnum.INVALID_FREEZE_KEY),
+
+    InvalidSupplyKey(ResponseCodeEnum.INVALID_SUPPLY_KEY),
+
+    /**
+     * Token Name is not provided
+     */
+    MissingTokenName(ResponseCodeEnum.MISSING_TOKEN_NAME),
+
+    /**
+     * Token Name is too long
+     */
+    TokenNameTooLong(ResponseCodeEnum.TOKEN_NAME_TOO_LONG),
+
+    /**
+     * The provided wipe amount must not be negative, zero or bigger than the token holder balance
+     */
+    InvalidWipingAmount(ResponseCodeEnum.INVALID_WIPING_AMOUNT),
+
+    /**
+     * Token does not have Admin key set, thus update/delete transactions cannot be performed
+     */
+    TokenIsImmutable(ResponseCodeEnum.TOKEN_IS_IMMUTABLE),
+
+    /**
+     * An associateToken operation specified a token already associated to the account
+     */
+    TokenAlreadyAssociatedToAccount(ResponseCodeEnum.TOKEN_ALREADY_ASSOCIATED_TO_ACCOUNT),
+
+    /**
+     * An attempted operation is invalid until all token balances for the target account are zero
+     */
+    TransactionRequiresZeroTokenBalances(ResponseCodeEnum.TRANSACTION_REQUIRES_ZERO_TOKEN_BALANCES),
+
+    /**
+     * An attempted operation is invalid because the account is a treasury;
+     */
+    AccountIsTreasury(ResponseCodeEnum.ACCOUNT_IS_TREASURY);
+
 
     private final ResponseCodeEnum responseCode;
 
@@ -268,7 +407,38 @@ public enum Status {
             case INVALID_TOPIC_MESSAGE: return InvalidTopicMessage;
             case INVALID_AUTORENEW_ACCOUNT: return InvalidAutorenewAccount;
             case AUTORENEW_ACCOUNT_NOT_ALLOWED: return AutorenewAccountNotAllowed;
-            case TOPIC_EXPIRED: return TopicExpired;
+            case ACCOUNT_FROZEN_FOR_TOKEN: return AccountFrozenForToken;
+            case TOKENS_PER_ACCOUNT_LIMIT_EXCEEDED: return TokensPerAccountLimitExceeded;
+            case INVALID_TOKEN_ID: return InvalidTokenId;
+            case INVALID_TOKEN_DECIMALS: return InvalidTokenDecimals;
+            case INVALID_TOKEN_INITIAL_SUPPLY: return InvalidTokenInitialSupply;
+            case INVALID_TREASURY_ACCOUNT_FOR_TOKEN: return InvalidTreasuryAccountForToken;
+            case INVALID_TOKEN_SYMBOL: return InvalidTokenSymbol;
+            case TOKEN_HAS_NO_FREEZE_KEY: return TokenHasNoFreezeKey;
+            case TRANSFERS_NOT_ZERO_SUM_FOR_TOKEN: return TransfersNotZeroSumForToken;
+            case MISSING_TOKEN_SYMBOL: return MissingTokenSymbol;
+            case TOKEN_SYMBOL_TOO_LONG: return TokenSymbolTooLong;
+            case ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN: return AccountKycNotGrantedForToken;
+            case TOKEN_HAS_NO_KYC_KEY: return TokenHasNoKycKey;
+            case INSUFFICIENT_TOKEN_BALANCE: return InsufficientTokenBalance;
+            case TOKEN_WAS_DELETED: return TokenWasDeleted;
+            case TOKEN_HAS_NO_SUPPLY_KEY: return TokenHasNoSupplyKey;
+            case TOKEN_HAS_NO_WIPE_KEY: return TokenHasNoWipeKey;
+            case INVALID_TOKEN_MINT_AMOUNT: return InvalidTokenMintAmount;
+            case INVALID_TOKEN_BURN_AMOUNT: return InvalidTokenBurnAmount;
+            case TOKEN_NOT_ASSOCIATED_TO_ACCOUNT: return TokenNotAssociatedToAccount;
+            case CANNOT_WIPE_TOKEN_TREASURY_ACCOUNT: return CannotWipeTokenTreasuryAccount;
+            case INVALID_KYC_KEY: return InvalidKycKey;
+            case INVALID_WIPE_KEY: return InvalidWipeKey;
+            case INVALID_FREEZE_KEY: return InvalidFreezeKey;
+            case INVALID_SUPPLY_KEY: return InvalidSupplyKey;
+            case MISSING_TOKEN_NAME: return MissingTokenName;
+            case TOKEN_NAME_TOO_LONG: return TokenNameTooLong;
+            case INVALID_WIPING_AMOUNT: return InvalidWipingAmount;
+            case TOKEN_IS_IMMUTABLE: return TokenIsImmutable;
+            case TOKEN_ALREADY_ASSOCIATED_TO_ACCOUNT: return TokenAlreadyAssociatedToAccount;
+            case TRANSACTION_REQUIRES_ZERO_TOKEN_BALANCES: return TransactionRequiresZeroTokenBalances;
+            case ACCOUNT_IS_TREASURY: return AccountIsTreasury;
 
             case UNRECOGNIZED:
                 // protobufs won't give us the actual value that was unexpected, unfortunately
