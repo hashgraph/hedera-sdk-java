@@ -6,14 +6,14 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 
-public class TokenUnfreezeAccountTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenUnfreezeAccountTransaction> {
+public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenUnfreezeTransaction> {
     private final TokenUnfreezeAccountTransactionBody.Builder builder;
 
-    public TokenUnfreezeAccountTransaction() {
+    public TokenUnfreezeTransaction() {
         builder = TokenUnfreezeAccountTransactionBody.newBuilder();
     }
 
-    TokenUnfreezeAccountTransaction(TransactionBody body) {
+    TokenUnfreezeTransaction(TransactionBody body) {
         super(body);
 
         builder = body.getTokenUnfreeze().toBuilder();
@@ -23,7 +23,7 @@ public class TokenUnfreezeAccountTransaction extends com.hedera.hashgraph.sdk.Tr
         return TokenId.fromProtobuf(builder.getToken());
     }
 
-    public TokenUnfreezeAccountTransaction setToken(TokenId tokenId) {
+    public TokenUnfreezeTransaction setToken(TokenId tokenId) {
         requireNotFrozen();
         builder.setToken(tokenId.toProtobuf());
         return this;
@@ -33,7 +33,7 @@ public class TokenUnfreezeAccountTransaction extends com.hedera.hashgraph.sdk.Tr
         return AccountId.fromProtobuf(builder.getAccount());
     }
 
-    public TokenUnfreezeAccountTransaction setAccount(AccountId accountId) {
+    public TokenUnfreezeTransaction setAccount(AccountId accountId) {
         requireNotFrozen();
         builder.setAccount(accountId.toProtobuf());
         return this;

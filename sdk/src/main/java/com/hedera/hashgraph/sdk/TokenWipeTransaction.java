@@ -6,14 +6,14 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 
-public class TokenWipeAccountTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenWipeAccountTransaction> {
+public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenWipeTransaction> {
     private final TokenWipeAccountTransactionBody.Builder builder;
 
-    public TokenWipeAccountTransaction() {
+    public TokenWipeTransaction() {
         builder = TokenWipeAccountTransactionBody.newBuilder();
     }
 
-    TokenWipeAccountTransaction(TransactionBody body) {
+    TokenWipeTransaction(TransactionBody body) {
         super(body);
 
         builder = body.getTokenWipe().toBuilder();
@@ -23,7 +23,7 @@ public class TokenWipeAccountTransaction extends com.hedera.hashgraph.sdk.Transa
         return TokenId.fromProtobuf(builder.getToken());
     }
 
-    public TokenWipeAccountTransaction setToken(TokenId tokenId) {
+    public TokenWipeTransaction setToken(TokenId tokenId) {
         requireNotFrozen();
         builder.setToken(tokenId.toProtobuf());
         return this;
@@ -33,7 +33,7 @@ public class TokenWipeAccountTransaction extends com.hedera.hashgraph.sdk.Transa
         return AccountId.fromProtobuf(builder.getAccount());
     }
 
-    public TokenWipeAccountTransaction setAccount(AccountId accountId) {
+    public TokenWipeTransaction setAccount(AccountId accountId) {
         requireNotFrozen();
         builder.setAccount(accountId.toProtobuf());
         return this;
@@ -43,7 +43,7 @@ public class TokenWipeAccountTransaction extends com.hedera.hashgraph.sdk.Transa
         return builder.getAmount();
     }
 
-    public TokenWipeAccountTransaction setAmount(long amount) {
+    public TokenWipeTransaction setAmount(long amount) {
         requireNotFrozen();
         builder.setAmount(amount);
         return this;
