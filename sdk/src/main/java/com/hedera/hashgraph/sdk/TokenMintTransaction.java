@@ -20,11 +20,11 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         builder = body.getTokenMint().toBuilder();
     }
 
-    public TokenId getToken() {
+    public TokenId getTokenId() {
         return TokenId.fromProtobuf(builder.getToken());
     }
 
-    public TokenMintTransaction setToken(TokenId tokenId) {
+    public TokenMintTransaction setTokenId(TokenId tokenId) {
         requireNotFrozen();
         builder.setToken(tokenId.toProtobuf());
         return this;

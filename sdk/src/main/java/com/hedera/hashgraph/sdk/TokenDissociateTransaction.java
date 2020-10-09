@@ -19,11 +19,11 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
         builder = body.getTokenDissociate().toBuilder();
     }
 
-    public AccountId getAccount() {
+    public AccountId getAccountId() {
         return AccountId.fromProtobuf(builder.getAccount());
     }
 
-    public TokenDissociateTransaction setAccount(AccountId accountId) {
+    public TokenDissociateTransaction setAccountId(AccountId accountId) {
         requireNotFrozen();
         builder.setAccount(accountId.toProtobuf());
         return this;

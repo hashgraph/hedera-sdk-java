@@ -20,11 +20,11 @@ public class TokenDeleteTransaction extends com.hedera.hashgraph.sdk.Transaction
         builder = body.getTokenDeletion().toBuilder();
     }
 
-    public TokenId getToken() {
+    public TokenId getTokenId() {
         return TokenId.fromProtobuf(builder.getToken());
     }
 
-    public TokenDeleteTransaction setToken(TokenId tokenId) {
+    public TokenDeleteTransaction setTokenId(TokenId tokenId) {
         requireNotFrozen();
         builder.setToken(tokenId.toProtobuf());
         return this;

@@ -19,11 +19,11 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         builder = body.getTokenUpdate().toBuilder();
     }
 
-    public TokenId getToken() {
+    public TokenId getTokenId() {
         return  TokenId.fromProtobuf(builder.getToken());
     }
 
-    public TokenUpdateTransaction setToken(TokenId tokenId) {
+    public TokenUpdateTransaction setTokenId(TokenId tokenId) {
         requireNotFrozen();
         builder.setToken(tokenId.toProtobuf());
         return this;

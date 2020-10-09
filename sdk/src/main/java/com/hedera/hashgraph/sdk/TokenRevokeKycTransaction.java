@@ -19,21 +19,21 @@ public class TokenRevokeKycTransaction extends com.hedera.hashgraph.sdk.Transact
         builder = body.getTokenRevokeKyc().toBuilder();
     }
 
-    public TokenId getToken() {
+    public TokenId getTokenId() {
         return TokenId.fromProtobuf(builder.getToken());
     }
 
-    public TokenRevokeKycTransaction setToken(TokenId tokenId) {
+    public TokenRevokeKycTransaction setTokenId(TokenId tokenId) {
         requireNotFrozen();
         builder.setToken(tokenId.toProtobuf());
         return this;
     }
 
-    public AccountId getAccount() {
+    public AccountId getAccountId() {
         return AccountId.fromProtobuf(builder.getAccount());
     }
 
-    public TokenRevokeKycTransaction setAccount(AccountId accountId) {
+    public TokenRevokeKycTransaction setAccountId(AccountId accountId) {
         requireNotFrozen();
         builder.setAccount(accountId.toProtobuf());
         return this;

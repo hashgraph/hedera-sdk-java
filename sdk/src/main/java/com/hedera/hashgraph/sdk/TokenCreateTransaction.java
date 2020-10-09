@@ -131,7 +131,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return this;
     }
 
-    public long getExpiry() {
+    public long getExpirationTime() {
         return builder.getExpiry();
     }
 

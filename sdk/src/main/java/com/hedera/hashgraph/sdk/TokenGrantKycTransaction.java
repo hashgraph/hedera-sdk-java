@@ -20,21 +20,21 @@ public class TokenGrantKycTransaction extends com.hedera.hashgraph.sdk.Transacti
         builder = body.getTokenGrantKyc().toBuilder();
     }
 
-    public TokenId getToken() {
+    public TokenId getTokenId() {
         return TokenId.fromProtobuf(builder.getToken());
     }
 
-    public TokenGrantKycTransaction setToken(TokenId tokenId) {
+    public TokenGrantKycTransaction setTokenId(TokenId tokenId) {
         requireNotFrozen();
         builder.setToken(tokenId.toProtobuf());
         return this;
     }
 
-    public AccountId getAccount() {
+    public AccountId getAccountId() {
         return AccountId.fromProtobuf(builder.getAccount());
     }
 
-    public TokenGrantKycTransaction setAccount(AccountId accountId) {
+    public TokenGrantKycTransaction setAccountId(AccountId accountId) {
         requireNotFrozen();
         builder.setAccount(accountId.toProtobuf());
         return this;

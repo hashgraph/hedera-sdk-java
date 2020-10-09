@@ -19,21 +19,21 @@ public class TokenFreezeTransaction extends com.hedera.hashgraph.sdk.Transaction
         builder = body.getTokenFreeze().toBuilder();
     }
 
-    public TokenId getToken() {
+    public TokenId getTokenId() {
         return TokenId.fromProtobuf(builder.getToken());
     }
 
-    public TokenFreezeTransaction setToken(TokenId tokenId) {
+    public TokenFreezeTransaction setTokenId(TokenId tokenId) {
         requireNotFrozen();
         builder.setToken(tokenId.toProtobuf());
         return this;
     }
 
-    public AccountId getAccount() {
+    public AccountId getAccountId() {
         return AccountId.fromProtobuf(builder.getAccount());
     }
 
-    public TokenFreezeTransaction setAccount(AccountId accountId) {
+    public TokenFreezeTransaction setAccountId(AccountId accountId) {
         requireNotFrozen();
         builder.setAccount(accountId.toProtobuf());
         return this;
