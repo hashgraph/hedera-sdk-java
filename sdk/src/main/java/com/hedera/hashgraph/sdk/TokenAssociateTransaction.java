@@ -37,17 +37,11 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
         return builder.getTokensList();
     }
 
-    public TokenAssociateTransaction addTokens(List<TokenId> tokens) {
+    public TokenAssociateTransaction addTokens(TokenId... tokens) {
         requireNotFrozen();
         for (TokenId token : tokens) {
             builder.addTokens(token.toProtobuf());
         }
-        return this;
-    }
-
-    public TokenAssociateTransaction addToken(TokenId token) {
-        requireNotFrozen();
-        builder.addTokens(token.toProtobuf());
         return this;
     }
 

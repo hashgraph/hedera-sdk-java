@@ -1,10 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.proto.TokenDissociateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
+
+import java.util.List;
 
 public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenDissociateTransaction> {
     private final TokenDissociateTransactionBody.Builder builder;
@@ -26,6 +26,18 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
     public TokenDissociateTransaction setAccount(AccountId accountId) {
         requireNotFrozen();
         builder.setAccount(accountId.toProtobuf());
+        return this;
+    }
+
+    public List<TokenID> getTokens() {
+        return builder.getTokensList();
+    }
+
+    public TokenDissociateTransaction addTokens(TokenId... tokens) {
+        requireNotFrozen();
+        for (TokenId token : tokens) {
+            builder.addTokens(token.toProtobuf());
+        }
         return this;
     }
 
