@@ -11,8 +11,6 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
 
     public TokenUpdateTransaction() {
         builder = TokenUpdateTransactionBody.newBuilder();
-
-        setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD.toMillis() / 1000);
     }
 
     TokenUpdateTransaction(TransactionBody body) {

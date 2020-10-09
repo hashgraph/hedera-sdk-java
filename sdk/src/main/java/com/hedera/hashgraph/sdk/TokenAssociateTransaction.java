@@ -23,11 +23,11 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
         builder = body.getTokenAssociate().toBuilder();
     }
 
-    public AccountId getAccount() {
+    public AccountId getAccountId() {
         return AccountId.fromProtobuf(builder.getAccount());
     }
 
-    public TokenAssociateTransaction setAccount(AccountId accountId) {
+    public TokenAssociateTransaction setAccountId(AccountId accountId) {
         requireNotFrozen();
         builder.setAccount(accountId.toProtobuf());
         return this;
@@ -48,12 +48,6 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
     public TokenAssociateTransaction addToken(TokenId token) {
         requireNotFrozen();
         builder.addTokens(token.toProtobuf());
-        return this;
-    }
-
-    public TokenAssociateTransaction clearTokens() {
-        requireNotFrozen();
-        builder.clearTokens();
         return this;
     }
 

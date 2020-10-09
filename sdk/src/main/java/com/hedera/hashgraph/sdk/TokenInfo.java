@@ -67,12 +67,14 @@ public class TokenInfo {
     /**
      *
      */
-    @Nullable public final Boolean defaultFreezeStatus;
+    @Nullable
+    public final Boolean defaultFreezeStatus;
 
     /**
      *
      */
-    @Nullable public final Boolean defaultKycStatus;
+    @Nullable
+    public final Boolean defaultKycStatus;
 
     /**
      *
@@ -82,6 +84,7 @@ public class TokenInfo {
     /**
      *
      */
+    @Nullable
     public final AccountId autoRenewAccount;
 
     /**

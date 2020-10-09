@@ -9,11 +9,13 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class TokenTransferTransaction extends Transaction<TokenTransferTransaction> {
     private final TokenTransfersTransactionBody.Builder builder;
-    private final TokenTransferList.Builder transfersBuilder;
+    private TokenTransferList.Builder transfersBuilder;
+    private HashMap<TokenId, Integer> tokenIndexes= new HashMap<>();
 
     public TokenTransferTransaction() {
         builder = TokenTransfersTransactionBody.newBuilder();
@@ -46,29 +48,42 @@ public class TokenTransferTransaction extends Transaction<TokenTransferTransacti
     }
 
     /**
-     * Adds hbar to the transfer from the given account.
+     * Adds token value to the transfer from the given account.
      *
-     * @param value    The Hbar value to be transferred
+     * @param tokenId  The Id of the token to be transferred
+     * @param value    The token value to be transferred
      * @param senderId The AccountId of the sender
      * @return {@code this}
      */
-    public TokenTransferTransaction addSender(AccountId senderId, Hbar value) {
-        return addTransfer(senderId, value.negated());
+    public TokenTransferTransaction addSender(TokenId tokenId, AccountId senderId, Hbar value) {
+        return addTransfer(tokenId, senderId, value.negated());
     }
 
     /**
-     * Removes hbar from the transfer to the given account.
+     * Removes token value from the transfer to the given account.
      *
-     * @param value       The Hbar value to be received
+     * @param tokenId     The Id of the token to be received
+     * @param value       The token value to be received
      * @param recipientId The AccountId of the recipient
      * @return {@code this}
      */
-    public TokenTransferTransaction addRecipient(AccountId recipientId, Hbar value) {
-        return addTransfer(recipientId, value);
+    public TokenTransferTransaction addRecipient(TokenId tokenId, AccountId recipientId, Hbar value) {
+        return addTransfer(tokenId, recipientId, value);
     }
 
-    public TokenTransferTransaction addTransfer(AccountId accountId, Hbar value) {
+    public TokenTransferTransaction addTransfer(TokenId tokenId, AccountId accountId, Hbar value) {
+        var index = tokenIndexes.get(tokenId);
+        var size = builder.getTokenTransfersCount();
+
         requireNotFrozen();
+
+        if (index != null) {
+            transfersBuilder = builder.getTokenTransfers(index).toBuilder();
+        } else {
+            transfersBuilder = TokenTransferList.newBuilder();
+            builder.addTokenTransfers(transfersBuilder);
+            tokenIndexes.put(tokenId, size);
+        }
 
         transfersBuilder.addTransfers(
             AccountAmount.newBuilder()

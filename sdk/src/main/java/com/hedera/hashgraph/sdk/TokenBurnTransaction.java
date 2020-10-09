@@ -20,11 +20,11 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         builder = body.getTokenBurn().toBuilder();
     }
 
-    public TokenId getToken() {
+    public TokenId getTokenId() {
         return TokenId.fromProtobuf(builder.getToken());
     }
 
-    public TokenBurnTransaction setToken(TokenId tokenId) {
+    public TokenBurnTransaction setTokenId(TokenId tokenId) {
         requireNotFrozen();
         builder.setToken(tokenId.toProtobuf());
         return this;
