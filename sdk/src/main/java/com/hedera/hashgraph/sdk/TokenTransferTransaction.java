@@ -1,10 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.proto.AccountAmount;
-import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.TokenTransferList;
-import com.hedera.hashgraph.sdk.proto.TokenTransfersTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -36,15 +32,21 @@ public class TokenTransferTransaction extends Transaction<TokenTransferTransacti
         }
     }
 
-    public List<Transfer> getTransfers() {
-        var numTransfers = transfersBuilder.getTransfersCount();
-        var transfers = new ArrayList<Transfer>(numTransfers);
+    public HashMap<TokenId, List<Transfer>> getTransfers() {
+        var tokenTransferListMap = new HashMap<TokenId, List<Transfer>>();
 
-        for (var i = 0; i < numTransfers; i++) {
-            transfers.add(Transfer.fromProtobuf(transfersBuilder.getTransfers(i)));
+        for (var i = 0; i < builder.getTokenTransfersCount(); i++) {
+            var numTransfers = builder.getTokenTransfersList().get(i).getTransfersCount();
+            var transfers = new ArrayList<Transfer>(numTransfers);
+
+            for (var j = 0; j < numTransfers; j++) {
+                transfers.add(Transfer.fromProtobuf(transfersBuilder.getTransfers(i)));
+            }
+
+            tokenTransferListMap.put(TokenId.fromProtobuf(builder.getTokenTransfersList().get(i).getToken()), transfers);
         }
 
-        return transfers;
+        return tokenTransferListMap;
     }
 
     /**
