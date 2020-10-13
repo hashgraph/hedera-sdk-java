@@ -61,7 +61,7 @@ public final class TokenTransferTransaction extends SingleTransactionBuilder<Tok
 
     @Override
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
-        return TokenServiceGrpc.getWipeTokenAccountMethod();
+        return TokenServiceGrpc.getTransferTokensMethod();
     }
 
     @Override
