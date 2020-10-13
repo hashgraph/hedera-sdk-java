@@ -59,7 +59,7 @@ public final class TokenCreateTransaction extends SingleTransactionBuilder<Token
      * @param symbol
      * @return TokenCreateTransaction
      */
-    public TokenCreateTransaction setSybmol(String symbol) {
+    public TokenCreateTransaction setSymbol(String symbol) {
         builder.setSymbol(symbol);
         return this;
     }

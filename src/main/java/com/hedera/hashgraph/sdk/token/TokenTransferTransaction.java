@@ -44,13 +44,14 @@ public final class TokenTransferTransaction extends SingleTransactionBuilder<Tok
         TokenTransferList.Builder transfers;
 
         if (index != null) {
-            transfers = builder.getTokenTransfers(index).toBuilder();
+            transfers = builder.getTokenTransfersBuilder(index);
         } else {
-            transfers = TokenTransferList.newBuilder();
-            builder.addTokenTransfers(transfers);
+            builder.addTokenTransfers(TokenTransferList.newBuilder());
+            transfers = builder.getTokenTransfersBuilder(size);
             tokenIndexes.put(tokenId, size);
         }
 
+        transfers.setToken(tokenId.toProto());
         transfers.addTransfers(AccountAmount.newBuilder()
             .setAccountID(accountId.toProto())
             .setAmount(amount)
