@@ -1022,7 +1022,71 @@ public enum Status {
                 return INVALID_CHUNK_NUMBER;
             case INVALID_CHUNK_TRANSACTION_ID:
                 return INVALID_CHUNK_TRANSACTION_ID;
-
+            case ACCOUNT_FROZEN_FOR_TOKEN:
+                return ACCOUNT_FROZEN_FOR_TOKEN;
+            case TOKENS_PER_ACCOUNT_LIMIT_EXCEEDED:
+                return TOKENS_PER_ACCOUNT_LIMIT_EXCEEDED;
+            case INVALID_TOKEN_ID:
+                return INVALID_TOKEN_ID;
+            case INVALID_TOKEN_DECIMALS:
+                return INVALID_TOKEN_DECIMALS;
+            case INVALID_TOKEN_INITIAL_SUPPLY:
+                return INVALID_TOKEN_INITIAL_SUPPLY;
+            case INVALID_TREASURY_ACCOUNT_FOR_TOKEN:
+                return INVALID_TREASURY_ACCOUNT_FOR_TOKEN;
+            case INVALID_TOKEN_SYMBOL:
+                return INVALID_TOKEN_SYMBOL;
+            case TOKEN_HAS_NO_FREEZE_KEY:
+                return TOKEN_HAS_NO_FREEZE_KEY;
+            case TRANSFERS_NOT_ZERO_SUM_FOR_TOKEN:
+                return TRANSFERS_NOT_ZERO_SUM_FOR_TOKEN;
+            case MISSING_TOKEN_SYMBOL:
+                return MISSING_TOKEN_SYMBOL;
+            case TOKEN_SYMBOL_TOO_LONG:
+                return TOKEN_SYMBOL_TOO_LONG;
+            case ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN:
+                return ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN;
+            case TOKEN_HAS_NO_KYC_KEY:
+                return TOKEN_HAS_NO_KYC_KEY;
+            case INSUFFICIENT_TOKEN_BALANCE:
+                return INSUFFICIENT_TOKEN_BALANCE;
+            case TOKEN_WAS_DELETED:
+                return TOKEN_WAS_DELETED;
+            case TOKEN_HAS_NO_SUPPLY_KEY:
+                return TOKEN_HAS_NO_SUPPLY_KEY;
+            case TOKEN_HAS_NO_WIPE_KEY:
+                return TOKEN_HAS_NO_WIPE_KEY;
+            case INVALID_TOKEN_MINT_AMOUNT:
+                return INVALID_TOKEN_MINT_AMOUNT;
+            case INVALID_TOKEN_BURN_AMOUNT:
+                return INVALID_TOKEN_BURN_AMOUNT;
+            case TOKEN_NOT_ASSOCIATED_TO_ACCOUNT:
+                return TOKEN_NOT_ASSOCIATED_TO_ACCOUNT;
+            case CANNOT_WIPE_TOKEN_TREASURY_ACCOUNT:
+                return CANNOT_WIPE_TOKEN_TREASURY_ACCOUNT;
+            case INVALID_KYC_KEY:
+                return INVALID_KYC_KEY;
+            case INVALID_WIPE_KEY:
+                return INVALID_WIPE_KEY;
+            case INVALID_FREEZE_KEY:
+                return INVALID_FREEZE_KEY;
+            case INVALID_SUPPLY_KEY:
+                return INVALID_SUPPLY_KEY;
+            case MISSING_TOKEN_NAME:
+                return MISSING_TOKEN_NAME;
+            case TOKEN_NAME_TOO_LONG:
+                return TOKEN_NAME_TOO_LONG;
+            case INVALID_WIPING_AMOUNT:
+                return INVALID_WIPING_AMOUNT;
+            case TOKEN_IS_IMMUTABLE:
+                return TOKEN_IS_IMMUTABLE;
+            case TOKEN_ALREADY_ASSOCIATED_TO_ACCOUNT:
+                return TOKEN_ALREADY_ASSOCIATED_TO_ACCOUNT;
+            case TRANSACTION_REQUIRES_ZERO_TOKEN_BALANCES:
+                return TRANSACTION_REQUIRES_ZERO_TOKEN_BALANCES;
+            case ACCOUNT_IS_TREASURY:
+                return ACCOUNT_IS_TREASURY;
+                
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
