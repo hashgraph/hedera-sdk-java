@@ -18,19 +18,17 @@ class AccountRecordsIntegrationTest {
     void test() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
-            var operatorId = client.getOperatorId();
+            var operatorId = client.getOperatorAccountId();
 
             var key = PrivateKey.generate();
 
-            var receipt = new AccountCreateTransaction()
+            var response = new AccountCreateTransaction()
                 .setKey(key)
                 .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
-                .setReceiveRecordThreshold(Hbar.fromTinybars(1))
-                .setSendRecordThreshold(Hbar.fromTinybars(1))
-                .execute(client)
-                .transactionId
-                .getReceipt(client);
+                .execute(client);
+
+            var receipt = response.transactionId.getReceipt(client);
 
             assertNotNull(receipt.accountId);
             assertTrue(Objects.requireNonNull(receipt.accountId).num > 0);
@@ -38,11 +36,13 @@ class AccountRecordsIntegrationTest {
             var account = receipt.accountId;
 
             new CryptoTransferTransaction()
+                .setNodeAccountId(response.nodeId)
                 .addRecipient(account, new Hbar(1))
                 .addSender(operatorId, new Hbar(1))
                 .execute(client);
 
             var records = new AccountRecordsQuery()
+                .setNodeAccountId(response.nodeId)
                 .setAccountId(operatorId)
                 .setMaxQueryPayment(new Hbar(1))
                 .execute(client);
@@ -50,10 +50,11 @@ class AccountRecordsIntegrationTest {
             assertTrue(records.isEmpty());
 
             new AccountDeleteTransaction()
+                .setNodeAccountId(response.nodeId)
                 .setAccountId(account)
                 .setTransferAccountId(operatorId)
                 .setTransactionId(TransactionId.generate(account))
-                .build(client)
+                .freezeWith(client)
                 .sign(key)
                 .execute(client)
                 .transactionId

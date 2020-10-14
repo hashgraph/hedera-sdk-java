@@ -31,7 +31,7 @@ public class CryptoTransferTransactionTest {
             .addRecipient(AccountId.fromString("0.0.5007"), Hbar.fromTinybars(400))
             .addTransfer(AccountId.fromString("0.0.5008"), Hbar.fromTinybars(400))
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .build(Client.forTestnet())
+            .freeze()
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();

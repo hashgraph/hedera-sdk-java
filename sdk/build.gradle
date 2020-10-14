@@ -33,21 +33,21 @@ dependencies {
 
 	// Protobuf Lite is used to maintain easy compatibility with Android
 	// https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
-	api "com.google.protobuf:protobuf-javalite:3.12.2"
+	api "com.google.protobuf:protobuf-javalite:3.13.0"
 
 	// https://mvnrepository.com/artifact/org.slf4j/slf4j-api
 	implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
 
-	implementation "io.grpc:grpc-api:1.31.0"
-	implementation "io.grpc:grpc-protobuf-lite:1.31.0"
-	implementation "io.grpc:grpc-stub:1.31.0"
+	implementation "io.grpc:grpc-api:1.31.1"
+	implementation "io.grpc:grpc-protobuf-lite:1.31.1"
+	implementation "io.grpc:grpc-stub:1.31.1"
 
 	testImplementation "org.junit.jupiter:junit-jupiter-engine:5.6.1"
 	testImplementation "org.junit.jupiter:junit-jupiter-params:5.6.1"
 
 	testRuntimeOnly "org.slf4j:slf4j-simple:2.0.0-alpha1"
-	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.31.0"
-	integrationTestRuntimeOnly "io.grpc:grpc-netty-shaded:1.31.0"
+	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.31.1"
+	integrationTestRuntimeOnly "io.grpc:grpc-netty-shaded:1.31.1"
 
 	// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
 	//       use CompletableFuture directly.
@@ -67,11 +67,11 @@ dependencies {
 // https://github.com/google/protobuf-gradle-plugin
 protobuf {
 	protoc {
-		artifact = "com.google.protobuf:protoc:3.12.3"
+		artifact = "com.google.protobuf:protoc:3.13.0"
 	}
 	plugins {
 		grpc {
-			artifact = "io.grpc:protoc-gen-grpc-java:1.30.2"
+			artifact = "io.grpc:protoc-gen-grpc-java:1.31.1"
 		}
 	}
 	generateProtoTasks {
@@ -159,18 +159,13 @@ tasks.withType(Test) {
 	// this task will fail on the first failed test
 	failFast = true
 
-	// maximum number of test processes
-	maxParallelForks = Runtime.runtime.availableProcessors() / 2
-
-	// maximum heap size for the process
-	maxHeapSize = "1G"
-
 	// emit logs per passed or failed test
 	testLogging {
 		exceptionFormat = 'full'
 		events "passed", "skipped", "failed", "standardOut", "standardError"
 	}
 
+	// propagate system environment to test runner
 	systemProperty "OPERATOR_ID", findProperty("OPERATOR_ID")
 	systemProperty "OPERATOR_KEY", findProperty("OPERATOR_KEY")
 	systemProperty "CONFIG_FILE", findProperty("CONFIG_FILE")

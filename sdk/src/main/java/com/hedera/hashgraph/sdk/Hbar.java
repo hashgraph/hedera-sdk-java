@@ -39,7 +39,7 @@ public final class Hbar implements Comparable<Hbar> {
         this(amount, HbarUnit.HBAR);
     }
 
-    public Hbar(BigDecimal amount, HbarUnit unit) {
+    Hbar(BigDecimal amount, HbarUnit unit) {
         var tinybars = amount.multiply(BigDecimal.valueOf(unit.tinybar));
 
         if (tinybars.doubleValue() % 1 != 0) {

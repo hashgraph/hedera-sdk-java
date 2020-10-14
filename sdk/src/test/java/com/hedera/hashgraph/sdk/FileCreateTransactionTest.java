@@ -31,7 +31,7 @@ public class FileCreateTransactionTest {
             .setExpirationTime(Instant.ofEpochSecond(1554158728))
             .setKeys(unusedPrivateKey)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .build(Client.forTestnet())
+            .freeze()
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();

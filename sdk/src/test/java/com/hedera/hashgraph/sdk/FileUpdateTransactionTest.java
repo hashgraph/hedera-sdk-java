@@ -32,7 +32,7 @@ public class FileUpdateTransactionTest {
             .setContents(new byte[]{1, 2, 3, 4, 5})
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .setKeys(unusedPrivateKey)
-            .build(Client.forTestnet())
+            .freeze()
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();

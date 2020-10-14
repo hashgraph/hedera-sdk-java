@@ -4,6 +4,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.errorprone.annotations.Var;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import java8.util.Lists;
@@ -32,7 +34,6 @@ import java.util.concurrent.TimeUnit;
  * Managed client for use on the Hedera Hashgraph network.
  */
 public final class Client implements AutoCloseable {
-    private static final String HEDERA_TESTNET_MIRROR_NODE = "hcs.testnet.mirrornode.hedera.com:5600";
     private static final Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
     private static final Hbar DEFAULT_MAX_TRANSACTION_FEE = new Hbar(1);
 
@@ -123,7 +124,9 @@ public final class Client implements AutoCloseable {
         network.put(new AccountId(11), "35.240.118.96:50211");
         network.put(new AccountId(12), "35.204.86.32:50211");
 
-        return Client.forNetwork(network);
+        var client = Client.forNetwork(network);
+        client.setMirrorNetwork(Lists.of("hcs.mainnet.mirrornode.hedera.com:5600"));
+        return client;
     }
 
     /**
@@ -140,7 +143,19 @@ public final class Client implements AutoCloseable {
         network.put(new AccountId(6), "3.testnet.hedera.com:50211");
 
         var client = Client.forNetwork(network);
-        client.setMirrorNetwork(Lists.of(HEDERA_TESTNET_MIRROR_NODE));
+        client.setMirrorNetwork(Lists.of("hcs.testnet.mirrornode.hedera.com:5600"));
+        return client;
+    }
+
+    public static Client forPreviewnet() {
+        var network = new HashMap<AccountId, String>();
+        network.put(new AccountId(3), "0.preview.hedera.com:50211");
+        network.put(new AccountId(4), "1.preview.hedera.com:50211");
+        network.put(new AccountId(5), "2.preview.hedera.com:50211");
+        network.put(new AccountId(6), "3.preview.hedera.com:50211");
+
+        var client = Client.forNetwork(network);
+        client.setMirrorNetwork(Lists.of("hcs.previewnet.mirrornode.hedera.com:5600"));
         return client;
     }
 
@@ -162,14 +177,32 @@ public final class Client implements AutoCloseable {
      */
     public static Client fromJson(Reader json) {
         Config config = new Gson().fromJson(json, Config.class);
+        Client client;
 
-        Map<AccountId, String> nodes = new HashMap<>(config.network.size());
-
-        for (Map.Entry<String, String> entry : config.network.entrySet()) {
-            nodes.put(AccountId.fromString(entry.getValue()), entry.getKey());
+        if (config.network.isJsonObject()) {
+            var networks = config.network.getAsJsonObject();
+            Map<AccountId, String> nodes = new HashMap<>(networks.size());
+            for (Map.Entry<String, JsonElement> entry : networks.entrySet()) {
+                nodes.put(AccountId.fromString(entry.getKey().toString().replace("\"", "")), entry.getValue().toString().replace("\"", ""));
+            }
+            client= new Client(nodes);
         }
-
-        Client client = new Client(nodes);
+        else{
+            String networks = config.network.getAsString();
+            switch (networks) {
+                case "mainnet":
+                    client = Client.forMainnet();
+                    break;
+                case "testnet":
+                    client = Client.forTestnet();
+                    break;
+                case "previewnet":
+                    client = Client.forPreviewnet();
+                    break;
+                default:
+                    throw new JsonParseException("Illegal argument for network.");
+            }
+        }
 
         if (config.operator != null) {
             AccountId operatorAccount = AccountId.fromString(config.operator.accountId);
@@ -178,8 +211,33 @@ public final class Client implements AutoCloseable {
             client.setOperator(operatorAccount, privateKey);
         }
 
+
+        //already set in previous set network if?
         if (config.mirrorNetwork != null) {
-            client.setMirrorNetwork(config.mirrorNetwork);
+            if (config.mirrorNetwork.isJsonArray()) {
+                var mirrors = config.mirrorNetwork.getAsJsonArray();
+                List<String>  listMirrors = new ArrayList<>(mirrors.size());
+                for ( var i = 0; i<mirrors.size(); i++) {
+                    listMirrors.add(mirrors.get(i).getAsString().replace("\"", ""));
+                }
+                client.setMirrorNetwork(listMirrors);
+            }
+            else{
+                String mirror = config.mirrorNetwork.getAsString();
+                switch (mirror) {
+                    case "mainnet":
+                        client.setMirrorNetwork(Lists.of("hcs.mainnet.mirrornode.hedera.com:5600"));
+                        break;
+                    case "testnet":
+                        client.setMirrorNetwork(Lists.of("hcs.testnet.mirrornode.hedera.com:5600"));
+                        break;
+                    case "previewnet":
+                        client.setMirrorNetwork(Lists.of("hcs.previewnet.mirrornode.hedera.com:5600"));
+                        break;
+                    default:
+                        throw new JsonParseException("Illegal argument for mirrorNetwork.");
+                }
+            }
         }
 
         return client;
@@ -300,7 +358,7 @@ public final class Client implements AutoCloseable {
      * @return {AccountId}
      */
     @Nullable
-    public AccountId getOperatorId() {
+    public AccountId getOperatorAccountId() {
         if (operator == null) {
             return null;
         }
@@ -314,7 +372,7 @@ public final class Client implements AutoCloseable {
      * @return {PublicKey}
      */
     @Nullable
-    public PublicKey getOperatorKey() {
+    public PublicKey getOperatorPublicKey() {
         if (operator == null) {
             return null;
         }
@@ -326,7 +384,7 @@ public final class Client implements AutoCloseable {
      * Set the maximum fee to be paid for transactions executed by this client.
      * <p>
      * Because transaction fees are always maximums, this will simply add a call to
-     * {@link TransactionBuilder#setMaxTransactionFee(Hbar)} on every new transaction. The actual
+     * {@link Transaction#setMaxTransactionFee(Hbar)} on every new transaction. The actual
      * fee assessed for a given transaction may be less than this value, but never greater.
      *
      * @param maxTransactionFee The Hbar to be set
@@ -344,15 +402,15 @@ public final class Client implements AutoCloseable {
     /**
      * Set the maximum default payment allowable for queries.
      * <p>
-     * When a query is executed without an explicit {@link QueryBuilder#setQueryPayment(Hbar)} call,
+     * When a query is executed without an explicit {@link Query#setQueryPayment(Hbar)} call,
      * the client will first request the cost
      * of the given query from the node it will be submitted to and attach a payment for that amount
      * from the operator account on the client.
      * <p>
      * If the returned value is greater than this value, a
      * {@link MaxQueryPaymentExceededException} will be thrown from
-     * {@link QueryBuilder#execute(Client)} or returned in the second callback of
-     * {@link QueryBuilder#executeAsync(Client, Consumer, Consumer)}.
+     * {@link Query#execute(Client)} or returned in the second callback of
+     * {@link Query#executeAsync(Client, Consumer, Consumer)}.
      * <p>
      * Set to 0 to disable automatic implicit payments.
      *
@@ -402,30 +460,26 @@ public final class Client implements AutoCloseable {
     public void close(Duration timeout) {
         // initialize shutdown for all channels
         // this should not block
-        for (var channel : Iterables.concat(mirrorChannels.values(), mirrorChannels.values())) {
+        for (var channel : Iterables.concat(nodeChannels.values(), mirrorChannels.values())) {
             channel.shutdown();
         }
 
         // wait for all channels to shutdown
-        for (var channel : Iterables.concat(mirrorChannels.values(), mirrorChannels.values())) {
-            try {
-                channel.awaitTermination(timeout.getSeconds(), TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+        for (var channel : Iterables.concat(nodeChannels.values(), mirrorChannels.values())) {
+            @Var var isClosed = false;
+
+            do {
+                try {
+                    isClosed = channel.awaitTermination(timeout.getSeconds(), TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            } while (!isClosed);
         }
 
         // preemptively clear memory for the channels map
         nodeChannels.clear();
         mirrorChannels.clear();
-
-        executor.shutdown();
-
-        try {
-            executor.awaitTermination(timeout.getSeconds(), TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     // Get the next node ID, following a round-robin distribution with a randomized start point
@@ -452,7 +506,6 @@ public final class Client implements AutoCloseable {
         var address = network.get(nodeId);
 
         if (address != null) {
-            // TODO: Determine if we should/should not have `keepAlive()` on this channel
             channel = ManagedChannelBuilder.forTarget(address)
                 .usePlaintext()
                 .userAgent(getUserAgent())
@@ -508,13 +561,14 @@ public final class Client implements AutoCloseable {
     }
 
     private static class Config {
-        private HashMap<String, String> network = new HashMap<>();
+        @Nullable
+        private JsonElement network;
 
         @Nullable
         private ConfigOperator operator;
 
         @Nullable
-        private List<String> mirrorNetwork = new ArrayList<>();
+        private JsonElement mirrorNetwork;
 
         private static class ConfigOperator {
             private String accountId = "";

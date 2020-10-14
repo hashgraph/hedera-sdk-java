@@ -1,7 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.ContractGetRecordsQuery;
-import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
@@ -15,11 +14,15 @@ import java.util.List;
  * Get all the records for a smart contract instance, for any function
  * call (or the constructor call) during the last 25 hours, for which a Record was requested.
  */
-public final class ContractRecordsQuery extends QueryBuilder<List<TransactionRecord>, ContractRecordsQuery> {
+public final class ContractRecordsQuery extends Query<List<TransactionRecord>, ContractRecordsQuery> {
     private final ContractGetRecordsQuery.Builder builder;
 
     public ContractRecordsQuery() {
         this.builder = ContractGetRecordsQuery.newBuilder();
+    }
+
+    public ContractId getContractId() {
+      return ContractId.fromProtobuf(builder.getContractID());
     }
 
     /**
@@ -34,7 +37,7 @@ public final class ContractRecordsQuery extends QueryBuilder<List<TransactionRec
     }
 
     @Override
-    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setContractGetRecords(builder.setHeader(header));
     }
 
@@ -44,12 +47,12 @@ public final class ContractRecordsQuery extends QueryBuilder<List<TransactionRec
     }
 
     @Override
-    QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request) {
         return request.getContractGetRecords().getHeader();
     }
 
     @Override
-    List<TransactionRecord> mapResponse(Response response, AccountId nodeId, Query request) {
+    List<TransactionRecord> mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
         var rawTransactionRecords = response.getContractGetRecordsResponse().getRecordsList();
         var transactionRecords = new ArrayList<TransactionRecord>(rawTransactionRecords.size());
 
@@ -61,7 +64,7 @@ public final class ContractRecordsQuery extends QueryBuilder<List<TransactionRec
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Query, Response> getMethodDescriptor() {
         return SmartContractServiceGrpc.getGetTxRecordByContractIDMethod();
     }
 }

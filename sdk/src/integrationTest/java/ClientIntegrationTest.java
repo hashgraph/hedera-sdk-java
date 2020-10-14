@@ -25,7 +25,7 @@ public class ClientIntegrationTest {
                 .setMaxQueryPayment(new Hbar(2))
                 .setRequestTimeout(Duration.ofMinutes(2));
 
-            var operatorId = client.getOperatorId();
+            var operatorId = client.getOperatorAccountId();
             assertNotNull(operatorId);
 
             // Execute two simple queries so we create a channel for each network node.

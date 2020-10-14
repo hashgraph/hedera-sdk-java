@@ -1,11 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.ConsensusGetTopicInfoQuery;
-import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
+import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 /**
@@ -13,11 +12,15 @@ import io.grpc.MethodDescriptor;
  * <p>
  * This method is unrestricted and allowed on any topic by any payer account.
  */
-public final class TopicInfoQuery extends QueryBuilder<TopicInfo, TopicInfoQuery> {
+public final class TopicInfoQuery extends Query<TopicInfo, TopicInfoQuery> {
     private final ConsensusGetTopicInfoQuery.Builder builder;
 
     public TopicInfoQuery() {
         builder = ConsensusGetTopicInfoQuery.newBuilder();
+    }
+
+    public TopicId getTopicId() {
+      return TopicId.fromProtobuf(builder.getTopicID());
     }
 
     /**
@@ -33,7 +36,7 @@ public final class TopicInfoQuery extends QueryBuilder<TopicInfo, TopicInfoQuery
     }
 
     @Override
-    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setConsensusGetTopicInfo(builder.setHeader(header));
     }
 
@@ -43,17 +46,17 @@ public final class TopicInfoQuery extends QueryBuilder<TopicInfo, TopicInfoQuery
     }
 
     @Override
-    QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request) {
         return request.getConsensusGetTopicInfo().getHeader();
     }
 
     @Override
-    TopicInfo mapResponse(Response response, AccountId nodeId, Query request) {
+    TopicInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
         return TopicInfo.fromProtobuf(response.getConsensusGetTopicInfo());
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Query, Response> getMethodDescriptor() {
         return ConsensusServiceGrpc.getGetTopicInfoMethod();
     }
 }

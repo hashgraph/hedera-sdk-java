@@ -10,6 +10,7 @@ import com.hedera.hashgraph.sdk.Key;
 import com.hedera.hashgraph.sdk.KeyList;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Collections;
@@ -46,26 +47,26 @@ public final class CreateAccountThresholdKeyExample {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // require 2 of the 3 keys we generated to sign on anything modifying this account
-        var tKey = KeyList.withThreshold(2);
-        Collections.addAll(tKey, keys);
+        KeyList transactionKey = KeyList.withThreshold(2);
+        Collections.addAll(transactionKey, keys);
 
-        var txId = new AccountCreateTransaction()
-            .setKey(tKey)
+        TransactionResponse transactionResponse = new AccountCreateTransaction()
+            .setKey(transactionKey)
             .setInitialBalance(new Hbar(10))
             .execute(client);
 
         // This will wait for the receipt to become available
-        TransactionReceipt receipt = txId.transactionId.getReceipt(client);
+        TransactionReceipt receipt = transactionResponse.getReceipt(client);
 
         AccountId newAccountId = Objects.requireNonNull(receipt.accountId);
 
         System.out.println("account = " + newAccountId);
 
-        var tsfrTxnId = new CryptoTransferTransaction()
+        TransactionResponse transferTransactionResponse = new CryptoTransferTransaction()
             .addSender(newAccountId, new Hbar(10))
             .addRecipient(new AccountId(3), new Hbar(10))
             // To manually sign, you must explicitly build the Transaction
-            .build(client)
+            .freezeWith(client)
             // we sign with 2 of the 3 keys
             .sign(keys[0])
             .sign(keys[1])
@@ -73,7 +74,7 @@ public final class CreateAccountThresholdKeyExample {
 
 
         // (important!) wait for the transfer to go to consensus
-        tsfrTxnId.transactionId.getReceipt(client);
+        transferTransactionResponse.getReceipt(client);
 
         Hbar balanceAfter = new AccountBalanceQuery()
             .setAccountId(newAccountId)

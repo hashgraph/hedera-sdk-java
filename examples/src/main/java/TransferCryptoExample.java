@@ -11,6 +11,7 @@ import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 
+import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public final class TransferCryptoExample {
@@ -45,7 +46,7 @@ public final class TransferCryptoExample {
         System.out.println("" + OPERATOR_ID + " balance = " + senderBalanceBefore);
         System.out.println("" + recipientId + " balance = " + receiptBalanceBefore);
 
-        var transactionResponse = new CryptoTransferTransaction()
+        TransactionResponse transactionResponse = new CryptoTransferTransaction()
             // .addSender and .addRecipient can be called as many times as you want as long as the total sum from
             // both sides is equivalent
             .addSender(OPERATOR_ID, amount)
@@ -55,7 +56,7 @@ public final class TransferCryptoExample {
 
         System.out.println("transaction ID: " + transactionResponse);
 
-        TransactionRecord record = transactionResponse.transactionId.getRecord(client);
+        TransactionRecord record = transactionResponse.getRecord(client);
 
         System.out.println("transferred " + amount + "...");
 

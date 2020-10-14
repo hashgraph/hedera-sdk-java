@@ -1,7 +1,12 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.ConsensusDeleteTopicTransactionBody;
+import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import io.grpc.MethodDescriptor;
+
+import javax.annotation.Nullable;
 
 /**
  * Delete a topic.
@@ -11,11 +16,22 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
  * If an {@code adminKey} is set, this transaction must be signed by that key.
  * If there is no {@code adminKey}, this transaction will fail with {@link Status#UNAUTHORIZED}.
  */
-public final class TopicDeleteTransaction extends SingleTransactionBuilder<TopicDeleteTransaction> {
+public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransaction> {
     private final ConsensusDeleteTopicTransactionBody.Builder builder;
 
     public TopicDeleteTransaction() {
         builder = ConsensusDeleteTopicTransactionBody.newBuilder();
+    }
+
+    TopicDeleteTransaction(TransactionBody body) {
+        super(body);
+
+        builder = body.getConsensusDeleteTopic().toBuilder();
+    }
+
+    @Nullable
+    public TopicId getTopicId() {
+        return builder.hasTopicID() ? TopicId.fromProtobuf(builder.getTopicID()) : null;
     }
 
     /**
@@ -25,12 +41,19 @@ public final class TopicDeleteTransaction extends SingleTransactionBuilder<Topic
      * @param topicId The TopicId to be set
      */
     public TopicDeleteTransaction setTopicId(TopicId topicId) {
+        requireNotFrozen();
         builder.setTopicID(topicId.toProtobuf());
         return this;
     }
 
     @Override
-    void onBuild(TransactionBody.Builder bodyBuilder) {
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
+        return ConsensusServiceGrpc.getDeleteTopicMethod();
+    }
+
+    @Override
+    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setConsensusDeleteTopic(builder);
+        return true;
     }
 }

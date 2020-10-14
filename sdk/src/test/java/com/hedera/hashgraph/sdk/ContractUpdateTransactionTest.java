@@ -36,7 +36,7 @@ public class ContractUpdateTransactionTest {
             .setExpirationTime(Instant.ofEpochMilli(4))
             .setProxyAccountId(new AccountId(4))
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .build(Client.forTestnet())
+            .freeze()
             .sign(privateKey)
             .toString()
         ).toMatchSnapshot();

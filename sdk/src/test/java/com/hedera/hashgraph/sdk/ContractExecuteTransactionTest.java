@@ -33,7 +33,7 @@ public class ContractExecuteTransactionTest {
             .setPayableAmount(Hbar.fromTinybars(1000))
             .setFunctionParameters(ByteString.copyFrom(new byte[]{24, 43, 11}))
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .build(Client.forTestnet())
+            .freeze()
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();

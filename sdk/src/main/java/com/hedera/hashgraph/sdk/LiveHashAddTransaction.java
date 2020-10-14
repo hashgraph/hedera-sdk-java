@@ -2,75 +2,129 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.CryptoAddLiveHashTransactionBody;
+import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.LiveHash;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
+
+import javax.annotation.Nullable;
+import java.util.Collection;
 
 /**
  * A hash---presumably of some kind of credential or certificate---along with a list of keys,
  * each of which may be either a primitive or a threshold key.
  */
-public final class LiveHashAddTransaction extends SingleTransactionBuilder<LiveHashAddTransaction> {
+public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransaction> {
     private final CryptoAddLiveHashTransactionBody.Builder builder;
-    private final LiveHash.Builder liveHash;
+    private final LiveHash.Builder hashBuilder;
 
     public LiveHashAddTransaction() {
         builder = CryptoAddLiveHashTransactionBody.newBuilder();
-        liveHash = LiveHash.newBuilder();
-        builder.setLiveHash(liveHash);
+        hashBuilder = LiveHash.newBuilder();
+    }
+
+    LiveHashAddTransaction(TransactionBody body) {
+        super(body);
+
+        builder = body.getCryptoAddLiveHash().toBuilder();
+        hashBuilder = builder.getLiveHash().toBuilder();
+    }
+
+    @Nullable
+    public AccountId getAccountId() {
+        return hashBuilder.hasAccountId() ? AccountId.fromProtobuf(hashBuilder.getAccountId()) : null;
     }
 
     /**
      * The account to which the livehash is attached
      *
-     * @return {@code this}
      * @param accountId The AccountId to be set
+     * @return {@code this}
      */
     public LiveHashAddTransaction setAccountId(AccountId accountId) {
-        liveHash.setAccountId(accountId.toProtobuf());
+        requireNotFrozen();
+        hashBuilder.setAccountId(accountId.toProtobuf());
         return this;
     }
 
+    public ByteString getHash() {
+        return hashBuilder.getHash();
+    }
+
     /**
-     * The SHA-384 hash of a credential or certificate
+     * The SHA-384 hash of a credential or certificate.
      *
-     * @return {@code this}
      * @param hash The array of bytes to be set as the hash
+     * @return {@code this}
      */
     public LiveHashAddTransaction setHash(byte[] hash) {
-        liveHash.setHash(ByteString.copyFrom(hash));
+        return setHash(ByteString.copyFrom(hash));
+    }
+
+    /**
+     * The SHA-384 hash of a credential or certificate.
+     *
+     * @param hash The array of bytes to be set as the hash
+     * @return {@code this}
+     */
+    public LiveHashAddTransaction setHash(ByteString hash) {
+        requireNotFrozen();
+        hashBuilder.setHash(hash);
         return this;
+    }
+
+    public Collection<Key> getKeys() {
+        return KeyList.fromProtobuf(hashBuilder.getKeys(), null);
     }
 
     /**
      * A list of keys (primitive or threshold), all of which must sign to attach the livehash to an
      * account, and any one of which can later delete it.
      *
-     * @return {@code this}
      * @param keys The Key or Keys to be set
+     * @return {@code this}
      */
     public LiveHashAddTransaction setKeys(Key... keys) {
+        requireNotFrozen();
+
         var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
+
         for (Key key : keys) {
             keyList.addKeys(key.toKeyProtobuf());
         }
-        liveHash.setKeys(keyList);
+
+        hashBuilder.setKeys(keyList);
+
         return this;
+    }
+
+    @Nullable
+    public Duration getDuration() {
+        return hashBuilder.hasDuration() ? DurationConverter.fromProtobuf(hashBuilder.getDuration()) : null;
     }
 
     /**
      * The duration for which the livehash will remain valid
      *
-     * @return {@code this}
      * @param duration The Duration to be set
+     * @return {@code this}
      */
     public LiveHashAddTransaction setDuration(Duration duration) {
-        liveHash.setDuration(DurationConverter.toProtobuf(duration));
+        requireNotFrozen();
+        hashBuilder.setDuration(DurationConverter.toProtobuf(duration));
         return this;
     }
 
     @Override
-    void onBuild(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setCryptoAddLiveHash(builder);
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
+        return CryptoServiceGrpc.getAddLiveHashMethod();
+    }
+
+    @Override
+    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+        bodyBuilder.setCryptoAddLiveHash(builder.setLiveHash(hashBuilder));
+        return true;
     }
 }

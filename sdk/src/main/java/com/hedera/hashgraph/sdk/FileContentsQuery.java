@@ -3,7 +3,6 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.FileGetContentsQuery;
 import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
@@ -13,11 +12,15 @@ import java8.util.concurrent.CompletableFuture;
 /**
  * Get the contents of a file. The content field is empty (no bytes) if the file is empty.
  */
-public final class FileContentsQuery extends QueryBuilder<ByteString, FileContentsQuery> {
+public final class FileContentsQuery extends Query<ByteString, FileContentsQuery> {
     private final FileGetContentsQuery.Builder builder;
 
     public FileContentsQuery() {
         this.builder = FileGetContentsQuery.newBuilder();
+    }
+
+    public FileId getFileId() {
+      return FileId.fromProtobuf(builder.getFileID());
     }
 
     /**
@@ -40,7 +43,7 @@ public final class FileContentsQuery extends QueryBuilder<ByteString, FileConten
     }
 
     @Override
-    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setFileGetContents(builder.setHeader(header));
     }
 
@@ -50,17 +53,17 @@ public final class FileContentsQuery extends QueryBuilder<ByteString, FileConten
     }
 
     @Override
-    QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request) {
         return request.getFileGetContents().getHeader();
     }
 
     @Override
-    ByteString mapResponse(Response response, AccountId nodeId, Query request) {
+    ByteString mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
         return response.getFileGetContents().getFileContents().getContents();
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Query, Response> getMethodDescriptor() {
         return FileServiceGrpc.getGetFileContentMethod();
     }
 }

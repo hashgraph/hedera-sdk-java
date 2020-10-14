@@ -2,7 +2,6 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
@@ -24,8 +23,8 @@ import java.util.List;
  * @param <O> The output type of the query.
  * @param <T> The type of the query itself. Used to enable chaining.
  */
-public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends HederaExecutable<Query, Response, O> implements WithGetCost {
-    private final Query.Builder builder;
+public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hedera.hashgraph.sdk.proto.Query, Response, O> implements WithGetCost {
+    private final com.hedera.hashgraph.sdk.proto.Query.Builder builder;
 
     private final QueryHeader.Builder headerBuilder;
 
@@ -46,9 +45,22 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
     @Nullable
     private Hbar maxQueryPayment;
 
-    QueryBuilder() {
-        builder = Query.newBuilder();
+    @Nullable
+    private AccountId nodeId;
+
+    Query() {
+        builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
         headerBuilder = QueryHeader.newBuilder();
+    }
+
+    /**
+     * Set an explicit node ID to use for this query.
+     */
+    public T setNodeAccountId(AccountId nodeAccountId) {
+        this.nodeId = nodeAccountId;
+
+        // noinspection unchecked
+        return (T) this;
     }
 
     /**
@@ -57,8 +69,8 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
      * The client will submit exactly this amount for the payment of this query. Hedera
      * will not return any remainder.
      *
-     * @return {@code this}
      * @param queryPayment The explicit payment amount to set
+     * @return {@code this}
      */
     public T setQueryPayment(Hbar queryPayment) {
         this.queryPayment = queryPayment;
@@ -70,20 +82,20 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
     /**
      * Set the maximum payment allowable for this query.
      * <p>
-     * When a query is executed without an explicit {@link QueryBuilder#setQueryPayment(Hbar)} call,
+     * When a query is executed without an explicit {@link Query#setQueryPayment(Hbar)} call,
      * the client will first request the cost
      * of the given query from the node it will be submitted to and attach a payment for that amount
      * from the operator account on the client.
      * <p>
      * If the returned value is greater than this value, a
      * {@link MaxQueryPaymentExceededException} will be thrown from
-     * {@link QueryBuilder#execute(Client)} or returned in the second callback of
-     * {@link QueryBuilder#executeAsync(Client, Consumer, Consumer)}.
+     * {@link Query#execute(Client)} or returned in the second callback of
+     * {@link Query#executeAsync(Client, Consumer, Consumer)}.
      * <p>
      * Set to 0 to disable automatic implicit payments.
      *
-     * @return {@code this}
      * @param maxQueryPayment The maximum payment amount to set
+     * @return {@code this}
      */
     public T setMaxQueryPayment(Hbar maxQueryPayment) {
         this.maxQueryPayment = maxQueryPayment;
@@ -107,16 +119,16 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
      * Called in {@link #makeRequest} just before the query is built. The intent is for the derived
      * class to assign their data variant to the query.
      */
-    abstract void onMakeRequest(Query.Builder queryBuilder, QueryHeader header);
+    abstract void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header);
 
     /**
      * The derived class should access its response header and return.
      */
     abstract ResponseHeader mapResponseHeader(Response response);
 
-    abstract QueryHeader mapRequestHeader(Query request);
+    abstract QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request);
 
-    private Executable<Hbar> getCostExecutable() {
+    private Query<Hbar, QueryCostQuery> getCostExecutable() {
         return new QueryCostQuery();
     }
 
@@ -163,29 +175,54 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
             .thenAccept((paymentAmount) -> {
                 paymentTransactionId = TransactionId.generate(operator.accountId);
 
-                // Like how TransactionBuilder has to build (N / 3) native transactions to handle multi-node retry,
-                // so too does the QueryBuilder for payment transactions
+                if (nodeId == null) {
+                    // Like how TransactionBuilder has to build (N / 3) native transactions to handle multi-node retry,
+                    // so too does the QueryBuilder for payment transactions
 
-                var size = client.getNumberOfNodesForTransaction();
-                paymentTransactions = new ArrayList<>(size);
-                paymentTransactionNodeIds = new ArrayList<>(size);
+                    var size = client.getNumberOfNodesForTransaction();
+                    paymentTransactions = new ArrayList<>(size);
+                    paymentTransactionNodeIds = new ArrayList<>(size);
 
-                for (var i = 0; i < size; ++i) {
-                    var nodeId = client.getNextNodeId();
+                    for (var i = 0; i < size; ++i) {
+                        var nodeId = client.getNextNodeId();
+
+                        paymentTransactionNodeIds.add(nodeId);
+                        paymentTransactions.add(makePaymentTransaction(
+                            paymentTransactionId,
+                            nodeId,
+                            operator,
+                            paymentAmount
+                        ));
+                    }
+                } else {
+                    paymentTransactions = new ArrayList<>(1);
+                    paymentTransactionNodeIds = new ArrayList<>(1);
 
                     paymentTransactionNodeIds.add(nodeId);
-                    paymentTransactions.add(new CryptoTransferTransaction()
-                        .setTransactionId(paymentTransactionId)
-                        .setNodeAccountId(nodeId)
-                        .setMaxTransactionFee(new Hbar(1)) // 1 Hbar
-                        .addSender(operator.accountId, paymentAmount)
-                        .addRecipient(nodeId, paymentAmount)
-                        .build(null)
-                        .signWith(operator.publicKey, operator.transactionSigner)
-                        .makeRequest()
-                    );
+                    paymentTransactions.add(makePaymentTransaction(
+                        paymentTransactionId,
+                        nodeId,
+                        operator,
+                        paymentAmount
+                    ));
                 }
             });
+    }
+
+    private static Transaction makePaymentTransaction(
+        TransactionId paymentTransactionId,
+        AccountId nodeId,
+        Client.Operator operator,
+        Hbar paymentAmount
+    ) {
+        return new CryptoTransferTransaction()
+            .setTransactionId(paymentTransactionId)
+            .setNodeAccountId(nodeId)
+            .setMaxTransactionFee(new Hbar(1)) // 1 Hbar
+            .addSender(operator.accountId, paymentAmount)
+            .addRecipient(nodeId, paymentAmount)
+            .signWith(operator.publicKey, operator.transactionSigner)
+            .makeRequest();
     }
 
     @Override
@@ -198,7 +235,7 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
     }
 
     @Override
-    final Query makeRequest() {
+    final com.hedera.hashgraph.sdk.proto.Query makeRequest() {
         // If payment is required, set the next payment transaction on the query
         if (isPaymentRequired() && paymentTransactions != null) {
             headerBuilder.setPayment(paymentTransactions.get(nextPaymentTransactionIndex));
@@ -219,11 +256,20 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
     }
 
     @Override
-    final AccountId getNodeId(Client client) {
+    final AccountId getNodeAccountId(@Nullable Client client) {
         if (paymentTransactionNodeIds != null) {
             // If this query needs a payment transaction we need to pick the node ID from the next
             // payment transaction
             return paymentTransactionNodeIds.get(nextPaymentTransactionIndex);
+        }
+
+        if (nodeId != null) {
+            // if there was an explicit node ID set, use that
+            return nodeId;
+        }
+
+        if (client == null) {
+            throw new IllegalStateException("requires a client to pick the next node ID for a query");
         }
 
         // Otherwise just pick the next node in the round robin
@@ -261,9 +307,9 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
     }
 
     @SuppressWarnings("NullableDereference")
-    private class QueryCostQuery extends QueryBuilder<Hbar, QueryCostQuery> {
+    private class QueryCostQuery extends Query<Hbar, QueryCostQuery> {
         @Override
-        void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+        void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
             headerBuilder.setResponseType(ResponseType.COST_ANSWER);
 
             // COST_ANSWER requires a payment to pass validation but doesn't actually process it
@@ -274,30 +320,30 @@ public abstract class QueryBuilder<O, T extends QueryBuilder<O, T>> extends Hede
             headerBuilder.setPayment(new CryptoTransferTransaction()
                 .setNodeAccountId(new AccountId(0))
                 .setTransactionId(new TransactionId(new AccountId(0), Instant.ofEpochSecond(0)))
-                .build(null)
+                .freeze()
                 .makeRequest());
 
-            QueryBuilder.this.onMakeRequest(queryBuilder, headerBuilder.build());
+            Query.this.onMakeRequest(queryBuilder, headerBuilder.build());
         }
 
         @Override
         ResponseHeader mapResponseHeader(Response response) {
-            return QueryBuilder.this.mapResponseHeader(response);
+            return Query.this.mapResponseHeader(response);
         }
 
         @Override
-        QueryHeader mapRequestHeader(Query request) {
-            return QueryBuilder.this.mapRequestHeader(request);
+        QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request) {
+            return Query.this.mapRequestHeader(request);
         }
 
         @Override
-        Hbar mapResponse(Response response, AccountId nodeId, Query Response) {
+        Hbar mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query Response) {
             return Hbar.fromTinybars(mapResponseHeader(response).getCost());
         }
 
         @Override
-        MethodDescriptor<Query, Response> getMethodDescriptor() {
-            return QueryBuilder.this.getMethodDescriptor();
+        MethodDescriptor<com.hedera.hashgraph.sdk.proto.Query, Response> getMethodDescriptor() {
+            return Query.this.getMethodDescriptor();
         }
 
         @Override
