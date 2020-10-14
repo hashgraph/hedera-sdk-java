@@ -2,14 +2,20 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.FileCreateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import io.grpc.MethodDescriptor;
 
 import java.time.Instant;
+
+import javax.annotation.Nullable;
+import java.util.Collection;
 
 /**
  * Creates a file with the content by submitting the transaction.
  */
-public final class FileCreateTransaction extends SingleTransactionBuilder<FileCreateTransaction> {
+public final class FileCreateTransaction extends Transaction<FileCreateTransaction> {
     private final FileCreateTransactionBody.Builder builder;
 
     public FileCreateTransaction() {
@@ -18,9 +24,15 @@ public final class FileCreateTransaction extends SingleTransactionBuilder<FileCr
         setExpirationTime(Instant.now().plus(DEFAULT_AUTO_RENEW_PERIOD));
     }
 
-    @Override
-    void onBuild(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setFileCreate(builder);
+    FileCreateTransaction(TransactionBody body) {
+        super(body);
+
+        builder = body.getFileCreate().toBuilder();
+    }
+
+    @Nullable
+    public Instant getExpirationTime() {
+        return builder.hasExpirationTime() ? InstantConverter.fromProtobuf(builder.getExpirationTime()) : null;
     }
 
     /**
@@ -36,9 +48,14 @@ public final class FileCreateTransaction extends SingleTransactionBuilder<FileCr
      * @return {@code this}
      */
     public FileCreateTransaction setExpirationTime(Instant expirationTime) {
+        requireNotFrozen();
         builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
 
         return this;
+    }
+
+    public Collection<Key> getKeys() {
+        return KeyList.fromProtobuf(builder.getKeys(), null);
     }
 
     /**
@@ -54,16 +71,24 @@ public final class FileCreateTransaction extends SingleTransactionBuilder<FileCr
      * <p>The network currently requires a file to have at least one key (or key list or threshold key)
      * but this requirement may be lifted in the future.
      *
-     * @return {@code this}
      * @param keys The Key or Keys to be set
+     * @return {@code this}
      */
     public FileCreateTransaction setKeys(Key... keys) {
+        requireNotFrozen();
+
         var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
+
         for (Key key : keys) {
             keyList.addKeys(key.toKeyProtobuf());
         }
+
         builder.setKeys(keyList);
         return this;
+    }
+
+    public ByteString getContents() {
+        return builder.getContents();
     }
 
     /**
@@ -83,6 +108,7 @@ public final class FileCreateTransaction extends SingleTransactionBuilder<FileCr
      * @return {@code this}
      */
     public FileCreateTransaction setContents(byte[] bytes) {
+        requireNotFrozen();
         builder.setContents(ByteString.copyFrom(bytes));
         return this;
     }
@@ -108,7 +134,19 @@ public final class FileCreateTransaction extends SingleTransactionBuilder<FileCr
      * @return {@code this}
      */
     public FileCreateTransaction setContents(String text) {
+        requireNotFrozen();
         builder.setContents(ByteString.copyFromUtf8(text));
         return this;
+    }
+
+    @Override
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
+        return FileServiceGrpc.getCreateFileMethod();
+    }
+
+    @Override
+    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+        bodyBuilder.setFileCreate(builder);
+        return true;
     }
 }

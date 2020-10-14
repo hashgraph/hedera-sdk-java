@@ -21,7 +21,7 @@ class AccountInfoIntegrationTest {
     void test() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
-            var operatorId = client.getOperatorId();
+            var operatorId = client.getOperatorAccountId();
 
             var key = PrivateKey.generate();
 
@@ -43,7 +43,7 @@ class AccountInfoIntegrationTest {
                 .execute(client);
 
             assertEquals(info.accountId, account);
-            assertFalse(info.deleted);
+            assertFalse(info.isDeleted);
             assertEquals(info.key.toString(), key.getPublicKey().toString());
             assertEquals(info.balance, new Hbar(1));
             assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
@@ -56,7 +56,7 @@ class AccountInfoIntegrationTest {
                 .setAccountId(account)
                 .setTransferAccountId(operatorId)
                 .setTransactionId(TransactionId.generate(account))
-                .build(client)
+                .freezeWith(client)
                 .sign(key)
                 .execute(client)
                 .transactionId

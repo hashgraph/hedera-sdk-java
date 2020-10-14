@@ -14,7 +14,7 @@ public class TransactionIntegrationTest {
     void test() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
-            var operatorId = client.getOperatorId();
+            var operatorId = client.getOperatorAccountId();
             Assert.assertNotNull(operatorId);
 
             var key = PrivateKey.generate();
@@ -23,14 +23,14 @@ public class TransactionIntegrationTest {
                 .setKey(key)
                 .setNodeAccountId(new AccountId(5))
                 .setMaxTransactionFee(new Hbar(2))
-                .build(client)
+                .freezeWith(client)
                 .signWithOperator(client);
 
-            var expectedHash = transaction.hash();
+            var expectedHash = transaction.getTransactionHash();
 
-            var txid = transaction.execute(client);
+            var response = transaction.execute(client);
 
-            var record = txid.transactionId.getRecord(client);
+            var record = response.getRecord(client);
 
             assertArrayEquals(expectedHash, record.transactionHash.toByteArray());
 
@@ -41,7 +41,7 @@ public class TransactionIntegrationTest {
                 .setAccountId(accountId)
                 .setTransferAccountId(operatorId)
                 .setMaxTransactionFee(new Hbar(1))
-                .build(client)
+                .freezeWith(client)
                 .sign(key)
                 .execute(client)
                 .transactionId

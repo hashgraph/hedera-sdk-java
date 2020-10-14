@@ -37,7 +37,7 @@ public class AccountUpdateTransactionTest {
             .setExpirationTime(Instant.ofEpochSecond(1554158543))
             .setReceiverSignatureRequired(false)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .build(Client.forTestnet())
+            .freeze()
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();

@@ -2,11 +2,16 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.BoolValue;
 import com.google.protobuf.UInt64Value;
+import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.CryptoUpdateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import io.grpc.MethodDescriptor;
 
 import java.time.Duration;
 import java.time.Instant;
+
+import javax.annotation.Nullable;
 
 /**
  * Change properties for the given account.
@@ -24,33 +29,56 @@ import java.time.Instant;
  * of the list of attached claims, and of the keys
  * associated with the claims and the account.
  */
-public final class AccountUpdateTransaction extends SingleTransactionBuilder<AccountUpdateTransaction> {
+public final class AccountUpdateTransaction extends Transaction<AccountUpdateTransaction> {
     private final CryptoUpdateTransactionBody.Builder builder;
 
     public AccountUpdateTransaction() {
         builder = CryptoUpdateTransactionBody.newBuilder();
     }
 
+    AccountUpdateTransaction(TransactionBody body) {
+        super(body);
+
+        builder = body.getCryptoUpdateAccount().toBuilder();
+    }
+
+    @Nullable
+    public AccountId getAccountId() {
+        return builder.hasAccountIDToUpdate() ? AccountId.fromProtobuf(builder.getAccountIDToUpdate()) : null;
+    }
+
     /**
      * Sets the account ID which is being updated in this transaction.
      *
-     * @return {@code this}
      * @param accountId The AccountId to be set
+     * @return {@code this}
      */
     public AccountUpdateTransaction setAccountId(AccountId accountId) {
+        requireNotFrozen();
         builder.setAccountIDToUpdate(accountId.toProtobuf());
         return this;
+    }
+
+    @Nullable
+    public Key getKey() {
+        return builder.hasKey() ? Key.fromProtobuf(builder.getKey()) : null;
     }
 
     /**
      * Sets the new key.
      *
-     * @return {@code this}
      * @param key The Key to be set
+     * @return {@code this}
      */
     public AccountUpdateTransaction setKey(Key key) {
+        requireNotFrozen();
         builder.setKey(key.toKeyProtobuf());
         return this;
+    }
+
+    @Nullable
+    public AccountId getProxyAccountId() {
+        return builder.hasProxyAccountID() ? AccountId.fromProtobuf(builder.getProxyAccountID()) : null;
     }
 
     /**
@@ -64,48 +92,72 @@ public final class AccountUpdateTransaction extends SingleTransactionBuilder<Acc
      * if it is not currently running a node, then it
      * will behave as if proxyAccountID was null.
      *
-     * @return {@code this}
      * @param proxyAccountId The AccountId to be set
+     * @return {@code this}
      */
     public AccountUpdateTransaction setProxyAccountId(AccountId proxyAccountId) {
+        requireNotFrozen();
         builder.setProxyAccountID(proxyAccountId.toProtobuf());
         return this;
+    }
+
+    @Nullable
+    Hbar getSendRecordThreshold() {
+        return builder.hasSendRecordThresholdWrapper() ? Hbar.fromTinybars(builder.getSendRecordThresholdWrapper().getValue()) : null;
     }
 
     /**
      * Sets the new threshold amount for which an account record is created
      * for any send/withdraw transaction.
      *
-     * @return {@code this}
      * @param sendRecordThreshold The Hbar to be set as the threshold
+     * @return {@code this}
      */
-    public AccountUpdateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
+    AccountUpdateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
+        requireNotFrozen();
         builder.setSendRecordThresholdWrapper(UInt64Value.of(sendRecordThreshold.toTinybars()));
         return this;
+    }
+
+    @Nullable
+    Hbar getReceiveRecordThreshold() {
+        return builder.hasReceiveRecordThresholdWrapper() ? Hbar.fromTinybars(builder.getReceiveRecordThresholdWrapper().getValue()) : null;
     }
 
     /**
      * Sets the new threshold amount for which an account record is created
      * for any receive/deposit transaction.
      *
-     * @return {@code this}
      * @param receiveRecordThreshold The Hbar to be set as the threshold
+     * @return {@code this}
      */
-    public AccountUpdateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
+    AccountUpdateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
+        requireNotFrozen();
         builder.setReceiveRecordThresholdWrapper(UInt64Value.of(receiveRecordThreshold.toTinybars()));
         return this;
+    }
+
+    @Nullable
+    public Instant getExpirationTime() {
+        return builder.hasExpirationTime() ? InstantConverter.fromProtobuf(builder.getExpirationTime()) : null;
     }
 
     /**
      * Sets the new expiration time to extend to (ignored if equal to or
      * before the current one).
      *
-     * @return {@code this}
      * @param expirationTime The Instant to be set as the expiration time
+     * @return {@code this}
      */
     public AccountUpdateTransaction setExpirationTime(Instant expirationTime) {
+        requireNotFrozen();
         builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
         return this;
+    }
+
+    @Nullable
+    public Duration getAutoRenewPeriod() {
+        return builder.hasAutoRenewPeriod() ? DurationConverter.fromProtobuf(builder.getAutoRenewPeriod()) : null;
     }
 
     /**
@@ -114,28 +166,42 @@ public final class AccountUpdateTransaction extends SingleTransactionBuilder<Acc
      * If it doesn't have enough balance, it extends as long as possible.
      * If it is empty when it expires, then it is deleted.
      *
-     * @return {@code this}
      * @param autoRenewPeriod The Duration to be set for auto renewal
+     * @return {@code this}
      */
+    @Deprecated
     public AccountUpdateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
+        requireNotFrozen();
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         return this;
+    }
+
+    @Nullable
+    public Boolean getReceiverSignatureRequired() {
+        return builder.hasReceiverSigRequiredWrapper() ? builder.getReceiverSigRequiredWrapper().getValue() : null;
     }
 
     /**
      * Sets whether this account's key must sign any transaction
      * depositing into this account (in addition to all withdrawals).
      *
-     * @return {@code this}
      * @param receiverSignatureRequired The bool to be set
+     * @return {@code this}
      */
     public AccountUpdateTransaction setReceiverSignatureRequired(boolean receiverSignatureRequired) {
+        requireNotFrozen();
         builder.setReceiverSigRequiredWrapper(BoolValue.of(receiverSignatureRequired));
         return this;
     }
 
     @Override
-    void onBuild(TransactionBody.Builder bodyBuilder) {
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
+        return CryptoServiceGrpc.getUpdateAccountMethod();
+    }
+
+    @Override
+    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setCryptoUpdateAccount(builder);
+        return true;
     }
 }

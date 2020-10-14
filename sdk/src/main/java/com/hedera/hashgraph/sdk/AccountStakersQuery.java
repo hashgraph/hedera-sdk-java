@@ -2,7 +2,6 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.CryptoGetStakersQuery;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
@@ -17,11 +16,15 @@ import java.util.List;
  *
  * This is not yet implemented, but will be in a future version of the API.
  */
-public final class AccountStakersQuery extends QueryBuilder<List<ProxyStaker>, AccountStakersQuery> {
+public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountStakersQuery> {
     private final CryptoGetStakersQuery.Builder builder;
 
     public AccountStakersQuery() {
         builder = CryptoGetStakersQuery.newBuilder();
+    }
+
+    public AccountId getAccountId() {
+      return AccountId.fromProtobuf(builder.getAccountID());
     }
 
     /**
@@ -36,7 +39,7 @@ public final class AccountStakersQuery extends QueryBuilder<List<ProxyStaker>, A
     }
 
     @Override
-    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setCryptoGetProxyStakers(builder.setHeader(header));
     }
 
@@ -46,12 +49,12 @@ public final class AccountStakersQuery extends QueryBuilder<List<ProxyStaker>, A
     }
 
     @Override
-    QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request) {
         return request.getCryptoGetProxyStakers().getHeader();
     }
 
     @Override
-    List<ProxyStaker> mapResponse(Response response, AccountId nodeId, Query request) {
+    List<ProxyStaker> mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
         var rawStakers = response.getCryptoGetProxyStakers().getStakers();
         var stakers = new ArrayList<ProxyStaker>(rawStakers.getProxyStakerCount());
 
@@ -63,7 +66,7 @@ public final class AccountStakersQuery extends QueryBuilder<List<ProxyStaker>, A
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Query, Response> getMethodDescriptor() {
         return CryptoServiceGrpc.getGetStakersByAccountIDMethod();
     }
 }

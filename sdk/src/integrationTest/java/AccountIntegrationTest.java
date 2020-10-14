@@ -28,18 +28,18 @@ class AccountIntegrationTest {
     void test() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
-            var operatorId = client.getOperatorId();
+            var operatorId = client.getOperatorAccountId();
 
             var key1 = PrivateKey.generate();
             var key2 = PrivateKey.generate();
 
-            var receipt = new AccountCreateTransaction()
+            var response = new AccountCreateTransaction()
                 .setKey(key1)
                 .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
-                .execute(client)
-                .transactionId
-                .getReceipt(client);
+                .execute(client);
+
+            var receipt = response.transactionId.getReceipt(client);
 
             assertNotNull(receipt.accountId);
             assertTrue(Objects.requireNonNull(receipt.accountId).num > 0);
@@ -47,17 +47,19 @@ class AccountIntegrationTest {
             var account = receipt.accountId;
 
             @Var var balance = new AccountBalanceQuery()
+                .setNodeAccountId(response.nodeId)
                 .setAccountId(account)
                 .execute(client);
 
             assertEquals(balance, new Hbar(1));
 
             var info = new AccountInfoQuery()
+                .setNodeAccountId(response.nodeId)
                 .setAccountId(account)
                 .execute(client);
 
             assertEquals(info.accountId, account);
-            assertFalse(info.deleted);
+            assertFalse(info.isDeleted);
             assertEquals(info.key.toString(), key1.getPublicKey().toString());
             assertEquals(info.balance, new Hbar(1));
             assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
@@ -67,22 +69,25 @@ class AccountIntegrationTest {
             assertEquals(info.proxyReceived, Hbar.ZERO);
 
             new AccountRecordsQuery()
+                .setNodeAccountId(response.nodeId)
                 .setAccountId(account)
                 .setMaxQueryPayment(new Hbar(1))
                 .execute(client);
 
             assertThrows(HederaPreCheckStatusException.class, () -> {
                 new AccountStakersQuery()
+                    .setNodeAccountId(response.nodeId)
                     .setAccountId(account)
                     .setMaxQueryPayment(new Hbar(1))
                     .execute(client);
             });
 
             new AccountUpdateTransaction()
+                .setNodeAccountId(response.nodeId)
                 .setAccountId(account)
                 .setKey(key2.getPublicKey())
                 .setMaxTransactionFee(new Hbar(1))
-                .build(client)
+                .freezeWith(client)
                 .sign(key1)
                 .sign(key2)
                 .execute(client)
@@ -90,6 +95,7 @@ class AccountIntegrationTest {
                 .getReceipt(client);
 
             balance = new AccountBalanceQuery()
+                .setNodeAccountId(response.nodeId)
                 .setAccountId(account)
                 .setMaxQueryPayment(new Hbar(1))
                 .execute(client);
@@ -97,11 +103,12 @@ class AccountIntegrationTest {
             assertEquals(balance, new Hbar(1));
 
             new AccountDeleteTransaction()
+                .setNodeAccountId(response.nodeId)
                 .setAccountId(account)
                 .setTransferAccountId(operatorId)
                 .setTransactionId(TransactionId.generate(account))
                 .setMaxTransactionFee(Hbar.fromTinybars(50000000))
-                .build(client)
+                .freezeWith(client)
                 .sign(key2)
                 .execute(client)
                 .transactionId
@@ -109,6 +116,7 @@ class AccountIntegrationTest {
 
             assertThrows(HederaPreCheckStatusException.class, () -> {
                 new AccountInfoQuery()
+                    .setNodeAccountId(response.nodeId)
                     .setAccountId(account)
                     .execute(client);
             });

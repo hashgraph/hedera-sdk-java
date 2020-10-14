@@ -32,7 +32,7 @@ public class AccountCreateTransactionTest {
             .setProxyAccountId(AccountId.fromString("0.0.1001"))
             .setReceiverSignatureRequired(true)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .build(Client.forTestnet())
+            .freeze()
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();

@@ -1,12 +1,18 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.CryptoCreateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import io.grpc.MethodDescriptor;
 
 import java.time.Duration;
+import javax.annotation.Nullable;
 
-/** Create a new Hedera™ account. */
-public final class AccountCreateTransaction extends SingleTransactionBuilder<AccountCreateTransaction> {
+/**
+ * Create a new Hedera™ account.
+ */
+public final class AccountCreateTransaction extends Transaction<AccountCreateTransaction> {
     private static final Hbar DEFAULT_RECORD_THRESHOLD = Hbar.fromTinybars(Long.MAX_VALUE);
 
     private final CryptoCreateTransactionBody.Builder builder;
@@ -19,6 +25,17 @@ public final class AccountCreateTransaction extends SingleTransactionBuilder<Acc
         setReceiveRecordThreshold(DEFAULT_RECORD_THRESHOLD);
     }
 
+    AccountCreateTransaction(TransactionBody body) {
+        super(body);
+
+        builder = body.getCryptoCreateAccount().toBuilder();
+    }
+
+    @Nullable
+    public Key getKey() {
+        return builder.hasKey() ? Key.fromProtobuf(builder.getKey()) : null;
+    }
+
     /**
      * Set the key for this account.
      *
@@ -29,8 +46,13 @@ public final class AccountCreateTransaction extends SingleTransactionBuilder<Acc
      * @return {@code this}
      */
     public AccountCreateTransaction setKey(Key key) {
+        requireNotFrozen();
         builder.setKey(key.toKeyProtobuf());
         return this;
+    }
+
+    public Hbar getInitialBalance() {
+        return Hbar.fromTinybars(builder.getInitialBalance());
     }
 
     /**
@@ -40,8 +62,13 @@ public final class AccountCreateTransaction extends SingleTransactionBuilder<Acc
      * @return {@code this}
      */
     public AccountCreateTransaction setInitialBalance(Hbar initialBalance) {
+        requireNotFrozen();
         builder.setInitialBalance(initialBalance.toTinybars());
         return this;
+    }
+
+    Hbar getSendRecordThreshold() {
+        return Hbar.fromTinybars(builder.getSendRecordThreshold());
     }
 
     /**
@@ -55,9 +82,14 @@ public final class AccountCreateTransaction extends SingleTransactionBuilder<Acc
      * @param sendRecordThreshold the threshold amount.
      * @return {@code this}
      */
-    public AccountCreateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
+    AccountCreateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
+        requireNotFrozen();
         builder.setSendRecordThreshold(sendRecordThreshold.toTinybars());
         return this;
+    }
+
+    Hbar getReceiveRecordThreshold() {
+        return Hbar.fromTinybars(builder.getReceiveRecordThreshold());
     }
 
     /**
@@ -71,9 +103,14 @@ public final class AccountCreateTransaction extends SingleTransactionBuilder<Acc
      * @param receiveRecordThreshold the threshold amount.
      * @return {@code this}
      */
-    public AccountCreateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
+    AccountCreateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
+        requireNotFrozen();
         builder.setReceiveRecordThreshold(receiveRecordThreshold.toTinybars());
         return this;
+    }
+
+    public boolean getReceiverSignatureRequired() {
+        return builder.getReceiverSigRequired();
     }
 
     /**
@@ -86,8 +123,14 @@ public final class AccountCreateTransaction extends SingleTransactionBuilder<Acc
      * @return {@code this}
      */
     public AccountCreateTransaction setReceiverSignatureRequired(boolean receiveSignatureRequired) {
+        requireNotFrozen();
         builder.setReceiverSigRequired(receiveSignatureRequired);
         return this;
+    }
+
+    @Nullable
+    public AccountId getProxyAccountId() {
+        return builder.hasProxyAccountID() ? AccountId.fromProtobuf(builder.getProxyAccountID()) : null;
     }
 
     /**
@@ -97,8 +140,14 @@ public final class AccountCreateTransaction extends SingleTransactionBuilder<Acc
      * @return {@code this}
      */
     public AccountCreateTransaction setProxyAccountId(AccountId proxyAccountId) {
+        requireNotFrozen();
         builder.setProxyAccountID(proxyAccountId.toProtobuf());
         return this;
+    }
+
+    @Nullable
+    public Duration getAutoRenewPeriod() {
+        return builder.hasAutoRenewPeriod() ? DurationConverter.fromProtobuf(builder.getAutoRenewPeriod()) : null;
     }
 
     /**
@@ -114,12 +163,19 @@ public final class AccountCreateTransaction extends SingleTransactionBuilder<Acc
      * @return {@code this}
      */
     public AccountCreateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
+        requireNotFrozen();
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         return this;
     }
 
     @Override
-    void onBuild(TransactionBody.Builder bodyBuilder) {
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
+        return CryptoServiceGrpc.getCreateAccountMethod();
+    }
+
+    @Override
+    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setCryptoCreateAccount(builder);
+        return true;
     }
 }

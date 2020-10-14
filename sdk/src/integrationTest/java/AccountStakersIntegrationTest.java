@@ -12,7 +12,7 @@ class AccountStakersIntegrationTest {
     void test() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
-            var operatorId = client.getOperatorId();
+            var operatorId = client.getOperatorAccountId();
 
             try {
                 new AccountStakersQuery()

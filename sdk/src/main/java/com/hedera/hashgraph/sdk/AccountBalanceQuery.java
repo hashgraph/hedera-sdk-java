@@ -1,11 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.CryptoGetAccountBalanceQuery;
-import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
+import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 /**
@@ -14,11 +13,15 @@ import io.grpc.MethodDescriptor;
  *
  * <p>This query is free.
  */
-public final class AccountBalanceQuery extends QueryBuilder<Hbar, AccountBalanceQuery> {
+public final class AccountBalanceQuery extends Query<Hbar, AccountBalanceQuery> {
     private final CryptoGetAccountBalanceQuery.Builder builder;
 
     public AccountBalanceQuery() {
         builder = CryptoGetAccountBalanceQuery.newBuilder();
+    }
+
+    public AccountId getAccountId() {
+      return AccountId.fromProtobuf(builder.getAccountID());
     }
 
     /**
@@ -31,6 +34,10 @@ public final class AccountBalanceQuery extends QueryBuilder<Hbar, AccountBalance
     public AccountBalanceQuery setAccountId(AccountId accountId) {
         builder.setAccountID(accountId.toProtobuf());
         return this;
+    }
+
+    public ContractId getContractId() {
+      return ContractId.fromProtobuf(builder.getContractID());
     }
 
     /**
@@ -51,12 +58,12 @@ public final class AccountBalanceQuery extends QueryBuilder<Hbar, AccountBalance
     }
 
     @Override
-    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setCryptogetAccountBalance(builder.setHeader(header));
     }
 
     @Override
-    Hbar mapResponse(Response response, AccountId nodeId, Query request) {
+    Hbar mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
         return Hbar.fromTinybars(response.getCryptogetAccountBalance().getBalance());
     }
 
@@ -66,12 +73,12 @@ public final class AccountBalanceQuery extends QueryBuilder<Hbar, AccountBalance
     }
 
     @Override
-    QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request) {
         return request.getCryptogetAccountBalance().getHeader();
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Query, Response> getMethodDescriptor() {
         return CryptoServiceGrpc.getCryptoGetBalanceMethod();
     }
 }

@@ -36,7 +36,7 @@ public class ContractCreateTransactionTest {
             .setAutoRenewPeriod(Duration.ofHours(10))
             .setConstructorParameters(new byte[]{10, 11, 12, 13, 25})
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .build(Client.forTestnet())
+            .freeze()
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();

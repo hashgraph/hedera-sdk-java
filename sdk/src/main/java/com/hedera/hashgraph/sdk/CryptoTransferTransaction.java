@@ -1,9 +1,15 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.AccountAmount;
+import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.CryptoTransferTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.proto.TransferList;
+import io.grpc.MethodDescriptor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Transfer cryptocurrency from some accounts to other accounts.
@@ -26,7 +32,7 @@ import com.hedera.hashgraph.sdk.proto.TransferList;
  * The signatures are in the same order as the accounts,
  * skipping those accounts that don't need a signature.
  */
-public final class CryptoTransferTransaction extends SingleTransactionBuilder<CryptoTransferTransaction> {
+public final class CryptoTransferTransaction extends Transaction<CryptoTransferTransaction> {
     private final CryptoTransferTransactionBody.Builder builder;
     private final TransferList.Builder transfersBuilder;
 
@@ -35,12 +41,30 @@ public final class CryptoTransferTransaction extends SingleTransactionBuilder<Cr
         transfersBuilder = TransferList.newBuilder();
     }
 
+    CryptoTransferTransaction(TransactionBody body) {
+        super(body);
+
+        builder = body.getCryptoTransfer().toBuilder();
+        transfersBuilder = builder.getTransfers().toBuilder();
+    }
+
+    public List<Transfer> getTransfers() {
+        var numTransfers = transfersBuilder.getAccountAmountsCount();
+        var transfers = new ArrayList<Transfer>(numTransfers);
+
+        for (var i = 0; i < numTransfers; i++) {
+            transfers.add(Transfer.fromProtobuf(transfersBuilder.getAccountAmounts(i)));
+        }
+
+        return transfers;
+    }
+
     /**
      * Adds hbar to the transfer from the given account.
      *
-     * @return {@code this}
-     * @param value The Hbar value to be transferred
+     * @param value    The Hbar value to be transferred
      * @param senderId The AccountId of the sender
+     * @return {@code this}
      */
     public CryptoTransferTransaction addSender(AccountId senderId, Hbar value) {
         return addTransfer(senderId, value.negated());
@@ -49,15 +73,17 @@ public final class CryptoTransferTransaction extends SingleTransactionBuilder<Cr
     /**
      * Removes hbar from the transfer to the given account.
      *
-     * @return {@code this}
-     * @param value The Hbar value to be received
+     * @param value       The Hbar value to be received
      * @param recipientId The AccountId of the recipient
+     * @return {@code this}
      */
     public CryptoTransferTransaction addRecipient(AccountId recipientId, Hbar value) {
         return addTransfer(recipientId, value);
     }
 
     public CryptoTransferTransaction addTransfer(AccountId accountId, Hbar value) {
+        requireNotFrozen();
+
         transfersBuilder.addAccountAmounts(
             AccountAmount.newBuilder()
                 .setAccountID(accountId.toProtobuf())
@@ -69,7 +95,13 @@ public final class CryptoTransferTransaction extends SingleTransactionBuilder<Cr
     }
 
     @Override
-    void onBuild(TransactionBody.Builder bodyBuilder) {
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
+        return CryptoServiceGrpc.getCryptoTransferMethod();
+    }
+
+    @Override
+    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setCryptoTransfer(builder.setTransfers(transfersBuilder));
+        return true;
     }
 }

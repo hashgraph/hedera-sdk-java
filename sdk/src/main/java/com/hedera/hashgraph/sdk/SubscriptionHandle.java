@@ -1,13 +1,21 @@
 package com.hedera.hashgraph.sdk;
 
-public final class SubscriptionHandle {
-    private final Runnable onUnsubscribe;
+import javax.annotation.Nullable;
 
-    SubscriptionHandle(Runnable onUnsubscribe) {
+public final class SubscriptionHandle {
+    @Nullable
+    private Runnable onUnsubscribe;
+
+    SubscriptionHandle() {
+    }
+
+    void setOnUnsubscribe(Runnable onUnsubscribe) {
         this.onUnsubscribe = onUnsubscribe;
     }
 
     public void unsubscribe() {
-        this.onUnsubscribe.run();
+        if (this.onUnsubscribe != null) {
+            this.onUnsubscribe.run();
+        }
     }
 }

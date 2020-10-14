@@ -57,7 +57,6 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
     }
 
     public static TransactionId fromString(String s) {
-        System.out.println("#fromString ? " + s);
         var parts = s.split("@", 2);
 
         if (parts.length != 2) {

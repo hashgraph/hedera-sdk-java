@@ -38,7 +38,7 @@ public final class Transfer {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("accoundId", accountId)
+            .add("accountId", accountId)
             .add("amount", amount)
             .toString();
     }

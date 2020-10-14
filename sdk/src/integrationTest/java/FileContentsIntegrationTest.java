@@ -16,15 +16,15 @@ public class FileContentsIntegrationTest {
     void test() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
-            var operatorKey = client.getOperatorKey();
+            var operatorKey = client.getOperatorPublicKey();
 
-            var receipt = new FileCreateTransaction()
+            var response = new FileCreateTransaction()
                 .setKeys(operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
-                .execute(client)
-                .transactionId
-                .getReceipt(client);
+                .execute(client);
+
+            var receipt = response.transactionId.getReceipt(client);
 
             assertNotNull(receipt.fileId);
             assertTrue(Objects.requireNonNull(receipt.fileId).num > 0);
@@ -33,6 +33,7 @@ public class FileContentsIntegrationTest {
 
             var contents = new FileContentsQuery()
                 .setFileId(file)
+                .setNodeAccountId(response.nodeId)
                 .setQueryPayment(new Hbar(1))
                 .execute(client);
 
@@ -40,6 +41,7 @@ public class FileContentsIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(file)
+                .setNodeAccountId(response.nodeId)
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
                 .transactionId

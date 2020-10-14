@@ -8,14 +8,25 @@ dependencies {
 	implementation "io.github.cdimascio:java-dotenv:5.3.1"
 }
 
+java {
+	sourceCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
+	targetCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
+}
+
 tasks.addRule("Pattern: run<Example>: Runs an example.") { String taskName ->
 	if (taskName.startsWith("run")) {
 		task(taskName, type: JavaExec) {
 			classpath = sourceSets.main.runtimeClasspath
 			main = (taskName - "run") + "Example"
 
-			// NOTE: Uncomment to enable trace logs in the SDK during tests
+			// NOTE: Uncomment to enable trace logs in the SDK during the examples
 			// jvmArgs "-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace"
 		}
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.errorprone {
+		disable("DefaultPackage")
 	}
 }

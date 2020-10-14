@@ -12,7 +12,7 @@ public class TransactionResponseTest {
     void test() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
-            var operatorId = client.getOperatorId();
+            var operatorId = client.getOperatorAccountId();
             Assert.assertNotNull(operatorId);
 
             var key = PrivateKey.generate();
@@ -21,7 +21,7 @@ public class TransactionResponseTest {
                 .setKey(key)
                 .execute(client);
 
-            var record = transaction.transactionId.getRecord(client);
+            var record = transaction.getRecord(client);
 
             assertArrayEquals(record.transactionHash.toByteArray(), transaction.transactionHash);
 
@@ -31,7 +31,7 @@ public class TransactionResponseTest {
             new AccountDeleteTransaction()
                 .setAccountId(accountId)
                 .setTransferAccountId(operatorId)
-                .build(client)
+                .freezeWith(client)
                 .sign(key)
                 .execute(client);
 

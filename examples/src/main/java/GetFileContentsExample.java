@@ -13,6 +13,7 @@ import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 
 import com.google.protobuf.ByteString;
+import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public final class GetFileContentsExample {
@@ -36,13 +37,13 @@ public final class GetFileContentsExample {
         byte[] fileContents = "Hedera is great!".getBytes(StandardCharsets.UTF_8);
 
         // Create the new file and set its properties
-        var newFileTxId = new FileCreateTransaction()
+        TransactionResponse newFileTransactionResponse = new FileCreateTransaction()
             .setKeys(OPERATOR_KEY) // The public key of the owner of the file
             .setContents(fileContents) // Contents of the file
             .setMaxTransactionFee(new Hbar(2))
             .execute(client);
 
-        FileId newFileId = Objects.requireNonNull(newFileTxId.transactionId.getReceipt(client).fileId);
+        FileId newFileId = Objects.requireNonNull(newFileTransactionResponse.getReceipt(client).fileId);
 
         //Print the file ID to console
         System.out.println("The new file ID is " + newFileId.toString());

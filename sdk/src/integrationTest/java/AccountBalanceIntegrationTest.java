@@ -19,17 +19,17 @@ class AccountBalanceIntegrationTest {
     void test() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
-            var operatorId = client.getOperatorId();
+            var operatorId = client.getOperatorAccountId();
 
             var key = PrivateKey.generate();
 
-            var receipt = new AccountCreateTransaction()
+            var response = new AccountCreateTransaction()
                 .setKey(key)
                 .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
-                .execute(client)
-                .transactionId
-                .getReceipt(client);
+                .execute(client);
+
+            var receipt = response.transactionId.getReceipt(client);
 
             assertNotNull(receipt.accountId);
             assertTrue(Objects.requireNonNull(receipt.accountId).num > 0);
@@ -38,15 +38,17 @@ class AccountBalanceIntegrationTest {
 
             @Var var balance = new AccountBalanceQuery()
                 .setAccountId(account)
+                .setNodeAccountId(response.nodeId)
                 .execute(client);
 
             assertEquals(balance, new Hbar(1));
 
             new AccountDeleteTransaction()
                 .setAccountId(account)
+                .setNodeAccountId(response.nodeId)
                 .setTransferAccountId(operatorId)
                 .setTransactionId(TransactionId.generate(account))
-                .build(client)
+                .freezeWith(client)
                 .sign(key)
                 .execute(client)
                 .transactionId

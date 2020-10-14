@@ -1,7 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.ContractGetInfoQuery;
-import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
@@ -16,11 +15,15 @@ import java.util.concurrent.CompletableFuture;
  * This includes the account that it uses, the file containing its bytecode,
  * and the time when it will expire.
  */
-public final class ContractInfoQuery extends QueryBuilder<ContractInfo, ContractInfoQuery> {
+public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQuery> {
     private final ContractGetInfoQuery.Builder builder;
 
     public ContractInfoQuery() {
         builder = ContractGetInfoQuery.newBuilder();
+    }
+
+    public ContractId getContractId() {
+      return ContractId.fromProtobuf(builder.getContractID());
     }
 
     /**
@@ -44,7 +47,7 @@ public final class ContractInfoQuery extends QueryBuilder<ContractInfo, Contract
     }
 
     @Override
-    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setContractGetInfo(builder.setHeader(header));
     }
 
@@ -54,17 +57,17 @@ public final class ContractInfoQuery extends QueryBuilder<ContractInfo, Contract
     }
 
     @Override
-    QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request) {
         return request.getContractGetInfo().getHeader();
     }
 
     @Override
-    ContractInfo mapResponse(Response response, AccountId nodeId, Query request) {
+    ContractInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
         return ContractInfo.fromProtobuf(response.getContractGetInfo().getContractInfo());
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Query, Response> getMethodDescriptor() {
         return SmartContractServiceGrpc.getGetContractInfoMethod();
     }
 }

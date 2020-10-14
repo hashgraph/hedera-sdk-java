@@ -33,7 +33,7 @@ public class TopicUpdateTransactionTest {
             .clearAutoRenewAccountId(AccountId.fromString("0.0.5008"))
             .clearSubmitKey()
             .clearTopicMemo()
-            .build(Client.forTestnet())
+            .freeze()
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();
@@ -49,7 +49,7 @@ public class TopicUpdateTransactionTest {
             .setAutoRenewAccountId(AccountId.fromString("0.0.5009"))
             .setAutoRenewPeriod(Duration.ofHours(24))
             .setSubmitKey(unusedPrivateKey)
-            .build(Client.forTestnet())
+            .freeze()
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();

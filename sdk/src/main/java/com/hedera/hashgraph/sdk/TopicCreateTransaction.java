@@ -1,9 +1,14 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.ConsensusCreateTopicTransactionBody;
+import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import io.grpc.MethodDescriptor;
 
 import java.time.Duration;
+
+import javax.annotation.Nullable;
 
 /**
  * Create a topic to be used for consensus.
@@ -14,7 +19,7 @@ import java.time.Duration;
  * <p>
  * On success, the resulting TransactionReceipt contains the newly created TopicId.
  */
-public final class TopicCreateTransaction extends SingleTransactionBuilder<TopicCreateTransaction> {
+public final class TopicCreateTransaction extends Transaction<TopicCreateTransaction> {
     private final ConsensusCreateTopicTransactionBody.Builder builder;
 
     public TopicCreateTransaction() {
@@ -23,15 +28,36 @@ public final class TopicCreateTransaction extends SingleTransactionBuilder<Topic
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
     }
 
+    TopicCreateTransaction(TransactionBody body) {
+        super(body);
+
+        builder = body.getConsensusCreateTopic().toBuilder();
+    }
+
+    @Override
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
+        return ConsensusServiceGrpc.getCreateTopicMethod();
+    }
+
+    public String getTopicMemo() {
+        return builder.getMemo();
+    }
+
     /**
      * Set a short publicly visible memo on the new topic.
      *
-     * @return {@code this}
      * @param memo The memo to be set
+     * @return {@code this}
      */
     public TopicCreateTransaction setTopicMemo(String memo) {
+        requireNotFrozen();
         builder.setMemo(memo);
         return this;
+    }
+
+    @Nullable
+    public Key getAdminKey() {
+        return builder.hasAdminKey() ? Key.fromProtobuf(builder.getAdminKey()) : null;
     }
 
     /**
@@ -43,12 +69,18 @@ public final class TopicCreateTransaction extends SingleTransactionBuilder<Topic
      * If no adminKey is specified, updateTopic may only be used to extend the topic's expirationTime, and deleteTopic
      * is disallowed.
      *
-     * @return {@code this}
      * @param adminKey The Key to be set
+     * @return {@code this}
      */
     public TopicCreateTransaction setAdminKey(Key adminKey) {
+        requireNotFrozen();
         builder.setAdminKey(adminKey.toKeyProtobuf());
         return this;
+    }
+
+    @Nullable
+    public Key getSubmitKey() {
+        return builder.hasSubmitKey() ? Key.fromProtobuf(builder.getSubmitKey()) : null;
     }
 
     /**
@@ -57,12 +89,18 @@ public final class TopicCreateTransaction extends SingleTransactionBuilder<Topic
      * Access control for submitMessage.
      * If unspecified, no access control is performed on ConsensusService.submitMessage (all submissions are allowed).
      *
-     * @return {@code this}
      * @param submitKey The Key to be set
+     * @return {@code this}
      */
     public TopicCreateTransaction setSubmitKey(Key submitKey) {
+        requireNotFrozen();
         builder.setSubmitKey(submitKey.toKeyProtobuf());
         return this;
+    }
+
+    @Nullable
+    public Duration getAutoRenewPeriod() {
+        return builder.hasAutoRenewPeriod() ? DurationConverter.fromProtobuf(builder.getAutoRenewPeriod()) : null;
     }
 
     /**
@@ -72,12 +110,18 @@ public final class TopicCreateTransaction extends SingleTransactionBuilder<Topic
      * automatically at the topic's expirationTime, if the autoRenewAccount is configured (once autoRenew functionality
      * is supported by HAPI).
      *
-     * @return {@code this}
      * @param autoRenewPeriod The Duration to be set for auto renewal
+     * @return {@code this}
      */
     public TopicCreateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
+        requireNotFrozen();
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         return this;
+    }
+
+    @Nullable
+    public AccountId getAutoRenewAccountId() {
+        return builder.hasAutoRenewAccount() ? AccountId.fromProtobuf(builder.getAutoRenewAccount()) : null;
     }
 
     /**
@@ -92,16 +136,18 @@ public final class TopicCreateTransaction extends SingleTransactionBuilder<Topic
      * <p>
      * If specified, there must be an adminKey and the autoRenewAccount must sign this transaction.
      *
-     * @return {@code this}
      * @param autoRenewAccountId The AccountId to be set for auto renewal
+     * @return {@code this}
      */
     public TopicCreateTransaction setAutoRenewAccountId(AccountId autoRenewAccountId) {
+        requireNotFrozen();
         builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
         return this;
     }
 
     @Override
-    void onBuild(TransactionBody.Builder bodyBuilder) {
+    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setConsensusCreateTopic(builder);
+        return true;
     }
 }

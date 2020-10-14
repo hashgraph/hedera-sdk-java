@@ -30,7 +30,7 @@ public class AccountDeleteTransactionTest {
             .setAccountId(AccountId.fromString("0.0.5007"))
             .setTransferAccountId(AccountId.fromString("0.0.5008"))
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .build(Client.forTestnet())
+            .freeze()
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();

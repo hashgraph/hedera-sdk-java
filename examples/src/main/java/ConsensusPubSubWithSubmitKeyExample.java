@@ -8,13 +8,13 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
-import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
-import com.hedera.hashgraph.sdk.TopicMessageQuery;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicId;
-
+import com.hedera.hashgraph.sdk.TopicMessageQuery;
+import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
+import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
 
 /**
@@ -25,11 +25,9 @@ import io.github.cdimascio.dotenv.Dotenv;
  * Publishes a number of messages to the topic signed by the submitKey.
  */
 public class ConsensusPubSubWithSubmitKeyExample {
-    private Client client;
-
     private final int messagesToPublish;
     private final int millisBetweenMessages;
-
+    private Client client;
     private TopicId topicId;
     private PrivateKey submitKey;
 
@@ -74,18 +72,18 @@ public class ConsensusPubSubWithSubmitKeyExample {
      * Create a new topic with that key as the topic's submitKey; required to sign all future
      * ConsensusMessageSubmitTransactions for that topic.
      */
-    private void createTopicWithSubmitKey() throws TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException, InterruptedException {
+    private void createTopicWithSubmitKey() throws TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException {
         // Generate a Ed25519 private, public key pair
         submitKey = PrivateKey.generate();
         PublicKey submitPublicKey = submitKey.getPublicKey();
 
-        var transactionResponse = new TopicCreateTransaction()
+        TransactionResponse transactionResponse = new TopicCreateTransaction()
             .setTopicMemo("HCS topic with submit key")
             .setSubmitKey(submitPublicKey)
             .execute(client);
 
 
-        topicId = Objects.requireNonNull(transactionResponse.transactionId.getReceipt(client).topicId);
+        topicId = Objects.requireNonNull(transactionResponse.getReceipt(client).topicId);
         System.out.println("Created new topic " + topicId + " with ED25519 submitKey of " + submitKey);
     }
 
@@ -113,7 +111,7 @@ public class ConsensusPubSubWithSubmitKeyExample {
             new TopicMessageSubmitTransaction()
                 .setTopicId(topicId)
                 .setMessage(message)
-                .build(client)
+                .freezeWith(client)
 
                 // The transaction is automatically signed by the payer.
                 // Due to the topic having a submitKey requirement, additionally sign the transaction with that key.

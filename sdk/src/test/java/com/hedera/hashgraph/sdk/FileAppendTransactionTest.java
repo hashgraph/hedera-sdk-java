@@ -30,7 +30,7 @@ public class FileAppendTransactionTest {
             .setFileId(FileId.fromString("0.0.6006"))
             .setContents(new byte[]{1, 2, 3, 4})
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .build(Client.forTestnet())
+            .freeze()
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();

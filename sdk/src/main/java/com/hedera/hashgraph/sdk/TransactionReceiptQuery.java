@@ -1,7 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
@@ -17,11 +16,15 @@ import io.grpc.MethodDescriptor;
  * <p>This query is free.
  */
 public final class TransactionReceiptQuery
-        extends QueryBuilder<TransactionReceipt, TransactionReceiptQuery> {
+        extends Query<TransactionReceipt, TransactionReceiptQuery> {
     private final TransactionGetReceiptQuery.Builder builder;
 
     public TransactionReceiptQuery() {
         builder = TransactionGetReceiptQuery.newBuilder();
+    }
+
+    public TransactionId getTransactionId() {
+      return TransactionId.fromProtobuf(builder.getTransactionID());
     }
 
     /**
@@ -41,17 +44,17 @@ public final class TransactionReceiptQuery
     }
 
     @Override
-    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setTransactionGetReceipt(builder.setHeader(header));
     }
 
     @Override
-    TransactionReceipt mapResponse(Response response, AccountId nodeId, Query request) {
+    TransactionReceipt mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
         return TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt());
     }
 
     @Override
-    QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request) {
         return request.getTransactionGetReceipt().getHeader();
     }
 
@@ -61,7 +64,7 @@ public final class TransactionReceiptQuery
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Query, Response> getMethodDescriptor() {
         return CryptoServiceGrpc.getGetTransactionReceiptsMethod();
     }
 

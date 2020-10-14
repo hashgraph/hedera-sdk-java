@@ -30,7 +30,7 @@ public class MessageSubmitTransactionTest {
             .setTopicId(TopicId.fromString("0.0.5007"))
             .setMessage("hello")
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .build(Client.forTestnet())
+            .freeze()
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();

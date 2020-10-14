@@ -30,7 +30,7 @@ public class FreezeTransactionTest {
             .setStartTime(0, 0)
             .setEndTime(23, 59)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .build(Client.forTestnet())
+            .freeze()
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();

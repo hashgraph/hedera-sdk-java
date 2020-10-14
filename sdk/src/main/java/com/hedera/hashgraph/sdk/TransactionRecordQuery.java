@@ -1,7 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
@@ -18,11 +17,15 @@ import io.grpc.MethodDescriptor;
  * which gives the details of that transfer. If the transaction didn't return anything that should be
  * in the record, then the results field will be set to nothing.
  */
-public final class TransactionRecordQuery extends QueryBuilder<TransactionRecord, TransactionRecordQuery> {
+public final class TransactionRecordQuery extends Query<TransactionRecord, TransactionRecordQuery> {
     private final TransactionGetRecordQuery.Builder builder;
 
     public TransactionRecordQuery() {
         this.builder = TransactionGetRecordQuery.newBuilder();
+    }
+
+    public TransactionId getTransactionId() {
+      return TransactionId.fromProtobuf(builder.getTransactionID());
     }
 
     /**
@@ -37,7 +40,7 @@ public final class TransactionRecordQuery extends QueryBuilder<TransactionRecord
     }
 
     @Override
-    void onMakeRequest(Query.Builder queryBuilder, QueryHeader header) {
+    void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
         queryBuilder.setTransactionGetRecord(builder.setHeader(header));
     }
 
@@ -47,17 +50,17 @@ public final class TransactionRecordQuery extends QueryBuilder<TransactionRecord
     }
 
     @Override
-    QueryHeader mapRequestHeader(Query request) {
+    QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request) {
         return request.getTransactionGetRecord().getHeader();
     }
 
     @Override
-    TransactionRecord mapResponse(Response response, AccountId nodeId, Query request) {
+    TransactionRecord mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
         return TransactionRecord.fromProtobuf(response.getTransactionGetRecord().getTransactionRecord());
     }
 
     @Override
-    MethodDescriptor<Query, Response> getMethodDescriptor() {
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Query, Response> getMethodDescriptor() {
         return CryptoServiceGrpc.getGetTxRecordByTxIDMethod();
     }
 

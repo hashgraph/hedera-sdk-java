@@ -1,5 +1,16 @@
+# generated files
 build/
+bin/
+
+# gradle cache
 .gradle/
+
+# project files
 .idea/
+*.classpath
+.settings/
+.project
+
+# local environment
 .env
 gradle.properties

@@ -19,15 +19,15 @@ public class FileAppendIntegrationTest {
     void test() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
-            var operatorKey = client.getOperatorKey();
+            var operatorKey = client.getOperatorPublicKey();
 
-            var receipt = new FileCreateTransaction()
+            var response = new FileCreateTransaction()
                 .setKeys(operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
-                .execute(client)
-                .transactionId
-                .getReceipt(client);
+                .execute(client);
+
+            var receipt = response.transactionId.getReceipt(client);
 
             assertNotNull(receipt.fileId);
             assertTrue(Objects.requireNonNull(receipt.fileId).num > 0);
@@ -35,6 +35,7 @@ public class FileAppendIntegrationTest {
             var file = receipt.fileId;
 
             @Var var info = new FileInfoQuery()
+                .setNodeAccountId(response.nodeId)
                 .setFileId(file)
                 .setQueryPayment(new Hbar(22))
                 .execute(client);
@@ -46,6 +47,7 @@ public class FileAppendIntegrationTest {
 
             new FileAppendTransaction()
                 .setFileId(file)
+                .setNodeAccountId(response.nodeId)
                 .setContents("[e2e::FileAppendTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
@@ -54,6 +56,7 @@ public class FileAppendIntegrationTest {
 
             info = new FileInfoQuery()
                 .setFileId(file)
+                .setNodeAccountId(response.nodeId)
                 .setQueryPayment(new Hbar(1))
                 .execute(client);
 
@@ -64,6 +67,7 @@ public class FileAppendIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(file)
+                .setNodeAccountId(response.nodeId)
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
                 .transactionId

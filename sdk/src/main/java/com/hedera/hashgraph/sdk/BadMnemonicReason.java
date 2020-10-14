@@ -33,5 +33,10 @@ public enum BadMnemonicReason {
      * replaced with another from the standard word list (as this is only returned if all the words
      * exist in the word list).
      */
-    ChecksumMismatch
+    ChecksumMismatch,
+    /**
+     *The given mnemonic doesn't contain 22 words required to be a legacy mnemonic, or the words are
+     * not in the legacy list.
+     */
+    NotLegacy
 }

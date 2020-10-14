@@ -15,6 +15,7 @@ import com.hedera.hashgraph.sdk.TopicInfoQuery;
 import com.hedera.hashgraph.sdk.TopicUpdateTransaction;
 import com.hedera.hashgraph.sdk.Transaction;
 
+import com.hedera.hashgraph.sdk.TransactionResponse;
 import java8.util.J8Arrays;
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -72,10 +73,10 @@ class TopicWithAdminKeyExample {
         KeyList thresholdKey = KeyList.withThreshold(2);
         Collections.addAll(thresholdKey, initialAdminKeys);
 
-        Transaction transaction = new TopicCreateTransaction()
+        Transaction<?> transaction = new TopicCreateTransaction()
             .setTopicMemo("demo topic")
             .setAdminKey(thresholdKey)
-            .build(hapiClient);
+            .freezeWith(hapiClient);
 
         // Sign the transaction with 2 of 3 keys that are part of the adminKey threshold key.
         J8Arrays.stream(initialAdminKeys, 0, 2).forEach(k -> {
@@ -83,9 +84,9 @@ class TopicWithAdminKeyExample {
             transaction.sign(k);
         });
 
-        var transactionResponse = transaction.execute(hapiClient);
+        TransactionResponse transactionResponse = transaction.execute(hapiClient);
 
-        topicId = transactionResponse.transactionId.getReceipt(hapiClient).topicId;
+        topicId = transactionResponse.getReceipt(hapiClient).topicId;
 
         System.out.println("Created new topic " + topicId + " with 2-of-3 threshold key as adminKey.");
     }
@@ -99,11 +100,11 @@ class TopicWithAdminKeyExample {
         KeyList thresholdKey = KeyList.withThreshold(3);
         Collections.addAll(thresholdKey, newAdminKeys);
 
-        Transaction transaction = new TopicUpdateTransaction()
+        Transaction<?> transaction = new TopicUpdateTransaction()
             .setTopicId(topicId)
             .setTopicMemo("updated demo topic")
             .setAdminKey(thresholdKey)
-            .build(hapiClient);
+            .freezeWith(hapiClient);
 
         // Sign with the initial adminKey. 2 of the 3 keys already part of the topic's adminKey.
         J8Arrays.stream(initialAdminKeys, 0, 2).forEach(k -> {
@@ -117,10 +118,10 @@ class TopicWithAdminKeyExample {
             transaction.sign(k);
         });
 
-        var transactionResponse = transaction.execute(hapiClient);
+        TransactionResponse transactionResponse = transaction.execute(hapiClient);
 
         // Retrieve results post-consensus.
-        transactionResponse.transactionId.getReceipt(hapiClient);
+        transactionResponse.getReceipt(hapiClient);
 
         System.out.println("Updated topic " + topicId + " with 3-of-4 threshold key as adminKey");
 
