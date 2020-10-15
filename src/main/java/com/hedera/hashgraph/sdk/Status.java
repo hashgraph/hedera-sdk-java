@@ -264,7 +264,19 @@ public enum Status {
     /**
      * An attempted operation is invalid because the account is a treasury;
      */
-    AccountIsTreasury(ResponseCodeEnum.ACCOUNT_IS_TREASURY);
+    AccountIsTreasury(ResponseCodeEnum.ACCOUNT_IS_TREASURY),
+
+    TopicExpired(ResponseCodeEnum.TOPIC_EXPIRED),
+
+    TokenIdRepeatedInTokenList(ResponseCodeEnum.TOKEN_ID_REPEATED_IN_TOKEN_LIST),
+
+    TokenTransferListSizeLimitExceeded(ResponseCodeEnum.TOKEN_TRANSFER_LIST_SIZE_LIMIT_EXCEEDED),
+
+    EmptyTokenTransferBody(ResponseCodeEnum.EMPTY_TOKEN_TRANSFER_BODY),
+
+    EmptyTokenTransferAccountAmounts(ResponseCodeEnum.EMPTY_TOKEN_TRANSFER_ACCOUNT_AMOUNTS)
+
+    ;
 
 
     private final ResponseCodeEnum responseCode;
@@ -439,6 +451,11 @@ public enum Status {
             case TOKEN_ALREADY_ASSOCIATED_TO_ACCOUNT: return TokenAlreadyAssociatedToAccount;
             case TRANSACTION_REQUIRES_ZERO_TOKEN_BALANCES: return TransactionRequiresZeroTokenBalances;
             case ACCOUNT_IS_TREASURY: return AccountIsTreasury;
+            case TOPIC_EXPIRED: return TopicExpired;
+            case TOKEN_ID_REPEATED_IN_TOKEN_LIST: return TokenIdRepeatedInTokenList;
+            case TOKEN_TRANSFER_LIST_SIZE_LIMIT_EXCEEDED: return TokenTransferListSizeLimitExceeded;
+            case EMPTY_TOKEN_TRANSFER_BODY: return EmptyTokenTransferBody;
+            case EMPTY_TOKEN_TRANSFER_ACCOUNT_AMOUNTS: return EmptyTokenTransferAccountAmounts;
 
             case UNRECOGNIZED:
                 // protobufs won't give us the actual value that was unexpected, unfortunately
