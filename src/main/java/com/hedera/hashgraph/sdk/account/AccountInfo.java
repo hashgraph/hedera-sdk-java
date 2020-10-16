@@ -9,7 +9,9 @@ import com.hedera.hashgraph.sdk.token.TokenId;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -36,7 +38,7 @@ public final class AccountInfo {
 
     public final Duration autoRenewPeriod;
 
-    public final HashMap<TokenId, TokenRelationship> tokenRelationships;
+    public final Map<TokenId, TokenRelationship> tokenRelationships;
 
     AccountInfo(CryptoGetInfoResponse.AccountInfoOrBuilder info) {
         if (!info.hasKey()) {
@@ -63,7 +65,7 @@ public final class AccountInfo {
             relationships.put(tokenId, new TokenRelationship(relationship));
         }
 
-        this.tokenRelationships = relationships;
+        this.tokenRelationships = Collections.unmodifiableMap(relationships);
     }
 
     static AccountInfo fromResponse(Response response) {
