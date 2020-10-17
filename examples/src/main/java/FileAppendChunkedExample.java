@@ -49,7 +49,7 @@ public class FileAppendChunkedExample {
         }
 
         TransactionReceipt fileAppendReceipt = new FileAppendTransaction()
-            .setNodeId(transactionResponse.nodeId)
+            .setNodeAccountId(transactionResponse.nodeId)
             .setFileId(newFileId)
             .setContents(contents)
             .setMaxTransactionFee(new Hbar(1000))
