@@ -128,6 +128,43 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
     }
 
     @Override
+    protected boolean isFrozen() {
+        return !chunkTransactions.isEmpty();
+    }
+
+    @Override
+    public FileAppendTransaction freezeWith(@Nullable Client client) {
+        var wasFrozen = isFrozen();
+
+        if (!bodyBuilder.hasNodeAccountID()) {
+            if (client != null) {
+                // if there is no defined node ID, we need to pick a set of nodes
+                // up front so each chunk's nodes are consistent
+                var size = client.getNumberOfNodesForTransaction();
+                nodeIds = new ArrayList<>(size);
+
+                for (var i = 0; i < size; ++i) {
+                    var nodeId = client.getNextNodeId();
+
+                    nodeIds.add(nodeId);
+                }
+            } else {
+                throw new IllegalStateException("`client` must be provided or `nodeId` must be set");
+            }
+        }
+
+        super.freezeWith(client);
+
+        if (!wasFrozen) {
+            for (var chunkTx : chunkTransactions) {
+                chunkTx.freezeWith(client);
+            }
+        }
+
+        return this;
+    }
+
+    @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         var initialTransactionId = bodyBuilder.getTransactionID();
         var content = builder.getContents();
@@ -181,7 +218,7 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
             freezeWith(client);
         }
 
-        var operatorId = client.getOperatorId();
+        var operatorId = client.getOperatorAccountId();
 
         if (operatorId != null && operatorId.equals(getTransactionId().accountId)) {
             // on execute, sign each transaction with the operator, if present
