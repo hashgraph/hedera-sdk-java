@@ -33,12 +33,18 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
         return this;
     }
 
-    public List<TokenID> getTokens() {
-        return builder.getTokensList();
+    public List<TokenId> getTokenIds() {
+        var list = new ArrayList<TokenId>(builder.getTokensCount());
+        for (var token : builder.getTokensList()) {
+            list.add(TokenId.fromProtobuf(token));
+        }
+        return list;
     }
 
-    public TokenAssociateTransaction addTokens(TokenId... tokens) {
+    public TokenAssociateTransaction setTokenIds(TokenId... tokens) {
         requireNotFrozen();
+        builder.clearTokens();
+
         for (TokenId token : tokens) {
             builder.addTokens(token.toProtobuf());
         }

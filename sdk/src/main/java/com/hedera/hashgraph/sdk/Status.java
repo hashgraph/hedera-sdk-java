@@ -1086,7 +1086,6 @@ public enum Status {
                 return TRANSACTION_REQUIRES_ZERO_TOKEN_BALANCES;
             case ACCOUNT_IS_TREASURY:
                 return ACCOUNT_IS_TREASURY;
-                
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

@@ -4,6 +4,7 @@ import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenDissociateTransaction> {
@@ -29,12 +30,18 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
         return this;
     }
 
-    public List<TokenID> getTokens() {
-        return builder.getTokensList();
+    public List<TokenId> getTokenIds() {
+        var list = new ArrayList<TokenId>(builder.getTokensCount());
+        for (var token : builder.getTokensList()) {
+            list.add(TokenId.fromProtobuf(token));
+        }
+        return list;
     }
 
-    public TokenDissociateTransaction addTokens(TokenId... tokens) {
+    public TokenDissociateTransaction setTokenIds(TokenId... tokens) {
         requireNotFrozen();
+        builder.clearTokens();
+
         for (TokenId token : tokens) {
             builder.addTokens(token.toProtobuf());
         }

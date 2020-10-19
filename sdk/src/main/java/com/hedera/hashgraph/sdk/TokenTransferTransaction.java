@@ -10,12 +10,10 @@ import java.util.List;
 
 public class TokenTransferTransaction extends Transaction<TokenTransferTransaction> {
     private final TokenTransfersTransactionBody.Builder builder;
-    private TokenTransferList.Builder transfersBuilder;
-    private HashMap<TokenId, Integer> tokenIndexes= new HashMap<>();
-
+    private HashMap<TokenId, TokenTransferList.Builder> tokenTransferLists;
     public TokenTransferTransaction() {
         builder = TokenTransfersTransactionBody.newBuilder();
-        transfersBuilder = TokenTransferList.newBuilder();
+        tokenTransferLists = new HashMap<>();
     }
 
     TokenTransferTransaction(TransactionBody body) {
@@ -23,27 +21,21 @@ public class TokenTransferTransaction extends Transaction<TokenTransferTransacti
 
         builder = body.getTokenTransfers().toBuilder();
 
-        transfersBuilder = TokenTransferList.newBuilder();
-
-        // TODO: remove nested loop when fixed
-        for (int i = 0; i <= builder.getTokenTransfersCount(); i++) {
-            for (int j = 0; j <= builder.getTokenTransfersCount(); j++)
-                transfersBuilder.addTransfers(builder.getTokenTransfers(i).getTransfers(j).toBuilder());
+        for (var list : builder.getTokenTransfersList()) {
+            var token = TokenId.fromProtobuf(list.getToken());
+            tokenTransferLists.put(token, list.toBuilder());
         }
     }
 
-    public HashMap<TokenId, List<Transfer>> getTransfers() {
-        var tokenTransferListMap = new HashMap<TokenId, List<Transfer>>();
+    public HashMap<TokenId, List<TokenTransfer>> getTransfers() {
+        var tokenTransferListMap = new HashMap<TokenId, List<TokenTransfer>>();
 
-        for (var i = 0; i < builder.getTokenTransfersCount(); i++) {
-            var numTransfers = builder.getTokenTransfersList().get(i).getTransfersCount();
-            var transfers = new ArrayList<Transfer>(numTransfers);
-
-            for (var j = 0; j < numTransfers; j++) {
-                transfers.add(Transfer.fromProtobuf(transfersBuilder.getTransfers(i)));
+        for (var entry : tokenTransferLists.entrySet()) {
+            var list = new ArrayList<TokenTransfer>(entry.getValue().getTransfersCount());
+            for (var transfer : entry.getValue().getTransfersList()) {
+                list.add(TokenTransfer.fromProtobuf(transfer));
             }
-
-            tokenTransferListMap.put(TokenId.fromProtobuf(builder.getTokenTransfersList().get(i).getToken()), transfers);
+            tokenTransferListMap.put(entry.getKey(), list);
         }
 
         return tokenTransferListMap;
@@ -57,8 +49,8 @@ public class TokenTransferTransaction extends Transaction<TokenTransferTransacti
      * @param senderId The AccountId of the sender
      * @return {@code this}
      */
-    public TokenTransferTransaction addSender(TokenId tokenId, AccountId senderId, Hbar value) {
-        return addTransfer(tokenId, senderId, value.negated());
+    public TokenTransferTransaction addSender(TokenId tokenId, AccountId senderId, long value) {
+        return addTransfer(tokenId, senderId, -value);
     }
 
     /**
@@ -69,28 +61,23 @@ public class TokenTransferTransaction extends Transaction<TokenTransferTransacti
      * @param recipientId The AccountId of the recipient
      * @return {@code this}
      */
-    public TokenTransferTransaction addRecipient(TokenId tokenId, AccountId recipientId, Hbar value) {
+    public TokenTransferTransaction addRecipient(TokenId tokenId, AccountId recipientId, long value) {
         return addTransfer(tokenId, recipientId, value);
     }
 
-    public TokenTransferTransaction addTransfer(TokenId tokenId, AccountId accountId, Hbar value) {
-        var index = tokenIndexes.get(tokenId);
-        var size = builder.getTokenTransfersCount();
-
+    public TokenTransferTransaction addTransfer(TokenId tokenId, AccountId accountId, long value) {
         requireNotFrozen();
 
-        if (index != null) {
-            transfersBuilder = builder.getTokenTransfers(index).toBuilder();
-        } else {
-            transfersBuilder = TokenTransferList.newBuilder();
-            builder.addTokenTransfers(transfersBuilder);
-            tokenIndexes.put(tokenId, size);
+        var list = tokenTransferLists.get(tokenId);
+        if (list == null) {
+            list = TokenTransferList.newBuilder().setToken(tokenId.toProtobuf());
+            tokenTransferLists.put(tokenId, list);
         }
 
-        transfersBuilder.addTransfers(
+        list.addTransfers(
             AccountAmount.newBuilder()
                 .setAccountID(accountId.toProtobuf())
-                .setAmount(value.toTinybars())
+                .setAmount(value)
                 .build()
         );
 
@@ -104,7 +91,18 @@ public class TokenTransferTransaction extends Transaction<TokenTransferTransacti
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setTokenTransfers(builder.setTokenTransfers(0, transfersBuilder));
+        for (var entry : tokenTransferLists.entrySet()) {
+            var listBuilder = TokenTransferList.newBuilder()
+                .setToken(entry.getKey().toProtobuf());
+
+            for (var transfer : entry.getValue().getTransfersList()) {
+                listBuilder.addTransfers(transfer);
+            }
+
+            builder.addTokenTransfers(listBuilder);
+        }
+
+        bodyBuilder.setTokenTransfers(builder);
         return true;
     }
 }
