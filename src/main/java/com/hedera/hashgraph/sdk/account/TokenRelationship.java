@@ -1,5 +1,7 @@
 package com.hedera.hashgraph.sdk.account;
 
+import com.hedera.hashgraph.proto.TokenFreezeStatus;
+import com.hedera.hashgraph.proto.TokenKycStatus;
 import com.hedera.hashgraph.sdk.token.TokenId;
 
 import javax.annotation.Nullable;
@@ -24,7 +26,7 @@ public class TokenRelationship {
         this.tokenId = new TokenId(relationship.getTokenId());
         this.symbol = relationship.getSymbol();
         this.balance = relationship.getBalance();
-        this.kycStatus = kycStatus == 0 ? null : kycStatus == 2;
-        this.freezeStatus = freezeStatus == 0 ? null : freezeStatus == 2;
+        this.kycStatus = kycStatus == TokenKycStatus.KycNotApplicable_VALUE ? null : kycStatus == TokenKycStatus.Granted_VALUE;
+        this.freezeStatus = freezeStatus == TokenFreezeStatus.FreezeNotApplicable_VALUE ? null : freezeStatus == TokenFreezeStatus.Frozen_VALUE;
     }
 }

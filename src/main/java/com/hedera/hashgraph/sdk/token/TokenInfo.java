@@ -1,7 +1,9 @@
 package com.hedera.hashgraph.sdk.token;
 
 import com.hedera.hashgraph.proto.Response;
+import com.hedera.hashgraph.proto.TokenFreezeStatus;
 import com.hedera.hashgraph.proto.TokenGetInfoResponse;
+import com.hedera.hashgraph.proto.TokenKycStatus;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
@@ -77,7 +79,7 @@ public class TokenInfo {
      *      Unfrozen = true;
      */
     @Nullable
-    public final boolean defaultFreezeStatus;
+    public final Boolean defaultFreezeStatus;
 
     /**
      * The default KYC status (KycNotApplicable or Revoked) of Hedera accounts relative to this token. KycNotApplicable
@@ -87,7 +89,7 @@ public class TokenInfo {
      *      Revoked = true;
      */
     @Nullable
-    public final boolean defaultKycStatus;
+    public final Boolean defaultKycStatus;
 
     /**
      * Specifies whether the token was deleted or not
@@ -111,8 +113,8 @@ public class TokenInfo {
     public final Instant expiry;
 
     TokenInfo(com.hedera.hashgraph.proto.TokenInfo info) {
-        int defaultFreezeStatus = info.getDefaultFreezeStatus().getNumber();
-        int defaultKycStatus = info.getDefaultKycStatus().getNumber();
+        TokenFreezeStatus defaultFreezeStatus = info.getDefaultFreezeStatus();
+        TokenKycStatus defaultKycStatus = info.getDefaultKycStatus();
 
         this.tokenId = new TokenId(info.getTokenId());
         this.name = info.getName();
@@ -125,8 +127,8 @@ public class TokenInfo {
         this.freezeKey = Ed25519PublicKey.fromProtoKey(info.getFreezeKey());
         this.wipeKey = Ed25519PublicKey.fromProtoKey(info.getWipeKey());
         this.supplyKey = Ed25519PublicKey.fromProtoKey(info.getSupplyKey());
-        this.defaultFreezeStatus = defaultFreezeStatus == 0 ? null : defaultFreezeStatus == 2;
-        this.defaultKycStatus = defaultKycStatus == 0 ? null : defaultKycStatus == 2;
+        this.defaultFreezeStatus = defaultFreezeStatus == TokenFreezeStatus.FreezeNotApplicable ? null : defaultFreezeStatus == TokenFreezeStatus.Frozen;
+        this.defaultKycStatus = defaultKycStatus == TokenKycStatus.KycNotApplicable ? null : defaultKycStatus == TokenKycStatus.Granted;
         this.isDeleted = info.getIsDeleted();
         this.autoRenewAccount = new AccountId(info.getAutoRenewAccount());
         this.autoRenewPeriod = Duration.ofSeconds(info.getAutoRenewPeriod());

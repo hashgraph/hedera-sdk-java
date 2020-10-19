@@ -164,7 +164,7 @@ public final class TokenCreateTransaction extends SingleTransactionBuilder<Token
      * @param freeze
      * @return TokenCreateTransaction
      */
-    public TokenCreateTransaction setFreezeDefault(boolean freeze) {
+    public TokenCreateTransaction setFreezeDefault(Boolean freeze) {
         builder.setFreezeDefault(freeze);
         return this;
     }
