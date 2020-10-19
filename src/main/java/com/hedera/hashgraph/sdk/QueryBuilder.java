@@ -259,6 +259,8 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
                 throw new IllegalStateException("Response not set");
             case CONSENSUSGETTOPICINFO:
                 return raw.getConsensusGetTopicInfo().getHeader();
+            case TOKENGETINFO:
+                return raw.getTokenGetInfo().getHeader();
             default:
                 // NOTE: TRANSACTIONGETFASTRECORD shouldn't be handled as we don't expose that query
                 throw new RuntimeException("Unhandled response case");
