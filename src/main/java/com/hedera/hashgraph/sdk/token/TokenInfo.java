@@ -47,27 +47,32 @@ public class TokenInfo {
      * The key which can perform update/delete operations on the token. If empty, the token can be perceived as
      * immutable (not being able to be updated/deleted)
      */
+    @Nullable
     public final PublicKey adminKey;
 
     /**
      * The key which can grant or revoke KYC of an account for the token's transactions. If empty, KYC is not required,
      * and KYC grant or revoke operations are not possible.
      */
+    @Nullable
     public final PublicKey kycKey;
 
     /**
      * The key which can freeze or unfreeze an account for token transactions. If empty, freezing is not possible
      */
+    @Nullable
     public final PublicKey freezeKey;
 
     /**
      * The key which can wipe token balance of an account. If empty, wipe is not possible
      */
+    @Nullable
     public final PublicKey wipeKey;
 
     /**
      * The key which can change the supply of a token. The key is used to sign Token Mint/Burn operations
      */
+    @Nullable
     public final PublicKey supplyKey;
 
     /**
@@ -99,6 +104,7 @@ public class TokenInfo {
     /**
      * An account which will be automatically charged to renew the token's expiration, at autoRenewPeriod interval
      */
+    @Nullable
     public final AccountId autoRenewAccount;
 
     /**
@@ -122,15 +128,15 @@ public class TokenInfo {
         this.decimals = info.getDecimals();
         this.totalSupply = info.getTotalSupply();
         this.treasury = new AccountId(info.getTreasury());
-        this.adminKey = Ed25519PublicKey.fromProtoKey(info.getAdminKey());
-        this.kycKey = Ed25519PublicKey.fromProtoKey(info.getKycKey());
-        this.freezeKey = Ed25519PublicKey.fromProtoKey(info.getFreezeKey());
-        this.wipeKey = Ed25519PublicKey.fromProtoKey(info.getWipeKey());
-        this.supplyKey = Ed25519PublicKey.fromProtoKey(info.getSupplyKey());
+        this.adminKey = info.hasAdminKey() ? Ed25519PublicKey.fromProtoKey(info.getAdminKey()) : null;
+        this.kycKey = info.hasKycKey() ? Ed25519PublicKey.fromProtoKey(info.getKycKey()) : null;
+        this.freezeKey = info.hasFreezeKey() ? Ed25519PublicKey.fromProtoKey(info.getFreezeKey()) : null;
+        this.wipeKey = info.hasWipeKey() ? Ed25519PublicKey.fromProtoKey(info.getWipeKey()) : null;
+        this.supplyKey = info.hasSupplyKey() ? Ed25519PublicKey.fromProtoKey(info.getSupplyKey()) : null;
         this.defaultFreezeStatus = defaultFreezeStatus == TokenFreezeStatus.FreezeNotApplicable ? null : defaultFreezeStatus == TokenFreezeStatus.Frozen;
         this.defaultKycStatus = defaultKycStatus == TokenKycStatus.KycNotApplicable ? null : defaultKycStatus == TokenKycStatus.Granted;
         this.isDeleted = info.getIsDeleted();
-        this.autoRenewAccount = new AccountId(info.getAutoRenewAccount());
+        this.autoRenewAccount = info.hasAutoRenewAccount() ? new AccountId(info.getAutoRenewAccount()) : null;
         this.autoRenewPeriod = Duration.ofSeconds(info.getAutoRenewPeriod());
         this.expiry = Instant.ofEpochSecond(info.getExpiry());
     }
