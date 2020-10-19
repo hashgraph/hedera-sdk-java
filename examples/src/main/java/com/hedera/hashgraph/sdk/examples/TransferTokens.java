@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.HederaStatusException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountCreateTransaction;
+import com.hedera.hashgraph.sdk.account.AccountDeleteTransaction;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
@@ -19,7 +20,7 @@ import java.util.Objects;
 import com.hedera.hashgraph.sdk.token.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
-public final class TokenTransfers {
+public final class TransferTokens {
 
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names
@@ -27,7 +28,8 @@ public final class TokenTransfers {
     private static final Ed25519PrivateKey OPERATOR_KEY = Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
     private static final String CONFIG_FILE = Objects.requireNonNull(Dotenv.load().get("CONFIG_FILE"));
 
-    private TokenTransfers() { }
+    private TransferTokens() {
+    }
 
     public static void main(String[] args) throws HederaStatusException, FileNotFoundException {
         // Generate a Ed25519 private, public key pair
@@ -68,7 +70,7 @@ public final class TokenTransfers {
             .execute(client);
 
         TokenId tokenId = txId.getReceipt(client).getTokenId();
-        System.out.println("New token created: " + tokenId);
+        System.out.println("token = " + tokenId);
 
         new TokenAssociateTransaction()
             .setAccountId(newAccountId)
@@ -79,16 +81,49 @@ public final class TokenTransfers {
             .execute(client)
             .getReceipt(client);
 
+        System.out.println("Associated account " + newAccountId + " with token " + tokenId);
+
         new TokenGrantKycTransaction()
             .setAccountId(newAccountId)
             .setTokenId(tokenId)
             .execute(client)
             .getReceipt(client);
 
+        System.out.println("Granted KYC for account " + newAccountId + " on token " + tokenId);
+
         new TokenTransferTransaction()
             .addSender(tokenId, OPERATOR_ID, 10)
             .addRecipient(tokenId, newAccountId, 10)
             .execute(client)
             .getReceipt(client);
+
+        System.out.println("Sent 10 tokens from account " + OPERATOR_ID + " to account " + newAccountId + " on token " + tokenId);
+
+        new TokenWipeTransaction()
+            .setTokenId(tokenId)
+            .setAccountId(newAccountId)
+            .setAmount(10)
+            .execute(client)
+            .getReceipt(client);
+
+        System.out.println("Wiped balance of account " + newAccountId);
+
+        new TokenDeleteTransaction()
+            .setTokenId(tokenId)
+            .execute(client)
+            .getReceipt(client);
+
+        System.out.println("Deleted token " + tokenId);
+
+        new AccountDeleteTransaction()
+            .setDeleteAccountId(newAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .build(client)
+            .sign(OPERATOR_KEY)
+            .sign(newKey)
+            .execute(client)
+            .getReceipt(client);
+
+        System.out.println("Deleted account " + newAccountId);
     }
 }

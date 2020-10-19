@@ -7,20 +7,25 @@ import com.hedera.hashgraph.sdk.account.AccountId;
 import io.grpc.MethodDescriptor;
 
 /**
- * Revokes KYC to the account for the given token. Must be signed by the Token's kycKey.
+ * Wipes the provided amount of tokens from the specified Account. Must be signed by the Token's Wipe key.
  * If the provided account is not found, the transaction will resolve to INVALID_ACCOUNT_ID.
  * If the provided account has been deleted, the transaction will resolve to ACCOUNT_DELETED.
  * If the provided token is not found, the transaction will resolve to INVALID_TOKEN_ID.
  * If the provided token has been deleted, the transaction will resolve to TOKEN_WAS_DELETED.
  * If an Association between the provided token and account is not found, the transaction will resolve to
  * TOKEN_NOT_ASSOCIATED_TO_ACCOUNT.
- * If no KYC Key is defined, the transaction will resolve to TOKEN_HAS_NO_KYC_KEY.
- * Once executed the Account is marked as KYC Revoked
+ * If Wipe Key is not present in the Token, transaction results in TOKEN_HAS_NO_WIPE_KEY.
+ * If the provided account is the Token's Treasury Account, transaction results in CANNOT_WIPE_TOKEN_TREASURY_ACCOUNT
+ * On success, tokens are removed from the account and the total supply of the token is decreased by the wiped amount.
+ *
+ * The amount provided is in the lowest denomination possible. Example:
+ * Token A has 2 decimals. In order to wipe 100 tokens from account, one must provide amount of 10000. In order to wipe
+ * 100.55 tokens, one must provide amount of 10055.
  */
-public final class TokenWipeAccountTransaction extends SingleTransactionBuilder<TokenWipeAccountTransaction> {
+public final class TokenWipeTransaction extends SingleTransactionBuilder<TokenWipeTransaction> {
     private final TokenWipeAccountTransactionBody.Builder builder = bodyBuilder.getTokenWipeBuilder();
 
-    public TokenWipeAccountTransaction() {
+    public TokenWipeTransaction() {
         super();
     }
 
@@ -30,7 +35,7 @@ public final class TokenWipeAccountTransaction extends SingleTransactionBuilder<
      * @param token
      * @return TokenWipeAccountTransaction
      */
-    public TokenWipeAccountTransaction setTokenId(TokenId token) {
+    public TokenWipeTransaction setTokenId(TokenId token) {
         builder.setToken(token.toProto());
         return this;
     }
@@ -41,7 +46,7 @@ public final class TokenWipeAccountTransaction extends SingleTransactionBuilder<
      * @param accountId
      * @return TokenWipeAccountTransaction
      */
-    public TokenWipeAccountTransaction setAccount(AccountId accountId) {
+    public TokenWipeTransaction setAccountId(AccountId accountId) {
         builder.setAccount(accountId.toProto());
         return this;
     }
@@ -53,7 +58,7 @@ public final class TokenWipeAccountTransaction extends SingleTransactionBuilder<
      * @param amount
      * @return TokenWipeAccountTransaction
      */
-    public TokenWipeAccountTransaction setAmount(long amount) {
+    public TokenWipeTransaction setAmount(long amount) {
         builder.setAmount(amount);
         return this;
     }

@@ -18,10 +18,10 @@ import io.grpc.MethodDescriptor;
  * Once executed the Account is marked as Frozen and will not be able to receive or send tokens unless unfrozen.
  * The operation is idempotent.
  */
-public final class TokenFreezeAccountTransaction extends SingleTransactionBuilder<TokenFreezeAccountTransaction> {
+public final class TokenFreezeTransaction extends SingleTransactionBuilder<TokenFreezeTransaction> {
     private final TokenFreezeAccountTransactionBody.Builder builder = bodyBuilder.getTokenFreezeBuilder();
 
-    public TokenFreezeAccountTransaction() {
+    public TokenFreezeTransaction() {
         super();
     }
 
@@ -31,7 +31,7 @@ public final class TokenFreezeAccountTransaction extends SingleTransactionBuilde
      * @param token
      * @return TokenFreezeAccountTransaction
      */
-    public TokenFreezeAccountTransaction setTokenId(TokenId token) {
+    public TokenFreezeTransaction setTokenId(TokenId token) {
         builder.setToken(token.toProto());
         return this;
     }
@@ -42,7 +42,7 @@ public final class TokenFreezeAccountTransaction extends SingleTransactionBuilde
      * @param accountId
      * @return TokenFreezeAccountTransaction
      */
-    public TokenFreezeAccountTransaction setAccountId(AccountId accountId) {
+    public TokenFreezeTransaction setAccountId(AccountId accountId) {
         builder.setAccount(accountId.toProto());
         return this;
     }
