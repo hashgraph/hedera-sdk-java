@@ -12,14 +12,14 @@ public class TokenRelationship {
     public final long balance;
 
     @Nullable
-    public final boolean kycStatus;
+    public final Boolean kycStatus;
 
     @Nullable
-    public final boolean freezeStatus;
+    public final Boolean freezeStatus;
 
     TokenRelationship(com.hedera.hashgraph.proto.TokenRelationship relationship) {
-        int freezeStatus = relationship.getFreezeStatus().getNumber();
-        int kycStatus = relationship.getKycStatus().getNumber();
+        int freezeStatus = relationship.getFreezeStatus() == null ? 0 : relationship.getFreezeStatus().getNumber();
+        int kycStatus = relationship.getKycStatus() == null ? 0 : relationship.getKycStatus().getNumber();
 
         this.tokenId = new TokenId(relationship.getTokenId());
         this.symbol = relationship.getSymbol();
