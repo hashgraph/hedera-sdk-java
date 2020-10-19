@@ -211,6 +211,7 @@ public final class AccountInfo {
             .add("expirationTime", expirationTime)
             .add("autoRenewPeriod", autoRenewPeriod)
             .add("liveHashes", liveHashes)
+            .add("tokenRelationships", tokenRelationships)
             .toString();
     }
 
