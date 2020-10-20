@@ -36,7 +36,9 @@ import io.grpc.MethodDescriptor;
  */
 public final class TokenCreateTransaction extends SingleTransactionBuilder<TokenCreateTransaction> {
     private final TokenCreateTransactionBody.Builder builder = bodyBuilder.getTokenCreationBuilder()
-        .setAutoRenewPeriod(HederaConstants.DEFAULT_AUTORENEW_DURATION.getSeconds());
+        .setAutoRenewPeriod(HederaConstants.DEFAULT_AUTORENEW_DURATION.getSeconds())
+        .setExpiry(Instant.now().plus(Duration.ofDays(90)).getEpochSecond());
+
 
     public TokenCreateTransaction() {
         super();
