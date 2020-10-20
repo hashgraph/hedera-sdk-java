@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk.account;
 
+import com.google.common.base.MoreObjects;
 import com.hedera.hashgraph.proto.TokenFreezeStatus;
 import com.hedera.hashgraph.proto.TokenKycStatus;
 import com.hedera.hashgraph.sdk.token.TokenId;
@@ -28,5 +29,16 @@ public class TokenRelationship {
         this.balance = relationship.getBalance();
         this.kycStatus = kycStatus == TokenKycStatus.KycNotApplicable_VALUE ? null : kycStatus == TokenKycStatus.Granted_VALUE;
         this.freezeStatus = freezeStatus == TokenFreezeStatus.FreezeNotApplicable_VALUE ? null : freezeStatus == TokenFreezeStatus.Frozen_VALUE;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("tokenId", tokenId)
+            .add("symbol", symbol)
+            .add("balance", balance)
+            .add("kycStatus", kycStatus)
+            .add("freezeStatus", freezeStatus)
+            .toString();
     }
 }
