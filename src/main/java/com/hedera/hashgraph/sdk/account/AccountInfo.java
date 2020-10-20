@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk.account;
 
+import com.google.common.base.MoreObjects;
 import com.hedera.hashgraph.proto.CryptoGetInfoResponse;
 import com.hedera.hashgraph.proto.Response;
 import com.hedera.hashgraph.sdk.DurationHelper;
@@ -76,5 +77,24 @@ public final class AccountInfo {
         CryptoGetInfoResponse infoResponse = response.getCryptoGetInfo();
 
         return new AccountInfo(infoResponse.getAccountInfo());
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("accountId", accountId)
+            .add("contractAccountId", contractAccountId)
+            .add("isDeleted", isDeleted)
+            .add("proxyAccountId", proxyAccountId)
+            .add("proxyReceived", proxyReceived)
+            .add("key", key)
+            .add("balance", balance)
+            .add("generateSendRecordThreshold", generateSendRecordThreshold)
+            .add("generateReceiveRecordThreshold", generateReceiveRecordThreshold)
+            .add("isReceiverSignatureRequired", isReceiverSignatureRequired)
+            .add("expirationTime", expirationTime)
+            .add("autoRenewPeriod", autoRenewPeriod)
+            .add("tokenRelationships", tokenRelationships)
+            .toString();
     }
 }
