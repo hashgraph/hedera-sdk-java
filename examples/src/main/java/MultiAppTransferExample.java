@@ -95,11 +95,13 @@ public final class MultiAppTransferExample {
 
         Hbar senderBalanceAfter = new AccountBalanceQuery()
             .setAccountId(userAccountId)
-            .execute(client);
+            .execute(client)
+            .hbars;
 
         Hbar receiptBalanceAfter = new AccountBalanceQuery()
             .setAccountId(exchangeAccountId)
-            .execute(client);
+            .execute(client)
+            .hbars;
 
         System.out.println("" + userAccountId + " balance = " + senderBalanceAfter);
         System.out.println("" + exchangeAccountId + " balance = " + receiptBalanceAfter);

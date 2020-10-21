@@ -78,7 +78,8 @@ public final class CreateAccountThresholdKeyExample {
 
         Hbar balanceAfter = new AccountBalanceQuery()
             .setAccountId(newAccountId)
-            .execute(client);
+            .execute(client)
+            .hbars;
 
         System.out.println("account balance after transfer: " + balanceAfter);
     }

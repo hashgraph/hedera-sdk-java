@@ -7,13 +7,16 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import io.grpc.MethodDescriptor;
 
+import java.util.Map;
+import java.util.HashMap;
+
 /**
  * Get the balance of a Hedera™ crypto-currency account. This returns only the balance, so it is a
  * smaller and faster reply than {@link AccountInfoQuery}.
  *
  * <p>This query is free.
  */
-public final class AccountBalanceQuery extends Query<Hbar, AccountBalanceQuery> {
+public final class AccountBalanceQuery extends Query<AccountBalance, AccountBalanceQuery> {
     private final CryptoGetAccountBalanceQuery.Builder builder;
 
     public AccountBalanceQuery() {
@@ -63,8 +66,14 @@ public final class AccountBalanceQuery extends Query<Hbar, AccountBalanceQuery> 
     }
 
     @Override
-    Hbar mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return Hbar.fromTinybars(response.getCryptogetAccountBalance().getBalance());
+    AccountBalance mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+        var balanceList = response.getCryptogetAccountBalance().getTokenBalancesList();
+        Map<TokenId, Long> map = new HashMap<>();
+        for(int i = 0; i < response.getCryptogetAccountBalance().getTokenBalancesCount(); i++){
+            map.put(TokenId.fromProtobuf(balanceList.get(i).getTokenId()), balanceList.get(i).getBalance());
+        }
+
+        return new AccountBalance(Hbar.fromTinybars(response.getCryptogetAccountBalance().getBalance()), map);
     }
 
     @Override

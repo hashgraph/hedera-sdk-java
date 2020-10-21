@@ -37,11 +37,13 @@ public final class TransferCryptoExample {
 
         Hbar senderBalanceBefore = new AccountBalanceQuery()
             .setAccountId(OPERATOR_ID)
-            .execute(client);
+            .execute(client)
+            .hbars;
 
         Hbar receiptBalanceBefore = new AccountBalanceQuery()
             .setAccountId(recipientId)
-            .execute(client);
+            .execute(client)
+            .hbars;
 
         System.out.println("" + OPERATOR_ID + " balance = " + senderBalanceBefore);
         System.out.println("" + recipientId + " balance = " + receiptBalanceBefore);
@@ -62,11 +64,13 @@ public final class TransferCryptoExample {
 
         Hbar senderBalanceAfter = new AccountBalanceQuery()
             .setAccountId(OPERATOR_ID)
-            .execute(client);
+            .execute(client)
+            .hbars;
 
         Hbar receiptBalanceAfter = new AccountBalanceQuery()
             .setAccountId(recipientId)
-            .execute(client);
+            .execute(client)
+            .hbars;
 
         System.out.println("" + OPERATOR_ID + " balance = " + senderBalanceAfter);
         System.out.println("" + recipientId + " balance = " + receiptBalanceAfter);

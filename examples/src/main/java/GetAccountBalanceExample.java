@@ -29,7 +29,8 @@ public final class GetAccountBalanceExample {
 
         Hbar balance = new AccountBalanceQuery()
             .setAccountId(OPERATOR_ID)
-            .execute(client);
+            .execute(client)
+            .hbars;
 
         System.out.println("balance = " + balance);
     }
