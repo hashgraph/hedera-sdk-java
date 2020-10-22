@@ -45,19 +45,14 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
     @Nullable
     private Hbar maxQueryPayment;
 
-    @Nullable
-    private AccountId nodeId;
-
     Query() {
         builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
         headerBuilder = QueryHeader.newBuilder();
     }
 
-    /**
-     * Set an explicit node ID to use for this query.
-     */
-    public T setNodeAccountId(AccountId nodeAccountId) {
-        this.nodeId = nodeAccountId;
+    public T setNodeAccountIds(List<AccountId> nodeAccountIds) {
+        paymentTransactionNodeIds = new ArrayList<>();
+        paymentTransactionNodeIds.addAll(nodeAccountIds);
 
         // noinspection unchecked
         return (T) this;
@@ -175,7 +170,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
             .thenAccept((paymentAmount) -> {
                 paymentTransactionId = TransactionId.generate(operator.accountId);
 
-                if (nodeId == null) {
+                if (nodeIds == null) {
                     // Like how TransactionBuilder has to build (N / 3) native transactions to handle multi-node retry,
                     // so too does the QueryBuilder for payment transactions
 
@@ -198,10 +193,10 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
                     paymentTransactions = new ArrayList<>(1);
                     paymentTransactionNodeIds = new ArrayList<>(1);
 
-                    paymentTransactionNodeIds.add(nodeId);
+                    paymentTransactionNodeIds.addAll(nodeIds);
                     paymentTransactions.add(makePaymentTransaction(
                         paymentTransactionId,
-                        nodeId,
+                        nodeIds.get(nextPaymentTransactionIndex),
                         operator,
                         paymentAmount
                     ));
@@ -257,16 +252,16 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
     }
 
     @Override
-    final AccountId getNodeAccountId(@Nullable Client client) {
+    final List<AccountId> getNodeAccountIds(@Nullable Client client) {
         if (paymentTransactionNodeIds != null) {
             // If this query needs a payment transaction we need to pick the node ID from the next
             // payment transaction
             return paymentTransactionNodeIds.get(nextPaymentTransactionIndex);
         }
 
-        if (nodeId != null) {
+        if (nodeIds.get(0) != null) {
             // if there was an explicit node ID set, use that
-            return nodeId;
+            return nodeIds.get(0);
         }
 
         if (client == null) {
