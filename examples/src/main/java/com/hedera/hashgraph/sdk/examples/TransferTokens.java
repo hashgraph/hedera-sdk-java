@@ -26,7 +26,6 @@ public final class TransferTokens {
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final Ed25519PrivateKey OPERATOR_KEY = Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
-    private static final String CONFIG_FILE = Objects.requireNonNull(Dotenv.load().get("CONFIG_FILE"));
 
     private TransferTokens() {
     }
@@ -39,7 +38,7 @@ public final class TransferTokens {
         System.out.println("private key = " + newKey);
         System.out.println("public key = " + newPublicKey);
 
-        Client client = Client.fromFile(CONFIG_FILE).setOperator(OPERATOR_ID, OPERATOR_KEY);
+        Client client = Client.forPreviewnet().setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         TransactionId txId = new AccountCreateTransaction()
             // The only _required_ property here is `key`
