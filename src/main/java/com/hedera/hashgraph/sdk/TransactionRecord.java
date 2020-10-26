@@ -1,10 +1,11 @@
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.contract.ContractFunctionResult;
+import com.hedera.hashgraph.sdk.token.TokenId;
 
 import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -40,6 +41,8 @@ public final class TransactionRecord {
      */
     public final List<Transfer> transfers;
 
+    public final Map<TokenId, Map<AccountId, List<Long>>> tokenTransfers;
+
     private final com.hedera.hashgraph.proto.TransactionRecord inner;
 
     @Internal
@@ -62,6 +65,23 @@ public final class TransactionRecord {
             .map(com.hedera.hashgraph.sdk.Transfer::new)
             .collect(Collectors.toList())
             : Collections.emptyList();
+
+        HashMap<TokenId, Map<AccountId, List<Long>>> tokenTransfers = new HashMap<>();
+        for (com.hedera.hashgraph.proto.TokenTransferList list : inner.getTokenTransferListsList()) {
+            Map<AccountId, List<Long>> transfers = tokenTransfers.computeIfAbsent(
+                new TokenId(list.getTokenOrBuilder()),
+                k -> new HashMap<>()
+            );
+
+            for (com.hedera.hashgraph.proto.AccountAmount aa : list.getTransfersList()) {
+                transfers.computeIfAbsent(
+                    new AccountId(aa.getAccountIDOrBuilder()),
+                    k -> new ArrayList<>()
+                ).add(aa.getAmount());
+            }
+        }
+
+        this.tokenTransfers = tokenTransfers;
     }
 
     /**
