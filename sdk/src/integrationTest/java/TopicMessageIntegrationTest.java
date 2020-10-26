@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.nio.charset.StandardCharsets;
@@ -45,7 +46,7 @@ public class TopicMessageIntegrationTest {
 
             @Var var info = new TopicInfoQuery()
                 .setTopicId(topic)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setQueryPayment(new Hbar(22))
                 .execute(client);
 
@@ -65,7 +66,7 @@ public class TopicMessageIntegrationTest {
               });
 
             new TopicMessageSubmitTransaction()
-              .setNodeAccountId(response.nodeId)
+              .setNodeAccountIds(Collections.singletonList(response.nodeId))
               .setTopicId(topic)
               .setMessage("Hello, from HCS!")
               .execute(client);

@@ -202,25 +202,35 @@ public abstract class Transaction<T extends Transaction<T>>
         return null;
     }
 
+    @Nullable
+    public final List<AccountId> getNodeAccountIds() {
+        if (!nodeIds.isEmpty()) {
+            return nodeIds;
+        }
+
+        return null;
+    }
+
     @Override
     final AccountId getNodeAccountId(@Nullable Client client) {
         return Objects.requireNonNull(getNodeAccountId());
     }
 
     /**
-     * Set the account ID of the node that this transaction will be submitted to.
+     * Set the account IDs of the nodes that this transaction will be submitted to.
      * <p>
      * Providing an explicit node account ID interferes with client-side load balancing of the
      * network. By default, the SDK will pre-generate a transaction for 1/3 of the nodes on the
      * network. If a node is down, busy, or otherwise reports a fatal error, the SDK will try again
      * with a different node.
      *
-     * @param nodeAccountId The node AccountId to be set
+     * @param nodeAccountIds The list of node AccountIds to be set
      * @return {@code this}
      */
-    public final T setNodeAccountId(AccountId nodeAccountId) {
+    public final T setNodeAccountIds(List<AccountId> nodeAccountIds) {
+        nodeIds = nodeAccountIds;
         requireNotFrozen();
-        bodyBuilder.setNodeAccountID(nodeAccountId.toProtobuf());
+        bodyBuilder.setNodeAccountID(nodeIds.get(nextTransactionIndex).toProtobuf());
 
         // noinspection unchecked
         return (T) this;

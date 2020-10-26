@@ -6,6 +6,8 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
+
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -21,7 +23,7 @@ public class TransactionIntegrationTest {
 
             var transaction = new AccountCreateTransaction()
                 .setKey(key)
-                .setNodeAccountId(new AccountId(5))
+                .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                 .setMaxTransactionFee(new Hbar(2))
                 .freezeWith(client)
                 .signWithOperator(client);

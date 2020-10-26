@@ -26,7 +26,7 @@ public class ContractExecuteTransactionTest {
     @Test
     void shouldSerialize() {
         SnapshotMatcher.expect(new ContractExecuteTransaction()
-            .setNodeAccountId(AccountId.fromString("0.0.5005"))
+            .setNodeAccountId(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setContractId(ContractId.fromString("0.0.5007"))
             .setGas(10)

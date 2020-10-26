@@ -6,6 +6,8 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
+
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -21,7 +23,7 @@ public class TransactionResponseTest {
 
             var transaction = new AccountCreateTransaction()
                 .setKey(key)
-                .setNodeAccountId(new AccountId(5))
+                .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                 .execute(client);
 
             var record = transaction.getRecord(client);
@@ -33,7 +35,7 @@ public class TransactionResponseTest {
 
             new AccountDeleteTransaction()
                 .setAccountId(accountId)
-                .setNodeAccountId(new AccountId(5))
+                .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                 .setTransferAccountId(operatorId)
                 .freezeWith(client)
                 .sign(key)

@@ -10,6 +10,7 @@ import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.KeyList;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -39,7 +40,7 @@ public class FileIntegrationTest {
             var file = receipt.fileId;
 
             @Var var info = new FileInfoQuery()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setFileId(file)
                 .setQueryPayment(new Hbar(22))
                 .execute(client);
@@ -51,7 +52,7 @@ public class FileIntegrationTest {
             assertEquals(info.keys.toString(), testKey.toString());
 
             new FileAppendTransaction()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setFileId(file)
                 .setContents("[e2e::FileAppendTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
@@ -60,7 +61,7 @@ public class FileIntegrationTest {
                 .getReceipt(client);
 
             info = new FileInfoQuery()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setFileId(file)
                 .setQueryPayment(new Hbar(1))
                 .execute(client);
@@ -72,7 +73,7 @@ public class FileIntegrationTest {
             assertEquals(info.keys.toString(), testKey.toString());
 
             var contents = new FileContentsQuery()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setFileId(file)
                 .setQueryPayment(new Hbar(1))
                 .execute(client);
@@ -80,7 +81,7 @@ public class FileIntegrationTest {
             assertEquals(contents.toStringUtf8(), "[e2e::FileCreateTransaction][e2e::FileAppendTransaction]");
 
             new FileUpdateTransaction()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setFileId(file)
                 .setContents("[e2e::FileUpdateTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
@@ -89,7 +90,7 @@ public class FileIntegrationTest {
                 .getReceipt(client);
 
             info = new FileInfoQuery()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setFileId(file)
                 .setQueryPayment(new Hbar(1))
                 .execute(client);
@@ -101,7 +102,7 @@ public class FileIntegrationTest {
             assertEquals(info.keys.toString(), testKey.toString());
 
             new FileDeleteTransaction()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setFileId(file)
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
@@ -109,7 +110,7 @@ public class FileIntegrationTest {
                 .getReceipt(client);
 
             info = new FileInfoQuery()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setFileId(file)
                 .setQueryPayment(new Hbar(1))
                 .execute(client);

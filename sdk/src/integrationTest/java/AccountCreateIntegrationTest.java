@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
 
+import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -40,7 +41,7 @@ class AccountCreateIntegrationTest {
 
             var info = new AccountInfoQuery()
                 .setAccountId(account)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .execute(client);
 
             assertEquals(info.accountId, account);
@@ -55,7 +56,7 @@ class AccountCreateIntegrationTest {
 
             new AccountDeleteTransaction()
                 .setAccountId(account)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setTransferAccountId(operatorId)
                 .setTransactionId(TransactionId.generate(account))
                 .freezeWith(client)

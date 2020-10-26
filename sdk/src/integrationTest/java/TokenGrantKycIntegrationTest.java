@@ -3,6 +3,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -53,7 +54,7 @@ class TokenGrantKycIntegrationTest {
                 TokenId tokenId = response.getReceipt(client).tokenId;
 
                 new TokenAssociateTransaction()
-                    .setNodeAccountId(response.nodeId)
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setAccountId(accountId)
                     .setTokenIds(tokenId)
                     .freezeWith(client)
@@ -63,7 +64,7 @@ class TokenGrantKycIntegrationTest {
                     .getReceipt(client);
 
                 new TokenGrantKycTransaction()
-                    .setNodeAccountId(response.nodeId)
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setAccountId(accountId)
                     .setTokenId(tokenId)
                     .execute(client)

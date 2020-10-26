@@ -12,6 +12,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
 
+import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -34,7 +35,7 @@ class LiveHashIntegrationTest {
                 .setKey(key)
                 .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
-                .setNodeAccountId(new AccountId(5))
+                .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                 .execute(client)
                 .transactionId
                 .getReceipt(client);
@@ -48,7 +49,7 @@ class LiveHashIntegrationTest {
                 new LiveHashAddTransaction()
                     .setAccountId(account)
                     .setDuration(Duration.ofDays(30))
-                    .setNodeAccountId(new AccountId(5))
+                    .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                     .setHash(hash)
                     .setKeys(key)
                     .execute(client);
@@ -72,7 +73,7 @@ class LiveHashIntegrationTest {
             try {
                 new LiveHashDeleteTransaction()
                     .setAccountId(account)
-                    .setNodeAccountId(new AccountId(5))
+                    .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                     .setHash(hash)
                     .execute(client);
             } catch (HederaPreCheckStatusException e) {
@@ -82,7 +83,7 @@ class LiveHashIntegrationTest {
             assertDoesNotThrow(() -> {
                 new LiveHashQuery()
                     .setAccountId(account)
-                    .setNodeAccountId(new AccountId(5))
+                    .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                     .setHash(hash)
                     .execute(client);
 //                assertEquals(liveHash.accountId, account);
@@ -102,7 +103,7 @@ class LiveHashIntegrationTest {
 //
             new AccountDeleteTransaction()
                 .setAccountId(account)
-                .setNodeAccountId(new AccountId(5))
+                .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                 .setTransferAccountId(operatorId)
                 .execute(client);
 

@@ -3,6 +3,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -53,7 +54,7 @@ class TokenUnfreezeIntegrationTest {
                 TokenId tokenId = response.getReceipt(client).tokenId;
 
                 new TokenAssociateTransaction()
-                    .setNodeAccountId(response.nodeId)
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setAccountId(accountId)
                     .setTokenIds(tokenId)
                     .freezeWith(client)
@@ -63,21 +64,21 @@ class TokenUnfreezeIntegrationTest {
                     .getReceipt(client);
 
                 new TokenFreezeTransaction()
-                    .setNodeAccountId(response.nodeId)
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setAccountId(accountId)
                     .setTokenId(tokenId)
                     .execute(client)
                     .getReceipt(client);
 
                 new TokenUnfreezeTransaction()
-                    .setNodeAccountId(response.nodeId)
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setAccountId(accountId)
                     .setTokenId(tokenId)
                     .execute(client)
                     .getReceipt(client);
 
                 new TokenDeleteTransaction()
-                    .setNodeAccountId(response.nodeId)
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setTokenId(tokenId)
                     .execute(client)
                     .getReceipt(client);

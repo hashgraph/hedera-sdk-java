@@ -3,6 +3,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -49,7 +50,7 @@ class TokenUpdateIntegrationTest {
                     .getReceipt(client);
 
                 new TokenDeleteTransaction()
-                    .setNodeAccountId(response.nodeId)
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setTokenId(tokenId)
                     .execute(client)
                     .getReceipt(client);

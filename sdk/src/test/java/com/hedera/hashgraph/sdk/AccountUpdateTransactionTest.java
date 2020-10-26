@@ -27,7 +27,7 @@ public class AccountUpdateTransactionTest {
     void shouldSerialize() {
         SnapshotMatcher.expect(new AccountUpdateTransaction()
             .setKey(unusedPrivateKey)
-            .setNodeAccountId(AccountId.fromString("0.0.5005"))
+            .setNodeAccountId(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setAccountId(AccountId.fromString("0.0.2002"))
             .setProxyAccountId(AccountId.fromString("0.0.1001"))

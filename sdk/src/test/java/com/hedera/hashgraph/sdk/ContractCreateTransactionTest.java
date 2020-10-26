@@ -26,7 +26,7 @@ public class ContractCreateTransactionTest {
     @Test
     void shouldSerialize() {
         SnapshotMatcher.expect(new ContractCreateTransaction()
-            .setNodeAccountId(AccountId.fromString("0.0.5005"))
+            .setNodeAccountId(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
             .setBytecodeFileId(FileId.fromString("0.0.3003"))
             .setAdminKey(unusedPrivateKey)

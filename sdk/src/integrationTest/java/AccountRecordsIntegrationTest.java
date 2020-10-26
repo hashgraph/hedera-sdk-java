@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransactionId;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -36,13 +37,13 @@ class AccountRecordsIntegrationTest {
             var account = receipt.accountId;
 
             new CryptoTransferTransaction()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .addRecipient(account, new Hbar(1))
                 .addSender(operatorId, new Hbar(1))
                 .execute(client);
 
             var records = new AccountRecordsQuery()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setAccountId(operatorId)
                 .setMaxQueryPayment(new Hbar(1))
                 .execute(client);
@@ -50,7 +51,7 @@ class AccountRecordsIntegrationTest {
             assertTrue(records.isEmpty());
 
             new AccountDeleteTransaction()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setAccountId(account)
                 .setTransferAccountId(operatorId)
                 .setTransactionId(TransactionId.generate(account))

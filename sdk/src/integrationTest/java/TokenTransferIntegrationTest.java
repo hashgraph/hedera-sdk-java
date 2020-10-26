@@ -3,6 +3,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -53,7 +54,7 @@ class TokenTransferIntegrationTest {
                 TokenId tokenId = response.getReceipt(client).tokenId;
 
                 new TokenAssociateTransaction()
-                    .setNodeAccountId(response.nodeId)
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setAccountId(accountId)
                     .setTokenIds(tokenId)
                     .freezeWith(client)
@@ -63,21 +64,21 @@ class TokenTransferIntegrationTest {
                     .getReceipt(client);
 
                 new TokenGrantKycTransaction()
-                    .setNodeAccountId(response.nodeId)
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setAccountId(accountId)
                     .setTokenId(tokenId)
                     .execute(client)
                     .getReceipt(client);
 
                 new TokenTransferTransaction()
-                    .setNodeAccountId(response.nodeId)
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .addSender(tokenId, OPERATOR_ID, 10)
                     .addRecipient(tokenId, accountId, 10)
                     .execute(client)
                     .getReceipt(client);
 
                 new TokenWipeTransaction()
-                    .setNodeAccountId(response.nodeId)
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setTokenId(tokenId)
                     .setAccountId(accountId)
                     .setAmount(10)

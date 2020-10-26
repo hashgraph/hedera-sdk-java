@@ -15,6 +15,8 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -170,7 +172,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
             .thenAccept((paymentAmount) -> {
                 paymentTransactionId = TransactionId.generate(operator.accountId);
 
-                if (nodeIds == null) {
+                if (paymentTransactionNodeIds == null) {
                     // Like how TransactionBuilder has to build (N / 3) native transactions to handle multi-node retry,
                     // so too does the QueryBuilder for payment transactions
 
@@ -191,12 +193,9 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
                     }
                 } else {
                     paymentTransactions = new ArrayList<>(1);
-                    paymentTransactionNodeIds = new ArrayList<>(1);
-
-                    paymentTransactionNodeIds.addAll(nodeIds);
                     paymentTransactions.add(makePaymentTransaction(
                         paymentTransactionId,
-                        nodeIds.get(nextPaymentTransactionIndex),
+                        paymentTransactionNodeIds.get(nextPaymentTransactionIndex),
                         operator,
                         paymentAmount
                     ));
@@ -212,7 +211,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
     ) {
         return new CryptoTransferTransaction()
             .setTransactionId(paymentTransactionId)
-            .setNodeAccountId(nodeId)
+            .setNodeAccountIds(new ArrayList<>(Collections.singletonList(nodeId)))
             .setMaxTransactionFee(new Hbar(1)) // 1 Hbar
             .addSender(operator.accountId, paymentAmount)
             .addRecipient(nodeId, paymentAmount)
@@ -252,24 +251,27 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
     }
 
     @Override
-    final List<AccountId> getNodeAccountIds(@Nullable Client client) {
+    final AccountId getNodeAccountId(@Nullable Client client) {
+        if (client == null) {
+            throw new IllegalStateException("requires a client to pick the next node ID for a query");
+        }
+
         if (paymentTransactionNodeIds != null) {
             // If this query needs a payment transaction we need to pick the node ID from the next
             // payment transaction
             return paymentTransactionNodeIds.get(nextPaymentTransactionIndex);
         }
 
-        if (nodeIds.get(0) != null) {
-            // if there was an explicit node ID set, use that
-            return nodeIds.get(0);
-        }
+        // Otherwise just pick the next node in the round robin
+        return client.getNextNodeId();
+    }
 
+    final List<AccountId> getNodeAccountIds(@Nullable Client client) {
         if (client == null) {
             throw new IllegalStateException("requires a client to pick the next node ID for a query");
         }
 
-        // Otherwise just pick the next node in the round robin
-        return client.getNextNodeId();
+        return paymentTransactionNodeIds;
     }
 
     @Override
@@ -314,7 +316,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
             // now go back to sleep
             // without this, an error of MISSING_QUERY_HEADER is returned
             headerBuilder.setPayment(new CryptoTransferTransaction()
-                .setNodeAccountId(new AccountId(0))
+                .setNodeAccountIds(new ArrayList<>(Collections.singletonList(new AccountId(0))))
                 .setTransactionId(new TransactionId(new AccountId(0), Instant.ofEpochSecond(0)))
                 .freeze()
                 .makeRequest());

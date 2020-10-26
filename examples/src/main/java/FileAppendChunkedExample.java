@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
@@ -42,16 +43,16 @@ public class FileAppendChunkedExample {
 
         System.out.println("fileId: " + newFileId);
 
-        String contents = "";
+        StringBuilder contents = new StringBuilder();
 
         for (int i=0; i <= 4096*9; i++){
-            contents += "1";
+            contents.append("1");
         }
 
         TransactionReceipt fileAppendReceipt = new FileAppendTransaction()
-            .setNodeAccountId(transactionResponse.nodeId)
+            .setNodeAccountIds(Collections.singletonList(transactionResponse.nodeId))
             .setFileId(newFileId)
-            .setContents(contents)
+            .setContents(contents.toString())
             .setMaxTransactionFee(new Hbar(1000))
             .execute(client)
             .getReceipt(client);

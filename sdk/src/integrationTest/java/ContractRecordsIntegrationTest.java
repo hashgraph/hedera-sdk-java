@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,7 +40,7 @@ public class ContractRecordsIntegrationTest {
 
             receipt = new ContractCreateTransaction()
                 .setAdminKey(operatorKey)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(file)
@@ -56,7 +57,7 @@ public class ContractRecordsIntegrationTest {
 
             List<TransactionRecord> records = new ContractRecordsQuery()
                 .setContractId(contract)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setQueryPayment(new Hbar(5))
                 .execute(client);
 
@@ -64,7 +65,7 @@ public class ContractRecordsIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contract)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .execute(client)
                 .transactionId
                 .getReceipt(client);

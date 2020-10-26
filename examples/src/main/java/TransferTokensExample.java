@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
@@ -51,7 +52,7 @@ public final class TransferTokensExample {
             System.out.println("account = " + newAccountId);
 
             response = new TokenCreateTransaction()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setName("ffff")
                 .setSymbol("F")
                 .setDecimals(3)
@@ -70,7 +71,7 @@ public final class TransferTokensExample {
             System.out.println("token = " + tokenId);
 
             new TokenAssociateTransaction()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setAccountId(newAccountId)
                 .setTokenIds(tokenId)
                 .freezeWith(client)
@@ -82,7 +83,7 @@ public final class TransferTokensExample {
             System.out.println("Associated account " + newAccountId + " with token " + tokenId);
 
             new TokenGrantKycTransaction()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setAccountId(newAccountId)
                 .setTokenId(tokenId)
                 .execute(client)
@@ -91,7 +92,7 @@ public final class TransferTokensExample {
             System.out.println("Granted KYC for account " + newAccountId + " on token " + tokenId);
 
             new TokenTransferTransaction()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .addSender(tokenId, OPERATOR_ID, 10)
                 .addRecipient(tokenId, newAccountId, 10)
                 .execute(client)
@@ -100,7 +101,7 @@ public final class TransferTokensExample {
             System.out.println("Sent 10 tokens from account " + OPERATOR_ID + " to account " + newAccountId + " on token " + tokenId);
 
             new TokenWipeTransaction()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setTokenId(tokenId)
                 .setAccountId(newAccountId)
                 .setAmount(10)
@@ -110,7 +111,7 @@ public final class TransferTokensExample {
             System.out.println("Wiped balance of account " + newAccountId);
 
             new TokenDeleteTransaction()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setTokenId(tokenId)
                 .execute(client)
                 .getReceipt(client);

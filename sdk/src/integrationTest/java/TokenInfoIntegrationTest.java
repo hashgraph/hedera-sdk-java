@@ -3,6 +3,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -43,7 +44,7 @@ class TokenInfoIntegrationTest {
                 TokenId tokenId = response.getReceipt(client).tokenId;
 
                 TokenInfo info = new TokenInfoQuery()
-                    .setNodeAccountId(response.nodeId)
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setQueryPayment(new Hbar(2))
                     .setTokenId(tokenId)
                     .execute(client);
@@ -62,7 +63,7 @@ class TokenInfoIntegrationTest {
                 assertFalse(info.defaultKycStatus);
 
                 new TokenDeleteTransaction()
-                    .setNodeAccountId(response.nodeId)
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setTokenId(tokenId)
                     .execute(client)
                     .getReceipt(client);
