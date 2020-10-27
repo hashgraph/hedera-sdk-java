@@ -165,7 +165,7 @@ public final class Client implements AutoCloseable {
         Config config = new Gson().fromJson(json, Config.class);
 
         Map<AccountId, String> nodes = config.network.entrySet().stream()
-            .collect(Collectors.toMap(entry -> AccountId.fromString(entry.getKey()), Map.Entry::getValue));
+            .collect(Collectors.toMap(entry -> AccountId.fromString(entry.getValue()), Map.Entry::getKey));
 
         final Client client = new Client(nodes);
 
