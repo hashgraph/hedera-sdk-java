@@ -16,40 +16,34 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TokenCreateIntegrationTest {
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(System.getProperty("OPERATOR_ID")));
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(System.getProperty("OPERATOR_KEY")));
-    private static final String CONFIG_FILE = Objects.requireNonNull(System.getProperty("CONFIG_FILE"));
 
     @Test
     void test() {
         assertDoesNotThrow(() -> {
-            try (Client client = Client.fromJsonFile(CONFIG_FILE)) {
-                // Defaults the operator account ID and key such that all generated transactions will be paid for
-                // by this account and be signed by this key
-                client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+            var client = IntegrationTestClientManager.getClient();
 
-                TransactionResponse response = new TokenCreateTransaction()
-                    .setName("ffff")
-                    .setSymbol("F")
-                    .setDecimals(3)
-                    .setInitialSupply(1000000)
-                    .setTreasury(OPERATOR_ID)
-                    .setAdminKey(OPERATOR_KEY.getPublicKey())
-                    .setFreezeKey(OPERATOR_KEY.getPublicKey())
-                    .setWipeKey(OPERATOR_KEY.getPublicKey())
-                    .setKycKey(OPERATOR_KEY.getPublicKey())
-                    .setSupplyKey(OPERATOR_KEY.getPublicKey())
-                    .setFreezeDefault(false)
-                    .setExpirationTime(Instant.now().plus(Duration.ofDays(90)).getEpochSecond())
-                    .execute(client);
+            TransactionResponse response = new TokenCreateTransaction()
+                .setName("ffff")
+                .setSymbol("F")
+                .setDecimals(3)
+                .setInitialSupply(1000000)
+                .setTreasury(OPERATOR_ID)
+                .setAdminKey(OPERATOR_KEY.getPublicKey())
+                .setFreezeKey(OPERATOR_KEY.getPublicKey())
+                .setWipeKey(OPERATOR_KEY.getPublicKey())
+                .setKycKey(OPERATOR_KEY.getPublicKey())
+                .setSupplyKey(OPERATOR_KEY.getPublicKey())
+                .setFreezeDefault(false)
+                .setExpirationTime(Instant.now().plus(Duration.ofDays(90)).getEpochSecond())
+                .execute(client);
 
-                TokenId tokenId = response.getReceipt(client).tokenId;
+            TokenId tokenId = response.getReceipt(client).tokenId;
 
-                new TokenDeleteTransaction()
-                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                    .setTokenId(tokenId)
-                    .execute(client)
-                    .getReceipt(client);
-
-            }
+            new TokenDeleteTransaction()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setTokenId(tokenId)
+                .execute(client)
+                .getReceipt(client);
         });
     }
 }

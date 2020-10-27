@@ -5,6 +5,7 @@ import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicDeleteTransaction;
 import com.hedera.hashgraph.sdk.TopicInfoQuery;
 import com.hedera.hashgraph.sdk.Hbar;
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -22,6 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TopicMessageIntegrationTest {
     @Test
     void test() {
+        // Skip if using PreviewNet
+        org.junit.Assume.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
+
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 
