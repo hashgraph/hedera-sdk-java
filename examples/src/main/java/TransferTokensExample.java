@@ -25,7 +25,7 @@ public final class TransferTokensExample {
     private TransferTokensExample() {
     }
 
-    public static void main(String[] args) throws IOException, TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException {
+    public static void main(String[] args) throws Exception {
         // Generate a Ed25519 private, public key pair
         PrivateKey newKey = PrivateKey.generate();
         PublicKey newPublicKey = newKey.getPublicKey();
