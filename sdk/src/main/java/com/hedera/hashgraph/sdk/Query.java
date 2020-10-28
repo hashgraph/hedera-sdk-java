@@ -211,7 +211,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
     ) {
         return new CryptoTransferTransaction()
             .setTransactionId(paymentTransactionId)
-            .setNodeAccountIds(new ArrayList<>(Collections.singletonList(nodeId)))
+            .setNodeAccountIds(Collections.singletonList(nodeId))
             .setMaxTransactionFee(new Hbar(1)) // 1 Hbar
             .addSender(operator.accountId, paymentAmount)
             .addRecipient(nodeId, paymentAmount)
@@ -252,25 +252,21 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
 
     @Override
     final AccountId getNodeAccountId(@Nullable Client client) {
-        if (client == null) {
-            throw new IllegalStateException("requires a client to pick the next node ID for a query");
-        }
-
         if (paymentTransactionNodeIds != null) {
             // If this query needs a payment transaction we need to pick the node ID from the next
             // payment transaction
             return paymentTransactionNodeIds.get(nextPaymentTransactionIndex);
         }
 
-        // Otherwise just pick the next node in the round robin
-        return client.getNextNodeId();
-    }
-
-    final List<AccountId> getNodeAccountIds(@Nullable Client client) {
         if (client == null) {
             throw new IllegalStateException("requires a client to pick the next node ID for a query");
         }
 
+        // Otherwise just pick the next node in the round robin
+        return client.getNextNodeId();
+    }
+
+    final List<AccountId> getNodeAccountIds() {
         return paymentTransactionNodeIds;
     }
 
@@ -316,7 +312,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
             // now go back to sleep
             // without this, an error of MISSING_QUERY_HEADER is returned
             headerBuilder.setPayment(new CryptoTransferTransaction()
-                .setNodeAccountIds(new ArrayList<>(Collections.singletonList(new AccountId(0))))
+                .setNodeAccountIds(Collections.singletonList(new AccountId(0)))
                 .setTransactionId(new TransactionId(new AccountId(0), Instant.ofEpochSecond(0)))
                 .freeze()
                 .makeRequest());

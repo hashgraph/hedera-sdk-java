@@ -228,8 +228,8 @@ public abstract class Transaction<T extends Transaction<T>>
      * @return {@code this}
      */
     public final T setNodeAccountIds(List<AccountId> nodeAccountIds) {
-        nodeIds = nodeAccountIds;
         requireNotFrozen();
+        nodeIds = nodeAccountIds;
         bodyBuilder.setNodeAccountID(nodeIds.get(nextTransactionIndex).toProtobuf());
 
         // noinspection unchecked
