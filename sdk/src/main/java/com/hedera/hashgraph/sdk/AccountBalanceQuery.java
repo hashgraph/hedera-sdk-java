@@ -24,15 +24,16 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
     }
 
     public AccountId getAccountId() {
-      return AccountId.fromProtobuf(builder.getAccountID());
+        return AccountId.fromProtobuf(builder.getAccountID());
     }
 
     /**
      * The account ID for which the balance is being requested.
-     *
+     * <p>
      * This is mutually exclusive with {@link #setContractId(ContractId)}.
-     * @return {@code this}
+     *
      * @param accountId The AccountId to set
+     * @return {@code this}
      */
     public AccountBalanceQuery setAccountId(AccountId accountId) {
         builder.setAccountID(accountId.toProtobuf());
@@ -40,15 +41,16 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
     }
 
     public ContractId getContractId() {
-      return ContractId.fromProtobuf(builder.getContractID());
+        return ContractId.fromProtobuf(builder.getContractID());
     }
 
     /**
      * The contract ID for which the balance is being requested.
-     *
+     * <p>
      * This is mutually exclusive with {@link #setAccountId(AccountId)}.
-     * @return {@code this}
+     *
      * @param contractId The ContractId to set
+     * @return {@code this}
      */
     public AccountBalanceQuery setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProtobuf());
@@ -67,13 +69,7 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
 
     @Override
     AccountBalance mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        var balanceList = response.getCryptogetAccountBalance().getTokenBalancesList();
-        Map<TokenId, Long> map = new HashMap<>();
-        for(int i = 0; i < response.getCryptogetAccountBalance().getTokenBalancesCount(); i++){
-            map.put(TokenId.fromProtobuf(balanceList.get(i).getTokenId()), balanceList.get(i).getBalance());
-        }
-
-        return new AccountBalance(Hbar.fromTinybars(response.getCryptogetAccountBalance().getBalance()), map);
+        return AccountBalance.fromProtobuf(response.getCryptogetAccountBalance());
     }
 
     @Override
