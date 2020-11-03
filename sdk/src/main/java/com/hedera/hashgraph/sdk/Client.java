@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.errorprone.annotations.Var;
@@ -12,6 +13,7 @@ import java8.util.Lists;
 import java8.util.function.Consumer;
 import java8.util.function.Function;
 import org.threeten.bp.Duration;
+import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -20,12 +22,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +37,7 @@ public final class Client implements AutoCloseable {
     Hbar maxTransactionFee = DEFAULT_MAX_QUERY_PAYMENT;
     Hbar maxQueryPayment = DEFAULT_MAX_TRANSACTION_FEE;
 
-    private final Map<AccountId, String> network;
+    private Map<AccountId, Node> network;
     private Iterator<AccountId> nodes;
 
     private Map<AccountId, ManagedChannel> nodeChannels;
@@ -55,6 +52,10 @@ public final class Client implements AutoCloseable {
 
     Duration requestTimeout = Duration.ofMinutes(2);
 
+    long nodeLastUsedAt = Instant.now().toEpochMilli();
+
+    List<Node> sortedNodes;
+
     Client(Map<String, AccountId> network) {
         var threadFactory = new ThreadFactoryBuilder()
             .setNameFormat("hedera-sdk-%d")
@@ -65,9 +66,9 @@ public final class Client implements AutoCloseable {
             Runtime.getRuntime().availableProcessors(),
             threadFactory);
 
-        this.network = new HashMap<AccountId, String>();
+        this.network = new HashMap<>();
         for (Map.Entry<String, AccountId> entry : network.entrySet()){
-            this.network.put(entry.getValue(), entry.getKey());
+            new Node(entry.getValue(), entry.getKey());
         }
 
         this.nodeChannels = new HashMap<>(network.size());
@@ -279,24 +280,19 @@ public final class Client implements AutoCloseable {
      * @return {@code this} for fluent API usage.
      */
     public Client setNetwork(Map<String, AccountId> nodes) throws InterruptedException {
-        @Var var inverted = new HashMap<AccountId, String>();
-        for (Map.Entry<String, AccountId> entry : nodes.entrySet()){
-            inverted.put(entry.getValue(), entry.getKey());
-        }
+        HashBiMap<String, AccountId> bimapNodes = HashBiMap.create(nodes);
 
         setNetworkNodes(nodes);
         @Var ManagedChannel channel = null;
 
-        for (Map.Entry<AccountId, String> node : this.network.entrySet()) {
-            String newNodeUrl = inverted.get(node.getKey());
+        for(Map.Entry<AccountId, Node> node : this.network.entrySet()) {
+            String newNodeUrl = bimapNodes.inverse().get(node.getKey());
 
-            // node hasn't changed
             if (node.getValue().equals(newNodeUrl)) {
                 continue;
             }
 
-            // Set new node address
-            node.setValue(newNodeUrl);
+            node.setValue(new Node(node.getKey(), newNodeUrl));
 
             if (newNodeUrl == null) {
                 this.nodeChannels.remove(node.getKey());
@@ -311,19 +307,41 @@ public final class Client implements AutoCloseable {
                 nodeChannels.put(node.getKey(), channel);
             }
         }
+        return this;
+    }
 
-        // remove
-        this.network.values().removeAll(Collections.singleton(null));
+    public List<AccountId> getNodeAccountIdsForTransaction() {
+        sortedNodes = new ArrayList<>(network.values());
+        if (nodeLastUsedAt + 1000 < Instant.now().toEpochMilli()) {
+            sortedNodes.sort((a,b) -> {
+                if (a.isHealthy() && b.isHealthy()) {
+                    return -1;
+                } else if (a.isHealthy() && !b.isHealthy()) {
+                    return -1;
+                } else if (!a.isHealthy() && b.isHealthy()) {
+                    return 1;
+                } else {
+                    var aLastUsed = a.lastUsed != null ? a.lastUsed : 0;
+                    var bLastUsed = b.lastUsed != null ? b.lastUsed : 0;
 
+                    if (aLastUsed + a.delay < bLastUsed + b.delay) {
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+                }
+            });
 
-        // add new nodes
-        for (Map.Entry<AccountId, String> node : inverted.entrySet()) {
-            this.network.put(node.getKey(), node.getValue());
-            // .getNetworkChannel() will add the node and channel from network
-            this.getNetworkChannel(node.getKey());
+            this.nodeLastUsedAt = Instant.now().toEpochMilli();
         }
 
-        return this;
+        List<AccountId> resultNodes = new ArrayList<>();
+
+        for (Node node : sortedNodes) {
+            resultNodes.add(node.accountId);
+        }
+
+        return resultNodes;
     }
 
     /**
@@ -497,6 +515,8 @@ public final class Client implements AutoCloseable {
         return nodes.next();
     }
 
+
+
     synchronized ManagedChannel getNextMirrorChannel() {
         return getMirrorChannel(mirrors.next());
     }
@@ -513,20 +533,20 @@ public final class Client implements AutoCloseable {
             return channel;
         }
 
-        var address = network.get(nodeId);
+        var node = network.get(nodeId);
 
-        if (address != null) {
-            channel = ManagedChannelBuilder.forTarget(address)
+        if (node != null) {
+            channel = ManagedChannelBuilder.forTarget(node.address)
                 .usePlaintext()
                 .userAgent(getUserAgent())
                 .executor(executor)
                 .build();
 
-            nodeChannels.put(nodeId, channel);
+            nodeChannels.put(node.accountId, channel);
         }
 
         if (channel == null) {
-            throw new IllegalArgumentException("Node Id does not exist");
+            throw new IllegalArgumentException("Node does not exist");
         }
 
         return channel;

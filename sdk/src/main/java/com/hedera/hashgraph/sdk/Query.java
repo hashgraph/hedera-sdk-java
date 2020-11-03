@@ -173,24 +173,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
                 paymentTransactionId = TransactionId.generate(operator.accountId);
 
                 if (paymentTransactionNodeIds == null) {
-                    // Like how TransactionBuilder has to build (N / 3) native transactions to handle multi-node retry,
-                    // so too does the QueryBuilder for payment transactions
-
-                    var size = client.getNumberOfNodesForTransaction();
-                    paymentTransactions = new ArrayList<>(size);
-                    paymentTransactionNodeIds = new ArrayList<>(size);
-
-                    for (var i = 0; i < size; ++i) {
-                        var nodeId = client.getNextNodeId();
-
-                        paymentTransactionNodeIds.add(nodeId);
-                        paymentTransactions.add(makePaymentTransaction(
-                            paymentTransactionId,
-                            nodeId,
-                            operator,
-                            paymentAmount
-                        ));
-                    }
+                    paymentTransactionNodeIds = client.getNodeAccountIdsForTransaction();
                 } else {
                     paymentTransactions = new ArrayList<>(1);
                     paymentTransactions.add(makePaymentTransaction(
