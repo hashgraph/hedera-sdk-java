@@ -172,6 +172,8 @@ public final class Hbar implements Comparable<Hbar> {
         return tinybar;
     }
 
+    public Hbar negate() { return Hbar.fromTinybar(tinybar * -1L); }
+
     /**
      * Get a human-readable printout of this hbar value for debugging purposes.
      *

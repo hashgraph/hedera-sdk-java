@@ -12,31 +12,40 @@ import com.hedera.hashgraph.sdk.mirror.MirrorClient;
 import com.hedera.hashgraph.sdk.mirror.MirrorConsensusTopicQuery;
 import io.github.cdimascio.dotenv.Dotenv;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 public final class ConsensusPubSubChunked {
+    // see `.env.sample` in the repository root for how to specify these values
+    // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final Ed25519PrivateKey OPERATOR_KEY = Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
-
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK");
+    private static final String CONFIG_FILE = Dotenv.load().get("CONFIG_FILE");
     private static final String MIRROR_NODE_ADDRESS = Objects.requireNonNull(Dotenv.load().get("MIRROR_NODE_ADDRESS"));
 
     private ConsensusPubSubChunked() {
     }
 
     public static void main(String[] args) throws InterruptedException, HederaStatusException {
-        final MirrorClient mirrorClient = new MirrorClient(MIRROR_NODE_ADDRESS);
+        Client client;
 
-        // `Client.forMainnet()` is provided for connecting to Hedera mainnet
-        // `Client.forPreviewnet()` is provided for connecting to Hedera previewNet
-        Client client = Client.forTestnet();
+        if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {
+            client = Client.forPreviewnet();
+        } else {
+            try {
+                client = Client.fromFile(CONFIG_FILE != null ? CONFIG_FILE : "");
+            } catch (FileNotFoundException e) {
+                client = Client.forTestnet();
+            }
+        }
+
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+
+        final MirrorClient mirrorClient = new MirrorClient(MIRROR_NODE_ADDRESS);
 
         // make a new topic ID to use
         ConsensusTopicId newTopicId = new ConsensusTopicCreateTransaction()

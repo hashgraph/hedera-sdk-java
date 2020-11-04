@@ -14,6 +14,7 @@ import com.hedera.hashgraph.sdk.crypto.ThresholdKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -27,10 +28,26 @@ public final class CreateAccountThresholdKey {
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final Ed25519PrivateKey OPERATOR_KEY = Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK");
+    private static final String CONFIG_FILE = Dotenv.load().get("CONFIG_FILE");
 
     private CreateAccountThresholdKey() { }
 
     public static void main(String[] args) throws HederaStatusException {
+        Client client;
+
+        if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {
+            client = Client.forPreviewnet();
+        } else {
+            try {
+                client = Client.fromFile(CONFIG_FILE != null ? CONFIG_FILE : "");
+            } catch (FileNotFoundException e) {
+                client = Client.forTestnet();
+            }
+        }
+
+        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+
         // Generate three new Ed25519 private, public key pairs
         final ArrayList<Ed25519PrivateKey> keys = new ArrayList<Ed25519PrivateKey>(3);
         for (int i = 0; i < 3; i++) {
@@ -44,14 +61,6 @@ public final class CreateAccountThresholdKey {
             + keys.stream()
             .map(Object::toString)
             .collect(Collectors.joining("\n")));
-
-        // `Client.forMainnet()` is provided for connecting to Hedera mainnet
-        // `Client.forPreviewnet()` is provided for connecting to Hedera previewNet
-        Client client = Client.forTestnet();
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
-        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         Transaction tx = new AccountCreateTransaction()
             // require 2 of the 3 keys we generated to sign on anything modifying this account

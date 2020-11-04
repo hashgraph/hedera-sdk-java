@@ -14,6 +14,7 @@ import com.hedera.hashgraph.sdk.mirror.MirrorConsensusTopicQuery;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.bouncycastle.util.encoders.Hex;
 
+import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Objects;
@@ -27,6 +28,13 @@ import java.util.Random;
  * Publishes a number of messages to the topic signed by the submitKey.
  */
 public class ConsensusPubSubWithSubmitKey {
+    // see `.env.sample` in the repository root for how to specify these values
+    // or set environment variables with the same names
+    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final Ed25519PrivateKey OPERATOR_KEY = Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK");
+    private static final String CONFIG_FILE = Dotenv.load().get("CONFIG_FILE");
+
     private Client hapiClient;
     private MirrorClient mirrorNodeClient;
 
@@ -59,19 +67,19 @@ public class ConsensusPubSubWithSubmitKey {
     }
 
     private void setupHapiClient() {
-        // Transaction payer's account ID and ED25519 private key.
-        AccountId payerId = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
-        Ed25519PrivateKey payerPrivateKey =
-            Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+        Client client;
 
-        // Interface used to publish messages on the HCS topic.
-        // `Client.forMainnet()` is provided for connecting to Hedera mainnet
-        // `Client.forPreviewnet()` is provided for connecting to Hedera previewNet
-        hapiClient = Client.forTestnet();
+        if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {
+            client = Client.forPreviewnet();
+        } else {
+            try {
+                client = Client.fromFile(CONFIG_FILE != null ? CONFIG_FILE : "");
+            } catch (FileNotFoundException e) {
+                client = Client.forTestnet();
+            }
+        }
 
-        // Defaults the operator account ID and key such that all generated transactions will be paid for by this
-        // account and be signed by this key
-        hapiClient.setOperator(payerId, payerPrivateKey);
+        hapiClient = client.setOperator(OPERATOR_ID, OPERATOR_KEY);
     }
 
     private void setupMirrorNodeClient() {

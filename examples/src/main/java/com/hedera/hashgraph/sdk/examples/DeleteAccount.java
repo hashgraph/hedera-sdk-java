@@ -13,6 +13,7 @@ import com.hedera.hashgraph.sdk.account.AccountInfoQuery;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 
+import java.io.FileNotFoundException;
 import java.util.Objects;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -23,24 +24,32 @@ public final class DeleteAccount {
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final Ed25519PrivateKey OPERATOR_KEY = Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK");
+    private static final String CONFIG_FILE = Dotenv.load().get("CONFIG_FILE");
 
     private DeleteAccount() { }
 
     public static void main(String[] args) throws HederaStatusException {
+        Client client;
+
+        if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {
+            client = Client.forPreviewnet();
+        } else {
+            try {
+                client = Client.fromFile(CONFIG_FILE != null ? CONFIG_FILE : "");
+            } catch (FileNotFoundException e) {
+                client = Client.forTestnet();
+            }
+        }
+
+        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+
         // Generate a Ed25519 private, public key pair
         Ed25519PrivateKey newKey = Ed25519PrivateKey.generate();
         Ed25519PublicKey newPublicKey = newKey.publicKey;
 
         System.out.println("private key = " + newKey);
         System.out.println("public key = " + newPublicKey);
-
-        // `Client.forMainnet()` is provided for connecting to Hedera mainnet
-        // `Client.forPreviewnet()` is provided for connecting to Hedera previewNet
-        Client client = Client.forTestnet();
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
-        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         TransactionId txId = new AccountCreateTransaction()
             // The only _required_ property here is `key`

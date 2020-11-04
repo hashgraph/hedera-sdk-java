@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.*;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
+import java.io.FileNotFoundException;
 import java.util.Objects;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -17,18 +18,25 @@ public final class UpdateAccountPublicKey {
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final Ed25519PrivateKey OPERATOR_KEY = Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK");
+    private static final String CONFIG_FILE = Dotenv.load().get("CONFIG_FILE");
 
     private UpdateAccountPublicKey() { }
 
     public static void main(String[] args) throws HederaStatusException {
-        // `Client.forMainnet()` is provided for connecting to Hedera mainnet
-        // `Client.forPreviewnet()` is provided for connecting to Hedera previewNet
-        Client client = Client.forTestnet();
+        Client client;
 
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {
+            client = Client.forPreviewnet();
+        } else {
+            try {
+                client = Client.fromFile(CONFIG_FILE != null ? CONFIG_FILE : "");
+            } catch (FileNotFoundException e) {
+                client = Client.forTestnet();
+            }
+        }
+
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
-
         client.setMaxTransactionFee(800000000);
 
         // First, we create a new account so we don't affect our account

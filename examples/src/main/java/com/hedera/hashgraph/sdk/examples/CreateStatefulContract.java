@@ -13,6 +13,7 @@ import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.file.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.file.FileId;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -26,10 +27,26 @@ public final class CreateStatefulContract {
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final Ed25519PrivateKey OPERATOR_KEY = Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK");
+    private static final String CONFIG_FILE = Dotenv.load().get("CONFIG_FILE");
 
     private CreateStatefulContract() { }
 
     public static void main(String[] args) throws HederaStatusException, IOException, InterruptedException {
+        Client client;
+
+        if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {
+            client = Client.forPreviewnet();
+        } else {
+            try {
+                client = Client.fromFile(CONFIG_FILE != null ? CONFIG_FILE : "");
+            } catch (FileNotFoundException e) {
+                client = Client.forTestnet();
+            }
+        }
+
+        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+
         ClassLoader cl = CreateStatefulContract.class.getClassLoader();
 
         Gson gson = new Gson();
@@ -47,14 +64,6 @@ public final class CreateStatefulContract {
         String byteCodeHex = jsonObject.getAsJsonPrimitive("object")
             .getAsString();
         byte[] byteCode = byteCodeHex.getBytes();
-
-        // `Client.forMainnet()` is provided for connecting to Hedera mainnet
-        // `Client.forPreviewnet()` is provided for connecting to Hedera previewNet
-        Client client = Client.forTestnet();
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
-        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // default max fee for all transactions executed by this client
         client.setMaxTransactionFee(new Hbar(100));

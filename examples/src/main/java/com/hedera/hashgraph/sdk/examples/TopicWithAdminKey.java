@@ -14,6 +14,7 @@ import com.hedera.hashgraph.sdk.crypto.ThresholdKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -26,6 +27,13 @@ import java.util.stream.Collectors;
  * Updates the HCS topic to a 3-of-4 threshold key for the adminKey.
  */
 final class TopicWithAdminKey {
+    // see `.env.sample` in the repository root for how to specify these values
+    // or set environment variables with the same names
+    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final Ed25519PrivateKey OPERATOR_KEY = Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK");
+    private static final String CONFIG_FILE = Dotenv.load().get("CONFIG_FILE");
+
     private Client hapiClient;
 
     private ConsensusTopicId topicId;
@@ -46,19 +54,19 @@ final class TopicWithAdminKey {
     }
 
     private void setupHapiClient() {
-        // Transaction payer's account ID and ED25519 private key.
-        AccountId payerId = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
-        Ed25519PrivateKey payerPrivateKey =
-            Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+        Client client;
 
-        // Interface used to publish messages on the HCS topic.
-        // `Client.forMainnet()` is provided for connecting to Hedera mainnet
-        // `Client.forPreviewnet()` is provided for connecting to Hedera previewNet
-        hapiClient = Client.forTestnet();
+        if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {
+            client = Client.forPreviewnet();
+        } else {
+            try {
+                client = Client.fromFile(CONFIG_FILE != null ? CONFIG_FILE : "");
+            } catch (FileNotFoundException e) {
+                client = Client.forTestnet();
+            }
+        }
 
-        // Defaults the operator account ID and key such that all generated transactions will be paid for by this
-        // account and be signed by this key
-        hapiClient.setOperator(payerId, payerPrivateKey);
+        hapiClient = client.setOperator(OPERATOR_ID, OPERATOR_KEY);
     }
 
     private void createTopicWithAdminKey() throws HederaStatusException {
