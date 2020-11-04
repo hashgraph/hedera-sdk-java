@@ -174,6 +174,22 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
 
                 if (paymentTransactionNodeIds == null) {
                     paymentTransactionNodeIds = client.getNodeAccountIdsForTransaction();
+                    paymentTransactions = new ArrayList<>();
+
+                    System.out.println("In Query: " + paymentTransactionNodeIds);
+
+                    for (var i = 0; i < paymentTransactionNodeIds.size(); ++i) {
+                        var nodeId = client.getNextNodeId();
+                        System.out.println(nodeId);
+
+                        paymentTransactionNodeIds.add(nodeId);
+                        paymentTransactions.add(makePaymentTransaction(
+                            paymentTransactionId,
+                            nodeId,
+                            operator,
+                            paymentAmount
+                        ));
+                    }
                 } else {
                     paymentTransactions = new ArrayList<>(1);
                     paymentTransactions.add(makePaymentTransaction(
