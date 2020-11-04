@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.account.AccountDeleteTransaction;
 import com.hedera.hashgraph.sdk.account.AccountId;
+import com.hedera.hashgraph.sdk.account.TransferTransaction;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 
@@ -30,7 +31,7 @@ public final class TransferTokens {
     private TransferTokens() {
     }
 
-    public static void main(String[] args) throws HederaStatusException, FileNotFoundException {
+    public static void main(String[] args) throws HederaStatusException {
         // Generate a Ed25519 private, public key pair
         Ed25519PrivateKey newKey = Ed25519PrivateKey.generate();
         Ed25519PublicKey newPublicKey = newKey.publicKey;
@@ -90,9 +91,9 @@ public final class TransferTokens {
 
         System.out.println("Granted KYC for account " + newAccountId + " on token " + tokenId);
 
-        new TokenTransferTransaction()
-            .addSender(tokenId, OPERATOR_ID, 10)
-            .addRecipient(tokenId, newAccountId, 10)
+        new TransferTransaction()
+            .addTokenSender(tokenId, OPERATOR_ID, 10)
+            .addTokenRecipient(tokenId, newAccountId, 10)
             .execute(client)
             .getReceipt(client);
 

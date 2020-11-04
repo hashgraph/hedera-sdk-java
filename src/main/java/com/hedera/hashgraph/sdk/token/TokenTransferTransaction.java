@@ -21,8 +21,9 @@ import javax.annotation.Nonnegative;
  * If any sender account fails to have sufficient token balance, then the entire transaction fails and none of the
  * transfers occur, though transaction fee is still charged.
 */
+@Deprecated
 public final class TokenTransferTransaction extends SingleTransactionBuilder<TokenTransferTransaction> {
-    private final TokenTransfersTransactionBody.Builder builder = bodyBuilder.getTokenTransfersBuilder();
+    private final CryptoTransferTransactionBody.Builder builder = bodyBuilder.getCryptoTransferBuilder();
     private HashMap<TokenId, Integer> tokenIndexes = new HashMap<>();
 
     public TokenTransferTransaction() {
@@ -62,7 +63,7 @@ public final class TokenTransferTransaction extends SingleTransactionBuilder<Tok
 
     @Override
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
-        return TokenServiceGrpc.getTransferTokensMethod();
+        return CryptoServiceGrpc.getCryptoTransferMethod();
     }
 
     @Override

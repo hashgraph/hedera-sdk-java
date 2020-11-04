@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.TransactionRecord;
 import com.hedera.hashgraph.sdk.account.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
+import com.hedera.hashgraph.sdk.account.TransferTransaction;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
 import java.util.Objects;
@@ -46,11 +47,11 @@ public final class TransferCrypto {
         System.out.println("" + OPERATOR_ID + " balance = " + senderBalanceBefore);
         System.out.println("" + recipientId + " balance = " + receiptBalanceBefore);
 
-        TransactionId transactionId = new CryptoTransferTransaction()
+        TransactionId transactionId = new TransferTransaction()
             // .addSender and .addRecipient can be called as many times as you want as long as the total sum from
             // both sides is equivalent
-            .addSender(OPERATOR_ID, amount)
-            .addRecipient(recipientId, amount)
+            .addHbarSender(OPERATOR_ID, amount)
+            .addHbarRecipient(recipientId, amount)
             .setTransactionMemo("transfer test")
             .execute(client);
 

@@ -1,25 +1,23 @@
 package com.hedera.hashgraph.sdk.account;
 
-import com.hedera.hashgraph.proto.AccountAmount;
-import com.hedera.hashgraph.proto.AccountAmountOrBuilder;
-import com.hedera.hashgraph.proto.CryptoServiceGrpc;
-import com.hedera.hashgraph.proto.CryptoTransferTransactionBody;
-import com.hedera.hashgraph.proto.Transaction;
-import com.hedera.hashgraph.proto.TransactionResponse;
-import com.hedera.hashgraph.proto.TransferList;
+import com.hedera.hashgraph.proto.*;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
 
 import javax.annotation.Nonnegative;
 
+import com.hedera.hashgraph.sdk.token.TokenId;
+import com.hedera.hashgraph.sdk.token.TokenTransferTransaction;
 import io.grpc.MethodDescriptor;
 
-@Deprecated
-public final class CryptoTransferTransaction extends SingleTransactionBuilder<CryptoTransferTransaction> {
+import java.util.HashMap;
+
+public final class TransferTransaction extends SingleTransactionBuilder<CryptoTransferTransaction> {
     private final CryptoTransferTransactionBody.Builder builder = bodyBuilder.getCryptoTransferBuilder();
     private final TransferList.Builder transferList = builder.getTransfersBuilder();
+    private HashMap<TokenId, Integer> tokenIndexes = new HashMap<>();
 
-    public CryptoTransferTransaction() { super(); }
+    public TransferTransaction() { super(); }
 
     /**
      * Add a party to the transfer who will have currency withdrawn from their account
@@ -34,8 +32,8 @@ public final class CryptoTransferTransaction extends SingleTransactionBuilder<Cr
      * @param value the amount to transfer from the account.
      * @return {@code this} for fluent usage.
      */
-    public CryptoTransferTransaction addSender(AccountId senderId, Hbar value) {
-        return this.addTransfer(senderId, value.asTinybar() * -1L);
+    public TransferTransaction addHbarSender(AccountId senderId, Hbar value) {
+        return this.addHbarTransfer(senderId, value.asTinybar() * -1L);
     }
 
     /**
@@ -48,8 +46,8 @@ public final class CryptoTransferTransaction extends SingleTransactionBuilder<Cr
      * @param value the amount to transfer from the account, in tinybar.
      * @return {@code this} for fluent usage.
      */
-    public CryptoTransferTransaction addSender(AccountId senderId, @Nonnegative long value) {
-        return this.addTransfer(senderId, value * -1L);
+    public TransferTransaction addHbarSender(AccountId senderId, @Nonnegative long value) {
+        return this.addHbarTransfer(senderId, value * -1L);
     }
 
     /**
@@ -62,8 +60,8 @@ public final class CryptoTransferTransaction extends SingleTransactionBuilder<Cr
      * @param value the amount to transfer from the account.
      * @return {@code this} for fluent usage.
      */
-    public CryptoTransferTransaction addRecipient(AccountId recipientId, Hbar value) {
-        return this.addTransfer(recipientId, value.asTinybar());
+    public TransferTransaction addHbarRecipient(AccountId recipientId, Hbar value) {
+        return this.addHbarTransfer(recipientId, value.asTinybar());
     }
 
     /**
@@ -76,11 +74,11 @@ public final class CryptoTransferTransaction extends SingleTransactionBuilder<Cr
      * @param value the amount to transfer from the account, in tinybar.
      * @return {@code this} for fluent usage.
      */
-    public CryptoTransferTransaction addRecipient(AccountId recipientId, @Nonnegative long value) {
-        return this.addTransfer(recipientId, value);
+    public TransferTransaction addHbarRecipient(AccountId recipientId, @Nonnegative long value) {
+        return this.addHbarTransfer(recipientId, value);
     }
 
-    public CryptoTransferTransaction addTransfer(AccountId accountId, long value) {
+    public TransferTransaction addHbarTransfer(AccountId accountId, long value) {
         transferList.addAccountAmounts(
             AccountAmount.newBuilder()
                 .setAccountID(accountId.toProto())
@@ -90,19 +88,39 @@ public final class CryptoTransferTransaction extends SingleTransactionBuilder<Cr
         return this;
     }
 
+    public TransferTransaction addTokenSender(TokenId tokenId, AccountId accountId, @Nonnegative long amount) {
+        return addTokenTransfer(tokenId, accountId, -amount);
+    }
+
+    public TransferTransaction addTokenRecipient(TokenId tokenId, AccountId accountId, @Nonnegative long amount) {
+        return addTokenTransfer(tokenId, accountId, amount);
+    }
+
+    public TransferTransaction addTokenTransfer(TokenId tokenId, AccountId accountId, long amount) {
+        Integer index = tokenIndexes.get(tokenId);
+        int size = builder.getTokenTransfersCount();
+
+        TokenTransferList.Builder transfers;
+
+        if (index != null) {
+            transfers = builder.getTokenTransfersBuilder(index);
+        } else {
+            builder.addTokenTransfers(TokenTransferList.newBuilder());
+            transfers = builder.getTokenTransfersBuilder(size);
+            tokenIndexes.put(tokenId, size);
+        }
+
+        transfers.setToken(tokenId.toProto());
+        transfers.addTransfers(AccountAmount.newBuilder()
+            .setAccountID(accountId.toProto())
+            .setAmount(amount)
+        );
+
+        return this;
+    }
+
     @Override
     protected void doValidate() {
-        require(transferList.getAccountAmountsOrBuilderList(), "at least one transfer required");
-
-        long sum = 0;
-
-        for (AccountAmountOrBuilder acctAmt : transferList.getAccountAmountsOrBuilderList()) {
-            sum += acctAmt.getAmount();
-        }
-
-        if (sum != 0) {
-            addValidationError(String.format("transfer transaction must have zero sum; transfer balance: %d tinybar", sum));
-        }
     }
 
     @Override
