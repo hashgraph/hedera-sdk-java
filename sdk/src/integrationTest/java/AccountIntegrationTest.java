@@ -52,7 +52,7 @@ class AccountIntegrationTest {
                 .setAccountId(account)
                 .execute(client);
 
-            assertEquals(balance, new Hbar(1));
+            assertEquals(balance.hbars, new Hbar(1));
 
             var info = new AccountInfoQuery()
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
@@ -64,8 +64,6 @@ class AccountIntegrationTest {
             assertEquals(info.key.toString(), key1.getPublicKey().toString());
             assertEquals(info.balance, new Hbar(1));
             assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
-            assertEquals(info.receiveRecordThreshold.toTinybars(), Long.MAX_VALUE);
-            assertEquals(info.sendRecordThreshold.toTinybars(), Long.MAX_VALUE);
             assertNull(info.proxyAccountId);
             assertEquals(info.proxyReceived, Hbar.ZERO);
 
@@ -101,7 +99,7 @@ class AccountIntegrationTest {
                 .setMaxQueryPayment(new Hbar(1))
                 .execute(client);
 
-            assertEquals(balance, new Hbar(1));
+            assertEquals(balance.hbars, new Hbar(1));
 
             new AccountDeleteTransaction()
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))

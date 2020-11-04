@@ -42,7 +42,7 @@ class AccountBalanceIntegrationTest {
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .execute(client);
 
-            assertEquals(balance, new Hbar(1));
+            assertEquals(balance.hbars, new Hbar(1));
 
             new AccountDeleteTransaction()
                 .setAccountId(account)
