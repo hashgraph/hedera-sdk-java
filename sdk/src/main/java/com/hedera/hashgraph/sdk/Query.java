@@ -131,7 +131,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
         if (paymentTransactionNodeIds.size() == 0) {
-            paymentTransactionNodeIds = client.getNodeAccountIdsForTransaction();
+            paymentTransactionNodeIds = client.getNodeAccountIdsForExecute();
         }
 
         if ((paymentTransactions != null) || !isPaymentRequired()) {

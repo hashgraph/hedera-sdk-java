@@ -534,7 +534,7 @@ public abstract class Transaction<T extends Transaction<T>>
 //                    ));
 //            }
 
-            nodeIds = client.getNodeAccountIdsForTransaction();
+            nodeIds = client.getNodeAccountIdsForExecute();
             signatures = new ArrayList<>();
             transactions = new ArrayList<>();
 
@@ -552,7 +552,7 @@ public abstract class Transaction<T extends Transaction<T>>
             }
 
 
-//            nodeIds = client.getNodeAccountIdsForTransaction();
+//            nodeIds = client.getNodeAccountIdsForExecute();
 
             // noinspection unchecked
             return (T) this;

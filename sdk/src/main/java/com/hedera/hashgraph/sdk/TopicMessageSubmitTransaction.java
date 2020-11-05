@@ -252,7 +252,7 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
 
         if (!bodyBuilder.hasNodeAccountID()) {
             if (client != null) {
-                nodeIds = client.getNodeAccountIdsForTransaction();
+                nodeIds = client.getNodeAccountIdsForExecute();
             } else {
                 throw new IllegalStateException("`client` must be provided or `nodeId` must be set");
             }

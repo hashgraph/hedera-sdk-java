@@ -329,7 +329,7 @@ public final class Client implements AutoCloseable {
         return this;
     }
 
-    public List<AccountId> getNodeAccountIdsForTransaction() {
+    public List<AccountId> getNodeAccountIdsForExecute() {
         System.out.println("Network values: " + network.values());
         sortedNodes = new ArrayList<>(network.values());
         if (nodeLastUsedAt + 1000 < Instant.now().toEpochMilli()) {
