@@ -202,6 +202,7 @@ public final class TransactionReceipt {
             .add("topicId", topicId)
             .add("tokenId", tokenId)
             .add("topicSequenceNumber", topicSequenceNumber)
+            .add("topicRunningHash", topicRunningHash)
             .toString();
     }
 
