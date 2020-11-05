@@ -1,5 +1,4 @@
 import com.hedera.hashgraph.sdk.*;
-import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -18,7 +17,6 @@ class TokenTransferIntegrationTest {
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(System.getProperty("OPERATOR_ID")));
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(System.getProperty("OPERATOR_KEY")));
 
-    @Ignore
     @Test
     void test() {
         assertDoesNotThrow(() -> {
@@ -68,20 +66,20 @@ class TokenTransferIntegrationTest {
                     .execute(client)
                     .getReceipt(client);
 
-//                new TokenTransferTransaction()
-//                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
-//                    .addSender(tokenId, OPERATOR_ID, 10)
-//                    .addRecipient(tokenId, accountId, 10)
-//                    .execute(client)
-//                    .getReceipt(client);
-//
-//                new TokenWipeTransaction()
-//                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
-//                    .setTokenId(tokenId)
-//                    .setAccountId(accountId)
-//                    .setAmount(10)
-//                    .execute(client)
-//                    .getReceipt(client);
+                new TokenTransferTransaction()
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                    .addSender(tokenId, OPERATOR_ID, 10)
+                    .addRecipient(tokenId, accountId, 10)
+                    .execute(client)
+                    .getReceipt(client);
+
+                new TokenWipeTransaction()
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                    .setTokenId(tokenId)
+                    .setAccountId(accountId)
+                    .setAmount(10)
+                    .execute(client)
+                    .getReceipt(client);
 
             new AccountDeleteTransaction()
                 .setAccountId(accountId)

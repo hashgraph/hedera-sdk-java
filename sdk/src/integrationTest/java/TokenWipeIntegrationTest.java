@@ -66,20 +66,20 @@ class TokenWipeIntegrationTest {
                     .execute(client)
                     .getReceipt(client);
 
-//                new TokenTransferTransaction()
-//                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
-//                    .addSender(tokenId, OPERATOR_ID, 10)
-//                    .addRecipient(tokenId, accountId, 10)
-//                    .execute(client)
-//                    .getReceipt(client);
-//
-//                new TokenWipeTransaction()
-//                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
-//                    .setTokenId(tokenId)
-//                    .setAccountId(accountId)
-//                    .setAmount(10)
-//                    .execute(client)
-//                    .getReceipt(client);
+                new TokenTransferTransaction()
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                    .addSender(tokenId, OPERATOR_ID, 10)
+                    .addRecipient(tokenId, accountId, 10)
+                    .execute(client)
+                    .getReceipt(client);
+
+                new TokenWipeTransaction()
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                    .setTokenId(tokenId)
+                    .setAccountId(accountId)
+                    .setAmount(10)
+                    .execute(client)
+                    .getReceipt(client);
 
             new AccountDeleteTransaction()
                 .setAccountId(accountId)
