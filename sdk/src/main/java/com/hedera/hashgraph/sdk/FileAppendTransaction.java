@@ -140,12 +140,9 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
             if (client != null) {
                 // if there is no defined node ID, we need to pick a set of nodes
                 // up front so each chunk's nodes are consistent
-                var size = client.getNumberOfNodesForTransaction();
-                nodeIds = new ArrayList<>(size);
+                nodeIds = client.getNodeAccountIdsForTransaction();
 
-                for (var i = 0; i < size; ++i) {
-                    var nodeId = client.getNextNodeId();
-
+                for (AccountId nodeId : nodeIds) {
                     nodeIds.add(nodeId);
                 }
             } else {

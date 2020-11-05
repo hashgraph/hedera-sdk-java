@@ -38,7 +38,6 @@ public final class Client implements AutoCloseable {
     Hbar maxQueryPayment = DEFAULT_MAX_TRANSACTION_FEE;
 
     private Map<AccountId, Node> network;
-    private Iterator<AccountId> nodes;
 
     private Map<AccountId, ManagedChannel> nodeChannels;
 
@@ -87,8 +86,8 @@ public final class Client implements AutoCloseable {
     private void setNetworkNodes(Map<String, AccountId> network) {
         // Take all given node account IDs, shuffle, and prepare an infinite iterator for use in [getNextNodeId]
         var allNodes = new ArrayList<>(network.values());
-        Collections.shuffle(allNodes, ThreadLocalSecureRandom.current());
-        nodes = Iterables.cycle(allNodes).iterator();
+//        Collections.shuffle(allNodes, ThreadLocalSecureRandom.current());
+//        nodes = Iterables.cycle(allNodes).iterator();
     }
 
     public void setMirrorNetwork(List<String> mirrorNetwork) {
@@ -362,6 +361,8 @@ public final class Client implements AutoCloseable {
             resultNodes.add(node.accountId);
         }
 
+        System.out.println("resultNodes: " + resultNodes);
+
         return resultNodes;
     }
 
@@ -530,13 +531,6 @@ public final class Client implements AutoCloseable {
         nodeChannels.clear();
         mirrorChannels.clear();
     }
-
-    // Get the next node ID, following a round-robin distribution with a randomized start point
-    synchronized AccountId getNextNodeId() {
-        return nodes.next();
-    }
-
-
 
     synchronized ManagedChannel getNextMirrorChannel() {
         return getMirrorChannel(mirrors.next());

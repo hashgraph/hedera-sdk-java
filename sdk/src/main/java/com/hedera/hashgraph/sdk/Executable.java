@@ -26,7 +26,7 @@ abstract class Executable<RequestT, ResponseT, O> implements WithExecute<O> {
     }
 
     private CompletableFuture<O> executeAsync(Client client, int attempt) {
-        var nodeId = getNodeAccountId(client);
+        var nodeId = getNodeAccountId();
 
         logger.atTrace()
             .addKeyValue("node", nodeId)
@@ -113,7 +113,7 @@ abstract class Executable<RequestT, ResponseT, O> implements WithExecute<O> {
      */
     abstract MethodDescriptor<RequestT, ResponseT> getMethodDescriptor();
 
-    abstract AccountId getNodeAccountId(@Nullable Client client);
+    abstract AccountId getNodeAccountId();
 
     @Nullable
     abstract TransactionId getTransactionId();

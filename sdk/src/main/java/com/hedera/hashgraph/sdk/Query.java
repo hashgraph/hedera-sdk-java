@@ -47,6 +47,8 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
     @Nullable
     private Hbar maxQueryPayment;
 
+    private AccountId currentNode;
+
     Query() {
         builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
         headerBuilder = QueryHeader.newBuilder();
@@ -176,12 +178,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
                     paymentTransactionNodeIds = client.getNodeAccountIdsForTransaction();
                     paymentTransactions = new ArrayList<>();
 
-                    System.out.println("In Query: " + paymentTransactionNodeIds);
-
-                    for (var i = 0; i < paymentTransactionNodeIds.size(); ++i) {
-                        var nodeId = client.getNextNodeId();
-                        System.out.println(nodeId);
-
+                    for (AccountId nodeId : paymentTransactionNodeIds) {
                         paymentTransactionNodeIds.add(nodeId);
                         paymentTransactions.add(makePaymentTransaction(
                             paymentTransactionId,
@@ -249,20 +246,12 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
         return Status.valueOf(preCheckCode);
     }
 
-    @Override
-    final AccountId getNodeAccountId(@Nullable Client client) {
+    final AccountId getNodeAccountId() {
         if (paymentTransactionNodeIds != null) {
-            // If this query needs a payment transaction we need to pick the node ID from the next
-            // payment transaction
             return paymentTransactionNodeIds.get(nextPaymentTransactionIndex);
-        }
-
-        if (client == null) {
+        } else {
             throw new IllegalStateException("requires a client to pick the next node ID for a query");
         }
-
-        // Otherwise just pick the next node in the round robin
-        return client.getNextNodeId();
     }
 
     final List<AccountId> getNodeAccountIds() {

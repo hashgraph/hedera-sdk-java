@@ -211,11 +211,6 @@ public abstract class Transaction<T extends Transaction<T>>
         return null;
     }
 
-    @Override
-    final AccountId getNodeAccountId(@Nullable Client client) {
-        return Objects.requireNonNull(getNodeAccountId());
-    }
-
     /**
      * Set the account IDs of the nodes that this transaction will be submitted to.
      * <p>
@@ -545,9 +540,8 @@ public abstract class Transaction<T extends Transaction<T>>
 
             System.out.println("In Transaction: " + nodeIds);
 
-            for (var i = 0; i < nodeIds.size(); ++i) {
-                var nodeId = client.getNextNodeId();
-                System.out.println(nodeId);
+            for (AccountId nodeId : nodeIds) {
+                System.out.println("Transaction NodeId:" + nodeId);
                 signatures.add(SignatureMap.newBuilder());
                 transactions.add(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
                     .setBodyBytes(bodyBuilder

@@ -84,7 +84,7 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
 
         for (var chunkTx : chunkTransactions) {
             if (firstNodeId == null) {
-                firstNodeId = chunkTx.getNodeAccountId(null).toProtobuf();
+                firstNodeId = chunkTx.getNodeAccountId().toProtobuf();
             }
 
             if (initialTransactionID == null) {
@@ -252,16 +252,7 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
 
         if (!bodyBuilder.hasNodeAccountID()) {
             if (client != null) {
-                // if there is no defined node ID, we need to pick a set of nodes
-                // up front so each chunk's nodes are consistent
-                var size = client.getNumberOfNodesForTransaction();
-                nodeIds = new ArrayList<>(size);
-
-                for (var i = 0; i < size; ++i) {
-                    var nodeId = client.getNextNodeId();
-
-                    nodeIds.add(nodeId);
-                }
+                nodeIds = client.getNodeAccountIdsForTransaction();
             } else {
                 throw new IllegalStateException("`client` must be provided or `nodeId` must be set");
             }
