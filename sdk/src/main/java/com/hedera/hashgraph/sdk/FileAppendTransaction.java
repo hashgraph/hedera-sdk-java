@@ -141,10 +141,6 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
                 // if there is no defined node ID, we need to pick a set of nodes
                 // up front so each chunk's nodes are consistent
                 nodeIds = client.getNodeAccountIdsForExecute();
-
-                for (AccountId nodeId : nodeIds) {
-                    nodeIds.add(nodeId);
-                }
             } else {
                 throw new IllegalStateException("`client` must be provided or `nodeId` must be set");
             }

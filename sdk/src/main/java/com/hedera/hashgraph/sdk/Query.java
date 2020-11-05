@@ -131,6 +131,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
         if (paymentTransactionNodeIds.size() == 0) {
+            // Get a list of node AccountId's if the user has not set them manually.
             paymentTransactionNodeIds = client.getNodeAccountIdsForExecute();
         }
 

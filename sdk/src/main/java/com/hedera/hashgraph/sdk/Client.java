@@ -39,6 +39,7 @@ public final class Client implements AutoCloseable {
     Hbar maxQueryPayment = DEFAULT_MAX_TRANSACTION_FEE;
 
     private Map<AccountId, Node> network;
+    private List<Node> sortedNodes;
 
     private Map<AccountId, ManagedChannel> nodeChannels;
 
@@ -68,6 +69,7 @@ public final class Client implements AutoCloseable {
         for (Map.Entry<String, AccountId> entry : network.entrySet()){
             this.network.put(entry.getValue(), new Node(entry.getValue(), entry.getKey()));
         }
+        this.sortedNodes = new ArrayList<>(this.network.values());
 
         this.nodeChannels = new HashMap<>(network.size());
 
@@ -274,7 +276,7 @@ public final class Client implements AutoCloseable {
         @Var ManagedChannel channel = null;
 
         // use Iterator here to remove network map entries in place
-        for(Iterator<Map.Entry<AccountId, Node>> nodeIterator = this.network.entrySet().iterator(); nodeIterator.hasNext();) {
+        for(Iterator<Map.Entry<AccountId, Node>> nodeIterator = network.entrySet().iterator(); nodeIterator.hasNext();) {
             Map.Entry<AccountId, Node> node = nodeIterator.next();
 
             @Nullable String newNodeUrl = inversedNodes.get(node.getKey());
@@ -288,7 +290,7 @@ public final class Client implements AutoCloseable {
             }
 
             if (newNodeUrl == null) {
-                this.nodeChannels.remove(node.getKey());
+                nodeChannels.remove(node.getKey());
                 nodeIterator.remove();
             } else if (nodeChannels.get(node.getKey()) != null && !nodeChannels.get(node.getKey()).authority().equals(newNodeUrl)) {
                 // Shutdown channel before replacing address
@@ -304,20 +306,27 @@ public final class Client implements AutoCloseable {
 
         // add new nodes
         for (Map.Entry<AccountId, String> node : inversedNodes.entrySet()) {
-            this.network.put(node.getKey(), new Node(node.getKey(), node.getValue()));
+            network.put(node.getKey(), new Node(node.getKey(), node.getValue()));
             // .getNetworkChannel() will add the node and channel from network
-            this.getNetworkChannel(node.getKey());
+            getNetworkChannel(node.getKey());
         }
+
+        sortedNodes = new ArrayList<>(this.network.values());
 
         return this;
     }
 
-    public List<AccountId> getNodeAccountIdsForExecute() {
-        var sortedNodes = new ArrayList<>(network.values());
+    /**
+     * Pick 1/3 of the nodes sorted by health and expected delay from the network.
+     * This is used by Query and Transaction for selecting node AccountId's.
+     *
+     * @return {@link java.util.List<com.hedera.hashgraph.sdk.AccountId>}
+     */
+    List<AccountId> getNodeAccountIdsForExecute() {
         if (nodeLastUsedAt + 1000 < Instant.now().toEpochMilli()) {
             sortedNodes.sort((a,b) -> {
                 if (a.isHealthy() && b.isHealthy()) {
-                    return -1;
+                    return 1;
                 } else if (a.isHealthy() && !b.isHealthy()) {
                     return -1;
                 } else if (!a.isHealthy() && b.isHealthy()) {
@@ -339,8 +348,8 @@ public final class Client implements AutoCloseable {
 
         List<AccountId> resultNodeAccountIds = new ArrayList<>();
 
-        for (Node node : sortedNodes) {
-            resultNodeAccountIds.add(node.accountId);
+        for (int i = 0; i < getNumberOfNodesForTransaction(); i++) {
+            resultNodeAccountIds.add(sortedNodes.get(i).accountId);
         }
 
         return resultNodeAccountIds;

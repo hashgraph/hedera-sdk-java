@@ -2,7 +2,7 @@ package com.hedera.hashgraph.sdk;
 
 import java.time.Instant;
 
-public class Node {
+class Node {
     AccountId accountId;
     String address;
     long delay;
@@ -34,7 +34,7 @@ public class Node {
         this.delay = Math.max(this.delay / 2, 250);
     }
 
-    public long delay() {
+    long delay() {
         return (this.lastUsed != null ? this.lastUsed : 0) + this.delay - Instant.now().toEpochMilli();
     }
 }

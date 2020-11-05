@@ -513,11 +513,10 @@ public abstract class Transaction<T extends Transaction<T>>
         }
 
         if (bodyBuilder.hasTransactionID() && client != null) {
-            // get nodes sorted by health and expected delay, set signatures and build transactions
-
+            // Get a list of node AccountId's if the user has not set them manually.
             nodeIds = client.getNodeAccountIdsForExecute();
-            signatures = new ArrayList<>();
-            transactions = new ArrayList<>();
+            signatures = new ArrayList<>(nodeIds.size());
+            transactions = new ArrayList<>(nodeIds.size());
 
             for (AccountId nodeId : nodeIds) {
                 signatures.add(SignatureMap.newBuilder());
