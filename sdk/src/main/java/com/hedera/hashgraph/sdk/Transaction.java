@@ -513,35 +513,13 @@ public abstract class Transaction<T extends Transaction<T>>
         }
 
         if (bodyBuilder.hasTransactionID() && client != null) {
-            // Pick N / 3 nodes from the client and build that many transactions
-            // This is for fail-over so we can cycle through nodes
-
-//            var size = client.getNumberOfNodesForTransaction();
-//            transactions = new ArrayList<>(size);
-//            nodeIds = new ArrayList<>(size);
-//            signatures = new ArrayList<>(size);
-//
-//            for (var i = 0; i < size; ++i) {
-//                var nodeId = client.getNextNodeId();
-//
-//                nodeIds.add(nodeId);
-//                signatures.add(SignatureMap.newBuilder());
-//                transactions.add(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
-//                    .setBodyBytes(bodyBuilder
-//                        .setNodeAccountID(nodeId.toProtobuf())
-//                        .build()
-//                        .toByteString()
-//                    ));
-//            }
+            // get nodes sorted by health and expected delay, set signatures and build transactions
 
             nodeIds = client.getNodeAccountIdsForExecute();
             signatures = new ArrayList<>();
             transactions = new ArrayList<>();
 
-            System.out.println("In Transaction: " + nodeIds);
-
             for (AccountId nodeId : nodeIds) {
-                System.out.println("Transaction NodeId:" + nodeId);
                 signatures.add(SignatureMap.newBuilder());
                 transactions.add(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
                     .setBodyBytes(bodyBuilder
@@ -550,9 +528,6 @@ public abstract class Transaction<T extends Transaction<T>>
                         .toByteString()
                     ));
             }
-
-
-//            nodeIds = client.getNodeAccountIdsForExecute();
 
             // noinspection unchecked
             return (T) this;

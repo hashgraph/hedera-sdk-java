@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -53,10 +54,7 @@ public final class Client implements AutoCloseable {
 
     long nodeLastUsedAt = Instant.now().toEpochMilli();
 
-    List<Node> sortedNodes;
-
     Client(Map<String, AccountId> network) {
-        System.out.println("constructing client with: " + network);
         var threadFactory = new ThreadFactoryBuilder()
             .setNameFormat("hedera-sdk-%d")
             .setDaemon(true)
@@ -71,23 +69,10 @@ public final class Client implements AutoCloseable {
             this.network.put(entry.getValue(), new Node(entry.getValue(), entry.getKey()));
         }
 
-        System.out.println(this.network);
-
         this.nodeChannels = new HashMap<>(network.size());
 
         this.mirrorChannels = new HashMap<>(1);
         this.mirrors = this.mirrorChannels.keySet().iterator();
-
-        System.out.println("setting network");
-        setNetworkNodes(network);
-
-    }
-
-    private void setNetworkNodes(Map<String, AccountId> network) {
-        // Take all given node account IDs, shuffle, and prepare an infinite iterator for use in [getNextNodeId]
-        var allNodes = new ArrayList<>(network.values());
-//        Collections.shuffle(allNodes, ThreadLocalSecureRandom.current());
-//        nodes = Iterables.cycle(allNodes).iterator();
     }
 
     public void setMirrorNetwork(List<String> mirrorNetwork) {
@@ -162,8 +147,6 @@ public final class Client implements AutoCloseable {
         network.put("1.previewnet.hedera.com:50211", new AccountId(4));
         network.put("2.previewnet.hedera.com:50211", new AccountId(5));
         network.put("3.previewnet.hedera.com:50211", new AccountId(6));
-
-        System.out.println("previewnet");
 
         var client = Client.forNetwork(network);
         client.setMirrorNetwork(Lists.of("hcs.previewnet.mirrornode.hedera.com:5600"));
@@ -286,24 +269,27 @@ public final class Client implements AutoCloseable {
      * @return {@code this} for fluent API usage.
      */
     public Client setNetwork(Map<String, AccountId> nodes) throws InterruptedException {
-        System.out.println("setting network for " + nodes);
+        BiMap<AccountId, String> inversedNodes = HashBiMap.create(nodes).inverse();
 
-        HashBiMap<String, AccountId> bimapNodes = HashBiMap.create(nodes);
-
-        setNetworkNodes(nodes);
         @Var ManagedChannel channel = null;
 
-        for(Map.Entry<AccountId, Node> node : this.network.entrySet()) {
-            String newNodeUrl = bimapNodes.inverse().get(node.getKey());
+        // use Iterator here to remove network map entries in place
+        for(Iterator<Map.Entry<AccountId, Node>> nodeIterator = this.network.entrySet().iterator(); nodeIterator.hasNext();) {
+            Map.Entry<AccountId, Node> node = nodeIterator.next();
 
-            if (node.getValue().address.equals(newNodeUrl)) {
+            @Nullable String newNodeUrl = inversedNodes.get(node.getKey());
+
+            if (node.getValue().address != null && node.getValue().address.equals(newNodeUrl)) {
                 continue;
             }
 
-            node.setValue(new Node(node.getKey(), newNodeUrl));
+            if (newNodeUrl != null) {
+                node.setValue(new Node(node.getKey(), newNodeUrl));
+            }
 
             if (newNodeUrl == null) {
                 this.nodeChannels.remove(node.getKey());
+                nodeIterator.remove();
             } else if (nodeChannels.get(node.getKey()) != null && !nodeChannels.get(node.getKey()).authority().equals(newNodeUrl)) {
                 // Shutdown channel before replacing address
                 nodeChannels.get(node.getKey()).shutdown().awaitTermination(30, TimeUnit.SECONDS);
@@ -316,11 +302,8 @@ public final class Client implements AutoCloseable {
             }
         }
 
-        // remove
-        this.network.values().removeAll(Collections.singleton(null));
-
         // add new nodes
-        for (Map.Entry<AccountId, String> node : bimapNodes.inverse().entrySet()) {
+        for (Map.Entry<AccountId, String> node : inversedNodes.entrySet()) {
             this.network.put(node.getKey(), new Node(node.getKey(), node.getValue()));
             // .getNetworkChannel() will add the node and channel from network
             this.getNetworkChannel(node.getKey());
@@ -330,8 +313,7 @@ public final class Client implements AutoCloseable {
     }
 
     public List<AccountId> getNodeAccountIdsForExecute() {
-        System.out.println("Network values: " + network.values());
-        sortedNodes = new ArrayList<>(network.values());
+        var sortedNodes = new ArrayList<>(network.values());
         if (nodeLastUsedAt + 1000 < Instant.now().toEpochMilli()) {
             sortedNodes.sort((a,b) -> {
                 if (a.isHealthy() && b.isHealthy()) {
@@ -355,15 +337,13 @@ public final class Client implements AutoCloseable {
             this.nodeLastUsedAt = Instant.now().toEpochMilli();
         }
 
-        List<AccountId> resultNodes = new ArrayList<>();
+        List<AccountId> resultNodeAccountIds = new ArrayList<>();
 
         for (Node node : sortedNodes) {
-            resultNodes.add(node.accountId);
+            resultNodeAccountIds.add(node.accountId);
         }
 
-        System.out.println("resultNodes: " + resultNodes);
-
-        return resultNodes;
+        return resultNodeAccountIds;
     }
 
     /**
