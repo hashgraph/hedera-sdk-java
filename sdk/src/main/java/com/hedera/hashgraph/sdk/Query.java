@@ -36,8 +36,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
     @Nullable
     private List<Transaction> paymentTransactions;
 
-    @Nullable
-    private List<AccountId> paymentTransactionNodeIds;
+    private List<AccountId> paymentTransactionNodeIds = new ArrayList<>();
 
     private int nextPaymentTransactionIndex = 0;
 
@@ -47,15 +46,13 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
     @Nullable
     private Hbar maxQueryPayment;
 
-    private AccountId currentNode;
-
     Query() {
         builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
         headerBuilder = QueryHeader.newBuilder();
     }
 
     public T setNodeAccountIds(List<AccountId> nodeAccountIds) {
-        paymentTransactionNodeIds = new ArrayList<>();
+        paymentTransactionNodeIds.clear();
         paymentTransactionNodeIds.addAll(nodeAccountIds);
 
         // noinspection unchecked
@@ -133,6 +130,10 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
 
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
+        if (paymentTransactionNodeIds.size() == 0) {
+            paymentTransactionNodeIds = client.getNodeAccountIdsForTransaction();
+        }
+
         if ((paymentTransactions != null) || !isPaymentRequired()) {
             return CompletableFuture.completedFuture(null);
         }
@@ -173,25 +174,12 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
             .thenCompose(x -> x)
             .thenAccept((paymentAmount) -> {
                 paymentTransactionId = TransactionId.generate(operator.accountId);
+                paymentTransactions = new ArrayList<>(paymentTransactionNodeIds.size());
 
-                if (paymentTransactionNodeIds == null) {
-                    paymentTransactionNodeIds = client.getNodeAccountIdsForTransaction();
-                    paymentTransactions = new ArrayList<>();
-
-                    for (AccountId nodeId : paymentTransactionNodeIds) {
-                        paymentTransactionNodeIds.add(nodeId);
-                        paymentTransactions.add(makePaymentTransaction(
-                            paymentTransactionId,
-                            nodeId,
-                            operator,
-                            paymentAmount
-                        ));
-                    }
-                } else {
-                    paymentTransactions = new ArrayList<>(1);
+                for (AccountId nodeId : paymentTransactionNodeIds) {
                     paymentTransactions.add(makePaymentTransaction(
                         paymentTransactionId,
-                        paymentTransactionNodeIds.get(nextPaymentTransactionIndex),
+                        nodeId,
                         operator,
                         paymentAmount
                     ));
@@ -250,7 +238,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
         if (paymentTransactionNodeIds != null) {
             return paymentTransactionNodeIds.get(nextPaymentTransactionIndex);
         } else {
-            throw new IllegalStateException("requires a client to pick the next node ID for a query");
+            throw new IllegalStateException("Query node AccountIds not set before executing");
         }
     }
 
