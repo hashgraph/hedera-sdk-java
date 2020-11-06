@@ -56,7 +56,7 @@ public final class FileInfo {
             FileId.fromProtobuf(fileInfo.getFileID()),
             fileInfo.getSize(),
             InstantConverter.fromProtobuf(fileInfo.getExpirationTime()),
-            fileInfo.getIsDeleted(),
+            fileInfo.getDeleted(),
             keys
         );
     }
@@ -75,7 +75,7 @@ public final class FileInfo {
             .setFileID(fileId.toProtobuf())
             .setSize(size)
             .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
-            .setIsDeleted(isDeleted)
+            .setDeleted(isDeleted)
             .setKeys(keyList);
 
         return fileInfoBuilder.build();

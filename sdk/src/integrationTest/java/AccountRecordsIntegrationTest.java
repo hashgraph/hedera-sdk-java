@@ -1,10 +1,4 @@
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.AccountRecordsQuery;
-import com.hedera.hashgraph.sdk.CryptoTransferTransaction;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.TransactionId;
+import com.hedera.hashgraph.sdk.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -36,10 +30,10 @@ class AccountRecordsIntegrationTest {
 
             var account = receipt.accountId;
 
-            new CryptoTransferTransaction()
+            new TransferTransaction()
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .addRecipient(account, new Hbar(1))
-                .addSender(operatorId, new Hbar(1))
+                .addHbarTransfer(operatorId, new Hbar(1))
+                .addHbarTransfer(account, new Hbar(1))
                 .execute(client);
 
             var records = new AccountRecordsQuery()

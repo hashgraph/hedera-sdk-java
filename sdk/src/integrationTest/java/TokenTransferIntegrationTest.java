@@ -49,37 +49,37 @@ class TokenTransferIntegrationTest {
 
             TokenId tokenId = response.getReceipt(client).tokenId;
 
-                new TokenAssociateTransaction()
-                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                    .setAccountId(accountId)
-                    .setTokenIds(tokenId)
-                    .freezeWith(client)
-                    .sign(OPERATOR_KEY)
-                    .sign(key)
-                    .execute(client)
-                    .getReceipt(client);
+            new TokenAssociateTransaction()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setAccountId(accountId)
+                .setTokenIds(tokenId)
+                .freezeWith(client)
+                .sign(OPERATOR_KEY)
+                .sign(key)
+                .execute(client)
+                .getReceipt(client);
 
-                new TokenGrantKycTransaction()
-                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                    .setAccountId(accountId)
-                    .setTokenId(tokenId)
-                    .execute(client)
-                    .getReceipt(client);
+            new TokenGrantKycTransaction()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setAccountId(accountId)
+                .setTokenId(tokenId)
+                .execute(client)
+                .getReceipt(client);
 
-                new TokenTransferTransaction()
-                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                    .addSender(tokenId, OPERATOR_ID, 10)
-                    .addRecipient(tokenId, accountId, 10)
-                    .execute(client)
-                    .getReceipt(client);
+            new TransferTransaction()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .addTokenTransfer(tokenId, OPERATOR_ID, -10)
+                .addTokenTransfer(tokenId, accountId, 10)
+                .execute(client)
+                .getReceipt(client);
 
-                new TokenWipeTransaction()
-                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                    .setTokenId(tokenId)
-                    .setAccountId(accountId)
-                    .setAmount(10)
-                    .execute(client)
-                    .getReceipt(client);
+            new TokenWipeTransaction()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setTokenId(tokenId)
+                .setAccountId(accountId)
+                .setAmount(10)
+                .execute(client)
+                .getReceipt(client);
 
             new AccountDeleteTransaction()
                 .setAccountId(accountId)

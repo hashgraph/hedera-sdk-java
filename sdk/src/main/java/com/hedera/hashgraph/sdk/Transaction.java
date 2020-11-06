@@ -116,7 +116,7 @@ public abstract class Transaction<T extends Transaction<T>>
                 break;
 
             case CRYPTOTRANSFER:
-                instance = new CryptoTransferTransaction(txBody);
+                instance = new TransferTransaction(txBody);
                 break;
 
             case CRYPTOUPDATEACCOUNT:

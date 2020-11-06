@@ -1,16 +1,4 @@
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.CryptoTransferTransaction;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
-import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
-import com.hedera.hashgraph.sdk.Key;
-import com.hedera.hashgraph.sdk.KeyList;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
-import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Collections;
@@ -62,9 +50,9 @@ public final class CreateAccountThresholdKeyExample {
 
         System.out.println("account = " + newAccountId);
 
-        TransactionResponse transferTransactionResponse = new CryptoTransferTransaction()
-            .addSender(newAccountId, new Hbar(10))
-            .addRecipient(new AccountId(3), new Hbar(10))
+        TransactionResponse transferTransactionResponse = new TransferTransaction()
+            .addHbarTransfer(newAccountId, new Hbar(10).negated())
+            .addHbarTransfer(new AccountId(3), new Hbar(10))
             // To manually sign, you must explicitly build the Transaction
             .freezeWith(client)
             // we sign with 2 of the 3 keys

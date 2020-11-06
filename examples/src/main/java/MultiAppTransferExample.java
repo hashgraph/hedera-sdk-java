@@ -1,14 +1,4 @@
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.CryptoTransferTransaction;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
-import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.TransactionResponse;
-import com.hedera.hashgraph.sdk.Transaction;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
@@ -65,9 +55,9 @@ public final class MultiAppTransferExample {
 
         // next we make a transfer from the user account to the
         // exchange account, this requires signing by both parties
-        CryptoTransferTransaction transferTxn = new CryptoTransferTransaction()
-            .addRecipient(exchangeAccountId, new Hbar(2))
-            .addSender(userAccountId, new Hbar(2))
+        TransferTransaction transferTxn = new TransferTransaction()
+            .addHbarTransfer(userAccountId, new Hbar(2).negated())
+            .addHbarTransfer(exchangeAccountId, new Hbar(2))
             // the exchange-provided memo required to validate the transaction
             .setTransactionMemo("https://some-exchange.com/user1/account1")
             // NOTE: to manually sign, you must freeze the Transaction first
@@ -83,7 +73,7 @@ public final class MultiAppTransferExample {
 
         // get the amount we are about to transfer
         // we built this with +2, -2
-        Hbar transferAmount = ((CryptoTransferTransaction)signedTransferTxn).getTransfers().get(0).amount;
+        Hbar transferAmount = ((TransferTransaction)signedTransferTxn).getHbarTransfers().values().toArray(new Hbar[0])[0];
 
         System.out.println("about to transfer " + transferAmount + "...");
 

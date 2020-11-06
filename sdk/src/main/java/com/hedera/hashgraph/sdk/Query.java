@@ -194,12 +194,12 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
         Client.Operator operator,
         Hbar paymentAmount
     ) {
-        return new CryptoTransferTransaction()
+        return new TransferTransaction()
             .setTransactionId(paymentTransactionId)
             .setNodeAccountIds(Collections.singletonList(nodeId))
             .setMaxTransactionFee(new Hbar(1)) // 1 Hbar
-            .addSender(operator.accountId, paymentAmount)
-            .addRecipient(nodeId, paymentAmount)
+            .addHbarTransfer(operator.accountId, paymentAmount.negated())
+            .addHbarTransfer(nodeId, paymentAmount)
             .freeze()
             .signWith(operator.publicKey, operator.transactionSigner)
             .makeRequest();
@@ -288,7 +288,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
             // that is okay
             // now go back to sleep
             // without this, an error of MISSING_QUERY_HEADER is returned
-            headerBuilder.setPayment(new CryptoTransferTransaction()
+            headerBuilder.setPayment(new TransferTransaction()
                 .setNodeAccountIds(Collections.singletonList(new AccountId(0)))
                 .setTransactionId(new TransactionId(new AccountId(0), Instant.ofEpochSecond(0)))
                 .freeze()

@@ -139,19 +139,19 @@ public final class TransferTokensExample {
 
         System.out.println("Granted KYC for account " + accountId2 + " on token " + tokenId);
 
-        new TokenTransferTransaction()
+        new TransferTransaction()
             .setNodeAccountIds(Collections.singletonList(response.nodeId))
-            .addSender(tokenId, OPERATOR_ID, 10)
-            .addRecipient(tokenId, accountId1, 10)
+            .addTokenTransfer(tokenId, OPERATOR_ID, -10)
+            .addTokenTransfer(tokenId, accountId1, 10)
             .execute(client)
             .getReceipt(client);
 
         System.out.println("Sent 10 tokens from account " + OPERATOR_ID + " to account " + accountId1 + " on token " + tokenId);
 
-        new TokenTransferTransaction()
+        new TransferTransaction()
             .setNodeAccountIds(Collections.singletonList(response.nodeId))
-            .addSender(tokenId, accountId1, 10)
-            .addRecipient(tokenId, accountId2, 10)
+            .addTokenTransfer(tokenId, accountId1, -10)
+            .addTokenTransfer(tokenId, accountId2, 10)
             .freezeWith(client)
             .sign(key1)
             .execute(client)
@@ -159,10 +159,10 @@ public final class TransferTokensExample {
 
         System.out.println("Sent 10 tokens from account " + accountId1 + " to account " + accountId2 + " on token " + tokenId);
 
-        new TokenTransferTransaction()
+        new TransferTransaction()
             .setNodeAccountIds(Collections.singletonList(response.nodeId))
-            .addSender(tokenId, accountId2, 10)
-            .addRecipient(tokenId, accountId1, 10)
+            .addTokenTransfer(tokenId, accountId2, -10)
+            .addTokenTransfer(tokenId, accountId1, 10)
             .freezeWith(client)
             .sign(key2)
             .execute(client)

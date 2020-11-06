@@ -19,7 +19,7 @@ public class FileInfoTest {
         .setFileID(new FileId(1).toProtobuf())
         .setSize(2)
         .setExpirationTime(InstantConverter.toProtobuf(Instant.ofEpochMilli(3)))
-        .setIsDeleted(true)
+        .setDeleted(true)
         .setKeys(KeyList.newBuilder()
             .addKeys(privateKey.getPublicKey().toKeyProtobuf()))
         .build();

@@ -26,12 +26,12 @@ public class CryptoTransferTransactionTest {
 
     @Test
     void shouldSerialize() {
-        SnapshotMatcher.expect(new CryptoTransferTransaction()
+        SnapshotMatcher.expect(new TransferTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
-            .addSender(AccountId.fromString("0.0.5006"), Hbar.fromTinybars(800))
-            .addRecipient(AccountId.fromString("0.0.5007"), Hbar.fromTinybars(400))
-            .addTransfer(AccountId.fromString("0.0.5008"), Hbar.fromTinybars(400))
+            .addHbarTransfer(AccountId.fromString("0.0.5006"), Hbar.fromTinybars(800).negated())
+            .addHbarTransfer(AccountId.fromString("0.0.5007"), Hbar.fromTinybars(400))
+            .addHbarTransfer(AccountId.fromString("0.0.5008"), Hbar.fromTinybars(400))
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
             .sign(unusedPrivateKey)
