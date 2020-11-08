@@ -16,7 +16,7 @@ import io.grpc.MethodDescriptor;
 /**
  * Get a list of {@link com.hedera.hashgraph.sdk.TransactionRecord}s involved with a contract.
  */
-// `ContractGetRecordsQuery`
+@Deprecated
 public class ContractRecordsQuery extends QueryBuilder<List<TransactionRecord>, ContractRecordsQuery> {
     private final ContractGetRecordsQuery.Builder builder = inner.getContractGetRecordsBuilder();
 
