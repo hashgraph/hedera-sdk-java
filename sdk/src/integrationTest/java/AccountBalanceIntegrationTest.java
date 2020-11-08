@@ -28,6 +28,9 @@ class AccountBalanceIntegrationTest {
                 .setKey(key)
                 .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
+                .freezeWith(client)
+                .sign(key)
+                .signWithOperator(client)
                 .execute(client);
 
             var receipt = response.transactionId.getReceipt(client);

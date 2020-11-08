@@ -768,7 +768,27 @@ public enum Status {
     /**
      * An attempted operation is invalid because the account is a treasury;
      */
-    ACCOUNT_IS_TREASURY(ResponseCodeEnum.ACCOUNT_IS_TREASURY);
+    ACCOUNT_IS_TREASURY(ResponseCodeEnum.ACCOUNT_IS_TREASURY),
+
+    /**
+     * Same TokenIDs present in the token list
+     */
+    TOKEN_ID_REPEATED_IN_TOKEN_LIST(ResponseCodeEnum.TOKEN_ID_REPEATED_IN_TOKEN_LIST),
+
+    /**
+     * Exceeded the number of token transfers (both from and to) allowed for token transfer list
+     */
+    TOKEN_TRANSFER_LIST_SIZE_LIMIT_EXCEEDED(ResponseCodeEnum.TOKEN_TRANSFER_LIST_SIZE_LIMIT_EXCEEDED),
+
+    /**
+     * TokenTransfersTransactionBody has no TokenTransferList
+     */
+    EMPTY_TOKEN_TRANSFER_BODY(ResponseCodeEnum.EMPTY_TOKEN_TRANSFER_BODY),
+
+    /**
+     * TokenTransfersTransactionBody has a TokenTransferList with no AccountAmounts
+     */
+    EMPTY_TOKEN_TRANSFER_ACCOUNT_AMOUNTS(ResponseCodeEnum.EMPTY_TOKEN_TRANSFER_ACCOUNT_AMOUNTS);
 
     final ResponseCodeEnum code;
 
@@ -1086,6 +1106,14 @@ public enum Status {
                 return TRANSACTION_REQUIRES_ZERO_TOKEN_BALANCES;
             case ACCOUNT_IS_TREASURY:
                 return ACCOUNT_IS_TREASURY;
+            case TOKEN_ID_REPEATED_IN_TOKEN_LIST:
+                return TOKEN_ID_REPEATED_IN_TOKEN_LIST;
+            case TOKEN_TRANSFER_LIST_SIZE_LIMIT_EXCEEDED:
+                return TOKEN_TRANSFER_LIST_SIZE_LIMIT_EXCEEDED;
+            case EMPTY_TOKEN_TRANSFER_BODY:
+                return EMPTY_TOKEN_TRANSFER_BODY;
+            case EMPTY_TOKEN_TRANSFER_ACCOUNT_AMOUNTS:
+                return EMPTY_TOKEN_TRANSFER_ACCOUNT_AMOUNTS;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

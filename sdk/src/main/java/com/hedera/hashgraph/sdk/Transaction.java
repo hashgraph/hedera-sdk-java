@@ -10,10 +10,7 @@ import org.bouncycastle.crypto.digests.SHA384Digest;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Base class for all transactions that may be built and submitted to Hedera.
@@ -302,16 +299,40 @@ public abstract class Transaction<T extends Transaction<T>>
         return transactions.get(0).setSigMap(signatures.get(0)).buildPartial().toByteArray();
     }
 
-    public byte[] getTransactionHash() {
+//    public Map<AccountId, byte[]> toBytes() {
+//        if (!this.isFrozen()) {
+//            throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
+//        }
+//
+//        var index = nextTransactionIndex;
+//        nextTransactionIndex = 0;
+//        var bytes = new HashMap<AccountId, byte[]>();
+//
+//        for (nextTransactionIndex = 0; nextTransactionIndex < transactions.size(); nextTransactionIndex++) {
+//            bytes.put(nodeIds.get(nextTransactionIndex), makeRequest().toByteArray());
+//        }
+//
+//        nextTransactionIndex = index;
+//
+//        return bytes;
+//    }
+
+    public Map<AccountId, byte[]> getTransactionHash() {
         if (!this.isFrozen()) {
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
-        if (this.transactions.size() != 1) {
-            throw new IllegalStateException("transaction must have an explicit node ID set, try calling `setNodeAccountId`");
+        var index = nextTransactionIndex;
+        nextTransactionIndex = 0;
+        var hashes = new HashMap<AccountId, byte[]>();
+
+        for (nextTransactionIndex = 0; nextTransactionIndex < transactions.size(); nextTransactionIndex++) {
+            hashes.put(nodeIds.get(nextTransactionIndex), hash(makeRequest().toByteArray()));
         }
 
-        return hash(makeRequest().toByteArray());
+        nextTransactionIndex = index;
+
+        return hashes;
     }
 
     @Override
@@ -405,7 +426,7 @@ public abstract class Transaction<T extends Transaction<T>>
         return false;
     }
 
-    public Transaction addSignature(PublicKey publicKey, byte[] signature) {
+    public T addSignature(PublicKey publicKey, byte[] signature) {
         this.requireExactNode();
 
         if (!isFrozen()) {
@@ -419,7 +440,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
         this.signatures.get(0).addSigPair(publicKey.toSignaturePairProtobuf(signature));
 
-        return this;
+        return (T) this;
     }
 
     protected boolean isFrozen() {
@@ -514,7 +535,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
         if (bodyBuilder.hasTransactionID() && client != null) {
             // Get a list of node AccountId's if the user has not set them manually.
-            nodeIds = client.getNodeAccountIdsForExecute();
+            nodeIds = client.network.getNodeAccountIdsForExecute();
             signatures = new ArrayList<>(nodeIds.size());
             transactions = new ArrayList<>(nodeIds.size());
 

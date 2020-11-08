@@ -85,6 +85,8 @@ com.hedera.hashgraph.sdk.ContractInfoTest.toProtobuf=[
     "storage_": 6,
     "memo_": "7",
     "balance_": 8,
+    "deleted_": false,
+    "tokenRelationships_": [ ],
     "initialized": true
   }
 ]

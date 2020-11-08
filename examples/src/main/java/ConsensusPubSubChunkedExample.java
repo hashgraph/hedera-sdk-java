@@ -23,12 +23,28 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public final class ConsensusPubSubChunkedExample {
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK");
+    private static final String CONFIG_FILE = Dotenv.load().get("CONFIG_FILE");
 
     private ConsensusPubSubChunkedExample() {
     }
 
     public static void main(String[] args) throws TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException, InterruptedException {
-        Client client = Client.forTestnet().setOperator(OPERATOR_ID, OPERATOR_KEY);
+        Client client;
+
+        if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {
+            client = Client.forPreviewnet();
+        } else {
+            try {
+                client = Client.fromConfigFile(CONFIG_FILE != null ? CONFIG_FILE : "");
+            } catch (Exception e) {
+                client = Client.forTestnet();
+            }
+        }
+
+        // Defaults the operator account ID and key such that all generated transactions will be paid for
+        // by this account and be signed by this key
+        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // prepare a second client without an operator for use by "somewhere else"
         Client clientWithoutOperator = Client.forTestnet();
@@ -91,7 +107,7 @@ public final class ConsensusPubSubChunkedExample {
 
         // now actually submit the transaction
         // get the receipt to ensure there were no errors
-        transaction.execute(clientWithoutOperator).transactionId.getReceipt(clientWithoutOperator);
+        transaction.execute(client).getReceipt(client);
 
         // noinspection InfiniteLoopStatement
         while (true) {

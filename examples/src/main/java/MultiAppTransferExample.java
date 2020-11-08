@@ -9,6 +9,9 @@ public final class MultiAppTransferExample {
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK");
+    private static final String CONFIG_FILE = Dotenv.load().get("CONFIG_FILE");
+
     // the exchange should possess this key, we're only generating it for demonstration purposes
     private static final PrivateKey exchangeKey = PrivateKey.generate();
     // this is the only key we should actually possess
@@ -16,11 +19,21 @@ public final class MultiAppTransferExample {
     private static final Client client;
 
     static {
-        client = Client.forTestnet();
+        Client c;
+
+        if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {
+            c = Client.forPreviewnet();
+        } else {
+            try {
+                c = Client.fromConfigFile(CONFIG_FILE != null ? CONFIG_FILE : "");
+            } catch (Exception e) {
+                c = Client.forTestnet();
+            }
+        }
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
-        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+        client = c.setOperator(OPERATOR_ID, OPERATOR_KEY);
     }
 
     private MultiAppTransferExample() {

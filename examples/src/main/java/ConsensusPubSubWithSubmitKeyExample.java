@@ -13,6 +13,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java8.util.Lists;
 import org.threeten.bp.Instant;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeoutException;
@@ -31,7 +32,7 @@ public class ConsensusPubSubWithSubmitKeyExample {
     private TopicId topicId;
     private PrivateKey submitKey;
 
-    public ConsensusPubSubWithSubmitKeyExample(int messagesToPublish, int millisBetweenMessages) {
+    public ConsensusPubSubWithSubmitKeyExample(int messagesToPublish, int millisBetweenMessages) throws InterruptedException {
         this.messagesToPublish = messagesToPublish;
         this.millisBetweenMessages = millisBetweenMessages;
         setupClient();
@@ -50,20 +51,33 @@ public class ConsensusPubSubWithSubmitKeyExample {
         publishMessagesToTopic();
     }
 
-    private void setupClient() {
+    private void setupClient() throws InterruptedException {
         // Transaction payer's account ID and ED25519 private key.
         AccountId payerId = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
         PrivateKey payerPrivateKey =
             PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
-        // Interface used to publish messages on the HCS topic.
-        client = Client.forTestnet();
+        String hederaNetwork = Dotenv.load().get("HEDERA_NETWORK");
+        String configFile = Dotenv.load().get("CONFIG_FILE");
+
+        Client c;
+
+        if (hederaNetwork != null && hederaNetwork.equals("previewnet")) {
+            c = Client.forPreviewnet();
+        } else {
+            try {
+                c = Client.fromConfigFile(configFile != null ? configFile : "");
+            } catch (Exception e) {
+                c = Client.forTestnet();
+            }
+        }
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for by this
         // account and be signed by this key
-        client.setOperator(payerId, payerPrivateKey);
+        c.setOperator(payerId, payerPrivateKey);
+        c.setMirrorNetwork(Lists.of(Objects.requireNonNull(Dotenv.load().get("MIRROR_NODE_ADDRESS"))));
 
-        client.setMirrorNetwork(Lists.of(Objects.requireNonNull(Dotenv.load().get("MIRROR_NODE_ADDRESS"))));
+        client = c;
     }
 
     /**
@@ -95,7 +109,11 @@ public class ConsensusPubSubWithSubmitKeyExample {
         new TopicMessageQuery()
             .setTopicId(topicId)
             .setStartTime(Instant.ofEpochSecond(0))
-            .subscribe(client, System.out::println);
+            .subscribe(client, (resp) -> {
+                String messageAsString = new String(resp.contents, StandardCharsets.UTF_8);
+
+                System.out.println(resp.consensusTimestamp + " received topic message: " + messageAsString);
+            });
     }
 
     /**

@@ -34,7 +34,7 @@ public class TransactionIntegrationTest {
 
             var record = response.getRecord(client);
 
-            assertArrayEquals(expectedHash, record.transactionHash.toByteArray());
+            assertArrayEquals(expectedHash.get(response.nodeId), record.transactionHash.toByteArray());
 
             var accountId = record.receipt.accountId;
             Assert.assertNotNull(accountId);

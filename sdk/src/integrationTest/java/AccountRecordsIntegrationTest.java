@@ -32,7 +32,7 @@ class AccountRecordsIntegrationTest {
 
             new TransferTransaction()
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .addHbarTransfer(operatorId, new Hbar(1))
+                .addHbarTransfer(operatorId, new Hbar(1).negated())
                 .addHbarTransfer(account, new Hbar(1))
                 .execute(client);
 

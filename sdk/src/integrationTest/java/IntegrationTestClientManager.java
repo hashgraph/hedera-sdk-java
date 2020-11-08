@@ -13,11 +13,14 @@ public class IntegrationTestClientManager {
     public static Client getClient() {
         @Var Client client;
 
-        client = System.getProperty("HEDERA_NETWORK").equals("previewnet") ? Client.forPreviewnet() : Client.forTestnet();
-
-        try {
-            client = Client.fromJsonFile(System.getProperty("CONFIG_FILE"));
-        } catch (Exception e) {
+        if (System.getProperty("HEDERA_NETWORK").equals("previewnet")) {
+            client = Client.forPreviewnet();
+        } else {
+            try {
+                client = Client.fromConfigFile(System.getProperty("CONFIG_FILE"));
+            } catch (Exception e) {
+                client = Client.forTestnet();
+            }
         }
 
         try {

@@ -52,8 +52,6 @@ class AccountUpdateIntegrationTest {
             assertEquals(info.key.toString(), key1.getPublicKey().toString());
             assertEquals(info.balance, new Hbar(1));
             assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
-            assertEquals(info.receiveRecordThreshold.toTinybars(), Long.MAX_VALUE);
-            assertEquals(info.sendRecordThreshold.toTinybars(), Long.MAX_VALUE);
             assertNull(info.proxyAccountId);
             assertEquals(info.proxyReceived, Hbar.ZERO);
 
@@ -78,8 +76,6 @@ class AccountUpdateIntegrationTest {
             assertEquals(info.key.toString(), key2.getPublicKey().toString());
             assertEquals(info.balance, new Hbar(1));
             assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
-            assertEquals(info.receiveRecordThreshold.toTinybars(), Long.MAX_VALUE);
-            assertEquals(info.sendRecordThreshold.toTinybars(), Long.MAX_VALUE);
             assertNull(info.proxyAccountId);
             assertEquals(info.proxyReceived, Hbar.ZERO);
 

@@ -6,7 +6,6 @@ import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
 import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
 import com.hedera.hashgraph.sdk.ContractFunctionParameters;
 import com.hedera.hashgraph.sdk.ContractInfoQuery;
-import com.hedera.hashgraph.sdk.ContractRecordsQuery;
 import com.hedera.hashgraph.sdk.ContractUpdateTransaction;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
@@ -115,12 +114,6 @@ public class ContractIntegrationTest {
                 .execute(client);
 
             assertEquals("new message", result.getString(0));
-
-            new ContractRecordsQuery()
-                .setContractId(contract)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setQueryPayment(new Hbar(5))
-                .execute(client);
 
             new ContractUpdateTransaction()
                 .setContractId(contract)

@@ -23,18 +23,17 @@ class TokenDeleteIntegrationTest {
             var client = IntegrationTestClientManager.getClient();
 
             TransactionResponse response = new TokenCreateTransaction()
-                .setName("ffff")
-                .setSymbol("F")
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
                 .setDecimals(3)
                 .setInitialSupply(1000000)
-                .setTreasury(OPERATOR_ID)
+                .setTreasuryAccountId(OPERATOR_ID)
                 .setAdminKey(OPERATOR_KEY.getPublicKey())
                 .setFreezeKey(OPERATOR_KEY.getPublicKey())
                 .setWipeKey(OPERATOR_KEY.getPublicKey())
                 .setKycKey(OPERATOR_KEY.getPublicKey())
                 .setSupplyKey(OPERATOR_KEY.getPublicKey())
                 .setFreezeDefault(false)
-                .setExpirationTime(Instant.now().plus(Duration.ofDays(90)).getEpochSecond())
                 .execute(client);
 
             TokenId tokenId = response.getReceipt(client).tokenId;

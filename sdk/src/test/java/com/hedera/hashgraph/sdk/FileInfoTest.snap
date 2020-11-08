@@ -54,7 +54,7 @@ com.hedera.hashgraph.sdk.FileInfoTest.toProtobuf=[
       "nanos_": 3000000,
       "initialized": true
     },
-    "isDeleted_": true,
+    "deleted_": true,
     "keys_": {
       "memoizedHashCode": 0,
       "unknownFields": {

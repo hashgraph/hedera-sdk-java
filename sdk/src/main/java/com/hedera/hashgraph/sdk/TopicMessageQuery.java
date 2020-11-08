@@ -70,7 +70,7 @@ public final class TopicMessageQuery {
         }
 
         ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call =
-            client.getNextMirrorChannel().newCall(ConsensusServiceGrpc.getSubscribeTopicMethod(), CallOptions.DEFAULT);
+            client.mirrorNetwork.getNextMirrorNode().getChannel().newCall(ConsensusServiceGrpc.getSubscribeTopicMethod(), CallOptions.DEFAULT);
 
         subscriptionHandle.setOnUnsubscribe(() -> {
             call.cancel("unsubscribe", null);

@@ -1,16 +1,8 @@
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -27,22 +19,13 @@ public final class TransferTokensExample {
     }
 
     public static void main(String[] args) throws Exception {
-        // Generate a Ed25519 private, public key pair
-        PrivateKey key1 = PrivateKey.generate();
-        PrivateKey key2 = PrivateKey.generate();
-
-        System.out.println("private key = " + key1);
-        System.out.println("public key = " + key1.getPublicKey());
-        System.out.println("private key = " + key2);
-        System.out.println("public key = " + key2.getPublicKey());
-
         Client client;
 
         if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {
             client = Client.forPreviewnet();
         } else {
             try {
-                client = Client.fromJsonFile(CONFIG_FILE != null ? CONFIG_FILE : "");
+                client = Client.fromConfigFile(CONFIG_FILE != null ? CONFIG_FILE : "");
             } catch (Exception e) {
                 client = Client.forTestnet();
             }
@@ -51,6 +34,15 @@ public final class TransferTokensExample {
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+
+        // Generate a Ed25519 private, public key pair
+        PrivateKey key1 = PrivateKey.generate();
+        PrivateKey key2 = PrivateKey.generate();
+
+        System.out.println("private key = " + key1);
+        System.out.println("public key = " + key1.getPublicKey());
+        System.out.println("private key = " + key2);
+        System.out.println("public key = " + key2.getPublicKey());
 
         TransactionResponse response = new AccountCreateTransaction()
             // The only _required_ property here is `key`
@@ -80,18 +72,17 @@ public final class TransferTokensExample {
 
         response = new TokenCreateTransaction()
             .setNodeAccountIds(Collections.singletonList(response.nodeId))
-            .setName("ffff")
-            .setSymbol("F")
+            .setTokenName("ffff")
+            .setTokenSymbol("F")
             .setDecimals(3)
             .setInitialSupply(1000000)
-            .setTreasury(OPERATOR_ID)
+            .setTreasuryAccountId(OPERATOR_ID)
             .setAdminKey(OPERATOR_KEY.getPublicKey())
             .setFreezeKey(OPERATOR_KEY.getPublicKey())
             .setWipeKey(OPERATOR_KEY.getPublicKey())
             .setKycKey(OPERATOR_KEY.getPublicKey())
             .setSupplyKey(OPERATOR_KEY.getPublicKey())
             .setFreezeDefault(false)
-            .setExpirationTime(Instant.now().plus(Duration.ofDays(90)).getEpochSecond())
             .execute(client);
 
         TokenId tokenId = Objects.requireNonNull(response.getReceipt(client).tokenId);

@@ -2,22 +2,14 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.proto.AccountID;
-import com.hedera.hashgraph.sdk.proto.ConsensusMessageChunkInfo;
-import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.ConsensusSubmitMessageTransactionBody;
-import com.hedera.hashgraph.sdk.proto.SignatureMap;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionID;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Function;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Submit a message for consensus.
@@ -153,6 +145,36 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
         this.maxChunks = maxChunks;
         return this;
     }
+//
+//    @Override
+//    public Map<AccountId, byte[]> toBytes() {
+//        var bufs = new HashMap<AccountId, ByteArrayOutputStream>(chunkTransactions.size());
+//
+//        for (var transaction : chunkTransactions) {
+//
+//            for (int i = 0; i < transaction.transactions.size(); i++) {
+//                var buf = bufs.computeIfAbsent(
+//                    transaction.nodeIds.get(i),
+//                    k -> new ByteArrayOutputStream()
+//                );
+//
+//                var tx = transactions.get(i).setSigMap(signatures.get(i)).build();
+//
+//                try {
+//                    tx.writeDelimitedTo(buf);
+//                } catch (IOException e) {
+//                    // Do nothing. This should never happened with a `ByteArrayOutputStream`
+//                }
+//            }
+//        }
+//
+//        var bytes = new HashMap<AccountId, byte[]>(bufs.size());
+//        for (var entry : bufs.entrySet()) {
+//            bytes.put(entry.getKey(), entry.getValue().toByteArray());
+//        }
+//
+//        return bytes;
+//    }
 
     @Override
     public CompletableFuture<com.hedera.hashgraph.sdk.TransactionResponse> executeAsync(Client client) {
@@ -189,7 +211,7 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
     }
 
     @Override
-    public byte[] getTransactionHash() {
+    public Map<AccountId, byte[]> getTransactionHash() {
         if (!this.isFrozen()) {
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
@@ -201,12 +223,12 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
         return chunkTransactions.get(0).getTransactionHash();
     }
 
-    public final List<byte[]> getAllTransactionHash() {
+    public final List<Map<AccountId, byte[]>> getAllTransactionHash() {
         if (!this.isFrozen()) {
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
-        var transactionHashes = new ArrayList<byte[]>(chunkTransactions.size());
+        var transactionHashes = new ArrayList<Map<AccountId, byte[]>>(chunkTransactions.size());
 
         for (var chunkTx : chunkTransactions) {
             transactionHashes.add(chunkTx.getTransactionHash());
@@ -234,9 +256,12 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
             freezeWith(client);
         }
 
-        for (var chunkTx : chunkTransactions) {
-            chunkTx.signWithOperator(client);
+        if (client.getOperator() == null) {
+            throw new IllegalStateException(
+                "`client` must have an `operator` to sign with the operator");
         }
+
+        signWith(client.getOperator().publicKey, client.getOperator().transactionSigner);
 
         return this;
     }
@@ -252,7 +277,7 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
 
         if (!bodyBuilder.hasNodeAccountID()) {
             if (client != null) {
-                nodeIds = client.getNodeAccountIdsForExecute();
+                nodeIds = client.network.getNodeAccountIdsForExecute();
             } else {
                 throw new IllegalStateException("`client` must be provided or `nodeId` must be set");
             }

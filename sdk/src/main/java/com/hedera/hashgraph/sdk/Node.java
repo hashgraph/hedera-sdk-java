@@ -1,20 +1,16 @@
 package com.hedera.hashgraph.sdk;
 
 import java.time.Instant;
+import java.util.concurrent.ExecutorService;
 
-class Node {
+class Node extends ManagedNode {
     AccountId accountId;
-    String address;
     long delay;
-    Long lastUsed;
 
-    Node(AccountId accountId, String address) {
+    Node(AccountId accountId, String address, ExecutorService executor) {
+        super(address, executor);
         this.accountId = accountId;
-        this.address = address;
-
         this.delay = 250;
-
-        this.lastUsed = null;
     }
 
     boolean isHealthy() {
@@ -26,7 +22,6 @@ class Node {
     }
 
     void increaseDelay() {
-        this.lastUsed = Instant.now().toEpochMilli();
         this.delay = Math.min(this.delay * 2, 8000);
     }
 
