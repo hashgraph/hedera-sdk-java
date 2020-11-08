@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk.account;
 import com.google.common.base.MoreObjects;
 import com.hedera.hashgraph.proto.TokenFreezeStatus;
 import com.hedera.hashgraph.proto.TokenKycStatus;
+import com.hedera.hashgraph.sdk.Internal;
 import com.hedera.hashgraph.sdk.token.TokenId;
 
 import javax.annotation.Nullable;
@@ -20,7 +21,8 @@ public class TokenRelationship {
     @Nullable
     public final Boolean freezeStatus;
 
-    TokenRelationship(com.hedera.hashgraph.proto.TokenRelationship relationship) {
+    @Internal
+    public TokenRelationship(com.hedera.hashgraph.proto.TokenRelationship relationship) {
         int freezeStatus = relationship.getFreezeStatus() == null ? 0 : relationship.getFreezeStatus().getNumber();
         int kycStatus = relationship.getKycStatus() == null ? 0 : relationship.getKycStatus().getNumber();
 
