@@ -1,15 +1,15 @@
+import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.proto.FileAppend;
 import io.github.cdimascio.dotenv.Dotenv;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class FileAppendChunkedExample {
     // see `.env.sample` in the repository root for how to specify these values
@@ -38,14 +38,13 @@ public class FileAppendChunkedExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        // The file is required to be a byte array,
-        // you can easily use the bytes of a file instead.
-        String fileContents = "Hedera hashgraph is great!";
+        // get a large file to send
+        String fileContents = readResources("large_message.txt");
 
         TransactionResponse transactionResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file
             .setKeys(OPERATOR_KEY.getPublicKey())
-            .setContents(fileContents)
+            .setContents("Hello from Hedera.")
             // The default max fee of 1 HBAR is not enough to make a file ( starts around 1.1 HBAR )
             .setMaxTransactionFee(new Hbar(2)) // 2 HBAR
             .execute(client);
@@ -66,9 +65,27 @@ public class FileAppendChunkedExample {
             .setFileId(newFileId)
             .setContents(contents.toString())
             .setMaxTransactionFee(new Hbar(1000))
+            .freezeWith(client)
             .execute(client)
             .getReceipt(client);
 
         System.out.println(fileAppendReceipt.toString());
+    }
+
+
+    private static String readResources(String filename) {
+        ClassLoader classLoader = ConsensusPubSubChunkedExample.class.getClassLoader();
+        InputStream inputStream = classLoader.getResourceAsStream(filename);
+        StringBuilder bigContents = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream), UTF_8))) {
+            @Var String line;
+            while ((line = reader.readLine()) != null) {
+                bigContents.append(line).append("\n");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return bigContents.toString();
     }
 }

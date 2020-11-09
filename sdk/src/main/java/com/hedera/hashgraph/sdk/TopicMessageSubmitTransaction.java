@@ -9,6 +9,8 @@ import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Function;
 
 import javax.annotation.Nullable;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -35,80 +37,76 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
      */
     private int maxChunks = 10;
 
+    private ByteString message = ByteString.EMPTY;
+
     public TopicMessageSubmitTransaction() {
         super();
 
         builder = ConsensusSubmitMessageTransactionBody.newBuilder();
     }
 
-    TopicMessageSubmitTransaction(TransactionBody body, SignatureMap signatureMap) {
-        super(body);
+    TopicMessageSubmitTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+        super(txs.values().iterator().next());
 
-        builder = body.getConsensusSubmitMessage().toBuilder();
+        chunkTransactions = new ArrayList<>(txs.entrySet().size());
 
-        if (signatureMap.getSigPairCount() > 0) {
-            // this transaction has been signed, we need to freeze it
-            // which should inflate the right data structures
-            freeze();
+        for (var txEntry : txs.entrySet()) {
+            var tx = new SingleTopicMessageSubmitTransaction(txEntry.getValue());
+            message.concat(tx.bodyBuilder.getConsensusSubmitMessage().getMessage());
+            chunkTransactions.add(tx);
+        }
 
-            var signatures = signatureMap.getSigPairList().iterator();
-            var numSignatures = signatureMap.getSigPairCount() / chunkTransactions.size();
+        builder = bodyBuilder.getConsensusSubmitMessage().toBuilder();
+    }
 
-            for (var chunkTx : chunkTransactions) {
-                for (var i = 0; i < numSignatures; i++) {
-                    chunkTx.signatures.get(0).addSigPair(signatures.next());
+    public byte[] toBytes() {
+        if (!this.isFrozen()) {
+            throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
+        }
+
+        var buf = new ByteArrayOutputStream();
+
+        for (var tx : chunkTransactions) {
+            for (int i = 0; i < tx.transactions.size(); i++) {
+                try {
+                    tx.transactions.get(i).setSigMap(tx.signatures.get(i)).buildPartial().writeDelimitedTo(buf);
+                } catch (IOException e) {
+                    // Do nothing as this should never happen
                 }
             }
         }
+
+        return buf.toByteArray();
     }
 
-    @Override
-    public byte[] toBytes() {
-        var signatureMap = SignatureMap.newBuilder();
+    public Map<AccountId, byte[]> toBytesPerNode() {
+        if (!this.isFrozen()) {
+            throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
+        }
 
-        @Var
-        @Nullable
-        AccountID firstNodeId = null;
+        var bufs = new HashMap<AccountId, ByteArrayOutputStream>();
 
-        @Var
-        @Nullable
-        TransactionID initialTransactionID = null;
+        for (var tx : chunkTransactions) {
+            for (int i = 0; i < tx.transactions.size(); i++) {
+                var buf = bufs.computeIfAbsent(
+                    tx.nodeIds.get(i),
+                    k -> new ByteArrayOutputStream()
+                );
 
-        for (var chunkTx : chunkTransactions) {
-            if (firstNodeId == null) {
-                firstNodeId = chunkTx.getNodeAccountId().toProtobuf();
-            }
-
-            if (initialTransactionID == null) {
-                initialTransactionID = chunkTx.bodyBuilder
-                    .getConsensusSubmitMessage()
-                    .getChunkInfo()
-                    .getInitialTransactionID();
-            }
-
-            for (var sigPair : chunkTx.signatures.get(0).getSigPairList()) {
-                signatureMap.addSigPair(sigPair);
+                try {
+                    transactions.get(i).setSigMap(signatures.get(0)).buildPartial().writeDelimitedTo(buf);
+                } catch (IOException e) {
+                    // Do nothing as this should never happen
+                }
             }
         }
 
-        var outBodyBuilder = bodyBuilder.clone();
-
-        if (initialTransactionID != null) {
-            outBodyBuilder.setTransactionID(initialTransactionID);
+        var bytesMap = new HashMap<AccountId, byte[]>(bufs.size());
+        for (var entry : bufs.entrySet()) {
+            bytesMap.put(entry.getKey(), entry.getValue().toByteArray());
         }
 
-        if (firstNodeId != null) {
-            outBodyBuilder.setNodeAccountID(firstNodeId);
-        }
-
-        return com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
-            .setBodyBytes(outBodyBuilder
-                .setConsensusSubmitMessage(builder)
-                .buildPartial()
-                .toByteString())
-            .setSigMap(signatureMap)
-            .buildPartial()
-            .toByteArray();
+        return bytesMap;
     }
 
     @Nullable
@@ -123,12 +121,12 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
     }
 
     public ByteString getMessage() {
-        return builder.getMessage();
+        return message;
     }
 
     public TopicMessageSubmitTransaction setMessage(ByteString message) {
         requireNotFrozen();
-        builder.setMessage(message);
+        this.message = message;
         return this;
     }
 
@@ -145,36 +143,6 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
         this.maxChunks = maxChunks;
         return this;
     }
-//
-//    @Override
-//    public Map<AccountId, byte[]> toBytes() {
-//        var bufs = new HashMap<AccountId, ByteArrayOutputStream>(chunkTransactions.size());
-//
-//        for (var transaction : chunkTransactions) {
-//
-//            for (int i = 0; i < transaction.transactions.size(); i++) {
-//                var buf = bufs.computeIfAbsent(
-//                    transaction.nodeIds.get(i),
-//                    k -> new ByteArrayOutputStream()
-//                );
-//
-//                var tx = transactions.get(i).setSigMap(signatures.get(i)).build();
-//
-//                try {
-//                    tx.writeDelimitedTo(buf);
-//                } catch (IOException e) {
-//                    // Do nothing. This should never happened with a `ByteArrayOutputStream`
-//                }
-//            }
-//        }
-//
-//        var bytes = new HashMap<AccountId, byte[]>(bufs.size());
-//        for (var entry : bufs.entrySet()) {
-//            bytes.put(entry.getKey(), entry.getValue().toByteArray());
-//        }
-//
-//        return bytes;
-//    }
 
     @Override
     public CompletableFuture<com.hedera.hashgraph.sdk.TransactionResponse> executeAsync(Client client) {
@@ -186,6 +154,14 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
     public CompletableFuture<List<com.hedera.hashgraph.sdk.TransactionResponse>> executeAllAsync(Client client) {
         if (!isFrozen()) {
             freezeWith(client);
+        }
+
+        var operatorId = client.getOperatorAccountId();
+
+        if (operatorId != null && operatorId.equals(getTransactionId().accountId)) {
+            // on execute, sign each transaction with the operator, if present
+            // and we are signing a transaction that used the default transaction ID
+            signWithOperator(client);
         }
 
         CompletableFuture<?>[] futures = new CompletableFuture[chunkTransactions.size()];
@@ -210,20 +186,32 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
         return ConsensusServiceGrpc.getSubmitMessageMethod();
     }
 
-    @Override
-    public Map<AccountId, byte[]> getTransactionHash() {
+    public byte[] getTransactionHash() {
         if (!this.isFrozen()) {
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
         if (chunkTransactions.size() > 1) {
-            throw new IllegalStateException("a single transaction hash can not be calculated for a chunked transaction, try calling `getAllTransactionHash`");
+            throw new IllegalStateException("a single transaction hash can not be calculated for a chunked transaction, try calling `getAllTransactionHashesPerNode`");
         }
 
         return chunkTransactions.get(0).getTransactionHash();
     }
 
-    public final List<Map<AccountId, byte[]>> getAllTransactionHash() {
+    @Override
+    public Map<AccountId, byte[]> getTransactionHashPerNode() {
+        if (!this.isFrozen()) {
+            throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
+        }
+
+        if (chunkTransactions.size() > 1) {
+            throw new IllegalStateException("a single transaction hash can not be calculated for a chunked transaction, try calling `getAllTransactionHashesPerNode`");
+        }
+
+        return chunkTransactions.get(0).getTransactionHashPerNode();
+    }
+
+    public final List<Map<AccountId, byte[]>> getAllTransactionHashesPerNode() {
         if (!this.isFrozen()) {
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
@@ -231,7 +219,7 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
         var transactionHashes = new ArrayList<Map<AccountId, byte[]>>(chunkTransactions.size());
 
         for (var chunkTx : chunkTransactions) {
-            transactionHashes.add(chunkTx.getTransactionHash());
+            transactionHashes.add(chunkTx.getTransactionHashPerNode());
         }
 
         return transactionHashes;
@@ -273,22 +261,22 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
 
     @Override
     public TopicMessageSubmitTransaction freezeWith(@Nullable Client client) {
-        var wasFrozen = isFrozen();
+        if (isFrozen()) {
+            return this;
+        }
 
-        if (!bodyBuilder.hasNodeAccountID()) {
-            if (client != null) {
-                nodeIds = client.network.getNodeAccountIdsForExecute();
-            } else {
-                throw new IllegalStateException("`client` must be provided or `nodeId` must be set");
-            }
+        if (client == null && nodeIds.size() == 0) {
+            throw new IllegalStateException("`client` must be provided or `nodeId` must be set");
+        }
+
+        if (nodeIds.size() == 0) {
+            nodeIds = client.network.getNodeAccountIdsForExecute();
         }
 
         super.freezeWith(client);
 
-        if (!wasFrozen) {
-            for (var chunkTx : chunkTransactions) {
-                chunkTx.freezeWith(client);
-            }
+        for (var chunkTx : chunkTransactions) {
+            chunkTx.freezeWith(client);
         }
 
         return this;
@@ -297,7 +285,7 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         var initialTransactionId = bodyBuilder.getTransactionID();
-        var message = builder.getMessage();
+        var message = this.message;
         var topicId = builder.getTopicID();
         var totalMessageSize = message.size();
         var requiredChunks = (totalMessageSize + (CHUNK_SIZE - 1)) / CHUNK_SIZE;

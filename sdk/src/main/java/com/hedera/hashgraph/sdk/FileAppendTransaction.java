@@ -9,9 +9,9 @@ import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Function;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * <p>A transaction specifically to append data to a file on the network.
@@ -32,14 +32,73 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
 
     private List<Transaction<SingleFileAppendTransaction>> chunkTransactions = Collections.emptyList();
 
+    private ByteString contents;
+
     public FileAppendTransaction() {
         builder = FileAppendTransactionBody.newBuilder();
     }
 
-    FileAppendTransaction(TransactionBody body) {
-        super(body);
+    FileAppendTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+        super(txs.values().iterator().next());
 
-        builder = body.getFileAppend().toBuilder();
+        for (var txEntry : txs.entrySet()) {
+            var tx = new SingleFileAppendTransaction(txEntry.getValue());
+            contents.concat(tx.bodyBuilder.getConsensusSubmitMessage().getMessage());
+            chunkTransactions.add(tx);
+        }
+
+        builder = bodyBuilder.getFileAppend().toBuilder();
+    }
+
+    public byte[] toBytes() {
+        if (!this.isFrozen()) {
+            throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
+        }
+
+        var buf = new ByteArrayOutputStream();
+
+        for (var tx : chunkTransactions) {
+
+            for (int i = 0; i < tx.transactions.size(); i++) {
+                try {
+                    transactions.get(i).setSigMap(signatures.get(0)).buildPartial().writeDelimitedTo(buf);
+                } catch (IOException e) {
+                    // Do nothing as this should never happen
+                }
+            }
+        }
+
+        return buf.toByteArray();
+    }
+
+    public Map<AccountId, byte[]> toBytesPerNode() {
+        if (!this.isFrozen()) {
+            throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
+        }
+
+        var bufs = new HashMap<AccountId, ByteArrayOutputStream>();
+
+        for (var tx : chunkTransactions) {
+            for (int i = 0; i < tx.transactions.size(); i++) {
+                var buf = bufs.computeIfAbsent(
+                    tx.nodeIds.get(i),
+                    k -> new ByteArrayOutputStream()
+                );
+
+                try {
+                    transactions.get(i).setSigMap(signatures.get(0)).buildPartial().writeDelimitedTo(buf);
+                } catch (IOException e) {
+                    // Do nothing as this should never happen
+                }
+            }
+        }
+
+        var bytesMap = new HashMap<AccountId, byte[]>(bufs.size());
+        for (var entry : bufs.entrySet()) {
+            bytesMap.put(entry.getKey(), entry.getValue().toByteArray());
+        }
+
+        return bytesMap;
     }
 
     @Nullable
@@ -61,7 +120,7 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
 
     @Nullable
     public ByteString getContents() {
-        return builder.getContents();
+        return contents;
     }
 
     /**
@@ -80,7 +139,7 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
      */
     public FileAppendTransaction setContents(byte[] contents) {
         requireNotFrozen();
-        builder.setContents(ByteString.copyFrom(contents));
+        this.contents = ByteString.copyFrom(contents);
         return this;
     }
 
@@ -106,7 +165,13 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
      */
     public FileAppendTransaction setContents(String text) {
         requireNotFrozen();
-        builder.setContents(ByteString.copyFromUtf8(text));
+        this.contents = ByteString.copyFromUtf8(text);
+        return this;
+    }
+
+    public FileAppendTransaction setMaxChunks(int maxChunks) {
+        requireNotFrozen();
+        this.maxChunks = maxChunks;
         return this;
     }
 
@@ -134,24 +199,22 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
 
     @Override
     public FileAppendTransaction freezeWith(@Nullable Client client) {
-        var wasFrozen = isFrozen();
+        if (isFrozen()) {
+            return this;
+        }
 
-        if (!bodyBuilder.hasNodeAccountID()) {
-            if (client != null) {
-                // if there is no defined node ID, we need to pick a set of nodes
-                // up front so each chunk's nodes are consistent
-                nodeIds = client.network.getNodeAccountIdsForExecute();
-            } else {
-                throw new IllegalStateException("`client` must be provided or `nodeId` must be set");
-            }
+        if (client == null && nodeIds.size() == 0) {
+            throw new IllegalStateException("`client` must be provided or `nodeId` must be set");
+        }
+
+        if (nodeIds.size() == 0) {
+            nodeIds = client.network.getNodeAccountIdsForExecute();
         }
 
         super.freezeWith(client);
 
-        if (!wasFrozen) {
-            for (var chunkTx : chunkTransactions) {
-                chunkTx.freezeWith(client);
-            }
+        for (var chunkTx : chunkTransactions) {
+            chunkTx.freezeWith(client);
         }
 
         return this;
@@ -160,7 +223,7 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         var initialTransactionId = bodyBuilder.getTransactionID();
-        var content = builder.getContents();
+        var content = this.contents;
         var fileId = builder.getFileID();
         var totalContentSize = content.size();
         var requiredChunks = (totalContentSize + (CHUNK_SIZE - 1)) / CHUNK_SIZE;
@@ -173,6 +236,7 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
 
         chunkTransactions = new ArrayList<>(requiredChunks);
         @Var var nextTransactionId = initialTransactionId.toBuilder();
+
         for (int i = 0; i < requiredChunks; i++) {
             @Var var startIndex = i * CHUNK_SIZE;
             @Var var endIndex = startIndex + CHUNK_SIZE;
@@ -197,6 +261,8 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
 
             nextTransactionId.setTransactionValidStart(nextValidStart);
         }
+
+        // false means stop freezing, this is good enough
         return false;
     }
 

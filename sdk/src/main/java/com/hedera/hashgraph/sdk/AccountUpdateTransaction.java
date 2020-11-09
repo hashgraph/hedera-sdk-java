@@ -11,6 +11,7 @@ import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 
 /**
  * Change properties for the given account.
@@ -35,10 +36,10 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         builder = CryptoUpdateTransactionBody.newBuilder();
     }
 
-    AccountUpdateTransaction(TransactionBody body) {
-        super(body);
+    AccountUpdateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+        super(txs.values().iterator().next());
 
-        builder = body.getCryptoUpdateAccount().toBuilder();
+        builder = bodyBuilder.getCryptoUpdateAccount().toBuilder();
     }
 
     @Nullable

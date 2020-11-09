@@ -10,6 +10,9 @@ import org.bouncycastle.crypto.digests.SHA384Digest;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -54,123 +57,152 @@ public abstract class Transaction<T extends Transaction<T>>
         this(body.toBuilder());
     }
 
+    Transaction(HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction> txs) {
+        this.nodeIds = new ArrayList<>(txs.keySet());
+        this.signatures = new ArrayList<>(this.nodeIds.size());
+        this.transactions = new ArrayList<>(this.nodeIds.size());
+
+        for (var value : txs.values()) {
+            this.signatures.add(value.getSigMap().toBuilder());
+            this.transactions.add(value.toBuilder());
+        }
+
+        try {
+            bodyBuilder = TransactionBody.parseFrom(this.transactions.get(0).getBodyBytes()).toBuilder();
+        } catch (InvalidProtocolBufferException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
     Transaction(TransactionBody.Builder bodyBuilder) {
         this.bodyBuilder = bodyBuilder;
     }
 
     public static Transaction<?> fromBytes(byte[] bytes) {
-        com.hedera.hashgraph.sdk.proto.Transaction tx;
+        var buf = new ByteArrayInputStream(bytes);
+        var txs = new HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>>();
+        TransactionBody.DataCase dataCase = TransactionBody.DataCase.DATA_NOT_SET;
 
-        try {
-            tx = com.hedera.hashgraph.sdk.proto.Transaction.parseFrom(bytes);
-        } catch (InvalidProtocolBufferException e) {
-            throw new IllegalArgumentException(e);
-        }
+        while (true) {
+            com.hedera.hashgraph.sdk.proto.Transaction tx = null;
 
-        var isFrozen = tx.getSigMap().getSigPairCount() > 0;
+            try {
+                tx = com.hedera.hashgraph.sdk.proto.Transaction.parseDelimitedFrom(buf);
+            } catch (IOException e) {
+                // Do nothing as this should not be possible
+            }
 
-        TransactionBody txBody;
+            if (tx == null) {
+                break;
+            }
 
-        try {
-            txBody = TransactionBody.parseFrom(tx.getBodyBytes());
-        } catch (InvalidProtocolBufferException e) {
-            throw new IllegalArgumentException(e);
+            TransactionBody txBody;
+
+            try {
+                txBody = TransactionBody.parseFrom(tx.getBodyBytes());
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException(e);
+            }
+
+            if (dataCase.getNumber() == TransactionBody.DataCase.DATA_NOT_SET.getNumber()) {
+                dataCase = txBody.getDataCase();
+            }
+
+            var account = AccountId.fromProtobuf(txBody.getNodeAccountID());
+            var transactionId = TransactionId.fromProtobuf(txBody.getTransactionID());
+
+            txs.computeIfAbsent(transactionId, k -> new HashMap<>()).put(account, tx);
         }
 
         Transaction<?> instance;
 
-        switch (txBody.getDataCase()) {
+        switch (dataCase) {
             case CONTRACTCALL:
-                instance = new ContractExecuteTransaction(txBody);
+                instance = new ContractExecuteTransaction(txs);
                 break;
 
             case CONTRACTCREATEINSTANCE:
-                instance = new ContractCreateTransaction(txBody);
+                instance = new ContractCreateTransaction(txs);
                 break;
 
             case CONTRACTUPDATEINSTANCE:
-                instance = new ContractUpdateTransaction(txBody);
+                instance = new ContractUpdateTransaction(txs);
                 break;
 
             case CONTRACTDELETEINSTANCE:
-                instance = new ContractDeleteTransaction(txBody);
+                instance = new ContractDeleteTransaction(txs);
                 break;
 
             case CRYPTOADDLIVEHASH:
-                instance = new LiveHashAddTransaction(txBody);
+                instance = new LiveHashAddTransaction(txs);
                 break;
 
             case CRYPTOCREATEACCOUNT:
-                instance = new AccountCreateTransaction(txBody);
+                instance = new AccountCreateTransaction(txs);
                 break;
 
             case CRYPTODELETE:
-                instance = new AccountDeleteTransaction(txBody);
+                instance = new AccountDeleteTransaction(txs);
                 break;
 
             case CRYPTODELETELIVEHASH:
-                instance = new LiveHashDeleteTransaction(txBody);
+                instance = new LiveHashDeleteTransaction(txs);
                 break;
 
             case CRYPTOTRANSFER:
-                instance = new TransferTransaction(txBody);
+                instance = new TransferTransaction(txs);
                 break;
 
             case CRYPTOUPDATEACCOUNT:
-                instance = new AccountUpdateTransaction(txBody);
+                instance = new AccountUpdateTransaction(txs);
                 break;
 
             case FILEAPPEND:
-                instance = new FileAppendTransaction(txBody);
+                instance = new FileAppendTransaction(txs);
                 break;
 
             case FILECREATE:
-                instance = new FileCreateTransaction(txBody);
+                instance = new FileCreateTransaction(txs);
                 break;
 
             case FILEDELETE:
-                instance = new FileDeleteTransaction(txBody);
+                instance = new FileDeleteTransaction(txs);
                 break;
 
             case FILEUPDATE:
-                instance = new FileUpdateTransaction(txBody);
+                instance = new FileUpdateTransaction(txs);
                 break;
 
             case SYSTEMDELETE:
-                instance = new SystemDeleteTransaction(txBody);
+                instance = new SystemDeleteTransaction(txs);
                 break;
 
             case SYSTEMUNDELETE:
-                instance = new SystemUndeleteTransaction(txBody);
+                instance = new SystemUndeleteTransaction(txs);
                 break;
 
             case FREEZE:
-                instance = new FreezeTransaction(txBody);
+                instance = new FreezeTransaction(txs);
                 break;
 
             case CONSENSUSCREATETOPIC:
-                instance = new TopicCreateTransaction(txBody);
+                instance = new TopicCreateTransaction(txs);
                 break;
 
             case CONSENSUSUPDATETOPIC:
-                instance = new TopicUpdateTransaction(txBody);
+                instance = new TopicUpdateTransaction(txs);
                 break;
 
             case CONSENSUSDELETETOPIC:
-                instance = new TopicDeleteTransaction(txBody);
+                instance = new TopicDeleteTransaction(txs);
                 break;
 
             case CONSENSUSSUBMITMESSAGE:
                 // a chunked transaction does not need the same handling
-                return new TopicMessageSubmitTransaction(txBody, tx.getSigMap());
+                return new TopicMessageSubmitTransaction(txs);
 
             default:
                 throw new IllegalArgumentException("parsed transaction body has no data");
-        }
-
-        if (isFrozen) {
-            instance.signatures = Collections.singletonList(tx.getSigMap().toBuilder());
-            instance.transactions = Collections.singletonList(tx.toBuilder());
         }
 
         return instance;
@@ -296,28 +328,46 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     public byte[] toBytes() {
-        return transactions.get(0).setSigMap(signatures.get(0)).buildPartial().toByteArray();
+        if (!this.isFrozen()) {
+            throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
+        }
+
+        var buf = new ByteArrayOutputStream();
+
+        for (int i = 0; i < transactions.size(); i++) {
+            try {
+                transactions.get(i).setSigMap(signatures.get(0)).buildPartial().writeDelimitedTo(buf);
+            } catch (IOException e) {
+                // Do nothing as this should never happen
+            }
+        }
+
+        return buf.toByteArray();
     }
 
-//    public Map<AccountId, byte[]> toBytes() {
-//        if (!this.isFrozen()) {
-//            throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
-//        }
-//
-//        var index = nextTransactionIndex;
-//        nextTransactionIndex = 0;
-//        var bytes = new HashMap<AccountId, byte[]>();
-//
-//        for (nextTransactionIndex = 0; nextTransactionIndex < transactions.size(); nextTransactionIndex++) {
-//            bytes.put(nodeIds.get(nextTransactionIndex), makeRequest().toByteArray());
-//        }
-//
-//        nextTransactionIndex = index;
-//
-//        return bytes;
-//    }
+    public Map<AccountId, byte[]> toBytesPerNode() {
+        if (!this.isFrozen()) {
+            throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
+        }
 
-    public Map<AccountId, byte[]> getTransactionHash() {
+        var bytes = new HashMap<AccountId, byte[]>();
+
+        for (int i = 0; i < transactions.size(); i++) {
+            bytes.put(nodeIds.get(nextTransactionIndex), transactions.get(i).setSigMap(signatures.get(i)).buildPartial().toByteArray());
+        }
+
+        return bytes;
+    }
+
+    public byte[] getTransactionHash() {
+        if (!this.isFrozen()) {
+            throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
+        }
+
+        return hash(transactions.get(0).setSigMap(signatures.get(0)).buildPartial().toByteArray());
+    }
+
+    public Map<AccountId, byte[]> getTransactionHashPerNode() {
         if (!this.isFrozen()) {
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
@@ -440,6 +490,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
         this.signatures.get(0).addSigPair(publicKey.toSignaturePairProtobuf(signature));
 
+        // noinspection unchecked
         return (T) this;
     }
 
@@ -479,6 +530,11 @@ public abstract class Transaction<T extends Transaction<T>>
      * @return {@code this}
      */
     public T freezeWith(@Nullable Client client) {
+        if (isFrozen()) {
+            // noinspection unchecked
+            return (T) this;
+        }
+
         if (client != null && bodyBuilder.getTransactionFee() == 0) {
             bodyBuilder.setTransactionFee(client.maxTransactionFee.toTinybars());
         }

@@ -28,7 +28,7 @@ public class TransactionIntegrationTest {
                 .freezeWith(client)
                 .signWithOperator(client);
 
-            var expectedHash = transaction.getTransactionHash();
+            var expectedHash = transaction.getTransactionHashPerNode();
 
             var response = transaction.execute(client);
 

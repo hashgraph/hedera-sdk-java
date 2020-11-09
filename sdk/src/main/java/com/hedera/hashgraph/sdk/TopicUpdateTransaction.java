@@ -11,6 +11,7 @@ import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 
 /**
  * Update a topic.
@@ -29,10 +30,10 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         builder = ConsensusUpdateTopicTransactionBody.newBuilder();
     }
 
-    TopicUpdateTransaction(TransactionBody body) {
-        super(body);
+    TopicUpdateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+        super(txs.values().iterator().next());
 
-        builder = body.getConsensusUpdateTopic().toBuilder();
+        builder = bodyBuilder.getConsensusUpdateTopic().toBuilder();
     }
 
     @Nullable

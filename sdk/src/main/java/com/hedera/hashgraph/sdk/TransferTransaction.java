@@ -16,12 +16,12 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         builder = CryptoTransferTransactionBody.newBuilder();
     }
 
-    TransferTransaction(TransactionBody body) {
-        super(body);
+    TransferTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+        super(txs.values().iterator().next());
 
-        builder = CryptoTransferTransactionBody.newBuilder();
+        builder = bodyBuilder.getCryptoTransfer().toBuilder();
 
-        for (var transfer : body.getCryptoTransfer().getTransfers().getAccountAmountsList()) {
+        for (var transfer : bodyBuilder.getCryptoTransfer().getTransfers().getAccountAmountsList()) {
             hbarTransfers.merge(
                 AccountId.fromProtobuf(transfer.getAccountID()),
                 Hbar.fromTinybars(transfer.getAmount()),
@@ -29,7 +29,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
             );
         }
 
-        for (var tokenTransferList : body.getCryptoTransfer().getTokenTransfersList()) {
+        for (var tokenTransferList : bodyBuilder.getCryptoTransfer().getTokenTransfersList()) {
             var list = tokenTransfers.computeIfAbsent(TokenId.fromProtobuf(tokenTransferList.getToken()), k -> new HashMap<>());
 
             for (var aa : tokenTransferList.getTransfersList()) {

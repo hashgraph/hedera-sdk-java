@@ -8,9 +8,14 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class SingleFileAppendTransaction extends Transaction<SingleFileAppendTransaction> {
+    SingleFileAppendTransaction(HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction> txs) {
+        super(txs);
+    }
+
     SingleFileAppendTransaction(
         List<AccountId> nodeIds,
         TransactionBody.Builder bodyBuilder,
