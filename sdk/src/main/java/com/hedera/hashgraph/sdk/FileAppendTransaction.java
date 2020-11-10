@@ -71,36 +71,6 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
         return buf.toByteArray();
     }
 
-    public Map<AccountId, byte[]> toBytesPerNode() {
-        if (!this.isFrozen()) {
-            throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
-        }
-
-        var bufs = new HashMap<AccountId, ByteArrayOutputStream>();
-
-        for (var tx : chunkTransactions) {
-            for (int i = 0; i < tx.transactions.size(); i++) {
-                var buf = bufs.computeIfAbsent(
-                    tx.nodeIds.get(i),
-                    k -> new ByteArrayOutputStream()
-                );
-
-                try {
-                    transactions.get(i).setSigMap(signatures.get(0)).buildPartial().writeDelimitedTo(buf);
-                } catch (IOException e) {
-                    // Do nothing as this should never happen
-                }
-            }
-        }
-
-        var bytesMap = new HashMap<AccountId, byte[]>(bufs.size());
-        for (var entry : bufs.entrySet()) {
-            bytesMap.put(entry.getKey(), entry.getValue().toByteArray());
-        }
-
-        return bytesMap;
-    }
-
     @Nullable
     public FileId getFileId() {
         return builder.hasFileID() ? FileId.fromProtobuf(builder.getFileID()) : null;

@@ -345,20 +345,6 @@ public abstract class Transaction<T extends Transaction<T>>
         return buf.toByteArray();
     }
 
-    public Map<AccountId, byte[]> toBytesPerNode() {
-        if (!this.isFrozen()) {
-            throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
-        }
-
-        var bytes = new HashMap<AccountId, byte[]>();
-
-        for (int i = 0; i < transactions.size(); i++) {
-            bytes.put(nodeIds.get(nextTransactionIndex), transactions.get(i).setSigMap(signatures.get(i)).buildPartial().toByteArray());
-        }
-
-        return bytes;
-    }
-
     public byte[] getTransactionHash() {
         if (!this.isFrozen()) {
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
