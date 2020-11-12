@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -44,18 +43,18 @@ class ClientTest {
 
     @Test
     @DisplayName("fromJsonFile() functions correctly")
-    void fromJsonFile() throws IOException {
-        Client.fromJsonFile(new File("./src/test/resources/client-config.json"));
-        Client.fromJsonFile(new File("./src/test/resources/client-config-with-operator.json"));
-        Client.fromJsonFile("./src/test/resources/client-config.json");
-        Client.fromJsonFile("./src/test/resources/client-config-with-operator.json");
+    void fromJsonFile() throws Exception {
+        Client.fromConfigFile(new File("./src/test/resources/client-config.json"));
+        Client.fromConfigFile(new File("./src/test/resources/client-config-with-operator.json"));
+        Client.fromConfigFile("./src/test/resources/client-config.json");
+        Client.fromConfigFile("./src/test/resources/client-config-with-operator.json");
     }
 
     @Test
     @DisplayName("fromJson() functions correctly")
-    void testFromJson() {
+    void testFromJson() throws Exception {
         // Copied content of `client-config-with-operator.json`
-        Client.fromJson("{\n" +
+        Client.fromConfig("{\n" +
             "    \"network\":\"mainnet\",\n" +
             "    \"operator\": {\n" +
             "        \"accountId\": \"0.0.36\",\n" +
@@ -69,7 +68,7 @@ class ClientTest {
 
         Assertions.assertNotNull(clientConfig);
 
-        Client.fromJson(new InputStreamReader(clientConfig, StandardCharsets.UTF_8));
+        Client.fromConfig(new InputStreamReader(clientConfig, StandardCharsets.UTF_8));
 
         // put it in a file for nicer formatting
         InputStream clientConfigWithOperator = ClientTest.class.getClassLoader()
@@ -82,21 +81,21 @@ class ClientTest {
     @DisplayName("setNetwork() functions correctly")
     void testReplaceNodes() {
         assertDoesNotThrow(() -> {
-            @Var Map<AccountId, String> nodes = new HashMap<>();
-            nodes.put(new AccountId(3), "0.testnet.hedera.com:50211");
-            nodes.put(new AccountId(4), "1.testnet.hedera.com:50211");
+            @Var Map<String, AccountId> nodes = new HashMap<>();
+            nodes.put("0.testnet.hedera.com:50211", new AccountId(3));
+            nodes.put("1.testnet.hedera.com:50211", new AccountId(4));
 
             Client client = new Client(nodes);
 
 
-            nodes = new HashMap<>();
-            nodes.put(new AccountId(5), "2.testnet.hedera.com:50211");
-            nodes.put(new AccountId(6), "3.testnet.hedera.com:50211");
+            @Var Map<String, AccountId> setNetworkNodes = new HashMap<>();
+            setNetworkNodes.put("2.testnet.hedera.com:50211", new AccountId(5));
+            setNetworkNodes.put("3.testnet.hedera.com:50211", new AccountId(6));
 
-            client.setNetwork(nodes);
+            client.setNetwork(setNetworkNodes);
 
-            Assertions.assertEquals(client.getNetworkChannel(new AccountId(5)).authority(), "2.testnet.hedera.com:50211");
-            Assertions.assertThrows(IllegalArgumentException.class , () -> client.getNetworkChannel(new AccountId(3)));
+            Assertions.assertEquals(client.network.networkNodes.get(new AccountId(5)).getChannel().authority(), "2.testnet.hedera.com:50211");
+            Assertions.assertFalse(client.network.networkNodes.containsKey(new AccountId(3)));
         });
     }
 }

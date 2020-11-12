@@ -3,11 +3,11 @@ syntax = "proto3";
 package proto;
 
 /*-
- *
+ * ‌
  * Hedera Network Services Protobuf
- *
+ * ​
  * Copyright (C) 2018 - 2020 Hedera Hashgraph, LLC
- *
+ * ​
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +19,7 @@ package proto;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
+ * ‍
  */
 
 option java_package = "com.hedera.hashgraph.sdk.proto";
@@ -28,7 +28,7 @@ option java_multiple_files = true;
 import "BasicTypes.proto";
 
 /* Updates an already created Token.
- If no value is given for a field, that field is left unchanged. For an immutable tokens (that is, a token created without an adminKey), only the expiry may be updated. Setting any other field in that case will cause the transaction status to resolve to TOKEN_IS_IMMUTABlE.
+ If no value is given for a field, that field is left unchanged. For an immutable tokens (that is, a token created without an adminKey), only the expiry may be updated. Setting any other field in that case will cause the transaction status to resolve to TOKEN_IS_IMMUTABLE. A new admin key must sign the transaction. The key associated to a new treasury account must sign the transaction.
  */
 message TokenUpdateTransactionBody {
     TokenID token = 1; // The Token to be updated

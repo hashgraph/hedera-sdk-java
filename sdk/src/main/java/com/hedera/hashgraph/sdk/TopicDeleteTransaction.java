@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 
 /**
  * Delete a topic.
@@ -23,10 +24,10 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
         builder = ConsensusDeleteTopicTransactionBody.newBuilder();
     }
 
-    TopicDeleteTransaction(TransactionBody body) {
-        super(body);
+    TopicDeleteTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+        super(txs.values().iterator().next());
 
-        builder = body.getConsensusDeleteTopic().toBuilder();
+        builder = bodyBuilder.getConsensusDeleteTopic().toBuilder();
     }
 
     @Nullable

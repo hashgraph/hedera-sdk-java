@@ -7,9 +7,10 @@ import com.hedera.hashgraph.sdk.proto.CryptoGetInfoResponse;
 import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 /**
  * Current information about an account, including the balance.
@@ -89,6 +90,8 @@ public final class AccountInfo {
 
     public final List<LiveHash> liveHashes;
 
+    public final Map<TokenId, TokenRelationship> tokenRelationships;
+
     private AccountInfo(
         AccountId accountId,
         String contractAccountId,
@@ -102,7 +105,8 @@ public final class AccountInfo {
         boolean receiverSignatureRequired,
         Instant expirationTime,
         Duration autoRenewPeriod,
-        List<LiveHash> liveHashes
+        List<LiveHash> liveHashes,
+        Map<TokenId, TokenRelationship> tokenRelationships
     ) {
         this.accountId = accountId;
         this.contractAccountId = contractAccountId;
@@ -117,6 +121,7 @@ public final class AccountInfo {
         this.expirationTime = expirationTime;
         this.autoRenewPeriod = autoRenewPeriod;
         this.liveHashes = liveHashes;
+        this.tokenRelationships = Collections.unmodifiableMap(tokenRelationships);
     }
 
     static AccountInfo fromProtobuf(CryptoGetInfoResponse.AccountInfo accountInfo) {
@@ -129,6 +134,13 @@ public final class AccountInfo {
         var liveHashes = Arrays.stream(accountInfo.getLiveHashesList().toArray())
             .map((liveHash) -> LiveHash.fromProtobuf((com.hedera.hashgraph.sdk.proto.LiveHash)liveHash))
             .collect(Collectors.toList());
+
+        Map<TokenId, TokenRelationship> relationships = new HashMap<>();
+
+        for (com.hedera.hashgraph.sdk.proto.TokenRelationship relationship : accountInfo.getTokenRelationshipsList()) {
+            TokenId tokenId = TokenId.fromProtobuf(relationship.getTokenId());
+            relationships.put(tokenId, TokenRelationship.fromProtobuf(relationship));
+        }
 
         return new AccountInfo(
             accountId,
@@ -143,7 +155,8 @@ public final class AccountInfo {
             accountInfo.getReceiverSigRequired(),
             InstantConverter.fromProtobuf(accountInfo.getExpirationTime()),
             DurationConverter.fromProtobuf(accountInfo.getAutoRenewPeriod()),
-            liveHashes
+            liveHashes,
+            relationships
         );
     }
 
@@ -196,6 +209,7 @@ public final class AccountInfo {
             .add("expirationTime", expirationTime)
             .add("autoRenewPeriod", autoRenewPeriod)
             .add("liveHashes", liveHashes)
+            .add("tokenRelationships", tokenRelationships)
             .toString();
     }
 

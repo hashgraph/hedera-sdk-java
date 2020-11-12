@@ -9,6 +9,7 @@ import io.grpc.MethodDescriptor;
 import java.time.Duration;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 
 /**
  * Create a topic to be used for consensus.
@@ -28,10 +29,10 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
     }
 
-    TopicCreateTransaction(TransactionBody body) {
-        super(body);
+    TopicCreateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+        super(txs.values().iterator().next());
 
-        builder = body.getConsensusCreateTopic().toBuilder();
+        builder = bodyBuilder.getConsensusCreateTopic().toBuilder();
     }
 
     @Override

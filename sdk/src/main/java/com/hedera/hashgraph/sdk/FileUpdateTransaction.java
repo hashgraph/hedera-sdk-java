@@ -11,6 +11,7 @@ import java.time.Instant;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.HashMap;
 
 /**
  * Updates a file by submitting the transaction.
@@ -22,10 +23,10 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         builder = FileUpdateTransactionBody.newBuilder();
     }
 
-    FileUpdateTransaction(TransactionBody body) {
-        super(body);
+    FileUpdateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+        super(txs.values().iterator().next());
 
-        builder = body.getFileUpdate().toBuilder();
+        builder = bodyBuilder.getFileUpdate().toBuilder();
     }
 
     @Nullable

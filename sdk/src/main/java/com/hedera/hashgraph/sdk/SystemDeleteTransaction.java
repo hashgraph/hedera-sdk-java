@@ -11,6 +11,7 @@ import io.grpc.MethodDescriptor;
 import java.time.Instant;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 
 /**
  * Delete a file or smart contract - can only be done with a Hedera admin.
@@ -30,10 +31,10 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
         builder = SystemDeleteTransactionBody.newBuilder();
     }
 
-    SystemDeleteTransaction(TransactionBody body) {
-        super(body);
+    SystemDeleteTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+        super(txs.values().iterator().next());
 
-        builder = body.getSystemDelete().toBuilder();
+        builder = bodyBuilder.getSystemDelete().toBuilder();
     }
 
     @Nullable

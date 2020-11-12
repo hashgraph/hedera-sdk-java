@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 
 /**
  * Marks a contract as deleted, moving all its current hbars to another account.
@@ -18,10 +19,10 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
         builder = ContractDeleteTransactionBody.newBuilder();
     }
 
-    ContractDeleteTransaction(TransactionBody body) {
-        super(body);
+    ContractDeleteTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+        super(txs.values().iterator().next());
 
-        builder = body.getContractDeleteInstance().toBuilder();
+        builder = bodyBuilder.getContractDeleteInstance().toBuilder();
     }
 
     @Nullable

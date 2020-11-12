@@ -12,6 +12,7 @@ import java.time.Duration;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.HashMap;
 
 /**
  * A hash---presumably of some kind of credential or certificate---along with a list of keys,
@@ -26,10 +27,10 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
         hashBuilder = LiveHash.newBuilder();
     }
 
-    LiveHashAddTransaction(TransactionBody body) {
-        super(body);
+    LiveHashAddTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+        super(txs.values().iterator().next());
 
-        builder = body.getCryptoAddLiveHash().toBuilder();
+        builder = bodyBuilder.getCryptoAddLiveHash().toBuilder();
         hashBuilder = builder.getLiveHash().toBuilder();
     }
 

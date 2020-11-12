@@ -146,6 +146,12 @@ and integration tests will run against the Hedera test network.
 $ ./gradlew integrationTest -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>"
 ```
 
+`HEDERA_NETWORK` can optionally be used to use `previewnet`.  This System Property can only be set to `previewnet`.
+
+```sh
+$ ./gradlew integrationTest -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="previewnet"
+```
+
 Note: It is also possible to use a custom network in a configuration file and pass `OPERATOR_ID` and `OPERATOR_KEY`
 into system properties.
 
@@ -155,13 +161,10 @@ An example configuration file containing only network information can be found i
 
 ### Examples
 
-Requires `OPERATOR_ID` and `OPERATOR_KEY` to be in the environment. Integration tests run against
+Requires `OPERATOR_ID` and `OPERATOR_KEY` to be in a .env file in the examples directory.   Many examples run against
 the Hedera test network.
 
 ```sh
-$ export OEPRATOR_ID="..."
-$ export OPERATOR_KEY="..."
-
 $ ./gradlew -q example:run<NameOfExample>
 $ ./gradlew -q example:runGenerateKey
 ```

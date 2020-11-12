@@ -6,6 +6,8 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 
+import java.time.Instant;
+
 public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> {
     private final TokenUpdateTransactionBody.Builder builder;
 
@@ -29,31 +31,31 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         return this;
     }
 
-    public String getName() {
+    public String getTokenName() {
         return builder.getName();
     }
 
-    public TokenUpdateTransaction setName(String name) {
+    public TokenUpdateTransaction setTokenName(String name) {
         requireNotFrozen();
         builder.setName(name);
         return this;
     }
 
-    public String getSymbol() {
+    public String getTokenSymbol() {
         return builder.getSymbol();
     }
 
-    public TokenUpdateTransaction setSymbol(String symbol) {
+    public TokenUpdateTransaction setTokenSymbol(String symbol) {
         requireNotFrozen();
         builder.setSymbol(symbol);
         return this;
     }
 
-    public AccountId getTreasury() {
+    public AccountId getTreasuryAccountId() {
         return AccountId.fromProtobuf(builder.getTreasury());
     }
 
-    public TokenUpdateTransaction setTreasury(AccountId accountId) {
+    public TokenUpdateTransaction setTreasuryAccountId(AccountId accountId) {
         requireNotFrozen();
         builder.setTreasury(accountId.toProtobuf());
         return this;
@@ -109,21 +111,21 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         return this;
     }
 
-    public long getExpirationTime() {
-        return builder.getExpiry();
+    public Instant getExpirationTime() {
+        return Instant.ofEpochSecond(builder.getExpiry());
     }
 
-    public TokenUpdateTransaction setExpirationTime(long expirationTime) {
+    public TokenUpdateTransaction setExpirationTime(Instant expirationTime) {
         requireNotFrozen();
-        builder.setExpiry(expirationTime);
+        builder.setExpiry(expirationTime.getEpochSecond());
         return this;
     }
 
-    public AccountId getAutoRenewAccount() {
+    public AccountId getAutoRenewAccountId() {
         return AccountId.fromProtobuf(builder.getAutoRenewAccount());
     }
 
-    public TokenUpdateTransaction setAutoRenewAccount(AccountId accountId) {
+    public TokenUpdateTransaction setAutoRenewAccountId(AccountId accountId) {
         requireNotFrozen();
         builder.setAutoRenewAccount(accountId.toProtobuf());
         return this;

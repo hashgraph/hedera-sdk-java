@@ -27,16 +27,15 @@ abstract class Executable<RequestT, ResponseT, O> implements WithExecute<O> {
     }
 
     private CompletableFuture<O> executeAsync(Client client, int attempt) {
-        var nodeId = getNodeAccountId(client);
+        var node = client.network.networkNodes.get(getNodeAccountId());
 
         logger.atTrace()
-            .addKeyValue("node", nodeId)
+            .addKeyValue("node", node.accountId)
             .addKeyValue("attempt", attempt)
             .log("sending request \n{}", this);
 
-        var channel = client.getNetworkChannel(nodeId);
         var methodDescriptor = getMethodDescriptor();
-        var call = channel.newCall(methodDescriptor, CallOptions.DEFAULT);
+        var call = node.getChannel().newCall(methodDescriptor, CallOptions.DEFAULT);
         var request = makeRequest();
 
         // advance the internal index
@@ -52,7 +51,7 @@ abstract class Executable<RequestT, ResponseT, O> implements WithExecute<O> {
 
             if (shouldRetryExceptionally(error)) {
                 logger.atError()
-                    .addKeyValue("node", nodeId)
+                    .addKeyValue("node", node.accountId)
                     .addKeyValue("attempt", attempt)
                     .addKeyValue("delay:", delay)
                     .setCause(error)
@@ -71,7 +70,7 @@ abstract class Executable<RequestT, ResponseT, O> implements WithExecute<O> {
             var responseStatus = mapResponseStatus(response);
 
             logger.atTrace()
-                .addKeyValue("node", nodeId)
+                .addKeyValue("node", node.accountId)
                 .addKeyValue("attempt", attempt)
                 .addKeyValue("status", responseStatus)
                 .log("received response in {}s\n{}", latency, response);
@@ -91,7 +90,7 @@ abstract class Executable<RequestT, ResponseT, O> implements WithExecute<O> {
             }
 
             // successful response from Hedera
-            return CompletableFuture.completedFuture(mapResponse(response, nodeId, request));
+            return CompletableFuture.completedFuture(mapResponse(response, node.accountId, request));
         }).thenCompose(x -> x);
     }
 
@@ -112,7 +111,7 @@ abstract class Executable<RequestT, ResponseT, O> implements WithExecute<O> {
      */
     abstract MethodDescriptor<RequestT, ResponseT> getMethodDescriptor();
 
-    abstract AccountId getNodeAccountId(@Nullable Client client);
+    abstract AccountId getNodeAccountId();
 
     @Nullable
     abstract TransactionId getTransactionId();

@@ -5,6 +5,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ContractGetInfoResponse;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -68,6 +70,16 @@ public final class ContractInfo {
      */
     public final Hbar balance;
 
+    /**
+     * Whether the contract has been deleted
+     */
+    public final boolean isDeleted;
+
+    /**
+     * The tokens associated to the contract
+     */
+    public final Map<TokenId, TokenRelationship> tokenRelationships;
+
     private ContractInfo(
         ContractId contractId,
         AccountId accountId,
@@ -77,7 +89,9 @@ public final class ContractInfo {
         Duration autoRenewPeriod,
         long storage,
         String contractMemo,
-        long balance
+        Hbar balance,
+        boolean isDeleted,
+        Map<TokenId, TokenRelationship> tokenRelationships
     ) {
         this.contractId = contractId;
         this.accountId = accountId;
@@ -87,13 +101,24 @@ public final class ContractInfo {
         this.autoRenewPeriod = autoRenewPeriod;
         this.storage = storage;
         this.contractMemo = contractMemo;
-        this.balance = Hbar.fromTinybars(balance);
+        this.balance = balance;
+        this.isDeleted = isDeleted;
+        this.tokenRelationships = tokenRelationships;
     }
 
     static ContractInfo fromProtobuf(ContractGetInfoResponse.ContractInfo contractInfo) {
         var adminKey = contractInfo.hasAdminKey()
             ? Key.fromProtobuf(contractInfo.getAdminKey())
             : null;
+
+        var tokenRelationships = new HashMap<TokenId, TokenRelationship>(contractInfo.getTokenRelationshipsCount());
+
+        for (var relationship : contractInfo.getTokenRelationshipsList()) {
+            tokenRelationships.put(
+                TokenId.fromProtobuf(relationship.getTokenId()),
+                TokenRelationship.fromProtobuf(relationship)
+            );
+        }
 
         return new ContractInfo(
             ContractId.fromProtobuf(contractInfo.getContractID()),
@@ -104,7 +129,9 @@ public final class ContractInfo {
             DurationConverter.fromProtobuf(contractInfo.getAutoRenewPeriod()),
             contractInfo.getStorage(),
             contractInfo.getMemo(),
-            contractInfo.getBalance()
+            Hbar.fromTinybars(contractInfo.getBalance()),
+            contractInfo.getDeleted(),
+            tokenRelationships
         );
     }
 
@@ -142,6 +169,8 @@ public final class ContractInfo {
             .add("storage", storage)
             .add("contractMemo", contractMemo)
             .add("balance", balance)
+            .add("isDeleted", isDeleted)
+            .add("tokenRelationships", tokenRelationships)
             .toString();
     }
 

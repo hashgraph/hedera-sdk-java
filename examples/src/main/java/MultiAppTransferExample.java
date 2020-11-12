@@ -1,14 +1,4 @@
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.CryptoTransferTransaction;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
-import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.TransactionResponse;
-import com.hedera.hashgraph.sdk.Transaction;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
@@ -19,6 +9,9 @@ public final class MultiAppTransferExample {
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK");
+    private static final String CONFIG_FILE = Dotenv.load().get("CONFIG_FILE");
+
     // the exchange should possess this key, we're only generating it for demonstration purposes
     private static final PrivateKey exchangeKey = PrivateKey.generate();
     // this is the only key we should actually possess
@@ -26,11 +19,21 @@ public final class MultiAppTransferExample {
     private static final Client client;
 
     static {
-        client = Client.forTestnet();
+        Client c;
+
+        if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {
+            c = Client.forPreviewnet();
+        } else {
+            try {
+                c = Client.fromConfigFile(CONFIG_FILE != null ? CONFIG_FILE : "");
+            } catch (Exception e) {
+                c = Client.forTestnet();
+            }
+        }
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
-        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+        client = c.setOperator(OPERATOR_ID, OPERATOR_KEY);
     }
 
     private MultiAppTransferExample() {
@@ -65,9 +68,9 @@ public final class MultiAppTransferExample {
 
         // next we make a transfer from the user account to the
         // exchange account, this requires signing by both parties
-        CryptoTransferTransaction transferTxn = new CryptoTransferTransaction()
-            .addRecipient(exchangeAccountId, new Hbar(2))
-            .addSender(userAccountId, new Hbar(2))
+        TransferTransaction transferTxn = new TransferTransaction()
+            .addHbarTransfer(userAccountId, new Hbar(2).negated())
+            .addHbarTransfer(exchangeAccountId, new Hbar(2))
             // the exchange-provided memo required to validate the transaction
             .setTransactionMemo("https://some-exchange.com/user1/account1")
             // NOTE: to manually sign, you must freeze the Transaction first
@@ -83,7 +86,7 @@ public final class MultiAppTransferExample {
 
         // get the amount we are about to transfer
         // we built this with +2, -2
-        Hbar transferAmount = ((CryptoTransferTransaction)signedTransferTxn).getTransfers().get(0).amount;
+        Hbar transferAmount = ((TransferTransaction)signedTransferTxn).getHbarTransfers().values().toArray(new Hbar[0])[0];
 
         System.out.println("about to transfer " + transferAmount + "...");
 
@@ -95,11 +98,13 @@ public final class MultiAppTransferExample {
 
         Hbar senderBalanceAfter = new AccountBalanceQuery()
             .setAccountId(userAccountId)
-            .execute(client);
+            .execute(client)
+            .hbars;
 
         Hbar receiptBalanceAfter = new AccountBalanceQuery()
             .setAccountId(exchangeAccountId)
-            .execute(client);
+            .execute(client)
+            .hbars;
 
         System.out.println("" + userAccountId + " balance = " + senderBalanceAfter);
         System.out.println("" + exchangeAccountId + " balance = " + receiptBalanceAfter);

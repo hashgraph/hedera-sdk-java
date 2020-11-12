@@ -10,6 +10,7 @@ import io.grpc.MethodDescriptor;
 import java.time.Duration;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 
 /**
  * Start a new smart contract instance.
@@ -64,10 +65,10 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
     }
 
-    ContractCreateTransaction(TransactionBody body) {
-        super(body);
+    ContractCreateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+        super(txs.values().iterator().next());
 
-        builder = body.getContractCreateInstance().toBuilder();
+        builder = bodyBuilder.getContractCreateInstance().toBuilder();
     }
 
     @Nullable

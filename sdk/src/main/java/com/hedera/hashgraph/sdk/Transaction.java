@@ -3,15 +3,14 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SignatureMap;
-import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import org.bouncycastle.crypto.digests.SHA384Digest;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.*;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -58,123 +57,152 @@ public abstract class Transaction<T extends Transaction<T>>
         this(body.toBuilder());
     }
 
+    Transaction(HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction> txs) {
+        this.nodeIds = new ArrayList<>(txs.keySet());
+        this.signatures = new ArrayList<>(this.nodeIds.size());
+        this.transactions = new ArrayList<>(this.nodeIds.size());
+
+        for (var value : txs.values()) {
+            this.signatures.add(value.getSigMap().toBuilder());
+            this.transactions.add(value.toBuilder());
+        }
+
+        try {
+            bodyBuilder = TransactionBody.parseFrom(this.transactions.get(0).getBodyBytes()).toBuilder();
+        } catch (InvalidProtocolBufferException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
     Transaction(TransactionBody.Builder bodyBuilder) {
         this.bodyBuilder = bodyBuilder;
     }
 
     public static Transaction<?> fromBytes(byte[] bytes) {
-        com.hedera.hashgraph.sdk.proto.Transaction tx;
+        var buf = new ByteArrayInputStream(bytes);
+        var txs = new HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>>();
+        TransactionBody.DataCase dataCase = TransactionBody.DataCase.DATA_NOT_SET;
 
-        try {
-            tx = com.hedera.hashgraph.sdk.proto.Transaction.parseFrom(bytes);
-        } catch (InvalidProtocolBufferException e) {
-            throw new IllegalArgumentException(e);
-        }
+        while (true) {
+            com.hedera.hashgraph.sdk.proto.Transaction tx = null;
 
-        var isFrozen = tx.getSigMap().getSigPairCount() > 0;
+            try {
+                tx = com.hedera.hashgraph.sdk.proto.Transaction.parseDelimitedFrom(buf);
+            } catch (IOException e) {
+                // Do nothing as this should not be possible
+            }
 
-        TransactionBody txBody;
+            if (tx == null) {
+                break;
+            }
 
-        try {
-            txBody = TransactionBody.parseFrom(tx.getBodyBytes());
-        } catch (InvalidProtocolBufferException e) {
-            throw new IllegalArgumentException(e);
+            TransactionBody txBody;
+
+            try {
+                txBody = TransactionBody.parseFrom(tx.getBodyBytes());
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException(e);
+            }
+
+            if (dataCase.getNumber() == TransactionBody.DataCase.DATA_NOT_SET.getNumber()) {
+                dataCase = txBody.getDataCase();
+            }
+
+            var account = AccountId.fromProtobuf(txBody.getNodeAccountID());
+            var transactionId = TransactionId.fromProtobuf(txBody.getTransactionID());
+
+            txs.computeIfAbsent(transactionId, k -> new HashMap<>()).put(account, tx);
         }
 
         Transaction<?> instance;
 
-        switch (txBody.getDataCase()) {
+        switch (dataCase) {
             case CONTRACTCALL:
-                instance = new ContractExecuteTransaction(txBody);
+                instance = new ContractExecuteTransaction(txs);
                 break;
 
             case CONTRACTCREATEINSTANCE:
-                instance = new ContractCreateTransaction(txBody);
+                instance = new ContractCreateTransaction(txs);
                 break;
 
             case CONTRACTUPDATEINSTANCE:
-                instance = new ContractUpdateTransaction(txBody);
+                instance = new ContractUpdateTransaction(txs);
                 break;
 
             case CONTRACTDELETEINSTANCE:
-                instance = new ContractDeleteTransaction(txBody);
+                instance = new ContractDeleteTransaction(txs);
                 break;
 
             case CRYPTOADDLIVEHASH:
-                instance = new LiveHashAddTransaction(txBody);
+                instance = new LiveHashAddTransaction(txs);
                 break;
 
             case CRYPTOCREATEACCOUNT:
-                instance = new AccountCreateTransaction(txBody);
+                instance = new AccountCreateTransaction(txs);
                 break;
 
             case CRYPTODELETE:
-                instance = new AccountDeleteTransaction(txBody);
+                instance = new AccountDeleteTransaction(txs);
                 break;
 
             case CRYPTODELETELIVEHASH:
-                instance = new LiveHashDeleteTransaction(txBody);
+                instance = new LiveHashDeleteTransaction(txs);
                 break;
 
             case CRYPTOTRANSFER:
-                instance = new CryptoTransferTransaction(txBody);
+                instance = new TransferTransaction(txs);
                 break;
 
             case CRYPTOUPDATEACCOUNT:
-                instance = new AccountUpdateTransaction(txBody);
+                instance = new AccountUpdateTransaction(txs);
                 break;
 
             case FILEAPPEND:
-                instance = new FileAppendTransaction(txBody);
+                instance = new FileAppendTransaction(txs);
                 break;
 
             case FILECREATE:
-                instance = new FileCreateTransaction(txBody);
+                instance = new FileCreateTransaction(txs);
                 break;
 
             case FILEDELETE:
-                instance = new FileDeleteTransaction(txBody);
+                instance = new FileDeleteTransaction(txs);
                 break;
 
             case FILEUPDATE:
-                instance = new FileUpdateTransaction(txBody);
+                instance = new FileUpdateTransaction(txs);
                 break;
 
             case SYSTEMDELETE:
-                instance = new SystemDeleteTransaction(txBody);
+                instance = new SystemDeleteTransaction(txs);
                 break;
 
             case SYSTEMUNDELETE:
-                instance = new SystemUndeleteTransaction(txBody);
+                instance = new SystemUndeleteTransaction(txs);
                 break;
 
             case FREEZE:
-                instance = new FreezeTransaction(txBody);
+                instance = new FreezeTransaction(txs);
                 break;
 
             case CONSENSUSCREATETOPIC:
-                instance = new TopicCreateTransaction(txBody);
+                instance = new TopicCreateTransaction(txs);
                 break;
 
             case CONSENSUSUPDATETOPIC:
-                instance = new TopicUpdateTransaction(txBody);
+                instance = new TopicUpdateTransaction(txs);
                 break;
 
             case CONSENSUSDELETETOPIC:
-                instance = new TopicDeleteTransaction(txBody);
+                instance = new TopicDeleteTransaction(txs);
                 break;
 
             case CONSENSUSSUBMITMESSAGE:
                 // a chunked transaction does not need the same handling
-                return new TopicMessageSubmitTransaction(txBody, tx.getSigMap());
+                return new TopicMessageSubmitTransaction(txs);
 
             default:
                 throw new IllegalArgumentException("parsed transaction body has no data");
-        }
-
-        if (isFrozen) {
-            instance.signatures = Collections.singletonList(tx.getSigMap().toBuilder());
-            instance.transactions = Collections.singletonList(tx.toBuilder());
         }
 
         return instance;
@@ -203,25 +231,30 @@ public abstract class Transaction<T extends Transaction<T>>
         return null;
     }
 
-    @Override
-    final AccountId getNodeAccountId(@Nullable Client client) {
-        return Objects.requireNonNull(getNodeAccountId());
+    @Nullable
+    public final List<AccountId> getNodeAccountIds() {
+        if (!nodeIds.isEmpty()) {
+            return nodeIds;
+        }
+
+        return null;
     }
 
     /**
-     * Set the account ID of the node that this transaction will be submitted to.
+     * Set the account IDs of the nodes that this transaction will be submitted to.
      * <p>
      * Providing an explicit node account ID interferes with client-side load balancing of the
      * network. By default, the SDK will pre-generate a transaction for 1/3 of the nodes on the
      * network. If a node is down, busy, or otherwise reports a fatal error, the SDK will try again
      * with a different node.
      *
-     * @param nodeAccountId The node AccountId to be set
+     * @param nodeAccountIds The list of node AccountIds to be set
      * @return {@code this}
      */
-    public final T setNodeAccountId(AccountId nodeAccountId) {
+    public final T setNodeAccountIds(List<AccountId> nodeAccountIds) {
         requireNotFrozen();
-        bodyBuilder.setNodeAccountID(nodeAccountId.toProtobuf());
+        nodeIds = nodeAccountIds;
+        bodyBuilder.setNodeAccountID(nodeIds.get(nextTransactionIndex).toProtobuf());
 
         // noinspection unchecked
         return (T) this;
@@ -295,7 +328,21 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     public byte[] toBytes() {
-        return transactions.get(0).setSigMap(signatures.get(0)).buildPartial().toByteArray();
+        if (!this.isFrozen()) {
+            throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
+        }
+
+        var buf = new ByteArrayOutputStream();
+
+        for (int i = 0; i < transactions.size(); i++) {
+            try {
+                transactions.get(i).setSigMap(signatures.get(0)).buildPartial().writeDelimitedTo(buf);
+            } catch (IOException e) {
+                // Do nothing as this should never happen
+            }
+        }
+
+        return buf.toByteArray();
     }
 
     public byte[] getTransactionHash() {
@@ -303,11 +350,25 @@ public abstract class Transaction<T extends Transaction<T>>
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
-        if (this.transactions.size() != 1) {
-            throw new IllegalStateException("transaction must have an explicit node ID set, try calling `setNodeAccountId`");
+        return hash(transactions.get(0).setSigMap(signatures.get(0)).buildPartial().toByteArray());
+    }
+
+    public Map<AccountId, byte[]> getTransactionHashPerNode() {
+        if (!this.isFrozen()) {
+            throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
-        return hash(makeRequest().toByteArray());
+        var index = nextTransactionIndex;
+        nextTransactionIndex = 0;
+        var hashes = new HashMap<AccountId, byte[]>();
+
+        for (nextTransactionIndex = 0; nextTransactionIndex < transactions.size(); nextTransactionIndex++) {
+            hashes.put(nodeIds.get(nextTransactionIndex), hash(makeRequest().toByteArray()));
+        }
+
+        nextTransactionIndex = index;
+
+        return hashes;
     }
 
     @Override
@@ -347,7 +408,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
     public T signWith(PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
         if (!isFrozen()) {
-            freeze();
+            throw new IllegalStateException("Signing requires transaction to be frozen");
         }
 
         for (var index = 0; index < transactions.size(); ++index) {
@@ -401,7 +462,7 @@ public abstract class Transaction<T extends Transaction<T>>
         return false;
     }
 
-    public Transaction addSignature(PublicKey publicKey, byte[] signature) {
+    public T addSignature(PublicKey publicKey, byte[] signature) {
         this.requireExactNode();
 
         if (!isFrozen()) {
@@ -415,7 +476,8 @@ public abstract class Transaction<T extends Transaction<T>>
 
         this.signatures.get(0).addSigPair(publicKey.toSignaturePairProtobuf(signature));
 
-        return this;
+        // noinspection unchecked
+        return (T) this;
     }
 
     protected boolean isFrozen() {
@@ -454,6 +516,11 @@ public abstract class Transaction<T extends Transaction<T>>
      * @return {@code this}
      */
     public T freezeWith(@Nullable Client client) {
+        if (isFrozen()) {
+            // noinspection unchecked
+            return (T) this;
+        }
+
         if (client != null && bodyBuilder.getTransactionFee() == 0) {
             bodyBuilder.setTransactionFee(client.maxTransactionFee.toTinybars());
         }
@@ -509,18 +576,12 @@ public abstract class Transaction<T extends Transaction<T>>
         }
 
         if (bodyBuilder.hasTransactionID() && client != null) {
-            // Pick N / 3 nodes from the client and build that many transactions
-            // This is for fail-over so we can cycle through nodes
+            // Get a list of node AccountId's if the user has not set them manually.
+            nodeIds = client.network.getNodeAccountIdsForExecute();
+            signatures = new ArrayList<>(nodeIds.size());
+            transactions = new ArrayList<>(nodeIds.size());
 
-            var size = client.getNumberOfNodesForTransaction();
-            transactions = new ArrayList<>(size);
-            nodeIds = new ArrayList<>(size);
-            signatures = new ArrayList<>(size);
-
-            for (var i = 0; i < size; ++i) {
-                var nodeId = client.getNextNodeId();
-
-                nodeIds.add(nodeId);
+            for (AccountId nodeId : nodeIds) {
                 signatures.add(SignatureMap.newBuilder());
                 transactions.add(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
                     .setBodyBytes(bodyBuilder
@@ -556,7 +617,9 @@ public abstract class Transaction<T extends Transaction<T>>
         AccountId nodeId,
         com.hedera.hashgraph.sdk.proto.Transaction request
     ) {
-        return new TransactionResponse(nodeId, Objects.requireNonNull(getTransactionId()), hash(request.toByteArray()));
+        freeze();
+        var transactionId = Objects.requireNonNull(getTransactionId());
+        return new TransactionResponse(nodeId, transactionId,  hash(request.toByteArray()));
     }
 
     @Override

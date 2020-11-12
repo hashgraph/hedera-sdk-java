@@ -10,6 +10,7 @@ import com.hedera.hashgraph.sdk.Hbar;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -41,7 +42,7 @@ public class ContractUpdateIntegrationTest {
 
             receipt = new ContractCreateTransaction()
                 .setAdminKey(operatorKey)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(file)
@@ -58,7 +59,7 @@ public class ContractUpdateIntegrationTest {
 
             @Var var info = new ContractInfoQuery()
                 .setContractId(contract)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setQueryPayment(new Hbar(1))
                 .execute(client);
 
@@ -72,7 +73,7 @@ public class ContractUpdateIntegrationTest {
 
             new ContractUpdateTransaction()
                 .setContractId(contract)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setContractMemo("[e2e::ContractUpdateTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
@@ -81,7 +82,7 @@ public class ContractUpdateIntegrationTest {
 
             info = new ContractInfoQuery()
                 .setContractId(contract)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setQueryPayment(new Hbar(5))
                 .execute(client);
 
@@ -94,14 +95,14 @@ public class ContractUpdateIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contract)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .execute(client)
                 .transactionId
                 .getReceipt(client);
 
             new FileDeleteTransaction()
                 .setFileId(file)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .execute(client);
 
             client.close();

@@ -4,6 +4,7 @@ import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,7 +34,7 @@ public class FileContentsIntegrationTest {
 
             var contents = new FileContentsQuery()
                 .setFileId(file)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setQueryPayment(new Hbar(1))
                 .execute(client);
 
@@ -41,7 +42,7 @@ public class FileContentsIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(file)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
                 .transactionId

@@ -23,12 +23,23 @@ public final class GetAddressBookExample {
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK");
+    private static final String CONFIG_FILE = Dotenv.load().get("CONFIG_FILE");
 
     private GetAddressBookExample() { }
 
     public static void main(String[] args) throws HederaPreCheckStatusException, IOException, TimeoutException {
-        // `Client.forMainnet()` is provided for connecting to Hedera mainnet
-        Client client = Client.forTestnet();
+        Client client;
+
+        if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {
+            client = Client.forPreviewnet();
+        } else {
+            try {
+                client = Client.fromConfigFile(CONFIG_FILE != null ? CONFIG_FILE : "");
+            } catch (Exception e) {
+                client = Client.forTestnet();
+            }
+        }
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
