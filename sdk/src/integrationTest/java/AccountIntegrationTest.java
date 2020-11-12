@@ -13,6 +13,7 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
 
+import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -47,14 +48,14 @@ class AccountIntegrationTest {
             var account = receipt.accountId;
 
             @Var var balance = new AccountBalanceQuery()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setAccountId(account)
                 .execute(client);
 
-            assertEquals(balance, new Hbar(1));
+            assertEquals(balance.hbars, new Hbar(1));
 
             var info = new AccountInfoQuery()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setAccountId(account)
                 .execute(client);
 
@@ -63,27 +64,25 @@ class AccountIntegrationTest {
             assertEquals(info.key.toString(), key1.getPublicKey().toString());
             assertEquals(info.balance, new Hbar(1));
             assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
-            assertEquals(info.receiveRecordThreshold.toTinybars(), Long.MAX_VALUE);
-            assertEquals(info.sendRecordThreshold.toTinybars(), Long.MAX_VALUE);
             assertNull(info.proxyAccountId);
             assertEquals(info.proxyReceived, Hbar.ZERO);
 
             new AccountRecordsQuery()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setAccountId(account)
                 .setMaxQueryPayment(new Hbar(1))
                 .execute(client);
 
             assertThrows(HederaPreCheckStatusException.class, () -> {
                 new AccountStakersQuery()
-                    .setNodeAccountId(response.nodeId)
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setAccountId(account)
                     .setMaxQueryPayment(new Hbar(1))
                     .execute(client);
             });
 
             new AccountUpdateTransaction()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setAccountId(account)
                 .setKey(key2.getPublicKey())
                 .setMaxTransactionFee(new Hbar(1))
@@ -95,15 +94,15 @@ class AccountIntegrationTest {
                 .getReceipt(client);
 
             balance = new AccountBalanceQuery()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setAccountId(account)
                 .setMaxQueryPayment(new Hbar(1))
                 .execute(client);
 
-            assertEquals(balance, new Hbar(1));
+            assertEquals(balance.hbars, new Hbar(1));
 
             new AccountDeleteTransaction()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setAccountId(account)
                 .setTransferAccountId(operatorId)
                 .setTransactionId(TransactionId.generate(account))
@@ -116,7 +115,7 @@ class AccountIntegrationTest {
 
             assertThrows(HederaPreCheckStatusException.class, () -> {
                 new AccountInfoQuery()
-                    .setNodeAccountId(response.nodeId)
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setAccountId(account)
                     .execute(client);
             });

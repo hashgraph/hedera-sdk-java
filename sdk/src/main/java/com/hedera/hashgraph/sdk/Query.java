@@ -15,6 +15,8 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,8 +36,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
     @Nullable
     private List<Transaction> paymentTransactions;
 
-    @Nullable
-    private List<AccountId> paymentTransactionNodeIds;
+    private List<AccountId> paymentTransactionNodeIds = new ArrayList<>();
 
     private int nextPaymentTransactionIndex = 0;
 
@@ -45,19 +46,14 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
     @Nullable
     private Hbar maxQueryPayment;
 
-    @Nullable
-    private AccountId nodeId;
-
     Query() {
         builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
         headerBuilder = QueryHeader.newBuilder();
     }
 
-    /**
-     * Set an explicit node ID to use for this query.
-     */
-    public T setNodeAccountId(AccountId nodeAccountId) {
-        this.nodeId = nodeAccountId;
+    public T setNodeAccountIds(List<AccountId> nodeAccountIds) {
+        paymentTransactionNodeIds.clear();
+        paymentTransactionNodeIds.addAll(nodeAccountIds);
 
         // noinspection unchecked
         return (T) this;
@@ -134,6 +130,11 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
 
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
+        if (paymentTransactionNodeIds.size() == 0) {
+            // Get a list of node AccountId's if the user has not set them manually.
+            paymentTransactionNodeIds = client.network.getNodeAccountIdsForExecute();
+        }
+
         if ((paymentTransactions != null) || !isPaymentRequired()) {
             return CompletableFuture.completedFuture(null);
         }
@@ -174,31 +175,9 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
             .thenCompose(x -> x)
             .thenAccept((paymentAmount) -> {
                 paymentTransactionId = TransactionId.generate(operator.accountId);
+                paymentTransactions = new ArrayList<>(paymentTransactionNodeIds.size());
 
-                if (nodeId == null) {
-                    // Like how TransactionBuilder has to build (N / 3) native transactions to handle multi-node retry,
-                    // so too does the QueryBuilder for payment transactions
-
-                    var size = client.getNumberOfNodesForTransaction();
-                    paymentTransactions = new ArrayList<>(size);
-                    paymentTransactionNodeIds = new ArrayList<>(size);
-
-                    for (var i = 0; i < size; ++i) {
-                        var nodeId = client.getNextNodeId();
-
-                        paymentTransactionNodeIds.add(nodeId);
-                        paymentTransactions.add(makePaymentTransaction(
-                            paymentTransactionId,
-                            nodeId,
-                            operator,
-                            paymentAmount
-                        ));
-                    }
-                } else {
-                    paymentTransactions = new ArrayList<>(1);
-                    paymentTransactionNodeIds = new ArrayList<>(1);
-
-                    paymentTransactionNodeIds.add(nodeId);
+                for (AccountId nodeId : paymentTransactionNodeIds) {
                     paymentTransactions.add(makePaymentTransaction(
                         paymentTransactionId,
                         nodeId,
@@ -215,12 +194,13 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
         Client.Operator operator,
         Hbar paymentAmount
     ) {
-        return new CryptoTransferTransaction()
+        return new TransferTransaction()
             .setTransactionId(paymentTransactionId)
-            .setNodeAccountId(nodeId)
+            .setNodeAccountIds(Collections.singletonList(nodeId))
             .setMaxTransactionFee(new Hbar(1)) // 1 Hbar
-            .addSender(operator.accountId, paymentAmount)
-            .addRecipient(nodeId, paymentAmount)
+            .addHbarTransfer(operator.accountId, paymentAmount.negated())
+            .addHbarTransfer(nodeId, paymentAmount)
+            .freeze()
             .signWith(operator.publicKey, operator.transactionSigner)
             .makeRequest();
     }
@@ -255,25 +235,16 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
         return Status.valueOf(preCheckCode);
     }
 
-    @Override
-    final AccountId getNodeAccountId(@Nullable Client client) {
+    final AccountId getNodeAccountId() {
         if (paymentTransactionNodeIds != null) {
-            // If this query needs a payment transaction we need to pick the node ID from the next
-            // payment transaction
             return paymentTransactionNodeIds.get(nextPaymentTransactionIndex);
+        } else {
+            throw new IllegalStateException("Query node AccountIds not set before executing");
         }
+    }
 
-        if (nodeId != null) {
-            // if there was an explicit node ID set, use that
-            return nodeId;
-        }
-
-        if (client == null) {
-            throw new IllegalStateException("requires a client to pick the next node ID for a query");
-        }
-
-        // Otherwise just pick the next node in the round robin
-        return client.getNextNodeId();
+    final List<AccountId> getNodeAccountIds() {
+        return paymentTransactionNodeIds;
     }
 
     @Override
@@ -317,8 +288,8 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
             // that is okay
             // now go back to sleep
             // without this, an error of MISSING_QUERY_HEADER is returned
-            headerBuilder.setPayment(new CryptoTransferTransaction()
-                .setNodeAccountId(new AccountId(0))
+            headerBuilder.setPayment(new TransferTransaction()
+                .setNodeAccountIds(Collections.singletonList(new AccountId(0)))
                 .setTransactionId(new TransactionId(new AccountId(0), Instant.ofEpochSecond(0)))
                 .freeze()
                 .makeRequest());

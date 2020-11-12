@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -39,7 +40,7 @@ public class ContractBytecodeIntegrationTest {
 
             receipt = new ContractCreateTransaction()
                 .setAdminKey(operatorKey)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(file)
@@ -55,7 +56,7 @@ public class ContractBytecodeIntegrationTest {
             var contract = Objects.requireNonNull(receipt.contractId);
 
             var bytecode = new ContractByteCodeQuery()
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setContractId(contract)
                 .setQueryPayment(new Hbar(2))
                 .execute(client);
@@ -64,14 +65,14 @@ public class ContractBytecodeIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contract)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .execute(client)
                 .transactionId
                 .getReceipt(client);
 
             new FileDeleteTransaction()
                 .setFileId(file)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .execute(client);
 
             client.close();

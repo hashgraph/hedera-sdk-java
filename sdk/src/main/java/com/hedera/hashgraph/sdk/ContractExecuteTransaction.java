@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 
 /**
  * Call a function of the given smart contract instance, giving it parameters as its inputs.
@@ -25,10 +26,10 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
         builder = ContractCallTransactionBody.newBuilder();
     }
 
-    ContractExecuteTransaction(TransactionBody body) {
-        super(body);
+    ContractExecuteTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+        super(txs.values().iterator().next());
 
-        builder = body.getContractCall().toBuilder();
+        builder = bodyBuilder.getContractCall().toBuilder();
     }
 
     @Nullable

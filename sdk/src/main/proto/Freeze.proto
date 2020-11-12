@@ -3,11 +3,11 @@ syntax = "proto3";
 package proto;
 
 /*-
- *
+ * ‌
  * Hedera Network Services Protobuf
- *
+ * ​
  * Copyright (C) 2018 - 2020 Hedera Hashgraph, LLC
- *
+ * ​
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +19,7 @@ package proto;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
+ * ‍
  */
 
 option java_package = "com.hedera.hashgraph.sdk.proto";
@@ -36,4 +36,5 @@ message FreezeTransactionBody {
     int32 endHour = 3; // The end hour (in UTC time), a value between 0 and 23
     int32 endMin = 4; // The end minute (in UTC time), a value between 0 and 59
     FileID updateFile = 5; // The ID of the file needs to be updated during a freeze transaction
+    bytes fileHash = 6; // The hash value of the file, used to verify file content before performing freeze and update
 }

@@ -9,6 +9,7 @@ import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 
 /**
  * Modify a smart contract instance to have the given parameter values.
@@ -40,10 +41,10 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         builder = ContractUpdateTransactionBody.newBuilder();
     }
 
-    ContractUpdateTransaction(TransactionBody body) {
-        super(body);
+    ContractUpdateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+        super(txs.values().iterator().next());
 
-        builder = body.getContractUpdateInstance().toBuilder();
+        builder = bodyBuilder.getContractUpdateInstance().toBuilder();
     }
 
     @Nullable

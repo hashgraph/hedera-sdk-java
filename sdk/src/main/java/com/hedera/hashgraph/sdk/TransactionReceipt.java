@@ -48,6 +48,12 @@ public final class TransactionReceipt {
     public final TopicId topicId;
 
     /**
+     * The token ID, if a new token was created.
+     */
+    @Nullable
+    public final TokenId tokenId;
+
+    /**
      * Updated sequence number for a consensus service topic.
      * Set for {@link TopicMessageSubmitTransaction}.
      */
@@ -68,6 +74,7 @@ public final class TransactionReceipt {
         @Nullable FileId fileId,
         @Nullable ContractId contractId,
         @Nullable TopicId topicId,
+        @Nullable TokenId tokenId,
         @Nullable Long topicSequenceNumber,
         @Nullable ByteString topicRunningHash
     ) {
@@ -77,6 +84,7 @@ public final class TransactionReceipt {
         this.fileId = fileId;
         this.contractId = contractId;
         this.topicId = topicId;
+        this.tokenId = tokenId;
         this.topicSequenceNumber = topicSequenceNumber;
         this.topicRunningHash = topicRunningHash;
     }
@@ -107,6 +115,11 @@ public final class TransactionReceipt {
                 ? TopicId.fromProtobuf(transactionReceipt.getTopicID())
                 : null;
 
+        var tokenId =
+            transactionReceipt.hasTokenId()
+                ? TokenId.fromProtobuf(transactionReceipt.getTokenId())
+                : null;
+
         var topicSequenceNumber =
             transactionReceipt.getTopicSequenceNumber() == 0
                 ? null
@@ -124,6 +137,7 @@ public final class TransactionReceipt {
             fileId,
             contractId,
             topicId,
+            tokenId,
             topicSequenceNumber,
             topicRunningHash
         );
@@ -162,6 +176,10 @@ public final class TransactionReceipt {
             transactionReceiptBuilder.setTopicID(topicId.toProtobuf());
         }
 
+        if (tokenId != null) {
+            transactionReceiptBuilder.setTokenId(tokenId.toProtobuf());
+        }
+
         if (topicSequenceNumber != null) {
             transactionReceiptBuilder.setTopicSequenceNumber(topicSequenceNumber);
         }
@@ -182,7 +200,9 @@ public final class TransactionReceipt {
             .add("fileId", fileId)
             .add("contractId", contractId)
             .add("topicId", topicId)
+            .add("tokenId", tokenId)
             .add("topicSequenceNumber", topicSequenceNumber)
+            .add("topicRunningHash", topicRunningHash)
             .toString();
     }
 

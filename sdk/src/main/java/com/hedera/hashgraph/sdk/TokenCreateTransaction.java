@@ -5,6 +5,8 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
+import org.threeten.bp.Duration;
+import org.threeten.bp.Instant;
 
 public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> {
     private final TokenCreateTransactionBody.Builder builder;
@@ -12,7 +14,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     public TokenCreateTransaction() {
         builder = TokenCreateTransactionBody.newBuilder();
 
-        setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD.toMillis() / 1000);
+        setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
+        setExpirationTime(Instant.now().plus(Duration.ofDays(90)));
     }
 
     TokenCreateTransaction(TransactionBody body) {
@@ -21,21 +24,21 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         builder = body.getTokenCreation().toBuilder();
     }
 
-    public String getName() {
+    public String getTokenName() {
         return builder.getName();
     }
 
-    public TokenCreateTransaction setName(String name) {
+    public TokenCreateTransaction setTokenName(String name) {
         requireNotFrozen();
         builder.setName(name);
         return this;
     }
 
-    public String getSymbol() {
+    public String getTokenSymbol() {
         return builder.getSymbol();
     }
 
-    public TokenCreateTransaction setSymbol(String symbol) {
+    public TokenCreateTransaction setTokenSymbol(String symbol) {
         requireNotFrozen();
         builder.setSymbol(symbol);
         return this;
@@ -61,11 +64,11 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return this;
     }
 
-    public AccountId getTreasury() {
+    public AccountId getTreasuryAccountId() {
         return AccountId.fromProtobuf(builder.getTreasury());
     }
 
-    public TokenCreateTransaction setTreasury(AccountId accountId) {
+    public TokenCreateTransaction setTreasuryAccountId(AccountId accountId) {
         requireNotFrozen();
         builder.setTreasury(accountId.toProtobuf());
         return this;
@@ -131,33 +134,33 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return this;
     }
 
-    public long getExpirationTime() {
-        return builder.getExpiry();
+    public Instant getExpirationTime() {
+        return Instant.ofEpochSecond(builder.getExpiry());
     }
 
-    public TokenCreateTransaction setExpirationTime(long expirationTime) {
+    public TokenCreateTransaction setExpirationTime(Instant expirationTime) {
         requireNotFrozen();
-        builder.setExpiry(expirationTime);
+        builder.setExpiry(expirationTime.getEpochSecond());
         return this;
     }
 
-    public AccountId getAutoRenewAccount() {
+    public AccountId getAutoRenewAccountId() {
         return AccountId.fromProtobuf(builder.getAutoRenewAccount());
     }
 
-    public TokenCreateTransaction setAutoRenewAccount(AccountId accountId) {
+    public TokenCreateTransaction setAutoRenewAccountId(AccountId accountId) {
         requireNotFrozen();
         builder.setAutoRenewAccount(accountId.toProtobuf());
         return this;
     }
 
-    public long getAutoRenewPeriod() {
-        return builder.getAutoRenewPeriod();
+    public Duration getAutoRenewPeriod() {
+        return Duration.ofSeconds(builder.getAutoRenewPeriod());
     }
 
-    public TokenCreateTransaction setAutoRenewPeriod(long period) {
+    public TokenCreateTransaction setAutoRenewPeriod(Duration period) {
         requireNotFrozen();
-        builder.setAutoRenewPeriod(period);
+        builder.setAutoRenewPeriod(period.getSeconds());
         return this;
     }
 

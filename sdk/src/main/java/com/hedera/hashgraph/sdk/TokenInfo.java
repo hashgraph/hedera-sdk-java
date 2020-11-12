@@ -136,21 +136,11 @@ public class TokenInfo {
     }
 
     @Nullable static Boolean freezeStatusFromProtobuf(TokenFreezeStatus freezeStatus) {
-        if (freezeStatus == TokenFreezeStatus.Frozen) {
-            return true;
-        } else if (freezeStatus == TokenFreezeStatus.Unfrozen) {
-            return false;
-        }
-        return null;
+        return freezeStatus == TokenFreezeStatus.FreezeNotApplicable ? null : freezeStatus == TokenFreezeStatus.Frozen;
     }
 
     @Nullable static Boolean kycStatusFromProtobuf(TokenKycStatus kycStatus) {
-        if (kycStatus == TokenKycStatus.Granted) {
-            return true;
-        } else if (kycStatus == TokenKycStatus.Revoked) {
-            return false;
-        }
-        return null;
+        return kycStatus == TokenKycStatus.KycNotApplicable ? null : kycStatus == TokenKycStatus.Granted;
     }
 
     static TokenInfo fromProtobuf(TokenGetInfoResponse tokenInfo) {
@@ -180,25 +170,15 @@ public class TokenInfo {
     }
 
     @Nullable static TokenFreezeStatus freezeStatusToProtobuf(@Nullable Boolean freezeStatus) {
-        if (freezeStatus == null) {
-            return TokenFreezeStatus.FreezeNotApplicable;
-        } else if (freezeStatus) {
-            return TokenFreezeStatus.Frozen;
-        }
-        return TokenFreezeStatus.Unfrozen;
+        return freezeStatus == null ? TokenFreezeStatus.FreezeNotApplicable : freezeStatus ? TokenFreezeStatus.Frozen : TokenFreezeStatus.Unfrozen;
     }
 
     @Nullable static TokenKycStatus kycStatusToProtobuf(@Nullable Boolean kycStatus) {
-        if (kycStatus == null) {
-            return TokenKycStatus.KycNotApplicable;
-        } else if (kycStatus) {
-            return TokenKycStatus.Granted;
-        }
-        return TokenKycStatus.Revoked;
+        return kycStatus == null ? TokenKycStatus.KycNotApplicable : kycStatus ? TokenKycStatus.Granted : TokenKycStatus.Revoked;
     }
 
     TokenGetInfoResponse toProtobuf() {
-        var tokenInfoBuilder = TokenGetInfoResponse.newBuilder().setTokenInfo(
+        return TokenGetInfoResponse.newBuilder().setTokenInfo(
             com.hedera.hashgraph.sdk.proto.TokenInfo.newBuilder()
             .setTokenId(tokenId.toProtobuf())
             .setName(name)
@@ -217,9 +197,7 @@ public class TokenInfo {
             .setAutoRenewAccount(autoRenewAccount.toProtobuf())
             .setAutoRenewPeriod(autoRenewPeriod)
             .setExpiry(expirationTime)
-        );
-
-        return tokenInfoBuilder.build();
+        ).build();
     }
 
     @Override

@@ -13,10 +13,14 @@ public class IntegrationTestClientManager {
     public static Client getClient() {
         @Var Client client;
 
-        try {
-            client = Client.fromJsonFile(System.getProperty("CONFIG_FILE"));
-        } catch (Exception e) {
-            client = Client.forTestnet();
+        if (System.getProperty("HEDERA_NETWORK").equals("previewnet")) {
+            client = Client.forPreviewnet();
+        } else {
+            try {
+                client = Client.fromConfigFile(System.getProperty("CONFIG_FILE"));
+            } catch (Exception e) {
+                client = Client.forTestnet();
+            }
         }
 
         try {
@@ -25,8 +29,6 @@ public class IntegrationTestClientManager {
 
             client.setOperator(operatorId, operatorKey);
         } catch (Exception e) {
-            System.out.println("Did not find `OPERATOR_KEY` or `OPERATOR_ID` environment variables.");
-            System.out.println("Using operator within the config.");
         }
 
         assertNotNull(client.getOperatorAccountId());

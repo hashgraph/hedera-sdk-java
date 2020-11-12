@@ -3,11 +3,11 @@ syntax = "proto3";
 package proto;
 
 /*-
- *
+ * ‌
  * Hedera Network Services Protobuf
- *
+ * ​
  * Copyright (C) 2018 - 2020 Hedera Hashgraph, LLC
- *
+ * ​
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +19,7 @@ package proto;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
+ * ‍
  */
 
 option java_package = "com.hedera.hashgraph.sdk.proto";
@@ -50,8 +50,9 @@ message ContractGetInfoResponse {
         int64 storage = 7; // number of bytes of storage being used by this instance (which affects the cost to extend the expiration time)
         string memo = 8; // the memo associated with the contract (max 100 bytes)
         uint64 balance = 9; // The current balance, in tinybars
+        bool deleted = 10; // Whether the contract has been deleted
+        repeated TokenRelationship tokenRelationships = 11; // The tokens associated to the contract
     }
-
     ContractInfo contractInfo = 2; // the information about this contract instance (a state proof can be generated for this)
 }
 

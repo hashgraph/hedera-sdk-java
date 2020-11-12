@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 
 /**
  * Undelete a file or smart contract that was deleted by AdminDelete.
@@ -21,10 +22,10 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
         builder = SystemUndeleteTransactionBody.newBuilder();
     }
 
-    SystemUndeleteTransaction(TransactionBody body) {
-        super(body);
+    SystemUndeleteTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+        super(txs.values().iterator().next());
 
-        builder = body.getSystemUndelete().toBuilder();
+        builder = bodyBuilder.getSystemUndelete().toBuilder();
     }
 
     @Nullable

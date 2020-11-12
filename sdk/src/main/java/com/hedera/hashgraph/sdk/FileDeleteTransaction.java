@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 
 /**
  * <p>A transaction to delete a file on the Hedera network.
@@ -26,10 +27,10 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
         builder = FileDeleteTransactionBody.newBuilder();
     }
 
-    FileDeleteTransaction(TransactionBody body) {
-        super(body);
+    FileDeleteTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+        super(txs.values().iterator().next());
 
-        builder = body.getFileDelete().toBuilder();
+        builder = bodyBuilder.getFileDelete().toBuilder();
     }
 
     @Nullable

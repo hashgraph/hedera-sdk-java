@@ -6,12 +6,12 @@ import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
 import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
 import com.hedera.hashgraph.sdk.ContractFunctionParameters;
 import com.hedera.hashgraph.sdk.ContractInfoQuery;
-import com.hedera.hashgraph.sdk.ContractRecordsQuery;
 import com.hedera.hashgraph.sdk.ContractUpdateTransaction;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -60,7 +60,7 @@ public class ContractIntegrationTest {
 
             @Var var info = new ContractInfoQuery()
                 .setContractId(contract)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setQueryPayment(new Hbar(1))
                 .execute(client);
 
@@ -74,7 +74,7 @@ public class ContractIntegrationTest {
 
             var bytecode = new ContractByteCodeQuery()
                 .setContractId(contract)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setQueryPayment(new Hbar(2))
                 .execute(client);
 
@@ -82,7 +82,7 @@ public class ContractIntegrationTest {
 
             var callQuery = new ContractCallQuery()
                 .setContractId(contract)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setQueryPayment(new Hbar(1))
                 .setGas(2000)
                 .setFunction("getMessage");
@@ -97,7 +97,7 @@ public class ContractIntegrationTest {
 
             new ContractExecuteTransaction()
                 .setContractId(contract)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setGas(10000)
                 .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
                 .setMaxTransactionFee(new Hbar(5))
@@ -107,7 +107,7 @@ public class ContractIntegrationTest {
 
             result = new ContractCallQuery()
                 .setContractId(contract)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setQueryPayment(new Hbar(5))
                 .setGas(2000)
                 .setFunction("getMessage")
@@ -115,15 +115,9 @@ public class ContractIntegrationTest {
 
             assertEquals("new message", result.getString(0));
 
-            new ContractRecordsQuery()
-                .setContractId(contract)
-                .setNodeAccountId(response.nodeId)
-                .setQueryPayment(new Hbar(5))
-                .execute(client);
-
             new ContractUpdateTransaction()
                 .setContractId(contract)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setContractMemo("[e2e::ContractUpdateTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
@@ -132,7 +126,7 @@ public class ContractIntegrationTest {
 
             info = new ContractInfoQuery()
                 .setContractId(contract)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setQueryPayment(new Hbar(5))
                 .execute(client);
 
@@ -145,7 +139,7 @@ public class ContractIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contract)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .execute(client)
                 .transactionId
                 .getReceipt(client);
@@ -153,7 +147,7 @@ public class ContractIntegrationTest {
             assertThrows(Exception.class, () -> {
                 new ContractInfoQuery()
                     .setContractId(contract)
-                    .setNodeAccountId(response.nodeId)
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setMaxQueryPayment(new Hbar(2))
                     .execute(client);
             });

@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 
 /**
  * At consensus, deletes a livehash associated to the given account. The transaction must be signed
@@ -20,10 +21,10 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
         builder = CryptoDeleteLiveHashTransactionBody.newBuilder();
     }
 
-    LiveHashDeleteTransaction(TransactionBody body) {
-        super(body);
+    LiveHashDeleteTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+        super(txs.values().iterator().next());
 
-        builder = body.getCryptoDeleteLiveHash().toBuilder();
+        builder = bodyBuilder.getCryptoDeleteLiveHash().toBuilder();
     }
 
     @Nullable

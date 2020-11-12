@@ -9,6 +9,8 @@ import org.threeten.bp.Instant;
 import org.threeten.bp.OffsetTime;
 import org.threeten.bp.ZoneOffset;
 
+import java.util.HashMap;
+
 /**
  * Set the freezing period in which the platform will stop creating events and accepting transactions.
  * This is used before safely shut down the platform for maintenance.
@@ -20,10 +22,10 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
         builder = FreezeTransactionBody.newBuilder();
     }
 
-    FreezeTransaction(TransactionBody body) {
-        super(body);
+    FreezeTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+        super(txs.values().iterator().next());
 
-        builder = body.getFreeze().toBuilder();
+        builder = bodyBuilder.getFreeze().toBuilder();
     }
 
     public Instant getStartTime() {

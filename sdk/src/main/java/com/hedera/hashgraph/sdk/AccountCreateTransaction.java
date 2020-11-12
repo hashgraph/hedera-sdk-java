@@ -8,6 +8,7 @@ import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 
 /**
  * Create a new Hedera™ account.
@@ -25,10 +26,10 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         setReceiveRecordThreshold(DEFAULT_RECORD_THRESHOLD);
     }
 
-    AccountCreateTransaction(TransactionBody body) {
-        super(body);
+    AccountCreateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+        super(txs.values().iterator().next());
 
-        builder = body.getCryptoCreateAccount().toBuilder();
+        builder = bodyBuilder.getCryptoCreateAccount().toBuilder();
     }
 
     @Nullable

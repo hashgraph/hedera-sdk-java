@@ -1,16 +1,4 @@
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.CryptoTransferTransaction;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
-import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
-import com.hedera.hashgraph.sdk.Key;
-import com.hedera.hashgraph.sdk.KeyList;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
-import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Collections;
@@ -23,11 +11,29 @@ public final class CreateAccountThresholdKeyExample {
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK");
+    private static final String CONFIG_FILE = Dotenv.load().get("CONFIG_FILE");
 
     private CreateAccountThresholdKeyExample() {
     }
 
     public static void main(String[] args) throws HederaPreCheckStatusException, TimeoutException, HederaReceiptStatusException {
+        Client client;
+
+        if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {
+            client = Client.forPreviewnet();
+        } else {
+            try {
+                client = Client.fromConfigFile(CONFIG_FILE != null ? CONFIG_FILE : "");
+            } catch (Exception e) {
+                client = Client.forTestnet();
+            }
+        }
+
+        // Defaults the operator account ID and key such that all generated transactions will be paid for
+        // by this account and be signed by this key
+        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+
         // Generate three new Ed25519 private, public key pairs
         PrivateKey[] keys = new PrivateKey[3];
         for (int i = 0; i < 3; i++) {
@@ -38,13 +44,6 @@ public final class CreateAccountThresholdKeyExample {
         for (Key key : keys) {
             System.out.println(key);
         }
-
-        // `Client.forMainnet()` is provided for connecting to Hedera mainnet
-        Client client = Client.forTestnet();
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
-        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // require 2 of the 3 keys we generated to sign on anything modifying this account
         KeyList transactionKey = KeyList.withThreshold(2);
@@ -62,9 +61,9 @@ public final class CreateAccountThresholdKeyExample {
 
         System.out.println("account = " + newAccountId);
 
-        TransactionResponse transferTransactionResponse = new CryptoTransferTransaction()
-            .addSender(newAccountId, new Hbar(10))
-            .addRecipient(new AccountId(3), new Hbar(10))
+        TransactionResponse transferTransactionResponse = new TransferTransaction()
+            .addHbarTransfer(newAccountId, new Hbar(10).negated())
+            .addHbarTransfer(new AccountId(3), new Hbar(10))
             // To manually sign, you must explicitly build the Transaction
             .freezeWith(client)
             // we sign with 2 of the 3 keys
@@ -78,7 +77,8 @@ public final class CreateAccountThresholdKeyExample {
 
         Hbar balanceAfter = new AccountBalanceQuery()
             .setAccountId(newAccountId)
-            .execute(client);
+            .execute(client)
+            .hbars;
 
         System.out.println("account balance after transfer: " + balanceAfter);
     }

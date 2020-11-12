@@ -7,13 +7,16 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import io.grpc.MethodDescriptor;
 
+import java.util.Map;
+import java.util.HashMap;
+
 /**
  * Get the balance of a Hedera™ crypto-currency account. This returns only the balance, so it is a
  * smaller and faster reply than {@link AccountInfoQuery}.
  *
  * <p>This query is free.
  */
-public final class AccountBalanceQuery extends Query<Hbar, AccountBalanceQuery> {
+public final class AccountBalanceQuery extends Query<AccountBalance, AccountBalanceQuery> {
     private final CryptoGetAccountBalanceQuery.Builder builder;
 
     public AccountBalanceQuery() {
@@ -21,15 +24,16 @@ public final class AccountBalanceQuery extends Query<Hbar, AccountBalanceQuery> 
     }
 
     public AccountId getAccountId() {
-      return AccountId.fromProtobuf(builder.getAccountID());
+        return AccountId.fromProtobuf(builder.getAccountID());
     }
 
     /**
      * The account ID for which the balance is being requested.
-     *
+     * <p>
      * This is mutually exclusive with {@link #setContractId(ContractId)}.
-     * @return {@code this}
+     *
      * @param accountId The AccountId to set
+     * @return {@code this}
      */
     public AccountBalanceQuery setAccountId(AccountId accountId) {
         builder.setAccountID(accountId.toProtobuf());
@@ -37,15 +41,16 @@ public final class AccountBalanceQuery extends Query<Hbar, AccountBalanceQuery> 
     }
 
     public ContractId getContractId() {
-      return ContractId.fromProtobuf(builder.getContractID());
+        return ContractId.fromProtobuf(builder.getContractID());
     }
 
     /**
      * The contract ID for which the balance is being requested.
-     *
+     * <p>
      * This is mutually exclusive with {@link #setAccountId(AccountId)}.
-     * @return {@code this}
+     *
      * @param contractId The ContractId to set
+     * @return {@code this}
      */
     public AccountBalanceQuery setContractId(ContractId contractId) {
         builder.setContractID(contractId.toProtobuf());
@@ -63,8 +68,8 @@ public final class AccountBalanceQuery extends Query<Hbar, AccountBalanceQuery> 
     }
 
     @Override
-    Hbar mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return Hbar.fromTinybars(response.getCryptogetAccountBalance().getBalance());
+    AccountBalance mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+        return AccountBalance.fromProtobuf(response.getCryptogetAccountBalance());
     }
 
     @Override

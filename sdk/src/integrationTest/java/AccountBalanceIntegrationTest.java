@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransactionId;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -27,6 +28,9 @@ class AccountBalanceIntegrationTest {
                 .setKey(key)
                 .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
+                .freezeWith(client)
+                .sign(key)
+                .signWithOperator(client)
                 .execute(client);
 
             var receipt = response.transactionId.getReceipt(client);
@@ -38,14 +42,14 @@ class AccountBalanceIntegrationTest {
 
             @Var var balance = new AccountBalanceQuery()
                 .setAccountId(account)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .execute(client);
 
-            assertEquals(balance, new Hbar(1));
+            assertEquals(balance.hbars, new Hbar(1));
 
             new AccountDeleteTransaction()
                 .setAccountId(account)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setTransferAccountId(operatorId)
                 .setTransactionId(TransactionId.generate(account))
                 .freezeWith(client)

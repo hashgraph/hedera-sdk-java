@@ -169,6 +169,7 @@ tasks.withType(Test) {
 	systemProperty "OPERATOR_ID", findProperty("OPERATOR_ID")
 	systemProperty "OPERATOR_KEY", findProperty("OPERATOR_KEY")
 	systemProperty "CONFIG_FILE", findProperty("CONFIG_FILE")
+	systemProperty "HEDERA_NETWORK", findProperty("HEDERA_NETWORK")
 }
 
 modifyPom {

@@ -5,9 +5,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.FileGetInfoResponse;
 import org.threeten.bp.Instant;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Current information for a file, including its size.
  */
@@ -30,33 +27,30 @@ public final class FileInfo {
     /**
      * True if deleted but not yet expired.
      */
-    public final boolean deleted;
+    public final boolean isDeleted;
 
     /**
      * One of these keys must sign in order to delete the file.
      * All of these keys must sign in order to update the file.
      */
-    public final List<Key> keys;
+    public final KeyList keys;
 
     private FileInfo(
         FileId fileId,
         long size,
         Instant expirationTime,
-        boolean deleted,
-        List<Key> keys
+        boolean isDeleted,
+        KeyList keys
     ) {
         this.fileId = fileId;
         this.size = size;
         this.expirationTime = expirationTime;
-        this.deleted = deleted;
+        this.isDeleted = isDeleted;
         this.keys = keys;
     }
 
     static FileInfo fromProtobuf(FileGetInfoResponse.FileInfo fileInfo) {
-        var keys = new ArrayList<Key>(fileInfo.getKeys().getKeysCount());
-        for (var i = 0; i < fileInfo.getKeys().getKeysCount(); ++i) {
-            keys.add(Key.fromProtobuf(fileInfo.getKeys().getKeys(i)));
-        }
+        KeyList keys = KeyList.fromProtobuf(fileInfo.getKeys(), fileInfo.getKeys().getKeysCount());
 
         return new FileInfo(
             FileId.fromProtobuf(fileInfo.getFileID()),
@@ -81,7 +75,7 @@ public final class FileInfo {
             .setFileID(fileId.toProtobuf())
             .setSize(size)
             .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
-            .setDeleted(deleted)
+            .setDeleted(isDeleted)
             .setKeys(keyList);
 
         return fileInfoBuilder.build();
@@ -93,7 +87,7 @@ public final class FileInfo {
             .add("fileId", fileId)
             .add("size", size)
             .add("expirationTime", expirationTime)
-            .add("deleted", deleted)
+            .add("isDeleted", isDeleted)
             .add("keys", keys)
             .toString();
     }

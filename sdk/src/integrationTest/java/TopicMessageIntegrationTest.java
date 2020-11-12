@@ -5,10 +5,12 @@ import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicDeleteTransaction;
 import com.hedera.hashgraph.sdk.TopicInfoQuery;
 import com.hedera.hashgraph.sdk.Hbar;
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.nio.charset.StandardCharsets;
@@ -21,6 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TopicMessageIntegrationTest {
     @Test
     void test() {
+        // Skip if using PreviewNet
+        org.junit.Assume.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
+
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 
@@ -45,7 +50,7 @@ public class TopicMessageIntegrationTest {
 
             @Var var info = new TopicInfoQuery()
                 .setTopicId(topic)
-                .setNodeAccountId(response.nodeId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setQueryPayment(new Hbar(22))
                 .execute(client);
 
@@ -65,7 +70,7 @@ public class TopicMessageIntegrationTest {
               });
 
             new TopicMessageSubmitTransaction()
-              .setNodeAccountId(response.nodeId)
+              .setNodeAccountIds(Collections.singletonList(response.nodeId))
               .setTopicId(topic)
               .setMessage("Hello, from HCS!")
               .execute(client);
