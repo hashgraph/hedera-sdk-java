@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.hedera.hashgraph</groupId>
     <artifactId>sdk-examples</artifactId>
@@ -29,7 +28,7 @@
         <dependency>
             <groupId>com.hedera.hashgraph</groupId>
             <artifactId>sdk</artifactId>
-            <version>1.3.0</version>
+            <version>1.3.2</version>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
@@ -129,10 +128,7 @@
                                     -Xplugin:ErrorProne
                                     -XepDisableWarningsInGeneratedCode
                                     -XepExcludedPaths:.*/target/generated-sources/.*
-                                    -Xep:NullAway:ERROR
-                                    -XepOpt:NullAway:AnnotatedPackages=com.hedera
-                                    -XepOpt:NullAway:AcknowledgeRestrictiveAnnotations=true
-                                    -XepOpt:NullAway:TreatGeneratedAsUnannotated=true
+                                    -Xep:NullAway:ERROR -XepOpt:NullAway:AnnotatedPackages=com.hedera -XepOpt:NullAway:AcknowledgeRestrictiveAnnotations=true -XepOpt:NullAway:TreatGeneratedAsUnannotated=true
                                 </arg>
                             </compilerArgs>
                         </configuration>
