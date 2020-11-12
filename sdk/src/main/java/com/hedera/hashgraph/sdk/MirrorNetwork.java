@@ -1,7 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
-import org.threeten.bp.Duration;
-
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;

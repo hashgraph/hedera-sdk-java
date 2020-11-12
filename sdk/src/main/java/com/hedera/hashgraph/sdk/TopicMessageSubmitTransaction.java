@@ -115,12 +115,12 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
     }
 
     @Override
-    public CompletableFuture<TransactionResponse> executeAsync(Client client) {
+    public CompletableFuture<com.hedera.hashgraph.sdk.TransactionResponse> executeAsync(Client client) {
         return executeAllAsync(client).thenApply(responses -> responses.get(0));
     }
 
     @Override
-    @FunctionalExecutable(type = "java.util.List<TransactionResponse>")
+    @FunctionalExecutable(type = "java.util.List<com.hedera.hashgraph.sdk.TransactionResponse>")
     public CompletableFuture<List<com.hedera.hashgraph.sdk.TransactionResponse>> executeAllAsync(Client client) {
         if (!isFrozen()) {
             freezeWith(client);

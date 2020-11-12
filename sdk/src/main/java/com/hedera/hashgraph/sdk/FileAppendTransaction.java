@@ -5,13 +5,13 @@ import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
-import java8.util.concurrent.CompletableFuture;
-import java8.util.function.Function;
 
 import javax.annotation.Nullable;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 /**
  * <p>A transaction specifically to append data to a file on the network.

@@ -5,8 +5,9 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
-import org.threeten.bp.Duration;
-import org.threeten.bp.Instant;
+
+import java.time.Duration;
+import java.time.Instant;
 
 public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> {
     private final TokenCreateTransactionBody.Builder builder;

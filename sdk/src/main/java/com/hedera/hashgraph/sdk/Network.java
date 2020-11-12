@@ -1,12 +1,12 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.collect.HashBiMap;
-import org.threeten.bp.Duration;
-import org.threeten.bp.Instant;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
