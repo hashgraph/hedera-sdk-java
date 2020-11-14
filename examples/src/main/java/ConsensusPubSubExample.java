@@ -68,7 +68,6 @@ class ConsensusPubSubExample {
                 .setTopicId(topicId)
                 .setMessage("hello, HCS! " + i)
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             Thread.sleep(2500);

@@ -22,6 +22,7 @@ public class FileUpdateIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
             var operatorKey = client.getOperatorPublicKey();
+            assertNotNull(operatorKey);
 
             var response = new FileCreateTransaction()
                 .setKeys(operatorKey)
@@ -29,7 +30,7 @@ public class FileUpdateIntegrationTest {
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client);
 
-            var receipt = response.transactionId.getReceipt(client);
+            var receipt = response.getReceipt(client);
 
             assertNotNull(receipt.fileId);
             assertTrue(Objects.requireNonNull(receipt.fileId).num > 0);
@@ -45,6 +46,7 @@ public class FileUpdateIntegrationTest {
             assertEquals(info.fileId, file);
             assertEquals(info.size, 28);
             assertFalse(info.isDeleted);
+            assertNotNull(info.keys.getThreshold());
             var testKey = KeyList.of(Objects.requireNonNull(operatorKey)).setThreshold(info.keys.getThreshold());
             assertEquals(info.keys.toString(), testKey.toString());
 
@@ -54,7 +56,6 @@ public class FileUpdateIntegrationTest {
                 .setContents("[e2e::FileUpdateTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             info = new FileInfoQuery()
@@ -66,6 +67,7 @@ public class FileUpdateIntegrationTest {
             assertEquals(info.fileId, file);
             assertEquals(info.size, 28);
             assertFalse(info.isDeleted);
+            assertNotNull(info.keys.getThreshold());
             testKey.setThreshold(info.keys.getThreshold());
             assertEquals(info.keys.toString(), testKey.toString());
 
@@ -74,7 +76,6 @@ public class FileUpdateIntegrationTest {
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             client.close();

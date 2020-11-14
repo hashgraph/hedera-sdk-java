@@ -46,7 +46,6 @@ public class TransactionIntegrationTest {
                 .freezeWith(client)
                 .sign(key)
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             client.close();

@@ -37,6 +37,7 @@ class TokenInfoIntegrationTest {
                 .execute(client);
 
             TokenId tokenId = response.getReceipt(client).tokenId;
+            assertNotNull(tokenId);
 
                 TokenInfo info = new TokenInfoQuery()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
@@ -54,7 +55,9 @@ class TokenInfoIntegrationTest {
             assertTrue(info.freezeKey.toString().equals(OPERATOR_KEY.getPublicKey().toString()));
             assertTrue(info.wipeKey.toString().equals(OPERATOR_KEY.getPublicKey().toString()));
             assertTrue(info.supplyKey.toString().equals(OPERATOR_KEY.getPublicKey().toString()));
+            assertNotNull(info.defaultFreezeStatus);
             assertFalse(info.defaultFreezeStatus);
+            assertNotNull(info.defaultKycStatus);
             assertFalse(info.defaultKycStatus);
 
                 new TokenDeleteTransaction()

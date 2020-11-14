@@ -27,6 +27,8 @@ public class IntegrationTestClientManager {
             var operatorKey = PrivateKey.fromString(System.getProperty("OPERATOR_KEY"));
             var operatorId = AccountId.fromString(System.getProperty("OPERATOR_ID"));
 
+            System.out.println("key" + operatorId);
+
             client.setOperator(operatorId, operatorKey);
         } catch (Exception e) {
         }

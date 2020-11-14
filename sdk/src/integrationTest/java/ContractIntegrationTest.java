@@ -34,7 +34,6 @@ public class ContractIntegrationTest {
                 .setContents(smartContractBytecode)
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             assertNotNull(receipt.fileId);
@@ -102,7 +101,6 @@ public class ContractIntegrationTest {
                 .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             result = new ContractCallQuery()
@@ -121,7 +119,6 @@ public class ContractIntegrationTest {
                 .setContractMemo("[e2e::ContractUpdateTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             info = new ContractInfoQuery()
@@ -141,7 +138,6 @@ public class ContractIntegrationTest {
                 .setContractId(contract)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             assertThrows(Exception.class, () -> {

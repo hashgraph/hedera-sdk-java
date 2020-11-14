@@ -57,7 +57,6 @@ public final class ConsensusPubSubChunkedExample {
             .setTopicMemo("hedera-sdk-java/ConsensusPubSubChunkedExample")
             .setSubmitKey(submitKey)
             .execute(client)
-            .transactionId
             .getReceipt(client)
             .topicId;
 

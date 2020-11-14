@@ -22,6 +22,7 @@ class AccountInfoIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
             var operatorId = client.getOperatorAccountId();
+            assertNotNull(operatorId);
 
             var key = PrivateKey.generate();
 
@@ -30,7 +31,6 @@ class AccountInfoIntegrationTest {
                 .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             assertNotNull(receipt.accountId);
@@ -57,7 +57,6 @@ class AccountInfoIntegrationTest {
                 .freezeWith(client)
                 .sign(key)
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             client.close();
