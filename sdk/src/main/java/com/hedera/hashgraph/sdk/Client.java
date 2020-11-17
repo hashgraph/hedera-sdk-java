@@ -54,8 +54,8 @@ public final class Client implements AutoCloseable {
         this.mirrorNetwork = new MirrorNetwork(executor);
     }
 
-    public void setMirrorNetwork(List<String> newtork) throws InterruptedException {
-        mirrorNetwork.setNetwork(newtork);
+    public void setMirrorNetwork(List<String> network) throws InterruptedException {
+        mirrorNetwork.setNetwork(network);
     }
 
     public List<String> getMirrorNetwork() {

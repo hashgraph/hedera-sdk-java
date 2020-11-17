@@ -116,8 +116,8 @@ public final class TransactionReceipt {
                 : null;
 
         var tokenId =
-            transactionReceipt.hasTokenId()
-                ? TokenId.fromProtobuf(transactionReceipt.getTokenId())
+            transactionReceipt.hasTokenID()
+                ? TokenId.fromProtobuf(transactionReceipt.getTokenID())
                 : null;
 
         var topicSequenceNumber =
@@ -177,7 +177,7 @@ public final class TransactionReceipt {
         }
 
         if (tokenId != null) {
-            transactionReceiptBuilder.setTokenId(tokenId.toProtobuf());
+            transactionReceiptBuilder.setTokenID(tokenId.toProtobuf());
         }
 
         if (topicSequenceNumber != null) {
