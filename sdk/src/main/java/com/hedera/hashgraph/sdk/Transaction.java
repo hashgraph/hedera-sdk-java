@@ -480,6 +480,23 @@ public abstract class Transaction<T extends Transaction<T>>
         return (T) this;
     }
 
+    public Map<PublicKey, byte[]> getSignatures() {
+        var map = new HashMap<PublicKey, byte[]>();
+
+        if (signatures.size() == 0) {
+            return map;
+        }
+
+        for (var sigPair : signatures.get(0).getSigPairList()) {
+            map.put(
+                PublicKey.fromBytes(sigPair.getPubKeyPrefix().toByteArray()),
+                sigPair.getEd25519().toByteArray()
+            );
+        }
+
+        return map;
+    }
+
     protected boolean isFrozen() {
         return !transactions.isEmpty();
     }
@@ -619,7 +636,7 @@ public abstract class Transaction<T extends Transaction<T>>
     ) {
         freeze();
         var transactionId = Objects.requireNonNull(getTransactionId());
-        return new TransactionResponse(nodeId, transactionId,  hash(request.toByteArray()));
+        return new TransactionResponse(nodeId, transactionId, hash(request.toByteArray()));
     }
 
     @Override
