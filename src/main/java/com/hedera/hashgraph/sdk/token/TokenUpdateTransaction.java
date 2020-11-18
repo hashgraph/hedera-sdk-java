@@ -138,7 +138,7 @@ public final class TokenUpdateTransaction extends SingleTransactionBuilder<Token
      * @return TokenUpdateTransaction
      */
     public TokenUpdateTransaction setExpirationTime(Instant expirationTime) {
-        builder.setExpiry(expirationTime.getEpochSecond());
+        builder.setExpiry(TimestampHelper.timestampFrom(expirationTime));
         return this;
     }
 
@@ -160,7 +160,7 @@ public final class TokenUpdateTransaction extends SingleTransactionBuilder<Token
      * @return TokenUpdateTransaction
      */
     public TokenUpdateTransaction setAutoRenewPeriod(Duration period) {
-        builder.setAutoRenewPeriod(period.getSeconds());
+        builder.setAutoRenewPeriod(DurationHelper.durationFrom(period));
         return this;
     }
 

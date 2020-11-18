@@ -4,6 +4,8 @@ import com.hedera.hashgraph.proto.Response;
 import com.hedera.hashgraph.proto.TokenFreezeStatus;
 import com.hedera.hashgraph.proto.TokenGetInfoResponse;
 import com.hedera.hashgraph.proto.TokenKycStatus;
+import com.hedera.hashgraph.sdk.DurationHelper;
+import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
@@ -122,23 +124,23 @@ public class TokenInfo {
         TokenFreezeStatus defaultFreezeStatus = info.getDefaultFreezeStatus();
         TokenKycStatus defaultKycStatus = info.getDefaultKycStatus();
 
-        this.tokenId = new TokenId(info.getTokenId());
+        this.tokenId = new TokenId(info.getTokenIdOrBuilder());
         this.name = info.getName();
         this.symbol = info.getSymbol();
         this.decimals = info.getDecimals();
         this.totalSupply = info.getTotalSupply();
-        this.treasury = new AccountId(info.getTreasury());
-        this.adminKey = info.hasAdminKey() ? Ed25519PublicKey.fromProtoKey(info.getAdminKey()) : null;
-        this.kycKey = info.hasKycKey() ? Ed25519PublicKey.fromProtoKey(info.getKycKey()) : null;
-        this.freezeKey = info.hasFreezeKey() ? Ed25519PublicKey.fromProtoKey(info.getFreezeKey()) : null;
-        this.wipeKey = info.hasWipeKey() ? Ed25519PublicKey.fromProtoKey(info.getWipeKey()) : null;
-        this.supplyKey = info.hasSupplyKey() ? Ed25519PublicKey.fromProtoKey(info.getSupplyKey()) : null;
+        this.treasury = new AccountId(info.getTreasuryOrBuilder());
+        this.adminKey = info.hasAdminKey() ? Ed25519PublicKey.fromProtoKey(info.getAdminKeyOrBuilder()) : null;
+        this.kycKey = info.hasKycKey() ? Ed25519PublicKey.fromProtoKey(info.getKycKeyOrBuilder()) : null;
+        this.freezeKey = info.hasFreezeKey() ? Ed25519PublicKey.fromProtoKey(info.getFreezeKeyOrBuilder()) : null;
+        this.wipeKey = info.hasWipeKey() ? Ed25519PublicKey.fromProtoKey(info.getWipeKeyOrBuilder()) : null;
+        this.supplyKey = info.hasSupplyKey() ? Ed25519PublicKey.fromProtoKey(info.getSupplyKeyOrBuilder()) : null;
         this.defaultFreezeStatus = defaultFreezeStatus == TokenFreezeStatus.FreezeNotApplicable ? null : defaultFreezeStatus == TokenFreezeStatus.Frozen;
         this.defaultKycStatus = defaultKycStatus == TokenKycStatus.KycNotApplicable ? null : defaultKycStatus == TokenKycStatus.Granted;
-        this.isDeleted = info.getIsDeleted();
-        this.autoRenewAccount = info.hasAutoRenewAccount() ? new AccountId(info.getAutoRenewAccount()) : null;
-        this.autoRenewPeriod = Duration.ofSeconds(info.getAutoRenewPeriod());
-        this.expiry = Instant.ofEpochSecond(info.getExpiry());
+        this.isDeleted = info.getDeleted();
+        this.autoRenewAccount = info.hasAutoRenewAccount() ? new AccountId(info.getAutoRenewAccountOrBuilder()) : null;
+        this.autoRenewPeriod = DurationHelper.durationTo(info.getAutoRenewPeriod());
+        this.expiry = TimestampHelper.timestampTo(info.getExpiry());
     }
 
     static TokenInfo fromResponse(Response response) {

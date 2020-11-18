@@ -36,8 +36,8 @@ import io.grpc.MethodDescriptor;
  */
 public final class TokenCreateTransaction extends SingleTransactionBuilder<TokenCreateTransaction> {
     private final TokenCreateTransactionBody.Builder builder = bodyBuilder.getTokenCreationBuilder()
-        .setAutoRenewPeriod(HederaConstants.DEFAULT_AUTORENEW_DURATION.getSeconds())
-        .setExpiry(Instant.now().plus(Duration.ofDays(90)).getEpochSecond());
+        .setAutoRenewPeriod(DurationHelper.durationFrom(HederaConstants.DEFAULT_AUTORENEW_DURATION))
+        .setExpiry(TimestampHelper.timestampFrom(Instant.now().plus(Duration.ofDays(90))));
 
 
     public TokenCreateTransaction() {
@@ -179,7 +179,7 @@ public final class TokenCreateTransaction extends SingleTransactionBuilder<Token
      * @return TokenCreateTransaction
      */
     public TokenCreateTransaction setExpirationTime(Instant expirationTime) {
-        builder.setExpiry(expirationTime.getEpochSecond());
+        builder.setExpiry(TimestampHelper.timestampFrom(expirationTime));
         return this;
     }
 
@@ -201,7 +201,7 @@ public final class TokenCreateTransaction extends SingleTransactionBuilder<Token
      * @return TokenCreateTransaction
      */
     public TokenCreateTransaction setAutoRenewPeriod(Duration period) {
-        builder.setAutoRenewPeriod(period.getSeconds());
+        builder.setAutoRenewPeriod(DurationHelper.durationFrom(period));
         return this;
     }
 

@@ -66,11 +66,11 @@ public final class TransactionReceipt {
 
     public TokenId getTokenId() {
         // Should be present for [ConsensusTopicCreateTransaction]
-        if (!inner.hasTokenId()) {
+        if (!inner.hasTokenID()) {
             throw new IllegalStateException("receipt does not contain a token ID");
         }
 
-        return new TokenId(inner.getTokenIdOrBuilder());
+        return new TokenId(inner.getTokenIDOrBuilder());
     }
 
     public long getConsensusTopicSequenceNumber() {
