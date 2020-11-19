@@ -513,8 +513,8 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     protected void requireExactNode() {
-        if (isFrozen()) {
-            throw new IllegalStateException("transaction did not have an exact node ID set");
+        if (transactions.size() > 0) {
+            throw new IllegalStateException("transaction did not have exactly one node ID set");
         }
     }
 

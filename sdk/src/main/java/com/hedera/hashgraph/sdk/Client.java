@@ -277,10 +277,10 @@ public final class Client implements AutoCloseable {
     public void ping(AccountId nodeAccountId) throws TimeoutException, HederaPreCheckStatusException {
         new AccountBalanceQuery()
             .setAccountId(nodeAccountId)
-            .setNodeAccountIds(List.of(nodeAccountId))
+            .setNodeAccountIds(Collections.singletonList(nodeAccountId))
             .execute(this);
     }
-    
+
     /**
      * Set the account that will, by default, be paying for transactions and queries built with
      * this client.
