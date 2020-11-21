@@ -121,13 +121,11 @@ public final class CreateSimpleContractExample {
         System.out.println("contract message: " + message);
 
         // now delete the contract
-        TransactionId contractDeleteTxnId = new ContractDeleteTransaction()
+        TransactionReceipt contractDeleteResult = new ContractDeleteTransaction()
             .setContractId(newContractId)
             .setMaxTransactionFee(new Hbar(1))
             .execute(client)
-            .transactionId;
-
-        TransactionReceipt contractDeleteResult = contractDeleteTxnId.getReceipt(client);
+            .getReceipt(client);
 
         if (contractDeleteResult.status != Status.SUCCESS) {
             System.out.println("error deleting contract: " + contractDeleteResult.status);

@@ -28,6 +28,7 @@ class LiveHashIntegrationTest {
 
             var client = IntegrationTestClientManager.getClient();
             var operatorId = client.getOperatorAccountId();
+            assertNotNull(operatorId);
 
             var key = PrivateKey.generate();
 
@@ -37,7 +38,6 @@ class LiveHashIntegrationTest {
                 .setInitialBalance(new Hbar(1))
                 .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             assertNotNull(receipt.accountId);

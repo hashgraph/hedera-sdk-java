@@ -5,6 +5,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TokenFreezeStatus;
 import com.hedera.hashgraph.sdk.proto.TokenGetInfoResponse;
 import com.hedera.hashgraph.sdk.proto.TokenKycStatus;
+import org.threeten.bp.Duration;
+import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 
@@ -37,7 +39,7 @@ public class TokenInfo {
     /**
      *
      */
-    public final AccountId treasury;
+    public final AccountId treasuryAccountId;
 
     /**
      *
@@ -90,12 +92,12 @@ public class TokenInfo {
     /**
      *
      */
-    public final long autoRenewPeriod;
+    public final Duration autoRenewPeriod;
 
     /**
      *
      */
-    public final long expirationTime;
+    public final Instant expirationTime;
 
     private TokenInfo(
         TokenId tokenId,
@@ -103,7 +105,7 @@ public class TokenInfo {
         String symbol,
         int decimals,
         long totalSupply,
-        AccountId treasury,
+        AccountId treasuryAccountId,
         Key adminKey,
         Key kycKey,
         Key freezeKey,
@@ -113,15 +115,15 @@ public class TokenInfo {
         @Nullable Boolean defaultKycStatus,
         boolean isDeleted,
         AccountId autoRenewAccount,
-        long autoRenewPeriod,
-        long expirationTime
+        Duration autoRenewPeriod,
+        Instant expirationTime
     ) {
         this.tokenId = tokenId;
         this.name = name;
         this.symbol = symbol;
         this.decimals = decimals;
         this.totalSupply = totalSupply;
-        this.treasury = treasury;
+        this.treasuryAccountId = treasuryAccountId;
         this.adminKey = adminKey;
         this.kycKey = kycKey;
         this.freezeKey = freezeKey;
@@ -158,10 +160,10 @@ public class TokenInfo {
             Key.fromProtobuf(tokenInfo.getTokenInfo().getSupplyKey()),
             freezeStatusFromProtobuf(tokenInfo.getTokenInfo().getDefaultFreezeStatus()),
             kycStatusFromProtobuf(tokenInfo.getTokenInfo().getDefaultKycStatus()),
-            tokenInfo.getTokenInfo().getIsDeleted(),
+            tokenInfo.getTokenInfo().getDeleted(),
             AccountId.fromProtobuf(tokenInfo.getTokenInfo().getAutoRenewAccount()),
-            tokenInfo.getTokenInfo().getAutoRenewPeriod(),
-            tokenInfo.getTokenInfo().getExpiry()
+            DurationConverter.fromProtobuf(tokenInfo.getTokenInfo().getAutoRenewPeriod()),
+            InstantConverter.fromProtobuf(tokenInfo.getTokenInfo().getExpiry())
         );
     }
 
@@ -185,7 +187,7 @@ public class TokenInfo {
             .setSymbol(symbol)
             .setDecimals(decimals)
             .setTotalSupply(totalSupply)
-            .setTreasury(treasury.toProtobuf())
+            .setTreasury(treasuryAccountId.toProtobuf())
             .setAdminKey(adminKey.toKeyProtobuf())
             .setKycKey(kycKey.toKeyProtobuf())
             .setFreezeKey(freezeKey.toKeyProtobuf())
@@ -193,10 +195,10 @@ public class TokenInfo {
             .setSupplyKey(supplyKey.toKeyProtobuf())
             .setDefaultFreezeStatus(freezeStatusToProtobuf(defaultFreezeStatus))
             .setDefaultKycStatus(kycStatusToProtobuf(defaultKycStatus))
-            .setIsDeleted(isDeleted)
-            .setAutoRenewAccount(autoRenewAccount.toProtobuf())
-            .setAutoRenewPeriod(autoRenewPeriod)
-            .setExpiry(expirationTime)
+            .setDeleted(isDeleted)
+            .setAutoRenewAccount(autoRenewAccount != null ? autoRenewAccount.toProtobuf() : null)
+            .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod))
+            .setExpiry(InstantConverter.toProtobuf(expirationTime))
         ).build();
     }
 
@@ -208,7 +210,7 @@ public class TokenInfo {
             .add("symbol", symbol)
             .add("decimals", decimals)
             .add("totalSupply", totalSupply)
-            .add("treasury", treasury)
+            .add("treasuryAccountId", treasuryAccountId)
             .add("adminKey", adminKey)
             .add("kycKey", kycKey)
             .add("freezeKey", freezeKey)

@@ -31,6 +31,7 @@ class TokenMintIntegrationTest {
                 .execute(client);
 
             AccountId accountId = response.getReceipt(client).accountId;
+            assertNotNull(accountId);
 
             response = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -47,6 +48,7 @@ class TokenMintIntegrationTest {
                 .execute(client);
 
             TokenId tokenId = response.getReceipt(client).tokenId;
+            assertNotNull(tokenId);
 
                 new TokenMintTransaction()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))

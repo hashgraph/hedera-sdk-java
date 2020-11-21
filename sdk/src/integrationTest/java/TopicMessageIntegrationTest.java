@@ -39,9 +39,7 @@ public class TopicMessageIntegrationTest {
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client);
 
-            var receipt = response
-                .transactionId
-                .getReceipt(client);
+            var receipt = response.getReceipt(client);
 
             assertNotNull(receipt.topicId);
             assertTrue(Objects.requireNonNull(receipt.topicId).num > 0);
@@ -89,7 +87,6 @@ public class TopicMessageIntegrationTest {
                 .setTopicId(topic)
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             client.close();

@@ -4,6 +4,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SignatureMap;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hederahashgraph.api.proto.java.TransactionList;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Function;
 import org.bouncycastle.crypto.digests.SHA384Digest;
@@ -78,28 +79,18 @@ public abstract class Transaction<T extends Transaction<T>>
         this.bodyBuilder = bodyBuilder;
     }
 
-    public static Transaction<?> fromBytes(byte[] bytes) {
+    public static Transaction<?> fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         var buf = new ByteArrayInputStream(bytes);
         var txs = new HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>>();
         TransactionBody.DataCase dataCase = TransactionBody.DataCase.DATA_NOT_SET;
 
-        while (true) {
-            com.hedera.hashgraph.sdk.proto.Transaction tx = null;
+        var list = TransactionList.parseFrom(bytes);
 
-            try {
-                tx = com.hedera.hashgraph.sdk.proto.Transaction.parseDelimitedFrom(buf);
-            } catch (IOException e) {
-                // Do nothing as this should not be possible
-            }
-
-            if (tx == null) {
-                break;
-            }
-
+        for (var transaction : list.getTransactionListList()) {
             TransactionBody txBody;
 
             try {
-                txBody = TransactionBody.parseFrom(tx.getBodyBytes());
+                txBody = TransactionBody.parseFrom(transaction.getBodyBytes());
             } catch (InvalidProtocolBufferException e) {
                 throw new IllegalArgumentException(e);
             }
@@ -111,7 +102,7 @@ public abstract class Transaction<T extends Transaction<T>>
             var account = AccountId.fromProtobuf(txBody.getNodeAccountID());
             var transactionId = TransactionId.fromProtobuf(txBody.getTransactionID());
 
-            txs.computeIfAbsent(transactionId, k -> new HashMap<>()).put(account, tx);
+            txs.computeIfAbsent(transactionId, k -> new HashMap<>()).put(account, transaction);
         }
 
         Transaction<?> instance;
@@ -332,17 +323,13 @@ public abstract class Transaction<T extends Transaction<T>>
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
-        var buf = new ByteArrayOutputStream();
+        var list = TransactionList.newBuilder();
 
-        for (int i = 0; i < transactions.size(); i++) {
-            try {
-                transactions.get(i).setSigMap(signatures.get(0)).buildPartial().writeDelimitedTo(buf);
-            } catch (IOException e) {
-                // Do nothing as this should never happen
-            }
+        for (var transaction : transactions) {
+            list.addTransactionList(transaction);
         }
 
-        return buf.toByteArray();
+        return list.build().toByteArray();
     }
 
     public byte[] getTransactionHash() {
@@ -480,6 +467,28 @@ public abstract class Transaction<T extends Transaction<T>>
         return (T) this;
     }
 
+    public Map<AccountId, Map<PublicKey, byte[]>> getSignatures() {
+        var map = new HashMap<AccountId, Map<PublicKey, byte[]>>(nodeIds.size());
+
+        if (signatures.size() == 0) {
+            return map;
+        }
+
+        for (int i = 0; i < nodeIds.size(); i++) {
+            var sigMap = signatures.get(i);
+            var nodeAccountId = nodeIds.get(i);
+            var keyMap = map.computeIfAbsent(nodeAccountId, k -> new HashMap<>(sigMap.getSigPairCount()));
+            for (var sigPair : sigMap.getSigPairList()) {
+                keyMap.put(
+                    PublicKey.fromBytes(sigPair.getPubKeyPrefix().toByteArray()),
+                    sigPair.getEd25519().toByteArray()
+                );
+            }
+        }
+
+        return map;
+    }
+
     protected boolean isFrozen() {
         return !transactions.isEmpty();
     }
@@ -491,8 +500,8 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     protected void requireExactNode() {
-        if (isFrozen()) {
-            throw new IllegalStateException("transaction did not have an exact node ID set");
+        if (transactions.size() > 0) {
+            throw new IllegalStateException("transaction did not have exactly one node ID set");
         }
     }
 
@@ -619,7 +628,7 @@ public abstract class Transaction<T extends Transaction<T>>
     ) {
         freeze();
         var transactionId = Objects.requireNonNull(getTransactionId());
-        return new TransactionResponse(nodeId, transactionId,  hash(request.toByteArray()));
+        return new TransactionResponse(nodeId, transactionId, hash(request.toByteArray()));
     }
 
     @Override

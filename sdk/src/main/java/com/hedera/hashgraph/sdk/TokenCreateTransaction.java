@@ -135,12 +135,12 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     public Instant getExpirationTime() {
-        return Instant.ofEpochSecond(builder.getExpiry());
+        return InstantConverter.fromProtobuf(builder.getExpiry());
     }
 
     public TokenCreateTransaction setExpirationTime(Instant expirationTime) {
         requireNotFrozen();
-        builder.setExpiry(expirationTime.getEpochSecond());
+        builder.setExpiry(InstantConverter.toProtobuf(expirationTime));
         return this;
     }
 
@@ -155,12 +155,12 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     public Duration getAutoRenewPeriod() {
-        return Duration.ofSeconds(builder.getAutoRenewPeriod());
+        return DurationConverter.fromProtobuf(builder.getAutoRenewPeriod());
     }
 
     public TokenCreateTransaction setAutoRenewPeriod(Duration period) {
         requireNotFrozen();
-        builder.setAutoRenewPeriod(period.getSeconds());
+        builder.setAutoRenewPeriod(DurationConverter.toProtobuf(period));
         return this;
     }
 

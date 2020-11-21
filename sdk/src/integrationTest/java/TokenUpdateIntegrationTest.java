@@ -37,6 +37,7 @@ class TokenUpdateIntegrationTest {
                 .execute(client);
 
             TokenId tokenId = response.getReceipt(client).tokenId;
+            assertNotNull(tokenId);
 
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
