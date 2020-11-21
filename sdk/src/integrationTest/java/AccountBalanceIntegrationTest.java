@@ -21,6 +21,7 @@ class AccountBalanceIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
             var operatorId = client.getOperatorAccountId();
+            assertNotNull(operatorId);
 
             var key = PrivateKey.generate();
 
@@ -55,7 +56,6 @@ class AccountBalanceIntegrationTest {
                 .freezeWith(client)
                 .sign(key)
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             client.close();

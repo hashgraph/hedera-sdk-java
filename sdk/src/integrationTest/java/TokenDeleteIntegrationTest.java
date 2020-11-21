@@ -37,6 +37,7 @@ class TokenDeleteIntegrationTest {
                 .execute(client);
 
             TokenId tokenId = response.getReceipt(client).tokenId;
+            assertNotNull(tokenId);
 
             new TokenDeleteTransaction()
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))

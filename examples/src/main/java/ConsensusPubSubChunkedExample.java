@@ -1,3 +1,4 @@
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
@@ -29,7 +30,7 @@ public final class ConsensusPubSubChunkedExample {
     private ConsensusPubSubChunkedExample() {
     }
 
-    public static void main(String[] args) throws TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException, InterruptedException {
+    public static void main(String[] args) throws TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException, InterruptedException, InvalidProtocolBufferException {
         Client client;
 
         if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {
@@ -57,7 +58,6 @@ public final class ConsensusPubSubChunkedExample {
             .setTopicMemo("hedera-sdk-java/ConsensusPubSubChunkedExample")
             .setSubmitKey(submitKey)
             .execute(client)
-            .transactionId
             .getReceipt(client)
             .topicId;
 

@@ -46,7 +46,6 @@ public class ContractExecuteIntegrationTest {
                 .setContractMemo("[e2e::ContractCreateTransaction]")
                 .setMaxTransactionFee(new Hbar(20))
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             assertNotNull(receipt.contractId);
@@ -61,14 +60,12 @@ public class ContractExecuteIntegrationTest {
                 .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             new ContractDeleteTransaction()
                 .setContractId(contract)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             new FileDeleteTransaction()

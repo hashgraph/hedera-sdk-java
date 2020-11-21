@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 
+import java.time.Duration;
 import java.time.Instant;
 
 public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> {
@@ -112,12 +113,12 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     public Instant getExpirationTime() {
-        return Instant.ofEpochSecond(builder.getExpiry());
+        return InstantConverter.fromProtobuf(builder.getExpiry());
     }
 
     public TokenUpdateTransaction setExpirationTime(Instant expirationTime) {
         requireNotFrozen();
-        builder.setExpiry(expirationTime.getEpochSecond());
+        builder.setExpiry(InstantConverter.toProtobuf(expirationTime));
         return this;
     }
 
@@ -131,13 +132,13 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         return this;
     }
 
-    public long getAutoRenewPeriod() {
-        return builder.getAutoRenewPeriod();
+    public Duration getAutoRenewPeriod() {
+        return DurationConverter.fromProtobuf(builder.getAutoRenewPeriod());
     }
 
-    public TokenUpdateTransaction setAutoRenewPeriod(long period) {
+    public TokenUpdateTransaction setAutoRenewPeriod(Duration period) {
         requireNotFrozen();
-        builder.setAutoRenewPeriod(period);
+        builder.setAutoRenewPeriod(DurationConverter.toProtobuf(period));
         return this;
     }
 

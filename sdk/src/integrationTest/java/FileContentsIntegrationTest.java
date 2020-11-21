@@ -18,6 +18,7 @@ public class FileContentsIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
             var operatorKey = client.getOperatorPublicKey();
+            assertNotNull(operatorKey);
 
             var response = new FileCreateTransaction()
                 .setKeys(operatorKey)
@@ -25,7 +26,7 @@ public class FileContentsIntegrationTest {
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client);
 
-            var receipt = response.transactionId.getReceipt(client);
+            var receipt = response.getReceipt(client);
 
             assertNotNull(receipt.fileId);
             assertTrue(Objects.requireNonNull(receipt.fileId).num > 0);
@@ -45,7 +46,6 @@ public class FileContentsIntegrationTest {
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             client.close();

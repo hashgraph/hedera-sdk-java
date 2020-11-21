@@ -30,6 +30,7 @@ class AccountIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
             var operatorId = client.getOperatorAccountId();
+            assertNotNull(operatorId);
 
             var key1 = PrivateKey.generate();
             var key2 = PrivateKey.generate();
@@ -40,7 +41,7 @@ class AccountIntegrationTest {
                 .setInitialBalance(new Hbar(1))
                 .execute(client);
 
-            var receipt = response.transactionId.getReceipt(client);
+            var receipt = response.getReceipt(client);
 
             assertNotNull(receipt.accountId);
             assertTrue(Objects.requireNonNull(receipt.accountId).num > 0);
@@ -90,7 +91,6 @@ class AccountIntegrationTest {
                 .sign(key1)
                 .sign(key2)
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             balance = new AccountBalanceQuery()
@@ -110,7 +110,6 @@ class AccountIntegrationTest {
                 .freezeWith(client)
                 .sign(key2)
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             assertThrows(HederaPreCheckStatusException.class, () -> {

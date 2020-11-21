@@ -18,6 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.time.Duration;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Managed client for use on the Hedera Hashgraph network.
@@ -53,8 +54,8 @@ public final class Client implements AutoCloseable {
         this.mirrorNetwork = new MirrorNetwork(executor);
     }
 
-    public void setMirrorNetwork(List<String> newtork) throws InterruptedException {
-        mirrorNetwork.setNetwork(newtork);
+    public void setMirrorNetwork(List<String> network) throws InterruptedException {
+        mirrorNetwork.setNetwork(network);
     }
 
     public List<String> getMirrorNetwork() {
@@ -173,16 +174,14 @@ public final class Client implements AutoCloseable {
 
         if (config.network == null) {
             throw new Exception("Network is not set in provided json object");
-        }
-        else if (config.network.isJsonObject()) {
+        } else if (config.network.isJsonObject()) {
             var networks = config.network.getAsJsonObject();
             Map<String, AccountId> nodes = new HashMap<>(networks.size());
             for (Map.Entry<String, JsonElement> entry : networks.entrySet()) {
                 nodes.put(entry.getValue().toString().replace("\"", ""), AccountId.fromString(entry.getKey().toString().replace("\"", "")));
             }
-            client= new Client(nodes);
-        }
-        else{
+            client = new Client(nodes);
+        } else {
             String networks = config.network.getAsString();
             switch (networks) {
                 case "mainnet":
@@ -210,13 +209,12 @@ public final class Client implements AutoCloseable {
         if (config.mirrorNetwork != null) {
             if (config.mirrorNetwork.isJsonArray()) {
                 var mirrors = config.mirrorNetwork.getAsJsonArray();
-                List<String>  listMirrors = new ArrayList<>(mirrors.size());
-                for ( var i = 0; i<mirrors.size(); i++) {
+                List<String> listMirrors = new ArrayList<>(mirrors.size());
+                for (var i = 0; i < mirrors.size(); i++) {
                     listMirrors.add(mirrors.get(i).getAsString().replace("\"", ""));
                 }
                 client.setMirrorNetwork(listMirrors);
-            }
-            else{
+            } else {
                 String mirror = config.mirrorNetwork.getAsString();
                 switch (mirror) {
                     case "mainnet":
@@ -271,9 +269,15 @@ public final class Client implements AutoCloseable {
         return this;
     }
 
-
     public Map<String, AccountId> getNetwork() {
         return network.network;
+    }
+
+    public void ping(AccountId nodeAccountId) throws TimeoutException, HederaPreCheckStatusException {
+        new AccountBalanceQuery()
+            .setAccountId(nodeAccountId)
+            .setNodeAccountIds(Collections.singletonList(nodeAccountId))
+            .execute(this);
     }
 
     /**

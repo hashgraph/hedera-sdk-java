@@ -25,6 +25,7 @@ public class FileIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
             var operatorKey = client.getOperatorPublicKey();
+            assertNotNull(operatorKey);
 
             var response = new FileCreateTransaction()
                 .setKeys(operatorKey)
@@ -32,7 +33,7 @@ public class FileIntegrationTest {
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client);
 
-            var receipt = response.transactionId.getReceipt(client);
+            var receipt = response.getReceipt(client);
 
             assertNotNull(receipt.fileId);
             assertTrue(Objects.requireNonNull(receipt.fileId).num > 0);
@@ -48,6 +49,7 @@ public class FileIntegrationTest {
             assertEquals(info.fileId, file);
             assertEquals(info.size, 28);
             assertFalse(info.isDeleted);
+            assertNotNull(info.keys.getThreshold());
             var testKey = KeyList.of(Objects.requireNonNull(operatorKey)).setThreshold(info.keys.getThreshold());
             assertEquals(info.keys.toString(), testKey.toString());
 
@@ -57,7 +59,6 @@ public class FileIntegrationTest {
                 .setContents("[e2e::FileAppendTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             info = new FileInfoQuery()
@@ -69,6 +70,7 @@ public class FileIntegrationTest {
             assertEquals(info.fileId, file);
             assertEquals(info.size, 56);
             assertFalse(info.isDeleted);
+            assertNotNull(info.keys.getThreshold());
             testKey.setThreshold(info.keys.getThreshold());
             assertEquals(info.keys.toString(), testKey.toString());
 
@@ -86,7 +88,6 @@ public class FileIntegrationTest {
                 .setContents("[e2e::FileUpdateTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             info = new FileInfoQuery()
@@ -98,6 +99,7 @@ public class FileIntegrationTest {
             assertEquals(info.fileId, file);
             assertEquals(info.size, 28);
             assertFalse(info.isDeleted);
+            assertNotNull(info.keys.getThreshold());
             testKey.setThreshold(info.keys.getThreshold());
             assertEquals(info.keys.toString(), testKey.toString());
 
@@ -106,7 +108,6 @@ public class FileIntegrationTest {
                 .setFileId(file)
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
-                .transactionId
                 .getReceipt(client);
 
             info = new FileInfoQuery()
@@ -117,6 +118,7 @@ public class FileIntegrationTest {
 
             assertEquals(info.fileId, file);
             assertTrue(info.isDeleted);
+            assertNotNull(info.keys.getThreshold());
             testKey.setThreshold(info.keys.getThreshold());
             assertEquals(info.keys.toString(), testKey.toString());
 
