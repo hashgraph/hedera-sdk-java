@@ -1,10 +1,13 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TokenWipeAccountTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
+
+import java.util.HashMap;
 
 public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenWipeTransaction> {
     private final TokenWipeAccountTransactionBody.Builder builder;
@@ -13,10 +16,10 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         builder = TokenWipeAccountTransactionBody.newBuilder();
     }
 
-    TokenWipeTransaction(TransactionBody body) {
-        super(body);
+    TokenWipeTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs.values().iterator().next());
 
-        builder = body.getTokenWipe().toBuilder();
+        builder = bodyBuilder.getTokenWipe().toBuilder();
     }
 
     public TokenId getTokenId() {

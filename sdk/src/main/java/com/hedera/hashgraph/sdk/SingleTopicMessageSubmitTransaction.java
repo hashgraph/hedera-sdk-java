@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
@@ -9,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 class SingleTopicMessageSubmitTransaction extends Transaction<SingleTopicMessageSubmitTransaction> {
-    SingleTopicMessageSubmitTransaction(HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction> txs) {
+    SingleTopicMessageSubmitTransaction(HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction> txs) throws InvalidProtocolBufferException {
         super(txs);
     }
 

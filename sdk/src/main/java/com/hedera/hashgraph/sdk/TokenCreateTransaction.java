@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TokenCreateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
@@ -7,6 +8,8 @@ import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
+
+import java.util.HashMap;
 
 public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> {
     private final TokenCreateTransactionBody.Builder builder;
@@ -18,10 +21,10 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         setExpirationTime(Instant.now().plus(Duration.ofDays(90)));
     }
 
-    TokenCreateTransaction(TransactionBody body) {
-        super(body);
+    TokenCreateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs.values().iterator().next());
 
-        builder = body.getTokenCreation().toBuilder();
+        builder = bodyBuilder.getTokenCreation().toBuilder();
     }
 
     public String getTokenName() {

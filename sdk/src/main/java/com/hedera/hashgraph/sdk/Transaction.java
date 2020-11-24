@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SignatureMap;
+import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionList;
 import java8.util.concurrent.CompletableFuture;
@@ -36,14 +37,15 @@ public abstract class Transaction<T extends Transaction<T>>
     // functionally identical, with the exception of pointing to different nodes. When retrying a
     // transaction after a network error or retry-able status response, we try a
     // different transaction and thus a different node.
-    protected List<com.hedera.hashgraph.sdk.proto.Transaction.Builder> transactions = Collections.emptyList();
+    protected List<com.hedera.hashgraph.sdk.proto.Transaction> transactions = Collections.emptyList();
+    protected List<com.hedera.hashgraph.sdk.proto.SignedTransaction.Builder> signedTransactions = Collections.emptyList();
     protected List<SignatureMap.Builder> signatures = Collections.emptyList();
     protected List<AccountId> nodeIds = Collections.emptyList();
 
     // The index of the _next_ transaction to be built and executed.
     // Each time `buildNext` is invoked, this should be incremented by 1 and wrapped around with the
     // size of the transaction array.
-    private int nextTransactionIndex = 0;
+    int nextTransactionIndex = 0;
 
     Transaction() {
         bodyBuilder = TransactionBody.newBuilder();
@@ -54,22 +56,21 @@ public abstract class Transaction<T extends Transaction<T>>
         bodyBuilder.setTransactionValidDuration(DurationConverter.toProtobuf(DEFAULT_TRANSACTION_VALID_DURATION));
     }
 
-    Transaction(TransactionBody body) {
-        this(body.toBuilder());
-    }
-
-    Transaction(HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction> txs) {
+    Transaction(HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction> txs) throws InvalidProtocolBufferException {
         this.nodeIds = new ArrayList<>(txs.keySet());
         this.signatures = new ArrayList<>(this.nodeIds.size());
         this.transactions = new ArrayList<>(this.nodeIds.size());
+        this.signedTransactions = new ArrayList<>(this.nodeIds.size());
 
         for (var value : txs.values()) {
-            this.signatures.add(value.getSigMap().toBuilder());
-            this.transactions.add(value.toBuilder());
+            var transaction = SignedTransaction.parseFrom(value.getSignedTransactionBytes());
+            this.signatures.add(transaction.getSigMap().toBuilder());
+            this.signedTransactions.add(transaction.toBuilder());
+            this.transactions.add(value);
         }
 
         try {
-            bodyBuilder = TransactionBody.parseFrom(this.transactions.get(0).getBodyBytes()).toBuilder();
+            bodyBuilder = TransactionBody.parseFrom(this.signedTransactions.get(0).getBodyBytes()).toBuilder();
         } catch (InvalidProtocolBufferException e) {
             throw new IllegalArgumentException(e);
         }
@@ -80,20 +81,14 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     public static Transaction<?> fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        var buf = new ByteArrayInputStream(bytes);
         var txs = new HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>>();
         TransactionBody.DataCase dataCase = TransactionBody.DataCase.DATA_NOT_SET;
 
         var list = TransactionList.parseFrom(bytes);
 
         for (var transaction : list.getTransactionListList()) {
-            TransactionBody txBody;
-
-            try {
-                txBody = TransactionBody.parseFrom(transaction.getBodyBytes());
-            } catch (InvalidProtocolBufferException e) {
-                throw new IllegalArgumentException(e);
-            }
+            var signedTransaction = SignedTransaction.parseFrom(transaction.getSignedTransactionBytes());
+            var txBody = TransactionBody.parseFrom(signedTransaction.getBodyBytes());
 
             if (dataCase.getNumber() == TransactionBody.DataCase.DATA_NOT_SET.getNumber()) {
                 dataCase = txBody.getDataCase();
@@ -323,6 +318,18 @@ public abstract class Transaction<T extends Transaction<T>>
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
+        if (transactions.size() != signedTransactions.size()) {
+            for (var i = nextTransactionIndex; i < signedTransactions.size(); ++i) {
+                transactions.add(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
+                    .setSignedTransactionBytes(
+                        signedTransactions.get(i)
+                            .setSigMap(signatures.get(i))
+                            .buildPartial()
+                            .toByteString()
+                    ).buildPartial());
+            }
+        }
+
         var list = TransactionList.newBuilder();
 
         for (var transaction : transactions) {
@@ -337,7 +344,7 @@ public abstract class Transaction<T extends Transaction<T>>
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
-        return hash(transactions.get(0).setSigMap(signatures.get(0)).buildPartial().toByteArray());
+        return hash(signedTransactions.get(0).setSigMap(signatures.get(0)).buildPartial().toByteArray());
     }
 
     public Map<AccountId, byte[]> getTransactionHashPerNode() {
@@ -345,15 +352,11 @@ public abstract class Transaction<T extends Transaction<T>>
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
-        var index = nextTransactionIndex;
-        nextTransactionIndex = 0;
         var hashes = new HashMap<AccountId, byte[]>();
 
-        for (nextTransactionIndex = 0; nextTransactionIndex < transactions.size(); nextTransactionIndex++) {
-            hashes.put(nodeIds.get(nextTransactionIndex), hash(makeRequest().toByteArray()));
+        for (var i = 0; i < transactions.size(); i++) {
+            hashes.put(nodeIds.get(i), hash(transactions.get(i).getSignedTransactionBytes().toByteArray()));
         }
-
-        nextTransactionIndex = index;
 
         return hashes;
     }
@@ -398,8 +401,10 @@ public abstract class Transaction<T extends Transaction<T>>
             throw new IllegalStateException("Signing requires transaction to be frozen");
         }
 
-        for (var index = 0; index < transactions.size(); ++index) {
-            var bodyBytes = transactions.get(index).getBodyBytes().toByteArray();
+        transactions.clear();
+
+        for (var index = 0; index < signedTransactions.size(); ++index) {
+            var bodyBytes = signedTransactions.get(index).getBodyBytes().toByteArray();
 
             // NOTE: Yes the transactionSigner is invoked N times
             //  However for a verified/pin signature system it is reasonable to allow it to sign multiple
@@ -440,7 +445,6 @@ public abstract class Transaction<T extends Transaction<T>>
             for (var sigPair : signatures.get(0).getSigPairList()) {
                 if (ByteString.copyFrom(key.toBytes()).startsWith(sigPair.getPubKeyPrefix())) {
                     // transaction already signed with the operator
-                    // noinspection unchecked
                     return true;
                 }
             }
@@ -450,7 +454,7 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     public T addSignature(PublicKey publicKey, byte[] signature) {
-        this.requireExactNode();
+        requireExactNode();
 
         if (!isFrozen()) {
             freeze();
@@ -490,7 +494,7 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     protected boolean isFrozen() {
-        return !transactions.isEmpty();
+        return !signedTransactions.isEmpty();
     }
 
     protected void requireNotFrozen() {
@@ -500,7 +504,7 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     protected void requireExactNode() {
-        if (transactions.size() > 0) {
+        if (signedTransactions.size() != 1) {
             throw new IllegalStateException("transaction did not have exactly one node ID set");
         }
     }
@@ -552,60 +556,31 @@ public abstract class Transaction<T extends Transaction<T>>
             return (T) this;
         }
 
-        if (bodyBuilder.hasTransactionID() && bodyBuilder.hasNodeAccountID()) {
-            // build exactly one transaction
-            // this is all we need if there is a node account ID set
-            signatures = Collections.singletonList(SignatureMap.newBuilder());
-            transactions = Collections.singletonList(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
-                .setBodyBytes(bodyBuilder.build().toByteString()));
-
-            // noinspection unchecked
-            return (T) this;
-        }
-
-        if (bodyBuilder.hasTransactionID() && !nodeIds.isEmpty()) {
-            // if the node IDs have been pre-selected but we have not yet frozen
-            // are transaction
-
-            transactions = new ArrayList<>(nodeIds.size());
-            signatures = new ArrayList<>(nodeIds.size());
-
-            for (AccountId nodeId : nodeIds) {
-                signatures.add(SignatureMap.newBuilder());
-                transactions.add(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
-                    .setBodyBytes(bodyBuilder
-                        .setNodeAccountID(nodeId.toProtobuf())
-                        .build()
-                        .toByteString()
-                    ));
+        if (nodeIds.isEmpty()) {
+            if (client == null) {
+                throw new IllegalStateException(
+                    "`client` must be provided or both `nodeId` and `transactionId` must be set");
             }
 
-            // noinspection unchecked
-            return (T) this;
-        }
-
-        if (bodyBuilder.hasTransactionID() && client != null) {
-            // Get a list of node AccountId's if the user has not set them manually.
             nodeIds = client.network.getNodeAccountIdsForExecute();
-            signatures = new ArrayList<>(nodeIds.size());
-            transactions = new ArrayList<>(nodeIds.size());
-
-            for (AccountId nodeId : nodeIds) {
-                signatures.add(SignatureMap.newBuilder());
-                transactions.add(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
-                    .setBodyBytes(bodyBuilder
-                        .setNodeAccountID(nodeId.toProtobuf())
-                        .build()
-                        .toByteString()
-                    ));
-            }
-
-            // noinspection unchecked
-            return (T) this;
         }
 
-        throw new IllegalStateException(
-            "`client` must be provided or both `nodeId` and `transactionId` must be set");
+        transactions = new ArrayList<>(nodeIds.size());
+        signatures = new ArrayList<>(nodeIds.size());
+        signedTransactions = new ArrayList<>(nodeIds.size());
+
+        for (AccountId nodeId : nodeIds) {
+            signatures.add(SignatureMap.newBuilder());
+            signedTransactions.add(com.hedera.hashgraph.sdk.proto.SignedTransaction.newBuilder()
+                .setBodyBytes(bodyBuilder
+                    .setNodeAccountID(nodeId.toProtobuf())
+                    .build()
+                    .toByteString()
+                ));
+        }
+
+        // noinspection unchecked
+        return (T) this;
     }
 
     /**
@@ -617,7 +592,19 @@ public abstract class Transaction<T extends Transaction<T>>
 
     @Override
     final com.hedera.hashgraph.sdk.proto.Transaction makeRequest() {
-        return transactions.get(nextTransactionIndex).setSigMap(signatures.get(nextTransactionIndex)).build();
+        if (transactions.size() <= nextTransactionIndex) {
+            transactions.add(
+                com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
+                    .setSignedTransactionBytes(
+                        signedTransactions.get(nextTransactionIndex)
+                            .setSigMap(signatures.get(nextTransactionIndex))
+                            .build().toByteString()
+                    )
+                    .build()
+            );
+        }
+
+        return transactions.get(nextTransactionIndex);
     }
 
     @Override

@@ -1,11 +1,14 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TokenMintTransactionBody;
 import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
+
+import java.util.HashMap;
 
 public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenMintTransaction> {
     private final TokenMintTransactionBody.Builder builder;
@@ -14,10 +17,10 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         builder = TokenMintTransactionBody.newBuilder();
     }
 
-    TokenMintTransaction(TransactionBody body) {
-        super(body);
+    TokenMintTransaction(HashMap<TransactionId, HashMap<AccountId, Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs.values().iterator().next());
 
-        builder = body.getTokenMint().toBuilder();
+        builder = bodyBuilder.getTokenMint().toBuilder();
     }
 
     public TokenId getTokenId() {

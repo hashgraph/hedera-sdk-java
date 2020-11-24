@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoDeleteLiveHashTransactionBody;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
@@ -21,7 +22,7 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
         builder = CryptoDeleteLiveHashTransactionBody.newBuilder();
     }
 
-    LiveHashDeleteTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+    LiveHashDeleteTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs.values().iterator().next());
 
         builder = bodyBuilder.getCryptoDeleteLiveHash().toBuilder();

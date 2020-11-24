@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.BoolValue;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.UInt64Value;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.CryptoUpdateTransactionBody;
@@ -36,7 +37,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         builder = CryptoUpdateTransactionBody.newBuilder();
     }
 
-    AccountUpdateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+    AccountUpdateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs.values().iterator().next());
 
         builder = bodyBuilder.getCryptoUpdateAccount().toBuilder();

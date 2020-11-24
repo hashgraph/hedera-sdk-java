@@ -1,10 +1,12 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenDissociateTransaction> {
@@ -14,10 +16,10 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
         builder = TokenDissociateTransactionBody.newBuilder();
     }
 
-    TokenDissociateTransaction(TransactionBody body) {
-        super(body);
+    TokenDissociateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs.values().iterator().next());
 
-        builder = body.getTokenDissociate().toBuilder();
+        builder = bodyBuilder.getTokenDissociate().toBuilder();
     }
 
     public AccountId getAccountId() {

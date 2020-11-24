@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.FileUpdateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
@@ -22,7 +23,7 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         builder = FileUpdateTransactionBody.newBuilder();
     }
 
-    FileUpdateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+    FileUpdateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs.values().iterator().next());
 
         builder = bodyBuilder.getFileUpdate().toBuilder();
