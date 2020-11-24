@@ -1,11 +1,14 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TokenGrantKycTransactionBody;
 import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
+
+import java.util.HashMap;
 
 public class TokenGrantKycTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenGrantKycTransaction> {
     private final TokenGrantKycTransactionBody.Builder builder;
@@ -14,10 +17,10 @@ public class TokenGrantKycTransaction extends com.hedera.hashgraph.sdk.Transacti
         builder = TokenGrantKycTransactionBody.newBuilder();
     }
 
-    TokenGrantKycTransaction(TransactionBody body) {
-        super(body);
+    TokenGrantKycTransaction(HashMap<TransactionId, HashMap<AccountId, Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs.values().iterator().next());
 
-        builder = body.getTokenGrantKyc().toBuilder();
+        builder = bodyBuilder.getTokenGrantKyc().toBuilder();
     }
 
     public TokenId getTokenId() {

@@ -301,10 +301,10 @@ public final class PrivateKey extends Key {
             transaction.freeze();
         }
 
-        var builder = (com.hedera.hashgraph.sdk.proto.Transaction.Builder) transaction.transactions.get(0);
+        var builder = (com.hedera.hashgraph.sdk.proto.SignedTransaction.Builder) transaction.signedTransactions.get(0);
         var signature = sign(builder.getBodyBytes().toByteArray());
 
-        transaction.addSignature(publicKey, signature);
+        transaction.addSignature(getPublicKey(), signature);
 
         return signature;
     }

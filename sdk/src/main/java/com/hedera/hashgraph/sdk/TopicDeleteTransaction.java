@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ConsensusDeleteTopicTransactionBody;
 import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
@@ -24,7 +25,7 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
         builder = ConsensusDeleteTopicTransactionBody.newBuilder();
     }
 
-    TopicDeleteTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+    TopicDeleteTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs.values().iterator().next());
 
         builder = bodyBuilder.getConsensusDeleteTopic().toBuilder();

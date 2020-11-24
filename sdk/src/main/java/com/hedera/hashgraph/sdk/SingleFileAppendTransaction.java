@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.FileAppendTransactionBody;
 import com.hedera.hashgraph.sdk.proto.FileID;
 import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
@@ -12,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class SingleFileAppendTransaction extends Transaction<SingleFileAppendTransaction> {
-    SingleFileAppendTransaction(HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction> txs) {
+    SingleFileAppendTransaction(HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction> txs) throws InvalidProtocolBufferException {
         super(txs);
     }
 

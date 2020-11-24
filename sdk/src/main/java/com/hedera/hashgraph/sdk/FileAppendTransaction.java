@@ -2,8 +2,10 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import com.hederahashgraph.api.proto.java.TransactionList;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Function;
@@ -38,7 +40,7 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
         builder = FileAppendTransactionBody.newBuilder();
     }
 
-    FileAppendTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
+    FileAppendTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs.values().iterator().next());
 
         for (var txEntry : txs.entrySet()) {
@@ -55,20 +57,29 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
-        var buf = new ByteArrayOutputStream();
-
         for (var tx : chunkTransactions) {
-
-            for (int i = 0; i < tx.transactions.size(); i++) {
-                try {
-                    transactions.get(i).setSigMap(signatures.get(0)).buildPartial().writeDelimitedTo(buf);
-                } catch (IOException e) {
-                    // Do nothing as this should never happen
+            if (tx.transactions.size() != tx.signedTransactions.size()) {
+                for (var i = tx.nextTransactionIndex; i < tx.signedTransactions.size(); ++i) {
+                    tx.transactions.add(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
+                        .setSignedTransactionBytes(
+                            tx.signedTransactions.get(i)
+                                .setSigMap(tx.signatures.get(i))
+                                .buildPartial()
+                                .toByteString()
+                        ).buildPartial());
                 }
             }
         }
 
-        return buf.toByteArray();
+        var list = TransactionList.newBuilder();
+
+        for (var transaction : chunkTransactions) {
+            for (var tx : transaction.transactions) {
+                list.addTransactionList(tx);
+            }
+        }
+
+        return list.build().toByteArray();
     }
 
     @Nullable
