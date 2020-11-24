@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenUnfreezeTransaction> {
     private final TokenUnfreezeAccountTransactionBody.Builder builder;
@@ -16,8 +17,8 @@ public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transacti
         builder = TokenUnfreezeAccountTransactionBody.newBuilder();
     }
 
-    TokenUnfreezeTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
-        super(txs.values().iterator().next());
+    TokenUnfreezeTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getTokenUnfreeze().toBuilder();
     }

@@ -69,6 +69,7 @@ abstract class Executable<RequestT, ResponseT, O> implements WithExecute<O> {
             }
 
             var responseStatus = mapResponseStatus(response);
+            System.out.println("Status: " + responseStatus);
 
             logger.atTrace()
                 .addKeyValue("node", node.accountId)

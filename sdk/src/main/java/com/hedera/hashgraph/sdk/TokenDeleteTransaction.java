@@ -9,6 +9,7 @@ import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class TokenDeleteTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenDeleteTransaction> {
     private final TokenDeleteTransactionBody.Builder builder;
@@ -17,8 +18,8 @@ public class TokenDeleteTransaction extends com.hedera.hashgraph.sdk.Transaction
         builder = TokenDeleteTransactionBody.newBuilder();
     }
 
-    TokenDeleteTransaction(HashMap<TransactionId, HashMap<AccountId, Transaction>> txs) throws InvalidProtocolBufferException {
-        super(txs.values().iterator().next());
+    TokenDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getTokenDeletion().toBuilder();
     }

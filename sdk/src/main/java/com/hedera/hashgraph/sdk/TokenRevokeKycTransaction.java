@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class TokenRevokeKycTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenRevokeKycTransaction> {
     private final TokenRevokeKycTransactionBody.Builder builder;
@@ -16,8 +17,8 @@ public class TokenRevokeKycTransaction extends com.hedera.hashgraph.sdk.Transact
         builder = TokenRevokeKycTransactionBody.newBuilder();
     }
 
-    TokenRevokeKycTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
-        super(txs.values().iterator().next());
+    TokenRevokeKycTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getTokenRevokeKyc().toBuilder();
     }

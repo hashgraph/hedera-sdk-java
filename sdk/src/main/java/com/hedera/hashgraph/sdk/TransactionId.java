@@ -6,6 +6,8 @@ import java8.util.concurrent.CompletableFuture;
 import org.threeten.bp.Clock;
 import org.threeten.bp.Instant;
 
+import javax.annotation.Nullable;
+
 import static java8.util.concurrent.CompletableFuture.completedFuture;
 import static java8.util.concurrent.CompletableFuture.failedFuture;
 
@@ -119,5 +121,21 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
 
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
+    }
+
+
+    @Override
+    public boolean equals(@Nullable Object object) {
+        if (!(object instanceof TransactionId)) {
+            return false;
+        }
+
+        return ((TransactionId) object).accountId.equals(accountId) &&
+            ((TransactionId) object).validStart.equals(validStart);
+    }
+
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
     }
 }

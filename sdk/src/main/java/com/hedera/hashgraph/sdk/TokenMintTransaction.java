@@ -9,6 +9,7 @@ import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenMintTransaction> {
     private final TokenMintTransactionBody.Builder builder;
@@ -17,8 +18,8 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         builder = TokenMintTransactionBody.newBuilder();
     }
 
-    TokenMintTransaction(HashMap<TransactionId, HashMap<AccountId, Transaction>> txs) throws InvalidProtocolBufferException {
-        super(txs.values().iterator().next());
+    TokenMintTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getTokenMint().toBuilder();
     }
