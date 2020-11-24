@@ -9,6 +9,7 @@ import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class TokenGrantKycTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenGrantKycTransaction> {
     private final TokenGrantKycTransactionBody.Builder builder;
@@ -17,8 +18,8 @@ public class TokenGrantKycTransaction extends com.hedera.hashgraph.sdk.Transacti
         builder = TokenGrantKycTransactionBody.newBuilder();
     }
 
-    TokenGrantKycTransaction(HashMap<TransactionId, HashMap<AccountId, Transaction>> txs) throws InvalidProtocolBufferException {
-        super(txs.values().iterator().next());
+    TokenGrantKycTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getTokenGrantKyc().toBuilder();
     }

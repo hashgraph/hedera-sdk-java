@@ -10,6 +10,7 @@ import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> {
     private final TokenUpdateTransactionBody.Builder builder;
@@ -17,9 +18,9 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     public TokenUpdateTransaction() {
         builder = TokenUpdateTransactionBody.newBuilder();
     }
-    
-    TokenUpdateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
-        super(txs.values().iterator().next());
+
+    TokenUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getTokenUpdate().toBuilder();
     }

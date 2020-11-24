@@ -12,6 +12,7 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Delete a file or smart contract - can only be done with a Hedera admin.
@@ -31,8 +32,8 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
         builder = SystemDeleteTransactionBody.newBuilder();
     }
 
-    SystemDeleteTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
-        super(txs.values().iterator().next());
+    SystemDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getSystemDelete().toBuilder();
     }

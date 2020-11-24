@@ -11,6 +11,7 @@ import org.threeten.bp.OffsetTime;
 import org.threeten.bp.ZoneOffset;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Set the freezing period in which the platform will stop creating events and accepting transactions.
@@ -23,8 +24,8 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
         builder = FreezeTransactionBody.newBuilder();
     }
 
-    FreezeTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
-        super(txs.values().iterator().next());
+    FreezeTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getFreeze().toBuilder();
     }

@@ -7,6 +7,7 @@ import io.grpc.MethodDescriptor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenDissociateTransaction> {
@@ -16,8 +17,8 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
         builder = TokenDissociateTransactionBody.newBuilder();
     }
 
-    TokenDissociateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
-        super(txs.values().iterator().next());
+    TokenDissociateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getTokenDissociate().toBuilder();
     }

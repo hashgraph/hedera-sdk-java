@@ -11,8 +11,6 @@ import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Function;
 
 import javax.annotation.Nullable;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -40,11 +38,13 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
         builder = FileAppendTransactionBody.newBuilder();
     }
 
-    FileAppendTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
-        super(txs.values().iterator().next());
+    FileAppendTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         for (var txEntry : txs.entrySet()) {
-            var tx = new SingleFileAppendTransaction(txEntry.getValue());
+            var map = new LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>>(1);
+            map.put(txEntry.getKey(), txEntry.getValue());
+            var tx = new SingleFileAppendTransaction(map);
             contents.concat(tx.bodyBuilder.getConsensusSubmitMessage().getMessage());
             chunkTransactions.add(tx);
         }
@@ -59,7 +59,7 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
 
         for (var tx : chunkTransactions) {
             if (tx.transactions.size() != tx.signedTransactions.size()) {
-                for (var i = tx.nextTransactionIndex; i < tx.signedTransactions.size(); ++i) {
+                for (var i = tx.nextNodeIndex; i < tx.signedTransactions.size(); ++i) {
                     tx.transactions.add(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
                         .setSignedTransactionBytes(
                             tx.signedTransactions.get(i)

@@ -9,6 +9,7 @@ import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Delete a topic.
@@ -25,8 +26,8 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
         builder = ConsensusDeleteTopicTransactionBody.newBuilder();
     }
 
-    TopicDeleteTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
-        super(txs.values().iterator().next());
+    TopicDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getConsensusDeleteTopic().toBuilder();
     }

@@ -10,6 +10,7 @@ import io.grpc.MethodDescriptor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class TokenAssociateTransaction extends Transaction<TokenAssociateTransaction> {
@@ -19,8 +20,8 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
         builder = TokenAssociateTransactionBody.newBuilder();
     }
 
-    TokenAssociateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
-        super(txs.values().iterator().next());
+    TokenAssociateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getTokenAssociate().toBuilder();
     }

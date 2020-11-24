@@ -12,6 +12,7 @@ import org.threeten.bp.Instant;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Creates a file with the content by submitting the transaction.
@@ -25,8 +26,8 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
         setExpirationTime(Instant.now().plus(DEFAULT_AUTO_RENEW_PERIOD));
     }
 
-    FileCreateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
-        super(txs.values().iterator().next());
+    FileCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getFileCreate().toBuilder();
     }

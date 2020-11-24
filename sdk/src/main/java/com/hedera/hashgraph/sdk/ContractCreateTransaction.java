@@ -11,6 +11,7 @@ import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Start a new smart contract instance.
@@ -65,8 +66,8 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
     }
 
-    ContractCreateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
-        super(txs.values().iterator().next());
+    ContractCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getContractCreateInstance().toBuilder();
     }

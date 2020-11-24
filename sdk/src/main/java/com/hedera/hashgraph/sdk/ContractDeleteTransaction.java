@@ -9,6 +9,7 @@ import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Marks a contract as deleted, moving all its current hbars to another account.
@@ -20,8 +21,8 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
         builder = ContractDeleteTransactionBody.newBuilder();
     }
 
-    ContractDeleteTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
-        super(txs.values().iterator().next());
+    ContractDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getContractDeleteInstance().toBuilder();
     }

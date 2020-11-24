@@ -13,6 +13,7 @@ import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Update a topic.
@@ -31,8 +32,8 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         builder = ConsensusUpdateTopicTransactionBody.newBuilder();
     }
 
-    TopicUpdateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
-        super(txs.values().iterator().next());
+    TopicUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getConsensusUpdateTopic().toBuilder();
     }

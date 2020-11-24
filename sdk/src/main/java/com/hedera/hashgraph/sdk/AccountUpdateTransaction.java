@@ -13,6 +13,7 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Change properties for the given account.
@@ -37,8 +38,8 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         builder = CryptoUpdateTransactionBody.newBuilder();
     }
 
-    AccountUpdateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
-        super(txs.values().iterator().next());
+    AccountUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getCryptoUpdateAccount().toBuilder();
     }
