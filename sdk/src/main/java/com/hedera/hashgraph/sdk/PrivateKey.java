@@ -295,7 +295,7 @@ public final class PrivateKey extends Key {
     }
 
     public byte[] signTransaction(Transaction transaction) {
-        transaction.requireExactNode();
+        transaction.requireOneNodeAccountId();
 
         if (!transaction.isFrozen()) {
             transaction.freeze();
