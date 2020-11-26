@@ -79,6 +79,10 @@ public abstract class Transaction<T extends Transaction<T>>
             transactionIds.add(transactionEntry.getKey());
 
             for (var nodeEntry : transactionEntry.getValue().entrySet()) {
+                if (nodeIds.size() != size) {
+                    nodeIds.add(nodeEntry.getKey());
+                }
+
                 var transaction = SignedTransaction.parseFrom(nodeEntry.getValue().getSignedTransactionBytes());
                 transactions.add(nodeEntry.getValue());
                 signatures.add(transaction.getSigMap().toBuilder());
@@ -87,10 +91,6 @@ public abstract class Transaction<T extends Transaction<T>>
         }
 
         bodyBuilder = TransactionBody.parseFrom(signedTransactions.get(0).getBodyBytes()).toBuilder();
-    }
-
-    Transaction(TransactionBody.Builder bodyBuilder) {
-        this.bodyBuilder = bodyBuilder;
     }
 
     public static Transaction<?> fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -327,17 +327,7 @@ public abstract class Transaction<T extends Transaction<T>>
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
-        if (transactions.size() != signedTransactions.size()) {
-            for (var i = transactions.size(); i < signedTransactions.size(); ++i) {
-                transactions.add(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
-                    .setSignedTransactionBytes(
-                        signedTransactions.get(i)
-                            .setSigMap(signatures.get(i))
-                            .build()
-                            .toByteString()
-                    ).build());
-            }
-        }
+        buildTransactions(signedTransactions.size());
 
         var list = TransactionList.newBuilder();
 
@@ -353,13 +343,17 @@ public abstract class Transaction<T extends Transaction<T>>
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
-        return hash(signedTransactions.get(0).setSigMap(signatures.get(0)).buildPartial().toByteArray());
+        buildTransactions(1);
+
+        return hash(transactions.get(0).getSignedTransactionBytes().toByteArray());
     }
 
     public Map<AccountId, byte[]> getTransactionHashPerNode() {
         if (!this.isFrozen()) {
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
+
+        buildTransactions(signedTransactions.size());
 
         var hashes = new HashMap<AccountId, byte[]>();
 
@@ -411,10 +405,9 @@ public abstract class Transaction<T extends Transaction<T>>
         }
 
         transactions.clear();
-        nextNodeIndex = 0;
 
-        for (var index = 0; index < signedTransactions.size(); ++index) {
-            var bodyBytes = signedTransactions.get(index).getBodyBytes().toByteArray();
+        for (var i = 0; i < signedTransactions.size(); ++i) {
+            var bodyBytes = signedTransactions.get(i).getBodyBytes().toByteArray();
 
             // NOTE: Yes the transactionSigner is invoked N times
             //  However for a verified/pin signature system it is reasonable to allow it to sign multiple
@@ -422,7 +415,7 @@ public abstract class Transaction<T extends Transaction<T>>
             var signatureBytes = transactionSigner.apply(bodyBytes);
 
             signatures
-                .get(index)
+                .get(i)
                 .addSigPair(publicKey.toSignaturePairProtobuf(signatureBytes));
         }
 
@@ -464,7 +457,7 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     public T addSignature(PublicKey publicKey, byte[] signature) {
-        requireExactNode();
+        requireOneNodeAccountId();
 
         if (!isFrozen()) {
             freeze();
@@ -475,7 +468,8 @@ public abstract class Transaction<T extends Transaction<T>>
             return (T) this;
         }
 
-        this.signatures.get(0).addSigPair(publicKey.toSignaturePairProtobuf(signature));
+        transactions.clear();
+        signatures.get(0).addSigPair(publicKey.toSignaturePairProtobuf(signature));
 
         // noinspection unchecked
         return (T) this;
@@ -513,7 +507,7 @@ public abstract class Transaction<T extends Transaction<T>>
         }
     }
 
-    protected void requireExactNode() {
+    protected void requireOneNodeAccountId() {
         if (signedTransactions.size() != 1) {
             throw new IllegalStateException("transaction did not have exactly one node ID set");
         }
@@ -595,6 +589,18 @@ public abstract class Transaction<T extends Transaction<T>>
         return (T) this;
     }
 
+    void buildTransactions(int untilIndex) {
+        for (var i = transactions.size(); i < untilIndex; ++i) {
+            transactions.add(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
+                .setSignedTransactionBytes(
+                    signedTransactions.get(i)
+                        .setSigMap(signatures.get(i))
+                        .build()
+                        .toByteString()
+                ).build());
+        }
+    }
+
     /**
      * Called in {@link #freezeWith(Client)} just before the transaction
      * body is built. The intent is for the derived class to assign
@@ -606,21 +612,7 @@ public abstract class Transaction<T extends Transaction<T>>
     final com.hedera.hashgraph.sdk.proto.Transaction makeRequest() {
         var index = nextNodeIndex + (nextTransactionIndex * nodeIds.size());
 
-        System.out.println("Index: " + index);
-
-        if (transactions.size() <= index) {
-            for (var i = transactions.size(); i <= index; ++i) {
-                transactions.add(
-                    com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
-                        .setSignedTransactionBytes(
-                            signedTransactions.get(i)
-                                .setSigMap(signatures.get(i))
-                                .build().toByteString()
-                        )
-                        .build()
-                );
-            }
-        }
+        buildTransactions(index + 1);
 
         return transactions.get(index);
     }

@@ -50,7 +50,7 @@ public class FileAppendChunkedExample {
             .execute(client);
 
         TransactionReceipt receipt = transactionResponse.getReceipt(client);
-        FileId newFileId = receipt.fileId;
+        FileId newFileId = Objects.requireNonNull(receipt.fileId);
 
         System.out.println("fileId: " + newFileId);
 
@@ -70,6 +70,12 @@ public class FileAppendChunkedExample {
             .getReceipt(client);
 
         System.out.println(fileAppendReceipt.toString());
+
+        FileInfo info = new FileInfoQuery()
+            .setFileId(newFileId)
+            .execute(client);
+
+        System.out.println("File size according to `FileInfoQuery`: " + info.size);
     }
 
 

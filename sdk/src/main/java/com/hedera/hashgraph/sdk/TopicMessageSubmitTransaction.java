@@ -47,7 +47,7 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
         builder = bodyBuilder.getConsensusSubmitMessage().toBuilder();
 
         for (var i = 0; i < signedTransactions.size(); i += nodeIds.size()) {
-            message.concat(
+            message = message.concat(
                 TransactionBody.parseFrom(signedTransactions.get(i).getBodyBytes())
                     .getConsensusSubmitMessage().getMessage()
             );
@@ -139,35 +139,7 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
 
     @Override
     public TopicMessageSubmitTransaction freezeWith(@Nullable Client client) {
-        if (isFrozen()) {
-            return this;
-        }
-
-        if (client != null && bodyBuilder.getTransactionFee() == 0) {
-            bodyBuilder.setTransactionFee(client.maxTransactionFee.toTinybars());
-        }
-
-        if (transactionIds.isEmpty() && client != null) {
-            var operator = client.getOperator();
-
-            if (operator != null) {
-                // Set a default transaction ID, generated from the operator account ID
-                setTransactionId(TransactionId.generate(operator.accountId));
-            } else {
-                // no client means there must be an explicitly set node ID and transaction ID
-                throw new IllegalStateException(
-                    "`client` must have an `operator` or `transactionId` must be set");
-            }
-        }
-
-        if (nodeIds.isEmpty()) {
-            if (client == null) {
-                throw new IllegalStateException(
-                    "`client` must be provided or both `nodeId` and `transactionId` must be set");
-            }
-
-            nodeIds = client.network.getNodeAccountIdsForExecute();
-        }
+        super.freezeWith(client);
 
         var initialTransactionId = Objects.requireNonNull(transactionIds.get(0)).toProtobuf();
         var requiredChunks = (this.message.size() + (CHUNK_SIZE - 1)) / CHUNK_SIZE;
@@ -261,7 +233,6 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
 
         for (var i = 0; i < transactionIds.size(); i++) {
             future = future.thenCompose(list -> super.executeAsync(client).thenApply(response -> {
-                    System.out.println("Got response for: " + response.transactionId.toString() + " nextTransactionIndex: " + (nextTransactionIndex + 1));
                     list.add(response);
                     return list;
                 }).thenCompose(CompletableFuture::completedFuture)
