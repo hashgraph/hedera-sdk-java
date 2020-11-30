@@ -294,7 +294,7 @@ public final class PrivateKey extends Key {
         return signature;
     }
 
-    public byte[] signTransaction(Transaction transaction) {
+    public byte[] signTransaction(Transaction<?> transaction) {
         transaction.requireOneNodeAccountId();
 
         if (!transaction.isFrozen()) {
