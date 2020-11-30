@@ -1,11 +1,9 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.SignatureMap;
-import com.hedera.hashgraph.sdk.proto.SignedTransaction;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionList;
+import com.hedera.hashgraph.sdk.proto.*;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Function;
 import org.bouncycastle.crypto.digests.SHA384Digest;
@@ -95,7 +93,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
     public static Transaction<?> fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         var txs = new LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>>();
-        TransactionBody.DataCase dataCase = TransactionBody.DataCase.DATA_NOT_SET;
+        @Var TransactionBody.DataCase dataCase = TransactionBody.DataCase.DATA_NOT_SET;
 
         var list = TransactionList.parseFrom(bytes);
 
@@ -113,98 +111,109 @@ public abstract class Transaction<T extends Transaction<T>>
             txs.computeIfAbsent(transactionId, k -> new LinkedHashMap<>()).put(account, transaction);
         }
 
-        Transaction<?> instance;
-
         switch (dataCase) {
             case CONTRACTCALL:
-                instance = new ContractExecuteTransaction(txs);
-                break;
+                return new ContractExecuteTransaction(txs);
 
             case CONTRACTCREATEINSTANCE:
-                instance = new ContractCreateTransaction(txs);
-                break;
+                return new ContractCreateTransaction(txs);
 
             case CONTRACTUPDATEINSTANCE:
-                instance = new ContractUpdateTransaction(txs);
-                break;
+                return new ContractUpdateTransaction(txs);
 
             case CONTRACTDELETEINSTANCE:
-                instance = new ContractDeleteTransaction(txs);
-                break;
+                return new ContractDeleteTransaction(txs);
 
             case CRYPTOADDLIVEHASH:
-                instance = new LiveHashAddTransaction(txs);
-                break;
+                return new LiveHashAddTransaction(txs);
 
             case CRYPTOCREATEACCOUNT:
-                instance = new AccountCreateTransaction(txs);
-                break;
+                return new AccountCreateTransaction(txs);
 
             case CRYPTODELETE:
-                instance = new AccountDeleteTransaction(txs);
-                break;
+                return new AccountDeleteTransaction(txs);
 
             case CRYPTODELETELIVEHASH:
-                instance = new LiveHashDeleteTransaction(txs);
-                break;
+                return new LiveHashDeleteTransaction(txs);
 
             case CRYPTOTRANSFER:
-                instance = new TransferTransaction(txs);
-                break;
+                return new TransferTransaction(txs);
 
             case CRYPTOUPDATEACCOUNT:
-                instance = new AccountUpdateTransaction(txs);
-                break;
+                return new AccountUpdateTransaction(txs);
 
             case FILEAPPEND:
-                instance = new FileAppendTransaction(txs);
-                break;
+                return new FileAppendTransaction(txs);
 
             case FILECREATE:
-                instance = new FileCreateTransaction(txs);
-                break;
+                return new FileCreateTransaction(txs);
 
             case FILEDELETE:
-                instance = new FileDeleteTransaction(txs);
-                break;
+                return new FileDeleteTransaction(txs);
 
             case FILEUPDATE:
-                instance = new FileUpdateTransaction(txs);
-                break;
+                return new FileUpdateTransaction(txs);
 
             case SYSTEMDELETE:
-                instance = new SystemDeleteTransaction(txs);
-                break;
+                return new SystemDeleteTransaction(txs);
 
             case SYSTEMUNDELETE:
-                instance = new SystemUndeleteTransaction(txs);
-                break;
+                return new SystemUndeleteTransaction(txs);
 
             case FREEZE:
-                instance = new FreezeTransaction(txs);
-                break;
+                return new FreezeTransaction(txs);
 
             case CONSENSUSCREATETOPIC:
-                instance = new TopicCreateTransaction(txs);
-                break;
+                return new TopicCreateTransaction(txs);
 
             case CONSENSUSUPDATETOPIC:
-                instance = new TopicUpdateTransaction(txs);
-                break;
+                return new TopicUpdateTransaction(txs);
 
             case CONSENSUSDELETETOPIC:
-                instance = new TopicDeleteTransaction(txs);
-                break;
+                return new TopicDeleteTransaction(txs);
 
             case CONSENSUSSUBMITMESSAGE:
-                // a chunked transaction does not need the same handling
                 return new TopicMessageSubmitTransaction(txs);
+
+            case TOKENASSOCIATE:
+                return new TokenAssociateTransaction(txs);
+
+            case TOKENBURN:
+                return new TokenBurnTransaction(txs);
+
+            case TOKENCREATION:
+                return new TokenCreateTransaction(txs);
+
+            case TOKENDELETION:
+                return new TokenDeleteTransaction(txs);
+
+            case TOKENDISSOCIATE:
+                return new TokenDissociateTransaction(txs);
+
+            case TOKENFREEZE:
+                return new TokenFreezeTransaction(txs);
+
+            case TOKENGRANTKYC:
+                return new TokenGrantKycTransaction(txs);
+
+            case TOKENMINT:
+                return new TokenMintTransaction(txs);
+
+            case TOKENREVOKEKYC:
+                return new TokenRevokeKycTransaction(txs);
+
+            case TOKENUNFREEZE:
+                return new TokenUnfreezeTransaction(txs);
+
+            case TOKENUPDATE:
+                return new TokenUpdateTransaction(txs);
+
+            case TOKENWIPE:
+                return new TokenWipeTransaction(txs);
 
             default:
                 throw new IllegalArgumentException("parsed transaction body has no data");
         }
-
-        return instance;
     }
 
     static byte[] hash(byte[] bytes) {
