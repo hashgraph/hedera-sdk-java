@@ -5,10 +5,8 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import com.hederahashgraph.api.proto.java.TransactionList;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
-import java8.util.function.Function;
 
 import javax.annotation.Nullable;
 import java.util.*;
