@@ -15,6 +15,8 @@ import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
 abstract class Executable<RequestT, ResponseT, O> implements WithExecute<O> {
     private static final Logger logger = LoggerFactory.getLogger(Executable.class);
 
+    protected int maxRetries = 10;
+
     Executable() {
     }
 
@@ -26,6 +28,10 @@ abstract class Executable<RequestT, ResponseT, O> implements WithExecute<O> {
     }
 
     private CompletableFuture<O> executeAsync(Client client, int attempt) {
+        if (attempt > maxRetries) {
+            return CompletableFuture.<O>failedFuture(new Exception("Failed to get gRPC response within maximum retry count"));
+        }
+
         var node = client.network.networkNodes.get(getNodeAccountId());
 
         logger.atTrace()

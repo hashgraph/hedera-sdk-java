@@ -404,6 +404,16 @@ public abstract class Transaction<T extends Transaction<T>>
         return (T) this;
     }
 
+    public final int getMaxRetry() {
+        return maxRetries;
+    }
+
+    public final T setMaxRetry(int count) {
+        maxRetries = count;
+        // noinspection unchecked
+        return (T) this;
+    }
+
     public final T sign(PrivateKey privateKey) {
         return signWith(privateKey.getPublicKey(), privateKey::sign);
     }
