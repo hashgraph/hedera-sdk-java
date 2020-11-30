@@ -65,6 +65,8 @@ public final class ConsensusPubSubChunkedExample {
 
         System.out.println("for topic " + newTopicId);
 
+        // Let's wait a bit
+        System.out.println("wait 10s to propagate to the mirror ...");
         Thread.sleep(10000);
 
         // setup a mirror client to print out messages as we receive them
