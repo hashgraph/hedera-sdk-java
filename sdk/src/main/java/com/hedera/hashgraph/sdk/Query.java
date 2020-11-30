@@ -100,6 +100,17 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
         return (T) this;
     }
 
+    public final int getMaxRetry() {
+        return maxRetries;
+    }
+
+    public final T setMaxRetry(int count) {
+        maxRetries = count;
+        // noinspection unchecked
+        return (T) this;
+    }
+
+
     @Override
     @FunctionalExecutable(type = "Hbar")
     public CompletableFuture<Hbar> getCostAsync(Client client) {
