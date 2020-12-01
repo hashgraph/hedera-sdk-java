@@ -10,14 +10,56 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 
+import java.util.Collections;
+import java.util.List;
+
 import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
 
-abstract class Executable<RequestT, ResponseT, O> implements WithExecute<O> {
+abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements WithExecute<O> {
     private static final Logger logger = LoggerFactory.getLogger(Executable.class);
 
     protected int maxRetries = 10;
+    protected int nextNodeIndex = 0;
+    protected List<AccountId> nodeAccountIds = Collections.emptyList();
 
     Executable() {
+    }
+
+    public final int getMaxRetry() {
+        return maxRetries;
+    }
+
+    public final SdkRequestT setMaxRetry(int count) {
+        maxRetries = count;
+        // noinspection unchecked
+        return (SdkRequestT) this;
+    }
+
+    @Nullable
+    public final List<AccountId> getNodeAccountIds() {
+        if (!nodeAccountIds.isEmpty()) {
+            return nodeAccountIds;
+        }
+
+        return null;
+    }
+
+    /**
+     * Set the account IDs of the nodes that this transaction will be submitted to.
+     * <p>
+     * Providing an explicit node account ID interferes with client-side load balancing of the
+     * network. By default, the SDK will pre-generate a transaction for 1/3 of the nodes on the
+     * network. If a node is down, busy, or otherwise reports a fatal error, the SDK will try again
+     * with a different node.
+     *
+     * @param nodeAccountIds The list of node AccountIds to be set
+     * @return {@code this}
+     */
+    public SdkRequestT setNodeAccountIds(List<AccountId> nodeAccountIds) {
+        this.nodeAccountIds = nodeAccountIds;
+
+        // noinspection unchecked
+        return (SdkRequestT) this;
     }
 
     abstract CompletableFuture<Void> onExecuteAsync(Client client);
@@ -101,24 +143,34 @@ abstract class Executable<RequestT, ResponseT, O> implements WithExecute<O> {
         }).thenCompose(x -> x);
     }
 
-    abstract RequestT makeRequest();
+    abstract ProtoRequestT makeRequest();
 
-    abstract void advanceRequest();
+    void advanceRequest() {
+        // each time buildNext is called we move our cursor to the next transaction
+        // wrapping around to ensure we are cycling
+        nextNodeIndex = (nextNodeIndex + 1) % nodeAccountIds.size();
+    }
 
     /**
      * Called after receiving the query response from Hedera. The derived class should map into its
      * output type.
      */
-    abstract O mapResponse(ResponseT response, AccountId NodeId, RequestT request);
+    abstract O mapResponse(ResponseT response, AccountId NodeId, ProtoRequestT request);
 
     abstract Status mapResponseStatus(ResponseT response);
 
     /**
      * Called to direct the invocation of the query to the appropriate gRPC service.
      */
-    abstract MethodDescriptor<RequestT, ResponseT> getMethodDescriptor();
+    abstract MethodDescriptor<ProtoRequestT, ResponseT> getMethodDescriptor();
 
-    abstract AccountId getNodeAccountId();
+    final AccountId getNodeAccountId() {
+        if (!nodeAccountIds.isEmpty()) {
+            return nodeAccountIds.get(nextNodeIndex);
+        } else {
+            throw new IllegalStateException("Request node account IDs were not set before executing");
+        }
+    }
 
     @Nullable
     abstract TransactionId getTransactionId();

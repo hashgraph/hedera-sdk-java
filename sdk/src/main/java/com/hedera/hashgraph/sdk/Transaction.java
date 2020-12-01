@@ -18,7 +18,7 @@ import java.util.*;
  * @param <T> The type of the transaction. Used to enable chaining.
  */
 public abstract class Transaction<T extends Transaction<T>>
-    extends Executable<com.hedera.hashgraph.sdk.proto.Transaction, com.hedera.hashgraph.sdk.proto.TransactionResponse, TransactionResponse> {
+    extends Executable<T, com.hedera.hashgraph.sdk.proto.Transaction, com.hedera.hashgraph.sdk.proto.TransactionResponse, TransactionResponse> {
 
     // Default auto renew duration for accounts, contracts, topics, and files (entities)
     static final Duration DEFAULT_AUTO_RENEW_PERIOD = Duration.ofDays(90);
@@ -35,13 +35,7 @@ public abstract class Transaction<T extends Transaction<T>>
     protected List<com.hedera.hashgraph.sdk.proto.Transaction> transactions = Collections.emptyList();
     protected List<com.hedera.hashgraph.sdk.proto.SignedTransaction.Builder> signedTransactions = Collections.emptyList();
     protected List<SignatureMap.Builder> signatures = Collections.emptyList();
-    protected List<AccountId> nodeIds = Collections.emptyList();
     protected List<TransactionId> transactionIds = Collections.emptyList();
-
-    // The index of the _next_ transaction to be built and executed.
-    // Each time `buildNext` is invoked, this should be incremented by 1 and wrapped around with the
-    // size of the transaction array.
-    int nextNodeIndex = 0;
 
     // For SDK Transactions that require multiple protobuf transaction ID's this variable keeps track of the current
     // execution group.
@@ -67,7 +61,7 @@ public abstract class Transaction<T extends Transaction<T>>
     Transaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         var size = txs.values().iterator().next().size();
 
-        nodeIds = new ArrayList<>(size);
+        nodeAccountIds = new ArrayList<>(size);
         signatures = new ArrayList<>(size * txs.keySet().size());
         transactions = new ArrayList<>(size * txs.keySet().size());
         signedTransactions = new ArrayList<>(size * txs.keySet().size());
@@ -77,8 +71,8 @@ public abstract class Transaction<T extends Transaction<T>>
             transactionIds.add(transactionEntry.getKey());
 
             for (var nodeEntry : transactionEntry.getValue().entrySet()) {
-                if (nodeIds.size() != size) {
-                    nodeIds.add(nodeEntry.getKey());
+                if (nodeAccountIds.size() != size) {
+                    nodeAccountIds.add(nodeEntry.getKey());
                 }
 
                 var transaction = SignedTransaction.parseFrom(nodeEntry.getValue().getSignedTransactionBytes());
@@ -226,24 +220,6 @@ public abstract class Transaction<T extends Transaction<T>>
         return hash;
     }
 
-    @Nullable
-    public final AccountId getNodeAccountId() {
-        if (!nodeIds.isEmpty()) {
-            return nodeIds.get(nextNodeIndex);
-        }
-
-        return null;
-    }
-
-    @Nullable
-    public final List<AccountId> getNodeAccountIds() {
-        if (!nodeIds.isEmpty()) {
-            return nodeIds;
-        }
-
-        return null;
-    }
-
     /**
      * Set the account IDs of the nodes that this transaction will be submitted to.
      * <p>
@@ -255,13 +231,10 @@ public abstract class Transaction<T extends Transaction<T>>
      * @param nodeAccountIds The list of node AccountIds to be set
      * @return {@code this}
      */
+    @Override
     public final T setNodeAccountIds(List<AccountId> nodeAccountIds) {
         requireNotFrozen();
-        nodeIds = nodeAccountIds;
-        bodyBuilder.setNodeAccountID(nodeIds.get(nextNodeIndex).toProtobuf());
-
-        // noinspection unchecked
-        return (T) this;
+        return super.setNodeAccountIds(nodeAccountIds);
     }
 
     @Nullable
@@ -352,9 +325,11 @@ public abstract class Transaction<T extends Transaction<T>>
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
-        buildTransactions(1);
+        var index = nextTransactionIndex * nodeAccountIds.size() + nextNodeIndex;
 
-        return hash(transactions.get(0).getSignedTransactionBytes().toByteArray());
+        buildTransactions(index + 1);
+
+        return hash(transactions.get(index).getSignedTransactionBytes().toByteArray());
     }
 
     public Map<AccountId, byte[]> getTransactionHashPerNode() {
@@ -367,7 +342,7 @@ public abstract class Transaction<T extends Transaction<T>>
         var hashes = new HashMap<AccountId, byte[]>();
 
         for (var i = 0; i < transactions.size(); i++) {
-            hashes.put(nodeIds.get(i), hash(transactions.get(i).getSignedTransactionBytes().toByteArray()));
+            hashes.put(nodeAccountIds.get(i), hash(transactions.get(i).getSignedTransactionBytes().toByteArray()));
         }
 
         return hashes;
@@ -400,16 +375,6 @@ public abstract class Transaction<T extends Transaction<T>>
         requireNotFrozen();
         transactionIds = Collections.singletonList(transactionId);
 
-        // noinspection unchecked
-        return (T) this;
-    }
-
-    public final int getMaxRetry() {
-        return maxRetries;
-    }
-
-    public final T setMaxRetry(int count) {
-        maxRetries = count;
         // noinspection unchecked
         return (T) this;
     }
@@ -495,15 +460,15 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     public Map<AccountId, Map<PublicKey, byte[]>> getSignatures() {
-        var map = new HashMap<AccountId, Map<PublicKey, byte[]>>(nodeIds.size());
+        var map = new HashMap<AccountId, Map<PublicKey, byte[]>>(nodeAccountIds.size());
 
         if (signatures.size() == 0) {
             return map;
         }
 
-        for (int i = 0; i < nodeIds.size(); i++) {
+        for (int i = 0; i < nodeAccountIds.size(); i++) {
             var sigMap = signatures.get(i);
-            var nodeAccountId = nodeIds.get(i);
+            var nodeAccountId = nodeAccountIds.get(i);
             var keyMap = map.computeIfAbsent(nodeAccountId, k -> new HashMap<>(sigMap.getSigPairCount()));
             for (var sigPair : sigMap.getSigPairList()) {
                 keyMap.put(
@@ -581,20 +546,20 @@ public abstract class Transaction<T extends Transaction<T>>
             return (T) this;
         }
 
-        if (nodeIds.isEmpty()) {
+        if (nodeAccountIds.isEmpty()) {
             if (client == null) {
                 throw new IllegalStateException(
                     "`client` must be provided or both `nodeId` and `transactionId` must be set");
             }
 
-            nodeIds = client.network.getNodeAccountIdsForExecute();
+            nodeAccountIds = client.network.getNodeAccountIdsForExecute();
         }
 
-        transactions = new ArrayList<>(nodeIds.size());
-        signatures = new ArrayList<>(nodeIds.size());
-        signedTransactions = new ArrayList<>(nodeIds.size());
+        transactions = new ArrayList<>(nodeAccountIds.size());
+        signatures = new ArrayList<>(nodeAccountIds.size());
+        signedTransactions = new ArrayList<>(nodeAccountIds.size());
 
-        for (AccountId nodeId : nodeIds) {
+        for (AccountId nodeId : nodeAccountIds) {
             signatures.add(SignatureMap.newBuilder());
             signedTransactions.add(com.hedera.hashgraph.sdk.proto.SignedTransaction.newBuilder()
                 .setBodyBytes(bodyBuilder
@@ -629,7 +594,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
     @Override
     final com.hedera.hashgraph.sdk.proto.Transaction makeRequest() {
-        var index = nextNodeIndex + (nextTransactionIndex * nodeIds.size());
+        var index = nextNodeIndex + (nextTransactionIndex * nodeAccountIds.size());
 
         buildTransactions(index + 1);
 
@@ -643,20 +608,14 @@ public abstract class Transaction<T extends Transaction<T>>
         com.hedera.hashgraph.sdk.proto.Transaction request
     ) {
         var transactionId = Objects.requireNonNull(getTransactionId());
+        var hash = getTransactionHash();
         nextTransactionIndex = (nextTransactionIndex + 1) % transactionIds.size();
-        return new TransactionResponse(nodeId, transactionId, hash(request.toByteArray()));
+        return new TransactionResponse(nodeId, transactionId, hash);
     }
 
     @Override
     final Status mapResponseStatus(com.hedera.hashgraph.sdk.proto.TransactionResponse transactionResponse) {
         return Status.valueOf(transactionResponse.getNodeTransactionPrecheckCode());
-    }
-
-    @Override
-    void advanceRequest() {
-        // each time buildNext is called we move our cursor to the next transaction
-        // wrapping around to ensure we are cycling
-        nextNodeIndex = (nextNodeIndex + 1) % nodeIds.size();
     }
 
     @Override
