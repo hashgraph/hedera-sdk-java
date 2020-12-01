@@ -22,9 +22,7 @@ final class Delayer {
     }
 
     static CompletableFuture<Void> delayFor(long milliseconds, Executor executor) {
-        logger.atTrace()
-                .addArgument((double) milliseconds / 1000.0)
-                .log("waiting for {} seconds before trying again");
+        logger.trace("waiting for {} seconds before trying again", (double) milliseconds / 1000.0);
 
         return CompletableFuture.runAsync(
                 () -> {},
