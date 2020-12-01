@@ -39,7 +39,7 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
 
         builder = bodyBuilder.getFileAppend().toBuilder();
 
-        for (var i = 0; i < signedTransactions.size(); i += nodeIds.size()) {
+        for (var i = 0; i < signedTransactions.size(); i += nodeAccountIds.size()) {
             contents = contents.concat(
                 TransactionBody.parseFrom(signedTransactions.get(i).getBodyBytes())
                     .getFileAppend().getContents()
@@ -133,19 +133,15 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
         var initialTransactionId = Objects.requireNonNull(transactionIds.get(0)).toProtobuf();
         var requiredChunks = (this.contents.size() + (CHUNK_SIZE - 1)) / CHUNK_SIZE;
 
-        if (requiredChunks == 1) {
-            return this;
-        }
-
         if (requiredChunks > maxChunks) {
             throw new IllegalArgumentException(
                 "message of " + this.contents.size() + " bytes requires " + requiredChunks
                     + " chunks but the maximum allowed chunks is " + maxChunks + ", try using setMaxChunks");
         }
 
-        signatures = new ArrayList<>(requiredChunks * nodeIds.size());
-        transactions = new ArrayList<>(requiredChunks * nodeIds.size());
-        signedTransactions = new ArrayList<>(requiredChunks * nodeIds.size());
+        signatures = new ArrayList<>(requiredChunks * nodeAccountIds.size());
+        transactions = new ArrayList<>(requiredChunks * nodeAccountIds.size());
+        signedTransactions = new ArrayList<>(requiredChunks * nodeAccountIds.size());
         transactionIds = new ArrayList<>(requiredChunks);
 
         @Var var nextTransactionId = initialTransactionId.toBuilder();
@@ -169,7 +165,7 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
                 );
 
             // For each node we add a transaction with that node
-            for (var nodeId : nodeIds) {
+            for (var nodeId : nodeAccountIds) {
                 signatures.add(SignatureMap.newBuilder());
                 signedTransactions.add(com.hedera.hashgraph.sdk.proto.SignedTransaction.newBuilder()
                     .setBodyBytes(
@@ -193,6 +189,7 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+        bodyBuilder.setFileAppend(builder);
         return true;
     }
 

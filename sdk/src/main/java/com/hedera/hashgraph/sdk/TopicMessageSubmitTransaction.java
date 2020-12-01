@@ -46,7 +46,7 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
 
         builder = bodyBuilder.getConsensusSubmitMessage().toBuilder();
 
-        for (var i = 0; i < signedTransactions.size(); i += nodeIds.size()) {
+        for (var i = 0; i < signedTransactions.size(); i += nodeAccountIds.size()) {
             message = message.concat(
                 TransactionBody.parseFrom(signedTransactions.get(i).getBodyBytes())
                     .getConsensusSubmitMessage().getMessage()
@@ -95,7 +95,7 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
     }
 
     public byte[] getTransactionHash() {
-        if (transactions.size() > nodeIds.size()) {
+        if (transactions.size() > nodeAccountIds.size()) {
             throw new IllegalStateException("a single transaction hash can not be calculated for a chunked transaction, try calling `getAllTransactionHashesPerNode`");
         }
 
@@ -104,7 +104,7 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
 
     @Override
     public Map<AccountId, byte[]> getTransactionHashPerNode() {
-        if (transactions.size() > nodeIds.size()) {
+        if (transactions.size() > nodeAccountIds.size()) {
             throw new IllegalStateException("a single transaction hash can not be calculated for a chunked transaction, try calling `getAllTransactionHashesPerNode`");
         }
 
@@ -116,14 +116,14 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
-        var size = signedTransactions.size() / nodeIds.size();
-        var transactionHashes = new ArrayList<Map<AccountId, byte[]>>(transactions.size() / nodeIds.size());
+        var size = signedTransactions.size() / nodeAccountIds.size();
+        var transactionHashes = new ArrayList<Map<AccountId, byte[]>>(transactions.size() / nodeAccountIds.size());
 
         for (var group = 0; group < size; ++group) {
             var hashes = new HashMap<AccountId, byte[]>();
 
             for (var i = group * size; i < (group + 1) * size; ++i) {
-                hashes.put(nodeIds.get(group), hash(transactions.get(i).getSignedTransactionBytes().toByteArray()));
+                hashes.put(nodeAccountIds.get(group), hash(transactions.get(i).getSignedTransactionBytes().toByteArray()));
             }
 
             transactionHashes.add(hashes);
@@ -134,6 +134,7 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+        bodyBuilder.setConsensusSubmitMessage(builder);
         return true;
     }
 
@@ -144,19 +145,15 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
         var initialTransactionId = Objects.requireNonNull(transactionIds.get(0)).toProtobuf();
         var requiredChunks = (this.message.size() + (CHUNK_SIZE - 1)) / CHUNK_SIZE;
 
-        if (requiredChunks == 1) {
-            return this;
-        }
-
         if (requiredChunks > maxChunks) {
             throw new IllegalArgumentException(
                 "message of " + this.message.size() + " bytes requires " + requiredChunks
                     + " chunks but the maximum allowed chunks is " + maxChunks + ", try using setMaxChunks");
         }
 
-        signatures = new ArrayList<>(requiredChunks * nodeIds.size());
-        transactions = new ArrayList<>(requiredChunks * nodeIds.size());
-        signedTransactions = new ArrayList<>(requiredChunks * nodeIds.size());
+        signatures = new ArrayList<>(requiredChunks * nodeAccountIds.size());
+        transactions = new ArrayList<>(requiredChunks * nodeAccountIds.size());
+        signedTransactions = new ArrayList<>(requiredChunks * nodeAccountIds.size());
         transactionIds = new ArrayList<>(requiredChunks);
 
         @Var var nextTransactionId = initialTransactionId.toBuilder();
@@ -185,7 +182,7 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
                 );
 
             // For each node we add a transaction with that node
-            for (var nodeId : nodeIds) {
+            for (var nodeId : nodeAccountIds) {
                 signatures.add(SignatureMap.newBuilder());
                 signedTransactions.add(com.hedera.hashgraph.sdk.proto.SignedTransaction.newBuilder()
                     .setBodyBytes(
