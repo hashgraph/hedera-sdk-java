@@ -76,10 +76,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
         var node = client.network.networkNodes.get(getNodeAccountId());
 
-        logger.atTrace()
-            .addKeyValue("node", node.accountId)
-            .addKeyValue("attempt", attempt)
-            .log("sending request \n{}", this);
+        logger.trace("sending request \nnode={}\nattempt={}\n{}", node.accountId, attempt, this);
 
         var methodDescriptor = getMethodDescriptor();
         var call = node.getChannel().newCall(methodDescriptor, CallOptions.DEFAULT);
@@ -99,12 +96,12 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             long delay = (long) Math.min(250 * Math.pow(2, attempt - 1), 16000);
 
             if (shouldRetryExceptionally(error)) {
-                logger.atError()
-                    .addKeyValue("node", node.accountId)
-                    .addKeyValue("attempt", attempt)
-                    .addKeyValue("delay:", delay)
-                    .setCause(error)
-                    .log("caught error, retrying");
+                logger.error("caught error, retrying\nnode={}\nattempt={}\ndelay={}\n{}",
+                    node.accountId,
+                    attempt,
+                    delay,
+                    error
+                );
 
                 // the transaction had a network failure reaching Hedera
                 return Delayer.delayFor(delay, client.executor)
@@ -118,11 +115,13 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
             var responseStatus = mapResponseStatus(response);
 
-            logger.atTrace()
-                .addKeyValue("node", node.accountId)
-                .addKeyValue("attempt", attempt)
-                .addKeyValue("status", responseStatus)
-                .log("received response in {}s\n{}", latency, response);
+            logger.trace("received response in {}s\nnode={}\nattempt={}\nstatus={}\n{}",
+                latency,
+                node.accountId,
+                attempt,
+                responseStatus,
+                response
+            );
 
             if (shouldRetry(responseStatus, response)) {
                 // the response has been identified as failing or otherwise
