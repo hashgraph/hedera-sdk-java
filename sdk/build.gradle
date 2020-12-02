@@ -36,7 +36,7 @@ dependencies {
 	api "com.google.protobuf:protobuf-javalite:3.13.0"
 
 	// https://mvnrepository.com/artifact/org.slf4j/slf4j-api
-	implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
+	implementation 'org.slf4j:slf4j-api:1.7.30'
 
 	implementation "net.javacrumbs.future-converter:future-converter-java8-guava:1.2.0"
 
@@ -47,7 +47,7 @@ dependencies {
 	testImplementation "org.junit.jupiter:junit-jupiter-engine:5.6.1"
 	testImplementation "org.junit.jupiter:junit-jupiter-params:5.6.1"
 
-	testRuntimeOnly "org.slf4j:slf4j-simple:2.0.0-alpha1"
+	testRuntimeOnly "org.slf4j:slf4j-simple:1.7.30"
 	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.31.1"
 	integrationTestRuntimeOnly "io.grpc:grpc-netty-shaded:1.31.1"
 

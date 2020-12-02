@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoDeleteTransactionBody;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
@@ -8,6 +9,7 @@ import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Marks an account as deleted, moving all its current hbars to another account.
@@ -23,8 +25,8 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
         builder = CryptoDeleteTransactionBody.newBuilder();
     }
 
-    AccountDeleteTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
-        super(txs.values().iterator().next());
+    AccountDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getCryptoDelete().toBuilder();
     }

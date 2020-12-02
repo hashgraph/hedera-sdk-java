@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
 import com.hedera.hashgraph.sdk.proto.AccountID;
 import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
@@ -13,6 +14,7 @@ import java.time.Duration;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Update a topic.
@@ -31,8 +33,8 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         builder = ConsensusUpdateTopicTransactionBody.newBuilder();
     }
 
-    TopicUpdateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
-        super(txs.values().iterator().next());
+    TopicUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getConsensusUpdateTopic().toBuilder();
     }

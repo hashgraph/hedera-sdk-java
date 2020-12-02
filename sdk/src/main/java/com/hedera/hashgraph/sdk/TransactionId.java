@@ -10,6 +10,8 @@ import java.util.concurrent.CompletableFuture;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.CompletableFuture.failedFuture;
 
+import javax.annotation.Nullable;
+
 /**
  * The client-generated ID for a transaction.
  *
@@ -120,5 +122,21 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
 
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
+    }
+
+
+    @Override
+    public boolean equals(@Nullable Object object) {
+        if (!(object instanceof TransactionId)) {
+            return false;
+        }
+
+        return ((TransactionId) object).accountId.equals(accountId) &&
+            ((TransactionId) object).validStart.equals(validStart);
+    }
+
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
     }
 }

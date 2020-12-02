@@ -2,16 +2,14 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 
 /**
  * <p>A transaction specifically to append data to a file on the network.
@@ -30,45 +28,23 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
      */
     private int maxChunks = 10;
 
-    private List<Transaction<SingleFileAppendTransaction>> chunkTransactions = Collections.emptyList();
-
     private ByteString contents;
 
     public FileAppendTransaction() {
         builder = FileAppendTransactionBody.newBuilder();
     }
 
-    FileAppendTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
-        super(txs.values().iterator().next());
-
-        for (var txEntry : txs.entrySet()) {
-            var tx = new SingleFileAppendTransaction(txEntry.getValue());
-            contents.concat(tx.bodyBuilder.getConsensusSubmitMessage().getMessage());
-            chunkTransactions.add(tx);
-        }
+    FileAppendTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getFileAppend().toBuilder();
-    }
 
-    public byte[] toBytes() {
-        if (!this.isFrozen()) {
-            throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
+        for (var i = 0; i < signedTransactions.size(); i += nodeAccountIds.size()) {
+            contents = contents.concat(
+                TransactionBody.parseFrom(signedTransactions.get(i).getBodyBytes())
+                    .getFileAppend().getContents()
+            );
         }
-
-        var buf = new ByteArrayOutputStream();
-
-        for (var tx : chunkTransactions) {
-
-            for (int i = 0; i < tx.transactions.size(); i++) {
-                try {
-                    transactions.get(i).setSigMap(signatures.get(0)).buildPartial().writeDelimitedTo(buf);
-                } catch (IOException e) {
-                    // Do nothing as this should never happen
-                }
-            }
-        }
-
-        return buf.toByteArray();
     }
 
     @Nullable
@@ -151,79 +127,55 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
     }
 
     @Override
-    public FileAppendTransaction signWith(PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
-        if (!isFrozen()) {
-            freeze();
-        }
-
-        for (var transaction : chunkTransactions) {
-            transaction.signWith(publicKey, transactionSigner);
-        }
-        return this;
-    }
-
-    @Override
-    protected boolean isFrozen() {
-        return !chunkTransactions.isEmpty();
-    }
-
-    @Override
     public FileAppendTransaction freezeWith(@Nullable Client client) {
-        if (isFrozen()) {
-            return this;
-        }
-
-        if (client == null && nodeIds.size() == 0) {
-            throw new IllegalStateException("`client` must be provided or `nodeId` must be set");
-        }
-
-        if (nodeIds.size() == 0) {
-            nodeIds = client.network.getNodeAccountIdsForExecute();
-        }
-
         super.freezeWith(client);
 
-        for (var chunkTx : chunkTransactions) {
-            chunkTx.freezeWith(client);
-        }
-
-        return this;
-    }
-
-    @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        var initialTransactionId = bodyBuilder.getTransactionID();
-        var content = this.contents;
-        var fileId = builder.getFileID();
-        var totalContentSize = content.size();
-        var requiredChunks = (totalContentSize + (CHUNK_SIZE - 1)) / CHUNK_SIZE;
+        var initialTransactionId = Objects.requireNonNull(transactionIds.get(0)).toProtobuf();
+        var requiredChunks = (this.contents.size() + (CHUNK_SIZE - 1)) / CHUNK_SIZE;
 
         if (requiredChunks > maxChunks) {
             throw new IllegalArgumentException(
-                "content of " + totalContentSize + " bytes requires " + requiredChunks
+                "message of " + this.contents.size() + " bytes requires " + requiredChunks
                     + " chunks but the maximum allowed chunks is " + maxChunks + ", try using setMaxChunks");
         }
 
-        chunkTransactions = new ArrayList<>(requiredChunks);
+        signatures = new ArrayList<>(requiredChunks * nodeAccountIds.size());
+        transactions = new ArrayList<>(requiredChunks * nodeAccountIds.size());
+        signedTransactions = new ArrayList<>(requiredChunks * nodeAccountIds.size());
+        transactionIds = new ArrayList<>(requiredChunks);
+
         @Var var nextTransactionId = initialTransactionId.toBuilder();
 
         for (int i = 0; i < requiredChunks; i++) {
             @Var var startIndex = i * CHUNK_SIZE;
             @Var var endIndex = startIndex + CHUNK_SIZE;
 
-            if (endIndex > totalContentSize) {
-                endIndex = totalContentSize;
+            if (endIndex > this.contents.size()) {
+                endIndex = this.contents.size();
             }
 
-            var chunkMessage = content.substring(startIndex, endIndex);
+            transactionIds.add(TransactionId.fromProtobuf(nextTransactionId.build()));
 
-            bodyBuilder.setTransactionID(nextTransactionId.build());
+            bodyBuilder
+                .setTransactionID(nextTransactionId.build())
+                .setFileAppend(
+                    builder
+                        .setContents(contents.substring(startIndex, endIndex))
+                        .build()
+                );
 
-            chunkTransactions.add(new SingleFileAppendTransaction(
-                nodeIds,
-                bodyBuilder.clone(),
-                fileId,
-                chunkMessage));
+            // For each node we add a transaction with that node
+            for (var nodeId : nodeAccountIds) {
+                signatures.add(SignatureMap.newBuilder());
+                signedTransactions.add(com.hedera.hashgraph.sdk.proto.SignedTransaction.newBuilder()
+                    .setBodyBytes(
+                        bodyBuilder
+                            .setNodeAccountID(nodeId.toProtobuf())
+                            .build()
+                            .toByteString()
+                    )
+                );
+            }
 
             // add 1 ns to the validStart to make cascading transaction IDs
             var nextValidStart = nextTransactionId.getTransactionValidStart().toBuilder();
@@ -232,8 +184,13 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
             nextTransactionId.setTransactionValidStart(nextValidStart);
         }
 
-        // false means stop freezing, this is good enough
-        return false;
+        return this;
+    }
+
+    @Override
+    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+        bodyBuilder.setFileAppend(builder);
+        return true;
     }
 
     @Override
@@ -249,28 +206,23 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
 
         var operatorId = client.getOperatorAccountId();
 
-        if (operatorId != null && operatorId.equals(getTransactionId().accountId)) {
+        if (operatorId != null && operatorId.equals(Objects.requireNonNull(getTransactionId()).accountId)) {
             // on execute, sign each transaction with the operator, if present
             // and we are signing a transaction that used the default transaction ID
             signWithOperator(client);
         }
 
-        CompletableFuture<?>[] futures = new CompletableFuture[chunkTransactions.size()];
+        CompletableFuture<List<com.hedera.hashgraph.sdk.TransactionResponse>> future =
+            CompletableFuture.supplyAsync(() -> new ArrayList<>(transactionIds.size()));
 
-        for (var i = 0; i < chunkTransactions.size(); i++) {
-            futures[i] = chunkTransactions.get(i).executeAsync(client)
-                .thenCompose(response -> response.getReceiptAsync(client)
-                    .thenCompose(receipt -> CompletableFuture.completedFuture(response)));
+        for (var i = 0; i < transactionIds.size(); i++) {
+            future = future.thenCompose(list -> super.executeAsync(client).thenApply(response -> {
+                    list.add(response);
+                    return list;
+                }).thenCompose(CompletableFuture::completedFuture)
+            );
         }
 
-        return CompletableFuture.allOf(futures).thenApply(v -> {
-            List<com.hedera.hashgraph.sdk.TransactionResponse> responses = new ArrayList<>(futures.length);
-
-            for (var fut : futures) {
-                responses.add((com.hedera.hashgraph.sdk.TransactionResponse) fut.join());
-            }
-
-            return responses;
-        });
+        return future;
     }
 }

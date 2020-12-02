@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.SystemDeleteTransactionBody;
@@ -12,6 +13,7 @@ import java.time.Instant;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Delete a file or smart contract - can only be done with a Hedera admin.
@@ -31,8 +33,8 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
         builder = SystemDeleteTransactionBody.newBuilder();
     }
 
-    SystemDeleteTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
-        super(txs.values().iterator().next());
+    SystemDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getSystemDelete().toBuilder();
     }

@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoCreateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
@@ -9,6 +10,7 @@ import io.grpc.MethodDescriptor;
 import java.time.Duration;
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Create a new Hedera™ account.
@@ -26,8 +28,8 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         setReceiveRecordThreshold(DEFAULT_RECORD_THRESHOLD);
     }
 
-    AccountCreateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
-        super(txs.values().iterator().next());
+    AccountCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getCryptoCreateAccount().toBuilder();
     }

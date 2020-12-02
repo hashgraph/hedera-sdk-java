@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ContractUpdateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
@@ -11,6 +12,7 @@ import java.time.Instant;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Modify a smart contract instance to have the given parameter values.
@@ -42,8 +44,8 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         builder = ContractUpdateTransactionBody.newBuilder();
     }
 
-    ContractUpdateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
-        super(txs.values().iterator().next());
+    ContractUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getContractUpdateInstance().toBuilder();
     }

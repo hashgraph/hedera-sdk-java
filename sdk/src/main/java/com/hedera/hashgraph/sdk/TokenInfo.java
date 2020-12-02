@@ -45,26 +45,31 @@ public class TokenInfo {
     /**
      *
      */
+    @Nullable
     public final Key adminKey;
 
     /**
      *
      */
+    @Nullable
     public final Key kycKey;
 
     /**
      *
      */
+    @Nullable
     public final Key freezeKey;
 
     /**
      *
      */
+    @Nullable
     public final Key wipeKey;
 
     /**
      *
      */
+    @Nullable
     public final Key supplyKey;
 
     /**
@@ -107,11 +112,11 @@ public class TokenInfo {
         int decimals,
         long totalSupply,
         AccountId treasuryAccountId,
-        Key adminKey,
-        Key kycKey,
-        Key freezeKey,
-        Key wipeKey,
-        Key supplyKey,
+        @Nullable Key adminKey,
+        @Nullable Key kycKey,
+        @Nullable Key freezeKey,
+        @Nullable Key wipeKey,
+        @Nullable Key supplyKey,
         @Nullable Boolean defaultFreezeStatus,
         @Nullable Boolean defaultKycStatus,
         boolean isDeleted,
@@ -146,25 +151,27 @@ public class TokenInfo {
         return kycStatus == TokenKycStatus.KycNotApplicable ? null : kycStatus == TokenKycStatus.Granted;
     }
 
-    static TokenInfo fromProtobuf(TokenGetInfoResponse tokenInfo) {
+    static TokenInfo fromProtobuf(TokenGetInfoResponse response) {
+        var info = response.getTokenInfo();
+
         return new TokenInfo(
-            TokenId.fromProtobuf(tokenInfo.getTokenInfo().getTokenId()),
-            tokenInfo.getTokenInfo().getName(),
-            tokenInfo.getTokenInfo().getSymbol(),
-            tokenInfo.getTokenInfo().getDecimals(),
-            tokenInfo.getTokenInfo().getTotalSupply(),
-            AccountId.fromProtobuf(tokenInfo.getTokenInfo().getTreasury()),
-            Key.fromProtobuf(tokenInfo.getTokenInfo().getAdminKey()),
-            Key.fromProtobuf(tokenInfo.getTokenInfo().getKycKey()),
-            Key.fromProtobuf(tokenInfo.getTokenInfo().getFreezeKey()),
-            Key.fromProtobuf(tokenInfo.getTokenInfo().getWipeKey()),
-            Key.fromProtobuf(tokenInfo.getTokenInfo().getSupplyKey()),
-            freezeStatusFromProtobuf(tokenInfo.getTokenInfo().getDefaultFreezeStatus()),
-            kycStatusFromProtobuf(tokenInfo.getTokenInfo().getDefaultKycStatus()),
-            tokenInfo.getTokenInfo().getDeleted(),
-            AccountId.fromProtobuf(tokenInfo.getTokenInfo().getAutoRenewAccount()),
-            DurationConverter.fromProtobuf(tokenInfo.getTokenInfo().getAutoRenewPeriod()),
-            InstantConverter.fromProtobuf(tokenInfo.getTokenInfo().getExpiry())
+            TokenId.fromProtobuf(info.getTokenId()),
+            info.getName(),
+            info.getSymbol(),
+            info.getDecimals(),
+            info.getTotalSupply(),
+            AccountId.fromProtobuf(info.getTreasury()),
+            info.hasAdminKey() ? Key.fromProtobuf(info.getAdminKey()) : null,
+            info.hasKycKey() ? Key.fromProtobuf(info.getKycKey()) : null,
+            info.hasFreezeKey() ? Key.fromProtobuf(info.getFreezeKey()) : null,
+            info.hasWipeKey() ? Key.fromProtobuf(info.getWipeKey()) : null,
+            info.hasSupplyKey() ? Key.fromProtobuf(info.getSupplyKey()) : null,
+            freezeStatusFromProtobuf(info.getDefaultFreezeStatus()),
+            kycStatusFromProtobuf(info.getDefaultKycStatus()),
+            info.getDeleted(),
+            AccountId.fromProtobuf(info.getAutoRenewAccount()),
+            DurationConverter.fromProtobuf(info.getAutoRenewPeriod()),
+            InstantConverter.fromProtobuf(info.getExpiry())
         );
     }
 

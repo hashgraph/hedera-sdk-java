@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.BoolValue;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.UInt64Value;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.CryptoUpdateTransactionBody;
@@ -13,6 +14,7 @@ import java.time.Instant;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Change properties for the given account.
@@ -37,8 +39,8 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         builder = CryptoUpdateTransactionBody.newBuilder();
     }
 
-    AccountUpdateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
-        super(txs.values().iterator().next());
+    AccountUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getCryptoUpdateAccount().toBuilder();
     }

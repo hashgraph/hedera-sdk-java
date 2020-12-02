@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ConsensusCreateTopicTransactionBody;
 import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
@@ -10,6 +11,7 @@ import java.time.Duration;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Create a topic to be used for consensus.
@@ -29,8 +31,8 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
     }
 
-    TopicCreateTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
-        super(txs.values().iterator().next());
+    TopicCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getConsensusCreateTopic().toBuilder();
     }

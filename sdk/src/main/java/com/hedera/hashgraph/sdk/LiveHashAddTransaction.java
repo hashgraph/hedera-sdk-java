@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoAddLiveHashTransactionBody;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.LiveHash;
@@ -13,6 +14,7 @@ import java.time.Duration;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * A hash---presumably of some kind of credential or certificate---along with a list of keys,
@@ -27,8 +29,8 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
         hashBuilder = LiveHash.newBuilder();
     }
 
-    LiveHashAddTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
-        super(txs.values().iterator().next());
+    LiveHashAddTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getCryptoAddLiveHash().toBuilder();
         hashBuilder = builder.getLiveHash().toBuilder();

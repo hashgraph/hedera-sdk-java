@@ -1,10 +1,14 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TokenRevokeKycTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class TokenRevokeKycTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenRevokeKycTransaction> {
     private final TokenRevokeKycTransactionBody.Builder builder;
@@ -13,10 +17,10 @@ public class TokenRevokeKycTransaction extends com.hedera.hashgraph.sdk.Transact
         builder = TokenRevokeKycTransactionBody.newBuilder();
     }
 
-    TokenRevokeKycTransaction(TransactionBody body) {
-        super(body);
+    TokenRevokeKycTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
-        builder = body.getTokenRevokeKyc().toBuilder();
+        builder = bodyBuilder.getTokenRevokeKyc().toBuilder();
     }
 
     public TokenId getTokenId() {

@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TokenUpdateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
@@ -9,6 +10,9 @@ import io.grpc.MethodDescriptor;
 import java.time.Duration;
 import java.time.Instant;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> {
     private final TokenUpdateTransactionBody.Builder builder;
 
@@ -16,10 +20,10 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         builder = TokenUpdateTransactionBody.newBuilder();
     }
 
-    TokenUpdateTransaction(TransactionBody body) {
-        super(body);
+    TokenUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
-        builder = body.getTokenUpdate().toBuilder();
+        builder = bodyBuilder.getTokenUpdate().toBuilder();
     }
 
     public TokenId getTokenId() {

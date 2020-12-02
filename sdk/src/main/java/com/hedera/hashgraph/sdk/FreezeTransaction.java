@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.FreezeServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.FreezeTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
@@ -11,6 +12,7 @@ import java.time.OffsetTime;
 import java.time.ZoneOffset;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Set the freezing period in which the platform will stop creating events and accepting transactions.
@@ -23,8 +25,8 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
         builder = FreezeTransactionBody.newBuilder();
     }
 
-    FreezeTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
-        super(txs.values().iterator().next());
+    FreezeTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getFreeze().toBuilder();
     }

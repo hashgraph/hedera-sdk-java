@@ -13,7 +13,6 @@ import io.grpc.MethodDescriptor;
 import javax.annotation.Nullable;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -25,7 +24,7 @@ import java.util.function.Consumer;
  * @param <O> The output type of the query.
  * @param <T> The type of the query itself. Used to enable chaining.
  */
-public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hedera.hashgraph.sdk.proto.Query, Response, O> implements WithGetCost {
+public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.hedera.hashgraph.sdk.proto.Query, Response, O> implements WithGetCost {
     private final com.hedera.hashgraph.sdk.proto.Query.Builder builder;
 
     private final QueryHeader.Builder headerBuilder;
@@ -36,10 +35,6 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
     @Nullable
     private List<Transaction> paymentTransactions;
 
-    private List<AccountId> paymentTransactionNodeIds = new ArrayList<>();
-
-    private int nextPaymentTransactionIndex = 0;
-
     @Nullable
     private Hbar queryPayment;
 
@@ -49,14 +44,6 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
     Query() {
         builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
         headerBuilder = QueryHeader.newBuilder();
-    }
-
-    public T setNodeAccountIds(List<AccountId> nodeAccountIds) {
-        paymentTransactionNodeIds.clear();
-        paymentTransactionNodeIds.addAll(nodeAccountIds);
-
-        // noinspection unchecked
-        return (T) this;
     }
 
     /**
@@ -130,9 +117,9 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
 
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
-        if (paymentTransactionNodeIds.size() == 0) {
+        if (nodeAccountIds.size() == 0) {
             // Get a list of node AccountId's if the user has not set them manually.
-            paymentTransactionNodeIds = client.network.getNodeAccountIdsForExecute();
+            nodeAccountIds = client.network.getNodeAccountIdsForExecute();
         }
 
         if ((paymentTransactions != null) || !isPaymentRequired()) {
@@ -175,9 +162,9 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
             .thenCompose(x -> x)
             .thenAccept((paymentAmount) -> {
                 paymentTransactionId = TransactionId.generate(operator.accountId);
-                paymentTransactions = new ArrayList<>(paymentTransactionNodeIds.size());
+                paymentTransactions = new ArrayList<>(nodeAccountIds.size());
 
-                for (AccountId nodeId : paymentTransactionNodeIds) {
+                for (AccountId nodeId : nodeAccountIds) {
                     paymentTransactions.add(makePaymentTransaction(
                         paymentTransactionId,
                         nodeId,
@@ -208,9 +195,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
     @Override
     final void advanceRequest() {
         if (isPaymentRequired() && paymentTransactions != null) {
-            // each time we move our cursor to the next transaction
-            // wrapping around to ensure we are cycling
-            nextPaymentTransactionIndex = (nextPaymentTransactionIndex + 1) % paymentTransactions.size();
+            super.advanceRequest();
         }
     }
 
@@ -218,7 +203,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
     final com.hedera.hashgraph.sdk.proto.Query makeRequest() {
         // If payment is required, set the next payment transaction on the query
         if (isPaymentRequired() && paymentTransactions != null) {
-            headerBuilder.setPayment(paymentTransactions.get(nextPaymentTransactionIndex));
+            headerBuilder.setPayment(paymentTransactions.get(nextNodeIndex));
         }
 
         // Delegate to the derived class to apply the header because the common header struct is
@@ -233,18 +218,6 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<com.hed
         var preCheckCode = mapResponseHeader(response).getNodeTransactionPrecheckCode();
 
         return Status.valueOf(preCheckCode);
-    }
-
-    final AccountId getNodeAccountId() {
-        if (paymentTransactionNodeIds != null) {
-            return paymentTransactionNodeIds.get(nextPaymentTransactionIndex);
-        } else {
-            throw new IllegalStateException("Query node AccountIds not set before executing");
-        }
-    }
-
-    final List<AccountId> getNodeAccountIds() {
-        return paymentTransactionNodeIds;
     }
 
     @Override

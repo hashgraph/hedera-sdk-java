@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ContractCallTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
@@ -9,6 +10,7 @@ import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Call a function of the given smart contract instance, giving it parameters as its inputs.
@@ -26,8 +28,8 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
         builder = ContractCallTransactionBody.newBuilder();
     }
 
-    ContractExecuteTransaction(HashMap<TransactionId, HashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) {
-        super(txs.values().iterator().next());
+    ContractExecuteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+        super(txs);
 
         builder = bodyBuilder.getContractCall().toBuilder();
     }
