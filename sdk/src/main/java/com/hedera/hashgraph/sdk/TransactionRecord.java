@@ -3,13 +3,17 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.sdk.proto.AccountAmount;
+import com.hedera.hashgraph.sdk.proto.TokenTransferList;
 import com.hedera.hashgraph.sdk.proto.TransferList;
 import org.bouncycastle.util.encoders.Hex;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The complete record for a transaction on Hedera that has reached consensus.
@@ -67,6 +71,8 @@ public final class TransactionRecord {
      */
     public final List<Transfer> transfers;
 
+    public final Map<TokenId, Map<AccountId, Long>> tokenTransfers;
+
     private TransactionRecord(
         TransactionReceipt transactionReceipt,
         ByteString transactionHash,
@@ -75,7 +81,8 @@ public final class TransactionRecord {
         String transactionMemo,
         long transactionFee,
         @Nullable ContractFunctionResult contractFunctionResult,
-        List<Transfer> transfers
+        List<Transfer> transfers,
+        Map<TokenId, Map<AccountId, Long>> tokenTransfers
     ) {
         this.receipt = transactionReceipt;
         this.transactionHash = transactionHash;
@@ -85,12 +92,23 @@ public final class TransactionRecord {
         this.transfers = transfers;
         this.contractFunctionResult = contractFunctionResult;
         this.transactionFee = Hbar.fromTinybars(transactionFee);
+        this.tokenTransfers = tokenTransfers;
     }
 
     static TransactionRecord fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord) {
         var transfers = new ArrayList<Transfer>(transactionRecord.getTransferList().getAccountAmountsCount());
         for (var accountAmount : transactionRecord.getTransferList().getAccountAmountsList()) {
             transfers.add(Transfer.fromProtobuf(accountAmount));
+        }
+
+        var tokenTransfers = new HashMap<TokenId, Map<AccountId, Long>>(transactionRecord.getTokenTransferListsCount());
+        for (var tokenTransfersList : transactionRecord.getTokenTransferListsList()) {
+            var accountAmounts = new HashMap<AccountId, Long>();
+            for (var accountAmount : tokenTransfersList.getTransfersList()) {
+                accountAmounts.put(AccountId.fromProtobuf(accountAmount.getAccountID()), accountAmount.getAmount());
+            }
+
+            tokenTransfers.put(TokenId.fromProtobuf(tokenTransfersList.getToken()), accountAmounts);
         }
 
         // HACK: This is a bit bad, any takers to clean this up
@@ -108,7 +126,8 @@ public final class TransactionRecord {
             transactionRecord.getMemo(),
             transactionRecord.getTransactionFee(),
             contractFunctionResult,
-            transfers
+            transfers,
+            tokenTransfers
         );
     }
 
@@ -131,6 +150,19 @@ public final class TransactionRecord {
             .setTransactionFee(transactionFee.toTinybars())
             .setTransferList(transferList);
 
+        for (var tokenEntry : tokenTransfers.entrySet()) {
+            var tokenTransfersList = TokenTransferList.newBuilder()
+                .setToken(tokenEntry.getKey().toProtobuf());
+            for (var aaEntry : tokenEntry.getValue().entrySet()) {
+                tokenTransfersList.addTransfers(AccountAmount.newBuilder()
+                    .setAccountID(aaEntry.getKey().toProtobuf())
+                    .setAmount(aaEntry.getValue()).build()
+                );
+            }
+
+            transactionRecord.addTokenTransferLists(tokenTransfersList);
+        }
+
         if (contractFunctionResult != null) {
             transactionRecord.setContractCallResult(contractFunctionResult.toProtobuf());
         }
@@ -149,6 +181,7 @@ public final class TransactionRecord {
             .add("transactionFee", transactionFee)
             .add("contractFunctionResult", contractFunctionResult)
             .add("transfers", transfers)
+            .add("tokenTransfers", tokenTransfers)
             .toString();
     }
 
