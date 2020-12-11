@@ -22,7 +22,7 @@ import java.util.*;
  * On success, the resulting TransactionReceipt contains the topic's updated topicSequenceNumber and
  * topicRunningHash.
  */
-public final class TopicMessageSubmitTransaction extends ChunkedTransaction<TopicMessageSubmitTransaction> implements WithExecuteAll {
+public final class TopicMessageSubmitTransaction extends ChunkedTransaction<TopicMessageSubmitTransaction> {
     private static final int CHUNK_SIZE = 4096;
 
     private final ConsensusSubmitMessageTransactionBody.Builder builder;

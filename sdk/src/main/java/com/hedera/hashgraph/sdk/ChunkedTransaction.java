@@ -11,9 +11,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Transaction<T> {
+abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Transaction<T> implements WithExecuteAll{
 
-    public ChunkedTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId,com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    ChunkedTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId,com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
     }
 

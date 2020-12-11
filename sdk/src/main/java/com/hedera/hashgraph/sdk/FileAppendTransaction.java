@@ -17,7 +17,7 @@ import java.util.*;
  * <p>If a file has multiple keys, all keys must sign to modify its contents.
  * (See {@link FileCreateTransaction#setKeys(Key...)} for more information.)
  */
-public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTransaction> implements WithExecuteAll {
+public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTransaction> {
     private static final int CHUNK_SIZE = 4096;
 
     private final FileAppendTransactionBody.Builder builder;
