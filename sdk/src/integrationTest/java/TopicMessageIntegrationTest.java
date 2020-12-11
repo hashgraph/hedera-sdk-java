@@ -29,7 +29,7 @@ public class TopicMessageIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 
-            client.setMirrorNetwork(List.of("api.testnet.kabuto.sh:50211"));
+//            client.setMirrorNetwork(List.of("api.testnet.kabuto.sh:50211"));
 
             var operatorKey = client.getOperatorPublicKey();
 
@@ -56,6 +56,8 @@ public class TopicMessageIntegrationTest {
             assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
             assertEquals(info.sequenceNumber, 0);
             assertEquals(info.adminKey, operatorKey);
+
+            Thread.sleep(20000);
 
             var receivedMessage = new boolean[]{false};
             var start = Instant.now();

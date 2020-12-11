@@ -11,11 +11,17 @@ abstract class ManagedNode {
     String address;
     ManagedChannel channel;
     final ExecutorService executor;
-    Long lastUsed = null;
+    long lastUsed = 0;
+    long useCount = 0;
 
     ManagedNode(String address, ExecutorService executor) {
         this.executor = executor;
         this.address = address;
+    }
+
+    void inUse() {
+        useCount++;
+        lastUsed = Instant.now().toEpochMilli();
     }
 
     synchronized ManagedChannel getChannel() {

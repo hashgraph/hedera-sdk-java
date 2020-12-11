@@ -79,28 +79,7 @@ class Network {
      * @return {@link java.util.List<com.hedera.hashgraph.sdk.AccountId>}
      */
     List<AccountId> getNodeAccountIdsForExecute() {
-        if (nodeLastUsedAt + 1 < Instant.now().getEpochSecond()) {
-            nodes.sort((a,b) -> {
-                if (a.isHealthy() && b.isHealthy()) {
-                    return 0;
-                } else if (a.isHealthy() && !b.isHealthy()) {
-                    return -1;
-                } else if (!a.isHealthy() && b.isHealthy()) {
-                    return 1;
-                } else {
-                    var aLastUsed = a.lastUsed != null ? a.lastUsed : 0;
-                    var bLastUsed = b.lastUsed != null ? b.lastUsed : 0;
-
-                    if (aLastUsed + a.delay < bLastUsed + b.delay) {
-                        return -1;
-                    } else {
-                        return 1;
-                    }
-                }
-            });
-
-            this.nodeLastUsedAt = Instant.now().toEpochMilli();
-        }
+        nodes.sort(Node::compareTo);
 
         List<AccountId> resultNodeAccountIds = new ArrayList<>();
 
@@ -112,7 +91,11 @@ class Network {
     }
 
     int getNumberOfNodesForTransaction() {
-        return (network.size() + 3 - 1) / 3;
+        int count = 0;
+        for (var node : nodes) {
+            count += node.isHealthy() ? 1 : 1;
+        }
+        return (count + 3 - 1) / 3;
     }
 
     void close(Duration timeout) {
