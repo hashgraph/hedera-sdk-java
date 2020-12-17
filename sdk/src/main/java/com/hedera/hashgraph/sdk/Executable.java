@@ -86,7 +86,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                 attempt
             );
 
-            return Delayer.delayFor(node.delay, client.executor)
+            return Delayer.delayFor(node.delay(), client.executor)
                 .thenCompose((v) -> executeAsync(client, attempt + 1, lastException));
         }
 
@@ -104,8 +104,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         return toCompletableFuture(ClientCalls.futureUnaryCall(call, request)).handle((response, error) -> {
             var latency = (double) (System.nanoTime() - startAt) / 1000000000.0;
 
-            // Exponential back-off for Delayer: 250ms, 500ms, 1s, 2s, 4s, 8s, 16s, ...16s
-            long delay = (long) Math.min(250 * Math.pow(2, attempt - 1), 16000);
+            // Exponential back-off for Delayer: 250ms, 500ms, 1s, 2s, 4s, 8s, ... 8s
+            long delay = (long) Math.min(250 * Math.pow(2, attempt - 1), 8000);
 
             if (shouldRetryExceptionally(error)) {
                 logger.error("caught error, retrying\nnode={}\nattempt={}\n{}",
