@@ -57,7 +57,7 @@ public class TopicMessageIntegrationTest {
             assertEquals(info.sequenceNumber, 0);
             assertEquals(info.adminKey, operatorKey);
 
-            Thread.sleep(20000);
+            Thread.sleep(30000);
 
             var receivedMessage = new boolean[]{false};
             var start = Instant.now();
@@ -76,8 +76,8 @@ public class TopicMessageIntegrationTest {
               .execute(client);
 
             while(!receivedMessage[0]) {
-                if (Duration.between(start, Instant.now()).compareTo(Duration.ofSeconds(30)) > 0) {
-                    throw new Exception("TopicMessage was not received in 30 seconds or less");
+                if (Duration.between(start, Instant.now()).compareTo(Duration.ofSeconds(60)) > 0) {
+                    throw new Exception("TopicMessage was not received in 60 seconds or less");
                 }
 
                 Thread.sleep(1000);
