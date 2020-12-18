@@ -1,14 +1,5 @@
 import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.ContractByteCodeQuery;
-import com.hedera.hashgraph.sdk.ContractCallQuery;
-import com.hedera.hashgraph.sdk.ContractCreateTransaction;
-import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
-import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
-import com.hedera.hashgraph.sdk.ContractFunctionParameters;
-import com.hedera.hashgraph.sdk.ContractInfoQuery;
-import com.hedera.hashgraph.sdk.ContractUpdateTransaction;
-import com.hedera.hashgraph.sdk.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -147,6 +138,12 @@ public class ContractIntegrationTest {
                     .setMaxQueryPayment(new Hbar(2))
                     .execute(client);
             });
+
+            new FileDeleteTransaction()
+                .setFileId(file)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .execute(client)
+                .getReceipt(client);
 
             client.close();
         });

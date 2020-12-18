@@ -54,7 +54,7 @@ class Network {
                 !inverted.get(nodes.get(i).accountId).equals(nodes.get(i).address)
             ) {
                 networkNodes.remove(nodes.get(i).accountId);
-                nodes.get(i).close();
+                nodes.get(i).close(Duration.ofSeconds(30));
                 nodes.remove(i);
                 i--;
             }
@@ -101,14 +101,16 @@ class Network {
     void close(Duration timeout) {
         for (var node : nodes) {
             if (node.channel != null) {
-                node.channel.shutdown();
+                node.channel = node.channel.shutdown();
             }
         }
 
         for (var node: nodes) {
             if (node.channel != null) {
                 try {
-                    node.channel.awaitTermination(timeout.getSeconds(), TimeUnit.SECONDS);
+                    while (!node.channel.awaitTermination(timeout.getSeconds(), TimeUnit.SECONDS)) {
+                        // Do nothing
+                    }
                 } catch (InterruptedException e ) {
                     throw new RuntimeException(e);
                 }

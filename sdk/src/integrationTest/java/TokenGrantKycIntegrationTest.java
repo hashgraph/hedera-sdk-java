@@ -75,6 +75,8 @@ class TokenGrantKycIntegrationTest {
                 .sign(key)
                 .execute(client)
                 .getReceipt(client);
+
+            client.close();
         });
     }
 }

@@ -26,7 +26,7 @@ class MirrorNetwork {
         // Remove nodes that do not exist in new network
         for (int i = 0; i < network.size(); i++) {
             if (!addresses.contains(network.get(i).address)) {
-                network.get(i).close();
+                network.get(i).close(Duration.ofSeconds(30));
                 network.remove(i);
                 i--;
             }
@@ -66,7 +66,9 @@ class MirrorNetwork {
         for (var node: network) {
             if (node.channel != null) {
                 try {
-                    node.channel.awaitTermination(timeout.getSeconds(), TimeUnit.SECONDS);
+                    while (!node.channel.awaitTermination(timeout.getSeconds(), TimeUnit.SECONDS)) {
+                        // Do nothing
+                    }
                 } catch (InterruptedException e ) {
                     throw new RuntimeException(e);
                 }

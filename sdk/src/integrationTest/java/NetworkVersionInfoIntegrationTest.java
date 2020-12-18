@@ -28,6 +28,8 @@ public class NetworkVersionInfoIntegrationTest {
 //            assertEquals(version.hederaServicesVersion.major, 0);
 //            assertEquals(version.hederaServicesVersion.minor, 0);
 //            assertEquals(version.hederaServicesVersion.patch, 0);
+
+            client.close();
         });
     }
 }

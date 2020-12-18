@@ -44,6 +44,8 @@ class TokenCreateIntegrationTest {
                 .setTokenId(tokenId)
                 .execute(client)
                 .getReceipt(client);
+
+            client.close();
         });
     }
 }
