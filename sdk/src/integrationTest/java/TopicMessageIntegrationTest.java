@@ -29,8 +29,6 @@ public class TopicMessageIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 
-//            client.setMirrorNetwork(List.of("api.testnet.kabuto.sh:50211"));
-
             var operatorKey = client.getOperatorPublicKey();
 
             var response = new TopicCreateTransaction()
