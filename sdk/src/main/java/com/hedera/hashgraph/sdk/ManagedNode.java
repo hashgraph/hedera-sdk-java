@@ -39,13 +39,10 @@ abstract class ManagedNode {
         return channel;
     }
 
-    void close(Duration timeout) throws InterruptedException {
+    void close(long seconds) throws InterruptedException {
         if (channel != null) {
             channel.shutdown();
-            while (!channel.awaitTermination(timeout.getSeconds(), TimeUnit.SECONDS)) {
-                // Do nothing
-            }
-
+            channel.awaitTermination(seconds, TimeUnit.SECONDS);
             channel = null;
         }
     }
