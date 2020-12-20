@@ -1,5 +1,5 @@
 dependencies {
-	// implementation "com.hedera.hashgraph:sdk:2.0.2"
+	// implementation "com.hedera.hashgraph:sdk:2.0.3"
 	implementation project(":sdk")
 
 	implementation "com.google.code.gson:gson:2.8.6"
