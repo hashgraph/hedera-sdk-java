@@ -82,6 +82,8 @@ class TokenRevokeKycIntegrationTest {
                 .sign(key)
                 .execute(client)
                 .getReceipt(client);
+
+            client.close();
         });
     }
 }

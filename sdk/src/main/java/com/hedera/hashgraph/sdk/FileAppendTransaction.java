@@ -17,7 +17,7 @@ import java.util.*;
  * <p>If a file has multiple keys, all keys must sign to modify its contents.
  * (See {@link FileCreateTransaction#setKeys(Key...)} for more information.)
  */
-public final class FileAppendTransaction extends Transaction<FileAppendTransaction> implements WithExecuteAll {
+public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTransaction> {
     private static final int CHUNK_SIZE = 4096;
 
     private final FileAppendTransactionBody.Builder builder;
@@ -191,38 +191,5 @@ public final class FileAppendTransaction extends Transaction<FileAppendTransacti
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setFileAppend(builder);
         return true;
-    }
-
-    @Override
-    public CompletableFuture<com.hedera.hashgraph.sdk.TransactionResponse> executeAsync(Client client) {
-        return executeAllAsync(client).thenApply(responses -> responses.get(0));
-    }
-
-    @Override
-    public CompletableFuture<List<com.hedera.hashgraph.sdk.TransactionResponse>> executeAllAsync(Client client) {
-        if (!isFrozen()) {
-            freezeWith(client);
-        }
-
-        var operatorId = client.getOperatorAccountId();
-
-        if (operatorId != null && operatorId.equals(Objects.requireNonNull(getTransactionId()).accountId)) {
-            // on execute, sign each transaction with the operator, if present
-            // and we are signing a transaction that used the default transaction ID
-            signWithOperator(client);
-        }
-
-        CompletableFuture<List<com.hedera.hashgraph.sdk.TransactionResponse>> future =
-            CompletableFuture.supplyAsync(() -> new ArrayList<>(transactionIds.size()));
-
-        for (var i = 0; i < transactionIds.size(); i++) {
-            future = future.thenCompose(list -> super.executeAsync(client).thenApply(response -> {
-                    list.add(response);
-                    return list;
-                }).thenCompose(CompletableFuture::completedFuture)
-            );
-        }
-
-        return future;
     }
 }

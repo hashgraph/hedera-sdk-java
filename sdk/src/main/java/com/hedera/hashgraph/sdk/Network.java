@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 class Network {
     Map<String, AccountId> network = new HashMap<>();
     Map<AccountId, Node> networkNodes = new HashMap<>();
     List<Node> nodes = new ArrayList<>();
     final ExecutorService executor;
-    long nodeLastUsedAt = Instant.now().getEpochSecond();
 
     Network(ExecutorService executor, Map<String, AccountId> network) {
         this.executor = executor;
@@ -25,10 +25,12 @@ class Network {
             setNetwork(network);
         } catch (InterruptedException e) {
             // This should never occur. The network is empty.
+        } catch (TimeoutException e) {
+            // This should never occur. The network is empty.
         }
     }
 
-    void setNetwork(Map<String, AccountId> network) throws InterruptedException {
+    void setNetwork(Map<String, AccountId> network) throws InterruptedException, TimeoutException {
         // Bypass the more complex code if the network is empty
         if (this.network.isEmpty()) {
             this.network = new HashMap<>(network);
@@ -45,16 +47,21 @@ class Network {
         this.network = new HashMap<>(network);
         var inverted = HashBiMap.create(network).inverse();
         var newNodeAccountIds = network.values();
+        var stopAt = Instant.now().getEpochSecond() + Duration.ofSeconds(30).getSeconds();
 
         // Remove nodes that don't exist in new network or that have a different
         // address for the same AccountId
         for (int i = 0; i < nodes.size(); i++) {
+            if (stopAt - Instant.now().getEpochSecond() == 0) {
+                throw new TimeoutException("Failed to properly shutdown all channels");
+            }
+
             if (
                 !newNodeAccountIds.contains(nodes.get(i).accountId) ||
-                !inverted.get(nodes.get(i).accountId).equals(nodes.get(i).address)
+                    !inverted.get(nodes.get(i).accountId).equals(nodes.get(i).address)
             ) {
                 networkNodes.remove(nodes.get(i).accountId);
-                nodes.get(i).close();
+                nodes.get(i).close(stopAt - Instant.now().toEpochMilli());
                 nodes.remove(i);
                 i--;
             }
@@ -79,28 +86,7 @@ class Network {
      * @return {@link java.util.List<com.hedera.hashgraph.sdk.AccountId>}
      */
     List<AccountId> getNodeAccountIdsForExecute() {
-        if (nodeLastUsedAt + 1 < Instant.now().getEpochSecond()) {
-            nodes.sort((a,b) -> {
-                if (a.isHealthy() && b.isHealthy()) {
-                    return 0;
-                } else if (a.isHealthy() && !b.isHealthy()) {
-                    return -1;
-                } else if (!a.isHealthy() && b.isHealthy()) {
-                    return 1;
-                } else {
-                    var aLastUsed = a.lastUsed != null ? a.lastUsed : 0;
-                    var bLastUsed = b.lastUsed != null ? b.lastUsed : 0;
-
-                    if (aLastUsed + a.delay < bLastUsed + b.delay) {
-                        return -1;
-                    } else {
-                        return 1;
-                    }
-                }
-            });
-
-            this.nodeLastUsedAt = Instant.now().toEpochMilli();
-        }
+        nodes.sort(Node::compareTo);
 
         List<AccountId> resultNodeAccountIds = new ArrayList<>();
 
@@ -112,21 +98,31 @@ class Network {
     }
 
     int getNumberOfNodesForTransaction() {
-        return (network.size() + 3 - 1) / 3;
+        int count = 0;
+        for (var node : nodes) {
+            count += node.isHealthy() ? 1 : 1;
+        }
+        return (count + 3 - 1) / 3;
     }
 
-    void close(Duration timeout) {
+    void close(Duration timeout) throws TimeoutException {
+        var stopAt = Instant.now().getEpochSecond() + timeout.getSeconds();
+
         for (var node : nodes) {
             if (node.channel != null) {
-                node.channel.shutdown();
+                node.channel = node.channel.shutdown();
             }
         }
 
-        for (var node: nodes) {
+        for (var node : nodes) {
+            if (stopAt - Instant.now().getEpochSecond() == 0) {
+                throw new TimeoutException("Failed to properly shutdown all channels");
+            }
+
             if (node.channel != null) {
                 try {
-                    node.channel.awaitTermination(timeout.getSeconds(), TimeUnit.SECONDS);
-                } catch (InterruptedException e ) {
+                    node.channel.awaitTermination(stopAt - Instant.now().getEpochSecond(), TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }

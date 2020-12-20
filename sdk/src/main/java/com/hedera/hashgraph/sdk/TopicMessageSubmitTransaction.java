@@ -22,7 +22,7 @@ import java.util.*;
  * On success, the resulting TransactionReceipt contains the topic's updated topicSequenceNumber and
  * topicRunningHash.
  */
-public final class TopicMessageSubmitTransaction extends Transaction<TopicMessageSubmitTransaction> implements WithExecuteAll {
+public final class TopicMessageSubmitTransaction extends ChunkedTransaction<TopicMessageSubmitTransaction> {
     private static final int CHUNK_SIZE = 4096;
 
     private final ConsensusSubmitMessageTransactionBody.Builder builder;
@@ -202,40 +202,5 @@ public final class TopicMessageSubmitTransaction extends Transaction<TopicMessag
         }
 
         return this;
-    }
-
-
-    @Override
-    public CompletableFuture<com.hedera.hashgraph.sdk.TransactionResponse> executeAsync(Client client) {
-        return executeAllAsync(client).thenApply(responses -> responses.get(0));
-    }
-
-    @Override
-    @FunctionalExecutable(type = "java.util.List<TransactionResponse>")
-    public CompletableFuture<List<com.hedera.hashgraph.sdk.TransactionResponse>> executeAllAsync(Client client) {
-        if (!isFrozen()) {
-            freezeWith(client);
-        }
-
-        var operatorId = client.getOperatorAccountId();
-
-        if (operatorId != null && operatorId.equals(Objects.requireNonNull(getTransactionId()).accountId)) {
-            // on execute, sign each transaction with the operator, if present
-            // and we are signing a transaction that used the default transaction ID
-            signWithOperator(client);
-        }
-
-        CompletableFuture<List<com.hedera.hashgraph.sdk.TransactionResponse>> future =
-            CompletableFuture.supplyAsync(() -> new ArrayList<>(transactionIds.size()));
-
-        for (var i = 0; i < transactionIds.size(); i++) {
-            future = future.thenCompose(list -> super.executeAsync(client).thenApply(response -> {
-                    list.add(response);
-                    return list;
-                }).thenCompose(CompletableFuture::completedFuture)
-            );
-        }
-
-        return future;
     }
 }

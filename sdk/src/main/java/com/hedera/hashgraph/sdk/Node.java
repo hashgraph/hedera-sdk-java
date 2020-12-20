@@ -6,19 +6,18 @@ import java.util.concurrent.ExecutorService;
 class Node extends ManagedNode {
     AccountId accountId;
     long delay;
+    long delayUntil;
 
     Node(AccountId accountId, String address, ExecutorService executor) {
         super(address, executor);
         this.accountId = accountId;
         this.delay = 250;
+        this.delayUntil = 0;
+        useCount = 0;
     }
 
     boolean isHealthy() {
-        if (this.lastUsed != null) {
-            return this.lastUsed + this.delay < Instant.now().toEpochMilli();
-        }
-
-        return true;
+        return delayUntil < Instant.now().toEpochMilli();
     }
 
     void increaseDelay() {
@@ -30,6 +29,34 @@ class Node extends ManagedNode {
     }
 
     long delay() {
-        return (this.lastUsed != null ? this.lastUsed : 0) + this.delay - Instant.now().toEpochMilli();
+        return delayUntil - Instant.now().toEpochMilli();
+    }
+
+    int compareTo(Node node) {
+        if (this.isHealthy() && node.isHealthy()) {
+            return compareToSameHealth(node);
+        } else if (this.isHealthy() && !node.isHealthy()) {
+            return -1;
+        } else if (!this.isHealthy() && node.isHealthy()) {
+            return 1;
+        } else {
+            return compareToSameHealth(node);
+        }
+    }
+
+    private int compareToSameHealth(Node node) {
+        if (this.useCount < node.useCount) {
+            return -1;
+        } else if (this.useCount > node.useCount) {
+            return 1;
+        } else {
+            if (this.lastUsed < node.lastUsed) {
+                return -1;
+            } else if (this.lastUsed > node.lastUsed) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
     }
 }

@@ -66,17 +66,29 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
     @FunctionalExecutable
     public CompletableFuture<O> executeAsync(Client client) {
-        return onExecuteAsync(client).thenCompose((v) -> executeAsync(client, 1));
+        return onExecuteAsync(client).thenCompose((v) -> executeAsync(client, 1, null));
     }
 
-    private CompletableFuture<O> executeAsync(Client client, int attempt) {
+    private CompletableFuture<O> executeAsync(Client client, int attempt, @Nullable Throwable lastException) {
         if (attempt > maxRetries) {
-            return CompletableFuture.<O>failedFuture(new Exception("Failed to get gRPC response within maximum retry count"));
+            return CompletableFuture.<O>failedFuture(new Exception("Failed to get gRPC response within maximum retry count", lastException));
         }
 
         var node = client.network.networkNodes.get(getNodeAccountId());
+        node.inUse();
 
         logger.trace("sending request \nnode={}\nattempt={}\n{}", node.accountId, attempt, this);
+
+        if (!node.isHealthy()) {
+            logger.error("using unhealthy node={}\ndelaying until {}ms\nattempt={}\n",
+                node.accountId,
+                node.delayUntil,
+                attempt
+            );
+
+            return Delayer.delayFor(node.delay(), client.executor)
+                .thenCompose((v) -> executeAsync(client, attempt + 1, lastException));
+        }
 
         var methodDescriptor = getMethodDescriptor();
         var call = node.getChannel().newCall(methodDescriptor, CallOptions.DEFAULT);
@@ -92,26 +104,28 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         return toCompletableFuture(ClientCalls.futureUnaryCall(call, request)).handle((response, error) -> {
             var latency = (double) (System.nanoTime() - startAt) / 1000000000.0;
 
-            // Exponential back-off for Delayer: 250ms, 500ms, 1s, 2s, 4s, 8s, 16s, ...16s
-            long delay = (long) Math.min(250 * Math.pow(2, attempt - 1), 16000);
+            // Exponential back-off for Delayer: 250ms, 500ms, 1s, 2s, 4s, 8s, ... 8s
+            long delay = (long) Math.min(250 * Math.pow(2, attempt - 1), 8000);
 
             if (shouldRetryExceptionally(error)) {
-                logger.error("caught error, retrying\nnode={}\nattempt={}\ndelay={}\n{}",
+                logger.error("caught error, retrying\nnode={}\nattempt={}\n{}",
                     node.accountId,
                     attempt,
-                    delay,
                     error
                 );
 
+                node.increaseDelay();
+
                 // the transaction had a network failure reaching Hedera
-                return Delayer.delayFor(delay, client.executor)
-                    .thenCompose((v) -> executeAsync(client, attempt + 1));
+                return executeAsync(client, attempt + 1, error);
             }
 
             if (error != null) {
                 // not a network failure, some other weirdness going on; just fail fast
                 return CompletableFuture.<O>failedFuture(error);
             }
+
+            node.decreaseDelay();
 
             var responseStatus = mapResponseStatus(response);
 
@@ -127,7 +141,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                 // the response has been identified as failing or otherwise
                 // needing a retry let's do this again after a delay
                 return Delayer.delayFor(delay, client.executor)
-                    .thenCompose((v) -> executeAsync(client, attempt + 1));
+                    .thenCompose((v) -> executeAsync(client, attempt + 1, new HederaPreCheckStatusException(responseStatus, getTransactionId())));
             }
 
             if (responseStatus != Status.OK) {

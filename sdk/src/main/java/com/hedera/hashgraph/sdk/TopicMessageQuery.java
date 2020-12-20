@@ -77,7 +77,6 @@ public final class TopicMessageQuery {
         });
 
         HashMap<TransactionID, ArrayList<ConsensusTopicResponse>> pendingMessages = new HashMap<>();
-
         ClientCalls.asyncServerStreamingCall(call, query, new StreamObserver<ConsensusTopicResponse>() {
             @Override
             public void onNext(ConsensusTopicResponse consensusTopicResponse) {
