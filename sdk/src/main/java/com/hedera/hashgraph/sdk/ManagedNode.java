@@ -2,8 +2,8 @@ package com.hedera.hashgraph.sdk;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import org.threeten.bp.Duration;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
