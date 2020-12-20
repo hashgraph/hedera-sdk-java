@@ -90,6 +90,8 @@ class TokenWipeIntegrationTest {
                 .sign(key)
                 .execute(client)
                 .getReceipt(client);
+
+            client.close();
         });
     }
 }

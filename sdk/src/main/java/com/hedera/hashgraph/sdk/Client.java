@@ -264,7 +264,7 @@ public final class Client implements AutoCloseable {
      * @param network a map of node account ID to node URL.
      * @return {@code this} for fluent API usage.
      */
-    public Client setNetwork(Map<String, AccountId> network) throws InterruptedException {
+    public Client setNetwork(Map<String, AccountId> network) throws InterruptedException, TimeoutException {
         this.network.setNetwork(network);
         return this;
     }
@@ -408,7 +408,7 @@ public final class Client implements AutoCloseable {
      * needed.
      */
     @Override
-    public synchronized void close() {
+    public synchronized void close() throws TimeoutException {
         close(Duration.ofSeconds(30));
     }
 
@@ -421,7 +421,7 @@ public final class Client implements AutoCloseable {
      *
      * @param timeout The Duration to be set
      */
-    public void close(Duration timeout) {
+    public void close(Duration timeout) throws TimeoutException {
         network.close(timeout);
         mirrorNetwork.close(timeout);
     }

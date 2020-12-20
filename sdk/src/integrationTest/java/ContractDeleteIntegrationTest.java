@@ -78,7 +78,8 @@ public class ContractDeleteIntegrationTest {
             new FileDeleteTransaction()
                 .setFileId(file)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .execute(client)
+                .getReceipt(client);
 
             client.close();
         });

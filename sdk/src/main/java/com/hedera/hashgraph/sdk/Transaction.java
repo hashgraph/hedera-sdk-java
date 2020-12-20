@@ -608,7 +608,7 @@ public abstract class Transaction<T extends Transaction<T>>
         com.hedera.hashgraph.sdk.proto.Transaction request
     ) {
         var transactionId = Objects.requireNonNull(getTransactionId());
-        var hash = getTransactionHash();
+        var hash = hash(request.getSignedTransactionBytes().toByteArray());
         nextTransactionIndex = (nextTransactionIndex + 1) % transactionIds.size();
         return new TransactionResponse(nodeId, transactionId, hash);
     }

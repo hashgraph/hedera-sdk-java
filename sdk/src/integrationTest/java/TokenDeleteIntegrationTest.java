@@ -44,6 +44,8 @@ class TokenDeleteIntegrationTest {
                 .setTokenId(tokenId)
                 .execute(client)
                 .getReceipt(client);
+
+            client.close();
         });
     }
 }

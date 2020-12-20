@@ -2,6 +2,7 @@ package com.hedera.hashgraph.sdk;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import org.threeten.bp.Duration;
 
 import java.time.Instant;
 import java.util.concurrent.ExecutorService;
@@ -11,16 +12,20 @@ abstract class ManagedNode {
     String address;
     ManagedChannel channel;
     final ExecutorService executor;
-    Long lastUsed = null;
+    long lastUsed = 0;
+    long useCount = 0;
 
     ManagedNode(String address, ExecutorService executor) {
         this.executor = executor;
         this.address = address;
     }
 
-    synchronized ManagedChannel getChannel() {
-        this.lastUsed = Instant.now().toEpochMilli();
+    void inUse() {
+        useCount++;
+        lastUsed = Instant.now().toEpochMilli();
+    }
 
+    synchronized ManagedChannel getChannel() {
         if (channel != null) {
             return channel;
         }
@@ -34,9 +39,11 @@ abstract class ManagedNode {
         return channel;
     }
 
-    void close() throws InterruptedException {
+    void close(long seconds) throws InterruptedException {
         if (channel != null) {
-            channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+            channel.shutdown();
+            channel.awaitTermination(seconds, TimeUnit.SECONDS);
+            channel = null;
         }
     }
 

@@ -61,6 +61,8 @@ class TokenInfoIntegrationTest {
                     .setTokenId(tokenId)
                     .execute(client)
                     .getReceipt(client);
+
+            client.close();
         });
     }
 }

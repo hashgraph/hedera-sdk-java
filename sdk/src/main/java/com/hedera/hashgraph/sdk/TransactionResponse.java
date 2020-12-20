@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import org.bouncycastle.util.encoders.Hex;
 
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 public final class TransactionResponse implements WithGetReceipt, WithGetRecord {
@@ -20,12 +21,19 @@ public final class TransactionResponse implements WithGetReceipt, WithGetRecord 
 
     @Override
     public CompletableFuture<TransactionReceipt> getReceiptAsync(Client client) {
-        return transactionId.getReceiptAsync(client);
+        return new TransactionReceiptQuery()
+            .setTransactionId(transactionId)
+            .setNodeAccountIds(Collections.singletonList(nodeId))
+            .executeAsync(client);
     }
 
     @Override
     public CompletableFuture<TransactionRecord> getRecordAsync(Client client) {
-        return transactionId.getRecordAsync(client);
+        return getReceiptAsync(client).thenCompose((receipt) -> new TransactionRecordQuery()
+                .setTransactionId(transactionId)
+                .setNodeAccountIds(Collections.singletonList(nodeId))
+                .executeAsync(client)
+        );
     }
 
     @Override
