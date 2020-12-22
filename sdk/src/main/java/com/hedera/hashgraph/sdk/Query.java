@@ -193,13 +193,6 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     }
 
     @Override
-    final void advanceRequest() {
-        if (isPaymentRequired() && paymentTransactions != null) {
-            super.advanceRequest();
-        }
-    }
-
-    @Override
     final com.hedera.hashgraph.sdk.proto.Query makeRequest() {
         // If payment is required, set the next payment transaction on the query
         if (isPaymentRequired() && paymentTransactions != null) {

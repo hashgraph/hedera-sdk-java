@@ -1,6 +1,7 @@
 import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -33,6 +34,8 @@ public class IntegrationTestClientManager {
 
         assertNotNull(client.getOperatorAccountId());
         assertNotNull(client.getOperatorAccountId());
+
+        client.setMaxTransactionFee(new Hbar(50));
 
         return client;
     }
