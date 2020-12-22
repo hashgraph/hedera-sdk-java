@@ -207,7 +207,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     }
 
     @Override
-    final Status mapResponseStatus(Response response) {
+    Status mapResponseStatus(Response response) {
         var preCheckCode = mapResponseHeader(response).getNodeTransactionPrecheckCode();
 
         return Status.valueOf(preCheckCode);

@@ -144,7 +144,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                     .thenCompose((v) -> executeAsync(client, attempt + 1, new HederaPreCheckStatusException(responseStatus, getTransactionId())));
             }
 
-            if (responseStatus != Status.OK) {
+            if (responseStatus != Status.OK && responseStatus != Status.SUCCESS) {
                 // request to hedera failed in a non-recoverable way
                 return CompletableFuture.<O>failedFuture(
                     new HederaPreCheckStatusException(

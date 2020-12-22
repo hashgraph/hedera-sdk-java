@@ -1,60 +1,79 @@
 import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.TransactionId;
+import com.hedera.hashgraph.sdk.*;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class AccountBalanceIntegrationTest {
     @Test
-    void test() {
+    @DisplayName("Can fetch balance for client operator")
+    void canFetchBalanceForClientOperator() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
-            var operatorId = client.getOperatorAccountId();
-            assertNotNull(operatorId);
-
-            var key = PrivateKey.generate();
-
-            var response = new AccountCreateTransaction()
-                .setKey(key)
-                .setMaxTransactionFee(new Hbar(2))
-                .setInitialBalance(new Hbar(1))
-                .freezeWith(client)
-                .sign(key)
-                .signWithOperator(client)
-                .execute(client);
-
-            var receipt = response.transactionId.getReceipt(client);
-
-            assertNotNull(receipt.accountId);
-            assertTrue(Objects.requireNonNull(receipt.accountId).num > 0);
-
-            var account = receipt.accountId;
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
             @Var var balance = new AccountBalanceQuery()
-                .setAccountId(account)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setAccountId(operatorId)
                 .execute(client);
 
-            assertEquals(balance.hbars, new Hbar(1));
+            assertTrue(balance.hbars.toTinybars() > 0);
 
-            new AccountDeleteTransaction()
-                .setAccountId(account)
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Cannot fetch balance for invalid account ID")
+    void canNotFetchBalanceForInvalidAccountId() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+
+            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+                new AccountBalanceQuery()
+                    .setAccountId(AccountId.fromString("1.0.3"))
+                    .execute(client);
+            });
+
+            assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Can fetch token balances for client operator")
+    void canFetchTokenBalancesForClientOperator() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+
+            var response = new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setInitialSupply(10000)
+                .setTreasuryAccountId(operatorId)
+                .setAdminKey(operatorKey)
+                .setSupplyKey(operatorKey)
+                .setFreezeDefault(false)
+                .execute(client);
+
+            var tokenId = Objects.requireNonNull(response.getReceipt(client).tokenId);
+
+            @Var var balance = new AccountBalanceQuery()
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTransferAccountId(operatorId)
-                .setTransactionId(TransactionId.generate(account))
-                .freezeWith(client)
-                .sign(key)
+                .setAccountId(operatorId)
+                .execute(client);
+
+            assertTrue(balance.token.get(tokenId) > 0);
+
+            new TokenDeleteTransaction()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setTokenId(tokenId)
                 .execute(client)
                 .getReceipt(client);
 
