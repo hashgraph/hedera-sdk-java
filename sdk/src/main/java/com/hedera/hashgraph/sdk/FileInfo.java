@@ -68,7 +68,7 @@ public final class FileInfo {
     FileGetInfoResponse.FileInfo toProtobuf() {
         var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
         for (Key key : keys) {
-            keyList.addKeys(key.toKeyProtobuf());
+            keyList.addKeys(key.toProtobufKey());
         }
 
         var fileInfoBuilder = FileGetInfoResponse.FileInfo.newBuilder()

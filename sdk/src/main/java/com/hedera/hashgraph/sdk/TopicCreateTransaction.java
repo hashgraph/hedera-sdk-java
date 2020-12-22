@@ -9,7 +9,6 @@ import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
@@ -59,7 +58,7 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
 
     @Nullable
     public Key getAdminKey() {
-        return builder.hasAdminKey() ? Key.fromProtobuf(builder.getAdminKey()) : null;
+        return builder.hasAdminKey() ? Key.fromProtobufKey(builder.getAdminKey()) : null;
     }
 
     /**
@@ -76,13 +75,13 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
      */
     public TopicCreateTransaction setAdminKey(Key adminKey) {
         requireNotFrozen();
-        builder.setAdminKey(adminKey.toKeyProtobuf());
+        builder.setAdminKey(adminKey.toProtobufKey());
         return this;
     }
 
     @Nullable
     public Key getSubmitKey() {
-        return builder.hasSubmitKey() ? Key.fromProtobuf(builder.getSubmitKey()) : null;
+        return builder.hasSubmitKey() ? Key.fromProtobufKey(builder.getSubmitKey()) : null;
     }
 
     /**
@@ -96,7 +95,7 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
      */
     public TopicCreateTransaction setSubmitKey(Key submitKey) {
         requireNotFrozen();
-        builder.setSubmitKey(submitKey.toKeyProtobuf());
+        builder.setSubmitKey(submitKey.toProtobufKey());
         return this;
     }
 

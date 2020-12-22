@@ -160,11 +160,11 @@ public class TokenInfo {
             info.getDecimals(),
             info.getTotalSupply(),
             AccountId.fromProtobuf(info.getTreasury()),
-            info.hasAdminKey() ? Key.fromProtobuf(info.getAdminKey()) : null,
-            info.hasKycKey() ? Key.fromProtobuf(info.getKycKey()) : null,
-            info.hasFreezeKey() ? Key.fromProtobuf(info.getFreezeKey()) : null,
-            info.hasWipeKey() ? Key.fromProtobuf(info.getWipeKey()) : null,
-            info.hasSupplyKey() ? Key.fromProtobuf(info.getSupplyKey()) : null,
+            info.hasAdminKey() ? Key.fromProtobufKey(info.getAdminKey()) : null,
+            info.hasKycKey() ? Key.fromProtobufKey(info.getKycKey()) : null,
+            info.hasFreezeKey() ? Key.fromProtobufKey(info.getFreezeKey()) : null,
+            info.hasWipeKey() ? Key.fromProtobufKey(info.getWipeKey()) : null,
+            info.hasSupplyKey() ? Key.fromProtobufKey(info.getSupplyKey()) : null,
             freezeStatusFromProtobuf(info.getDefaultFreezeStatus()),
             kycStatusFromProtobuf(info.getDefaultKycStatus()),
             info.getDeleted(),
@@ -195,11 +195,11 @@ public class TokenInfo {
             .setDecimals(decimals)
             .setTotalSupply(totalSupply)
             .setTreasury(treasuryAccountId.toProtobuf())
-            .setAdminKey(adminKey.toKeyProtobuf())
-            .setKycKey(kycKey.toKeyProtobuf())
-            .setFreezeKey(freezeKey.toKeyProtobuf())
-            .setWipeKey(wipeKey.toKeyProtobuf())
-            .setSupplyKey(supplyKey.toKeyProtobuf())
+            .setAdminKey(adminKey.toProtobufKey())
+            .setKycKey(kycKey.toProtobufKey())
+            .setFreezeKey(freezeKey.toProtobufKey())
+            .setWipeKey(wipeKey.toProtobufKey())
+            .setSupplyKey(supplyKey.toProtobufKey())
             .setDefaultFreezeStatus(freezeStatusToProtobuf(defaultFreezeStatus))
             .setDefaultKycStatus(kycStatusToProtobuf(defaultKycStatus))
             .setDeleted(isDeleted)

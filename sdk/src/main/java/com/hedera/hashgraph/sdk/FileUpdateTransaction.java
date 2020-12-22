@@ -11,7 +11,6 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
@@ -63,7 +62,7 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
 
         for (Key key: keys) {
-            keyList.addKeys(key.toKeyProtobuf());
+            keyList.addKeys(key.toProtobufKey());
         }
 
         builder.setKeys(keyList);

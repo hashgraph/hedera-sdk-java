@@ -53,7 +53,7 @@ public final class KeyList extends Key implements Collection<Key> {
     static KeyList fromProtobuf(com.hedera.hashgraph.sdk.proto.KeyList keyList, @Nullable Integer threshold) {
         var keys = (threshold != null ? new KeyList(threshold) : new KeyList());
         for (var i = 0; i < keyList.getKeysCount(); ++i) {
-            keys.add(Key.fromProtobuf(keyList.getKeys(i)));
+            keys.add(Key.fromProtobufKey(keyList.getKeys(i)));
         }
 
         return keys;
@@ -147,10 +147,10 @@ public final class KeyList extends Key implements Collection<Key> {
     }
 
     @Override
-    com.hedera.hashgraph.sdk.proto.Key toKeyProtobuf() {
+    com.hedera.hashgraph.sdk.proto.Key toProtobufKey() {
         var protoKeyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
         for (var key : keys) {
-            protoKeyList.addKeys(key.toKeyProtobuf());
+            protoKeyList.addKeys(key.toProtobufKey());
         }
 
         if (threshold != null) {

@@ -21,7 +21,7 @@ public class FileInfoTest {
         .setExpirationTime(InstantConverter.toProtobuf(Instant.ofEpochMilli(3)))
         .setDeleted(true)
         .setKeys(KeyList.newBuilder()
-            .addKeys(privateKey.getPublicKey().toKeyProtobuf()))
+            .addKeys(privateKey.getPublicKey().toProtobufKey()))
         .build();
 
     @BeforeAll

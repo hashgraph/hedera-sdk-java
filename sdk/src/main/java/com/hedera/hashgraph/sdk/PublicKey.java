@@ -50,7 +50,7 @@ public final class PublicKey extends Key {
     }
 
     @Override
-    com.hedera.hashgraph.sdk.proto.Key toKeyProtobuf() {
+    com.hedera.hashgraph.sdk.proto.Key toProtobufKey() {
         return com.hedera.hashgraph.sdk.proto.Key.newBuilder()
             .setEd25519(ByteString.copyFrom(keyData))
             .build();

@@ -331,9 +331,9 @@ public final class PrivateKey extends Key {
     }
 
     @Override
-    com.hedera.hashgraph.sdk.proto.Key toKeyProtobuf() {
+    com.hedera.hashgraph.sdk.proto.Key toProtobufKey() {
         // Forward to the corresponding public key.
-        return getPublicKey().toKeyProtobuf();
+        return getPublicKey().toProtobufKey();
     }
 
     public static PrivateKey fromLegacyMnemonic(byte[] entropy) {
