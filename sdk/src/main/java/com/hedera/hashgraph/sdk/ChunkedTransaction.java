@@ -22,7 +22,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
      */
     private int maxChunks = 10;
 
-    protected ByteString data;
+    protected ByteString data = ByteString.EMPTY;
 
     ChunkedTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
@@ -162,7 +162,11 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         super.freezeWith(client);
 
         var initialTransactionId = Objects.requireNonNull(transactionIds.get(0)).toProtobuf();
-        var requiredChunks = (this.data.size() + (CHUNK_SIZE - 1)) / CHUNK_SIZE;
+        @Var var requiredChunks = (this.data.size() + (CHUNK_SIZE - 1)) / CHUNK_SIZE;
+
+        if (requiredChunks == 0) {
+            requiredChunks = 1;
+        }
 
         if (requiredChunks > maxChunks) {
             throw new IllegalArgumentException(

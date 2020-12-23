@@ -24,6 +24,7 @@ class LiveHashAddIntegrationTest {
     void cannotCreateLiveHashBecauseItsNotSupported() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
             var key = PrivateKey.generate();
 
@@ -50,8 +51,11 @@ class LiveHashAddIntegrationTest {
             new AccountDeleteTransaction()
                 .setAccountId(accountId)
                 .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
-                .setTransferAccountId(accountId)
-                .execute(client);
+                .setTransferAccountId(operatorId)
+                .freezeWith(client)
+                .sign(key)
+                .execute(client)
+                .getReceipt(client);
 
             assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
 

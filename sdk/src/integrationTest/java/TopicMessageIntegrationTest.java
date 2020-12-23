@@ -1,35 +1,27 @@
 import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.TopicMessageQuery;
-import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
-import com.hedera.hashgraph.sdk.TopicCreateTransaction;
-import com.hedera.hashgraph.sdk.TopicDeleteTransaction;
-import com.hedera.hashgraph.sdk.TopicInfoQuery;
-import com.hedera.hashgraph.sdk.Hbar;
-import org.junit.Before;
+import com.hedera.hashgraph.sdk.*;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.threeten.bp.Duration;
+import org.threeten.bp.Instant;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TopicMessageIntegrationTest {
     @Test
-    void test() {
+    @DisplayName("Can receive a topic message")
+    void canReceiveATopicMessage() {
         // Skip if using PreviewNet
-        org.junit.Assume.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
+        Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
 
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
-
-            var operatorKey = client.getOperatorPublicKey();
+            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
             var response = new TopicCreateTransaction()
                 .setAdminKey(operatorKey)
@@ -37,43 +29,102 @@ public class TopicMessageIntegrationTest {
                 .setMaxTransactionFee(new Hbar(5))
                 .execute(client);
 
-            var receipt = response.getReceipt(client);
-
-            assertNotNull(receipt.topicId);
-            assertTrue(Objects.requireNonNull(receipt.topicId).num > 0);
-
-            var topic = receipt.topicId;
+            var topicId = Objects.requireNonNull(response.getReceipt(client).topicId);
 
             @Var var info = new TopicInfoQuery()
-                .setTopicId(topic)
+                .setTopicId(topicId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setQueryPayment(new Hbar(22))
                 .execute(client);
 
-            assertEquals(info.topicId, topic);
+            assertEquals(info.topicId, topicId);
             assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
             assertEquals(info.sequenceNumber, 0);
             assertEquals(info.adminKey, operatorKey);
-
-            Thread.sleep(30000);
 
             var receivedMessage = new boolean[]{false};
             var start = Instant.now();
 
             var handle = new TopicMessageQuery()
-              .setTopicId(topic)
-              .subscribe(client, (message) -> {
-                  assertEquals(new String(message.contents, StandardCharsets.UTF_8), "Hello, from HCS!");
-                  receivedMessage[0] = true;
-              });
+                .setTopicId(topicId)
+                .setStartTime(Instant.EPOCH)
+                .subscribe(client, (message) -> {
+                    receivedMessage[0] = new String(message.contents, StandardCharsets.UTF_8).equals("Hello, from HCS!");
+                });
 
             new TopicMessageSubmitTransaction()
-              .setNodeAccountIds(Collections.singletonList(response.nodeId))
-              .setTopicId(topic)
-              .setMessage("Hello, from HCS!")
-              .execute(client);
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setTopicId(topicId)
+                .setMessage("Hello, from HCS!")
+                .execute(client)
+                .getReceipt(client);
 
-            while(!receivedMessage[0]) {
+            while (!receivedMessage[0]) {
+                if (Duration.between(start, Instant.now()).compareTo(Duration.ofSeconds(60)) > 0) {
+                    throw new Exception("TopicMessage was not received in 60 seconds or less");
+                }
+
+                Thread.sleep(2000);
+            }
+
+            handle.unsubscribe();
+
+            new TopicDeleteTransaction()
+                .setTopicId(topicId)
+                .setMaxTransactionFee(new Hbar(5))
+                .execute(client)
+                .getReceipt(client);
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Can receive a large topic message")
+    void canReceiveALargeTopicMessage() {
+        // Skip if using PreviewNet
+        Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
+
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+
+            var response = new TopicCreateTransaction()
+                .setAdminKey(operatorKey)
+                .setTopicMemo("[e2e::TopicCreateTransaction]")
+                .execute(client);
+
+            var topicId = Objects.requireNonNull(response.getReceipt(client).topicId);
+
+            @Var var info = new TopicInfoQuery()
+                .setTopicId(topicId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setQueryPayment(new Hbar(22))
+                .execute(client);
+
+            assertEquals(info.topicId, topicId);
+            assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
+            assertEquals(info.sequenceNumber, 0);
+            assertEquals(info.adminKey, operatorKey);
+
+            var receivedMessage = new boolean[]{false};
+            var start = Instant.now();
+
+            var handle = new TopicMessageQuery()
+                .setTopicId(topicId)
+                .setStartTime(Instant.EPOCH)
+                .subscribe(client, (message) -> {
+                    receivedMessage[0] = new String(message.contents, StandardCharsets.UTF_8).equals(Contents.BIG_CONTENTS);
+                });
+
+            new TopicMessageSubmitTransaction()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setTopicId(topicId)
+                .setMessage(Contents.BIG_CONTENTS)
+                .execute(client)
+                .getReceipt(client);
+
+            while (!receivedMessage[0]) {
                 if (Duration.between(start, Instant.now()).compareTo(Duration.ofSeconds(60)) > 0) {
                     throw new Exception("TopicMessage was not received in 60 seconds or less");
                 }
@@ -84,8 +135,7 @@ public class TopicMessageIntegrationTest {
             handle.unsubscribe();
 
             new TopicDeleteTransaction()
-                .setTopicId(topic)
-                .setMaxTransactionFee(new Hbar(5))
+                .setTopicId(topicId)
                 .execute(client)
                 .getReceipt(client);
 

@@ -53,7 +53,7 @@ class AccountDeleteIntegrationTest {
 
     @Test
     @DisplayName("Cannot delete invalid account ID")
-    void canNotCreateAccountWithNoKey() {
+    void cannotCreateAccountWithNoKey() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
@@ -73,7 +73,7 @@ class AccountDeleteIntegrationTest {
 
     @Test
     @DisplayName("Cannot delete account that has not signed transaction")
-    void canNotDeleteAccountThatHasNotSignedTransaction() {
+    void cannotDeleteAccountThatHasNotSignedTransaction() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
@@ -91,7 +91,6 @@ class AccountDeleteIntegrationTest {
                 new AccountDeleteTransaction()
                     .setAccountId(accountId)
                     .setTransferAccountId(operatorId)
-                    .setTransactionId(TransactionId.generate(accountId))
                     .execute(client)
                     .getReceipt(client);
             });

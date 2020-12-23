@@ -288,8 +288,6 @@ class TokenDissociateIntegrationTest {
                 .execute(client)
                 .getReceipt(client);
 
-            System.out.println(error.getMessage());
-
             assertTrue(error.getMessage().contains(Status.TOKEN_NOT_ASSOCIATED_TO_ACCOUNT.toString()));
 
             client.close();
