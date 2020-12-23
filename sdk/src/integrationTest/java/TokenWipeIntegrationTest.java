@@ -1,4 +1,5 @@
 import com.hedera.hashgraph.sdk.*;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -6,56 +7,50 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TokenWipeIntegrationTest {
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(System.getProperty("OPERATOR_ID")));
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(System.getProperty("OPERATOR_KEY")));
-
     @Test
-    void test() {
+    @DisplayName("Can wipe accounts balance")
+    void canWipeAccountsBalance() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
-            PrivateKey key = PrivateKey.generate();
+            var key = PrivateKey.generate();
 
-            TransactionResponse response = new AccountCreateTransaction()
+            var response = new AccountCreateTransaction()
                 .setKey(key)
                 .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
                 .execute(client);
 
-            AccountId accountId = response.getReceipt(client).accountId;
-            assertNotNull(accountId);
+            var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
 
-            response = new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .setDecimals(3)
-                .setInitialSupply(1000000)
-                .setTreasuryAccountId(OPERATOR_ID)
-                .setAdminKey(OPERATOR_KEY.getPublicKey())
-                .setFreezeKey(OPERATOR_KEY.getPublicKey())
-                .setWipeKey(OPERATOR_KEY.getPublicKey())
-                .setKycKey(OPERATOR_KEY.getPublicKey())
-                .setSupplyKey(OPERATOR_KEY.getPublicKey())
-                .setFreezeDefault(false)
-                .execute(client);
-
-            TokenId tokenId = response.getReceipt(client).tokenId;
-            assertNotNull(tokenId);
+            var tokenId = Objects.requireNonNull(
+                new TokenCreateTransaction()
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setDecimals(3)
+                    .setInitialSupply(1000000)
+                    .setTreasuryAccountId(operatorId)
+                    .setAdminKey(operatorKey)
+                    .setFreezeKey(operatorKey)
+                    .setWipeKey(operatorKey)
+                    .setKycKey(operatorKey)
+                    .setSupplyKey(operatorKey)
+                    .setFreezeDefault(false)
+                    .execute(client)
+                    .getReceipt(client)
+                    .tokenId
+            );
 
             new TokenAssociateTransaction()
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setAccountId(accountId)
-                .setTokenIds(tokenId)
+                .setTokenIds(Collections.singletonList(tokenId))
                 .freezeWith(client)
-                .sign(OPERATOR_KEY)
                 .sign(key)
                 .execute(client)
                 .getReceipt(client);
@@ -69,7 +64,7 @@ class TokenWipeIntegrationTest {
 
             new TransferTransaction()
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .addTokenTransfer(tokenId, OPERATOR_ID, -10)
+                .addTokenTransfer(tokenId, operatorId, -10)
                 .addTokenTransfer(tokenId, accountId, 10)
                 .execute(client)
                 .getReceipt(client);
@@ -84,12 +79,233 @@ class TokenWipeIntegrationTest {
 
             new AccountDeleteTransaction()
                 .setAccountId(accountId)
-                .setTransferAccountId(OPERATOR_ID)
+                .setTransferAccountId(operatorId)
                 .freezeWith(client)
-                .sign(OPERATOR_KEY)
                 .sign(key)
                 .execute(client)
                 .getReceipt(client);
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Cannot wipe accounts balance when account ID is not set")
+    void cannotWipeAccountsBalanceWhenAccountIDIsNotSet() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+
+            var key = PrivateKey.generate();
+
+            var response = new AccountCreateTransaction()
+                .setKey(key)
+                .setMaxTransactionFee(new Hbar(2))
+                .setInitialBalance(new Hbar(1))
+                .execute(client);
+
+            var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
+
+            var tokenId = Objects.requireNonNull(
+                new TokenCreateTransaction()
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setDecimals(3)
+                    .setInitialSupply(1000000)
+                    .setTreasuryAccountId(operatorId)
+                    .setAdminKey(operatorKey)
+                    .setFreezeKey(operatorKey)
+                    .setWipeKey(operatorKey)
+                    .setKycKey(operatorKey)
+                    .setSupplyKey(operatorKey)
+                    .setFreezeDefault(false)
+                    .execute(client)
+                    .getReceipt(client)
+                    .tokenId
+            );
+
+            new TokenAssociateTransaction()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setAccountId(accountId)
+                .setTokenIds(Collections.singletonList(tokenId))
+                .freezeWith(client)
+                .sign(key)
+                .execute(client)
+                .getReceipt(client);
+
+            new TokenGrantKycTransaction()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setAccountId(accountId)
+                .setTokenId(tokenId)
+                .execute(client)
+                .getReceipt(client);
+
+            new TransferTransaction()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .addTokenTransfer(tokenId, operatorId, -10)
+                .addTokenTransfer(tokenId, accountId, 10)
+                .execute(client)
+                .getReceipt(client);
+
+            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+                new TokenWipeTransaction()
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                    .setTokenId(tokenId)
+                    .setAmount(10)
+                    .execute(client)
+                    .getReceipt(client);
+            });
+
+            assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Cannot wipe accounts balance when token ID is not set")
+    void cannotWipeAccountsBalanceWhenTokenIDIsNotSet() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+
+            var key = PrivateKey.generate();
+
+            var response = new AccountCreateTransaction()
+                .setKey(key)
+                .setMaxTransactionFee(new Hbar(2))
+                .setInitialBalance(new Hbar(1))
+                .execute(client);
+
+            var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
+
+            var tokenId = Objects.requireNonNull(
+                new TokenCreateTransaction()
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setDecimals(3)
+                    .setInitialSupply(1000000)
+                    .setTreasuryAccountId(operatorId)
+                    .setAdminKey(operatorKey)
+                    .setFreezeKey(operatorKey)
+                    .setWipeKey(operatorKey)
+                    .setKycKey(operatorKey)
+                    .setSupplyKey(operatorKey)
+                    .setFreezeDefault(false)
+                    .execute(client)
+                    .getReceipt(client)
+                    .tokenId
+            );
+
+            new TokenAssociateTransaction()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setAccountId(accountId)
+                .setTokenIds(Collections.singletonList(tokenId))
+                .freezeWith(client)
+                .sign(key)
+                .execute(client)
+                .getReceipt(client);
+
+            new TokenGrantKycTransaction()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setAccountId(accountId)
+                .setTokenId(tokenId)
+                .execute(client)
+                .getReceipt(client);
+
+            new TransferTransaction()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .addTokenTransfer(tokenId, operatorId, -10)
+                .addTokenTransfer(tokenId, accountId, 10)
+                .execute(client)
+                .getReceipt(client);
+
+            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+                new TokenWipeTransaction()
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                    .setAccountId(accountId)
+                    .setAmount(10)
+                    .execute(client)
+                    .getReceipt(client);
+            });
+
+            assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_ID.toString()));
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Cannot wipe accounts balance when amount is not set")
+    void cannotWipeAccountsBalanceWhenAmountIsNotSet() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+
+            var key = PrivateKey.generate();
+
+            var response = new AccountCreateTransaction()
+                .setKey(key)
+                .setMaxTransactionFee(new Hbar(2))
+                .setInitialBalance(new Hbar(1))
+                .execute(client);
+
+            var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
+
+            var tokenId = Objects.requireNonNull(
+                new TokenCreateTransaction()
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setDecimals(3)
+                    .setInitialSupply(1000000)
+                    .setTreasuryAccountId(operatorId)
+                    .setAdminKey(operatorKey)
+                    .setFreezeKey(operatorKey)
+                    .setWipeKey(operatorKey)
+                    .setKycKey(operatorKey)
+                    .setSupplyKey(operatorKey)
+                    .setFreezeDefault(false)
+                    .execute(client)
+                    .getReceipt(client)
+                    .tokenId
+            );
+
+            new TokenAssociateTransaction()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setAccountId(accountId)
+                .setTokenIds(Collections.singletonList(tokenId))
+                .freezeWith(client)
+                .sign(key)
+                .execute(client)
+                .getReceipt(client);
+
+            new TokenGrantKycTransaction()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setAccountId(accountId)
+                .setTokenId(tokenId)
+                .execute(client)
+                .getReceipt(client);
+
+            new TransferTransaction()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .addTokenTransfer(tokenId, operatorId, -10)
+                .addTokenTransfer(tokenId, accountId, 10)
+                .execute(client)
+                .getReceipt(client);
+
+            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+                new TokenWipeTransaction()
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                    .setTokenId(tokenId)
+                    .setAccountId(accountId)
+                    .execute(client)
+                    .getReceipt(client);
+            });
+
+            assertTrue(error.getMessage().contains(Status.INVALID_WIPING_AMOUNT.toString()));
 
             client.close();
         });

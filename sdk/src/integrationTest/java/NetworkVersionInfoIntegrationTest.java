@@ -1,33 +1,23 @@
 import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
 import com.hedera.hashgraph.sdk.NetworkVersionInfoQuery;
 import com.hedera.hashgraph.sdk.Status;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class NetworkVersionInfoIntegrationTest {
     @Test
-    void test() {
+    @DisplayName("Cannot query network version info")
+    void cannotQueryNetworkVersionInfo() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 
-            try {
+            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
                 new NetworkVersionInfoQuery().execute(client);
-            } catch (HederaPreCheckStatusException e) {
-                assertEquals(e.status, Status.NOT_SUPPORTED);
-            }
+            });
 
-//            NetworkVersionInfo version = new NetworkVersionInfoQuery()
-//                .execute(client);
-//
-//            assertEquals(version.hapiProtoVersion.major, 0);
-//            assertEquals(version.hapiProtoVersion.minor, 0);
-//            assertEquals(version.hapiProtoVersion.patch, 0);
-//
-//            assertEquals(version.hederaServicesVersion.major, 0);
-//            assertEquals(version.hederaServicesVersion.minor, 0);
-//            assertEquals(version.hederaServicesVersion.patch, 0);
+            assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
 
             client.close();
         });

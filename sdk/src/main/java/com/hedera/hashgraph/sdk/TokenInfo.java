@@ -97,11 +97,13 @@ public class TokenInfo {
     /**
      *
      */
+    @Nullable
     public final Duration autoRenewPeriod;
 
     /**
      *
      */
+    @Nullable
     public final Instant expirationTime;
 
     private TokenInfo(
@@ -119,9 +121,9 @@ public class TokenInfo {
         @Nullable Boolean defaultFreezeStatus,
         @Nullable Boolean defaultKycStatus,
         boolean isDeleted,
-        AccountId autoRenewAccount,
-        Duration autoRenewPeriod,
-        Instant expirationTime
+        @Nullable AccountId autoRenewAccount,
+        @Nullable Duration autoRenewPeriod,
+        @Nullable Instant expirationTime
     ) {
         this.tokenId = tokenId;
         this.name = name;
@@ -142,11 +144,13 @@ public class TokenInfo {
         this.expirationTime = expirationTime;
     }
 
-    @Nullable static Boolean freezeStatusFromProtobuf(TokenFreezeStatus freezeStatus) {
+    @Nullable
+    static Boolean freezeStatusFromProtobuf(TokenFreezeStatus freezeStatus) {
         return freezeStatus == TokenFreezeStatus.FreezeNotApplicable ? null : freezeStatus == TokenFreezeStatus.Frozen;
     }
 
-    @Nullable static Boolean kycStatusFromProtobuf(TokenKycStatus kycStatus) {
+    @Nullable
+    static Boolean kycStatusFromProtobuf(TokenKycStatus kycStatus) {
         return kycStatus == TokenKycStatus.KycNotApplicable ? null : kycStatus == TokenKycStatus.Granted;
     }
 
@@ -168,9 +172,9 @@ public class TokenInfo {
             freezeStatusFromProtobuf(info.getDefaultFreezeStatus()),
             kycStatusFromProtobuf(info.getDefaultKycStatus()),
             info.getDeleted(),
-            AccountId.fromProtobuf(info.getAutoRenewAccount()),
-            DurationConverter.fromProtobuf(info.getAutoRenewPeriod()),
-            InstantConverter.fromProtobuf(info.getExpiry())
+            info.hasAutoRenewAccount() ? AccountId.fromProtobuf(info.getAutoRenewAccount()) : null,
+            info.hasAutoRenewPeriod() ? DurationConverter.fromProtobuf(info.getAutoRenewPeriod()) : null,
+            info.hasExpiry() ? InstantConverter.fromProtobuf(info.getExpiry()) : null
         );
     }
 
@@ -178,34 +182,36 @@ public class TokenInfo {
         return fromProtobuf(TokenGetInfoResponse.parseFrom(bytes).toBuilder().build());
     }
 
-    @Nullable static TokenFreezeStatus freezeStatusToProtobuf(@Nullable Boolean freezeStatus) {
+    @Nullable
+    static TokenFreezeStatus freezeStatusToProtobuf(@Nullable Boolean freezeStatus) {
         return freezeStatus == null ? TokenFreezeStatus.FreezeNotApplicable : freezeStatus ? TokenFreezeStatus.Frozen : TokenFreezeStatus.Unfrozen;
     }
 
-    @Nullable static TokenKycStatus kycStatusToProtobuf(@Nullable Boolean kycStatus) {
+    @Nullable
+    static TokenKycStatus kycStatusToProtobuf(@Nullable Boolean kycStatus) {
         return kycStatus == null ? TokenKycStatus.KycNotApplicable : kycStatus ? TokenKycStatus.Granted : TokenKycStatus.Revoked;
     }
 
     TokenGetInfoResponse toProtobuf() {
         return TokenGetInfoResponse.newBuilder().setTokenInfo(
             com.hedera.hashgraph.sdk.proto.TokenInfo.newBuilder()
-            .setTokenId(tokenId.toProtobuf())
-            .setName(name)
-            .setSymbol(symbol)
-            .setDecimals(decimals)
-            .setTotalSupply(totalSupply)
-            .setTreasury(treasuryAccountId.toProtobuf())
-            .setAdminKey(adminKey.toProtobufKey())
-            .setKycKey(kycKey.toProtobufKey())
-            .setFreezeKey(freezeKey.toProtobufKey())
-            .setWipeKey(wipeKey.toProtobufKey())
-            .setSupplyKey(supplyKey.toProtobufKey())
-            .setDefaultFreezeStatus(freezeStatusToProtobuf(defaultFreezeStatus))
-            .setDefaultKycStatus(kycStatusToProtobuf(defaultKycStatus))
-            .setDeleted(isDeleted)
-            .setAutoRenewAccount(autoRenewAccount != null ? autoRenewAccount.toProtobuf() : null)
-            .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod))
-            .setExpiry(InstantConverter.toProtobuf(expirationTime))
+                .setTokenId(tokenId.toProtobuf())
+                .setName(name)
+                .setSymbol(symbol)
+                .setDecimals(decimals)
+                .setTotalSupply(totalSupply)
+                .setTreasury(treasuryAccountId.toProtobuf())
+                .setAdminKey(adminKey != null ? adminKey.toProtobufKey() : null)
+                .setKycKey(kycKey != null ? kycKey.toProtobufKey() : null)
+                .setFreezeKey(freezeKey != null ? freezeKey.toProtobufKey() : null)
+                .setWipeKey(wipeKey != null ? wipeKey.toProtobufKey() : null)
+                .setSupplyKey(supplyKey != null ? supplyKey.toProtobufKey() : null)
+                .setDefaultFreezeStatus(freezeStatusToProtobuf(defaultFreezeStatus))
+                .setDefaultKycStatus(kycStatusToProtobuf(defaultKycStatus))
+                .setDeleted(isDeleted)
+                .setAutoRenewAccount(autoRenewAccount != null ? autoRenewAccount.toProtobuf() : null)
+                .setAutoRenewPeriod(autoRenewPeriod != null ? DurationConverter.toProtobuf(autoRenewPeriod) : null)
+                .setExpiry(expirationTime != null ? InstantConverter.toProtobuf(expirationTime) : null)
         ).build();
     }
 

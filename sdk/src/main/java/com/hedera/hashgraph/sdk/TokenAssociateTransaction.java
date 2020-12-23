@@ -44,7 +44,7 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
         return list;
     }
 
-    public TokenAssociateTransaction setTokenIds(TokenId... tokens) {
+    public TokenAssociateTransaction setTokenIds(List<TokenId> tokens) {
         requireNotFrozen();
         builder.clearTokens();
 

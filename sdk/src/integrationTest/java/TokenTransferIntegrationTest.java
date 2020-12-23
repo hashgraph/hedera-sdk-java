@@ -53,7 +53,7 @@ class TokenTransferIntegrationTest {
             new TokenAssociateTransaction()
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setAccountId(accountId)
-                .setTokenIds(tokenId)
+                .setTokenIds(Collections.singletonList(tokenId))
                 .freezeWith(client)
                 .sign(OPERATOR_KEY)
                 .sign(key)

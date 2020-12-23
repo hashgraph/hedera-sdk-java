@@ -1,45 +1,51 @@
-import com.hedera.hashgraph.sdk.ContractId;
-import com.hedera.hashgraph.sdk.FileId;
-import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
-import com.hedera.hashgraph.sdk.SystemDeleteTransaction;
-import com.hedera.hashgraph.sdk.SystemUndeleteTransaction;
+import com.google.errorprone.annotations.Var;
+import com.hedera.hashgraph.sdk.*;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Instant;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SystemIntegrationTest {
     @Test
-    void system() {
+    @DisplayName("All system transactions are not supported")
+    void allSystemTransactionsAreNotSupported() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 
-            assertThrows(HederaPreCheckStatusException.class, () -> {
+            @Var var error = assertThrows(HederaPreCheckStatusException.class, () -> {
                 new SystemDeleteTransaction()
                     .setContractId(new ContractId(10))
                     .setExpirationTime(Instant.now())
                     .execute(client);
             });
 
-            assertThrows(HederaPreCheckStatusException.class, () -> {
+            assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
+
+            error = assertThrows(HederaPreCheckStatusException.class, () -> {
                 new SystemDeleteTransaction()
                     .setFileId(new FileId(10))
                     .setExpirationTime(Instant.now())
                     .execute(client);
             });
 
-            assertThrows(HederaPreCheckStatusException.class, () -> {
+            assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
+
+            error = assertThrows(HederaPreCheckStatusException.class, () -> {
                 new SystemUndeleteTransaction()
                     .setContractId(new ContractId(10))
                     .execute(client);
             });
 
-            assertThrows(HederaPreCheckStatusException.class, () -> {
+            assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
+
+            error = assertThrows(HederaPreCheckStatusException.class, () -> {
                 new SystemUndeleteTransaction()
                     .setFileId(new FileId(10))
                     .execute(client);
             });
+
+            assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
 
             client.close();
         });
