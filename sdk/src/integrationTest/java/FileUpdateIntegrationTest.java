@@ -1,57 +1,43 @@
 import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.FileDeleteTransaction;
-import com.hedera.hashgraph.sdk.FileInfoQuery;
-import com.hedera.hashgraph.sdk.FileUpdateTransaction;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.KeyList;
+import com.hedera.hashgraph.sdk.*;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class FileUpdateIntegrationTest {
     @Test
-    void test() {
+    @DisplayName("Can update file")
+    void canUpdateFile() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
-            var operatorKey = client.getOperatorPublicKey();
-            assertNotNull(operatorKey);
+            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
             var response = new FileCreateTransaction()
                 .setKeys(operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
-                .setMaxTransactionFee(new Hbar(5))
                 .execute(client);
 
-            var receipt = response.getReceipt(client);
-
-            assertNotNull(receipt.fileId);
-            assertTrue(Objects.requireNonNull(receipt.fileId).num > 0);
-
-            var file = receipt.fileId;
+            var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
 
             @Var var info = new FileInfoQuery()
-                .setFileId(file)
+                .setFileId(fileId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setQueryPayment(new Hbar(22))
                 .execute(client);
 
-            assertEquals(info.fileId, file);
+            assertEquals(info.fileId, fileId);
             assertEquals(info.size, 28);
             assertFalse(info.isDeleted);
+            assertNotNull(info.keys);
             assertNotNull(info.keys.getThreshold());
-            var testKey = KeyList.of(Objects.requireNonNull(operatorKey)).setThreshold(info.keys.getThreshold());
-            assertEquals(info.keys.toString(), testKey.toString());
+            assertEquals(info.keys, KeyList.of(operatorKey).setThreshold(info.keys.getThreshold()));
 
             new FileUpdateTransaction()
-                .setFileId(file)
+                .setFileId(fileId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setContents("[e2e::FileUpdateTransaction]")
                 .setMaxTransactionFee(new Hbar(5))
@@ -59,24 +45,80 @@ public class FileUpdateIntegrationTest {
                 .getReceipt(client);
 
             info = new FileInfoQuery()
-                .setFileId(file)
+                .setFileId(fileId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setQueryPayment(new Hbar(1))
                 .execute(client);
 
-            assertEquals(info.fileId, file);
+            assertEquals(info.fileId, fileId);
             assertEquals(info.size, 28);
             assertFalse(info.isDeleted);
+            assertNotNull(info.keys);
             assertNotNull(info.keys.getThreshold());
-            testKey.setThreshold(info.keys.getThreshold());
-            assertEquals(info.keys.toString(), testKey.toString());
+            assertEquals(info.keys, KeyList.of(operatorKey).setThreshold(info.keys.getThreshold()));
 
             new FileDeleteTransaction()
-                .setFileId(file)
+                .setFileId(fileId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
                 .getReceipt(client);
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Cannot update immutable file")
+    void cannotUpdateImmutableFile() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+
+            var response = new FileCreateTransaction()
+                .setContents("[e2e::FileCreateTransaction]")
+                .execute(client);
+
+            var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
+
+            var info = new FileInfoQuery()
+                .setFileId(fileId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setQueryPayment(new Hbar(22))
+                .execute(client);
+
+            assertEquals(info.fileId, fileId);
+            assertEquals(info.size, 28);
+            assertFalse(info.isDeleted);
+            assertNull(info.keys);
+
+            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+                new FileUpdateTransaction()
+                    .setFileId(fileId)
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                    .setContents("[e2e::FileUpdateTransaction]")
+                    .execute(client)
+                    .getReceipt(client);
+            });
+
+            assertTrue(error.getMessage().contains(Status.UNAUTHORIZED.toString()));
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Cannot update file when file ID is not set")
+    void cannotUpdateFileWhenFileIDIsNotSet() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+
+            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+                new FileUpdateTransaction()
+                    .setContents("[e2e::FileUpdateTransaction]")
+                    .execute(client)
+                    .getReceipt(client);
+            });
+
+            assertTrue(error.getMessage().contains(Status.INVALID_FILE_ID.toString()));
 
             client.close();
         });

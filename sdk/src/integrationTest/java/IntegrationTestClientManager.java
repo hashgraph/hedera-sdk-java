@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class IntegrationTestClientManager {
     IntegrationTestClientManager() {
-
     }
 
     public static Client getClient() {

@@ -18,19 +18,11 @@ import java.util.*;
  * (See {@link FileCreateTransaction#setKeys(Key...)} for more information.)
  */
 public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTransaction> {
-    private static final int CHUNK_SIZE = 4096;
-
     private final FileAppendTransactionBody.Builder builder;
 
-    /**
-     * Maximum number of chunks this message will get broken up into when
-     * its frozen.
-     */
-    private int maxChunks = 10;
-
-    private ByteString contents;
-
     public FileAppendTransaction() {
+        super();
+
         builder = FileAppendTransactionBody.newBuilder();
     }
 
@@ -40,7 +32,7 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
         builder = bodyBuilder.getFileAppend().toBuilder();
 
         for (var i = 0; i < signedTransactions.size(); i += nodeAccountIds.size()) {
-            contents = contents.concat(
+            data = data.concat(
                 TransactionBody.parseFrom(signedTransactions.get(i).getBodyBytes())
                     .getFileAppend().getContents()
             );
@@ -66,7 +58,7 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
 
     @Nullable
     public ByteString getContents() {
-        return contents;
+        return getData();
     }
 
     /**
@@ -84,10 +76,27 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
      * @see #setContents(String) for an overload which takes {@link String}.
      */
     public FileAppendTransaction setContents(byte[] contents) {
-        requireNotFrozen();
-        this.contents = ByteString.copyFrom(contents);
-        return this;
+        return setData(contents);
     }
+
+    /**
+     * <p>Set the contents to append to the file as identified by {@link #setFileId(FileId)}.
+     *
+     * <p>Note that total size for a given transaction is limited to 6KiB (as of March 2020) by the
+     * network; if you exceed this you may receive a {@link com.hedera.hashgraph.sdk.HederaPreCheckStatusException}
+     * with {@link com.hedera.hashgraph.sdk.Status#TRANSACTION_OVERSIZE}.
+     *
+     * <p>If you want to append more than ~6KiB of data, you will need to break it into multiple chunks
+     * and use a separate {@link FileAppendTransaction} for each.
+     *
+     * @param contents the contents to append to the file.
+     * @return {@code this}
+     * @see #setContents(String) for an overload which takes {@link String}.
+     */
+    public FileAppendTransaction setContents(ByteString contents) {
+        return setData(contents);
+    }
+
 
     /**
      * <p>Encode the given {@link String} as UTF-8 and append it to file as identified by
@@ -110,15 +119,7 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
      * @see #setContents(byte[]) for appending arbitrary data.
      */
     public FileAppendTransaction setContents(String text) {
-        requireNotFrozen();
-        this.contents = ByteString.copyFromUtf8(text);
-        return this;
-    }
-
-    public FileAppendTransaction setMaxChunks(int maxChunks) {
-        requireNotFrozen();
-        this.maxChunks = maxChunks;
-        return this;
+        return setData(text);
     }
 
     @Override
@@ -127,64 +128,12 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
     }
 
     @Override
-    public FileAppendTransaction freezeWith(@Nullable Client client) {
-        super.freezeWith(client);
+    void onFreezeChunk(TransactionBody.Builder body, TransactionID initialTransactionId, int startIndex, int endIndex, int chunk, int total) {
+        body.setFileAppend(builder.setContents(data.substring(startIndex, endIndex)));
+    }
 
-        var initialTransactionId = Objects.requireNonNull(transactionIds.get(0)).toProtobuf();
-        var requiredChunks = (this.contents.size() + (CHUNK_SIZE - 1)) / CHUNK_SIZE;
-
-        if (requiredChunks > maxChunks) {
-            throw new IllegalArgumentException(
-                "message of " + this.contents.size() + " bytes requires " + requiredChunks
-                    + " chunks but the maximum allowed chunks is " + maxChunks + ", try using setMaxChunks");
-        }
-
-        signatures = new ArrayList<>(requiredChunks * nodeAccountIds.size());
-        transactions = new ArrayList<>(requiredChunks * nodeAccountIds.size());
-        signedTransactions = new ArrayList<>(requiredChunks * nodeAccountIds.size());
-        transactionIds = new ArrayList<>(requiredChunks);
-
-        @Var var nextTransactionId = initialTransactionId.toBuilder();
-
-        for (int i = 0; i < requiredChunks; i++) {
-            @Var var startIndex = i * CHUNK_SIZE;
-            @Var var endIndex = startIndex + CHUNK_SIZE;
-
-            if (endIndex > this.contents.size()) {
-                endIndex = this.contents.size();
-            }
-
-            transactionIds.add(TransactionId.fromProtobuf(nextTransactionId.build()));
-
-            bodyBuilder
-                .setTransactionID(nextTransactionId.build())
-                .setFileAppend(
-                    builder
-                        .setContents(contents.substring(startIndex, endIndex))
-                        .build()
-                );
-
-            // For each node we add a transaction with that node
-            for (var nodeId : nodeAccountIds) {
-                signatures.add(SignatureMap.newBuilder());
-                signedTransactions.add(com.hedera.hashgraph.sdk.proto.SignedTransaction.newBuilder()
-                    .setBodyBytes(
-                        bodyBuilder
-                            .setNodeAccountID(nodeId.toProtobuf())
-                            .build()
-                            .toByteString()
-                    )
-                );
-            }
-
-            // add 1 ns to the validStart to make cascading transaction IDs
-            var nextValidStart = nextTransactionId.getTransactionValidStart().toBuilder();
-            nextValidStart.setNanos(nextValidStart.getNanos() + 1);
-
-            nextTransactionId.setTransactionValidStart(nextValidStart);
-        }
-
-        return this;
+    boolean shouldGetReceipt() {
+        return true;
     }
 
     @Override
