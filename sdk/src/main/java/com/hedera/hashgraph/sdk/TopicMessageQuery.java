@@ -10,15 +10,20 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
+import java8.util.function.BiConsumer;
 import java8.util.function.Consumer;
 import org.threeten.bp.Instant;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
 public final class TopicMessageQuery {
     private final ConsensusTopicQuery.Builder builder;
+
+    @Nullable
+    private BiConsumer<Throwable, TopicMessage> errorHandler;
 
     public TopicMessageQuery() {
         builder = ConsensusTopicQuery.newBuilder();
@@ -44,6 +49,11 @@ public final class TopicMessageQuery {
         return this;
     }
 
+    public TopicMessageQuery setErrorHandler(BiConsumer<Throwable, TopicMessage> errorHandler) {
+        this.errorHandler = errorHandler;
+        return this;
+    }
+
     // TODO: Refactor into a base class when we add more mirror query types
     public SubscriptionHandle subscribe(
         Client client,
@@ -51,7 +61,7 @@ public final class TopicMessageQuery {
     ) {
         SubscriptionHandle subscriptionHandle = new SubscriptionHandle();
 
-        makeStreamingCall(client, subscriptionHandle, builder.build(), onNext, 0, new Instant[]{null});
+        makeStreamingCall(client, subscriptionHandle, errorHandler, builder.build(), onNext, 0, new Instant[]{null});
 
         return subscriptionHandle;
     }
@@ -59,6 +69,7 @@ public final class TopicMessageQuery {
     private static void makeStreamingCall(
         Client client,
         SubscriptionHandle subscriptionHandle,
+        @Nullable BiConsumer<Throwable, TopicMessage> errorHandler,
         ConsensusTopicQuery query,
         Consumer<TopicMessage> onNext,
         int attempt,
@@ -66,7 +77,10 @@ public final class TopicMessageQuery {
         Instant[] startTime
     ) {
         if (attempt > 10) {
-            throw new Error("Failed to connect to mirror node");
+            if (errorHandler != null) {
+                errorHandler.accept(new Error("Failed to connect to mirror node"), null);
+                return;
+            }
         }
 
         ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call =
@@ -84,7 +98,13 @@ public final class TopicMessageQuery {
                     // short circuit for no chunks
                     var message = TopicMessage.ofSingle(consensusTopicResponse);
                     startTime[0] = message.consensusTimestamp;
-                    onNext.accept(message);
+                    try {
+                        onNext.accept(message);
+                    } catch (Throwable e) {
+                        if (errorHandler != null) {
+                            errorHandler.accept(e, message);
+                        }
+                    }
                     return;
                 }
 
@@ -106,22 +126,28 @@ public final class TopicMessageQuery {
                 if (chunks.size() == consensusTopicResponse.getChunkInfo().getTotal()) {
                     var message = TopicMessage.ofMany(chunks);
                     startTime[0] = message.consensusTimestamp;
-                    onNext.accept(message);
+                    try {
+                        onNext.accept(message);
+                    } catch (Throwable e) {
+                        if (errorHandler != null) {
+                            errorHandler.accept(e, null);
+                        }
+                    }
                 }
             }
 
             @Override
             public void onError(Throwable t) {
                 if (t instanceof StatusRuntimeException) {
-                    var status = (StatusRuntimeException)t;
+                    var status = (StatusRuntimeException) t;
 
                     if (
                         status.getStatus().getCode().equals(Status.NOT_FOUND.getCode()) ||
-                        status.getStatus().getCode().equals(Status.UNAVAILABLE.getCode())
+                            status.getStatus().getCode().equals(Status.UNAVAILABLE.getCode())
                     ) {
                         // Cannot use `CompletableFuture<U>` here since this future is never polled
                         try {
-                            Thread.sleep(250 * (long)Math.pow(2, attempt));
+                            Thread.sleep(250 * (long) Math.pow(2, attempt));
                         } catch (InterruptedException e) {
                             // Do nothing
                         }
@@ -131,8 +157,10 @@ public final class TopicMessageQuery {
                         }
 
                         call.cancel("unsubscribed", null);
-                        makeStreamingCall(client, subscriptionHandle, query, onNext, attempt + 1, startTime);
+                        makeStreamingCall(client, subscriptionHandle, errorHandler, query, onNext, attempt + 1, startTime);
                     }
+                } else if (errorHandler != null) {
+                    errorHandler.accept(t, null);
                 }
             }
 
