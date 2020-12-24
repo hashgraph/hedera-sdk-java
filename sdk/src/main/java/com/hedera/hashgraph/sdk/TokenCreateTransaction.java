@@ -9,6 +9,7 @@ import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
+import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 
 public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> {
@@ -18,7 +19,6 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         builder = TokenCreateTransactionBody.newBuilder();
 
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
-        setExpirationTime(Instant.now().plus(Duration.ofDays(90)));
         setMaxTransactionFee(new Hbar(30));
     }
 
@@ -146,6 +146,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
 
     public TokenCreateTransaction setExpirationTime(Instant expirationTime) {
         requireNotFrozen();
+        builder.clearAutoRenewPeriod();
         builder.setExpiry(InstantConverter.toProtobuf(expirationTime));
         return this;
     }
@@ -168,6 +169,19 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         requireNotFrozen();
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(period));
         return this;
+    }
+
+    public TokenCreateTransaction freezeWith(@Nullable Client client) {
+        if (
+            builder.hasAutoRenewPeriod() &&
+                !builder.hasAutoRenewAccount() &&
+                client != null &&
+                client.getOperatorAccountId() != null
+        ) {
+            builder.setAutoRenewAccount(client.getOperatorAccountId().toProtobuf());
+        }
+
+        return super.freezeWith(client);
     }
 
     @Override
