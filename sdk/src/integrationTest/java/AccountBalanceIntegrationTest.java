@@ -69,7 +69,7 @@ class AccountBalanceIntegrationTest {
                 .setAccountId(operatorId)
                 .execute(client);
 
-            assertTrue(balance.token.get(tokenId) > 0);
+            assertEquals(balance.token.get(tokenId), 10000);
 
             new TokenDeleteTransaction()
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))

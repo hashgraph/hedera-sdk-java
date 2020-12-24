@@ -67,6 +67,8 @@ public final class TransactionReceipt {
     @Nullable
     public final ByteString topicRunningHash;
 
+    public final Long totalSupply;
+
     private TransactionReceipt(
         Status status,
         ExchangeRate exchangeRate,
@@ -76,7 +78,8 @@ public final class TransactionReceipt {
         @Nullable TopicId topicId,
         @Nullable TokenId tokenId,
         @Nullable Long topicSequenceNumber,
-        @Nullable ByteString topicRunningHash
+        @Nullable ByteString topicRunningHash,
+        Long totalSupply
     ) {
         this.status = status;
         this.exchangeRate = exchangeRate;
@@ -87,6 +90,7 @@ public final class TransactionReceipt {
         this.tokenId = tokenId;
         this.topicSequenceNumber = topicSequenceNumber;
         this.topicRunningHash = topicRunningHash;
+        this.totalSupply = totalSupply;
     }
 
     static TransactionReceipt fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionReceipt transactionReceipt) {
@@ -130,6 +134,8 @@ public final class TransactionReceipt {
                 ? null
                 : transactionReceipt.getTopicRunningHash();
 
+        var totalSupply = transactionReceipt.getNewTotalSupply();
+
         return new TransactionReceipt(
             status,
             exchangeRate,
@@ -139,7 +145,8 @@ public final class TransactionReceipt {
             topicId,
             tokenId,
             topicSequenceNumber,
-            topicRunningHash
+            topicRunningHash,
+            totalSupply
         );
     }
 
@@ -158,7 +165,8 @@ public final class TransactionReceipt {
                         .setSeconds(exchangeRate.expirationTime.getEpochSecond())
                     )
                 )
-            );
+            )
+            .setNewTotalSupply(totalSupply);
 
         if (accountId != null) {
             transactionReceiptBuilder.setAccountID(accountId.toProtobuf());
@@ -203,6 +211,7 @@ public final class TransactionReceipt {
             .add("tokenId", tokenId)
             .add("topicSequenceNumber", topicSequenceNumber)
             .add("topicRunningHash", topicRunningHash)
+            .add("totalSupply", totalSupply)
             .toString();
     }
 

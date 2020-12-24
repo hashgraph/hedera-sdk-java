@@ -44,12 +44,14 @@ class TokenMintIntegrationTest {
                     .tokenId
             );
 
-            new TokenMintTransaction()
+            var receipt = new TokenMintTransaction()
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setAmount(10)
                 .setTokenId(tokenId)
                 .execute(client)
                 .getReceipt(client);
+
+            assertEquals(receipt.totalSupply, 1000000 + 10);
 
             new TokenDeleteTransaction()
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
