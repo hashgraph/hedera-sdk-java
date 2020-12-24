@@ -22,7 +22,6 @@ class TokenWipeIntegrationTest {
 
             var response = new AccountCreateTransaction()
                 .setKey(key)
-                .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
                 .execute(client);
 
@@ -101,7 +100,6 @@ class TokenWipeIntegrationTest {
 
             var response = new AccountCreateTransaction()
                 .setKey(key)
-                .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
                 .execute(client);
 
@@ -175,7 +173,6 @@ class TokenWipeIntegrationTest {
 
             var response = new AccountCreateTransaction()
                 .setKey(key)
-                .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
                 .execute(client);
 
@@ -249,7 +246,6 @@ class TokenWipeIntegrationTest {
 
             var response = new AccountCreateTransaction()
                 .setKey(key)
-                .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
                 .execute(client);
 

@@ -28,7 +28,6 @@ public class TopicDeleteIntegrationTest {
 
             new TopicDeleteTransaction()
                 .setTopicId(topicId)
-                .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
                 .getReceipt(client);
 

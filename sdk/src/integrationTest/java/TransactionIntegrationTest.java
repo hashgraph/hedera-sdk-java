@@ -25,7 +25,6 @@ public class TransactionIntegrationTest {
             var transaction = new AccountCreateTransaction()
                 .setKey(key)
                 .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
-                .setMaxTransactionFee(new Hbar(2))
                 .freezeWith(client)
                 .signWithOperator(client);
 
@@ -43,7 +42,6 @@ public class TransactionIntegrationTest {
             new AccountDeleteTransaction()
                 .setAccountId(accountId)
                 .setTransferAccountId(operatorId)
-                .setMaxTransactionFee(new Hbar(1))
                 .freezeWith(client)
                 .sign(key)
                 .execute(client)

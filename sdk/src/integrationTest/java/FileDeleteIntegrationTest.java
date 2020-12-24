@@ -19,7 +19,6 @@ public class FileDeleteIntegrationTest {
             var response = new FileCreateTransaction()
                 .setKeys(operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
-                .setMaxTransactionFee(new Hbar(5))
                 .execute(client);
 
             var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
@@ -40,7 +39,6 @@ public class FileDeleteIntegrationTest {
             new FileDeleteTransaction()
                 .setFileId(fileId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
                 .getReceipt(client);
 
@@ -56,7 +54,6 @@ public class FileDeleteIntegrationTest {
 
             var response = new FileCreateTransaction()
                 .setContents("[e2e::FileCreateTransaction]")
-                .setMaxTransactionFee(new Hbar(5))
                 .execute(client);
 
             var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
@@ -76,7 +73,6 @@ public class FileDeleteIntegrationTest {
                 new FileDeleteTransaction()
                     .setFileId(fileId)
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                    .setMaxTransactionFee(new Hbar(5))
                     .execute(client)
                     .getReceipt(client);
             });

@@ -26,7 +26,6 @@ public class TopicMessageIntegrationTest {
             var response = new TopicCreateTransaction()
                 .setAdminKey(operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
-                .setMaxTransactionFee(new Hbar(5))
                 .execute(client);
 
             var topicId = Objects.requireNonNull(response.getReceipt(client).topicId);
@@ -71,7 +70,6 @@ public class TopicMessageIntegrationTest {
 
             new TopicDeleteTransaction()
                 .setTopicId(topicId)
-                .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
                 .getReceipt(client);
 

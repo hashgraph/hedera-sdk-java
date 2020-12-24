@@ -23,7 +23,6 @@ class LiveHashDeleteIntegrationTest {
 
             var response = new AccountCreateTransaction()
                 .setKey(key)
-                .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
                 .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                 .execute(client);

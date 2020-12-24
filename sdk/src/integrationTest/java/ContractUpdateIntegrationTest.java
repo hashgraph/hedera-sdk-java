@@ -56,7 +56,6 @@ public class ContractUpdateIntegrationTest {
                 .setContractId(contractId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setContractMemo("[e2e::ContractUpdateTransaction]")
-                .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
                 .getReceipt(client);
 
@@ -99,7 +98,6 @@ public class ContractUpdateIntegrationTest {
             var error = assertThrows(HederaPreCheckStatusException.class, () -> {
                 new ContractUpdateTransaction()
                     .setContractMemo("[e2e::ContractUpdateTransaction]")
-                    .setMaxTransactionFee(new Hbar(5))
                     .execute(client)
                     .getReceipt(client);
             });
@@ -141,7 +139,6 @@ public class ContractUpdateIntegrationTest {
                     .setContractId(contractId)
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setContractMemo("[e2e::ContractUpdateTransaction]")
-                    .setMaxTransactionFee(new Hbar(5))
                     .execute(client)
                     .getReceipt(client);
             });

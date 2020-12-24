@@ -40,7 +40,6 @@ public class FileUpdateIntegrationTest {
                 .setFileId(fileId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setContents("[e2e::FileUpdateTransaction]")
-                .setMaxTransactionFee(new Hbar(5))
                 .execute(client)
                 .getReceipt(client);
 
