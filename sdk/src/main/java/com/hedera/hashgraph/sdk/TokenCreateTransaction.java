@@ -19,12 +19,15 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
 
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
         setExpirationTime(Instant.now().plus(Duration.ofDays(90)));
+        setMaxTransactionFee(new Hbar(30));
     }
 
     TokenCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
 
         builder = bodyBuilder.getTokenCreation().toBuilder();
+
+        setMaxTransactionFee(new Hbar(30));
     }
 
     public String getTokenName() {

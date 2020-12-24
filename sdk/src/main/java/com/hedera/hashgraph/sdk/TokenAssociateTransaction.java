@@ -18,6 +18,8 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
 
     public TokenAssociateTransaction() {
         builder = TokenAssociateTransactionBody.newBuilder();
+
+        setMaxTransactionFee(new Hbar(5));
     }
 
     TokenAssociateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {

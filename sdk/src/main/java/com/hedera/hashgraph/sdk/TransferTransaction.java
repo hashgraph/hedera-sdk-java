@@ -16,12 +16,16 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
     public TransferTransaction() {
         builder = CryptoTransferTransactionBody.newBuilder();
+
+        setMaxTransactionFee(new Hbar(1));
     }
 
     TransferTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
 
         builder = bodyBuilder.getCryptoTransfer().toBuilder();
+
+        setMaxTransactionFee(new Hbar(1));
 
         for (var transfer : bodyBuilder.getCryptoTransfer().getTransfers().getAccountAmountsList()) {
             hbarTransfers.merge(

@@ -34,8 +34,6 @@ public class IntegrationTestClientManager {
         assertNotNull(client.getOperatorAccountId());
         assertNotNull(client.getOperatorAccountId());
 
-        client.setMaxTransactionFee(new Hbar(100));
-
         return client;
     }
 }

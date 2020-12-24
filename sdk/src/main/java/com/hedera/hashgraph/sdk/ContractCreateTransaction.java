@@ -63,6 +63,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         builder = ContractCreateTransactionBody.newBuilder();
 
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
+        setMaxTransactionFee(new Hbar(20));
     }
 
     ContractCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
