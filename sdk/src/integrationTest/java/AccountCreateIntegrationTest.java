@@ -98,7 +98,7 @@ class AccountCreateIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new AccountCreateTransaction()
                     .setInitialBalance(new Hbar(1))
                     .execute(client)

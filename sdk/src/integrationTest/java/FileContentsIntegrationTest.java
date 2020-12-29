@@ -77,7 +77,7 @@ public class FileContentsIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 
-           var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+           var error = assertThrows(PrecheckStatusException.class, () -> {
                new FileContentsQuery()
                    .setQueryPayment(new Hbar(1))
                    .execute(client);

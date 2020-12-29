@@ -41,12 +41,31 @@ public final class PublicKey extends Key {
     /**
      * Verify a signature on a message with this public key.
      *
-     * @param message The array of bytes representing the message
+     * @param message   The array of bytes representing the message
      * @param signature The array of bytes representing the signature
      * @return boolean
      */
     public boolean verify(byte[] message, byte[] signature) {
         return Ed25519.verify(signature, 0, keyData, 0, message, 0, message.length);
+    }
+
+    public boolean verifyTransaction(Transaction<?> transaction) {
+        if (!transaction.isFrozen()) {
+            transaction.freeze();
+        }
+
+        for (var signedTransaction : transaction.signedTransactions) {
+            for (var sigPair : signedTransaction.getSigMap().getSigPairList()) {
+                if (
+                    sigPair.getPubKeyPrefix().equals(ByteString.copyFrom(toBytes())) &&
+                        !verify(signedTransaction.getBodyBytes().toByteArray(), sigPair.getECDSA384().toByteArray())
+                ) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     @Override

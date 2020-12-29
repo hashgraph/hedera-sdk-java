@@ -95,7 +95,7 @@ class TokenUnfreezeIntegrationTest {
 
             var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenUnfreezeTransaction()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setAccountId(accountId)
@@ -145,7 +145,7 @@ class TokenUnfreezeIntegrationTest {
 
             var tokenId = Objects.requireNonNull(response.getReceipt(client).tokenId);
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenUnfreezeTransaction()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setTokenId(tokenId)
@@ -196,7 +196,7 @@ class TokenUnfreezeIntegrationTest {
                     .tokenId
             );
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenUnfreezeTransaction()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setAccountId(accountId)

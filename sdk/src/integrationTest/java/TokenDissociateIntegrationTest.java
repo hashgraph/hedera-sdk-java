@@ -133,7 +133,7 @@ class TokenDissociateIntegrationTest {
 
             var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenDissociateTransaction()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .freezeWith(client)
@@ -192,7 +192,7 @@ class TokenDissociateIntegrationTest {
                     .tokenId
             );
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenDissociateTransaction()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setAccountId(accountId)
@@ -257,7 +257,7 @@ class TokenDissociateIntegrationTest {
                     .tokenId
             );
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenDissociateTransaction()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setAccountId(accountId)

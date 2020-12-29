@@ -81,7 +81,7 @@ class AccountUpdateIntegrationTest {
             var client = IntegrationTestClientManager.getClient();
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new AccountUpdateTransaction()
                     .execute(client)
                     .getReceipt(client);

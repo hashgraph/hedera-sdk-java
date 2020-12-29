@@ -2,8 +2,6 @@ import com.hedera.hashgraph.sdk.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.Objects;
 
@@ -146,7 +144,7 @@ class TokenWipeIntegrationTest {
                 .execute(client)
                 .getReceipt(client);
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenWipeTransaction()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setTokenId(tokenId)
@@ -219,7 +217,7 @@ class TokenWipeIntegrationTest {
                 .execute(client)
                 .getReceipt(client);
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenWipeTransaction()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setAccountId(accountId)
@@ -292,7 +290,7 @@ class TokenWipeIntegrationTest {
                 .execute(client)
                 .getReceipt(client);
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenWipeTransaction()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setTokenId(tokenId)

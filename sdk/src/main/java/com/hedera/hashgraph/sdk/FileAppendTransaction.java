@@ -1,12 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
-import java8.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -67,7 +65,7 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
      * <p>Set the contents to append to the file as identified by {@link #setFileId(FileId)}.
      *
      * <p>Note that total size for a given transaction is limited to 6KiB (as of March 2020) by the
-     * network; if you exceed this you may receive a {@link com.hedera.hashgraph.sdk.HederaPreCheckStatusException}
+     * network; if you exceed this you may receive a {@link PrecheckStatusException}
      * with {@link com.hedera.hashgraph.sdk.Status#TRANSACTION_OVERSIZE}.
      *
      * <p>If you want to append more than ~6KiB of data, you will need to break it into multiple chunks
@@ -85,7 +83,7 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
      * <p>Set the contents to append to the file as identified by {@link #setFileId(FileId)}.
      *
      * <p>Note that total size for a given transaction is limited to 6KiB (as of March 2020) by the
-     * network; if you exceed this you may receive a {@link com.hedera.hashgraph.sdk.HederaPreCheckStatusException}
+     * network; if you exceed this you may receive a {@link PrecheckStatusException}
      * with {@link com.hedera.hashgraph.sdk.Status#TRANSACTION_OVERSIZE}.
      *
      * <p>If you want to append more than ~6KiB of data, you will need to break it into multiple chunks
@@ -110,7 +108,7 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
      * {@link java.nio.charset.StandardCharsets#UTF_8}.
      *
      * <p>Note that total size for a given transaction is limited to 6KiB (as of March 2020) by the
-     * network; if you exceed this you may receive a {@link com.hedera.hashgraph.sdk.HederaPreCheckStatusException}
+     * network; if you exceed this you may receive a {@link PrecheckStatusException}
      * with {@link com.hedera.hashgraph.sdk.Status#TRANSACTION_OVERSIZE}.
      *
      * <p>If you want to append more than ~6KiB of data, you will need to break it into multiple chunks

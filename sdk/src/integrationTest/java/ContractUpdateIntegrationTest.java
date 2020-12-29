@@ -1,6 +1,5 @@
 import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.*;
-import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -95,7 +94,7 @@ public class ContractUpdateIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractUpdateTransaction()
                     .setContractMemo("[e2e::ContractUpdateTransaction]")
                     .execute(client)
@@ -134,7 +133,7 @@ public class ContractUpdateIntegrationTest {
                     .contractId
             );
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractUpdateTransaction()
                     .setContractId(contractId)
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))

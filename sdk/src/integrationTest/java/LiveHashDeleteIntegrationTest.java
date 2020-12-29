@@ -2,7 +2,6 @@ import com.hedera.hashgraph.sdk.*;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.threeten.bp.Duration;
 
 import java.util.Collections;
 import java.util.Objects;
@@ -29,7 +28,7 @@ class LiveHashDeleteIntegrationTest {
 
             var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new LiveHashDeleteTransaction()
                     .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                     .setAccountId(accountId)

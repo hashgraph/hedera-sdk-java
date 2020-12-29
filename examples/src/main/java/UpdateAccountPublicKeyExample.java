@@ -1,17 +1,8 @@
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.AccountInfo;
-import com.hedera.hashgraph.sdk.AccountInfoQuery;
-import com.hedera.hashgraph.sdk.AccountUpdateTransaction;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
-import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -27,7 +18,7 @@ public final class UpdateAccountPublicKeyExample {
     private UpdateAccountPublicKeyExample() {
     }
 
-    public static void main(String[] args) throws TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException {
+    public static void main(String[] args) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         Client client;
 
         if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {

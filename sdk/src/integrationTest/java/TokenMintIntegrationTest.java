@@ -87,7 +87,7 @@ class TokenMintIntegrationTest {
 
             var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenMintTransaction()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setAmount(10)
@@ -144,7 +144,7 @@ class TokenMintIntegrationTest {
                     .tokenId
             );
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenMintTransaction()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setTokenId(tokenId)
@@ -207,7 +207,7 @@ class TokenMintIntegrationTest {
                     .tokenId
             );
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenMintTransaction()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setTokenId(tokenId)

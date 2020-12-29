@@ -122,7 +122,7 @@ public class ContractCreateIntegrationTest {
 
             var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractCreateTransaction()
                     .setAdminKey(operatorKey)
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
@@ -159,7 +159,7 @@ public class ContractCreateIntegrationTest {
 
             var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractCreateTransaction()
                     .setAdminKey(operatorKey)
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
@@ -189,7 +189,7 @@ public class ContractCreateIntegrationTest {
             var client = IntegrationTestClientManager.getClient();
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractCreateTransaction()
                     .setAdminKey(operatorKey)
                     .setGas(2000)

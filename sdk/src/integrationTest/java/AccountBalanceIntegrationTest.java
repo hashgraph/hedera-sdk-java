@@ -32,7 +32,7 @@ class AccountBalanceIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new AccountBalanceQuery()
                     .setAccountId(AccountId.fromString("1.0.3"))
                     .execute(client);

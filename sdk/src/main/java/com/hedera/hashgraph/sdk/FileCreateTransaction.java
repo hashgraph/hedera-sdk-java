@@ -99,7 +99,7 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
      * <p>This may be omitted to create an empty file.
      *
      * <p>Note that total size for a given transaction is limited to 6KiB (as of March 2020) by the
-     * network; if you exceed this you may receive a {@link com.hedera.hashgraph.sdk.HederaPreCheckStatusException}
+     * network; if you exceed this you may receive a {@link PrecheckStatusException}
      * with {@link com.hedera.hashgraph.sdk.Status#TRANSACTION_OVERSIZE}.
      *
      * <p>In this case, you will need to break the data into chunks of less than ~6KiB and execute this
@@ -125,7 +125,7 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
      * {@link java.nio.charset.StandardCharsets#UTF_8}.
      *
      * <p>Note that total size for a given transaction is limited to 6KiB (as of March 2020) by the
-     * network; if you exceed this you may receive a {@link com.hedera.hashgraph.sdk.HederaPreCheckStatusException}
+     * network; if you exceed this you may receive a {@link PrecheckStatusException}
      * with {@link com.hedera.hashgraph.sdk.Status#TRANSACTION_OVERSIZE}.
      *
      * <p>In this case, you will need to break the data into chunks of less than ~6KiB and execute this

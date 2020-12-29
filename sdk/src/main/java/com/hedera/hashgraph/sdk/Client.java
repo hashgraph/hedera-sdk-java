@@ -274,7 +274,7 @@ public final class Client implements AutoCloseable {
         return network.network;
     }
 
-    public void ping(AccountId nodeAccountId) throws TimeoutException, HederaPreCheckStatusException {
+    public void ping(AccountId nodeAccountId) throws TimeoutException, PrecheckStatusException {
         new AccountBalanceQuery()
             .setAccountId(nodeAccountId)
             .setNodeAccountIds(Collections.singletonList(nodeAccountId))

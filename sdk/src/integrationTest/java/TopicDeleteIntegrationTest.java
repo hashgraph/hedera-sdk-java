@@ -48,7 +48,7 @@ public class TopicDeleteIntegrationTest {
 
             var topicId = Objects.requireNonNull(response.getReceipt(client).topicId);
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TopicDeleteTransaction()
                     .setTopicId(topicId)
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))

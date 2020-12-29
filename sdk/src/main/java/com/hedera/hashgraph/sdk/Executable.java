@@ -141,13 +141,13 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                 // the response has been identified as failing or otherwise
                 // needing a retry let's do this again after a delay
                 return Delayer.delayFor(delay, client.executor)
-                    .thenCompose((v) -> executeAsync(client, attempt + 1, new HederaPreCheckStatusException(responseStatus, getTransactionId())));
+                    .thenCompose((v) -> executeAsync(client, attempt + 1, new PrecheckStatusException(responseStatus, getTransactionId())));
             }
 
             if (responseStatus != Status.OK && responseStatus != Status.SUCCESS) {
                 // request to hedera failed in a non-recoverable way
                 return CompletableFuture.<O>failedFuture(
-                    new HederaPreCheckStatusException(
+                    new PrecheckStatusException(
                         responseStatus, getTransactionId()));
             }
 

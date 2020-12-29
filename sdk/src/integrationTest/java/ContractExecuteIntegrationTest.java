@@ -66,7 +66,7 @@ public class ContractExecuteIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractExecuteTransaction()
                     .setGas(10000)
                     .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
@@ -107,7 +107,7 @@ public class ContractExecuteIntegrationTest {
                     .contractId
             );
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractExecuteTransaction()
                     .setContractId(contractId)
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
@@ -161,7 +161,7 @@ public class ContractExecuteIntegrationTest {
                     .contractId
             );
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractExecuteTransaction()
                     .setContractId(contractId)
                     .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))

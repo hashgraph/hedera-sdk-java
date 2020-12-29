@@ -89,7 +89,7 @@ public class FileUpdateIntegrationTest {
             assertFalse(info.isDeleted);
             assertNull(info.keys);
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new FileUpdateTransaction()
                     .setFileId(fileId)
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
@@ -110,7 +110,7 @@ public class FileUpdateIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new FileUpdateTransaction()
                     .setContents("[e2e::FileUpdateTransaction]")
                     .execute(client)

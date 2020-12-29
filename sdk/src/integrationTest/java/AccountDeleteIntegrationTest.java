@@ -58,7 +58,7 @@ class AccountDeleteIntegrationTest {
             var client = IntegrationTestClientManager.getClient();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new AccountDeleteTransaction()
                     .setTransferAccountId(operatorId)
                     .execute(client)
@@ -87,7 +87,7 @@ class AccountDeleteIntegrationTest {
 
             var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new AccountDeleteTransaction()
                     .setAccountId(accountId)
                     .setTransferAccountId(operatorId)

@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
+import com.google.protobuf.ByteString;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;

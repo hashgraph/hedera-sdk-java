@@ -114,7 +114,7 @@ public class ContractInfoIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractInfoQuery()
                     .setQueryPayment(new Hbar(1))
                     .execute(client);

@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
  * Before a node submits a transaction to the rest of the network,
  * it attempts some cheap assertions. This process is called the "pre-check".
  */
-public final class HederaPreCheckStatusException extends Exception {
+public final class PrecheckStatusException extends Exception {
     /**
      * The status of the failing transaction
      */
@@ -23,7 +23,7 @@ public final class HederaPreCheckStatusException extends Exception {
     @Nullable
     public final TransactionId transactionId;
 
-    HederaPreCheckStatusException(Status status, @Nullable TransactionId transactionId) {
+    PrecheckStatusException(Status status, @Nullable TransactionId transactionId) {
         this.status = status;
         this.transactionId = transactionId;
     }

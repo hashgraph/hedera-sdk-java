@@ -66,7 +66,7 @@ public class ContractBytecodeIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractByteCodeQuery().execute(client);
             });
 

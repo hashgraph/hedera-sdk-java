@@ -13,7 +13,7 @@ public class SystemIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 
-            @Var var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            @Var var error = assertThrows(PrecheckStatusException.class, () -> {
                 new SystemDeleteTransaction()
                     .setContractId(new ContractId(10))
                     .setExpirationTime(Instant.now())
@@ -22,7 +22,7 @@ public class SystemIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
 
-            error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            error = assertThrows(PrecheckStatusException.class, () -> {
                 new SystemDeleteTransaction()
                     .setFileId(new FileId(10))
                     .setExpirationTime(Instant.now())
@@ -31,7 +31,7 @@ public class SystemIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
 
-            error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            error = assertThrows(PrecheckStatusException.class, () -> {
                 new SystemUndeleteTransaction()
                     .setContractId(new ContractId(10))
                     .execute(client);
@@ -39,7 +39,7 @@ public class SystemIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
 
-            error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            error = assertThrows(PrecheckStatusException.class, () -> {
                 new SystemUndeleteTransaction()
                     .setFileId(new FileId(10))
                     .execute(client);

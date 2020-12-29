@@ -140,7 +140,7 @@ public class TopicMessageSubmitIntegrationTest {
 
             var topicId = Objects.requireNonNull(response.getReceipt(client).topicId);
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TopicMessageSubmitTransaction()
                     .setMessage(Contents.BIG_CONTENTS)
                     .execute(client)
@@ -175,7 +175,7 @@ public class TopicMessageSubmitIntegrationTest {
 
             var topicId = Objects.requireNonNull(response.getReceipt(client).topicId);
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TopicMessageSubmitTransaction()
                     .setTopicId(topicId)
                     .execute(client)

@@ -1,6 +1,6 @@
 import com.hedera.hashgraph.sdk.AccountStakersQuery;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ class AccountStakersIntegrationTest {
             var client = IntegrationTestClientManager.getClient();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new AccountStakersQuery()
                     .setAccountId(operatorId)
                     .setMaxQueryPayment(new Hbar(1))

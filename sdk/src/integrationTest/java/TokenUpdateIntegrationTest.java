@@ -3,8 +3,6 @@ import com.hedera.hashgraph.sdk.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.Objects;
 
@@ -120,7 +118,7 @@ class TokenUpdateIntegrationTest {
 
             var tokenId = Objects.requireNonNull(response.getReceipt(client).tokenId);
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenUpdateTransaction()
                     .setTokenId(tokenId)
                     .setTokenName("aaaa")

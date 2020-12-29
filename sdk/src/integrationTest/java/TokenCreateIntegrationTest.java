@@ -2,8 +2,6 @@ import com.hedera.hashgraph.sdk.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.Objects;
 
@@ -69,7 +67,7 @@ class TokenCreateIntegrationTest {
             var client = IntegrationTestClientManager.getClient();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenCreateTransaction()
                     .setTokenSymbol("F")
                     .setTreasuryAccountId(operatorId)
@@ -91,7 +89,7 @@ class TokenCreateIntegrationTest {
             var client = IntegrationTestClientManager.getClient();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenCreateTransaction()
                     .setTokenName("ffff")
                     .setTreasuryAccountId(operatorId)
@@ -112,7 +110,7 @@ class TokenCreateIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenCreateTransaction()
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
@@ -133,7 +131,7 @@ class TokenCreateIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenCreateTransaction()
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
@@ -158,7 +156,7 @@ class TokenCreateIntegrationTest {
 
             var key = PrivateKey.generate();
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenCreateTransaction()
                     .setTokenName("ffff")
                     .setTokenSymbol("F")

@@ -95,7 +95,7 @@ public class ContractCallIntegrationTest {
                 .contractId
             );
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractCallQuery()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setContractId(contractId)
@@ -149,7 +149,7 @@ public class ContractCallIntegrationTest {
                     .contractId
             );
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractCallQuery()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setContractId(contractId)
@@ -203,7 +203,7 @@ public class ContractCallIntegrationTest {
                     .contractId
             );
 
-            var error = assertThrows(HederaPreCheckStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractCallQuery()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setQueryPayment(new Hbar(1))

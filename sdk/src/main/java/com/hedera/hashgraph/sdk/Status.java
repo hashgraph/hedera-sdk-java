@@ -3,8 +3,8 @@ package com.hedera.hashgraph.sdk;
 import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
 
 /**
- * Returned in {@link TransactionReceipt}, {@link HederaPreCheckStatusException}
- * and {@link HederaReceiptStatusException}.
+ * Returned in {@link TransactionReceipt}, {@link PrecheckStatusException}
+ * and {@link ReceiptStatusException}.
  * <p>
  * The success variant is {@link #SUCCESS} which is what a {@link TransactionReceipt} will contain for a
  * successful transaction.
