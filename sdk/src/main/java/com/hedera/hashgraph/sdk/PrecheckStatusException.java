@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
  * Before a node submits a transaction to the rest of the network,
  * it attempts some cheap assertions. This process is called the "pre-check".
  */
-public final class PrecheckStatusException extends Exception {
+public class PrecheckStatusException extends Exception {
     /**
      * The status of the failing transaction
      */

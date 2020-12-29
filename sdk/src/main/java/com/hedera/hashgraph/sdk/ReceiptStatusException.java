@@ -6,7 +6,7 @@ package com.hedera.hashgraph.sdk;
  * The receipt is included, though only the {@link TransactionReceipt#status} field will be
  * initialized; all the getters should throw.
  */
-public final class ReceiptStatusException extends Exception {
+public class ReceiptStatusException extends Exception {
     /**
      * The ID of the transaction that failed, in case that context is no longer available
      * (e.g. the exception was bubbled up).
