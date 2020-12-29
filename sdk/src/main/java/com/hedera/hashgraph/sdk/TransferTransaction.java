@@ -25,8 +25,6 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
         builder = bodyBuilder.getCryptoTransfer().toBuilder();
 
-        setMaxTransactionFee(new Hbar(1));
-
         for (var transfer : bodyBuilder.getCryptoTransfer().getTransfers().getAccountAmountsList()) {
             hbarTransfers.merge(
                 AccountId.fromProtobuf(transfer.getAccountID()),

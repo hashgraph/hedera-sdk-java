@@ -26,8 +26,6 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         super(txs);
 
         builder = bodyBuilder.getTokenCreation().toBuilder();
-
-        setMaxTransactionFee(new Hbar(30));
     }
 
     public String getTokenName() {
