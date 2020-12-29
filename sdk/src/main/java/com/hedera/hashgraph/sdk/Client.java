@@ -80,6 +80,19 @@ public final class Client implements AutoCloseable {
         return new Client(network);
     }
 
+    public static Client forName(String name) {
+        switch (name) {
+            case "mainnet":
+                return Client.forMainnet();
+            case "testnet":
+                return Client.forTestnet();
+            case "previewnet":
+                return Client.forPreviewnet();
+            default:
+                throw new IllegalArgumentException("Name must be one-of `mainnet`, `testnet`, or `previewnet`");
+        }
+    }
+
     /**
      * Construct a Hedera client pre-configured for <a
      * href="https://docs.hedera.com/guides/mainnet/address-book#mainnet-address-book">Mainnet
