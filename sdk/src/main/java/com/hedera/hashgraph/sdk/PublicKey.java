@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -55,13 +56,19 @@ public final class PublicKey extends Key {
         }
 
         for (var signedTransaction : transaction.signedTransactions) {
+            @Var var found = false;
             for (var sigPair : signedTransaction.getSigMap().getSigPairList()) {
-                if (
-                    sigPair.getPubKeyPrefix().equals(ByteString.copyFrom(toBytes())) &&
-                        !verify(signedTransaction.getBodyBytes().toByteArray(), sigPair.getECDSA384().toByteArray())
-                ) {
-                    return false;
+                if (sigPair.getPubKeyPrefix().equals(ByteString.copyFrom(toBytes()))) {
+                    found = true;
+
+                    if (!verify(signedTransaction.getBodyBytes().toByteArray(), sigPair.getECDSA384().toByteArray())) {
+                        return false;
+                    }
                 }
+            }
+
+            if (!found) {
+                return false;
             }
         }
 
