@@ -61,7 +61,7 @@ public final class PublicKey extends Key {
                 if (sigPair.getPubKeyPrefix().equals(ByteString.copyFrom(toBytes()))) {
                     found = true;
 
-                    if (!verify(signedTransaction.getBodyBytes().toByteArray(), sigPair.getECDSA384().toByteArray())) {
+                    if (!verify(signedTransaction.getBodyBytes().toByteArray(), sigPair.getEd25519().toByteArray())) {
                         return false;
                     }
                 }
