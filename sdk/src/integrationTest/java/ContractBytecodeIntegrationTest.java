@@ -39,7 +39,6 @@ public class ContractBytecodeIntegrationTest {
             var bytecode = new ContractByteCodeQuery()
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setContractId(contractId)
-                .setQueryPayment(new Hbar(2))
                 .execute(client);
 
             assertEquals(bytecode.size(), 798);

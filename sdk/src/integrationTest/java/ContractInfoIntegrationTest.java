@@ -39,7 +39,6 @@ public class ContractInfoIntegrationTest {
             @Var var info = new ContractInfoQuery()
                 .setContractId(contractId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setQueryPayment(new Hbar(1))
                 .execute(client);
 
             assertEquals(info.contractId, contractId);
@@ -93,7 +92,6 @@ public class ContractInfoIntegrationTest {
             @Var var info = new ContractInfoQuery()
                 .setContractId(contractId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setQueryPayment(new Hbar(1))
                 .execute(client);
 
             assertEquals(info.contractId, contractId);
@@ -116,7 +114,6 @@ public class ContractInfoIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractInfoQuery()
-                    .setQueryPayment(new Hbar(1))
                     .execute(client);
             });
 

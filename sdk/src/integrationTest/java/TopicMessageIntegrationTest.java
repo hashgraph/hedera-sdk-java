@@ -33,7 +33,6 @@ public class TopicMessageIntegrationTest {
             @Var var info = new TopicInfoQuery()
                 .setTopicId(topicId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setQueryPayment(new Hbar(22))
                 .execute(client);
 
             assertEquals(info.topicId, topicId);
@@ -97,7 +96,6 @@ public class TopicMessageIntegrationTest {
             @Var var info = new TopicInfoQuery()
                 .setTopicId(topicId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setQueryPayment(new Hbar(22))
                 .execute(client);
 
             assertEquals(info.topicId, topicId);

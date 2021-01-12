@@ -25,7 +25,6 @@ public class FileContentsIntegrationTest {
             var contents = new FileContentsQuery()
                 .setFileId(fileId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setQueryPayment(new Hbar(1))
                 .execute(client);
 
             assertEquals(contents.toStringUtf8(), "[e2e::FileCreateTransaction]");
@@ -56,7 +55,6 @@ public class FileContentsIntegrationTest {
             var contents = new FileContentsQuery()
                 .setFileId(fileId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setQueryPayment(new Hbar(1))
                 .execute(client);
 
             assertEquals(contents.size(), 0);
@@ -79,7 +77,6 @@ public class FileContentsIntegrationTest {
 
            var error = assertThrows(PrecheckStatusException.class, () -> {
                new FileContentsQuery()
-                   .setQueryPayment(new Hbar(1))
                    .execute(client);
            });
 

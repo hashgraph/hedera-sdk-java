@@ -31,7 +31,6 @@ public class FileAppendIntegrationTest {
             @Var var info = new FileInfoQuery()
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setFileId(fileId)
-                .setQueryPayment(new Hbar(22))
                 .execute(client);
 
             assertEquals(info.fileId, fileId);
@@ -51,7 +50,6 @@ public class FileAppendIntegrationTest {
             info = new FileInfoQuery()
                 .setFileId(fileId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setQueryPayment(new Hbar(1))
                 .execute(client);
 
             assertEquals(info.fileId, fileId);
@@ -88,7 +86,6 @@ public class FileAppendIntegrationTest {
             @Var var info = new FileInfoQuery()
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setFileId(fileId)
-                .setQueryPayment(new Hbar(22))
                 .execute(client);
 
             assertEquals(info.fileId, fileId);
@@ -108,7 +105,6 @@ public class FileAppendIntegrationTest {
             info = new FileInfoQuery()
                 .setFileId(fileId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setQueryPayment(new Hbar(1))
                 .execute(client);
 
             assertEquals(info.fileId, fileId);

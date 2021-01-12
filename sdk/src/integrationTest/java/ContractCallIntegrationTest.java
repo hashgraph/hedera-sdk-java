@@ -39,7 +39,6 @@ public class ContractCallIntegrationTest {
             var callQuery = new ContractCallQuery()
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setContractId(contractId)
-                .setQueryPayment(new Hbar(1))
                 .setGas(2000)
                 .setFunction("getMessage");
 
@@ -99,7 +98,6 @@ public class ContractCallIntegrationTest {
                 new ContractCallQuery()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setContractId(contractId)
-                    .setQueryPayment(new Hbar(1))
                     .setGas(2000)
                     .execute(client);
             });
@@ -153,7 +151,6 @@ public class ContractCallIntegrationTest {
                 new ContractCallQuery()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setContractId(contractId)
-                    .setQueryPayment(new Hbar(1))
                     .setFunction("getMessage")
                     .execute(client);
             });
@@ -206,7 +203,6 @@ public class ContractCallIntegrationTest {
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractCallQuery()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                    .setQueryPayment(new Hbar(1))
                     .setGas(2000)
                     .setFunction("getMessage")
                     .execute(client);

@@ -39,7 +39,6 @@ public class ContractDeleteIntegrationTest {
             @Var var info = new ContractInfoQuery()
                 .setContractId(contractId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setQueryPayment(new Hbar(1))
                 .execute(client);
 
             assertEquals(info.contractId, contractId);
@@ -93,7 +92,6 @@ public class ContractDeleteIntegrationTest {
             @Var var info = new ContractInfoQuery()
                 .setContractId(contractId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setQueryPayment(new Hbar(1))
                 .execute(client);
 
             assertEquals(info.contractId, contractId);

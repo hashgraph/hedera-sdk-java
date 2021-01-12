@@ -26,7 +26,6 @@ public class FileDeleteIntegrationTest {
             @Var var info = new FileInfoQuery()
                 .setFileId(fileId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setQueryPayment(new Hbar(22))
                 .execute(client);
 
             assertEquals(info.fileId, fileId);
@@ -61,7 +60,6 @@ public class FileDeleteIntegrationTest {
             @Var var info = new FileInfoQuery()
                 .setFileId(fileId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setQueryPayment(new Hbar(22))
                 .execute(client);
 
             assertEquals(info.fileId, fileId);

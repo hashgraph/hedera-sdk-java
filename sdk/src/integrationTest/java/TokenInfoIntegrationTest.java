@@ -41,7 +41,6 @@ class TokenInfoIntegrationTest {
 
             var info = new TokenInfoQuery()
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setQueryPayment(new Hbar(2))
                 .setTokenId(tokenId)
                 .execute(client);
 
@@ -94,7 +93,6 @@ class TokenInfoIntegrationTest {
 
             var info = new TokenInfoQuery()
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setQueryPayment(new Hbar(2))
                 .setTokenId(tokenId)
                 .execute(client);
 
