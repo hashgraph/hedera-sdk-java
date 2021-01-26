@@ -30,7 +30,6 @@ import "Timestamp.proto";
 import "QueryHeader.proto";
 import "ResponseHeader.proto";
 import "ScheduleCreate.proto";
-import "BasicTypes.proto";
 
 message ScheduleGetInfoQuery {
   QueryHeader header = 1; // standard info sent from client to node including the signed payment, and what kind of response is requested (cost, state proof, both, or neither).

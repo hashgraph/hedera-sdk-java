@@ -4,6 +4,7 @@ import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ExchangeRateSet;
+import com.hedera.hashgraph.sdk.proto.ScheduleID;
 import com.hedera.hashgraph.sdk.proto.TimestampSeconds;
 
 import javax.annotation.Nullable;
@@ -69,6 +70,9 @@ public final class TransactionReceipt {
 
     public final Long totalSupply;
 
+    @Nullable
+    public final ScheduleId scheduleId;
+
     private TransactionReceipt(
         Status status,
         ExchangeRate exchangeRate,
@@ -79,7 +83,8 @@ public final class TransactionReceipt {
         @Nullable TokenId tokenId,
         @Nullable Long topicSequenceNumber,
         @Nullable ByteString topicRunningHash,
-        Long totalSupply
+        Long totalSupply,
+        @Nullable ScheduleId scheduleId
     ) {
         this.status = status;
         this.exchangeRate = exchangeRate;
@@ -91,6 +96,7 @@ public final class TransactionReceipt {
         this.topicSequenceNumber = topicSequenceNumber;
         this.topicRunningHash = topicRunningHash;
         this.totalSupply = totalSupply;
+        this.scheduleId = scheduleId;
     }
 
     static TransactionReceipt fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionReceipt transactionReceipt) {
@@ -136,6 +142,11 @@ public final class TransactionReceipt {
 
         var totalSupply = transactionReceipt.getNewTotalSupply();
 
+        var scheduleId =
+            transactionReceipt.hasScheduleID()
+                ? ScheduleId.fromProtobuf(transactionReceipt.getScheduleID())
+                : null;
+
         return new TransactionReceipt(
             status,
             exchangeRate,
@@ -146,7 +157,8 @@ public final class TransactionReceipt {
             tokenId,
             topicSequenceNumber,
             topicRunningHash,
-            totalSupply
+            totalSupply,
+            scheduleId
         );
     }
 
@@ -196,6 +208,10 @@ public final class TransactionReceipt {
             transactionReceiptBuilder.setTopicRunningHash(topicRunningHash);
         }
 
+        if (scheduleId != null) {
+            transactionReceiptBuilder.setScheduleID(scheduleId.toProtobuf());
+        }
+
         return transactionReceiptBuilder.build();
     }
 
@@ -212,6 +228,7 @@ public final class TransactionReceipt {
             .add("topicSequenceNumber", topicSequenceNumber)
             .add("topicRunningHash", topicRunningHash)
             .add("totalSupply", totalSupply)
+            .add("scheduleId", scheduleId)
             .toString();
     }
 
