@@ -98,6 +98,13 @@ message TokenID {
     int64 tokenNum = 3; // A nonnegative token number
 }
 
+/* Unique identifier for a Schedule */
+message ScheduleID {
+    int64 shardNum = 1; // A nonnegative shard number
+    int64 realmNum = 2; // A nonnegative realm number
+    int64 scheduleNum = 3; // A nonnegative schedule number
+}
+
 /* Possible Freeze statuses returned on TokenGetInfoQuery or CryptoGetInfoResponse in TokenRelationship */
 enum TokenFreezeStatus {
     FreezeNotApplicable = 0;
@@ -148,7 +155,7 @@ message KeyList {
 
 /* A Signature corresponding to a Key. It is a sequence of bytes holding a public key signature from one of the three supported systems (ed25519, RSA-3072,  ECDSA with p384). Or, it can be a list of signatures corresponding to a single threshold key. Or, it can be the ID of a smart contract instance, which is authorized to act as if it had a key. If an account has an ed25519 key associated with it, then the corresponding private key must sign any transaction to transfer cryptocurrency out of it. If it has a smart contract ID associated with it, then that smart contract is allowed to transfer cryptocurrency out of it. The smart contract doesn't actually have a key, and  doesn't actually sign a transaction. But it's as if a virtual transaction were created, and the smart contract signed it with a private key. A key can also be a "threshold key", which means a list of M keys, any N of which must sign in order for the threshold signature to be considered valid. The keys within a threshold signature may themselves be threshold signatures, to allow complex signature requirements (this nesting is not supported in the currently, but will be supported in a future version of API). If a Signature message is missing the "signature" field, then this is considered to be a null signature. That is useful in cases such as threshold signatures, where some of the signatures can be null.
  * The definition of Key uses mutual recursion, so it allows nesting that is arbitrarily deep. But the current API only accepts Key messages up to 3 levels deep, such as a list of threshold keys, each of which is a list of primitive keys. Therefore, the matching Signature will have the same limitation. This restriction may be relaxed in future versions of the API, to allow deeper nesting.
- * This message is deprecated and succeeded by SignaturePair and SignatureMap messages. 
+ * This message is deprecated and succeeded by SignaturePair and SignatureMap messages.
  */
 message Signature {
     option deprecated = true;
@@ -252,7 +259,7 @@ enum HederaFunctionality {
     ConsensusSubmitMessage = 54; // Submit message to topic
     UncheckedSubmit = 55;
     TokenCreate = 56; // Create Token
-    TokenGetInfo = 58; // Get token information
+    TokenGetInfo = 58; // Get Token information
     TokenFreezeAccount = 59; // Freeze Account
     TokenUnfreezeAccount = 60; // Unfreeze Account
     TokenGrantKycToAccount = 61; // Grant KYC to Account
@@ -264,6 +271,10 @@ enum HederaFunctionality {
     TokenAccountWipe = 67; // Wipe token amount from Account holder
     TokenAssociateToAccount = 68; // Associate tokens to an account
     TokenDissociateFromAccount = 69; // Dissociate tokens from an account
+    ScheduleCreate = 70; // Create Scheduled Transaction
+    ScheduleDelete = 71; // Delete Scheduled Transaction
+    ScheduleSign = 72; // Sign Scheduled Transaction
+    ScheduleGetInfo = 73; // Get Scheduled Transaction Information
 }
 
 /*
