@@ -87,7 +87,6 @@ class ClientTest {
 
             Client client = new Client(nodes);
 
-
             @Var Map<String, AccountId> setNetworkNodes = new HashMap<>();
             setNetworkNodes.put("2.testnet.hedera.com:50211", new AccountId(5));
             setNetworkNodes.put("3.testnet.hedera.com:50211", new AccountId(6));
