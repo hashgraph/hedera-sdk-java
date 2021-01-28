@@ -4,11 +4,30 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.FileID;
 
 import javax.annotation.Nonnegative;
+import java.util.Objects;
 
 /**
  * The ID for a file on Hedera.
  */
-public final class FileId extends EntityId {
+public final class FileId {
+    /**
+     * The shard number
+     */
+    @Nonnegative
+    public final long shard;
+
+    /**
+     * The realm number
+     */
+    @Nonnegative
+    public final long realm;
+
+    /**
+     * The id number
+     */
+    @Nonnegative
+    public final long num;
+
     /**
      * The public node address book for the current network.
      */
@@ -25,16 +44,18 @@ public final class FileId extends EntityId {
     public static final FileId EXCHANGE_RATES = new FileId(0, 0, 112);
 
     public FileId(@Nonnegative long num) {
-        super(0, 0, num);
+        this(0, 0, num);
     }
 
     @SuppressWarnings("InconsistentOverloads")
     public FileId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num) {
-        super(shard, realm, num);
+        this.shard = shard;
+        this.realm = realm;
+        this.num = num;
     }
 
     public static FileId fromString(String id) {
-        return EntityId.fromString(id, FileId::new);
+        return EntityIdHelper.fromString(id, FileId::new);
     }
 
     public static FileId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -55,5 +76,24 @@ public final class FileId extends EntityId {
 
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
+    }
+
+    @Override
+    public String toString() {
+        return "" + shard + "." + realm + "." + num;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(shard, realm, num);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FileId)) return false;
+
+        FileId otherId = (FileId) o;
+        return shard == otherId.shard && realm == otherId.realm && num == otherId.num;
     }
 }

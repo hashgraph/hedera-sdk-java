@@ -2,18 +2,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.FileContentsQuery;
-import com.hedera.hashgraph.sdk.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.FileId;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
-import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
 
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public final class GetFileContentsExample {
@@ -27,7 +19,7 @@ public final class GetFileContentsExample {
     private GetFileContentsExample() {
     }
 
-    public static void main(String[] args) throws HederaReceiptStatusException, TimeoutException, HederaPreCheckStatusException {
+    public static void main(String[] args) throws ReceiptStatusException, TimeoutException, PrecheckStatusException {
         Client client;
 
         if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {

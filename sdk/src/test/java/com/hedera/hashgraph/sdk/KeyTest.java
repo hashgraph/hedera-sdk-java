@@ -39,7 +39,7 @@ class KeyTest {
         var keyBytes = Hex.decode("0011223344556677889900112233445566778899001122334455667788990011");
         var protoKey = Key.newBuilder().setEd25519(ByteString.copyFrom(keyBytes)).build();
 
-        var cut = PublicKey.fromProtobuf(protoKey);
+        var cut = PublicKey.fromProtobufKey(protoKey);
 
         assertEquals(cut.getClass(), PublicKey.class);
         assertArrayEquals(keyBytes, ((PublicKey) cut).toBytes());
@@ -63,13 +63,13 @@ class KeyTest {
         var protoKey = Key.newBuilder().setKeyList(protoKeyList).build();
 
         // when
-        var cut = com.hedera.hashgraph.sdk.Key.fromProtobuf(protoKey);
+        var cut = com.hedera.hashgraph.sdk.Key.fromProtobufKey(protoKey);
 
         // then
         assertEquals(cut.getClass(), com.hedera.hashgraph.sdk.KeyList.class);
 
         var keyList = (com.hedera.hashgraph.sdk.KeyList) cut;
-        var actual = keyList.toKeyProtobuf().getKeyList();
+        var actual = keyList.toProtobufKey().getKeyList();
 
         assertEquals(2, actual.getKeysCount());
         assertArrayEquals(keyBytes[0], actual.getKeys(0).getEd25519().toByteArray());
@@ -95,13 +95,13 @@ class KeyTest {
         var protoKey = Key.newBuilder().setThresholdKey(protoThresholdKey).build();
 
         // when
-        var cut = com.hedera.hashgraph.sdk.Key.fromProtobuf(protoKey);
+        var cut = com.hedera.hashgraph.sdk.Key.fromProtobufKey(protoKey);
 
         // then
         assertEquals(cut.getClass(), com.hedera.hashgraph.sdk.KeyList.class);
 
         var thresholdKey = (com.hedera.hashgraph.sdk.KeyList) cut;
-        var actual = thresholdKey.toKeyProtobuf().getThresholdKey();
+        var actual = thresholdKey.toProtobufKey().getThresholdKey();
 
         assertEquals(1, actual.getThreshold());
         assertEquals(2, actual.getKeys().getKeysCount());
@@ -114,7 +114,7 @@ class KeyTest {
     void throwsUnsupportedKey() {
         byte[] keyBytes = {0, 1, 2};
         var protoKey = Key.newBuilder().setRSA3072(ByteString.copyFrom(keyBytes)).build();
-        assertThrows(IllegalStateException.class, () -> com.hedera.hashgraph.sdk.Key.fromProtobuf(protoKey));
+        assertThrows(IllegalStateException.class, () -> com.hedera.hashgraph.sdk.Key.fromProtobufKey(protoKey));
     }
 
     @Test

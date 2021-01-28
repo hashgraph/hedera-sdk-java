@@ -5,11 +5,9 @@ import com.hedera.hashgraph.sdk.proto.FileDeleteTransactionBody;
 import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
@@ -17,7 +15,7 @@ import java.util.LinkedHashMap;
  *
  * <p>When deleted, a file's contents are truncated to zero length and it can no longer be updated
  * or appended to, or its expiration time extended. {@link FileContentsQuery} and {@link FileInfoQuery}
- * will throw {@link HederaPreCheckStatusException} with a status of {@link Status#FILE_DELETED}.
+ * will throw {@link PrecheckStatusException} with a status of {@link Status#FILE_DELETED}.
  *
  * <p>Only one of the file's keys needs to sign to delete the file, unless the key you have is part
  * of a {@link com.hedera.hashgraph.sdk.KeyList}.

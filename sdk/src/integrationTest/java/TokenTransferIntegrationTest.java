@@ -26,7 +26,6 @@ class TokenTransferIntegrationTest {
 
             TransactionResponse response = new AccountCreateTransaction()
                 .setKey(key)
-                .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
                 .execute(client);
 
@@ -53,7 +52,7 @@ class TokenTransferIntegrationTest {
             new TokenAssociateTransaction()
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setAccountId(accountId)
-                .setTokenIds(tokenId)
+                .setTokenIds(Collections.singletonList(tokenId))
                 .freezeWith(client)
                 .sign(OPERATOR_KEY)
                 .sign(key)

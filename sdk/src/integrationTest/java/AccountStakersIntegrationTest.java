@@ -1,27 +1,30 @@
 import com.hedera.hashgraph.sdk.AccountStakersQuery;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.Status;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.Objects;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class AccountStakersIntegrationTest {
     @Test
-    void test() {
+    @DisplayName("Cannot query account stakers since it is not supported")
+    void cannotQueryAccountStakersSinceItIsNotSupported() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
-            var operatorId = client.getOperatorAccountId();
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
-            try {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new AccountStakersQuery()
                     .setAccountId(operatorId)
                     .setMaxQueryPayment(new Hbar(1))
                     .execute(client);
-            } catch (HederaPreCheckStatusException e) {
-                assertEquals(e.status, Status.NOT_SUPPORTED);
-            }
+            });
+
+            assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
 
             client.close();
         });

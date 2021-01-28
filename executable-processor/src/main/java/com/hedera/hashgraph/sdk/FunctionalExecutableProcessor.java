@@ -36,7 +36,7 @@ public class FunctionalExecutableProcessor extends AbstractProcessor {
         var packageName = "com.hedera.hashgraph.sdk";
 
         var clientClazz = ClassName.get(packageName, "Client");
-        var preCheckStatusException = ClassName.get(packageName, "HederaPreCheckStatusException");
+        var preCheckStatusException = ClassName.get(packageName, "PrecheckStatusException");
 
         for (var element : roundEnv.getElementsAnnotatedWith(FunctionalExecutable.class)) {
             var annotation = element.getAnnotation(FunctionalExecutable.class);

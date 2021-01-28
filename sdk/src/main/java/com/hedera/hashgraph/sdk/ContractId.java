@@ -4,26 +4,47 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ContractID;
 
 import javax.annotation.Nonnegative;
+import java.util.Objects;
 
 /**
  * The ID for a smart contract instance on Hedera.
  */
-public final class ContractId extends EntityId {
+public final class ContractId extends Key {
+    /**
+     * The shard number
+     */
+    @Nonnegative
+    public final long shard;
+
+    /**
+     * The realm number
+     */
+    @Nonnegative
+    public final long realm;
+
+    /**
+     * The id number
+     */
+    @Nonnegative
+    public final long num;
+
     public ContractId(@Nonnegative long num) {
-        super(0, 0, num);
+        this(0, 0, num);
     }
 
     @SuppressWarnings("InconsistentOverloads")
     public ContractId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num) {
-        super(shard, realm, num);
+        this.shard = shard;
+        this.realm = realm;
+        this.num = num;
     }
 
     public static ContractId fromString(String id) {
-        return EntityId.fromString(id, ContractId::new);
+        return EntityIdHelper.fromString(id, ContractId::new);
     }
 
     public static ContractId fromSolidityAddress(String address) {
-        return EntityId.fromSolidityAddress(address, ContractId::new);
+        return EntityIdHelper.fromSolidityAddress(address, ContractId::new);
     }
 
     static ContractId fromProtobuf(ContractID contractId) {
@@ -35,9 +56,8 @@ public final class ContractId extends EntityId {
         return fromProtobuf(ContractID.parseFrom(bytes).toBuilder().build());
     }
 
-    @Override
     public String toSolidityAddress() {
-        return super.toSolidityAddress();
+        return EntityIdHelper.toSolidityAddress(shard, realm, num);
     }
 
     ContractID toProtobuf() {
@@ -48,7 +68,33 @@ public final class ContractId extends EntityId {
             .build();
     }
 
+    @Override
+    com.hedera.hashgraph.sdk.proto.Key toProtobufKey() {
+        return com.hedera.hashgraph.sdk.proto.Key.newBuilder()
+            .setContractID(toProtobuf())
+            .build();
+    }
+
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
+    }
+
+    @Override
+    public String toString() {
+        return "" + shard + "." + realm + "." + num;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(shard, realm, num);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ContractId)) return false;
+
+        ContractId otherId = (ContractId) o;
+        return shard == otherId.shard && realm == otherId.realm && num == otherId.num;
     }
 }

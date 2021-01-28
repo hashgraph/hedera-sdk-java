@@ -9,7 +9,7 @@ import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
-import java.util.HashMap;
+import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 
 public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> {
@@ -19,7 +19,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         builder = TokenCreateTransactionBody.newBuilder();
 
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
-        setExpirationTime(Instant.now().plus(Duration.ofDays(90)));
+        setMaxTransactionFee(new Hbar(30));
     }
 
     TokenCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
@@ -79,52 +79,52 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     public Key getAdminKey() {
-        return Key.fromProtobuf(builder.getAdminKey());
+        return Key.fromProtobufKey(builder.getAdminKey());
     }
 
     public TokenCreateTransaction setAdminKey(Key key) {
         requireNotFrozen();
-        builder.setAdminKey(key.toKeyProtobuf());
+        builder.setAdminKey(key.toProtobufKey());
         return this;
     }
 
     public Key getKycKey() {
-        return Key.fromProtobuf(builder.getKycKey());
+        return Key.fromProtobufKey(builder.getKycKey());
     }
 
     public TokenCreateTransaction setKycKey(Key key) {
         requireNotFrozen();
-        builder.setKycKey(key.toKeyProtobuf());
+        builder.setKycKey(key.toProtobufKey());
         return this;
     }
 
     public Key getFreezeKey() {
-        return Key.fromProtobuf(builder.getFreezeKey());
+        return Key.fromProtobufKey(builder.getFreezeKey());
     }
 
     public TokenCreateTransaction setFreezeKey(Key key) {
         requireNotFrozen();
-        builder.setFreezeKey(key.toKeyProtobuf());
+        builder.setFreezeKey(key.toProtobufKey());
         return this;
     }
 
     public Key getWipeKey() {
-        return Key.fromProtobuf(builder.getWipeKey());
+        return Key.fromProtobufKey(builder.getWipeKey());
     }
 
     public TokenCreateTransaction setWipeKey(Key key) {
         requireNotFrozen();
-        builder.setWipeKey(key.toKeyProtobuf());
+        builder.setWipeKey(key.toProtobufKey());
         return this;
     }
 
     public Key getSupplyKey() {
-        return Key.fromProtobuf(builder.getSupplyKey());
+        return Key.fromProtobufKey(builder.getSupplyKey());
     }
 
     public TokenCreateTransaction setSupplyKey(Key key) {
         requireNotFrozen();
-        builder.setSupplyKey(key.toKeyProtobuf());
+        builder.setSupplyKey(key.toProtobufKey());
         return this;
     }
 
@@ -144,6 +144,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
 
     public TokenCreateTransaction setExpirationTime(Instant expirationTime) {
         requireNotFrozen();
+        builder.clearAutoRenewPeriod();
         builder.setExpiry(InstantConverter.toProtobuf(expirationTime));
         return this;
     }
@@ -166,6 +167,19 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         requireNotFrozen();
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(period));
         return this;
+    }
+
+    public TokenCreateTransaction freezeWith(@Nullable Client client) {
+        if (
+            builder.hasAutoRenewPeriod() &&
+                !builder.hasAutoRenewAccount() &&
+                client != null &&
+                client.getOperatorAccountId() != null
+        ) {
+            builder.setAutoRenewAccount(client.getOperatorAccountId().toProtobuf());
+        }
+
+        return super.freezeWith(client);
     }
 
     @Override

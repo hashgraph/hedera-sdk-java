@@ -16,8 +16,8 @@ import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
-import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransactionResponse;
@@ -38,7 +38,7 @@ public final class CreateStatefulContractExample {
 
     private CreateStatefulContractExample() { }
 
-    public static void main(String[] args) throws HederaPreCheckStatusException, TimeoutException, IOException, HederaReceiptStatusException {
+    public static void main(String[] args) throws PrecheckStatusException, TimeoutException, IOException, ReceiptStatusException {
         ClassLoader cl = CreateStatefulContractExample.class.getClassLoader();
 
         Gson gson = new Gson();

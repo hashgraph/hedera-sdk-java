@@ -22,14 +22,14 @@ public class AccountInfoTest {
     public static final LiveHash liveHash = LiveHash.newBuilder().setAccountId(new AccountId(10).toProtobuf())
         .setDuration(DurationConverter.toProtobuf(Duration.ofDays(11)))
         .setHash(ByteString.copyFrom(hash))
-        .setKeys(KeyList.newBuilder().addKeys(privateKey.getPublicKey().toKeyProtobuf()))
+        .setKeys(KeyList.newBuilder().addKeys(privateKey.getPublicKey().toProtobufKey()))
         .build();
 
     private static final CryptoGetInfoResponse.AccountInfo info = CryptoGetInfoResponse.AccountInfo.newBuilder()
         .setAccountID(new AccountId(1).toProtobuf())
         .setDeleted(true)
         .setProxyReceived(2)
-        .setKey(privateKey.getPublicKey().toKeyProtobuf())
+        .setKey(privateKey.getPublicKey().toProtobufKey())
         .setBalance(3)
         .setGenerateSendRecordThreshold(4)
         .setGenerateReceiveRecordThreshold(5)

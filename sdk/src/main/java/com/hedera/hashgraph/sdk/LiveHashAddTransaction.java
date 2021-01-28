@@ -12,7 +12,6 @@ import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
@@ -95,7 +94,7 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
         var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
 
         for (Key key : keys) {
-            keyList.addKeys(key.toKeyProtobuf());
+            keyList.addKeys(key.toProtobufKey());
         }
 
         hashBuilder.setKeys(keyList);

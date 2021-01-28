@@ -10,7 +10,6 @@ import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
@@ -64,6 +63,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         builder = ContractCreateTransactionBody.newBuilder();
 
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
+        setMaxTransactionFee(new Hbar(20));
     }
 
     ContractCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
@@ -96,7 +96,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
 
     @Nullable
     public Key getAdminKey() {
-        return builder.hasAdminKey() ? Key.fromProtobuf(builder.getAdminKey()) : null;
+        return builder.hasAdminKey() ? Key.fromProtobufKey(builder.getAdminKey()) : null;
     }
 
     /**
@@ -111,7 +111,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      */
     public ContractCreateTransaction setAdminKey(Key adminKey) {
         requireNotFrozen();
-        builder.setAdminKey(adminKey.toKeyProtobuf());
+        builder.setAdminKey(adminKey.toProtobufKey());
         return this;
     }
 

@@ -26,8 +26,8 @@ public class TopicInfoTest {
             .setSequenceNumber(3)
             .setExpirationTime(InstantConverter.toProtobuf(Instant.ofEpochMilli(4)))
             .setAutoRenewPeriod(DurationConverter.toProtobuf(Duration.ofDays(5)))
-            .setAdminKey(privateKey.getPublicKey().toKeyProtobuf())
-            .setSubmitKey(privateKey.getPublicKey().toKeyProtobuf())
+            .setAdminKey(privateKey.getPublicKey().toProtobufKey())
+            .setSubmitKey(privateKey.getPublicKey().toProtobufKey())
             .setAutoRenewAccount(new AccountId(4).toProtobuf()))
         .build();
 

@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
+import com.google.protobuf.ByteString;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -331,9 +332,9 @@ public final class PrivateKey extends Key {
     }
 
     @Override
-    com.hedera.hashgraph.sdk.proto.Key toKeyProtobuf() {
+    com.hedera.hashgraph.sdk.proto.Key toProtobufKey() {
         // Forward to the corresponding public key.
-        return getPublicKey().toKeyProtobuf();
+        return getPublicKey().toProtobufKey();
     }
 
     public static PrivateKey fromLegacyMnemonic(byte[] entropy) {

@@ -2,20 +2,9 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
-import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
-import com.hedera.hashgraph.sdk.KeyList;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.TopicCreateTransaction;
-import com.hedera.hashgraph.sdk.TopicId;
-import com.hedera.hashgraph.sdk.TopicInfo;
-import com.hedera.hashgraph.sdk.TopicInfoQuery;
-import com.hedera.hashgraph.sdk.TopicUpdateTransaction;
-import com.hedera.hashgraph.sdk.Transaction;
+import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
 
-import com.hedera.hashgraph.sdk.TransactionResponse;
 import java8.util.J8Arrays;
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -40,11 +29,11 @@ class TopicWithAdminKeyExample {
         setupHapiClient();
     }
 
-    public static void main(String[] args) throws HederaReceiptStatusException, TimeoutException, HederaPreCheckStatusException {
+    public static void main(String[] args) throws ReceiptStatusException, TimeoutException, PrecheckStatusException {
         new TopicWithAdminKeyExample().execute();
     }
 
-    public void execute() throws HederaReceiptStatusException, TimeoutException, HederaPreCheckStatusException {
+    public void execute() throws ReceiptStatusException, TimeoutException, PrecheckStatusException {
         createTopicWithAdminKey();
 
         updateTopicAdminKeyAndMemo();
@@ -76,7 +65,7 @@ class TopicWithAdminKeyExample {
         hapiClient = client.setOperator(payerId, payerPrivateKey);
     }
 
-    private void createTopicWithAdminKey() throws TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException {
+    private void createTopicWithAdminKey() throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         // Generate the initial keys that are part of the adminKey's thresholdKey.
         // 3 ED25519 keys part of a 2-of-3 threshold key.
         initialAdminKeys = new PrivateKey[3];
@@ -103,7 +92,7 @@ class TopicWithAdminKeyExample {
         System.out.println("Created new topic " + topicId + " with 2-of-3 threshold key as adminKey.");
     }
 
-    private void updateTopicAdminKeyAndMemo() throws TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException {
+    private void updateTopicAdminKeyAndMemo() throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         // Generate the new keys that are part of the adminKey's thresholdKey.
         // 4 ED25519 keys part of a 3-of-4 threshold key.
         PrivateKey[] newAdminKeys = new PrivateKey[4];
