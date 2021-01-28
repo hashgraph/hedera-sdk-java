@@ -10,7 +10,6 @@ import io.grpc.MethodDescriptor;
 import java.time.Duration;
 import java.time.Instant;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> {
@@ -67,52 +66,52 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     public Key getAdminKey() {
-        return Key.fromProtobuf(builder.getAdminKey());
+        return Key.fromProtobufKey(builder.getAdminKey());
     }
 
     public TokenUpdateTransaction setAdminKey(Key key) {
         requireNotFrozen();
-        builder.setAdminKey(key.toKeyProtobuf());
+        builder.setAdminKey(key.toProtobufKey());
         return this;
     }
 
     public Key getKycKey() {
-        return Key.fromProtobuf(builder.getKycKey());
+        return Key.fromProtobufKey(builder.getKycKey());
     }
 
     public TokenUpdateTransaction setKycKey(Key key) {
         requireNotFrozen();
-        builder.setKycKey(key.toKeyProtobuf());
+        builder.setKycKey(key.toProtobufKey());
         return this;
     }
 
     public Key getFreezeKey() {
-        return Key.fromProtobuf(builder.getFreezeKey());
+        return Key.fromProtobufKey(builder.getFreezeKey());
     }
 
     public TokenUpdateTransaction setFreezeKey(Key key) {
         requireNotFrozen();
-        builder.setFreezeKey(key.toKeyProtobuf());
+        builder.setFreezeKey(key.toProtobufKey());
         return this;
     }
 
     public Key getWipeKey() {
-        return Key.fromProtobuf(builder.getWipeKey());
+        return Key.fromProtobufKey(builder.getWipeKey());
     }
 
     public TokenUpdateTransaction setWipeKey(Key key) {
         requireNotFrozen();
-        builder.setWipeKey(key.toKeyProtobuf());
+        builder.setWipeKey(key.toProtobufKey());
         return this;
     }
 
     public Key getSupplyKey() {
-        return Key.fromProtobuf(builder.getSupplyKey());
+        return Key.fromProtobufKey(builder.getSupplyKey());
     }
 
     public TokenUpdateTransaction setSupplyKey(Key key) {
         requireNotFrozen();
-        builder.setSupplyKey(key.toKeyProtobuf());
+        builder.setSupplyKey(key.toProtobufKey());
         return this;
     }
 

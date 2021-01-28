@@ -16,6 +16,8 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
     public TransferTransaction() {
         builder = CryptoTransferTransactionBody.newBuilder();
+
+        setMaxTransactionFee(new Hbar(1));
     }
 
     TransferTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {

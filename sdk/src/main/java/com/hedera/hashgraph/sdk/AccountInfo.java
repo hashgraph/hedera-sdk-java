@@ -150,7 +150,7 @@ public final class AccountInfo {
             accountInfo.getDeleted(),
             proxyAccountId,
             accountInfo.getProxyReceived(),
-            Key.fromProtobuf(accountInfo.getKey()),
+            Key.fromProtobufKey(accountInfo.getKey()),
             accountInfo.getBalance(),
             accountInfo.getGenerateSendRecordThreshold(),
             accountInfo.getGenerateReceiveRecordThreshold(),
@@ -175,7 +175,7 @@ public final class AccountInfo {
             .setAccountID(accountId.toProtobuf())
             .setDeleted(isDeleted)
             .setProxyReceived(proxyReceived.toTinybars())
-            .setKey(key.toKeyProtobuf())
+            .setKey(key.toProtobufKey())
             .setBalance(balance.toTinybars())
             .setGenerateSendRecordThreshold(sendRecordThreshold.toTinybars())
             .setGenerateReceiveRecordThreshold(receiveRecordThreshold.toTinybars())

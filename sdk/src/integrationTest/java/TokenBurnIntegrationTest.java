@@ -1,76 +1,236 @@
 import com.hedera.hashgraph.sdk.*;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TokenBurnIntegrationTest {
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(System.getProperty("OPERATOR_ID")));
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(System.getProperty("OPERATOR_KEY")));
-
     @Test
-    void test() {
+    @DisplayName("Can burn tokens")
+    void canBurnTokens() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
-            PrivateKey key = PrivateKey.generate();
+            var key = PrivateKey.generate();
 
-            TransactionResponse response = new AccountCreateTransaction()
+            var response = new AccountCreateTransaction()
                 .setKey(key)
-                .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
                 .execute(client);
 
-            AccountId accountId = response.getReceipt(client).accountId;
-            assertNotNull(accountId);
+            var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
 
-            response = new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .setDecimals(3)
-                .setInitialSupply(1000000)
-                .setTreasuryAccountId(OPERATOR_ID)
-                .setAdminKey(OPERATOR_KEY.getPublicKey())
-                .setFreezeKey(OPERATOR_KEY.getPublicKey())
-                .setWipeKey(OPERATOR_KEY.getPublicKey())
-                .setKycKey(OPERATOR_KEY.getPublicKey())
-                .setSupplyKey(OPERATOR_KEY.getPublicKey())
-                .setFreezeDefault(false)
-                .execute(client);
-
-            TokenId tokenId = response.getReceipt(client).tokenId;
-            assertNotNull(tokenId);
-
-                new TokenBurnTransaction()
-                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                    .setAmount(10)
-                    .setTokenId(tokenId)
+            var tokenId = Objects.requireNonNull(
+                new TokenCreateTransaction()
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setDecimals(3)
+                    .setInitialSupply(1000000)
+                    .setTreasuryAccountId(operatorId)
+                    .setAdminKey(operatorKey)
+                    .setFreezeKey(operatorKey)
+                    .setWipeKey(operatorKey)
+                    .setKycKey(operatorKey)
+                    .setSupplyKey(operatorKey)
+                    .setFreezeDefault(false)
                     .execute(client)
-                    .getReceipt(client);
+                    .getReceipt(client)
+                    .tokenId
+            );
 
-                new TokenDeleteTransaction()
-                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                    .setTokenId(tokenId)
-                    .execute(client)
-                    .getReceipt(client);
+            var receipt = new TokenBurnTransaction()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setAmount(10)
+                .setTokenId(tokenId)
+                .execute(client)
+                .getReceipt(client);
+
+            assertEquals(receipt.totalSupply, 1000000 - 10);
+
+            new TokenDeleteTransaction()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setTokenId(tokenId)
+                .execute(client)
+                .getReceipt(client);
 
             new AccountDeleteTransaction()
                 .setAccountId(accountId)
-                .setTransferAccountId(OPERATOR_ID)
+                .setTransferAccountId(operatorId)
                 .freezeWith(client)
-                .sign(OPERATOR_KEY)
                 .sign(key)
                 .execute(client)
                 .getReceipt(client);
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Cannot burn tokens when token ID is not set")
+    void cannotBurnTokensWhenTokenIDIsNotSet() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+
+            var key = PrivateKey.generate();
+
+            var response = new AccountCreateTransaction()
+                .setKey(key)
+                .setInitialBalance(new Hbar(1))
+                .execute(client);
+
+            var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
+
+            var error = assertThrows(PrecheckStatusException.class, () -> {
+                new TokenBurnTransaction()
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                    .setAmount(10)
+                    .execute(client)
+                    .getReceipt(client);
+            });
+
+            new AccountDeleteTransaction()
+                .setAccountId(accountId)
+                .setTransferAccountId(operatorId)
+                .freezeWith(client)
+                .sign(key)
+                .execute(client)
+                .getReceipt(client);
+
+            assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_ID.toString()));
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Cannot burn tokens when amount is not set")
+    void cannotBurnTokensWhenAmountIsNotSet() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+
+            var key = PrivateKey.generate();
+
+            var response = new AccountCreateTransaction()
+                .setKey(key)
+                .setInitialBalance(new Hbar(1))
+                .execute(client);
+
+            var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
+
+            var tokenId = Objects.requireNonNull(
+                new TokenCreateTransaction()
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setDecimals(3)
+                    .setInitialSupply(1000000)
+                    .setTreasuryAccountId(operatorId)
+                    .setAdminKey(operatorKey)
+                    .setFreezeKey(operatorKey)
+                    .setWipeKey(operatorKey)
+                    .setKycKey(operatorKey)
+                    .setSupplyKey(operatorKey)
+                    .setFreezeDefault(false)
+                    .execute(client)
+                    .getReceipt(client)
+                    .tokenId
+            );
+
+            var error = assertThrows(PrecheckStatusException.class, () -> {
+                new TokenBurnTransaction()
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                    .setTokenId(tokenId)
+                    .execute(client)
+                    .getReceipt(client);
+            });
+
+            new TokenDeleteTransaction()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setTokenId(tokenId)
+                .execute(client)
+                .getReceipt(client);
+
+            new AccountDeleteTransaction()
+                .setAccountId(accountId)
+                .setTransferAccountId(operatorId)
+                .freezeWith(client)
+                .sign(key)
+                .execute(client)
+                .getReceipt(client);
+
+            assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_BURN_AMOUNT.toString()));
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Cannot burn tokens when supply key does not sign transaction")
+    void cannotBurnTokensWhenSupplyKeyDoesNotSignTransaction() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+
+            var key = PrivateKey.generate();
+
+            var response = new AccountCreateTransaction()
+                .setKey(key)
+                .setInitialBalance(new Hbar(1))
+                .execute(client);
+
+            var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
+
+            var tokenId = Objects.requireNonNull(
+                new TokenCreateTransaction()
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setDecimals(3)
+                    .setInitialSupply(1000000)
+                    .setTreasuryAccountId(operatorId)
+                    .setAdminKey(operatorKey)
+                    .setFreezeKey(operatorKey)
+                    .setWipeKey(operatorKey)
+                    .setKycKey(operatorKey)
+                    .setSupplyKey(key)
+                    .setFreezeDefault(false)
+                    .execute(client)
+                    .getReceipt(client)
+                    .tokenId
+            );
+
+            var error = assertThrows(PrecheckStatusException.class, () -> {
+                new TokenBurnTransaction()
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                    .setTokenId(tokenId)
+                    .setAmount(10)
+                    .execute(client)
+                    .getReceipt(client);
+            });
+
+            new TokenDeleteTransaction()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setTokenId(tokenId)
+                .execute(client)
+                .getReceipt(client);
+
+            new AccountDeleteTransaction()
+                .setAccountId(accountId)
+                .setTransferAccountId(operatorId)
+                .freezeWith(client)
+                .sign(key)
+                .execute(client)
+                .getReceipt(client);
+
+            assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
             client.close();
         });

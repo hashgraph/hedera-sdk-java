@@ -85,14 +85,14 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
     }
 
     @Override
-    @FunctionalExecutable(type = "TransactionReceipt", exceptionTypes = {"HederaReceiptStatusException"})
+    @FunctionalExecutable(type = "TransactionReceipt", exceptionTypes = {"ReceiptStatusException"})
     public CompletableFuture<TransactionReceipt> getReceiptAsync(Client client) {
         return new TransactionReceiptQuery()
             .setTransactionId(this)
             .executeAsync(client)
             .thenCompose(receipt -> {
                 if (receipt.status != Status.SUCCESS) {
-                    return failedFuture(new HederaReceiptStatusException(this, receipt));
+                    return failedFuture(new ReceiptStatusException(this, receipt));
                 }
 
                 return completedFuture(receipt);
@@ -100,7 +100,7 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
     }
 
     @Override
-    @FunctionalExecutable(type = "TransactionRecord", exceptionTypes = {"HederaReceiptStatusException"})
+    @FunctionalExecutable(type = "TransactionRecord", exceptionTypes = {"ReceiptStatusException"})
     public CompletableFuture<TransactionRecord> getRecordAsync(Client client) {
         // note: we get the receipt first to ensure consensus has been reached
         return getReceiptAsync(client).thenCompose(receipt -> new TransactionRecordQuery()

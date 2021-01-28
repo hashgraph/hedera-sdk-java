@@ -22,7 +22,7 @@ public class LiveHash {
     protected com.hedera.hashgraph.sdk.proto.LiveHash toProtobuf() {
         var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
         for (Key key : keys) {
-            keyList.addKeys(key.toKeyProtobuf());
+            keyList.addKeys(key.toProtobufKey());
         }
 
         return com.hedera.hashgraph.sdk.proto.LiveHash.newBuilder()

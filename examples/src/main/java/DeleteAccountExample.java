@@ -7,8 +7,8 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.AccountInfoQuery;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.HederaPreCheckStatusException;
-import com.hedera.hashgraph.sdk.HederaReceiptStatusException;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.TransactionId;
@@ -28,7 +28,7 @@ public final class DeleteAccountExample {
 
     private DeleteAccountExample() { }
 
-    public static void main(String[] args) throws TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException {
+    public static void main(String[] args) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         Client client;
 
         if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {

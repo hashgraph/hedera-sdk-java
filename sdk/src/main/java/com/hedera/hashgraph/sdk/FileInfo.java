@@ -6,6 +6,8 @@ import com.hedera.hashgraph.sdk.proto.FileGetInfoResponse;
 
 import java.time.Instant;
 
+import javax.annotation.Nullable;
+
 /**
  * Current information for a file, including its size.
  */
@@ -34,6 +36,7 @@ public final class FileInfo {
      * One of these keys must sign in order to delete the file.
      * All of these keys must sign in order to update the file.
      */
+    @Nullable
     public final KeyList keys;
 
     private FileInfo(
@@ -41,7 +44,7 @@ public final class FileInfo {
         long size,
         Instant expirationTime,
         boolean isDeleted,
-        KeyList keys
+        @Nullable KeyList keys
     ) {
         this.fileId = fileId;
         this.size = size;
@@ -51,7 +54,9 @@ public final class FileInfo {
     }
 
     static FileInfo fromProtobuf(FileGetInfoResponse.FileInfo fileInfo) {
-        KeyList keys = KeyList.fromProtobuf(fileInfo.getKeys(), fileInfo.getKeys().getKeysCount());
+        @Nullable KeyList keys = fileInfo.hasKeys() ?
+            KeyList.fromProtobuf(fileInfo.getKeys(), fileInfo.getKeys().getKeysCount()) :
+            null;
 
         return new FileInfo(
             FileId.fromProtobuf(fileInfo.getFileID()),
@@ -67,17 +72,21 @@ public final class FileInfo {
     }
 
     FileGetInfoResponse.FileInfo toProtobuf() {
-        var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
-        for (Key key : keys) {
-            keyList.addKeys(key.toKeyProtobuf());
-        }
-
         var fileInfoBuilder = FileGetInfoResponse.FileInfo.newBuilder()
             .setFileID(fileId.toProtobuf())
             .setSize(size)
             .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
-            .setDeleted(isDeleted)
-            .setKeys(keyList);
+            .setDeleted(isDeleted);
+
+        if (keys != null) {
+            var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
+
+            for (Key key : keys) {
+                keyList.addKeys(key.toProtobufKey());
+            }
+
+            fileInfoBuilder.setKeys(keyList);
+        }
 
         return fileInfoBuilder.build();
     }

@@ -1,51 +1,36 @@
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.AccountInfoQuery;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.TransactionId;
+import com.hedera.hashgraph.sdk.*;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
 
 import java.util.Collections;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class AccountDeleteIntegrationTest {
     @Test
-    void test() {
+    @DisplayName("Can delete account")
+    void canDeleteAccount() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
-            var operatorId = client.getOperatorAccountId();
-            assertNotNull(operatorId);
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
                 .setKey(key)
-                .setMaxTransactionFee(new Hbar(2))
                 .setInitialBalance(new Hbar(1))
                 .execute(client);
 
-            var receipt = response.transactionId.getReceipt(client);
-
-            assertNotNull(receipt.accountId);
-            assertTrue(Objects.requireNonNull(receipt.accountId).num > 0);
-
-            var account = receipt.accountId;
+            var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
 
             var info = new AccountInfoQuery()
-                .setAccountId(account)
+                .setAccountId(accountId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .execute(client);
 
-            assertEquals(info.accountId, account);
+            assertEquals(info.accountId, accountId);
             assertFalse(info.isDeleted);
             assertEquals(info.key.toString(), key.getPublicKey().toString());
             assertEquals(info.balance, new Hbar(1));
@@ -54,14 +39,63 @@ class AccountDeleteIntegrationTest {
             assertEquals(info.proxyReceived, Hbar.ZERO);
 
             new AccountDeleteTransaction()
-                .setAccountId(account)
+                .setAccountId(accountId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setTransferAccountId(operatorId)
-                .setTransactionId(TransactionId.generate(account))
                 .freezeWith(client)
                 .sign(key)
                 .execute(client)
                 .getReceipt(client);
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Cannot delete invalid account ID")
+    void cannotCreateAccountWithNoKey() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+
+            var error = assertThrows(PrecheckStatusException.class, () -> {
+                new AccountDeleteTransaction()
+                    .setTransferAccountId(operatorId)
+                    .execute(client)
+                    .getReceipt(client);
+            });
+
+            assertTrue(error.getMessage().contains(Status.ACCOUNT_ID_DOES_NOT_EXIST.toString()));
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Cannot delete account that has not signed transaction")
+    void cannotDeleteAccountThatHasNotSignedTransaction() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+
+            var key = PrivateKey.generate();
+
+            var response = new AccountCreateTransaction()
+                .setKey(key)
+                .setInitialBalance(new Hbar(1))
+                .execute(client);
+
+            var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
+
+            var error = assertThrows(PrecheckStatusException.class, () -> {
+                new AccountDeleteTransaction()
+                    .setAccountId(accountId)
+                    .setTransferAccountId(operatorId)
+                    .execute(client)
+                    .getReceipt(client);
+            });
+
+            assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
             client.close();
         });

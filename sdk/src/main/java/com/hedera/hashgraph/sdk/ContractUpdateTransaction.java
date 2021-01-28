@@ -11,7 +11,6 @@ import java.time.Duration;
 import java.time.Instant;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
@@ -87,7 +86,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
 
     @Nullable
     public Key getAdminKey() {
-        return builder.hasAdminKey() ? Key.fromProtobuf(builder.getAdminKey()) : null;
+        return builder.hasAdminKey() ? Key.fromProtobufKey(builder.getAdminKey()) : null;
     }
 
     /**
@@ -98,7 +97,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      */
     public ContractUpdateTransaction setAdminKey(Key adminKey) {
         requireNotFrozen();
-        builder.setAdminKey(adminKey.toKeyProtobuf());
+        builder.setAdminKey(adminKey.toProtobufKey());
         return this;
     }
 

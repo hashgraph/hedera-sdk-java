@@ -13,7 +13,6 @@ import java.time.Duration;
 import java.time.Instant;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
@@ -64,7 +63,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
 
     @Nullable
     public Key getKey() {
-        return builder.hasKey() ? Key.fromProtobuf(builder.getKey()) : null;
+        return builder.hasKey() ? Key.fromProtobufKey(builder.getKey()) : null;
     }
 
     /**
@@ -75,7 +74,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      */
     public AccountUpdateTransaction setKey(Key key) {
         requireNotFrozen();
-        builder.setKey(key.toKeyProtobuf());
+        builder.setKey(key.toProtobufKey());
         return this;
     }
 

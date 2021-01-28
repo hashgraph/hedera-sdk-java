@@ -9,7 +9,6 @@ import io.grpc.MethodDescriptor;
 
 import java.time.Duration;
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
@@ -36,7 +35,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
 
     @Nullable
     public Key getKey() {
-        return builder.hasKey() ? Key.fromProtobuf(builder.getKey()) : null;
+        return builder.hasKey() ? Key.fromProtobufKey(builder.getKey()) : null;
     }
 
     /**
@@ -50,7 +49,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
      */
     public AccountCreateTransaction setKey(Key key) {
         requireNotFrozen();
-        builder.setKey(key.toKeyProtobuf());
+        builder.setKey(key.toProtobufKey());
         return this;
     }
 

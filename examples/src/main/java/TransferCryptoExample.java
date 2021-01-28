@@ -17,7 +17,7 @@ public final class TransferCryptoExample {
     private TransferCryptoExample() {
     }
 
-    public static void main(String[] args) throws TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException {
+    public static void main(String[] args) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         Client client;
 
         if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {

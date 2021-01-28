@@ -4,19 +4,40 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TokenID;
 
 import javax.annotation.Nonnegative;
+import java.util.Objects;
 
-public class TokenId extends EntityId {
+public class TokenId {
+    /**
+     * The shard number
+     */
+    @Nonnegative
+    public final long shard;
+
+    /**
+     * The realm number
+     */
+    @Nonnegative
+    public final long realm;
+
+    /**
+     * The id number
+     */
+    @Nonnegative
+    public final long num;
+
     public TokenId(@Nonnegative long num) {
-        super(0, 0, num);
+        this(0, 0, num);
     }
 
     @SuppressWarnings("InconsistentOverloads")
     public TokenId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num) {
-        super(shard, realm, num);
+        this.shard = shard;
+        this.realm = realm;
+        this.num = num;
     }
 
     public static TokenId fromString(String id) {
-        return EntityId.fromString(id, TokenId::new);
+        return EntityIdHelper.fromString(id, TokenId::new);
     }
 
     static TokenId fromProtobuf(TokenID topicId) {
@@ -37,5 +58,24 @@ public class TokenId extends EntityId {
 
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
+    }
+
+    @Override
+    public String toString() {
+        return "" + shard + "." + realm + "." + num;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(shard, realm, num);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TokenId)) return false;
+
+        TokenId otherId = (TokenId) o;
+        return shard == otherId.shard && realm == otherId.realm && num == otherId.num;
     }
 }

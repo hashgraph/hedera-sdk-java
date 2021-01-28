@@ -17,7 +17,7 @@ public final class CreateAccountThresholdKeyExample {
     private CreateAccountThresholdKeyExample() {
     }
 
-    public static void main(String[] args) throws HederaPreCheckStatusException, TimeoutException, HederaReceiptStatusException {
+    public static void main(String[] args) throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
         Client client;
 
         if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {

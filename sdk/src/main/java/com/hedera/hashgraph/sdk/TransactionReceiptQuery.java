@@ -49,6 +49,13 @@ public final class TransactionReceiptQuery
     }
 
     @Override
+    Status mapResponseStatus(Response response) {
+        var preCheckCode = response.getTransactionGetReceipt().getReceipt().getStatus();
+
+        return Status.valueOf(preCheckCode);
+    }
+
+    @Override
     TransactionReceipt mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
         return TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt());
     }
@@ -70,8 +77,6 @@ public final class TransactionReceiptQuery
 
     @Override
     boolean shouldRetry(Status status, Response response) {
-        if (super.shouldRetry(status, response)) return true;
-
         var receiptStatus =
                 Status.valueOf(response.getTransactionGetReceipt().getReceipt().getStatus());
 

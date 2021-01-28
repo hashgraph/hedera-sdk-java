@@ -108,7 +108,7 @@ public final class ContractInfo {
 
     static ContractInfo fromProtobuf(ContractGetInfoResponse.ContractInfo contractInfo) {
         var adminKey = contractInfo.hasAdminKey()
-            ? Key.fromProtobuf(contractInfo.getAdminKey())
+            ? Key.fromProtobufKey(contractInfo.getAdminKey())
             : null;
 
         var tokenRelationships = new HashMap<TokenId, TokenRelationship>(contractInfo.getTokenRelationshipsCount());
@@ -151,7 +151,7 @@ public final class ContractInfo {
             .setBalance(balance.toTinybars());
 
         if (adminKey != null) {
-            contractInfoBuilder.setAdminKey(adminKey.toKeyProtobuf());
+            contractInfoBuilder.setAdminKey(adminKey.toProtobufKey());
         }
 
         return contractInfoBuilder.build();

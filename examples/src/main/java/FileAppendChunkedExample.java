@@ -1,10 +1,8 @@
 import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.*;
-import com.hedera.hashgraph.sdk.proto.FileAppend;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
@@ -21,7 +19,7 @@ public class FileAppendChunkedExample {
 
     private FileAppendChunkedExample() { }
 
-    public static void main(String[] args) throws TimeoutException, HederaPreCheckStatusException, HederaReceiptStatusException {
+    public static void main(String[] args) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         Client client;
 
         if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {

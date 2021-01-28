@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -41,7 +42,7 @@ public final class PublicKey extends Key {
     /**
      * Verify a signature on a message with this public key.
      *
-     * @param message The array of bytes representing the message
+     * @param message   The array of bytes representing the message
      * @param signature The array of bytes representing the signature
      * @return boolean
      */
@@ -49,8 +50,33 @@ public final class PublicKey extends Key {
         return Ed25519.verify(signature, 0, keyData, 0, message, 0, message.length);
     }
 
+    public boolean verifyTransaction(Transaction<?> transaction) {
+        if (!transaction.isFrozen()) {
+            transaction.freeze();
+        }
+
+        for (var signedTransaction : transaction.signedTransactions) {
+            @Var var found = false;
+            for (var sigPair : signedTransaction.getSigMap().getSigPairList()) {
+                if (sigPair.getPubKeyPrefix().equals(ByteString.copyFrom(toBytes()))) {
+                    found = true;
+
+                    if (!verify(signedTransaction.getBodyBytes().toByteArray(), sigPair.getEd25519().toByteArray())) {
+                        return false;
+                    }
+                }
+            }
+
+            if (!found) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     @Override
-    com.hedera.hashgraph.sdk.proto.Key toKeyProtobuf() {
+    com.hedera.hashgraph.sdk.proto.Key toProtobufKey() {
         return com.hedera.hashgraph.sdk.proto.Key.newBuilder()
             .setEd25519(ByteString.copyFrom(keyData))
             .build();

@@ -82,11 +82,11 @@ public final class TopicInfo {
         var topicInfo = topicInfoResponse.getTopicInfo();
 
         var adminKey = topicInfo.hasAdminKey()
-            ? Key.fromProtobuf(topicInfo.getAdminKey())
+            ? Key.fromProtobufKey(topicInfo.getAdminKey())
             : null;
 
         var submitKey = topicInfo.hasSubmitKey()
-            ? Key.fromProtobuf(topicInfo.getSubmitKey())
+            ? Key.fromProtobufKey(topicInfo.getSubmitKey())
             : null;
 
         var autoRenewAccountId = topicInfo.hasAutoRenewAccount()
@@ -122,11 +122,11 @@ public final class TopicInfo {
             .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
 
         if (adminKey != null) {
-            topicInfoBuilder.setAdminKey(adminKey.toKeyProtobuf());
+            topicInfoBuilder.setAdminKey(adminKey.toProtobufKey());
         }
 
         if (submitKey != null) {
-            topicInfoBuilder.setSubmitKey(submitKey.toKeyProtobuf());
+            topicInfoBuilder.setSubmitKey(submitKey.toProtobufKey());
         }
 
         if (autoRenewAccountId != null) {

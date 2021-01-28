@@ -4,10 +4,7 @@ import com.google.common.base.MoreObjects;
 import com.hedera.hashgraph.sdk.proto.ThresholdKey;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * A list of keys that are required to sign in unison, with an optional threshold controlling how many keys of
@@ -53,7 +50,7 @@ public final class KeyList extends Key implements Collection<Key> {
     static KeyList fromProtobuf(com.hedera.hashgraph.sdk.proto.KeyList keyList, @Nullable Integer threshold) {
         var keys = (threshold != null ? new KeyList(threshold) : new KeyList());
         for (var i = 0; i < keyList.getKeysCount(); ++i) {
-            keys.add(Key.fromProtobuf(keyList.getKeys(i)));
+            keys.add(Key.fromProtobufKey(keyList.getKeys(i)));
         }
 
         return keys;
@@ -147,10 +144,10 @@ public final class KeyList extends Key implements Collection<Key> {
     }
 
     @Override
-    com.hedera.hashgraph.sdk.proto.Key toKeyProtobuf() {
+    com.hedera.hashgraph.sdk.proto.Key toProtobufKey() {
         var protoKeyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
         for (var key : keys) {
-            protoKeyList.addKeys(key.toKeyProtobuf());
+            protoKeyList.addKeys(key.toProtobufKey());
         }
 
         if (threshold != null) {
@@ -172,5 +169,30 @@ public final class KeyList extends Key implements Collection<Key> {
             .add("threshold", threshold)
             .add("keys", keys)
             .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof KeyList)) return false;
+
+        KeyList keyList = (KeyList) o;
+
+        if (keyList.size() != size()) {
+            return false;
+        }
+
+        for (int i = 0; i < keyList.size(); i++) {
+            if (!Arrays.equals(keyList.keys.get(i).toBytes(), keys.get(i).toBytes())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(keys.hashCode(), threshold != null ? threshold : -1);
     }
 }

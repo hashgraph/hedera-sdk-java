@@ -40,7 +40,7 @@ public final class MultiAppTransferExample {
     private MultiAppTransferExample() {
     }
 
-    public static void main(String[] args) throws HederaReceiptStatusException, TimeoutException, HederaPreCheckStatusException, InvalidProtocolBufferException {
+    public static void main(String[] args) throws ReceiptStatusException, TimeoutException, PrecheckStatusException, InvalidProtocolBufferException {
         // the exchange creates an account for the user to transfer funds to
         AccountId exchangeAccountId = new AccountCreateTransaction()
             // the exchange only accepts transfers that it validates through a side channel (e.g. REST API)

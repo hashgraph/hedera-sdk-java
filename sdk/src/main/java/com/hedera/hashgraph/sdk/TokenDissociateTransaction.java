@@ -15,6 +15,8 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
 
     public TokenDissociateTransaction() {
         builder = TokenDissociateTransactionBody.newBuilder();
+
+        setMaxTransactionFee(new Hbar(5));
     }
 
     TokenDissociateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
@@ -41,7 +43,7 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
         return list;
     }
 
-    public TokenDissociateTransaction setTokenIds(TokenId... tokens) {
+    public TokenDissociateTransaction setTokenIds(List<TokenId> tokens) {
         requireNotFrozen();
         builder.clearTokens();
 
