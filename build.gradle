@@ -1,9 +1,9 @@
 plugins {
-	id "net.ltgt.errorprone" version "1.2.1" apply false
+	id "net.ltgt.errorprone" version "1.3.0" apply false
 
 	// Gradle plugin to discover dependency updates
 	// <https://github.com/ben-manes/gradle-versions-plugin>
-	id "com.github.ben-manes.versions" version "0.29.0"
+	id "com.github.ben-manes.versions" version "0.36.0"
 
 	id "jacoco"
 }
@@ -23,7 +23,7 @@ allprojects {
 	dependencies {
 		// https://github.com/google/error-prone
 		// https://errorprone.info/
-		errorprone "com.google.errorprone:error_prone_core:2.5.0"
+		errorprone "com.google.errorprone:error_prone_core:2.5.1"
 
 		// https://github.com/uber/NullAway
 		errorprone "com.uber.nullaway:nullaway:0.8.0"
@@ -32,7 +32,7 @@ allprojects {
 		errorprone "io.grpc:grpc-java-api-checker:1.1.0"
 
 		// https://github.com/eclipse-ee4j/common-annotations-api
-		implementation "jakarta.annotation:jakarta.annotation-api:2.0.0-RC1"
+		implementation "jakarta.annotation:jakarta.annotation-api:2.0.0"
 	}
 
 	jacoco {
