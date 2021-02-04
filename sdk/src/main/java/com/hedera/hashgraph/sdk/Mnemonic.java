@@ -48,6 +48,8 @@ public final class Mnemonic {
         if(words.size() == 22){
             isLegacy = true;
         }
+        wordList = null;
+
         this.words = Collections.unmodifiableList(words);
     }
 
@@ -65,8 +67,11 @@ public final class Mnemonic {
      */
     public static Mnemonic fromWords(List<? extends CharSequence> words) throws BadMnemonicException {
         Mnemonic mnemonic = new Mnemonic(words);
+        wordList = null;
 
-        mnemonic.validate();
+        if(words.size() != 22){
+            mnemonic.validate();
+        }
 
         return mnemonic;
     }
@@ -233,9 +238,17 @@ public final class Mnemonic {
             if(passphrase.compareTo("") != 0){
                 throw new Error("Legacy mnemonic doesn't support passphrases");
             }
-            return PrivateKey.fromLegacyMnemonic(this.wordsToLegacyEntropy());
+            return PrivateKey.fromBytes(PrivateKey.legacyDeriveChildKey(this.wordsToLegacyEntropy(), -1));
         }
         return PrivateKey.fromMnemonic(this, passphrase);
+    }
+
+    public PrivateKey toLegacyPrivateKey() throws BadMnemonicException{
+        if(this.words.size() == 22){
+            return PrivateKey.fromBytes(PrivateKey.legacyDeriveChildKey(this.wordsToLegacyEntropy(), -1));
+        }
+
+        return PrivateKey.fromBytes(PrivateKey.legacyDeriveChildKey(this.wordsToLegacyEntropy2(), 0));
     }
 
     /**
@@ -245,7 +258,7 @@ public final class Mnemonic {
      * account index (0 for default account)
      * @see PrivateKey#fromMnemonic(Mnemonic)
      */
-    public PrivateKey toPrivateKey() throws BadMnemonicException {
+    public PrivateKey toPrivateKey() throws BadMnemonicException{
         return toPrivateKey("");
     }
 
@@ -257,7 +270,7 @@ public final class Mnemonic {
         ArrayList<Integer> unknownIndices = new ArrayList<>();
 
         for (int i = 0; i < words.size(); i++) {
-            if (getWordIndex(words.get(i), isLegacy) < 0) {
+            if (getWordIndex(words.get(i), false) < 0) {
                 unknownIndices.add(i);
             }
         }
@@ -266,7 +279,7 @@ public final class Mnemonic {
             throw new BadMnemonicException(this, BadMnemonicReason.UnknownWords, unknownIndices);
         }
 
-        if (!isLegacy) {
+        if (words.size() != 22) {
             // test the checksum encoded in the mnemonic
             byte[] entropyAndChecksum = wordsToEntropyAndChecksum();
             // ignores the 33rd byte
@@ -361,7 +374,7 @@ public final class Mnemonic {
 
         @Var var indices = new int[words.size()];
         for( var i = 0; i < words.size(); i++){
-            indices[i] = getWordIndex(words.get(i), isLegacy);
+            indices[i] = getWordIndex(words.get(i), true);
         }
         @Var var data = convertRadix(indices, 4096, 256, 33);
         @Var var crc = data[ data.length - 1 ];
@@ -393,6 +406,47 @@ public final class Mnemonic {
         return array2;
     }
 
+    private byte[] wordsToLegacyEntropy2() throws BadMnemonicException{
+        @Var var concatBitsLen = this.words.size() * 11;
+        @Var var concatBits = new boolean[concatBitsLen];
+        Arrays.fill(concatBits, Boolean.FALSE);
+
+        for (int index = 0; index < this.words.size(); index++) {
+            @Var var nds = Collections.binarySearch(getWordList(false), this.words.get(index), null);
+
+            for(int i = 0; i < 11; i++){
+                concatBits[(index * 11) + i] = (nds & (1 << (10 - i))) != 0;
+            }
+        }
+
+        @Var var checksumBitsLen = concatBitsLen / 33;
+        @Var var entropyBitsLen = concatBitsLen - checksumBitsLen;
+
+        @Var var entropy = new byte[entropyBitsLen / 8];
+
+        for (int i = 0; i < entropy.length; i++){
+            for (int j = 0; j < 8; j++){
+                if(concatBits[(i * 8) + j]){
+                    entropy[i] |= 1 << (7 - j);
+                }
+            }
+        }
+
+        var digest = new SHA256Digest();
+        byte[] hash = new byte[entropy.length];
+        digest.update(entropy, 0, entropy.length);
+        digest.doFinal(hash, 0);
+        @Var var hashBits = bytesToBits(hash);
+
+        for (int i = 0; i < checksumBitsLen; i++){
+            if (concatBits[entropyBitsLen + i] != hashBits[i]){
+                throw new BadMnemonicException(this, BadMnemonicReason.ChecksumMismatch);
+            }
+        }
+
+        return entropy;
+    }
+
     private static int[] convertRadix(int[] nums, int fromRadix, int toRadix,int toLength){
         @Var BigInteger num = BigInteger.valueOf(0);
         for (int element : nums) {
@@ -422,5 +476,18 @@ public final class Mnemonic {
         }
 
         return crc ^ 0xFF;
+    }
+
+    private static boolean[] bytesToBits(byte[] dat){
+        @Var var bits = new boolean[dat.length * 8];
+        Arrays.fill(bits, Boolean.FALSE);
+
+        for (int i = 0; i < dat.length; i ++){
+            for (int j = 0; j < 8; j++){
+                bits[(i * 8) + j] = (dat[i] & (1 << (7 - j))) != 0;
+            }
+        }
+
+        return bits;
     }
 }
