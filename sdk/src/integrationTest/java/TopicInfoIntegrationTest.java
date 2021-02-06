@@ -1,6 +1,4 @@
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.*;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -9,10 +7,11 @@ import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TopicMessageSubmitIntegrationTest {
+public class TopicInfoIntegrationTest {
+
     @Test
-    @DisplayName("Can submit a topic message")
-    void canSubmitATopicMessage() {
+    @DisplayName("Can query topic info")
+    void canQueryTopicInfo() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
@@ -24,32 +23,12 @@ public class TopicMessageSubmitIntegrationTest {
 
             var topicId = Objects.requireNonNull(response.getReceipt(client).topicId);
 
-            @Var var info = new TopicInfoQuery()
+            var info = new TopicInfoQuery()
                 .setTopicId(topicId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .execute(client);
 
-            assertEquals(info.topicId, topicId);
             assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
-            assertEquals(info.sequenceNumber, 0);
-            assertEquals(info.adminKey, operatorKey);
-
-            new TopicMessageSubmitTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTopicId(topicId)
-                .setMessage("Hello, from HCS!")
-                .execute(client)
-                .getReceipt(client);
-
-            info = new TopicInfoQuery()
-                .setTopicId(topicId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
-
-            assertEquals(info.topicId, topicId);
-            assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
-            assertEquals(info.sequenceNumber, 1);
-            assertEquals(info.adminKey, operatorKey);
 
             new TopicDeleteTransaction()
                 .setTopicId(topicId)
@@ -61,11 +40,8 @@ public class TopicMessageSubmitIntegrationTest {
     }
 
     @Test
-    @DisplayName("Can submit a large topic message")
-    void canSubmitALargeTopicMessage() {
-        // Skip if using PreviewNet
-        Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
-
+    @DisplayName("Can get cost for topic info query")
+    void getCostQueryTopicInfo() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
@@ -77,35 +53,17 @@ public class TopicMessageSubmitIntegrationTest {
 
             var topicId = Objects.requireNonNull(response.getReceipt(client).topicId);
 
-            @Var var info = new TopicInfoQuery()
+            var infoQuery = new TopicInfoQuery()
                 .setTopicId(topicId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .setNodeAccountIds(Collections.singletonList(response.nodeId));
 
-            assertEquals(info.topicId, topicId);
+            var cost = infoQuery.getCost(client);
+
+            assertNotNull(cost);
+
+            var info = infoQuery.execute(client);
+
             assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
-            assertEquals(info.sequenceNumber, 0);
-            assertEquals(info.adminKey, operatorKey);
-
-            var responses = new TopicMessageSubmitTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTopicId(topicId)
-                .setMessage(Contents.BIG_CONTENTS)
-                .executeAll(client);
-
-            for (var resp : responses) {
-                resp.getReceipt(client);
-            }
-
-            info = new TopicInfoQuery()
-                .setTopicId(topicId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
-
-            assertEquals(info.topicId, topicId);
-            assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
-            assertEquals(info.sequenceNumber, 4);
-            assertEquals(info.adminKey, operatorKey);
 
             new TopicDeleteTransaction()
                 .setTopicId(topicId)
@@ -117,11 +75,8 @@ public class TopicMessageSubmitIntegrationTest {
     }
 
     @Test
-    @DisplayName("Cannot submit message when topic ID is not set")
-    void cannotSubmitMessageWhenTopicIDIsNotSet() {
-        // Skip if using PreviewNet
-        Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
-
+    @DisplayName("Can get cost for topic info query")
+    void getCostBigMaxQueryTopicInfo() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
@@ -133,30 +88,69 @@ public class TopicMessageSubmitIntegrationTest {
 
             var topicId = Objects.requireNonNull(response.getReceipt(client).topicId);
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
-                new TopicMessageSubmitTransaction()
-                    .setMessage(Contents.BIG_CONTENTS)
-                    .execute(client)
-                    .getReceipt(client);
+            var infoQuery = new TopicInfoQuery()
+                .setTopicId(topicId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setMaxQueryPayment(new Hbar(1000));
+
+            var cost = infoQuery.getCost(client);
+
+            assertNotNull(cost);
+
+            var info = infoQuery.execute(client);
+
+            assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
+
+            new TopicDeleteTransaction()
+                .setTopicId(topicId)
+                .execute(client)
+                .getReceipt(client);
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Can get cost for topic info query")
+    void getCostSmallMaxQueryTopicInfo() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+
+            var response = new TopicCreateTransaction()
+                .setAdminKey(operatorKey)
+                .setTopicMemo("[e2e::TopicCreateTransaction]")
+                .execute(client);
+
+            var topicId = Objects.requireNonNull(response.getReceipt(client).topicId);
+
+            var infoQuery = new TopicInfoQuery()
+                .setTopicId(topicId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setMaxQueryPayment(Hbar.fromTinybars(1));
+
+            var cost = infoQuery.getCost(client);
+
+            assertNotNull(cost);
+
+            var error = assertThrows(RuntimeException.class, () -> {
+                infoQuery.execute(client);
             });
 
+            assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for TopicInfoQuery, of "+cost.toString()+", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
+
             new TopicDeleteTransaction()
                 .setTopicId(topicId)
                 .execute(client)
                 .getReceipt(client);
-
-            assertTrue(error.getMessage().contains(Status.INVALID_TOPIC_ID.toString()));
 
             client.close();
         });
     }
 
     @Test
-    @DisplayName("Cannot submit message when message is not set")
-    void cannotSubmitMessageWhenMessageIsNotSet() {
-        // Skip if using PreviewNet
-        Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
-
+    @DisplayName("Can get cost for topic info query")
+    void getCostInsufficientTxFeeQueryTopicInfo() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
@@ -168,21 +162,28 @@ public class TopicMessageSubmitIntegrationTest {
 
             var topicId = Objects.requireNonNull(response.getReceipt(client).topicId);
 
+            var infoQuery = new TopicInfoQuery()
+                .setTopicId(topicId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId));
+
+            var cost = infoQuery.getCost(client);
+
+            assertNotNull(cost);
+
             var error = assertThrows(PrecheckStatusException.class, () -> {
-                new TopicMessageSubmitTransaction()
-                    .setTopicId(topicId)
-                    .execute(client)
-                    .getReceipt(client);
+                infoQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(client);
             });
+
+            assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
 
             new TopicDeleteTransaction()
                 .setTopicId(topicId)
                 .execute(client)
                 .getReceipt(client);
 
-            assertTrue(error.getMessage().contains(Status.INVALID_TOPIC_MESSAGE.toString()));
-
             client.close();
         });
     }
+
+
 }

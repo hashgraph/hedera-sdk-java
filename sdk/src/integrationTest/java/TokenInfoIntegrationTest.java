@@ -77,7 +77,7 @@ class TokenInfoIntegrationTest {
     }
 
     @Test
-    @DisplayName("Can query token info when all keys are different")
+    @DisplayName("Can query token with minimal properties")
     void canQueryTokenInfoWhenTokenIsCreatedWithMinimalProperties() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
@@ -113,4 +113,126 @@ class TokenInfoIntegrationTest {
             client.close();
         });
     }
+
+    @Test
+    @DisplayName("Get cost of token info query")
+    void getCostQueryTokenInfo() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+
+            var response = new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTreasuryAccountId(operatorId)
+                .execute(client);
+
+            var tokenId = Objects.requireNonNull(response.getReceipt(client).tokenId);
+
+            var infoQuery = new TokenInfoQuery()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setTokenId(tokenId);
+
+            var cost = infoQuery.getCost(client);
+
+            infoQuery.setQueryPayment(cost).execute(client);
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Get cost of token info query, with big max")
+    void getCostBigMaxQueryTokenInfo() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+
+            var response = new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTreasuryAccountId(operatorId)
+                .execute(client);
+
+            var tokenId = Objects.requireNonNull(response.getReceipt(client).tokenId);
+
+            var infoQuery = new TokenInfoQuery()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setTokenId(tokenId)
+                .setMaxQueryPayment(new Hbar(1000));
+
+            var cost = infoQuery.getCost(client);
+
+            infoQuery.setQueryPayment(cost).execute(client);
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Can query token info when all keys are different")
+    void getCostSmallMaxTokenInfo() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+
+            var response = new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTreasuryAccountId(operatorId)
+                .execute(client);
+
+            var tokenId = Objects.requireNonNull(response.getReceipt(client).tokenId);
+
+            var infoQuery = new TokenInfoQuery()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setTokenId(tokenId)
+                .setMaxQueryPayment(Hbar.fromTinybars(1));
+
+            var cost = infoQuery.getCost(client);
+
+            var error = assertThrows(RuntimeException.class, () -> {
+                infoQuery.execute(client);
+            });
+
+            assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for TokenInfoQuery, of "+cost.toString()+", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Throws insufficient transaction fee error")
+    void getCostInsufficientTxFeeQueryTokenInfo() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+
+            var response = new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTreasuryAccountId(operatorId)
+                .execute(client);
+
+            var tokenId = Objects.requireNonNull(response.getReceipt(client).tokenId);
+
+            var infoQuery = new TokenInfoQuery()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setTokenId(tokenId)
+                .setMaxQueryPayment(new Hbar(1000));
+
+            var cost = infoQuery.getCost(client);
+
+            var error = assertThrows(PrecheckStatusException.class, () -> {
+                infoQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(client);
+            });
+
+            assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
+
+            client.close();
+        });
+    }
 }
+
+
+
