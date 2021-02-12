@@ -6,7 +6,7 @@ package proto;
  * ‌
  * Hedera Network Services Protobuf
  * ​
- * Copyright (C) 2018 - 2020 Hedera Hashgraph, LLC
+ * Copyright (C) 2018 - 2021 Hedera Hashgraph, LLC
  * ​
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import "Timestamp.proto";
 
 // Current state of a topic.
 message ConsensusTopicInfo {
-    string memo = 1; // Short publicly visible memo about the topic. No guarantee of uniqueness.
+    string memo = 1; // The memo associated with the topic (UTF-8 encoding max 100 bytes)
 
     // When a topic is created, its running hash is initialized to 48 bytes of binary zeros.
     // For each submitted message, the topic's running hash is then updated to the output
@@ -51,6 +51,6 @@ message ConsensusTopicInfo {
     Key adminKey = 5; // Access control for update/delete of the topic. Null if there is no key.
     Key submitKey = 6; // Access control for ConsensusService.submitMessage. Null if there is no key.
 
-    Duration autoRenewPeriod = 7;
-    AccountID autoRenewAccount = 8; // Null if there is no autoRenewAccount.
+    Duration autoRenewPeriod = 7; // If an auto-renew account is specified, when the topic expires, its lifetime will be extended by up to this duration (depending on the solvency of the auto-renew account). If the auto-renew account has no funds at all, the topic will be deleted instead.
+    AccountID autoRenewAccount = 8; // The account, if any, to charge for automatic renewal of the topic's lifetime upon expiry.
 }

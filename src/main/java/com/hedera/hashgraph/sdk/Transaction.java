@@ -2,24 +2,14 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.proto.ConsensusServiceGrpc;
-import com.hedera.hashgraph.proto.CryptoServiceGrpc;
-import com.hedera.hashgraph.proto.FileServiceGrpc;
-import com.hedera.hashgraph.proto.FreezeServiceGrpc;
-import com.hedera.hashgraph.proto.SignatureMap;
-import com.hedera.hashgraph.proto.SignatureMapOrBuilder;
-import com.hedera.hashgraph.proto.SignaturePair;
-import com.hedera.hashgraph.proto.SignaturePairOrBuilder;
-import com.hedera.hashgraph.proto.SmartContractServiceGrpc;
-import com.hedera.hashgraph.proto.TransactionBody;
-import com.hedera.hashgraph.proto.TransactionBodyOrBuilder;
-import com.hedera.hashgraph.proto.TransactionResponse;
+import com.hedera.hashgraph.proto.*;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hedera.hashgraph.sdk.crypto.TransactionSigner;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 
+import com.hedera.hashgraph.sdk.schedule.ScheduleCreateTransaction;
 import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.crypto.digests.SHA384Digest;
 
@@ -50,8 +40,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
     Transaction(
         com.hedera.hashgraph.proto.Transaction.Builder inner,
         TransactionBodyOrBuilder body,
-        MethodDescriptor<com.hedera.hashgraph.proto.Transaction, TransactionResponse> methodDescriptor)
-    {
+        MethodDescriptor<com.hedera.hashgraph.proto.Transaction, TransactionResponse> methodDescriptor) {
         this.inner = inner;
         this.nodeAccountId = body.getNodeAccountID();
         this.txnIdProto = body.getTransactionID();
@@ -76,7 +65,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
      *
      * @param publicKey the public key that pairs with the signature.
      *                  Currently only {@link Ed25519PublicKey} is allowed.
-     * @param signer the labmda to generate the signature.
+     * @param signer    the labmda to generate the signature.
      * @return {@code this} for fluent usage.
      * @see TransactionSigner
      */
@@ -121,7 +110,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
 
     /**
      * Calculate the expected hash of the transaction.
-     *
+     * <p>
      * The transaction must have all required signatures and have the node
      * account id set in order to be accurate.
      *
@@ -143,14 +132,21 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
         return hash;
     }
 
+    public final ScheduleCreateTransaction schedule() {
+        ScheduleCreateTransaction transaction = new ScheduleCreateTransaction();
+        transaction.bodyBuilder.getScheduleCreateBuilder()
+            .setTransactionBody(this.inner.getBodyBytes())
+            .setSigMap(this.inner.getSigMap());
+        return transaction;
+    }
+
     @Override
     public final TransactionId execute(Client client, Duration timeout) throws HederaStatusException, HederaNetworkException, LocalValidationException {
         // Sign with the operator if there is a client; the client has an operator; and, the transaction
         // has a transaction ID that matches that operator ( which it would unless overridden ).
         if (client.getOperatorPublicKey() != null && client.getOperatorSigner() != null
             && client.getOperatorId() != null
-            && client.getOperatorId().equals(new AccountId(txnIdProto.getAccountID())))
-        {
+            && client.getOperatorId().equals(new AccountId(txnIdProto.getAccountID()))) {
             signWith(client.getOperatorPublicKey(), client.getOperatorSigner());
         }
 
@@ -163,8 +159,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
         // has a transaction ID that matches that operator ( which it would unless overridden ).
         if (client.getOperatorPublicKey() != null && client.getOperatorSigner() != null
             && client.getOperatorId() != null
-            && client.getOperatorId().equals(new AccountId(txnIdProto.getAccountID())))
-        {
+            && client.getOperatorId().equals(new AccountId(txnIdProto.getAccountID()))) {
             signWith(client.getOperatorPublicKey(), client.getOperatorSigner());
         }
 
@@ -375,6 +370,13 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
 
             case CONSENSUSSUBMITMESSAGE:
                 return ConsensusServiceGrpc.getSubmitMessageMethod();
+
+            case SCHEDULECREATE:
+                return ScheduleServiceGrpc.getCreateScheduleMethod();
+            case SCHEDULEDELETE:
+                return ScheduleServiceGrpc.getDeleteScheduleMethod();
+            case SCHEDULESIGN:
+                return ScheduleServiceGrpc.getSignScheduleMethod();
 
             case DATA_NOT_SET:
                 throw new IllegalArgumentException("method not set");
