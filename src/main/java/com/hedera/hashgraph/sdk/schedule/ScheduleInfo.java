@@ -22,13 +22,13 @@ public class ScheduleInfo {
     /**
      * The Schedule ID which created the Scheduled TX
      */
-    public final AccountId creatorId;
+    public final AccountId creatorAccountId;
 
     /**
      * The account which is going to pay for the execution of the Scheduled TX
      */
     @Nullable
-    public final AccountId payerId;
+    public final AccountId payerAccountId;
 
     /**
      * The transaction serialized into bytes that must be signed
@@ -58,8 +58,8 @@ public class ScheduleInfo {
 
     ScheduleInfo(com.hedera.hashgraph.proto.ScheduleInfo info) {
         scheduleId = new ScheduleId(info.getScheduleID());
-        creatorId = new AccountId(info.getCreatorAccountID());
-        payerId = new AccountId(info.getPayerAccountID());
+        creatorAccountId = new AccountId(info.getCreatorAccountID());
+        payerAccountId = new AccountId(info.getPayerAccountID());
         bodyBytes = info.getTransactionBody();
         signatories = info.hasSignatories() ? (KeyList) PublicKey.fromProtoKey(Key.newBuilder().setKeyList(info.getSignatories())) : null;
         adminKey = info.hasAdminKey() ? PublicKey.fromProtoKey(info.getAdminKey()) : null;
@@ -81,8 +81,8 @@ public class ScheduleInfo {
     public String toString() {
         return MoreObjects.toStringHelper(this)
             .add("scheduleId", scheduleId)
-            .add("creatorId", creatorId)
-            .add("payerId", payerId)
+            .add("creatorAccountId", creatorAccountId)
+            .add("payerAccountId", payerAccountId)
             .add("bodyBytes", bodyBytes)
             .add("signatories", signatories)
             .add("adminKey", adminKey)

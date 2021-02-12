@@ -134,6 +134,7 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
 
     public final ScheduleCreateTransaction schedule() {
         ScheduleCreateTransaction transaction = new ScheduleCreateTransaction();
+        transaction.setNodeAccountId(new AccountId(this.nodeAccountId));
         transaction.bodyBuilder.getScheduleCreateBuilder()
             .setTransactionBody(this.inner.getBodyBytes())
             .setSigMap(this.inner.getSigMap());
