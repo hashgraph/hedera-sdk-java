@@ -14,7 +14,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.lang.ref.SoftReference;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -24,6 +26,8 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.annotation.Nullable;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * BIP-39 24-word mnemonic phrases compatible with the Android and iOS mobile wallets.
@@ -36,6 +40,8 @@ public final class Mnemonic {
 
     @Nullable
     private String asString;
+
+    public boolean isLegacy = false;
 
     private static final SecureRandom secureRandom = new SecureRandom();
 
@@ -50,6 +56,11 @@ public final class Mnemonic {
      * @param words the 24-word list that constitutes a mnemonic phrase.
      */
     public Mnemonic(List<? extends CharSequence> words) {
+        if(words.size() == 22){
+            this.isLegacy = true;
+        }
+        wordList = null;
+
         this.words = Collections.unmodifiableList(words);
     }
 
@@ -57,7 +68,15 @@ public final class Mnemonic {
      * Recover a mnemonic from a string, splitting on spaces.
      */
     public static Mnemonic fromString(String mnemonicString) {
-        return new Mnemonic(Arrays.asList(mnemonicString.split(" ")));
+        List<String> list = Arrays.asList(mnemonicString.split(" "));
+        Mnemonic mnemonic = new Mnemonic(list);
+        wordList = null;
+
+        if(list.size() != 22){
+            mnemonic.validate();
+        }
+
+        return mnemonic;
     }
 
     /**
@@ -80,10 +99,21 @@ public final class Mnemonic {
      *                   mobile wallets, use {@link #toPrivateKey()} instead.)
      * @return the recovered key; use {@link Ed25519PrivateKey#derive(int)} to get a key for an
      * account index (0 for default account)
-     * @see Ed25519PrivateKey#fromMnemonic(Mnemonic, String)
+      * @see Ed25519PrivateKey#fromMnemonic(Mnemonic, String)
      */
-    public Ed25519PrivateKey toPrivateKey(String passphrase) {
+    public Ed25519PrivateKey toPrivateKey(String passphrase){
+        if(isLegacy){
+            throw new Error("This is a legacy mnemonic, please use Mnemonic.toLegacyPrivateKey().");
+        }
         return Ed25519PrivateKey.fromMnemonic(this, passphrase);
+    }
+
+    public Ed25519PrivateKey toLegacyPrivateKey(){
+        if(this.words.size() == 22){
+            return Ed25519PrivateKey.fromBytes(Ed25519PrivateKey.legacyDeriveChildKey(this.wordsToLegacyEntropy(), -1));
+        }
+
+        return Ed25519PrivateKey.fromBytes(Ed25519PrivateKey.legacyDeriveChildKey(this.wordsToLegacyEntropy2(), 0));
     }
 
     /**
@@ -123,15 +153,16 @@ public final class Mnemonic {
      * BIP-39 English word list
      * </a>.
      */
+
     public MnemonicValidationResult validate() {
-        if (words.size() != 24) {
+        if (this.words.size() != 24) {
             return new MnemonicValidationResult(MnemonicValidationStatus.BadLength);
         }
 
         ArrayList<Integer> unknownIndices = new ArrayList<>();
 
-        for (int i = 0; i < words.size(); i++) {
-            if (getWordIndex(words.get(i)) < 0) {
+        for (int i = 0; i < this.words.size(); i++) {
+            if (getWordIndex(this.words.get(i), false) < 0) {
                 unknownIndices.add(i);
             }
         }
@@ -142,7 +173,6 @@ public final class Mnemonic {
 
         // test the checksum encoded in the mnemonic
         byte[] entropyAndChecksum = wordsToEntropyAndChecksum();
-
         // ignores the 33rd byte
         byte expectedChecksum = checksum(entropyAndChecksum);
         byte givenChecksum = entropyAndChecksum[32];
@@ -152,6 +182,85 @@ public final class Mnemonic {
         }
 
         return new MnemonicValidationResult(MnemonicValidationStatus.Ok);
+    }
+
+
+
+    private byte[] wordsToLegacyEntropy(){
+        int[] indices = new int[words.size()];
+        for( int i = 0; i < words.size(); i++){
+            indices[i] = getWordIndex(words.get(i), true);
+        }
+        int[] data = convertRadix(indices, 4096, 256, 33);
+        int crc = data[ data.length - 1 ];
+        int[] result = new int[data.length - 1];
+        for (int i = 0; i < data.length - 1; i += 1) {
+            result[ i ] = data[ i ] ^ crc;
+        }
+        //int to byte conversion
+        ByteBuffer byteBuffer = ByteBuffer.allocate(result.length * 4);
+        IntBuffer intBuffer = byteBuffer.asIntBuffer();
+        intBuffer.put(result);
+
+        int crc2 = crc8(result);
+        if (crc != crc2) {
+            throw new Error("Legacy mnemonic checksum mismatch.");
+
+        }
+
+        byte[] array = byteBuffer.array();
+        int i = 0;
+        int j = 3;
+        byte[] array2 = new byte[data.length-1];
+        //remove all the fill 0s
+        while(j < array.length){
+            array2[i] = array[j];
+            i++;
+            j = j + 4;
+        }
+
+        return array2;
+    }
+
+    private byte[] wordsToLegacyEntropy2(){
+        int concatBitsLen = this.words.size() * 11;
+        boolean[] concatBits = new boolean[concatBitsLen];
+        Arrays.fill(concatBits, Boolean.FALSE);
+
+        for (int index = 0; index < this.words.size(); index++) {
+            int  nds = Collections.binarySearch(getWordList(false), this.words.get(index), null);
+
+            for(int i = 0; i < 11; i++){
+                concatBits[(index * 11) + i] = (nds & (1 << (10 - i))) != 0;
+            }
+        }
+
+        int checksumBitsLen = concatBitsLen / 33;
+        int entropyBitsLen = concatBitsLen - checksumBitsLen;
+
+        byte[] entropy = new byte[entropyBitsLen / 8];
+
+        for (int i = 0; i < entropy.length; i++){
+            for (int j = 0; j < 8; j++){
+                if(concatBits[(i * 8) + j]){
+                    entropy[i] |= 1 << (7 - j);
+                }
+            }
+        }
+
+        SHA256Digest digest = new SHA256Digest();
+        byte[] hash = new byte[entropy.length];
+        digest.update(entropy, 0, entropy.length);
+        digest.doFinal(hash, 0);
+        boolean[] hashBits = bytesToBits(hash);
+
+        for (int i = 0; i < checksumBitsLen; i++){
+            if (concatBits[entropyBitsLen + i] != hashBits[i]){
+                throw new Error("Mnemonic 3 checksum mismatch.");
+            }
+        }
+
+        return entropy;
     }
 
     @Override
@@ -191,7 +300,7 @@ public final class Mnemonic {
         int scratch = 0;
         int offset = 0;
         for (CharSequence word : words) {
-            int index = getWordIndex(word);
+            int index = getWordIndex(word, false);
 
             if (index < 0) {
                 // should also be checked in `validate()`
@@ -224,7 +333,7 @@ public final class Mnemonic {
         byte[] bytes = Arrays.copyOf(entropy, 33);
         bytes[32] = checksum(entropy);
 
-        List<String> wordList = getWordList();
+        List<String> wordList = getWordList(false);
         ArrayList<String> words = new ArrayList<>(24);
 
         int scratch = 0;
@@ -261,15 +370,15 @@ public final class Mnemonic {
         return checksum[0];
     }
 
-    private static int getWordIndex(CharSequence word) {
-        return Collections.binarySearch(getWordList(), word, null);
+    private static int getWordIndex(CharSequence word, boolean isLegacy) {
+        return Collections.binarySearch(getWordList(isLegacy), word, null);
     }
 
-    private static List<String> getWordList() {
+    private static List<String> getWordList(boolean isLegacy) {
         if (wordList == null || wordList.get() == null) {
             synchronized (Mnemonic.class) {
                 if (wordList == null || wordList.get() == null) {
-                    List<String> words = readWordList();
+                    List<String> words = readWordList(isLegacy);
                     wordList = new SoftReference<>(words);
                     // immediately return the strong reference
                     return words;
@@ -280,17 +389,76 @@ public final class Mnemonic {
         return wordList.get();
     }
 
-    private static List<String> readWordList() {
-        InputStream wordStream = Mnemonic.class.getClassLoader().getResourceAsStream("bip39-english.txt");
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(wordStream)))) {
-            ArrayList<String> words = new ArrayList<>(2048);
+    private static List<String> readWordList(boolean isLegacy) {
+        if(isLegacy){
+            InputStream wordStream = Mnemonic.class.getClassLoader().getResourceAsStream("legacy-english.txt");
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(wordStream), UTF_8))) {
+                ArrayList<String> words = new ArrayList<>(4096);
 
-            for (String word = reader.readLine(); word != null; word = reader.readLine()) {
-                words.add(word);
+                for (String word = reader.readLine(); word != null; word = reader.readLine()) {
+                    words.add(word);
+                }
+                return Collections.unmodifiableList(words);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
             }
-            return Collections.unmodifiableList(words);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
         }
+        else{
+            InputStream wordStream = Mnemonic.class.getClassLoader().getResourceAsStream("bip39-english.txt");
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(wordStream)))) {
+                ArrayList<String> words = new ArrayList<>(2048);
+
+                for (String word = reader.readLine(); word != null; word = reader.readLine()) {
+                    words.add(word);
+                }
+                return Collections.unmodifiableList(words);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
+    }
+
+    private static int[] convertRadix(int[] nums, int fromRadix, int toRadix,int toLength){
+        BigInteger num = BigInteger.valueOf(0);
+        for (int element : nums) {
+            num = num.multiply(BigInteger.valueOf(fromRadix));
+            num = num.add(BigInteger.valueOf(element));
+        }
+
+        int[] result = new int[toLength];
+        for (int i = toLength - 1; i >= 0; i -= 1) {
+            BigInteger tem = num.divide(BigInteger.valueOf(toRadix));
+            BigInteger rem = num.mod(BigInteger.valueOf(toRadix));
+            num = tem;
+            result[ i ] = rem.intValue();
+        }
+
+        return result;
+    }
+
+    private static int crc8(int[] data) {
+        int crc = 0xFF;
+
+        for (int i = 0; i < data.length - 1; i += 1) {
+            crc ^= data[ i ];
+            for (int j = 0; j < 8; j += 1) {
+                crc = (crc >>> 1) ^ (((crc & 1) == 0) ? 0 : 0xB2);
+            }
+        }
+
+        return crc ^ 0xFF;
+    }
+
+    private static boolean[] bytesToBits(byte[] dat){
+        boolean[] bits = new boolean[dat.length * 8];
+        Arrays.fill(bits, Boolean.FALSE);
+
+        for (int i = 0; i < dat.length; i ++){
+            for (int j = 0; j < 8; j++){
+                bits[(i * 8) + j] = (dat[i] & (1 << (7 - j))) != 0;
+            }
+        }
+
+        return bits;
     }
 }

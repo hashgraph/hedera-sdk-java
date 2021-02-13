@@ -15,6 +15,7 @@ import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.digests.SHA512Digest;
+import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
@@ -36,6 +37,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 import javax.annotation.Nullable;
 
@@ -74,6 +76,16 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
         final Ed25519PrivateKeyParameters privateKeyParameters = new Ed25519PrivateKeyParameters(deriveData, 0);
         final KeyParameter chainCode = new KeyParameter(deriveData, 32, 32);
         return new Ed25519PrivateKey(privateKeyParameters, chainCode);
+    }
+
+    public Ed25519PrivateKey legacyDerive(int index) {
+        if(this.privKeyParams != null){
+            byte[] keyBytes = legacyDeriveChildKey(this.privKeyParams.getEncoded(), index);
+
+            return Ed25519PrivateKey.fromBytes(keyBytes);
+        }
+
+        return this;
     }
 
     private static Ed25519PrivateKey fromPrivateKeyInfo(PrivateKeyInfo privateKeyInfo) {
@@ -222,6 +234,28 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
         final KeyParameter childChainCode = new KeyParameter(output, 32, 32);
 
         return new Ed25519PrivateKey(childKeyParams, childChainCode);
+    }
+
+    public static byte[] legacyDeriveChildKey(byte[] entropy,int index) {
+        byte[] seed = new byte[entropy.length + 8];
+        if(index >= 0){
+            Arrays.fill(seed, entropy.length, entropy.length + 4, (byte)0);
+        } else {
+            Arrays.fill(seed, entropy.length, entropy.length + 4, (byte)-1);
+        }
+        Arrays.fill(seed, entropy.length + 4, entropy.length + 8, (byte)index);
+        System.arraycopy(entropy, 0, seed, 0, entropy.length);
+
+        byte[] salt = new byte[1];
+        salt[0] = -1;
+        PKCS5S2ParametersGenerator pbkdf2 = new PKCS5S2ParametersGenerator(new SHA512Digest());
+        pbkdf2.init(
+            seed,
+            salt,
+            2048);
+
+        KeyParameter key = (KeyParameter) pbkdf2.generateDerivedParameters(256);
+        return key.getKey();
     }
 
     /**
