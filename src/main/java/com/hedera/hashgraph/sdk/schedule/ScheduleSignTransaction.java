@@ -18,7 +18,7 @@ public class ScheduleSignTransaction extends SingleTransactionBuilder<ScheduleSi
         return this;
     }
 
-    public ScheduleSignTransaction addSignature(PublicKey publicKey, byte[] signature) {
+    public ScheduleSignTransaction addScheduleSignature(PublicKey publicKey, byte[] signature) {
         SignatureMap.Builder sigMap = builder.getSigMapBuilder();
 
         SignaturePair.Builder sigPairBuilder = SignaturePair.newBuilder()

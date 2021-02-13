@@ -1,5 +1,7 @@
 package com.hedera.hashgraph.sdk.crypto.ed25519;
 
+import com.google.protobuf.ByteString;
+import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.crypto.BadKeyException;
 import com.hedera.hashgraph.sdk.crypto.CryptoUtils;
 import com.hedera.hashgraph.sdk.crypto.Keystore;
@@ -389,6 +391,17 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
         Ed25519.sign(secret, 0, message, messageOffset, messageLen, sigBytes, 0);
 
         return sigBytes;
+    }
+
+    /**
+     * Sign the transaction `bodyBytes` and  get the resulting signature
+     * @param transaction
+     * @return
+     */
+    @Override
+    public byte[] signTransaction(Transaction transaction) {
+        ByteString bodyBytes = transaction.toProto().getBodyBytes();
+        return sign(bodyBytes.toByteArray(), 0, bodyBytes.size());
     }
 
     private byte[] encodeDER() {

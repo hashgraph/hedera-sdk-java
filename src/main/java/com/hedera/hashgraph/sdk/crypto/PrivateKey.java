@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk.crypto;
 
 import com.hedera.hashgraph.sdk.Internal;
+import com.hedera.hashgraph.sdk.Transaction;
 
 public abstract class PrivateKey<PubKey extends PublicKey> {
 
@@ -22,6 +23,8 @@ public abstract class PrivateKey<PubKey extends PublicKey> {
 
     @Internal
     public abstract byte[] sign(byte[] message, int messageOffset, int messageLen);
+
+    public abstract byte[] signTransaction(Transaction transaction);
 
     @Internal
     public byte[] sign(byte[] message) {
