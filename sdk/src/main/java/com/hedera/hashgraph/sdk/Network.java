@@ -5,6 +5,7 @@ import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +87,7 @@ class Network {
      * @return {@link java.util.List<com.hedera.hashgraph.sdk.AccountId>}
      */
     List<AccountId> getNodeAccountIdsForExecute() {
-        nodes.sort(Node::compareTo);
+        Collections.sort(nodes);
 
         List<AccountId> resultNodeAccountIds = new ArrayList<>();
 
