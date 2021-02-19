@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk.crypto.ed25519;
 
+import com.hedera.hashgraph.sdk.Internal;
 import com.hedera.hashgraph.sdk.crypto.BadKeyException;
 import com.hedera.hashgraph.sdk.crypto.CryptoUtils;
 import com.hedera.hashgraph.sdk.crypto.Keystore;
@@ -236,7 +237,8 @@ public final class Ed25519PrivateKey extends PrivateKey<Ed25519PublicKey> {
         return new Ed25519PrivateKey(childKeyParams, childChainCode);
     }
 
-    public static byte[] legacyDeriveChildKey(byte[] entropy,int index) {
+    @Internal
+    public static byte[] legacyDeriveChildKey(byte[] entropy, int index) {
         byte[] seed = new byte[entropy.length + 8];
         if(index >= 0){
             Arrays.fill(seed, entropy.length, entropy.length + 4, (byte)0);

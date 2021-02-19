@@ -41,7 +41,7 @@ public final class Mnemonic {
     @Nullable
     private String asString;
 
-    public boolean isLegacy = false;
+    boolean isLegacy = false;
 
     private static final SecureRandom secureRandom = new SecureRandom();
 
@@ -99,16 +99,16 @@ public final class Mnemonic {
      *                   mobile wallets, use {@link #toPrivateKey()} instead.)
      * @return the recovered key; use {@link Ed25519PrivateKey#derive(int)} to get a key for an
      * account index (0 for default account)
-      * @see Ed25519PrivateKey#fromMnemonic(Mnemonic, String)
+     * @see Ed25519PrivateKey#fromMnemonic(Mnemonic, String)
      */
-    public Ed25519PrivateKey toPrivateKey(String passphrase){
+    public Ed25519PrivateKey toPrivateKey(String passphrase) {
         if(isLegacy){
             throw new Error("This is a legacy mnemonic, please use Mnemonic.toLegacyPrivateKey().");
         }
         return Ed25519PrivateKey.fromMnemonic(this, passphrase);
     }
 
-    public Ed25519PrivateKey toLegacyPrivateKey(){
+    public Ed25519PrivateKey toLegacyPrivateKey() {
         if(this.words.size() == 22){
             return Ed25519PrivateKey.fromBytes(Ed25519PrivateKey.legacyDeriveChildKey(this.wordsToLegacyEntropy(), -1));
         }
@@ -186,7 +186,7 @@ public final class Mnemonic {
 
 
 
-    private byte[] wordsToLegacyEntropy(){
+    private byte[] wordsToLegacyEntropy() {
         int[] indices = new int[words.size()];
         for( int i = 0; i < words.size(); i++){
             indices[i] = getWordIndex(words.get(i), true);
@@ -222,7 +222,7 @@ public final class Mnemonic {
         return array2;
     }
 
-    private byte[] wordsToLegacyEntropy2(){
+    private byte[] wordsToLegacyEntropy2() {
         int concatBitsLen = this.words.size() * 11;
         boolean[] concatBits = new boolean[concatBitsLen];
         Arrays.fill(concatBits, Boolean.FALSE);
