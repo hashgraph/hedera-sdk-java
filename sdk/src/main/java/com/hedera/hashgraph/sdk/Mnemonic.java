@@ -48,6 +48,8 @@ public final class Mnemonic {
         if(words.size() == 22){
             isLegacy = true;
         }
+
+        // Set the wordList to null so we can fetch correct wordlist once we need it.
         wordList = null;
 
         this.words = Collections.unmodifiableList(words);
@@ -67,6 +69,8 @@ public final class Mnemonic {
      */
     public static Mnemonic fromWords(List<? extends CharSequence> words) throws BadMnemonicException {
         Mnemonic mnemonic = new Mnemonic(words);
+
+        // Set the wordList to null so we can fetch correct wordlist once we need it.
         wordList = null;
 
         if(words.size() != 22){
@@ -106,9 +110,7 @@ public final class Mnemonic {
         var entropy = new byte[16];
         ThreadLocalSecureRandom.current().nextBytes(entropy);
 
-        Mnemonic k = new Mnemonic(entropyToWords(entropy));
-
-        return k;
+        return new Mnemonic(entropyToWords(entropy));
     }
 
     private static List<String> entropyToWords(byte[] entropy) {
