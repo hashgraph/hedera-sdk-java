@@ -1,11 +1,9 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ScheduleSignTransactionBody;
 import com.hedera.hashgraph.sdk.proto.ScheduleServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.SignatureMap;
-import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
@@ -43,7 +41,7 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
         return this;
     }
 
-    public ScheduleSignTransaction addSignature(PublicKey publicKey, byte[] signature) {
+    public ScheduleSignTransaction addScheduleSignature(PublicKey publicKey, byte[] signature) {
         SignatureMap.Builder sigMap = builder.getSigMap().toBuilder();
         sigMap.addSigPair(publicKey.toSignaturePairProtobuf(signature));
 

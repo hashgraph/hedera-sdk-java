@@ -6,7 +6,7 @@ package proto;
  * ‌
  * Hedera Network Services Protobuf
  * ​
- * Copyright (C) 2018 - 2020 Hedera Hashgraph, LLC
+ * Copyright (C) 2018 - 2021 Hedera Hashgraph, LLC
  * ​
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,4 +55,5 @@ message TokenCreateTransactionBody {
     Timestamp expiry = 13; // The epoch second at which the token should expire; if an auto-renew account and period are specified, this is coerced to the current epoch second plus the autoRenewPeriod
     AccountID autoRenewAccount = 14; // An account which will be automatically charged to renew the token's expiration, at autoRenewPeriod interval
     Duration autoRenewPeriod = 15; // The interval at which the auto-renew account will be charged to extend the token's expiry
+    string memo = 16; // The memo associated with the token (UTF-8 encoding max 100 bytes)
 }

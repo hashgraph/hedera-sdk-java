@@ -6,7 +6,7 @@ import com.hedera.hashgraph.sdk.proto.ScheduleID;
 import javax.annotation.Nonnegative;
 import java.util.Objects;
 
-public final class ScheduleId{
+public final class ScheduleId {
     /**
      * The shard number
      */
@@ -40,10 +40,6 @@ public final class ScheduleId{
         return EntityIdHelper.fromString(id, ScheduleId::new);
     }
 
-    public static ScheduleId fromSolidityAddress(String address) {
-        return EntityIdHelper.fromSolidityAddress(address, ScheduleId::new);
-    }
-
     static ScheduleId fromProtobuf(ScheduleID ScheduleId) {
         return new ScheduleId(
             ScheduleId.getShardNum(), ScheduleId.getRealmNum(), ScheduleId.getScheduleNum());
@@ -51,10 +47,6 @@ public final class ScheduleId{
 
     public static ScheduleId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(ScheduleID.parseFrom(bytes).toBuilder().build());
-    }
-
-    public String toSolidityAddress() {
-        return EntityIdHelper.toSolidityAddress(shard, realm, num);
     }
 
     ScheduleID toProtobuf() {

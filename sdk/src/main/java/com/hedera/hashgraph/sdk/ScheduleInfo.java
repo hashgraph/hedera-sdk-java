@@ -3,8 +3,6 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import javax.annotation.Nullable;
-
 public final class ScheduleInfo {
 
     public final ScheduleId scheduleId;
@@ -13,7 +11,7 @@ public final class ScheduleInfo {
 
     public final AccountId payerAccountId;
 
-    public final KeyList signers;
+    public final KeyList signatories;
 
     public final Key adminKey;
 
@@ -27,7 +25,7 @@ public final class ScheduleInfo {
         this.scheduleId = scheduleId;
         this.creatorAccountId = creatorAccountId;
         this.payerAccountId = payerAccountId;
-        this.signers = signers;
+        this.signatories = signers;
         this.adminKey = adminKey;
     }
 
@@ -45,7 +43,7 @@ public final class ScheduleInfo {
             scheduleId,
             creatorAccountId,
             payerAccountId,
-            KeyList.fromProtobuf(info.getSigners(), null),
+            KeyList.fromProtobuf(info.getSignatories(), null),
             Key.fromProtobufKey(info.getAdminKey())
         );
     }
@@ -59,15 +57,15 @@ public final class ScheduleInfo {
             ? this.adminKey.toProtobufKey()
             : null;
 
-        var signers = this.signers.toProtobuf() != null
-            ? this.signers.toProtobuf()
+        var signers = this.signatories.toProtobuf() != null
+            ? this.signatories.toProtobuf()
             : null;
 
         var scheduleInfoBuilder = com.hedera.hashgraph.sdk.proto.ScheduleInfo.newBuilder()
             .setScheduleID(scheduleId.toProtobuf())
             .setCreatorAccountID(creatorAccountId.toProtobuf())
             .setPayerAccountID(payerAccountId.toProtobuf())
-            .setSigners(signers)
+            .setSignatories(signers)
             .setAdminKey(adminKey);
 
         return scheduleInfoBuilder.build();
@@ -79,7 +77,7 @@ public final class ScheduleInfo {
             .add("scheduleId", scheduleId)
             .add("creatorAccountId", creatorAccountId)
             .add("payerAccountId", payerAccountId)
-            .add("signers", signers)
+            .add("signers", signatories)
             .add("adminKey", adminKey)
             .toString();
     }
