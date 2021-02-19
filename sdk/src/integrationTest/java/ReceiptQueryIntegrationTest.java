@@ -196,7 +196,7 @@ public class ReceiptQueryIntegrationTest {
     }
 
     @Test
-    @DisplayName("Insufficient transaction fee error for transactiong record query")
+    @DisplayName("Insufficient transaction fee error for transaction record query")
     void getCostInsufficientTxFeeTransactionRecord() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
@@ -216,8 +216,6 @@ public class ReceiptQueryIntegrationTest {
             var recordQuery = new TransactionRecordQuery()
                 .setTransactionId(response.transactionId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId));
-
-            var cost = recordQuery.getCost(client);
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 recordQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(client);
