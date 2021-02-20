@@ -44,4 +44,33 @@ public class ScheduleTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
     }
+
+    @Test
+    void testCreateWithSchedule() throws HederaStatusException {
+        Ed25519PrivateKey key = Ed25519PrivateKey.generate();
+
+        final Transaction transaction = new AccountCreateTransaction()
+            .setInitialBalance(new Hbar(10))
+            .setKey(key.publicKey)
+            .build(testEnv.client);
+
+        ScheduleCreateTransaction tx = transaction.schedule();
+
+        final Transaction scheduled = tx
+            .setPayerAccountId(testEnv.operatorId)
+            .setAdminKey(testEnv.operatorKey.publicKey)
+            .build(testEnv.client);
+
+        final ScheduleId scheduleId = scheduled.execute(testEnv.client).getReceipt(testEnv.client).getScheduleId();
+
+        new ScheduleInfoQuery()
+            .setScheduleId(scheduleId)
+            .execute(testEnv.client);
+
+        new ScheduleDeleteTransaction()
+            .setScheduleId(scheduleId)
+            .build(testEnv.client)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+    }
 }
