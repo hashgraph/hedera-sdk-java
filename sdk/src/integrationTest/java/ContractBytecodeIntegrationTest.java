@@ -60,6 +60,166 @@ public class ContractBytecodeIntegrationTest {
     }
 
     @Test
+    @DisplayName("Can get cost, even with a big max")
+    void getCostBigMaxQueryContractBytecode() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+
+            @Var var response = new FileCreateTransaction()
+                .setKeys(operatorKey)
+                .setContents(SMART_CONTRACT_BYTECODE)
+                .execute(client);
+
+            var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
+
+            response = new ContractCreateTransaction()
+                .setAdminKey(operatorKey)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setGas(2000)
+                .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
+                .setBytecodeFileId(fileId)
+                .setContractMemo("[e2e::ContractCreateTransaction]")
+                .execute(client);
+
+            var contractId = Objects.requireNonNull(response.getReceipt(client).contractId);
+
+            var bytecodeQuery = new ContractByteCodeQuery()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setContractId(contractId)
+                .setMaxQueryPayment(new Hbar(1000));
+
+            var cost = bytecodeQuery.getCost(client);
+
+            var bytecode = bytecodeQuery.setQueryPayment(cost).execute(client);
+
+            assertEquals(bytecode.size(), 798);
+
+            new ContractDeleteTransaction()
+                .setContractId(contractId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .execute(client)
+                .getReceipt(client);
+
+            new FileDeleteTransaction()
+                .setFileId(fileId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .execute(client)
+                .getReceipt(client);
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Error, max is smaller than set payment.")
+    void getCostSmallMaxQueryContractBytecode() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+
+            @Var var response = new FileCreateTransaction()
+                .setKeys(operatorKey)
+                .setContents(SMART_CONTRACT_BYTECODE)
+                .execute(client);
+
+            var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
+
+            response = new ContractCreateTransaction()
+                .setAdminKey(operatorKey)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setGas(2000)
+                .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
+                .setBytecodeFileId(fileId)
+                .setContractMemo("[e2e::ContractCreateTransaction]")
+                .execute(client);
+
+            var contractId = Objects.requireNonNull(response.getReceipt(client).contractId);
+
+            var bytecodeQuery = new ContractByteCodeQuery()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setContractId(contractId)
+                .setMaxQueryPayment(Hbar.fromTinybars(1));
+
+            var cost = bytecodeQuery.getCost(client);
+
+            var error = assertThrows(RuntimeException.class, () -> {
+                bytecodeQuery.execute(client);
+            });
+
+            assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for ContractByteCodeQuery, of "+cost.toString()+", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
+
+            new ContractDeleteTransaction()
+                .setContractId(contractId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .execute(client)
+                .getReceipt(client);
+
+            new FileDeleteTransaction()
+                .setFileId(fileId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .execute(client)
+                .getReceipt(client);
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Insufficient tx fee error.")
+    void getCostInsufficientTxFeeQueryContractBytecode() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+
+            @Var var response = new FileCreateTransaction()
+                .setKeys(operatorKey)
+                .setContents(SMART_CONTRACT_BYTECODE)
+                .execute(client);
+
+            var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
+
+            response = new ContractCreateTransaction()
+                .setAdminKey(operatorKey)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setGas(2000)
+                .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
+                .setBytecodeFileId(fileId)
+                .setContractMemo("[e2e::ContractCreateTransaction]")
+                .execute(client);
+
+            var contractId = Objects.requireNonNull(response.getReceipt(client).contractId);
+
+            var bytecodeQuery = new ContractByteCodeQuery()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setContractId(contractId)
+                .setMaxQueryPayment(new Hbar(100));
+
+            var cost = bytecodeQuery.getCost(client);
+
+            var error = assertThrows(PrecheckStatusException.class, () -> {
+                bytecodeQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(client);
+            });
+
+            assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
+
+            new ContractDeleteTransaction()
+                .setContractId(contractId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .execute(client)
+                .getReceipt(client);
+
+            new FileDeleteTransaction()
+                .setFileId(fileId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .execute(client)
+                .getReceipt(client);
+
+            client.close();
+        });
+    }
+
+    @Test
     @DisplayName("Cannot query contract bytecode when contract ID is not set")
     void cannotQueryContractBytecodeWhenContractIDIsNotSet() {
         assertDoesNotThrow(() -> {

@@ -11,9 +11,6 @@ public class TopicCreateIntegrationTest {
     @Test
     @DisplayName("Can create topic")
     void canCreateTopic() {
-        // Skip if using PreviewNet
-        Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
-
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
@@ -37,9 +34,6 @@ public class TopicCreateIntegrationTest {
     @Test
     @DisplayName("Can create topic with no field set")
     void canCreateTopicWithNoFieldsSet() {
-        // Skip if using PreviewNet
-        Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
-
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 

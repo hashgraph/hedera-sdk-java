@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package proto;
+
+/*-
+ * ‌
+ * Hedera Network Services Protobuf
+ * ​
+ * Copyright (C) 2018 - 2021 Hedera Hashgraph, LLC
+ * ​
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ‍
+ */
+
+option java_package = "com.hedera.hashgraph.sdk.proto";
+option java_multiple_files = true;
+
+import "BasicTypes.proto";
+
+
+/*
+Deletes a Scheduled Transaction from the ledger.
+The operation must be signed by the specified Admin Key of the Scheduled Transaction. If admin key is not set, Transaction will result in SCHEDULE_IS_IMMUTABLE.
+Once deleted, sign and delete transactions will resolve to INVALID_SCHEDULE_ID.
+*/
+message ScheduleDeleteTransactionBody {
+  ScheduleID scheduleID = 1; // The ID of the Scheduled Entity
+}

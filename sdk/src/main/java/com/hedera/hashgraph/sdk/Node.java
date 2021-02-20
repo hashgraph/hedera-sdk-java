@@ -3,7 +3,7 @@ package com.hedera.hashgraph.sdk;
 import java.time.Instant;
 import java.util.concurrent.ExecutorService;
 
-class Node extends ManagedNode {
+class Node extends ManagedNode implements Comparable<Node>{
     AccountId accountId;
     long delay;
     long delayUntil;
@@ -32,7 +32,8 @@ class Node extends ManagedNode {
         return delayUntil - Instant.now().toEpochMilli();
     }
 
-    int compareTo(Node node) {
+    @Override
+    public int compareTo(Node node) {
         if (this.isHealthy() && node.isHealthy()) {
             return compareToSameHealth(node);
         } else if (this.isHealthy() && !node.isHealthy()) {

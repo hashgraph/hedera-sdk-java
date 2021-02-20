@@ -27,6 +27,70 @@ class AccountBalanceIntegrationTest {
     }
 
     @Test
+    @DisplayName("Can fetch cost for the query")
+    void getCostBalanceForClientOperator() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+
+            @Var var balance = new AccountBalanceQuery()
+                .setAccountId(operatorId)
+                .setMaxQueryPayment(new Hbar(1));
+
+            var cost = balance.getCost(client);
+
+            var accBalance = balance.setQueryPayment(cost).execute(client);
+
+            assertTrue(accBalance.hbars.toTinybars() > 0);
+            assertEquals(cost.toTinybars(), 0);
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Can fetch cost for the query, big max set")
+    void getCostBigMaxBalanceForClientOperator() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+
+            @Var var balance = new AccountBalanceQuery()
+                .setAccountId(operatorId)
+                .setMaxQueryPayment(new Hbar(1000000));
+
+            var cost = balance.getCost(client);
+
+            var accBalance = balance.setQueryPayment(cost).execute(client);
+
+            assertTrue(accBalance.hbars.toTinybars() > 0);
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Can fetch cost for the query, very small max set")
+    void getCostSmallMaxBalanceForClientOperator() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+
+            @Var var balance = new AccountBalanceQuery()
+                .setAccountId(operatorId)
+                .setMaxQueryPayment(Hbar.fromTinybars(1));
+
+            var cost = balance.getCost(client);
+
+            var accBalance = balance.setQueryPayment(cost).execute(client);
+
+            assertTrue(accBalance.hbars.toTinybars() > 0);
+
+            client.close();
+        });
+    }
+
+    @Test
     @DisplayName("Cannot fetch balance for invalid account ID")
     void canNotFetchBalanceForInvalidAccountId() {
         assertDoesNotThrow(() -> {
