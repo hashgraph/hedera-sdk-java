@@ -58,8 +58,15 @@ public enum Status {
     InvalidTransactionBody(ResponseCodeEnum.INVALID_TRANSACTION_BODY),
     InvalidSignatureTypeMismatchingKey(ResponseCodeEnum.INVALID_SIGNATURE_TYPE_MISMATCHING_KEY),
     InvalidSignatureCountMismatchingKey(ResponseCodeEnum.INVALID_SIGNATURE_COUNT_MISMATCHING_KEY),
+    EmptyLiveHashBody(ResponseCodeEnum.EMPTY_LIVE_HASH_BODY),
+    EmptyLiveHash(ResponseCodeEnum.EMPTY_LIVE_HASH),
+    EmptyLiveHashKeys(ResponseCodeEnum.EMPTY_LIVE_HASH_KEYS),
+    InvalidLiveHashSize(ResponseCodeEnum.INVALID_LIVE_HASH_SIZE),
     EmptyQueryBody(ResponseCodeEnum.EMPTY_QUERY_BODY),
+    EmptyLiveHashQuery(ResponseCodeEnum.EMPTY_LIVE_HASH_QUERY),
+    LiveHashNotFound(ResponseCodeEnum.LIVE_HASH_NOT_FOUND),
     AccountIdDoesNotExist(ResponseCodeEnum.ACCOUNT_ID_DOES_NOT_EXIST),
+    LiveHashAlreadyExists(ResponseCodeEnum.LIVE_HASH_ALREADY_EXISTS),
     InvalidFileWacl(ResponseCodeEnum.INVALID_FILE_WACL),
     SerializationFailed(ResponseCodeEnum.SERIALIZATION_FAILED),
     TransactionOversize(ResponseCodeEnum.TRANSACTION_OVERSIZE),
@@ -117,165 +124,55 @@ public enum Status {
     InvalidTopicMessage(ResponseCodeEnum.INVALID_TOPIC_MESSAGE),
     InvalidAutorenewAccount(ResponseCodeEnum.INVALID_AUTORENEW_ACCOUNT),
     AutorenewAccountNotAllowed(ResponseCodeEnum.AUTORENEW_ACCOUNT_NOT_ALLOWED),
-    EmptyLiveHash(ResponseCodeEnum.EMPTY_LIVE_HASH),
-    EmptyLiveHashQuery(ResponseCodeEnum.EMPTY_LIVE_HASH_QUERY),
-    EmptyLiveHashBody(ResponseCodeEnum.EMPTY_LIVE_HASH_BODY),
-    EmptyLiveHashKeys(ResponseCodeEnum.EMPTY_LIVE_HASH_KEYS),
-    InvalidLiveHashSize(ResponseCodeEnum.INVALID_LIVE_HASH_SIZE),
-    LiveHashNotFound(ResponseCodeEnum.LIVE_HASH_NOT_FOUND),
-    LiveHashAlreadyExists(ResponseCodeEnum.LIVE_HASH_ALREADY_EXISTS),
+    TopicExpired(ResponseCodeEnum.TOPIC_EXPIRED),
     InvalidChunkNumber(ResponseCodeEnum.INVALID_CHUNK_NUMBER),
     InvalidChunkTransactionId(ResponseCodeEnum.INVALID_CHUNK_TRANSACTION_ID),
-
-    /**
-     *  Account is frozen and cannot transact with the token
-     */
     AccountFrozenForToken(ResponseCodeEnum.ACCOUNT_FROZEN_FOR_TOKEN),
-
-    /**
-     * Maximum number of token relations for agiven account is exceeded
-     */
     TokensPerAccountLimitExceeded(ResponseCodeEnum.TOKENS_PER_ACCOUNT_LIMIT_EXCEEDED),
-
-    /**
-     * The token is invalid or does not exist
-     */
     InvalidTokenId(ResponseCodeEnum.INVALID_TOKEN_ID),
-
-    /**
-     * Invalid token decimals
-     */
     InvalidTokenDecimals(ResponseCodeEnum.INVALID_TOKEN_DECIMALS),
-
-    /**
-     * Invalid token initial supply
-     */
-    InvalidTokenInitialSupply(ResponseCodeEnum.INVALID_TOKEN_INITIAL_SUPPLY) ,
-
-    /**
-     * Treasury Account does not exist or is deleted
-     */
+    InvalidTokenInitialSupply(ResponseCodeEnum.INVALID_TOKEN_INITIAL_SUPPLY),
     InvalidTreasuryAccountForToken(ResponseCodeEnum.INVALID_TREASURY_ACCOUNT_FOR_TOKEN),
-
-    /**
-     * Token Symbol is not UTF-8 capitalized alphabetical string
-     */
     InvalidTokenSymbol(ResponseCodeEnum.INVALID_TOKEN_SYMBOL),
-
-    /**
-     * Freeze key is not set on token
-     */
     TokenHasNoFreezeKey(ResponseCodeEnum.TOKEN_HAS_NO_FREEZE_KEY),
-
-    /**
-     * Amounts in transfer list are not net zero
-     */
     TransfersNotZeroSumForToken(ResponseCodeEnum.TRANSFERS_NOT_ZERO_SUM_FOR_TOKEN),
-
-    /**
-     * Token Symbol is not provided
-     */
     MissingTokenSymbol(ResponseCodeEnum.MISSING_TOKEN_SYMBOL),
-
-    /**
-     * Token Symbol is too long
-     */
     TokenSymbolTooLong(ResponseCodeEnum.TOKEN_SYMBOL_TOO_LONG),
-
-    /**
-     * KYC must be granted and account does not have KYC granted
-     */
     AccountKycNotGrantedForToken(ResponseCodeEnum.ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN),
-
-    /**
-     * KYC key is not set on token
-     */
     TokenHasNoKycKey(ResponseCodeEnum.TOKEN_HAS_NO_KYC_KEY),
-
-    /**
-     * Token balance is not sufficient for the transaction
-     */
     InsufficientTokenBalance(ResponseCodeEnum.INSUFFICIENT_TOKEN_BALANCE),
-
-    /**
-     * Token transactions cannot be executed on deleted token
-     */
     TokenWasDeleted(ResponseCodeEnum.TOKEN_WAS_DELETED),
-
-    /**
-     * Supply key is not set on token
-     */
     TokenHasNoSupplyKey(ResponseCodeEnum.TOKEN_HAS_NO_SUPPLY_KEY),
-
-    /**
-     * Wipe key is not set on token
-     */
     TokenHasNoWipeKey(ResponseCodeEnum.TOKEN_HAS_NO_WIPE_KEY),
-
     InvalidTokenMintAmount(ResponseCodeEnum.INVALID_TOKEN_MINT_AMOUNT),
-
     InvalidTokenBurnAmount(ResponseCodeEnum.INVALID_TOKEN_BURN_AMOUNT),
-
     TokenNotAssociatedToAccount(ResponseCodeEnum.TOKEN_NOT_ASSOCIATED_TO_ACCOUNT),
-
-    /**
-     * Cannot execute wipe operation on treasury account
-     */
     CannotWipeTokenTreasuryAccount(ResponseCodeEnum.CANNOT_WIPE_TOKEN_TREASURY_ACCOUNT),
-
     InvalidKycKey(ResponseCodeEnum.INVALID_KYC_KEY),
-
     InvalidWipeKey(ResponseCodeEnum.INVALID_WIPE_KEY),
-
     InvalidFreezeKey(ResponseCodeEnum.INVALID_FREEZE_KEY),
-
     InvalidSupplyKey(ResponseCodeEnum.INVALID_SUPPLY_KEY),
-
-    /**
-     * Token Name is not provided
-     */
     MissingTokenName(ResponseCodeEnum.MISSING_TOKEN_NAME),
-
-    /**
-     * Token Name is too long
-     */
     TokenNameTooLong(ResponseCodeEnum.TOKEN_NAME_TOO_LONG),
-
-    /**
-     * The provided wipe amount must not be negative, zero or bigger than the token holder balance
-     */
     InvalidWipingAmount(ResponseCodeEnum.INVALID_WIPING_AMOUNT),
-
-    /**
-     * Token does not have Admin key set, thus update/delete transactions cannot be performed
-     */
     TokenIsImmutable(ResponseCodeEnum.TOKEN_IS_IMMUTABLE),
-
-    /**
-     * An associateToken operation specified a token already associated to the account
-     */
     TokenAlreadyAssociatedToAccount(ResponseCodeEnum.TOKEN_ALREADY_ASSOCIATED_TO_ACCOUNT),
-
-    /**
-     * An attempted operation is invalid until all token balances for the target account are zero
-     */
     TransactionRequiresZeroTokenBalances(ResponseCodeEnum.TRANSACTION_REQUIRES_ZERO_TOKEN_BALANCES),
-
-    /**
-     * An attempted operation is invalid because the account is a treasury;
-     */
     AccountIsTreasury(ResponseCodeEnum.ACCOUNT_IS_TREASURY),
-
-    TopicExpired(ResponseCodeEnum.TOPIC_EXPIRED),
-
     TokenIdRepeatedInTokenList(ResponseCodeEnum.TOKEN_ID_REPEATED_IN_TOKEN_LIST),
-
     TokenTransferListSizeLimitExceeded(ResponseCodeEnum.TOKEN_TRANSFER_LIST_SIZE_LIMIT_EXCEEDED),
-
     EmptyTokenTransferBody(ResponseCodeEnum.EMPTY_TOKEN_TRANSFER_BODY),
-
-    EmptyTokenTransferAccountAmounts(ResponseCodeEnum.EMPTY_TOKEN_TRANSFER_ACCOUNT_AMOUNTS)
-
+    EmptyTokenTransferAccountAmounts(ResponseCodeEnum.EMPTY_TOKEN_TRANSFER_ACCOUNT_AMOUNTS),
+    InvalidScheduleId(ResponseCodeEnum.INVALID_SCHEDULE_ID),
+    ScheduleIsImmutable(ResponseCodeEnum.SCHEDULE_IS_IMMUTABLE),
+    InvalidSchedulePayerId(ResponseCodeEnum.INVALID_SCHEDULE_PAYER_ID),
+    InvalidScheduleAccountId(ResponseCodeEnum.INVALID_SCHEDULE_ACCOUNT_ID),
+    NoNewValidSignatures(ResponseCodeEnum.NO_NEW_VALID_SIGNATURES),
+    UnresolvableRequiredSigners(ResponseCodeEnum.UNRESOLVABLE_REQUIRED_SIGNERS),
+    UnparseableScheduledTransaction(ResponseCodeEnum.UNPARSEABLE_SCHEDULED_TRANSACTION),
+    UnschedulableTransaction(ResponseCodeEnum.UNSCHEDULABLE_TRANSACTION),
+    SomeSignaturesWereInvalid(ResponseCodeEnum.SOME_SIGNATURES_WERE_INVALID),
+    TransactionIdFieldNotAllowed(ResponseCodeEnum.TRANSACTION_ID_FIELD_NOT_ALLOWED)
     ;
 
 
@@ -346,22 +243,20 @@ public enum Status {
             case INVALID_EXPIRATION_TIME: return InvalidExpirationTime;
             case NO_WACL_KEY: return NoWaclKey;
             case FILE_CONTENT_EMPTY: return FileContentEmpty;
-            case EMPTY_LIVE_HASH_QUERY: return EmptyLiveHashQuery;
-            case EMPTY_LIVE_HASH_BODY: return EmptyLiveHashBody;
-            case EMPTY_LIVE_HASH: return EmptyLiveHash;
-            case EMPTY_LIVE_HASH_KEYS: return EmptyLiveHashKeys;
-            case INVALID_LIVE_HASH_SIZE: return InvalidLiveHashSize;
-            case LIVE_HASH_NOT_FOUND: return LiveHashNotFound;
-            case LIVE_HASH_ALREADY_EXISTS: return LiveHashAlreadyExists;
-            case INVALID_CHUNK_NUMBER: return InvalidChunkNumber;
-            case INVALID_CHUNK_TRANSACTION_ID: return InvalidChunkTransactionId;
             case INVALID_ACCOUNT_AMOUNTS: return InvalidAccountAmounts;
             case EMPTY_TRANSACTION_BODY: return EmptyTransactionBody;
             case INVALID_TRANSACTION_BODY: return InvalidTransactionBody;
             case INVALID_SIGNATURE_TYPE_MISMATCHING_KEY: return InvalidSignatureTypeMismatchingKey;
             case INVALID_SIGNATURE_COUNT_MISMATCHING_KEY: return InvalidSignatureCountMismatchingKey;
+            case EMPTY_LIVE_HASH_BODY: return EmptyLiveHashBody;
+            case EMPTY_LIVE_HASH: return EmptyLiveHash;
+            case EMPTY_LIVE_HASH_KEYS: return EmptyLiveHashKeys;
+            case INVALID_LIVE_HASH_SIZE: return InvalidLiveHashSize;
             case EMPTY_QUERY_BODY: return EmptyQueryBody;
+            case EMPTY_LIVE_HASH_QUERY: return EmptyLiveHashQuery;
+            case LIVE_HASH_NOT_FOUND: return LiveHashNotFound;
             case ACCOUNT_ID_DOES_NOT_EXIST: return AccountIdDoesNotExist;
+            case LIVE_HASH_ALREADY_EXISTS: return LiveHashAlreadyExists;
             case INVALID_FILE_WACL: return InvalidFileWacl;
             case SERIALIZATION_FAILED: return SerializationFailed;
             case TRANSACTION_OVERSIZE: return TransactionOversize;
@@ -419,6 +314,9 @@ public enum Status {
             case INVALID_TOPIC_MESSAGE: return InvalidTopicMessage;
             case INVALID_AUTORENEW_ACCOUNT: return InvalidAutorenewAccount;
             case AUTORENEW_ACCOUNT_NOT_ALLOWED: return AutorenewAccountNotAllowed;
+            case TOPIC_EXPIRED: return TopicExpired;
+            case INVALID_CHUNK_NUMBER: return InvalidChunkNumber;
+            case INVALID_CHUNK_TRANSACTION_ID: return InvalidChunkTransactionId;
             case ACCOUNT_FROZEN_FOR_TOKEN: return AccountFrozenForToken;
             case TOKENS_PER_ACCOUNT_LIMIT_EXCEEDED: return TokensPerAccountLimitExceeded;
             case INVALID_TOKEN_ID: return InvalidTokenId;
@@ -451,11 +349,20 @@ public enum Status {
             case TOKEN_ALREADY_ASSOCIATED_TO_ACCOUNT: return TokenAlreadyAssociatedToAccount;
             case TRANSACTION_REQUIRES_ZERO_TOKEN_BALANCES: return TransactionRequiresZeroTokenBalances;
             case ACCOUNT_IS_TREASURY: return AccountIsTreasury;
-            case TOPIC_EXPIRED: return TopicExpired;
             case TOKEN_ID_REPEATED_IN_TOKEN_LIST: return TokenIdRepeatedInTokenList;
             case TOKEN_TRANSFER_LIST_SIZE_LIMIT_EXCEEDED: return TokenTransferListSizeLimitExceeded;
             case EMPTY_TOKEN_TRANSFER_BODY: return EmptyTokenTransferBody;
             case EMPTY_TOKEN_TRANSFER_ACCOUNT_AMOUNTS: return EmptyTokenTransferAccountAmounts;
+            case INVALID_SCHEDULE_ID: return InvalidScheduleId;
+            case SCHEDULE_IS_IMMUTABLE: return ScheduleIsImmutable;
+            case INVALID_SCHEDULE_PAYER_ID: return InvalidSchedulePayerId;
+            case INVALID_SCHEDULE_ACCOUNT_ID: return InvalidScheduleAccountId;
+            case NO_NEW_VALID_SIGNATURES: return NoNewValidSignatures;
+            case UNRESOLVABLE_REQUIRED_SIGNERS: return UnresolvableRequiredSigners;
+            case UNPARSEABLE_SCHEDULED_TRANSACTION: return UnparseableScheduledTransaction;
+            case UNSCHEDULABLE_TRANSACTION: return UnschedulableTransaction;
+            case SOME_SIGNATURES_WERE_INVALID: return SomeSignaturesWereInvalid;
+            case TRANSACTION_ID_FIELD_NOT_ALLOWED: return TransactionIdFieldNotAllowed;
 
             case UNRECOGNIZED:
                 // protobufs won't give us the actual value that was unexpected, unfortunately

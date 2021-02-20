@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.contract.ContractId;
 import com.hedera.hashgraph.sdk.file.FileId;
 import com.hedera.hashgraph.proto.Response;
 import com.hedera.hashgraph.proto.ResponseCodeEnum;
+import com.hedera.hashgraph.sdk.schedule.ScheduleId;
 import com.hedera.hashgraph.sdk.token.TokenId;
 
 public final class TransactionReceipt {
@@ -71,6 +72,15 @@ public final class TransactionReceipt {
         }
 
         return new TokenId(inner.getTokenIDOrBuilder());
+    }
+
+    public ScheduleId getScheduleId() {
+        // Should be present for [ConsensusTopicCreateTransaction]
+        if (!inner.hasScheduleID()) {
+            throw new IllegalStateException("receipt does not contain a token ID");
+        }
+
+        return new ScheduleId(inner.getScheduleIDOrBuilder());
     }
 
     public long getConsensusTopicSequenceNumber() {

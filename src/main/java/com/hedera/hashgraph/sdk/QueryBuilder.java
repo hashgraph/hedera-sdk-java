@@ -261,6 +261,8 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
                 return raw.getConsensusGetTopicInfo().getHeader();
             case TOKENGETINFO:
                 return raw.getTokenGetInfo().getHeader();
+            case SCHEDULEGETINFO:
+                return raw.getScheduleGetInfo().getHeader();
             default:
                 // NOTE: TRANSACTIONGETFASTRECORD shouldn't be handled as we don't expose that query
                 throw new RuntimeException("Unhandled response case");
