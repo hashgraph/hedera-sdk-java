@@ -215,12 +215,12 @@ public abstract class Transaction<T extends Transaction<T>>
 
     public final ScheduleCreateTransaction schedule() {
         requireOneNodeAccountId();
-        ScheduleCreateTransaction transaction = new ScheduleCreateTransaction();
-        transaction.setNodeAccountIds(this.nodeAccountIds);
-        transaction.bodyBuilder.getScheduleCreate().toBuilder()
-            .setTransactionBody(this.signedTransactions.get(0).getBodyBytes())
-            .setSigMap(this.signedTransactions.get(0).getSigMap());
-        return transaction;
+
+        return new ScheduleCreateTransaction(
+            this.nodeAccountIds,
+            this.signedTransactions.get(0).getBodyBytes(),
+            this.signedTransactions.get(0).getSigMap()
+        );
     }
 
     static byte[] hash(byte[] bytes) {

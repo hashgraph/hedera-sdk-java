@@ -1,13 +1,13 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.ScheduleCreateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.ScheduleServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateTransaction> {
     private final ScheduleCreateTransactionBody.Builder builder;
@@ -16,6 +16,18 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         builder = ScheduleCreateTransactionBody.newBuilder();
 
         setMaxTransactionFee(new Hbar(5));
+    }
+
+    ScheduleCreateTransaction(
+        List<AccountId> nodeAccountIds,
+        ByteString bodyBytes,
+        SignatureMap signatureMap
+    ) {
+        this();
+
+        this.nodeAccountIds = nodeAccountIds;
+        this.builder.setTransactionBody(bodyBytes);
+        this.builder.mergeSigMap(signatureMap);
     }
 
     ScheduleCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
@@ -47,9 +59,8 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
 
     public ScheduleCreateTransaction setTransaction(Transaction<?> transaction) {
         requireNotFrozen();
-        ScheduleCreateTransaction other = transaction.schedule();
-        this.builder.setTransactionBody(other.builder.getTransactionBody());
-        this.builder.mergeSigMap(other.builder.getSigMap());
+        this.builder.setTransactionBody(transaction.signedTransactions.get(0).getBodyBytes());
+        this.builder.mergeSigMap(transaction.signedTransactions.get(0).getSigMap());
         return this;
     }
 
