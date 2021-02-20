@@ -16,9 +16,6 @@ public class TopicMessageIntegrationTest {
     @Test
     @DisplayName("Can receive a topic message")
     void canReceiveATopicMessage() {
-        // Skip if using PreviewNet
-        Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
-
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
@@ -79,9 +76,6 @@ public class TopicMessageIntegrationTest {
     @Test
     @DisplayName("Can receive a large topic message")
     void canReceiveALargeTopicMessage() {
-        // Skip if using PreviewNet
-        Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
-
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());

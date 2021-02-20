@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.collect.HashBiMap;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.time.Duration;
@@ -86,7 +87,7 @@ class Network {
      * @return {@link java.util.List<com.hedera.hashgraph.sdk.AccountId>}
      */
     List<AccountId> getNodeAccountIdsForExecute() {
-        nodes.sort(Node::compareTo);
+        Collections.sort(nodes);
 
         List<AccountId> resultNodeAccountIds = new ArrayList<>();
 

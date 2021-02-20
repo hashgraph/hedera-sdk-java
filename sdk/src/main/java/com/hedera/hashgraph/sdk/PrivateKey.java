@@ -50,7 +50,7 @@ public final class PrivateKey extends Key {
         byte[] data = new byte[Ed25519.SECRET_KEY_SIZE + 32];
         ThreadLocalSecureRandom.current().nextBytes(data);
 
-        return derivableKey(data, false);
+        return derivableKey(data);
     }
 
     /**
@@ -75,7 +75,7 @@ public final class PrivateKey extends Key {
         var derivedState = new byte[hmacSha512.getMacSize()];
         hmacSha512.doFinal(derivedState, 0);
 
-        @Var var derivedKey = derivableKey(derivedState, false);
+        @Var var derivedKey = derivableKey(derivedState);
 
         // BIP-44 path with the Hedera Hbar coin-type (omitting key index)
         // we pre-derive most of the path as the mobile wallets don't expose more than the index
@@ -126,29 +126,30 @@ public final class PrivateKey extends Key {
         }
     }
 
-    private static PrivateKey derivableKey(byte[] deriveData, boolean isLegacy) {
+    private static PrivateKey derivableKey(byte[] deriveData) {
         var keyData = Arrays.copyOfRange(deriveData, 0, 32);
         var chainCode = new KeyParameter(deriveData, 32, 32);
 
-        if(!isLegacy){
-            return new PrivateKey(keyData, chainCode);
-        }
-        else{
-            return new PrivateKey(keyData, null);
-        }
+        return new PrivateKey(keyData, chainCode);
     }
 
-    /**
-     * Parse a private key from a PEM encoded reader.
-     * <p>
-     * This will read the first "PRIVATE KEY" section in the stream as an Ed25519 private key.
-     *
-     * @throws IOException     if one occurred while reading.
-     * @throws BadKeyException if no "PRIVATE KEY" section was found or the key was not an Ed25519
-     *                         private key.
-     * @param pemFile The Reader containing the pem file
-     * @return {@link com.hedera.hashgraph.sdk.PrivateKey}
-     */
+    public PrivateKey legacyDerive(int index) {
+        var keyBytes = legacyDeriveChildKey(this.keyData, index);
+
+        return PrivateKey.fromBytes(keyBytes);
+    }
+
+        /**
+         * Parse a private key from a PEM encoded reader.
+         * <p>
+         * This will read the first "PRIVATE KEY" section in the stream as an Ed25519 private key.
+         *
+         * @throws IOException     if one occurred while reading.
+         * @throws BadKeyException if no "PRIVATE KEY" section was found or the key was not an Ed25519
+         *                         private key.
+         * @param pemFile The Reader containing the pem file
+         * @return {@link com.hedera.hashgraph.sdk.PrivateKey}
+         */
     public static PrivateKey readPem(Reader pemFile) throws IOException {
         return readPem(pemFile, null);
     }
@@ -259,7 +260,7 @@ public final class PrivateKey extends Key {
         var output = new byte[64];
         hmacSha512.doFinal(output, 0);
 
-        return derivableKey(output, false);
+        return derivableKey(output);
     }
 
     /**
@@ -337,9 +338,14 @@ public final class PrivateKey extends Key {
         return getPublicKey().toProtobufKey();
     }
 
-    public static PrivateKey fromLegacyMnemonic(byte[] entropy) {
+    static byte[] legacyDeriveChildKey(byte[] entropy,int index) {
         byte[] seed = new byte[entropy.length + 8];
-        Arrays.fill(seed, entropy.length, entropy.length + 8, (byte)-1);
+        if(index >= 0){
+            Arrays.fill(seed, entropy.length, entropy.length + 4, (byte)0);
+        } else {
+            Arrays.fill(seed, entropy.length, entropy.length + 4, (byte)-1);
+        }
+        Arrays.fill(seed, entropy.length + 4, entropy.length + 8, (byte)index);
         System.arraycopy(entropy, 0, seed, 0, entropy.length);
 
         byte[] salt = new byte[1];
@@ -351,6 +357,6 @@ public final class PrivateKey extends Key {
             2048);
 
         KeyParameter key = (KeyParameter) pbkdf2.generateDerivedParameters(256);
-        return derivableKey(key.getKey(), true);
+        return key.getKey();
     }
 }

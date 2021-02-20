@@ -55,7 +55,7 @@ public final class FileInfo {
 
     static FileInfo fromProtobuf(FileGetInfoResponse.FileInfo fileInfo) {
         @Nullable KeyList keys = fileInfo.hasKeys() ?
-            KeyList.fromProtobuf(fileInfo.getKeys(), fileInfo.getKeys().getKeysCount()) :
+            KeyList.fromProtobuf(fileInfo.getKeys(), null) :
             null;
 
         return new FileInfo(

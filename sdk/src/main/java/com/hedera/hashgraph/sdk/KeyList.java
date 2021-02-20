@@ -163,6 +163,16 @@ public final class KeyList extends Key implements Collection<Key> {
             .build();
     }
 
+    com.hedera.hashgraph.sdk.proto.KeyList toProtobuf() {
+        var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
+
+        for (Key key : keys) {
+            keyList.addKeys(key.toProtobufKey());
+        }
+
+        return keyList.build();
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)

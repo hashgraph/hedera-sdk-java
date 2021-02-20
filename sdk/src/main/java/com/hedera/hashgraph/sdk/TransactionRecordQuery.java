@@ -68,6 +68,10 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     boolean shouldRetry(Status status, Response response) {
         if (super.shouldRetry(status, response)) return true;
 
+        if (status != Status.OK) {
+            return false;
+        }
+
         var receiptStatus =
             Status.valueOf(response.getTransactionGetRecord().getTransactionRecord().getReceipt().getStatus());
 

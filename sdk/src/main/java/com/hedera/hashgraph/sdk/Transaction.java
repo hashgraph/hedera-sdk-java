@@ -213,6 +213,16 @@ public abstract class Transaction<T extends Transaction<T>>
         }
     }
 
+    public final ScheduleCreateTransaction schedule() {
+        requireOneNodeAccountId();
+
+        return new ScheduleCreateTransaction(
+            this.nodeAccountIds,
+            this.signedTransactions.get(0).getBodyBytes(),
+            this.signedTransactions.get(0).getSigMap()
+        );
+    }
+
     static byte[] hash(byte[] bytes) {
         var digest = new SHA384Digest();
         var hash = new byte[digest.getDigestSize()];
