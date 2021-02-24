@@ -208,6 +208,15 @@ public abstract class Transaction<T extends Transaction<T>>
             case TOKENWIPE:
                 return new TokenWipeTransaction(txs);
 
+            case SCHEDULECREATE:
+                return new ScheduleCreateTransaction(txs);
+
+            case SCHEDULEDELETE:
+                return new ScheduleDeleteTransaction(txs);
+
+            case SCHEDULESIGN:
+                return new ScheduleSignTransaction(txs);
+
             default:
                 throw new IllegalArgumentException("parsed transaction body has no data");
         }

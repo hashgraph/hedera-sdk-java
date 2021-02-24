@@ -1,7 +1,12 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.sdk.proto.ScheduleCreateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SignedTransaction;
+import com.hedera.hashgraph.sdk.proto.SignedTransactionOrBuilder;
+import com.hedera.hashgraph.sdk.proto.TransactionList;
 
 public final class ScheduleInfo {
 
@@ -11,6 +16,8 @@ public final class ScheduleInfo {
 
     public final AccountId payerAccountId;
 
+    public final byte[] transactionBody;
+
     public final KeyList signatories;
 
     public final Key adminKey;
@@ -19,6 +26,7 @@ public final class ScheduleInfo {
         ScheduleId scheduleId,
         AccountId creatorAccountId,
         AccountId payerAccountId,
+        byte[] transactionBody,
         KeyList signers,
         Key adminKey
     ) {
@@ -27,6 +35,7 @@ public final class ScheduleInfo {
         this.payerAccountId = payerAccountId;
         this.signatories = signers;
         this.adminKey = adminKey;
+        this.transactionBody = transactionBody;
     }
 
     static ScheduleInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.ScheduleGetInfoResponse scheduleInfo) {
@@ -43,6 +52,7 @@ public final class ScheduleInfo {
             scheduleId,
             creatorAccountId,
             payerAccountId,
+            info.getTransactionBody().toByteArray(),
             KeyList.fromProtobuf(info.getSignatories(), null),
             Key.fromProtobufKey(info.getAdminKey())
         );
@@ -64,11 +74,29 @@ public final class ScheduleInfo {
         var scheduleInfoBuilder = com.hedera.hashgraph.sdk.proto.ScheduleInfo.newBuilder()
             .setScheduleID(scheduleId.toProtobuf())
             .setCreatorAccountID(creatorAccountId.toProtobuf())
+            .setTransactionBody(ByteString.copyFrom(transactionBody))
             .setPayerAccountID(payerAccountId.toProtobuf())
             .setSignatories(signers)
             .setAdminKey(adminKey);
 
         return scheduleInfoBuilder.build();
+    }
+
+    public final Transaction<?> getTransaction() {
+        SignedTransaction.Builder builder = SignedTransaction.newBuilder();
+        builder.setBodyBytes(ByteString.copyFrom(transactionBody));
+
+        try {
+            return Transaction.fromBytes(TransactionList.newBuilder()
+                .addTransactionList(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
+                    .setSignedTransactionBytes(builder.build().toByteString())
+                    .build())
+                .build()
+                .toByteArray()
+            );
+        } catch (InvalidProtocolBufferException e) {
+            throw new RuntimeException("Failed to build transaction of `bodyBytes` inside `ScheduleInfo`", e);
+        }
     }
 
     @Override
