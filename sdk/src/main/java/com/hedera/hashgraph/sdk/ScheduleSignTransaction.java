@@ -45,8 +45,10 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
     }
 
     public ScheduleSignTransaction addScheduleSignature(PublicKey publicKey, byte[] signature) {
-        requireNotFrozen();
-        signatureBuilder.addSigPair(publicKey.toSignaturePairProtobuf(signature));
+        SignatureMap.Builder sigMap = builder.getSigMap().toBuilder();
+        sigMap.addSigPair(publicKey.toSignaturePairProtobuf(signature));
+        builder.setSigMap(sigMap);
+
         return this;
     }
 
