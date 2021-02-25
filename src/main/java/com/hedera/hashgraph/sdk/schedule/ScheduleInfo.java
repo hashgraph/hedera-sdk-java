@@ -2,10 +2,12 @@ package com.hedera.hashgraph.sdk.schedule;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.proto.Key;
 import com.hedera.hashgraph.proto.ScheduleGetInfoResponse;
 import com.hedera.hashgraph.proto.Response;
 import com.hedera.hashgraph.sdk.TimestampHelper;
+import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.KeyList;
 import com.hedera.hashgraph.sdk.crypto.PublicKey;
@@ -75,6 +77,13 @@ public class ScheduleInfo {
         ScheduleGetInfoResponse infoResponse = response.getScheduleGetInfo();
 
         return new ScheduleInfo(infoResponse.getScheduleInfo());
+    }
+
+    public Transaction getTransaction() throws InvalidProtocolBufferException  {
+        return Transaction.fromBytes(com.hedera.hashgraph.proto.Transaction.newBuilder()
+            .setBodyBytes(this.bodyBytes)
+            .build()
+            .toByteArray());
     }
 
     @Override
