@@ -6,8 +6,10 @@ import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateTransaction> {
     private final ScheduleCreateTransactionBody.Builder builder;
@@ -36,6 +38,27 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         builder = bodyBuilder.getScheduleCreate().toBuilder();
     }
 
+    public Map<PublicKey, byte[]> getScheduleSignatures() {
+        var map = new HashMap<PublicKey, byte[]>();
+
+        for (var sigPair : builder.getSigMap().getSigPairList()) {
+            map.put(
+                PublicKey.fromBytes(sigPair.getPubKeyPrefix().toByteArray()),
+                sigPair.getEd25519().toByteArray()
+            );
+        }
+
+        return map;
+    }
+
+    public ScheduleCreateTransaction addScheduleSignature(PublicKey publicKey, byte[] signature) {
+        SignatureMap.Builder sigMap = builder.getSigMap().toBuilder();
+        sigMap.addSigPair(publicKey.toSignaturePairProtobuf(signature));
+        builder.setSigMap(sigMap);
+
+        return this;
+    }
+
     public AccountId getPayerAccountId() {
         return AccountId.fromProtobuf(builder.getPayerAccountID());
     }
@@ -60,7 +83,7 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     public ScheduleCreateTransaction setTransaction(Transaction<?> transaction) {
         requireNotFrozen();
         this.builder.setTransactionBody(transaction.signedTransactions.get(0).getBodyBytes());
-        this.builder.mergeSigMap(transaction.signedTransactions.get(0).getSigMap());
+        this.builder.mergeSigMap(transaction.signatures.get(0).build());
         return this;
     }
 

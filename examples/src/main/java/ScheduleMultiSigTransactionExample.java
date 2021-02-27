@@ -39,7 +39,7 @@ public class ScheduleMultiSigTransactionExample {
         return client;
     }
 
-    public static void main(String[] args) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
+    public static void main(String[] args) throws Exception {
         Client client = createClient();
         AccountId operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
@@ -53,17 +53,21 @@ public class ScheduleMultiSigTransactionExample {
         // multiple keys are required to sign.
         KeyList keyList = new KeyList();
 
-        keyList.add(key1);
-        keyList.add(key2);
-        keyList.add(key3);
+        keyList.add(key1.getPublicKey());
+        keyList.add(key2.getPublicKey());
+        keyList.add(key3.getPublicKey());
 
-        System.out.println("key1 = " + key1);
-        System.out.println("key2 = " + key2);
-        System.out.println("key3 = " + key3);
+        System.out.println("key1 private = " + key1);
+        System.out.println("key1 public = " + key1.getPublicKey());
+        System.out.println("key1 private = " + key2);
+        System.out.println("key2 public = " + key2.getPublicKey());
+        System.out.println("key1 private = " + key3);
+        System.out.println("key3 public = " + key3.getPublicKey());
         System.out.println("keyList = " + keyList);
 
         // Creat the account with the `KeyList`
         TransactionResponse response = new AccountCreateTransaction()
+            .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
             // The only _required_ property here is `key`
             .setKey(keyList)
             .setInitialBalance(new Hbar(10))
@@ -95,6 +99,10 @@ public class ScheduleMultiSigTransactionExample {
         // Schedule the transactoin
         ScheduleCreateTransaction scheduled = transfer.schedule();
 
+        if (scheduled.getScheduleSignatures().size() != 2) {
+            throw new Exception("Scheduled transaction has incorrect number of signatures: " + scheduled.getScheduleSignatures().size());
+        }
+
         receipt = scheduled.execute(client).getReceipt(client);
 
         // Get the schedule ID from the receipt
@@ -115,9 +123,17 @@ public class ScheduleMultiSigTransactionExample {
         Map<AccountId, Hbar> transfers = transfer.getHbarTransfers();
 
         // Make sure the transfer transaction is what we expect
-        assert transfers.size() == 2;
-        assert transfers.get(accountId).equals(new Hbar(1).negated());
-        assert transfers.get(operatorId).equals(new Hbar(1));
+        if (transfers.size() != 2) {
+            throw new Exception("more transfers than expected");
+        }
+
+        if (!transfers.get(accountId).equals(new Hbar(1).negated())) {
+            throw new Exception("transfer for " + accountId + " is not what is expected " + transfers.get(accountId));
+        }
+
+        if (!transfers.get(operatorId).equals(new Hbar(1))) {
+            throw new Exception("transfer for " + operatorId + " is not what is expected " + transfers.get(operatorId));
+        }
 
         // Get the last signature for the inner scheduled transaction
         byte[] key3Signature = key3.signTransaction(transfer);
@@ -126,19 +142,26 @@ public class ScheduleMultiSigTransactionExample {
 
         // Finally send this last signature to Hedera. This last signature _should_ mean the transaction executes
         // since all 3 signatures have been provided.
-        new ScheduleSignTransaction()
-            .setScheduleId(scheduleId)
-            .addScheduleSignature(key3.getPublicKey(), key3Signature)
-            .execute(client)
-            .getReceipt(client);
-
-        // Query the schedule info again
-        info = new ScheduleInfoQuery()
+        ScheduleSignTransaction signTransaction = new ScheduleSignTransaction()
             .setNodeAccountIds(Collections.singletonList(response.nodeId))
             .setScheduleId(scheduleId)
-            .execute(client);
+            .addScheduleSignature(key3.getPublicKey(), key3Signature);
 
-        System.out.println("Schedule Info after last signature appended = " + info);
+        if (signTransaction.getScheduleSignatures().size() != 1) {
+            throw new Exception("Scheduled sign transaction has incorrect number of signatures: " + signTransaction.getScheduleSignatures().size());
+        }
+
+        signTransaction.execute(client).getReceipt(client);
+
+        // Query the schedule info again
+        try {
+            new ScheduleInfoQuery()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setScheduleId(scheduleId)
+                .execute(client);
+        } catch (PrecheckStatusException e) {
+            System.out.println("Received " + e.status + " status code for schedule info query after all signatures appended");
+        }
 
 //        Cannot seem to get the receipt for a scheduled transaction after it's expected to have executed
 //        receipt = new TransactionReceiptQuery()

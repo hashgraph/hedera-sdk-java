@@ -228,7 +228,7 @@ public abstract class Transaction<T extends Transaction<T>>
         return new ScheduleCreateTransaction(
             this.nodeAccountIds,
             this.signedTransactions.get(0).getBodyBytes(),
-            this.signedTransactions.get(0).getSigMap()
+            this.signatures.get(0).build()
         );
     }
 
