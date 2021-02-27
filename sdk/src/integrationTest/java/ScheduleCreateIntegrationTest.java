@@ -131,7 +131,7 @@ public class ScheduleCreateIntegrationTest {
 
     @Test
     @DisplayName("Can sign schedule")
-    void canSignSchedule() {
+    void canSignSchedule1() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
@@ -179,7 +179,7 @@ public class ScheduleCreateIntegrationTest {
 
     @Test
     @DisplayName("Can sign schedule")
-    void canSignSchedule() {
+    void canSignSchedule2() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
