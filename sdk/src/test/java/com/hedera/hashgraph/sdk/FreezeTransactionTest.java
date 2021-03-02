@@ -28,7 +28,7 @@ public class FreezeTransactionTest {
     void shouldSerialize() {
         SnapshotMatcher.expect(new FreezeTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setStartTime(0, 0)
             .setEndTime(23, 59)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))

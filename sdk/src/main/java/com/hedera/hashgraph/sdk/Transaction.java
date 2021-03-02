@@ -228,7 +228,7 @@ public abstract class Transaction<T extends Transaction<T>>
         return new ScheduleCreateTransaction(
             this.nodeAccountIds,
             this.signedTransactions.get(0).getBodyBytes(),
-            this.signedTransactions.get(0).getSigMap()
+            this.signatures.get(0).build()
         );
     }
 
@@ -624,7 +624,7 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     @Override
-    final TransactionResponse mapResponse(
+    TransactionResponse mapResponse(
         com.hedera.hashgraph.sdk.proto.TransactionResponse transactionResponse,
         AccountId nodeId,
         com.hedera.hashgraph.sdk.proto.Transaction request
@@ -632,7 +632,7 @@ public abstract class Transaction<T extends Transaction<T>>
         var transactionId = Objects.requireNonNull(getTransactionId());
         var hash = hash(request.getSignedTransactionBytes().toByteArray());
         nextTransactionIndex = (nextTransactionIndex + 1) % transactionIds.size();
-        return new TransactionResponse(nodeId, transactionId, hash);
+        return new TransactionResponse(nodeId, transactionId, hash, null);
     }
 
     @Override

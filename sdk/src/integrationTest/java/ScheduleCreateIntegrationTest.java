@@ -131,7 +131,7 @@ public class ScheduleCreateIntegrationTest {
 
     @Test
     @DisplayName("Can sign schedule")
-    void canSignSchedule() {
+    void canSignSchedule1() {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
@@ -166,6 +166,49 @@ public class ScheduleCreateIntegrationTest {
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .execute(client)
                 .getReceipt(client);
+
+            new ScheduleDeleteTransaction()
+                .setScheduleId(scheduleId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .execute(client)
+                .getReceipt(client);
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Can sign schedule")
+    void canSignSchedule2() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+
+            var key = PrivateKey.generate();
+
+            var transaction = new AccountCreateTransaction()
+                .setKey(key.getPublicKey())
+                .setInitialBalance(new Hbar(10))
+                .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
+                .freezeWith(client);
+
+            var response = new ScheduleCreateTransaction()
+                .setTransaction(transaction)
+                .setAdminKey(operatorKey)
+                .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
+                .setPayerAccountId(operatorId)
+                .execute(client);
+
+            var signature = key.signTransaction(transaction);
+
+            var scheduleId = Objects.requireNonNull(response.getReceipt(client).scheduleId);
+
+            var signTransaction = new ScheduleSignTransaction()
+                .addScheduleSignature(key.getPublicKey(), signature)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setScheduleId(scheduleId)
+                .freezeWith(client);
 
             new ScheduleDeleteTransaction()
                 .setScheduleId(scheduleId)

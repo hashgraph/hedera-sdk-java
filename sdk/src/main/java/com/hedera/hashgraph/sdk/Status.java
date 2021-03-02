@@ -788,7 +788,27 @@ public enum Status {
     /**
      * TokenTransfersTransactionBody has a TokenTransferList with no AccountAmounts
      */
-    EMPTY_TOKEN_TRANSFER_ACCOUNT_AMOUNTS(ResponseCodeEnum.EMPTY_TOKEN_TRANSFER_ACCOUNT_AMOUNTS);
+    EMPTY_TOKEN_TRANSFER_ACCOUNT_AMOUNTS(ResponseCodeEnum.EMPTY_TOKEN_TRANSFER_ACCOUNT_AMOUNTS),
+
+    INVALID_SCHEDULE_ID(ResponseCodeEnum.INVALID_SCHEDULE_ID),
+
+    SCHEDULE_IS_IMMUTABLE(ResponseCodeEnum.SCHEDULE_IS_IMMUTABLE),
+
+    INVALID_SCHEDULE_PAYER_ID(ResponseCodeEnum.INVALID_SCHEDULE_PAYER_ID),
+
+    INVALID_SCHEDULE_ACCOUNT_ID(ResponseCodeEnum.INVALID_SCHEDULE_ACCOUNT_ID),
+
+    NO_NEW_VALID_SIGNATURES(ResponseCodeEnum.NO_NEW_VALID_SIGNATURES),
+
+    UNRESOLVABLE_REQUIRED_SIGNERS(ResponseCodeEnum.UNRESOLVABLE_REQUIRED_SIGNERS),
+
+    UNPARSEABLE_SCHEDULED_TRANSACTION(ResponseCodeEnum.UNPARSEABLE_SCHEDULED_TRANSACTION ),
+
+    UNSCHEDULABLE_TRANSACTION(ResponseCodeEnum.UNSCHEDULABLE_TRANSACTION ),
+
+    SOME_SIGNATURES_WERE_INVALID(ResponseCodeEnum.SOME_SIGNATURES_WERE_INVALID),
+
+    TRANSACTION_ID_FIELD_NOT_ALLOWED(ResponseCodeEnum.TRANSACTION_ID_FIELD_NOT_ALLOWED);
 
     final ResponseCodeEnum code;
 
@@ -1114,6 +1134,26 @@ public enum Status {
                 return EMPTY_TOKEN_TRANSFER_BODY;
             case EMPTY_TOKEN_TRANSFER_ACCOUNT_AMOUNTS:
                 return EMPTY_TOKEN_TRANSFER_ACCOUNT_AMOUNTS;
+            case INVALID_SCHEDULE_ID:
+                return INVALID_SCHEDULE_ID;
+            case SCHEDULE_IS_IMMUTABLE:
+                return SCHEDULE_IS_IMMUTABLE;
+            case INVALID_SCHEDULE_PAYER_ID:
+                return INVALID_SCHEDULE_PAYER_ID;
+            case INVALID_SCHEDULE_ACCOUNT_ID:
+                return INVALID_SCHEDULE_ACCOUNT_ID;
+            case NO_NEW_VALID_SIGNATURES:
+                return NO_NEW_VALID_SIGNATURES;
+            case UNRESOLVABLE_REQUIRED_SIGNERS:
+                return UNRESOLVABLE_REQUIRED_SIGNERS;
+            case UNPARSEABLE_SCHEDULED_TRANSACTION:
+                return UNPARSEABLE_SCHEDULED_TRANSACTION;
+            case UNSCHEDULABLE_TRANSACTION:
+                return UNSCHEDULABLE_TRANSACTION;
+            case SOME_SIGNATURES_WERE_INVALID:
+                return SOME_SIGNATURES_WERE_INVALID;
+            case TRANSACTION_ID_FIELD_NOT_ALLOWED:
+                return TRANSACTION_ID_FIELD_NOT_ALLOWED;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
