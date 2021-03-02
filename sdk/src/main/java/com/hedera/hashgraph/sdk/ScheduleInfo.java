@@ -3,10 +3,10 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.ScheduleCreateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
-import com.hedera.hashgraph.sdk.proto.SignedTransactionOrBuilder;
 import com.hedera.hashgraph.sdk.proto.TransactionList;
+
+import javax.annotation.Nullable;
 
 public final class ScheduleInfo {
 
@@ -20,7 +20,7 @@ public final class ScheduleInfo {
 
     public final KeyList signatories;
 
-    public final Key adminKey;
+    @Nullable public final Key adminKey;
 
     private ScheduleInfo(
         ScheduleId scheduleId,
@@ -28,7 +28,7 @@ public final class ScheduleInfo {
         AccountId payerAccountId,
         byte[] transactionBody,
         KeyList signers,
-        Key adminKey
+        @Nullable Key adminKey
     ) {
         this.scheduleId = scheduleId;
         this.creatorAccountId = creatorAccountId;
@@ -41,12 +41,10 @@ public final class ScheduleInfo {
     static ScheduleInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.ScheduleGetInfoResponse scheduleInfo) {
         com.hedera.hashgraph.sdk.proto.ScheduleInfo info = scheduleInfo.getScheduleInfo();
 
-
         var scheduleId = ScheduleId.fromProtobuf(info.getScheduleID());
-
         var creatorAccountId = AccountId.fromProtobuf(info.getCreatorAccountID());
-
         var payerAccountId = AccountId.fromProtobuf(info.getPayerAccountID());
+        var adminKey = info.hasAdminKey() ? Key.fromProtobufKey(info.getAdminKey()) : null;
 
         return new ScheduleInfo(
             scheduleId,
@@ -54,7 +52,7 @@ public final class ScheduleInfo {
             payerAccountId,
             info.getTransactionBody().toByteArray(),
             KeyList.fromProtobuf(info.getSignatories(), null),
-            Key.fromProtobufKey(info.getAdminKey())
+            adminKey
         );
     }
 
@@ -63,7 +61,7 @@ public final class ScheduleInfo {
     }
 
     com.hedera.hashgraph.sdk.proto.ScheduleInfo toProtobuf() {
-        var adminKey = this.adminKey.toProtobufKey() != null
+        var adminKey = this.adminKey != null
             ? this.adminKey.toProtobufKey()
             : null;
 
@@ -105,7 +103,7 @@ public final class ScheduleInfo {
             .add("scheduleId", scheduleId)
             .add("creatorAccountId", creatorAccountId)
             .add("payerAccountId", payerAccountId)
-            .add("signers", signatories)
+            .add("signatories", signatories)
             .add("adminKey", adminKey)
             .toString();
     }

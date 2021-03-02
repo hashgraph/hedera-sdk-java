@@ -256,7 +256,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
             // without this, an error of MISSING_QUERY_HEADER is returned
             headerBuilder.setPayment(new TransferTransaction()
                 .setNodeAccountIds(Collections.singletonList(new AccountId(0)))
-                .setTransactionId(new TransactionId(new AccountId(0), Instant.ofEpochSecond(0)))
+                .setTransactionId(TransactionId.withValidStart(new AccountId(0), Instant.ofEpochSecond(0)))
                 .freeze()
                 .makeRequest());
 

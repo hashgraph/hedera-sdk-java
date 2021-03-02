@@ -6,8 +6,7 @@ import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateTransaction> {
     private final ScheduleCreateTransactionBody.Builder builder;
@@ -36,6 +35,27 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         builder = bodyBuilder.getScheduleCreate().toBuilder();
     }
 
+    public Map<PublicKey, byte[]> getScheduleSignatures() {
+        var map = new HashMap<PublicKey, byte[]>();
+
+        for (var sigPair : builder.getSigMap().getSigPairList()) {
+            map.put(
+                PublicKey.fromBytes(sigPair.getPubKeyPrefix().toByteArray()),
+                sigPair.getEd25519().toByteArray()
+            );
+        }
+
+        return map;
+    }
+
+    public ScheduleCreateTransaction addScheduleSignature(PublicKey publicKey, byte[] signature) {
+        SignatureMap.Builder sigMap = builder.getSigMap().toBuilder();
+        sigMap.addSigPair(publicKey.toSignaturePairProtobuf(signature));
+        builder.setSigMap(sigMap);
+
+        return this;
+    }
+
     public AccountId getPayerAccountId() {
         return AccountId.fromProtobuf(builder.getPayerAccountID());
     }
@@ -59,8 +79,18 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
 
     public ScheduleCreateTransaction setTransaction(Transaction<?> transaction) {
         requireNotFrozen();
-        this.builder.setTransactionBody(transaction.signedTransactions.get(0).getBodyBytes());
-        this.builder.mergeSigMap(transaction.signedTransactions.get(0).getSigMap());
+        builder.setTransactionBody(transaction.signedTransactions.get(0).getBodyBytes());
+        builder.mergeSigMap(transaction.signatures.get(0).build());
+        return this;
+    }
+
+    public String getMemo() {
+        return builder.getMemo();
+    }
+
+    public ScheduleCreateTransaction setMemo(String memo) {
+        requireNotFrozen();
+        builder.setMemo(memo);
         return this;
     }
 
@@ -73,5 +103,17 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setScheduleCreate(builder);
         return true;
+    }
+
+    @Override
+    final com.hedera.hashgraph.sdk.TransactionResponse mapResponse(
+        com.hedera.hashgraph.sdk.proto.TransactionResponse transactionResponse,
+        AccountId nodeId,
+        com.hedera.hashgraph.sdk.proto.Transaction request
+    ) {
+        var transactionId = Objects.requireNonNull(getTransactionId()).setScheduled(true);
+        var hash = hash(request.getSignedTransactionBytes().toByteArray());
+        nextTransactionIndex = (nextTransactionIndex + 1) % transactionIds.size();
+        return new com.hedera.hashgraph.sdk.TransactionResponse(nodeId, transactionId, hash, transactionId);
     }
 }

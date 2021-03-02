@@ -8,15 +8,15 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 public final class ScheduleSignTransaction extends Transaction<ScheduleSignTransaction> {
     private final ScheduleSignTransactionBody.Builder builder;
-    private final SignatureMap.Builder signatureBuilder;
 
     public ScheduleSignTransaction() {
         builder = ScheduleSignTransactionBody.newBuilder();
-        signatureBuilder = SignatureMap.newBuilder();
 
         setMaxTransactionFee(new Hbar(5));
     }
@@ -25,7 +25,6 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
         super(txs);
 
         builder = bodyBuilder.getScheduleSign().toBuilder();
-        signatureBuilder = builder.getSigMap().toBuilder();
     }
 
     public ScheduleId getScheduleId() {
@@ -44,9 +43,24 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
         return this;
     }
 
+    public Map<PublicKey, byte[]> getScheduleSignatures() {
+        var map = new HashMap<PublicKey, byte[]>();
+
+        for (var sigPair : builder.getSigMap().getSigPairList()) {
+            map.put(
+                PublicKey.fromBytes(sigPair.getPubKeyPrefix().toByteArray()),
+                sigPair.getEd25519().toByteArray()
+            );
+        }
+
+        return map;
+    }
+
     public ScheduleSignTransaction addScheduleSignature(PublicKey publicKey, byte[] signature) {
-        requireNotFrozen();
-        signatureBuilder.addSigPair(publicKey.toSignaturePairProtobuf(signature));
+        SignatureMap.Builder sigMap = builder.getSigMap().toBuilder();
+        sigMap.addSigPair(publicKey.toSignaturePairProtobuf(signature));
+        builder.setSigMap(sigMap);
+
         return this;
     }
 
@@ -57,7 +71,7 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setScheduleSign(builder.setSigMap(signatureBuilder));
+        bodyBuilder.setScheduleSign(builder);
         return true;
     }
 }
