@@ -14,9 +14,11 @@ import java.util.Map;
 
 public final class ScheduleSignTransaction extends Transaction<ScheduleSignTransaction> {
     private final ScheduleSignTransactionBody.Builder builder;
+    private final SignatureMap.Builder signatureBuilder;
 
     public ScheduleSignTransaction() {
         builder = ScheduleSignTransactionBody.newBuilder();
+        signatureBuilder = builder.getSigMap().toBuilder();
 
         setMaxTransactionFee(new Hbar(5));
     }
@@ -25,6 +27,7 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
         super(txs);
 
         builder = bodyBuilder.getScheduleSign().toBuilder();
+        signatureBuilder = builder.getSigMap().toBuilder();
     }
 
     public ScheduleId getScheduleId() {
@@ -46,7 +49,7 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
     public Map<PublicKey, byte[]> getScheduleSignatures() {
         var map = new HashMap<PublicKey, byte[]>();
 
-        for (var sigPair : builder.getSigMap().getSigPairList()) {
+        for (var sigPair : signatureBuilder.getSigPairList()) {
             map.put(
                 PublicKey.fromBytes(sigPair.getPubKeyPrefix().toByteArray()),
                 sigPair.getEd25519().toByteArray()
@@ -57,9 +60,7 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
     }
 
     public ScheduleSignTransaction addScheduleSignature(PublicKey publicKey, byte[] signature) {
-        SignatureMap.Builder sigMap = builder.getSigMap().toBuilder();
-        sigMap.addSigPair(publicKey.toSignaturePairProtobuf(signature));
-        builder.setSigMap(sigMap);
+        signatureBuilder.addSigPair(publicKey.toSignaturePairProtobuf(signature));
 
         return this;
     }
@@ -71,7 +72,7 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setScheduleSign(builder);
+        bodyBuilder.setScheduleSign(builder.setSigMap(signatureBuilder));
         return true;
     }
 }

@@ -10,9 +10,11 @@ import java.util.*;
 
 public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateTransaction> {
     private final ScheduleCreateTransactionBody.Builder builder;
+    private final SignatureMap.Builder signatureBuilder;
 
     public ScheduleCreateTransaction() {
         builder = ScheduleCreateTransactionBody.newBuilder();
+        signatureBuilder = builder.getSigMap().toBuilder();
 
         setMaxTransactionFee(new Hbar(5));
     }
@@ -26,19 +28,20 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
 
         this.nodeAccountIds = nodeAccountIds;
         this.builder.setTransactionBody(bodyBytes);
-        this.builder.mergeSigMap(signatureMap);
+        this.signatureBuilder.mergeFrom(signatureMap);
     }
 
     ScheduleCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
 
         builder = bodyBuilder.getScheduleCreate().toBuilder();
+        signatureBuilder = builder.getSigMap().toBuilder();
     }
 
     public Map<PublicKey, byte[]> getScheduleSignatures() {
         var map = new HashMap<PublicKey, byte[]>();
 
-        for (var sigPair : builder.getSigMap().getSigPairList()) {
+        for (var sigPair : signatureBuilder.getSigPairList()) {
             map.put(
                 PublicKey.fromBytes(sigPair.getPubKeyPrefix().toByteArray()),
                 sigPair.getEd25519().toByteArray()
@@ -49,9 +52,7 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     }
 
     public ScheduleCreateTransaction addScheduleSignature(PublicKey publicKey, byte[] signature) {
-        SignatureMap.Builder sigMap = builder.getSigMap().toBuilder();
-        sigMap.addSigPair(publicKey.toSignaturePairProtobuf(signature));
-        builder.setSigMap(sigMap);
+        signatureBuilder.addSigPair(publicKey.toSignaturePairProtobuf(signature));
 
         return this;
     }
@@ -80,7 +81,7 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     public ScheduleCreateTransaction setTransaction(Transaction<?> transaction) {
         requireNotFrozen();
         builder.setTransactionBody(transaction.signedTransactions.get(0).getBodyBytes());
-        builder.mergeSigMap(transaction.signatures.get(0).build());
+        signatureBuilder.mergeFrom(transaction.signatures.get(0).build());
         return this;
     }
 
@@ -101,7 +102,7 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setScheduleCreate(builder);
+        bodyBuilder.setScheduleCreate(builder.setSigMap(signatureBuilder));
         return true;
     }
 
