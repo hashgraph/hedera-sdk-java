@@ -6,10 +6,7 @@ import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateTransaction> {
     private final ScheduleCreateTransactionBody.Builder builder;
@@ -82,8 +79,18 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
 
     public ScheduleCreateTransaction setTransaction(Transaction<?> transaction) {
         requireNotFrozen();
-        this.builder.setTransactionBody(transaction.signedTransactions.get(0).getBodyBytes());
-        this.builder.mergeSigMap(transaction.signatures.get(0).build());
+        builder.setTransactionBody(transaction.signedTransactions.get(0).getBodyBytes());
+        builder.mergeSigMap(transaction.signatures.get(0).build());
+        return this;
+    }
+
+    public String getMemo() {
+        return builder.getMemo();
+    }
+
+    public ScheduleCreateTransaction setMemo(String memo) {
+        requireNotFrozen();
+        builder.setMemo(memo);
         return this;
     }
 
@@ -96,5 +103,17 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setScheduleCreate(builder);
         return true;
+    }
+
+    @Override
+    final com.hedera.hashgraph.sdk.TransactionResponse mapResponse(
+        com.hedera.hashgraph.sdk.proto.TransactionResponse transactionResponse,
+        AccountId nodeId,
+        com.hedera.hashgraph.sdk.proto.Transaction request
+    ) {
+        var transactionId = Objects.requireNonNull(getTransactionId());
+        var hash = hash(request.getSignedTransactionBytes().toByteArray());
+        nextTransactionIndex = (nextTransactionIndex + 1) % transactionIds.size();
+        return new com.hedera.hashgraph.sdk.TransactionResponse(nodeId, transactionId, hash, transactionId);
     }
 }

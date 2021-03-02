@@ -29,7 +29,7 @@ public class TopicUpdateTransactionTest {
     void clearShouldSerialize() {
         SnapshotMatcher.expect(new TopicUpdateTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setTopicId(TopicId.fromString("0.0.5007"))
             .clearAdminKey()
             .clearAutoRenewAccountId(AccountId.fromString("0.0.5008"))
@@ -45,7 +45,7 @@ public class TopicUpdateTransactionTest {
     void setShouldSerialize() {
         SnapshotMatcher.expect(new TopicUpdateTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setTopicId(TopicId.fromString("0.0.5007"))
             .setAdminKey(unusedPrivateKey)
             .setAutoRenewAccountId(AccountId.fromString("0.0.5009"))

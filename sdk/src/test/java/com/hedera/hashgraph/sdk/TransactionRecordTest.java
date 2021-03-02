@@ -35,7 +35,7 @@ public class TransactionRecordTest {
                         .setReceipt(com.hedera.hashgraph.sdk.proto.TransactionReceipt.newBuilder().build())
                         .setTransactionHash(ByteString.copyFrom("hello", StandardCharsets.UTF_8))
                         .setConsensusTimestamp(InstantConverter.toProtobuf(exampleInstant))
-                        .setTransactionID(new TransactionId(AccountId.fromString("0.0.5006"), exampleInstant).toProtobuf())
+                        .setTransactionID(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), exampleInstant).toProtobuf())
                         .setMemo("hola")
                         .setTransactionFee(100_000)
                         .setTransferList(transferList)
