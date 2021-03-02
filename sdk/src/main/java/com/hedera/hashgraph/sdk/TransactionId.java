@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
 import java8.util.concurrent.CompletableFuture;
+import org.bouncycastle.util.encoders.Hex;
 import org.threeten.bp.Clock;
 import org.threeten.bp.Instant;
 
@@ -152,7 +153,13 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
 
     @Override
     public String toString() {
-        return "" + accountId + "@" + validStart.getEpochSecond() + "." + validStart.getNano();
+        if (accountId != null && validStart != null) {
+            return "" + accountId + "@" + validStart.getEpochSecond() + "." + validStart.getNano() + (scheduled ? "?scheduled" : "");
+        } else if (nonce != null) {
+            return Hex.toHexString(nonce) + (scheduled ? "?scheduled" : "");
+        } else {
+            throw new IllegalStateException("`TransactionId.toString()` is non-exhaustive");
+        }
     }
 
     public byte[] toBytes() {
