@@ -13,17 +13,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
- * `TransactionId.withValidStart()` replaces `new TransactionId(AccountId, Instant)`
- * `TransactionId.withNonce()` - Supports creating transaction ID with random bytes.
- * `TransactionId.[set|get]Scheduled()` - Supports scheduled transaction IDs.
-
-### Deprecated
-
- * `new TransactionId(AccountId, Instant)` - Use `TransactionId.withValidStart()` instead.
+ * Support for scheduled and nonce in `TransactionId`
+   * `TransactionId.withNonce()` - Supports creating transaction ID with random bytes.
+   * `TransactionId.[set|get]Scheduled()` - Supports scheduled transaction IDs.
+ * `TransactionId.withValidStart()`
 
 ### Fixed
  * `ScheduleCreateTransaction.setTransaction()` and `Transaction.schedule()` not correctly setting
    existing signatures.
+
+### Deprecated
+
+ * `new TransactionId(AccountId, Instant)` - Use `TransactionId.withValidStart()` instead.
 
 ## v2.0.5-beta2
 
@@ -33,7 +34,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v2.0.5-beta1
 
 ### Added
+
  * Support for scheduled transactions.
+   * `ScheduleCreateTransaction` - Create a new scheduled transaction
+   * `ScheduleSignTransaction` - Sign an existing scheduled transaction on the network
+   * `ScheduleDeleteTransaction` - Delete a scheduled transaction
+   * `ScheduleInfoQuery` - Query the info including `bodyBytes` of a scheduled transaction
+   * `ScheduleId`
 
 ## v2.0.2
 
