@@ -4,9 +4,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.5-beta3
+
+### Changed
+
+ * `TransactionId.toString()` will append `?scheduled` for scheduled transaction IDs, and
+   transaction IDs created from nonce will print in hex.
+
+### Added
+
+ * `TransactionId.withValidStart()` replaces `new TransactionId(AccountId, Instant)`
+ * `TransactionId.withNonce()` - Supports creating transaction ID with random bytes.
+ * `TransactionId.[set|get]Scheduled()` - Supports scheduled transaction IDs.
+
+### Deprecated
+
+ * `new TransactionId(AccountId, Instant)` - Use `TransactionId.withValidStart()` instead.
+
+### Fixed
+ * `ScheduleCreateTransaction.setTransaction()` and `Transaction.schedule()` not correctly setting
+   existing signatures.
+
+## v2.0.5-beta2
+
+### Fixed
+ * `Schedule[Create|Sign]Transaction.addScheduleSignature()` didn't save added signatures correctly.
+
+## v2.0.5-beta1
+
+### Added
+ * Support for scheduled transactions.
+
 ## v2.0.2
 
-### General changes
+### Changes
 
  * Implement `Client.forName()` to support construction of client from network name.
  * Implement `PrivateKey.verifyTransaction()` to allow a user to verify a transaction was signed with a partiular key.
