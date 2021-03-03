@@ -12,7 +12,7 @@ class TokenUnfreezeIntegrationTest {
     @DisplayName("Can unfreeze account with token")
     void canUnfreezeAccountWithToken() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
@@ -61,20 +61,6 @@ class TokenUnfreezeIntegrationTest {
                 .execute(client)
                 .getReceipt(client);
 
-            new TokenDeleteTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTokenId(tokenId)
-                .execute(client)
-                .getReceipt(client);
-
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
-                .sign(key)
-                .execute(client)
-                .getReceipt(client);
-
             client.close();
         });
     }
@@ -83,7 +69,7 @@ class TokenUnfreezeIntegrationTest {
     @DisplayName("Cannot unfreeze account on token when token ID is not set")
     void cannotUnfreezeAccountOnTokenWhenTokenIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
             var key = PrivateKey.generate();
@@ -105,14 +91,6 @@ class TokenUnfreezeIntegrationTest {
                     .getReceipt(client);
             });
 
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
-                .sign(key)
-                .execute(client)
-                .getReceipt(client);
-
             assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_ID.toString()));
 
             client.close();
@@ -123,7 +101,7 @@ class TokenUnfreezeIntegrationTest {
     @DisplayName("Cannot unfreeze account on token when account ID is not set")
     void cannotUnfreezeAccountOnTokenWhenAccountIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
@@ -165,7 +143,7 @@ class TokenUnfreezeIntegrationTest {
     @DisplayName("Cannot unfreeze account on token when account was not associated with")
     void cannotUnfreezeAccountOnTokenWhenAccountWasNotAssociatedWith() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
@@ -206,21 +184,6 @@ class TokenUnfreezeIntegrationTest {
                     .execute(client)
                     .getReceipt(client);
             });
-
-            new TokenDeleteTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTokenId(tokenId)
-                .execute(client)
-                .getReceipt(client);
-
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
-                .signWithOperator(client)
-                .sign(key)
-                .execute(client)
-                .getReceipt(client);
 
             assertTrue(error.getMessage().contains(Status.TOKEN_NOT_ASSOCIATED_TO_ACCOUNT.toString()));
 

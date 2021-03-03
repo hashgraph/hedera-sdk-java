@@ -13,7 +13,7 @@ class TokenUpdateIntegrationTest {
     @DisplayName("Can update token")
     void canUpdateToken() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
@@ -90,12 +90,6 @@ class TokenUpdateIntegrationTest {
             assertNotNull(info.defaultKycStatus);
             assertFalse(info.defaultKycStatus);
 
-            new TokenDeleteTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTokenId(tokenId)
-                .execute(client)
-                .getReceipt(client);
-
             client.close();
         });
     }
@@ -104,7 +98,7 @@ class TokenUpdateIntegrationTest {
     @DisplayName("Cannot update immutable token")
     void cannotUpdateImmutableToken() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
             var response = new TokenCreateTransaction()
