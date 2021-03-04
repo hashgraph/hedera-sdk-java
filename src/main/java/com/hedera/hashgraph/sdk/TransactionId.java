@@ -26,6 +26,12 @@ public final class TransactionId {
     @Nullable
     private static Instant lastInstant;
 
+    @Nullable
+    public byte[] nonce;
+
+    boolean scheduled = false;
+
+
     private TransactionId(AccountId accountId, Instant transactionValidStart) {
         inner = TransactionID.newBuilder()
             .setAccountID(accountId.toProto())
@@ -36,6 +42,8 @@ public final class TransactionId {
 
         this.accountId = accountId;
         this.validStart = transactionValidStart;
+        this.scheduled = false;
+        this.nonce = null;
     }
 
     /**
@@ -66,19 +74,36 @@ public final class TransactionId {
         return new TransactionId(accountId, transactionValidStart);
     }
 
+    public static TransactionId withNonce(byte[] nonce) {
+        TransactionId txId = new TransactionId(new AccountId(0), Instant.EPOCH);
+        txId.nonce = nonce;
+
+        return txId;
+    }
+
     @Internal
     public TransactionId(TransactionIDOrBuilder transactionId) {
         inner = TransactionID.newBuilder()
             .setAccountID(transactionId.getAccountID())
-            .setTransactionValidStart(transactionId.getTransactionValidStart());
+            .setTransactionValidStart(transactionId.getTransactionValidStart())
+            .setScheduled(transactionId.getScheduled())
+            .setNonce(transactionId.getNonce());
 
         accountId = new AccountId(transactionId.getAccountIDOrBuilder());
         validStart = TimestampHelper.timestampTo(transactionId.getTransactionValidStart());
+        nonce = transactionId.getNonce().toByteArray();
+        scheduled = transactionId.getScheduled();
     }
 
     @Internal
     public TransactionID toProto() {
         return inner.build();
+    }
+
+    public TransactionId setScheduled(boolean scheduled) {
+        this.scheduled = scheduled;
+
+        return this;
     }
 
     @Override
