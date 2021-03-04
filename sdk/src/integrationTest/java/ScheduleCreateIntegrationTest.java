@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ScheduleCreateIntegrationTest {
@@ -201,7 +200,7 @@ public class ScheduleCreateIntegrationTest {
             .setKey(keyList)
             .execute(client);
 
-       assertNotNull(response.getReceipt(client).accountId);
+        assertNotNull(response.getReceipt(client).accountId);
 
         var topicId = Objects.requireNonNull(new TopicCreateTransaction()
             .setAdminKey(operatorKey)
@@ -220,10 +219,15 @@ public class ScheduleCreateIntegrationTest {
             .freezeWith(client);
 
         // create schedule
-        var scheduleId = Objects.requireNonNull(transaction.schedule()
+        var scheduled = transaction.schedule()
             .setAdminKey(operatorKey)
             .setPayerAccountId(operatorId)
             .setMemo("mirror scheduled E2E signature on create and sign_" + Instant.now())
+            .freezeWith(client);
+
+        var transactionId = scheduled.getTransactionId();
+
+        var scheduleId = Objects.requireNonNull(scheduled
             .execute(client)
             .getReceipt(client)
             .scheduleId
@@ -254,5 +258,14 @@ public class ScheduleCreateIntegrationTest {
         });
 
         assertTrue(error.getMessage().contains(Status.INVALID_SCHEDULE_ID.toString()));
+
+        System.out.println(
+            "https://previewnet.mirrornode.hedera.com/api/v1/transactions/" +
+            transactionId.accountId.toString() +
+                "-" +
+                transactionId.validStart.getEpochSecond() +
+                "-" +
+                transactionId.validStart.getNano()
+        );
     }
 }
