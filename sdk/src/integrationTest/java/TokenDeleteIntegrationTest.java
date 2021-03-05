@@ -1,4 +1,5 @@
 import com.hedera.hashgraph.sdk.*;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -9,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TokenDeleteIntegrationTest {
     @Test
+    @Disabled
     @DisplayName("Can delete token")
     void canDeleteToken() {
         assertDoesNotThrow(() -> {
@@ -43,6 +45,7 @@ class TokenDeleteIntegrationTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("Can delete token with only admin key set")
     void canDeleteTokenWithOnlyAdminKeySet() {
         assertDoesNotThrow(() -> {
@@ -70,6 +73,7 @@ class TokenDeleteIntegrationTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("Cannot delete token when admin key does not sign transaction")
     void cannotDeleteTokenWhenAdminKeyDoesNotSignTransaction() {
         assertDoesNotThrow(() -> {
@@ -104,6 +108,7 @@ class TokenDeleteIntegrationTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("Cannot delete token when token ID is not set")
     void cannotDeleteTokenWhenTokenIDIsNotSet() {
         assertDoesNotThrow(() -> {

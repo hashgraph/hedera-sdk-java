@@ -12,7 +12,7 @@ class TokenRevokeKycIntegrationTest {
     @DisplayName("Can revoke kyc to account with token")
     void canRevokeKycAccountWithToken() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
@@ -61,20 +61,6 @@ class TokenRevokeKycIntegrationTest {
                 .execute(client)
                 .getReceipt(client);
 
-            new TokenDeleteTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTokenId(tokenId)
-                .execute(client)
-                .getReceipt(client);
-
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
-                .sign(key)
-                .execute(client)
-                .getReceipt(client);
-
             client.close();
         });
     }
@@ -83,7 +69,7 @@ class TokenRevokeKycIntegrationTest {
     @DisplayName("Cannot revoke kyc to account on token when token ID is not set")
     void cannotRevokeKycToAccountOnTokenWhenTokenIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
             var key = PrivateKey.generate();
@@ -105,14 +91,6 @@ class TokenRevokeKycIntegrationTest {
                     .getReceipt(client);
             });
 
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
-                .sign(key)
-                .execute(client)
-                .getReceipt(client);
-
             assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_ID.toString()));
 
             client.close();
@@ -123,7 +101,7 @@ class TokenRevokeKycIntegrationTest {
     @DisplayName("Cannot revoke kyc to account on token when account ID is not set")
     void cannotRevokeKycToAccountOnTokenWhenAccountIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
@@ -165,7 +143,7 @@ class TokenRevokeKycIntegrationTest {
     @DisplayName("Cannot revoke kyc to account on token when account was not associated with")
     void cannotRevokeKycToAccountOnTokenWhenAccountWasNotAssociatedWith() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
@@ -206,21 +184,6 @@ class TokenRevokeKycIntegrationTest {
                     .execute(client)
                     .getReceipt(client);
             });
-
-            new TokenDeleteTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTokenId(tokenId)
-                .execute(client)
-                .getReceipt(client);
-
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
-                .signWithOperator(client)
-                .sign(key)
-                .execute(client)
-                .getReceipt(client);
 
             assertTrue(error.getMessage().contains(Status.TOKEN_NOT_ASSOCIATED_TO_ACCOUNT.toString()));
 

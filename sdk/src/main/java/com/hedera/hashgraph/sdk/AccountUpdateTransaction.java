@@ -2,6 +2,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.BoolValue;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.StringValue;
 import com.google.protobuf.UInt64Value;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.CryptoUpdateTransactionBody;
@@ -193,6 +194,22 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     public AccountUpdateTransaction setReceiverSignatureRequired(boolean receiverSignatureRequired) {
         requireNotFrozen();
         builder.setReceiverSigRequiredWrapper(BoolValue.of(receiverSignatureRequired));
+        return this;
+    }
+
+    public String getAccountMemo() {
+        return builder.getMemo().getValue();
+    }
+
+    public AccountUpdateTransaction setAccountMemo(String memo) {
+        requireNotFrozen();
+        this.builder.setMemo(StringValue.of(memo));
+        return this;
+    }
+
+    public AccountUpdateTransaction clearMemo() {
+        requireNotFrozen();
+        this.builder.clearMemo();
         return this;
     }
 

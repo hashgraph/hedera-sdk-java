@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.*;
@@ -84,12 +83,17 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
 
     @Override
     void onFreezeChunk(TransactionBody.Builder body, TransactionID initialTransactionId, int startIndex, int endIndex, int chunk, int total) {
-        body.setConsensusSubmitMessage(builder.setMessage(data.substring(startIndex, endIndex))
-            .setChunkInfo(ConsensusMessageChunkInfo.newBuilder()
-                .setInitialTransactionID(initialTransactionId)
-                .setNumber(chunk + 1)
-                .setTotal(total)
-            )
-        );
+        if (total == 1) {
+            body.setConsensusSubmitMessage(builder.setMessage(data.substring(startIndex, endIndex)));
+        } else {
+            body.setConsensusSubmitMessage(builder.setMessage(data.substring(startIndex, endIndex))
+                .setChunkInfo(ConsensusMessageChunkInfo.newBuilder()
+                    .setInitialTransactionID(initialTransactionId)
+                    .setNumber(chunk + 1)
+                    .setTotal(total)
+                )
+            );
+        }
+
     }
 }

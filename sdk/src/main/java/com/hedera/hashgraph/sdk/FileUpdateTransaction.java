@@ -2,6 +2,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.StringValue;
 import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.FileUpdateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
@@ -147,6 +148,22 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     public FileUpdateTransaction setContents(String text) {
         requireNotFrozen();
         builder.setContents(ByteString.copyFromUtf8(text));
+        return this;
+    }
+
+    public String getFileMemo() {
+        return builder.getMemo().getValue();
+    }
+
+    public FileUpdateTransaction setFileMemo(String memo) {
+        requireNotFrozen();
+        this.builder.setMemo(StringValue.of(memo));
+        return this;
+    }
+
+    public FileUpdateTransaction clearMemo() {
+        requireNotFrozen();
+        this.builder.clearMemo();
         return this;
     }
 

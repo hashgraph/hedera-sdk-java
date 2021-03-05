@@ -4,9 +4,54 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.5-beta4
+
+### Added
+
+ * Support `memo` for Tokens, Accounts, and Files.
+ * `TransactionId.fromString()` should support nonce and scheduled.
+
+## v2.0.5-beta3
+
+### Changed
+
+ * `TransactionId.toString()` will append `?scheduled` for scheduled transaction IDs, and
+   transaction IDs created from nonce will print in hex.
+
+### Added
+
+ * Support for scheduled and nonce in `TransactionId`
+   * `TransactionId.withNonce()` - Supports creating transaction ID with random bytes.
+   * `TransactionId.[set|get]Scheduled()` - Supports scheduled transaction IDs.
+ * `TransactionId.withValidStart()`
+
+### Fixed
+ * `ScheduleCreateTransaction.setTransaction()` and `Transaction.schedule()` not correctly setting
+   existing signatures.
+
+### Deprecated
+
+ * `new TransactionId(AccountId, Instant)` - Use `TransactionId.withValidStart()` instead.
+
+## v2.0.5-beta2
+
+### Fixed
+ * `Schedule[Create|Sign]Transaction.addScheduleSignature()` didn't save added signatures correctly.
+
+## v2.0.5-beta1
+
+### Added
+
+ * Support for scheduled transactions.
+   * `ScheduleCreateTransaction` - Create a new scheduled transaction
+   * `ScheduleSignTransaction` - Sign an existing scheduled transaction on the network
+   * `ScheduleDeleteTransaction` - Delete a scheduled transaction
+   * `ScheduleInfoQuery` - Query the info including `bodyBytes` of a scheduled transaction
+   * `ScheduleId`
+
 ## v2.0.2
 
-### General changes
+### Changes
 
  * Implement `Client.forName()` to support construction of client from network name.
  * Implement `PrivateKey.verifyTransaction()` to allow a user to verify a transaction was signed with a partiular key.

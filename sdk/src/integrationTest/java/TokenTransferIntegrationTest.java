@@ -14,13 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TokenTransferIntegrationTest {
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(System.getProperty("OPERATOR_ID")));
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(System.getProperty("OPERATOR_KEY")));
-
     @Test
     void test() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
+            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
             PrivateKey key = PrivateKey.generate();
 
@@ -37,12 +36,12 @@ class TokenTransferIntegrationTest {
                 .setTokenSymbol("F")
                 .setDecimals(3)
                 .setInitialSupply(1000000)
-                .setTreasuryAccountId(OPERATOR_ID)
-                .setAdminKey(OPERATOR_KEY.getPublicKey())
-                .setFreezeKey(OPERATOR_KEY.getPublicKey())
-                .setWipeKey(OPERATOR_KEY.getPublicKey())
-                .setKycKey(OPERATOR_KEY.getPublicKey())
-                .setSupplyKey(OPERATOR_KEY.getPublicKey())
+                .setTreasuryAccountId(operatorId)
+                .setAdminKey(operatorKey)
+                .setFreezeKey(operatorKey)
+                .setWipeKey(operatorKey)
+                .setKycKey(operatorKey)
+                .setSupplyKey(operatorKey)
                 .setFreezeDefault(false)
                 .execute(client);
 
@@ -54,7 +53,7 @@ class TokenTransferIntegrationTest {
                 .setAccountId(accountId)
                 .setTokenIds(Collections.singletonList(tokenId))
                 .freezeWith(client)
-                .sign(OPERATOR_KEY)
+                .signWithOperator(client)
                 .sign(key)
                 .execute(client)
                 .getReceipt(client);
@@ -68,7 +67,7 @@ class TokenTransferIntegrationTest {
 
             new TransferTransaction()
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .addTokenTransfer(tokenId, OPERATOR_ID, -10)
+                .addTokenTransfer(tokenId, operatorId, -10)
                 .addTokenTransfer(tokenId, accountId, 10)
                 .execute(client)
                 .getReceipt(client);
@@ -78,15 +77,6 @@ class TokenTransferIntegrationTest {
                 .setTokenId(tokenId)
                 .setAccountId(accountId)
                 .setAmount(10)
-                .execute(client)
-                .getReceipt(client);
-
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(OPERATOR_ID)
-                .freezeWith(client)
-                .sign(OPERATOR_KEY)
-                .sign(key)
                 .execute(client)
                 .getReceipt(client);
 
