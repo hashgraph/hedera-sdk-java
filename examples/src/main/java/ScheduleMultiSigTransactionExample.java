@@ -93,11 +93,14 @@ public class ScheduleMultiSigTransactionExample {
             .addHbarTransfer(accountId, new Hbar(1).negated())
             .addHbarTransfer(operatorId, new Hbar(1))
             .freezeWith(client)
-            .sign(key1)
-            .sign(key2);
+            .sign(key1);
 
         // Schedule the transactoin
         ScheduleCreateTransaction scheduled = transfer.schedule();
+
+        byte[] key2Signature = key2.signTransaction(transfer);
+
+        scheduled.addScheduleSignature(key2.getPublicKey(), key2Signature);
 
         if (scheduled.getScheduleSignatures().size() != 2) {
             throw new Exception("Scheduled transaction has incorrect number of signatures: " + scheduled.getScheduleSignatures().size());
@@ -160,7 +163,7 @@ public class ScheduleMultiSigTransactionExample {
                 .setScheduleId(scheduleId)
                 .execute(client);
         } catch (PrecheckStatusException e) {
-            System.out.println("Received " + e.status + " status code for schedule info query after all signatures appended");
+            System.out.println("Received " + e.status + " status code which implies scheduled transaction was executed");
         }
 
 //        Cannot seem to get the receipt for a scheduled transaction after it's expected to have executed

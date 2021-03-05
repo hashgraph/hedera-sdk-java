@@ -112,7 +112,7 @@ class AccountBalanceIntegrationTest {
     @DisplayName("Can fetch token balances for client operator")
     void canFetchTokenBalancesForClientOperator() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
@@ -134,12 +134,6 @@ class AccountBalanceIntegrationTest {
                 .execute(client);
 
             assertEquals(balance.token.get(tokenId), 10000);
-
-            new TokenDeleteTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTokenId(tokenId)
-                .execute(client)
-                .getReceipt(client);
 
             client.close();
         });

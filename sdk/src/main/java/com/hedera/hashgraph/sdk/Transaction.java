@@ -225,6 +225,10 @@ public abstract class Transaction<T extends Transaction<T>>
     public final ScheduleCreateTransaction schedule() {
         requireOneNodeAccountId();
 
+        if (signedTransactions.size() > 1) {
+            throw new IllegalStateException("Cannot schedule a chunked transaction");
+        }
+
         return new ScheduleCreateTransaction(
             this.nodeAccountIds,
             this.signedTransactions.get(0).getBodyBytes(),
@@ -514,7 +518,7 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     protected void requireOneNodeAccountId() {
-        if (signedTransactions.size() != 1) {
+        if (nodeAccountIds.size() != 1) {
             throw new IllegalStateException("transaction did not have exactly one node ID set");
         }
     }

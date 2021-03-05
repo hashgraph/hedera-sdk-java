@@ -12,7 +12,7 @@ class TokenInfoIntegrationTest {
     @DisplayName("Can query token info when all keys are different")
     void canQueryTokenInfoWhenAllKeysAreDifferent() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
             var key1 = PrivateKey.generate();
@@ -64,14 +64,6 @@ class TokenInfoIntegrationTest {
             assertNotNull(info.defaultKycStatus);
             assertFalse(info.defaultKycStatus);
 
-            new TokenDeleteTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTokenId(tokenId)
-                .freezeWith(client)
-                .sign(key1)
-                .execute(client)
-                .getReceipt(client);
-
             client.close();
         });
     }
@@ -80,7 +72,7 @@ class TokenInfoIntegrationTest {
     @DisplayName("Can query token with minimal properties")
     void canQueryTokenInfoWhenTokenIsCreatedWithMinimalProperties() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
             var response = new TokenCreateTransaction()
@@ -118,7 +110,7 @@ class TokenInfoIntegrationTest {
     @DisplayName("Get cost of token info query")
     void getCostQueryTokenInfo() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
             var response = new TokenCreateTransaction()
@@ -145,7 +137,7 @@ class TokenInfoIntegrationTest {
     @DisplayName("Get cost of token info query, with big max")
     void getCostBigMaxQueryTokenInfo() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
             var response = new TokenCreateTransaction()
@@ -173,7 +165,7 @@ class TokenInfoIntegrationTest {
     @DisplayName("Can query token info when all keys are different")
     void getCostSmallMaxTokenInfo() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
             var response = new TokenCreateTransaction()
@@ -205,7 +197,7 @@ class TokenInfoIntegrationTest {
     @DisplayName("Throws insufficient transaction fee error")
     void getCostInsufficientTxFeeQueryTokenInfo() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
             var response = new TokenCreateTransaction()
