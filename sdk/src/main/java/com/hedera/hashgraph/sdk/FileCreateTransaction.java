@@ -141,6 +141,16 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
         return this;
     }
 
+    public String getFileMemo() {
+        return builder.getMemo();
+    }
+
+    public FileCreateTransaction setFileMemo(String memo) {
+        requireNotFrozen();
+        this.builder.setMemo(memo);
+        return this;
+    }
+
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return FileServiceGrpc.getCreateFileMethod();

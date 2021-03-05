@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.StringValue;
 import com.hedera.hashgraph.sdk.proto.TokenUpdateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
@@ -141,6 +142,22 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     public TokenUpdateTransaction setAutoRenewPeriod(Duration period) {
         requireNotFrozen();
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(period));
+        return this;
+    }
+
+    public String getTokenMemo() {
+        return builder.getMemo().getValue();
+    }
+
+    public TokenUpdateTransaction setTokenMemo(String memo) {
+        requireNotFrozen();
+        this.builder.setMemo(StringValue.of(memo));
+        return this;
+    }
+
+    public TokenUpdateTransaction clearMemo() {
+        requireNotFrozen();
+        this.builder.clearMemo();
         return this;
     }
 

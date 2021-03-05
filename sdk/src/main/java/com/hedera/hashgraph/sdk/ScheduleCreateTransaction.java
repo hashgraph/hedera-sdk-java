@@ -85,11 +85,11 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         return this;
     }
 
-    public String getMemo() {
+    public String getScheduleMemo() {
         return builder.getMemo();
     }
 
-    public ScheduleCreateTransaction setMemo(String memo) {
+    public ScheduleCreateTransaction setScheduleMemo(String memo) {
         requireNotFrozen();
         builder.setMemo(memo);
         return this;
