@@ -34,7 +34,7 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
 
         builder = bodyBuilder.getConsensusSubmitMessage().toBuilder();
 
-        for (var i = 0; i < signedTransactions.size(); i += nodeAccountIds.size()) {
+        for (var i = 0; i < signedTransactions.size(); i += nodeAccountIds.isEmpty() ? 1 : nodeAccountIds.size()) {
             data = data.concat(
                 TransactionBody.parseFrom(signedTransactions.get(i).getBodyBytes())
                     .getConsensusSubmitMessage().getMessage()

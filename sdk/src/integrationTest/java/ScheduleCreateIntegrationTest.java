@@ -23,12 +23,10 @@ public class ScheduleCreateIntegrationTest {
 
             var transaction = new AccountCreateTransaction()
                 .setKey(key)
-                .setInitialBalance(new Hbar(10))
-                .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
-                .freezeWith(client);
+                .setInitialBalance(new Hbar(10));
 
             var response = new ScheduleCreateTransaction()
-                .setTransaction(transaction)
+                .setScheduledTransaction(transaction)
                 .setAdminKey(operatorKey)
                 .setPayerAccountId(operatorId)
                 .execute(client);
@@ -62,12 +60,10 @@ public class ScheduleCreateIntegrationTest {
 
             var transaction = new AccountCreateTransaction()
                 .setKey(key)
-                .setInitialBalance(new Hbar(10))
-                .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
-                .freezeWith(client);
+                .setInitialBalance(new Hbar(10));
 
             var response = new ScheduleCreateTransaction()
-                .setTransaction(transaction)
+                .setScheduledTransaction(transaction)
                 .setAdminKey(operatorKey)
                 .setPayerAccountId(operatorId)
                 .execute(client);
@@ -103,9 +99,7 @@ public class ScheduleCreateIntegrationTest {
 
             var transaction = new AccountCreateTransaction()
                 .setKey(key)
-                .setInitialBalance(new Hbar(10))
-                .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
-                .freezeWith(client);
+                .setInitialBalance(new Hbar(10));
 
             var tx = transaction.schedule();
 
@@ -143,23 +137,25 @@ public class ScheduleCreateIntegrationTest {
 
             var transaction = new AccountCreateTransaction()
                 .setKey(key.getPublicKey())
-                .setInitialBalance(new Hbar(10))
-                .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
-                .freezeWith(client);
+                .setInitialBalance(new Hbar(10));
 
             var response = new ScheduleCreateTransaction()
-                .setTransaction(transaction)
+                .setScheduledTransaction(transaction)
                 .setAdminKey(operatorKey)
                 .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
                 .setPayerAccountId(operatorId)
                 .execute(client);
 
-            var signature = key.signTransaction(transaction);
-
             var scheduleId = Objects.requireNonNull(response.getReceipt(client).scheduleId);
 
+            var info = new ScheduleInfoQuery()
+                .setScheduleId(scheduleId)
+                .execute(client);
+
+            var signature = key.sign(info.transactionBody);
+
             new ScheduleSignTransaction()
-                .addScheduleSignature(key.getPublicKey(), signature)
+                .addScheduledSignature(key.getPublicKey(), signature)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setScheduleId(scheduleId)
                 .freezeWith(client);
@@ -213,16 +209,15 @@ public class ScheduleCreateIntegrationTest {
         );
 
         var transaction = new TopicMessageSubmitTransaction()
-            .setNodeAccountIds(Collections.singletonList(response.nodeId))
             .setTopicId(topicId)
-            .setMessage("scheduled hcs message".getBytes(StandardCharsets.UTF_8))
-            .freezeWith(client);
+            .setMessage("scheduled hcs message".getBytes(StandardCharsets.UTF_8));
 
         // create schedule
         var scheduled = transaction.schedule()
+            .setNodeAccountIds(Collections.singletonList(response.nodeId))
             .setAdminKey(operatorKey)
             .setPayerAccountId(operatorId)
-            .setMemo("mirror scheduled E2E signature on create and sign_" + Instant.now())
+            .setScheduleMemo("mirror scheduled E2E signature on create and sign_" + Instant.now())
             .freezeWith(client);
 
         var transactionId = scheduled.getTransactionId();
@@ -242,11 +237,17 @@ public class ScheduleCreateIntegrationTest {
         assertNotNull(info);
         assertEquals(info.scheduleId, scheduleId);
 
-        var key2Signature = key2.signTransaction(transaction);
+        var infoTransaction = (TopicMessageSubmitTransaction) info.getTransaction();
+
+        assertEquals(transaction.getTopicId(), infoTransaction.getTopicId());
+        assertEquals(transaction.getMessage(), infoTransaction.getMessage());
+        assertEquals(transaction.getNodeAccountIds(), infoTransaction.getNodeAccountIds());
+
+        var key2Signature = key2.sign(info.transactionBody);
 
         new ScheduleSignTransaction()
             .setScheduleId(scheduleId)
-            .addScheduleSignature(key2.getPublicKey(), key2Signature)
+            .addScheduledSignature(key2.getPublicKey(), key2Signature)
             .execute(client)
             .getReceipt(client);
 
@@ -261,7 +262,7 @@ public class ScheduleCreateIntegrationTest {
 
         System.out.println(
             "https://previewnet.mirrornode.hedera.com/api/v1/transactions/" +
-            transactionId.accountId.toString() +
+                transactionId.accountId.toString() +
                 "-" +
                 transactionId.validStart.getEpochSecond() +
                 "-" +

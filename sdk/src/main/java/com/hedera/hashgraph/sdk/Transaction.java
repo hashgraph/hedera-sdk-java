@@ -85,6 +85,8 @@ public abstract class Transaction<T extends Transaction<T>>
             }
         }
 
+        nodeAccountIds.remove(new AccountId(0));
+
         bodyBuilder = TransactionBody.parseFrom(signedTransactions.get(0).getBodyBytes()).toBuilder();
     }
 
@@ -222,18 +224,19 @@ public abstract class Transaction<T extends Transaction<T>>
         }
     }
 
-    public final ScheduleCreateTransaction schedule() {
-        requireOneNodeAccountId();
+    public ScheduleCreateTransaction schedule() {
+        requireNotFrozen();
 
-        if (signedTransactions.size() > 1) {
-            throw new IllegalStateException("Cannot schedule a chunked transaction");
+        if (!nodeAccountIds.isEmpty()) {
+            throw new IllegalStateException(
+                "The underlying transaction for a scheduled transaction cannot have node account IDs set"
+            );
         }
 
-        return new ScheduleCreateTransaction(
-            this.nodeAccountIds,
-            this.signedTransactions.get(0).getBodyBytes(),
-            this.signatures.get(0).build()
-        );
+        onFreeze(bodyBuilder);
+
+        return new ScheduleCreateTransaction()
+            .setTransactionBodyBytes(bodyBuilder.build().toByteString());
     }
 
     static byte[] hash(byte[] bytes) {

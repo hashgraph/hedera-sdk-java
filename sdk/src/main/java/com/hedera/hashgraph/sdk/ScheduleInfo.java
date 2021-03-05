@@ -20,7 +20,8 @@ public final class ScheduleInfo {
 
     public final KeyList signatories;
 
-    @Nullable public final Key adminKey;
+    @Nullable
+    public final Key adminKey;
 
     private ScheduleInfo(
         ScheduleId scheduleId,
@@ -81,13 +82,13 @@ public final class ScheduleInfo {
     }
 
     public final Transaction<?> getTransaction() {
-        SignedTransaction.Builder builder = SignedTransaction.newBuilder();
-        builder.setBodyBytes(ByteString.copyFrom(transactionBody));
-
         try {
             return Transaction.fromBytes(TransactionList.newBuilder()
                 .addTransactionList(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
-                    .setSignedTransactionBytes(builder.build().toByteString())
+                    .setSignedTransactionBytes(SignedTransaction.newBuilder()
+                        .setBodyBytes(ByteString.copyFrom(transactionBody))
+                        .build()
+                        .toByteString())
                     .build())
                 .build()
                 .toByteArray()

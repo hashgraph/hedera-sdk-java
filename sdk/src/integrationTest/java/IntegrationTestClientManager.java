@@ -32,7 +32,7 @@ public class IntegrationTestClientManager {
         }
 
         assertNotNull(client.getOperatorAccountId());
-        assertNotNull(client.getOperatorAccountId());
+        assertNotNull(client.getOperatorPublicKey());
 
         return client;
     }
@@ -59,7 +59,7 @@ public class IntegrationTestClientManager {
         }
 
         assertNotNull(client.getOperatorAccountId());
-        assertNotNull(client.getOperatorAccountId());
+        assertNotNull(client.getOperatorPublicKey());
 
         var key = PrivateKey.generate();
 
