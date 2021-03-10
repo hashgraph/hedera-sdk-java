@@ -32,8 +32,8 @@ public class FileDeleteIntegrationTest {
             assertEquals(info.size, 28);
             assertFalse(info.isDeleted);
             assertNotNull(info.keys);
-            assertNotNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(operatorKey).setThreshold(info.keys.getThreshold()));
+            assertNull(info.keys.getThreshold());
+            assertEquals(info.keys, KeyList.of(operatorKey));
 
             new FileDeleteTransaction()
                 .setFileId(fileId)

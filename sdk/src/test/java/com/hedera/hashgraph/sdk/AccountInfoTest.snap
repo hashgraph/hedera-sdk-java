@@ -189,6 +189,7 @@ com.hedera.hashgraph.sdk.AccountInfoTest.toProtobuf=[
       }
     ],
     "tokenRelationships_": [ ],
+    "memo_": "",
     "initialized": true
   }
 ]

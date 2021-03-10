@@ -28,7 +28,7 @@ public class AccountCreateTransactionTest {
     void shouldSerialize() {
         SnapshotMatcher.expect(new AccountCreateTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setKey(unusedPrivateKey)
             .setInitialBalance(Hbar.fromTinybars(450))
             .setProxyAccountId(AccountId.fromString("0.0.1001"))

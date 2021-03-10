@@ -12,7 +12,7 @@ class TokenAssociateIntegrationTest {
     @DisplayName("Can associate account with token")
     void canAssociateAccountWithToken() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
@@ -52,20 +52,6 @@ class TokenAssociateIntegrationTest {
                 .execute(client)
                 .getReceipt(client);
 
-            new TokenDeleteTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTokenId(tokenId)
-                .execute(client)
-                .getReceipt(client);
-
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
-                .sign(key)
-                .execute(client)
-                .getReceipt(client);
-
             client.close();
         });
     }
@@ -74,7 +60,7 @@ class TokenAssociateIntegrationTest {
     @DisplayName("Can execute token associate transaction even when token IDs are not set")
     void canExecuteTokenAssociateTransactionEvenWhenTokenIDsAreNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
             var key = PrivateKey.generate();
@@ -94,14 +80,6 @@ class TokenAssociateIntegrationTest {
                 .execute(client)
                 .getReceipt(client);
 
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
-                .sign(key)
-                .execute(client)
-                .getReceipt(client);
-
             client.close();
         });
     }
@@ -110,7 +88,7 @@ class TokenAssociateIntegrationTest {
     @DisplayName("Cannot associate account with tokens when account ID is not set")
     void cannotAssociateAccountWithTokensWhenAccountIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
             var key = PrivateKey.generate();
@@ -131,14 +109,6 @@ class TokenAssociateIntegrationTest {
                     .getReceipt(client);
             });
 
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
-                .sign(key)
-                .execute(client)
-                .getReceipt(client);
-
             assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
 
             client.close();
@@ -149,7 +119,7 @@ class TokenAssociateIntegrationTest {
     @DisplayName("Cannot associate account with tokens when account does not sign transaction")
     void cannotAssociateAccountWhenAccountDoesNotSignTransaction() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
@@ -188,20 +158,6 @@ class TokenAssociateIntegrationTest {
                     .execute(client)
                     .getReceipt(client);
             });
-
-            new TokenDeleteTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTokenId(tokenId)
-                .execute(client)
-                .getReceipt(client);
-
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
-                .sign(key)
-                .execute(client)
-                .getReceipt(client);
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 

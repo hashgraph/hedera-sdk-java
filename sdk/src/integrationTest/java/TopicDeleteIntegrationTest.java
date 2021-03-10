@@ -12,9 +12,6 @@ public class TopicDeleteIntegrationTest {
     @Test
     @DisplayName("Can delete topic")
     void canDeleteTopic() {
-        // Skip if using PreviewNet
-        Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
-
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
@@ -38,9 +35,6 @@ public class TopicDeleteIntegrationTest {
     @Test
     @DisplayName("Cannot delete immutable topic")
     void cannotDeleteImmutableTopic() {
-        // Skip if using PreviewNet
-        Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
-
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 

@@ -85,6 +85,8 @@ public abstract class Transaction<T extends Transaction<T>>
             }
         }
 
+        nodeAccountIds.remove(new AccountId(0));
+
         bodyBuilder = TransactionBody.parseFrom(signedTransactions.get(0).getBodyBytes()).toBuilder();
     }
 
@@ -208,9 +210,33 @@ public abstract class Transaction<T extends Transaction<T>>
             case TOKENWIPE:
                 return new TokenWipeTransaction(txs);
 
+            case SCHEDULECREATE:
+                return new ScheduleCreateTransaction(txs);
+
+            case SCHEDULEDELETE:
+                return new ScheduleDeleteTransaction(txs);
+
+            case SCHEDULESIGN:
+                return new ScheduleSignTransaction(txs);
+
             default:
                 throw new IllegalArgumentException("parsed transaction body has no data");
         }
+    }
+
+    public ScheduleCreateTransaction schedule() {
+        requireNotFrozen();
+
+        if (!nodeAccountIds.isEmpty()) {
+            throw new IllegalStateException(
+                "The underlying transaction for a scheduled transaction cannot have node account IDs set"
+            );
+        }
+
+        onFreeze(bodyBuilder);
+
+        return new ScheduleCreateTransaction()
+            .setTransactionBodyBytes(bodyBuilder.build().toByteString());
     }
 
     static byte[] hash(byte[] bytes) {
@@ -495,7 +521,7 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     protected void requireOneNodeAccountId() {
-        if (signedTransactions.size() != 1) {
+        if (nodeAccountIds.size() != 1) {
             throw new IllegalStateException("transaction did not have exactly one node ID set");
         }
     }
@@ -605,7 +631,7 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     @Override
-    final TransactionResponse mapResponse(
+    TransactionResponse mapResponse(
         com.hedera.hashgraph.sdk.proto.TransactionResponse transactionResponse,
         AccountId nodeId,
         com.hedera.hashgraph.sdk.proto.Transaction request
@@ -613,7 +639,7 @@ public abstract class Transaction<T extends Transaction<T>>
         var transactionId = Objects.requireNonNull(getTransactionId());
         var hash = hash(request.getSignedTransactionBytes().toByteArray());
         nextTransactionIndex = (nextTransactionIndex + 1) % transactionIds.size();
-        return new TransactionResponse(nodeId, transactionId, hash);
+        return new TransactionResponse(nodeId, transactionId, hash, null);
     }
 
     @Override

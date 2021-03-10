@@ -29,7 +29,7 @@ public class ContractUpdateTransactionTest {
     void shouldSerialize() {
         SnapshotMatcher.expect(new ContractUpdateTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setContractId(ContractId.fromString("0.0.5007"))
             .setAdminKey(privateKey)
             .setAutoRenewPeriod(Duration.ofDays(1))

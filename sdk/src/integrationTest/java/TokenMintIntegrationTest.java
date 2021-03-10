@@ -12,7 +12,7 @@ class TokenMintIntegrationTest {
     @DisplayName("Can mint tokens")
     void canMintTokens() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
@@ -52,20 +52,6 @@ class TokenMintIntegrationTest {
 
             assertEquals(receipt.totalSupply, 1000000 + 10);
 
-            new TokenDeleteTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTokenId(tokenId)
-                .execute(client)
-                .getReceipt(client);
-
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
-                .sign(key)
-                .execute(client)
-                .getReceipt(client);
-
             client.close();
         });
     }
@@ -74,7 +60,7 @@ class TokenMintIntegrationTest {
     @DisplayName("Cannot mint tokens when token ID is not set")
     void cannotMintTokensWhenTokenIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
@@ -95,14 +81,6 @@ class TokenMintIntegrationTest {
                     .getReceipt(client);
             });
 
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
-                .sign(key)
-                .execute(client)
-                .getReceipt(client);
-
             assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_ID.toString()));
 
             client.close();
@@ -113,7 +91,7 @@ class TokenMintIntegrationTest {
     @DisplayName("Cannot mint tokens when amount is not set")
     void cannotMintTokensWhenAmountIsNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
@@ -152,20 +130,6 @@ class TokenMintIntegrationTest {
                     .getReceipt(client);
             });
 
-            new TokenDeleteTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTokenId(tokenId)
-                .execute(client)
-                .getReceipt(client);
-
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
-                .sign(key)
-                .execute(client)
-                .getReceipt(client);
-
             assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_MINT_AMOUNT.toString()));
 
             client.close();
@@ -176,7 +140,7 @@ class TokenMintIntegrationTest {
     @DisplayName("Cannot mint tokens when supply key does not sign transaction")
     void cannotMintTokensWhenSupplyKeyDoesNotSignTransaction() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
@@ -215,20 +179,6 @@ class TokenMintIntegrationTest {
                     .execute(client)
                     .getReceipt(client);
             });
-
-            new TokenDeleteTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTokenId(tokenId)
-                .execute(client)
-                .getReceipt(client);
-
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
-                .sign(key)
-                .execute(client)
-                .getReceipt(client);
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 

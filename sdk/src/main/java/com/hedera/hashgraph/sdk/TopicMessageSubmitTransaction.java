@@ -1,12 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
-import java8.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -36,7 +34,7 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
 
         builder = bodyBuilder.getConsensusSubmitMessage().toBuilder();
 
-        for (var i = 0; i < signedTransactions.size(); i += nodeAccountIds.size()) {
+        for (var i = 0; i < signedTransactions.size(); i += nodeAccountIds.isEmpty() ? 1 : nodeAccountIds.size()) {
             data = data.concat(
                 TransactionBody.parseFrom(signedTransactions.get(i).getBodyBytes())
                     .getConsensusSubmitMessage().getMessage()
@@ -84,12 +82,17 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
 
     @Override
     void onFreezeChunk(TransactionBody.Builder body, TransactionID initialTransactionId, int startIndex, int endIndex, int chunk, int total) {
-        body.setConsensusSubmitMessage(builder.setMessage(data.substring(startIndex, endIndex))
-            .setChunkInfo(ConsensusMessageChunkInfo.newBuilder()
-                .setInitialTransactionID(initialTransactionId)
-                .setNumber(chunk + 1)
-                .setTotal(total)
-            )
-        );
+        if (total == 1) {
+            body.setConsensusSubmitMessage(builder.setMessage(data.substring(startIndex, endIndex)));
+        } else {
+            body.setConsensusSubmitMessage(builder.setMessage(data.substring(startIndex, endIndex))
+                .setChunkInfo(ConsensusMessageChunkInfo.newBuilder()
+                    .setInitialTransactionID(initialTransactionId)
+                    .setNumber(chunk + 1)
+                    .setTotal(total)
+                )
+            );
+        }
+
     }
 }

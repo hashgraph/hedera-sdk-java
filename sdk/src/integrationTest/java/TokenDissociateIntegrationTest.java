@@ -12,7 +12,7 @@ class TokenDissociateIntegrationTest {
     @DisplayName("Can dissociate account with token")
     void canAssociateAccountWithToken() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
@@ -61,21 +61,6 @@ class TokenDissociateIntegrationTest {
                 .execute(client)
                 .getReceipt(client);
 
-            new TokenDeleteTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTokenId(tokenId)
-                .execute(client)
-                .getReceipt(client);
-
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
-                .signWithOperator(client)
-                .sign(key)
-                .execute(client)
-                .getReceipt(client);
-
             client.close();
         });
     }
@@ -84,7 +69,7 @@ class TokenDissociateIntegrationTest {
     @DisplayName("Can execute token dissociate transaction even when token IDs are not set")
     void canExecuteTokenDissociateTransactionEvenWhenTokenIDsAreNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
             var key = PrivateKey.generate();
@@ -104,15 +89,6 @@ class TokenDissociateIntegrationTest {
                 .execute(client)
                 .getReceipt(client);
 
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
-                .signWithOperator(client)
-                .sign(key)
-                .execute(client)
-                .getReceipt(client);
-
             client.close();
         });
     }
@@ -121,7 +97,7 @@ class TokenDissociateIntegrationTest {
     @DisplayName("Cannot dissociate account with tokens when account ID is not set")
     void cannotDissociateAccountWithTokensWhenAccountIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
             var key = PrivateKey.generate();
@@ -141,15 +117,6 @@ class TokenDissociateIntegrationTest {
                     .execute(client)
                     .getReceipt(client);
             });
-
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
-                .signWithOperator(client)
-                .sign(key)
-                .execute(client)
-                .getReceipt(client);
 
             assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
 
@@ -161,7 +128,7 @@ class TokenDissociateIntegrationTest {
     @DisplayName("Cannot dissociate account with tokens when account does not sign transaction")
     void cannotDissociateAccountWhenAccountDoesNotSignTransaction() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
@@ -201,21 +168,6 @@ class TokenDissociateIntegrationTest {
                     .getReceipt(client);
             });
 
-            new TokenDeleteTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTokenId(tokenId)
-                .execute(client)
-                .getReceipt(client);
-
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
-                .signWithOperator(client)
-                .sign(key)
-                .execute(client)
-                .getReceipt(client);
-
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
             client.close();
@@ -226,7 +178,7 @@ class TokenDissociateIntegrationTest {
     @DisplayName("Cannot dissociate account from token when account was not associated with")
     void cannotDissociateAccountFromTokenWhenAccountWasNotAssociatedWith() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
@@ -267,21 +219,6 @@ class TokenDissociateIntegrationTest {
                     .execute(client)
                     .getReceipt(client);
             });
-
-            new TokenDeleteTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTokenId(tokenId)
-                .execute(client)
-                .getReceipt(client);
-
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
-                .signWithOperator(client)
-                .sign(key)
-                .execute(client)
-                .getReceipt(client);
 
             assertTrue(error.getMessage().contains(Status.TOKEN_NOT_ASSOCIATED_TO_ACCOUNT.toString()));
 

@@ -25,7 +25,7 @@ public class TransactionRecordQueryTest {
     @Test
     void shouldSerialize() {
         SnapshotMatcher.expect(new TransactionRecordQuery()
-            .setTransactionId(new TransactionId(AccountId.fromString("0.0.5005"), validStart))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5005"), validStart))
             .toString()
         ).toMatchSnapshot();
     }

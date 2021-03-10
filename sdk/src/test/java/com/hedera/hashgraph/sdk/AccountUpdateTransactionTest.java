@@ -30,7 +30,7 @@ public class AccountUpdateTransactionTest {
         SnapshotMatcher.expect(new AccountUpdateTransaction()
             .setKey(unusedPrivateKey)
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setAccountId(AccountId.fromString("0.0.2002"))
             .setProxyAccountId(AccountId.fromString("0.0.1001"))
             .setSendRecordThreshold(Hbar.fromTinybars(5))
