@@ -64,21 +64,21 @@ Select _one_ of the following to provide the gRPC implementation.
 <dependency>
   <groupId>io.grpc</groupId>
   <artifactId>grpc-netty-shaded</artifactId>
-  <version>1.24.0</version>
+  <version>1.35.0</version>
 </dependency>
 
 <!-- netty transport, unshaded (if you have a matching Netty dependency already) -->
 <dependency>
   <groupId>io.grpc</groupId>
   <artifactId>grpc-netty</artifactId>
-  <version>1.24.0</version>
+  <version>1.35.0</version>
 </dependency>
 
 <!-- okhttp transport (for lighter-weight applications or Android) -->
 <dependency>
   <groupId>io.grpc</groupId>
   <artifactId>grpc-okhttp</artifactId>
-  <version>1.24.0</version>
+  <version>1.35.0</version>
 </dependency>
 ```
 
