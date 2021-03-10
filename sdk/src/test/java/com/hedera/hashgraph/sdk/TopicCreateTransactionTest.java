@@ -29,7 +29,7 @@ public class TopicCreateTransactionTest {
     void shouldSerialize() {
         SnapshotMatcher.expect(new TopicCreateTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setSubmitKey(unusedPrivateKey)
             .setAdminKey(unusedPrivateKey)
             .setAutoRenewAccountId(AccountId.fromString("0.0.5007"))

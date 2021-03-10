@@ -28,7 +28,7 @@ public class FileDeleteTransactionTest {
     void shouldSerialize() {
         SnapshotMatcher.expect(new FileDeleteTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setFileId(FileId.fromString("0.0.6006"))
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()

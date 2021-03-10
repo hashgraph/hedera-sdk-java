@@ -28,7 +28,7 @@ public class MessageSubmitTransactionTest {
     void shouldSerialize() {
         SnapshotMatcher.expect(new TopicMessageSubmitTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setTopicId(TopicId.fromString("0.0.5007"))
             .setMessage("hello")
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))

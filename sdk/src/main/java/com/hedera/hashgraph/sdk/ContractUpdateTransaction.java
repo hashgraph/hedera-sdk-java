@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.StringValue;
 import com.hedera.hashgraph.sdk.proto.ContractUpdateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
@@ -162,7 +163,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     }
 
     public String getContractMemo() {
-        return builder.getMemo();
+        return builder.getMemoWrapper().getValue();
     }
 
     /**
@@ -173,7 +174,13 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      */
     public ContractUpdateTransaction setContractMemo(String memo) {
         requireNotFrozen();
-        builder.setMemo(memo);
+        builder.setMemoWrapper(StringValue.of(memo));
+        return this;
+    }
+
+    public ContractUpdateTransaction clearMemo() {
+        requireNotFrozen();
+        builder.clearMemoWrapper();
         return this;
     }
 

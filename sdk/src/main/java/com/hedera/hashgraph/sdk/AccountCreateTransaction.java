@@ -170,6 +170,16 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         return this;
     }
 
+    public String getAccountMemo() {
+        return builder.getMemo();
+    }
+
+    public AccountCreateTransaction setAccountMemo(String memo) {
+        requireNotFrozen();
+        this.builder.setMemo(memo);
+        return this;
+    }
+
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return CryptoServiceGrpc.getCreateAccountMethod();

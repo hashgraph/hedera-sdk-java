@@ -28,7 +28,7 @@ public class CryptoTransferTransactionTest {
     void shouldSerialize() {
         SnapshotMatcher.expect(new TransferTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .addHbarTransfer(AccountId.fromString("0.0.5006"), Hbar.fromTinybars(800).negated())
             .addHbarTransfer(AccountId.fromString("0.0.5007"), Hbar.fromTinybars(400))
             .addHbarTransfer(AccountId.fromString("0.0.5008"), Hbar.fromTinybars(400))

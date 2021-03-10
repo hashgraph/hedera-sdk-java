@@ -204,9 +204,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
      * when the pre-check status is {@code BUSY}.
      */
     boolean shouldRetry(Status status, ResponseT response) {
-        if(status == Status.PLATFORM_TRANSACTION_NOT_CREATED){
+        if (status == Status.PLATFORM_TRANSACTION_NOT_CREATED) {
             return true;
-        }else{
+        } else {
             return status == Status.BUSY;
         }
     }

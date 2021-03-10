@@ -28,7 +28,7 @@ public class AccountDeleteTransactionTest {
     void shouldSerialize() {
         SnapshotMatcher.expect(new AccountDeleteTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(new TransactionId(AccountId.fromString("0.0.5006"), validStart))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setAccountId(AccountId.fromString("0.0.5007"))
             .setTransferAccountId(AccountId.fromString("0.0.5008"))
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))

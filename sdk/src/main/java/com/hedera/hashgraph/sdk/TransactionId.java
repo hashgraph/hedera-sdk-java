@@ -3,6 +3,8 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
 import java8.util.concurrent.CompletableFuture;
+import org.bouncycastle.util.encoders.DecoderException;
+import org.bouncycastle.util.encoders.Hex;
 import org.threeten.bp.Clock;
 import org.threeten.bp.Instant;
 
@@ -22,6 +24,7 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
     /**
      * The Account ID that paid for this transaction.
      */
+    @Nullable
     public final AccountId accountId;
 
     /**
@@ -30,11 +33,37 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
      * <p>When a transaction is submitted there is additionally a validDuration (defaults to 120s)
      * and together they define a time window that a transaction may be processed in.
      */
+    @Nullable
     public final Instant validStart;
 
+    @Nullable
+    public final byte[] nonce;
+
+    boolean scheduled = false;
+
+    /**
+     * No longer part of the public API. Use `Transaction.withValidStart()` instead.
+     */
+    @Deprecated
     public TransactionId(AccountId accountId, Instant validStart) {
         this.accountId = accountId;
         this.validStart = validStart;
+        this.scheduled = false;
+        this.nonce = null;
+    }
+
+    TransactionId(@Nullable AccountId accountId, @Nullable Instant validStart, @Nullable byte[] nonce) {
+        this.accountId = accountId;
+        this.validStart = validStart;
+        this.nonce = nonce;
+    }
+
+    public static TransactionId withNonce(byte[] nonce) {
+        return new TransactionId(null, null, nonce);
+    }
+
+    public static TransactionId withValidStart(AccountId accountId, Instant validStart) {
+        return new TransactionId(accountId, validStart, null);
     }
 
     /**
@@ -48,39 +77,59 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
      */
     public static TransactionId generate(AccountId accountId) {
         Instant instant = Clock.systemUTC().instant().minusNanos((long) (Math.random() * 5000000000L + 8000000000L));
-        return new TransactionId(accountId, instant);
+        return new TransactionId(accountId, instant, null);
     }
 
     static TransactionId fromProtobuf(TransactionID transactionID) {
-        return new TransactionId(
+        return TransactionId.withValidStart(
             AccountId.fromProtobuf(transactionID.getAccountID()),
             InstantConverter.fromProtobuf(transactionID.getTransactionValidStart()));
     }
 
     public static TransactionId fromString(String s) {
-        var parts = s.split("@", 2);
+        var parts = s.split("\\?", 2);
 
-        if (parts.length != 2) {
-            throw new IllegalArgumentException("expecting {account}@{seconds}.{nanos}");
+        @Nullable AccountId accountId = null;
+        @Nullable Instant validStart = null;
+        @Nullable byte[] nonce = null;
+        var scheduled = parts.length == 2 && parts[1].equals("scheduled");
+
+        try {
+            nonce = Hex.decode(parts[0]);
+        } catch (DecoderException e) {
+            parts = parts[0].split("@", 2);
+
+            if (parts.length != 2) {
+                throw new IllegalArgumentException("expecting [{account}@{seconds}.{nanos}|{nonce}][?scheduled]");
+            }
+
+            accountId = AccountId.fromString(parts[0]);
+
+            var validStartParts = parts[1].split("\\.", 2);
+
+            if (validStartParts.length != 2) {
+                throw new IllegalArgumentException("expecting {account}@{seconds}.{nanos}");
+            }
+
+            validStart = Instant.ofEpochSecond(
+                Long.parseLong(validStartParts[0]),
+                Long.parseLong(validStartParts[1]));
         }
 
-        var accountId = AccountId.fromString(parts[0]);
-
-        var validStartParts = parts[1].split("\\.", 2);
-
-        if (validStartParts.length != 2) {
-            throw new IllegalArgumentException("expecting {account}@{seconds}.{nanos}");
-        }
-
-        var validStart = Instant.ofEpochSecond(
-            Long.parseLong(validStartParts[0]),
-            Long.parseLong(validStartParts[1]));
-
-        return new TransactionId(accountId, validStart);
+        return new TransactionId(accountId, validStart, nonce).setScheduled(scheduled);
     }
 
     public static TransactionId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(TransactionID.parseFrom(bytes).toBuilder().build());
+    }
+
+    public boolean getScheduled() {
+        return scheduled;
+    }
+
+    public TransactionId setScheduled(boolean scheduled) {
+        this.scheduled = scheduled;
+        return this;
     }
 
     @Override
@@ -116,13 +165,18 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
 
     @Override
     public String toString() {
-        return "" + accountId + "@" + validStart.getEpochSecond() + "." + validStart.getNano();
+        if (accountId != null && validStart != null) {
+            return "" + accountId + "@" + validStart.getEpochSecond() + "." + validStart.getNano() + (scheduled ? "?scheduled" : "");
+        } else if (nonce != null) {
+            return Hex.toHexString(nonce) + (scheduled ? "?scheduled" : "");
+        } else {
+            throw new IllegalStateException("`TransactionId.toString()` is non-exhaustive");
+        }
     }
 
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }
-
 
     @Override
     public boolean equals(@Nullable Object object) {

@@ -169,6 +169,16 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return this;
     }
 
+    public String getTokenMemo() {
+        return builder.getMemo();
+    }
+
+    public TokenCreateTransaction setTokenMemo(String memo) {
+        requireNotFrozen();
+        this.builder.setMemo(memo);
+        return this;
+    }
+
     public TokenCreateTransaction freezeWith(@Nullable Client client) {
         if (
             builder.hasAutoRenewPeriod() &&

@@ -36,8 +36,8 @@ public class FileCreateIntegrationTest {
             assertEquals(info.size, 28);
             assertFalse(info.isDeleted);
             assertNotNull(info.keys);
-            assertNotNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(operatorKey).setThreshold(info.keys.getThreshold()));
+            assertNull(info.keys.getThreshold());
+            assertEquals(info.keys, KeyList.of(operatorKey));
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
@@ -71,8 +71,8 @@ public class FileCreateIntegrationTest {
             assertEquals(info.size, 0);
             assertFalse(info.isDeleted);
             assertNotNull(info.keys);
-            assertNotNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(operatorKey).setThreshold(info.keys.getThreshold()));
+            assertNull(info.keys.getThreshold());
+            assertEquals(info.keys, KeyList.of(operatorKey));
 
             new FileDeleteTransaction()
                 .setFileId(fileId)

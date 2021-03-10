@@ -4,6 +4,7 @@ import com.google.common.base.MoreObjects;
 import java8.util.concurrent.CompletableFuture;
 import org.bouncycastle.util.encoders.Hex;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 
 public final class TransactionResponse implements WithGetReceipt, WithGetRecord {
@@ -13,10 +14,19 @@ public final class TransactionResponse implements WithGetReceipt, WithGetRecord 
 
     public final TransactionId transactionId;
 
-    TransactionResponse(AccountId nodeId, TransactionId transactionId, byte[] transactionHash) {
+    @Nullable
+    public final TransactionId scheduledTransactionId;
+
+    TransactionResponse(
+        AccountId nodeId,
+        TransactionId transactionId,
+        byte[] transactionHash,
+        @Nullable TransactionId scheduledTransactionId
+    ) {
         this.nodeId = nodeId;
         this.transactionId = transactionId;
         this.transactionHash = transactionHash;
+        this.scheduledTransactionId = scheduledTransactionId;
     }
 
     @Override
@@ -30,9 +40,9 @@ public final class TransactionResponse implements WithGetReceipt, WithGetRecord 
     @Override
     public CompletableFuture<TransactionRecord> getRecordAsync(Client client) {
         return getReceiptAsync(client).thenCompose((receipt) -> new TransactionRecordQuery()
-                .setTransactionId(transactionId)
-                .setNodeAccountIds(Collections.singletonList(nodeId))
-                .executeAsync(client)
+            .setTransactionId(transactionId)
+            .setNodeAccountIds(Collections.singletonList(nodeId))
+            .executeAsync(client)
         );
     }
 

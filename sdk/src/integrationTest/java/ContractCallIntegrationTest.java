@@ -225,4 +225,171 @@ public class ContractCallIntegrationTest {
             client.close();
         });
     }
+
+    @Test
+    @DisplayName("Can get cost, even with a big max")
+    void getCostBigMaxContractCallFunction() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+
+            @Var var response = new FileCreateTransaction()
+                .setKeys(operatorKey)
+                .setContents(SMART_CONTRACT_BYTECODE)
+                .execute(client);
+
+            var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
+
+            response = new ContractCreateTransaction()
+                .setAdminKey(operatorKey)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setGas(2000)
+                .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
+                .setBytecodeFileId(fileId)
+                .setContractMemo("[e2e::ContractCreateTransaction]")
+                .execute(client);
+
+            var contractId = Objects.requireNonNull(response.getReceipt(client).contractId);
+
+            var callQuery = new ContractCallQuery()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setContractId(contractId)
+                .setGas(2000)
+                .setFunction("getMessage")
+                .setMaxQueryPayment(new Hbar(10000));
+
+            var cost = callQuery.getCost(client);
+
+            @Var var result = callQuery
+                .execute(client);
+
+            assertEquals("Hello from Hedera.", result.getString(0));
+
+            new ContractDeleteTransaction()
+                .setContractId(contractId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .execute(client)
+                .getReceipt(client);
+
+            new FileDeleteTransaction()
+                .setFileId(fileId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .execute(client)
+                .getReceipt(client);
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Error, max is smaller than set payment.")
+    void getCostSmallMaxContractCallFunction() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+
+            @Var var response = new FileCreateTransaction()
+                .setKeys(operatorKey)
+                .setContents(SMART_CONTRACT_BYTECODE)
+                .execute(client);
+
+            var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
+
+            response = new ContractCreateTransaction()
+                .setAdminKey(operatorKey)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setGas(2000)
+                .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
+                .setBytecodeFileId(fileId)
+                .setContractMemo("[e2e::ContractCreateTransaction]")
+                .execute(client);
+
+            var contractId = Objects.requireNonNull(response.getReceipt(client).contractId);
+
+            var callQuery = new ContractCallQuery()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setContractId(contractId)
+                .setGas(2000)
+                .setFunction("getMessage")
+                .setMaxQueryPayment(Hbar.fromTinybars(1));
+
+            var cost = callQuery.getCost(client);
+
+            var error = assertThrows(RuntimeException.class, () -> {
+                callQuery.execute(client);
+            });
+
+            assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for ContractCallQuery, of "+cost.toString()+", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
+
+            new ContractDeleteTransaction()
+                .setContractId(contractId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .execute(client)
+                .getReceipt(client);
+
+            new FileDeleteTransaction()
+                .setFileId(fileId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .execute(client)
+                .getReceipt(client);
+
+            client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Insufficient tx fee error.")
+    void getCostInsufficientTxFeeContractCallFunction() {
+        assertDoesNotThrow(() -> {
+            var client = IntegrationTestClientManager.getClient();
+            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+
+            @Var var response = new FileCreateTransaction()
+                .setKeys(operatorKey)
+                .setContents(SMART_CONTRACT_BYTECODE)
+                .execute(client);
+
+            var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
+
+            response = new ContractCreateTransaction()
+                .setAdminKey(operatorKey)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setGas(2000)
+                .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
+                .setBytecodeFileId(fileId)
+                .setContractMemo("[e2e::ContractCreateTransaction]")
+                .execute(client);
+
+            var contractId = Objects.requireNonNull(response.getReceipt(client).contractId);
+
+            var callQuery = new ContractCallQuery()
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setContractId(contractId)
+                .setGas(2000)
+                .setFunction("getMessage")
+                .setMaxQueryPayment(new Hbar(100));
+
+            var cost = callQuery.getCost(client);
+
+            var error = assertThrows(PrecheckStatusException.class, () -> {
+                callQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(client);
+            });
+
+            assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
+
+            new ContractDeleteTransaction()
+                .setContractId(contractId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .execute(client)
+                .getReceipt(client);
+
+            new FileDeleteTransaction()
+                .setFileId(fileId)
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .execute(client)
+                .getReceipt(client);
+
+            client.close();
+        });
+    }
 }

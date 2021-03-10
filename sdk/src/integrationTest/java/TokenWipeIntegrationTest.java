@@ -12,7 +12,7 @@ class TokenWipeIntegrationTest {
     @DisplayName("Can wipe accounts balance")
     void canWipeAccountsBalance() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
@@ -74,14 +74,6 @@ class TokenWipeIntegrationTest {
                 .execute(client)
                 .getReceipt(client);
 
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
-                .sign(key)
-                .execute(client)
-                .getReceipt(client);
-
             client.close();
         });
     }
@@ -90,7 +82,7 @@ class TokenWipeIntegrationTest {
     @DisplayName("Cannot wipe accounts balance when account ID is not set")
     void cannotWipeAccountsBalanceWhenAccountIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
@@ -163,7 +155,7 @@ class TokenWipeIntegrationTest {
     @DisplayName("Cannot wipe accounts balance when token ID is not set")
     void cannotWipeAccountsBalanceWhenTokenIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
@@ -236,7 +228,7 @@ class TokenWipeIntegrationTest {
     @DisplayName("Cannot wipe accounts balance when amount is not set")
     void cannotWipeAccountsBalanceWhenAmountIsNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var client = IntegrationTestClientManager.getClientNewAccount();
             var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
