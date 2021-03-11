@@ -73,6 +73,9 @@ public final class TransactionRecord {
 
     public final Map<TokenId, Map<AccountId, Long>> tokenTransfers;
 
+    @Nullable
+    public final ScheduleId scheduleRef;
+
     private TransactionRecord(
         TransactionReceipt transactionReceipt,
         ByteString transactionHash,
@@ -82,7 +85,8 @@ public final class TransactionRecord {
         long transactionFee,
         @Nullable ContractFunctionResult contractFunctionResult,
         List<Transfer> transfers,
-        Map<TokenId, Map<AccountId, Long>> tokenTransfers
+        Map<TokenId, Map<AccountId, Long>> tokenTransfers,
+        ScheduleId scheduleRef
     ) {
         this.receipt = transactionReceipt;
         this.transactionHash = transactionHash;
@@ -93,6 +97,7 @@ public final class TransactionRecord {
         this.contractFunctionResult = contractFunctionResult;
         this.transactionFee = Hbar.fromTinybars(transactionFee);
         this.tokenTransfers = tokenTransfers;
+        this.scheduleRef = scheduleRef;
     }
 
     static TransactionRecord fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord) {
@@ -127,7 +132,8 @@ public final class TransactionRecord {
             transactionRecord.getTransactionFee(),
             contractFunctionResult,
             transfers,
-            tokenTransfers
+            tokenTransfers,
+            transactionRecord.hasScheduleRef() ? ScheduleId.fromProtobuf(transactionRecord.getScheduleRef()) : null
         );
     }
 
@@ -167,6 +173,10 @@ public final class TransactionRecord {
             transactionRecord.setContractCallResult(contractFunctionResult.toProtobuf());
         }
 
+        if (scheduleRef != null) {
+            transactionRecord.setScheduleRef(scheduleRef.toProtobuf());
+        }
+
         return transactionRecord.build();
     }
 
@@ -182,6 +192,7 @@ public final class TransactionRecord {
             .add("contractFunctionResult", contractFunctionResult)
             .add("transfers", transfers)
             .add("tokenTransfers", tokenTransfers)
+            .add("scheduleRef", scheduleRef)
             .toString();
     }
 

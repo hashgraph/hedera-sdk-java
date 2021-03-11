@@ -56,9 +56,9 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         return AccountId.fromProtobuf(builder.getPayerAccountID());
     }
 
-    public ScheduleCreateTransaction setPayerAccountId(AccountId id) {
+    public ScheduleCreateTransaction setPayerAccountId(AccountId accountId) {
         requireNotFrozen();
-        builder.setPayerAccountID(id.toProtobuf());
+        builder.setPayerAccountID(accountId.toProtobuf());
         return this;
     }
 

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+ * `TransactionRecord.scheduleRef` - Reference to the scheduled transaction
  * `TransactionReceipt.scheduledTransactionId`
  * `ScheduleInfo.scheduledTransactionId`
  * Feature to copy `TransactionId` of a transaction being scheduled
