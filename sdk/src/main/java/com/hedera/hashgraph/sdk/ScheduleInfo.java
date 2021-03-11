@@ -23,13 +23,17 @@ public final class ScheduleInfo {
     @Nullable
     public final Key adminKey;
 
+    @Nullable
+    public final TransactionId scheduledTransactionId;
+
     private ScheduleInfo(
         ScheduleId scheduleId,
         AccountId creatorAccountId,
         AccountId payerAccountId,
         byte[] transactionBody,
         KeyList signers,
-        @Nullable Key adminKey
+        @Nullable Key adminKey,
+        @Nullable TransactionId scheduledTransactionId
     ) {
         this.scheduleId = scheduleId;
         this.creatorAccountId = creatorAccountId;
@@ -37,6 +41,7 @@ public final class ScheduleInfo {
         this.signatories = signers;
         this.adminKey = adminKey;
         this.transactionBody = transactionBody;
+        this.scheduledTransactionId = scheduledTransactionId;
     }
 
     static ScheduleInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.ScheduleGetInfoResponse scheduleInfo) {
@@ -46,6 +51,9 @@ public final class ScheduleInfo {
         var creatorAccountId = AccountId.fromProtobuf(info.getCreatorAccountID());
         var payerAccountId = AccountId.fromProtobuf(info.getPayerAccountID());
         var adminKey = info.hasAdminKey() ? Key.fromProtobufKey(info.getAdminKey()) : null;
+        var scheduledTransactionId = info.hasScheduledTransactionID() ?
+            TransactionId.fromProtobuf(info.getScheduledTransactionID()) :
+            null;
 
         return new ScheduleInfo(
             scheduleId,
@@ -53,7 +61,8 @@ public final class ScheduleInfo {
             payerAccountId,
             info.getTransactionBody().toByteArray(),
             KeyList.fromProtobuf(info.getSignatories(), null),
-            adminKey
+            adminKey,
+            scheduledTransactionId
         );
     }
 
@@ -62,23 +71,23 @@ public final class ScheduleInfo {
     }
 
     com.hedera.hashgraph.sdk.proto.ScheduleInfo toProtobuf() {
-        var adminKey = this.adminKey != null
-            ? this.adminKey.toProtobufKey()
-            : null;
+        var info = com.hedera.hashgraph.sdk.proto.ScheduleInfo.newBuilder();
 
-        var signers = this.signatories.toProtobuf() != null
-            ? this.signatories.toProtobuf()
-            : null;
+        if (adminKey != null) {
+            info.setAdminKey(adminKey.toProtobufKey());
+        }
 
-        var scheduleInfoBuilder = com.hedera.hashgraph.sdk.proto.ScheduleInfo.newBuilder()
+        if (scheduledTransactionId != null) {
+            info.setScheduledTransactionID(scheduledTransactionId.toProtobuf());
+        }
+
+        return info
             .setScheduleID(scheduleId.toProtobuf())
             .setCreatorAccountID(creatorAccountId.toProtobuf())
             .setTransactionBody(ByteString.copyFrom(transactionBody))
             .setPayerAccountID(payerAccountId.toProtobuf())
-            .setSignatories(signers)
-            .setAdminKey(adminKey);
-
-        return scheduleInfoBuilder.build();
+            .setSignatories(signatories.toProtobuf())
+            .build();
     }
 
     public final Transaction<?> getTransaction() {

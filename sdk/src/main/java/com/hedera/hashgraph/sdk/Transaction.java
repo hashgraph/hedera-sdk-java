@@ -233,10 +233,20 @@ public abstract class Transaction<T extends Transaction<T>>
             );
         }
 
+        if (!transactionIds.isEmpty()) {
+            bodyBuilder.setTransactionID(transactionIds.get(0).setScheduled(true).toProtobuf());
+        }
+
         onFreeze(bodyBuilder);
 
-        return new ScheduleCreateTransaction()
+        var scheduled = new ScheduleCreateTransaction()
             .setTransactionBodyBytes(bodyBuilder.build().toByteString());
+
+        if (!transactionIds.isEmpty()) {
+            scheduled.setTransactionId(transactionIds.get(0));
+        }
+
+        return scheduled;
     }
 
     static byte[] hash(byte[] bytes) {

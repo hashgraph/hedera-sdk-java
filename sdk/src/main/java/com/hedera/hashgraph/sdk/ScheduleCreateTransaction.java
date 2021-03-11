@@ -77,8 +77,30 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         requireNotFrozen();
         transaction.requireNotFrozen();
 
-        builder.setTransactionBody(transaction.schedule().builder.getTransactionBody());
+        var scheduled = transaction.schedule();
+
+        builder.setTransactionBody(scheduled.builder.getTransactionBody());
         signatureBuilder.clearSigPair();
+
+        if (!scheduled.transactionIds.isEmpty() && transactionIds.isEmpty()) {
+            transactionIds = scheduled.transactionIds;
+        } else if (!scheduled.transactionIds.isEmpty() && !transactionIds.isEmpty()) {
+            var scheduledTransactionId = scheduled.transactionIds.get(0);
+
+            // Set `scheduled` to `true` to make it easier to compare
+            var thisTransactionId = transactionIds.get(0).setScheduled(true);
+
+            if (!thisTransactionId.equals(scheduledTransactionId)) {
+                throw new IllegalStateException(
+                    "Transaction being scheduled has a transaction ID already set, but the current " +
+                    "`ScheduleCreateTransaction` already has a transaction ID set which differs from the " +
+                    "transaction being scheduled."
+                );
+            }
+
+            // Revert `scheduled` to `false`
+            transactionIds.get(0).setScheduled(false);
+        }
 
         return this;
     }
