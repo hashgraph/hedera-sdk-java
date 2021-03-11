@@ -5,6 +5,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 import com.hedera.hashgraph.sdk.proto.TransactionList;
+import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 
@@ -26,6 +27,11 @@ public final class ScheduleInfo {
     @Nullable
     public final TransactionId scheduledTransactionId;
 
+    public final String memo;
+
+    @Nullable
+    public final Instant expirationTime;
+
     private ScheduleInfo(
         ScheduleId scheduleId,
         AccountId creatorAccountId,
@@ -33,7 +39,9 @@ public final class ScheduleInfo {
         byte[] transactionBody,
         KeyList signers,
         @Nullable Key adminKey,
-        @Nullable TransactionId scheduledTransactionId
+        @Nullable TransactionId scheduledTransactionId,
+        String memo,
+        @Nullable Instant expirationTime
     ) {
         this.scheduleId = scheduleId;
         this.creatorAccountId = creatorAccountId;
@@ -42,10 +50,12 @@ public final class ScheduleInfo {
         this.adminKey = adminKey;
         this.transactionBody = transactionBody;
         this.scheduledTransactionId = scheduledTransactionId;
+        this.memo = memo;
+        this.expirationTime = expirationTime;
     }
 
     static ScheduleInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.ScheduleGetInfoResponse scheduleInfo) {
-        com.hedera.hashgraph.sdk.proto.ScheduleInfo info = scheduleInfo.getScheduleInfo();
+        var info = scheduleInfo.getScheduleInfo();
 
         var scheduleId = ScheduleId.fromProtobuf(info.getScheduleID());
         var creatorAccountId = AccountId.fromProtobuf(info.getCreatorAccountID());
@@ -62,7 +72,9 @@ public final class ScheduleInfo {
             info.getTransactionBody().toByteArray(),
             KeyList.fromProtobuf(info.getSignatories(), null),
             adminKey,
-            scheduledTransactionId
+            scheduledTransactionId,
+            info.getMemo(),
+            info.hasExpirationTime() ? InstantConverter.fromProtobuf(info.getExpirationTime()) : null
         );
     }
 
@@ -81,12 +93,17 @@ public final class ScheduleInfo {
             info.setScheduledTransactionID(scheduledTransactionId.toProtobuf());
         }
 
+        if (expirationTime != null) {
+            info.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
+        }
+
         return info
             .setScheduleID(scheduleId.toProtobuf())
             .setCreatorAccountID(creatorAccountId.toProtobuf())
             .setTransactionBody(ByteString.copyFrom(transactionBody))
             .setPayerAccountID(payerAccountId.toProtobuf())
             .setSignatories(signatories.toProtobuf())
+            .setMemo(memo)
             .build();
     }
 
@@ -115,6 +132,8 @@ public final class ScheduleInfo {
             .add("payerAccountId", payerAccountId)
             .add("signatories", signatories)
             .add("adminKey", adminKey)
+            .add("expirationTime", expirationTime)
+            .add("memo", memo)
             .toString();
     }
 
