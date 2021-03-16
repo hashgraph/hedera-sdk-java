@@ -106,6 +106,8 @@ public class TokenInfo {
     @Nullable
     public final Instant expirationTime;
 
+    public final String tokenMemo;
+
     private TokenInfo(
         TokenId tokenId,
         String name,
@@ -123,7 +125,8 @@ public class TokenInfo {
         boolean isDeleted,
         @Nullable AccountId autoRenewAccount,
         @Nullable Duration autoRenewPeriod,
-        @Nullable Instant expirationTime
+        @Nullable Instant expirationTime,
+        String tokenMemo
     ) {
         this.tokenId = tokenId;
         this.name = name;
@@ -142,6 +145,7 @@ public class TokenInfo {
         this.autoRenewAccount = autoRenewAccount;
         this.autoRenewPeriod = autoRenewPeriod;
         this.expirationTime = expirationTime;
+        this.tokenMemo = tokenMemo;
     }
 
     @Nullable
@@ -174,7 +178,8 @@ public class TokenInfo {
             info.getDeleted(),
             info.hasAutoRenewAccount() ? AccountId.fromProtobuf(info.getAutoRenewAccount()) : null,
             info.hasAutoRenewPeriod() ? DurationConverter.fromProtobuf(info.getAutoRenewPeriod()) : null,
-            info.hasExpiry() ? InstantConverter.fromProtobuf(info.getExpiry()) : null
+            info.hasExpiry() ? InstantConverter.fromProtobuf(info.getExpiry()) : null,
+            info.getMemo()
         );
     }
 
@@ -212,6 +217,7 @@ public class TokenInfo {
                 .setAutoRenewAccount(autoRenewAccount != null ? autoRenewAccount.toProtobuf() : null)
                 .setAutoRenewPeriod(autoRenewPeriod != null ? DurationConverter.toProtobuf(autoRenewPeriod) : null)
                 .setExpiry(expirationTime != null ? InstantConverter.toProtobuf(expirationTime) : null)
+                .setMemo(tokenMemo)
         ).build();
     }
 
@@ -235,6 +241,7 @@ public class TokenInfo {
             .add("autoRenewAccount", autoRenewAccount)
             .add("autoRenewPeriod", autoRenewPeriod)
             .add("expirationTime", expirationTime)
+            .add("tokenMemo", tokenMemo)
             .toString();
     }
 
