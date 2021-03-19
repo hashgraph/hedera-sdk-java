@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import java.time.Instant;
 import java.util.concurrent.ExecutorService;
 
 class Node extends ManagedNode implements Comparable<Node>{
@@ -17,7 +16,7 @@ class Node extends ManagedNode implements Comparable<Node>{
     }
 
     boolean isHealthy() {
-        return delayUntil < Instant.now().toEpochMilli();
+        return delayUntil < System.currentTimeMillis();
     }
 
     void increaseDelay() {
@@ -29,7 +28,7 @@ class Node extends ManagedNode implements Comparable<Node>{
     }
 
     long delay() {
-        return delayUntil - Instant.now().toEpochMilli();
+        return delayUntil - System.currentTimeMillis();
     }
 
     @Override
