@@ -38,18 +38,22 @@ public final class FileInfo {
     @Nullable
     public final KeyList keys;
 
+    public final String fileMemo;
+
     private FileInfo(
         FileId fileId,
         long size,
         Instant expirationTime,
         boolean isDeleted,
-        @Nullable KeyList keys
+        @Nullable KeyList keys,
+        String fileMemo
     ) {
         this.fileId = fileId;
         this.size = size;
         this.expirationTime = expirationTime;
         this.isDeleted = isDeleted;
         this.keys = keys;
+        this.fileMemo = fileMemo;
     }
 
     static FileInfo fromProtobuf(FileGetInfoResponse.FileInfo fileInfo) {
@@ -62,7 +66,8 @@ public final class FileInfo {
             fileInfo.getSize(),
             InstantConverter.fromProtobuf(fileInfo.getExpirationTime()),
             fileInfo.getDeleted(),
-            keys
+            keys,
+            fileInfo.getMemo()
         );
     }
 
@@ -75,7 +80,8 @@ public final class FileInfo {
             .setFileID(fileId.toProtobuf())
             .setSize(size)
             .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
-            .setDeleted(isDeleted);
+            .setDeleted(isDeleted)
+            .setMemo(fileMemo);
 
         if (keys != null) {
             var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
@@ -98,6 +104,7 @@ public final class FileInfo {
             .add("expirationTime", expirationTime)
             .add("isDeleted", isDeleted)
             .add("keys", keys)
+            .add("fileMemo", fileMemo)
             .toString();
     }
 

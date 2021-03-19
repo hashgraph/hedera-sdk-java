@@ -73,6 +73,9 @@ public final class TransactionReceipt {
     @Nullable
     public final ScheduleId scheduleId;
 
+    @Nullable
+    public final TransactionId scheduledTransactionId;
+
     private TransactionReceipt(
         Status status,
         ExchangeRate exchangeRate,
@@ -84,7 +87,8 @@ public final class TransactionReceipt {
         @Nullable Long topicSequenceNumber,
         @Nullable ByteString topicRunningHash,
         Long totalSupply,
-        @Nullable ScheduleId scheduleId
+        @Nullable ScheduleId scheduleId,
+        @Nullable TransactionId scheduledTransactionId
     ) {
         this.status = status;
         this.exchangeRate = exchangeRate;
@@ -97,6 +101,7 @@ public final class TransactionReceipt {
         this.topicRunningHash = topicRunningHash;
         this.totalSupply = totalSupply;
         this.scheduleId = scheduleId;
+        this.scheduledTransactionId = scheduledTransactionId;
     }
 
     static TransactionReceipt fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionReceipt transactionReceipt) {
@@ -147,6 +152,11 @@ public final class TransactionReceipt {
                 ? ScheduleId.fromProtobuf(transactionReceipt.getScheduleID())
                 : null;
 
+        var scheduledTransactionId =
+            transactionReceipt.hasScheduledTransactionID()
+                ? TransactionId.fromProtobuf(transactionReceipt.getScheduledTransactionID())
+                : null;
+
         return new TransactionReceipt(
             status,
             exchangeRate,
@@ -158,7 +168,8 @@ public final class TransactionReceipt {
             topicSequenceNumber,
             topicRunningHash,
             totalSupply,
-            scheduleId
+            scheduleId,
+            scheduledTransactionId
         );
     }
 
@@ -210,6 +221,10 @@ public final class TransactionReceipt {
 
         if (scheduleId != null) {
             transactionReceiptBuilder.setScheduleID(scheduleId.toProtobuf());
+        }
+
+        if (scheduledTransactionId != null) {
+            transactionReceiptBuilder.setScheduledTransactionID(scheduledTransactionId.toProtobuf());
         }
 
         return transactionReceiptBuilder.build();

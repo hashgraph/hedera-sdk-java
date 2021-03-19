@@ -94,6 +94,8 @@ public final class AccountInfo {
 
     public final Map<TokenId, TokenRelationship> tokenRelationships;
 
+    public final String accountMemo;
+
     private AccountInfo(
         AccountId accountId,
         String contractAccountId,
@@ -108,7 +110,8 @@ public final class AccountInfo {
         Instant expirationTime,
         Duration autoRenewPeriod,
         List<LiveHash> liveHashes,
-        Map<TokenId, TokenRelationship> tokenRelationships
+        Map<TokenId, TokenRelationship> tokenRelationships,
+        String accountMemo
     ) {
         this.accountId = accountId;
         this.contractAccountId = contractAccountId;
@@ -124,6 +127,7 @@ public final class AccountInfo {
         this.autoRenewPeriod = autoRenewPeriod;
         this.liveHashes = liveHashes;
         this.tokenRelationships = Collections.unmodifiableMap(tokenRelationships);
+        this.accountMemo = accountMemo;
     }
 
     static AccountInfo fromProtobuf(CryptoGetInfoResponse.AccountInfo accountInfo) {
@@ -158,7 +162,8 @@ public final class AccountInfo {
             InstantConverter.fromProtobuf(accountInfo.getExpirationTime()),
             DurationConverter.fromProtobuf(accountInfo.getAutoRenewPeriod()),
             liveHashes,
-            relationships
+            relationships,
+            accountInfo.getMemo()
         );
     }
 
@@ -182,7 +187,8 @@ public final class AccountInfo {
             .setReceiverSigRequired(isReceiverSignatureRequired)
             .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
             .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod))
-            .addAllLiveHashes(hashes);
+            .addAllLiveHashes(hashes)
+            .setMemo(accountMemo);
 
         if (contractAccountId != null) {
             accountInfoBuilder.setContractAccountID(contractAccountId);
@@ -212,6 +218,7 @@ public final class AccountInfo {
             .add("autoRenewPeriod", autoRenewPeriod)
             .add("liveHashes", liveHashes)
             .add("tokenRelationships", tokenRelationships)
+            .add("accountMemo", accountMemo)
             .toString();
     }
 

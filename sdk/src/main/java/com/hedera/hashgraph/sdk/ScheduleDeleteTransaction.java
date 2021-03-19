@@ -28,9 +28,9 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
         return ScheduleId.fromProtobuf(builder.getScheduleID());
     }
 
-    public ScheduleDeleteTransaction setScheduleId(ScheduleId id) {
+    public ScheduleDeleteTransaction setScheduleId(ScheduleId scheduleId) {
         requireNotFrozen();
-        builder.setScheduleID(id.toProtobuf());
+        builder.setScheduleID(scheduleId.toProtobuf());
         return this;
     }
 
