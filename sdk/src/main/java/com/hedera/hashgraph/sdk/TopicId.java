@@ -65,7 +65,8 @@ public final class TopicId {
 
     @Override
     public String toString() {
-        return "" + shard + "." + realm + "." + num;
+        var checksum = EntityIdHelper.parseAddress("","" + shard + "." + realm + "." + num);
+        return "" + shard + "." + realm + "." + num + "-" + checksum.correctChecksum;
     }
 
     @Override
