@@ -1,4 +1,5 @@
 import com.hedera.hashgraph.sdk.*;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Instant;
@@ -10,6 +11,7 @@ import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Disabled
 public class ScheduleCreateIntegrationTest {
     @Test
     @DisplayName("Can create schedule")

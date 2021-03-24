@@ -7,6 +7,9 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.TransactionGetReceiptQuery;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
+import java.util.Objects;
+
 /**
  * Get the receipt of a transaction, given its transaction ID.
  *
@@ -77,8 +80,20 @@ public final class TransactionReceiptQuery
 
     @Override
     boolean shouldRetry(Status status, Response response) {
+        if (super.shouldRetry(status, response)) return true;
+
+        switch (status) {
+            case BUSY:
+            case UNKNOWN:
+                return true;
+            case OK:
+                break;
+            default:
+                return false;
+        }
+
         var receiptStatus =
-                Status.valueOf(response.getTransactionGetReceipt().getReceipt().getStatus());
+            Status.valueOf(response.getTransactionGetReceipt().getReceipt().getStatus());
 
         switch (receiptStatus) {
             case BUSY:
@@ -88,11 +103,25 @@ public final class TransactionReceiptQuery
             case OK:
                 // accepted but has not reached consensus
             case RECEIPT_NOT_FOUND:
+            case RECORD_NOT_FOUND:
                 // has reached consensus but not generated
                 return true;
 
             default:
                 return false;
         }
+    }
+
+    @Override
+    Exception mapStatusError(Status status, @Nullable TransactionId transactionId, Response response) {
+        if (status != Status.OK) {
+            return new PrecheckStatusException(status, transactionId);
+        }
+
+        // has reached consensus but not generated
+        return new ReceiptStatusException(
+            Objects.requireNonNull(transactionId),
+            TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt())
+        );
     }
 }

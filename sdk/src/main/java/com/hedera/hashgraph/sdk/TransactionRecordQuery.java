@@ -7,6 +7,9 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.TransactionGetRecordQuery;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
+import java.util.Objects;
+
 /**
  * Get the record for a transaction.
  * <p>
@@ -68,8 +71,14 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     boolean shouldRetry(Status status, Response response) {
         if (super.shouldRetry(status, response)) return true;
 
-        if (status != Status.OK) {
-            return false;
+        switch (status) {
+            case BUSY:
+            case UNKNOWN:
+                return true;
+            case OK:
+                break;
+            default:
+                return false;
         }
 
         var receiptStatus =
@@ -90,5 +99,18 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
             default:
                 return false;
         }
+    }
+
+    @Override
+    Exception mapStatusError(Status status, @Nullable TransactionId transactionId, Response response) {
+        if (status != Status.OK) {
+            return new PrecheckStatusException(status, transactionId);
+        }
+
+        // has reached consensus but not generated
+        return new ReceiptStatusException(
+            Objects.requireNonNull(transactionId),
+            TransactionReceipt.fromProtobuf(response.getTransactionGetRecord().getTransactionRecord().getReceipt())
+        );
     }
 }
