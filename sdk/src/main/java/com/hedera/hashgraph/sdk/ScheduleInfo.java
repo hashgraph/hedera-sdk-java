@@ -5,6 +5,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 import com.hedera.hashgraph.sdk.proto.TransactionList;
+import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 
@@ -20,7 +21,16 @@ public final class ScheduleInfo {
 
     public final KeyList signatories;
 
-    @Nullable public final Key adminKey;
+    @Nullable
+    public final Key adminKey;
+
+    @Nullable
+    public final TransactionId scheduledTransactionId;
+
+    public final String memo;
+
+    @Nullable
+    public final Instant expirationTime;
 
     private ScheduleInfo(
         ScheduleId scheduleId,
@@ -28,7 +38,10 @@ public final class ScheduleInfo {
         AccountId payerAccountId,
         byte[] transactionBody,
         KeyList signers,
-        @Nullable Key adminKey
+        @Nullable Key adminKey,
+        @Nullable TransactionId scheduledTransactionId,
+        String memo,
+        @Nullable Instant expirationTime
     ) {
         this.scheduleId = scheduleId;
         this.creatorAccountId = creatorAccountId;
@@ -36,15 +49,21 @@ public final class ScheduleInfo {
         this.signatories = signers;
         this.adminKey = adminKey;
         this.transactionBody = transactionBody;
+        this.scheduledTransactionId = scheduledTransactionId;
+        this.memo = memo;
+        this.expirationTime = expirationTime;
     }
 
     static ScheduleInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.ScheduleGetInfoResponse scheduleInfo) {
-        com.hedera.hashgraph.sdk.proto.ScheduleInfo info = scheduleInfo.getScheduleInfo();
+        var info = scheduleInfo.getScheduleInfo();
 
         var scheduleId = ScheduleId.fromProtobuf(info.getScheduleID());
         var creatorAccountId = AccountId.fromProtobuf(info.getCreatorAccountID());
         var payerAccountId = AccountId.fromProtobuf(info.getPayerAccountID());
         var adminKey = info.hasAdminKey() ? Key.fromProtobufKey(info.getAdminKey()) : null;
+        var scheduledTransactionId = info.hasScheduledTransactionID() ?
+            TransactionId.fromProtobuf(info.getScheduledTransactionID()) :
+            null;
 
         return new ScheduleInfo(
             scheduleId,
@@ -52,7 +71,10 @@ public final class ScheduleInfo {
             payerAccountId,
             info.getTransactionBody().toByteArray(),
             KeyList.fromProtobuf(info.getSignatories(), null),
-            adminKey
+            adminKey,
+            scheduledTransactionId,
+            info.getMemo(),
+            info.hasExpirationTime() ? InstantConverter.fromProtobuf(info.getExpirationTime()) : null
         );
     }
 
@@ -61,33 +83,38 @@ public final class ScheduleInfo {
     }
 
     com.hedera.hashgraph.sdk.proto.ScheduleInfo toProtobuf() {
-        var adminKey = this.adminKey != null
-            ? this.adminKey.toProtobufKey()
-            : null;
+        var info = com.hedera.hashgraph.sdk.proto.ScheduleInfo.newBuilder();
 
-        var signers = this.signatories.toProtobuf() != null
-            ? this.signatories.toProtobuf()
-            : null;
+        if (adminKey != null) {
+            info.setAdminKey(adminKey.toProtobufKey());
+        }
 
-        var scheduleInfoBuilder = com.hedera.hashgraph.sdk.proto.ScheduleInfo.newBuilder()
+        if (scheduledTransactionId != null) {
+            info.setScheduledTransactionID(scheduledTransactionId.toProtobuf());
+        }
+
+        if (expirationTime != null) {
+            info.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
+        }
+
+        return info
             .setScheduleID(scheduleId.toProtobuf())
             .setCreatorAccountID(creatorAccountId.toProtobuf())
             .setTransactionBody(ByteString.copyFrom(transactionBody))
             .setPayerAccountID(payerAccountId.toProtobuf())
-            .setSignatories(signers)
-            .setAdminKey(adminKey);
-
-        return scheduleInfoBuilder.build();
+            .setSignatories(signatories.toProtobuf())
+            .setMemo(memo)
+            .build();
     }
 
     public final Transaction<?> getTransaction() {
-        SignedTransaction.Builder builder = SignedTransaction.newBuilder();
-        builder.setBodyBytes(ByteString.copyFrom(transactionBody));
-
         try {
             return Transaction.fromBytes(TransactionList.newBuilder()
                 .addTransactionList(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
-                    .setSignedTransactionBytes(builder.build().toByteString())
+                    .setSignedTransactionBytes(SignedTransaction.newBuilder()
+                        .setBodyBytes(ByteString.copyFrom(transactionBody))
+                        .build()
+                        .toByteString())
                     .build())
                 .build()
                 .toByteArray()
@@ -105,6 +132,8 @@ public final class ScheduleInfo {
             .add("payerAccountId", payerAccountId)
             .add("signatories", signatories)
             .add("adminKey", adminKey)
+            .add("expirationTime", expirationTime)
+            .add("memo", memo)
             .toString();
     }
 

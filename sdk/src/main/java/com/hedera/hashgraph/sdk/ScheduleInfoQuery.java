@@ -18,8 +18,8 @@ public class ScheduleInfoQuery extends com.hedera.hashgraph.sdk.Query<ScheduleIn
         builder = ScheduleGetInfoQuery.newBuilder();
     }
 
-    public ScheduleInfoQuery setScheduleId(ScheduleId id) {
-        builder.setScheduleID(id.toProtobuf());
+    public ScheduleInfoQuery setScheduleId(ScheduleId scheduleId) {
+        builder.setScheduleID(scheduleId.toProtobuf());
 
         return this;
     }

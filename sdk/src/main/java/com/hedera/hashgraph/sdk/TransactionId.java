@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
 import java8.util.concurrent.CompletableFuture;
@@ -9,6 +10,8 @@ import org.threeten.bp.Clock;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
+
+import java.util.Arrays;
 
 import static java8.util.concurrent.CompletableFuture.completedFuture;
 import static java8.util.concurrent.CompletableFuture.failedFuture;
@@ -81,9 +84,19 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
     }
 
     static TransactionId fromProtobuf(TransactionID transactionID) {
-        return TransactionId.withValidStart(
-            AccountId.fromProtobuf(transactionID.getAccountID()),
-            InstantConverter.fromProtobuf(transactionID.getTransactionValidStart()));
+        if (transactionID.hasAccountID() && transactionID.hasTransactionValidStart()) {
+            return TransactionId.withValidStart(
+                AccountId.fromProtobuf(transactionID.getAccountID()),
+                InstantConverter.fromProtobuf(transactionID.getTransactionValidStart())
+            ).setScheduled(transactionID.getScheduled());
+        } else if (!transactionID.getNonce().isEmpty()) {
+            return TransactionId.withNonce(transactionID.getNonce().toByteArray())
+                .setScheduled(transactionID.getScheduled());
+        } else {
+            throw new IllegalStateException(
+                "Protobuf transaction does not have a `nonce` or `accountID` and `transactionValidStart`"
+            );
+        }
     }
 
     public static TransactionId fromString(String s) {
@@ -157,10 +170,21 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
     }
 
     TransactionID toProtobuf() {
-        return TransactionID.newBuilder()
-            .setAccountID(accountId.toProtobuf())
-            .setTransactionValidStart(InstantConverter.toProtobuf(validStart))
-            .build();
+        var id = TransactionID.newBuilder();
+
+        if (accountId != null) {
+            id.setAccountID(accountId.toProtobuf());
+        }
+
+        if (validStart != null) {
+            id.setTransactionValidStart(InstantConverter.toProtobuf(validStart));
+        }
+
+        if (nonce != null) {
+            id.setNonce(ByteString.copyFrom(nonce));
+        }
+
+        return id.setScheduled(scheduled).build();
     }
 
     @Override
@@ -184,8 +208,15 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
             return false;
         }
 
-        return ((TransactionId) object).accountId.equals(accountId) &&
-            ((TransactionId) object).validStart.equals(validStart);
+        var id = (TransactionId) object;
+
+        if (accountId != null && validStart != null && id.accountId != null && id.validStart != null) {
+            return id.accountId.equals(accountId) && id.validStart.equals(validStart) && scheduled == id.scheduled;
+        } else if (nonce != null && id.nonce != null) {
+            return Arrays.equals(nonce, id.nonce) && scheduled == id.scheduled;
+        } else {
+            return false;
+        }
     }
 
     @Override
