@@ -3,18 +3,19 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
-import java8.util.concurrent.CompletableFuture;
+
+import java.util.concurrent.CompletableFuture;
+
 import org.bouncycastle.util.encoders.DecoderException;
 import org.bouncycastle.util.encoders.Hex;
-import org.threeten.bp.Clock;
-import org.threeten.bp.Instant;
 
+import java.time.Clock;
+import java.time.Instant;
 import javax.annotation.Nullable;
-
 import java.util.Arrays;
 
-import static java8.util.concurrent.CompletableFuture.completedFuture;
-import static java8.util.concurrent.CompletableFuture.failedFuture;
+import static java.util.concurrent.CompletableFuture.completedFuture;
+import static java.util.concurrent.CompletableFuture.failedFuture;
 
 /**
  * The client-generated ID for a transaction.

@@ -5,8 +5,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
-import java8.util.function.Function;
 
+import java.util.function.Function;
 import java.util.*;
 
 public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateTransaction> {
@@ -93,8 +93,8 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
             if (!thisTransactionId.equals(scheduledTransactionId)) {
                 throw new IllegalStateException(
                     "Transaction being scheduled has a transaction ID already set, but the current " +
-                    "`ScheduleCreateTransaction` already has a transaction ID set which differs from the " +
-                    "transaction being scheduled."
+                        "`ScheduleCreateTransaction` already has a transaction ID set which differs from the " +
+                        "transaction being scheduled."
                 );
             }
 

@@ -5,8 +5,8 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 import com.hedera.hashgraph.sdk.proto.TransactionList;
-import org.threeten.bp.Instant;
 
+import java.time.Instant;
 import javax.annotation.Nullable;
 
 public final class ScheduleInfo {
