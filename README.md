@@ -37,6 +37,19 @@ implementation 'io.grpc:grpc-netty:1.35.0'
 implementation 'io.grpc:grpc-okhttp:1.35.0'
 ```
 
+Select _one_ of the following to enable or disable Simple Logging Facade for Java (SLFJ4).
+
+```groovy
+// Enable logs
+implementation 'org.slf4j:slf4j-simple:1.7.29'
+
+// Disable logs
+implementation 'org.slf4j:slf4j-nop:1.7.29'
+
+```
+
+
+
 #### Maven
 
 Select _one_ of the following depending on your target platform.
