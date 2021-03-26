@@ -5,7 +5,6 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public class ScheduleMultiSigTransactionExample {
 
@@ -100,10 +99,10 @@ public class ScheduleMultiSigTransactionExample {
 
         byte[] key2Signature = key2.signTransaction(transfer);
 
-        scheduled.addScheduleSignature(key2.getPublicKey(), key2Signature);
+        scheduled.addScheduledSignature(key2.getPublicKey(), key2Signature);
 
-        if (scheduled.getScheduleSignatures().size() != 2) {
-            throw new Exception("Scheduled transaction has incorrect number of signatures: " + scheduled.getScheduleSignatures().size());
+        if (scheduled.getScheduledSignatures().size() != 2) {
+            throw new Exception("Scheduled transaction has incorrect number of signatures: " + scheduled.getScheduledSignatures().size());
         }
 
         receipt = scheduled.execute(client).getReceipt(client);
@@ -148,7 +147,7 @@ public class ScheduleMultiSigTransactionExample {
         ScheduleSignTransaction signTransaction = new ScheduleSignTransaction()
             .setNodeAccountIds(Collections.singletonList(response.nodeId))
             .setScheduleId(scheduleId)
-            .addScheduleSignature(key3.getPublicKey(), key3Signature);
+            .addScheduledSignature(key3.getPublicKey(), key3Signature);
 
         if (signTransaction.getScheduleSignatures().size() != 1) {
             throw new Exception("Scheduled sign transaction has incorrect number of signatures: " + signTransaction.getScheduleSignatures().size());

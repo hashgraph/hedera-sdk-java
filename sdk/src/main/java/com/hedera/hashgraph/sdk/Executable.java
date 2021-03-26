@@ -146,9 +146,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
             if (responseStatus != Status.OK && responseStatus != Status.SUCCESS) {
                 // request to hedera failed in a non-recoverable way
-                return CompletableFuture.<O>failedFuture(
-                    new PrecheckStatusException(
-                        responseStatus, getTransactionId()));
+                return CompletableFuture.<O>failedFuture(mapStatusError(responseStatus, getTransactionId(), response));
             }
 
             // successful response from Hedera
@@ -209,5 +207,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         } else {
             return status == Status.BUSY;
         }
+    }
+
+    Exception mapStatusError(Status status, @Nullable TransactionId transactionId, ResponseT response) {
+        return new PrecheckStatusException(status, transactionId);
     }
 }

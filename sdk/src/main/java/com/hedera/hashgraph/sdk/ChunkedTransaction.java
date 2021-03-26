@@ -159,6 +159,25 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         return executeAllAsync(client).thenApply(responses -> responses.get(0));
     }
 
+    public ScheduleCreateTransaction schedule() {
+        requireNotFrozen();
+
+        if (data.size() > CHUNK_SIZE) {
+            throw new IllegalStateException("Cannot schedule a topic message with length greater than " + CHUNK_SIZE);
+        }
+
+        onFreezeChunk(
+            bodyBuilder,
+            null,
+            0,
+            data.size(),
+            1,
+            1
+        );
+
+        return super.schedule();
+    }
+
     public T freezeWith(@Nullable Client client) {
         super.freezeWith(client);
 

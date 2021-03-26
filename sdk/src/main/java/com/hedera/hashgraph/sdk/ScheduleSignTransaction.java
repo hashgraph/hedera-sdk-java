@@ -59,7 +59,7 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
         return map;
     }
 
-    public ScheduleSignTransaction addScheduleSignature(PublicKey publicKey, byte[] signature) {
+    public ScheduleSignTransaction addScheduledSignature(PublicKey publicKey, byte[] signature) {
         signatureBuilder.addSigPair(publicKey.toSignaturePairProtobuf(signature));
 
         return this;

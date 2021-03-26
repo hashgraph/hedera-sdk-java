@@ -5,6 +5,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
+import java8.util.function.Function;
 
 import java.util.*;
 
@@ -19,18 +20,6 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         setMaxTransactionFee(new Hbar(5));
     }
 
-    ScheduleCreateTransaction(
-        List<AccountId> nodeAccountIds,
-        ByteString bodyBytes,
-        SignatureMap signatureMap
-    ) {
-        this();
-
-        this.nodeAccountIds = nodeAccountIds;
-        this.builder.setTransactionBody(bodyBytes);
-        this.signatureBuilder.mergeFrom(signatureMap);
-    }
-
     ScheduleCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
 
@@ -38,7 +27,13 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         signatureBuilder = builder.getSigMap().toBuilder();
     }
 
-    public Map<PublicKey, byte[]> getScheduleSignatures() {
+    ScheduleCreateTransaction setTransactionBodyBytes(ByteString bodyBytes) {
+        requireNotFrozen();
+        builder.setTransactionBody(bodyBytes);
+        return this;
+    }
+
+    public Map<PublicKey, byte[]> getScheduledSignatures() {
         var map = new HashMap<PublicKey, byte[]>();
 
         for (var sigPair : signatureBuilder.getSigPairList()) {
@@ -51,7 +46,7 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         return map;
     }
 
-    public ScheduleCreateTransaction addScheduleSignature(PublicKey publicKey, byte[] signature) {
+    public ScheduleCreateTransaction addScheduledSignature(PublicKey publicKey, byte[] signature) {
         signatureBuilder.addSigPair(publicKey.toSignaturePairProtobuf(signature));
 
         return this;
@@ -61,9 +56,9 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         return AccountId.fromProtobuf(builder.getPayerAccountID());
     }
 
-    public ScheduleCreateTransaction setPayerAccountId(AccountId id) {
+    public ScheduleCreateTransaction setPayerAccountId(AccountId accountId) {
         requireNotFrozen();
-        builder.setPayerAccountID(id.toProtobuf());
+        builder.setPayerAccountID(accountId.toProtobuf());
         return this;
     }
 
@@ -78,10 +73,35 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         return this;
     }
 
-    public ScheduleCreateTransaction setTransaction(Transaction<?> transaction) {
+    public ScheduleCreateTransaction setScheduledTransaction(Transaction<?> transaction) {
         requireNotFrozen();
-        builder.setTransactionBody(transaction.signedTransactions.get(0).getBodyBytes());
-        signatureBuilder.mergeFrom(transaction.signatures.get(0).build());
+        transaction.requireNotFrozen();
+
+        var scheduled = transaction.schedule();
+
+        builder.setTransactionBody(scheduled.builder.getTransactionBody());
+        signatureBuilder.clearSigPair();
+
+        if (!scheduled.transactionIds.isEmpty() && transactionIds.isEmpty()) {
+            transactionIds = scheduled.transactionIds;
+        } else if (!scheduled.transactionIds.isEmpty() && !transactionIds.isEmpty()) {
+            var scheduledTransactionId = scheduled.transactionIds.get(0);
+
+            // Set `scheduled` to `true` to make it easier to compare
+            var thisTransactionId = transactionIds.get(0).setScheduled(true);
+
+            if (!thisTransactionId.equals(scheduledTransactionId)) {
+                throw new IllegalStateException(
+                    "Transaction being scheduled has a transaction ID already set, but the current " +
+                    "`ScheduleCreateTransaction` already has a transaction ID set which differs from the " +
+                    "transaction being scheduled."
+                );
+            }
+
+            // Revert `scheduled` to `false`
+            transactionIds.get(0).setScheduled(false);
+        }
+
         return this;
     }
 
@@ -93,6 +113,44 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         requireNotFrozen();
         builder.setMemo(memo);
         return this;
+    }
+
+    public ScheduleCreateTransaction signScheduled(PrivateKey key) {
+        return signScheduledWith(key.getPublicKey(), key::sign);
+    }
+
+    public ScheduleCreateTransaction signScheduledWithOperator(Client client) {
+        var operator = client.getOperator();
+
+        if (operator == null) {
+            throw new IllegalStateException(
+                "`client` must have an `operator` to sign with the operator");
+        }
+
+        return signScheduledWith(operator.publicKey, operator.transactionSigner);
+    }
+
+    public ScheduleCreateTransaction signScheduledWith(PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
+        requireNotFrozen();
+
+        if (keyAlreadySignedScheduled(publicKey)) {
+            return this;
+        }
+
+        var signature = transactionSigner.apply(builder.getTransactionBody().toByteArray());
+        signatureBuilder.addSigPair(publicKey.toSignaturePairProtobuf(signature));
+
+        return this;
+    }
+
+    protected boolean keyAlreadySignedScheduled(PublicKey key) {
+        for (var sigPair : signatureBuilder.getSigPairList()) {
+            if (ByteString.copyFrom(key.toBytes()).startsWith(sigPair.getPubKeyPrefix())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
