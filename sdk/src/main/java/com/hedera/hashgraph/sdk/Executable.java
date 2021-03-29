@@ -25,6 +25,22 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     Executable() {
     }
 
+    /**
+     * @deprecated Use {@link #getMaxAttempts()} instead.
+     */
+    @java.lang.Deprecated
+    public final int getMaxRetry() {
+        return getMaxAttempts();
+    }
+
+    /**
+     * @deprecated Use {@link #setMaxAttempts(int)} instead.
+     */
+    @java.lang.Deprecated
+    public final SdkRequestT setMaxRetry(int count) {
+        return setMaxAttempts(count);
+    }
+
     public final int getMaxAttempts() {
         return maxAttempts;
     }
