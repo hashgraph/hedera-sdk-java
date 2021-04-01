@@ -73,7 +73,6 @@ message TransactionID {
     Timestamp transactionValidStart = 1; // The transaction is invalid if consensusTimestamp < transactionID.transactionStartValid
     AccountID accountID = 2; // The Account ID that paid for this transaction
     bool scheduled = 3; // Whether the Transaction is of type Scheduled or no
-    bytes nonce = 4; // Used to manipulate the uniqueness check for idempotent schedule transaction creation
 }
 
 /* An account, and the amount that it sends or receives during a cryptocurrency or token transfer. */
