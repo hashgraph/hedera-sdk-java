@@ -102,7 +102,7 @@ public class ContractDeleteIntegrationTest {
             assertEquals(info.storage, 926);
             assertEquals(info.contractMemo, "[e2e::ContractCreateTransaction]");
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new ContractDeleteTransaction()
                     .setContractId(contractId)
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))

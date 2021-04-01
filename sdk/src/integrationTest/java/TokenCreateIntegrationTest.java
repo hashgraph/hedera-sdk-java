@@ -125,7 +125,7 @@ class TokenCreateIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClientNewAccount();
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
@@ -150,7 +150,7 @@ class TokenCreateIntegrationTest {
 
             var key = PrivateKey.generate();
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
                     .setTokenName("ffff")
                     .setTokenSymbol("F")

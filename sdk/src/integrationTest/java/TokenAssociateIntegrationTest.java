@@ -150,7 +150,7 @@ class TokenAssociateIntegrationTest {
                     .tokenId
             );
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenAssociateTransaction()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setAccountId(accountId)
