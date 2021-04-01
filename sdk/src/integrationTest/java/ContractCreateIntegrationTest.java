@@ -120,7 +120,7 @@ public class ContractCreateIntegrationTest {
 
             var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new ContractCreateTransaction()
                     .setAdminKey(operatorKey)
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
@@ -157,7 +157,7 @@ public class ContractCreateIntegrationTest {
 
             var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new ContractCreateTransaction()
                     .setAdminKey(operatorKey)
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
@@ -187,7 +187,7 @@ public class ContractCreateIntegrationTest {
             var client = IntegrationTestClientManager.getClient();
             var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new ContractCreateTransaction()
                     .setAdminKey(operatorKey)
                     .setGas(2000)

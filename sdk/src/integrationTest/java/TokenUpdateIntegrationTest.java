@@ -110,7 +110,7 @@ class TokenUpdateIntegrationTest {
 
             var tokenId = Objects.requireNonNull(response.getReceipt(client).tokenId);
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenUpdateTransaction()
                     .setTokenId(tokenId)
                     .setTokenName("aaaa")

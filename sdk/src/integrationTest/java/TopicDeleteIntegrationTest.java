@@ -42,7 +42,7 @@ public class TopicDeleteIntegrationTest {
 
             var topicId = Objects.requireNonNull(response.getReceipt(client).topicId);
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TopicDeleteTransaction()
                     .setTopicId(topicId)
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))

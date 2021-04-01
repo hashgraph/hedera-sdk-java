@@ -133,7 +133,7 @@ public class TopicMessageSubmitIntegrationTest {
 
             var topicId = Objects.requireNonNull(response.getReceipt(client).topicId);
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TopicMessageSubmitTransaction()
                     .setMessage(Contents.BIG_CONTENTS)
                     .execute(client)
@@ -168,7 +168,7 @@ public class TopicMessageSubmitIntegrationTest {
 
             var topicId = Objects.requireNonNull(response.getReceipt(client).topicId);
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TopicMessageSubmitTransaction()
                     .setTopicId(topicId)
                     .execute(client)

@@ -67,7 +67,7 @@ public class FileDeleteIntegrationTest {
             assertFalse(info.isDeleted);
             assertNull(info.keys);
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new FileDeleteTransaction()
                     .setFileId(fileId)
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
