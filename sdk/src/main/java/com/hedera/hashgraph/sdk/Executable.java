@@ -137,20 +137,33 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                 response
             );
 
-            if (shouldRetry(responseStatus, response)) {
-                // the response has been identified as failing or otherwise
-                // needing a retry let's do this again after a delay
-                return Delayer.delayFor(delay, client.executor)
-                    .thenCompose((v) -> executeAsync(client, attempt + 1, new PrecheckStatusException(responseStatus, getTransactionId())));
-            }
+            switch (shouldRetry(responseStatus, response)) {
+                case Retry:
+                    // the response has been identified as failing or otherwise
+                    // needing a retry let's do this again after a delay
+                    return Delayer.delayFor(delay, client.executor)
+                        .thenCompose(
+                            (v) -> executeAsync(
+                                client,
+                                attempt + 1,
+                                new PrecheckStatusException(responseStatus, getTransactionId())
+                            )
+                        );
 
-            if (responseStatus != Status.OK && responseStatus != Status.SUCCESS) {
-                // request to hedera failed in a non-recoverable way
-                return CompletableFuture.<O>failedFuture(mapStatusError(responseStatus, getTransactionId(), response));
-            }
+                case Error:
+                    // request to hedera failed in a non-recoverable way
+                    return CompletableFuture.<O>failedFuture(
+                        mapStatusError(responseStatus,
+                            getTransactionId(),
+                            response
+                        )
+                    );
 
-            // successful response from Hedera
-            return CompletableFuture.completedFuture(mapResponse(response, node.accountId, request));
+                case Finished:
+                default:
+                    // successful response from Hedera
+                    return CompletableFuture.completedFuture(mapResponse(response, node.accountId, request));
+            }
         }).thenCompose(x -> x);
     }
 
@@ -200,12 +213,17 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     /**
      * Called just after receiving the query response from Hedera. By default it triggers a retry
      * when the pre-check status is {@code BUSY}.
+     * @return
      */
-    boolean shouldRetry(Status status, ResponseT response) {
-        if (status == Status.PLATFORM_TRANSACTION_NOT_CREATED) {
-            return true;
-        } else {
-            return status == Status.BUSY;
+    ExecutionState shouldRetry(Status status, ResponseT response) {
+        switch (status) {
+            case PLATFORM_TRANSACTION_NOT_CREATED:
+            case BUSY:
+                return ExecutionState.Retry;
+            case OK:
+                return ExecutionState.Finished;
+            default:
+                return ExecutionState.Error;
         }
     }
 

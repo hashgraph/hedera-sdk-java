@@ -131,7 +131,7 @@ public class ContractUpdateIntegrationTest {
                     .contractId
             );
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new ContractUpdateTransaction()
                     .setContractId(contractId)
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))

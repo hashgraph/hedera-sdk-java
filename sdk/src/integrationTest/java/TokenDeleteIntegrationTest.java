@@ -93,7 +93,7 @@ class TokenDeleteIntegrationTest {
 
             var tokenId = Objects.requireNonNull(response.getReceipt(client).tokenId);
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenDeleteTransaction()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setTokenId(tokenId)
@@ -114,7 +114,7 @@ class TokenDeleteIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenDeleteTransaction()
                     .execute(client)
                     .getReceipt(client);

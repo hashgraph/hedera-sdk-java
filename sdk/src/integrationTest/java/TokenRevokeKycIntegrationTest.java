@@ -174,7 +174,7 @@ class TokenRevokeKycIntegrationTest {
                     .tokenId
             );
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenRevokeKycTransaction()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setAccountId(accountId)

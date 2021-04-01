@@ -171,7 +171,7 @@ class TokenMintIntegrationTest {
                     .tokenId
             );
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenMintTransaction()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setTokenId(tokenId)

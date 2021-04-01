@@ -126,7 +126,7 @@ class TokenBurnIntegrationTest {
 
             var tokenId = Objects.requireNonNull(response.getReceipt(client).tokenId);
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenBurnTransaction()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setTokenId(tokenId)

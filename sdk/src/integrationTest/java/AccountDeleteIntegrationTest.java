@@ -87,7 +87,7 @@ class AccountDeleteIntegrationTest {
 
             var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new AccountDeleteTransaction()
                     .setAccountId(accountId)
                     .setTransferAccountId(operatorId)

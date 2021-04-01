@@ -85,19 +85,12 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
     }
 
     static TransactionId fromProtobuf(TransactionID transactionID) {
-        if (transactionID.hasAccountID() && transactionID.hasTransactionValidStart()) {
-            return TransactionId.withValidStart(
-                AccountId.fromProtobuf(transactionID.getAccountID()),
-                InstantConverter.fromProtobuf(transactionID.getTransactionValidStart())
-            ).setScheduled(transactionID.getScheduled());
-        } else if (!transactionID.getNonce().isEmpty()) {
-            return TransactionId.withNonce(transactionID.getNonce().toByteArray())
-                .setScheduled(transactionID.getScheduled());
-        } else {
-            throw new IllegalStateException(
-                "Protobuf transaction does not have a `nonce` or `accountID` and `transactionValidStart`"
-            );
-        }
+        var accountId = transactionID.hasAccountID() ? AccountId.fromProtobuf(transactionID.getAccountID()) : null;
+        var validStart = transactionID.hasTransactionValidStart() ? InstantConverter.fromProtobuf(transactionID.getTransactionValidStart()) : null;
+        var nonce = transactionID.hasAccountID() && transactionID.hasTransactionValidStart() ? null : transactionID.getNonce().toByteArray();
+
+        return new TransactionId(accountId, validStart, nonce)
+            .setScheduled(transactionID.getScheduled());
     }
 
     public static TransactionId fromString(String s) {

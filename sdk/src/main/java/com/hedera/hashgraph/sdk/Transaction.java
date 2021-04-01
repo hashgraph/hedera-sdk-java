@@ -96,18 +96,45 @@ public abstract class Transaction<T extends Transaction<T>>
 
         var list = TransactionList.parseFrom(bytes);
 
-        for (var transaction : list.getTransactionListList()) {
-            var signedTransaction = SignedTransaction.parseFrom(transaction.getSignedTransactionBytes());
-            var txBody = TransactionBody.parseFrom(signedTransaction.getBodyBytes());
+        if (list.getTransactionListList().isEmpty()) {
+            var transaction = com.hedera.hashgraph.sdk.proto.Transaction.parseFrom(bytes).toBuilder();
 
-            if (dataCase.getNumber() == TransactionBody.DataCase.DATA_NOT_SET.getNumber()) {
-                dataCase = txBody.getDataCase();
+            TransactionBody txBody;
+            if (transaction.getSignedTransactionBytes().isEmpty()) {
+                txBody = TransactionBody.parseFrom(transaction.getBodyBytes());
+
+                transaction.setSignedTransactionBytes(SignedTransaction.newBuilder()
+                    .setBodyBytes(transaction.getBodyBytes())
+                    .setSigMap(transaction.getSigMap())
+                    .build()
+                    .toByteString())
+                    .clearBodyBytes()
+                    .clearSigMap();
+            } else {
+                var signedTransaction = SignedTransaction.parseFrom(transaction.getSignedTransactionBytes());
+                txBody = TransactionBody.parseFrom(signedTransaction.getBodyBytes());
             }
+
+            dataCase = txBody.getDataCase();
 
             var account = AccountId.fromProtobuf(txBody.getNodeAccountID());
             var transactionId = TransactionId.fromProtobuf(txBody.getTransactionID());
 
-            txs.computeIfAbsent(transactionId, k -> new LinkedHashMap<>()).put(account, transaction);
+            txs.computeIfAbsent(transactionId, k -> new LinkedHashMap<>()).put(account, transaction.build());
+        } else {
+            for (var transaction : list.getTransactionListList()) {
+                var signedTransaction = SignedTransaction.parseFrom(transaction.getSignedTransactionBytes());
+                var txBody = TransactionBody.parseFrom(signedTransaction.getBodyBytes());
+
+                if (dataCase.getNumber() == TransactionBody.DataCase.DATA_NOT_SET.getNumber()) {
+                    dataCase = txBody.getDataCase();
+                }
+
+                var account = AccountId.fromProtobuf(txBody.getNodeAccountID());
+                var transactionId = TransactionId.fromProtobuf(txBody.getTransactionID());
+
+                txs.computeIfAbsent(transactionId, k -> new LinkedHashMap<>()).put(account, transaction);
+            }
         }
 
         switch (dataCase) {

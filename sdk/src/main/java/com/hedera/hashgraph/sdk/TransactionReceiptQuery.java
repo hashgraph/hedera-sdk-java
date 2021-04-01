@@ -53,7 +53,7 @@ public final class TransactionReceiptQuery
 
     @Override
     Status mapResponseStatus(Response response) {
-        var preCheckCode = response.getTransactionGetReceipt().getReceipt().getStatus();
+        var preCheckCode = response.getTransactionGetReceipt().getHeader().getNodeTransactionPrecheckCode();
 
         return Status.valueOf(preCheckCode);
     }
@@ -79,17 +79,18 @@ public final class TransactionReceiptQuery
     }
 
     @Override
-    boolean shouldRetry(Status status, Response response) {
-        if (super.shouldRetry(status, response)) return true;
+    ExecutionState shouldRetry(Status status, Response response) {
+        var retry = super.shouldRetry(status, response);
+        if (retry != ExecutionState.Finished) return retry;
 
         switch (status) {
             case BUSY:
             case UNKNOWN:
-                return true;
+                return ExecutionState.Retry;
             case OK:
                 break;
             default:
-                return false;
+                return ExecutionState.Error;
         }
 
         var receiptStatus =
@@ -105,10 +106,13 @@ public final class TransactionReceiptQuery
             case RECEIPT_NOT_FOUND:
             case RECORD_NOT_FOUND:
                 // has reached consensus but not generated
-                return true;
+                return ExecutionState.Retry;
+
+            case SUCCESS:
+                return ExecutionState.Finished;
 
             default:
-                return false;
+                return ExecutionState.Error;
         }
     }
 

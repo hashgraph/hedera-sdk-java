@@ -107,7 +107,7 @@ public class ContractExecuteIntegrationTest {
                     .contractId
             );
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new ContractExecuteTransaction()
                     .setContractId(contractId)
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
@@ -161,7 +161,7 @@ public class ContractExecuteIntegrationTest {
                     .contractId
             );
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new ContractExecuteTransaction()
                     .setContractId(contractId)
                     .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
