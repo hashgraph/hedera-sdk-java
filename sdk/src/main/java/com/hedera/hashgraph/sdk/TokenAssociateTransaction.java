@@ -28,6 +28,12 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
         builder = bodyBuilder.getTokenAssociate().toBuilder();
     }
 
+    TokenAssociateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getTokenAssociate().toBuilder();
+    }
+
     public AccountId getAccountId() {
         return AccountId.fromProtobuf(builder.getAccount());
     }

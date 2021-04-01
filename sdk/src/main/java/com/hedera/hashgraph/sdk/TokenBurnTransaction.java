@@ -24,6 +24,12 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         builder = bodyBuilder.getTokenBurn().toBuilder();
     }
 
+    TokenBurnTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getTokenBurn().toBuilder();
+    }
+
     public TokenId getTokenId() {
         return TokenId.fromProtobuf(builder.getToken());
     }

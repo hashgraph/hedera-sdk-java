@@ -23,6 +23,12 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         builder = bodyBuilder.getTokenWipe().toBuilder();
     }
 
+    TokenWipeTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getTokenWipe().toBuilder();
+    }
+
     public TokenId getTokenId() {
         return TokenId.fromProtobuf(builder.getToken());
     }

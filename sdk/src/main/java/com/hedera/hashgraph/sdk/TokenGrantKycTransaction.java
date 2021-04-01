@@ -24,6 +24,12 @@ public class TokenGrantKycTransaction extends com.hedera.hashgraph.sdk.Transacti
         builder = bodyBuilder.getTokenGrantKyc().toBuilder();
     }
 
+    TokenGrantKycTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getTokenGrantKyc().toBuilder();
+    }
+
     public TokenId getTokenId() {
         return TokenId.fromProtobuf(builder.getToken());
     }

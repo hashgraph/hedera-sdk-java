@@ -24,6 +24,12 @@ public class TokenDeleteTransaction extends com.hedera.hashgraph.sdk.Transaction
         builder = bodyBuilder.getTokenDeletion().toBuilder();
     }
 
+    TokenDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getTokenDeletion().toBuilder();
+    }
+
     public TokenId getTokenId() {
         return TokenId.fromProtobuf(builder.getToken());
     }

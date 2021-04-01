@@ -23,6 +23,12 @@ public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transacti
         builder = bodyBuilder.getTokenUnfreeze().toBuilder();
     }
 
+    TokenUnfreezeTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getTokenUnfreeze().toBuilder();
+    }
+
     public TokenId getTokenId() {
         return TokenId.fromProtobuf(builder.getToken());
     }

@@ -30,6 +30,12 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         builder = bodyBuilder.getFileUpdate().toBuilder();
     }
 
+    FileUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getFileUpdate().toBuilder();
+    }
+
     @Nullable
     public FileId getFileId() {
         return builder.hasFileID() ? FileId.fromProtobuf(builder.getFileID()) : null;

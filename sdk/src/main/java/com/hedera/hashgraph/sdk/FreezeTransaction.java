@@ -30,6 +30,12 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
         builder = bodyBuilder.getFreeze().toBuilder();
     }
 
+    FreezeTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getFreeze().toBuilder();
+    }
+
     public Instant getStartTime() {
         return Instant.from(OffsetTime.of(builder.getStartHour(), builder.getStartMin(), 0, 0, ZoneOffset.UTC));
     }

@@ -14,11 +14,9 @@ import java.util.Map;
 
 public final class ScheduleSignTransaction extends Transaction<ScheduleSignTransaction> {
     private final ScheduleSignTransactionBody.Builder builder;
-    private final SignatureMap.Builder signatureBuilder;
 
     public ScheduleSignTransaction() {
         builder = ScheduleSignTransactionBody.newBuilder();
-        signatureBuilder = builder.getSigMap().toBuilder();
 
         setMaxTransactionFee(new Hbar(5));
     }
@@ -27,7 +25,6 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
         super(txs);
 
         builder = bodyBuilder.getScheduleSign().toBuilder();
-        signatureBuilder = builder.getSigMap().toBuilder();
     }
 
     public ScheduleId getScheduleId() {
@@ -46,24 +43,6 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
         return this;
     }
 
-    public Map<PublicKey, byte[]> getScheduleSignatures() {
-        var map = new HashMap<PublicKey, byte[]>();
-
-        for (var sigPair : signatureBuilder.getSigPairList()) {
-            map.put(
-                PublicKey.fromBytes(sigPair.getPubKeyPrefix().toByteArray()),
-                sigPair.getEd25519().toByteArray()
-            );
-        }
-
-        return map;
-    }
-
-    public ScheduleSignTransaction addScheduledSignature(PublicKey publicKey, byte[] signature) {
-        signatureBuilder.addSigPair(publicKey.toSignaturePairProtobuf(signature));
-
-        return this;
-    }
 
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
@@ -72,7 +51,7 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setScheduleSign(builder.setSigMap(signatureBuilder));
+        bodyBuilder.setScheduleSign(builder);
         return true;
     }
 }

@@ -32,6 +32,12 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
         builder = bodyBuilder.getConsensusDeleteTopic().toBuilder();
     }
 
+    TopicDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getConsensusDeleteTopic().toBuilder();
+    }
+
     @Nullable
     public TopicId getTopicId() {
         return builder.hasTopicID() ? TopicId.fromProtobuf(builder.getTopicID()) : null;

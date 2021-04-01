@@ -34,6 +34,12 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
         builder = bodyBuilder.getContractCall().toBuilder();
     }
 
+    ContractExecuteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getContractCall().toBuilder();
+    }
+
     @Nullable
     public ContractId getContractId() {
         return builder.hasContractID() ? ContractId.fromProtobuf(builder.getContractID()) : null;

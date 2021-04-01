@@ -44,6 +44,12 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         builder = bodyBuilder.getCryptoUpdateAccount().toBuilder();
     }
 
+    AccountUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getCryptoUpdateAccount().toBuilder();
+    }
+
     @Nullable
     public AccountId getAccountId() {
         return builder.hasAccountIDToUpdate() ? AccountId.fromProtobuf(builder.getAccountIDToUpdate()) : null;

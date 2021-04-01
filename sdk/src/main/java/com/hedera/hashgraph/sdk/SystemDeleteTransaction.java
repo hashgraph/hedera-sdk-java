@@ -38,6 +38,12 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
         builder = bodyBuilder.getSystemDelete().toBuilder();
     }
 
+    SystemDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getSystemDelete().toBuilder();
+    }
+
     @Nullable
     public final FileId getFileId() {
         return builder.hasFileID() ? FileId.fromProtobuf(builder.getFileID()) : null;

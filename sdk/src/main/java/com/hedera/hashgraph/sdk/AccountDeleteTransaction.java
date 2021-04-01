@@ -31,6 +31,12 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
         builder = bodyBuilder.getCryptoDelete().toBuilder();
     }
 
+    AccountDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getCryptoDelete().toBuilder();
+    }
+
     @Nullable
     public AccountId getAccountId() {
         return builder.hasDeleteAccountID() ? AccountId.fromProtobuf(builder.getDeleteAccountID()) : null;

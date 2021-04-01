@@ -61,6 +61,36 @@ public abstract class Transaction<T extends Transaction<T>>
         bodyBuilder.setTransactionFee(new Hbar(2).toTinybars());
     }
 
+    Transaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException  {
+        bodyBuilder = txBody.toBuilder();
+
+        // Cannot call `Transaction#setTranscationValidDuration()` because it calls `isFrozen()` and
+        // causes a `NullPointerException` in `TopicMessageSubmitTransaction#isFrozen()`. I assume the private
+        // fields are not being set before the `super()` call which is why that is happening.
+        bodyBuilder.setTransactionValidDuration(DurationConverter.toProtobuf(DEFAULT_TRANSACTION_VALID_DURATION));
+
+        // Default transaction fee is 2 Hbar
+        bodyBuilder.setTransactionFee(new Hbar(2).toTinybars());
+    }
+
+    Transaction(com.hedera.hashgraph.sdk.proto.Transaction tx) throws InvalidProtocolBufferException  {
+
+        var transaction = SignedTransaction.parseFrom(tx.getSignedTransactionBytes());
+        transactions.add(tx);
+        signatures.add(transaction.getSigMap().toBuilder());
+        signedTransactions.add(transaction.toBuilder());
+
+        bodyBuilder = TransactionBody.parseFrom(signedTransactions.get(0).getBodyBytes()).toBuilder();
+
+        // Cannot call `Transaction#setTranscationValidDuration()` because it calls `isFrozen()` and
+        // causes a `NullPointerException` in `TopicMessageSubmitTransaction#isFrozen()`. I assume the private
+        // fields are not being set before the `super()` call which is why that is happening.
+        bodyBuilder.setTransactionValidDuration(DurationConverter.toProtobuf(DEFAULT_TRANSACTION_VALID_DURATION));
+
+        // Default transaction fee is 2 Hbar
+        bodyBuilder.setTransactionFee(new Hbar(2).toTinybars());
+    }
+
     Transaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         var size = txs.values().iterator().next().size();
 
@@ -266,8 +296,8 @@ public abstract class Transaction<T extends Transaction<T>>
 
         onFreeze(bodyBuilder);
 
-        var scheduled = new ScheduleCreateTransaction()
-            .setTransactionBodyBytes(bodyBuilder.build().toByteString());
+        var schedulableTransaction = new SchedulableTransactionBody(bodyBuilder.build());
+        var scheduled = new ScheduleCreateTransaction().setScheduledTransactionBody(schedulableTransaction);
 
         if (!transactionIds.isEmpty()) {
             scheduled.setTransactionId(transactionIds.get(0));

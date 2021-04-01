@@ -27,6 +27,12 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
         builder = bodyBuilder.getContractDeleteInstance().toBuilder();
     }
 
+    ContractDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getContractDeleteInstance().toBuilder();
+    }
+
     @Nullable
     public ContractId getContractId() {
         return builder.hasContractID() ? ContractId.fromProtobuf(builder.getContractID()) : null;

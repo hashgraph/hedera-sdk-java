@@ -25,6 +25,12 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         builder = bodyBuilder.getTokenUpdate().toBuilder();
     }
 
+    TokenUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getTokenUpdate().toBuilder();
+    }
+
     public TokenId getTokenId() {
         return  TokenId.fromProtobuf(builder.getToken());
     }

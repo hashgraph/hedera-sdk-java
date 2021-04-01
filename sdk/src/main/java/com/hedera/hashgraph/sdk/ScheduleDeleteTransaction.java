@@ -24,6 +24,12 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
         builder = bodyBuilder.getScheduleDelete().toBuilder();
     }
 
+    ScheduleDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getScheduleDelete().toBuilder();
+    }
+
     public ScheduleId getScheduleId() {
         return ScheduleId.fromProtobuf(builder.getScheduleID());
     }

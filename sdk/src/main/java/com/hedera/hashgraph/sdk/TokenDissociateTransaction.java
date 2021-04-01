@@ -25,6 +25,12 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
         builder = bodyBuilder.getTokenDissociate().toBuilder();
     }
 
+    TokenDissociateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getTokenDissociate().toBuilder();
+    }
+
     public AccountId getAccountId() {
         return AccountId.fromProtobuf(builder.getAccount());
     }

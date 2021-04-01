@@ -32,6 +32,12 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
         builder = bodyBuilder.getFileCreate().toBuilder();
     }
 
+    FileCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getFileCreate().toBuilder();
+    }
+
     @Nullable
     public Instant getExpirationTime() {
         return builder.hasExpirationTime() ? InstantConverter.fromProtobuf(builder.getExpirationTime()) : null;

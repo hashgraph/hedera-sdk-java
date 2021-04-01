@@ -35,6 +35,12 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
         builder = bodyBuilder.getConsensusCreateTopic().toBuilder();
     }
 
+    TopicCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getConsensusCreateTopic().toBuilder();
+    }
+
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return ConsensusServiceGrpc.getCreateTopicMethod();

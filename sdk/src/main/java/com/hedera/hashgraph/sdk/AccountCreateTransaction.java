@@ -33,6 +33,12 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         builder = bodyBuilder.getCryptoCreateAccount().toBuilder();
     }
 
+    AccountCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getCryptoCreateAccount().toBuilder();
+    }
+
     @Nullable
     public Key getKey() {
         return builder.hasKey() ? Key.fromProtobufKey(builder.getKey()) : null;

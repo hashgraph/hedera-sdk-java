@@ -37,6 +37,12 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         builder = bodyBuilder.getConsensusUpdateTopic().toBuilder();
     }
 
+    TopicUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getConsensusUpdateTopic().toBuilder();
+    }
+
     @Nullable
     public TopicId getTopicId() {
         return builder.hasTopicID() ? TopicId.fromProtobuf(builder.getTopicID()) : null;

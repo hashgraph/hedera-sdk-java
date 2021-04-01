@@ -97,13 +97,13 @@ public class ScheduleMultiSigTransactionExample {
         // Schedule the transactoin
         ScheduleCreateTransaction scheduled = transfer.schedule();
 
-        byte[] key2Signature = key2.signTransaction(transfer);
-
-        scheduled.addScheduledSignature(key2.getPublicKey(), key2Signature);
-
-        if (scheduled.getScheduledSignatures().size() != 2) {
-            throw new Exception("Scheduled transaction has incorrect number of signatures: " + scheduled.getScheduledSignatures().size());
-        }
+//        byte[] key2Signature = key2.signTransaction(transfer);
+//
+        scheduled.sign(key2);
+//
+//        if (scheduled.getScheduledSignatures().size() != 2) {
+//            throw new Exception("Scheduled transaction has incorrect number of signatures: " + scheduled.getScheduledSignatures().size());
+//        }
 
         receipt = scheduled.execute(client).getReceipt(client);
 
@@ -120,7 +120,7 @@ public class ScheduleMultiSigTransactionExample {
 
         System.out.println("Schedule Info = " + info);
 
-        transfer = (TransferTransaction) info.getTransaction();
+        transfer = (TransferTransaction) info.getTransaction().schedulableTransaction;
 
         Map<AccountId, Hbar> transfers = transfer.getHbarTransfers();
 
@@ -147,13 +147,9 @@ public class ScheduleMultiSigTransactionExample {
         ScheduleSignTransaction signTransaction = new ScheduleSignTransaction()
             .setNodeAccountIds(Collections.singletonList(response.nodeId))
             .setScheduleId(scheduleId)
-            .addScheduledSignature(key3.getPublicKey(), key3Signature);
+            .freezeWith(client);
 
-        if (signTransaction.getScheduleSignatures().size() != 1) {
-            throw new Exception("Scheduled sign transaction has incorrect number of signatures: " + signTransaction.getScheduleSignatures().size());
-        }
-
-        signTransaction.execute(client).getReceipt(client);
+        signTransaction.sign(key3).execute(client).getReceipt(client);
 
         // Query the schedule info again
         try {

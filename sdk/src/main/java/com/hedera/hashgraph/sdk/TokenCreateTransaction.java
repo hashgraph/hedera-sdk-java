@@ -28,6 +28,12 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         builder = bodyBuilder.getTokenCreation().toBuilder();
     }
 
+    TokenCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getTokenCreation().toBuilder();
+    }
+
     public String getTokenName() {
         return builder.getName();
     }

@@ -23,6 +23,12 @@ public class TokenRevokeKycTransaction extends com.hedera.hashgraph.sdk.Transact
         builder = bodyBuilder.getTokenRevokeKyc().toBuilder();
     }
 
+    TokenRevokeKycTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getTokenRevokeKyc().toBuilder();
+    }
+
     public TokenId getTokenId() {
         return TokenId.fromProtobuf(builder.getToken());
     }
