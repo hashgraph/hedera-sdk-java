@@ -75,6 +75,8 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
         switch (status) {
             case BUSY:
             case UNKNOWN:
+            case RECEIPT_NOT_FOUND:
+            case RECORD_NOT_FOUND:
                 return ExecutionState.Retry;
             case OK:
                 break;
@@ -87,14 +89,10 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
 
         switch (receiptStatus) {
             case BUSY:
-                // node is busy
             case UNKNOWN:
-                // still in the node's queue
             case OK:
-                // accepted but has not reached consensus
             case RECEIPT_NOT_FOUND:
             case RECORD_NOT_FOUND:
-                // has reached consensus but not generated
                 return ExecutionState.Retry;
 
             case SUCCESS:
