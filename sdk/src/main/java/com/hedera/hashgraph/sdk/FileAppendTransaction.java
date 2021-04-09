@@ -154,4 +154,9 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
         bodyBuilder.setFileAppend(builder);
         return true;
     }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        scheduled.setFileAppend(builder.setContents(data));
+    }
 }

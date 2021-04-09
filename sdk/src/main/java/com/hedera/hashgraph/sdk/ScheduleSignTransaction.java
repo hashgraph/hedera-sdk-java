@@ -1,10 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.ScheduleSignTransactionBody;
-import com.hedera.hashgraph.sdk.proto.ScheduleServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.SignatureMap;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -53,5 +50,10 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setScheduleSign(builder);
         return true;
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        throw new IllegalStateException("cannot schedule `ScheduleSignTransaction`");
     }
 }

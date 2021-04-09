@@ -1,20 +1,15 @@
 import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.*;
-import org.junit.Assert;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.threeten.bp.Instant;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Disabled
 public class ScheduleCreateIntegrationTest {
     @Test
     @DisplayName("Can create schedule")
@@ -43,7 +38,7 @@ public class ScheduleCreateIntegrationTest {
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .execute(client);
 
-            assertNotNull(info.executed);
+            assertNotNull(info.executedAt);
 
             client.close();
         });
@@ -76,7 +71,7 @@ public class ScheduleCreateIntegrationTest {
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .execute(client);
 
-            assertNotNull(info.executed);
+            assertNotNull(info.executedAt);
             assertNotNull(info.getTransaction());
 
             client.close();
@@ -111,7 +106,7 @@ public class ScheduleCreateIntegrationTest {
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .execute(client);
 
-            assertNotNull(info.executed);
+            assertNotNull(info.executedAt);
             assertNotNull(info.getTransaction());
 
             client.close();
@@ -172,7 +167,7 @@ public class ScheduleCreateIntegrationTest {
                 .setScheduleId(scheduleId)
                 .execute(client);
 
-            assertNull(info.executed);
+            assertNull(info.executedAt);
 
             // Finally send this last signature to Hedera. This last signature _should_ mean the transaction executes
             // since all 3 signatures have been provided.
@@ -188,7 +183,7 @@ public class ScheduleCreateIntegrationTest {
                 .setScheduleId(scheduleId)
                 .execute(client);
 
-            assertNotNull(info.executed);
+            assertNotNull(info.executedAt);
 
             client.close();
         });

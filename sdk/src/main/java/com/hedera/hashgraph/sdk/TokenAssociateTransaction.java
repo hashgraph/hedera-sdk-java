@@ -1,11 +1,8 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.TokenAssociateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TokenID;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 import java.util.ArrayList;
@@ -28,7 +25,7 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
         builder = bodyBuilder.getTokenAssociate().toBuilder();
     }
 
-    TokenAssociateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+    TokenAssociateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getTokenAssociate().toBuilder();
@@ -71,5 +68,10 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setTokenAssociate(builder);
         return true;
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        scheduled.setTokenAssociate(builder);
     }
 }

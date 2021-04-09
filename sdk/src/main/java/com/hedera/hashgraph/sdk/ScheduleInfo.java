@@ -1,10 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
-import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.SignedTransaction;
-import com.hedera.hashgraph.sdk.proto.TransactionList;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
@@ -17,7 +14,7 @@ public final class ScheduleInfo {
 
     public final AccountId payerAccountId;
 
-    public final SchedulableTransactionBody transactionBody;
+    final com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody transactionBody;
 
     public final KeyList signatories;
 
@@ -33,16 +30,16 @@ public final class ScheduleInfo {
     public final Instant expirationTime;
 
     @Nullable
-    public final Instant executed;
+    public final Instant executedAt;
 
     @Nullable
-    public final Instant deleted;
+    public final Instant deletedAt;
 
     private ScheduleInfo(
         ScheduleId scheduleId,
         AccountId creatorAccountId,
         AccountId payerAccountId,
-        SchedulableTransactionBody transactionBody,
+        com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody transactionBody,
         KeyList signers,
         @Nullable Key adminKey,
         @Nullable TransactionId scheduledTransactionId,
@@ -60,8 +57,8 @@ public final class ScheduleInfo {
         this.scheduledTransactionId = scheduledTransactionId;
         this.memo = memo;
         this.expirationTime = expirationTime;
-        this.executed = executed;
-        this.deleted = deleted;
+        this.executedAt = executed;
+        this.deletedAt = deleted;
     }
 
     static ScheduleInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.ScheduleGetInfoResponse scheduleInfo) {
@@ -74,19 +71,12 @@ public final class ScheduleInfo {
         var scheduledTransactionId = info.hasScheduledTransactionID() ?
             TransactionId.fromProtobuf(info.getScheduledTransactionID()) :
             null;
-        SchedulableTransactionBody scheduledTransactionBody;
-
-        try{
-            scheduledTransactionBody = SchedulableTransactionBody.fromProtobuf(info.getScheduledTransactionBody());
-        }  catch (InvalidProtocolBufferException e) {
-            throw new RuntimeException("Failed to build Transaction from ScheduledTransactionBody inside ScheduleInfo ", e);
-        }
 
         return new ScheduleInfo(
             scheduleId,
             creatorAccountId,
             payerAccountId,
-            scheduledTransactionBody,
+            info.getScheduledTransactionBody(),
             KeyList.fromProtobuf(info.getSigners(), null),
             adminKey,
             scheduledTransactionId,
@@ -116,26 +106,26 @@ public final class ScheduleInfo {
             info.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
         }
 
-        if (executed != null) {
-            info.setExecutionTime(InstantConverter.toProtobuf(executed));
+        if (executedAt != null) {
+            info.setExecutionTime(InstantConverter.toProtobuf(executedAt));
         }
 
-        if (deleted != null) {
-            info.setDeletionTime(InstantConverter.toProtobuf(deleted));
+        if (deletedAt != null) {
+            info.setDeletionTime(InstantConverter.toProtobuf(deletedAt));
         }
 
         return info
             .setScheduleID(scheduleId.toProtobuf())
             .setCreatorAccountID(creatorAccountId.toProtobuf())
-            .setScheduledTransactionBody(transactionBody.toProtobuf())
+            .setScheduledTransactionBody(transactionBody)
             .setPayerAccountID(payerAccountId.toProtobuf())
             .setSigners(signatories.toProtobuf())
             .setMemo(memo)
             .build();
     }
 
-    public final SchedulableTransactionBody getTransaction() {
-            return transactionBody;
+    public final Transaction<?> getTransaction() throws InvalidProtocolBufferException {
+        return Transaction.fromScheduledTransaction(transactionBody);
     }
 
     @Override
@@ -148,8 +138,8 @@ public final class ScheduleInfo {
             .add("adminKey", adminKey)
             .add("expirationTime", expirationTime)
             .add("memo", memo)
-            .add("execution time", executed)
-            .add("time deleted", deleted)
+            .add("executedAt", executedAt)
+            .add("deletedAt", deletedAt)
             .toString();
     }
 

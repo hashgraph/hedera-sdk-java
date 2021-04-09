@@ -108,4 +108,9 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
         }
 
     }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        scheduled.setConsensusSubmitMessage(builder.setMessage(data));
+    }
 }

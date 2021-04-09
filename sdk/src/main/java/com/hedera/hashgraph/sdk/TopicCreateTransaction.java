@@ -1,9 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.ConsensusCreateTopicTransactionBody;
-import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
@@ -35,7 +33,7 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
         builder = bodyBuilder.getConsensusCreateTopic().toBuilder();
     }
 
-    TopicCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+    TopicCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getConsensusCreateTopic().toBuilder();
@@ -156,5 +154,10 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setConsensusCreateTopic(builder);
         return true;
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        scheduled.setConsensusCreateTopic(builder);
     }
 }

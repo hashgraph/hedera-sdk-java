@@ -42,7 +42,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         }
     }
 
-    TransferTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+    TransferTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getCryptoTransfer().toBuilder();
@@ -116,5 +116,10 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
         bodyBuilder.setCryptoTransfer(builder);
         return true;
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        scheduled.setCryptoTransfer(builder);
     }
 }

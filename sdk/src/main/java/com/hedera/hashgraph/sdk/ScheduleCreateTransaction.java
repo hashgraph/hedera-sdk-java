@@ -1,11 +1,9 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
-import java8.util.function.Function;
 
 import java.util.*;
 
@@ -41,7 +39,7 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
 
     ScheduleCreateTransaction setScheduledTransactionBody(SchedulableTransactionBody tx) {
         requireNotFrozen();
-        builder.setScheduledTransactionBody(tx.toProtobuf());
+        builder.setScheduledTransactionBody(tx);
         return this;
     }
 
@@ -65,11 +63,6 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         return this;
     }
 
-    public Transaction<?> getScheduledTransaction() throws InvalidProtocolBufferException {
-        requireNotFrozen();
-        return SchedulableTransactionBody.fromProtobuf(builder.getScheduledTransactionBody()).schedulableTransaction;
-    }
-
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return ScheduleServiceGrpc.getCreateScheduleMethod();
@@ -91,5 +84,10 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         var hash = hash(request.getSignedTransactionBytes().toByteArray());
         nextTransactionIndex = (nextTransactionIndex + 1) % transactionIds.size();
         return new com.hedera.hashgraph.sdk.TransactionResponse(nodeId, transactionId, hash, transactionId);
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        throw new IllegalStateException("Cannot schedule `ScheduleCreateTransaction`");
     }
 }

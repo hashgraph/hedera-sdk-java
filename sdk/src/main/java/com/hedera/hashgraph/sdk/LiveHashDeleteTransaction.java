@@ -2,9 +2,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.CryptoDeleteLiveHashTransactionBody;
-import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -81,5 +79,10 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setCryptoDeleteLiveHash(builder);
         return true;
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        throw new IllegalStateException("Cannot schedule live hash transactions");
     }
 }

@@ -2,9 +2,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.FileCreateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Instant;
@@ -32,7 +30,7 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
         builder = bodyBuilder.getFileCreate().toBuilder();
     }
 
-    FileCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+    FileCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getFileCreate().toBuilder();
@@ -166,5 +164,10 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setFileCreate(builder);
         return true;
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        scheduled.setFileCreate(builder);
     }
 }

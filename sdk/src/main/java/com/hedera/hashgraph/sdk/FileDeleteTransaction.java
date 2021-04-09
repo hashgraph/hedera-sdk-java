@@ -1,9 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.FileDeleteTransactionBody;
-import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -33,7 +31,7 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
         builder = bodyBuilder.getFileDelete().toBuilder();
     }
 
-    FileDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+    FileDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getFileDelete().toBuilder();
@@ -65,5 +63,10 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setFileDelete(builder);
         return true;
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        scheduled.setFileDelete(builder);
     }
 }

@@ -1,11 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.SystemDeleteTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TimestampSeconds;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Instant;
@@ -38,7 +34,7 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
         builder = bodyBuilder.getSystemDelete().toBuilder();
     }
 
-    SystemDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+    SystemDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getSystemDelete().toBuilder();
@@ -122,5 +118,10 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setSystemDelete(builder);
         return true;
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        scheduled.setSystemDelete(builder);
     }
 }
