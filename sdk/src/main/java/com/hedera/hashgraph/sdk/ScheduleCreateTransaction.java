@@ -34,7 +34,11 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
 
     public ScheduleCreateTransaction setScheduledTransaction(Transaction<?> transaction) {
         requireNotFrozen();
-        return transaction.schedule();
+
+        var scheduled = transaction.schedule();
+        builder.setScheduledTransactionBody(scheduled.builder.getScheduledTransactionBody());
+
+        return this;
     }
 
     ScheduleCreateTransaction setScheduledTransactionBody(SchedulableTransactionBody tx) {
