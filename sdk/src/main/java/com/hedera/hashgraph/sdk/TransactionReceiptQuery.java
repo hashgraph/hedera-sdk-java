@@ -80,9 +80,6 @@ public final class TransactionReceiptQuery
 
     @Override
     ExecutionState shouldRetry(Status status, Response response) {
-        var retry = super.shouldRetry(status, response);
-        if (retry != ExecutionState.Finished) return retry;
-
         switch (status) {
             case BUSY:
             case UNKNOWN:
