@@ -25,6 +25,12 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
         builder = bodyBuilder.getTokenDissociate().toBuilder();
     }
 
+    TokenDissociateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
+        super(txBody);
+
+        builder = bodyBuilder.getTokenDissociate().toBuilder();
+    }
+
     public AccountId getAccountId() {
         return AccountId.fromProtobuf(builder.getAccount());
     }
@@ -62,5 +68,10 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setTokenDissociate(builder);
         return true;
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        scheduled.setTokenDissociate(builder);
     }
 }

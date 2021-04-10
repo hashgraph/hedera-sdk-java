@@ -42,6 +42,28 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         }
     }
 
+    TransferTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
+        super(txBody);
+
+        builder = bodyBuilder.getCryptoTransfer().toBuilder();
+
+        for (var transfer : bodyBuilder.getCryptoTransfer().getTransfers().getAccountAmountsList()) {
+            hbarTransfers.merge(
+                AccountId.fromProtobuf(transfer.getAccountID()),
+                Hbar.fromTinybars(transfer.getAmount()),
+                (a, b) -> Hbar.fromTinybars(a.toTinybars() + b.toTinybars())
+            );
+        }
+
+        for (var tokenTransferList : bodyBuilder.getCryptoTransfer().getTokenTransfersList()) {
+            var list = tokenTransfers.computeIfAbsent(TokenId.fromProtobuf(tokenTransferList.getToken()), k -> new HashMap<>());
+
+            for (var aa : tokenTransferList.getTransfersList()) {
+                list.merge(AccountId.fromProtobuf(aa.getAccountID()), aa.getAmount(), Long::sum);
+            }
+        }
+    }
+
     public Map<TokenId, Map<AccountId, Long>> getTokenTransfers() {
         return tokenTransfers;
     }
@@ -94,5 +116,10 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
         bodyBuilder.setCryptoTransfer(builder);
         return true;
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        scheduled.setCryptoTransfer(builder);
     }
 }

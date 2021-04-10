@@ -2,9 +2,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.ContractCallTransactionBody;
-import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -30,6 +28,12 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
 
     ContractExecuteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+
+        builder = bodyBuilder.getContractCall().toBuilder();
+    }
+
+    ContractExecuteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
+        super(txBody);
 
         builder = bodyBuilder.getContractCall().toBuilder();
     }
@@ -135,5 +139,10 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setContractCall(builder);
         return true;
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        scheduled.setContractCall(builder);
     }
 }

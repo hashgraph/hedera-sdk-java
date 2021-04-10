@@ -1,10 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
-import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.SignedTransaction;
-import com.hedera.hashgraph.sdk.proto.TransactionList;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
@@ -17,7 +14,7 @@ public final class ScheduleInfo {
 
     public final AccountId payerAccountId;
 
-    public final byte[] transactionBody;
+    final com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody transactionBody;
 
     public final KeyList signatories;
 
@@ -32,16 +29,24 @@ public final class ScheduleInfo {
     @Nullable
     public final Instant expirationTime;
 
+    @Nullable
+    public final Instant executedAt;
+
+    @Nullable
+    public final Instant deletedAt;
+
     private ScheduleInfo(
         ScheduleId scheduleId,
         AccountId creatorAccountId,
         AccountId payerAccountId,
-        byte[] transactionBody,
+        com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody transactionBody,
         KeyList signers,
         @Nullable Key adminKey,
         @Nullable TransactionId scheduledTransactionId,
         String memo,
-        @Nullable Instant expirationTime
+        @Nullable Instant expirationTime,
+        @Nullable Instant executed,
+        @Nullable Instant deleted
     ) {
         this.scheduleId = scheduleId;
         this.creatorAccountId = creatorAccountId;
@@ -52,6 +57,8 @@ public final class ScheduleInfo {
         this.scheduledTransactionId = scheduledTransactionId;
         this.memo = memo;
         this.expirationTime = expirationTime;
+        this.executedAt = executed;
+        this.deletedAt = deleted;
     }
 
     static ScheduleInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.ScheduleGetInfoResponse scheduleInfo) {
@@ -69,12 +76,14 @@ public final class ScheduleInfo {
             scheduleId,
             creatorAccountId,
             payerAccountId,
-            info.getTransactionBody().toByteArray(),
-            KeyList.fromProtobuf(info.getSignatories(), null),
+            info.getScheduledTransactionBody(),
+            KeyList.fromProtobuf(info.getSigners(), null),
             adminKey,
             scheduledTransactionId,
             info.getMemo(),
-            info.hasExpirationTime() ? InstantConverter.fromProtobuf(info.getExpirationTime()) : null
+            info.hasExpirationTime() ? InstantConverter.fromProtobuf(info.getExpirationTime()) : null,
+            info.hasExecutionTime() ? InstantConverter.fromProtobuf(info.getExecutionTime()) : null,
+            info.hasDeletionTime() ? InstantConverter.fromProtobuf(info.getDeletionTime()) : null
         );
     }
 
@@ -97,31 +106,26 @@ public final class ScheduleInfo {
             info.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
         }
 
+        if (executedAt != null) {
+            info.setExecutionTime(InstantConverter.toProtobuf(executedAt));
+        }
+
+        if (deletedAt != null) {
+            info.setDeletionTime(InstantConverter.toProtobuf(deletedAt));
+        }
+
         return info
             .setScheduleID(scheduleId.toProtobuf())
             .setCreatorAccountID(creatorAccountId.toProtobuf())
-            .setTransactionBody(ByteString.copyFrom(transactionBody))
+            .setScheduledTransactionBody(transactionBody)
             .setPayerAccountID(payerAccountId.toProtobuf())
-            .setSignatories(signatories.toProtobuf())
+            .setSigners(signatories.toProtobuf())
             .setMemo(memo)
             .build();
     }
 
-    public final Transaction<?> getTransaction() {
-        try {
-            return Transaction.fromBytes(TransactionList.newBuilder()
-                .addTransactionList(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
-                    .setSignedTransactionBytes(SignedTransaction.newBuilder()
-                        .setBodyBytes(ByteString.copyFrom(transactionBody))
-                        .build()
-                        .toByteString())
-                    .build())
-                .build()
-                .toByteArray()
-            );
-        } catch (InvalidProtocolBufferException e) {
-            throw new RuntimeException("Failed to build transaction of `bodyBytes` inside `ScheduleInfo`", e);
-        }
+    public final Transaction<?> getTransaction() throws InvalidProtocolBufferException {
+        return Transaction.fromScheduledTransaction(transactionBody);
     }
 
     @Override
@@ -134,6 +138,8 @@ public final class ScheduleInfo {
             .add("adminKey", adminKey)
             .add("expirationTime", expirationTime)
             .add("memo", memo)
+            .add("executedAt", executedAt)
+            .add("deletedAt", deletedAt)
             .toString();
     }
 

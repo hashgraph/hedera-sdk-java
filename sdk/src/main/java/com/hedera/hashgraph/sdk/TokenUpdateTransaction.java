@@ -2,10 +2,8 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
-import com.hedera.hashgraph.sdk.proto.TokenUpdateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
@@ -21,6 +19,12 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
 
     TokenUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+
+        builder = bodyBuilder.getTokenUpdate().toBuilder();
+    }
+
+    TokenUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
+        super(txBody);
 
         builder = bodyBuilder.getTokenUpdate().toBuilder();
     }
@@ -170,5 +174,10 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setTokenUpdate(builder);
         return true;
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        scheduled.setTokenUpdate(builder);
     }
 }

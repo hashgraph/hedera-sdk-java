@@ -1,9 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.FreezeServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.FreezeTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Instant;
@@ -26,6 +24,12 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
 
     FreezeTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+
+        builder = bodyBuilder.getFreeze().toBuilder();
+    }
+
+    FreezeTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
+        super(txBody);
 
         builder = bodyBuilder.getFreeze().toBuilder();
     }
@@ -79,5 +83,10 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setFreeze(builder);
         return true;
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        scheduled.setFreeze(builder);
     }
 }

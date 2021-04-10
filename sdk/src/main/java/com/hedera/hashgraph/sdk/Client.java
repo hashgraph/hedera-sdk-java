@@ -102,24 +102,24 @@ public final class Client implements AutoCloseable {
      */
     public static Client forMainnet() {
         var network = new HashMap<String, AccountId>();
-        network.put("35.237.200.180:50212", new AccountId(3));
-        network.put("35.186.191.247:50212", new AccountId(4));
-        network.put("35.192.2.25:50212", new AccountId(5));
-        network.put("35.199.161.108:50212", new AccountId(6));
-        network.put("35.203.82.240:50212", new AccountId(7));
-        network.put("35.236.5.219:50212", new AccountId(8));
-        network.put("35.197.192.225:50212", new AccountId(9));
-        network.put("35.242.233.154:50212", new AccountId(10));
-        network.put("35.240.118.96:50212", new AccountId(11));
-        network.put("35.204.86.32:50212", new AccountId(12));
-        network.put("35.234.132.107:50212", new AccountId(13));
-        network.put("35.236.2.27:50212", new AccountId(14));
-        network.put("35.228.11.53:50212", new AccountId(15));
-        network.put("34.91.181.183:50212", new AccountId(16));
-        network.put("34.86.212.247:50212", new AccountId(17));
-        network.put("172.105.247.67:50212", new AccountId(18));
-        network.put("34.89.87.138:50212", new AccountId(19));
-        network.put("34.82.78.255:50212", new AccountId(20));
+        network.put("35.237.200.180:50211", new AccountId(3));
+        network.put("35.186.191.247:50211", new AccountId(4));
+        network.put("35.192.2.25:50211", new AccountId(5));
+        network.put("35.199.161.108:50211", new AccountId(6));
+        network.put("35.203.82.240:50211", new AccountId(7));
+        network.put("35.236.5.219:50211", new AccountId(8));
+        network.put("35.197.192.225:50211", new AccountId(9));
+        network.put("35.242.233.154:50211", new AccountId(10));
+        network.put("35.240.118.96:50211", new AccountId(11));
+        network.put("35.204.86.32:50211", new AccountId(12));
+        network.put("35.234.132.107:50211", new AccountId(13));
+        network.put("35.236.2.27:50211", new AccountId(14));
+        network.put("35.228.11.53:50211", new AccountId(15));
+        network.put("34.91.181.183:50211", new AccountId(16));
+        network.put("34.86.212.247:50211", new AccountId(17));
+        network.put("172.105.247.67:50211", new AccountId(18));
+        network.put("34.89.87.138:50211", new AccountId(19));
+        network.put("34.82.78.255:50211", new AccountId(20));
 
         var client = Client.forNetwork(network);
 

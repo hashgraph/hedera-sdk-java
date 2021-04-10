@@ -1,10 +1,8 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.TokenUnfreezeAccountTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 import java.util.HashMap;
@@ -19,6 +17,12 @@ public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transacti
 
     TokenUnfreezeTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+
+        builder = bodyBuilder.getTokenUnfreeze().toBuilder();
+    }
+
+    TokenUnfreezeTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
+        super(txBody);
 
         builder = bodyBuilder.getTokenUnfreeze().toBuilder();
     }
@@ -52,5 +56,10 @@ public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transacti
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setTokenUnfreeze(builder);
         return true;
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        scheduled.setTokenUnfreeze(builder);
     }
 }

@@ -4,9 +4,7 @@ import com.google.protobuf.BoolValue;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
 import com.google.protobuf.UInt64Value;
-import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.CryptoUpdateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
@@ -40,6 +38,12 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
 
     AccountUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+
+        builder = bodyBuilder.getCryptoUpdateAccount().toBuilder();
+    }
+
+    AccountUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
+        super(txBody);
 
         builder = bodyBuilder.getCryptoUpdateAccount().toBuilder();
     }
@@ -221,5 +225,10 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setCryptoUpdateAccount(builder);
         return true;
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        scheduled.setCryptoUpdateAccount(builder);
     }
 }

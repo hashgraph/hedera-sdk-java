@@ -2,11 +2,8 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
-import com.hedera.hashgraph.sdk.proto.AccountID;
-import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.ConsensusUpdateTopicTransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.KeyList;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
@@ -33,6 +30,12 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
 
     TopicUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+
+        builder = bodyBuilder.getConsensusUpdateTopic().toBuilder();
+    }
+
+    TopicUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
+        super(txBody);
 
         builder = bodyBuilder.getConsensusUpdateTopic().toBuilder();
     }
@@ -200,5 +203,10 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setConsensusUpdateTopic(builder);
         return true;
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        scheduled.setConsensusUpdateTopic(builder);
     }
 }

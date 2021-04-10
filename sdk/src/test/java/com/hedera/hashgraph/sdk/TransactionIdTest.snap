@@ -1,3 +1,3 @@
 com.hedera.hashgraph.sdk.TransactionIdTest.shouldSerialize=[
-  "# com.hedera.hashgraph.sdk.proto.TransactionID@5976af07\naccount_i_d {\n  account_num: 23847\n  realm_num: 0\n  shard_num: 0\n}\ntransaction_valid_start {\n  nanos: 632521325\n  seconds: 1588539964\n}"
+  "# com.hedera.hashgraph.sdk.proto.TransactionID@cc95e7a6\naccount_i_d {\n  account_num: 23847\n  realm_num: 0\n  shard_num: 0\n}\ntransaction_valid_start {\n  nanos: 632521325\n  seconds: 1588539964\n}"
 ]

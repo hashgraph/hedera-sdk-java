@@ -47,16 +47,4 @@ class TransactionIdTest {
 
         assertEquals(transactionId.toString(), "0.0.23847@1588539964.632521325?scheduled");
     }
-
-    @Test
-    void shouldParseNonceScheduled() {
-        var transactionId = TransactionId.fromString("001122334455?scheduled");
-
-        assertNull(transactionId.accountId);
-        assertNull(transactionId.validStart);
-        assertEquals(Hex.toHexString(transactionId.nonce), "001122334455");
-        assertTrue(transactionId.scheduled);
-
-        assertEquals(transactionId.toString(), "001122334455?scheduled");
-    }
 }
