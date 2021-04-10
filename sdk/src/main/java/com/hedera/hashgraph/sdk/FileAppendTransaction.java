@@ -40,6 +40,19 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
         }
     }
 
+    FileAppendTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+
+        builder = bodyBuilder.getFileAppend().toBuilder();
+
+        for (var i = 0; i < signedTransactions.size(); i += nodeAccountIds.isEmpty() ? 1 : nodeAccountIds.size()) {
+            data = data.concat(
+                TransactionBody.parseFrom(signedTransactions.get(i).getBodyBytes())
+                    .getFileAppend().getContents()
+            );
+        }
+    }
+
     @Nullable
     public FileId getFileId() {
         return builder.hasFileID() ? FileId.fromProtobuf(builder.getFileID()) : null;
@@ -141,5 +154,10 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setFileAppend(builder);
         return true;
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        scheduled.setFileAppend(builder.setContents(data));
     }
 }

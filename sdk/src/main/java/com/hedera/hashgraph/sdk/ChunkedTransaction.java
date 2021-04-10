@@ -29,6 +29,10 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         super(txs);
     }
 
+    ChunkedTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+        super(txBody);
+    }
+
     ChunkedTransaction() {
         super();
     }

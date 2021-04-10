@@ -30,10 +30,10 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     private final QueryHeader.Builder headerBuilder;
 
     @Nullable
-    private TransactionId paymentTransactionId;
+    protected TransactionId paymentTransactionId;
 
     @Nullable
-    private List<Transaction> paymentTransactions;
+    protected List<Transaction> paymentTransactions;
 
     @Nullable
     private Hbar queryPayment;

@@ -26,7 +26,6 @@ option java_package = "com.hedera.hashgraph.sdk.proto";
 option java_multiple_files = true;
 
 enum ResponseCodeEnum {
-
   OK = 0; // The transaction passed the precheck validations.
   INVALID_TRANSACTION = 1; // For any error not handled by specific error codes listed below.
   PAYER_ACCOUNT_NOT_FOUND = 2; //Payer account does not exist.
@@ -215,8 +214,12 @@ enum ResponseCodeEnum {
   INVALID_SCHEDULE_ACCOUNT_ID = 204; // The Schedule Create Transaction TransactionID account does not exist
   NO_NEW_VALID_SIGNATURES = 205; // The provided sig map did not contain any new valid signatures from required signers of the scheduled transaction
   UNRESOLVABLE_REQUIRED_SIGNERS = 206; // The required signers for a scheduled transaction cannot be resolved, for example because they do not exist or have been deleted
-  UNPARSEABLE_SCHEDULED_TRANSACTION = 207; // The bytes allegedly representing a transaction to be scheduled could not be parsed
-  UNSCHEDULABLE_TRANSACTION = 208; // ScheduleCreate and ScheduleSign transactions cannot be scheduled
-  SOME_SIGNATURES_WERE_INVALID = 209; // At least one of the signatures in the provided sig map did not represent a valid signature for any required signer
-  TRANSACTION_ID_FIELD_NOT_ALLOWED = 210; // The <tt>scheduled</tt> and <tt>nonce</tt> fields in the <tt>TransactionID</tt> may not be set in a top-level transaction
+  SCHEDULED_TRANSACTION_NOT_IN_WHITELIST = 207; // Only whitelisted transaction types may be scheduled
+  SOME_SIGNATURES_WERE_INVALID = 208; // At least one of the signatures in the provided sig map did not represent a valid signature for any required signer
+  TRANSACTION_ID_FIELD_NOT_ALLOWED = 209; // The scheduled field in the TransactionID may not be set to true
+  IDENTICAL_SCHEDULE_ALREADY_CREATED = 210; // A schedule already exists with the same identifying fields of an attempted ScheduleCreate (that is, all fields other than scheduledPayerAccountID)
+  INVALID_ZERO_BYTE_IN_STRING = 211; // A string field in the transaction has a UTF-8 encoding with the prohibited zero byte
+  SCHEDULE_ALREADY_DELETED = 212; // A schedule being signed or deleted has already been deleted
+  SCHEDULE_ALREADY_EXECUTED = 213; // A schedule being signed or deleted has already been executed
+  MESSAGE_SIZE_TOO_LARGE = 214; // ConsensusSubmitMessage request's message size is larger than allowed.
 }

@@ -1,9 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.CryptoDeleteTransactionBody;
-import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -27,6 +25,12 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
 
     AccountDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+
+        builder = bodyBuilder.getCryptoDelete().toBuilder();
+    }
+
+    AccountDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
+        super(txBody);
 
         builder = bodyBuilder.getCryptoDelete().toBuilder();
     }
@@ -74,5 +78,10 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setCryptoDelete(builder);
         return true;
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        scheduled.setCryptoDelete(builder);
     }
 }

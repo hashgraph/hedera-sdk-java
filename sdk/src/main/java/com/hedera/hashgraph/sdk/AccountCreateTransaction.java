@@ -1,9 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.CryptoCreateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -29,6 +27,12 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
 
     AccountCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+
+        builder = bodyBuilder.getCryptoCreateAccount().toBuilder();
+    }
+
+    AccountCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
+        super(txBody);
 
         builder = bodyBuilder.getCryptoCreateAccount().toBuilder();
     }
@@ -189,5 +193,10 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setCryptoCreateAccount(builder);
         return true;
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        scheduled.setCryptoCreateAccount(builder);
     }
 }

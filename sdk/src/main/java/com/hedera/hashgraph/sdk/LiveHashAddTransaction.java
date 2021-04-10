@@ -2,10 +2,8 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.CryptoAddLiveHashTransactionBody;
-import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.LiveHash;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -129,5 +127,10 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setCryptoAddLiveHash(builder.setLiveHash(hashBuilder));
         return true;
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        throw new IllegalStateException("Cannot schedule live hash transactions");
     }
 }

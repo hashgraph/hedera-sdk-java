@@ -3,9 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
-import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.FileUpdateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -27,6 +25,12 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
 
     FileUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+
+        builder = bodyBuilder.getFileUpdate().toBuilder();
+    }
+
+    FileUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
+        super(txBody);
 
         builder = bodyBuilder.getFileUpdate().toBuilder();
     }
@@ -176,5 +180,10 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setFileUpdate(builder);
         return true;
+    }
+
+    @Override
+    void onScheduled(SchedulableTransactionBody.Builder scheduled) {
+        scheduled.setFileUpdate(builder);
     }
 }
