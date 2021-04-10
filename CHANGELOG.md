@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * Removed `nonce` from `TransactionId`
  * `Transaction[Receipt|Record]Query` should not error for status `IDENTICAL_SCHEDULE_ALREADY_CREATED`
    because the other fields on the receipt are present with that status.
+ * `ScheduleMultiSigExample` should use updated scheduled transaction API
 
 ### Removed
    * `ScheduleCreateTransaction.addScheduledSignature()`
