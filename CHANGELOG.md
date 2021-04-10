@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.5-beta.7
+
+### Fixed
+
+ * Scheduled transactions should use new HAPI protobufs
+ * `ReceiptPrecheckException` should be thrown when the erroring status was in the `TransactionReceipt`
+ * Removed `nonce` from `TransactionId`
+ * `Transaction[Receipt|Record]Query` should not error for status `IDENTICAL_SCHEDULE_ALREADY_CREATED`
+   because the other fields on the receipt are present with that status.
+
+### Removed
+   * `ScheduleCreateTransaction.addScheduledSignature()`
+   * `ScheduleCreateTransaction.getScheduledSignatures()`
+   * `ScheduleSignTransaction.addScheduledSignature()`
+   * `ScheduleSignTransaction.getScheduledSignatures()`
+
 ## v2.0.5-beta.6
 
 ### Added

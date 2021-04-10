@@ -79,7 +79,12 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
             case RECORD_NOT_FOUND:
                 return ExecutionState.Retry;
             case OK:
-                break;
+                // When fetching payment an `OK` in there query header means the cost is in the response
+                if (paymentTransactions == null || paymentTransactions.isEmpty()) {
+                    return ExecutionState.Finished;
+                } else {
+                    break;
+                }
             default:
                 return ExecutionState.Error;
         }
@@ -96,6 +101,7 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
                 return ExecutionState.Retry;
 
             case SUCCESS:
+            case IDENTICAL_SCHEDULE_ALREADY_CREATED:
                 return ExecutionState.Finished;
 
             default:
