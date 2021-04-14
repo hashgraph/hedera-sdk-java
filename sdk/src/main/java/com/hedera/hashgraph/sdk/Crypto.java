@@ -42,7 +42,7 @@ final class Crypto {
         Cipher aesCipher;
 
         try {
-            aesCipher = Cipher.getInstance("AES/CTR/PKCS5Padding");
+            aesCipher = Cipher.getInstance("AES/CTR/NOPADDING");
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             throw new Error("platform does not support AES-CTR ciphers", e);
         }
