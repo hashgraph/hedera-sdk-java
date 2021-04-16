@@ -6,6 +6,7 @@ import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 
+import javax.annotation.Nullable;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -119,11 +120,14 @@ final class Crypto {
         return output;
     }
 
-    static byte[] calcHmacSha384(KeyParameter cipherKey, byte[] input) {
+    static byte[] calcHmacSha384(KeyParameter cipherKey, @Nullable byte[] iv, byte[] input) {
         HMac hmacSha384 = new HMac(new SHA384Digest());
         byte[] output = new byte[hmacSha384.getMacSize()];
 
         hmacSha384.init(new KeyParameter(cipherKey.getKey(), 16, 16));
+        if(iv != null){
+            hmacSha384.update(iv, 0, iv.length);
+        }
         hmacSha384.update(input, 0, input.length);
         hmacSha384.doFinal(output, 0);
 
