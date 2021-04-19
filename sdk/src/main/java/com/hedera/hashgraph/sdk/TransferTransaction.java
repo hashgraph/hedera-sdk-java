@@ -8,6 +8,7 @@ import io.grpc.MethodDescriptor;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class TransferTransaction extends Transaction<TransferTransaction> {
     private final CryptoTransferTransactionBody.Builder builder;
@@ -70,7 +71,12 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
     public TransferTransaction addTokenTransfer(TokenId tokenId, AccountId accountId, long value) {
         requireNotFrozen();
-        tokenTransfers.computeIfAbsent(tokenId, k -> new HashMap<>()).merge(accountId, value, Long::sum);
+
+        // Cannot use `Map.merge()` as it uses `BiFunction`
+        var tokenTransfer = Objects.requireNonNull(tokenTransfers.computeIfAbsent(tokenId, k -> new HashMap<>()));
+        var current = tokenTransfer.computeIfAbsent(accountId, k -> 0L);
+        tokenTransfer.put(accountId, current + value);
+
         return this;
     }
 
@@ -80,7 +86,11 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
     public TransferTransaction addHbarTransfer(AccountId accountId, Hbar value) {
         requireNotFrozen();
-        hbarTransfers.merge(accountId, value, (a, b) -> Hbar.fromTinybars(a.toTinybars() + b.toTinybars()));
+
+        // Cannot use `Map.merge()` as it uses `BiFunction`
+        var current = hbarTransfers.computeIfAbsent(accountId, k -> new Hbar(0));
+        hbarTransfers.put(accountId, Hbar.fromTinybars(current.toTinybars() + value.toTinybars()));
+
         return this;
     }
 
