@@ -27,18 +27,28 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         builder = bodyBuilder.getCryptoTransfer().toBuilder();
 
         for (var transfer : bodyBuilder.getCryptoTransfer().getTransfers().getAccountAmountsList()) {
-            hbarTransfers.merge(
-                AccountId.fromProtobuf(transfer.getAccountID()),
-                Hbar.fromTinybars(transfer.getAmount()),
-                (a, b) -> Hbar.fromTinybars(a.toTinybars() + b.toTinybars())
-            );
+            var account = AccountId.fromProtobuf(transfer.getAccountID());
+            var current = hbarTransfers.containsKey(account) ?
+                Objects.requireNonNull(hbarTransfers.get(account)).toTinybars() :
+                0L;
+
+            hbarTransfers.put(account, Hbar.fromTinybars(current + transfer.getAmount()));
         }
 
         for (var tokenTransferList : bodyBuilder.getCryptoTransfer().getTokenTransfersList()) {
-            var list = tokenTransfers.computeIfAbsent(TokenId.fromProtobuf(tokenTransferList.getToken()), k -> new HashMap<>());
+            var token = TokenId.fromProtobuf(tokenTransferList.getToken());
+            var list = tokenTransfers.containsKey(token) ?
+                Objects.requireNonNull(tokenTransfers.get(token)) :
+                new HashMap<AccountId, Long>();
+            tokenTransfers.put(token, list);
 
             for (var aa : tokenTransferList.getTransfersList()) {
-                list.merge(AccountId.fromProtobuf(aa.getAccountID()), aa.getAmount(), Long::sum);
+                var account = AccountId.fromProtobuf(aa.getAccountID());
+                var current = list.containsKey(account) ?
+                    Objects.requireNonNull(list.get(account)) :
+                    0L;
+
+                list.put(account, current + aa.getAmount());
             }
         }
     }
@@ -49,18 +59,28 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         builder = bodyBuilder.getCryptoTransfer().toBuilder();
 
         for (var transfer : bodyBuilder.getCryptoTransfer().getTransfers().getAccountAmountsList()) {
-            hbarTransfers.merge(
-                AccountId.fromProtobuf(transfer.getAccountID()),
-                Hbar.fromTinybars(transfer.getAmount()),
-                (a, b) -> Hbar.fromTinybars(a.toTinybars() + b.toTinybars())
-            );
+            var account = AccountId.fromProtobuf(transfer.getAccountID());
+            var current = hbarTransfers.containsKey(account) ?
+                Objects.requireNonNull(hbarTransfers.get(account)).toTinybars() :
+                0L;
+
+            hbarTransfers.put(account, Hbar.fromTinybars(current + transfer.getAmount()));
         }
 
         for (var tokenTransferList : bodyBuilder.getCryptoTransfer().getTokenTransfersList()) {
-            var list = tokenTransfers.computeIfAbsent(TokenId.fromProtobuf(tokenTransferList.getToken()), k -> new HashMap<>());
+            var token = TokenId.fromProtobuf(tokenTransferList.getToken());
+            var list = tokenTransfers.containsKey(token) ?
+                Objects.requireNonNull(tokenTransfers.get(token)) :
+                new HashMap<AccountId, Long>();
+            tokenTransfers.put(token, list);
 
             for (var aa : tokenTransferList.getTransfersList()) {
-                list.merge(AccountId.fromProtobuf(aa.getAccountID()), aa.getAmount(), Long::sum);
+                var account = AccountId.fromProtobuf(aa.getAccountID());
+                var current = list.containsKey(account) ?
+                    Objects.requireNonNull(list.get(account)) :
+                    0L;
+
+                list.put(account, current + aa.getAmount());
             }
         }
     }
@@ -73,8 +93,14 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         requireNotFrozen();
 
         // Cannot use `Map.merge()` as it uses `BiFunction`
-        var tokenTransfer = Objects.requireNonNull(tokenTransfers.computeIfAbsent(tokenId, k -> new HashMap<>()));
-        var current = tokenTransfer.computeIfAbsent(accountId, k -> 0L);
+        var tokenTransfer = tokenTransfers.containsKey(tokenId) ?
+            Objects.requireNonNull(tokenTransfers.get(tokenId)) :
+            new HashMap<AccountId, Long>();
+
+        var current = tokenTransfer.containsKey(accountId) ?
+            Objects.requireNonNull(tokenTransfer.get(accountId)) :
+            0L;
+
         tokenTransfer.put(accountId, current + value);
 
         return this;
@@ -88,8 +114,11 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         requireNotFrozen();
 
         // Cannot use `Map.merge()` as it uses `BiFunction`
-        var current = hbarTransfers.computeIfAbsent(accountId, k -> new Hbar(0));
-        hbarTransfers.put(accountId, Hbar.fromTinybars(current.toTinybars() + value.toTinybars()));
+        var current = hbarTransfers.containsKey(accountId) ?
+            Objects.requireNonNull(hbarTransfers.get(accountId)).toTinybars() :
+            0L;
+
+        hbarTransfers.put(accountId, Hbar.fromTinybars(current + value.toTinybars()));
 
         return this;
     }

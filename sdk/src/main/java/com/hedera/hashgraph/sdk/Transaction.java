@@ -149,7 +149,9 @@ public abstract class Transaction<T extends Transaction<T>>
             var account = AccountId.fromProtobuf(txBody.getNodeAccountID());
             var transactionId = TransactionId.fromProtobuf(txBody.getTransactionID());
 
-            txs.computeIfAbsent(transactionId, k -> new LinkedHashMap<>()).put(account, transaction.build());
+            var linked = new LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>();
+            linked.put(account, transaction.build());
+            txs.put(transactionId, linked);
         } else {
             for (var transaction : list.getTransactionListList()) {
                 var signedTransaction = SignedTransaction.parseFrom(transaction.getSignedTransactionBytes());
@@ -162,7 +164,13 @@ public abstract class Transaction<T extends Transaction<T>>
                 var account = AccountId.fromProtobuf(txBody.getNodeAccountID());
                 var transactionId = TransactionId.fromProtobuf(txBody.getTransactionID());
 
-                txs.computeIfAbsent(transactionId, k -> new LinkedHashMap<>()).put(account, transaction);
+                var linked = txs.containsKey(transactionId) ?
+                    Objects.requireNonNull(txs.get(transactionId)) :
+                    new LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>();
+
+                linked.put(account, transaction);
+
+                txs.put(transactionId, linked);
             }
         }
 
@@ -671,7 +679,12 @@ public abstract class Transaction<T extends Transaction<T>>
         for (int i = 0; i < nodeAccountIds.size(); i++) {
             var sigMap = signatures.get(i);
             var nodeAccountId = nodeAccountIds.get(i);
-            var keyMap = map.computeIfAbsent(nodeAccountId, k -> new HashMap<>(sigMap.getSigPairCount()));
+
+            var keyMap = map.containsKey(nodeAccountId) ?
+                Objects.requireNonNull(map.get(nodeAccountId)) :
+                new HashMap<PublicKey, byte[]>(sigMap.getSigPairCount());
+            map.put(nodeAccountId, keyMap);
+
             for (var sigPair : sigMap.getSigPairList()) {
                 keyMap.put(
                     PublicKey.fromBytes(sigPair.getPubKeyPrefix().toByteArray()),
