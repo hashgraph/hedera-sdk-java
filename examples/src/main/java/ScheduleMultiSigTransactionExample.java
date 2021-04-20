@@ -112,7 +112,7 @@ public class ScheduleMultiSigTransactionExample {
 
         System.out.println("Schedule Info = " + info);
 
-        transfer = (TransferTransaction) info.getTransaction();
+        transfer = (TransferTransaction) info.getScheduledTransaction();
 
         Map<AccountId, Hbar> transfers = transfer.getHbarTransfers();
 
