@@ -96,6 +96,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         var tokenTransfer = tokenTransfers.containsKey(tokenId) ?
             Objects.requireNonNull(tokenTransfers.get(tokenId)) :
             new HashMap<AccountId, Long>();
+        tokenTransfers.put(tokenId, tokenTransfer);
 
         var current = tokenTransfer.containsKey(accountId) ?
             Objects.requireNonNull(tokenTransfer.get(accountId)) :

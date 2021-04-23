@@ -70,6 +70,12 @@ public class IntegrationTestClientManager {
 
         var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
 
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            // Do nothing
+        }
+
         return client.setOperator(accountId, key);
     }
 }
