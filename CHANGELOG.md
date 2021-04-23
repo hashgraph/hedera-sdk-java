@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -   `TransferTransaction.addTokenTransfer()` was correctly adding tokens
 -   HMAC Calculation Does Not Include IV [NCC-E001154-010]
+-   Non-Constant Time Lookup of Mnemonic Words [NCC-E001154-009]
 -   Decreased `CHUNK_SIZE` 4096->1024 and increased default max chunks 10->20
 -   Renamed `ScheduleInfo.getTransaction()` -> `ScheduleInfo.getScheduledTransaction()`
 
