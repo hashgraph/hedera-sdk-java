@@ -28,9 +28,9 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
         return ScheduleId.fromProtobuf(builder.getScheduleID());
     }
 
-    public ScheduleSignTransaction setScheduleId(ScheduleId id) {
+    public ScheduleSignTransaction setScheduleId(ScheduleId scheduleId) {
         requireNotFrozen();
-        builder.setScheduleID(id.toProtobuf());
+        builder.setScheduleID(scheduleId.toProtobuf());
         return this;
     }
 

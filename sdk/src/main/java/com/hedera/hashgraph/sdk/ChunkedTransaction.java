@@ -15,13 +15,13 @@ import java.util.function.Function;
 import javax.annotation.Nullable;
 
 abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Transaction<T> implements WithExecuteAll {
-    private static final int CHUNK_SIZE = 4096;
+    private static final int CHUNK_SIZE = 1024;
 
     /**
      * Maximum number of chunks this message will get broken up into when
      * its frozen.
      */
-    private int maxChunks = 10;
+    private int maxChunks = 20;
 
     protected ByteString data = ByteString.EMPTY;
 

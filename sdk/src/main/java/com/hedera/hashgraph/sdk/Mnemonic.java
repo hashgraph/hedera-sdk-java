@@ -176,7 +176,14 @@ public final class Mnemonic {
     }
 
     private static int getWordIndex(CharSequence word, boolean isLegacy) {
-        return Collections.binarySearch(getWordList(isLegacy), word, null);
+        var wordList = getWordList(isLegacy);
+        var found = -1;
+        for (var i = 0; i < wordList.size(); i++) {
+            if (word.equals(wordList.get(i))) {
+                found = i;
+            }
+        }
+        return found;
     }
 
     private static List<String> getWordList(boolean isLegacy) {

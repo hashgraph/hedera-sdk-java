@@ -90,6 +90,7 @@ public class TopicMessageSubmitIntegrationTest {
             var responses = new TopicMessageSubmitTransaction()
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .setTopicId(topicId)
+                .setMaxChunks(15)
                 .setMessage(Contents.BIG_CONTENTS)
                 .executeAll(client);
 
@@ -104,7 +105,7 @@ public class TopicMessageSubmitIntegrationTest {
 
             assertEquals(info.topicId, topicId);
             assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
-            assertEquals(info.sequenceNumber, 4);
+            assertEquals(info.sequenceNumber, 14);
             assertEquals(info.adminKey, operatorKey);
 
             new TopicDeleteTransaction()
@@ -136,6 +137,7 @@ public class TopicMessageSubmitIntegrationTest {
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TopicMessageSubmitTransaction()
                     .setMessage(Contents.BIG_CONTENTS)
+                    .setMaxChunks(15)
                     .execute(client)
                     .getReceipt(client);
             });

@@ -124,7 +124,7 @@ public final class ScheduleInfo {
             .build();
     }
 
-    public final Transaction<?> getTransaction() throws InvalidProtocolBufferException {
+    public final Transaction<?> getScheduledTransaction() throws InvalidProtocolBufferException {
         return Transaction.fromScheduledTransaction(transactionBody);
     }
 

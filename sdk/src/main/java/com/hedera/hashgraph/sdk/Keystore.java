@@ -16,7 +16,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.security.MessageDigest;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -69,6 +69,8 @@ final class Keystore {
         switch (version) {
             case 1:
                 return parseKeystoreV1(expectObject(object, "crypto"), passphrase);
+            case 2:
+                return parseKeystoreV2(expectObject(object, "crypto"), passphrase);
             default:
                 throw new BadKeyException("unsupported keystore version: " + version);
         }
@@ -82,7 +84,7 @@ final class Keystore {
 
     private JsonObject exportJson(String passphrase) {
         JsonObject object = new JsonObject();
-        object.addProperty("version", 1);
+        object.addProperty("version", 2);
 
         JsonObject crypto = new JsonObject();
         crypto.addProperty("cipher", "aes-128-ctr");
@@ -96,7 +98,7 @@ final class Keystore {
 
         byte[] cipherBytes = Crypto.encryptAesCtr128(cipherKey, iv, keyBytes);
 
-        byte[] mac = Crypto.calcHmacSha384(cipherKey, cipherBytes);
+        byte[] mac = Crypto.calcHmacSha384(cipherKey, iv,  cipherBytes);
 
         JsonObject cipherParams = new JsonObject();
         cipherParams.addProperty("iv", Hex.toHexString(iv));
@@ -149,9 +151,50 @@ final class Keystore {
 
         KeyParameter cipherKey = Crypto.deriveKeySha256(passphrase, salt, count, dkLen);
 
-        byte[] testHmac = Crypto.calcHmacSha384(cipherKey, cipherBytes);
+        byte[] testHmac = Crypto.calcHmacSha384(cipherKey, null, cipherBytes);
 
-        if (!Arrays.equals(mac, testHmac)) {
+        if(!MessageDigest.isEqual(mac,testHmac)){
+            throw new BadKeyException("HMAC mismatch; passphrase is incorrect");
+        }
+
+        return new Keystore(Crypto.decryptAesCtr128(cipherKey, iv, cipherBytes));
+    }
+
+    private static Keystore parseKeystoreV2(JsonObject crypto, String passphrase) {
+        String ciphertext = expectString(crypto, "ciphertext");
+        String ivString = expectString(expectObject(crypto, "cipherparams"), "iv");
+        String cipher = expectString(crypto, "cipher");
+        String kdf = expectString(crypto, "kdf");
+        JsonObject kdfParams = expectObject(crypto, "kdfparams");
+        String macString = expectString(crypto, "mac");
+
+        if (!cipher.equals("aes-128-ctr")) {
+            throw new BadKeyException("unsupported keystore cipher: " + cipher);
+        }
+
+        if (!kdf.equals("pbkdf2")) {
+            throw new BadKeyException("unsuppported KDF: " + kdf);
+        }
+
+        int dkLen = expectInt(kdfParams, "dkLen");
+        String saltStr = expectString(kdfParams, "salt");
+        int count = expectInt(kdfParams, "c");
+        String prf = expectString(kdfParams, "prf");
+
+        if (!prf.equals("hmac-sha256")) {
+            throw new BadKeyException("unsupported KDF hash function: " + prf);
+        }
+
+        byte[] cipherBytes = Hex.decode(ciphertext);
+        byte[] iv = Hex.decode(ivString);
+        byte[] mac = Hex.decode(macString);
+        byte[] salt = Hex.decode(saltStr);
+
+        KeyParameter cipherKey = Crypto.deriveKeySha256(passphrase, salt, count, dkLen);
+
+        byte[] testHmac = Crypto.calcHmacSha384(cipherKey, iv, cipherBytes);
+
+        if(!MessageDigest.isEqual(mac,testHmac)){
             throw new BadKeyException("HMAC mismatch; passphrase is incorrect");
         }
 

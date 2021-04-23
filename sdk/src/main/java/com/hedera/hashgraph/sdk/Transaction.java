@@ -404,14 +404,14 @@ public abstract class Transaction<T extends Transaction<T>>
 
         onFreeze(bodyBuilder);
 
-        var scheduable = SchedulableTransactionBody.newBuilder()
+        var schedulable = SchedulableTransactionBody.newBuilder()
             .setTransactionFee(bodyBuilder.getTransactionFee())
             .setMemo(bodyBuilder.getMemo());
 
-        onScheduled(scheduable);
+        onScheduled(schedulable);
 
         var scheduled = new ScheduleCreateTransaction()
-            .setScheduledTransactionBody(scheduable.build());
+            .setScheduledTransactionBody(schedulable.build());
 
         if (!transactionIds.isEmpty()) {
             scheduled.setTransactionId(transactionIds.get(0).setScheduled(true));

@@ -72,7 +72,7 @@ public class ScheduleCreateIntegrationTest {
                 .execute(client);
 
             assertNotNull(info.executedAt);
-            assertNotNull(info.getTransaction());
+            assertNotNull(info.getScheduledTransaction());
 
             client.close();
         });
@@ -107,7 +107,7 @@ public class ScheduleCreateIntegrationTest {
                 .execute(client);
 
             assertNotNull(info.executedAt);
-            assertNotNull(info.getTransaction());
+            assertNotNull(info.getScheduledTransaction());
 
             client.close();
         });
