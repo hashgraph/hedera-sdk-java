@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.5-beta.9
+
+### Fixed
+
+-   `TransferTransaction.addTokenTransfer()` was correctly adding tokens
+-   HMAC Calculation Does Not Include IV [NCC-E001154-010]
+-   Decreased `CHUNK_SIZE` 4096->1024 and increased default max chunks 10->20
+-   Renamed `ScheduleInfo.getTransaction()` -> `ScheduleInfo.getScheduledTransaction()`
+
 ## v2.0.5-beta.8
 
 ### Fixed
