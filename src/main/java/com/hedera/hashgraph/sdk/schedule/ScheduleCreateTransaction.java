@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk.schedule;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.proto.*;
 import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
 import com.hedera.hashgraph.sdk.account.AccountId;
@@ -14,10 +15,14 @@ public class ScheduleCreateTransaction extends SingleTransactionBuilder<Schedule
         super();
     }
 
-    public ScheduleCreateTransaction setTransaction(com.hedera.hashgraph.sdk.Transaction transaction) {
+    public ScheduleCreateTransaction setScheduledTransaction(com.hedera.hashgraph.sdk.Transaction transaction) throws InvalidProtocolBufferException {
         ScheduleCreateTransaction other = transaction.schedule();
-        this.builder.setTransactionBody(other.builder.getTransactionBody());
-        this.builder.getSigMapBuilder().mergeFrom(other.builder.getSigMap());
+        this.builder.setScheduledTransactionBody(other.builder.getScheduledTransactionBody());
+        return this;
+    }
+
+    public ScheduleCreateTransaction setScheduledTransactionBody(SchedulableTransactionBody body) throws InvalidProtocolBufferException {
+        this.builder.setScheduledTransactionBody(body);
         return this;
     }
 

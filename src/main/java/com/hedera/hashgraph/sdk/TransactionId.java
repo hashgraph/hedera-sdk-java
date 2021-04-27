@@ -26,9 +26,6 @@ public final class TransactionId {
     @Nullable
     private static Instant lastInstant;
 
-    @Nullable
-    public byte[] nonce;
-
     boolean scheduled = false;
 
 
@@ -43,7 +40,6 @@ public final class TransactionId {
         this.accountId = accountId;
         this.validStart = transactionValidStart;
         this.scheduled = false;
-        this.nonce = null;
     }
 
     /**
@@ -76,7 +72,6 @@ public final class TransactionId {
 
     public static TransactionId withNonce(byte[] nonce) {
         TransactionId txId = new TransactionId(new AccountId(0), Instant.EPOCH);
-        txId.nonce = nonce;
 
         return txId;
     }
@@ -86,12 +81,10 @@ public final class TransactionId {
         inner = TransactionID.newBuilder()
             .setAccountID(transactionId.getAccountID())
             .setTransactionValidStart(transactionId.getTransactionValidStart())
-            .setScheduled(transactionId.getScheduled())
-            .setNonce(transactionId.getNonce());
+            .setScheduled(transactionId.getScheduled());
 
         accountId = new AccountId(transactionId.getAccountIDOrBuilder());
         validStart = TimestampHelper.timestampTo(transactionId.getTransactionValidStart());
-        nonce = transactionId.getNonce().toByteArray();
         scheduled = transactionId.getScheduled();
     }
 

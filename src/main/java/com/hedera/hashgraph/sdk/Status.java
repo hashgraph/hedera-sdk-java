@@ -169,12 +169,22 @@ public enum Status {
     InvalidScheduleAccountId(ResponseCodeEnum.INVALID_SCHEDULE_ACCOUNT_ID),
     NoNewValidSignatures(ResponseCodeEnum.NO_NEW_VALID_SIGNATURES),
     UnresolvableRequiredSigners(ResponseCodeEnum.UNRESOLVABLE_REQUIRED_SIGNERS),
-    UnparseableScheduledTransaction(ResponseCodeEnum.UNPARSEABLE_SCHEDULED_TRANSACTION),
-    UnschedulableTransaction(ResponseCodeEnum.UNSCHEDULABLE_TRANSACTION),
+    ScheduledTransactionNotInWhitelist(ResponseCodeEnum.SCHEDULED_TRANSACTION_NOT_IN_WHITELIST),
     SomeSignaturesWereInvalid(ResponseCodeEnum.SOME_SIGNATURES_WERE_INVALID),
-    TransactionIdFieldNotAllowed(ResponseCodeEnum.TRANSACTION_ID_FIELD_NOT_ALLOWED)
-    ;
-
+    TransactionIdFieldNotAllowed(ResponseCodeEnum.TRANSACTION_ID_FIELD_NOT_ALLOWED),
+    IdenticalScheduleAlreadyCreated(ResponseCodeEnum.IDENTICAL_SCHEDULE_ALREADY_CREATED),
+    InvalidZeroByteInString(ResponseCodeEnum.INVALID_ZERO_BYTE_IN_STRING),
+    ScheduleAlreadyDeleted(ResponseCodeEnum.SCHEDULE_ALREADY_DELETED),
+    ScheduleAlreadyExecuted(ResponseCodeEnum.SCHEDULE_ALREADY_EXECUTED),
+    MessageSizeTooLarge(ResponseCodeEnum.MESSAGE_SIZE_TOO_LARGE),
+    OperationRepeatedInBucketGroups(ResponseCodeEnum.OPERATION_REPEATED_IN_BUCKET_GROUPS),
+    BucketCapacityOverflow(ResponseCodeEnum.BUCKET_CAPACITY_OVERFLOW),
+    NodeCapacityNotSufficientForOperation(ResponseCodeEnum.NODE_CAPACITY_NOT_SUFFICIENT_FOR_OPERATION),
+    BucketHasNoThrottleGroups(ResponseCodeEnum.BUCKET_HAS_NO_THROTTLE_GROUPS),
+    ThrottleGroupHasZeroOpsPerSec(ResponseCodeEnum.THROTTLE_GROUP_HAS_ZERO_OPS_PER_SEC),
+    SuccessButMissingExpectedOperation(ResponseCodeEnum.SUCCESS_BUT_MISSING_EXPECTED_OPERATION),
+    UnparseableThrottleDefinitions(ResponseCodeEnum.UNPARSEABLE_THROTTLE_DEFINITIONS),
+    InvalidThrottleDefinitions(ResponseCodeEnum.INVALID_THROTTLE_DEFINITIONS);
 
     private final ResponseCodeEnum responseCode;
 
@@ -359,10 +369,22 @@ public enum Status {
             case INVALID_SCHEDULE_ACCOUNT_ID: return InvalidScheduleAccountId;
             case NO_NEW_VALID_SIGNATURES: return NoNewValidSignatures;
             case UNRESOLVABLE_REQUIRED_SIGNERS: return UnresolvableRequiredSigners;
-            case UNPARSEABLE_SCHEDULED_TRANSACTION: return UnparseableScheduledTransaction;
-            case UNSCHEDULABLE_TRANSACTION: return UnschedulableTransaction;
+            case SCHEDULED_TRANSACTION_NOT_IN_WHITELIST: return ScheduledTransactionNotInWhitelist;
             case SOME_SIGNATURES_WERE_INVALID: return SomeSignaturesWereInvalid;
             case TRANSACTION_ID_FIELD_NOT_ALLOWED: return TransactionIdFieldNotAllowed;
+            case IDENTICAL_SCHEDULE_ALREADY_CREATED: return IdenticalScheduleAlreadyCreated;
+            case INVALID_ZERO_BYTE_IN_STRING: return InvalidZeroByteInString;
+            case SCHEDULE_ALREADY_DELETED: return ScheduleAlreadyDeleted;
+            case SCHEDULE_ALREADY_EXECUTED: return ScheduleAlreadyExecuted;
+            case MESSAGE_SIZE_TOO_LARGE: return MessageSizeTooLarge;
+            case OPERATION_REPEATED_IN_BUCKET_GROUPS: return OperationRepeatedInBucketGroups;
+            case BUCKET_CAPACITY_OVERFLOW: return BucketCapacityOverflow;
+            case NODE_CAPACITY_NOT_SUFFICIENT_FOR_OPERATION: return NodeCapacityNotSufficientForOperation;
+            case BUCKET_HAS_NO_THROTTLE_GROUPS: return BucketHasNoThrottleGroups;
+            case THROTTLE_GROUP_HAS_ZERO_OPS_PER_SEC: return ThrottleGroupHasZeroOpsPerSec;
+            case SUCCESS_BUT_MISSING_EXPECTED_OPERATION: return SuccessButMissingExpectedOperation;
+            case UNPARSEABLE_THROTTLE_DEFINITIONS: return UnparseableThrottleDefinitions;
+            case INVALID_THROTTLE_DEFINITIONS: return InvalidThrottleDefinitions;
 
             case UNRECOGNIZED:
                 // protobufs won't give us the actual value that was unexpected, unfortunately

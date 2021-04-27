@@ -132,13 +132,114 @@ public final class Transaction extends HederaCall<com.hedera.hashgraph.proto.Tra
         return hash;
     }
 
-    public final ScheduleCreateTransaction schedule() {
+    public final ScheduleCreateTransaction schedule() throws InvalidProtocolBufferException {
+        SchedulableTransactionBody.Builder scheduleBuilder = SchedulableTransactionBody.newBuilder();
         ScheduleCreateTransaction transaction = new ScheduleCreateTransaction();
+        TransactionBody body = TransactionBody.parseFrom(inner.getBodyBytes());
+        scheduleBuilder.setTransactionFee(body.getTransactionFee());
+        scheduleBuilder.setMemo(body.getMemo());
         transaction.setNodeAccountId(new AccountId(this.nodeAccountId));
-        transaction.bodyBuilder.getScheduleCreateBuilder()
-            .setTransactionBody(this.inner.getBodyBytes())
-            .setSigMap(this.inner.getSigMap());
-        return transaction;
+
+        switch (body.getDataCase()) {
+            case CONTRACTCALL:
+                scheduleBuilder.setContractCall(body.getContractCall());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case CONTRACTCREATEINSTANCE:
+                scheduleBuilder.setContractCreateInstance(body.getContractCreateInstance());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case CONTRACTUPDATEINSTANCE:
+                scheduleBuilder.setContractUpdateInstance(body.getContractUpdateInstance());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case CONTRACTDELETEINSTANCE:
+                scheduleBuilder.setContractDeleteInstance(body.getContractDeleteInstance());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case CRYPTOCREATEACCOUNT:
+                scheduleBuilder.setCryptoCreateAccount(body.getCryptoCreateAccount());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case CRYPTODELETE:
+                scheduleBuilder.setCryptoDelete(body.getCryptoDelete());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case CRYPTOTRANSFER:
+                scheduleBuilder.setCryptoTransfer(body.getCryptoTransfer());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case CRYPTOUPDATEACCOUNT:
+                scheduleBuilder.setCryptoUpdateAccount(body.getCryptoUpdateAccount());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case FILEAPPEND:
+                scheduleBuilder.setFileAppend(body.getFileAppend());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case FILECREATE:
+                scheduleBuilder.setFileCreate(body.getFileCreate());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case FILEDELETE:
+                scheduleBuilder.setFileDelete(body.getFileDelete());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case FILEUPDATE:
+                scheduleBuilder.setFileUpdate(body.getFileUpdate());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case SYSTEMDELETE:
+                scheduleBuilder.setSystemDelete(body.getSystemDelete());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case SYSTEMUNDELETE:
+                scheduleBuilder.setSystemUndelete(body.getSystemUndelete());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case FREEZE:
+                scheduleBuilder.setFreeze(body.getFreeze());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case CONSENSUSCREATETOPIC:
+                scheduleBuilder.setConsensusCreateTopic(body.getConsensusCreateTopic());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case CONSENSUSUPDATETOPIC:
+                scheduleBuilder.setConsensusUpdateTopic(body.getConsensusUpdateTopic());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case CONSENSUSDELETETOPIC:
+                scheduleBuilder.setConsensusDeleteTopic(body.getConsensusDeleteTopic());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case CONSENSUSSUBMITMESSAGE:
+                scheduleBuilder.setConsensusSubmitMessage(body.getConsensusSubmitMessage());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case TOKENASSOCIATE:
+                scheduleBuilder.setTokenAssociate(body.getTokenAssociate());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case TOKENBURN:
+                scheduleBuilder.setTokenBurn(body.getTokenBurn());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case TOKENCREATION:
+                scheduleBuilder.setTokenCreation(body.getTokenCreation());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case TOKENDELETION:
+                scheduleBuilder.setTokenDeletion(body.getTokenDeletion());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case TOKENDISSOCIATE:
+                scheduleBuilder.setTokenDissociate(body.getTokenDissociate());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case TOKENFREEZE:
+                scheduleBuilder.setTokenFreeze(body.getTokenFreeze());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case TOKENGRANTKYC:
+                scheduleBuilder.setTokenGrantKyc(body.getTokenGrantKyc());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case TOKENMINT:
+                scheduleBuilder.setTokenMint(body.getTokenMint());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case TOKENREVOKEKYC:
+                scheduleBuilder.setTokenRevokeKyc(body.getTokenRevokeKyc());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case TOKENUNFREEZE:
+                scheduleBuilder.setTokenUnfreeze(body.getTokenUnfreeze());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case TOKENUPDATE:
+                scheduleBuilder.setTokenUpdate(body.getTokenUpdate());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case TOKENWIPE:
+                scheduleBuilder.setTokenWipe(body.getTokenWipe());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            case SCHEDULEDELETE:
+                scheduleBuilder.setScheduleDelete(body.getScheduleDelete());
+                return transaction.setScheduledTransactionBody(scheduleBuilder.build());
+            default:
+                throw new IllegalStateException("schedulable transaction did not have a transaction set");
+        }
     }
 
     @Override

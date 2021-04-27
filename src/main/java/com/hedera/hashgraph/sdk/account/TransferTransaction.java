@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.token.TokenId;
 import io.grpc.MethodDescriptor;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public final class TransferTransaction extends SingleTransactionBuilder<TransferTransaction> {
     private final CryptoTransferTransactionBody.Builder builder = bodyBuilder.getCryptoTransferBuilder();
@@ -26,6 +27,10 @@ public final class TransferTransaction extends SingleTransactionBuilder<Transfer
                 .build());
 
         return this;
+    }
+
+    public TransferList getHbarTransfers() {
+        return transferList.build();
     }
 
     public TransferTransaction addTokenTransfer(TokenId tokenId, AccountId accountId, long amount) {

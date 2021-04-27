@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk.integration_tests;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.account.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
@@ -29,13 +30,20 @@ public class ScheduleTest {
             .setKey(key.publicKey)
             .build(testEnv.client);
 
-        final Transaction scheduled = new ScheduleCreateTransaction()
-            .setTransaction(transaction)
+        final ScheduleCreateTransaction scheduled = new ScheduleCreateTransaction()
             .setPayerAccountId(testEnv.operatorId)
-            .setAdminKey(testEnv.operatorKey.publicKey)
+            .setAdminKey(testEnv.operatorKey.publicKey);
+
+        try{
+            scheduled.setScheduledTransaction(transaction);
+        }catch(InvalidProtocolBufferException e){
+            System.out.println(e.toString());
+        }
+
+        final Transaction scheduledTransaction = scheduled
             .build(testEnv.client);
 
-        final ScheduleId scheduleId = scheduled.execute(testEnv.client).getReceipt(testEnv.client).getScheduleId();
+        final ScheduleId scheduleId = scheduledTransaction.execute(testEnv.client).getReceipt(testEnv.client).getScheduleId();
 
         new ScheduleInfoQuery()
             .setScheduleId(scheduleId)
@@ -57,7 +65,12 @@ public class ScheduleTest {
             .setKey(key.publicKey)
             .build(testEnv.client);
 
-        ScheduleCreateTransaction tx = transaction.schedule();
+        ScheduleCreateTransaction tx = new ScheduleCreateTransaction();
+        try{
+            tx = transaction.schedule();
+        }catch(InvalidProtocolBufferException e){
+            System.out.println(e.toString());
+        }
 
         final Transaction scheduled = tx
             .setPayerAccountId(testEnv.operatorId)
