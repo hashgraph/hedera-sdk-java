@@ -13,11 +13,7 @@ public class NetworkVersionInfoIntegrationTest {
         assertDoesNotThrow(() -> {
             var client = IntegrationTestClientManager.getClient();
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
-                new NetworkVersionInfoQuery().execute(client);
-            });
-
-            assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
+            new NetworkVersionInfoQuery().execute(client);
 
             client.close();
         });
