@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.5
+
+### Added
+
+-   Support `memo` for Tokens, Accounts, and Files.
+
+### Fixed
+
+-   Scheduled transaction support: `ScheduleCreateTransaction`, `ScheduleDeleteTransaction`, and `ScheduleSignTransaction`
+-   HMAC Calculation Does Not Include IV [NCC-E001154-010]
+-   Non-Constant Time Lookup of Mnemonic Words [NCC-E001154-009]
+-   Decreased `CHUNK_SIZE` 4096->1024 and increased default max chunks 10->20
+-   Remove use of `computeIfAbsent` and `putIfAbsent` from JDK7 builds
+
+### Deprecated
+
+-   `new TransactionId(AccountId, Instant)` - Use `TransactionId.withValidStart()` instead.
+
 ## v2.0.5-beta.9
 
 ### Fixed

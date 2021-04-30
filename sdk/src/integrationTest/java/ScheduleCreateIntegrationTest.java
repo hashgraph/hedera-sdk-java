@@ -9,9 +9,9 @@ import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Disabled
 public class ScheduleCreateIntegrationTest {
     @Test
+    @Disabled
     @DisplayName("Can create schedule")
     void canCreateSchedule() {
         assertDoesNotThrow(() -> {
@@ -45,6 +45,7 @@ public class ScheduleCreateIntegrationTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("Can get Transaction")
     void canGetTransactionSchedule() {
         assertDoesNotThrow(() -> {
@@ -79,6 +80,7 @@ public class ScheduleCreateIntegrationTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("Can create schedule with schedule()")
     void canCreateWithSchedule() {
         assertDoesNotThrow(() -> {
