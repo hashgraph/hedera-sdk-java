@@ -83,7 +83,7 @@ public final class ConsensusPubSubChunkedExample {
 
         // prepare a message send transaction that requires a submit key from "somewhere else"
         @Var Transaction<?> transaction = new TopicMessageSubmitTransaction()
-            .setMaxChunks(5) // this is 10 by default
+            .setMaxChunks(15) // this is 10 by default
             .setTopicId(newTopicId)
             .setMessage(bigContents)
             // sign with the operator or "sender" of the message

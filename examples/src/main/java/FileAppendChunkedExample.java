@@ -62,6 +62,7 @@ public class FileAppendChunkedExample {
             .setNodeAccountIds(Collections.singletonList(transactionResponse.nodeId))
             .setFileId(newFileId)
             .setContents(contents.toString())
+            .setMaxChunks(40)
             .setMaxTransactionFee(new Hbar(1000))
             .freezeWith(client)
             .execute(client)
