@@ -16,6 +16,10 @@ public class TransactionList {
         this.transactions = transactions;
     }
 
+    public Collection<Transaction> getTransactions() {
+        return this.transactions;
+    }
+
     public TransactionList sign(PrivateKey<? extends PublicKey> privateKey) {
         return signWith(privateKey.publicKey, privateKey::sign);
     }

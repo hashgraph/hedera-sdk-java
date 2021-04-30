@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class ConsensusMessageSubmitTransaction extends TransactionBuilder<TransactionId, TransactionList, ConsensusMessageSubmitTransaction> {
-    private static final int CHUNK_SIZE = 4096;
+    private static final int CHUNK_SIZE = 1024;
 
     @Nullable
     private ConsensusTopicId topicId;
@@ -22,7 +22,7 @@ public class ConsensusMessageSubmitTransaction extends TransactionBuilder<Transa
 
     private ByteString message = ByteString.EMPTY;
 
-    private int maxChunks = 10;
+    private int maxChunks = 20;
 
     public ConsensusMessageSubmitTransaction() {
         super();

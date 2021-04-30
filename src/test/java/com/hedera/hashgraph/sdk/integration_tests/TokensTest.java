@@ -17,85 +17,82 @@ import java.util.HashMap;
 import java.util.Objects;
 
 class TokensTest {
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
-    private static final Ed25519PrivateKey OPERATOR_KEY = Ed25519PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
-    private static final String CONFIG_FILE = Dotenv.load().get("CONFIG_FILE");
-    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK");
+    private final TestEnv testEnv = new TestEnv();
+
+    {
+        testEnv.client.setMaxTransactionFee(new Hbar(100));
+    }
 
     @Test
     void issue376() throws IOException, HederaStatusException {
-        Client client;
-
-        if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {
-            client = Client.forPreviewnet();
-        } else {
-            try {
-                client = Client.fromFile(CONFIG_FILE != null ? CONFIG_FILE : "");
-            } catch (FileNotFoundException e) {
-                client = Client.forTestnet();
-            }
-        }
-
-        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
-
         // Generate a Ed25519 private, public key pair
         Ed25519PrivateKey newKey = Ed25519PrivateKey.generate();
         Ed25519PublicKey newPublicKey = newKey.publicKey;
-
-        System.out.println("private key = " + newKey);
-        System.out.println("public key = " + newPublicKey);
 
         TransactionId txId = new AccountCreateTransaction()
             // The only _required_ property here is `key`
             .setKey(newKey.publicKey)
             .setInitialBalance(Hbar.fromTinybar(1000))
-            .execute(client);
+            .execute(testEnv.client);
 
         // This will wait for the receipt to become available
-        TransactionReceipt receipt = txId.getReceipt(client);
+        TransactionReceipt receipt = txId.getReceipt(testEnv.client);
 
-        AccountId newAccountId = receipt.getAccountId();
+        AccountId newAccountId1 = receipt.getAccountId();
 
-        System.out.println("account = " + newAccountId);
+        txId = new AccountCreateTransaction()
+            // The only _required_ property here is `key`
+            .setKey(newKey.publicKey)
+            .setInitialBalance(Hbar.fromTinybar(1000))
+            .execute(testEnv.client);
+
+        // This will wait for the receipt to become available
+        receipt = txId.getReceipt(testEnv.client);
+
+        AccountId newAccountId2 = receipt.getAccountId();
 
         txId = new TokenCreateTransaction()
             .setName("ffff")
             .setSymbol("F")
             .setDecimals(3)
             .setInitialSupply(1000000)
-            .setTreasury(OPERATOR_ID)
-            .setAdminKey(OPERATOR_KEY.publicKey)
-            .setFreezeKey(OPERATOR_KEY.publicKey)
-            .setWipeKey(OPERATOR_KEY.publicKey)
-            .setKycKey(OPERATOR_KEY.publicKey)
-            .setSupplyKey(OPERATOR_KEY.publicKey)
+            .setTreasury(newAccountId1)
+            .setAdminKey(newPublicKey)
+            .setFreezeKey(newPublicKey)
+            .setWipeKey(newPublicKey)
+            .setKycKey(newPublicKey)
+            .setSupplyKey(newPublicKey)
             .setFreezeDefault(false)
             .setExpirationTime(Instant.now().plus(Duration.ofDays(90)))
-            .execute(client);
+            .build(testEnv.client)
+            .sign(newKey)
+            .execute(testEnv.client);
 
-        TokenId tokenId = txId.getReceipt(client).getTokenId();
-        System.out.println("New token created: " + tokenId);
+        TokenId tokenId = txId.getReceipt(testEnv.client).getTokenId();
 
         new TokenAssociateTransaction()
-            .setAccountId(newAccountId)
+            .setAccountId(newAccountId2)
             .addTokenId(tokenId)
-            .build(client)
-            .sign(OPERATOR_KEY)
+            .build(testEnv.client)
             .sign(newKey)
-            .execute(client)
-            .getReceipt(client);
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
         new TokenGrantKycTransaction()
-            .setAccountId(newAccountId)
+            .setAccountId(newAccountId2)
             .setTokenId(tokenId)
-            .execute(client)
-            .getReceipt(client);
+            .build(testEnv.client)
+            .sign(newKey)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
         new TokenTransferTransaction()
-            .addSender(tokenId, OPERATOR_ID, 10)
-            .addRecipient(tokenId, newAccountId, 10)
-            .execute(client)
-            .getReceipt(client);
+            .addSender(tokenId, newAccountId1, 10)
+            .addRecipient(tokenId, newAccountId2, 10)
+            .build(testEnv.client)
+            .sign(newKey)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
     }
 }
 

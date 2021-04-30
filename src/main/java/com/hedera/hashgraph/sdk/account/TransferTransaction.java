@@ -29,10 +29,6 @@ public final class TransferTransaction extends SingleTransactionBuilder<Transfer
         return this;
     }
 
-    public TransferList getHbarTransfers() {
-        return transferList.build();
-    }
-
     public TransferTransaction addTokenTransfer(TokenId tokenId, AccountId accountId, long amount) {
         Integer index = tokenIndexes.get(tokenId);
         int size = builder.getTokenTransfersCount();

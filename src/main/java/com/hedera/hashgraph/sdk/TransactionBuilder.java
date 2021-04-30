@@ -6,7 +6,6 @@ import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.PrivateKey;
 
 import java.time.Duration;
-import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 

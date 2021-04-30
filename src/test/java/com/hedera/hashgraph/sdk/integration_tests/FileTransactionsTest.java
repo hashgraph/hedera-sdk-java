@@ -99,7 +99,7 @@ public class FileTransactionsTest {
 
         // ASSERT UPDATE FAILED
         Assertions.assertArrayEquals(
-            new byte[] {},
+            new byte[]{},
             new FileContentsQuery().setFileId(fileId).execute(testEnv.client));
 
         // TEST ALL KEYS SIGNING APPEND
@@ -127,12 +127,10 @@ public class FileTransactionsTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        HederaPrecheckStatusException exception = assertThrows(
-            HederaPrecheckStatusException.class,
-            () -> new FileInfoQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client));
-
-        assertEquals(exception.status, Status.FileDeleted);
+        assertTrue(new FileInfoQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client)
+            .isDeleted
+        );
     }
 }
