@@ -70,12 +70,6 @@ public final class TransactionId {
         return new TransactionId(accountId, transactionValidStart);
     }
 
-    public static TransactionId withNonce(byte[] nonce) {
-        TransactionId txId = new TransactionId(new AccountId(0), Instant.EPOCH);
-
-        return txId;
-    }
-
     @Internal
     public TransactionId(TransactionIDOrBuilder transactionId) {
         inner = TransactionID.newBuilder()
