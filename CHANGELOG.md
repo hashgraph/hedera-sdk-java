@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
- * Scheduled transaction support: `ScheduleCreateTransaction`, `ScheduleSignTransaction`, and `ScheduleSignTransaction`
+ * Scheduled transaction support: `ScheduleCreateTransaction`, `ScheduleDeleteTransaction`, and `ScheduleSignTransaction`
  * Implemented `TransactionList.getTransactions()` to support scheduling `ConsensusMessageSubmitTransaction`'s
 
 ### Fixed
