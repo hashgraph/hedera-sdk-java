@@ -1,5 +1,4 @@
 import com.hedera.hashgraph.sdk.*;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -12,22 +11,22 @@ public class TopicCreateIntegrationTest {
     @DisplayName("Can create topic")
     void canCreateTopic() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             var response = new TopicCreateTransaction()
-                .setAdminKey(operatorKey)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
-                .execute(client);
+                .execute(testEnv.client);
 
-            var topicId = Objects.requireNonNull(response.getReceipt(client).topicId);
+            var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
             new TopicDeleteTransaction()
                 .setTopicId(topicId)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -35,12 +34,14 @@ public class TopicCreateIntegrationTest {
     @DisplayName("Can create topic with no field set")
     void canCreateTopicWithNoFieldsSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var testEnv = new IntegrationTestEnv();
 
-            var response = new TopicCreateTransaction().execute(client);
-            assertNotNull(response.getReceipt(client).topicId);
+            var response = new TopicCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
+            assertNotNull(response.getReceipt(testEnv.client).topicId);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 }

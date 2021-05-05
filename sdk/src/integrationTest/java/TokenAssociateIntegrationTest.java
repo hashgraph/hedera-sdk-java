@@ -12,47 +12,47 @@ class TokenAssociateIntegrationTest {
     @DisplayName("Can associate account with token")
     void canAssociateAccountWithToken() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClientNewAccount();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
-                .execute(client);
+                .execute(testEnv.client);
 
-            var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
+            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setDecimals(3)
                     .setInitialSupply(1000000)
-                    .setTreasuryAccountId(operatorId)
-                    .setAdminKey(operatorKey)
-                    .setFreezeKey(operatorKey)
-                    .setWipeKey(operatorKey)
-                    .setKycKey(operatorKey)
-                    .setSupplyKey(operatorKey)
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(testEnv.operatorKey)
+                    .setFreezeKey(testEnv.operatorKey)
+                    .setWipeKey(testEnv.operatorKey)
+                    .setKycKey(testEnv.operatorKey)
+                    .setSupplyKey(testEnv.operatorKey)
                     .setFreezeDefault(false)
-                    .execute(client)
-                    .getReceipt(client)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client)
                     .tokenId
             );
 
             new TokenAssociateTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTokenIds(Collections.singletonList(tokenId))
-                .freezeWith(client)
+                .freezeWith(testEnv.client)
                 .sign(key)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -60,27 +60,27 @@ class TokenAssociateIntegrationTest {
     @DisplayName("Can execute token associate transaction even when token IDs are not set")
     void canExecuteTokenAssociateTransactionEvenWhenTokenIDsAreNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClientNewAccount();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
-                .execute(client);
+                .execute(testEnv.client);
 
-            var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
+            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
             new TokenAssociateTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
-                .freezeWith(client)
+                .freezeWith(testEnv.client)
                 .sign(key)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -88,30 +88,30 @@ class TokenAssociateIntegrationTest {
     @DisplayName("Cannot associate account with tokens when account ID is not set")
     void cannotAssociateAccountWithTokensWhenAccountIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClientNewAccount();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
-                .execute(client);
+                .execute(testEnv.client);
 
-            var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
+            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenAssociateTransaction()
-                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                    .freezeWith(client)
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    .freezeWith(testEnv.client)
                     .sign(key)
-                    .execute(client)
-                    .getReceipt(client);
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
             });
 
             assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -119,49 +119,49 @@ class TokenAssociateIntegrationTest {
     @DisplayName("Cannot associate account with tokens when account does not sign transaction")
     void cannotAssociateAccountWhenAccountDoesNotSignTransaction() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClientNewAccount();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
-                .execute(client);
+                .execute(testEnv.client);
 
-            var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
+            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setDecimals(3)
                     .setInitialSupply(1000000)
-                    .setTreasuryAccountId(operatorId)
-                    .setAdminKey(operatorKey)
-                    .setFreezeKey(operatorKey)
-                    .setWipeKey(operatorKey)
-                    .setKycKey(operatorKey)
-                    .setSupplyKey(operatorKey)
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(testEnv.operatorKey)
+                    .setFreezeKey(testEnv.operatorKey)
+                    .setWipeKey(testEnv.operatorKey)
+                    .setKycKey(testEnv.operatorKey)
+                    .setSupplyKey(testEnv.operatorKey)
                     .setFreezeDefault(false)
-                    .execute(client)
-                    .getReceipt(client)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client)
                     .tokenId
             );
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenAssociateTransaction()
-                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setAccountId(accountId)
                     .setTokenIds(Collections.singletonList(tokenId))
-                    .execute(client)
-                    .getReceipt(client);
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
             });
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            client.close();
+            testEnv.client.close();
         });
     }
 }

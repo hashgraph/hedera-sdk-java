@@ -13,46 +13,45 @@ class TokenUpdateIntegrationTest {
     @DisplayName("Can update token")
     void canUpdateToken() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClientNewAccount();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             var response = new TokenCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
                 .setInitialSupply(1000000)
-                .setTreasuryAccountId(operatorId)
-                .setAdminKey(operatorKey)
-                .setFreezeKey(operatorKey)
-                .setWipeKey(operatorKey)
-                .setKycKey(operatorKey)
-                .setSupplyKey(operatorKey)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setFreezeKey(testEnv.operatorKey)
+                .setWipeKey(testEnv.operatorKey)
+                .setKycKey(testEnv.operatorKey)
+                .setSupplyKey(testEnv.operatorKey)
                 .setFreezeDefault(false)
-                .execute(client);
+                .execute(testEnv.client);
 
-            var tokenId = Objects.requireNonNull(response.getReceipt(client).tokenId);
+            var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             @Var var info = new TokenInfoQuery()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
-                .execute(client);
+                .execute(testEnv.client);
 
             assertEquals(tokenId, info.tokenId);
             assertEquals(info.name, "ffff");
             assertEquals(info.symbol, "F");
             assertEquals(info.decimals, 3);
-            assertEquals(operatorId, info.treasuryAccountId);
+            assertEquals(testEnv.operatorId, info.treasuryAccountId);
             assertNotNull(info.adminKey);
             assertNotNull(info.freezeKey);
             assertNotNull(info.wipeKey);
             assertNotNull(info.kycKey);
             assertNotNull(info.supplyKey);
-            assertEquals(operatorKey.toString(), info.adminKey.toString());
-            assertEquals(operatorKey.toString(), info.freezeKey.toString());
-            assertEquals(operatorKey.toString(), info.wipeKey.toString());
-            assertEquals(operatorKey.toString(), info.kycKey.toString());
-            assertEquals(operatorKey.toString(), info.supplyKey.toString());
+            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.adminKey.toString());
+            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.freezeKey.toString());
+            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.wipeKey.toString());
+            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.kycKey.toString());
+            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.supplyKey.toString());
             assertNotNull(info.defaultFreezeStatus);
             assertFalse(info.defaultFreezeStatus);
             assertNotNull(info.defaultKycStatus);
@@ -62,35 +61,35 @@ class TokenUpdateIntegrationTest {
                 .setTokenId(tokenId)
                 .setTokenName("aaaa")
                 .setTokenSymbol("A")
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
             info = new TokenInfoQuery()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
-                .execute(client);
+                .execute(testEnv.client);
 
             assertEquals(tokenId, info.tokenId);
             assertEquals(info.name, "aaaa");
             assertEquals(info.symbol, "A");
             assertEquals(info.decimals, 3);
-            assertEquals(operatorId, info.treasuryAccountId);
+            assertEquals(testEnv.operatorId, info.treasuryAccountId);
             assertNotNull(info.adminKey);
             assertNotNull(info.freezeKey);
             assertNotNull(info.wipeKey);
             assertNotNull(info.kycKey);
             assertNotNull(info.supplyKey);
-            assertEquals(operatorKey.toString(), info.adminKey.toString());
-            assertEquals(operatorKey.toString(), info.freezeKey.toString());
-            assertEquals(operatorKey.toString(), info.wipeKey.toString());
-            assertEquals(operatorKey.toString(), info.kycKey.toString());
-            assertEquals(operatorKey.toString(), info.supplyKey.toString());
+            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.adminKey.toString());
+            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.freezeKey.toString());
+            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.wipeKey.toString());
+            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.kycKey.toString());
+            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.supplyKey.toString());
             assertNotNull(info.defaultFreezeStatus);
             assertFalse(info.defaultFreezeStatus);
             assertNotNull(info.defaultKycStatus);
             assertFalse(info.defaultKycStatus);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -98,30 +97,30 @@ class TokenUpdateIntegrationTest {
     @DisplayName("Cannot update immutable token")
     void cannotUpdateImmutableToken() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClientNewAccount();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
 
             var response = new TokenCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
-                .setTreasuryAccountId(operatorId)
+                .setTreasuryAccountId(testEnv.operatorId)
                 .setFreezeDefault(false)
-                .execute(client);
+                .execute(testEnv.client);
 
-            var tokenId = Objects.requireNonNull(response.getReceipt(client).tokenId);
+            var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenUpdateTransaction()
                     .setTokenId(tokenId)
                     .setTokenName("aaaa")
                     .setTokenSymbol("A")
-                    .execute(client)
-                    .getReceipt(client);
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
             });
 
             assertTrue(error.getMessage().contains(Status.TOKEN_IS_IMMUTABLE.toString()));
 
-            client.close();
+            testEnv.client.close();
         });
     }
 }

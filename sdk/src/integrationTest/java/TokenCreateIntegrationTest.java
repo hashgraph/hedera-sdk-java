@@ -2,7 +2,6 @@ import com.hedera.hashgraph.sdk.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,27 +11,26 @@ class TokenCreateIntegrationTest {
     @DisplayName("Can create token with operator as all keys")
     void canCreateTokenWithOperatorAsAllKeys() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClientNewAccount();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             var response = new TokenCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
                 .setInitialSupply(1000000)
-                .setTreasuryAccountId(operatorId)
-                .setAdminKey(operatorKey)
-                .setFreezeKey(operatorKey)
-                .setWipeKey(operatorKey)
-                .setKycKey(operatorKey)
-                .setSupplyKey(operatorKey)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setFreezeKey(testEnv.operatorKey)
+                .setWipeKey(testEnv.operatorKey)
+                .setKycKey(testEnv.operatorKey)
+                .setSupplyKey(testEnv.operatorKey)
                 .setFreezeDefault(false)
-                .execute(client);
+                .execute(testEnv.client);
 
-            var tokenId = Objects.requireNonNull(response.getReceipt(client).tokenId);
+            var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -40,17 +38,17 @@ class TokenCreateIntegrationTest {
     @DisplayName("Can create token with minimal properties set")
     void canCreateTokenWithMinimalPropertiesSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClientNewAccount();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
 
             new TokenCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
-                .setTreasuryAccountId(operatorId)
-                .execute(client)
-                .getReceipt(client);
+                .setTreasuryAccountId(testEnv.operatorId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -58,21 +56,21 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create token when token name is not set")
     void cannotCreateTokenWhenTokenNameIsNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClientNewAccount();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenCreateTransaction()
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenSymbol("F")
-                    .setTreasuryAccountId(operatorId)
-                    .execute(client)
-                    .getReceipt(client);
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
             });
 
             assertTrue(error.getMessage().contains(Status.MISSING_TOKEN_NAME.toString()));
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -80,21 +78,21 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create token when token symbol is not set")
     void cannotCreateTokenWhenTokenSymbolIsNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClientNewAccount();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenCreateTransaction()
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
-                    .setTreasuryAccountId(operatorId)
-                    .execute(client)
-                    .getReceipt(client);
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
             });
 
             assertTrue(error.getMessage().contains(Status.MISSING_TOKEN_SYMBOL.toString()));
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -102,20 +100,21 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create token when token treasury account ID is not set")
     void cannotCreateTokenWhenTokenTreasuryAccountIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClientNewAccount();
+            var testEnv = new IntegrationTestEnv();
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenCreateTransaction()
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
-                    .execute(client)
-                    .getReceipt(client);
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
             });
 
             assertTrue(error.getMessage().contains(Status.INVALID_TREASURY_ACCOUNT_FOR_TOKEN.toString()));
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -123,21 +122,22 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create token when token treasury account ID does not sign transaction")
     void cannotCreateTokenWhenTokenTreasuryAccountIDDoesNotSignTransaction() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClientNewAccount();
+            var testEnv = new IntegrationTestEnv();
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setTreasuryAccountId(AccountId.fromString("0.0.3"))
-                    .execute(client)
-                    .getReceipt(client);
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
             });
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -145,25 +145,25 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create token when admin key does not sign transaction")
     void cannotCreateTokenWhenAdminKeyDoesNotSignTransaction() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClientNewAccount();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
 
             var key = PrivateKey.generate();
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
-                    .setTreasuryAccountId(operatorId)
+                    .setTreasuryAccountId(testEnv.operatorId)
                     .setAdminKey(key)
-                    .execute(client)
-                    .getReceipt(client);
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
             });
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            client.close();
+            testEnv.client.close();
         });
     }
 }
