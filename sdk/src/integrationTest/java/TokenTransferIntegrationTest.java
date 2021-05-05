@@ -1,8 +1,6 @@
 import com.hedera.hashgraph.sdk.*;
 import org.junit.jupiter.api.Test;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.Objects;
 
@@ -17,70 +15,70 @@ class TokenTransferIntegrationTest {
     @Test
     void test() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClientNewAccount();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             PrivateKey key = PrivateKey.generate();
 
             TransactionResponse response = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
-                .execute(client);
+                .execute(testEnv.client);
 
-            AccountId accountId = response.getReceipt(client).accountId;
+            AccountId accountId = response.getReceipt(testEnv.client).accountId;
             assertNotNull(accountId);
 
             response = new TokenCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
                 .setInitialSupply(1000000)
-                .setTreasuryAccountId(operatorId)
-                .setAdminKey(operatorKey)
-                .setFreezeKey(operatorKey)
-                .setWipeKey(operatorKey)
-                .setKycKey(operatorKey)
-                .setSupplyKey(operatorKey)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setFreezeKey(testEnv.operatorKey)
+                .setWipeKey(testEnv.operatorKey)
+                .setKycKey(testEnv.operatorKey)
+                .setSupplyKey(testEnv.operatorKey)
                 .setFreezeDefault(false)
-                .execute(client);
+                .execute(testEnv.client);
 
-            TokenId tokenId = response.getReceipt(client).tokenId;
+            TokenId tokenId = response.getReceipt(testEnv.client).tokenId;
             assertNotNull(tokenId);
 
             new TokenAssociateTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTokenIds(Collections.singletonList(tokenId))
-                .freezeWith(client)
-                .signWithOperator(client)
+                .freezeWith(testEnv.client)
+                .signWithOperator(testEnv.client)
                 .sign(key)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
             new TokenGrantKycTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTokenId(tokenId)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
             new TransferTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .addTokenTransfer(tokenId, operatorId, -10)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .addTokenTransfer(tokenId, testEnv.operatorId, -10)
                 .addTokenTransfer(tokenId, accountId, 10)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
             new TokenWipeTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .setAccountId(accountId)
                 .setAmount(10)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 }

@@ -1,6 +1,4 @@
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.NetworkVersionInfoQuery;
-import com.hedera.hashgraph.sdk.Status;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -11,11 +9,13 @@ public class NetworkVersionInfoIntegrationTest {
     @DisplayName("Cannot query network version info")
     void cannotQueryNetworkVersionInfo() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var testEnv = new IntegrationTestEnv();
 
-            new NetworkVersionInfoQuery().execute(client);
+            new NetworkVersionInfoQuery()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 }

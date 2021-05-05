@@ -15,22 +15,22 @@ public class TransactionIntegrationTest {
     @DisplayName("transaction hash in transaction record is equal to the derived transaction hash")
     void transactionHashInTransactionRecordIsEqualToTheDerivedTransactionHash() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
 
             var key = PrivateKey.generate();
 
             var transaction = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
-                .freezeWith(client)
-                .signWithOperator(client);
+                .freezeWith(testEnv.client)
+                .signWithOperator(testEnv.client);
 
             var expectedHash = transaction.getTransactionHashPerNode();
 
-            var response = transaction.execute(client);
+            var response = transaction.execute(testEnv.client);
 
-            var record = response.getRecord(client);
+            var record = response.getRecord(testEnv.client);
 
             assertArrayEquals(expectedHash.get(response.nodeId), record.transactionHash.toByteArray());
 
@@ -38,14 +38,15 @@ public class TransactionIntegrationTest {
             assertNotNull(accountId);
 
             new AccountDeleteTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
+                .setTransferAccountId(testEnv.operatorId)
+                .freezeWith(testEnv.client)
                 .sign(key)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 }
