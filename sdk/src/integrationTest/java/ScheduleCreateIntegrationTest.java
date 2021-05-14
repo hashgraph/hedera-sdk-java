@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Objects;
 
@@ -185,104 +187,95 @@ public class ScheduleCreateIntegrationTest {
         });
     }
 
-//    @Test
-//    @DisplayName("Can schedule topic message")
-//    void canScheduleTopicMessage() throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
-//        Client client = IntegrationTestClientManager.getClient();
-//        var testEnv.operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
-//        var testEnv.operatorId = Objects.requireNonNull(client.getOperatorAccountId());
-//
-//        // Generate 3 random keys
-//        var key1 = PrivateKey.generate();
-//
-//        // This is the submit key
-//        var key2 = PrivateKey.generate();
-//
-//        var key3 = PrivateKey.generate();
-//
-//        var keyList = new KeyList();
-//
-//        keyList.add(key1.getPublicKey());
-//        keyList.add(key2.getPublicKey());
-//        keyList.add(key3.getPublicKey());
-//
-//        var response = new AccountCreateTransaction()
-//            .setInitialBalance(new Hbar(100))
-//            .setKey(keyList)
-//            .execute(testEnv.client);
-//
-//        assertNotNull(response.getReceipt(testEnv.client).accountId);
-//
-//        var topicId = Objects.requireNonNull(new TopicCreateTransaction()
-//            .setAdminKey(testEnv.operatorKey)
-//            .setAutoRenewAccountId(testEnv.operatorId)
-//            .setTopicMemo("HCS Topic_")
-//            .setSubmitKey(key2.getPublicKey())
-//            .execute(testEnv.client)
-//            .getReceipt(testEnv.client)
-//            .topicId
-//        );
-//
-//        var transaction = new TopicMessageSubmitTransaction()
-//            .setTopicId(topicId)
-//            .setMessage("scheduled hcs message".getBytes(StandardCharsets.UTF_8));
-//
-//        // create schedule
-//        var scheduled = transaction.schedule()
-//            .setNodeAccountIds(testEnv.nodeAccountIds)
-//            .setAdminKey(testEnv.operatorKey)
-//            .setPayerAccountId(testEnv.operatorId)
-//            .setScheduleMemo("mirror scheduled E2E signature on create and sign_" + Instant.now())
-//            .freezeWith(testEnv.client);
-//
-//        var transactionId = scheduled.getTransactionId();
-//
-//        var scheduleId = Objects.requireNonNull(scheduled
-//            .execute(testEnv.client)
-//            .getReceipt(testEnv.client)
-//            .scheduleId
-//        );
-//
-//        // verify schedule has been created and has 1 of 2 signatures
-//        var info = new ScheduleInfoQuery()
-//            .setScheduleId(scheduleId)
-//            .setNodeAccountIds(testEnv.nodeAccountIds)
-//            .execute(testEnv.client);
-//
-//        assertNotNull(info);
-//        assertEquals(info.scheduleId, scheduleId);
-//
-//        var infoTransaction = (TopicMessageSubmitTransaction) info.getTransaction().schedulableTransaction;
-//
-//        assertEquals(transaction.getTopicId(), infoTransaction.getTopicId());
-//        assertEquals(transaction.getMessage(), infoTransaction.getMessage());
-//        assertEquals(transaction.getNodeAccountIds(), infoTransaction.getNodeAccountIds());
-//
-//        var scheduleSign = new ScheduleSignTransaction()
-//            .setScheduleId(scheduleId)
-//            .freezeWith(testEnv.client);
-//
-//        scheduleSign
-//            .sign(key2)
-//            .execute(testEnv.client)
-//            .getReceipt(testEnv.client);
-//
-//        var error = assertThrows(PrecheckStatusException.class, () -> {
-//            new ScheduleInfoQuery()
-//                .setScheduleId(scheduleId)
-//                .setNodeAccountIds(testEnv.nodeAccountIds)
-//                .execute(testEnv.client);
-//        });
-//
-//        assertTrue(error.getMessage().contains(Status.INVALID_SCHEDULE_ID.toString()));
-//
-//        System.out.println(
-//            "https://previewnet.mirrornode.hedera.com/api/v1/transactions/" +
-//                transactionId.accountId.toString() +
-//                "-" +
-//                transactionId.validStart.getEpochSecond() +
-//                "-" +
-//                transactionId.validStart.getNano()
-//        );
-//    }
+    @Test
+    @DisplayName("Can schedule topic message")
+    void canScheduleTopicMessage() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv();
+
+            // Generate 3 random keys
+            var key1 = PrivateKey.generate();
+
+            // This is the submit key
+            var key2 = PrivateKey.generate();
+
+            var key3 = PrivateKey.generate();
+
+            var keyList = new KeyList();
+
+            keyList.add(key1.getPublicKey());
+            keyList.add(key2.getPublicKey());
+            keyList.add(key3.getPublicKey());
+
+            var response = new AccountCreateTransaction()
+                .setInitialBalance(new Hbar(100))
+                .setKey(keyList)
+                .execute(testEnv.client);
+
+            assertNotNull(response.getReceipt(testEnv.client).accountId);
+
+            var topicId = Objects.requireNonNull(new TopicCreateTransaction()
+                .setAdminKey(testEnv.operatorKey)
+                .setAutoRenewAccountId(testEnv.operatorId)
+                .setTopicMemo("HCS Topic_")
+                .setSubmitKey(key2.getPublicKey())
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .topicId
+            );
+
+            var transaction = new TopicMessageSubmitTransaction()
+                .setTopicId(topicId)
+                .setMessage("scheduled hcs message".getBytes(StandardCharsets.UTF_8));
+
+            // create schedule
+            var scheduledTx = transaction.schedule()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setAdminKey(testEnv.operatorKey)
+                .setPayerAccountId(testEnv.operatorId)
+                .setScheduleMemo("mirror scheduled E2E signature on create and sign_" + Instant.now());
+
+            var scheduled = scheduledTx.freezeWith(testEnv.client);
+
+            var transactionId = scheduled.getTransactionId();
+
+            assertNotNull(transactionId);
+
+            var scheduleId = Objects.requireNonNull(scheduled
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .scheduleId
+            );
+
+            // verify schedule has been created and has 1 of 2 signatures
+            var info = new ScheduleInfoQuery()
+                .setScheduleId(scheduleId)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
+
+            assertNotNull(info);
+            assertEquals(info.scheduleId, scheduleId);
+
+            var infoTransaction = (TopicMessageSubmitTransaction) info.getScheduledTransaction();
+
+            assertEquals(transaction.getTopicId(), infoTransaction.getTopicId());
+            assertEquals(transaction.getNodeAccountIds(), infoTransaction.getNodeAccountIds());
+
+            var scheduleSign = new ScheduleSignTransaction()
+                .setScheduleId(scheduleId)
+                .freezeWith(testEnv.client);
+
+            scheduleSign
+                .sign(key2)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            info = new ScheduleInfoQuery()
+                .setScheduleId(scheduleId)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
+
+            assertNotNull(info.executedAt);
+        });
+    }
 }
