@@ -112,7 +112,7 @@ within the repository in [`examples/`](./examples/src/main/java).
 
 ### Dependencies
 
- * [Java Development Kit (JDK)](https://adoptopenjdk.net/) v12+ (note this is to _build_, not run)
+ * [Java Development Kit (JDK)](https://adoptopenjdk.net/) v14+ (note this is to _build_, not run)
 
 ### Compile
 
