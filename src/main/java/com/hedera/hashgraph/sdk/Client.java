@@ -30,6 +30,10 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 
 /**
+ * @deprecated
+ * Version 1 of the SDk is deprecated. Please upgrade to version 2 of the SDK. Use
+ * https://github.com/hashgraph/hedera-sdk-java/blob/master/MIGRATING_V1.md for help with the migration.
+ * 
  * The Hedera protocol wrapper for the SDK, used by all transaction and query types.
  *
  * <h3>Note: AutoCloseable</h3>
@@ -50,6 +54,7 @@ import javax.annotation.Nullable;
  * reused between multiple queries and transactions. The Client may not be reused once its
  * channels have been shut down.
  */
+@Deprecated
 public final class Client implements AutoCloseable {
     final Random random = new Random();
     private Map<AccountId, Node> nodes;
