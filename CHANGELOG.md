@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v1.4.1
 
+### Added
+
+ * `TransactionReceipt.getScheduledTransactionId()`
+ * `TransactionRecord.scheduleRef`
+
 ### Deprecate
 
  * `Client` Instruct user to upgrade to version 2 of the SDK since version 1 is now deprecated.

@@ -83,6 +83,14 @@ public final class TransactionReceipt {
         return new ScheduleId(inner.getScheduleIDOrBuilder());
     }
 
+    public TransactionId getScheduledTransactionId() {
+        if (!inner.hasScheduledTransactionID()) {
+            throw new IllegalStateException("receipt does not contain a scheduled transaction ID");
+        }
+
+        return new TransactionId(inner.getScheduledTransactionID());
+    }
+
     public long getConsensusTopicSequenceNumber() {
         // Should be present for [ConsensusTopicCreateTransaction]
         // FIXME[@mike-burrage-hedera]: Should this bail if there is no Topic ID

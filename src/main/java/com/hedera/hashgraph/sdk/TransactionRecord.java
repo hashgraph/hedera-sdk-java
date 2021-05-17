@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.account.AccountId;
+import com.hedera.hashgraph.sdk.schedule.ScheduleId;
 import com.hedera.hashgraph.sdk.contract.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.token.TokenId;
 
@@ -43,6 +44,8 @@ public final class TransactionRecord {
 
     public final Map<TokenId, Map<AccountId, List<Long>>> tokenTransfers;
 
+    public final ScheduleId scheduleRef;
+
     private final com.hedera.hashgraph.proto.TransactionRecord inner;
 
     @Internal
@@ -82,6 +85,8 @@ public final class TransactionRecord {
         }
 
         this.tokenTransfers = tokenTransfers;
+
+        this.scheduleRef = new ScheduleId(inner.getScheduleRef());
     }
 
     /**
