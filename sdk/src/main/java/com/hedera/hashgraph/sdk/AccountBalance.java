@@ -5,7 +5,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoGetAccountBalanceResponse;
 import com.hedera.hashgraph.sdk.proto.TokenBalance;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -15,16 +14,22 @@ public class AccountBalance {
     @Nonnegative
     public final Hbar hbars;
 
+    /**
+     * @deprecated - Use `tokens` instead
+     */
+    @Deprecated
     @Nonnegative
-    public final Map<TokenId, Long> token;
+    public final Map<TokenId, Long> token = new HashMap<>();
+
+    public final Map<TokenId, Long> tokens;
 
     @Nonnegative
-    public final Map<Long, Integer> decimal;
+    public final Map<Long, Integer> tokenDecimals;
 
     AccountBalance(Hbar hbars, Map<TokenId, Long> token, Map<Long, Integer> decimal) {
         this.hbars = hbars;
-        this.token = token;
-        this.decimal = decimal;
+        this.tokens = token;
+        this.tokenDecimals = decimal;
     }
 
     static AccountBalance fromProtobuf(CryptoGetAccountBalanceResponse protobuf) {
@@ -47,11 +52,11 @@ public class AccountBalance {
         var protobuf = CryptoGetAccountBalanceResponse.newBuilder()
             .setBalance(hbars.toTinybars());
 
-        for (var entry : token.entrySet()) {
+        for (var entry : tokens.entrySet()) {
             protobuf.addTokenBalances(TokenBalance.newBuilder()
                 .setTokenId(entry.getKey().toProtobuf())
                 .setBalance(entry.getValue())
-                .setDecimals(decimal.get(entry.getValue()))
+                .setDecimals(tokenDecimals.get(entry.getValue()))
             );
         }
 
