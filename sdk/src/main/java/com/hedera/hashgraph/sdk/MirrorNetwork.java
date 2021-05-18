@@ -4,12 +4,13 @@ import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 class MirrorNetwork {
-    List<String> addresses = new ArrayList<>();
-    List<MirrorNode> network = new ArrayList<>();
+    CopyOnWriteArrayList<String> addresses = new CopyOnWriteArrayList<>();
+    CopyOnWriteArrayList<MirrorNode> network = new CopyOnWriteArrayList<>();
     int index = 0;
     final ExecutorService executor;
 
@@ -23,7 +24,7 @@ class MirrorNetwork {
         }
     }
 
-    void setNetwork(List<String> addresses) throws InterruptedException {
+    synchronized void setNetwork(List<String> addresses) throws InterruptedException {
         var stopAt = Instant.now().getEpochSecond() + Duration.ofSeconds(30).getSeconds();
 
         // Remove nodes that do not exist in new network
@@ -49,7 +50,7 @@ class MirrorNetwork {
             }
         }
 
-        this.addresses = new ArrayList<>(addresses);
+        this.addresses = new CopyOnWriteArrayList<>(addresses);
         Collections.shuffle(network, ThreadLocalSecureRandom.current());
     }
 

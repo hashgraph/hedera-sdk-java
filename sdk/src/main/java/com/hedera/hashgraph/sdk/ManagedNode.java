@@ -18,7 +18,7 @@ abstract class ManagedNode {
         this.address = address;
     }
 
-    void inUse() {
+    synchronized void inUse() {
         useCount++;
         lastUsed = System.currentTimeMillis();
     }
