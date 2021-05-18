@@ -3,7 +3,6 @@ import com.hedera.hashgraph.sdk.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -120,6 +119,7 @@ class AccountBalanceIntegrationTest {
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setInitialSupply(10000)
+                .setDecimals(50)
                 .setTreasuryAccountId(testEnv.operatorId)
                 .setAdminKey(testEnv.operatorKey)
                 .setSupplyKey(testEnv.operatorKey)
@@ -133,7 +133,8 @@ class AccountBalanceIntegrationTest {
                 .setAccountId(testEnv.operatorId)
                 .execute(testEnv.client);
 
-            assertEquals(balance.token.get(tokenId), 10000);
+            assertEquals(balance.tokens.get(tokenId), 10000);
+            assertEquals(balance.tokenDecimals.get(balance.tokens.get(tokenId)), 50);
 
             testEnv.client.close();
         });
