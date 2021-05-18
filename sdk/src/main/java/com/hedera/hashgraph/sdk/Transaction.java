@@ -859,7 +859,7 @@ public abstract class Transaction<T extends Transaction<T>>
     @SuppressWarnings("LiteProtoToString")
     public String toString() {
         // NOTE: regex is for removing the instance address from the default debug output
-        TransactionBody.Builder body = TransactionBody.newBuilder();;
+        TransactionBody.Builder body = TransactionBody.newBuilder().mergeFrom(this.bodyBuilder.buildPartial());
 
         onFreeze(body);
 
