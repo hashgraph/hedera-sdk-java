@@ -38,7 +38,7 @@ public class IntegrationTestEnv {
         var key = PrivateKey.generate();
 
         var response = new AccountCreateTransaction()
-            .setInitialBalance(new Hbar(100))
+            .setInitialBalance(new Hbar(130))
             .setKey(key)
             .execute(client);
 

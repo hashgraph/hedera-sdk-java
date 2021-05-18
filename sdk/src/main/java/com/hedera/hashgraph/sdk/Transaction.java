@@ -859,6 +859,10 @@ public abstract class Transaction<T extends Transaction<T>>
     @SuppressWarnings("LiteProtoToString")
     public String toString() {
         // NOTE: regex is for removing the instance address from the default debug output
-        return bodyBuilder.buildPartial().toString().replaceAll("@[A-Za-z0-9]+", "");
+        TransactionBody.Builder body = TransactionBody.newBuilder();;
+
+        onFreeze(body);
+
+        return body.buildPartial().toString().replaceAll("@[A-Za-z0-9]+", "");
     }
 }
