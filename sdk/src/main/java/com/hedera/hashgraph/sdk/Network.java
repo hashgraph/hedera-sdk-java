@@ -11,16 +11,16 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 class Network {
     Hashtable<String, AccountId> network = new Hashtable<>();
     Hashtable<AccountId, Node> networkNodes = new Hashtable<>();
-    CopyOnWriteArrayList<Node> nodes = new CopyOnWriteArrayList<>();
+    
+    List<Node> nodes = new ArrayList<>();
     final ExecutorService executor;
+
+    final Semaphore lock = new Semaphore(1);
 
     Network(ExecutorService executor, Map<String, AccountId> network) {
         this.executor = executor;
@@ -34,7 +34,9 @@ class Network {
         }
     }
 
-    synchronized void setNetwork(Map<String, AccountId> network) throws InterruptedException, TimeoutException {
+    void setNetwork(Map<String, AccountId> network) throws InterruptedException, TimeoutException {
+        lock.acquire();
+
         // Bypass the more complex code if the network is empty
         if (this.network.isEmpty()) {
             this.network = new Hashtable<>(network);
@@ -45,6 +47,7 @@ class Network {
                 this.nodes.add(node);
             }
 
+            lock.release();
             return;
         }
 
@@ -57,6 +60,7 @@ class Network {
         // address for the same AccountId
         for (int i = 0; i < nodes.size(); i++) {
             if (stopAt - Instant.now().getEpochSecond() == 0) {
+                lock.release();
                 throw new TimeoutException("Failed to properly shutdown all channels");
             }
 
@@ -80,6 +84,8 @@ class Network {
                 networkNodes.put(entry.getKey(), node);
             }
         }
+
+        lock.release();
     }
 
 
@@ -89,7 +95,9 @@ class Network {
      *
      * @return {@link java.util.List<com.hedera.hashgraph.sdk.AccountId>}
      */
-    List<AccountId> getNodeAccountIdsForExecute() {
+    List<AccountId> getNodeAccountIdsForExecute() throws InterruptedException {
+        lock.acquire();
+
         Collections.sort(nodes);
 
         List<AccountId> resultNodeAccountIds = new ArrayList<>();
@@ -97,6 +105,8 @@ class Network {
         for (int i = 0; i < getNumberOfNodesForTransaction(); i++) {
             resultNodeAccountIds.add(nodes.get(i).accountId);
         }
+
+        lock.release();
 
         return resultNodeAccountIds;
     }
@@ -110,6 +120,12 @@ class Network {
     }
 
     void close(Duration timeout) throws TimeoutException {
+        try {
+            lock.acquire();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
         var stopAt = Instant.now().getEpochSecond() + timeout.getSeconds();
 
         for (var node : nodes) {
@@ -120,6 +136,7 @@ class Network {
 
         for (var node : nodes) {
             if (stopAt - Instant.now().getEpochSecond() == 0) {
+                lock.release();
                 throw new TimeoutException("Failed to properly shutdown all channels");
             }
 
@@ -127,6 +144,7 @@ class Network {
                 try {
                     node.channel.awaitTermination(stopAt - Instant.now().getEpochSecond(), TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
+                    lock.release();
                     throw new RuntimeException(e);
                 }
             }
@@ -135,5 +153,7 @@ class Network {
         nodes.clear();
         networkNodes.clear();
         network.clear();
+
+        lock.release();
     }
 }

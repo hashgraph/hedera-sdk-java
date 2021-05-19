@@ -124,7 +124,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             long delay = (long) Math.min(250 * Math.pow(2, attempt - 1), 8000);
 
             if (shouldRetryExceptionally(error)) {
-                logger.error("caught error, retrying\nnode={}\nattempt={}\n{}",
+                logger.trace("caught error, retrying\nnode={}\nattempt={}\n{}",
                     node.accountId,
                     attempt,
                     error

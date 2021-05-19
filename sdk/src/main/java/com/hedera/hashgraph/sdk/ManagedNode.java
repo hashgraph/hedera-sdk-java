@@ -37,7 +37,7 @@ abstract class ManagedNode {
         return channel;
     }
 
-    void close(long seconds) throws InterruptedException {
+    synchronized void close(long seconds) throws InterruptedException {
         if (channel != null) {
             channel.shutdown();
             channel.awaitTermination(seconds, TimeUnit.SECONDS);

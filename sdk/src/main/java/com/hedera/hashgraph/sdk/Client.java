@@ -296,7 +296,13 @@ public final class Client implements AutoCloseable {
     }
 
     public Map<String, AccountId> getNetwork() {
-        return network.network;
+        var network = new Hashtable<String, AccountId>(this.network.network.size());
+
+        for (var entry : this.network.network.entrySet()) {
+            network.put(entry.getKey(), AccountId.fromProtobuf(entry.getValue().toProtobuf()));
+        }
+
+        return network;
     }
 
     public void ping(AccountId nodeAccountId) throws TimeoutException, PrecheckStatusException {
