@@ -119,7 +119,11 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     CompletableFuture<Void> onExecuteAsync(Client client) {
         if (nodeAccountIds.size() == 0) {
             // Get a list of node AccountId's if the user has not set them manually.
-            nodeAccountIds = client.network.getNodeAccountIdsForExecute();
+            try {
+                nodeAccountIds = client.network.getNodeAccountIdsForExecute();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         if ((paymentTransactions != null) || !isPaymentRequired()) {

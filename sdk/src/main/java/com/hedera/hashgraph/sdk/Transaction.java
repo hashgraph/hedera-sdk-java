@@ -767,7 +767,11 @@ public abstract class Transaction<T extends Transaction<T>>
                     "`client` must be provided or both `nodeId` and `transactionId` must be set");
             }
 
-            nodeAccountIds = client.network.getNodeAccountIdsForExecute();
+            try {
+                nodeAccountIds = client.network.getNodeAccountIdsForExecute();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         transactions = new ArrayList<>(nodeAccountIds.size());

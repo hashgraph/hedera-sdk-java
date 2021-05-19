@@ -1,23 +1,26 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.collect.HashBiMap;
+import org.bouncycastle.crypto.tls.TlsHandshakeHash;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 class Network {
-    Map<String, AccountId> network = new HashMap<>();
-    Map<AccountId, Node> networkNodes = new HashMap<>();
+    Hashtable<String, AccountId> network = new Hashtable<>();
+    Hashtable<AccountId, Node> networkNodes = new Hashtable<>();
+    
     List<Node> nodes = new ArrayList<>();
     final ExecutorService executor;
+
+    final Semaphore lock = new Semaphore(1);
 
     Network(ExecutorService executor, Map<String, AccountId> network) {
         this.executor = executor;
@@ -32,9 +35,11 @@ class Network {
     }
 
     void setNetwork(Map<String, AccountId> network) throws InterruptedException, TimeoutException {
+        lock.acquire();
+
         // Bypass the more complex code if the network is empty
         if (this.network.isEmpty()) {
-            this.network = new HashMap<>(network);
+            this.network = new Hashtable<>(network);
 
             for (var entry : network.entrySet()) {
                 var node = new Node(entry.getValue(), entry.getKey(), executor);
@@ -42,10 +47,11 @@ class Network {
                 this.nodes.add(node);
             }
 
+            lock.release();
             return;
         }
 
-        this.network = new HashMap<>(network);
+        this.network = new Hashtable<>(network);
         var inverted = HashBiMap.create(network).inverse();
         var newNodeAccountIds = network.values();
         var stopAt = Instant.now().getEpochSecond() + Duration.ofSeconds(30).getSeconds();
@@ -54,6 +60,7 @@ class Network {
         // address for the same AccountId
         for (int i = 0; i < nodes.size(); i++) {
             if (stopAt - Instant.now().getEpochSecond() == 0) {
+                lock.release();
                 throw new TimeoutException("Failed to properly shutdown all channels");
             }
 
@@ -77,6 +84,8 @@ class Network {
                 networkNodes.put(entry.getKey(), node);
             }
         }
+
+        lock.release();
     }
 
 
@@ -86,7 +95,9 @@ class Network {
      *
      * @return {@link java.util.List<com.hedera.hashgraph.sdk.AccountId>}
      */
-    List<AccountId> getNodeAccountIdsForExecute() {
+    List<AccountId> getNodeAccountIdsForExecute() throws InterruptedException {
+        lock.acquire();
+
         Collections.sort(nodes);
 
         List<AccountId> resultNodeAccountIds = new ArrayList<>();
@@ -94,6 +105,8 @@ class Network {
         for (int i = 0; i < getNumberOfNodesForTransaction(); i++) {
             resultNodeAccountIds.add(nodes.get(i).accountId);
         }
+
+        lock.release();
 
         return resultNodeAccountIds;
     }
@@ -107,6 +120,12 @@ class Network {
     }
 
     void close(Duration timeout) throws TimeoutException {
+        try {
+            lock.acquire();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
         var stopAt = Instant.now().getEpochSecond() + timeout.getSeconds();
 
         for (var node : nodes) {
@@ -117,6 +136,7 @@ class Network {
 
         for (var node : nodes) {
             if (stopAt - Instant.now().getEpochSecond() == 0) {
+                lock.release();
                 throw new TimeoutException("Failed to properly shutdown all channels");
             }
 
@@ -124,6 +144,7 @@ class Network {
                 try {
                     node.channel.awaitTermination(stopAt - Instant.now().getEpochSecond(), TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
+                    lock.release();
                     throw new RuntimeException(e);
                 }
             }
@@ -132,5 +153,7 @@ class Network {
         nodes.clear();
         networkNodes.clear();
         network.clear();
+
+        lock.release();
     }
 }
