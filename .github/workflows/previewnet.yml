@@ -50,5 +50,5 @@ jobs:
         env:
           OPERATOR_KEY: ${{ secrets.PREVIEWNET_OPERATOR_KEY }}
           OPERATOR_ID: ${{ secrets.PREVIEWNET_OPERATOR_ID }}
-          HEDERA_NETWORK: "previewnet"
-        run: ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY integrationTest
+          HEDRERA_NETWORK: "previewnet"
+        run: ./gradlew -PHEDERA_NETWORK=$HEDERA_NETWORK -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY integrationTest
