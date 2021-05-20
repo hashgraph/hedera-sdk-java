@@ -1,4 +1,4 @@
-name: Java CI
+name: CI against Testnet
 
 on:
   push:
@@ -7,8 +7,6 @@ on:
   pull_request:
     branches:
       - master
-  schedule:
-    - cron: '0 0 * * *'
 
 jobs:
   build:
@@ -54,6 +52,6 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Run Integration Tests
         env:
-          OPERATOR_KEY: ${{ secrets.OPERATOR_KEY }}
-          OPERATOR_ID: ${{ secrets.OPERATOR_ID }}
+          OPERATOR_KEY: ${{ secrets.TESTNET_OPERATOR_KEY }}
+          OPERATOR_ID: ${{ secrets.TESTNET_OPERATOR_ID }}
         run: ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY integrationTest
