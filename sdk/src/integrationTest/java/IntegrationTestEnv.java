@@ -19,15 +19,14 @@ public class IntegrationTestEnv {
         } else if (System.getProperty("HEDERA_NETWORK").equals("localhost")) {
             var network = new Hashtable<String, AccountId>();
             network.put("127.0.0.1:50213", new AccountId(3));
-//            network.put("127.0.0.1:50214", new AccountId(4));
-//            network.put("127.0.0.1:50215", new AccountId(5));
+            network.put("127.0.0.1:50214", new AccountId(4));
+            network.put("127.0.0.1:50215", new AccountId(5));
 
             client = Client.forNetwork(network);
         } else {
             try {
                 client = Client.fromConfigFile(System.getProperty("CONFIG_FILE"));
             } catch (Exception e) {
-                System.out.println(e.getMessage());
                 client = Client.forTestnet();
             }
         }

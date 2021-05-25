@@ -31,6 +31,7 @@ public class TopicInfoIntegrationTest {
             assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
 
             new TopicDeleteTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -66,6 +67,7 @@ public class TopicInfoIntegrationTest {
             assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
 
             new TopicDeleteTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -102,6 +104,7 @@ public class TopicInfoIntegrationTest {
             assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
 
             new TopicDeleteTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -140,6 +143,7 @@ public class TopicInfoIntegrationTest {
             assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for TopicInfoQuery, of "+cost.toString()+", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
 
             new TopicDeleteTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -177,6 +181,7 @@ public class TopicInfoIntegrationTest {
             assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
 
             new TopicDeleteTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
