@@ -93,14 +93,10 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         var node = client.network.networkNodes.get(getNodeAccountId());
         node.inUse();
 
-        logger.trace("sending request \nnode={}\nattempt={}\n{}", node.accountId, attempt, this);
+        logger.trace("Sending request #{} to node {}: {}", attempt, node.accountId, this);
 
         if (!node.isHealthy()) {
-            logger.error("using unhealthy node={}\ndelaying until {}ms\nattempt={}\n",
-                node.accountId,
-                node.delayUntil,
-                attempt
-            );
+            logger.warn("Using unhealthy node {}. Delaying attempt #{} for {} ms", node.accountId, attempt, node.delayUntil);
 
             return Delayer.delayFor(node.delay(), client.executor)
                 .thenCompose((v) -> executeAsync(client, attempt + 1, lastException));
@@ -124,12 +120,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             long delay = (long) Math.min(250 * Math.pow(2, attempt - 1), 8000);
 
             if (shouldRetryExceptionally(error)) {
-                logger.trace("caught error, retrying\nnode={}\nattempt={}\n{}",
-                    node.accountId,
-                    attempt,
-                    error
-                );
-
+                logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
+                    node.accountId, delay, attempt, error.getMessage());
                 node.increaseDelay();
 
                 // the transaction had a network failure reaching Hedera
@@ -145,18 +137,15 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
             var responseStatus = mapResponseStatus(response);
 
-            logger.trace("received response in {}s\nnode={}\nattempt={}\nstatus={}\n{}",
-                latency,
-                node.accountId,
-                attempt,
-                responseStatus,
-                response
-            );
+            logger.trace("Received {} response in {} s from node {} during attempt #{}: {}",
+                responseStatus, latency, node.accountId, attempt, response);
 
             switch (shouldRetry(responseStatus, response)) {
                 case Retry:
                     // the response has been identified as failing or otherwise
                     // needing a retry let's do this again after a delay
+                    logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
+                        node.accountId, delay, attempt, error.getMessage());
                     return Delayer.delayFor(delay, client.executor)
                         .thenCompose(
                             (v) -> executeAsync(
