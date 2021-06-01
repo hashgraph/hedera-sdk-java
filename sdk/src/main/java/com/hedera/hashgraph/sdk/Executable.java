@@ -145,7 +145,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                     // the response has been identified as failing or otherwise
                     // needing a retry let's do this again after a delay
                     logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
-                        node.accountId, delay, attempt, error.getMessage());
+                        node.accountId, delay, attempt, responseStatus);
                     return Delayer.delayFor(delay, client.executor)
                         .thenCompose(
                             (v) -> executeAsync(
