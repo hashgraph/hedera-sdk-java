@@ -92,6 +92,7 @@ class TokenGrantKycIntegrationTest {
             });
 
             new AccountDeleteTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTransferAccountId(testEnv.operatorId)
                 .freezeWith(testEnv.client)

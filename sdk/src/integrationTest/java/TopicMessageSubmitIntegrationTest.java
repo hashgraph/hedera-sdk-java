@@ -109,6 +109,7 @@ public class TopicMessageSubmitIntegrationTest {
             assertEquals(info.adminKey, testEnv.operatorKey.getPublicKey());
 
             new TopicDeleteTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -136,6 +137,7 @@ public class TopicMessageSubmitIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TopicMessageSubmitTransaction()
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setMessage(Contents.BIG_CONTENTS)
                     .setMaxChunks(15)
                     .execute(testEnv.client)
@@ -143,6 +145,7 @@ public class TopicMessageSubmitIntegrationTest {
             });
 
             new TopicDeleteTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -172,12 +175,14 @@ public class TopicMessageSubmitIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TopicMessageSubmitTransaction()
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTopicId(topicId)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
             });
 
             new TopicDeleteTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);

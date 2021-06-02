@@ -21,6 +21,7 @@ class TokenInfoIntegrationTest {
             var key5 = PrivateKey.generate();
 
             var response = new TokenCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
@@ -74,6 +75,7 @@ class TokenInfoIntegrationTest {
             var testEnv = new IntegrationTestEnv();
 
             var response = new TokenCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
@@ -111,6 +113,7 @@ class TokenInfoIntegrationTest {
             var testEnv = new IntegrationTestEnv();
 
             var response = new TokenCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
@@ -137,6 +140,7 @@ class TokenInfoIntegrationTest {
             var testEnv = new IntegrationTestEnv();
 
             var response = new TokenCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
@@ -164,6 +168,7 @@ class TokenInfoIntegrationTest {
             var testEnv = new IntegrationTestEnv();
 
             var response = new TokenCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
