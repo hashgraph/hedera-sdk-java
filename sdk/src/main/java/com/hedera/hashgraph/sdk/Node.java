@@ -20,8 +20,8 @@ class Node extends ManagedNode implements Comparable<Node>{
     }
 
     void increaseDelay() {
-        this.delay = Math.min(this.delay * 2, 8000);
         this.delayUntil = System.currentTimeMillis() + this.delay;
+        this.delay = Math.min(this.delay * 2, 8000);
     }
 
     void decreaseDelay() {
