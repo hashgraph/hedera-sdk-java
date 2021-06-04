@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.proto.Timestamp;
 import io.grpc.CallOptions;
 import io.grpc.ClientCall;
 import io.grpc.Status;
@@ -10,12 +11,12 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.threeten.bp.Instant;
@@ -36,7 +37,7 @@ public final class TopicMessageQuery {
     private Runnable completionHandler = this::onComplete;
     private BiConsumer<Throwable, TopicMessage> errorHandler = this::onError;
     private int maxAttempts = 10;
-    private Duration maxBackoff = Duration.ofSeconds(10L);
+    private Duration maxBackoff = Duration.ofSeconds(8L);
     private Predicate<Throwable> retryHandler = this::shouldRetry;
 
     public TopicMessageQuery() {
@@ -44,21 +45,27 @@ public final class TopicMessageQuery {
     }
 
     public TopicMessageQuery setTopicId(TopicId topicId) {
+        Objects.requireNonNull(topicId, "topicId must not be null");
         builder.setTopicID(topicId.toProtobuf());
         return this;
     }
 
     public TopicMessageQuery setStartTime(Instant startTime) {
+        Objects.requireNonNull(startTime, "startTime must not be null");
         builder.setConsensusStartTime(InstantConverter.toProtobuf(startTime));
         return this;
     }
 
     public TopicMessageQuery setEndTime(Instant endTime) {
+        Objects.requireNonNull(endTime, "endTime must not be null");
         builder.setConsensusEndTime(InstantConverter.toProtobuf(endTime));
         return this;
     }
 
     public TopicMessageQuery setLimit(long limit) {
+        if (limit < 0) {
+            throw new IllegalArgumentException("limit must be positive");
+        }
         builder.setLimit(limit);
         return this;
     }
@@ -110,15 +117,15 @@ public final class TopicMessageQuery {
     /**
      * This method will retry the following scenarios:
      *
-     * NOT_FOUND: Can occur when a client creates a topic and attempts to subscribe to it immediately before it is
-     * creation shows up in the mirror node.
+     * NOT_FOUND: Can occur when a client creates a topic and attempts to subscribe to it immediately before it
+     * is available in the mirror node.
      *
      * UNAVAILABLE: Can occur when the mirror node's database or other downstream components are temporarily down.
      *
-     * RESOURCE_EXHAUSTED: Can occur when the mirror node's resources are temporarily exhausted.
+     * RESOURCE_EXHAUSTED: Can occur when the mirror node's resources (database, threads, etc.) are temporarily exhausted.
      *
-     * INTERNAL: With details that indicate the stream was reset. Stream resets can sometimes occur when a proxy or
-     * load balancer disconnected the client.
+     * INTERNAL: With a gRPC error status description that indicates the stream was reset. Stream resets can sometimes
+     * occur when a proxy or load balancer disconnects the client.
      *
      * @param throwable the potentially retryable exception
      * @return if the request should be retried or not
@@ -141,17 +148,17 @@ public final class TopicMessageQuery {
     // TODO: Refactor into a base class when we add more mirror query types
     public SubscriptionHandle subscribe(Client client, Consumer<TopicMessage> onNext) {
         SubscriptionHandle subscriptionHandle = new SubscriptionHandle();
-        makeStreamingCall(client, subscriptionHandle, builder.build(), onNext, 0, new AtomicReference<>());
+        makeStreamingCall(client, subscriptionHandle, onNext, 0, new AtomicLong(), new AtomicReference<>());
         return subscriptionHandle;
     }
 
     private void makeStreamingCall(
             Client client,
             SubscriptionHandle subscriptionHandle,
-            ConsensusTopicQuery query,
             Consumer<TopicMessage> onNext,
             int attempt,
-            AtomicReference<Instant> startTime
+            AtomicLong counter,
+            AtomicReference<ConsensusTopicResponse> lastMessage
     ) {
         ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call =
                 client.mirrorNetwork.getNextMirrorNode().getChannel()
@@ -161,14 +168,31 @@ public final class TopicMessageQuery {
             call.cancel("unsubscribe", null);
         });
 
+        ConsensusTopicQuery.Builder newBuilder = builder;
+
+        // Update the start time and limit on retry
+        if (lastMessage.get() != null) {
+            newBuilder = builder.clone();
+
+            if (builder.getLimit() > 0) {
+                newBuilder.setLimit(builder.getLimit() - counter.get());
+            }
+
+            var lastStartTime = lastMessage.get().getConsensusTimestamp();
+            var nextStartTime = Timestamp.newBuilder(lastStartTime).setNanos(lastStartTime.getNanos() + 1);
+            newBuilder.setConsensusStartTime(nextStartTime);
+        }
+
         HashMap<TransactionID, ArrayList<ConsensusTopicResponse>> pendingMessages = new HashMap<>();
-        ClientCalls.asyncServerStreamingCall(call, query, new StreamObserver<>() {
+        ClientCalls.asyncServerStreamingCall(call, newBuilder.build(), new StreamObserver<>() {
             @Override
             public void onNext(ConsensusTopicResponse consensusTopicResponse) {
-                if (!consensusTopicResponse.hasChunkInfo()) {
-                    // short circuit for no chunks
+                counter.incrementAndGet();
+                lastMessage.set(consensusTopicResponse);
+
+                // Short circuit for no chunks or 1/1 chunks
+                if (!consensusTopicResponse.hasChunkInfo() || consensusTopicResponse.getChunkInfo().getTotal() == 1) {
                     var message = TopicMessage.ofSingle(consensusTopicResponse);
-                    startTime.set(message.consensusTimestamp);
                     onNext.accept(message);
                     return;
                 }
@@ -190,7 +214,6 @@ public final class TopicMessageQuery {
                 // if we now have enough chunks, emit
                 if (chunks.size() == consensusTopicResponse.getChunkInfo().getTotal()) {
                     var message = TopicMessage.ofMany(chunks);
-                    startTime.set(message.consensusTimestamp);
                     onNext.accept(message);
                 }
             }
@@ -202,8 +225,8 @@ public final class TopicMessageQuery {
                     return;
                 }
 
-                long delay = Math.min(250 * (long) Math.pow(2, attempt), maxBackoff.toMillis());
-                TopicId topicId = TopicId.fromProtobuf(query.getTopicID());
+                long delay = Math.min(500 * (long) Math.pow(2, attempt), maxBackoff.toMillis());
+                TopicId topicId = TopicId.fromProtobuf(builder.getTopicID());
                 LOGGER.warn("Error subscribing to topic {} during attempt #{}. Waiting {} ms before next attempt: {}",
                         topicId, attempt, delay, t.getMessage());
                 call.cancel("unsubscribed", null);
@@ -215,8 +238,7 @@ public final class TopicMessageQuery {
                     Thread.currentThread().interrupt();
                 }
 
-                startTime.getAndUpdate(s -> s != null ? s.plusNanos(1) : null);
-                makeStreamingCall(client, subscriptionHandle, query, onNext, attempt + 1, startTime);
+                makeStreamingCall(client, subscriptionHandle, onNext, attempt + 1, counter, lastMessage);
             }
 
             @Override
