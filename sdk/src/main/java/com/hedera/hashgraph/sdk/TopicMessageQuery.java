@@ -63,9 +63,6 @@ public final class TopicMessageQuery {
     }
 
     public TopicMessageQuery setLimit(long limit) {
-        if (limit < 0) {
-            throw new IllegalArgumentException("limit must be positive");
-        }
         builder.setLimit(limit);
         return this;
     }
@@ -105,12 +102,12 @@ public final class TopicMessageQuery {
     }
 
     private void onComplete() {
-        TopicId topicId = TopicId.fromProtobuf(builder.getTopicID());
+        var topicId = TopicId.fromProtobuf(builder.getTopicID());
         LOGGER.info("Subscription to topic {} complete", topicId);
     }
 
     private void onError(Throwable throwable, TopicMessage topicMessage) {
-        TopicId topicId = TopicId.fromProtobuf(builder.getTopicID());
+        var topicId = TopicId.fromProtobuf(builder.getTopicID());
         LOGGER.error("Error attempting to subscribe to topic {}:", topicId, throwable);
     }
 
@@ -132,9 +129,9 @@ public final class TopicMessageQuery {
      */
     private boolean shouldRetry(Throwable throwable) {
         if (throwable instanceof StatusRuntimeException) {
-            StatusRuntimeException statusRuntimeException = (StatusRuntimeException) throwable;
-            Status.Code code = statusRuntimeException.getStatus().getCode();
-            String description = statusRuntimeException.getStatus().getDescription();
+            var statusRuntimeException = (StatusRuntimeException) throwable;
+            var code = statusRuntimeException.getStatus().getCode();
+            var description = statusRuntimeException.getStatus().getDescription();
 
             return code == Status.Code.NOT_FOUND ||
                     code == Status.Code.UNAVAILABLE ||
@@ -168,7 +165,7 @@ public final class TopicMessageQuery {
             call.cancel("unsubscribe", null);
         });
 
-        ConsensusTopicQuery.Builder newBuilder = builder;
+        var newBuilder = builder;
 
         // Update the start time and limit on retry
         if (lastMessage.get() != null) {
@@ -225,8 +222,8 @@ public final class TopicMessageQuery {
                     return;
                 }
 
-                long delay = Math.min(500 * (long) Math.pow(2, attempt), maxBackoff.toMillis());
-                TopicId topicId = TopicId.fromProtobuf(builder.getTopicID());
+                var delay = Math.min(500 * (long) Math.pow(2, attempt), maxBackoff.toMillis());
+                var topicId = TopicId.fromProtobuf(builder.getTopicID());
                 LOGGER.warn("Error subscribing to topic {} during attempt #{}. Waiting {} ms before next attempt: {}",
                         topicId, attempt, delay, t.getMessage());
                 call.cancel("unsubscribed", null);
