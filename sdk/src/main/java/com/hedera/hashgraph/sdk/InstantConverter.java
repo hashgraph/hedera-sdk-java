@@ -21,6 +21,7 @@ final class InstantConverter {
                 .setNanos(instant.getNano())
                 .build();
     }
+    
     static TimestampSeconds toSecondsProtobuf(Instant instant) {
         return TimestampSeconds.newBuilder()
             .setSeconds(instant.getEpochSecond())

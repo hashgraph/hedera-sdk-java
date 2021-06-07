@@ -2,11 +2,10 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CurrentAndNextFeeSchedule;
-
 import javax.annotation.Nullable;
+import com.google.common.base.MoreObjects;
 
 public class FeeSchedules {
-    
     @Nullable
     private FeeSchedule current, next;
 
@@ -14,55 +13,52 @@ public class FeeSchedules {
         current = next = null;
     }
 
-    boolean hasCurrent() {
-        return current != null;
-    }
-    boolean hasNext() {
-        return next != null;
-    }
-    @Nullable
-    FeeSchedule getCurrent() {
-        assert hasCurrent();
-        return current;
-    }
-    @Nullable
-    FeeSchedule getNext() {
-        assert hasNext();
-        return next;
-    }
-    FeeSchedules setCurrent(@Nullable FeeSchedule current) {
-        this.current = current;
-        return this;
-    }
-    FeeSchedules setNext(@Nullable FeeSchedule next) {
-        this.next = next;
-        return this;
-    }
-
-
     static FeeSchedules fromProtobuf(CurrentAndNextFeeSchedule feeSchedules) {
         return new FeeSchedules()
             .setCurrent(feeSchedules.hasCurrentFeeSchedule() ? FeeSchedule.fromProtobuf(feeSchedules.getCurrentFeeSchedule()) : null)
             .setNext(feeSchedules.hasNextFeeSchedule() ? FeeSchedule.fromProtobuf(feeSchedules.getNextFeeSchedule()) : null);
     }
+
     public static FeeSchedules fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(CurrentAndNextFeeSchedule.parseFrom(bytes).toBuilder().build());
     }
 
-
-
-    CurrentAndNextFeeSchedule toProtobuf()
-    {
-        var builder = CurrentAndNextFeeSchedule.newBuilder();
-        if(hasCurrent()) {
-            builder.setCurrentFeeSchedule(getCurrent().toProtobuf());
-        }
-        if(hasNext()) {
-            builder.setNextFeeSchedule(getNext().toProtobuf());
-        }
-        return builder.build();
+    @Nullable
+    public FeeSchedule getCurrent() {
+        return current;
     }
+
+    public FeeSchedules setCurrent(@Nullable FeeSchedule current) {
+        this.current = current;
+        return this;
+    }
+
+    @Nullable
+    public FeeSchedule getNext() {
+        return next;
+    }
+    
+    public FeeSchedules setNext(@Nullable FeeSchedule next) {
+        this.next = next;
+        return this;
+    }
+
+    CurrentAndNextFeeSchedule toProtobuf() {
+        return CurrentAndNextFeeSchedule.newBuilder()
+            .setCurrentFeeSchedule(current != null ? current.toProtobuf() : null)
+            .setNextFeeSchedule(next != null ? next.toProtobuf() : null)
+            .build();
+    }
+
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("current", getCurrent())
+            .add("next", getNext())
+            .toString();
     }
 }
