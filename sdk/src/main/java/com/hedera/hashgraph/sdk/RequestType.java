@@ -306,126 +306,127 @@ public enum RequestType {
     }
 
     static RequestType valueOf(HederaFunctionality code) {
-        if(code == HederaFunctionality.NONE) {
-            return NONE;
-        } else if(code == HederaFunctionality.CryptoTransfer) {
-            return CRYPTO_TRANSFER;
-        } else if(code == HederaFunctionality.CryptoUpdate) {
-            return CRYPTO_UPDATE;
-        } else if(code == HederaFunctionality.CryptoDelete) {
-            return CRYPTO_DELETE;
-        } else if(code == HederaFunctionality.CryptoAddLiveHash) {
-            return CRYPTO_ADD_LIVE_HASH;
-        } else if(code == HederaFunctionality.CryptoDeleteLiveHash) {
-            return CRYPTO_DELETE_LIVE_HASH;
-        } else if(code == HederaFunctionality.ContractCall) {
-            return CONTRACT_CALL;
-        } else if(code == HederaFunctionality.ContractCreate) {
-            return CONTRACT_CREATE;
-        } else if(code == HederaFunctionality.ContractUpdate) {
-            return CONTRACT_UPDATE;
-        } else if(code == HederaFunctionality.FileCreate) {
-            return FILE_CREATE;
-        } else if(code == HederaFunctionality.FileAppend) {
-            return FILE_APPEND;
-        } else if(code == HederaFunctionality.FileUpdate) {
-            return FILE_UPDATE;
-        } else if(code == HederaFunctionality.FileDelete) {
-            return FILE_DELETE;
-        } else if(code == HederaFunctionality.CryptoGetAccountBalance) {
-            return CRYPTO_GET_ACCOUNT_BALANCE;
-        } else if(code == HederaFunctionality.CryptoGetAccountRecords) {
-            return CRYPTO_GET_ACCOUNT_RECORDS;
-        } else if(code == HederaFunctionality.CryptoGetInfo) {
-            return CRYPTO_GET_INFO;
-        } else if(code == HederaFunctionality.ContractCallLocal) {
-            return CONTRACT_CALL_LOCAL;
-        } else if(code == HederaFunctionality.ContractGetInfo) {
-            return CONTRACT_GET_INFO;
-        } else if(code == HederaFunctionality.ContractGetBytecode) {
-            return CONTRACT_GET_BYTECODE;
-        } else if(code == HederaFunctionality.GetBySolidityID) {
-            return GET_BY_SOLIDITY_ID;
-        } else if(code == HederaFunctionality.GetByKey) {
-            return GET_BY_KEY;
-        } else if(code == HederaFunctionality.CryptoGetLiveHash) {
-            return CRYPTO_GET_LIVE_HASH;
-        } else if(code == HederaFunctionality.CryptoGetStakers) {
-            return CRYPTO_GET_STAKERS;
-        } else if(code == HederaFunctionality.FileGetContents) {
-            return FILE_GET_CONTENTS;
-        } else if(code == HederaFunctionality.FileGetInfo) {
-            return FILE_GET_INFO;
-        } else if(code == HederaFunctionality.TransactionGetRecord) {
-            return TRANSACTION_GET_RECORD;
-        } else if(code == HederaFunctionality.ContractGetRecords) {
-            return CONTRACT_GET_RECORDS;
-        } else if(code == HederaFunctionality.CryptoCreate) {
-            return CRYPTO_CREATE;
-        } else if(code == HederaFunctionality.SystemDelete) {
-            return SYSTEM_DELETE;
-        } else if(code == HederaFunctionality.SystemUndelete) {
-            return SYSTEM_UNDELETE;
-        } else if(code == HederaFunctionality.ContractDelete) {
-            return CONTRACT_DELETE;
-        } else if(code == HederaFunctionality.Freeze) {
-            return FREEZE;
-        } else if(code == HederaFunctionality.CreateTransactionRecord) {
-            return CREATE_TRANSACTION_RECORD;
-        } else if(code == HederaFunctionality.CryptoAccountAutoRenew) {
-            return CRYPTO_ACCOUNT_AUTO_RENEW;
-        } else if(code == HederaFunctionality.ContractAutoRenew) {
-            return CONTRACT_AUTO_RENEW;
-        } else if(code == HederaFunctionality.GetVersionInfo) {
-            return GET_VERSION_INFO;
-        } else if(code == HederaFunctionality.TransactionGetReceipt) {
-            return TRANSACTION_GET_RECEIPT;
-        } else if(code == HederaFunctionality.ConsensusCreateTopic) {
-            return CONSENSUS_CREATE_TOPIC;
-        } else if(code == HederaFunctionality.ConsensusUpdateTopic) {
-            return CONSENSUS_UPDATE_TOPIC;
-        } else if(code == HederaFunctionality.ConsensusDeleteTopic) {
-            return CONSENSUS_DELETE_TOPIC;
-        } else if(code == HederaFunctionality.ConsensusGetTopicInfo) {
-            return CONSENSUS_GET_TOPIC_INFO;
-        } else if(code == HederaFunctionality.ConsensusSubmitMessage) {
-            return CONSENSUS_SUBMIT_MESSAGE;
-        } else if(code == HederaFunctionality.TokenCreate) {
-            return TOKEN_CREATE;
-        } else if(code == HederaFunctionality.TokenGetInfo) {
-            return TOKEN_GET_INFO;
-        } else if(code == HederaFunctionality.TokenFreezeAccount) {
-            return TOKEN_FREEZE_ACCOUNT;
-        } else if(code == HederaFunctionality.TokenUnfreezeAccount) {
-            return TOKEN_UNFREEZE_ACCOUNT;
-        } else if(code == HederaFunctionality.TokenGrantKycToAccount) {
-            return TOKEN_GRANT_KYC_TO_ACCOUNT;
-        } else if(code == HederaFunctionality.TokenRevokeKycFromAccount) {
-            return TOKEN_REVOKE_KYC_FROM_ACCOUNT;
-        } else if(code == HederaFunctionality.TokenDelete) {
-            return TOKEN_DELETE;
-        } else if(code == HederaFunctionality.TokenUpdate) {
-            return TOKEN_UPDATE;
-        } else if(code == HederaFunctionality.TokenMint) {
-            return TOKEN_MINT;
-        } else if(code == HederaFunctionality.TokenBurn) {
-            return TOKEN_BURN;
-        } else if(code == HederaFunctionality.TokenAccountWipe) {
-            return TOKEN_ACCOUNT_WIPE;
-        } else if(code == HederaFunctionality.TokenAssociateToAccount) {
-            return TOKEN_ASSOCIATE_TO_ACCOUNT;
-        } else if(code == HederaFunctionality.TokenDissociateFromAccount) {
-            return TOKEN_DISSOCIATE_FROM_ACCOUNT;
-        } else if(code == HederaFunctionality.ScheduleCreate) {
-            return SCHEDULE_CREATE;
-        } else if(code == HederaFunctionality.ScheduleDelete) {
-            return SCHEDULE_DELETE;
-        } else if(code == HederaFunctionality.ScheduleSign) {
-            return SCHEDULE_SIGN;
-        } else if(code == HederaFunctionality.ScheduleGetInfo) {
-            return SCHEDULE_GET_INFO;
-        } else {
-            return NONE;
+        switch (code) {
+            case NONE:
+                return NONE;
+            case CryptoTransfer:
+                return CRYPTO_TRANSFER;
+            case CryptoUpdate:
+                return CRYPTO_UPDATE;
+            case CryptoDelete:
+                return CRYPTO_DELETE;
+            case CryptoAddLiveHash:
+                return CRYPTO_ADD_LIVE_HASH;
+            case CryptoDeleteLiveHash:
+                return CRYPTO_DELETE_LIVE_HASH;
+            case ContractCall:
+                return CONTRACT_CALL;
+            case ContractCreate:
+                return CONTRACT_CREATE;
+            case ContractUpdate:
+                return CONTRACT_UPDATE;
+            case FileCreate:
+                return FILE_CREATE;
+            case FileAppend:
+                return FILE_APPEND;
+            case FileUpdate:
+                return FILE_UPDATE;
+            case FileDelete:
+                return FILE_DELETE;
+            case CryptoGetAccountBalance:
+                return CRYPTO_GET_ACCOUNT_BALANCE;
+            case CryptoGetAccountRecords:
+                return CRYPTO_GET_ACCOUNT_RECORDS;
+            case CryptoGetInfo:
+                return CRYPTO_GET_INFO;
+            case ContractCallLocal:
+                return CONTRACT_CALL_LOCAL;
+            case ContractGetInfo:
+                return CONTRACT_GET_INFO;
+            case ContractGetBytecode:
+                return CONTRACT_GET_BYTECODE;
+            case GetBySolidityID:
+                return GET_BY_SOLIDITY_ID;
+            case GetByKey:
+                return GET_BY_KEY;
+            case CryptoGetLiveHash:
+                return CRYPTO_GET_LIVE_HASH;
+            case CryptoGetStakers:
+                return CRYPTO_GET_STAKERS;
+            case FileGetContents:
+                return FILE_GET_CONTENTS;
+            case FileGetInfo:
+                return FILE_GET_INFO;
+            case TransactionGetRecord:
+                return TRANSACTION_GET_RECORD;
+            case ContractGetRecords:
+                return CONTRACT_GET_RECORDS;
+            case CryptoCreate:
+                return CRYPTO_CREATE;
+            case SystemDelete:
+                return SYSTEM_DELETE;
+            case SystemUndelete:
+                return SYSTEM_UNDELETE;
+            case ContractDelete:
+                return CONTRACT_DELETE;
+            case Freeze:
+                return FREEZE;
+            case CreateTransactionRecord:
+                return CREATE_TRANSACTION_RECORD;
+            case CryptoAccountAutoRenew:
+                return CRYPTO_ACCOUNT_AUTO_RENEW;
+            case ContractAutoRenew:
+                return CONTRACT_AUTO_RENEW;
+            case GetVersionInfo:
+                return GET_VERSION_INFO;
+            case TransactionGetReceipt:
+                return TRANSACTION_GET_RECEIPT;
+            case ConsensusCreateTopic:
+                return CONSENSUS_CREATE_TOPIC;
+            case ConsensusUpdateTopic:
+                return CONSENSUS_UPDATE_TOPIC;
+            case ConsensusDeleteTopic:
+                return CONSENSUS_DELETE_TOPIC;
+            case ConsensusGetTopicInfo:
+                return CONSENSUS_GET_TOPIC_INFO;
+            case ConsensusSubmitMessage:
+                return CONSENSUS_SUBMIT_MESSAGE;
+            case TokenCreate:
+                return TOKEN_CREATE;
+            case TokenGetInfo:
+                return TOKEN_GET_INFO;
+            case TokenFreezeAccount:
+                return TOKEN_FREEZE_ACCOUNT;
+            case TokenUnfreezeAccount:
+                return TOKEN_UNFREEZE_ACCOUNT;
+            case TokenGrantKycToAccount:
+                return TOKEN_GRANT_KYC_TO_ACCOUNT;
+            case TokenRevokeKycFromAccount:
+                return TOKEN_REVOKE_KYC_FROM_ACCOUNT;
+            case TokenDelete:
+                return TOKEN_DELETE;
+            case TokenUpdate:
+                return TOKEN_UPDATE;
+            case TokenMint:
+                return TOKEN_MINT;
+            case TokenBurn:
+                return TOKEN_BURN;
+            case TokenAccountWipe:
+                return TOKEN_ACCOUNT_WIPE;
+            case TokenAssociateToAccount:
+                return TOKEN_ASSOCIATE_TO_ACCOUNT;
+            case TokenDissociateFromAccount:
+                return TOKEN_DISSOCIATE_FROM_ACCOUNT;
+            case ScheduleCreate:
+                return SCHEDULE_CREATE;
+            case ScheduleDelete:
+                return SCHEDULE_DELETE;
+            case ScheduleSign:
+                return SCHEDULE_SIGN;
+            case ScheduleGetInfo:
+                return SCHEDULE_GET_INFO;
+            default:
+                throw new IllegalStateException("(BUG) unhandled HederaFunctionality " + code);
         }
     }
 
