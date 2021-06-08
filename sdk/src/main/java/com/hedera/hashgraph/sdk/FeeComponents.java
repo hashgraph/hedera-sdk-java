@@ -20,42 +20,34 @@ public class FeeComponents {
     * The price of bandwidth consumed by a transaction, measured in bytes
     */
     private long transactionBandwidthByte;
-    // private long bpt;
     /*
     * The price per signature verification for a transaction
     */
     private long transactionVerification;
-    // private long vpt;
     /*
     * The price of RAM consumed by a transaction, measured in byte-hours
     */
     private long transactionRamByteHour;
-    // private long rbh;
     /*
     * The price of storage consumed by a transaction, measured in byte-hours
     */
     private long transactionStorageByteHour;
-    // private long sbh;
     /*
     * The price of computation for a smart contract transaction, measured in gas
     */
     private long contractTransactionGas;
-    // private long gas;
     /*
     * The price per hbar transferred for a transfer
     */
     private long transferVolumeHbar;
-    // private long tv;
     /*
     * The price of bandwidth for data retrieved from memory for a response, measured in bytes
     */
     private long responseMemoryByte;
-    // private long bpr;
     /*
     * The price of bandwidth for data retrieved from disk for a response, measured in bytes
     */
     private long responseDiskByte;
-    // private long sbpr;
 
     public FeeComponents() {
     }
