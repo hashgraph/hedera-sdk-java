@@ -19,35 +19,43 @@ public class FeeComponents {
     /*
     * The price of bandwidth consumed by a transaction, measured in bytes
     */
-    private long bpt;
+    private long transactionBandwidthByte;
+    // private long bpt;
     /*
     * The price per signature verification for a transaction
     */
-    private long vpt;
+    private long transactionVerification;
+    // private long vpt;
     /*
     * The price of RAM consumed by a transaction, measured in byte-hours
     */
-    private long rbh;
+    private long transactionRamByteHour;
+    // private long rbh;
     /*
     * The price of storage consumed by a transaction, measured in byte-hours
     */
-    private long sbh;
+    private long transactionStorageByteHour;
+    // private long sbh;
     /*
     * The price of computation for a smart contract transaction, measured in gas
     */
-    private long gas;
+    private long contractTransactionGas;
+    // private long gas;
     /*
     * The price per hbar transferred for a transfer
     */
-    private long tv;
+    private long transferVolumeHbar;
+    // private long tv;
     /*
     * The price of bandwidth for data retrieved from memory for a response, measured in bytes
     */
-    private long bpr;
+    private long responseMemoryByte;
+    // private long bpr;
     /*
     * The price of bandwidth for data retrieved from disk for a response, measured in bytes
     */
-    private long sbpr;
+    private long responseDiskByte;
+    // private long sbpr;
 
     public FeeComponents() {
     }
@@ -57,14 +65,14 @@ public class FeeComponents {
             .setMin(feeComponents.getMin())
             .setMax(feeComponents.getMax())
             .setConstant(feeComponents.getConstant())
-            .setBpt(feeComponents.getBpt())
-            .setVpt(feeComponents.getVpt())
-            .setRbh(feeComponents.getRbh())
-            .setSbh(feeComponents.getSbh())
-            .setGas(feeComponents.getGas())
-            .setTv(feeComponents.getTv())
-            .setBpr(feeComponents.getBpr())
-            .setSbpr(feeComponents.getSbpr());
+            .setTransactionBandwidthByte(feeComponents.getBpt())
+            .setTransactionVerification(feeComponents.getVpt())
+            .setTransactionRamByteHour(feeComponents.getRbh())
+            .setTransactionStorageByteHour(feeComponents.getSbh())
+            .setContractTransactionGas(feeComponents.getGas())
+            .setTransferVolumeHbar(feeComponents.getTv())
+            .setResponseMemoryByte(feeComponents.getBpr())
+            .setResponseDiskByte(feeComponents.getSbpr());
     }
 
     public static FeeComponents fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -98,75 +106,75 @@ public class FeeComponents {
         return this;
     }
 
-    public long getBpt() {
-        return bpt;
+    public long getTransactionBandwidthByte() {
+        return transactionBandwidthByte;
     }
 
-    public FeeComponents setBpt(long bpt) {
-        this.bpt = bpt;
+    public FeeComponents setTransactionBandwidthByte(long transactionBandwidthByte) {
+        this.transactionBandwidthByte = transactionBandwidthByte;
         return this;
     }
 
-    public long getVpt() {
-        return vpt;
+    public long getTransactionVerification() {
+        return transactionVerification;
     }
 
-    public FeeComponents setVpt(long vpt) {
-        this.vpt = vpt;
+    public FeeComponents setTransactionVerification(long transactionVerification) {
+        this.transactionVerification = transactionVerification;
         return this;
     }
 
-    public long getRbh() {
-        return rbh;
+    public long getTransactionRamByteHour() {
+        return transactionRamByteHour;
     }
 
-    public FeeComponents setRbh(long rbh) {
-        this.rbh = rbh;
+    public FeeComponents setTransactionRamByteHour(long transactionRamByteHour) {
+        this.transactionRamByteHour = transactionRamByteHour;
         return this;
     }
 
-    public long getSbh() {
-        return sbh;
+    public long getTransactionStorageByteHour() {
+        return transactionStorageByteHour;
     }
 
-    public FeeComponents setSbh(long sbh) {
-        this.sbh = sbh;
+    public FeeComponents setTransactionStorageByteHour(long transactionStorageByteHour) {
+        this.transactionStorageByteHour = transactionStorageByteHour;
         return this;
     }
 
-    public long getGas() {
-        return gas;
+    public long getContractTransactionGas() {
+        return contractTransactionGas;
     }
 
-    public FeeComponents setGas(long gas) {
-        this.gas = gas;
+    public FeeComponents setContractTransactionGas(long contractTransactionGas) {
+        this.contractTransactionGas = contractTransactionGas;
         return this;
     }
 
-    public long getTv() {
-        return tv;
+    public long getTransferVolumeHbar() {
+        return transferVolumeHbar;
     }
 
-    public FeeComponents setTv(long tv) {
-        this.tv = tv;
+    public FeeComponents setTransferVolumeHbar(long transferVolumeHbar) {
+        this.transferVolumeHbar = transferVolumeHbar;
         return this;
     }
 
-    public long getBpr() {
-        return bpr;
+    public long getResponseMemoryByte() {
+        return responseMemoryByte;
     }
 
-    public FeeComponents setBpr(long bpr) {
-        this.bpr = bpr;
+    public FeeComponents setResponseMemoryByte(long responseMemoryByte) {
+        this.responseMemoryByte = responseMemoryByte;
         return this;
     }
 
-    public long getSbpr() {
-        return sbpr;
+    public long getResponseDiskByte() {
+        return responseDiskByte;
     }
 
-    public FeeComponents setSbpr(long sbpr) {
-        this.sbpr = sbpr;
+    public FeeComponents setResponseDiskByte(long responseDiskByte) {
+        this.responseDiskByte = responseDiskByte;
         return this;
     }
 
@@ -176,14 +184,14 @@ public class FeeComponents {
             .setMin(getMin())
             .setMax(getMax())
             .setConstant(getConstant())
-            .setBpt(getBpt())
-            .setVpt(getVpt())
-            .setRbh(getRbh())
-            .setSbh(getSbh())
-            .setGas(getGas())
-            .setTv(getTv())
-            .setBpr(getBpr())
-            .setSbpr(getSbpr())
+            .setBpt(getTransactionBandwidthByte())
+            .setVpt(getTransactionVerification())
+            .setRbh(getTransactionRamByteHour())
+            .setSbh(getTransactionStorageByteHour())
+            .setGas(getContractTransactionGas())
+            .setTv(getTransferVolumeHbar())
+            .setBpr(getResponseMemoryByte())
+            .setSbpr(getResponseDiskByte())
             .build();
     }
 
@@ -193,14 +201,14 @@ public class FeeComponents {
             .add("min", getMin())
             .add("max", getMax())
             .add("constant", getConstant())
-            .add("bpt", getBpt())
-            .add("vpt", getVpt())
-            .add("rbh", getRbh())
-            .add("sbh", getSbh())
-            .add("gas", getGas())
-            .add("tv", getTv())
-            .add("bpr", getBpr())
-            .add("sbpr", getSbpr())
+            .add("transactionBandwidthByte", getTransactionBandwidthByte())
+            .add("transactionVerification", getTransactionVerification())
+            .add("transactionRamByteHour", getTransactionRamByteHour())
+            .add("transactionStorageByteHour", getTransactionStorageByteHour())
+            .add("contractTransactionGas", getContractTransactionGas())
+            .add("transferVolumeHbar", getTransferVolumeHbar())
+            .add("responseMemoryByte", getResponseMemoryByte())
+            .add("responseDiskByte", getResponseDiskByte())
             .toString();
     }
 
