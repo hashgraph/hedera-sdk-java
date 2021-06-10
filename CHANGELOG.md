@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- Support for parsing file `0.0.111` on HFS using `FeeSchedules`
+- Support for `maxBackoff`, `maxAttempts`, `retryHandler`, and `completionHandler` in `TopicMessageQuery`
+- Default logging behavior to `TopicMessageQuery` if an error handler or completion handler was not set
+
+### Fixed
+
+- `TopicMessageQuery` retry handling; this should retry on more gRPC errors
+- `TopicMessageQuery` max retry timeout; before this would could wait up to 4m with no feedback
+- Nodes default wait time incorrectly doubled to 500ms instead of 250ms
+- `Mnemonic.generate12()` using wrong word list
+- Updated `Client` to be thread-safe now; hopefully no more `ConcurrentModificaitonException` will arise
+- `Transaction.toString()` no longer requires transactions to be frozen
+
 ## v2.0.5
 
 ### Added
