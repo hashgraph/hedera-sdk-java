@@ -54,4 +54,11 @@ jobs:
         env:
           OPERATOR_KEY: ${{ secrets.TESTNET_OPERATOR_KEY }}
           OPERATOR_ID: ${{ secrets.TESTNET_OPERATOR_ID }}
-        run: ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY integrationTest
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: |
+          ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY jacocoTestReport && bash <(curl -s https://codecov.io/bash)
+      - uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+          verbose: true
