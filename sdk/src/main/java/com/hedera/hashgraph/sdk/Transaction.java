@@ -59,7 +59,7 @@ public abstract class Transaction<T extends Transaction<T>>
     // ]
     int nextTransactionIndex = 0;
 
-    private boolean persistentSigning = true;
+    private boolean signOnDemand = true;
     private List<PublicKey> publicKeys = new ArrayList<>();
     private List<Function<byte[], byte[]>> signers = new ArrayList<>();
 
@@ -603,8 +603,8 @@ public abstract class Transaction<T extends Transaction<T>>
         return (T) this;
     }
 
-    public final T setPersistentSigning(boolean persistentSigning) {
-        this.persistentSigning = persistentSigning;
+    public final T setSignOnDemand(boolean signOnDemand) {
+        this.signOnDemand = signOnDemand;
 
         // noinspection unchecked
         return (T) this;
@@ -626,7 +626,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
         transactions.clear();
 
-        if (persistentSigning) {
+        if (signOnDemand) {
             publicKeys.add(publicKey);
             signers.add(transactionSigner);
 
@@ -772,7 +772,7 @@ public abstract class Transaction<T extends Transaction<T>>
         }
 
         if (client != null) {
-            setPersistentSigning(client.getOperatorPersistent());
+            setSignOnDemand(client.getSignonDemand());
         }
 
         if (client != null && bodyBuilder.getTransactionFee() == 0) {
