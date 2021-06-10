@@ -3,21 +3,25 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.InvalidProtocolBufferException;
 import javax.annotation.Nullable;
 import com.google.common.base.MoreObjects;
+import java.util.List;
+import java.util.ArrayList;
 
 public class TransactionFeeSchedule {
     private RequestType requestType;
     @Nullable
-    private FeeData feeData;
+    private List<FeeData> fees = new ArrayList<>();
 
     public TransactionFeeSchedule() {
         requestType = RequestType.NONE;
-        feeData = null;
     }
 
     static TransactionFeeSchedule fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionFeeSchedule transactionFeeSchedule) {
-        return new TransactionFeeSchedule()
-            .setRequestType(RequestType.valueOf(transactionFeeSchedule.getHederaFunctionality()))
-            .setFeeData(transactionFeeSchedule.hasFeeData() ? FeeData.fromProtobuf(transactionFeeSchedule.getFeeData()) : null);
+        var returnTransactionFeeSchedule = new TransactionFeeSchedule()
+            .setRequestType(RequestType.valueOf(transactionFeeSchedule.getHederaFunctionality()));
+        if(transactionFeeSchedule.hasFeeData()) {
+            returnTransactionFeeSchedule.getFees().add(FeeData.fromProtobuf(transactionFeeSchedule.getFeeData()));
+        }
+        return returnTransactionFeeSchedule;
     }
 
     public static TransactionFeeSchedule fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -33,20 +37,14 @@ public class TransactionFeeSchedule {
         return this;
     }
 
-    @Nullable
-    public FeeData getFeeData() {
-        return feeData;
-    }
-    
-    public TransactionFeeSchedule setFeeData(@Nullable FeeData feeData) {
-        this.feeData = feeData;
-        return this;
+    List<FeeData> getFees() {
+        return fees;
     }
 
     com.hedera.hashgraph.sdk.proto.TransactionFeeSchedule toProtobuf() {
         return com.hedera.hashgraph.sdk.proto.TransactionFeeSchedule.newBuilder()
             .setHederaFunctionality(getRequestType().code)
-            .setFeeData(feeData != null ? feeData.toProtobuf() : null)
+            .setFeeData(fees.isEmpty() ? fees.get(0).toProtobuf() : null)
             .build();
     }
 
@@ -54,7 +52,7 @@ public class TransactionFeeSchedule {
     public String toString() {
         return MoreObjects.toStringHelper(this)
             .add("requestType", getRequestType())
-            .add("feeData", getFeeData())
+            .add("fees", getFees())
             .toString();
     }
 

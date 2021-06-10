@@ -19,9 +19,7 @@ public class FeeSchedule {
         FeeSchedule returnFeeSchedule = new FeeSchedule()
             .setExpirationTime(feeSchedule.hasExpiryTime() ? InstantConverter.fromProtobuf(feeSchedule.getExpiryTime()) : null);
         for(var transactionFeeSchedule : feeSchedule.getTransactionFeeScheduleList()) {
-            returnFeeSchedule
-                .getTransactionFeeSchedules()
-                .add(TransactionFeeSchedule.fromProtobuf(transactionFeeSchedule));
+            returnFeeSchedule.getTransactionFeeSchedules().add(TransactionFeeSchedule.fromProtobuf(transactionFeeSchedule));
         }
         return returnFeeSchedule;
     }
