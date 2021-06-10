@@ -42,6 +42,7 @@ public final class Client implements AutoCloseable {
 
     @Nullable
     private Operator operator;
+    private boolean operatorPersistent = true;
 
     Duration requestTimeout = Duration.ofMinutes(2);
 
@@ -362,6 +363,15 @@ public final class Client implements AutoCloseable {
 
         this.operator = new Operator(accountId, publicKey, transactionSigner);
         return this;
+    }
+
+    public synchronized Client setOperatorPersistent(boolean operatorPersistent) {
+        this.operatorPersistent = operatorPersistent;
+        return this;
+    }
+
+    public boolean getOperatorPersistent() {
+        return operatorPersistent;
     }
 
     /**

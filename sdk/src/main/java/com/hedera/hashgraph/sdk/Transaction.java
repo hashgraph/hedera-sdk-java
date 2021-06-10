@@ -47,7 +47,6 @@ public abstract class Transaction<T extends Transaction<T>>
     protected List<com.hedera.hashgraph.sdk.proto.SignedTransaction.Builder> signedTransactions = Collections.emptyList();
     protected List<SignatureMap.Builder> signatures = Collections.emptyList();
     protected List<TransactionId> transactionIds = Collections.emptyList();
-
     // For SDK Transactions that require multiple protobuf transaction ID's this variable keeps track of the current
     // execution group.
     // Example:
@@ -59,6 +58,10 @@ public abstract class Transaction<T extends Transaction<T>>
     //      { ID: 2, NodeAccountID: 4 }  // group = 1
     // ]
     int nextTransactionIndex = 0;
+
+    private boolean persistentSigning = true;
+    private List<PublicKey> publicKeys = new ArrayList<>();
+    private List<Function<byte[], byte[]>> signers = new ArrayList<>();
 
     Transaction() {
         bodyBuilder = TransactionBody.newBuilder();
@@ -84,7 +87,7 @@ public abstract class Transaction<T extends Transaction<T>>
         bodyBuilder.setTransactionFee(new Hbar(2).toTinybars());
     }
 
-    Transaction(com.hedera.hashgraph.sdk.proto.Transaction tx) throws InvalidProtocolBufferException  {
+    Transaction(com.hedera.hashgraph.sdk.proto.Transaction tx) throws InvalidProtocolBufferException {
         var transaction = SignedTransaction.parseFrom(tx.getSignedTransactionBytes());
         transactions.add(tx);
         signatures.add(transaction.getSigMap().toBuilder());
@@ -404,6 +407,16 @@ public abstract class Transaction<T extends Transaction<T>>
         }
     }
 
+    static byte[] hash(byte[] bytes) {
+        var digest = new SHA384Digest();
+        var hash = new byte[digest.getDigestSize()];
+
+        digest.update(bytes, 0, bytes.length);
+        digest.doFinal(hash, 0);
+
+        return hash;
+    }
+
     public ScheduleCreateTransaction schedule() {
         requireNotFrozen();
 
@@ -429,16 +442,6 @@ public abstract class Transaction<T extends Transaction<T>>
         }
 
         return scheduled;
-    }
-
-    static byte[] hash(byte[] bytes) {
-        var digest = new SHA384Digest();
-        var hash = new byte[digest.getDigestSize()];
-
-        digest.update(bytes, 0, bytes.length);
-        digest.doFinal(hash, 0);
-
-        return hash;
     }
 
     /**
@@ -530,7 +533,7 @@ public abstract class Transaction<T extends Transaction<T>>
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
-        buildTransactions(signedTransactions.size());
+        buildTransaction(-1);
 
         var list = TransactionList.newBuilder();
 
@@ -548,7 +551,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
         var index = nextTransactionIndex * nodeAccountIds.size() + nextNodeIndex;
 
-        buildTransactions(index + 1);
+        buildTransaction(index);
 
         return hash(transactions.get(index).getSignedTransactionBytes().toByteArray());
     }
@@ -558,7 +561,7 @@ public abstract class Transaction<T extends Transaction<T>>
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
-        buildTransactions(signedTransactions.size());
+        buildTransaction(-1);
 
         var hashes = new HashMap<AccountId, byte[]>();
 
@@ -600,6 +603,13 @@ public abstract class Transaction<T extends Transaction<T>>
         return (T) this;
     }
 
+    public final T setPersistentSigning(boolean persistentSigning) {
+        this.persistentSigning = persistentSigning;
+
+        // noinspection unchecked
+        return (T) this;
+    }
+
     public final T sign(PrivateKey privateKey) {
         return signWith(privateKey.getPublicKey(), privateKey::sign);
     }
@@ -609,7 +619,20 @@ public abstract class Transaction<T extends Transaction<T>>
             throw new IllegalStateException("Signing requires transaction to be frozen");
         }
 
+        if (keyAlreadySigned(publicKey)) {
+            // noinspection unchecked
+            return (T) this;
+        }
+
         transactions.clear();
+
+        if (persistentSigning) {
+            publicKeys.add(publicKey);
+            signers.add(transactionSigner);
+
+            // noinspection unchecked
+            return (T) this;
+        }
 
         for (var i = 0; i < signedTransactions.size(); ++i) {
             var bodyBytes = signedTransactions.get(i).getBodyBytes().toByteArray();
@@ -748,6 +771,10 @@ public abstract class Transaction<T extends Transaction<T>>
             return (T) this;
         }
 
+        if (client != null) {
+            setPersistentSigning(client.getOperatorPersistent());
+        }
+
         if (client != null && bodyBuilder.getTransactionFee() == 0) {
             bodyBuilder.setTransactionFee(client.maxTransactionFee.toTinybars());
         }
@@ -803,16 +830,62 @@ public abstract class Transaction<T extends Transaction<T>>
         return (T) this;
     }
 
-    void buildTransactions(int untilIndex) {
-        for (var i = transactions.size(); i < untilIndex; ++i) {
-            transactions.add(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
-                .setSignedTransactionBytes(
-                    signedTransactions.get(i)
-                        .setSigMap(signatures.get(i))
-                        .build()
-                        .toByteString()
-                ).build());
+    /**
+     * Will build the specific transaction at {@code index} and will fill with `null` for any empty indices before it
+     * @param index
+     */
+    void buildTransaction(int index) {
+        if (index < 0) {
+            for (var i = 0; i < signedTransactions.size(); ++i) {
+                signTransaction(i);
+
+                transactions.add(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
+                    .setSignedTransactionBytes(
+                        signedTransactions.get(i)
+                            .setSigMap(signatures.get(i))
+                            .build()
+                            .toByteString()
+                    ).build());
+            }
+
+            return;
         }
+
+        if (transactions.size() < index) {
+            for (var i = transactions.size(); i < index - 1; ++i) {
+                transactions.add(null);
+            }
+        }
+
+        signTransaction(index);
+
+        transactions.add(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
+            .setSignedTransactionBytes(
+                signedTransactions.get(index)
+                    .setSigMap(signatures.get(index))
+                    .build()
+                    .toByteString()
+            ).build());
+    }
+    /**
+     * Will sign the specific transaction at {@code index} and will fill with `null` for any empty indices before it
+     * @param index
+     */
+    void signTransaction(int index) {
+        if (signatures.get(index).getSigPairCount() != 0) {
+            return;
+        }
+
+        var bodyBytes = signedTransactions.get(index).getBodyBytes().toByteArray();
+
+        for (var i = 0; i < publicKeys.size(); i++) {
+            var signatureBytes = signers.get(i).apply(bodyBytes);
+
+            signatures
+                .get(index)
+                .addSigPair(publicKeys.get(i).toSignaturePairProtobuf(signatureBytes));
+        }
+
     }
 
     /**
@@ -831,7 +904,7 @@ public abstract class Transaction<T extends Transaction<T>>
     final com.hedera.hashgraph.sdk.proto.Transaction makeRequest() {
         var index = nextNodeIndex + (nextTransactionIndex * nodeAccountIds.size());
 
-        buildTransactions(index + 1);
+        buildTransaction(index);
 
         return transactions.get(index);
     }
