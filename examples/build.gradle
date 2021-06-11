@@ -4,7 +4,7 @@ dependencies {
 
 	implementation "com.google.code.gson:gson:2.8.6"
 	implementation "org.slf4j:slf4j-simple:2.0.0-alpha1"
-	implementation "io.grpc:grpc-netty-shaded:1.35.0"
+	implementation "io.grpc:grpc-netty-shaded:1.38.0"
 	implementation "io.github.cdimascio:java-dotenv:5.2.2"
 	implementation "com.google.errorprone:error_prone_core:2.5.0"
 }
