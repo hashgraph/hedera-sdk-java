@@ -106,7 +106,6 @@ public final class TransactionReceiptQuery
                 return ExecutionState.Retry;
 
             case SUCCESS:
-            case IDENTICAL_SCHEDULE_ALREADY_CREATED:
                 return ExecutionState.Finished;
 
             default:
