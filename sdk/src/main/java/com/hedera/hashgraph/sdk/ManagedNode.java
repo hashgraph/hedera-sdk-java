@@ -28,8 +28,15 @@ abstract class ManagedNode {
             return channel;
         }
 
-        channel = ManagedChannelBuilder.forTarget(address)
-            .usePlaintext()
+        var channelBuilder = ManagedChannelBuilder.forTarget(address);
+
+        if (address.endsWith(":50212") || address.endsWith(":443")) {
+            channelBuilder.useTransportSecurity();
+        } else {
+            channelBuilder.usePlaintext();
+        }
+
+        channel = channelBuilder
             .userAgent(getUserAgent())
             .executor(executor)
             .build();
