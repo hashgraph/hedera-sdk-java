@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.6
+
+### Added
+
+-   Add `FeeSchedule` type to allow a structured parse of file `0.0.111`
+
+-   Support for setting `maxBackoff`, `maxAttempts`, `retryHandler`, and `completionHandler` in `TopicMessageQuery`
+
+-   Default logging behavior to `TopicMessageQuery` if an error handler or completion handler was not set
+
+-   (Internal) CI is run significantly more often, and against previewnet and the master branch of hedera-services.
+
+-   Expose `tokenDecimals` from `AccountBalance`
+
+### Fixed
+
+-   `TopicMessageQuery` retry handling; this should retry on more gRPC errors
+
+-   `TopicMessageQuery` max retry timeout; before this would could wait up to 4m with no feedback
+
+-   `Client` should be more thread safe
+
 ## v2.0.5
 
 ### Added
