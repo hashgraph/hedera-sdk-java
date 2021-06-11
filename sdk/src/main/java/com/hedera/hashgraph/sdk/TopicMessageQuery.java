@@ -7,7 +7,7 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
-import java.time.Duration;
+import org.threeten.bp.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
