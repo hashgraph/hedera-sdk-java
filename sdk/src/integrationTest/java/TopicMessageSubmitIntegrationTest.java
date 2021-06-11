@@ -14,49 +14,49 @@ public class TopicMessageSubmitIntegrationTest {
     @DisplayName("Can submit a topic message")
     void canSubmitATopicMessage() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             var response = new TopicCreateTransaction()
-                .setAdminKey(operatorKey)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
-                .execute(client);
+                .execute(testEnv.client);
 
-            var topicId = Objects.requireNonNull(response.getReceipt(client).topicId);
+            var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
             @Var var info = new TopicInfoQuery()
                 .setTopicId(topicId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
             assertEquals(info.topicId, topicId);
             assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
             assertEquals(info.sequenceNumber, 0);
-            assertEquals(info.adminKey, operatorKey);
+            assertEquals(info.adminKey, testEnv.operatorKey.getPublicKey());
 
             new TopicMessageSubmitTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
                 .setMessage("Hello, from HCS!")
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
             info = new TopicInfoQuery()
                 .setTopicId(topicId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
             assertEquals(info.topicId, topicId);
             assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
             assertEquals(info.sequenceNumber, 1);
-            assertEquals(info.adminKey, operatorKey);
+            assertEquals(info.adminKey, testEnv.operatorKey.getPublicKey());
 
             new TopicDeleteTransaction()
                 .setTopicId(topicId)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -67,53 +67,54 @@ public class TopicMessageSubmitIntegrationTest {
         Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
 
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             var response = new TopicCreateTransaction()
-                .setAdminKey(operatorKey)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
-                .execute(client);
+                .execute(testEnv.client);
 
-            var topicId = Objects.requireNonNull(response.getReceipt(client).topicId);
+            var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
             @Var var info = new TopicInfoQuery()
                 .setTopicId(topicId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
             assertEquals(info.topicId, topicId);
             assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
             assertEquals(info.sequenceNumber, 0);
-            assertEquals(info.adminKey, operatorKey);
+            assertEquals(info.adminKey, testEnv.operatorKey.getPublicKey());
 
             var responses = new TopicMessageSubmitTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
                 .setMaxChunks(15)
                 .setMessage(Contents.BIG_CONTENTS)
-                .executeAll(client);
+                .executeAll(testEnv.client);
 
             for (var resp : responses) {
-                resp.getReceipt(client);
+                resp.getReceipt(testEnv.client);
             }
 
             info = new TopicInfoQuery()
                 .setTopicId(topicId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
             assertEquals(info.topicId, topicId);
             assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
             assertEquals(info.sequenceNumber, 14);
-            assertEquals(info.adminKey, operatorKey);
+            assertEquals(info.adminKey, testEnv.operatorKey.getPublicKey());
 
             new TopicDeleteTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -124,32 +125,34 @@ public class TopicMessageSubmitIntegrationTest {
         Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
 
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             var response = new TopicCreateTransaction()
-                .setAdminKey(operatorKey)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
-                .execute(client);
+                .execute(testEnv.client);
 
-            var topicId = Objects.requireNonNull(response.getReceipt(client).topicId);
+            var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TopicMessageSubmitTransaction()
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setMessage(Contents.BIG_CONTENTS)
                     .setMaxChunks(15)
-                    .execute(client)
-                    .getReceipt(client);
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
             });
 
             new TopicDeleteTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
             assertTrue(error.getMessage().contains(Status.INVALID_TOPIC_ID.toString()));
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -160,31 +163,33 @@ public class TopicMessageSubmitIntegrationTest {
         Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
 
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             var response = new TopicCreateTransaction()
-                .setAdminKey(operatorKey)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
-                .execute(client);
+                .execute(testEnv.client);
 
-            var topicId = Objects.requireNonNull(response.getReceipt(client).topicId);
+            var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TopicMessageSubmitTransaction()
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTopicId(topicId)
-                    .execute(client)
-                    .getReceipt(client);
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
             });
 
             new TopicDeleteTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
             assertTrue(error.getMessage().contains(Status.INVALID_TOPIC_MESSAGE.toString()));
 
-            client.close();
+            testEnv.client.close();
         });
     }
 }

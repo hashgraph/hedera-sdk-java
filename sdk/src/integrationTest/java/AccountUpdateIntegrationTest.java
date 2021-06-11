@@ -14,22 +14,22 @@ class AccountUpdateIntegrationTest {
     @DisplayName("Can update account with a new key")
     void canUpdateAccountWithNewKey() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
 
             var key1 = PrivateKey.generate();
             var key2 = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key1)
-                .execute(client);
+                .execute(testEnv.client);
 
-            var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
+            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
             @Var var info = new AccountInfoQuery()
                 .setAccountId(accountId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
             assertEquals(info.accountId, accountId);
             assertFalse(info.isDeleted);
@@ -41,17 +41,17 @@ class AccountUpdateIntegrationTest {
 
             new AccountUpdateTransaction()
                 .setAccountId(accountId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key2.getPublicKey())
-                .freezeWith(client)
+                .freezeWith(testEnv.client)
                 .sign(key1)
                 .sign(key2)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
             info = new AccountInfoQuery()
                 .setAccountId(accountId)
-                .execute(client);
+                .execute(testEnv.client);
 
             assertEquals(info.accountId, accountId);
             assertFalse(info.isDeleted);
@@ -63,14 +63,14 @@ class AccountUpdateIntegrationTest {
 
             new AccountDeleteTransaction()
                 .setAccountId(accountId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setTransferAccountId(testEnv.operatorId)
+                .freezeWith(testEnv.client)
                 .sign(key2)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -78,18 +78,18 @@ class AccountUpdateIntegrationTest {
     @DisplayName("Cannot update account when account ID is not set")
     void cannotUpdateAccountWhenAccountIdIsNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new AccountUpdateTransaction()
-                    .execute(client)
-                    .getReceipt(client);
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
             });
 
             assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
 
-            client.close();
+            testEnv.client.close();
         });
     }
 }

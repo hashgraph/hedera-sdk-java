@@ -15,40 +15,40 @@ class LiveHashDeleteIntegrationTest {
     @DisplayName("Cannot delete live hash because it's not supported")
     void cannotDeleteLiveHashBecauseItsNotSupported() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
-                .execute(client);
+                .execute(testEnv.client);
 
-            var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
+            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new LiveHashDeleteTransaction()
                     .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                     .setAccountId(accountId)
                     .setHash(HASH)
-                    .execute(client)
-                    .getReceipt(client);
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
             });
 
             new AccountDeleteTransaction()
                 .setAccountId(accountId)
                 .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
+                .setTransferAccountId(testEnv.operatorId)
+                .freezeWith(testEnv.client)
                 .sign(key)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
             assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
 
-            client.close();
+            testEnv.client.close();
         });
     }
 }

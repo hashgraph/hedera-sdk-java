@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.hedera.hashgraph"
-version = "2.0.5"
+version = "2.0.6"
 description = "Hedera™ Hashgraph SDK for Java"
 
 configurations {
@@ -17,11 +17,7 @@ configurations {
 
 dependencies {
 	// https://github.com/bsideup/jabel
-	annotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin') {
-		version {
-			branch = 'master'
-		}
-	}
+	annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:0.3.0'
 
 	// custom annotation processor to help generate methods around executables
 	annotationProcessor project(":executable-processor")
@@ -38,16 +34,16 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.slf4j/slf4j-api
 	implementation 'org.slf4j:slf4j-api:1.7.30'
 
-	implementation "io.grpc:grpc-api:1.35.0"
-	implementation "io.grpc:grpc-protobuf-lite:1.35.0"
-	implementation "io.grpc:grpc-stub:1.35.0"
+	implementation "io.grpc:grpc-api:1.38.0"
+	implementation "io.grpc:grpc-protobuf-lite:1.38.0"
+	implementation "io.grpc:grpc-stub:1.38.0"
 
 	testImplementation "org.junit.jupiter:junit-jupiter-engine:5.6.1"
 	testImplementation "org.junit.jupiter:junit-jupiter-params:5.6.1"
 
 	testRuntimeOnly "org.slf4j:slf4j-simple:1.7.30"
-	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.35.0"
-	integrationTestRuntimeOnly "io.grpc:grpc-netty-shaded:1.35.0"
+	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.38.0"
+	integrationTestRuntimeOnly "io.grpc:grpc-netty-shaded:1.38.0"
 
 	// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
 	//       use CompletableFuture directly.
@@ -71,7 +67,7 @@ protobuf {
 	}
 	plugins {
 		grpc {
-			artifact = "io.grpc:protoc-gen-grpc-java:1.35.0"
+			artifact = "io.grpc:protoc-gen-grpc-java:1.38.0"
 		}
 	}
 	generateProtoTasks {

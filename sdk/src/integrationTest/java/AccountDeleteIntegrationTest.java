@@ -13,22 +13,22 @@ class AccountDeleteIntegrationTest {
     @DisplayName("Can delete account")
     void canDeleteAccount() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
-                .execute(client);
+                .execute(testEnv.client);
 
-            var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
+            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
             var info = new AccountInfoQuery()
                 .setAccountId(accountId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
             assertEquals(info.accountId, accountId);
             assertFalse(info.isDeleted);
@@ -40,14 +40,14 @@ class AccountDeleteIntegrationTest {
 
             new AccountDeleteTransaction()
                 .setAccountId(accountId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setTransferAccountId(testEnv.operatorId)
+                .freezeWith(testEnv.client)
                 .sign(key)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -55,19 +55,19 @@ class AccountDeleteIntegrationTest {
     @DisplayName("Cannot delete invalid account ID")
     void cannotCreateAccountWithNoKey() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new AccountDeleteTransaction()
-                    .setTransferAccountId(operatorId)
-                    .execute(client)
-                    .getReceipt(client);
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    .setTransferAccountId(testEnv.operatorId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
             });
 
             assertTrue(error.getMessage().contains(Status.ACCOUNT_ID_DOES_NOT_EXIST.toString()));
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -75,29 +75,29 @@ class AccountDeleteIntegrationTest {
     @DisplayName("Cannot delete account that has not signed transaction")
     void cannotDeleteAccountThatHasNotSignedTransaction() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
-                .execute(client);
+                .execute(testEnv.client);
 
-            var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
+            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new AccountDeleteTransaction()
                     .setAccountId(accountId)
-                    .setTransferAccountId(operatorId)
-                    .execute(client)
-                    .getReceipt(client);
+                    .setTransferAccountId(testEnv.operatorId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
             });
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            client.close();
+            testEnv.client.close();
         });
     }
 }

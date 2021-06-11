@@ -123,7 +123,7 @@ public final class Mnemonic {
         ArrayList<String> words;
         byte[] bytes;
         if(entropy.length == 16) {
-            wordList = getWordList(true);
+            wordList = getWordList(false);
             bytes = Arrays.copyOf(entropy, 17);
             bytes[16] = (byte)(checksum(entropy) & 0xF0);
 

@@ -15,53 +15,53 @@ public class ContractCreateIntegrationTest {
     @DisplayName("Can create contract")
     void canCreateContract() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             @Var var response = new FileCreateTransaction()
-                .setKeys(operatorKey)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
-                .execute(client);
+                .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
+            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
             response = new ContractCreateTransaction()
-                .setAdminKey(operatorKey)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setAdminKey(testEnv.operatorKey)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
                 .setContractMemo("[e2e::ContractCreateTransaction]")
-                .execute(client);
+                .execute(testEnv.client);
 
-            var contractId = Objects.requireNonNull(response.getReceipt(client).contractId);
+            var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
             @Var var info = new ContractInfoQuery()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContractId(contractId)
-                .execute(client);
+                .execute(testEnv.client);
 
             assertEquals(info.contractId, contractId);
             assertNotNull(info.accountId);
             assertEquals(Objects.requireNonNull(info.accountId).toString(), Objects.requireNonNull(contractId).toString());
             assertNotNull(info.adminKey);
-            assertEquals(Objects.requireNonNull(info.adminKey).toString(), Objects.requireNonNull(operatorKey).toString());
+            assertEquals(Objects.requireNonNull(info.adminKey).toString(), Objects.requireNonNull(testEnv.operatorKey.getPublicKey()).toString());
             assertEquals(info.storage, 926);
             assertEquals(info.contractMemo, "[e2e::ContractCreateTransaction]");
 
             new ContractDeleteTransaction()
                 .setContractId(contractId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client)
-                .getReceipt(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client)
-                .getReceipt(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -69,30 +69,30 @@ public class ContractCreateIntegrationTest {
     @DisplayName("Can create contract with no admin key")
     void canCreateContractWithNoAdminKey() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             @Var var response = new FileCreateTransaction()
-                .setKeys(operatorKey)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
-                .execute(client);
+                .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
+            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
             response = new ContractCreateTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
                 .setContractMemo("[e2e::ContractCreateTransaction]")
-                .execute(client);
+                .execute(testEnv.client);
 
-            var contractId = Objects.requireNonNull(response.getReceipt(client).contractId);
+            var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
             @Var var info = new ContractInfoQuery()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContractId(contractId)
-                .execute(client);
+                .execute(testEnv.client);
 
             assertEquals(info.contractId, contractId);
             assertNotNull(info.accountId);
@@ -102,7 +102,7 @@ public class ContractCreateIntegrationTest {
             assertEquals(info.storage, 926);
             assertEquals(info.contractMemo, "[e2e::ContractCreateTransaction]");
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -110,36 +110,36 @@ public class ContractCreateIntegrationTest {
     @DisplayName("Cannot create contract when gas is not set")
     void cannotCreateContractWhenGasIsNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             @Var var response = new FileCreateTransaction()
-                .setKeys(operatorKey)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
-                .execute(client);
+                .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
+            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new ContractCreateTransaction()
-                    .setAdminKey(operatorKey)
-                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                    .setAdminKey(testEnv.operatorKey)
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                     .setBytecodeFileId(fileId)
                     .setContractMemo("[e2e::ContractCreateTransaction]")
-                    .execute(client)
-                    .getReceipt(client);
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
             });
 
             assertTrue(error.getMessage().contains(Status.INSUFFICIENT_GAS.toString()));
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client)
-                .getReceipt(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -147,36 +147,36 @@ public class ContractCreateIntegrationTest {
     @DisplayName("Cannot create contract when constructor parameters are not set")
     void cannotCreateContractWhenConstructorParametersAreNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             @Var var response = new FileCreateTransaction()
-                .setKeys(operatorKey)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
-                .execute(client);
+                .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
+            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new ContractCreateTransaction()
-                    .setAdminKey(operatorKey)
-                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                    .setAdminKey(testEnv.operatorKey)
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setGas(2000)
                     .setBytecodeFileId(fileId)
                     .setContractMemo("[e2e::ContractCreateTransaction]")
-                    .execute(client)
-                    .getReceipt(client);
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
             });
 
             assertTrue(error.getMessage().contains(Status.CONTRACT_REVERT_EXECUTED.toString()));
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client)
-                .getReceipt(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -184,22 +184,22 @@ public class ContractCreateIntegrationTest {
     @DisplayName("Cannot create contract when bytecode file ID is not set")
     void cannotCreateContractWhenBytecodeFileIdIsNotSet() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new ContractCreateTransaction()
-                    .setAdminKey(operatorKey)
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    .setAdminKey(testEnv.operatorKey)
                     .setGas(2000)
                     .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                     .setContractMemo("[e2e::ContractCreateTransaction]")
-                    .execute(client)
-                    .getReceipt(client);
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
             });
 
             assertTrue(error.getMessage().contains(Status.INVALID_FILE_ID.toString()));
 
-            client.close();
+            testEnv.client.close();
         });
     }
 }

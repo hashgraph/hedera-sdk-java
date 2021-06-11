@@ -21,35 +21,37 @@ public class ClientIntegrationTest {
             network.put("0.testnet.hedera.com:50211", new AccountId(3));
             network.put("1.testnet.hedera.com:50211", new AccountId(4));
 
-            var client = IntegrationTestClientManager.getClient()
+            var testEnv = new IntegrationTestEnv();
+
+            testEnv.client
                 .setMaxQueryPayment(new Hbar(2))
                 .setRequestTimeout(Duration.ofMinutes(2));
 
-            var operatorId = client.getOperatorAccountId();
-            assertNotNull(operatorId);
+            var operatorId = testEnv.client.getOperatorAccountId();
+            assertNotNull(testEnv.operatorId);
 
             // Execute two simple queries so we create a channel for each network node.
             new AccountBalanceQuery()
-                .setAccountId(operatorId)
-                .execute(client);
+                .setAccountId(testEnv.operatorId)
+                .execute(testEnv.client);
 
             new AccountBalanceQuery()
-                .setAccountId(operatorId)
-                .execute(client);
+                .setAccountId(testEnv.operatorId)
+                .execute(testEnv.client);
 
             network = new HashMap<>();
             network.put("1.testnet.hedera.com:50211", new AccountId(4));
             network.put("2.testnet.hedera.com:50211", new AccountId(5));
 
-            client.setNetwork(network);
+            testEnv.client.setNetwork(network);
 
             network = new HashMap<>();
             network.put("35.186.191.247:50211", new AccountId(4));
             network.put("35.192.2.25:50211", new AccountId(5));
 
-            client.setNetwork(network);
+            testEnv.client.setNetwork(network);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 }

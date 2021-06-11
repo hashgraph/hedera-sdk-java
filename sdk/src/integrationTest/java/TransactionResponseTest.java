@@ -1,9 +1,7 @@
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import org.junit.Assert;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -17,17 +15,17 @@ public class TransactionResponseTest {
     @DisplayName("transaction hash in transaction record is equal to the transaction response transaction hash")
     void transactionHashInTransactionRecordIsEqualToTheTransactionResponseTransactionHash() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
 
             var key = PrivateKey.generate();
 
             var transaction = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
-                .execute(client);
+                .execute(testEnv.client);
 
-            var record = transaction.getRecord(client);
+            var record = transaction.getRecord(testEnv.client);
 
             assertArrayEquals(record.transactionHash.toByteArray(), transaction.transactionHash);
 
@@ -35,14 +33,15 @@ public class TransactionResponseTest {
             assertNotNull(accountId);
 
             new AccountDeleteTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
+                .setTransferAccountId(testEnv.operatorId)
+                .freezeWith(testEnv.client)
                 .sign(key)
-                .execute(client);
+                .execute(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 }

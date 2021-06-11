@@ -12,52 +12,50 @@ class AccountRecordsIntegrationTest {
     @DisplayName("Can query account records")
     void canQueryAccountRecords() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorId = client.getOperatorAccountId();
-            assertNotNull(operatorId);
-
+            var testEnv = new IntegrationTestEnv();
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
-                .execute(client);
+                .execute(testEnv.client);
 
-            var accountId = Objects.requireNonNull(response.getReceipt(client).accountId);
+            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
             new TransferTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .addHbarTransfer(operatorId, new Hbar(1).negated())
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .addHbarTransfer(testEnv.operatorId, new Hbar(1).negated())
                 .addHbarTransfer(accountId, new Hbar(1))
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
             new TransferTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .addHbarTransfer(operatorId, new Hbar(1))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .addHbarTransfer(testEnv.operatorId, new Hbar(1))
                 .addHbarTransfer(accountId, new Hbar(1).negated())
-                .freezeWith(client)
+                .freezeWith(testEnv.client)
                 .sign(key)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
             var records = new AccountRecordsQuery()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setAccountId(operatorId)
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setAccountId(testEnv.operatorId)
+                .execute(testEnv.client);
 
             assertTrue(records.isEmpty());
 
             new AccountDeleteTransaction()
                 .setAccountId(accountId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setTransferAccountId(testEnv.operatorId)
+                .freezeWith(testEnv.client)
                 .sign(key)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 }

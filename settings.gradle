@@ -2,9 +2,3 @@ include 'sdk'
 include 'examples'
 include 'executable-annotation'
 include 'executable-processor'
-
-sourceControl {
-	gitRepository("https://github.com/bsideup/jabel.git") {
-		producesModule("com.github.bsideup.jabel:jabel-javac-plugin")
-	}
-}

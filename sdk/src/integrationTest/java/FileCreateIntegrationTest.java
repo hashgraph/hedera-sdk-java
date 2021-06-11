@@ -2,7 +2,6 @@ import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.FileInfoQuery;
-import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.KeyList;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,35 +16,35 @@ public class FileCreateIntegrationTest {
     @DisplayName("Can create file")
     void canCreateFile() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             var response = new FileCreateTransaction()
-                .setKeys(operatorKey)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setKeys(testEnv.operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
-                .execute(client);
+                .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
+            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
             @Var var info = new FileInfoQuery()
                 .setFileId(fileId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
             assertEquals(info.size, 28);
             assertFalse(info.isDeleted);
             assertNotNull(info.keys);
             assertNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(operatorKey));
+            assertEquals(info.keys, KeyList.of(testEnv.operatorKey.getPublicKey()));
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client)
-                .getReceipt(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -53,34 +52,34 @@ public class FileCreateIntegrationTest {
     @DisplayName("Can create file with no contents")
     void canCreateFileWithNoContents() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             var response = new FileCreateTransaction()
-                .setKeys(operatorKey)
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setKeys(testEnv.operatorKey)
+                .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
+            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
             @Var var info = new FileInfoQuery()
                 .setFileId(fileId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
             assertEquals(info.size, 0);
             assertFalse(info.isDeleted);
             assertNotNull(info.keys);
             assertNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(operatorKey));
+            assertEquals(info.keys, KeyList.of(testEnv.operatorKey.getPublicKey()));
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client)
-                .getReceipt(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -88,23 +87,25 @@ public class FileCreateIntegrationTest {
     @DisplayName("Can create file with no keys")
     void canCreateFileWithNoKeys() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var testEnv = new IntegrationTestEnv();
 
-            var response = new FileCreateTransaction().execute(client);
+            var response = new FileCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
+            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
             @Var var info = new FileInfoQuery()
                 .setFileId(fileId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
             assertEquals(info.size, 0);
             assertFalse(info.isDeleted);
             assertNull(info.keys);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 }

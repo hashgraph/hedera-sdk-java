@@ -3,7 +3,6 @@ import com.hedera.hashgraph.sdk.FileAppendTransaction;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.FileInfoQuery;
-import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.KeyList;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,54 +17,54 @@ public class FileAppendIntegrationTest {
     @DisplayName("Can append to file")
     void canAppendToFile() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             var response = new FileCreateTransaction()
-                .setKeys(operatorKey)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setKeys(testEnv.operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
-                .execute(client);
+                .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
+            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
             @Var var info = new FileInfoQuery()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setFileId(fileId)
-                .execute(client);
+                .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
             assertEquals(info.size, 28);
             assertFalse(info.isDeleted);
             assertNotNull(info.keys);
             assertNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(operatorKey));
+            assertEquals(info.keys, KeyList.of(testEnv.operatorKey.getPublicKey()));
 
             new FileAppendTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContents("[e2e::FileAppendTransaction]")
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
             info = new FileInfoQuery()
                 .setFileId(fileId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
             assertEquals(info.size, 56);
             assertFalse(info.isDeleted);
             assertNotNull(info.keys);
             assertNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(operatorKey));
+            assertEquals(info.keys, KeyList.of(testEnv.operatorKey.getPublicKey()));
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client)
-                .getReceipt(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -73,54 +72,54 @@ public class FileAppendIntegrationTest {
     @DisplayName("Can append large contents to file")
     void canAppendLargeContentsToFile() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             var response = new FileCreateTransaction()
-                .setKeys(operatorKey)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setKeys(testEnv.operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
-                .execute(client);
+                .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(client).fileId);
+            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
             @Var var info = new FileInfoQuery()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setFileId(fileId)
-                .execute(client);
+                .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
             assertEquals(info.size, 28);
             assertFalse(info.isDeleted);
             assertNotNull(info.keys);
             assertNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(operatorKey));
+            assertEquals(info.keys, KeyList.of(testEnv.operatorKey.getPublicKey()));
 
             new FileAppendTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContents(Contents.BIG_CONTENTS)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
             info = new FileInfoQuery()
                 .setFileId(fileId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
             assertEquals(info.size, 13522);
             assertFalse(info.isDeleted);
             assertNotNull(info.keys);
             assertNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(operatorKey));
+            assertEquals(info.keys, KeyList.of(testEnv.operatorKey.getPublicKey()));
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client)
-                .getReceipt(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 }
