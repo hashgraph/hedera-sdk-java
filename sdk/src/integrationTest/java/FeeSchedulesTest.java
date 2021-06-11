@@ -19,7 +19,7 @@ public class FeeSchedulesTest {
                 .execute(testEnv.client);
             
             FeeSchedules feeSchedules = FeeSchedules.fromBytes(feeSchedulesBytes.toByteArray());
-
+            assertNotNull(feeSchedules.getCurrent());
             testEnv.client.close();
         });
     }
