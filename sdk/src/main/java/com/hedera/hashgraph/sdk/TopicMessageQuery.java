@@ -190,7 +190,13 @@ public final class TopicMessageQuery {
                 // Short circuit for no chunks or 1/1 chunks
                 if (!consensusTopicResponse.hasChunkInfo() || consensusTopicResponse.getChunkInfo().getTotal() == 1) {
                     var message = TopicMessage.ofSingle(consensusTopicResponse);
-                    onNext.accept(message);
+
+                    try {
+                        onNext.accept(message);
+                    } catch (Throwable t) {
+                        errorHandler.accept(t, message);
+                    }
+
                     return;
                 }
 
@@ -211,7 +217,12 @@ public final class TopicMessageQuery {
                 // if we now have enough chunks, emit
                 if (chunks.size() == consensusTopicResponse.getChunkInfo().getTotal()) {
                     var message = TopicMessage.ofMany(chunks);
-                    onNext.accept(message);
+
+                    try {
+                        onNext.accept(message);
+                    } catch (Throwable t) {
+                        errorHandler.accept(t, message);
+                    }
                 }
             }
 
