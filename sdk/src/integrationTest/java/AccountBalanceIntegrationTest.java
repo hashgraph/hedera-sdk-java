@@ -3,7 +3,6 @@ import com.hedera.hashgraph.sdk.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,16 +12,16 @@ class AccountBalanceIntegrationTest {
     @DisplayName("Can fetch balance for client operator")
     void canFetchBalanceForClientOperator() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
 
             @Var var balance = new AccountBalanceQuery()
-                .setAccountId(operatorId)
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setAccountId(testEnv.operatorId)
+                .execute(testEnv.client);
 
             assertTrue(balance.hbars.toTinybars() > 0);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -30,21 +29,21 @@ class AccountBalanceIntegrationTest {
     @DisplayName("Can fetch cost for the query")
     void getCostBalanceForClientOperator() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
 
             @Var var balance = new AccountBalanceQuery()
-                .setAccountId(operatorId)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setAccountId(testEnv.operatorId)
                 .setMaxQueryPayment(new Hbar(1));
 
-            var cost = balance.getCost(client);
+            var cost = balance.getCost(testEnv.client);
 
-            var accBalance = balance.setQueryPayment(cost).execute(client);
+            var accBalance = balance.setQueryPayment(cost).execute(testEnv.client);
 
             assertTrue(accBalance.hbars.toTinybars() > 0);
             assertEquals(cost.toTinybars(), 0);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -52,20 +51,20 @@ class AccountBalanceIntegrationTest {
     @DisplayName("Can fetch cost for the query, big max set")
     void getCostBigMaxBalanceForClientOperator() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
 
             @Var var balance = new AccountBalanceQuery()
-                .setAccountId(operatorId)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setAccountId(testEnv.operatorId)
                 .setMaxQueryPayment(new Hbar(1000000));
 
-            var cost = balance.getCost(client);
+            var cost = balance.getCost(testEnv.client);
 
-            var accBalance = balance.setQueryPayment(cost).execute(client);
+            var accBalance = balance.setQueryPayment(cost).execute(testEnv.client);
 
             assertTrue(accBalance.hbars.toTinybars() > 0);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -73,20 +72,20 @@ class AccountBalanceIntegrationTest {
     @DisplayName("Can fetch cost for the query, very small max set")
     void getCostSmallMaxBalanceForClientOperator() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
 
             @Var var balance = new AccountBalanceQuery()
-                .setAccountId(operatorId)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setAccountId(testEnv.operatorId)
                 .setMaxQueryPayment(Hbar.fromTinybars(1));
 
-            var cost = balance.getCost(client);
+            var cost = balance.getCost(testEnv.client);
 
-            var accBalance = balance.setQueryPayment(cost).execute(client);
+            var accBalance = balance.setQueryPayment(cost).execute(testEnv.client);
 
             assertTrue(accBalance.hbars.toTinybars() > 0);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -94,17 +93,18 @@ class AccountBalanceIntegrationTest {
     @DisplayName("Cannot fetch balance for invalid account ID")
     void canNotFetchBalanceForInvalidAccountId() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
+            var testEnv = new IntegrationTestEnv();
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new AccountBalanceQuery()
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setAccountId(AccountId.fromString("1.0.3"))
-                    .execute(client);
+                    .execute(testEnv.client);
             });
 
             assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -112,30 +112,31 @@ class AccountBalanceIntegrationTest {
     @DisplayName("Can fetch token balances for client operator")
     void canFetchTokenBalancesForClientOperator() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClientNewAccount();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             var response = new TokenCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setInitialSupply(10000)
-                .setTreasuryAccountId(operatorId)
-                .setAdminKey(operatorKey)
-                .setSupplyKey(operatorKey)
+                .setDecimals(50)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setSupplyKey(testEnv.operatorKey)
                 .setFreezeDefault(false)
-                .execute(client);
+                .execute(testEnv.client);
 
-            var tokenId = Objects.requireNonNull(response.getReceipt(client).tokenId);
+            var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             @Var var balance = new AccountBalanceQuery()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setAccountId(operatorId)
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setAccountId(testEnv.operatorId)
+                .execute(testEnv.client);
 
-            assertEquals(balance.token.get(tokenId), 10000);
+            assertEquals(balance.tokens.get(tokenId), 10000);
+            assertEquals(balance.tokenDecimals.get(balance.tokens.get(tokenId)), 50);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 }

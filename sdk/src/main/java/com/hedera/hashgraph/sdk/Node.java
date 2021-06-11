@@ -9,10 +9,10 @@ class Node extends ManagedNode implements Comparable<Node>{
 
     Node(AccountId accountId, String address, ExecutorService executor) {
         super(address, executor);
+
         this.accountId = accountId;
         this.delay = 250;
         this.delayUntil = 0;
-        useCount = 0;
     }
 
     boolean isHealthy() {
@@ -20,6 +20,7 @@ class Node extends ManagedNode implements Comparable<Node>{
     }
 
     void increaseDelay() {
+        this.delayUntil = System.currentTimeMillis() + this.delay;
         this.delay = Math.min(this.delay * 2, 8000);
     }
 

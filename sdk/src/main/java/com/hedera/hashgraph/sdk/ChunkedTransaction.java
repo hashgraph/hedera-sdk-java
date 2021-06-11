@@ -148,9 +148,9 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
                     };
 
                 if (shouldGetReceipt()) {
-                    return responseFuture.thenCompose(receiptFuture).thenApply(addToList).thenCompose(CompletableFuture::completedFuture);
+                    return responseFuture.thenCompose(receiptFuture).thenApply(addToList);
                 } else {
-                    return responseFuture.thenApply(addToList).thenCompose(CompletableFuture::completedFuture);
+                    return responseFuture.thenApply(addToList);
                 }
             });
         }

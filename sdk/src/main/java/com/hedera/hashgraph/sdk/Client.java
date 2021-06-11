@@ -54,7 +54,7 @@ public final class Client implements AutoCloseable {
         this.mirrorNetwork = new MirrorNetwork(executor);
     }
 
-    public void setMirrorNetwork(List<String> network) throws InterruptedException {
+    public synchronized void setMirrorNetwork(List<String> network) throws InterruptedException {
         mirrorNetwork.setNetwork(network);
     }
 
@@ -100,7 +100,7 @@ public final class Client implements AutoCloseable {
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forMainnet() {
-        var network = new HashMap<String, AccountId>();
+        var network = new Hashtable<String, AccountId>();
         network.put("35.237.200.180:50211", new AccountId(3));
         network.put("35.186.191.247:50211", new AccountId(4));
         network.put("35.192.2.25:50211", new AccountId(5));
@@ -138,7 +138,7 @@ public final class Client implements AutoCloseable {
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forTestnet() {
-        var network = new HashMap<String, AccountId>();
+        var network = new Hashtable<String, AccountId>();
         network.put("0.testnet.hedera.com:50211", new AccountId(3));
         network.put("1.testnet.hedera.com:50211", new AccountId(4));
         network.put("2.testnet.hedera.com:50211", new AccountId(5));
@@ -158,7 +158,7 @@ public final class Client implements AutoCloseable {
     }
 
     public static Client forPreviewnet() {
-        var network = new HashMap<String, AccountId>();
+        var network = new Hashtable<String, AccountId>();
         network.put("0.previewnet.hedera.com:50211", new AccountId(3));
         network.put("1.previewnet.hedera.com:50211", new AccountId(4));
         network.put("2.previewnet.hedera.com:50211", new AccountId(5));
@@ -289,13 +289,19 @@ public final class Client implements AutoCloseable {
      * @param network a map of node account ID to node URL.
      * @return {@code this} for fluent API usage.
      */
-    public Client setNetwork(Map<String, AccountId> network) throws InterruptedException, TimeoutException {
+    public synchronized Client setNetwork(Map<String, AccountId> network) throws InterruptedException, TimeoutException {
         this.network.setNetwork(network);
         return this;
     }
 
     public Map<String, AccountId> getNetwork() {
-        return network.network;
+        var network = new Hashtable<String, AccountId>(this.network.network.size());
+
+        for (var entry : this.network.network.entrySet()) {
+            network.put(entry.getKey(), AccountId.fromProtobuf(entry.getValue().toProtobuf()));
+        }
+
+        return network;
     }
 
     public void ping(AccountId nodeAccountId) throws TimeoutException, PrecheckStatusException {
@@ -318,7 +324,7 @@ public final class Client implements AutoCloseable {
      * @param privateKey The PrivateKey of the operator
      * @return {@code this}
      */
-    public Client setOperator(AccountId accountId, PrivateKey privateKey) {
+    public synchronized Client setOperator(AccountId accountId, PrivateKey privateKey) {
         return setOperatorWith(accountId, privateKey.getPublicKey(), privateKey::sign);
     }
 
@@ -336,7 +342,7 @@ public final class Client implements AutoCloseable {
      * @param transactionSigner The signer for the operator
      * @return {@code this}
      */
-    public Client setOperatorWith(AccountId accountId, PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
+    public synchronized Client setOperatorWith(AccountId accountId, PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
         this.operator = new Operator(accountId, publicKey, transactionSigner);
         return this;
     }
@@ -379,7 +385,7 @@ public final class Client implements AutoCloseable {
      * @param maxTransactionFee The Hbar to be set
      * @return {@code this}
      */
-    public Client setMaxTransactionFee(Hbar maxTransactionFee) {
+    public synchronized Client setMaxTransactionFee(Hbar maxTransactionFee) {
         if (maxTransactionFee.toTinybars() < 0) {
             throw new IllegalArgumentException("maxTransactionFee must be non-negative");
         }
@@ -406,7 +412,7 @@ public final class Client implements AutoCloseable {
      * @param maxQueryPayment The Hbar to be set
      * @return {@code this}
      */
-    public Client setMaxQueryPayment(Hbar maxQueryPayment) {
+    public synchronized Client setMaxQueryPayment(Hbar maxQueryPayment) {
         if (maxQueryPayment.toTinybars() < 0) {
             throw new IllegalArgumentException("maxQueryPayment must be non-negative");
         }
@@ -415,7 +421,7 @@ public final class Client implements AutoCloseable {
         return this;
     }
 
-    public Client setRequestTimeout(Duration requestTimeout) {
+    public synchronized Client setRequestTimeout(Duration requestTimeout) {
         this.requestTimeout = requestTimeout;
         return this;
     }

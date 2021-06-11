@@ -767,7 +767,11 @@ public abstract class Transaction<T extends Transaction<T>>
                     "`client` must be provided or both `nodeId` and `transactionId` must be set");
             }
 
-            nodeAccountIds = client.network.getNodeAccountIdsForExecute();
+            try {
+                nodeAccountIds = client.network.getNodeAccountIdsForExecute();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         transactions = new ArrayList<>(nodeAccountIds.size());
@@ -859,6 +863,10 @@ public abstract class Transaction<T extends Transaction<T>>
     @SuppressWarnings("LiteProtoToString")
     public String toString() {
         // NOTE: regex is for removing the instance address from the default debug output
-        return bodyBuilder.buildPartial().toString().replaceAll("@[A-Za-z0-9]+", "");
+        TransactionBody.Builder body = TransactionBody.newBuilder().mergeFrom(this.bodyBuilder.buildPartial());
+
+        onFreeze(body);
+
+        return body.buildPartial().toString().replaceAll("@[A-Za-z0-9]+", "");
     }
 }

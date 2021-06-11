@@ -14,22 +14,34 @@ public class AccountBalance {
     @Nonnegative
     public final Hbar hbars;
 
+    /**
+     * @deprecated - Use `tokens` instead
+     */
+    @Deprecated
     @Nonnegative
-    public final Map<TokenId, Long> token;
+    public final Map<TokenId, Long> token = new HashMap<>();
 
-    AccountBalance(Hbar hbars, Map<TokenId, Long> token) {
+    public final Map<TokenId, Long> tokens;
+
+    @Nonnegative
+    public final Map<Long, Integer> tokenDecimals;
+
+    AccountBalance(Hbar hbars, Map<TokenId, Long> token, Map<Long, Integer> decimal) {
         this.hbars = hbars;
-        this.token = token;
+        this.tokens = token;
+        this.tokenDecimals = decimal;
     }
 
     static AccountBalance fromProtobuf(CryptoGetAccountBalanceResponse protobuf) {
         var balanceList = protobuf.getTokenBalancesList();
         Map<TokenId, Long> map = new HashMap<>();
+        Map<Long, Integer>  decimalMap = new HashMap<>();
         for (int i = 0; i < protobuf.getTokenBalancesCount(); i++) {
             map.put(TokenId.fromProtobuf(balanceList.get(i).getTokenId()), balanceList.get(i).getBalance());
+            decimalMap.put(balanceList.get(i).getBalance(), balanceList.get(i).getDecimals());
         }
 
-        return new AccountBalance(Hbar.fromTinybars(protobuf.getBalance()), map);
+        return new AccountBalance(Hbar.fromTinybars(protobuf.getBalance()), map, decimalMap);
     }
 
     static AccountBalance fromBytes(byte[] data) throws InvalidProtocolBufferException {
@@ -40,10 +52,11 @@ public class AccountBalance {
         var protobuf = CryptoGetAccountBalanceResponse.newBuilder()
             .setBalance(hbars.toTinybars());
 
-        for (var entry : token.entrySet()) {
+        for (var entry : tokens.entrySet()) {
             protobuf.addTokenBalances(TokenBalance.newBuilder()
-                .setBalance(entry.getValue())
                 .setTokenId(entry.getKey().toProtobuf())
+                .setBalance(entry.getValue())
+                .setDecimals(tokenDecimals.get(entry.getValue()))
             );
         }
 

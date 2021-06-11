@@ -148,6 +148,28 @@ class Ed25519PrivateKeyTest {
     }
 
     @Test
+    @DisplayName("validate 12 word generated mnemonic")
+    void validateGenerated12() {
+        Mnemonic mnemonic = Mnemonic.generate12();
+        assertDoesNotThrow(() -> Mnemonic.fromString(mnemonic.toString()));
+    }
+
+    @Test
+    @DisplayName("validate legacy mnemonic")
+    void validateLegacyMnemonic() {
+        Mnemonic mnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(MNEMONIC_LEGACY_STRING));
+        PrivateKey key = assertDoesNotThrow(mnemonic::toLegacyPrivateKey);
+        assertEquals(key.toString(), MNEMONIC_LEGACY_PRIVATE_KEY);
+    }
+
+    @Test
+    @DisplayName("validate 24 word generated mnemonic")
+    void validateGenerated24() {
+        Mnemonic mnemonic = Mnemonic.generate24();
+        assertDoesNotThrow(() -> Mnemonic.fromString(mnemonic.toString()));
+    }
+
+    @Test
     @DisplayName("derived key matches that of the mobile wallets")
     void deriveKeyIndex0() {
         Mnemonic iosMnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(IOS_MNEMONIC_STRING));

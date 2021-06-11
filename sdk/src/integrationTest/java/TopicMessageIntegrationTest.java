@@ -1,6 +1,5 @@
 import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.*;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
@@ -17,25 +16,25 @@ public class TopicMessageIntegrationTest {
     @DisplayName("Can receive a topic message")
     void canReceiveATopicMessage() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             var response = new TopicCreateTransaction()
-                .setAdminKey(operatorKey)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
-                .execute(client);
+                .execute(testEnv.client);
 
-            var topicId = Objects.requireNonNull(response.getReceipt(client).topicId);
+            var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
             @Var var info = new TopicInfoQuery()
                 .setTopicId(topicId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
             assertEquals(info.topicId, topicId);
             assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
             assertEquals(info.sequenceNumber, 0);
-            assertEquals(info.adminKey, operatorKey);
+            assertEquals(info.adminKey, testEnv.operatorKey.getPublicKey());
 
             var receivedMessage = new boolean[]{false};
             var start = Instant.now();
@@ -43,16 +42,16 @@ public class TopicMessageIntegrationTest {
             var handle = new TopicMessageQuery()
                 .setTopicId(topicId)
                 .setStartTime(Instant.EPOCH)
-                .subscribe(client, (message) -> {
+                .subscribe(testEnv.client, (message) -> {
                     receivedMessage[0] = new String(message.contents, StandardCharsets.UTF_8).equals("Hello, from HCS!");
                 });
 
             new TopicMessageSubmitTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
                 .setMessage("Hello, from HCS!")
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
             while (!receivedMessage[0]) {
                 if (Duration.between(start, Instant.now()).compareTo(Duration.ofSeconds(60)) > 0) {
@@ -66,10 +65,10 @@ public class TopicMessageIntegrationTest {
 
             new TopicDeleteTransaction()
                 .setTopicId(topicId)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -77,25 +76,25 @@ public class TopicMessageIntegrationTest {
     @DisplayName("Can receive a large topic message")
     void canReceiveALargeTopicMessage() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorKey = Objects.requireNonNull(client.getOperatorPublicKey());
+            var testEnv = new IntegrationTestEnv();
 
             var response = new TopicCreateTransaction()
-                .setAdminKey(operatorKey)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
-                .execute(client);
+                .execute(testEnv.client);
 
-            var topicId = Objects.requireNonNull(response.getReceipt(client).topicId);
+            var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
             @Var var info = new TopicInfoQuery()
                 .setTopicId(topicId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
             assertEquals(info.topicId, topicId);
             assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
             assertEquals(info.sequenceNumber, 0);
-            assertEquals(info.adminKey, operatorKey);
+            assertEquals(info.adminKey, testEnv.operatorKey.getPublicKey());
 
             var receivedMessage = new boolean[]{false};
             var start = Instant.now();
@@ -103,16 +102,16 @@ public class TopicMessageIntegrationTest {
             var handle = new TopicMessageQuery()
                 .setTopicId(topicId)
                 .setStartTime(Instant.EPOCH)
-                .subscribe(client, (message) -> {
+                .subscribe(testEnv.client, (message) -> {
                     receivedMessage[0] = new String(message.contents, StandardCharsets.UTF_8).equals(Contents.BIG_CONTENTS);
                 });
 
             new TopicMessageSubmitTransaction()
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
                 .setMessage(Contents.BIG_CONTENTS)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
             while (!receivedMessage[0]) {
                 if (Duration.between(start, Instant.now()).compareTo(Duration.ofSeconds(60)) > 0) {
@@ -126,10 +125,10 @@ public class TopicMessageIntegrationTest {
 
             new TopicDeleteTransaction()
                 .setTopicId(topicId)
-                .execute(client)
-                .getReceipt(client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 }

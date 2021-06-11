@@ -338,7 +338,7 @@ public final class PrivateKey extends Key {
         return getPublicKey().toProtobufKey();
     }
 
-    static byte[] legacyDeriveChildKey(byte[] entropy,int index) {
+    static byte[] legacyDeriveChildKey(byte[] entropy, int index) {
         byte[] seed = new byte[entropy.length + 8];
         if(index >= 0){
             Arrays.fill(seed, entropy.length, entropy.length + 4, (byte)0);

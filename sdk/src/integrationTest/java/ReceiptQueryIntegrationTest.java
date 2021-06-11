@@ -12,30 +12,30 @@ public class ReceiptQueryIntegrationTest {
     @DisplayName("Can get Receipt")
     void canGetTransactionReceipt() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
-                .execute(client);
+                .execute(testEnv.client);
 
             var receipt = new TransactionReceiptQuery()
                 .setTransactionId(response.transactionId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
             new AccountDeleteTransaction()
                 .setAccountId(receipt.accountId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setTransferAccountId(testEnv.operatorId)
+                .freezeWith(testEnv.client)
                 .sign(key)
-                .execute(client);
+                .execute(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -43,34 +43,34 @@ public class ReceiptQueryIntegrationTest {
     @DisplayName("Can get Record")
     void canGetTransactionRecord() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
-                .execute(client);
+                .execute(testEnv.client);
 
             new TransactionReceiptQuery()
                 .setTransactionId(response.transactionId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
             var record = new TransactionRecordQuery()
                 .setTransactionId(response.transactionId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
             new AccountDeleteTransaction()
                 .setAccountId(record.receipt.accountId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setTransferAccountId(testEnv.operatorId)
+                .freezeWith(testEnv.client)
                 .sign(key)
-                .execute(client);
+                .execute(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -78,37 +78,37 @@ public class ReceiptQueryIntegrationTest {
     @DisplayName("Can get Record cost")
     void getCostTransactionRecord() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
-                .execute(client);
+                .execute(testEnv.client);
 
             new TransactionReceiptQuery()
                 .setTransactionId(response.transactionId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
             var recordQuery = new TransactionRecordQuery()
                 .setTransactionId(response.transactionId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId));
+                .setNodeAccountIds(testEnv.nodeAccountIds);
 
-            var cost = recordQuery.getCost(client);
+            var cost = recordQuery.getCost(testEnv.client);
 
-            var record = recordQuery.execute(client);
+            var record = recordQuery.execute(testEnv.client);
 
             new AccountDeleteTransaction()
                 .setAccountId(record.receipt.accountId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setTransferAccountId(testEnv.operatorId)
+                .freezeWith(testEnv.client)
                 .sign(key)
-                .execute(client);
+                .execute(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -116,38 +116,38 @@ public class ReceiptQueryIntegrationTest {
     @DisplayName("Can get Record cost with big max set")
     void getCostBigMaxTransactionRecord() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
-                .execute(client);
+                .execute(testEnv.client);
 
             new TransactionReceiptQuery()
                 .setTransactionId(response.transactionId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
             var recordQuery = new TransactionRecordQuery()
                 .setTransactionId(response.transactionId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setMaxQueryPayment(new Hbar(1000));
 
-            var cost = recordQuery.getCost(client);
+            var cost = recordQuery.getCost(testEnv.client);
 
-            var record = recordQuery.execute(client);
+            var record = recordQuery.execute(testEnv.client);
 
             new AccountDeleteTransaction()
                 .setAccountId(record.receipt.accountId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setTransferAccountId(testEnv.operatorId)
+                .freezeWith(testEnv.client)
                 .sign(key)
-                .execute(client);
+                .execute(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -155,29 +155,29 @@ public class ReceiptQueryIntegrationTest {
     @DisplayName("Error at very small max, getRecord")
     void getCostSmallMaxTransactionRecord() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
-                .execute(client);
+                .execute(testEnv.client);
 
             var receipt = new TransactionReceiptQuery()
                 .setTransactionId(response.transactionId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
             var recordQuery = new TransactionRecordQuery()
                 .setTransactionId(response.transactionId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setMaxQueryPayment(Hbar.fromTinybars(1));
 
-            var cost = recordQuery.getCost(client);
+            var cost = recordQuery.getCost(testEnv.client);
 
             var error = assertThrows(RuntimeException.class, () -> {
-                recordQuery.execute(client);
+                recordQuery.execute(testEnv.client);
             });
 
             assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for TransactionRecordQuery, of "+cost.toString()+", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
@@ -185,13 +185,13 @@ public class ReceiptQueryIntegrationTest {
 
             new AccountDeleteTransaction()
                 .setAccountId(receipt.accountId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setTransferAccountId(testEnv.operatorId)
+                .freezeWith(testEnv.client)
                 .sign(key)
-                .execute(client);
+                .execute(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 
@@ -199,39 +199,38 @@ public class ReceiptQueryIntegrationTest {
     @DisplayName("Insufficient transaction fee error for transaction record query")
     void getCostInsufficientTxFeeTransactionRecord() {
         assertDoesNotThrow(() -> {
-            var client = IntegrationTestClientManager.getClient();
-            var operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+            var testEnv = new IntegrationTestEnv();
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
-                .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
-                .execute(client);
+                .execute(testEnv.client);
 
             var receipt = new TransactionReceiptQuery()
                 .setTransactionId(response.transactionId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .execute(client);
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client);
 
             var recordQuery = new TransactionRecordQuery()
                 .setTransactionId(response.transactionId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId));
+                .setNodeAccountIds(testEnv.nodeAccountIds);
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
-                recordQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(client);
+                recordQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
             });
 
             assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
 
             new AccountDeleteTransaction()
                 .setAccountId(receipt.accountId)
-                .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                .setTransferAccountId(operatorId)
-                .freezeWith(client)
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setTransferAccountId(testEnv.operatorId)
+                .freezeWith(testEnv.client)
                 .sign(key)
-                .execute(client);
+                .execute(testEnv.client);
 
-            client.close();
+            testEnv.client.close();
         });
     }
 }
