@@ -24,15 +24,6 @@ public class FeeSchedulesTest {
              * Test whether the file 0.0.111 actually contains stuff
              */
             assertNotNull(feeSchedules.getCurrent());
-
-            byte[] bytes = feeSchedules.toBytes();
-
-            /*
-             * Test serializing a null schedule
-             */
-            FeeSchedules nullSchedules = new FeeSchedules();
-            byte[] nullBytes = nullSchedules.toBytes();
-            testEnv.client.close();
         });
     }
 }

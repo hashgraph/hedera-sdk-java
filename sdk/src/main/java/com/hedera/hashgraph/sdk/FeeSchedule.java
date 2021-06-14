@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.threeten.bp.Instant;
 import com.google.common.base.MoreObjects;
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 public class FeeSchedule {
     private List<TransactionFeeSchedule> transactionFeeSchedules = new ArrayList<>();
@@ -32,6 +33,11 @@ public class FeeSchedule {
 
     public List<TransactionFeeSchedule> getTransactionFeeSchedules() {
         return transactionFeeSchedules;
+    }
+
+    public FeeSchedule setTransactionFeeSchedules(List<TransactionFeeSchedule> transactionFeeSchedules) {
+        this.transactionFeeSchedules = Objects.requireNonNull(transactionFeeSchedules);
+        return this;
     }
 
     @Nullable
