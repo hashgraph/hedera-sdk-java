@@ -45,12 +45,14 @@ public class FeeSchedule {
     }
 
     com.hedera.hashgraph.sdk.proto.FeeSchedule toProtobuf() {
-        var builder = com.hedera.hashgraph.sdk.proto.FeeSchedule.newBuilder()
-            .setExpiryTime(expirationTime != null ? InstantConverter.toSecondsProtobuf(expirationTime) : null);
-        for(TransactionFeeSchedule tFeeSchedule : getTransactionFeeSchedules()) {
-            builder.addTransactionFeeSchedule(tFeeSchedule.toProtobuf());
+        var returnBuilder = com.hedera.hashgraph.sdk.proto.FeeSchedule.newBuilder();
+        if(expirationTime != null) {
+            returnBuilder.setExpiryTime(expirationTime != null ? InstantConverter.toSecondsProtobuf(expirationTime) : null);
         }
-        return builder.build();
+        for(TransactionFeeSchedule tFeeSchedule : getTransactionFeeSchedules()) {
+            returnBuilder.addTransactionFeeSchedule(tFeeSchedule.toProtobuf());
+        }
+        return returnBuilder.build();
     }
 
     @Override
