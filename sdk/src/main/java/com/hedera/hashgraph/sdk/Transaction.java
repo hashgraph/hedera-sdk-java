@@ -807,6 +807,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
     /**
      * Will build the specific transaction at {@code index} and will fill with `null` for any empty indices before it
+     *
      * @param index
      */
     void buildTransaction(int index) {
@@ -814,6 +815,12 @@ public abstract class Transaction<T extends Transaction<T>>
             for (var i = transactions.size(); i < index - 1; ++i) {
                 transactions.add(null);
             }
+        } else if (
+            transactions.size() > index &&
+                transactions.get(index) != null &&
+                !transactions.get(index).getSignedTransactionBytes().isEmpty()
+        ) {
+            return;
         }
 
         signTransaction(index);
@@ -826,8 +833,10 @@ public abstract class Transaction<T extends Transaction<T>>
                     .toByteString()
             ).build());
     }
+
     /**
      * Will sign the specific transaction at {@code index} and will fill with `null` for any empty indices before it
+     *
      * @param index
      */
     void signTransaction(int index) {
