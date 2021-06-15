@@ -532,7 +532,7 @@ public abstract class Transaction<T extends Transaction<T>>
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
-        buildTransaction(-1);
+        buildAllTransactions();
 
         var list = TransactionList.newBuilder();
 
@@ -560,7 +560,7 @@ public abstract class Transaction<T extends Transaction<T>>
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
-        buildTransaction(-1);
+        buildAllTransactions();
 
         var hashes = new HashMap<AccountId, byte[]>();
 
@@ -799,27 +799,17 @@ public abstract class Transaction<T extends Transaction<T>>
         return (T) this;
     }
 
+    void buildAllTransactions() {
+        for (var i = 0; i < signedTransactions.size(); ++i) {
+            buildTransaction(i);
+        }
+    }
+
     /**
      * Will build the specific transaction at {@code index} and will fill with `null` for any empty indices before it
      * @param index
      */
     void buildTransaction(int index) {
-        if (index < 0) {
-            for (var i = 0; i < signedTransactions.size(); ++i) {
-                signTransaction(i);
-
-                transactions.add(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
-                    .setSignedTransactionBytes(
-                        signedTransactions.get(i)
-                            .setSigMap(signatures.get(i))
-                            .build()
-                            .toByteString()
-                    ).build());
-            }
-
-            return;
-        }
-
         if (transactions.size() < index) {
             for (var i = transactions.size(); i < index - 1; ++i) {
                 transactions.add(null);
