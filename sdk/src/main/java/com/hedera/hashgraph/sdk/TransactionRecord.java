@@ -86,7 +86,7 @@ public final class TransactionRecord {
         @Nullable ContractFunctionResult contractFunctionResult,
         List<Transfer> transfers,
         Map<TokenId, Map<AccountId, Long>> tokenTransfers,
-        ScheduleId scheduleRef
+        @Nullable ScheduleId scheduleRef
     ) {
         this.receipt = transactionReceipt;
         this.transactionHash = transactionHash;

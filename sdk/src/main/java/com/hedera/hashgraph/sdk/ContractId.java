@@ -75,6 +75,7 @@ public final class ContractId extends Key {
             .build();
     }
 
+    @Override
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

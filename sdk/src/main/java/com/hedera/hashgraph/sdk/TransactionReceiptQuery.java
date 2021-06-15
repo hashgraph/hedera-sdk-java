@@ -26,6 +26,7 @@ public final class TransactionReceiptQuery
         builder = TransactionGetReceiptQuery.newBuilder();
     }
 
+    @Override
     public TransactionId getTransactionId() {
       return TransactionId.fromProtobuf(builder.getTransactionID());
     }

@@ -278,7 +278,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         }
 
         @Override
-        Hbar mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query Response) {
+        Hbar mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
             return Hbar.fromTinybars(mapResponseHeader(response).getCost());
         }
 

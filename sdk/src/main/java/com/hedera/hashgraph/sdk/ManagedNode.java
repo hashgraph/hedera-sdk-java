@@ -5,10 +5,12 @@ import io.grpc.ManagedChannelBuilder;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.Nullable;
 
 abstract class ManagedNode {
     String address;
-    ManagedChannel channel;
+    @Nullable
+    ManagedChannel channel = null;
     final ExecutorService executor;
     long lastUsed = 0;
     long useCount = 0;
@@ -28,15 +30,8 @@ abstract class ManagedNode {
             return channel;
         }
 
-        var channelBuilder = ManagedChannelBuilder.forTarget(address);
-
-        if (address.endsWith(":50212") || address.endsWith(":443")) {
-            channelBuilder.useTransportSecurity();
-        } else {
-            channelBuilder.usePlaintext();
-        }
-
-        channel = channelBuilder
+        channel = ManagedChannelBuilder.forTarget(address)
+            .usePlaintext()
             .userAgent(getUserAgent())
             .executor(executor)
             .build();

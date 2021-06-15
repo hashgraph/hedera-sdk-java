@@ -2,12 +2,18 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionID;
+import com.hedera.hashgraph.sdk.proto.ConsensusSubmitMessageTransactionBody;
+import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.ConsensusMessageChunkInfo;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Submit a message for consensus.
@@ -94,13 +100,13 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
     }
 
     @Override
-    void onFreezeChunk(TransactionBody.Builder body, TransactionID initialTransactionId, int startIndex, int endIndex, int chunk, int total) {
+    void onFreezeChunk(TransactionBody.Builder body, @Nullable TransactionID initialTransactionId, int startIndex, int endIndex, int chunk, int total) {
         if (total == 1) {
             body.setConsensusSubmitMessage(builder.setMessage(data.substring(startIndex, endIndex)));
         } else {
             body.setConsensusSubmitMessage(builder.setMessage(data.substring(startIndex, endIndex))
                 .setChunkInfo(ConsensusMessageChunkInfo.newBuilder()
-                    .setInitialTransactionID(initialTransactionId)
+                    .setInitialTransactionID(Objects.requireNonNull(initialTransactionId))
                     .setNumber(chunk + 1)
                     .setTotal(total)
                 )

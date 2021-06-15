@@ -2,8 +2,12 @@ package com.hedera.hashgraph.sdk;
 
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
+import com.google.errorprone.annotations.Var;
 
-import java.util.*;
+//import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Collections;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
@@ -43,6 +47,7 @@ class MirrorNetwork {
 
         // Add new nodes that the network doesn't already have
         for (var address : addresses) {
+            @Var
             var contains = false;
             for (var node : this.network) {
                 if (node.address.equals(address)) {

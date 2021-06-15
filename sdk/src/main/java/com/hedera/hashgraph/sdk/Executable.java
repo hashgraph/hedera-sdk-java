@@ -80,7 +80,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
     abstract CompletableFuture<Void> onExecuteAsync(Client client);
 
-    @FunctionalExecutable
+    @Override @FunctionalExecutable
     public CompletableFuture<O> executeAsync(Client client) {
         return onExecuteAsync(client).thenCompose((v) -> executeAsync(client, 1, null));
     }
@@ -184,7 +184,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
      * Called after receiving the query response from Hedera. The derived class should map into its
      * output type.
      */
-    abstract O mapResponse(ResponseT response, AccountId NodeId, ProtoRequestT request);
+    abstract O mapResponse(ResponseT response, AccountId nodeId, ProtoRequestT request);
 
     abstract Status mapResponseStatus(ResponseT response);
 
@@ -218,7 +218,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     /**
      * Called just after receiving the query response from Hedera. By default it triggers a retry
      * when the pre-check status is {@code BUSY}.
-     * @return
      */
     ExecutionState shouldRetry(Status status, ResponseT response) {
         switch (status) {
