@@ -59,7 +59,6 @@ public abstract class Transaction<T extends Transaction<T>>
     // ]
     int nextTransactionIndex = 0;
 
-    private boolean signOnDemand = true;
     private List<PublicKey> publicKeys = new ArrayList<>();
     private List<Function<byte[], byte[]>> signers = new ArrayList<>();
 
@@ -603,13 +602,6 @@ public abstract class Transaction<T extends Transaction<T>>
         return (T) this;
     }
 
-    public final T setSignOnDemand(boolean signOnDemand) {
-        this.signOnDemand = signOnDemand;
-
-        // noinspection unchecked
-        return (T) this;
-    }
-
     public final T sign(PrivateKey privateKey) {
         return signWith(privateKey.getPublicKey(), privateKey::sign);
     }
@@ -625,27 +617,8 @@ public abstract class Transaction<T extends Transaction<T>>
         }
 
         transactions.clear();
-
-        if (signOnDemand) {
-            publicKeys.add(publicKey);
-            signers.add(transactionSigner);
-
-            // noinspection unchecked
-            return (T) this;
-        }
-
-        for (var i = 0; i < signedTransactions.size(); ++i) {
-            var bodyBytes = signedTransactions.get(i).getBodyBytes().toByteArray();
-
-            // NOTE: Yes the transactionSigner is invoked N times
-            //  However for a verified/pin signature system it is reasonable to allow it to sign multiple
-            //  transactions with identical details apart from the node ID
-            var signatureBytes = transactionSigner.apply(bodyBytes);
-
-            signatures
-                .get(i)
-                .addSigPair(publicKey.toSignaturePairProtobuf(signatureBytes));
-        }
+        publicKeys.add(publicKey);
+        signers.add(transactionSigner);
 
         // noinspection unchecked
         return (T) this;
@@ -769,10 +742,6 @@ public abstract class Transaction<T extends Transaction<T>>
         if (isFrozen()) {
             // noinspection unchecked
             return (T) this;
-        }
-
-        if (client != null) {
-            setSignOnDemand(client.getSignonDemand());
         }
 
         if (client != null && bodyBuilder.getTransactionFee() == 0) {

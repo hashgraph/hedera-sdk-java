@@ -42,7 +42,6 @@ public final class Client implements AutoCloseable {
 
     @Nullable
     private Operator operator;
-    private boolean signonDemand = true;
 
     Duration requestTimeout = Duration.ofMinutes(2);
 
@@ -363,15 +362,6 @@ public final class Client implements AutoCloseable {
 
         this.operator = new Operator(accountId, publicKey, transactionSigner);
         return this;
-    }
-
-    public synchronized Client setSignonDemand(boolean signonDemand) {
-        this.signonDemand = signonDemand;
-        return this;
-    }
-
-    public boolean getSignonDemand() {
-        return signonDemand;
     }
 
     /**
