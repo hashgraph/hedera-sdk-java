@@ -310,5 +310,21 @@ The `Transaction` is not immediately sent after freezing.  Instead, the user of 
 
 
 
-**This document is not comprehensive.  There are classes I have not yet documented, or which I have only documented in passing, like ChunkedTransaction.**
+### `TopicMessageQuery`
+
+Unlike most classes in the Hedera SDK, this is _not_ a query to a Hedera Hashgraph network, it is a query to a _mirror_ network.  As such, it is _not_ a subclass of `Query`, despite its name.
+
+To use a `TopicMessageQuery`, instantiate one, configure it to specify which messages you want to receive, add any custom handlers you want, and then call its `MakeStreamingCall()` method.  The user must pass an `onNext()` handler to handle each response message.  The mirror network of the given `Client` will be used.  `MakeStreamingCall()` will make an asynchronous streaming rpc to one node in the mirror network.
+
+The proto messages used under the hood are defined in `"proto/mirror/ConsensusService.proto"`, and response messages are parsed into `TopicMessage`s before being handed over to the `onNext()` handler.  The `ConsensusTopicResponse` proto message contains a `chunkInfo` field of type `ConsensusMessageChunkInfo` , which is defined in `ConsensusSubmitMessage.proto`.  `ConsensusTopicResponse` also has a `message` field, which is of type `bytes`, and these bytes are what the user is really querying for.  The SDK does not do anything to parse these bytes.  The meaning and parsing of these bytes is left to the user.
+
+The responses may be chunked.  If they are, `TopicMessageQuery` will collect all of the chunks into one `TopicMessage` before passing it to the `onNext()` handler.  The `initialTransactionID` field of each responses' `chunkInfo` field is used to identify which pending message this response is a chunk of and store it appropriately.  `chunkInfo`'s `total` field is used to identify whether we've collected all of the chunks of a pending message, and if we have, we construct the `TopicMessage` and dispatch it to the `onNext()` handler.  Because grpc works over HTTP, we're guaranteed to receive all of the chunks, and in the correct order (unless an error occurs, obviously), though chunks from different topic messages may be interleaved.
+
+In addition to the `onNext()` handler, there are several optional handlers which can be set with `setCompletionHandler()`, `setErrorhandler()`, and `setRetryHandler()`.  The retry handler returns a boolean to indicate whether the query should be retried.
+
+
+
+
+
+**This document is not comprehensive.  There are classes I have not yet documented, or which I have only documented in passing, like `ChunkedTransaction`.**
 
