@@ -645,12 +645,9 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     protected boolean keyAlreadySigned(PublicKey key) {
-        if (!signatures.isEmpty()) {
-            for (var sigPair : signatures.get(0).getSigPairList()) {
-                if (ByteString.copyFrom(key.toBytes()).startsWith(sigPair.getPubKeyPrefix())) {
-                    // transaction already signed with the operator
-                    return true;
-                }
+        for (var publicKey : publicKeys) {
+            if (publicKey.toString().equals(key.toString())) {
+                return true;
             }
         }
 
