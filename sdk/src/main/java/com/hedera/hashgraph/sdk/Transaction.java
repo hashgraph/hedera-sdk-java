@@ -847,8 +847,12 @@ public abstract class Transaction<T extends Transaction<T>>
      */
     void signTransaction(int index) {
         if (signatures.get(index).getSigPairCount() != 0) {
-            for (var pubilcKey : publicKeys) {
-                if (signatures.get(index).getSigPair(0).getPubKeyPrefix().equals(ByteString.copyFrom(pubilcKey.toBytes()))) {
+            for (var i = 0; i < publicKeys.size(); i++) {
+                var publicKey = publicKeys.get(i);
+                var signer = signers.get(i);
+
+                if (signer != null &&
+                        signatures.get(index).getSigPair(0).getPubKeyPrefix().equals(ByteString.copyFrom(publicKey.toBytes()))) {
                     return;
                 }
             }
