@@ -124,6 +124,13 @@ public abstract class Transaction<T extends Transaction<T>>
                 transactions.add(nodeEntry.getValue());
                 signatures.add(transaction.getSigMap().toBuilder());
                 signedTransactions.add(transaction.toBuilder());
+
+                if (publicKeys.isEmpty()) {
+                    for (var sigPair : transaction.getSigMap().getSigPairList()) {
+                        publicKeys.add(PublicKey.fromBytes(sigPair.getPubKeyPrefix().toByteArray()));
+                        signers.add(null);
+                    }
+                }
             }
         }
 
@@ -838,12 +845,20 @@ public abstract class Transaction<T extends Transaction<T>>
      */
     void signTransaction(int index) {
         if (signatures.get(index).getSigPairCount() != 0) {
-            return;
+            for (var pubilcKey : publicKeys) {
+                if (signatures.get(index).getSigPair(0).getPubKeyPrefix().equals(ByteString.copyFrom(pubilcKey.toBytes()))) {
+                    return;
+                }
+            }
         }
 
         var bodyBytes = signedTransactions.get(index).getBodyBytes().toByteArray();
 
         for (var i = 0; i < publicKeys.size(); i++) {
+            if (signers.get(i) == null) {
+                continue;
+            }
+
             var signatureBytes = signers.get(i).apply(bodyBytes);
 
             signatures
