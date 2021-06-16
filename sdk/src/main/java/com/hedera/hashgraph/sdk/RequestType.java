@@ -391,6 +391,8 @@ public enum RequestType {
                 return CONSENSUS_GET_TOPIC_INFO;
             case ConsensusSubmitMessage:
                 return CONSENSUS_SUBMIT_MESSAGE;
+            case UncheckedSubmit:
+                return UNCHECKED_SUBMIT;
             case TokenCreate:
                 return TOKEN_CREATE;
             case TokenGetInfo:
@@ -518,6 +520,8 @@ public enum RequestType {
                 return "CONSENSUS_GET_TOPIC_INFO";
             case CONSENSUS_SUBMIT_MESSAGE:
                 return "CONSENSUS_SUBMIT_MESSAGE";
+            case UNCHECKED_SUBMIT:
+                return "UNCHECKED_SUBMIT";
             case TOKEN_CREATE:
                 return "TOKEN_CREATE";
             case TOKEN_GET_INFO:
