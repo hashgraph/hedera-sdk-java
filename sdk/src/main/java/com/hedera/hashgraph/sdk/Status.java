@@ -886,7 +886,82 @@ public enum Status {
     /*
      * The sum of all custom fractional fees must be strictly less than 1
      */
-    INVALID_CUSTOM_FRACTIONAL_FEES_SUM(ResponseCodeEnum.INVALID_CUSTOM_FRACTIONAL_FEES_SUM);
+    INVALID_CUSTOM_FRACTIONAL_FEES_SUM(ResponseCodeEnum.INVALID_CUSTOM_FRACTIONAL_FEES_SUM),
+    
+    /*
+     * An operation was assigned to more than one throttle group in a given bucket
+     */
+    OPERATION_REPEATED_IN_BUCKET_GROUPS(ResponseCodeEnum.OPERATION_REPEATED_IN_BUCKET_GROUPS),
+
+    /*
+     * The capacity needed to satisfy all opsPerSec groups in a bucket overflowed a signed 8-byte integral type
+     */
+    BUCKET_CAPACITY_OVERFLOW(ResponseCodeEnum.BUCKET_CAPACITY_OVERFLOW),
+
+    /*
+     * Given the network size in the address book, the node-level capacity for an operation would never be enough to accept a single request; usually means a bucket burstPeriod should be increased
+     */
+    NODE_CAPACITY_NOT_SUFFICIENT_FOR_OPERATION(ResponseCodeEnum.NODE_CAPACITY_NOT_SUFFICIENT_FOR_OPERATION),
+
+    /*
+     * A bucket was defined without any throttle groups
+     */
+    BUCKET_HAS_NO_THROTTLE_GROUPS(ResponseCodeEnum.BUCKET_HAS_NO_THROTTLE_GROUPS),
+
+    /*
+     * A throttle group was granted zero opsPerSec
+     */
+    THROTTLE_GROUP_HAS_ZERO_OPS_PER_SEC(ResponseCodeEnum.THROTTLE_GROUP_HAS_ZERO_OPS_PER_SEC),
+
+    /*
+     * The throttle definitions file was updated, but some supported operations were not assigned a bucket
+     */
+    SUCCESS_BUT_MISSING_EXPECTED_OPERATION(ResponseCodeEnum.SUCCESS_BUT_MISSING_EXPECTED_OPERATION),
+
+    /*
+     * The new contents for the throttle definitions system file were not valid protobuf
+     */
+    UNPARSEABLE_THROTTLE_DEFINITIONS(ResponseCodeEnum.UNPARSEABLE_THROTTLE_DEFINITIONS),
+
+    /*
+     * The new throttle definitions system file were invalid, and no more specific error could be divined
+     */
+    INVALID_THROTTLE_DEFINITIONS(ResponseCodeEnum.INVALID_THROTTLE_DEFINITIONS),
+
+    /*
+     * The transaction references an account which has passed its expiration without renewal funds available, and currently remains in the ledger only because of the grace period given to expired entities
+     */
+    ACCOUNT_EXPIRED_AND_PENDING_REMOVAL(ResponseCodeEnum.ACCOUNT_EXPIRED_AND_PENDING_REMOVAL),
+
+    /*
+     * Invalid token max supply
+     */
+    INVALID_TOKEN_MAX_SUPPLY(ResponseCodeEnum.INVALID_TOKEN_MAX_SUPPLY),
+
+    /*
+     * Invalid token nft serial number
+     */
+    INVALID_TOKEN_NFT_SERIAL_NUMBER(ResponseCodeEnum.INVALID_TOKEN_NFT_SERIAL_NUMBER),
+
+    /*
+     * Invalid nft id
+     */
+    INVALID_NFT_ID(ResponseCodeEnum.INVALID_NFT_ID),
+
+    /*
+     * Nft metadata is too long
+     */
+    METADATA_TOO_LONG(ResponseCodeEnum.METADATA_TOO_LONG),
+
+    /*
+     * Repeated operations count exceeds the limit
+     */
+    BATCH_SIZE_LIMIT_EXCEEDED(ResponseCodeEnum.BATCH_SIZE_LIMIT_EXCEEDED),
+
+    /*
+     * The range of data to be gathered exceeds the limit
+     */
+    QUERY_RANGE_LIMIT_EXCEEDED(ResponseCodeEnum.QUERY_RANGE_LIMIT_EXCEEDED);
 
 
     final ResponseCodeEnum code;
@@ -1269,6 +1344,36 @@ public enum Status {
                 return CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE;
             case INVALID_CUSTOM_FRACTIONAL_FEES_SUM:
                 return INVALID_CUSTOM_FRACTIONAL_FEES_SUM;
+            case OPERATION_REPEATED_IN_BUCKET_GROUPS:
+                return OPERATION_REPEATED_IN_BUCKET_GROUPS;
+            case BUCKET_CAPACITY_OVERFLOW:
+                return BUCKET_CAPACITY_OVERFLOW;
+            case NODE_CAPACITY_NOT_SUFFICIENT_FOR_OPERATION:
+                return NODE_CAPACITY_NOT_SUFFICIENT_FOR_OPERATION;
+            case BUCKET_HAS_NO_THROTTLE_GROUPS:
+                return BUCKET_HAS_NO_THROTTLE_GROUPS;
+            case THROTTLE_GROUP_HAS_ZERO_OPS_PER_SEC:
+                return THROTTLE_GROUP_HAS_ZERO_OPS_PER_SEC;
+            case SUCCESS_BUT_MISSING_EXPECTED_OPERATION:
+                return SUCCESS_BUT_MISSING_EXPECTED_OPERATION;
+            case UNPARSEABLE_THROTTLE_DEFINITIONS:
+                return UNPARSEABLE_THROTTLE_DEFINITIONS;
+            case INVALID_THROTTLE_DEFINITIONS:
+                return INVALID_THROTTLE_DEFINITIONS;
+            case ACCOUNT_EXPIRED_AND_PENDING_REMOVAL:
+                return ACCOUNT_EXPIRED_AND_PENDING_REMOVAL;
+            case INVALID_TOKEN_MAX_SUPPLY:
+                return INVALID_TOKEN_MAX_SUPPLY;
+            case INVALID_TOKEN_NFT_SERIAL_NUMBER:
+                return INVALID_TOKEN_NFT_SERIAL_NUMBER;
+            case INVALID_NFT_ID:
+                return INVALID_NFT_ID;
+            case METADATA_TOO_LONG:
+                return METADATA_TOO_LONG;
+            case BATCH_SIZE_LIMIT_EXCEEDED:
+                return BATCH_SIZE_LIMIT_EXCEEDED;
+            case QUERY_RANGE_LIMIT_EXCEEDED:
+                return QUERY_RANGE_LIMIT_EXCEEDED;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

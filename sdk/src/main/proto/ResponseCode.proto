@@ -237,4 +237,19 @@ enum ResponseCodeEnum {
   CUSTOM_FEES_ARE_MARKED_IMMUTABLE = 240; // Once custom fees are marked as immutable, they can never be changed (or made mutable again)
   CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE = 241; // A fractional custom fee exceeded the range of a 64-bit signed integer
   INVALID_CUSTOM_FRACTIONAL_FEES_SUM = 242; // The sum of all custom fractional fees must be strictly less than 1
+  OPERATION_REPEATED_IN_BUCKET_GROUPS = 215; // An operation was assigned to more than one throttle group in a given bucket
+  BUCKET_CAPACITY_OVERFLOW = 216; // The capacity needed to satisfy all opsPerSec groups in a bucket overflowed a signed 8-byte integral type
+  NODE_CAPACITY_NOT_SUFFICIENT_FOR_OPERATION = 217; // Given the network size in the address book, the node-level capacity for an operation would never be enough to accept a single request; usually means a bucket burstPeriod should be increased
+  BUCKET_HAS_NO_THROTTLE_GROUPS = 218; // A bucket was defined without any throttle groups
+  THROTTLE_GROUP_HAS_ZERO_OPS_PER_SEC = 219; // A throttle group was granted zero opsPerSec
+  SUCCESS_BUT_MISSING_EXPECTED_OPERATION = 220; // The throttle definitions file was updated, but some supported operations were not assigned a bucket
+  UNPARSEABLE_THROTTLE_DEFINITIONS = 221; // The new contents for the throttle definitions system file were not valid protobuf
+  INVALID_THROTTLE_DEFINITIONS = 222; // The new throttle definitions system file were invalid, and no more specific error could be divined
+  ACCOUNT_EXPIRED_AND_PENDING_REMOVAL = 223; // The transaction references an account which has passed its expiration without renewal funds available, and currently remains in the ledger only because of the grace period given to expired entities
+  INVALID_TOKEN_MAX_SUPPLY = 224; // Invalid token max supply
+  INVALID_TOKEN_NFT_SERIAL_NUMBER = 225; // Invalid token nft serial number
+  INVALID_NFT_ID = 226; // Invalid nft id
+  METADATA_TOO_LONG = 227; // Nft metadata is too long
+  BATCH_SIZE_LIMIT_EXCEEDED = 228; // Repeated operations count exceeds the limit
+  QUERY_RANGE_LIMIT_EXCEEDED = 229; // The range of data to be gathered exceeds the limit
 }

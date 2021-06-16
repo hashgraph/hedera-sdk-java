@@ -190,6 +190,7 @@ com.hedera.hashgraph.sdk.AccountInfoTest.toProtobuf=[
     ],
     "tokenRelationships_": [ ],
     "memo_": "",
+    "ownedNfts_": 0,
     "initialized": true
   }
 ]
