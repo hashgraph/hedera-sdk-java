@@ -674,6 +674,8 @@ public abstract class Transaction<T extends Transaction<T>>
         }
 
         transactions.clear();
+        publicKeys.add(publicKey);
+        signers.add(null);
         signatures.get(0).addSigPair(publicKey.toSignaturePairProtobuf(signature));
 
         // noinspection unchecked
