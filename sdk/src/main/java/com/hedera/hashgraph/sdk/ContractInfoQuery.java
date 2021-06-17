@@ -8,6 +8,8 @@ import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 
+import java.util.Objects;
+
 /**
  * Get information about a smart contract instance.
  * <p>
@@ -32,6 +34,7 @@ public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQue
      * @param contractId The ContractId to be set
      */
     public ContractInfoQuery setContractId(ContractId contractId) {
+        Objects.requireNonNull(contractId);
         builder.setContractID(contractId.toProtobuf());
 
         return this;

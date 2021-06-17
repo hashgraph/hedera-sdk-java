@@ -9,6 +9,7 @@ import io.grpc.MethodDescriptor;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * Get the balance of a Hedera™ crypto-currency account. This returns only the balance, so it is a
@@ -36,6 +37,7 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
      * @return {@code this}
      */
     public AccountBalanceQuery setAccountId(AccountId accountId) {
+        Objects.requireNonNull(accountId);
         builder.setAccountID(accountId.toProtobuf());
         return this;
     }
@@ -53,6 +55,7 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
      * @return {@code this}
      */
     public AccountBalanceQuery setContractId(ContractId contractId) {
+        Objects.requireNonNull(contractId);
         builder.setContractID(contractId.toProtobuf());
         return this;
     }

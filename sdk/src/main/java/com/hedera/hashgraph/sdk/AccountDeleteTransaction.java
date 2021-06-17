@@ -8,6 +8,7 @@ import io.grpc.MethodDescriptor;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Marks an account as deleted, moving all its current hbars to another account.
@@ -48,6 +49,7 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
      */
     public AccountDeleteTransaction setAccountId(AccountId deleteAccountId) {
         requireNotFrozen();
+        Objects.requireNonNull(deleteAccountId);
         builder.setDeleteAccountID(deleteAccountId.toProtobuf());
         return this;
     }
@@ -65,6 +67,7 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
      */
     public AccountDeleteTransaction setTransferAccountId(AccountId transferAccountId) {
         requireNotFrozen();
+        Objects.requireNonNull(transferAccountId);
         builder.setTransferAccountID(transferAccountId.toProtobuf());
         return this;
     }

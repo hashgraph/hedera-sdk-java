@@ -10,6 +10,7 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Modify a smart contract instance to have the given parameter values.
@@ -65,6 +66,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @return {@code this}
      */
     public ContractUpdateTransaction setContractId(ContractId contractId) {
+        Objects.requireNonNull(contractId);
         requireNotFrozen();
         builder.setContractID(contractId.toProtobuf());
         return this;
@@ -83,6 +85,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @return {@code this}
      */
     public ContractUpdateTransaction setExpirationTime(Instant expirationTime) {
+        Objects.requireNonNull(expirationTime);
         requireNotFrozen();
         builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
         return this;
@@ -100,6 +103,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @return {@code this}
      */
     public ContractUpdateTransaction setAdminKey(Key adminKey) {
+        Objects.requireNonNull(adminKey);
         requireNotFrozen();
         builder.setAdminKey(adminKey.toProtobufKey());
         return this;
@@ -124,6 +128,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @return {@code this}
      */
     public ContractUpdateTransaction setProxyAccountId(AccountId proxyAccountId) {
+        Objects.requireNonNull(proxyAccountId);
         requireNotFrozen();
         builder.setProxyAccountID(proxyAccountId.toProtobuf());
         return this;
@@ -141,6 +146,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @return {@code this}
      */
     public ContractUpdateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
+        Objects.requireNonNull(autoRenewPeriod);
         requireNotFrozen();
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         return this;
@@ -161,6 +167,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @return {@code this}
      */
     public ContractUpdateTransaction setBytecodeFileId(FileId byteCodeFileId) {
+        Objects.requireNonNull(byteCodeFileId);
         requireNotFrozen();
         builder.setFileID(byteCodeFileId.toProtobuf());
         return this;

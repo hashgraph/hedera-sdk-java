@@ -48,6 +48,7 @@ public final class AccountId {
     }
 
     static AccountId fromProtobuf(AccountID accountId) {
+        Objects.requireNonNull(accountId);
         return new AccountId(
             accountId.getShardNum(), accountId.getRealmNum(), accountId.getAccountNum());
     }

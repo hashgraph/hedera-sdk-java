@@ -9,6 +9,7 @@ import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Start a new smart contract instance.
@@ -93,6 +94,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      * @return {@code this}
      */
     public ContractCreateTransaction setBytecodeFileId(FileId byteCodeFileId) {
+        Objects.requireNonNull(byteCodeFileId);
         requireNotFrozen();
         builder.setFileID(byteCodeFileId.toProtobuf());
         return this;
@@ -114,6 +116,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      * @return {@code this}
      */
     public ContractCreateTransaction setAdminKey(Key adminKey) {
+        Objects.requireNonNull(adminKey);
         requireNotFrozen();
         builder.setAdminKey(adminKey.toProtobufKey());
         return this;
@@ -147,6 +150,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      * @return {@code this}
      */
     public ContractCreateTransaction setInitialBalance(Hbar initialBalance) {
+        Objects.requireNonNull(initialBalance);
         requireNotFrozen();
         builder.setInitialBalance(initialBalance.toTinybars());
         return this;
@@ -170,6 +174,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      * @return {@code this}
      */
     public ContractCreateTransaction setProxyAccountId(AccountId proxyAccountId) {
+        Objects.requireNonNull(proxyAccountId);
         requireNotFrozen();
         builder.setProxyAccountID(proxyAccountId.toProtobuf());
         return this;
@@ -187,6 +192,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      * @return {@code this}
      */
     public ContractCreateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
+        Objects.requireNonNull(autoRenewPeriod);
         requireNotFrozen();
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         return this;
@@ -218,6 +224,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      * @return {@code this}
      */
     public ContractCreateTransaction setConstructorParameters(ContractFunctionParameters constructorParameters) {
+        Objects.requireNonNull(constructorParameters);
         requireNotFrozen();
         builder.setConstructorParameters(constructorParameters.toBytes(null));
         return this;

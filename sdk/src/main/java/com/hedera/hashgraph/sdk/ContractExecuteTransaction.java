@@ -9,6 +9,7 @@ import io.grpc.MethodDescriptor;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Call a function of the given smart contract instance, giving it parameters as its inputs.
@@ -50,6 +51,7 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
      * @return {@code this}
      */
     public ContractExecuteTransaction setContractId(ContractId contractId) {
+        Objects.requireNonNull(contractId);
         requireNotFrozen();
         builder.setContractID(contractId.toProtobuf());
         return this;
@@ -82,6 +84,7 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
      * @return {@code this}
      */
     public ContractExecuteTransaction setPayableAmount(Hbar amount) {
+        Objects.requireNonNull(amount);
         requireNotFrozen();
         builder.setAmount(amount.toTinybars());
         return this;
@@ -101,6 +104,7 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
      * @return {@code this}
      */
     public ContractExecuteTransaction setFunctionParameters(ByteString functionParameters) {
+        Objects.requireNonNull(functionParameters);
         requireNotFrozen();
         builder.setFunctionParameters(functionParameters);
         return this;
@@ -127,6 +131,7 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
      * @return {@code this}
      */
     public ContractExecuteTransaction setFunction(String name, ContractFunctionParameters params) {
+        Objects.requireNonNull(params);
         return setFunctionParameters(params.toBytes(name));
     }
 
