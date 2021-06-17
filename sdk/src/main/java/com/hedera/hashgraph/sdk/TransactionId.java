@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
 import java8.util.concurrent.CompletableFuture;

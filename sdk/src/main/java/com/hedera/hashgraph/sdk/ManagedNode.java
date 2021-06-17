@@ -9,11 +9,12 @@ import javax.annotation.Nullable;
 
 abstract class ManagedNode {
     String address;
-    @Nullable
-    ManagedChannel channel = null;
     final ExecutorService executor;
     long lastUsed = 0;
     long useCount = 0;
+
+    @Nullable
+    ManagedChannel channel = null;
 
     ManagedNode(String address, ExecutorService executor) {
         this.executor = executor;

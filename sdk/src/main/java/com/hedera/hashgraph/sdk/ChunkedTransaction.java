@@ -121,7 +121,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         return transactionHashes;
     }
 
-    @Override @FunctionalExecutable(type = "java.util.List<TransactionResponse>")
+    @Override 
+    @FunctionalExecutable(type = "java.util.List<TransactionResponse>")
     public CompletableFuture<List<com.hedera.hashgraph.sdk.TransactionResponse>> executeAllAsync(Client client) {
         if (!isFrozen()) {
             freezeWith(client);

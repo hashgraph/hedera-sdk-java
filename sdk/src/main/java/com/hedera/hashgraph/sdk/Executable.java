@@ -80,7 +80,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
     abstract CompletableFuture<Void> onExecuteAsync(Client client);
 
-    @Override @FunctionalExecutable
+    @Override 
+    @FunctionalExecutable
     public CompletableFuture<O> executeAsync(Client client) {
         return onExecuteAsync(client).thenCompose((v) -> executeAsync(client, 1, null));
     }
