@@ -76,8 +76,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
      */
     public SdkRequestT setNodeAccountIds(List<AccountId> nodeAccountIds) {
         this.nodeAccountIds = nodeAccountIds;
-        nextNodeIndex = 0;
-        nodes.clear();
 
         // noinspection unchecked
         return (SdkRequestT) this;
@@ -91,18 +89,22 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             if(nodeAccountIds.isEmpty()) {
                 throw new IllegalStateException("Request node account IDs were not set before executing");
             }
-            if(nodes.isEmpty()) {
-                for(AccountId id : nodeAccountIds) {
-                    @Nullable
-                    Node node = client.network.networkNodes.get(id);
-                    if(node == null) {
-                        throw new IllegalStateException("Some node IDs did not map to valid nodes in the client network");
-                    }
-                    nodes.add(Objects.requireNonNull(node));
-                }
-            }
+
+            setNodesFromNodeAccountIds(client);
+            
             return executeAsync(client, 1, null);
         });
+    }
+
+    private void setNodesFromNodeAccountIds(Client client) throws IllegalStateException {
+        for(var accountId : nodeAccountIds) {
+            @Nullable
+            var node = client.network.networkNodes.get(accountId);
+            if(node == null) {
+                throw new IllegalStateException("Some node account IDs did not map to valid nodes in the client's network");
+            }
+            nodes.add(Objects.requireNonNull(node));
+        }
     }
 
     private CompletableFuture<O> executeAsync(Client client, int attempt, @Nullable Throwable lastException) {
