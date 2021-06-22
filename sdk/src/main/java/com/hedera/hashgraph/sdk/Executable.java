@@ -11,7 +11,9 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 
 import java.util.Collections;
+import java.util.Objects;
 import java.util.List;
+import java.util.ArrayList;
 
 import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
 
@@ -21,6 +23,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     protected int maxAttempts = 10;
     protected int nextNodeIndex = 0;
     protected List<AccountId> nodeAccountIds = Collections.emptyList();
+    protected List<Node> nodes = new ArrayList<>();
 
     Executable() {
     }
@@ -82,7 +85,26 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
     @FunctionalExecutable
     public CompletableFuture<O> executeAsync(Client client) {
-        return onExecuteAsync(client).thenCompose((v) -> executeAsync(client, 1, null));
+        return onExecuteAsync(client).thenCompose((v) -> {
+            if(nodeAccountIds.isEmpty()) {
+                throw new IllegalStateException("Request node account IDs were not set before executing");
+            }
+
+            setNodesFromNodeAccountIds(client);
+            
+            return executeAsync(client, 1, null);
+        });
+    }
+
+    private void setNodesFromNodeAccountIds(Client client) throws IllegalStateException {
+        for(var accountId : nodeAccountIds) {
+            @Nullable
+            var node = client.network.networkNodes.get(accountId);
+            if(node == null) {
+                throw new IllegalStateException("Some node account IDs did not map to valid nodes in the client's network");
+            }
+            nodes.add(Objects.requireNonNull(node));
+        }
     }
 
     private CompletableFuture<O> executeAsync(Client client, int attempt, @Nullable Throwable lastException) {
@@ -90,7 +112,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             return CompletableFuture.<O>failedFuture(new Exception("Failed to get gRPC response within maximum retry count", lastException));
         }
 
-        var node = client.network.networkNodes.get(getNodeAccountId());
+        var node = nodes.get(nextNodeIndex);
         node.inUse();
 
         logger.trace("Sending request #{} to node {}: {}", attempt, node.accountId, this);
@@ -192,14 +214,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
      * Called to direct the invocation of the query to the appropriate gRPC service.
      */
     abstract MethodDescriptor<ProtoRequestT, ResponseT> getMethodDescriptor();
-
-    final AccountId getNodeAccountId() {
-        if (!nodeAccountIds.isEmpty()) {
-            return nodeAccountIds.get(nextNodeIndex);
-        } else {
-            throw new IllegalStateException("Request node account IDs were not set before executing");
-        }
-    }
 
     @Nullable
     abstract TransactionId getTransactionId();
