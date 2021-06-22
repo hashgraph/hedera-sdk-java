@@ -66,6 +66,8 @@ allprojects {
 			disable("Finally")
 			disable("BooleanParameter")
 			disable("ThreadJoinLoop")
+			disable("UnnecessaryDefaultInEnumSwitch")
+			disable("UngroupedOverloads")
 
 			// Uncomment do disable Android + JDK7 checks
 			// disable("Java7ApiChecker")

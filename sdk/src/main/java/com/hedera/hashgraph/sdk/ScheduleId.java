@@ -40,9 +40,9 @@ public final class ScheduleId {
         return EntityIdHelper.fromString(id, ScheduleId::new);
     }
 
-    static ScheduleId fromProtobuf(ScheduleID ScheduleId) {
+    static ScheduleId fromProtobuf(ScheduleID scheduleId) {
         return new ScheduleId(
-            ScheduleId.getShardNum(), ScheduleId.getRealmNum(), ScheduleId.getScheduleNum());
+            scheduleId.getShardNum(), scheduleId.getRealmNum(), scheduleId.getScheduleNum());
     }
 
     public static ScheduleId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {

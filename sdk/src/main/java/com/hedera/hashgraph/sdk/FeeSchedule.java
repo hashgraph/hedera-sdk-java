@@ -53,7 +53,7 @@ public class FeeSchedule {
     com.hedera.hashgraph.sdk.proto.FeeSchedule toProtobuf() {
         var returnBuilder = com.hedera.hashgraph.sdk.proto.FeeSchedule.newBuilder();
         if(expirationTime != null) {
-            returnBuilder.setExpiryTime(expirationTime != null ? InstantConverter.toSecondsProtobuf(expirationTime) : null);
+            returnBuilder.setExpiryTime(InstantConverter.toSecondsProtobuf(expirationTime));
         }
         for(TransactionFeeSchedule tFeeSchedule : getTransactionFeeSchedules()) {
             returnBuilder.addTransactionFeeSchedule(tFeeSchedule.toProtobuf());

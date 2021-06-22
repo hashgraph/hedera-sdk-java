@@ -3,14 +3,25 @@ package com.hedera.hashgraph.sdk;
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.*;
+//import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SignatureMap;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SignedTransaction;
+import com.hedera.hashgraph.sdk.proto.TransactionList;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Function;
 import org.bouncycastle.crypto.digests.SHA384Digest;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.ArrayList;
 
 /**
  * Base class for all transactions that may be built and submitted to Hedera.
@@ -850,7 +861,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
         var operatorId = client.getOperatorAccountId();
 
-        if (operatorId != null && operatorId.equals(Objects.requireNonNull(getTransactionId()).accountId)) {
+        if (operatorId != null && operatorId.equals(Objects.requireNonNull(getTransactionId().accountId))) {
             // on execute, sign each transaction with the operator, if present
             // and we are signing a transaction that used the default transaction ID
             signWithOperator(client);

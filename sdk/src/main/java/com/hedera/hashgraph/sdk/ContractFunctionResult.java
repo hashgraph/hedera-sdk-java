@@ -96,9 +96,9 @@ public final class ContractFunctionResult {
         var strings = new ArrayList<String>();
 
         for (int i = 0; i < count; i++) {
-            var str_offset = getIntValueAt(offset + 32 + (i * 32));
-            var len = getIntValueAt(offset + str_offset + 32);
-            var str = getByteString(offset + str_offset + 32 + 32, offset + str_offset + 32 + 32 + len).toStringUtf8();
+            var strOffset = getIntValueAt(offset + 32 + (i * 32));
+            var len = getIntValueAt(offset + strOffset + 32);
+            var str = getByteString(offset + strOffset + 32 + 32, offset + strOffset + 32 + 32 + len).toStringUtf8();
             strings.add(str);
         }
 

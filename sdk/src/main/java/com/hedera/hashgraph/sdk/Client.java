@@ -16,7 +16,11 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.Map;
+import java.util.List;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
@@ -101,7 +105,7 @@ public final class Client implements AutoCloseable {
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forMainnet() {
-        var network = new Hashtable<String, AccountId>();
+        var network = new HashMap<String, AccountId>();
         network.put("35.237.200.180:50211", new AccountId(3));
         network.put("35.186.191.247:50211", new AccountId(4));
         network.put("35.192.2.25:50211", new AccountId(5));
@@ -139,7 +143,7 @@ public final class Client implements AutoCloseable {
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forTestnet() {
-        var network = new Hashtable<String, AccountId>();
+        var network = new HashMap<String, AccountId>();
         network.put("0.testnet.hedera.com:50211", new AccountId(3));
         network.put("1.testnet.hedera.com:50211", new AccountId(4));
         network.put("2.testnet.hedera.com:50211", new AccountId(5));
@@ -159,7 +163,7 @@ public final class Client implements AutoCloseable {
     }
 
     public static Client forPreviewnet() {
-        var network = new Hashtable<String, AccountId>();
+        var network = new HashMap<String, AccountId>();
         network.put("0.previewnet.hedera.com:50211", new AccountId(3));
         network.put("1.previewnet.hedera.com:50211", new AccountId(4));
         network.put("2.previewnet.hedera.com:50211", new AccountId(5));
@@ -296,7 +300,7 @@ public final class Client implements AutoCloseable {
     }
 
     public Map<String, AccountId> getNetwork() {
-        var network = new Hashtable<String, AccountId>(this.network.network.size());
+        var network = new HashMap<String, AccountId>(this.network.network.size());
 
         for (var entry : this.network.network.entrySet()) {
             network.put(entry.getKey(), AccountId.fromProtobuf(entry.getValue().toProtobuf()));
@@ -456,12 +460,6 @@ public final class Client implements AutoCloseable {
     public void close(Duration timeout) throws TimeoutException {
         network.close(timeout);
         mirrorNetwork.close(timeout);
-    }
-
-    private String getUserAgent() {
-        var thePackage = getClass().getPackage();
-        var implementationVersion = thePackage != null ? thePackage.getImplementationVersion() : null;
-        return "hedera-sdk-java/" + ((implementationVersion != null) ? ("v" + implementationVersion) : "DEV");
     }
 
     static class Operator {

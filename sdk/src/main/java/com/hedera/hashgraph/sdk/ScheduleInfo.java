@@ -3,6 +3,8 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.threeten.bp.Instant;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.ScheduleGetInfoResponse;
 
 import javax.annotation.Nullable;
 
@@ -14,7 +16,7 @@ public final class ScheduleInfo {
 
     public final AccountId payerAccountId;
 
-    final com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody transactionBody;
+    final SchedulableTransactionBody transactionBody;
 
     public final KeyList signatories;
 
@@ -39,7 +41,7 @@ public final class ScheduleInfo {
         ScheduleId scheduleId,
         AccountId creatorAccountId,
         AccountId payerAccountId,
-        com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody transactionBody,
+        SchedulableTransactionBody transactionBody,
         KeyList signers,
         @Nullable Key adminKey,
         @Nullable TransactionId scheduledTransactionId,
@@ -61,7 +63,7 @@ public final class ScheduleInfo {
         this.deletedAt = deleted;
     }
 
-    static ScheduleInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.ScheduleGetInfoResponse scheduleInfo) {
+    static ScheduleInfo fromProtobuf(ScheduleGetInfoResponse scheduleInfo) {
         var info = scheduleInfo.getScheduleInfo();
 
         var scheduleId = ScheduleId.fromProtobuf(info.getScheduleID());
@@ -88,7 +90,7 @@ public final class ScheduleInfo {
     }
 
     public static ScheduleInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(com.hedera.hashgraph.sdk.proto.ScheduleGetInfoResponse.parseFrom(bytes).toBuilder().build());
+        return fromProtobuf(ScheduleGetInfoResponse.parseFrom(bytes).toBuilder().build());
     }
 
     com.hedera.hashgraph.sdk.proto.ScheduleInfo toProtobuf() {
