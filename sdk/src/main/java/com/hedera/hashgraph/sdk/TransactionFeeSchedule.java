@@ -3,15 +3,19 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.InvalidProtocolBufferException;
 import javax.annotation.Nullable;
 import com.google.common.base.MoreObjects;
+import java.util.List;
+import java.util.ArrayList;
 
 public class TransactionFeeSchedule {
     private RequestType requestType;
     @Nullable
     private FeeData feeData;
+    private List<FeeData> fees;
 
     public TransactionFeeSchedule() {
         requestType = RequestType.NONE;
         feeData = null;
+        fees = new ArrayList<>();
     }
 
     static TransactionFeeSchedule fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionFeeSchedule transactionFeeSchedule) {
@@ -33,14 +37,20 @@ public class TransactionFeeSchedule {
         return this;
     }
 
+    @Deprecated
     @Nullable
     public FeeData getFeeData() {
         return feeData;
     }
     
+    @Deprecated
     public TransactionFeeSchedule setFeeData(@Nullable FeeData feeData) {
         this.feeData = feeData;
         return this;
+    }
+
+    public List<FeeData> getFees() {
+        return fees;
     }
 
     com.hedera.hashgraph.sdk.proto.TransactionFeeSchedule toProtobuf() {
@@ -48,6 +58,9 @@ public class TransactionFeeSchedule {
             .setHederaFunctionality(getRequestType().code);
         if(feeData != null) {
             returnBuilder.setFeeData(feeData.toProtobuf());
+        }
+        for(var fee : fees) {
+            returnBuilder.addFees(fee.toProtobuf());
         }
         return returnBuilder.build();
     }
@@ -57,6 +70,7 @@ public class TransactionFeeSchedule {
         return MoreObjects.toStringHelper(this)
             .add("requestType", getRequestType())
             .add("feeData", getFeeData())
+            .add("fees", getFees())
             .toString();
     }
 

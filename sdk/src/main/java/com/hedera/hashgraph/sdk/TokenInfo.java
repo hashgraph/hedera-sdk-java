@@ -113,6 +113,12 @@ public class TokenInfo {
 
     @Nullable
     public final CustomFeeList customFeeList;
+    
+    public final TokenType tokenType;
+
+    public final TokenSupplyType supplyType;
+
+    public final long maxSupply;
 
     private TokenInfo(
         TokenId tokenId,
@@ -133,7 +139,13 @@ public class TokenInfo {
         @Nullable Duration autoRenewPeriod,
         @Nullable Instant expirationTime,
         String tokenMemo,
+<<<<<<< HEAD
         @Nullable CustomFeeList customFeeList
+=======
+        TokenType tokenType,
+        TokenSupplyType supplyType,
+        long maxSupply
+>>>>>>> c7f711a7a... feat: add misc NFT support
     ) {
         this.tokenId = tokenId;
         this.name = name;
@@ -153,7 +165,13 @@ public class TokenInfo {
         this.autoRenewPeriod = autoRenewPeriod;
         this.expirationTime = expirationTime;
         this.tokenMemo = tokenMemo;
+<<<<<<< HEAD
         this.customFeeList = customFeeList;
+=======
+        this.tokenType = tokenType;
+        this.supplyType = supplyType;
+        this.maxSupply = maxSupply;
+>>>>>>> c7f711a7a... feat: add misc NFT support
     }
 
     @Nullable
@@ -192,7 +210,13 @@ public class TokenInfo {
             info.hasAutoRenewPeriod() ? DurationConverter.fromProtobuf(info.getAutoRenewPeriod()) : null,
             info.hasExpiry() ? InstantConverter.fromProtobuf(info.getExpiry()) : null,
             info.getMemo(),
+<<<<<<< HEAD
             info.hasCustomFees() ? CustomFeeList.fromProtobuf(info.getCustomFees()) : null
+=======
+            TokenType.valueOf(info.getTokenType()),
+            TokenSupplyType.valueOf(info.getSupplyType()),
+            info.getMaxSupply()
+>>>>>>> c7f711a7a... feat: add misc NFT support
         );
     }
 
@@ -209,6 +233,7 @@ public class TokenInfo {
     }
 
     TokenGetInfoResponse toProtobuf() {
+<<<<<<< HEAD
         var tokenInfoBuilder = com.hedera.hashgraph.sdk.proto.TokenInfo.newBuilder()
             .setTokenId(tokenId.toProtobuf())
             .setName(name)
@@ -245,6 +270,32 @@ public class TokenInfo {
             tokenInfoBuilder.setExpiry(InstantConverter.toProtobuf(expirationTime));
         }
         return TokenGetInfoResponse.newBuilder().setTokenInfo(tokenInfoBuilder).build();
+=======
+        return TokenGetInfoResponse.newBuilder().setTokenInfo(
+            com.hedera.hashgraph.sdk.proto.TokenInfo.newBuilder()
+                .setTokenId(tokenId.toProtobuf())
+                .setName(name)
+                .setSymbol(symbol)
+                .setDecimals(decimals)
+                .setTotalSupply(totalSupply)
+                .setTreasury(treasuryAccountId.toProtobuf())
+                .setAdminKey(adminKey != null ? adminKey.toProtobufKey() : null)
+                .setKycKey(kycKey != null ? kycKey.toProtobufKey() : null)
+                .setFreezeKey(freezeKey != null ? freezeKey.toProtobufKey() : null)
+                .setWipeKey(wipeKey != null ? wipeKey.toProtobufKey() : null)
+                .setSupplyKey(supplyKey != null ? supplyKey.toProtobufKey() : null)
+                .setDefaultFreezeStatus(freezeStatusToProtobuf(defaultFreezeStatus))
+                .setDefaultKycStatus(kycStatusToProtobuf(defaultKycStatus))
+                .setDeleted(isDeleted)
+                .setAutoRenewAccount(autoRenewAccount != null ? autoRenewAccount.toProtobuf() : null)
+                .setAutoRenewPeriod(autoRenewPeriod != null ? DurationConverter.toProtobuf(autoRenewPeriod) : null)
+                .setExpiry(expirationTime != null ? InstantConverter.toProtobuf(expirationTime) : null)
+                .setMemo(tokenMemo)
+                .setTokenType(tokenType.code)
+                .setSupplyType(supplyType.code)
+                .setMaxSupply(maxSupply)
+        ).build();
+>>>>>>> c7f711a7a... feat: add misc NFT support
     }
 
     @Override
@@ -268,7 +319,13 @@ public class TokenInfo {
             .add("autoRenewPeriod", autoRenewPeriod)
             .add("expirationTime", expirationTime)
             .add("tokenMemo", tokenMemo)
+<<<<<<< HEAD
             .add("customFeeList", customFeeList)
+=======
+            .add("tokenType", tokenType)
+            .add("supplyType", supplyType)
+            .add("maxSupply", maxSupply)
+>>>>>>> c7f711a7a... feat: add misc NFT support
             .toString();
     }
 

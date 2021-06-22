@@ -225,6 +225,36 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     public CustomFeeList getCustomFeeList() {
         return customFeeList != null ? customFeeList.deepClone() : null;
     }
+    
+    public TokenType getTokenType() {
+        return TokenType.valueOf(builder.getTokenType());
+    }
+
+    public TokenCreateTransaction setTokenType(TokenType tokenType) {
+        requireNotFrozen();
+        builder.setTokenType(tokenType.code);
+        return this;
+    }
+
+    public TokenSupplyType getSupplyType() {
+        return TokenSupplyType.valueOf(builder.getSupplyType());
+    }
+
+    public TokenCreateTransaction setSupplyType(TokenSupplyType supplyType) {
+        requireNotFrozen();
+        builder.setSupplyType(supplyType.code);
+        return this;
+    }
+
+    public long getMaxSupply() {
+        return builder.getMaxSupply();
+    }
+
+    public TokenCreateTransaction setMaxSupply(long maxSupply) {
+        requireNotFrozen();
+        builder.setMaxSupply(maxSupply);
+        return this;
+    }
 
     @Override
     public TokenCreateTransaction freezeWith(@Nullable Client client) {

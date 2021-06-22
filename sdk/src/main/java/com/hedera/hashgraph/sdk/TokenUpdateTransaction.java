@@ -12,10 +12,7 @@ import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import java.util.LinkedHashMap;
-<<<<<<< HEAD
 import java.util.Objects;
-=======
->>>>>>> 2069bed89 (feat: add custom fees)
 import javax.annotation.Nullable;
 
 public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> {
@@ -27,12 +24,9 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     AccountId treasuryAccountId = null;
     @Nullable
     AccountId autoRenewAccountId = null;
-<<<<<<< HEAD
-=======
     @Nullable
     CustomFeeList customFeeList = null;
 
->>>>>>> 2069bed89 (feat: add custom fees)
 
     public TokenUpdateTransaction() {
         builder = TokenUpdateTransactionBody.newBuilder();

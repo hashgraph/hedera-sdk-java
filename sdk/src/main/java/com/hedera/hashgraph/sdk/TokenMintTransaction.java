@@ -8,10 +8,13 @@ import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
+import com.google.protobuf.ByteString;
 
 import java.util.LinkedHashMap;
 import javax.annotation.Nullable;
 import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenMintTransaction> {
     private final TokenMintTransactionBody.Builder builder;
@@ -57,6 +60,20 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
 
     public long getAmount() {
         return builder.getAmount();
+    }
+
+    public TokenMintTransaction addMetadata(byte[] metadata) {
+        requireNotFrozen();
+        builder.addMetadata(ByteString.copyFrom(metadata));
+        return this;
+    }
+
+    public List<byte[]> getMetadata() {
+        var metadata = new ArrayList<byte[]>();
+        for(var datum : builder.getMetadataList()) {
+            metadata.add(datum.toByteArray());
+        }
+        return metadata;
     }
 
     public TokenMintTransaction setAmount(long amount) {
