@@ -44,7 +44,7 @@ class AccountRecordsIntegrationTest {
                 .setAccountId(testEnv.operatorId)
                 .execute(testEnv.client);
 
-            assertTrue(records.isEmpty());
+            assertTrue(!records.isEmpty());
 
             new AccountDeleteTransaction()
                 .setAccountId(accountId)

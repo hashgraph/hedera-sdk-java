@@ -61,6 +61,8 @@ import java.util.Objects;
 public final class ContractCreateTransaction extends Transaction<ContractCreateTransaction> {
     private final ContractCreateTransactionBody.Builder builder;
 
+    FileId bytecodeFileId;
+
     public ContractCreateTransaction() {
         builder = ContractCreateTransactionBody.newBuilder();
 
@@ -82,7 +84,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
 
     @Nullable
     public FileId getBytecodeFileId() {
-        return builder.hasFileID() ? FileId.fromProtobuf(builder.getFileID()) : null;
+        return bytecodeFileId;
     }
 
     /**
@@ -99,7 +101,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     public ContractCreateTransaction setBytecodeFileId(FileId byteCodeFileId) {
         Objects.requireNonNull(byteCodeFileId);
         requireNotFrozen();
-        builder.setFileID(byteCodeFileId.toProtobuf());
+        this.bytecodeFileId = byteCodeFileId;
         return this;
     }
 
@@ -249,6 +251,19 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    ContractCreateTransactionBody.Builder build() {
+        if (bytecodeFileId != null) {
+            builder.setFileID(bytecodeFileId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.bytecodeFileId, accountId);
+    }
+
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return SmartContractServiceGrpc.getCreateContractMethod();
@@ -256,12 +271,12 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setContractCreateInstance(builder);
+        bodyBuilder.setContractCreateInstance(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setContractCreateInstance(builder);
+        scheduled.setContractCreateInstance(build());
     }
 }

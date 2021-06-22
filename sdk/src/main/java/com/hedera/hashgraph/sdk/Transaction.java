@@ -853,15 +853,23 @@ public abstract class Transaction<T extends Transaction<T>>
         return Status.valueOf(transactionResponse.getNodeTransactionPrecheckCode());
     }
 
+    abstract void validateNetworkOnIds(@Nullable AccountId accountId);
+
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
         if (!isFrozen()) {
             freezeWith(client);
         }
 
-        var operatorId = client.getOperatorAccountId();
+        var accountId = Objects.requireNonNull(Objects.requireNonNull(getTransactionId()).accountId);
+        if (accountId.network != null && client.network.networkName != null && client.network.networkName != accountId.network) {
+            throw new IllegalStateException("TransactionId.accountId uses different network than the Client");
+        }
 
-        if (operatorId != null && operatorId.equals(Objects.requireNonNull(getTransactionId().accountId))) {
+        validateNetworkOnIds(client.getOperatorAccountId());
+
+        var operatorId = client.getOperatorAccountId();
+        if (operatorId != null && operatorId.equals(accountId)) {
             // on execute, sign each transaction with the operator, if present
             // and we are signing a transaction that used the default transaction ID
             signWithOperator(client);

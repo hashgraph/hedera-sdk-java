@@ -11,21 +11,37 @@ import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 
+import javax.annotation.Nullable;
+
 public class ScheduleInfoQuery extends com.hedera.hashgraph.sdk.Query<ScheduleInfo, ScheduleInfoQuery> {
     private final ScheduleGetInfoQuery.Builder builder;
+
+    ScheduleId scheduleId;
 
     public ScheduleInfoQuery() {
         builder = ScheduleGetInfoQuery.newBuilder();
     }
 
     public ScheduleInfoQuery setScheduleId(ScheduleId scheduleId) {
-        builder.setScheduleID(scheduleId.toProtobuf());
-
+        this.scheduleId = scheduleId;
         return this;
+    }
+
+    public ScheduleId getScheduleId() {
+        return scheduleId;
+    }
+
+    @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.scheduleId, accountId);
     }
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (scheduleId != null) {
+            builder.setScheduleID(scheduleId.toProtobuf());
+        }
+
         queryBuilder.setScheduleGetInfo(builder.setHeader(header));
     }
 

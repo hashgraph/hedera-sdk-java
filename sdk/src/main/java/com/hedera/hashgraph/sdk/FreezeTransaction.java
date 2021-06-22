@@ -8,6 +8,7 @@ import org.threeten.bp.Instant;
 import org.threeten.bp.OffsetTime;
 import org.threeten.bp.ZoneOffset;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -73,6 +74,11 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
 
         return this;
     }
+
+    @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+    }
+
 
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {

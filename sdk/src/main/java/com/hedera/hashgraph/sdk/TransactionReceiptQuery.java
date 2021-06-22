@@ -19,8 +19,10 @@ import java.util.Objects;
  * <p>This query is free.
  */
 public final class TransactionReceiptQuery
-        extends Query<TransactionReceipt, TransactionReceiptQuery> {
+    extends Query<TransactionReceipt, TransactionReceiptQuery> {
     private final TransactionGetReceiptQuery.Builder builder;
+
+    TransactionId transactionId;
 
     public TransactionReceiptQuery() {
         builder = TransactionGetReceiptQuery.newBuilder();
@@ -28,17 +30,21 @@ public final class TransactionReceiptQuery
 
     @Override
     public TransactionId getTransactionId() {
-      return TransactionId.fromProtobuf(builder.getTransactionID());
+        if (transactionId == null) {
+            return TransactionId.fromProtobuf(builder.getTransactionID());
+        }
+
+        return transactionId;
     }
 
     /**
      * Set the ID of the transaction for which the receipt is being requested.
      *
-     * @return {@code this}
      * @param transactionId The TransactionId to be set
+     * @return {@code this}
      */
     public TransactionReceiptQuery setTransactionId(TransactionId transactionId) {
-        builder.setTransactionID(transactionId.toProtobuf());
+        this.transactionId = transactionId;
         return this;
     }
 
@@ -48,7 +54,18 @@ public final class TransactionReceiptQuery
     }
 
     @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        if (transactionId != null) {
+            EntityIdHelper.validateNetworkOnIds(transactionId.accountId, accountId);
+        }
+    }
+
+    @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (transactionId != null) {
+            builder.setTransactionID(transactionId.toProtobuf());
+        }
+
         queryBuilder.setTransactionGetReceipt(builder.setHeader(header));
     }
 

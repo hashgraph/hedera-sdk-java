@@ -9,6 +9,7 @@ import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Get information about a smart contract instance.
@@ -19,12 +20,18 @@ import java.util.Objects;
 public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQuery> {
     private final ContractGetInfoQuery.Builder builder;
 
+    ContractId contractId;
+
     public ContractInfoQuery() {
         builder = ContractGetInfoQuery.newBuilder();
     }
 
     public ContractId getContractId() {
-      return ContractId.fromProtobuf(builder.getContractID());
+        if (contractId == null) {
+            return new ContractId(0);
+        }
+
+        return contractId;
     }
 
     /**
@@ -35,8 +42,7 @@ public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQue
      */
     public ContractInfoQuery setContractId(ContractId contractId) {
         Objects.requireNonNull(contractId);
-        builder.setContractID(contractId.toProtobuf());
-
+        this.contractId = contractId;
         return this;
     }
 
@@ -49,7 +55,16 @@ public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQue
     }
 
     @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.contractId, accountId);
+    }
+
+    @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (contractId != null) {
+            builder.setContractID(contractId.toProtobuf());
+        }
+
         queryBuilder.setContractGetInfo(builder.setHeader(header));
     }
 

@@ -9,18 +9,26 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 
+import javax.annotation.Nullable;
+
 /**
  * Get the contents of a file. The content field is empty (no bytes) if the file is empty.
  */
 public final class FileContentsQuery extends Query<ByteString, FileContentsQuery> {
     private final FileGetContentsQuery.Builder builder;
 
+    FileId fileId;
+
     public FileContentsQuery() {
         this.builder = FileGetContentsQuery.newBuilder();
     }
 
     public FileId getFileId() {
-      return FileId.fromProtobuf(builder.getFileID());
+        if (fileId == null) {
+            return new FileId(0);
+        }
+
+        return fileId;
     }
 
     /**
@@ -30,7 +38,7 @@ public final class FileContentsQuery extends Query<ByteString, FileContentsQuery
      * @param fileId The FileId to be set
      */
     public FileContentsQuery setFileId(FileId fileId) {
-        builder.setFileID(fileId.toProtobuf());
+        this.fileId = fileId;
         return this;
     }
 
@@ -43,7 +51,16 @@ public final class FileContentsQuery extends Query<ByteString, FileContentsQuery
     }
 
     @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.fileId, accountId);
+    }
+
+    @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (fileId != null) {
+            builder.setFileID(fileId.toProtobuf());
+        }
+
         queryBuilder.setFileGetContents(builder.setHeader(header));
     }
 

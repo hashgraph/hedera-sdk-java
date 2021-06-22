@@ -9,6 +9,7 @@ import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Get all the information about an account, including the balance.
@@ -17,12 +18,18 @@ import java.util.Objects;
 public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery> {
     private final CryptoGetInfoQuery.Builder builder;
 
+    AccountId accountId;
+
     public AccountInfoQuery() {
         builder = CryptoGetInfoQuery.newBuilder();
     }
 
     public AccountId getAccountId() {
-      return AccountId.fromProtobuf(builder.getAccountID());
+        if (accountId == null) {
+            return new AccountId(0);
+        }
+
+        return accountId;
     }
 
     /**
@@ -33,12 +40,21 @@ public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery>
      */
     public AccountInfoQuery setAccountId(AccountId accountId) {
         Objects.requireNonNull(accountId);
-        builder.setAccountID(accountId.toProtobuf());
+        this.accountId = accountId;
         return this;
     }
 
     @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.accountId, accountId);
+    }
+
+    @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (accountId != null) {
+            builder.setAccountID(accountId.toProtobuf());
+        }
+
         queryBuilder.setCryptoGetInfo(builder.setHeader(header));
     }
 

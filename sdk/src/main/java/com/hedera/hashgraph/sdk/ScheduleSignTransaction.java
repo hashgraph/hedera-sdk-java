@@ -8,10 +8,13 @@ import com.hedera.hashgraph.sdk.proto.ScheduleServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 
 public final class ScheduleSignTransaction extends Transaction<ScheduleSignTransaction> {
     private final ScheduleSignTransactionBody.Builder builder;
+
+    ScheduleId scheduleId;
 
     public ScheduleSignTransaction() {
         builder = ScheduleSignTransactionBody.newBuilder();
@@ -23,15 +26,23 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
         super(txs);
 
         builder = bodyBuilder.getScheduleSign().toBuilder();
+
+        if (builder.hasScheduleID()) {
+            scheduleId = ScheduleId.fromProtobuf(builder.getScheduleID());
+        }
     }
 
     public ScheduleId getScheduleId() {
-        return ScheduleId.fromProtobuf(builder.getScheduleID());
+        if (scheduleId == null) {
+            return new ScheduleId(0);
+        }
+
+        return scheduleId;
     }
 
     public ScheduleSignTransaction setScheduleId(ScheduleId scheduleId) {
         requireNotFrozen();
-        builder.setScheduleID(scheduleId.toProtobuf());
+        this.scheduleId = scheduleId;
         return this;
     }
 
@@ -41,6 +52,18 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
         return this;
     }
 
+    ScheduleSignTransactionBody.Builder build() {
+        if (scheduleId != null) {
+            builder.setScheduleID(scheduleId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.scheduleId, accountId);
+    }
 
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
@@ -49,7 +72,7 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setScheduleSign(builder);
+        bodyBuilder.setScheduleSign(build());
         return true;
     }
 

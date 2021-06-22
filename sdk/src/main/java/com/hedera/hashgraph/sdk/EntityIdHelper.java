@@ -6,6 +6,7 @@ import java8.lang.FunctionalInterface;
 import org.bouncycastle.util.encoders.DecoderException;
 import org.bouncycastle.util.encoders.Hex;
 
+import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,17 +25,34 @@ class EntityIdHelper {
     static final int SOLIDITY_ADDRESS_LEN_HEX = SOLIDITY_ADDRESS_LEN * 2;
 
     static <R> R fromString(String id, WithIdNums<R> withIdNums) {
-        R newId;
-
-        try {
-            var result = parseAddress("", id);
-            verify(result.status);
-            newId = withIdNums.apply(result.num1, result.num2, result.num3);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid Id format, should be in format {shardNum}.{realmNum}.{idNum}", e);
+        for (var network : NetworkName.values()) {
+            try {
+                return EntityIdHelper.fromString(id, network, withIdNums);
+            } catch (IllegalArgumentException e) {
+                // Do nothing
+            }
         }
 
-        return newId;
+        return EntityIdHelper.fromString(id, null, withIdNums);
+    }
+
+    static <R> R fromString(String id, @Nullable NetworkName name, WithIdNums<R> withIdNums) {
+        var result = parseAddress(name != null ? Integer.toString(name.id) : "", id);
+
+        switch (result.status) {
+            case 0: // Syntax error
+                throw new IllegalArgumentException(
+                    "Invalid ID: format should look like 0.0.123 or 0.0.123-vfmkw"
+                );
+            case 1: // An invalid with-checksum address
+                throw new IllegalArgumentException("Invalid ID: checksum does not match, received: " + result.givenChecksum + " expected: " + result.correctChecksum);
+            case 2: // A valid no-checksum address
+                return withIdNums.apply(result.num1, result.num2, result.num3, null, result.correctChecksum);
+            case 3: // A valid with-checksum address
+                return withIdNums.apply(result.num1, result.num2, result.num3, name, result.correctChecksum);
+            default:
+                throw new IllegalStateException("(BUG) checksum verification switch statement is non-exhaustive");
+        }
     }
 
     static <R> R fromSolidityAddress(String address, WithIdNums<R> withAddress) {
@@ -48,7 +66,7 @@ class EntityIdHelper {
         }
 
         var buf = ByteBuffer.wrap(address);
-        return withAddress.apply(buf.getInt(), buf.getLong(), buf.getLong());
+        return withAddress.apply(buf.getInt(), buf.getLong(), buf.getLong(), null, null);
     }
 
     private static byte[] decodeSolidityAddress(@Var String address) {
@@ -79,21 +97,6 @@ class EntityIdHelper {
                 .array());
     }
 
-    static void verify(int status) {
-        switch (status) {
-            case 0: // Syntax error
-                throw new Error(
-                    "Invalid ID: format should look like 0.0.123 or 0.0.123-laujm"
-                );
-            case 1: // An invalid with-checksum address
-                throw new Error("Invalid ID: checksum does not match");
-            case 2: // A valid no-checksum address
-            break;
-            case 3: // A valid with-checksum address
-            break;
-        }
-    }
-
     static ParseAddressResult parseAddress(String ledgerId, String addr ) {
         Pattern regex1 = Pattern.compile("(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))(?:-([a-z]{5}))?$");
         var match = regex1.matcher(addr);
@@ -102,30 +105,31 @@ class EntityIdHelper {
         }
 
         var a = new Long[]{Long.parseLong(match.group(1)), Long.parseLong(match.group(2)), Long.parseLong(match.group(3))};
-        var ad = a[0].toString() + "." + a[1].toString() + "." + a[2].toString();
+        var ad = a[0] + "." + a[1] + "." + a[2];
         var c = checksum(ledgerId, ad);
         var s = match.group(4) == null ? 2 : c.equals(match.group(4)) ? 3 : 1;
         return new ParseAddressResult(s, a[0], a[1], a[2], c, match.group(4), ad,ad + "-" + c);
     }
 
-    static String checksum(String ledgerId, String addr ) {
+    static String checksum(String ledgerId, String addr) {
         StringBuilder answer = new StringBuilder();
         List<Integer> d = new ArrayList<>(); // Digits with 10 for ".", so if addr == "0.0.123" then d == [0, 10, 0, 10, 1, 2, 3]
-        var s0 = 0; // Sum of even positions (mod 11)
-        var s1 = 0; // Sum of odd positions (mod 11)
-        var s = 0; // Weighted sum of all positions (mod p3)
-        var sh = 0; // Hash of the ledger ID
-        var c = 0; // The checksum, as a single number
-        var p3 = 26 * 26 * 26; // 3 digits in base 26
-        var p5 = 26 * 26 * 26 * 26 * 26; // 5 digits in base 26
-        var ascii_a = Character.codePointAt("a", 0); // 97
-        var w = 31; // Sum s of digit values weights them by powers of w. Should be coprime to p5.
+        long s0 = 0; // Sum of even positions (mod 11)
+        long s1 = 0; // Sum of odd positions (mod 11)
+        long s = 0; // Weighted sum of all positions (mod p3)
+        long sh = 0; // Hash of the ledger ID
+        long c = 0; // The checksum, as a single number
+        long p3 = 26 * 26 * 26; // 3 digits in base 26
+        long p5 = 26 * 26 * 26 * 26 * 26; // 5 digits in base 26
+        long ascii_a = Character.codePointAt("a", 0); // 97
+        long m = 1_000_003; //min prime greater than a million. Used for the final permutation.
+        long w = 31; // Sum s of digit values weights them by powers of w. Should be coprime to p5.
 
         var id = ledgerId + "000000000000";
         List<Integer> h = new ArrayList<>();
 
         for (var i = 0; i < id.length(); i += 2) {
-            h.add(Integer.parseInt(id.substring(i, i+2), 16));
+            h.add(Integer.parseInt(id.substring(i, Math.min(i + 2, id.length())), 16));
         }
         for (var i = 0; i < addr.length(); i++) {
             d.add(addr.charAt(i) == '.' ? 10 : Integer.parseInt(String.valueOf(addr.charAt(i)), 10));
@@ -142,9 +146,10 @@ class EntityIdHelper {
             sh = (w * sh + integer) % p5;
         }
         c = ((((addr.length() % 5) * 11 + s0) * 11 + s1) * p3 + s + sh) % p5;
+        c = (c * m) % p5;
 
         for (var i = 0; i < 5; i++) {
-            answer.append(Character.toChars( ascii_a + (c % 26)));
+            answer.append((char)  (ascii_a + (c % 26)));
             c /= 26;
         }
 
@@ -153,6 +158,50 @@ class EntityIdHelper {
 
     @FunctionalInterface
     interface WithIdNums<R> {
-        R apply(long shard, long realm, long num);
+        R apply(long shard, long realm, long num, @Nullable NetworkName name, String checksum);
+    }
+
+    static String toString(long shard, long realm, long num, @Nullable NetworkName network, @Nullable String checksum) {
+        if (checksum != null) {
+            return "" + shard + "." + realm + "." + num + "-" + checksum;
+        } else {
+            return "" + shard + "." + realm + "." + num;
+        }
+    }
+
+    static void validateNetworkOnIds(@Nullable AccountId left, @Nullable AccountId right) {
+        if (left != null && right != null && left.network != null && right.network != null && left.network != right.network) {
+            throw new IllegalStateException("Network mismatch; some IDs have different networks set");
+        }
+    }
+
+    static void validateNetworkOnIds(@Nullable ContractId left, @Nullable AccountId right) {
+        if (left != null && right != null && left.network != null && right.network != null && left.network != right.network) {
+            throw new IllegalStateException("Network mismatch; some IDs have different networks set");
+        }
+    }
+
+    static void validateNetworkOnIds(@Nullable FileId left, @Nullable AccountId right) {
+        if (left != null && right != null && left.network != null && right.network != null && left.network != right.network) {
+            throw new IllegalStateException("Network mismatch; some IDs have different networks set");
+        }
+    }
+
+    static void validateNetworkOnIds(@Nullable TopicId left, @Nullable AccountId right) {
+        if (left != null && right != null && left.network != null && right.network != null && left.network != right.network) {
+            throw new IllegalStateException("Network mismatch; some IDs have different networks set");
+        }
+    }
+
+    static void validateNetworkOnIds(@Nullable TokenId left, @Nullable AccountId right) {
+        if (left != null && right != null && left.network != null && right.network != null && left.network != right.network) {
+            throw new IllegalStateException("Network mismatch; some IDs have different networks set");
+        }
+    }
+
+    static void validateNetworkOnIds(@Nullable ScheduleId left, @Nullable AccountId right) {
+        if (left != null && right != null && left.network != null && right.network != null && left.network != right.network) {
+            throw new IllegalStateException("Network mismatch; some IDs have different networks set");
+        }
     }
 }

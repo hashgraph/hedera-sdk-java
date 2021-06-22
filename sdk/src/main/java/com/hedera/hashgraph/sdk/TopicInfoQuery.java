@@ -7,6 +7,8 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
+
 /**
  * Retrieve the latest state of a topic.
  * <p>
@@ -15,12 +17,18 @@ import io.grpc.MethodDescriptor;
 public final class TopicInfoQuery extends Query<TopicInfo, TopicInfoQuery> {
     private final ConsensusGetTopicInfoQuery.Builder builder;
 
+    TopicId topicId;
+
     public TopicInfoQuery() {
         builder = ConsensusGetTopicInfoQuery.newBuilder();
     }
 
     public TopicId getTopicId() {
-      return TopicId.fromProtobuf(builder.getTopicID());
+        if (topicId == null) {
+            return new TopicId(0);
+        }
+
+        return topicId;
     }
 
     /**
@@ -30,13 +38,21 @@ public final class TopicInfoQuery extends Query<TopicInfo, TopicInfoQuery> {
      * @param topicId The TopicId to be set
      */
     public TopicInfoQuery setTopicId(TopicId topicId) {
-        builder.setTopicID(topicId.toProtobuf());
-
+        this.topicId = topicId;
         return this;
     }
 
     @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.topicId, accountId);
+    }
+
+    @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (topicId != null) {
+            builder.setTopicID(topicId.toProtobuf());
+        }
+
         queryBuilder.setConsensusGetTopicInfo(builder.setHeader(header));
     }
 

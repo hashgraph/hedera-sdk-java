@@ -23,6 +23,8 @@ import java.util.Objects;
 public final class ContractExecuteTransaction extends Transaction<ContractExecuteTransaction> {
     private final ContractCallTransactionBody.Builder builder;
 
+    ContractId contractId;
+
     public ContractExecuteTransaction() {
         builder = ContractCallTransactionBody.newBuilder();
     }
@@ -31,17 +33,25 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
         super(txs);
 
         builder = bodyBuilder.getContractCall().toBuilder();
+
+        if (builder.hasContractID()) {
+            contractId = ContractId.fromProtobuf(builder.getContractID());
+        }
     }
 
     ContractExecuteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getContractCall().toBuilder();
+
+        if (builder.hasContractID()) {
+            contractId = ContractId.fromProtobuf(builder.getContractID());
+        }
     }
 
     @Nullable
     public ContractId getContractId() {
-        return builder.hasContractID() ? ContractId.fromProtobuf(builder.getContractID()) : null;
+        return contractId;
     }
 
     /**
@@ -53,7 +63,7 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
     public ContractExecuteTransaction setContractId(ContractId contractId) {
         Objects.requireNonNull(contractId);
         requireNotFrozen();
-        builder.setContractID(contractId.toProtobuf());
+        this.contractId = contractId;
         return this;
     }
 
@@ -135,6 +145,19 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
         return setFunctionParameters(params.toBytes(name));
     }
 
+    ContractCallTransactionBody.Builder build() {
+        if (contractId != null) {
+            builder.setContractID(contractId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.contractId, accountId);
+    }
+
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return SmartContractServiceGrpc.getContractCallMethodMethod();
@@ -142,12 +165,12 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setContractCall(builder);
+        bodyBuilder.setContractCall(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setContractCall(builder);
+        scheduled.setContractCall(build());
     }
 }

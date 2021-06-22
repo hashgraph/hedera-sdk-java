@@ -10,6 +10,7 @@ import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Call a function of the given smart contract instance, giving it functionParameters as its inputs.
@@ -27,12 +28,18 @@ import java.util.Objects;
 public final class ContractCallQuery extends Query<ContractFunctionResult, ContractCallQuery> {
     private final ContractCallLocalQuery.Builder builder;
 
+    ContractId contractId;
+
     public ContractCallQuery() {
         builder = ContractCallLocalQuery.newBuilder();
     }
 
     public ContractId getContractId() {
-      return ContractId.fromProtobuf(builder.getContractID());
+        if (contractId == null) {
+            return new ContractId(0);
+        }
+
+        return contractId;
     }
 
     /**
@@ -43,7 +50,7 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
      */
     public ContractCallQuery setContractId(ContractId contractId) {
         Objects.requireNonNull(contractId);
-        builder.setContractID(contractId.toProtobuf());
+        this.contractId = contractId;
         return this;
     }
 
@@ -126,7 +133,16 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
     }
 
     @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.contractId, accountId);
+    }
+
+    @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (contractId != null) {
+            builder.setContractID(contractId.toProtobuf());
+        }
+
         queryBuilder.setContractCallLocal(builder.setHeader(header));
     }
 

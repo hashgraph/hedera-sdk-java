@@ -13,6 +13,9 @@ import java.util.LinkedHashMap;
 public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> {
     private final TokenCreateTransactionBody.Builder builder;
 
+    AccountId treasuryAccountId;
+    AccountId autoRenewAccountId;
+
     public TokenCreateTransaction() {
         builder = TokenCreateTransactionBody.newBuilder();
 
@@ -24,12 +27,20 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         super(txs);
 
         builder = bodyBuilder.getTokenCreation().toBuilder();
+
+        if (builder.hasTreasury()) {
+            treasuryAccountId = AccountId.fromProtobuf(builder.getTreasury());
+        }
     }
 
     TokenCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getTokenCreation().toBuilder();
+
+        if (builder.hasTreasury()) {
+            treasuryAccountId = AccountId.fromProtobuf(builder.getTreasury());
+        }
     }
 
     public String getTokenName() {
@@ -73,12 +84,16 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     public AccountId getTreasuryAccountId() {
-        return AccountId.fromProtobuf(builder.getTreasury());
+        if (treasuryAccountId == null) {
+            return new AccountId(0);
+        }
+
+        return treasuryAccountId;
     }
 
     public TokenCreateTransaction setTreasuryAccountId(AccountId accountId) {
         requireNotFrozen();
-        builder.setTreasury(accountId.toProtobuf());
+        this.treasuryAccountId = accountId;
         return this;
     }
 
@@ -154,12 +169,16 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     public AccountId getAutoRenewAccountId() {
-        return AccountId.fromProtobuf(builder.getAutoRenewAccount());
+        if (autoRenewAccountId == null) {
+            return new AccountId(0);
+        }
+
+        return autoRenewAccountId;
     }
 
     public TokenCreateTransaction setAutoRenewAccountId(AccountId accountId) {
         requireNotFrozen();
-        builder.setAutoRenewAccount(accountId.toProtobuf());
+        this.autoRenewAccountId = accountId;
         return this;
     }
 
@@ -196,6 +215,24 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return super.freezeWith(client);
     }
 
+    TokenCreateTransactionBody.Builder build() {
+        if (treasuryAccountId != null) {
+            builder.setTreasury(treasuryAccountId.toProtobuf());
+        }
+
+        if (autoRenewAccountId != null) {
+            builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.treasuryAccountId, accountId);
+        EntityIdHelper.validateNetworkOnIds(this.autoRenewAccountId, accountId);
+    }
+
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return TokenServiceGrpc.getCreateTokenMethod();
@@ -203,12 +240,12 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setTokenCreation(builder);
+        bodyBuilder.setTokenCreation(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setTokenCreation(builder);
+        scheduled.setTokenCreation(build());
     }
 }

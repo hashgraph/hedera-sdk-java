@@ -8,18 +8,26 @@ import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
+
 /**
  * Requests a livehash associated to an account.
  */
 public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
     private final CryptoGetLiveHashQuery.Builder builder;
 
+    AccountId accountId;
+
     public LiveHashQuery() {
         builder = CryptoGetLiveHashQuery.newBuilder();
     }
 
     public AccountId getAccountId() {
-      return AccountId.fromProtobuf(builder.getAccountID());
+        if (accountId == null) {
+            return new AccountId(0);
+        }
+
+        return accountId;
     }
 
     /**
@@ -29,7 +37,7 @@ public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
      * @return {@code this}
      */
     public LiveHashQuery setAccountId(AccountId accountId) {
-        builder.setAccountID(accountId.toProtobuf());
+        this.accountId = accountId;
         return this;
     }
 
@@ -49,7 +57,16 @@ public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
     }
 
     @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.accountId, accountId);
+    }
+
+    @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (accountId != null) {
+            builder.setAccountID(accountId.toProtobuf());
+        }
+
         queryBuilder.setCryptoGetLiveHash(builder.setHeader(header));
     }
 

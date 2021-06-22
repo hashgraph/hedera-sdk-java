@@ -5,10 +5,13 @@ import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 
 public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteTransaction> {
     private final ScheduleDeleteTransactionBody.Builder builder;
+
+    ScheduleId scheduleId;
 
     public ScheduleDeleteTransaction() {
         builder = ScheduleDeleteTransactionBody.newBuilder();
@@ -20,22 +23,47 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
         super(txs);
 
         builder = bodyBuilder.getScheduleDelete().toBuilder();
+
+        if (builder.hasScheduleID()) {
+            scheduleId = ScheduleId.fromProtobuf(builder.getScheduleID());
+        }
     }
 
     ScheduleDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getScheduleDelete().toBuilder();
+
+        if (builder.hasScheduleID()) {
+            scheduleId = ScheduleId.fromProtobuf(builder.getScheduleID());
+        }
     }
 
     public ScheduleId getScheduleId() {
-        return ScheduleId.fromProtobuf(builder.getScheduleID());
+        if (scheduleId == null) {
+            return new ScheduleId(0);
+        }
+
+        return scheduleId;
     }
 
     public ScheduleDeleteTransaction setScheduleId(ScheduleId scheduleId) {
         requireNotFrozen();
-        builder.setScheduleID(scheduleId.toProtobuf());
+        this.scheduleId = scheduleId;
         return this;
+    }
+
+    ScheduleDeleteTransactionBody.Builder build() {
+        if (scheduleId != null) {
+            builder.setScheduleID(scheduleId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.scheduleId, accountId);
     }
 
     @Override
@@ -45,12 +73,12 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setScheduleDelete(builder);
+        bodyBuilder.setScheduleDelete(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setScheduleDelete(builder);
+        scheduled.setScheduleDelete(build());
     }
 }

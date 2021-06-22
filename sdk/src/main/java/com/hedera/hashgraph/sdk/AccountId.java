@@ -4,6 +4,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.AccountID;
 
 import javax.annotation.Nonnegative;
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
@@ -28,6 +29,12 @@ public final class AccountId {
     @Nonnegative
     public final long num;
 
+    @Nullable
+    NetworkName network;
+
+    @Nullable
+    final String checksum;
+
     public AccountId(@Nonnegative long num) {
         this(0, 0, num);
     }
@@ -37,6 +44,33 @@ public final class AccountId {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
+        this.network = null;
+        this.checksum = null;
+    }
+
+    AccountId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable NetworkName network, @Nullable String checksum) {
+        this.shard = shard;
+        this.realm = realm;
+        this.num = num;
+        this.network = network;
+
+        if (network != null) {
+            if (checksum == null) {
+                this.checksum = EntityIdHelper.checksum(network.toString(), shard + "." + realm + "." + num);
+            } else {
+                this.checksum = checksum;
+            }
+        } else {
+            this.checksum = null;
+        }
+    }
+
+    public static AccountId withNetwork(@Nonnegative long num, NetworkName network) {
+        return new AccountId(0, 0, num, network, null);
+    }
+
+    public static AccountId withNetwork(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, NetworkName network) {
+        return new AccountId(shard, realm, num, network, null);
     }
 
     public static AccountId fromString(String id) {
@@ -75,8 +109,7 @@ public final class AccountId {
 
     @Override
     public String toString() {
-        var checksum = EntityIdHelper.parseAddress("","" + shard + "." + realm + "." + num);
-        return "" + shard + "." + realm + "." + num + "-" + checksum.correctChecksum;
+        return EntityIdHelper.toString(shard, realm, num, network, checksum);
     }
 
     @Override

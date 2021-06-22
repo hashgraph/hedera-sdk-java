@@ -5,6 +5,7 @@ import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -12,6 +13,9 @@ import java.util.List;
 
 public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenDissociateTransaction> {
     private final TokenDissociateTransactionBody.Builder builder;
+
+    AccountId accountId;
+    List<TokenId> tokenIds = new ArrayList<>();
 
     public TokenDissociateTransaction() {
         builder = TokenDissociateTransactionBody.newBuilder();
@@ -22,41 +26,78 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
     TokenDissociateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
 
-        builder = bodyBuilder.getTokenDissociate().toBuilder();
+        builder = bodyBuilder.getTokenDissociate().toBuilder();;
+
+        if (builder.hasAccount()) {
+            accountId = AccountId.fromProtobuf(builder.getAccount());
+        }
+
+        for (var token : builder.getTokensList()) {
+            tokenIds.add(TokenId.fromProtobuf(token));
+        }
     }
 
     TokenDissociateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
-        builder = bodyBuilder.getTokenDissociate().toBuilder();
+        builder = bodyBuilder.getTokenDissociate().toBuilder();;
+
+        if (builder.hasAccount()) {
+            accountId = AccountId.fromProtobuf(builder.getAccount());
+        }
+
+        for (var token : builder.getTokensList()) {
+            tokenIds.add(TokenId.fromProtobuf(token));
+        }
     }
 
     public AccountId getAccountId() {
-        return AccountId.fromProtobuf(builder.getAccount());
+        if (accountId != null) {
+            return new AccountId(0);
+        }
+
+        return accountId;
     }
 
     public TokenDissociateTransaction setAccountId(AccountId accountId) {
         requireNotFrozen();
-        builder.setAccount(accountId.toProtobuf());
+        this.accountId = accountId;
         return this;
     }
 
     public List<TokenId> getTokenIds() {
-        var list = new ArrayList<TokenId>(builder.getTokensCount());
-        for (var token : builder.getTokensList()) {
-            list.add(TokenId.fromProtobuf(token));
-        }
-        return list;
+        return tokenIds;
     }
 
     public TokenDissociateTransaction setTokenIds(List<TokenId> tokens) {
         requireNotFrozen();
-        builder.clearTokens();
-
-        for (TokenId token : tokens) {
-            builder.addTokens(token.toProtobuf());
-        }
+        this.tokenIds = tokens;
         return this;
+    }
+
+    TokenDissociateTransactionBody.Builder build() {
+        if (accountId != null) {
+            builder.setAccount(accountId.toProtobuf());
+        }
+
+        for (var token : tokenIds) {
+            if (token != null) {
+                builder.addTokens(token.toProtobuf());
+            }
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.accountId, accountId);
+
+        for (var token : tokenIds) {
+            if (token != null) {
+                EntityIdHelper.validateNetworkOnIds(token, accountId);
+            }
+        }
     }
 
     @Override
@@ -66,12 +107,12 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setTokenDissociate(builder);
+        bodyBuilder.setTokenDissociate(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setTokenDissociate(builder);
+        scheduled.setTokenDissociate(build());
     }
 }

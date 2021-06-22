@@ -127,6 +127,8 @@ public final class Client implements AutoCloseable {
 
         var client = Client.forNetwork(network);
 
+        client.network.networkName = NetworkName.MAINNET;
+
         try {
             client.setMirrorNetwork(Lists.of("hcs.mainnet.mirrornode.hedera.com:5600"));
         } catch (InterruptedException e) {
@@ -153,6 +155,8 @@ public final class Client implements AutoCloseable {
 
         var client = Client.forNetwork(network);
 
+        client.network.networkName = NetworkName.TESTNET;
+
         try {
             client.setMirrorNetwork(Lists.of("hcs.testnet.mirrornode.hedera.com:5600"));
         } catch (InterruptedException e) {
@@ -172,6 +176,8 @@ public final class Client implements AutoCloseable {
 
 
         var client = Client.forNetwork(network);
+
+        client.network.networkName = NetworkName.PREVIEWNET;
 
         try {
             client.setMirrorNetwork(Lists.of("hcs.previewnet.mirrornode.hedera.com:5600"));

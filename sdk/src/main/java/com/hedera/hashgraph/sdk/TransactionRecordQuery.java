@@ -23,12 +23,18 @@ import java.util.Objects;
 public final class TransactionRecordQuery extends Query<TransactionRecord, TransactionRecordQuery> {
     private final TransactionGetRecordQuery.Builder builder;
 
+    TransactionId transactionId;
+
     public TransactionRecordQuery() {
         this.builder = TransactionGetRecordQuery.newBuilder();
     }
 
     public TransactionId getTransactionId() {
-      return TransactionId.fromProtobuf(builder.getTransactionID());
+        if (transactionId == null) {
+            return TransactionId.fromProtobuf(builder.getTransactionID());
+        }
+
+        return transactionId;
     }
 
     /**
@@ -38,12 +44,23 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
      * @param transactionId The TransactionId to be set
      */
     public TransactionRecordQuery setTransactionId(TransactionId transactionId) {
-        builder.setTransactionID(transactionId.toProtobuf());
+        this.transactionId = transactionId;
         return this;
     }
 
     @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        if (transactionId != null) {
+            EntityIdHelper.validateNetworkOnIds(transactionId.accountId, accountId);
+        }
+    }
+
+    @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (transactionId != null) {
+            builder.setTransactionID(transactionId.toProtobuf());
+        }
+
         queryBuilder.setTransactionGetRecord(builder.setHeader(header));
     }
 

@@ -10,9 +10,12 @@ import io.grpc.MethodDescriptor;
 
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateTransaction> {
     private final ScheduleCreateTransactionBody.Builder builder;
+
+    AccountId payerAccountId;
 
     public ScheduleCreateTransaction() {
         builder = ScheduleCreateTransactionBody.newBuilder();
@@ -24,15 +27,23 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         super(txs);
 
         builder = bodyBuilder.getScheduleCreate().toBuilder();
+
+        if (builder.hasPayerAccountID()) {
+            payerAccountId = AccountId.fromProtobuf(builder.getPayerAccountID());
+        }
     }
 
     public AccountId getPayerAccountId() {
-        return AccountId.fromProtobuf(builder.getPayerAccountID());
+        if (payerAccountId == null) {
+            return new AccountId(0);
+        }
+
+        return payerAccountId;
     }
 
     public ScheduleCreateTransaction setPayerAccountId(AccountId accountId) {
         requireNotFrozen();
-        builder.setPayerAccountID(accountId.toProtobuf());
+        this.payerAccountId = accountId;
         return this;
     }
 
@@ -71,6 +82,19 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         return this;
     }
 
+    ScheduleCreateTransactionBody.Builder build() {
+        if (payerAccountId != null) {
+            builder.setPayerAccountID(payerAccountId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.payerAccountId, accountId);
+    }
+
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return ScheduleServiceGrpc.getCreateScheduleMethod();
@@ -78,7 +102,7 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setScheduleCreate(builder);
+        bodyBuilder.setScheduleCreate(build());
         return true;
     }
 

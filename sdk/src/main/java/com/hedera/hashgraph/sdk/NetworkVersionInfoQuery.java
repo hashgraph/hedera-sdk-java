@@ -7,11 +7,17 @@ import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
+
 public class NetworkVersionInfoQuery extends Query<NetworkVersionInfo, NetworkVersionInfoQuery> {
     private final NetworkGetVersionInfoQuery.Builder builder;
 
     public NetworkVersionInfoQuery() {
         builder = NetworkGetVersionInfoQuery.newBuilder();
+    }
+
+    @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
     }
 
     @Override

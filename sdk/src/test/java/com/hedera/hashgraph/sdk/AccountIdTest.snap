@@ -18,6 +18,21 @@ com.hedera.hashgraph.sdk.AccountIdTest.fromString=[
 ]
 
 
+com.hedera.hashgraph.sdk.AccountIdTest.fromStringWithChecksumOnMainnet=[
+  "0.0.123-vfmkw"
+]
+
+
+com.hedera.hashgraph.sdk.AccountIdTest.fromStringWithChecksumOnPreviewnet=[
+  "0.0.123-ntjly"
+]
+
+
+com.hedera.hashgraph.sdk.AccountIdTest.fromStringWithChecksumOnTestnet=[
+  "0.0.123-rmkyk"
+]
+
+
 com.hedera.hashgraph.sdk.AccountIdTest.toBytes=[
   "188d27"
 ]

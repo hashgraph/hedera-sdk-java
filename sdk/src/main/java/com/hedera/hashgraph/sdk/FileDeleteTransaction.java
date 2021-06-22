@@ -21,6 +21,8 @@ import java.util.LinkedHashMap;
 public final class FileDeleteTransaction extends Transaction<FileDeleteTransaction> {
     private final FileDeleteTransactionBody.Builder builder;
 
+    FileId fileId;
+
     public FileDeleteTransaction() {
         builder = FileDeleteTransactionBody.newBuilder();
     }
@@ -29,17 +31,25 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
         super(txs);
 
         builder = bodyBuilder.getFileDelete().toBuilder();
+
+        if (builder.hasFileID()) {
+            fileId = FileId.fromProtobuf(builder.getFileID());
+        }
     }
 
     FileDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getFileDelete().toBuilder();
+
+        if (builder.hasFileID()) {
+            fileId = FileId.fromProtobuf(builder.getFileID());
+        }
     }
 
     @Nullable
     public FileId getFileId() {
-        return builder.hasFileID() ? FileId.fromProtobuf(builder.getFileID()) : null;
+        return fileId;
     }
 
     /**
@@ -50,8 +60,21 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
      */
     public FileDeleteTransaction setFileId(FileId fileId) {
         requireNotFrozen();
-        builder.setFileID(fileId.toProtobuf());
+        this.fileId = fileId;
         return this;
+    }
+
+    FileDeleteTransactionBody.Builder build() {
+        if (fileId != null) {
+            builder.setFileID(fileId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.fileId, accountId);
     }
 
     @Override
@@ -61,12 +84,12 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setFileDelete(builder);
+        bodyBuilder.setFileDelete(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setFileDelete(builder);
+        scheduled.setFileDelete(build());
     }
 }

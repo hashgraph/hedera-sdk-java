@@ -5,6 +5,7 @@ import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -124,13 +125,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return this;
     }
 
-    @Override
-    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
-        return CryptoServiceGrpc.getCryptoTransferMethod();
-    }
-
-    @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    CryptoTransferTransactionBody.Builder build() {
         for (var entry : tokenTransfers.entrySet()) {
             var list = TokenTransferList.newBuilder()
                 .setToken(entry.getKey().toProtobuf());
@@ -154,12 +149,37 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         }
         builder.setTransfers(list);
 
-        bodyBuilder.setCryptoTransfer(builder);
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        for (var a : hbarTransfers.keySet()) {
+            EntityIdHelper.validateNetworkOnIds(a, accountId);
+        }
+
+        for (var entry : tokenTransfers.entrySet()) {
+            EntityIdHelper.validateNetworkOnIds(entry.getKey(), accountId);
+
+            for (var a : entry.getValue().keySet()) {
+                EntityIdHelper.validateNetworkOnIds(a, accountId);
+            }
+        }
+    }
+
+    @Override
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
+        return CryptoServiceGrpc.getCryptoTransferMethod();
+    }
+
+    @Override
+    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+        bodyBuilder.setCryptoTransfer(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setCryptoTransfer(builder);
+        scheduled.setCryptoTransfer(build());
     }
 }

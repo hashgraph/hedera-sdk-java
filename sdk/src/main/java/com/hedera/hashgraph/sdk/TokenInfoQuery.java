@@ -9,8 +9,12 @@ import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 
+import javax.annotation.Nullable;
+
 public class TokenInfoQuery extends com.hedera.hashgraph.sdk.Query<TokenInfo, TokenInfoQuery> {
     private final TokenGetInfoQuery.Builder builder;
+
+    TokenId tokenId;
 
     public TokenInfoQuery() {
         builder = TokenGetInfoQuery.newBuilder();
@@ -23,13 +27,25 @@ public class TokenInfoQuery extends com.hedera.hashgraph.sdk.Query<TokenInfo, To
      * @param tokenId The TokenId to be set
      */
     public TokenInfoQuery setTokenId(TokenId tokenId) {
-        builder.setToken(tokenId.toProtobuf());
-
+        this.tokenId = tokenId;
         return this;
+    }
+
+    public TokenId getTokenId() {
+        return tokenId;
+    }
+
+    @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.tokenId, accountId);
     }
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (tokenId != null) {
+            builder.setToken(tokenId.toProtobuf());
+        }
+
         queryBuilder.setTokenGetInfo(builder.setHeader(header));
     }
 

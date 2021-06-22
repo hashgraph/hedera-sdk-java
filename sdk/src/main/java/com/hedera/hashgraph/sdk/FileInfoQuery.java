@@ -8,6 +8,8 @@ import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 
+import javax.annotation.Nullable;
+
 /**
  * Get all of the information about a file, except for its contents.
  * <p>
@@ -21,14 +23,19 @@ import java8.util.concurrent.CompletableFuture;
 public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
     private final FileGetInfoQuery.Builder builder;
 
+    FileId fileId;
+
     public FileInfoQuery() {
         builder = FileGetInfoQuery.newBuilder();
     }
 
     public FileId getFileId() {
-      return FileId.fromProtobuf(builder.getFileID());
-    }
+        if (fileId == null) {
+            return new FileId(0);
+        }
 
+        return fileId;
+    }
     /**
      * Sets the file ID for which information is requested.
      *
@@ -36,13 +43,21 @@ public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
      * @param fileId The FileId to be set
      */
     public FileInfoQuery setFileId(FileId fileId) {
-        builder.setFileID(fileId.toProtobuf());
-
+        this.fileId = fileId;
         return this;
     }
 
     @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.fileId, accountId);
+    }
+
+    @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (fileId != null) {
+            builder.setFileID(fileId.toProtobuf());
+        }
+
         queryBuilder.setFileGetInfo(builder.setHeader(header));
     }
 

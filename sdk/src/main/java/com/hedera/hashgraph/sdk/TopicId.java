@@ -4,6 +4,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TopicID;
 
 import javax.annotation.Nonnegative;
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
@@ -28,6 +29,12 @@ public final class TopicId {
     @Nonnegative
     public final long num;
 
+    @Nullable
+    NetworkName network;
+
+    @Nullable
+    private final String checksum;
+
     public TopicId(@Nonnegative long num) {
         this(0, 0, num);
     }
@@ -37,6 +44,33 @@ public final class TopicId {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
+        this.network = null;
+        this.checksum = null;
+    }
+
+    TopicId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable NetworkName network, @Nullable String checksum) {
+        this.shard = shard;
+        this.realm = realm;
+        this.num = num;
+        this.network = network;
+
+        if (network != null) {
+            if (checksum == null) {
+                this.checksum = EntityIdHelper.checksum(network.toString(), shard + "." + realm + "." + num);
+            } else {
+                this.checksum = checksum;
+            }
+        } else {
+            this.checksum = null;
+        }
+    }
+
+    public static TopicId withNetwork(@Nonnegative long num, NetworkName network) {
+        return new TopicId(0, 0, num, network, null);
+    }
+
+    public static TopicId withNetwork(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, NetworkName network) {
+        return new TopicId(shard, realm, num, network, null);
     }
 
     public static TopicId fromString(String id) {
@@ -65,8 +99,7 @@ public final class TopicId {
 
     @Override
     public String toString() {
-        var checksum = EntityIdHelper.parseAddress("","" + shard + "." + realm + "." + num);
-        return "" + shard + "." + realm + "." + num + "-" + checksum.correctChecksum;
+        return EntityIdHelper.toString(shard, realm, num, network, checksum);
     }
 
     @Override

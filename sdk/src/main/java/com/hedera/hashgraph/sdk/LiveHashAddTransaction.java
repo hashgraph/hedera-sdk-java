@@ -20,6 +20,8 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
     private final CryptoAddLiveHashTransactionBody.Builder builder;
     private final LiveHash.Builder hashBuilder;
 
+    AccountId accountId;
+
     public LiveHashAddTransaction() {
         builder = CryptoAddLiveHashTransactionBody.newBuilder();
         hashBuilder = LiveHash.newBuilder();
@@ -30,11 +32,15 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
 
         builder = bodyBuilder.getCryptoAddLiveHash().toBuilder();
         hashBuilder = builder.getLiveHash().toBuilder();
+
+        if (hashBuilder.hasAccountId()) {
+            accountId = AccountId.fromProtobuf(hashBuilder.getAccountId());
+        }
     }
 
     @Nullable
     public AccountId getAccountId() {
-        return hashBuilder.hasAccountId() ? AccountId.fromProtobuf(hashBuilder.getAccountId()) : null;
+        return accountId;
     }
 
     /**
@@ -45,7 +51,7 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
      */
     public LiveHashAddTransaction setAccountId(AccountId accountId) {
         requireNotFrozen();
-        hashBuilder.setAccountId(accountId.toProtobuf());
+        this.accountId = accountId;
         return this;
     }
 
@@ -117,6 +123,19 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
         return this;
     }
 
+    CryptoAddLiveHashTransactionBody.Builder build() {
+        if (accountId != null) {
+            hashBuilder.setAccountId(accountId.toProtobuf());
+        }
+
+        return builder.setLiveHash(hashBuilder);
+    }
+
+    @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.accountId, accountId);
+    }
+
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return CryptoServiceGrpc.getAddLiveHashMethod();
@@ -124,7 +143,7 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setCryptoAddLiveHash(builder.setLiveHash(hashBuilder));
+        bodyBuilder.setCryptoAddLiveHash(build());
         return true;
     }
 

@@ -21,6 +21,8 @@ import java.util.LinkedHashMap;
 public final class TopicCreateTransaction extends Transaction<TopicCreateTransaction> {
     private final ConsensusCreateTopicTransactionBody.Builder builder;
 
+    AccountId autoRenewAccountId;
+
     public TopicCreateTransaction() {
         builder = ConsensusCreateTopicTransactionBody.newBuilder();
 
@@ -31,17 +33,20 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
         super(txs);
 
         builder = bodyBuilder.getConsensusCreateTopic().toBuilder();
+
+        if (builder.hasAutoRenewAccount()) {
+            autoRenewAccountId = AccountId.fromProtobuf(builder.getAutoRenewAccount());
+        }
     }
 
     TopicCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getConsensusCreateTopic().toBuilder();
-    }
 
-    @Override
-    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
-        return ConsensusServiceGrpc.getCreateTopicMethod();
+        if (builder.hasAutoRenewAccount()) {
+            autoRenewAccountId = AccountId.fromProtobuf(builder.getAutoRenewAccount());
+        }
     }
 
     public String getTopicMemo() {
@@ -126,7 +131,7 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
 
     @Nullable
     public AccountId getAutoRenewAccountId() {
-        return builder.hasAutoRenewAccount() ? AccountId.fromProtobuf(builder.getAutoRenewAccount()) : null;
+        return autoRenewAccountId;
     }
 
     /**
@@ -146,18 +151,36 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
      */
     public TopicCreateTransaction setAutoRenewAccountId(AccountId autoRenewAccountId) {
         requireNotFrozen();
-        builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
+        this.autoRenewAccountId = autoRenewAccountId;
         return this;
+    }
+
+    ConsensusCreateTopicTransactionBody.Builder build() {
+        if (autoRenewAccountId != null) {
+            builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.autoRenewAccountId, accountId);
+    }
+
+    @Override
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
+        return ConsensusServiceGrpc.getCreateTopicMethod();
     }
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setConsensusCreateTopic(builder);
+        bodyBuilder.setConsensusCreateTopic(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setConsensusCreateTopic(builder);
+        scheduled.setConsensusCreateTopic(build());
     }
 }

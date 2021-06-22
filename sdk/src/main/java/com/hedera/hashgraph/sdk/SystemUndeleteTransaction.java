@@ -17,6 +17,9 @@ import java.util.LinkedHashMap;
 public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteTransaction> {
     private final SystemUndeleteTransactionBody.Builder builder;
 
+    FileId fileId;
+    ContractId contractId;
+
     public SystemUndeleteTransaction() {
         builder = SystemUndeleteTransactionBody.newBuilder();
     }
@@ -35,7 +38,7 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
 
     @Nullable
     public final FileId getFileId() {
-        return builder.hasFileID() ? FileId.fromProtobuf(builder.getFileID()) : null;
+        return fileId;
     }
 
     /**
@@ -48,13 +51,13 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
      */
     public final SystemUndeleteTransaction setFileId(FileId fileId) {
         requireNotFrozen();
-        builder.setFileID(fileId.toProtobuf());
+        this.fileId = fileId;
         return this;
     }
 
     @Nullable
     public final ContractId getContractId() {
-        return builder.hasContractID() ? ContractId.fromProtobuf(builder.getContractID()) : null;
+        return contractId;
     }
 
     /**
@@ -67,9 +70,28 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
      */
     public final SystemUndeleteTransaction setContractId(ContractId contractId) {
         requireNotFrozen();
-        builder.setContractID(contractId.toProtobuf());
+        this.contractId = contractId;
         return this;
     }
+
+    SystemUndeleteTransactionBody.Builder build() {
+        if (fileId != null) {
+            builder.setFileID(fileId.toProtobuf());
+        }
+
+        if (contractId != null) {
+            builder.setContractID(contractId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.fileId, accountId);
+        EntityIdHelper.validateNetworkOnIds(this.contractId, accountId);
+    }
+
 
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
@@ -87,12 +109,12 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setSystemUndelete(builder);
+        bodyBuilder.setSystemUndelete(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setSystemUndelete(builder);
+        scheduled.setSystemUndelete(build());
     }
 }

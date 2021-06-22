@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -20,12 +21,18 @@ import java.util.Objects;
 public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountStakersQuery> {
     private final CryptoGetStakersQuery.Builder builder;
 
+    AccountId accountId;
+
     public AccountStakersQuery() {
         builder = CryptoGetStakersQuery.newBuilder();
     }
 
     public AccountId getAccountId() {
-      return AccountId.fromProtobuf(builder.getAccountID());
+        if (accountId == null) {
+            return new AccountId(0);
+        }
+
+        return accountId;
     }
 
     /**
@@ -36,12 +43,21 @@ public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountS
      */
     public AccountStakersQuery setAccountId(AccountId accountId) {
         Objects.requireNonNull(accountId);
-        builder.setAccountID(accountId.toProtobuf());
+        this.accountId = accountId;
         return this;
     }
 
     @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.accountId, accountId);
+    }
+
+    @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (accountId != null) {
+            builder.setAccountID(accountId.toProtobuf());
+        }
+
         queryBuilder.setCryptoGetProxyStakers(builder.setHeader(header));
     }
 

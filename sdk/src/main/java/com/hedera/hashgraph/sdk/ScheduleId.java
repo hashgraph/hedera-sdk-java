@@ -4,6 +4,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ScheduleID;
 
 import javax.annotation.Nonnegative;
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 public final class ScheduleId {
@@ -25,6 +26,12 @@ public final class ScheduleId {
     @Nonnegative
     public final long num;
 
+    @Nullable
+    NetworkName network;
+
+    @Nullable
+    private final String checksum;
+
     public ScheduleId(@Nonnegative long num) {
         this(0, 0, num);
     }
@@ -34,6 +41,33 @@ public final class ScheduleId {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
+        this.network = null;
+        this.checksum = null;
+    }
+
+    ScheduleId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable NetworkName network, @Nullable String checksum) {
+        this.shard = shard;
+        this.realm = realm;
+        this.num = num;
+        this.network = network;
+
+        if (network != null) {
+            if (checksum == null) {
+                this.checksum = EntityIdHelper.checksum(network.toString(), shard + "." + realm + "." + num);
+            } else {
+                this.checksum = checksum;
+            }
+        } else {
+            this.checksum = null;
+        }
+    }
+
+    public static ScheduleId withNetwork(@Nonnegative long num, NetworkName network) {
+        return new ScheduleId(0, 0, num, network, null);
+    }
+
+    public static ScheduleId withNetwork(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, NetworkName network) {
+        return new ScheduleId(shard, realm, num, network, null);
     }
 
     public static ScheduleId fromString(String id) {
@@ -63,8 +97,7 @@ public final class ScheduleId {
 
     @Override
     public String toString() {
-        var checksum = EntityIdHelper.parseAddress("","" + shard + "." + realm + "." + num);
-        return "" + shard + "." + realm + "." + num + "-" + checksum.correctChecksum;
+        return EntityIdHelper.toString(shard, realm, num, network, checksum);
     }
 
     @Override

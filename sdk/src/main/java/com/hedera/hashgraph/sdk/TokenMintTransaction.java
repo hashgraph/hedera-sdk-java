@@ -6,35 +6,50 @@ import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenMintTransaction> {
     private final TokenMintTransactionBody.Builder builder;
 
+    TokenId tokenId;
+
     public TokenMintTransaction() {
         builder = TokenMintTransactionBody.newBuilder();
     }
 
-    TokenMintTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, Transaction>> txs) throws InvalidProtocolBufferException {
+    TokenMintTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
 
         builder = bodyBuilder.getTokenMint().toBuilder();
+
+        if (builder.hasToken()) {
+            tokenId = TokenId.fromProtobuf(builder.getToken());
+        }
     }
 
     TokenMintTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getTokenMint().toBuilder();
+
+        if (builder.hasToken()) {
+            tokenId = TokenId.fromProtobuf(builder.getToken());
+        }
     }
 
     public TokenId getTokenId() {
-        return TokenId.fromProtobuf(builder.getToken());
+        if (tokenId == null) {
+            return new TokenId(0);
+        }
+
+        return tokenId;
     }
 
     public TokenMintTransaction setTokenId(TokenId tokenId) {
         requireNotFrozen();
-        builder.setToken(tokenId.toProtobuf());
+        this.tokenId = tokenId;
         return this;
     }
 
@@ -48,6 +63,19 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         return this;
     }
 
+    TokenMintTransactionBody.Builder build() {
+        if (tokenId != null) {
+            builder.setToken(tokenId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.tokenId, accountId);
+    }
+
     @Override
     MethodDescriptor<Transaction, TransactionResponse> getMethodDescriptor() {
         return TokenServiceGrpc.getMintTokenMethod();
@@ -55,12 +83,12 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setTokenMint(builder);
+        bodyBuilder.setTokenMint(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setTokenMint(builder);
+        scheduled.setTokenMint(build());
     }
 }

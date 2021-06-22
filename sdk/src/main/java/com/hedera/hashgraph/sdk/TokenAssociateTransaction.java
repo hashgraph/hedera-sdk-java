@@ -5,6 +5,7 @@ import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -12,6 +13,9 @@ import java.util.List;
 
 public class TokenAssociateTransaction extends Transaction<TokenAssociateTransaction> {
     private final TokenAssociateTransactionBody.Builder builder;
+
+    AccountId accountId;
+    List<TokenId> tokenIds = new ArrayList<>();
 
     public TokenAssociateTransaction() {
         builder = TokenAssociateTransactionBody.newBuilder();
@@ -23,40 +27,77 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
         super(txs);
 
         builder = bodyBuilder.getTokenAssociate().toBuilder();
+
+        if (builder.hasAccount()) {
+            accountId = AccountId.fromProtobuf(builder.getAccount());
+        }
+
+        for (var token : builder.getTokensList()) {
+            tokenIds.add(TokenId.fromProtobuf(token));
+        }
     }
 
     TokenAssociateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getTokenAssociate().toBuilder();
+
+        if (builder.hasAccount()) {
+            accountId = AccountId.fromProtobuf(builder.getAccount());
+        }
+
+        for (var token : builder.getTokensList()) {
+            tokenIds.add(TokenId.fromProtobuf(token));
+        }
     }
 
     public AccountId getAccountId() {
-        return AccountId.fromProtobuf(builder.getAccount());
+        if (accountId != null) {
+            return new AccountId(0);
+        }
+
+        return accountId;
     }
 
     public TokenAssociateTransaction setAccountId(AccountId accountId) {
         requireNotFrozen();
-        builder.setAccount(accountId.toProtobuf());
+        this.accountId = accountId;
         return this;
     }
 
     public List<TokenId> getTokenIds() {
-        var list = new ArrayList<TokenId>(builder.getTokensCount());
-        for (var token : builder.getTokensList()) {
-            list.add(TokenId.fromProtobuf(token));
-        }
-        return list;
+        return tokenIds;
     }
 
     public TokenAssociateTransaction setTokenIds(List<TokenId> tokens) {
         requireNotFrozen();
-        builder.clearTokens();
-
-        for (TokenId token : tokens) {
-            builder.addTokens(token.toProtobuf());
-        }
+        this.tokenIds = tokens;
         return this;
+    }
+
+    TokenAssociateTransactionBody.Builder build() {
+        if (accountId != null) {
+            builder.setAccount(accountId.toProtobuf());
+        }
+
+        for (var token : tokenIds) {
+            if (token != null) {
+                builder.addTokens(token.toProtobuf());
+            }
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+        EntityIdHelper.validateNetworkOnIds(this.accountId, accountId);
+
+        for (var token : tokenIds) {
+            if (token != null) {
+                EntityIdHelper.validateNetworkOnIds(token, accountId);
+            }
+        }
     }
 
     @Override
@@ -66,12 +107,12 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setTokenAssociate(builder);
+        bodyBuilder.setTokenAssociate(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setTokenAssociate(builder);
+        scheduled.setTokenAssociate(build());
     }
 }

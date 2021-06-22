@@ -159,6 +159,10 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
     }
 
     @Override
+    void validateNetworkOnIds(@Nullable AccountId accountId) {
+    }
+
+    @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return FileServiceGrpc.getCreateFileMethod();
     }

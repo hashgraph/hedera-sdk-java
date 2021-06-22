@@ -4,6 +4,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ContractID;
 
 import javax.annotation.Nonnegative;
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
@@ -28,6 +29,12 @@ public final class ContractId extends Key {
     @Nonnegative
     public final long num;
 
+    @Nullable
+    NetworkName network;
+
+    @Nullable
+    private final String checksum;
+
     public ContractId(@Nonnegative long num) {
         this(0, 0, num);
     }
@@ -37,6 +44,33 @@ public final class ContractId extends Key {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
+        this.network = null;
+        this.checksum = null;
+    }
+
+    ContractId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable NetworkName network, @Nullable String checksum) {
+        this.shard = shard;
+        this.realm = realm;
+        this.num = num;
+        this.network = network;
+
+        if (network != null) {
+            if (checksum == null) {
+                this.checksum = EntityIdHelper.checksum(network.toString(), shard + "." + realm + "." + num);
+            } else {
+                this.checksum = checksum;
+            }
+        } else {
+            this.checksum = null;
+        }
+    }
+
+    public static ContractId withNetwork(@Nonnegative long num, NetworkName network) {
+        return new ContractId(0, 0, num, network, null);
+    }
+
+    public static ContractId withNetwork(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, NetworkName network) {
+        return new ContractId(shard, realm, num, network, null);
     }
 
     public static ContractId fromString(String id) {
@@ -82,8 +116,7 @@ public final class ContractId extends Key {
 
     @Override
     public String toString() {
-        var checksum = EntityIdHelper.parseAddress("","" + shard + "." + realm + "." + num);
-        return "" + shard + "." + realm + "." + num + "-" + checksum.correctChecksum;
+        return EntityIdHelper.toString(shard, realm, num, network, checksum);
     }
 
     @Override
