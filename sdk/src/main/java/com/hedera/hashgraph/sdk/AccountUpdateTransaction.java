@@ -12,6 +12,7 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Change properties for the given account.
@@ -60,6 +61,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @return {@code this}
      */
     public AccountUpdateTransaction setAccountId(AccountId accountId) {
+        Objects.requireNonNull(accountId);
         requireNotFrozen();
         builder.setAccountIDToUpdate(accountId.toProtobuf());
         return this;
@@ -77,6 +79,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @return {@code this}
      */
     public AccountUpdateTransaction setKey(Key key) {
+        Objects.requireNonNull(key);
         requireNotFrozen();
         builder.setKey(key.toProtobufKey());
         return this;
@@ -102,6 +105,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @return {@code this}
      */
     public AccountUpdateTransaction setProxyAccountId(AccountId proxyAccountId) {
+        Objects.requireNonNull(proxyAccountId);
         requireNotFrozen();
         builder.setProxyAccountID(proxyAccountId.toProtobuf());
         return this;
@@ -120,6 +124,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @return {@code this}
      */
     AccountUpdateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
+        Objects.requireNonNull(sendRecordThreshold);
         requireNotFrozen();
         builder.setSendRecordThresholdWrapper(UInt64Value.of(sendRecordThreshold.toTinybars()));
         return this;
@@ -138,6 +143,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @return {@code this}
      */
     AccountUpdateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
+        Objects.requireNonNull(receiveRecordThreshold);
         requireNotFrozen();
         builder.setReceiveRecordThresholdWrapper(UInt64Value.of(receiveRecordThreshold.toTinybars()));
         return this;
@@ -156,6 +162,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @return {@code this}
      */
     public AccountUpdateTransaction setExpirationTime(Instant expirationTime) {
+        Objects.requireNonNull(expirationTime);
         requireNotFrozen();
         builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
         return this;
@@ -177,6 +184,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      */
     @Deprecated
     public AccountUpdateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
+        Objects.requireNonNull(autoRenewPeriod);
         requireNotFrozen();
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         return this;

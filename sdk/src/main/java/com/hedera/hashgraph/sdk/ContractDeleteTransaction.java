@@ -8,6 +8,7 @@ import io.grpc.MethodDescriptor;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Marks a contract as deleted, moving all its current hbars to another account.
@@ -43,6 +44,7 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
      * @return {@code this}
      */
     public ContractDeleteTransaction setContractId(ContractId contractId) {
+        Objects.requireNonNull(contractId);
         requireNotFrozen();
         builder.setContractID(contractId.toProtobuf());
         return this;
@@ -62,6 +64,7 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
      * @return {@code this}
      */
     public ContractDeleteTransaction setTransferAccountId(AccountId transferAccountId) {
+        Objects.requireNonNull(transferAccountId);
         requireNotFrozen();
         builder.setTransferAccountID(transferAccountId.toProtobuf());
         return this;
@@ -81,6 +84,7 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
      * @return {@code this}
      */
     public ContractDeleteTransaction setTransferContractId(ContractId transferContractId) {
+        Objects.requireNonNull(transferContractId);
         requireNotFrozen();
         builder.setTransferContractID(transferContractId.toProtobuf());
         return this;

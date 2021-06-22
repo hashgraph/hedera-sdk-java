@@ -9,6 +9,7 @@ import io.grpc.MethodDescriptor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Get all the records for an account for any transfers into it and out of it,
@@ -32,6 +33,7 @@ public final class AccountRecordsQuery extends Query<List<TransactionRecord>, Ac
      * @param accountId The AccountId to be set
      */
     public AccountRecordsQuery setAccountId(AccountId accountId) {
+        Objects.requireNonNull(accountId);
         builder.setAccountID(accountId.toProtobuf());
         return this;
     }

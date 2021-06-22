@@ -8,6 +8,8 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 
+import java.util.Objects;
+
 /**
  * Get all the information about an account, including the balance.
  * This does not get the list of account records.
@@ -30,6 +32,7 @@ public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery>
      * @param accountId  The AccountId to be set
      */
     public AccountInfoQuery setAccountId(AccountId accountId) {
+        Objects.requireNonNull(accountId);
         builder.setAccountID(accountId.toProtobuf());
         return this;
     }

@@ -9,6 +9,8 @@ import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 
+import java.util.Objects;
+
 /**
  * Call a function of the given smart contract instance, giving it functionParameters as its inputs.
  * It will consume the entire given amount of gas.
@@ -40,6 +42,7 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
      * @param contractId The ContractId to be set
      */
     public ContractCallQuery setContractId(ContractId contractId) {
+        Objects.requireNonNull(contractId);
         builder.setContractID(contractId.toProtobuf());
         return this;
     }
@@ -105,6 +108,7 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
      * @param params The parameters to pass
      */
     public ContractCallQuery setFunction(String name, ContractFunctionParameters params) {
+        Objects.requireNonNull(params);
         builder.setFunctionParameters(params.toBytes(name));
         return this;
     }

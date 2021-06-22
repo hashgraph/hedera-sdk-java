@@ -9,6 +9,7 @@ import io.grpc.MethodDescriptor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Get all the accounts that are proxy staking to this account.
@@ -34,6 +35,7 @@ public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountS
      * @param accountId The AccountId to be set
      */
     public AccountStakersQuery setAccountId(AccountId accountId) {
+        Objects.requireNonNull(accountId);
         builder.setAccountID(accountId.toProtobuf());
         return this;
     }
