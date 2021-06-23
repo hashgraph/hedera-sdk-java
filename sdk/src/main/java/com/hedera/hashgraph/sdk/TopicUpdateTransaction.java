@@ -232,9 +232,9 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
-        EntityIdHelper.validateNetworkOnIds(this.topicId, accountId);
-        EntityIdHelper.validateNetworkOnIds(this.autoRenewAccountId, accountId);
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
+        EntityIdHelper.validateNetworkOnIds(this.topicId, networkName);
+        EntityIdHelper.validateNetworkOnIds(this.autoRenewAccountId, networkName);
     }
 
     @Override

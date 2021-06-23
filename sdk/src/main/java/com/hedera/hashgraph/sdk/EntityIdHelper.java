@@ -169,38 +169,38 @@ class EntityIdHelper {
         }
     }
 
-    static void validateNetworkOnIds(@Nullable AccountId left, @Nullable AccountId right) {
-        if (left != null && right != null && left.network != null && right.network != null && left.network != right.network) {
+    static void validateNetworkOnIds(@Nullable AccountId left, @Nullable NetworkName networkName) {
+        if (left != null && networkName != null && left.network != null && left.network != networkName) {
             throw new IllegalStateException("Network mismatch; some IDs have different networks set");
         }
     }
 
-    static void validateNetworkOnIds(@Nullable ContractId left, @Nullable AccountId right) {
-        if (left != null && right != null && left.network != null && right.network != null && left.network != right.network) {
+    static void validateNetworkOnIds(@Nullable ContractId left, @Nullable NetworkName networkName) {
+        if (left != null && networkName != null && left.network != null && left.network != networkName) {
             throw new IllegalStateException("Network mismatch; some IDs have different networks set");
         }
     }
 
-    static void validateNetworkOnIds(@Nullable FileId left, @Nullable AccountId right) {
-        if (left != null && right != null && left.network != null && right.network != null && left.network != right.network) {
+    static void validateNetworkOnIds(@Nullable FileId left, @Nullable NetworkName networkName) {
+        if (left != null && networkName != null && left.network != null && left.network != networkName) {
             throw new IllegalStateException("Network mismatch; some IDs have different networks set");
         }
     }
 
-    static void validateNetworkOnIds(@Nullable TopicId left, @Nullable AccountId right) {
-        if (left != null && right != null && left.network != null && right.network != null && left.network != right.network) {
+    static void validateNetworkOnIds(@Nullable TopicId left, @Nullable NetworkName networkName) {
+        if (left != null && networkName != null && left.network != null && left.network != networkName) {
             throw new IllegalStateException("Network mismatch; some IDs have different networks set");
         }
     }
 
-    static void validateNetworkOnIds(@Nullable TokenId left, @Nullable AccountId right) {
-        if (left != null && right != null && left.network != null && right.network != null && left.network != right.network) {
+    static void validateNetworkOnIds(@Nullable TokenId left, @Nullable NetworkName networkName) {
+        if (left != null && networkName != null && left.network != null && left.network != networkName) {
             throw new IllegalStateException("Network mismatch; some IDs have different networks set");
         }
     }
 
-    static void validateNetworkOnIds(@Nullable ScheduleId left, @Nullable AccountId right) {
-        if (left != null && right != null && left.network != null && right.network != null && left.network != right.network) {
+    static void validateNetworkOnIds(@Nullable ScheduleId left, @Nullable NetworkName networkName) {
+        if (left != null && networkName != null && left.network != null && left.network != networkName) {
             throw new IllegalStateException("Network mismatch; some IDs have different networks set");
         }
     }

@@ -159,7 +159,7 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
     }
 
     @Override

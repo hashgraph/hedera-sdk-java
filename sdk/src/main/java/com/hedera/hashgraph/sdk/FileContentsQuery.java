@@ -47,8 +47,8 @@ public final class FileContentsQuery extends Query<ByteString, FileContentsQuery
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
-        EntityIdHelper.validateNetworkOnIds(this.fileId, accountId);
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
+        EntityIdHelper.validateNetworkOnIds(this.fileId, networkName);
     }
 
     @Override

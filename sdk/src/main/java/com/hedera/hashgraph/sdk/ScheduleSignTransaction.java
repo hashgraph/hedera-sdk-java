@@ -57,8 +57,8 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
-        EntityIdHelper.validateNetworkOnIds(this.scheduleId, accountId);
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
+        EntityIdHelper.validateNetworkOnIds(this.scheduleId, networkName);
     }
 
     @Override

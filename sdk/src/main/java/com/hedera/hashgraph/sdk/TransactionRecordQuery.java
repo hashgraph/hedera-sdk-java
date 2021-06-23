@@ -49,9 +49,9 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
         if (transactionId != null) {
-            EntityIdHelper.validateNetworkOnIds(transactionId.accountId, accountId);
+            EntityIdHelper.validateNetworkOnIds(transactionId.accountId, networkName);
         }
     }
 

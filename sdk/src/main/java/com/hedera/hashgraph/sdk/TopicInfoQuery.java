@@ -39,8 +39,8 @@ public final class TopicInfoQuery extends Query<TopicInfo, TopicInfoQuery> {
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
-        EntityIdHelper.validateNetworkOnIds(this.topicId, accountId);
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
+        EntityIdHelper.validateNetworkOnIds(this.topicId, networkName);
     }
 
     @Override

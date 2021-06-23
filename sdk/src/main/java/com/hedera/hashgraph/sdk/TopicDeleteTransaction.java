@@ -6,7 +6,6 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
@@ -72,8 +71,8 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
-        EntityIdHelper.validateNetworkOnIds(this.topicId, accountId);
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
+        EntityIdHelper.validateNetworkOnIds(this.topicId, networkName);
     }
 
     @Override

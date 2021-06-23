@@ -8,8 +8,8 @@ import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 
-import java.util.Objects;
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * Get information about a smart contract instance.
@@ -51,8 +51,8 @@ public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQue
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
-        EntityIdHelper.validateNetworkOnIds(this.contractId, accountId);
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
+        EntityIdHelper.validateNetworkOnIds(this.contractId, networkName);
     }
 
     @Override

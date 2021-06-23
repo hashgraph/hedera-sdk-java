@@ -44,8 +44,8 @@ public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
-        EntityIdHelper.validateNetworkOnIds(this.fileId, accountId);
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
+        EntityIdHelper.validateNetworkOnIds(this.fileId, networkName);
     }
 
     @Override

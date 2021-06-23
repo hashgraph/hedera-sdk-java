@@ -2,9 +2,11 @@ import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.AccountInfoQuery;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.NetworkName;
+import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransactionId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -68,6 +70,24 @@ public class ClientIntegrationTest {
             new AccountCreateTransaction()
                 .setTransactionId(TransactionId.generate(AccountId.withNetwork(0, NetworkName.TESTNET)))
                 .execute(client);
+        });
+    }
+
+    @Test
+    void accountIdNetworkIsVerified() {
+        assertThrows(IllegalStateException.class, () -> {
+            var client = Client.forPreviewnet();
+
+            new AccountInfoQuery()
+                .setAccountId(AccountId.withNetwork(0, NetworkName.TESTNET))
+                .execute(client);
+        });
+    }
+
+    @Test
+    void operatorIdMustBeSameNetwork() {
+        assertThrows(IllegalStateException.class, () -> {
+            Client.forPreviewnet().setOperator(AccountId.withNetwork(0, NetworkName.TESTNET), PrivateKey.generate());
         });
     }
 }

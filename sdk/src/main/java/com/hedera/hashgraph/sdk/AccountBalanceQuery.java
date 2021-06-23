@@ -7,8 +7,8 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import io.grpc.MethodDescriptor;
 
-import java.util.Objects;
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * Get the balance of a Hedera™ crypto-currency account. This returns only the balance, so it is a
@@ -63,9 +63,9 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
-        EntityIdHelper.validateNetworkOnIds(this.accountId, accountId);
-        EntityIdHelper.validateNetworkOnIds(this.contractId, accountId);
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
+        EntityIdHelper.validateNetworkOnIds(this.accountId, networkName);
+        EntityIdHelper.validateNetworkOnIds(this.contractId, networkName);
     }
 
     @Override

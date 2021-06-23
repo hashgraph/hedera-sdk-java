@@ -210,8 +210,8 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
-        EntityIdHelper.validateNetworkOnIds(this.proxyAccountId, accountId);
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
+        EntityIdHelper.validateNetworkOnIds(this.proxyAccountId, networkName);
     }
 
     @Override

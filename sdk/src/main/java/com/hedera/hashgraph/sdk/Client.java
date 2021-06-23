@@ -354,6 +354,8 @@ public final class Client implements AutoCloseable {
      * @return {@code this}
      */
     public synchronized Client setOperatorWith(AccountId accountId, PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
+        EntityIdHelper.validateNetworkOnIds(accountId, network.networkName);
+
         this.operator = new Operator(accountId, publicKey, transactionSigner);
         return this;
     }

@@ -54,9 +54,9 @@ public final class TransactionReceiptQuery
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
         if (transactionId != null) {
-            EntityIdHelper.validateNetworkOnIds(transactionId.accountId, accountId);
+            EntityIdHelper.validateNetworkOnIds(transactionId.accountId, networkName);
         }
     }
 

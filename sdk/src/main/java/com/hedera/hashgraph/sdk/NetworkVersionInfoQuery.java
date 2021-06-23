@@ -17,7 +17,7 @@ public class NetworkVersionInfoQuery extends Query<NetworkVersionInfo, NetworkVe
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
     }
 
     @Override

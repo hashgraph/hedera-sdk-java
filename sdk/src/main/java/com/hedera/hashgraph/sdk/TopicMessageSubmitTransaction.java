@@ -107,8 +107,8 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
-        EntityIdHelper.validateNetworkOnIds(this.topicId, accountId);
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
+        EntityIdHelper.validateNetworkOnIds(this.topicId, networkName);
     }
 
     @Override

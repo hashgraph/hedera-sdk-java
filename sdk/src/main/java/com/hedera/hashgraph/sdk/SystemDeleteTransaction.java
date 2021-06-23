@@ -7,7 +7,6 @@ import io.grpc.MethodDescriptor;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
@@ -116,9 +115,9 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
-        EntityIdHelper.validateNetworkOnIds(this.fileId, accountId);
-        EntityIdHelper.validateNetworkOnIds(this.contractId, accountId);
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
+        EntityIdHelper.validateNetworkOnIds(this.fileId, networkName);
+        EntityIdHelper.validateNetworkOnIds(this.contractId, networkName);
     }
 
     @Override

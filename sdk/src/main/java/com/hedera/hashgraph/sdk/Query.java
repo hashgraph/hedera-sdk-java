@@ -115,11 +115,11 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         return new QueryCostQuery();
     }
 
-    abstract void validateNetworkOnIds(@Nullable AccountId accountId);
+    abstract void validateNetworkOnIds(@Nullable NetworkName networkName);
 
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
-        validateNetworkOnIds(client.getOperatorAccountId());
+        validateNetworkOnIds(client.network.networkName);
 
         if (nodeAccountIds.size() == 0) {
             // Get a list of node AccountId's if the user has not set them manually.
@@ -254,7 +254,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     @SuppressWarnings("NullableDereference")
     private class QueryCostQuery extends Query<Hbar, QueryCostQuery> {
         @Override
-        void validateNetworkOnIds(@Nullable AccountId accountId) {
+        void validateNetworkOnIds(@Nullable NetworkName networkName) {
         }
 
         @Override

@@ -42,8 +42,8 @@ public final class AccountRecordsQuery extends Query<List<TransactionRecord>, Ac
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
-        EntityIdHelper.validateNetworkOnIds(this.accountId, accountId);
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
+        EntityIdHelper.validateNetworkOnIds(this.accountId, networkName);
     }
 
     @Override

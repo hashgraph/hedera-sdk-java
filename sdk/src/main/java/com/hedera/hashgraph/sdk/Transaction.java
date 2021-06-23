@@ -853,7 +853,7 @@ public abstract class Transaction<T extends Transaction<T>>
         return Status.valueOf(transactionResponse.getNodeTransactionPrecheckCode());
     }
 
-    abstract void validateNetworkOnIds(@Nullable AccountId accountId);
+    abstract void validateNetworkOnIds(@Nullable NetworkName networkName);
 
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
@@ -866,7 +866,7 @@ public abstract class Transaction<T extends Transaction<T>>
             throw new IllegalStateException("TransactionId.accountId uses different network than the Client");
         }
 
-        validateNetworkOnIds(client.getOperatorAccountId());
+        validateNetworkOnIds(client.network.networkName);
 
         var operatorId = client.getOperatorAccountId();
         if (operatorId != null && operatorId.equals(accountId)) {

@@ -9,7 +9,6 @@ import org.threeten.bp.OffsetTime;
 import org.threeten.bp.ZoneOffset;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
@@ -76,7 +75,7 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
     }
 
 

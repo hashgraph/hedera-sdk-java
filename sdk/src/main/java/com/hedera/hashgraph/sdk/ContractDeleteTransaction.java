@@ -6,7 +6,6 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 
@@ -100,10 +99,10 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
-        EntityIdHelper.validateNetworkOnIds(this.contractId, accountId);
-        EntityIdHelper.validateNetworkOnIds(this.transferContractId, accountId);
-        EntityIdHelper.validateNetworkOnIds(this.transferAccountId, accountId);
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
+        EntityIdHelper.validateNetworkOnIds(this.contractId, networkName);
+        EntityIdHelper.validateNetworkOnIds(this.transferContractId, networkName);
+        EntityIdHelper.validateNetworkOnIds(this.transferAccountId, networkName);
     }
 
 

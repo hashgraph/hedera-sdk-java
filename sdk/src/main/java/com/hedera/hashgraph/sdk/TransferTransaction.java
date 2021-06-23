@@ -153,16 +153,16 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
         for (var a : hbarTransfers.keySet()) {
-            EntityIdHelper.validateNetworkOnIds(a, accountId);
+            EntityIdHelper.validateNetworkOnIds(a, networkName);
         }
 
         for (var entry : tokenTransfers.entrySet()) {
-            EntityIdHelper.validateNetworkOnIds(entry.getKey(), accountId);
+            EntityIdHelper.validateNetworkOnIds(entry.getKey(), networkName);
 
             for (var a : entry.getValue().keySet()) {
-                EntityIdHelper.validateNetworkOnIds(a, accountId);
+                EntityIdHelper.validateNetworkOnIds(a, networkName);
             }
         }
     }

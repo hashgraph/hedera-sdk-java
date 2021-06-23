@@ -73,8 +73,8 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
-        EntityIdHelper.validateNetworkOnIds(this.fileId, accountId);
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
+        EntityIdHelper.validateNetworkOnIds(this.fileId, networkName);
     }
 
     @Override

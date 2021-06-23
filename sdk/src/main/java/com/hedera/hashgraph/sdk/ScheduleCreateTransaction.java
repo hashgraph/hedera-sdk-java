@@ -87,8 +87,8 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
-        EntityIdHelper.validateNetworkOnIds(this.payerAccountId, accountId);
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
+        EntityIdHelper.validateNetworkOnIds(this.payerAccountId, networkName);
     }
 
     @Override

@@ -203,10 +203,10 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
-        EntityIdHelper.validateNetworkOnIds(this.tokenId, accountId);
-        EntityIdHelper.validateNetworkOnIds(this.treasuryAccountId, accountId);
-        EntityIdHelper.validateNetworkOnIds(this.autoRenewAccountId, accountId);
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
+        EntityIdHelper.validateNetworkOnIds(this.tokenId, networkName);
+        EntityIdHelper.validateNetworkOnIds(this.treasuryAccountId, networkName);
+        EntityIdHelper.validateNetworkOnIds(this.autoRenewAccountId, networkName);
     }
 
     @Override

@@ -7,7 +7,6 @@ import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -90,12 +89,12 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable AccountId accountId) {
-        EntityIdHelper.validateNetworkOnIds(this.accountId, accountId);
+    void validateNetworkOnIds(@Nullable NetworkName networkName) {
+        EntityIdHelper.validateNetworkOnIds(this.accountId, networkName);
 
         for (var token : tokenIds) {
             if (token != null) {
-                EntityIdHelper.validateNetworkOnIds(token, accountId);
+                EntityIdHelper.validateNetworkOnIds(token, networkName);
             }
         }
     }
