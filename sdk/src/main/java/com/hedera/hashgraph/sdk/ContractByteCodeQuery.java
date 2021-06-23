@@ -24,10 +24,6 @@ public final class ContractByteCodeQuery extends Query<ByteString, ContractByteC
     }
 
     public ContractId getContractId() {
-        if (contractId == null) {
-            return new ContractId(0);
-        }
-
         return contractId;
     }
 

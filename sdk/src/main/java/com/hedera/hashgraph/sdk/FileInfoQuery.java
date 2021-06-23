@@ -30,10 +30,6 @@ public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
     }
 
     public FileId getFileId() {
-        if (fileId == null) {
-            return new FileId(0);
-        }
-
         return fileId;
     }
     /**

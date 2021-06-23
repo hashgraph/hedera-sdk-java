@@ -51,10 +51,6 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     public TokenId getTokenId() {
-        if (tokenId == null) {
-            return new TokenId(0);
-        }
-
         return tokenId;
     }
 
@@ -85,10 +81,6 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     public AccountId getTreasuryAccountId() {
-        if (treasuryAccountId == null) {
-            return new AccountId(0);
-        }
-
         return treasuryAccountId;
     }
 
@@ -159,10 +151,6 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     public AccountId getAutoRenewAccountId() {
-        if (autoRenewAccountId == null) {
-            return new AccountId(0);
-        }
-
         return autoRenewAccountId;
     }
 

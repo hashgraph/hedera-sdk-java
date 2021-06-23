@@ -28,10 +28,6 @@ public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountS
     }
 
     public AccountId getAccountId() {
-        if (accountId == null) {
-            return new AccountId(0);
-        }
-
         return accountId;
     }
 

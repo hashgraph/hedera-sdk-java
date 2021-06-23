@@ -26,10 +26,6 @@ public final class AccountRecordsQuery extends Query<List<TransactionRecord>, Ac
     }
 
     public AccountId getAccountId() {
-        if (accountId == null) {
-            return new AccountId(0);
-        }
-
         return accountId;
     }
 

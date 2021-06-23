@@ -34,10 +34,6 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     }
 
     public AccountId getPayerAccountId() {
-        if (payerAccountId == null) {
-            return new AccountId(0);
-        }
-
         return payerAccountId;
     }
 

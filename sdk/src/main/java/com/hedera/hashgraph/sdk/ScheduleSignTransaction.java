@@ -33,10 +33,6 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
     }
 
     public ScheduleId getScheduleId() {
-        if (scheduleId == null) {
-            return new ScheduleId(0);
-        }
-
         return scheduleId;
     }
 

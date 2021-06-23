@@ -48,10 +48,6 @@ public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transacti
     }
 
     public TokenId getTokenId() {
-        if (tokenId == null) {
-            return new TokenId(0);
-        }
-
         return tokenId;
     }
 
@@ -62,10 +58,6 @@ public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transacti
     }
 
     public AccountId getAccountId() {
-        if (accountId == null) {
-            return new AccountId(0);
-        }
-
         return accountId;
     }
 

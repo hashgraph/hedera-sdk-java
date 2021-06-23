@@ -35,10 +35,6 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
     }
 
     public ContractId getContractId() {
-        if (contractId == null) {
-            return new ContractId(0);
-        }
-
         return contractId;
     }
 

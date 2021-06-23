@@ -25,10 +25,6 @@ public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery>
     }
 
     public AccountId getAccountId() {
-        if (accountId == null) {
-            return new AccountId(0);
-        }
-
         return accountId;
     }
 

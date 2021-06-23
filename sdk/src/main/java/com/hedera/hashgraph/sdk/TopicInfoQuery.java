@@ -24,10 +24,6 @@ public final class TopicInfoQuery extends Query<TopicInfo, TopicInfoQuery> {
     }
 
     public TopicId getTopicId() {
-        if (topicId == null) {
-            return new TopicId(0);
-        }
-
         return topicId;
     }
 

@@ -24,10 +24,6 @@ public final class FileContentsQuery extends Query<ByteString, FileContentsQuery
     }
 
     public FileId getFileId() {
-        if (fileId == null) {
-            return new FileId(0);
-        }
-
         return fileId;
     }
 

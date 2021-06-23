@@ -40,10 +40,6 @@ public class TokenDeleteTransaction extends com.hedera.hashgraph.sdk.Transaction
     }
 
     public TokenId getTokenId() {
-        if (tokenId == null) {
-            return new TokenId(0);
-        }
-
         return tokenId;
     }
 

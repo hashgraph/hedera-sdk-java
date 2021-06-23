@@ -40,10 +40,6 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
     }
 
     public ScheduleId getScheduleId() {
-        if (scheduleId == null) {
-            return new ScheduleId(0);
-        }
-
         return scheduleId;
     }
 

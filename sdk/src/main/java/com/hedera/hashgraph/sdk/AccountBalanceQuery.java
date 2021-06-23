@@ -27,10 +27,6 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
     }
 
     public AccountId getAccountId() {
-        if (accountId == null) {
-            return new AccountId(0);
-        }
-
         return accountId;
     }
 
@@ -49,10 +45,6 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
     }
 
     public ContractId getContractId() {
-        if (contractId == null) {
-            return new ContractId(0);
-        }
-
         return contractId;
     }
 

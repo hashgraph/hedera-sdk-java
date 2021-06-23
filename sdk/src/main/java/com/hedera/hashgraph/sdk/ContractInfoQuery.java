@@ -27,10 +27,6 @@ public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQue
     }
 
     public ContractId getContractId() {
-        if (contractId == null) {
-            return new ContractId(0);
-        }
-
         return contractId;
     }
 

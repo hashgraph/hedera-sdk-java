@@ -23,10 +23,6 @@ public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
     }
 
     public AccountId getAccountId() {
-        if (accountId == null) {
-            return new AccountId(0);
-        }
-
         return accountId;
     }
 
