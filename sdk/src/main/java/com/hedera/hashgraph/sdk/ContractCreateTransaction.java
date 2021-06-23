@@ -62,6 +62,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     private final ContractCreateTransactionBody.Builder builder;
 
     FileId bytecodeFileId;
+    AccountId proxyAccountId;
 
     public ContractCreateTransaction() {
         builder = ContractCreateTransactionBody.newBuilder();
@@ -181,7 +182,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     public ContractCreateTransaction setProxyAccountId(AccountId proxyAccountId) {
         Objects.requireNonNull(proxyAccountId);
         requireNotFrozen();
-        builder.setProxyAccountID(proxyAccountId.toProtobuf());
+        this.proxyAccountId = proxyAccountId;
         return this;
     }
 
@@ -256,12 +257,17 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
             builder.setFileID(bytecodeFileId.toProtobuf());
         }
 
+        if (proxyAccountId != null) {
+            builder.setProxyAccountID(proxyAccountId.toProtobuf());
+        }
+
         return builder;
     }
 
     @Override
     void validateNetworkOnIds(@Nullable AccountId accountId) {
         EntityIdHelper.validateNetworkOnIds(this.bytecodeFileId, accountId);
+        EntityIdHelper.validateNetworkOnIds(this.proxyAccountId, accountId);
     }
 
     @Override
