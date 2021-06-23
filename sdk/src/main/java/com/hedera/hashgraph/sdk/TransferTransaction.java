@@ -15,11 +15,27 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.List;
+import java.util.ArrayList;
+import javax.annotation.Nullable;
 
 public class TransferTransaction extends Transaction<TransferTransaction> {
     private final CryptoTransferTransactionBody.Builder builder;
     private final Map<TokenId, Map<AccountId, Long>> tokenTransfers = new HashMap<>();
+    private final Map<TokenId, List<NftTransfer>> nftTransfers = new HashMap<>();
     private final Map<AccountId, Hbar> hbarTransfers = new HashMap<>();
+
+    class NftTransfer {
+        @Nullable
+        public AccountId sender, receiver;
+        public long serial;
+
+        public NftTransfer(@Nullable AccountId sender, @Nullable AccountId receiver, long serial) {
+            this.sender = sender;
+            this.receiver = receiver;
+            this.serial = serial;
+        }
+    };
 
     public TransferTransaction() {
         builder = CryptoTransferTransactionBody.newBuilder();
@@ -32,31 +48,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
         builder = bodyBuilder.getCryptoTransfer().toBuilder();
 
-        for (var transfer : bodyBuilder.getCryptoTransfer().getTransfers().getAccountAmountsList()) {
-            var account = AccountId.fromProtobuf(transfer.getAccountID());
-            var current = hbarTransfers.containsKey(account) ?
-                Objects.requireNonNull(hbarTransfers.get(account)).toTinybars() :
-                0L;
-
-            hbarTransfers.put(account, Hbar.fromTinybars(current + transfer.getAmount()));
-        }
-
-        for (var tokenTransferList : bodyBuilder.getCryptoTransfer().getTokenTransfersList()) {
-            var token = TokenId.fromProtobuf(tokenTransferList.getToken());
-            var list = tokenTransfers.containsKey(token) ?
-                Objects.requireNonNull(tokenTransfers.get(token)) :
-                new HashMap<AccountId, Long>();
-            tokenTransfers.put(token, list);
-
-            for (var aa : tokenTransferList.getTransfersList()) {
-                var account = AccountId.fromProtobuf(aa.getAccountID());
-                var current = list.containsKey(account) ?
-                    Objects.requireNonNull(list.get(account)) :
-                    0L;
-
-                list.put(account, current + aa.getAmount());
-            }
-        }
+        constructFromBuilder();
     }
 
     TransferTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
@@ -64,31 +56,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
         builder = bodyBuilder.getCryptoTransfer().toBuilder();
 
-        for (var transfer : bodyBuilder.getCryptoTransfer().getTransfers().getAccountAmountsList()) {
-            var account = AccountId.fromProtobuf(transfer.getAccountID());
-            var current = hbarTransfers.containsKey(account) ?
-                Objects.requireNonNull(hbarTransfers.get(account)).toTinybars() :
-                0L;
-
-            hbarTransfers.put(account, Hbar.fromTinybars(current + transfer.getAmount()));
-        }
-
-        for (var tokenTransferList : bodyBuilder.getCryptoTransfer().getTokenTransfersList()) {
-            var token = TokenId.fromProtobuf(tokenTransferList.getToken());
-            var list = tokenTransfers.containsKey(token) ?
-                Objects.requireNonNull(tokenTransfers.get(token)) :
-                new HashMap<AccountId, Long>();
-            tokenTransfers.put(token, list);
-
-            for (var aa : tokenTransferList.getTransfersList()) {
-                var account = AccountId.fromProtobuf(aa.getAccountID());
-                var current = list.containsKey(account) ?
-                    Objects.requireNonNull(list.get(account)) :
-                    0L;
-
-                list.put(account, current + aa.getAmount());
-            }
-        }
+        constructFromBuilder();
     }
 
     public Map<TokenId, Map<AccountId, Long>> getTokenTransfers() {
@@ -97,19 +65,17 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
     public TransferTransaction addTokenTransfer(TokenId tokenId, AccountId accountId, long value) {
         requireNotFrozen();
+        doAddTokenTransfer(getTokenTransferMap(tokenId), accountId, value);
+        return this;
+    }
 
-        // Cannot use `Map.merge()` as it uses `BiFunction`
-        var tokenTransfer = tokenTransfers.containsKey(tokenId) ?
-            Objects.requireNonNull(tokenTransfers.get(tokenId)) :
-            new HashMap<AccountId, Long>();
-        tokenTransfers.put(tokenId, tokenTransfer);
+    public Map<TokenId, List<NftTransfer>> getTokenNftTransfers() {
+        return nftTransfers;
+    }
 
-        var current = tokenTransfer.containsKey(accountId) ?
-            Objects.requireNonNull(tokenTransfer.get(accountId)) :
-            0L;
-
-        tokenTransfer.put(accountId, current + value);
-
+    public TransferTransaction addTokenNftTransfer(NftId nftId, AccountId sender, AccountId receiver) {
+        requireNotFrozen();
+        getNftTransferList(nftId.tokenId).add(new NftTransfer(sender, receiver, nftId.serial));
         return this;
     }
 
@@ -119,14 +85,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
     public TransferTransaction addHbarTransfer(AccountId accountId, Hbar value) {
         requireNotFrozen();
-
-        // Cannot use `Map.merge()` as it uses `BiFunction`
-        var current = hbarTransfers.containsKey(accountId) ?
-            Objects.requireNonNull(hbarTransfers.get(accountId)).toTinybars() :
-            0L;
-
-        hbarTransfers.put(accountId, Hbar.fromTinybars(current + value.toTinybars()));
-
+        doAddHbarTransfer(accountId, value.toTinybars());
         return this;
     }
 
@@ -186,5 +145,67 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
         scheduled.setCryptoTransfer(build());
+    }
+
+    private Map<AccountId, Long> getTokenTransferMap(TokenId tokenId) {
+        // Cannot use `Map.merge()` as it uses `BiFunction`
+        var map = tokenTransfers.containsKey(tokenId) ?
+            Objects.requireNonNull(tokenTransfers.get(tokenId)) :
+            new HashMap<AccountId, Long>();
+        tokenTransfers.put(tokenId, map);
+        return map;
+    }
+
+    private List<NftTransfer> getNftTransferList(TokenId tokenId) {
+        // Cannot use `Map.merge()` as it uses `BiFunction`
+        var list = nftTransfers.containsKey(tokenId) ?
+            Objects.requireNonNull(nftTransfers.get(tokenId)) :
+            new ArrayList<NftTransfer>();
+        nftTransfers.put(tokenId, list);
+        return list;
+    }
+
+    private void doAddTokenTransfer(Map<AccountId, Long> tokenTransferMap, AccountId accountId, long amount) {
+        var current = tokenTransferMap.containsKey(accountId) ?
+            Objects.requireNonNull(tokenTransferMap.get(accountId)) :
+            0L;
+        tokenTransferMap.put(accountId, current + amount);
+    }
+
+    private void doAddHbarTransfer(AccountId accountId, long amount) {
+        var current = hbarTransfers.containsKey(accountId) ?
+            Objects.requireNonNull(hbarTransfers.get(accountId)).toTinybars() :
+            0L;
+
+        hbarTransfers.put(accountId, Hbar.fromTinybars(current + amount));
+    }
+
+    private void constructFromBuilder() {
+        for (var transfer : bodyBuilder.getCryptoTransfer().getTransfers().getAccountAmountsList()) {
+            doAddHbarTransfer(AccountId.fromProtobuf(transfer.getAccountID()), transfer.getAmount());
+        }
+
+        for (var tokenTransferList : bodyBuilder.getCryptoTransfer().getTokenTransfersList()) {
+            var token = TokenId.fromProtobuf(tokenTransferList.getToken());
+
+            if(tokenTransferList.getTransfersCount() > 0) {
+                var map = getTokenTransferMap(token);
+                
+                for (var aa : tokenTransferList.getTransfersList()) {
+                    doAddTokenTransfer(map, AccountId.fromProtobuf(aa.getAccountID()), aa.getAmount());
+                }
+            }
+
+            if(tokenTransferList.getNftTransfersCount() > 0) {
+                var list = getNftTransferList(token);
+
+                for(var nftTransfer : tokenTransferList.getNftTransfersList()) {
+                    list.add(new NftTransfer(
+                        AccountId.fromProtobuf(nftTransfer.getSenderAccountID()), 
+                        AccountId.fromProtobuf(nftTransfer.getReceiverAccountID()), 
+                        nftTransfer.getSerialNumber()));
+                }
+            }
+        }
     }
 }
