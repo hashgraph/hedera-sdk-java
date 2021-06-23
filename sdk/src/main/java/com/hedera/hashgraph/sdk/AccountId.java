@@ -56,7 +56,7 @@ public final class AccountId {
 
         if (network != null) {
             if (checksum == null) {
-                this.checksum = EntityIdHelper.checksum(network.toString(), shard + "." + realm + "." + num);
+                this.checksum = EntityIdHelper.checksum(Integer.toString(network.id), shard + "." + realm + "." + num);
             } else {
                 this.checksum = checksum;
             }
