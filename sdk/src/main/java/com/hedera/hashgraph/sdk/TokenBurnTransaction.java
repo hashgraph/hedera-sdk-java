@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.List;
+import java.util.Objects;
 
 public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenBurnTransaction> {
     private final TokenBurnTransactionBody.Builder builder;
@@ -88,6 +89,15 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     public TokenBurnTransaction addSerial(long serial) {
         requireNotFrozen();
         builder.addSerialNumbers(serial);
+        return this;
+    }
+
+    public TokenBurnTransaction setSerials(List<Long> serials) {
+        requireNotFrozen();
+        builder.clearSerialNumbers();
+        for(var serial : Objects.requireNonNull(serials)) {
+            builder.addSerialNumbers(serial);
+        }
         return this;
     }
 

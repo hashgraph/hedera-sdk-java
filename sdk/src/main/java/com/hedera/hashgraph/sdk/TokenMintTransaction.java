@@ -68,6 +68,14 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         return this;
     }
 
+    public TokenMintTransaction addMetadatas(List<byte[]> metadatas) {
+        requireNotFrozen();
+        for(var metadata : metadatas) {
+            builder.addMetadata(ByteString.copyFrom(metadata));
+        }
+        return this;
+    }
+
     public List<byte[]> getMetadata() {
         var metadata = new ArrayList<byte[]>();
         for(var datum : builder.getMetadataList()) {

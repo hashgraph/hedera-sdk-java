@@ -17,8 +17,6 @@ import java.util.Objects;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 
-
-
 public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<TokenNftInfo>, TokenNftInfoQuery> {
     @Nullable
     private TokenGetNftInfoQuery.Builder byNftBuilder = null;

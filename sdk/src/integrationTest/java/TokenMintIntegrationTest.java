@@ -1,6 +1,7 @@
 import com.hedera.hashgraph.sdk.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.Objects;
 
@@ -182,6 +183,56 @@ class TokenMintIntegrationTest {
             });
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
+
+            testEnv.client.close();
+        });
+    }
+
+    @Disabled
+    @Test
+    @DisplayName("Can mint NFTs")
+    void canMintNfts() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv();
+
+            var key = PrivateKey.generate();
+
+            var response = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setKey(key)
+                .setInitialBalance(new Hbar(1))
+                .execute(testEnv.client);
+
+            Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
+
+            var tokenId = Objects.requireNonNull(
+                new TokenCreateTransaction()
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setDecimals(3)
+                    .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(testEnv.operatorKey)
+                    .setFreezeKey(testEnv.operatorKey)
+                    .setWipeKey(testEnv.operatorKey)
+                    .setKycKey(testEnv.operatorKey)
+                    .setSupplyKey(testEnv.operatorKey)
+                    .setFreezeDefault(false)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client)
+                    .tokenId
+            );
+
+            var receipt = new TokenMintTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setAmount(10)
+                .setTokenId(tokenId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            assertEquals(receipt.totalSupply, 10);
+            assertEquals(receipt.serials.size(), 10);
 
             testEnv.client.close();
         });

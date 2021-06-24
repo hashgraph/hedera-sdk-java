@@ -29,6 +29,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
 
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
         setMaxTransactionFee(new Hbar(30));
+        setInitialSupply(0);
     }
 
     TokenCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
