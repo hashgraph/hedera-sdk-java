@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.7
+
+### Added
+
+ * Support for entity ID checksums which are validated whenever a request begins execution.
+   This includes the IDs within the request, the account ID within the transaction ID, and
+   query responses will contain entity IDs with a checksum for the network the query was executed on.
+ * Node validation before execution
+ * Null checks for most parameters to catch stray `NullPointerException`'s
+
+### Fixed
+ 
+ * `RequestType` missing `UNCHECKED_SUBMIT` for `toString()` and `valueOf()` methods.
+ * `FeeSchedules` incorrectly serializing nulls causing `NullPointerException`
+
 ## v2.0.6
 
 ### Added
