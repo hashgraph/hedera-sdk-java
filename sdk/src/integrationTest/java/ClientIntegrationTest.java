@@ -1,6 +1,7 @@
 import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
+import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.AccountInfoQuery;
 import com.hedera.hashgraph.sdk.Client;
@@ -16,8 +17,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ClientIntegrationTest {
     @Test
@@ -70,6 +73,25 @@ public class ClientIntegrationTest {
             new AccountCreateTransaction()
                 .setTransactionId(TransactionId.generate(AccountId.fromString("0.0.123-rmkyk")))
                 .execute(client);
+        });
+    }
+
+    @Test
+    @DisplayName("`setMaxNodesPerTransaction()`")
+    void testMaxNodesPerTransaction() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv();
+
+            testEnv.client.setMaxNodesPerTransaction(1);
+
+            var transaction = new AccountDeleteTransaction()
+                .setAccountId(testEnv.operatorId)
+                .freezeWith(testEnv.client);
+
+            assertNotNull(transaction.getNodeAccountIds());
+            assertEquals(1, transaction.getNodeAccountIds().size());
+
+            testEnv.client.close();
         });
     }
 }

@@ -29,6 +29,9 @@ class Network {
 
     final Semaphore lock = new Semaphore(1);
 
+    @Nullable
+    Integer maxNodesPerTransaction = null;
+
     Network(ExecutorService executor, Map<String, AccountId> network) {
         this.executor = executor;
 
@@ -118,13 +121,16 @@ class Network {
         return resultNodeAccountIds;
     }
 
+    void setMaxNodesPerTransaction(int maxNodesPerTransaction) {
+        this.maxNodesPerTransaction = maxNodesPerTransaction;
+    }
+
     int getNumberOfNodesForTransaction() {
-        @Var
-        int count = 0;
-        for (var node : nodes) {
-            count += node.isHealthy() ? 1 : 1;
+        if (maxNodesPerTransaction != null) {
+            return maxNodesPerTransaction;
+        } else {
+            return (nodes.size() + 3 - 1) / 3;
         }
-        return (count + 3 - 1) / 3;
     }
 
     void close(Duration timeout) throws TimeoutException {
