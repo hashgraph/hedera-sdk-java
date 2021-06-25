@@ -115,11 +115,13 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         return new QueryCostQuery();
     }
 
-    abstract void validateNetworkOnIds(@Nullable NetworkName networkName);
+    void validateNetworkOnIds(Client client) {
+        // Do nothing
+    }
 
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
-        validateNetworkOnIds(client.network.networkName);
+        validateNetworkOnIds(client);
 
         if (nodeAccountIds.size() == 0) {
             // Get a list of node AccountId's if the user has not set them manually.
@@ -254,7 +256,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     @SuppressWarnings("NullableDereference")
     private class QueryCostQuery extends Query<Hbar, QueryCostQuery> {
         @Override
-        void validateNetworkOnIds(@Nullable NetworkName networkName) {
+        void validateNetworkOnIds(Client client) {
         }
 
         @Override
@@ -286,7 +288,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         }
 
         @Override
-        Hbar mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+        Hbar mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
             return Hbar.fromTinybars(mapResponseHeader(response).getCost());
         }
 

@@ -265,9 +265,14 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.bytecodeFileId, networkName);
-        EntityIdHelper.validateNetworkOnIds(this.proxyAccountId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (bytecodeFileId != null) {
+            bytecodeFileId.validate(client);
+        }
+
+        if (proxyAccountId != null) {
+            proxyAccountId.validate(client);
+        }
     }
 
     @Override

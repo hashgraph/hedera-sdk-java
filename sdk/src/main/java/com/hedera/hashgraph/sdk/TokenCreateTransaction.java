@@ -220,9 +220,14 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.treasuryAccountId, networkName);
-        EntityIdHelper.validateNetworkOnIds(this.autoRenewAccountId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (treasuryAccountId != null) {
+            treasuryAccountId.validate(client);
+        }
+
+        if (autoRenewAccountId != null) {
+            autoRenewAccountId.validate(client);
+        }
     }
 
     @Override

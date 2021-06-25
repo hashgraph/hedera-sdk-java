@@ -30,10 +30,7 @@ public final class ContractId extends Key {
     public final long num;
 
     @Nullable
-    NetworkName network;
-
-    @Nullable
-    private final String checksum;
+    private String checksum;
 
     public ContractId(@Nonnegative long num) {
         this(0, 0, num);
@@ -44,7 +41,6 @@ public final class ContractId extends Key {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
-        this.network = null;
         this.checksum = null;
     }
 
@@ -52,7 +48,6 @@ public final class ContractId extends Key {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
-        this.network = network;
 
         if (network != null) {
             if (checksum == null) {
@@ -65,14 +60,6 @@ public final class ContractId extends Key {
         }
     }
 
-    public static ContractId withNetwork(@Nonnegative long num, NetworkName network) {
-        return new ContractId(0, 0, num, network, null);
-    }
-
-    public static ContractId withNetwork(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, NetworkName network) {
-        return new ContractId(shard, realm, num, network, null);
-    }
-
     public static ContractId fromString(String id) {
         return EntityIdHelper.fromString(id, ContractId::new);
     }
@@ -81,11 +68,21 @@ public final class ContractId extends Key {
         return EntityIdHelper.fromSolidityAddress(address, ContractId::new);
     }
 
-    static ContractId fromProtobuf(ContractID contractId) {
-        return new ContractId(
-            contractId.getShardNum(), contractId.getRealmNum(), contractId.getContractNum());
+    static ContractId fromProtobuf(ContractID contractId, @Nullable NetworkName networkName) {
+        Objects.requireNonNull(contractId);
+
+        var id = new ContractId(contractId.getShardNum(), contractId.getRealmNum(), contractId.getContractNum());
+
+        if (networkName != null) {
+            id.setNetwork(networkName);
+        }
+
+        return id;
     }
 
+    static ContractId fromProtobuf(ContractID contractId) {
+        return ContractId.fromProtobuf(contractId, null);
+    }
     public static ContractId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(ContractID.parseFrom(bytes).toBuilder().build());
     }
@@ -102,6 +99,23 @@ public final class ContractId extends Key {
             .build();
     }
 
+    ContractId setNetworkWith(Client client) {
+        if (client.network.networkName != null) {
+            setNetwork(client.network.networkName);
+        }
+
+        return this;
+    }
+
+    ContractId setNetwork(NetworkName name) {
+        checksum = EntityIdHelper.checksum(Integer.toString(name.id), EntityIdHelper.toString(shard, realm, num));
+        return this;
+    }
+
+    public void validate(Client client) {
+        EntityIdHelper.validate(shard, realm, num, client, checksum);
+    }
+
     @Override
     com.hedera.hashgraph.sdk.proto.Key toProtobufKey() {
         return com.hedera.hashgraph.sdk.proto.Key.newBuilder()
@@ -116,7 +130,7 @@ public final class ContractId extends Key {
 
     @Override
     public String toString() {
-        return EntityIdHelper.toString(shard, realm, num, network, checksum);
+        return EntityIdHelper.toString(shard, realm, num, checksum);
     }
 
     @Override

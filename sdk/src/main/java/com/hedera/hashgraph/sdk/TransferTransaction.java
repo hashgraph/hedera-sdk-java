@@ -5,7 +5,6 @@ import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -153,16 +152,16 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
+    void validateNetworkOnIds(Client client) {
         for (var a : hbarTransfers.keySet()) {
-            EntityIdHelper.validateNetworkOnIds(a, networkName);
+            a.validate(client);
         }
 
         for (var entry : tokenTransfers.entrySet()) {
-            EntityIdHelper.validateNetworkOnIds(entry.getKey(), networkName);
+            entry.getKey().validate(client);
 
             for (var a : entry.getValue().keySet()) {
-                EntityIdHelper.validateNetworkOnIds(a, networkName);
+                a.validate(client);
             }
         }
     }

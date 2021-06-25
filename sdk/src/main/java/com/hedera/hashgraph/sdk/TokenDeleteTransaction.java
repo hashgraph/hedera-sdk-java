@@ -6,7 +6,6 @@ import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
-import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 
 public class TokenDeleteTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenDeleteTransaction> {
@@ -57,8 +56,10 @@ public class TokenDeleteTransaction extends com.hedera.hashgraph.sdk.Transaction
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.tokenId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (tokenId != null) {
+            tokenId.validate(client);
+        }
     }
 
     @Override

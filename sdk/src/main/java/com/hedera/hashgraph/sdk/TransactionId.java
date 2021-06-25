@@ -65,7 +65,11 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
     }
 
     static TransactionId fromProtobuf(TransactionID transactionID) {
-        var accountId = transactionID.hasAccountID() ? AccountId.fromProtobuf(transactionID.getAccountID()) : null;
+        return TransactionId.fromProtobuf(transactionID, null);
+    }
+
+    static TransactionId fromProtobuf(TransactionID transactionID, @Nullable NetworkName networkName) {
+        var accountId = transactionID.hasAccountID() ? AccountId.fromProtobuf(transactionID.getAccountID(), networkName) : null;
         var validStart = transactionID.hasTransactionValidStart() ? InstantConverter.fromProtobuf(transactionID.getTransactionValidStart()) : null;
 
         return new TransactionId(accountId, validStart).setScheduled(transactionID.getScheduled());

@@ -39,8 +39,10 @@ public final class TopicInfoQuery extends Query<TopicInfo, TopicInfoQuery> {
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.topicId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (topicId != null) {
+            topicId.validate(client);
+        }
     }
 
     @Override
@@ -63,8 +65,8 @@ public final class TopicInfoQuery extends Query<TopicInfo, TopicInfoQuery> {
     }
 
     @Override
-    TopicInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return TopicInfo.fromProtobuf(response.getConsensusGetTopicInfo());
+    TopicInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
+        return TopicInfo.fromProtobuf(response.getConsensusGetTopicInfo(), networkName);
     }
 
     @Override

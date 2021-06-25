@@ -27,10 +27,7 @@ public class TokenId {
     public final long num;
 
     @Nullable
-    NetworkName network;
-
-    @Nullable
-    private final String checksum;
+    private String checksum;
 
     public TokenId(@Nonnegative long num) {
         this(0, 0, num);
@@ -41,7 +38,6 @@ public class TokenId {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
-        this.network = null;
         this.checksum = null;
     }
 
@@ -49,7 +45,6 @@ public class TokenId {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
-        this.network = network;
 
         if (network != null) {
             if (checksum == null) {
@@ -62,20 +57,24 @@ public class TokenId {
         }
     }
 
-    public static TokenId withNetwork(@Nonnegative long num, NetworkName network) {
-        return new TokenId(0, 0, num, network, null);
-    }
-
-    public static TokenId withNetwork(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, NetworkName network) {
-        return new TokenId(shard, realm, num, network, null);
-    }
-
     public static TokenId fromString(String id) {
         return EntityIdHelper.fromString(id, TokenId::new);
     }
 
-    static TokenId fromProtobuf(TokenID topicId) {
-        return new TokenId(topicId.getShardNum(), topicId.getRealmNum(), topicId.getTokenNum());
+    static TokenId fromProtobuf(TokenID tokenId, @Nullable NetworkName networkName) {
+        Objects.requireNonNull(tokenId);
+
+        var id = new TokenId(tokenId.getShardNum(), tokenId.getRealmNum(), tokenId.getTokenNum());
+
+        if (networkName != null) {
+            id.setNetwork(networkName);
+        }
+
+        return id;
+    }
+
+    static TokenId fromProtobuf(TokenID tokenId) {
+        return TokenId.fromProtobuf(tokenId, null);
     }
 
     public static TokenId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -90,13 +89,30 @@ public class TokenId {
             .build();
     }
 
+    TokenId setNetworkWith(Client client) {
+        if (client.network.networkName != null) {
+            setNetwork(client.network.networkName);
+        }
+
+        return this;
+    }
+
+    TokenId setNetwork(NetworkName name) {
+        checksum = EntityIdHelper.checksum(Integer.toString(name.id), EntityIdHelper.toString(shard, realm, num));
+        return this;
+    }
+
+    public void validate(Client client) {
+        EntityIdHelper.validate(shard, realm, num, client, checksum);
+    }
+
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }
 
     @Override
     public String toString() {
-        return EntityIdHelper.toString(shard, realm, num, network, checksum);
+        return EntityIdHelper.toString(shard, realm, num, checksum);
     }
 
     @Override

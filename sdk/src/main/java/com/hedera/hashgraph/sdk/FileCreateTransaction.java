@@ -64,7 +64,7 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
     }
 
     public Collection<Key> getKeys() {
-        return KeyList.fromProtobuf(builder.getKeys(), null);
+        return KeyList.fromProtobuf(builder.getKeys(), null, null);
     }
 
     /**
@@ -156,10 +156,6 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
         requireNotFrozen();
         this.builder.setMemo(memo);
         return this;
-    }
-
-    @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
     }
 
     @Override

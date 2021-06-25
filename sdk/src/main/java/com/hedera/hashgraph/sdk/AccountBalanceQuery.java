@@ -63,9 +63,14 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.accountId, networkName);
-        EntityIdHelper.validateNetworkOnIds(this.contractId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (accountId != null) {
+            accountId.validate(client);
+        }
+
+        if (contractId != null) {
+            contractId.validate(client);
+        }
     }
 
     @Override
@@ -87,8 +92,8 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
     }
 
     @Override
-    AccountBalance mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return AccountBalance.fromProtobuf(response.getCryptogetAccountBalance());
+    AccountBalance mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
+        return AccountBalance.fromProtobuf(response.getCryptogetAccountBalance(), networkName);
     }
 
     @Override

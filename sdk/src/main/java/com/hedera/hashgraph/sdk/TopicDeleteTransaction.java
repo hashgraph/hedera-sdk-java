@@ -71,8 +71,10 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.topicId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (topicId != null) {
+            topicId.validate(client);
+        }
     }
 
     @Override

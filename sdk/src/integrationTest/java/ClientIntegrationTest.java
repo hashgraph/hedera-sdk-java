@@ -64,30 +64,12 @@ public class ClientIntegrationTest {
 
     @Test
     void transactionIdNetworkIsVerified() {
-        assertThrows(IllegalStateException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             var client = Client.forPreviewnet();
 
             new AccountCreateTransaction()
-                .setTransactionId(TransactionId.generate(AccountId.withNetwork(0, NetworkName.TESTNET)))
+                .setTransactionId(TransactionId.generate(AccountId.fromString("0.0.123-rmkyk")))
                 .execute(client);
-        });
-    }
-
-    @Test
-    void accountIdNetworkIsVerified() {
-        assertThrows(IllegalStateException.class, () -> {
-            var client = Client.forPreviewnet();
-
-            new AccountInfoQuery()
-                .setAccountId(AccountId.withNetwork(0, NetworkName.TESTNET))
-                .execute(client);
-        });
-    }
-
-    @Test
-    void operatorIdMustBeSameNetwork() {
-        assertThrows(IllegalStateException.class, () -> {
-            Client.forPreviewnet().setOperator(AccountId.withNetwork(0, NetworkName.TESTNET), PrivateKey.generate());
         });
     }
 }

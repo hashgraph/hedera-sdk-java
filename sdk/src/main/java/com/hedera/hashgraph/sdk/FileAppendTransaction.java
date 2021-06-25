@@ -150,8 +150,10 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.fileId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (fileId != null) {
+            fileId.validate(client);
+        }
     }
 
     @Override

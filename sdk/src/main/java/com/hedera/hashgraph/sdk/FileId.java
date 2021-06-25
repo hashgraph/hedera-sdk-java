@@ -30,10 +30,7 @@ public final class FileId {
     public final long num;
 
     @Nullable
-    NetworkName network;
-
-    @Nullable
-    private final String checksum;
+    private String checksum;
 
     /**
      * The public node address book for the current network.
@@ -59,7 +56,6 @@ public final class FileId {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
-        this.network = null;
         this.checksum = null;
     }
 
@@ -67,7 +63,6 @@ public final class FileId {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
-        this.network = network;
 
         if (network != null) {
             if (checksum == null) {
@@ -80,14 +75,6 @@ public final class FileId {
         }
     }
 
-    public static FileId withNetwork(@Nonnegative long num, NetworkName network) {
-        return new FileId(0, 0, num, network, null);
-    }
-
-    public static FileId withNetwork(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, NetworkName network) {
-        return new FileId(shard, realm, num, network, null);
-    }
-
     public static FileId fromString(String id) {
         return EntityIdHelper.fromString(id, FileId::new);
     }
@@ -96,8 +83,20 @@ public final class FileId {
         return fromProtobuf(FileID.parseFrom(bytes).toBuilder().build());
     }
 
+    static FileId fromProtobuf(FileID fileId, @Nullable NetworkName networkName) {
+        Objects.requireNonNull(fileId);
+
+        var id = new FileId(fileId.getShardNum(), fileId.getRealmNum(), fileId.getFileNum());
+
+        if (networkName != null) {
+            id.setNetwork(networkName);
+        }
+
+        return id;
+    }
+
     static FileId fromProtobuf(FileID fileId) {
-        return new FileId(fileId.getShardNum(), fileId.getRealmNum(), fileId.getFileNum());
+        return FileId.fromProtobuf(fileId, null);
     }
 
     FileID toProtobuf() {
@@ -108,13 +107,30 @@ public final class FileId {
             .build();
     }
 
+    FileId setNetworkWith(Client client) {
+        if (client.network.networkName != null) {
+            setNetwork(client.network.networkName);
+        }
+
+        return this;
+    }
+
+    FileId setNetwork(NetworkName name) {
+        checksum = EntityIdHelper.checksum(Integer.toString(name.id), EntityIdHelper.toString(shard, realm, num));
+        return this;
+    }
+
+    public void validate(Client client) {
+        EntityIdHelper.validate(shard, realm, num, client, checksum);
+    }
+
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }
 
     @Override
     public String toString() {
-        return EntityIdHelper.toString(shard, realm, num, network, checksum);
+        return EntityIdHelper.toString(shard, realm, num, checksum);
     }
 
     @Override

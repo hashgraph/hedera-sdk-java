@@ -91,9 +91,14 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.accountId, networkName);
-        EntityIdHelper.validateNetworkOnIds(this.transferAccountId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (accountId != null) {
+            accountId.validate(client);
+        }
+
+        if (transferAccountId != null) {
+            transferAccountId.validate(client);
+        }
     }
 
     @Override

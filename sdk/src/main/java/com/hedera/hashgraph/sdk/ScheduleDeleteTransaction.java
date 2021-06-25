@@ -5,7 +5,6 @@ import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
-import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 
 public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteTransaction> {
@@ -58,8 +57,10 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.scheduleId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (scheduleId != null) {
+            scheduleId.validate(client);
+        }
     }
 
     @Override

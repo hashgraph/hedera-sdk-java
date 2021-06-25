@@ -164,8 +164,10 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.autoRenewAccountId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (autoRenewAccountId != null) {
+            autoRenewAccountId.validate(client);
+        }
     }
 
     @Override

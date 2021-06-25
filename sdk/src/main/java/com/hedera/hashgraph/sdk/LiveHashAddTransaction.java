@@ -82,7 +82,7 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
     }
 
     public Collection<Key> getKeys() {
-        return KeyList.fromProtobuf(hashBuilder.getKeys(), null);
+        return KeyList.fromProtobuf(hashBuilder.getKeys(), null, null);
     }
 
     /**
@@ -132,8 +132,10 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.accountId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (accountId != null) {
+            accountId.validate(client);
+        }
     }
 
     @Override

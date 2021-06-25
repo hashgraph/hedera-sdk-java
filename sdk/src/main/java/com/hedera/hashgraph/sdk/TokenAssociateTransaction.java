@@ -5,7 +5,6 @@ import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -89,12 +88,14 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.accountId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (accountId != null) {
+            accountId.validate(client);
+        }
 
         for (var token : tokenIds) {
             if (token != null) {
-                EntityIdHelper.validateNetworkOnIds(token, networkName);
+                token.validate(client);
             }
         }
     }

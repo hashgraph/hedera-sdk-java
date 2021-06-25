@@ -40,8 +40,10 @@ public final class ContractByteCodeQuery extends Query<ByteString, ContractByteC
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.contractId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (contractId != null) {
+            contractId.validate(client);
+        }
     }
 
     @Override
@@ -64,7 +66,7 @@ public final class ContractByteCodeQuery extends Query<ByteString, ContractByteC
     }
 
     @Override
-    ByteString mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+    ByteString mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
         return response.getContractGetBytecodeResponse().getBytecode();
     }
 

@@ -8,7 +8,6 @@ import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
-import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 
 public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> {
@@ -203,10 +202,18 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.tokenId, networkName);
-        EntityIdHelper.validateNetworkOnIds(this.treasuryAccountId, networkName);
-        EntityIdHelper.validateNetworkOnIds(this.autoRenewAccountId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (tokenId != null) {
+            tokenId.validate(client);
+        }
+
+        if (treasuryAccountId != null) {
+            treasuryAccountId.validate(client);
+        }
+
+        if (autoRenewAccountId != null) {
+            autoRenewAccountId.validate(client);
+        }
     }
 
     @Override

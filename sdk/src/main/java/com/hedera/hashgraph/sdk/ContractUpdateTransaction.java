@@ -240,10 +240,18 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.contractId, networkName);
-        EntityIdHelper.validateNetworkOnIds(this.bytecodeFileId, networkName);
-        EntityIdHelper.validateNetworkOnIds(this.proxyAccountId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (contractId != null) {
+            contractId.validate(client);
+        }
+
+        if (bytecodeFileId != null) {
+            bytecodeFileId.validate(client);
+        }
+
+        if (proxyAccountId != null) {
+            proxyAccountId.validate(client);
+        }
     }
 
     @Override

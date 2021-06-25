@@ -9,7 +9,6 @@ import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
-import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 
 public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenBurnTransaction> {
@@ -70,8 +69,10 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.tokenId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (tokenId != null) {
+            tokenId.validate(client);
+        }
     }
 
     @Override

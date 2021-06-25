@@ -8,9 +8,9 @@ import com.hedera.hashgraph.sdk.proto.ScheduleServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Objects;
-import javax.annotation.Nullable;
 
 public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateTransaction> {
     private final ScheduleCreateTransactionBody.Builder builder;
@@ -87,8 +87,10 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.payerAccountId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (payerAccountId != null) {
+            payerAccountId.validate(client);
+        }
     }
 
     @Override
@@ -104,10 +106,10 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
 
     @Override
     final com.hedera.hashgraph.sdk.TransactionResponse mapResponse(
-        com.hedera.hashgraph.sdk.proto.TransactionResponse transactionResponse,
+        TransactionResponse transactionResponse,
         AccountId nodeId,
-        com.hedera.hashgraph.sdk.proto.Transaction request
-    ) {
+        com.hedera.hashgraph.sdk.proto.Transaction request,
+        @Nullable NetworkName networkName) {
         var transactionId = Objects.requireNonNull(getTransactionId()).setScheduled(true);
         var hash = hash(request.getSignedTransactionBytes().toByteArray());
         nextTransactionIndex = (nextTransactionIndex + 1) % transactionIds.size();

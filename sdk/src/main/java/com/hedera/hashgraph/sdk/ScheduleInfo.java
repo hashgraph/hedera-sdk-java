@@ -64,12 +64,16 @@ public final class ScheduleInfo {
     }
 
     static ScheduleInfo fromProtobuf(ScheduleGetInfoResponse scheduleInfo) {
+        return ScheduleInfo.fromProtobuf(scheduleInfo, null);
+    }
+
+    static ScheduleInfo fromProtobuf(ScheduleGetInfoResponse scheduleInfo, @Nullable NetworkName networkName) {
         var info = scheduleInfo.getScheduleInfo();
 
-        var scheduleId = ScheduleId.fromProtobuf(info.getScheduleID());
-        var creatorAccountId = AccountId.fromProtobuf(info.getCreatorAccountID());
-        var payerAccountId = AccountId.fromProtobuf(info.getPayerAccountID());
-        var adminKey = info.hasAdminKey() ? Key.fromProtobufKey(info.getAdminKey()) : null;
+        var scheduleId = ScheduleId.fromProtobuf(info.getScheduleID(), networkName);
+        var creatorAccountId = AccountId.fromProtobuf(info.getCreatorAccountID(), networkName);
+        var payerAccountId = AccountId.fromProtobuf(info.getPayerAccountID(), networkName);
+        var adminKey = info.hasAdminKey() ? Key.fromProtobufKey(info.getAdminKey(), networkName) : null;
         var scheduledTransactionId = info.hasScheduledTransactionID() ?
             TransactionId.fromProtobuf(info.getScheduledTransactionID()) :
             null;
@@ -79,7 +83,7 @@ public final class ScheduleInfo {
             creatorAccountId,
             payerAccountId,
             info.getScheduledTransactionBody(),
-            KeyList.fromProtobuf(info.getSigners(), null),
+            KeyList.fromProtobuf(info.getSigners(), null, networkName),
             adminKey,
             scheduledTransactionId,
             info.getMemo(),

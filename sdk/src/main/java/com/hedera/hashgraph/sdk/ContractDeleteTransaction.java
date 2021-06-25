@@ -99,10 +99,18 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.contractId, networkName);
-        EntityIdHelper.validateNetworkOnIds(this.transferContractId, networkName);
-        EntityIdHelper.validateNetworkOnIds(this.transferAccountId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (contractId != null) {
+            contractId.validate(client);
+        }
+
+        if (transferContractId != null) {
+            transferContractId.validate(client);
+        }
+
+        if (transferAccountId != null) {
+            transferAccountId.validate(client);
+        }
     }
 
 

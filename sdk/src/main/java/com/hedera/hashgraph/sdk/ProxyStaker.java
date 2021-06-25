@@ -1,5 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
+import javax.annotation.Nullable;
+
 /**
  * Information about a single account that is proxy staking.
  */
@@ -20,6 +22,10 @@ public final class ProxyStaker {
     }
 
     static ProxyStaker fromProtobuf(com.hedera.hashgraph.sdk.proto.ProxyStaker proxyStaker) {
-        return new ProxyStaker(AccountId.fromProtobuf(proxyStaker.getAccountID()), proxyStaker.getAmount());
+        return ProxyStaker.fromProtobuf(proxyStaker, null);
+    }
+
+    static ProxyStaker fromProtobuf(com.hedera.hashgraph.sdk.proto.ProxyStaker proxyStaker, @Nullable NetworkName networkName) {
+        return new ProxyStaker(AccountId.fromProtobuf(proxyStaker.getAccountID(), networkName), proxyStaker.getAmount());
     }
 }

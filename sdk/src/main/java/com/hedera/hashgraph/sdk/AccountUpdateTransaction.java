@@ -244,9 +244,13 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.accountId, networkName);
-        EntityIdHelper.validateNetworkOnIds(this.proxyAccountId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (accountId != null) {
+            accountId.validate(client);
+        }
+        if (proxyAccountId != null) {
+            proxyAccountId.validate(client);
+        }
     }
 
     @Override

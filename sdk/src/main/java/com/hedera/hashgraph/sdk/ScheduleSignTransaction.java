@@ -8,7 +8,6 @@ import com.hedera.hashgraph.sdk.proto.ScheduleServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
-import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 
 public final class ScheduleSignTransaction extends Transaction<ScheduleSignTransaction> {
@@ -57,8 +56,10 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.scheduleId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (scheduleId != null) {
+            scheduleId.validate(client);
+        }
     }
 
     @Override

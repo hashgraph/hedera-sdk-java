@@ -44,8 +44,10 @@ public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.fileId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (fileId != null) {
+            fileId.validate(client);
+        }
     }
 
     @Override
@@ -68,8 +70,8 @@ public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
     }
 
     @Override
-    FileInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return FileInfo.fromProtobuf(response.getFileGetInfo().getFileInfo());
+    FileInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
+        return FileInfo.fromProtobuf(response.getFileGetInfo().getFileInfo(), networkName);
     }
 
     @Override

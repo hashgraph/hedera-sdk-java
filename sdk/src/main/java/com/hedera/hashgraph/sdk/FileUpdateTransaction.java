@@ -62,7 +62,7 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     }
 
     public Collection<Key> getKeys() {
-        return KeyList.fromProtobuf(builder.getKeys(), null);
+        return KeyList.fromProtobuf(builder.getKeys(), null, null);
     }
 
     /**
@@ -189,8 +189,10 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.fileId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (fileId != null) {
+            fileId.validate(client);
+        }
     }
 
     @Override

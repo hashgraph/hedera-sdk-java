@@ -47,8 +47,10 @@ public final class FileContentsQuery extends Query<ByteString, FileContentsQuery
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.fileId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (fileId != null) {
+            fileId.validate(client);
+        }
     }
 
     @Override
@@ -71,7 +73,7 @@ public final class FileContentsQuery extends Query<ByteString, FileContentsQuery
     }
 
     @Override
-    ByteString mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+    ByteString mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
         return response.getFileGetContents().getFileContents().getContents();
     }
 

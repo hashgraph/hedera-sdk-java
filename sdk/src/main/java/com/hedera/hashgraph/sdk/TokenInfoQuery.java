@@ -36,8 +36,10 @@ public class TokenInfoQuery extends com.hedera.hashgraph.sdk.Query<TokenInfo, To
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.tokenId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (tokenId != null) {
+            tokenId.validate(client);
+        }
     }
 
     @Override
@@ -60,8 +62,8 @@ public class TokenInfoQuery extends com.hedera.hashgraph.sdk.Query<TokenInfo, To
     }
 
     @Override
-    TokenInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return TokenInfo.fromProtobuf(response.getTokenGetInfo());
+    TokenInfo mapResponse(Response response, AccountId nodeId, Query request, @Nullable NetworkName networkName) {
+        return TokenInfo.fromProtobuf(response.getTokenGetInfo(), networkName);
     }
 
     @Override

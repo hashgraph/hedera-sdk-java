@@ -86,9 +86,14 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.fileId, networkName);
-        EntityIdHelper.validateNetworkOnIds(this.contractId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (fileId != null) {
+            fileId.validate(client);
+        }
+
+        if (contractId != null) {
+            contractId.validate(client);
+        }
     }
 
 

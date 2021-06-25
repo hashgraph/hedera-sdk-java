@@ -153,8 +153,10 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.contractId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (contractId != null) {
+            contractId.validate(client);
+        }
     }
 
     @Override

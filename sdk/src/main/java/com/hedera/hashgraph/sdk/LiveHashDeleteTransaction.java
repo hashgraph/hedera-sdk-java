@@ -84,8 +84,10 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.accountId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (accountId != null) {
+            accountId.validate(client);
+        }
     }
 
     @Override

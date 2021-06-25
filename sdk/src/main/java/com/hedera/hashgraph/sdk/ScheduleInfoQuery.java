@@ -30,8 +30,10 @@ public class ScheduleInfoQuery extends com.hedera.hashgraph.sdk.Query<ScheduleIn
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.scheduleId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (scheduleId != null) {
+            scheduleId.validate(client);
+        }
     }
 
     @Override
@@ -54,8 +56,8 @@ public class ScheduleInfoQuery extends com.hedera.hashgraph.sdk.Query<ScheduleIn
     }
 
     @Override
-    ScheduleInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return ScheduleInfo.fromProtobuf(response.getScheduleGetInfo());
+    ScheduleInfo mapResponse(Response response, AccountId nodeId, Query request, @Nullable NetworkName networkName) {
+        return ScheduleInfo.fromProtobuf(response.getScheduleGetInfo(), networkName);
     }
 
     @Override

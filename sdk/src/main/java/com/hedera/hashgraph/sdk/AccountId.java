@@ -30,10 +30,7 @@ public final class AccountId {
     public final long num;
 
     @Nullable
-    NetworkName network;
-
-    @Nullable
-    final String checksum;
+    String checksum;
 
     public AccountId(@Nonnegative long num) {
         this(0, 0, num);
@@ -44,7 +41,6 @@ public final class AccountId {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
-        this.network = null;
         this.checksum = null;
     }
 
@@ -52,7 +48,6 @@ public final class AccountId {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
-        this.network = network;
 
         if (network != null) {
             if (checksum == null) {
@@ -65,14 +60,6 @@ public final class AccountId {
         }
     }
 
-    public static AccountId withNetwork(@Nonnegative long num, NetworkName network) {
-        return new AccountId(0, 0, num, network, null);
-    }
-
-    public static AccountId withNetwork(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, NetworkName network) {
-        return new AccountId(shard, realm, num, network, null);
-    }
-
     public static AccountId fromString(String id) {
         return EntityIdHelper.fromString(id, AccountId::new);
     }
@@ -81,10 +68,20 @@ public final class AccountId {
         return EntityIdHelper.fromSolidityAddress(address, AccountId::new);
     }
 
-    static AccountId fromProtobuf(AccountID accountId) {
+    static AccountId fromProtobuf(AccountID accountId, @Nullable NetworkName networkName) {
         Objects.requireNonNull(accountId);
-        return new AccountId(
-            accountId.getShardNum(), accountId.getRealmNum(), accountId.getAccountNum());
+
+        var id = new AccountId(accountId.getShardNum(), accountId.getRealmNum(), accountId.getAccountNum());
+
+        if (networkName != null) {
+            id.setNetwork(networkName);
+        }
+
+        return id;
+    }
+
+    static AccountId fromProtobuf(AccountID accountId) {
+        return AccountId.fromProtobuf(accountId, null);
     }
 
     public static AccountId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -103,13 +100,30 @@ public final class AccountId {
             .build();
     }
 
+    AccountId setNetworkWith(Client client) {
+        if (client.network.networkName != null) {
+            setNetwork(client.network.networkName);
+        }
+
+        return this;
+    }
+
+    AccountId setNetwork(NetworkName name) {
+        checksum = EntityIdHelper.checksum(Integer.toString(name.id), EntityIdHelper.toString(shard, realm, num));
+        return this;
+    }
+
+    public void validate(Client client) {
+        EntityIdHelper.validate(shard, realm, num, client, checksum);
+    }
+
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }
 
     @Override
     public String toString() {
-        return EntityIdHelper.toString(shard, realm, num, network, checksum);
+        return EntityIdHelper.toString(shard, realm, num, checksum);
     }
 
     @Override

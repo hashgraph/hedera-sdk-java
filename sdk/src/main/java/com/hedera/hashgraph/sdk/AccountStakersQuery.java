@@ -44,8 +44,10 @@ public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountS
     }
 
     @Override
-    void validateNetworkOnIds(@Nullable NetworkName networkName) {
-        EntityIdHelper.validateNetworkOnIds(this.accountId, networkName);
+    void validateNetworkOnIds(Client client) {
+        if (accountId != null) {
+            accountId.validate(client);
+        }
     }
 
     @Override
@@ -68,12 +70,12 @@ public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountS
     }
 
     @Override
-    List<ProxyStaker> mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+    List<ProxyStaker> mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
         var rawStakers = response.getCryptoGetProxyStakers().getStakers();
         var stakers = new ArrayList<ProxyStaker>(rawStakers.getProxyStakerCount());
 
         for (var i = 0; i < rawStakers.getProxyStakerCount(); ++i) {
-            stakers.add(ProxyStaker.fromProtobuf(rawStakers.getProxyStaker(i)));
+            stakers.add(ProxyStaker.fromProtobuf(rawStakers.getProxyStaker(i), networkName));
         }
 
         return stakers;
