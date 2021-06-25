@@ -13,6 +13,10 @@ import java.util.LinkedHashMap;
 public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> {
     private final TokenUpdateTransactionBody.Builder builder;
 
+    TokenId tokenId;
+    AccountId treasuryAccountId;
+    AccountId autoRenewAccountId;
+
     public TokenUpdateTransaction() {
         builder = TokenUpdateTransactionBody.newBuilder();
     }
@@ -21,21 +25,37 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         super(txs);
 
         builder = bodyBuilder.getTokenUpdate().toBuilder();
+
+        if (builder.hasToken()) {
+            tokenId = TokenId.fromProtobuf(builder.getToken());
+        }
+
+        if (builder.hasTreasury()) {
+            treasuryAccountId = AccountId.fromProtobuf(builder.getTreasury());
+        }
     }
 
     TokenUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getTokenUpdate().toBuilder();
+
+        if (builder.hasToken()) {
+            tokenId = TokenId.fromProtobuf(builder.getToken());
+        }
+
+        if (builder.hasTreasury()) {
+            treasuryAccountId = AccountId.fromProtobuf(builder.getTreasury());
+        }
     }
 
     public TokenId getTokenId() {
-        return  TokenId.fromProtobuf(builder.getToken());
+        return tokenId;
     }
 
     public TokenUpdateTransaction setTokenId(TokenId tokenId) {
         requireNotFrozen();
-        builder.setToken(tokenId.toProtobuf());
+        this.tokenId = tokenId;
         return this;
     }
 
@@ -60,12 +80,12 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     public AccountId getTreasuryAccountId() {
-        return AccountId.fromProtobuf(builder.getTreasury());
+        return treasuryAccountId;
     }
 
     public TokenUpdateTransaction setTreasuryAccountId(AccountId accountId) {
         requireNotFrozen();
-        builder.setTreasury(accountId.toProtobuf());
+        this.treasuryAccountId = accountId;
         return this;
     }
 
@@ -130,12 +150,12 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     public AccountId getAutoRenewAccountId() {
-        return AccountId.fromProtobuf(builder.getAutoRenewAccount());
+        return autoRenewAccountId;
     }
 
     public TokenUpdateTransaction setAutoRenewAccountId(AccountId accountId) {
         requireNotFrozen();
-        builder.setAutoRenewAccount(accountId.toProtobuf());
+        this.autoRenewAccountId = accountId;
         return this;
     }
 
@@ -165,6 +185,37 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         return this;
     }
 
+    TokenUpdateTransactionBody.Builder build() {
+        if (tokenId != null) {
+            builder.setToken(tokenId.toProtobuf());
+        }
+
+        if (treasuryAccountId != null) {
+            builder.setTreasury(treasuryAccountId.toProtobuf());
+        }
+
+        if (autoRenewAccountId != null) {
+            builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(Client client) {
+        if (tokenId != null) {
+            tokenId.validate(client);
+        }
+
+        if (treasuryAccountId != null) {
+            treasuryAccountId.validate(client);
+        }
+
+        if (autoRenewAccountId != null) {
+            autoRenewAccountId.validate(client);
+        }
+    }
+
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return TokenServiceGrpc.getUpdateTokenMethod();
@@ -172,12 +223,12 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setTokenUpdate(builder);
+        bodyBuilder.setTokenUpdate(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setTokenUpdate(builder);
+        scheduled.setTokenUpdate(build());
     }
 }

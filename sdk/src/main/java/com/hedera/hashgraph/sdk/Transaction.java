@@ -840,8 +840,8 @@ public abstract class Transaction<T extends Transaction<T>>
     TransactionResponse mapResponse(
         com.hedera.hashgraph.sdk.proto.TransactionResponse transactionResponse,
         AccountId nodeId,
-        com.hedera.hashgraph.sdk.proto.Transaction request
-    ) {
+        com.hedera.hashgraph.sdk.proto.Transaction request,
+        @Nullable NetworkName networkName) {
         var transactionId = Objects.requireNonNull(getTransactionId());
         var hash = hash(request.getSignedTransactionBytes().toByteArray());
         nextTransactionIndex = (nextTransactionIndex + 1) % transactionIds.size();
@@ -853,15 +853,23 @@ public abstract class Transaction<T extends Transaction<T>>
         return Status.valueOf(transactionResponse.getNodeTransactionPrecheckCode());
     }
 
+    void validateNetworkOnIds(Client client) {
+        // Do nothing
+    }
+
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
         if (!isFrozen()) {
             freezeWith(client);
         }
 
-        var operatorId = client.getOperatorAccountId();
+        var accountId = Objects.requireNonNull(Objects.requireNonNull(getTransactionId()).accountId);
+        accountId.validate(client);
 
-        if (operatorId != null && operatorId.equals(Objects.requireNonNull(getTransactionId().accountId))) {
+        validateNetworkOnIds(client);
+
+        var operatorId = client.getOperatorAccountId();
+        if (operatorId != null && operatorId.equals(accountId)) {
             // on execute, sign each transaction with the operator, if present
             // and we are signing a transaction that used the default transaction ID
             signWithOperator(client);

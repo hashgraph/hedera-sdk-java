@@ -22,6 +22,8 @@ import java.util.LinkedHashMap;
 public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTransaction> {
     private final FileAppendTransactionBody.Builder builder;
 
+    FileId fileId;
+
     public FileAppendTransaction() {
         super();
 
@@ -34,6 +36,10 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
         super(txs);
 
         builder = bodyBuilder.getFileAppend().toBuilder();
+
+        if (builder.hasFileID()) {
+            fileId = FileId.fromProtobuf(builder.getFileID());
+        }
 
         for (var i = 0; i < signedTransactions.size(); i += nodeAccountIds.isEmpty() ? 1 : nodeAccountIds.size()) {
             data = data.concat(
@@ -48,6 +54,10 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
 
         builder = bodyBuilder.getFileAppend().toBuilder();
 
+        if (builder.hasFileID()) {
+            fileId = FileId.fromProtobuf(builder.getFileID());
+        }
+
         for (var i = 0; i < signedTransactions.size(); i += nodeAccountIds.isEmpty() ? 1 : nodeAccountIds.size()) {
             data = data.concat(
                 TransactionBody.parseFrom(signedTransactions.get(i).getBodyBytes())
@@ -58,7 +68,7 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
 
     @Nullable
     public FileId getFileId() {
-        return builder.hasFileID() ? FileId.fromProtobuf(builder.getFileID()) : null;
+        return fileId;
     }
 
     /**
@@ -69,7 +79,7 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
      */
     public FileAppendTransaction setFileId(FileId fileId) {
         requireNotFrozen();
-        builder.setFileID(fileId.toProtobuf());
+        this.fileId = fileId;
         return this;
     }
 
@@ -140,13 +150,28 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
     }
 
     @Override
+    void validateNetworkOnIds(Client client) {
+        if (fileId != null) {
+            fileId.validate(client);
+        }
+    }
+
+    @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return FileServiceGrpc.getAppendContentMethod();
     }
 
+    FileAppendTransactionBody.Builder build() {
+        if (fileId != null) {
+            builder.setFileID(fileId.toProtobuf());
+        }
+
+        return builder;
+    }
+
     @Override
     void onFreezeChunk(TransactionBody.Builder body, @Nullable TransactionID initialTransactionId, int startIndex, int endIndex, int chunk, int total) {
-        body.setFileAppend(builder.setContents(data.substring(startIndex, endIndex)));
+        body.setFileAppend(build().setContents(data.substring(startIndex, endIndex)));
     }
 
     @Override
@@ -156,12 +181,12 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setFileAppend(builder);
+        bodyBuilder.setFileAppend(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setFileAppend(builder.setContents(data));
+        scheduled.setFileAppend(build().setContents(data));
     }
 }

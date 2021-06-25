@@ -6,7 +6,6 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
@@ -20,6 +19,8 @@ import java.util.LinkedHashMap;
 public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransaction> {
     private final ConsensusDeleteTopicTransactionBody.Builder builder;
 
+    TopicId topicId;
+
     public TopicDeleteTransaction() {
         builder = ConsensusDeleteTopicTransactionBody.newBuilder();
     }
@@ -28,17 +29,25 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
         super(txs);
 
         builder = bodyBuilder.getConsensusDeleteTopic().toBuilder();
+
+        if (builder.hasTopicID()) {
+            topicId = TopicId.fromProtobuf(builder.getTopicID());
+        }
     }
 
     TopicDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getConsensusDeleteTopic().toBuilder();
+
+        if (builder.hasTopicID()) {
+            topicId = TopicId.fromProtobuf(builder.getTopicID());
+        }
     }
 
     @Nullable
     public TopicId getTopicId() {
-        return builder.hasTopicID() ? TopicId.fromProtobuf(builder.getTopicID()) : null;
+        return topicId;
     }
 
     /**
@@ -49,8 +58,23 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
      */
     public TopicDeleteTransaction setTopicId(TopicId topicId) {
         requireNotFrozen();
-        builder.setTopicID(topicId.toProtobuf());
+        this.topicId = topicId;
         return this;
+    }
+
+    ConsensusDeleteTopicTransactionBody.Builder build() {
+        if (topicId != null) {
+            builder.setTopicID(topicId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(Client client) {
+        if (topicId != null) {
+            topicId.validate(client);
+        }
     }
 
     @Override
@@ -60,12 +84,12 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setConsensusDeleteTopic(builder);
+        bodyBuilder.setConsensusDeleteTopic(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setConsensusDeleteTopic(builder);
+        scheduled.setConsensusDeleteTopic(build());
     }
 }

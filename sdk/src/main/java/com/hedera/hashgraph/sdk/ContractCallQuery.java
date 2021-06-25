@@ -9,6 +9,7 @@ import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
@@ -27,12 +28,14 @@ import java.util.Objects;
 public final class ContractCallQuery extends Query<ContractFunctionResult, ContractCallQuery> {
     private final ContractCallLocalQuery.Builder builder;
 
+    ContractId contractId;
+
     public ContractCallQuery() {
         builder = ContractCallLocalQuery.newBuilder();
     }
 
     public ContractId getContractId() {
-      return ContractId.fromProtobuf(builder.getContractID());
+        return contractId;
     }
 
     /**
@@ -43,7 +46,7 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
      */
     public ContractCallQuery setContractId(ContractId contractId) {
         Objects.requireNonNull(contractId);
-        builder.setContractID(contractId.toProtobuf());
+        this.contractId = contractId;
         return this;
     }
 
@@ -126,7 +129,18 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
     }
 
     @Override
+    void validateNetworkOnIds(Client client) {
+        if (contractId != null) {
+            contractId.validate(client);
+        }
+    }
+
+    @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (contractId != null) {
+            builder.setContractID(contractId.toProtobuf());
+        }
+
         queryBuilder.setContractCallLocal(builder.setHeader(header));
     }
 
@@ -141,7 +155,7 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
     }
 
     @Override
-    ContractFunctionResult mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+    ContractFunctionResult mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
         return new ContractFunctionResult(response.getContractCallLocal().getFunctionResult());
     }
 

@@ -33,6 +33,9 @@ import java.util.Objects;
 public final class AccountUpdateTransaction extends Transaction<AccountUpdateTransaction> {
     private final CryptoUpdateTransactionBody.Builder builder;
 
+    AccountId accountId;
+    AccountId proxyAccountId;
+
     public AccountUpdateTransaction() {
         builder = CryptoUpdateTransactionBody.newBuilder();
     }
@@ -41,17 +44,33 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         super(txs);
 
         builder = bodyBuilder.getCryptoUpdateAccount().toBuilder();
+
+        if (builder.hasAccountIDToUpdate()) {
+            accountId = AccountId.fromProtobuf(builder.getAccountIDToUpdate());
+        }
+
+        if (builder.hasProxyAccountID()) {
+            proxyAccountId = AccountId.fromProtobuf(builder.getProxyAccountID());
+        }
     }
 
     AccountUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getCryptoUpdateAccount().toBuilder();
+
+        if (builder.hasAccountIDToUpdate()) {
+            accountId = AccountId.fromProtobuf(builder.getAccountIDToUpdate());
+        }
+
+        if (builder.hasProxyAccountID()) {
+            proxyAccountId = AccountId.fromProtobuf(builder.getProxyAccountID());
+        }
     }
 
     @Nullable
     public AccountId getAccountId() {
-        return builder.hasAccountIDToUpdate() ? AccountId.fromProtobuf(builder.getAccountIDToUpdate()) : null;
+        return accountId;
     }
 
     /**
@@ -63,7 +82,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     public AccountUpdateTransaction setAccountId(AccountId accountId) {
         Objects.requireNonNull(accountId);
         requireNotFrozen();
-        builder.setAccountIDToUpdate(accountId.toProtobuf());
+        this.accountId = accountId;
         return this;
     }
 
@@ -87,7 +106,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
 
     @Nullable
     public AccountId getProxyAccountId() {
-        return builder.hasProxyAccountID() ? AccountId.fromProtobuf(builder.getProxyAccountID()) : null;
+        return proxyAccountId;
     }
 
     /**
@@ -107,7 +126,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     public AccountUpdateTransaction setProxyAccountId(AccountId proxyAccountId) {
         Objects.requireNonNull(proxyAccountId);
         requireNotFrozen();
-        builder.setProxyAccountID(proxyAccountId.toProtobuf());
+        this.proxyAccountId = proxyAccountId;
         return this;
     }
 
@@ -225,18 +244,40 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     @Override
+    void validateNetworkOnIds(Client client) {
+        if (accountId != null) {
+            accountId.validate(client);
+        }
+        if (proxyAccountId != null) {
+            proxyAccountId.validate(client);
+        }
+    }
+
+    @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return CryptoServiceGrpc.getUpdateAccountMethod();
     }
 
+    CryptoUpdateTransactionBody.Builder build() {
+        if (accountId != null) {
+            builder.setAccountIDToUpdate(accountId.toProtobuf());
+        }
+
+        if (proxyAccountId != null) {
+            builder.setProxyAccountID(proxyAccountId.toProtobuf());
+        }
+
+        return builder;
+    }
+
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setCryptoUpdateAccount(builder);
+        bodyBuilder.setCryptoUpdateAccount(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setCryptoUpdateAccount(builder);
+        scheduled.setCryptoUpdateAccount(build());
     }
 }

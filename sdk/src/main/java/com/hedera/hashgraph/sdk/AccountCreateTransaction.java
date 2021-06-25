@@ -16,6 +16,8 @@ import java.util.Objects;
 public final class AccountCreateTransaction extends Transaction<AccountCreateTransaction> {
     private static final Hbar DEFAULT_RECORD_THRESHOLD = Hbar.fromTinybars(Long.MAX_VALUE);
 
+    AccountId proxyAccountId;
+
     private final CryptoCreateTransactionBody.Builder builder;
 
     public AccountCreateTransaction() {
@@ -30,12 +32,20 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         super(txs);
 
         builder = bodyBuilder.getCryptoCreateAccount().toBuilder();
+
+        if (builder.hasProxyAccountID()) {
+            proxyAccountId = AccountId.fromProtobuf(builder.getProxyAccountID());
+        }
     }
 
     AccountCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getCryptoCreateAccount().toBuilder();
+
+        if (builder.hasProxyAccountID()) {
+            proxyAccountId = AccountId.fromProtobuf(builder.getProxyAccountID());
+        }
     }
 
     @Nullable
@@ -141,7 +151,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
 
     @Nullable
     public AccountId getProxyAccountId() {
-        return builder.hasProxyAccountID() ? AccountId.fromProtobuf(builder.getProxyAccountID()) : null;
+        return proxyAccountId;
     }
 
     /**
@@ -153,7 +163,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     public AccountCreateTransaction setProxyAccountId(AccountId proxyAccountId) {
         requireNotFrozen();
         Objects.requireNonNull(proxyAccountId);
-        builder.setProxyAccountID(proxyAccountId.toProtobuf());
+        this.proxyAccountId = proxyAccountId;
         return this;
     }
 
@@ -191,6 +201,21 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         return this;
     }
 
+    CryptoCreateTransactionBody.Builder build() {
+        if (proxyAccountId != null) {
+            builder.setProxyAccountID(proxyAccountId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(Client client) {
+        if (proxyAccountId != null) {
+            proxyAccountId.validate(client);
+        }
+    }
+
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return CryptoServiceGrpc.getCreateAccountMethod();
@@ -198,12 +223,12 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setCryptoCreateAccount(builder);
+        bodyBuilder.setCryptoCreateAccount(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setCryptoCreateAccount(builder);
+        scheduled.setCryptoCreateAccount(build());
     }
 }

@@ -18,6 +18,8 @@ import java.util.LinkedHashMap;
 public final class FileUpdateTransaction extends Transaction<FileUpdateTransaction> {
     private final FileUpdateTransactionBody.Builder builder;
 
+    FileId fileId;
+
     public FileUpdateTransaction() {
         builder = FileUpdateTransactionBody.newBuilder();
     }
@@ -26,17 +28,25 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         super(txs);
 
         builder = bodyBuilder.getFileUpdate().toBuilder();
+
+        if (builder.hasFileID()) {
+            fileId = FileId.fromProtobuf(builder.getFileID());
+        }
     }
 
     FileUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getFileUpdate().toBuilder();
+
+        if (builder.hasFileID()) {
+            fileId = FileId.fromProtobuf(builder.getFileID());
+        }
     }
 
     @Nullable
     public FileId getFileId() {
-        return builder.hasFileID() ? FileId.fromProtobuf(builder.getFileID()) : null;
+        return fileId;
     }
 
     /**
@@ -47,12 +57,12 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
      */
     public FileUpdateTransaction setFileId(FileId fileId) {
         requireNotFrozen();
-        builder.setFileID(fileId.toProtobuf());
+        this.fileId = fileId;
         return this;
     }
 
     public Collection<Key> getKeys() {
-        return KeyList.fromProtobuf(builder.getKeys(), null);
+        return KeyList.fromProtobuf(builder.getKeys(), null, null);
     }
 
     /**
@@ -170,6 +180,21 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         return this;
     }
 
+    FileUpdateTransactionBody.Builder build() {
+        if (fileId != null) {
+            builder.setFileID(fileId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(Client client) {
+        if (fileId != null) {
+            fileId.validate(client);
+        }
+    }
+
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return FileServiceGrpc.getUpdateFileMethod();
@@ -177,12 +202,12 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setFileUpdate(builder);
+        bodyBuilder.setFileUpdate(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setFileUpdate(builder);
+        scheduled.setFileUpdate(build());
     }
 }

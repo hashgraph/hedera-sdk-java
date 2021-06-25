@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -20,12 +21,14 @@ import java.util.Objects;
 public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountStakersQuery> {
     private final CryptoGetStakersQuery.Builder builder;
 
+    AccountId accountId;
+
     public AccountStakersQuery() {
         builder = CryptoGetStakersQuery.newBuilder();
     }
 
     public AccountId getAccountId() {
-      return AccountId.fromProtobuf(builder.getAccountID());
+        return accountId;
     }
 
     /**
@@ -36,12 +39,23 @@ public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountS
      */
     public AccountStakersQuery setAccountId(AccountId accountId) {
         Objects.requireNonNull(accountId);
-        builder.setAccountID(accountId.toProtobuf());
+        this.accountId = accountId;
         return this;
     }
 
     @Override
+    void validateNetworkOnIds(Client client) {
+        if (accountId != null) {
+            accountId.validate(client);
+        }
+    }
+
+    @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (accountId != null) {
+            builder.setAccountID(accountId.toProtobuf());
+        }
+
         queryBuilder.setCryptoGetProxyStakers(builder.setHeader(header));
     }
 
@@ -56,12 +70,12 @@ public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountS
     }
 
     @Override
-    List<ProxyStaker> mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+    List<ProxyStaker> mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
         var rawStakers = response.getCryptoGetProxyStakers().getStakers();
         var stakers = new ArrayList<ProxyStaker>(rawStakers.getProxyStakerCount());
 
         for (var i = 0; i < rawStakers.getProxyStakerCount(); ++i) {
-            stakers.add(ProxyStaker.fromProtobuf(rawStakers.getProxyStaker(i)));
+            stakers.add(ProxyStaker.fromProtobuf(rawStakers.getProxyStaker(i), networkName));
         }
 
         return stakers;

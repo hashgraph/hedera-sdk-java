@@ -14,6 +14,8 @@ import java.util.LinkedHashMap;
 public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenBurnTransaction> {
     private final TokenBurnTransactionBody.Builder builder;
 
+    TokenId tokenId;
+
     public TokenBurnTransaction() {
         builder = TokenBurnTransactionBody.newBuilder();
     }
@@ -22,21 +24,29 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         super(txs);
 
         builder = bodyBuilder.getTokenBurn().toBuilder();
+
+        if (builder.hasToken()) {
+            tokenId = TokenId.fromProtobuf(builder.getToken());
+        }
     }
 
     TokenBurnTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getTokenBurn().toBuilder();
+
+        if (builder.hasToken()) {
+            tokenId = TokenId.fromProtobuf(builder.getToken());
+        }
     }
 
     public TokenId getTokenId() {
-        return TokenId.fromProtobuf(builder.getToken());
+        return tokenId;
     }
 
     public TokenBurnTransaction setTokenId(TokenId tokenId) {
         requireNotFrozen();
-        builder.setToken(tokenId.toProtobuf());
+        this.tokenId = tokenId;
         return this;
     }
 
@@ -50,6 +60,21 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         return this;
     }
 
+    TokenBurnTransactionBody.Builder build() {
+        if (tokenId != null) {
+            builder.setToken(tokenId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(Client client) {
+        if (tokenId != null) {
+            tokenId.validate(client);
+        }
+    }
+
     @Override
     MethodDescriptor<Transaction, TransactionResponse> getMethodDescriptor() {
         return TokenServiceGrpc.getBurnTokenMethod();
@@ -57,12 +82,12 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setTokenBurn(builder);
+        bodyBuilder.setTokenBurn(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setTokenBurn(builder);
+        scheduled.setTokenBurn(build());
     }
 }

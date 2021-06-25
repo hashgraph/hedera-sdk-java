@@ -52,10 +52,10 @@ public final class KeyList extends Key implements Collection<Key> {
         return new KeyList(threshold);
     }
 
-    static KeyList fromProtobuf(com.hedera.hashgraph.sdk.proto.KeyList keyList, @Nullable Integer threshold) {
+    static KeyList fromProtobuf(com.hedera.hashgraph.sdk.proto.KeyList keyList, @Nullable Integer threshold, @Nullable NetworkName networkName) {
         var keys = (threshold != null ? new KeyList(threshold) : new KeyList());
         for (var i = 0; i < keyList.getKeysCount(); ++i) {
-            keys.add(Key.fromProtobufKey(keyList.getKeys(i)));
+            keys.add(Key.fromProtobufKey(keyList.getKeys(i), networkName));
         }
 
         return keys;

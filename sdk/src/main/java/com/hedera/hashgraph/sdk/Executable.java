@@ -83,7 +83,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
     abstract CompletableFuture<Void> onExecuteAsync(Client client);
 
-    @Override 
+    @Override
     @FunctionalExecutable
     public CompletableFuture<O> executeAsync(Client client) {
         return onExecuteAsync(client).thenCompose((v) -> {
@@ -92,7 +92,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             }
 
             setNodesFromNodeAccountIds(client);
-            
+
             return executeAsync(client, 1, null);
         });
     }
@@ -183,14 +183,15 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                     return CompletableFuture.<O>failedFuture(
                         mapStatusError(responseStatus,
                             getTransactionId(),
-                            response
+                            response,
+                            client.network.networkName
                         )
                     );
 
                 case Finished:
                 default:
                     // successful response from Hedera
-                    return CompletableFuture.completedFuture(mapResponse(response, node.accountId, request));
+                    return CompletableFuture.completedFuture(mapResponse(response, node.accountId, request, client.network.networkName));
             }
         }).thenCompose(x -> x);
     }
@@ -207,7 +208,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
      * Called after receiving the query response from Hedera. The derived class should map into its
      * output type.
      */
-    abstract O mapResponse(ResponseT response, AccountId nodeId, ProtoRequestT request);
+    abstract O mapResponse(ResponseT response, AccountId nodeId, ProtoRequestT request, @Nullable NetworkName networkName);
 
     abstract Status mapResponseStatus(ResponseT response);
 
@@ -246,7 +247,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         }
     }
 
-    Exception mapStatusError(Status status, @Nullable TransactionId transactionId, ResponseT response) {
+    Exception mapStatusError(Status status, @Nullable TransactionId transactionId, ResponseT response, @Nullable NetworkName networkName) {
         return new PrecheckStatusException(status, transactionId);
     }
 }

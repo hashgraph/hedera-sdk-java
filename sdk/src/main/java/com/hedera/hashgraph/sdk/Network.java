@@ -5,6 +5,7 @@ import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 import com.google.errorprone.annotations.Var;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,7 +20,10 @@ import java.util.concurrent.TimeUnit;
 class Network {
     HashMap<String, AccountId> network = new HashMap<>();
     HashMap<AccountId, Node> networkNodes = new HashMap<>();
-    
+
+    @Nullable
+    NetworkName networkName;
+
     List<Node> nodes = new ArrayList<>();
     final ExecutorService executor;
 

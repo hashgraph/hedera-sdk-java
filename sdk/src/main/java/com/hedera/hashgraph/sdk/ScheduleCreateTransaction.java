@@ -8,11 +8,14 @@ import com.hedera.hashgraph.sdk.proto.ScheduleServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 
 public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateTransaction> {
     private final ScheduleCreateTransactionBody.Builder builder;
+
+    AccountId payerAccountId;
 
     public ScheduleCreateTransaction() {
         builder = ScheduleCreateTransactionBody.newBuilder();
@@ -24,15 +27,19 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         super(txs);
 
         builder = bodyBuilder.getScheduleCreate().toBuilder();
+
+        if (builder.hasPayerAccountID()) {
+            payerAccountId = AccountId.fromProtobuf(builder.getPayerAccountID());
+        }
     }
 
     public AccountId getPayerAccountId() {
-        return AccountId.fromProtobuf(builder.getPayerAccountID());
+        return payerAccountId;
     }
 
     public ScheduleCreateTransaction setPayerAccountId(AccountId accountId) {
         requireNotFrozen();
-        builder.setPayerAccountID(accountId.toProtobuf());
+        this.payerAccountId = accountId;
         return this;
     }
 
@@ -71,6 +78,21 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         return this;
     }
 
+    ScheduleCreateTransactionBody.Builder build() {
+        if (payerAccountId != null) {
+            builder.setPayerAccountID(payerAccountId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(Client client) {
+        if (payerAccountId != null) {
+            payerAccountId.validate(client);
+        }
+    }
+
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return ScheduleServiceGrpc.getCreateScheduleMethod();
@@ -78,16 +100,16 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setScheduleCreate(builder);
+        bodyBuilder.setScheduleCreate(build());
         return true;
     }
 
     @Override
     final com.hedera.hashgraph.sdk.TransactionResponse mapResponse(
-        com.hedera.hashgraph.sdk.proto.TransactionResponse transactionResponse,
+        TransactionResponse transactionResponse,
         AccountId nodeId,
-        com.hedera.hashgraph.sdk.proto.Transaction request
-    ) {
+        com.hedera.hashgraph.sdk.proto.Transaction request,
+        @Nullable NetworkName networkName) {
         var transactionId = Objects.requireNonNull(getTransactionId()).setScheduled(true);
         var hash = hash(request.getSignedTransactionBytes().toByteArray());
         nextTransactionIndex = (nextTransactionIndex + 1) % transactionIds.size();

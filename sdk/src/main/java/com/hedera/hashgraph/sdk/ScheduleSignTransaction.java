@@ -13,6 +13,8 @@ import java.util.LinkedHashMap;
 public final class ScheduleSignTransaction extends Transaction<ScheduleSignTransaction> {
     private final ScheduleSignTransactionBody.Builder builder;
 
+    ScheduleId scheduleId;
+
     public ScheduleSignTransaction() {
         builder = ScheduleSignTransactionBody.newBuilder();
 
@@ -23,15 +25,19 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
         super(txs);
 
         builder = bodyBuilder.getScheduleSign().toBuilder();
+
+        if (builder.hasScheduleID()) {
+            scheduleId = ScheduleId.fromProtobuf(builder.getScheduleID());
+        }
     }
 
     public ScheduleId getScheduleId() {
-        return ScheduleId.fromProtobuf(builder.getScheduleID());
+        return scheduleId;
     }
 
     public ScheduleSignTransaction setScheduleId(ScheduleId scheduleId) {
         requireNotFrozen();
-        builder.setScheduleID(scheduleId.toProtobuf());
+        this.scheduleId = scheduleId;
         return this;
     }
 
@@ -41,6 +47,20 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
         return this;
     }
 
+    ScheduleSignTransactionBody.Builder build() {
+        if (scheduleId != null) {
+            builder.setScheduleID(scheduleId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(Client client) {
+        if (scheduleId != null) {
+            scheduleId.validate(client);
+        }
+    }
 
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
@@ -49,7 +69,7 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setScheduleSign(builder);
+        bodyBuilder.setScheduleSign(build());
         return true;
     }
 

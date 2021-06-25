@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -18,12 +19,14 @@ import java.util.Objects;
 public final class AccountRecordsQuery extends Query<List<TransactionRecord>, AccountRecordsQuery> {
     private final CryptoGetAccountRecordsQuery.Builder builder;
 
+    AccountId accountId;
+
     public AccountRecordsQuery() {
         this.builder = CryptoGetAccountRecordsQuery.newBuilder();
     }
 
     public AccountId getAccountId() {
-      return AccountId.fromProtobuf(builder.getAccountID());
+        return accountId;
     }
 
     /**
@@ -34,12 +37,23 @@ public final class AccountRecordsQuery extends Query<List<TransactionRecord>, Ac
      */
     public AccountRecordsQuery setAccountId(AccountId accountId) {
         Objects.requireNonNull(accountId);
-        builder.setAccountID(accountId.toProtobuf());
+        this.accountId = accountId;
         return this;
     }
 
     @Override
+    void validateNetworkOnIds(Client client) {
+        if (accountId != null) {
+            accountId.validate(client);
+        }
+    }
+
+    @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (accountId != null) {
+            builder.setAccountID(accountId.toProtobuf());
+        }
+
         queryBuilder.setCryptoGetAccountRecords(builder.setHeader(header));
     }
 
@@ -54,12 +68,12 @@ public final class AccountRecordsQuery extends Query<List<TransactionRecord>, Ac
     }
 
     @Override
-    List<TransactionRecord> mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+    List<TransactionRecord> mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
         var rawTransactionRecords = response.getCryptoGetAccountRecords().getRecordsList();
         var transactionRecords = new ArrayList<TransactionRecord>(rawTransactionRecords.size());
 
         for (var record : rawTransactionRecords) {
-            transactionRecords.add(TransactionRecord.fromProtobuf(record));
+            transactionRecords.add(TransactionRecord.fromProtobuf(record, networkName));
         }
 
         return transactionRecords;

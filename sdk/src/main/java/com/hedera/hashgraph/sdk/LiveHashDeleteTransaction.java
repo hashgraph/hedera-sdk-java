@@ -7,7 +7,6 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
@@ -17,6 +16,8 @@ import java.util.LinkedHashMap;
 public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteTransaction> {
     private final CryptoDeleteLiveHashTransactionBody.Builder builder;
 
+    AccountId accountId;
+
     public LiveHashDeleteTransaction() {
         builder = CryptoDeleteLiveHashTransactionBody.newBuilder();
     }
@@ -25,11 +26,15 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
         super(txs);
 
         builder = bodyBuilder.getCryptoDeleteLiveHash().toBuilder();
+
+        if (builder.hasAccountOfLiveHash()) {
+            accountId = AccountId.fromProtobuf(builder.getAccountOfLiveHash());
+        }
     }
 
     @Nullable
     public AccountId getAccountId() {
-        return builder.hasAccountOfLiveHash() ? AccountId.fromProtobuf(builder.getAccountOfLiveHash()) : null;
+        return accountId;
     }
 
     /**
@@ -40,7 +45,7 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
      */
     public LiveHashDeleteTransaction setAccountId(AccountId accountId) {
         requireNotFrozen();
-        builder.setAccountOfLiveHash(accountId.toProtobuf());
+        this.accountId = accountId;
         return this;
     }
 
@@ -70,6 +75,21 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
         return this;
     }
 
+    CryptoDeleteLiveHashTransactionBody.Builder build() {
+        if (accountId != null) {
+            builder.setAccountOfLiveHash(accountId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(Client client) {
+        if (accountId != null) {
+            accountId.validate(client);
+        }
+    }
+
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return CryptoServiceGrpc.getDeleteLiveHashMethod();
@@ -77,7 +97,7 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setCryptoDeleteLiveHash(builder);
+        bodyBuilder.setCryptoDeleteLiveHash(build());
         return true;
     }
 

@@ -8,6 +8,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class AccountIdTest {
     @BeforeAll
@@ -23,6 +24,26 @@ class AccountIdTest {
     @Test
     void fromString() {
         SnapshotMatcher.expect(AccountId.fromString("0.0.5005").toString()).toMatchSnapshot();
+    }
+
+    @Test
+    void fromStringWithChecksumOnMainnet() {
+        SnapshotMatcher.expect(AccountId.fromString("0.0.123-vfmkw").toString()).toMatchSnapshot();
+    }
+
+    @Test
+    void fromStringWithChecksumOnTestnet() {
+        SnapshotMatcher.expect(AccountId.fromString("0.0.123-rmkyk").toString()).toMatchSnapshot();
+    }
+
+    @Test
+    void fromStringWithChecksumOnPreviewnet() {
+        SnapshotMatcher.expect(AccountId.fromString("0.0.123-ntjly").toString()).toMatchSnapshot();
+    }
+
+    @Test
+    void fromStringWithChecksumOnUndefinedNetwork() {
+        assertThrows(IllegalArgumentException.class, () -> AccountId.fromString("0.0.123-ghgna"));
     }
 
     @Test
