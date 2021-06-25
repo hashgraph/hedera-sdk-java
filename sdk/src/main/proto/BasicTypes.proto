@@ -92,6 +92,12 @@ message TokenTransferList {
     repeated AccountAmount transfers = 2; // Multiple list of AccountAmounts, each of which has an account and amount
 }
 
+/* A rational number, used to set the amount of a value transfer to collect as a custom fee */
+message Fraction {
+    int64 numerator = 1; // The rational's numerator
+    int64 denominator = 2; // The rational's denominator; a zero value will result in FRACTION_DIVIDES_BY_ZERO
+}
+
 /* Unique identifier for a topic (used by the consensus service) */
 message TopicID {
     int64 shardNum = 1; // The shard number (nonnegative)

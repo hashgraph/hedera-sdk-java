@@ -816,7 +816,78 @@ public enum Status {
 
     SCHEDULE_ALREADY_EXECUTED(ResponseCodeEnum.SCHEDULE_ALREADY_EXECUTED),
 
-    MESSAGE_SIZE_TOO_LARGE(ResponseCodeEnum.MESSAGE_SIZE_TOO_LARGE);
+    MESSAGE_SIZE_TOO_LARGE(ResponseCodeEnum.MESSAGE_SIZE_TOO_LARGE),
+
+    /*
+     * When a valid signature is not provided for operations on account with receiverSigRequired=true
+     */
+    RECEIVER_SIG_REQUIRED(ResponseCodeEnum.RECEIVER_SIG_REQUIRED),
+
+    /*
+     * A custom fractional fee set a denominator of zero
+     */
+    FRACTION_DIVIDES_BY_ZERO(ResponseCodeEnum.FRACTION_DIVIDES_BY_ZERO),
+
+    /*
+     * The transaction payer could not afford a custom fee
+     */
+    INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE(ResponseCodeEnum.INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE),
+
+    /*
+     * The customFees list is longer than allowed limit 10
+     */
+    CUSTOM_FEES_LIST_TOO_LONG(ResponseCodeEnum.CUSTOM_FEES_LIST_TOO_LONG),
+
+    /*
+     * Any of the feeCollector accounts for customFees is invalid
+     */
+    INVALID_CUSTOM_FEE_COLLECTOR(ResponseCodeEnum.INVALID_CUSTOM_FEE_COLLECTOR),
+
+    /*
+     * Any of the token Ids in customFees is invalid
+     */
+    INVALID_TOKEN_ID_IN_CUSTOM_FEES(ResponseCodeEnum.INVALID_TOKEN_ID_IN_CUSTOM_FEES),
+
+    /*
+     * Any of the token Ids in customFees are not associated to feeCollector
+     */
+    TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR(ResponseCodeEnum.TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR),
+
+    /*
+     * A token cannot have more units minted due to its configured supply ceiling
+     */
+    TOKEN_MAX_SUPPLY_REACHED(ResponseCodeEnum.TOKEN_MAX_SUPPLY_REACHED),
+
+    /*
+     * The transaction attempted to move an NFT serial number from an account other than its owner
+     */
+    SENDER_DOES_NOT_OWN_NFT_SERIAL_NO(ResponseCodeEnum.SENDER_DOES_NOT_OWN_NFT_SERIAL_NO),
+
+    /*
+     * A custom fee schedule entry did not specify either a fixed or fractional fee
+     */
+    CUSTOM_FEE_NOT_FULLY_SPECIFIED(ResponseCodeEnum.CUSTOM_FEE_NOT_FULLY_SPECIFIED),
+
+    /*
+     * Only positive fees may be assessed at this time
+     */
+    CUSTOM_FEE_MUST_BE_POSITIVE(ResponseCodeEnum.CUSTOM_FEE_MUST_BE_POSITIVE),
+
+    /*
+     * Once custom fees are marked as immutable, they can never be changed (or made mutable again)
+     */
+    CUSTOM_FEES_ARE_MARKED_IMMUTABLE(ResponseCodeEnum.CUSTOM_FEES_ARE_MARKED_IMMUTABLE),
+
+    /*
+     * A fractional custom fee exceeded the range of a 64-bit signed integer
+     */
+    CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE(ResponseCodeEnum.CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE),
+
+    /*
+     * The sum of all custom fractional fees must be strictly less than 1
+     */
+    INVALID_CUSTOM_FRACTIONAL_FEES_SUM(ResponseCodeEnum.INVALID_CUSTOM_FRACTIONAL_FEES_SUM);
+
 
     final ResponseCodeEnum code;
 
@@ -1170,6 +1241,34 @@ public enum Status {
                 return SCHEDULE_ALREADY_EXECUTED;
             case MESSAGE_SIZE_TOO_LARGE:
                 return MESSAGE_SIZE_TOO_LARGE;
+            case RECEIVER_SIG_REQUIRED:
+                return RECEIVER_SIG_REQUIRED;
+            case FRACTION_DIVIDES_BY_ZERO:
+                return FRACTION_DIVIDES_BY_ZERO;
+            case INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE:
+                return INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE;
+            case CUSTOM_FEES_LIST_TOO_LONG:
+                return CUSTOM_FEES_LIST_TOO_LONG;
+            case INVALID_CUSTOM_FEE_COLLECTOR:
+                return INVALID_CUSTOM_FEE_COLLECTOR;
+            case INVALID_TOKEN_ID_IN_CUSTOM_FEES:
+                return INVALID_TOKEN_ID_IN_CUSTOM_FEES;
+            case TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR:
+                return TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR;
+            case TOKEN_MAX_SUPPLY_REACHED:
+                return TOKEN_MAX_SUPPLY_REACHED;
+            case SENDER_DOES_NOT_OWN_NFT_SERIAL_NO:
+                return SENDER_DOES_NOT_OWN_NFT_SERIAL_NO;
+            case CUSTOM_FEE_NOT_FULLY_SPECIFIED:
+                return CUSTOM_FEE_NOT_FULLY_SPECIFIED;
+            case CUSTOM_FEE_MUST_BE_POSITIVE:
+                return CUSTOM_FEE_MUST_BE_POSITIVE;
+            case CUSTOM_FEES_ARE_MARKED_IMMUTABLE:
+                return CUSTOM_FEES_ARE_MARKED_IMMUTABLE;
+            case CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE:
+                return CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE;
+            case INVALID_CUSTOM_FRACTIONAL_FEES_SUM:
+                return INVALID_CUSTOM_FRACTIONAL_FEES_SUM;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

@@ -26,6 +26,7 @@ option java_package = "com.hedera.hashgraph.sdk.proto";
 option java_multiple_files = true;
 
 import "BasicTypes.proto";
+import "CustomFees.proto";
 import "QueryHeader.proto";
 import "ResponseHeader.proto";
 import "Timestamp.proto";
@@ -57,6 +58,7 @@ message TokenInfo {
     Duration autoRenewPeriod = 16; // The interval at which the auto-renew account will be charged to extend the token's expiry
     Timestamp expiry = 17; // The epoch second at which the token will expire
     string memo = 18; // The memo associated with the token
+    CustomFees custom_fees = 22; // Custom fees to be assessed during a CryptoTransfer that transfers units of this token
 }
 
 /* Response when the client sends the node TokenGetInfoQuery */

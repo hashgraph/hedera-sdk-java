@@ -27,6 +27,7 @@ option java_multiple_files = true;
 
 import "Duration.proto";
 import "BasicTypes.proto";
+import "CustomFees.proto";
 import "Timestamp.proto";
 
 /*
@@ -57,4 +58,5 @@ message TokenCreateTransactionBody {
     AccountID autoRenewAccount = 14; // An account which will be automatically charged to renew the token's expiration, at autoRenewPeriod interval
     Duration autoRenewPeriod = 15; // The interval at which the auto-renew account will be charged to extend the token's expiry
     string memo = 16; // The memo associated with the token (UTF-8 encoding max 100 bytes)
+    CustomFees custom_fees = 20; // Custom fees to be assessed during a CryptoTransfer that transfers units of this token
 }
