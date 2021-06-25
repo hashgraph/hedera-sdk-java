@@ -2,12 +2,18 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionID;
+import com.hedera.hashgraph.sdk.proto.ConsensusSubmitMessageTransactionBody;
+import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.ConsensusMessageChunkInfo;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Submit a message for consensus.
@@ -23,6 +29,8 @@ import java.util.*;
 public final class TopicMessageSubmitTransaction extends ChunkedTransaction<TopicMessageSubmitTransaction> {
     private final ConsensusSubmitMessageTransactionBody.Builder builder;
 
+    TopicId topicId;
+
     public TopicMessageSubmitTransaction() {
         super();
 
@@ -33,6 +41,10 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
         super(txs);
 
         builder = bodyBuilder.getConsensusSubmitMessage().toBuilder();
+
+        if (builder.hasTopicID()) {
+            topicId = TopicId.fromProtobuf(builder.getTopicID());
+        }
 
         for (var i = 0; i < signedTransactions.size(); i += nodeAccountIds.isEmpty() ? 1 : nodeAccountIds.size()) {
             data = data.concat(
@@ -47,6 +59,10 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
 
         builder = bodyBuilder.getConsensusSubmitMessage().toBuilder();
 
+        if (builder.hasTopicID()) {
+            topicId = TopicId.fromProtobuf(builder.getTopicID());
+        }
+
         for (var i = 0; i < signedTransactions.size(); i += nodeAccountIds.isEmpty() ? 1 : nodeAccountIds.size()) {
             data = data.concat(
                 TransactionBody.parseFrom(signedTransactions.get(i).getBodyBytes())
@@ -57,12 +73,12 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
 
     @Nullable
     public TopicId getTopicId() {
-        return builder.hasTopicID() ? TopicId.fromProtobuf(builder.getTopicID()) : null;
+        return topicId;
     }
 
     public TopicMessageSubmitTransaction setTopicId(TopicId topicId) {
         requireNotFrozen();
-        builder.setTopicID(topicId.toProtobuf());
+        this.topicId = topicId;
         return this;
     }
 
@@ -82,6 +98,21 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
         return setData(message);
     }
 
+    ConsensusSubmitMessageTransactionBody.Builder build() {
+        if (topicId != null) {
+            builder.setTopicID(topicId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(Client client) {
+        if (topicId != null) {
+            topicId.validate(client);
+        }
+    }
+
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return ConsensusServiceGrpc.getSubmitMessageMethod();
@@ -89,18 +120,18 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setConsensusSubmitMessage(builder);
+        bodyBuilder.setConsensusSubmitMessage(build());
         return true;
     }
 
     @Override
-    void onFreezeChunk(TransactionBody.Builder body, TransactionID initialTransactionId, int startIndex, int endIndex, int chunk, int total) {
+    void onFreezeChunk(TransactionBody.Builder body, @Nullable TransactionID initialTransactionId, int startIndex, int endIndex, int chunk, int total) {
         if (total == 1) {
-            body.setConsensusSubmitMessage(builder.setMessage(data.substring(startIndex, endIndex)));
+            body.setConsensusSubmitMessage(build().setMessage(data.substring(startIndex, endIndex)));
         } else {
-            body.setConsensusSubmitMessage(builder.setMessage(data.substring(startIndex, endIndex))
+            body.setConsensusSubmitMessage(build().setMessage(data.substring(startIndex, endIndex))
                 .setChunkInfo(ConsensusMessageChunkInfo.newBuilder()
-                    .setInitialTransactionID(initialTransactionId)
+                    .setInitialTransactionID(Objects.requireNonNull(initialTransactionId))
                     .setNumber(chunk + 1)
                     .setTotal(total)
                 )
@@ -111,6 +142,6 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setConsensusSubmitMessage(builder.setMessage(data));
+        scheduled.setConsensusSubmitMessage(build().setMessage(data));
     }
 }

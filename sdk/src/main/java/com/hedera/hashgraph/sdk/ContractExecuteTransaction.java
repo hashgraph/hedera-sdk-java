@@ -7,8 +7,8 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Call a function of the given smart contract instance, giving it parameters as its inputs.
@@ -22,6 +22,8 @@ import java.util.LinkedHashMap;
 public final class ContractExecuteTransaction extends Transaction<ContractExecuteTransaction> {
     private final ContractCallTransactionBody.Builder builder;
 
+    ContractId contractId;
+
     public ContractExecuteTransaction() {
         builder = ContractCallTransactionBody.newBuilder();
     }
@@ -30,17 +32,25 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
         super(txs);
 
         builder = bodyBuilder.getContractCall().toBuilder();
+
+        if (builder.hasContractID()) {
+            contractId = ContractId.fromProtobuf(builder.getContractID());
+        }
     }
 
     ContractExecuteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getContractCall().toBuilder();
+
+        if (builder.hasContractID()) {
+            contractId = ContractId.fromProtobuf(builder.getContractID());
+        }
     }
 
     @Nullable
     public ContractId getContractId() {
-        return builder.hasContractID() ? ContractId.fromProtobuf(builder.getContractID()) : null;
+        return contractId;
     }
 
     /**
@@ -50,8 +60,9 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
      * @return {@code this}
      */
     public ContractExecuteTransaction setContractId(ContractId contractId) {
+        Objects.requireNonNull(contractId);
         requireNotFrozen();
-        builder.setContractID(contractId.toProtobuf());
+        this.contractId = contractId;
         return this;
     }
 
@@ -82,6 +93,7 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
      * @return {@code this}
      */
     public ContractExecuteTransaction setPayableAmount(Hbar amount) {
+        Objects.requireNonNull(amount);
         requireNotFrozen();
         builder.setAmount(amount.toTinybars());
         return this;
@@ -101,6 +113,7 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
      * @return {@code this}
      */
     public ContractExecuteTransaction setFunctionParameters(ByteString functionParameters) {
+        Objects.requireNonNull(functionParameters);
         requireNotFrozen();
         builder.setFunctionParameters(functionParameters);
         return this;
@@ -127,7 +140,23 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
      * @return {@code this}
      */
     public ContractExecuteTransaction setFunction(String name, ContractFunctionParameters params) {
+        Objects.requireNonNull(params);
         return setFunctionParameters(params.toBytes(name));
+    }
+
+    ContractCallTransactionBody.Builder build() {
+        if (contractId != null) {
+            builder.setContractID(contractId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(Client client) {
+        if (contractId != null) {
+            contractId.validate(client);
+        }
     }
 
     @Override
@@ -137,12 +166,12 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setContractCall(builder);
+        bodyBuilder.setContractCall(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setContractCall(builder);
+        scheduled.setContractCall(build());
     }
 }

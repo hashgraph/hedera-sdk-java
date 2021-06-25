@@ -19,25 +19,32 @@ import java.util.Objects;
  * <p>This query is free.
  */
 public final class TransactionReceiptQuery
-        extends Query<TransactionReceipt, TransactionReceiptQuery> {
+    extends Query<TransactionReceipt, TransactionReceiptQuery> {
     private final TransactionGetReceiptQuery.Builder builder;
+
+    TransactionId transactionId;
 
     public TransactionReceiptQuery() {
         builder = TransactionGetReceiptQuery.newBuilder();
     }
 
+    @Override
     public TransactionId getTransactionId() {
-      return TransactionId.fromProtobuf(builder.getTransactionID());
+        if (transactionId == null) {
+            return TransactionId.fromProtobuf(builder.getTransactionID());
+        }
+
+        return transactionId;
     }
 
     /**
      * Set the ID of the transaction for which the receipt is being requested.
      *
-     * @return {@code this}
      * @param transactionId The TransactionId to be set
+     * @return {@code this}
      */
     public TransactionReceiptQuery setTransactionId(TransactionId transactionId) {
-        builder.setTransactionID(transactionId.toProtobuf());
+        this.transactionId = transactionId;
         return this;
     }
 
@@ -47,7 +54,18 @@ public final class TransactionReceiptQuery
     }
 
     @Override
+    void validateNetworkOnIds(Client client) {
+        if (transactionId != null) {
+            transactionId.accountId.validate(client);
+        }
+    }
+
+    @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (transactionId != null) {
+            builder.setTransactionID(transactionId.toProtobuf());
+        }
+
         queryBuilder.setTransactionGetReceipt(builder.setHeader(header));
     }
 
@@ -59,8 +77,8 @@ public final class TransactionReceiptQuery
     }
 
     @Override
-    TransactionReceipt mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt());
+    TransactionReceipt mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
+        return TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt(), networkName);
     }
 
     @Override
@@ -106,7 +124,6 @@ public final class TransactionReceiptQuery
                 return ExecutionState.Retry;
 
             case SUCCESS:
-            case IDENTICAL_SCHEDULE_ALREADY_CREATED:
                 return ExecutionState.Finished;
 
             default:
@@ -115,7 +132,7 @@ public final class TransactionReceiptQuery
     }
 
     @Override
-    Exception mapStatusError(Status status, @Nullable TransactionId transactionId, Response response) {
+    Exception mapStatusError(Status status, @Nullable TransactionId transactionId, Response response, @Nullable NetworkName networkName) {
         if (status != Status.OK) {
             return new PrecheckStatusException(status, transactionId);
         }
@@ -123,7 +140,7 @@ public final class TransactionReceiptQuery
         // has reached consensus but not generated
         return new ReceiptStatusException(
             Objects.requireNonNull(transactionId),
-            TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt())
+            TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt(), networkName)
         );
     }
 }

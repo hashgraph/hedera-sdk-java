@@ -7,6 +7,8 @@ import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
+
 public class NetworkVersionInfoQuery extends Query<NetworkVersionInfo, NetworkVersionInfoQuery> {
     private final NetworkGetVersionInfoQuery.Builder builder;
 
@@ -30,7 +32,7 @@ public class NetworkVersionInfoQuery extends Query<NetworkVersionInfo, NetworkVe
     }
 
     @Override
-    NetworkVersionInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+    NetworkVersionInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
         return NetworkVersionInfo.fromProtobuf(response.getNetworkGetVersionInfo());
     }
 

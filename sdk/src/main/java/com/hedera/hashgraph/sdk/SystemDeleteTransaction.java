@@ -7,7 +7,6 @@ import io.grpc.MethodDescriptor;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
@@ -23,6 +22,9 @@ import java.util.LinkedHashMap;
  */
 public final class SystemDeleteTransaction extends Transaction<SystemDeleteTransaction> {
     private final SystemDeleteTransactionBody.Builder builder;
+
+    FileId fileId;
+    ContractId contractId;
 
     public SystemDeleteTransaction() {
         builder = SystemDeleteTransactionBody.newBuilder();
@@ -42,7 +44,7 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
 
     @Nullable
     public final FileId getFileId() {
-        return builder.hasFileID() ? FileId.fromProtobuf(builder.getFileID()) : null;
+        return fileId;
     }
 
     /**
@@ -55,13 +57,13 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
      */
     public SystemDeleteTransaction setFileId(FileId fileId) {
         requireNotFrozen();
-        builder.setFileID(fileId.toProtobuf());
+        this.fileId = fileId;
         return this;
     }
 
     @Nullable
     public final ContractId getContractId() {
-        return builder.hasContractID() ? ContractId.fromProtobuf(builder.getContractID()) : null;
+        return contractId;
     }
 
     /**
@@ -74,7 +76,7 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
      */
     public SystemDeleteTransaction setContractId(ContractId contractId) {
         requireNotFrozen();
-        builder.setContractID(contractId.toProtobuf());
+        this.contractId = contractId;
         return this;
     }
 
@@ -100,6 +102,29 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
         return this;
     }
 
+    SystemDeleteTransactionBody.Builder build() {
+        if (fileId != null) {
+            builder.setFileID(fileId.toProtobuf());
+        }
+
+        if (contractId != null) {
+            builder.setContractID(contractId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(Client client) {
+        if (fileId != null) {
+            fileId.validate(client);
+        }
+
+        if (contractId != null) {
+            contractId.validate(client);
+        }
+    }
+
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         switch (builder.getIdCase()) {
@@ -116,12 +141,12 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setSystemDelete(builder);
+        bodyBuilder.setSystemDelete(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setSystemDelete(builder);
+        scheduled.setSystemDelete(build());
     }
 }

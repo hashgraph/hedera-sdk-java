@@ -24,6 +24,9 @@ import java.util.LinkedHashMap;
 public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransaction> {
     private final ConsensusUpdateTopicTransactionBody.Builder builder;
 
+    TopicId topicId;
+    AccountId autoRenewAccountId;
+
     public TopicUpdateTransaction() {
         builder = ConsensusUpdateTopicTransactionBody.newBuilder();
     }
@@ -32,17 +35,25 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         super(txs);
 
         builder = bodyBuilder.getConsensusUpdateTopic().toBuilder();
+
+        if (builder.hasTopicID()) {
+            topicId = TopicId.fromProtobuf(builder.getTopicID());
+        }
     }
 
     TopicUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getConsensusUpdateTopic().toBuilder();
+
+        if (builder.hasTopicID()) {
+            topicId = TopicId.fromProtobuf(builder.getTopicID());
+        }
     }
 
     @Nullable
     public TopicId getTopicId() {
-        return builder.hasTopicID() ? TopicId.fromProtobuf(builder.getTopicID()) : null;
+        return topicId;
     }
 
     /**
@@ -53,7 +64,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
      */
     public TopicUpdateTransaction setTopicId(TopicId topicId) {
         requireNotFrozen();
-        builder.setTopicID(topicId.toProtobuf());
+        this.topicId = topicId;
         return this;
     }
 
@@ -167,7 +178,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
 
     @Nullable
     public AccountId getAutoRenewAccountId() {
-        return builder.hasAutoRenewAccount() ? AccountId.fromProtobuf(builder.getAutoRenewAccount()) : null;
+        return autoRenewAccountId;
     }
 
     /**
@@ -178,20 +189,57 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
      */
     public TopicUpdateTransaction setAutoRenewAccountId(AccountId autoRenewAccountId) {
         requireNotFrozen();
-        builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
+        this.autoRenewAccountId = autoRenewAccountId;
+        return this;
+    }
+
+    /**
+     * @deprecated Use {@link #clearAutoRenewAccountId()}
+     *
+     * Clear the auto renew account ID for this topic.
+     *
+     * @param autoRenewAccountId The AccountId to be cleared for auto renewal
+     * @return {@code this}
+     */
+    @Deprecated
+    public TopicUpdateTransaction clearAutoRenewAccountId(AccountId autoRenewAccountId) {
+        requireNotFrozen();
+        autoRenewAccountId = null;
         return this;
     }
 
     /**
      * Clear the auto renew account ID for this topic.
      *
-     * @param autoRenewAccountId The AccountId to be cleared for auto renewal
      * @return {@code this}
      */
-    public TopicUpdateTransaction clearAutoRenewAccountId(AccountId autoRenewAccountId) {
+    public TopicUpdateTransaction clearAutoRenewAccountId() {
         requireNotFrozen();
-        builder.setAutoRenewAccount(AccountID.getDefaultInstance());
+        autoRenewAccountId = null;
         return this;
+    }
+
+    ConsensusUpdateTopicTransactionBody.Builder build() {
+        if (topicId != null) {
+            builder.setTopicID(topicId.toProtobuf());
+        }
+
+        if (autoRenewAccountId != null) {
+            builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(Client client) {
+        if (topicId != null) {
+            topicId.validate(client);
+        }
+
+        if (autoRenewAccountId != null) {
+            autoRenewAccountId.validate(client);
+        }
     }
 
     @Override
@@ -201,12 +249,12 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setConsensusUpdateTopic(builder);
+        bodyBuilder.setConsensusUpdateTopic(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setConsensusUpdateTopic(builder);
+        scheduled.setConsensusUpdateTopic(build());
     }
 }

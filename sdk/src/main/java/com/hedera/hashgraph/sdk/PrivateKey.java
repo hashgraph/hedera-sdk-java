@@ -1,7 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
-import com.google.protobuf.ByteString;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -12,6 +11,7 @@ import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
+import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -303,7 +303,7 @@ public final class PrivateKey extends Key {
             transaction.freeze();
         }
 
-        var builder = (com.hedera.hashgraph.sdk.proto.SignedTransaction.Builder) transaction.signedTransactions.get(0);
+        var builder = (SignedTransaction.Builder) transaction.signedTransactions.get(0);
         var signature = sign(builder.getBodyBytes().toByteArray());
 
         transaction.addSignature(getPublicKey(), signature);

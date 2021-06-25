@@ -10,6 +10,8 @@ import java.util.LinkedHashMap;
 public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteTransaction> {
     private final ScheduleDeleteTransactionBody.Builder builder;
 
+    ScheduleId scheduleId;
+
     public ScheduleDeleteTransaction() {
         builder = ScheduleDeleteTransactionBody.newBuilder();
 
@@ -20,22 +22,45 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
         super(txs);
 
         builder = bodyBuilder.getScheduleDelete().toBuilder();
+
+        if (builder.hasScheduleID()) {
+            scheduleId = ScheduleId.fromProtobuf(builder.getScheduleID());
+        }
     }
 
     ScheduleDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getScheduleDelete().toBuilder();
+
+        if (builder.hasScheduleID()) {
+            scheduleId = ScheduleId.fromProtobuf(builder.getScheduleID());
+        }
     }
 
     public ScheduleId getScheduleId() {
-        return ScheduleId.fromProtobuf(builder.getScheduleID());
+        return scheduleId;
     }
 
     public ScheduleDeleteTransaction setScheduleId(ScheduleId scheduleId) {
         requireNotFrozen();
-        builder.setScheduleID(scheduleId.toProtobuf());
+        this.scheduleId = scheduleId;
         return this;
+    }
+
+    ScheduleDeleteTransactionBody.Builder build() {
+        if (scheduleId != null) {
+            builder.setScheduleID(scheduleId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(Client client) {
+        if (scheduleId != null) {
+            scheduleId.validate(client);
+        }
     }
 
     @Override
@@ -45,12 +70,12 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setScheduleDelete(builder);
+        bodyBuilder.setScheduleDelete(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setScheduleDelete(builder);
+        scheduled.setScheduleDelete(build());
     }
 }

@@ -12,6 +12,7 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Change properties for the given account.
@@ -32,6 +33,9 @@ import java.util.LinkedHashMap;
 public final class AccountUpdateTransaction extends Transaction<AccountUpdateTransaction> {
     private final CryptoUpdateTransactionBody.Builder builder;
 
+    AccountId accountId;
+    AccountId proxyAccountId;
+
     public AccountUpdateTransaction() {
         builder = CryptoUpdateTransactionBody.newBuilder();
     }
@@ -40,17 +44,33 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         super(txs);
 
         builder = bodyBuilder.getCryptoUpdateAccount().toBuilder();
+
+        if (builder.hasAccountIDToUpdate()) {
+            accountId = AccountId.fromProtobuf(builder.getAccountIDToUpdate());
+        }
+
+        if (builder.hasProxyAccountID()) {
+            proxyAccountId = AccountId.fromProtobuf(builder.getProxyAccountID());
+        }
     }
 
     AccountUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getCryptoUpdateAccount().toBuilder();
+
+        if (builder.hasAccountIDToUpdate()) {
+            accountId = AccountId.fromProtobuf(builder.getAccountIDToUpdate());
+        }
+
+        if (builder.hasProxyAccountID()) {
+            proxyAccountId = AccountId.fromProtobuf(builder.getProxyAccountID());
+        }
     }
 
     @Nullable
     public AccountId getAccountId() {
-        return builder.hasAccountIDToUpdate() ? AccountId.fromProtobuf(builder.getAccountIDToUpdate()) : null;
+        return accountId;
     }
 
     /**
@@ -60,8 +80,9 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @return {@code this}
      */
     public AccountUpdateTransaction setAccountId(AccountId accountId) {
+        Objects.requireNonNull(accountId);
         requireNotFrozen();
-        builder.setAccountIDToUpdate(accountId.toProtobuf());
+        this.accountId = accountId;
         return this;
     }
 
@@ -77,6 +98,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @return {@code this}
      */
     public AccountUpdateTransaction setKey(Key key) {
+        Objects.requireNonNull(key);
         requireNotFrozen();
         builder.setKey(key.toProtobufKey());
         return this;
@@ -84,7 +106,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
 
     @Nullable
     public AccountId getProxyAccountId() {
-        return builder.hasProxyAccountID() ? AccountId.fromProtobuf(builder.getProxyAccountID()) : null;
+        return proxyAccountId;
     }
 
     /**
@@ -102,8 +124,9 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @return {@code this}
      */
     public AccountUpdateTransaction setProxyAccountId(AccountId proxyAccountId) {
+        Objects.requireNonNull(proxyAccountId);
         requireNotFrozen();
-        builder.setProxyAccountID(proxyAccountId.toProtobuf());
+        this.proxyAccountId = proxyAccountId;
         return this;
     }
 
@@ -120,6 +143,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @return {@code this}
      */
     AccountUpdateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
+        Objects.requireNonNull(sendRecordThreshold);
         requireNotFrozen();
         builder.setSendRecordThresholdWrapper(UInt64Value.of(sendRecordThreshold.toTinybars()));
         return this;
@@ -138,6 +162,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @return {@code this}
      */
     AccountUpdateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
+        Objects.requireNonNull(receiveRecordThreshold);
         requireNotFrozen();
         builder.setReceiveRecordThresholdWrapper(UInt64Value.of(receiveRecordThreshold.toTinybars()));
         return this;
@@ -156,6 +181,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @return {@code this}
      */
     public AccountUpdateTransaction setExpirationTime(Instant expirationTime) {
+        Objects.requireNonNull(expirationTime);
         requireNotFrozen();
         builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
         return this;
@@ -177,6 +203,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      */
     @Deprecated
     public AccountUpdateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
+        Objects.requireNonNull(autoRenewPeriod);
         requireNotFrozen();
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         return this;
@@ -217,18 +244,40 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     @Override
+    void validateNetworkOnIds(Client client) {
+        if (accountId != null) {
+            accountId.validate(client);
+        }
+        if (proxyAccountId != null) {
+            proxyAccountId.validate(client);
+        }
+    }
+
+    @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return CryptoServiceGrpc.getUpdateAccountMethod();
     }
 
+    CryptoUpdateTransactionBody.Builder build() {
+        if (accountId != null) {
+            builder.setAccountIDToUpdate(accountId.toProtobuf());
+        }
+
+        if (proxyAccountId != null) {
+            builder.setProxyAccountID(proxyAccountId.toProtobuf());
+        }
+
+        return builder;
+    }
+
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setCryptoUpdateAccount(builder);
+        bodyBuilder.setCryptoUpdateAccount(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setCryptoUpdateAccount(builder);
+        scheduled.setCryptoUpdateAccount(build());
     }
 }

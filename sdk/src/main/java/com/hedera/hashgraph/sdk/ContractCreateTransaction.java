@@ -2,13 +2,17 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.ContractCreateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Start a new smart contract instance.
@@ -57,6 +61,9 @@ import java.util.LinkedHashMap;
 public final class ContractCreateTransaction extends Transaction<ContractCreateTransaction> {
     private final ContractCreateTransactionBody.Builder builder;
 
+    FileId bytecodeFileId;
+    AccountId proxyAccountId;
+
     public ContractCreateTransaction() {
         builder = ContractCreateTransactionBody.newBuilder();
 
@@ -78,7 +85,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
 
     @Nullable
     public FileId getBytecodeFileId() {
-        return builder.hasFileID() ? FileId.fromProtobuf(builder.getFileID()) : null;
+        return bytecodeFileId;
     }
 
     /**
@@ -93,8 +100,9 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      * @return {@code this}
      */
     public ContractCreateTransaction setBytecodeFileId(FileId byteCodeFileId) {
+        Objects.requireNonNull(byteCodeFileId);
         requireNotFrozen();
-        builder.setFileID(byteCodeFileId.toProtobuf());
+        this.bytecodeFileId = byteCodeFileId;
         return this;
     }
 
@@ -114,6 +122,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      * @return {@code this}
      */
     public ContractCreateTransaction setAdminKey(Key adminKey) {
+        Objects.requireNonNull(adminKey);
         requireNotFrozen();
         builder.setAdminKey(adminKey.toProtobufKey());
         return this;
@@ -147,6 +156,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      * @return {@code this}
      */
     public ContractCreateTransaction setInitialBalance(Hbar initialBalance) {
+        Objects.requireNonNull(initialBalance);
         requireNotFrozen();
         builder.setInitialBalance(initialBalance.toTinybars());
         return this;
@@ -170,8 +180,9 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      * @return {@code this}
      */
     public ContractCreateTransaction setProxyAccountId(AccountId proxyAccountId) {
+        Objects.requireNonNull(proxyAccountId);
         requireNotFrozen();
-        builder.setProxyAccountID(proxyAccountId.toProtobuf());
+        this.proxyAccountId = proxyAccountId;
         return this;
     }
 
@@ -187,6 +198,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      * @return {@code this}
      */
     public ContractCreateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
+        Objects.requireNonNull(autoRenewPeriod);
         requireNotFrozen();
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         return this;
@@ -218,6 +230,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      * @return {@code this}
      */
     public ContractCreateTransaction setConstructorParameters(ContractFunctionParameters constructorParameters) {
+        Objects.requireNonNull(constructorParameters);
         requireNotFrozen();
         builder.setConstructorParameters(constructorParameters.toBytes(null));
         return this;
@@ -239,6 +252,29 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    ContractCreateTransactionBody.Builder build() {
+        if (bytecodeFileId != null) {
+            builder.setFileID(bytecodeFileId.toProtobuf());
+        }
+
+        if (proxyAccountId != null) {
+            builder.setProxyAccountID(proxyAccountId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(Client client) {
+        if (bytecodeFileId != null) {
+            bytecodeFileId.validate(client);
+        }
+
+        if (proxyAccountId != null) {
+            proxyAccountId.validate(client);
+        }
+    }
+
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return SmartContractServiceGrpc.getCreateContractMethod();
@@ -246,12 +282,12 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setContractCreateInstance(builder);
+        bodyBuilder.setContractCreateInstance(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setContractCreateInstance(builder);
+        scheduled.setContractCreateInstance(build());
     }
 }

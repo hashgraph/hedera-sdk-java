@@ -9,6 +9,9 @@ import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 
+import javax.annotation.Nullable;
+import java.util.Objects;
+
 /**
  * Call a function of the given smart contract instance, giving it functionParameters as its inputs.
  * It will consume the entire given amount of gas.
@@ -25,12 +28,14 @@ import java8.util.concurrent.CompletableFuture;
 public final class ContractCallQuery extends Query<ContractFunctionResult, ContractCallQuery> {
     private final ContractCallLocalQuery.Builder builder;
 
+    ContractId contractId;
+
     public ContractCallQuery() {
         builder = ContractCallLocalQuery.newBuilder();
     }
 
     public ContractId getContractId() {
-      return ContractId.fromProtobuf(builder.getContractID());
+        return contractId;
     }
 
     /**
@@ -40,7 +45,8 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
      * @param contractId The ContractId to be set
      */
     public ContractCallQuery setContractId(ContractId contractId) {
-        builder.setContractID(contractId.toProtobuf());
+        Objects.requireNonNull(contractId);
+        this.contractId = contractId;
         return this;
     }
 
@@ -105,6 +111,7 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
      * @param params The parameters to pass
      */
     public ContractCallQuery setFunction(String name, ContractFunctionParameters params) {
+        Objects.requireNonNull(params);
         builder.setFunctionParameters(params.toBytes(name));
         return this;
     }
@@ -122,7 +129,18 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
     }
 
     @Override
+    void validateNetworkOnIds(Client client) {
+        if (contractId != null) {
+            contractId.validate(client);
+        }
+    }
+
+    @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (contractId != null) {
+            builder.setContractID(contractId.toProtobuf());
+        }
+
         queryBuilder.setContractCallLocal(builder.setHeader(header));
     }
 
@@ -137,7 +155,7 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
     }
 
     @Override
-    ContractFunctionResult mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+    ContractFunctionResult mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
         return new ContractFunctionResult(response.getContractCallLocal().getFunctionResult());
     }
 

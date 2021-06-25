@@ -57,12 +57,16 @@ public final class FileInfo {
     }
 
     static FileInfo fromProtobuf(FileGetInfoResponse.FileInfo fileInfo) {
+        return FileInfo.fromProtobuf(fileInfo, null);
+    }
+
+    static FileInfo fromProtobuf(FileGetInfoResponse.FileInfo fileInfo, @Nullable NetworkName networkName) {
         @Nullable KeyList keys = fileInfo.hasKeys() ?
-            KeyList.fromProtobuf(fileInfo.getKeys(), null) :
+            KeyList.fromProtobuf(fileInfo.getKeys(), null, networkName) :
             null;
 
         return new FileInfo(
-            FileId.fromProtobuf(fileInfo.getFileID()),
+            FileId.fromProtobuf(fileInfo.getFileID(), networkName),
             fileInfo.getSize(),
             InstantConverter.fromProtobuf(fileInfo.getExpirationTime()),
             fileInfo.getDeleted(),

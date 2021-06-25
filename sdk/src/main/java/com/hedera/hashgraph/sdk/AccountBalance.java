@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 import javax.annotation.Nonnegative;
+import javax.annotation.Nullable;
 
 public class AccountBalance {
     @Nonnegative
@@ -33,11 +34,15 @@ public class AccountBalance {
     }
 
     static AccountBalance fromProtobuf(CryptoGetAccountBalanceResponse protobuf) {
+        return AccountBalance.fromProtobuf(protobuf, null);
+    }
+
+    static AccountBalance fromProtobuf(CryptoGetAccountBalanceResponse protobuf, @Nullable NetworkName networkName) {
         var balanceList = protobuf.getTokenBalancesList();
         Map<TokenId, Long> map = new HashMap<>();
         Map<Long, Integer>  decimalMap = new HashMap<>();
         for (int i = 0; i < protobuf.getTokenBalancesCount(); i++) {
-            map.put(TokenId.fromProtobuf(balanceList.get(i).getTokenId()), balanceList.get(i).getBalance());
+            map.put(TokenId.fromProtobuf(balanceList.get(i).getTokenId(), networkName), balanceList.get(i).getBalance());
             decimalMap.put(balanceList.get(i).getBalance(), balanceList.get(i).getDecimals());
         }
 

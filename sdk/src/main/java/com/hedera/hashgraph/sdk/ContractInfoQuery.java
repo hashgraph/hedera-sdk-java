@@ -8,6 +8,9 @@ import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 
+import javax.annotation.Nullable;
+import java.util.Objects;
+
 /**
  * Get information about a smart contract instance.
  * <p>
@@ -17,12 +20,14 @@ import java8.util.concurrent.CompletableFuture;
 public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQuery> {
     private final ContractGetInfoQuery.Builder builder;
 
+    ContractId contractId;
+
     public ContractInfoQuery() {
         builder = ContractGetInfoQuery.newBuilder();
     }
 
     public ContractId getContractId() {
-      return ContractId.fromProtobuf(builder.getContractID());
+        return contractId;
     }
 
     /**
@@ -32,8 +37,8 @@ public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQue
      * @param contractId The ContractId to be set
      */
     public ContractInfoQuery setContractId(ContractId contractId) {
-        builder.setContractID(contractId.toProtobuf());
-
+        Objects.requireNonNull(contractId);
+        this.contractId = contractId;
         return this;
     }
 
@@ -46,7 +51,18 @@ public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQue
     }
 
     @Override
+    void validateNetworkOnIds(Client client) {
+        if (contractId != null) {
+            contractId.validate(client);
+        }
+    }
+
+    @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (contractId != null) {
+            builder.setContractID(contractId.toProtobuf());
+        }
+
         queryBuilder.setContractGetInfo(builder.setHeader(header));
     }
 
@@ -61,8 +77,8 @@ public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQue
     }
 
     @Override
-    ContractInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return ContractInfo.fromProtobuf(response.getContractGetInfo().getContractInfo());
+    ContractInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
+        return ContractInfo.fromProtobuf(response.getContractGetInfo().getContractInfo(), networkName);
     }
 
     @Override

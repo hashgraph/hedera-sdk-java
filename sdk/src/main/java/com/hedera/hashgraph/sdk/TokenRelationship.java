@@ -37,8 +37,12 @@ public class TokenRelationship {
     }
 
     static TokenRelationship fromProtobuf(com.hedera.hashgraph.sdk.proto.TokenRelationship tokenRelationship) {
+        return TokenRelationship.fromProtobuf(tokenRelationship, null);
+    }
+
+    static TokenRelationship fromProtobuf(com.hedera.hashgraph.sdk.proto.TokenRelationship tokenRelationship, @Nullable NetworkName networkName) {
         return new TokenRelationship(
-            TokenId.fromProtobuf(tokenRelationship.getTokenId()),
+            TokenId.fromProtobuf(tokenRelationship.getTokenId(), networkName),
             tokenRelationship.getSymbol(),
             tokenRelationship.getBalance(),
             kycStatusFromProtobuf(tokenRelationship.getKycStatus()),

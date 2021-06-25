@@ -7,8 +7,8 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import io.grpc.MethodDescriptor;
 
-import java.util.Map;
-import java.util.HashMap;
+import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * Get the balance of a Hedera™ crypto-currency account. This returns only the balance, so it is a
@@ -19,12 +19,15 @@ import java.util.HashMap;
 public final class AccountBalanceQuery extends Query<AccountBalance, AccountBalanceQuery> {
     private final CryptoGetAccountBalanceQuery.Builder builder;
 
+    AccountId accountId;
+    ContractId contractId;
+
     public AccountBalanceQuery() {
         builder = CryptoGetAccountBalanceQuery.newBuilder();
     }
 
     public AccountId getAccountId() {
-        return AccountId.fromProtobuf(builder.getAccountID());
+        return accountId;
     }
 
     /**
@@ -36,12 +39,13 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
      * @return {@code this}
      */
     public AccountBalanceQuery setAccountId(AccountId accountId) {
-        builder.setAccountID(accountId.toProtobuf());
+        Objects.requireNonNull(accountId);
+        this.accountId = accountId;
         return this;
     }
 
     public ContractId getContractId() {
-        return ContractId.fromProtobuf(builder.getContractID());
+        return contractId;
     }
 
     /**
@@ -53,8 +57,20 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
      * @return {@code this}
      */
     public AccountBalanceQuery setContractId(ContractId contractId) {
-        builder.setContractID(contractId.toProtobuf());
+        Objects.requireNonNull(contractId);
+        this.contractId = contractId;
         return this;
+    }
+
+    @Override
+    void validateNetworkOnIds(Client client) {
+        if (accountId != null) {
+            accountId.validate(client);
+        }
+
+        if (contractId != null) {
+            contractId.validate(client);
+        }
     }
 
     @Override
@@ -64,12 +80,20 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (accountId != null) {
+            builder.setAccountID(accountId.toProtobuf());
+        }
+
+        if (contractId != null) {
+            builder.setContractID(contractId.toProtobuf());
+        }
+
         queryBuilder.setCryptogetAccountBalance(builder.setHeader(header));
     }
 
     @Override
-    AccountBalance mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return AccountBalance.fromProtobuf(response.getCryptogetAccountBalance());
+    AccountBalance mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
+        return AccountBalance.fromProtobuf(response.getCryptogetAccountBalance(), networkName);
     }
 
     @Override

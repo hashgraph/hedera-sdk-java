@@ -8,6 +8,9 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 
+import javax.annotation.Nullable;
+import java.util.Objects;
+
 /**
  * Get all the information about an account, including the balance.
  * This does not get the list of account records.
@@ -15,12 +18,14 @@ import java8.util.concurrent.CompletableFuture;
 public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery> {
     private final CryptoGetInfoQuery.Builder builder;
 
+    AccountId accountId;
+
     public AccountInfoQuery() {
         builder = CryptoGetInfoQuery.newBuilder();
     }
 
     public AccountId getAccountId() {
-      return AccountId.fromProtobuf(builder.getAccountID());
+        return accountId;
     }
 
     /**
@@ -30,12 +35,24 @@ public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery>
      * @param accountId  The AccountId to be set
      */
     public AccountInfoQuery setAccountId(AccountId accountId) {
-        builder.setAccountID(accountId.toProtobuf());
+        Objects.requireNonNull(accountId);
+        this.accountId = accountId;
         return this;
     }
 
     @Override
+    void validateNetworkOnIds(Client client) {
+        if (accountId != null) {
+            accountId.validate(client);
+        }
+    }
+
+    @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (accountId != null) {
+            builder.setAccountID(accountId.toProtobuf());
+        }
+
         queryBuilder.setCryptoGetInfo(builder.setHeader(header));
     }
 
@@ -50,8 +67,8 @@ public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery>
     }
 
     @Override
-    AccountInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return AccountInfo.fromProtobuf(response.getCryptoGetInfo().getAccountInfo());
+    AccountInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
+        return AccountInfo.fromProtobuf(response.getCryptoGetInfo().getAccountInfo(), networkName);
     }
 
     @Override

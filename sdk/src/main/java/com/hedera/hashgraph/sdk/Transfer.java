@@ -3,6 +3,8 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.hedera.hashgraph.sdk.proto.AccountAmount;
 
+import javax.annotation.Nullable;
+
 /**
  * A transfer of Hbar that occurred within a transaction.
  *
@@ -25,7 +27,11 @@ public final class Transfer {
     }
 
     static Transfer fromProtobuf(AccountAmount accountAmount) {
-        return new Transfer(AccountId.fromProtobuf(accountAmount.getAccountID()), Hbar.fromTinybars(accountAmount.getAmount()));
+        return Transfer.fromProtobuf(accountAmount, null);
+    }
+
+    static Transfer fromProtobuf(AccountAmount accountAmount, @Nullable NetworkName networkName) {
+        return new Transfer(AccountId.fromProtobuf(accountAmount.getAccountID(), networkName), Hbar.fromTinybars(accountAmount.getAmount()));
     }
 
     AccountAmount toProtobuf() {
