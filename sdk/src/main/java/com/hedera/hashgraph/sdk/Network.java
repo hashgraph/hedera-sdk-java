@@ -1,20 +1,30 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.collect.HashBiMap;
+import com.google.errorprone.annotations.Var;
 
+import javax.annotation.Nullable;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.TimeUnit;
 
 class Network {
-    Hashtable<String, AccountId> network = new Hashtable<>();
-    Hashtable<AccountId, Node> networkNodes = new Hashtable<>();
+    HashMap<String, AccountId> network = new HashMap<>();
+    HashMap<AccountId, Node> networkNodes = new HashMap<>();
+
+    @Nullable
+    NetworkName networkName;
 
     List<Node> nodes = new ArrayList<>();
     final ExecutorService executor;
@@ -38,7 +48,7 @@ class Network {
 
         // Bypass the more complex code if the network is empty
         if (this.network.isEmpty()) {
-            this.network = new Hashtable<>(network);
+            this.network = new HashMap<>(network);
 
             for (var entry : network.entrySet()) {
                 var node = new Node(entry.getValue(), entry.getKey(), executor);
@@ -50,7 +60,7 @@ class Network {
             return;
         }
 
-        this.network = new Hashtable<>(network);
+        this.network = new HashMap<>(network);
         var inverted = HashBiMap.create(network).inverse();
         var newNodeAccountIds = network.values();
         var stopAt = Instant.now().getEpochSecond() + Duration.ofSeconds(30).getSeconds();
@@ -65,7 +75,7 @@ class Network {
 
             if (
                 !newNodeAccountIds.contains(nodes.get(i).accountId) ||
-                    !inverted.get(nodes.get(i).accountId).equals(nodes.get(i).address)
+                    !Objects.requireNonNull(inverted.get(nodes.get(i).accountId)).equals(nodes.get(i).address)
             ) {
                 networkNodes.remove(nodes.get(i).accountId);
                 nodes.get(i).close(stopAt - Instant.now().toEpochMilli());
@@ -111,6 +121,7 @@ class Network {
     }
 
     int getNumberOfNodesForTransaction() {
+        @Var
         int count = 0;
         for (var node : nodes) {
             count += node.isHealthy() ? 1 : 1;

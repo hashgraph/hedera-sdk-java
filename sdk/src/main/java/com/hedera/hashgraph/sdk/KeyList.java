@@ -4,7 +4,12 @@ import com.google.common.base.MoreObjects;
 import com.hedera.hashgraph.sdk.proto.ThresholdKey;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * A list of keys that are required to sign in unison, with an optional threshold controlling how many keys of
@@ -47,10 +52,10 @@ public final class KeyList extends Key implements Collection<Key> {
         return new KeyList(threshold);
     }
 
-    static KeyList fromProtobuf(com.hedera.hashgraph.sdk.proto.KeyList keyList, @Nullable Integer threshold) {
+    static KeyList fromProtobuf(com.hedera.hashgraph.sdk.proto.KeyList keyList, @Nullable Integer threshold, @Nullable NetworkName networkName) {
         var keys = (threshold != null ? new KeyList(threshold) : new KeyList());
         for (var i = 0; i < keyList.getKeysCount(); ++i) {
-            keys.add(Key.fromProtobufKey(keyList.getKeys(i)));
+            keys.add(Key.fromProtobufKey(keyList.getKeys(i), networkName));
         }
 
         return keys;

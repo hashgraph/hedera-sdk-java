@@ -86,7 +86,7 @@ public final class TransactionRecord {
         @Nullable ContractFunctionResult contractFunctionResult,
         List<Transfer> transfers,
         Map<TokenId, Map<AccountId, Long>> tokenTransfers,
-        ScheduleId scheduleRef
+        @Nullable ScheduleId scheduleRef
     ) {
         this.receipt = transactionReceipt;
         this.transactionHash = transactionHash;
@@ -101,19 +101,23 @@ public final class TransactionRecord {
     }
 
     static TransactionRecord fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord) {
+        return TransactionRecord.fromProtobuf(transactionRecord, null);
+    }
+
+    static TransactionRecord fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord, @Nullable NetworkName networkName) {
         var transfers = new ArrayList<Transfer>(transactionRecord.getTransferList().getAccountAmountsCount());
         for (var accountAmount : transactionRecord.getTransferList().getAccountAmountsList()) {
-            transfers.add(Transfer.fromProtobuf(accountAmount));
+            transfers.add(Transfer.fromProtobuf(accountAmount, networkName));
         }
 
         var tokenTransfers = new HashMap<TokenId, Map<AccountId, Long>>(transactionRecord.getTokenTransferListsCount());
         for (var tokenTransfersList : transactionRecord.getTokenTransferListsList()) {
             var accountAmounts = new HashMap<AccountId, Long>();
             for (var accountAmount : tokenTransfersList.getTransfersList()) {
-                accountAmounts.put(AccountId.fromProtobuf(accountAmount.getAccountID()), accountAmount.getAmount());
+                accountAmounts.put(AccountId.fromProtobuf(accountAmount.getAccountID(), networkName), accountAmount.getAmount());
             }
 
-            tokenTransfers.put(TokenId.fromProtobuf(tokenTransfersList.getToken()), accountAmounts);
+            tokenTransfers.put(TokenId.fromProtobuf(tokenTransfersList.getToken(), networkName), accountAmounts);
         }
 
         // HACK: This is a bit bad, any takers to clean this up
@@ -127,13 +131,13 @@ public final class TransactionRecord {
             TransactionReceipt.fromProtobuf(transactionRecord.getReceipt()),
             transactionRecord.getTransactionHash(),
             InstantConverter.fromProtobuf(transactionRecord.getConsensusTimestamp()),
-            TransactionId.fromProtobuf(transactionRecord.getTransactionID()),
+            TransactionId.fromProtobuf(transactionRecord.getTransactionID(), networkName),
             transactionRecord.getMemo(),
             transactionRecord.getTransactionFee(),
             contractFunctionResult,
             transfers,
             tokenTransfers,
-            transactionRecord.hasScheduleRef() ? ScheduleId.fromProtobuf(transactionRecord.getScheduleRef()) : null
+            transactionRecord.hasScheduleRef() ? ScheduleId.fromProtobuf(transactionRecord.getScheduleRef(), networkName) : null
         );
     }
 

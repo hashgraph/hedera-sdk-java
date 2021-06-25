@@ -2,30 +2,46 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.ScheduleGetInfoQuery;
 import com.hedera.hashgraph.sdk.proto.ScheduleServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.TokenGetInfoQuery;
 import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
-import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 import java.util.concurrent.CompletableFuture;
 
+import javax.annotation.Nullable;
+
 public class ScheduleInfoQuery extends com.hedera.hashgraph.sdk.Query<ScheduleInfo, ScheduleInfoQuery> {
     private final ScheduleGetInfoQuery.Builder builder;
+
+    ScheduleId scheduleId;
 
     public ScheduleInfoQuery() {
         builder = ScheduleGetInfoQuery.newBuilder();
     }
 
     public ScheduleInfoQuery setScheduleId(ScheduleId scheduleId) {
-        builder.setScheduleID(scheduleId.toProtobuf());
-
+        this.scheduleId = scheduleId;
         return this;
+    }
+
+    public ScheduleId getScheduleId() {
+        return scheduleId;
+    }
+
+    @Override
+    void validateNetworkOnIds(Client client) {
+        if (scheduleId != null) {
+            scheduleId.validate(client);
+        }
     }
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (scheduleId != null) {
+            builder.setScheduleID(scheduleId.toProtobuf());
+        }
+
         queryBuilder.setScheduleGetInfo(builder.setHeader(header));
     }
 
@@ -40,8 +56,8 @@ public class ScheduleInfoQuery extends com.hedera.hashgraph.sdk.Query<ScheduleIn
     }
 
     @Override
-    ScheduleInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return ScheduleInfo.fromProtobuf(response.getScheduleGetInfo());
+    ScheduleInfo mapResponse(Response response, AccountId nodeId, Query request, @Nullable NetworkName networkName) {
+        return ScheduleInfo.fromProtobuf(response.getScheduleGetInfo(), networkName);
     }
 
     @Override

@@ -5,13 +5,16 @@ import io.grpc.ManagedChannelBuilder;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.Nullable;
 
 abstract class ManagedNode {
     String address;
-    ManagedChannel channel;
     final ExecutorService executor;
     long lastUsed = 0;
     long useCount = 0;
+
+    @Nullable
+    ManagedChannel channel = null;
 
     ManagedNode(String address, ExecutorService executor) {
         this.executor = executor;

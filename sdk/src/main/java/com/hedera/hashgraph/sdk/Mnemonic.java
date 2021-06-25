@@ -177,6 +177,7 @@ public final class Mnemonic {
 
     private static int getWordIndex(CharSequence word, boolean isLegacy) {
         var wordList = getWordList(isLegacy);
+        @Var
         var found = -1;
         for (var i = 0; i < wordList.size(); i++) {
             if (word.equals(wordList.get(i))) {
@@ -381,13 +382,13 @@ public final class Mnemonic {
             throw new BadMnemonicException(this, BadMnemonicReason.NotLegacy);
         }
 
-        @Var var indices = new int[words.size()];
+        var indices = new int[words.size()];
         for( var i = 0; i < words.size(); i++){
             indices[i] = getWordIndex(words.get(i), true);
         }
-        @Var var data = convertRadix(indices, 4096, 256, 33);
-        @Var var crc = data[ data.length - 1 ];
-        @Var var result = new int[data.length - 1];
+        var data = convertRadix(indices, 4096, 256, 33);
+        var crc = data[ data.length - 1 ];
+        var result = new int[data.length - 1];
         for (var i = 0; i < data.length - 1; i += 1) {
             result[ i ] = data[ i ] ^ crc;
         }
@@ -396,7 +397,7 @@ public final class Mnemonic {
         IntBuffer intBuffer = byteBuffer.asIntBuffer();
         intBuffer.put(result);
 
-        @Var var crc2 = crc8(result);
+        var crc2 = crc8(result);
         if (crc != crc2) {
             throw new BadMnemonicException(this, BadMnemonicReason.ChecksumMismatch);
         }
@@ -416,27 +417,27 @@ public final class Mnemonic {
     }
 
     private byte[] wordsToLegacyEntropy2() throws BadMnemonicException{
-        @Var var concatBitsLen = this.words.size() * 11;
-        @Var var concatBits = new boolean[concatBitsLen];
+        var concatBitsLen = this.words.size() * 11;
+        var concatBits = new boolean[concatBitsLen];
         Arrays.fill(concatBits, Boolean.FALSE);
 
         for (int index = 0; index < this.words.size(); index++) {
-            @Var var nds = Collections.binarySearch(getWordList(false), this.words.get(index), null);
+            var nds = Collections.binarySearch(getWordList(false), this.words.get(index), null);
 
             for(int i = 0; i < 11; i++){
                 concatBits[(index * 11) + i] = (nds & (1 << (10 - i))) != 0;
             }
         }
 
-        @Var var checksumBitsLen = concatBitsLen / 33;
-        @Var var entropyBitsLen = concatBitsLen - checksumBitsLen;
+        var checksumBitsLen = concatBitsLen / 33;
+        var entropyBitsLen = concatBitsLen - checksumBitsLen;
 
-        @Var var entropy = new byte[entropyBitsLen / 8];
+        var entropy = new byte[entropyBitsLen / 8];
 
         for (int i = 0; i < entropy.length; i++){
             for (int j = 0; j < 8; j++){
                 if(concatBits[(i * 8) + j]){
-                    entropy[i] |= 1 << (7 - j);
+                    entropy[i] |= (byte)(1 << (7 - j));
                 }
             }
         }
@@ -445,7 +446,7 @@ public final class Mnemonic {
         byte[] hash = new byte[entropy.length];
         digest.update(entropy, 0, entropy.length);
         digest.doFinal(hash, 0);
-        @Var var hashBits = bytesToBits(hash);
+        var hashBits = bytesToBits(hash);
 
         for (int i = 0; i < checksumBitsLen; i++){
             if (concatBits[entropyBitsLen + i] != hashBits[i]){
@@ -463,7 +464,7 @@ public final class Mnemonic {
             num = num.add(BigInteger.valueOf(element));
         }
 
-        @Var var result = new int[toLength];
+        var result = new int[toLength];
         for (@Var var i = toLength - 1; i >= 0; i -= 1) {
             BigInteger tem = num.divide(BigInteger.valueOf(toRadix));
             BigInteger rem = num.mod(BigInteger.valueOf(toRadix));
@@ -488,7 +489,7 @@ public final class Mnemonic {
     }
 
     private static boolean[] bytesToBits(byte[] dat){
-        @Var var bits = new boolean[dat.length * 8];
+        var bits = new boolean[dat.length * 8];
         Arrays.fill(bits, Boolean.FALSE);
 
         for (int i = 0; i < dat.length; i ++){

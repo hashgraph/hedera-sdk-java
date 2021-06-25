@@ -131,21 +131,25 @@ public final class AccountInfo {
     }
 
     static AccountInfo fromProtobuf(CryptoGetInfoResponse.AccountInfo accountInfo) {
-        var accountId = AccountId.fromProtobuf(accountInfo.getAccountID());
+        return AccountInfo.fromProtobuf(accountInfo, null);
+    }
+
+    static AccountInfo fromProtobuf(CryptoGetInfoResponse.AccountInfo accountInfo, @Nullable NetworkName networkName) {
+        var accountId = AccountId.fromProtobuf(accountInfo.getAccountID(), networkName);
 
         var proxyAccountId = accountInfo.getProxyAccountID().getAccountNum() > 0
-            ? AccountId.fromProtobuf(accountInfo.getProxyAccountID())
+            ? AccountId.fromProtobuf(accountInfo.getProxyAccountID(), networkName)
             : null;
 
         var liveHashes = Arrays.stream(accountInfo.getLiveHashesList().toArray())
-            .map((liveHash) -> LiveHash.fromProtobuf((com.hedera.hashgraph.sdk.proto.LiveHash)liveHash))
+            .map((liveHash) -> LiveHash.fromProtobuf((com.hedera.hashgraph.sdk.proto.LiveHash)liveHash, networkName))
             .collect(Collectors.toList());
 
         Map<TokenId, TokenRelationship> relationships = new HashMap<>();
 
         for (com.hedera.hashgraph.sdk.proto.TokenRelationship relationship : accountInfo.getTokenRelationshipsList()) {
-            TokenId tokenId = TokenId.fromProtobuf(relationship.getTokenId());
-            relationships.put(tokenId, TokenRelationship.fromProtobuf(relationship));
+            TokenId tokenId = TokenId.fromProtobuf(relationship.getTokenId(), networkName);
+            relationships.put(tokenId, TokenRelationship.fromProtobuf(relationship, networkName));
         }
 
         return new AccountInfo(
@@ -154,7 +158,7 @@ public final class AccountInfo {
             accountInfo.getDeleted(),
             proxyAccountId,
             accountInfo.getProxyReceived(),
-            Key.fromProtobufKey(accountInfo.getKey()),
+            Key.fromProtobufKey(accountInfo.getKey(), networkName),
             accountInfo.getBalance(),
             accountInfo.getGenerateSendRecordThreshold(),
             accountInfo.getGenerateReceiveRecordThreshold(),

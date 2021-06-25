@@ -13,7 +13,9 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.List;
+import java.util.ArrayList;
 
 abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements WithExecute<O> {
     private static final Logger logger = LoggerFactory.getLogger(Executable.class);
@@ -21,6 +23,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     protected int maxAttempts = 10;
     protected int nextNodeIndex = 0;
     protected List<AccountId> nodeAccountIds = Collections.emptyList();
+    protected List<Node> nodes = new ArrayList<>();
 
     Executable() {
     }
@@ -80,9 +83,29 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
     abstract CompletableFuture<Void> onExecuteAsync(Client client);
 
+    @Override
     @FunctionalExecutable
     public CompletableFuture<O> executeAsync(Client client) {
-        return onExecuteAsync(client).thenCompose((v) -> executeAsync(client, 1, null));
+        return onExecuteAsync(client).thenCompose((v) -> {
+            if(nodeAccountIds.isEmpty()) {
+                throw new IllegalStateException("Request node account IDs were not set before executing");
+            }
+
+            setNodesFromNodeAccountIds(client);
+
+            return executeAsync(client, 1, null);
+        });
+    }
+
+    private void setNodesFromNodeAccountIds(Client client) throws IllegalStateException {
+        for(var accountId : nodeAccountIds) {
+            @Nullable
+            var node = client.network.networkNodes.get(accountId);
+            if(node == null) {
+                throw new IllegalStateException("Some node account IDs did not map to valid nodes in the client's network");
+            }
+            nodes.add(Objects.requireNonNull(node));
+        }
     }
 
     private CompletableFuture<O> executeAsync(Client client, int attempt, @Nullable Throwable lastException) {
@@ -90,7 +113,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             return CompletableFuture.<O>failedFuture(new Exception("Failed to get gRPC response within maximum retry count", lastException));
         }
 
-        var node = client.network.networkNodes.get(getNodeAccountId());
+        var node = nodes.get(nextNodeIndex);
         node.inUse();
 
         logger.trace("Sending request #{} to node {}: {}", attempt, node.accountId, this);
@@ -160,14 +183,15 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                     return CompletableFuture.<O>failedFuture(
                         mapStatusError(responseStatus,
                             getTransactionId(),
-                            response
+                            response,
+                            client.network.networkName
                         )
                     );
 
                 case Finished:
                 default:
                     // successful response from Hedera
-                    return CompletableFuture.completedFuture(mapResponse(response, node.accountId, request));
+                    return CompletableFuture.completedFuture(mapResponse(response, node.accountId, request, client.network.networkName));
             }
         }).thenCompose(x -> x);
     }
@@ -184,7 +208,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
      * Called after receiving the query response from Hedera. The derived class should map into its
      * output type.
      */
-    abstract O mapResponse(ResponseT response, AccountId NodeId, ProtoRequestT request);
+    abstract O mapResponse(ResponseT response, AccountId nodeId, ProtoRequestT request, @Nullable NetworkName networkName);
 
     abstract Status mapResponseStatus(ResponseT response);
 
@@ -192,14 +216,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
      * Called to direct the invocation of the query to the appropriate gRPC service.
      */
     abstract MethodDescriptor<ProtoRequestT, ResponseT> getMethodDescriptor();
-
-    final AccountId getNodeAccountId() {
-        if (!nodeAccountIds.isEmpty()) {
-            return nodeAccountIds.get(nextNodeIndex);
-        } else {
-            throw new IllegalStateException("Request node account IDs were not set before executing");
-        }
-    }
 
     @Nullable
     abstract TransactionId getTransactionId();
@@ -218,7 +234,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     /**
      * Called just after receiving the query response from Hedera. By default it triggers a retry
      * when the pre-check status is {@code BUSY}.
-     * @return
      */
     ExecutionState shouldRetry(Status status, ResponseT response) {
         switch (status) {
@@ -232,7 +247,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         }
     }
 
-    Exception mapStatusError(Status status, @Nullable TransactionId transactionId, ResponseT response) {
+    Exception mapStatusError(Status status, @Nullable TransactionId transactionId, ResponseT response, @Nullable NetworkName networkName) {
         return new PrecheckStatusException(status, transactionId);
     }
 }

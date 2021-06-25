@@ -124,13 +124,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return this;
     }
 
-    @Override
-    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
-        return CryptoServiceGrpc.getCryptoTransferMethod();
-    }
-
-    @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    CryptoTransferTransactionBody.Builder build() {
         for (var entry : tokenTransfers.entrySet()) {
             var list = TokenTransferList.newBuilder()
                 .setToken(entry.getKey().toProtobuf());
@@ -154,12 +148,37 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         }
         builder.setTransfers(list);
 
-        bodyBuilder.setCryptoTransfer(builder);
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(Client client) {
+        for (var a : hbarTransfers.keySet()) {
+            a.validate(client);
+        }
+
+        for (var entry : tokenTransfers.entrySet()) {
+            entry.getKey().validate(client);
+
+            for (var a : entry.getValue().keySet()) {
+                a.validate(client);
+            }
+        }
+    }
+
+    @Override
+    MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
+        return CryptoServiceGrpc.getCryptoTransferMethod();
+    }
+
+    @Override
+    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+        bodyBuilder.setCryptoTransfer(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setCryptoTransfer(builder);
+        scheduled.setCryptoTransfer(build());
     }
 }

@@ -10,18 +10,22 @@ import io.grpc.MethodDescriptor;
 
 import java.util.concurrent.CompletableFuture;
 
+import javax.annotation.Nullable;
+
 /**
  * Get the contents of a file. The content field is empty (no bytes) if the file is empty.
  */
 public final class FileContentsQuery extends Query<ByteString, FileContentsQuery> {
     private final FileGetContentsQuery.Builder builder;
 
+    FileId fileId;
+
     public FileContentsQuery() {
         this.builder = FileGetContentsQuery.newBuilder();
     }
 
     public FileId getFileId() {
-      return FileId.fromProtobuf(builder.getFileID());
+        return fileId;
     }
 
     /**
@@ -31,7 +35,7 @@ public final class FileContentsQuery extends Query<ByteString, FileContentsQuery
      * @param fileId The FileId to be set
      */
     public FileContentsQuery setFileId(FileId fileId) {
-        builder.setFileID(fileId.toProtobuf());
+        this.fileId = fileId;
         return this;
     }
 
@@ -44,7 +48,18 @@ public final class FileContentsQuery extends Query<ByteString, FileContentsQuery
     }
 
     @Override
+    void validateNetworkOnIds(Client client) {
+        if (fileId != null) {
+            fileId.validate(client);
+        }
+    }
+
+    @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (fileId != null) {
+            builder.setFileID(fileId.toProtobuf());
+        }
+
         queryBuilder.setFileGetContents(builder.setHeader(header));
     }
 
@@ -59,7 +74,7 @@ public final class FileContentsQuery extends Query<ByteString, FileContentsQuery
     }
 
     @Override
-    ByteString mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+    ByteString mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
         return response.getFileGetContents().getFileContents().getContents();
     }
 

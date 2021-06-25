@@ -9,6 +9,8 @@ import io.grpc.MethodDescriptor;
 
 import java.util.concurrent.CompletableFuture;
 
+import javax.annotation.Nullable;
+
 /**
  * Get all of the information about a file, except for its contents.
  * <p>
@@ -22,14 +24,15 @@ import java.util.concurrent.CompletableFuture;
 public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
     private final FileGetInfoQuery.Builder builder;
 
+    FileId fileId;
+
     public FileInfoQuery() {
         builder = FileGetInfoQuery.newBuilder();
     }
 
     public FileId getFileId() {
-      return FileId.fromProtobuf(builder.getFileID());
+        return fileId;
     }
-
     /**
      * Sets the file ID for which information is requested.
      *
@@ -37,13 +40,23 @@ public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
      * @param fileId The FileId to be set
      */
     public FileInfoQuery setFileId(FileId fileId) {
-        builder.setFileID(fileId.toProtobuf());
-
+        this.fileId = fileId;
         return this;
     }
 
     @Override
+    void validateNetworkOnIds(Client client) {
+        if (fileId != null) {
+            fileId.validate(client);
+        }
+    }
+
+    @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (fileId != null) {
+            builder.setFileID(fileId.toProtobuf());
+        }
+
         queryBuilder.setFileGetInfo(builder.setHeader(header));
     }
 
@@ -58,8 +71,8 @@ public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
     }
 
     @Override
-    FileInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return FileInfo.fromProtobuf(response.getFileGetInfo().getFileInfo());
+    FileInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
+        return FileInfo.fromProtobuf(response.getFileGetInfo().getFileInfo(), networkName);
     }
 
     @Override

@@ -19,8 +19,11 @@ public class FeeSchedulesTest {
                 .execute(testEnv.client);
             
             FeeSchedules feeSchedules = FeeSchedules.fromBytes(feeSchedulesBytes.toByteArray());
-
-            testEnv.client.close();
+            
+            /*
+             * Test whether the file 0.0.111 actually contains stuff
+             */
+            assertNotNull(feeSchedules.getCurrent());
         });
     }
 }

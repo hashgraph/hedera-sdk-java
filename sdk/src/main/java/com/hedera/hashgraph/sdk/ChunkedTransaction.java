@@ -6,13 +6,18 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SignatureMap;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
+import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 
-import java.util.*;
+import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
-
-import javax.annotation.Nullable;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
 
 abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Transaction<T> implements WithExecuteAll {
     private static final int CHUNK_SIZE = 1024;
@@ -29,7 +34,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         super(txs);
     }
 
-    ChunkedTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+    ChunkedTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
     }
 
@@ -37,7 +42,6 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         super();
     }
 
-    @Nullable
     ByteString getData() {
         return data;
     }
@@ -78,6 +82,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         return maxChunks;
     }
 
+    @Override
     public byte[] getTransactionHash() {
         if (transactions.size() > nodeAccountIds.size()) {
             throw new IllegalStateException("a single transaction hash can not be calculated for a chunked transaction, try calling `getAllTransactionHashesPerNode`");
@@ -116,6 +121,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         return transactionHashes;
     }
 
+    @Override 
     @FunctionalExecutable(type = "java.util.List<TransactionResponse>")
     public CompletableFuture<List<com.hedera.hashgraph.sdk.TransactionResponse>> executeAllAsync(Client client) {
         if (!isFrozen()) {
@@ -124,12 +130,13 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
 
         var operatorId = client.getOperatorAccountId();
 
-        if (operatorId != null && operatorId.equals(Objects.requireNonNull(getTransactionId()).accountId)) {
+        if (operatorId != null && operatorId.equals(Objects.requireNonNull(getTransactionId().accountId))) {
             // on execute, sign each transaction with the operator, if present
             // and we are signing a transaction that used the default transaction ID
             signWithOperator(client);
         }
 
+        @Var
         CompletableFuture<List<com.hedera.hashgraph.sdk.TransactionResponse>> future =
             CompletableFuture.supplyAsync(() -> new ArrayList<>(transactionIds.size()));
 
@@ -163,6 +170,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         return executeAllAsync(client).thenApply(responses -> responses.get(0));
     }
 
+    @Override
     public ScheduleCreateTransaction schedule() {
         requireNotFrozen();
 
@@ -182,6 +190,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         return super.schedule();
     }
 
+    @Override
     public T freezeWith(@Nullable Client client) {
         super.freezeWith(client);
 
@@ -203,10 +212,10 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         signedTransactions = new ArrayList<>(requiredChunks * nodeAccountIds.size());
         transactionIds = new ArrayList<>(requiredChunks);
 
-        @Var var nextTransactionId = initialTransactionId.toBuilder();
+        var nextTransactionId = initialTransactionId.toBuilder();
 
         for (int i = 0; i < requiredChunks; i++) {
-            @Var var startIndex = i * CHUNK_SIZE;
+            var startIndex = i * CHUNK_SIZE;
             @Var var endIndex = startIndex + CHUNK_SIZE;
 
             if (endIndex > this.data.size()) {
@@ -227,7 +236,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
             // For each node we add a transaction with that node
             for (var nodeId : nodeAccountIds) {
                 signatures.add(SignatureMap.newBuilder());
-                signedTransactions.add(com.hedera.hashgraph.sdk.proto.SignedTransaction.newBuilder()
+                signedTransactions.add(SignedTransaction.newBuilder()
                     .setBodyBytes(
                         bodyBuilder
                             .setNodeAccountID(nodeId.toProtobuf())
@@ -248,7 +257,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         return (T) this;
     }
 
-    abstract void onFreezeChunk(TransactionBody.Builder body, TransactionID initialTransactionId, int startIndex, int endIndex, int chunk, int total);
+    abstract void onFreezeChunk(TransactionBody.Builder body, @Nullable TransactionID initialTransactionId, int startIndex, int endIndex, int chunk, int total);
 
     boolean shouldGetReceipt() {
         return false;

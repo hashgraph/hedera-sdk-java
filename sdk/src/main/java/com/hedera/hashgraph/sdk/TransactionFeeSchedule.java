@@ -44,10 +44,12 @@ public class TransactionFeeSchedule {
     }
 
     com.hedera.hashgraph.sdk.proto.TransactionFeeSchedule toProtobuf() {
-        return com.hedera.hashgraph.sdk.proto.TransactionFeeSchedule.newBuilder()
-            .setHederaFunctionality(getRequestType().code)
-            .setFeeData(feeData != null ? feeData.toProtobuf() : null)
-            .build();
+        var returnBuilder = com.hedera.hashgraph.sdk.proto.TransactionFeeSchedule.newBuilder()
+            .setHederaFunctionality(getRequestType().code);
+        if(feeData != null) {
+            returnBuilder.setFeeData(feeData.toProtobuf());
+        }
+        return returnBuilder.build();
     }
 
     @Override

@@ -1,18 +1,13 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
-
-import java.util.concurrent.CompletableFuture;
-
-import org.bouncycastle.util.encoders.DecoderException;
-import org.bouncycastle.util.encoders.Hex;
+import com.google.errorprone.annotations.Var;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
-import java.util.Arrays;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.CompletableFuture.failedFuture;
@@ -45,7 +40,7 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
     /**
      * No longer part of the public API. Use `Transaction.withValidStart()` instead.
      */
-    public TransactionId(AccountId accountId, Instant validStart) {
+    public TransactionId(@Nullable AccountId accountId, @Nullable Instant validStart) {
         this.accountId = accountId;
         this.validStart = validStart;
         this.scheduled = false;
@@ -70,17 +65,19 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
     }
 
     static TransactionId fromProtobuf(TransactionID transactionID) {
-        var accountId = transactionID.hasAccountID() ? AccountId.fromProtobuf(transactionID.getAccountID()) : null;
+        return TransactionId.fromProtobuf(transactionID, null);
+    }
+
+    static TransactionId fromProtobuf(TransactionID transactionID, @Nullable NetworkName networkName) {
+        var accountId = transactionID.hasAccountID() ? AccountId.fromProtobuf(transactionID.getAccountID(), networkName) : null;
         var validStart = transactionID.hasTransactionValidStart() ? InstantConverter.fromProtobuf(transactionID.getTransactionValidStart()) : null;
 
         return new TransactionId(accountId, validStart).setScheduled(transactionID.getScheduled());
     }
 
     public static TransactionId fromString(String s) {
+        @Var
         var parts = s.split("\\?", 2);
-
-        @Nullable AccountId accountId = null;
-        @Nullable Instant validStart = null;
 
         var scheduled = parts.length == 2 && parts[1].equals("scheduled");
 
@@ -90,7 +87,7 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
             throw new IllegalArgumentException("expecting {account}@{seconds}.{nanos}[?scheduled]");
         }
 
-        accountId = AccountId.fromString(parts[0]);
+        @Nullable AccountId accountId = AccountId.fromString(parts[0]);
 
         var validStartParts = parts[1].split("\\.", 2);
 
@@ -98,7 +95,7 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
             throw new IllegalArgumentException("expecting {account}@{seconds}.{nanos}");
         }
 
-        validStart = Instant.ofEpochSecond(
+        @Nullable Instant validStart = Instant.ofEpochSecond(
             Long.parseLong(validStartParts[0]),
             Long.parseLong(validStartParts[1]));
 

@@ -8,18 +8,23 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
+import java.util.Objects;
+
 /**
  * Get the bytecode for a smart contract instance.
  */
 public final class ContractByteCodeQuery extends Query<ByteString, ContractByteCodeQuery> {
     private final ContractGetBytecodeQuery.Builder builder;
 
+    ContractId contractId;
+
     public ContractByteCodeQuery() {
         this.builder = ContractGetBytecodeQuery.newBuilder();
     }
 
     public ContractId getContractId() {
-      return ContractId.fromProtobuf(builder.getContractID());
+        return contractId;
     }
 
     /**
@@ -29,12 +34,24 @@ public final class ContractByteCodeQuery extends Query<ByteString, ContractByteC
      * @param contractId The ContractId to be set
      */
     public ContractByteCodeQuery setContractId(ContractId contractId) {
-        builder.setContractID(contractId.toProtobuf());
+        Objects.requireNonNull(contractId);
+        this.contractId = contractId;
         return this;
     }
 
     @Override
+    void validateNetworkOnIds(Client client) {
+        if (contractId != null) {
+            contractId.validate(client);
+        }
+    }
+
+    @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (contractId != null) {
+            builder.setContractID(contractId.toProtobuf());
+        }
+
         queryBuilder.setContractGetBytecode(builder.setHeader(header));
     }
 
@@ -49,7 +66,7 @@ public final class ContractByteCodeQuery extends Query<ByteString, ContractByteC
     }
 
     @Override
-    ByteString mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+    ByteString mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
         return response.getContractGetBytecodeResponse().getBytecode();
     }
 

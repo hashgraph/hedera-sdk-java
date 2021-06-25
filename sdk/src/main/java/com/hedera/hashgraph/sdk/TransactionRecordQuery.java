@@ -23,12 +23,18 @@ import java.util.Objects;
 public final class TransactionRecordQuery extends Query<TransactionRecord, TransactionRecordQuery> {
     private final TransactionGetRecordQuery.Builder builder;
 
+    TransactionId transactionId;
+
     public TransactionRecordQuery() {
         this.builder = TransactionGetRecordQuery.newBuilder();
     }
 
     public TransactionId getTransactionId() {
-      return TransactionId.fromProtobuf(builder.getTransactionID());
+        if (transactionId == null) {
+            return TransactionId.fromProtobuf(builder.getTransactionID());
+        }
+
+        return transactionId;
     }
 
     /**
@@ -38,12 +44,23 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
      * @param transactionId The TransactionId to be set
      */
     public TransactionRecordQuery setTransactionId(TransactionId transactionId) {
-        builder.setTransactionID(transactionId.toProtobuf());
+        this.transactionId = transactionId;
         return this;
     }
 
     @Override
+    void validateNetworkOnIds(Client client) {
+        if (transactionId != null) {
+            transactionId.accountId.validate(client);
+        }
+    }
+
+    @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        if (transactionId != null) {
+            builder.setTransactionID(transactionId.toProtobuf());
+        }
+
         queryBuilder.setTransactionGetRecord(builder.setHeader(header));
     }
 
@@ -58,8 +75,8 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     }
 
     @Override
-    TransactionRecord mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return TransactionRecord.fromProtobuf(response.getTransactionGetRecord().getTransactionRecord());
+    TransactionRecord mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
+        return TransactionRecord.fromProtobuf(response.getTransactionGetRecord().getTransactionRecord(), networkName);
     }
 
     @Override
@@ -110,7 +127,7 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     }
 
     @Override
-    Exception mapStatusError(Status status, @Nullable TransactionId transactionId, Response response) {
+    Exception mapStatusError(Status status, @Nullable TransactionId transactionId, Response response, @Nullable NetworkName networkName) {
         if (status != Status.OK) {
             return new PrecheckStatusException(status, transactionId);
         }
@@ -118,7 +135,7 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
         // has reached consensus but not generated
         return new ReceiptStatusException(
             Objects.requireNonNull(transactionId),
-            TransactionReceipt.fromProtobuf(response.getTransactionGetRecord().getTransactionRecord().getReceipt())
+            TransactionReceipt.fromProtobuf(response.getTransactionGetRecord().getTransactionRecord().getReceipt(), networkName)
         );
     }
 }

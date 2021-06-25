@@ -6,6 +6,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ContractLoginfo;
 import org.bouncycastle.util.encoders.Hex;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,8 +43,12 @@ public final class ContractLogInfo {
     }
 
     static ContractLogInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.ContractLoginfo logInfo) {
+        return ContractLogInfo.fromProtobuf(logInfo, null);
+    }
+
+    static ContractLogInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.ContractLoginfo logInfo, @Nullable NetworkName networkName) {
         return new ContractLogInfo(
-            ContractId.fromProtobuf(logInfo.getContractID()),
+            ContractId.fromProtobuf(logInfo.getContractID(), networkName),
             logInfo.getBloom(),
             logInfo.getTopicList(),
             logInfo.getData()

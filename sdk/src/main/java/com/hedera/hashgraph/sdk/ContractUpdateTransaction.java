@@ -11,6 +11,7 @@ import java.time.Instant;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Modify a smart contract instance to have the given parameter values.
@@ -38,6 +39,10 @@ import java.util.LinkedHashMap;
 public final class ContractUpdateTransaction extends Transaction<ContractUpdateTransaction> {
     private final ContractUpdateTransactionBody.Builder builder;
 
+    ContractId contractId;
+    AccountId proxyAccountId;
+    FileId bytecodeFileId;
+
     public ContractUpdateTransaction() {
         builder = ContractUpdateTransactionBody.newBuilder();
     }
@@ -46,17 +51,41 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         super(txs);
 
         builder = bodyBuilder.getContractUpdateInstance().toBuilder();
+
+        if (builder.hasContractID()) {
+            contractId = ContractId.fromProtobuf(builder.getContractID());
+        }
+
+        if (builder.hasProxyAccountID()) {
+            proxyAccountId = AccountId.fromProtobuf(builder.getProxyAccountID());
+        }
+
+        if (builder.hasFileID()) {
+            bytecodeFileId = FileId.fromProtobuf(builder.getFileID());
+        }
     }
 
     ContractUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getContractUpdateInstance().toBuilder();
+
+        if (builder.hasContractID()) {
+            contractId = ContractId.fromProtobuf(builder.getContractID());
+        }
+
+        if (builder.hasProxyAccountID()) {
+            proxyAccountId = AccountId.fromProtobuf(builder.getProxyAccountID());
+        }
+
+        if (builder.hasFileID()) {
+            bytecodeFileId = FileId.fromProtobuf(builder.getFileID());
+        }
     }
 
     @Nullable
     public ContractId getContractId() {
-        return builder.hasContractID() ? ContractId.fromProtobuf(builder.getContractID()) : null;
+        return contractId;
     }
 
     /**
@@ -66,8 +95,9 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @return {@code this}
      */
     public ContractUpdateTransaction setContractId(ContractId contractId) {
+        Objects.requireNonNull(contractId);
         requireNotFrozen();
-        builder.setContractID(contractId.toProtobuf());
+        this.contractId = contractId;
         return this;
     }
 
@@ -84,6 +114,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @return {@code this}
      */
     public ContractUpdateTransaction setExpirationTime(Instant expirationTime) {
+        Objects.requireNonNull(expirationTime);
         requireNotFrozen();
         builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
         return this;
@@ -101,6 +132,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @return {@code this}
      */
     public ContractUpdateTransaction setAdminKey(Key adminKey) {
+        Objects.requireNonNull(adminKey);
         requireNotFrozen();
         builder.setAdminKey(adminKey.toProtobufKey());
         return this;
@@ -108,7 +140,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
 
     @Nullable
     public AccountId getProxyAccountId() {
-        return builder.hasProxyAccountID() ? AccountId.fromProtobuf(builder.getProxyAccountID()) : null;
+        return proxyAccountId;
     }
 
     /**
@@ -125,8 +157,9 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @return {@code this}
      */
     public ContractUpdateTransaction setProxyAccountId(AccountId proxyAccountId) {
+        Objects.requireNonNull(proxyAccountId);
         requireNotFrozen();
-        builder.setProxyAccountID(proxyAccountId.toProtobuf());
+        this.proxyAccountId = proxyAccountId;
         return this;
     }
 
@@ -142,6 +175,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @return {@code this}
      */
     public ContractUpdateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
+        Objects.requireNonNull(autoRenewPeriod);
         requireNotFrozen();
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         return this;
@@ -149,7 +183,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
 
     @Nullable
     public FileId getBytecodeFileId() {
-        return builder.hasFileID() ? FileId.fromProtobuf(builder.getFileID()) : null;
+        return bytecodeFileId;
     }
 
     /**
@@ -162,8 +196,9 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @return {@code this}
      */
     public ContractUpdateTransaction setBytecodeFileId(FileId byteCodeFileId) {
+        Objects.requireNonNull(byteCodeFileId);
         requireNotFrozen();
-        builder.setFileID(byteCodeFileId.toProtobuf());
+        this.bytecodeFileId = byteCodeFileId;
         return this;
     }
 
@@ -189,6 +224,37 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         return this;
     }
 
+    ContractUpdateTransactionBody.Builder build() {
+        if (contractId != null) {
+            builder.setContractID(contractId.toProtobuf());
+        }
+
+        if (proxyAccountId != null) {
+            builder.setProxyAccountID(proxyAccountId.toProtobuf());
+        }
+
+        if (bytecodeFileId != null) {
+            builder.setFileID(bytecodeFileId.toProtobuf());
+        }
+
+        return builder;
+    }
+
+    @Override
+    void validateNetworkOnIds(Client client) {
+        if (contractId != null) {
+            contractId.validate(client);
+        }
+
+        if (bytecodeFileId != null) {
+            bytecodeFileId.validate(client);
+        }
+
+        if (proxyAccountId != null) {
+            proxyAccountId.validate(client);
+        }
+    }
+
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return SmartContractServiceGrpc.getUpdateContractMethod();
@@ -196,12 +262,12 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
 
     @Override
     boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setContractUpdateInstance(builder);
+        bodyBuilder.setContractUpdateInstance(build());
         return true;
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setContractUpdateInstance(builder);
+        scheduled.setContractUpdateInstance(build());
     }
 }

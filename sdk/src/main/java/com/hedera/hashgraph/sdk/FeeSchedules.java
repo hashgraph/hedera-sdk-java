@@ -44,10 +44,14 @@ public class FeeSchedules {
     }
 
     CurrentAndNextFeeSchedule toProtobuf() {
-        return CurrentAndNextFeeSchedule.newBuilder()
-            .setCurrentFeeSchedule(current != null ? current.toProtobuf() : null)
-            .setNextFeeSchedule(next != null ? next.toProtobuf() : null)
-            .build();
+        var returnBuilder = CurrentAndNextFeeSchedule.newBuilder();
+        if(current != null) {
+            returnBuilder.setCurrentFeeSchedule(current.toProtobuf());
+        }
+        if(next != null) {
+            returnBuilder.setNextFeeSchedule(next.toProtobuf());
+        }
+        return returnBuilder.build();
     }
 
     public byte[] toBytes() {

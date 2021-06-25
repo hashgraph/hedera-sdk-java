@@ -107,22 +107,26 @@ public final class ContractInfo {
     }
 
     static ContractInfo fromProtobuf(ContractGetInfoResponse.ContractInfo contractInfo) {
+        return ContractInfo.fromProtobuf(contractInfo, null);
+    }
+
+    static ContractInfo fromProtobuf(ContractGetInfoResponse.ContractInfo contractInfo, @Nullable NetworkName networkName) {
         var adminKey = contractInfo.hasAdminKey()
-            ? Key.fromProtobufKey(contractInfo.getAdminKey())
+            ? Key.fromProtobufKey(contractInfo.getAdminKey(), networkName)
             : null;
 
         var tokenRelationships = new HashMap<TokenId, TokenRelationship>(contractInfo.getTokenRelationshipsCount());
 
         for (var relationship : contractInfo.getTokenRelationshipsList()) {
             tokenRelationships.put(
-                TokenId.fromProtobuf(relationship.getTokenId()),
-                TokenRelationship.fromProtobuf(relationship)
+                TokenId.fromProtobuf(relationship.getTokenId(), networkName),
+                TokenRelationship.fromProtobuf(relationship, networkName)
             );
         }
 
         return new ContractInfo(
-            ContractId.fromProtobuf(contractInfo.getContractID()),
-            AccountId.fromProtobuf(contractInfo.getAccountID()),
+            ContractId.fromProtobuf(contractInfo.getContractID(), networkName),
+            AccountId.fromProtobuf(contractInfo.getAccountID(), networkName),
             contractInfo.getContractAccountID(),
             adminKey,
             InstantConverter.fromProtobuf(contractInfo.getExpirationTime()),

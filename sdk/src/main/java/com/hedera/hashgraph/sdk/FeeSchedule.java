@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.time.Instant;
 import com.google.common.base.MoreObjects;
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 public class FeeSchedule {
     private List<TransactionFeeSchedule> transactionFeeSchedules = new ArrayList<>();
@@ -34,6 +35,11 @@ public class FeeSchedule {
         return transactionFeeSchedules;
     }
 
+    public FeeSchedule setTransactionFeeSchedules(List<TransactionFeeSchedule> transactionFeeSchedules) {
+        this.transactionFeeSchedules = Objects.requireNonNull(transactionFeeSchedules);
+        return this;
+    }
+
     @Nullable
     public Instant getExpirationTime() {
         return expirationTime;
@@ -45,12 +51,14 @@ public class FeeSchedule {
     }
 
     com.hedera.hashgraph.sdk.proto.FeeSchedule toProtobuf() {
-        var builder = com.hedera.hashgraph.sdk.proto.FeeSchedule.newBuilder()
-            .setExpiryTime(expirationTime != null ? InstantConverter.toSecondsProtobuf(expirationTime) : null);
-        for(TransactionFeeSchedule tFeeSchedule : getTransactionFeeSchedules()) {
-            builder.addTransactionFeeSchedule(tFeeSchedule.toProtobuf());
+        var returnBuilder = com.hedera.hashgraph.sdk.proto.FeeSchedule.newBuilder();
+        if(expirationTime != null) {
+            returnBuilder.setExpiryTime(InstantConverter.toSecondsProtobuf(expirationTime));
         }
-        return builder.build();
+        for(TransactionFeeSchedule tFeeSchedule : getTransactionFeeSchedules()) {
+            returnBuilder.addTransactionFeeSchedule(tFeeSchedule.toProtobuf());
+        }
+        return returnBuilder.build();
     }
 
     @Override
