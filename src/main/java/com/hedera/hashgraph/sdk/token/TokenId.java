@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.IdUtil;
 import com.hedera.hashgraph.sdk.Internal;
 import com.hedera.hashgraph.sdk.SolidityUtil;
 
+import javax.annotation.Nonnegative;
 import java.util.Objects;
 
 public final class TokenId {
@@ -35,6 +36,10 @@ public final class TokenId {
 
     public static TokenId fromSolidityAddress(String address) {
         return SolidityUtil.parseAddress(address, TokenId::new);
+    }
+
+    public NftId nft(@Nonnegative long serial) {
+        return new NftId(this, serial);
     }
 
     @Override

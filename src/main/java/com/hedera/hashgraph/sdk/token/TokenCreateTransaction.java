@@ -205,6 +205,21 @@ public final class TokenCreateTransaction extends SingleTransactionBuilder<Token
         return this;
     }
 
+    public TokenCreateTransaction setTokenType(TokenType tokenType) {
+        builder.setTokenType(tokenType.code);
+        return this;
+    }
+
+    public TokenCreateTransaction setSupplyType(TokenSupplyType supplyType) {
+        builder.setSupplyType(supplyType.code);
+        return this;
+    }
+
+    public TokenCreateTransaction setMaxSupply(long maxSupply) {
+        builder.setMaxSupply(maxSupply);
+        return this;
+    }
+
     @Override
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return TokenServiceGrpc.getCreateTokenMethod();

@@ -5,6 +5,9 @@ import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
 
 import io.grpc.MethodDescriptor;
 
+import java.util.List;
+import java.util.Objects;
+
 /**
  * Burns tokens from the Token's treasury Account. If no Supply Key is defined, the transaction will resolve to
  * TOKEN_HAS_NO_SUPPLY_KEY. The operation decreases the Total Supply of the Token. Total supply cannot go below zero.
@@ -39,6 +42,17 @@ public final class TokenBurnTransaction extends SingleTransactionBuilder<TokenBu
      */
     public TokenBurnTransaction setAmount(long amount) {
         builder.setAmount(amount);
+        return this;
+    }
+
+    public TokenBurnTransaction addSerial(long serial) {
+        builder.addSerialNumbers(serial);
+        return this;
+    }
+
+    public TokenBurnTransaction setSerials(List<Long> serials) {
+        builder.clearSerialNumbers();
+        builder.addAllSerialNumbers(serials);
         return this;
     }
 

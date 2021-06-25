@@ -1,9 +1,13 @@
 package com.hedera.hashgraph.sdk.token;
 
+import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.proto.*;
 import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
 
 import io.grpc.MethodDescriptor;
+import org.bouncycastle.util.encoders.Hex;
+
+import java.util.List;
 
 /**
  * Mints tokens to the Token's treasury Account. If no Supply Key is defined, the transaction will resolve to
@@ -41,6 +45,24 @@ public final class TokenMintTransaction extends SingleTransactionBuilder<TokenMi
         builder.setAmount(amount);
         return this;
     }
+
+    public TokenMintTransaction addMetadata(String metadata) {
+        builder.addMetadata(ByteString.copyFrom(Hex.decode(metadata)));
+        return this;
+    }
+
+    public TokenMintTransaction addMetadata(byte[] metadata) {
+        builder.addMetadata(ByteString.copyFrom(metadata));
+        return this;
+    }
+
+    public TokenMintTransaction addMetadatas(List<byte[]> metadatas) {
+        for(byte[] metadata : metadatas) {
+            builder.addMetadata(ByteString.copyFrom(metadata));
+        }
+        return this;
+    }
+
 
     @Override
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {

@@ -120,6 +120,12 @@ public class TokenInfo {
      */
     public final Instant expiry;
 
+    public final TokenType tokenType;
+
+    public final TokenSupplyType supplyType;
+
+    public final long maxSupply;
+
     TokenInfo(com.hedera.hashgraph.proto.TokenInfo info) {
         TokenFreezeStatus defaultFreezeStatus = info.getDefaultFreezeStatus();
         TokenKycStatus defaultKycStatus = info.getDefaultKycStatus();
@@ -141,6 +147,9 @@ public class TokenInfo {
         this.autoRenewAccount = info.hasAutoRenewAccount() ? new AccountId(info.getAutoRenewAccountOrBuilder()) : null;
         this.autoRenewPeriod = DurationHelper.durationTo(info.getAutoRenewPeriod());
         this.expiry = TimestampHelper.timestampTo(info.getExpiry());
+        this.tokenType = TokenType.valueOf(info.getTokenType());
+        this.supplyType = TokenSupplyType.valueOf(info.getSupplyType());
+        this.maxSupply = info.getMaxSupply();
     }
 
     static TokenInfo fromResponse(Response response) {
