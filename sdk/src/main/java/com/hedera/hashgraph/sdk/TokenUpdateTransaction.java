@@ -12,7 +12,10 @@ import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import java.util.LinkedHashMap;
+<<<<<<< HEAD
 import java.util.Objects;
+=======
+>>>>>>> 2069bed89 (feat: add custom fees)
 import javax.annotation.Nullable;
 
 public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> {
@@ -24,6 +27,12 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     AccountId treasuryAccountId = null;
     @Nullable
     AccountId autoRenewAccountId = null;
+<<<<<<< HEAD
+=======
+    @Nullable
+    CustomFeeList customFeeList = null;
+
+>>>>>>> 2069bed89 (feat: add custom fees)
 
     public TokenUpdateTransaction() {
         builder = TokenUpdateTransactionBody.newBuilder();
@@ -209,6 +218,16 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         return this;
     }
 
+    public TokenUpdateTransaction setCustomFeeList(@Nullable CustomFeeList customFeeList) {
+        requireNotFrozen();
+        this.customFeeList = customFeeList;
+        return this;
+    }
+
+    public CustomFeeList getCustomFeeList() {
+        return customFeeList != null ? customFeeList.deepClone() : null;
+    }
+
     TokenUpdateTransactionBody.Builder build() {
         if (tokenId != null) {
             builder.setToken(tokenId.toProtobuf());
@@ -220,6 +239,10 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
 
         if (autoRenewAccountId != null) {
             builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
+        }
+
+        if(customFeeList != null) {
+            builder.setCustomFees(customFeeList.toProtobuf());
         }
 
         return builder;
@@ -237,6 +260,10 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
 
         if (autoRenewAccountId != null) {
             autoRenewAccountId.validate(client);
+        }
+
+        if(customFeeList != null) {
+            customFeeList.validateNetworkOnIds(client);
         }
     }
 

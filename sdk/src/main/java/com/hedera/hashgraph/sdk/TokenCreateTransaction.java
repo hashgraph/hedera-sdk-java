@@ -18,6 +18,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     private final TokenCreateTransactionBody.Builder builder;
 
     @Nullable
+    CustomFeeList customFeeList = null;
+    @Nullable
     AccountId treasuryAccountId = null;
     @Nullable
     AccountId autoRenewAccountId = null;
@@ -213,6 +215,17 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return this;
     }
 
+    public TokenCreateTransaction setCustomFeeList(@Nullable CustomFeeList customFeeList) {
+        requireNotFrozen();
+        this.customFeeList = customFeeList;
+        return this;
+    }
+
+    @Nullable
+    public CustomFeeList getCustomFeeList() {
+        return customFeeList != null ? customFeeList.deepClone() : null;
+    }
+
     @Override
     public TokenCreateTransaction freezeWith(@Nullable Client client) {
         if (
@@ -236,11 +249,18 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
             builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
         }
 
+        if(customFeeList != null) {
+            builder.setCustomFees(customFeeList.toProtobuf());
+        }
+
         return builder;
     }
 
     @Override
     void validateNetworkOnIds(Client client) {
+        if(customFeeList != null) {
+            customFeeList.validateNetworkOnIds(client);
+        }
         if (treasuryAccountId != null) {
             treasuryAccountId.validate(client);
         }

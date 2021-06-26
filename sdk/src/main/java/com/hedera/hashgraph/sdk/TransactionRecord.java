@@ -76,6 +76,8 @@ public final class TransactionRecord {
     @Nullable
     public final ScheduleId scheduleRef;
 
+    public final List<AssessedCustomFee> assessedCustomFees;
+
     private TransactionRecord(
         TransactionReceipt transactionReceipt,
         ByteString transactionHash,
@@ -86,7 +88,8 @@ public final class TransactionRecord {
         @Nullable ContractFunctionResult contractFunctionResult,
         List<Transfer> transfers,
         Map<TokenId, Map<AccountId, Long>> tokenTransfers,
-        @Nullable ScheduleId scheduleRef
+        @Nullable ScheduleId scheduleRef,
+        List<AssessedCustomFee> assessedCustomFees
     ) {
         this.receipt = transactionReceipt;
         this.transactionHash = transactionHash;
@@ -98,6 +101,7 @@ public final class TransactionRecord {
         this.transactionFee = Hbar.fromTinybars(transactionFee);
         this.tokenTransfers = tokenTransfers;
         this.scheduleRef = scheduleRef;
+        this.assessedCustomFees = assessedCustomFees;
     }
 
     static TransactionRecord fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord) {
@@ -120,6 +124,11 @@ public final class TransactionRecord {
             tokenTransfers.put(TokenId.fromProtobuf(tokenTransfersList.getToken(), networkName), accountAmounts);
         }
 
+        var fees = new ArrayList<AssessedCustomFee>(transactionRecord.getAssessedCustomFeesCount());
+        for(var fee : transactionRecord.getAssessedCustomFeesList()) {
+            fees.add(AssessedCustomFee.fromProtobuf(fee, networkName));
+        }
+
         // HACK: This is a bit bad, any takers to clean this up
         var contractFunctionResult = transactionRecord.hasContractCallResult() ?
             new ContractFunctionResult(transactionRecord.getContractCallResult()) :
@@ -137,7 +146,8 @@ public final class TransactionRecord {
             contractFunctionResult,
             transfers,
             tokenTransfers,
-            transactionRecord.hasScheduleRef() ? ScheduleId.fromProtobuf(transactionRecord.getScheduleRef(), networkName) : null
+            transactionRecord.hasScheduleRef() ? ScheduleId.fromProtobuf(transactionRecord.getScheduleRef(), networkName) : null,
+            fees
         );
     }
 
@@ -179,6 +189,10 @@ public final class TransactionRecord {
 
         if (scheduleRef != null) {
             transactionRecord.setScheduleRef(scheduleRef.toProtobuf());
+        }
+
+        for (var fee : assessedCustomFees) {
+            transactionRecord.addAssessedCustomFees(fee.toProtobuf());
         }
 
         return transactionRecord.build();

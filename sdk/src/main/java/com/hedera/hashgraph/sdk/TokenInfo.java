@@ -111,6 +111,9 @@ public class TokenInfo {
      */
     public final String tokenMemo;
 
+    @Nullable
+    public final CustomFeeList customFeeList;
+
     private TokenInfo(
         TokenId tokenId,
         String name,
@@ -129,7 +132,8 @@ public class TokenInfo {
         @Nullable AccountId autoRenewAccount,
         @Nullable Duration autoRenewPeriod,
         @Nullable Instant expirationTime,
-        String tokenMemo
+        String tokenMemo,
+        @Nullable CustomFeeList customFeeList
     ) {
         this.tokenId = tokenId;
         this.name = name;
@@ -149,6 +153,7 @@ public class TokenInfo {
         this.autoRenewPeriod = autoRenewPeriod;
         this.expirationTime = expirationTime;
         this.tokenMemo = tokenMemo;
+        this.customFeeList = customFeeList;
     }
 
     @Nullable
@@ -186,7 +191,8 @@ public class TokenInfo {
             info.hasAutoRenewAccount() ? AccountId.fromProtobuf(info.getAutoRenewAccount(), networkName) : null,
             info.hasAutoRenewPeriod() ? DurationConverter.fromProtobuf(info.getAutoRenewPeriod()) : null,
             info.hasExpiry() ? InstantConverter.fromProtobuf(info.getExpiry()) : null,
-            info.getMemo()
+            info.getMemo(),
+            info.hasCustomFees() ? CustomFeeList.fromProtobuf(info.getCustomFees()) : null
         );
     }
 
@@ -262,6 +268,7 @@ public class TokenInfo {
             .add("autoRenewPeriod", autoRenewPeriod)
             .add("expirationTime", expirationTime)
             .add("tokenMemo", tokenMemo)
+            .add("customFeeList", customFeeList)
             .toString();
     }
 

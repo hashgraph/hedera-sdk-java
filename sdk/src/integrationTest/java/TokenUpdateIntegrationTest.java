@@ -66,6 +66,9 @@ class TokenUpdateIntegrationTest {
                 .setTokenId(tokenId)
                 .setTokenName("aaaa")
                 .setTokenSymbol("A")
+                .setCustomFeeList(new CustomFeeList()
+                    .addCustomFee(new CustomFixedFee().setAmount(10).setFeeCollectorAccountId(testEnv.operatorId))
+                    .addCustomFee(new CustomFractionalFee().setNumerator(1).setDenominator(20).setMin(1).setMax(10)))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -93,6 +96,32 @@ class TokenUpdateIntegrationTest {
             assertFalse(info.defaultFreezeStatus);
             assertNotNull(info.defaultKycStatus);
             assertFalse(info.defaultKycStatus);
+            
+            
+            // TODO: this if statement is temporary until HIP 18 is fully implemented on the network.
+            if(info.customFeeList != null) {
+                var fees = info.customFeeList.getCustomFees();
+                assertEquals(fees.size(), 2);
+                int fixedCount = 0, fractionalCount = 0;
+                for(var fee : fees) {
+                    if(fee instanceof CustomFixedFee) {
+                        fixedCount++;
+                        var fixed = (CustomFixedFee)fee;
+                        assertEquals(fixed.getAmount(), 10);
+                        assertEquals(fixed.getFeeCollectorAccountId(), testEnv.operatorId);
+                        assertNull(fixed.getDenominatingTokenId());
+                    }
+                    else if(fee instanceof CustomFractionalFee) {
+                        fractionalCount++;
+                        var fractional = (CustomFractionalFee)fee;
+                        assertEquals(fractional.getNumerator(), 1);
+                        assertEquals(fractional.getDenominator(), 20);
+                        assertEquals(fractional.getMin(), 1);
+                        assertEquals(fractional.getMax(), 10);
+                        assertEquals(fractional.getFeeCollectorAccountId(), testEnv.operatorId);
+                    }
+                }
+            }
 
             testEnv.client.close();
         });

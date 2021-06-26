@@ -1,6 +1,7 @@
 import com.hedera.hashgraph.sdk.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.Objects;
 
@@ -164,6 +165,28 @@ class TokenCreateIntegrationTest {
             });
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
+
+            testEnv.client.close();
+        });
+    }
+
+    @Disabled
+    @Test
+    @DisplayName("Can create token with custom fees")
+    void canCreateTokenWithCustomFees() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv();
+
+            new TokenCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setCustomFeeList(new CustomFeeList()
+                    .addCustomFee(new CustomFixedFee().setAmount(10).setFeeCollectorAccountId(testEnv.operatorId))
+                    .addCustomFee(new CustomFractionalFee().setNumerator(1).setDenominator(20).setMin(1).setMax(10)))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
             testEnv.client.close();
         });
