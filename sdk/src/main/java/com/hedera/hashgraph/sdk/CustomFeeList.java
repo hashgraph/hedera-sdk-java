@@ -56,10 +56,14 @@ public class CustomFeeList {
 
     void validateNetworkOnIds(Client client) {
         for(var fee : customFees) {
-            fee.getFeeCollectorAccountId().validate(client);
+            if(fee.getFeeCollectorAccountId() != null) {
+                fee.getFeeCollectorAccountId().validate(client);
+            }
             if(fee instanceof CustomFixedFee) {
                 var fixedFee = (CustomFixedFee)fee;
-                fixedFee.getDenominatingTokenId().validate(client);
+                if(fixedFee.getDenominatingTokenId() != null) {
+                    fixedFee.getDenominatingTokenId().validate(client);
+                }
             }
         }
     }

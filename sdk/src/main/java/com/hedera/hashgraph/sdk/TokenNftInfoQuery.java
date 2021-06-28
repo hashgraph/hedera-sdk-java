@@ -179,22 +179,22 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
         }
     }
 
-    private List<TokenNftInfo> infosFromProtos(List<com.hedera.hashgraph.sdk.proto.TokenNftInfo> protoList) {
+    private List<TokenNftInfo> infosFromProtos(List<com.hedera.hashgraph.sdk.proto.TokenNftInfo> protoList, @Nullable NetworkName networkName) {
         var infos = new ArrayList<TokenNftInfo>();
         for(var proto : protoList) {
-            infos.add(TokenNftInfo.fromProtobuf(proto));
+            infos.add(TokenNftInfo.fromProtobuf(proto, networkName));
         }
         return infos;
     }
 
     @Override
-    List<TokenNftInfo> mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+    List<TokenNftInfo> mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
         if(isByNft()) {
-            return Collections.singletonList(TokenNftInfo.fromProtobuf(response.getTokenGetNftInfo().getNft()));
+            return Collections.singletonList(TokenNftInfo.fromProtobuf(response.getTokenGetNftInfo().getNft(), networkName));
         } else if(isByToken()) {
-            return infosFromProtos(response.getTokenGetNftInfos().getNftsList());
+            return infosFromProtos(response.getTokenGetNftInfos().getNftsList(), networkName);
         } else /* is by account */ {
-            return infosFromProtos(response.getTokenGetAccountNftInfo().getNftsList());
+            return infosFromProtos(response.getTokenGetAccountNftInfo().getNftsList(), networkName);
         }
     }
 

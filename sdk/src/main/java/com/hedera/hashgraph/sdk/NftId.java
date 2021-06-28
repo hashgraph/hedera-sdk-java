@@ -4,6 +4,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 import javax.annotation.Nonnegative;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 public class NftId {
     /*
@@ -22,26 +23,30 @@ public class NftId {
         this.serial = serial;
     }
 
-    public NftId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nonnegative long serial) {
-        this(new TokenId(shard, realm, num), serial);
-    }
-
     public static NftId fromString(String id) {
-        // temporary
         var parts = id.split("@");
         if(parts.length != 2) {
-            throw new IllegalArgumentException("Expecting {shardNum}.{realmNum}.{idNum}@{serialNum}");
+            throw new IllegalArgumentException("Expecting {shardNum}.{realmNum}.{idNum}-{checksum}@{serialNum}");
         }
         try {
             return new NftId(TokenId.fromString(parts[0]), Long.parseLong(parts[1]));
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid Id format, should be in format {shardNum}.{realmNum}.{idNum}@{serialNum}", e);
+            throw new IllegalArgumentException("Invalid Id format, should be in format {shardNum}.{realmNum}.{idNum}-{checksum}@{serialNum}", e);
         }
     }
 
-    static NftId fromProtobuf(com.hedera.hashgraph.sdk.proto.NftID nftId) {
+    static NftId fromProtobuf(com.hedera.hashgraph.sdk.proto.NftID nftId, @Nullable NetworkName networkName) {
+        Objects.requireNonNull(nftId);
         var tokenId = nftId.getTokenID();
-        return new NftId(TokenId.fromProtobuf(tokenId), nftId.getSerialNumber());
+        var returnNftId = new NftId(TokenId.fromProtobuf(tokenId), nftId.getSerialNumber());
+        if(networkName != null) {
+            returnNftId.tokenId.setNetwork(networkName);
+        }
+        return returnNftId; 
+    }
+
+    static NftId fromProtobuf(com.hedera.hashgraph.sdk.proto.NftID nftId) {
+        return fromProtobuf(nftId, null);
     }
 
     public static NftId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -61,7 +66,6 @@ public class NftId {
 
     @Override
     public String toString() {
-        // temporary
         return tokenId.toString() + "@" + serial;
     }
 

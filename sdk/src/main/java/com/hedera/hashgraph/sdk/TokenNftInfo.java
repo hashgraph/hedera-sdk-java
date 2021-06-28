@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.proto.TokenGetNftInfoResponse;
 import com.hedera.hashgraph.sdk.proto.TokenGetNftInfo;
 import org.threeten.bp.Instant;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 public class TokenNftInfo {
     /**
@@ -41,13 +42,17 @@ public class TokenNftInfo {
         this.metadata = metadata;
     }
 
-    static TokenNftInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.TokenNftInfo info) {
+    static TokenNftInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.TokenNftInfo info, @Nullable NetworkName networkName) {
         return new TokenNftInfo(
-            NftId.fromProtobuf(info.getNftID()),
-            AccountId.fromProtobuf(info.getAccountID()),
+            NftId.fromProtobuf(info.getNftID(), networkName),
+            AccountId.fromProtobuf(info.getAccountID(), networkName),
             InstantConverter.fromProtobuf(info.getCreationTime()),
             info.getMetadata().toByteArray()
         );
+    }
+
+    static TokenNftInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.TokenNftInfo info) {
+        return fromProtobuf(info, null);
     }
 
     public static TokenNftInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {

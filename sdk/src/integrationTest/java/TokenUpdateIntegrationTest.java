@@ -121,6 +121,8 @@ class TokenUpdateIntegrationTest {
                         assertEquals(fractional.getFeeCollectorAccountId(), testEnv.operatorId);
                     }
                 }
+                assertEquals(fixedCount, 1);
+                assertEquals(fractionalCount, 1);
             }
 
             testEnv.client.close();
