@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Objects;
 import javax.annotation.Nullable;
+import com.google.common.base.MoreObjects;
 
 public class CustomFeeList {
     private boolean canUpdate = true;
@@ -66,6 +67,14 @@ public class CustomFeeList {
                 }
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("canUpdate", getCanUpdate())
+            .add("customFees", getCustomFees())
+            .toString();
     }
 
     com.hedera.hashgraph.sdk.proto.CustomFees toProtobuf() {

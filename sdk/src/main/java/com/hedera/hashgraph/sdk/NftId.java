@@ -7,7 +7,7 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 
 public class NftId {
-    /*
+    /**
      * The (non-fungible) token of which this NFT is an instance
      */
     public final TokenId tokenId;

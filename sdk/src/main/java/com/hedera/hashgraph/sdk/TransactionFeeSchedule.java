@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import com.google.common.base.MoreObjects;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class TransactionFeeSchedule {
     private RequestType requestType;
@@ -19,9 +20,13 @@ public class TransactionFeeSchedule {
     }
 
     static TransactionFeeSchedule fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionFeeSchedule transactionFeeSchedule) {
-        return new TransactionFeeSchedule()
+        var returnFeeSchedule = new TransactionFeeSchedule()
             .setRequestType(RequestType.valueOf(transactionFeeSchedule.getHederaFunctionality()))
             .setFeeData(transactionFeeSchedule.hasFeeData() ? FeeData.fromProtobuf(transactionFeeSchedule.getFeeData()) : null);
+        for(var feeData : transactionFeeSchedule.getFeesList()) {
+            returnFeeSchedule.addFee(FeeData.fromProtobuf(feeData));
+        }
+        return returnFeeSchedule;
     }
 
     public static TransactionFeeSchedule fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -51,6 +56,11 @@ public class TransactionFeeSchedule {
 
     public List<FeeData> getFees() {
         return fees;
+    }
+
+    public TransactionFeeSchedule addFee(FeeData fee) {
+        fees.add(Objects.requireNonNull(fee));
+        return this;
     }
 
     com.hedera.hashgraph.sdk.proto.TransactionFeeSchedule toProtobuf() {

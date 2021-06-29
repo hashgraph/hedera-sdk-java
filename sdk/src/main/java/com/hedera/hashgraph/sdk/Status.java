@@ -818,147 +818,147 @@ public enum Status {
 
     MESSAGE_SIZE_TOO_LARGE(ResponseCodeEnum.MESSAGE_SIZE_TOO_LARGE),
 
-    /*
+    /**
      * When a valid signature is not provided for operations on account with receiverSigRequired=true
      */
     RECEIVER_SIG_REQUIRED(ResponseCodeEnum.RECEIVER_SIG_REQUIRED),
 
-    /*
+    /**
      * A custom fractional fee set a denominator of zero
      */
     FRACTION_DIVIDES_BY_ZERO(ResponseCodeEnum.FRACTION_DIVIDES_BY_ZERO),
 
-    /*
+    /**
      * The transaction payer could not afford a custom fee
      */
     INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE(ResponseCodeEnum.INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE),
 
-    /*
+    /**
      * The customFees list is longer than allowed limit 10
      */
     CUSTOM_FEES_LIST_TOO_LONG(ResponseCodeEnum.CUSTOM_FEES_LIST_TOO_LONG),
 
-    /*
+    /**
      * Any of the feeCollector accounts for customFees is invalid
      */
     INVALID_CUSTOM_FEE_COLLECTOR(ResponseCodeEnum.INVALID_CUSTOM_FEE_COLLECTOR),
 
-    /*
+    /**
      * Any of the token Ids in customFees is invalid
      */
     INVALID_TOKEN_ID_IN_CUSTOM_FEES(ResponseCodeEnum.INVALID_TOKEN_ID_IN_CUSTOM_FEES),
 
-    /*
+    /**
      * Any of the token Ids in customFees are not associated to feeCollector
      */
     TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR(ResponseCodeEnum.TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR),
 
-    /*
+    /**
      * A token cannot have more units minted due to its configured supply ceiling
      */
     TOKEN_MAX_SUPPLY_REACHED(ResponseCodeEnum.TOKEN_MAX_SUPPLY_REACHED),
 
-    /*
+    /**
      * The transaction attempted to move an NFT serial number from an account other than its owner
      */
     SENDER_DOES_NOT_OWN_NFT_SERIAL_NO(ResponseCodeEnum.SENDER_DOES_NOT_OWN_NFT_SERIAL_NO),
 
-    /*
+    /**
      * A custom fee schedule entry did not specify either a fixed or fractional fee
      */
     CUSTOM_FEE_NOT_FULLY_SPECIFIED(ResponseCodeEnum.CUSTOM_FEE_NOT_FULLY_SPECIFIED),
 
-    /*
+    /**
      * Only positive fees may be assessed at this time
      */
     CUSTOM_FEE_MUST_BE_POSITIVE(ResponseCodeEnum.CUSTOM_FEE_MUST_BE_POSITIVE),
 
-    /*
+    /**
      * Once custom fees are marked as immutable, they can never be changed (or made mutable again)
      */
     CUSTOM_FEES_ARE_MARKED_IMMUTABLE(ResponseCodeEnum.CUSTOM_FEES_ARE_MARKED_IMMUTABLE),
 
-    /*
+    /**
      * A fractional custom fee exceeded the range of a 64-bit signed integer
      */
     CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE(ResponseCodeEnum.CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE),
 
-    /*
+    /**
      * The sum of all custom fractional fees must be strictly less than 1
      */
     INVALID_CUSTOM_FRACTIONAL_FEES_SUM(ResponseCodeEnum.INVALID_CUSTOM_FRACTIONAL_FEES_SUM),
     
-    /*
+    /**
      * An operation was assigned to more than one throttle group in a given bucket
      */
     OPERATION_REPEATED_IN_BUCKET_GROUPS(ResponseCodeEnum.OPERATION_REPEATED_IN_BUCKET_GROUPS),
 
-    /*
+    /**
      * The capacity needed to satisfy all opsPerSec groups in a bucket overflowed a signed 8-byte integral type
      */
     BUCKET_CAPACITY_OVERFLOW(ResponseCodeEnum.BUCKET_CAPACITY_OVERFLOW),
 
-    /*
+    /**
      * Given the network size in the address book, the node-level capacity for an operation would never be enough to accept a single request; usually means a bucket burstPeriod should be increased
      */
     NODE_CAPACITY_NOT_SUFFICIENT_FOR_OPERATION(ResponseCodeEnum.NODE_CAPACITY_NOT_SUFFICIENT_FOR_OPERATION),
 
-    /*
+    /**
      * A bucket was defined without any throttle groups
      */
     BUCKET_HAS_NO_THROTTLE_GROUPS(ResponseCodeEnum.BUCKET_HAS_NO_THROTTLE_GROUPS),
 
-    /*
+    /**
      * A throttle group was granted zero opsPerSec
      */
     THROTTLE_GROUP_HAS_ZERO_OPS_PER_SEC(ResponseCodeEnum.THROTTLE_GROUP_HAS_ZERO_OPS_PER_SEC),
 
-    /*
+    /**
      * The throttle definitions file was updated, but some supported operations were not assigned a bucket
      */
     SUCCESS_BUT_MISSING_EXPECTED_OPERATION(ResponseCodeEnum.SUCCESS_BUT_MISSING_EXPECTED_OPERATION),
 
-    /*
+    /**
      * The new contents for the throttle definitions system file were not valid protobuf
      */
     UNPARSEABLE_THROTTLE_DEFINITIONS(ResponseCodeEnum.UNPARSEABLE_THROTTLE_DEFINITIONS),
 
-    /*
+    /**
      * The new throttle definitions system file were invalid, and no more specific error could be divined
      */
     INVALID_THROTTLE_DEFINITIONS(ResponseCodeEnum.INVALID_THROTTLE_DEFINITIONS),
 
-    /*
+    /**
      * The transaction references an account which has passed its expiration without renewal funds available, and currently remains in the ledger only because of the grace period given to expired entities
      */
     ACCOUNT_EXPIRED_AND_PENDING_REMOVAL(ResponseCodeEnum.ACCOUNT_EXPIRED_AND_PENDING_REMOVAL),
 
-    /*
+    /**
      * Invalid token max supply
      */
     INVALID_TOKEN_MAX_SUPPLY(ResponseCodeEnum.INVALID_TOKEN_MAX_SUPPLY),
 
-    /*
+    /**
      * Invalid token nft serial number
      */
     INVALID_TOKEN_NFT_SERIAL_NUMBER(ResponseCodeEnum.INVALID_TOKEN_NFT_SERIAL_NUMBER),
 
-    /*
+    /**
      * Invalid nft id
      */
     INVALID_NFT_ID(ResponseCodeEnum.INVALID_NFT_ID),
 
-    /*
+    /**
      * Nft metadata is too long
      */
     METADATA_TOO_LONG(ResponseCodeEnum.METADATA_TOO_LONG),
 
-    /*
+    /**
      * Repeated operations count exceeds the limit
      */
     BATCH_SIZE_LIMIT_EXCEEDED(ResponseCodeEnum.BATCH_SIZE_LIMIT_EXCEEDED),
 
-    /*
+    /**
      * The range of data to be gathered exceeds the limit
      */
     QUERY_RANGE_LIMIT_EXCEEDED(ResponseCodeEnum.QUERY_RANGE_LIMIT_EXCEEDED);
