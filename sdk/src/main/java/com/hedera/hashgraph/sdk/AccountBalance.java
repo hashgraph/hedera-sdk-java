@@ -25,9 +25,9 @@ public class AccountBalance {
     public final Map<TokenId, Long> tokens;
 
     @Nonnegative
-    public final Map<Long, Integer> tokenDecimals;
+    public final Map<TokenId, Integer> tokenDecimals;
 
-    AccountBalance(Hbar hbars, Map<TokenId, Long> token, Map<Long, Integer> decimal) {
+    AccountBalance(Hbar hbars, Map<TokenId, Long> token, Map<TokenId, Integer> decimal) {
         this.hbars = hbars;
         this.tokens = token;
         this.tokenDecimals = decimal;
@@ -40,10 +40,10 @@ public class AccountBalance {
     static AccountBalance fromProtobuf(CryptoGetAccountBalanceResponse protobuf, @Nullable NetworkName networkName) {
         var balanceList = protobuf.getTokenBalancesList();
         Map<TokenId, Long> map = new HashMap<>();
-        Map<Long, Integer>  decimalMap = new HashMap<>();
+        Map<TokenId, Integer>  decimalMap = new HashMap<>();
         for (int i = 0; i < protobuf.getTokenBalancesCount(); i++) {
             map.put(TokenId.fromProtobuf(balanceList.get(i).getTokenId(), networkName), balanceList.get(i).getBalance());
-            decimalMap.put(balanceList.get(i).getBalance(), balanceList.get(i).getDecimals());
+            decimalMap.put(TokenId.fromProtobuf(balanceList.get(i).getTokenId(), networkName), balanceList.get(i).getDecimals());
         }
 
         return new AccountBalance(Hbar.fromTinybars(protobuf.getBalance()), map, decimalMap);
@@ -61,7 +61,7 @@ public class AccountBalance {
             protobuf.addTokenBalances(TokenBalance.newBuilder()
                 .setTokenId(entry.getKey().toProtobuf())
                 .setBalance(entry.getValue())
-                .setDecimals(tokenDecimals.get(entry.getValue()))
+                .setDecimals(tokenDecimals.get(entry.getKey()))
             );
         }
 
