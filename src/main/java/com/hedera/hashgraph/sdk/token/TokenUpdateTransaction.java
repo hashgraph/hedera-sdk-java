@@ -164,6 +164,11 @@ public final class TokenUpdateTransaction extends SingleTransactionBuilder<Token
         return this;
     }
 
+    public TokenUpdateTransaction setCustomFeeList(CustomFeeList customFeeList) {
+        builder.setCustomFees(customFeeList.toProto());
+        return this;
+    }
+
     @Override
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return TokenServiceGrpc.getUpdateTokenMethod();

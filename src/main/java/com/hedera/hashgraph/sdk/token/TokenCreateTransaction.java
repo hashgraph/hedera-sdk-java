@@ -220,6 +220,11 @@ public final class TokenCreateTransaction extends SingleTransactionBuilder<Token
         return this;
     }
 
+    public TokenCreateTransaction setCustomFeeList(CustomFeeList customFeeList) {
+        this.builder.setCustomFees(customFeeList.toProto());
+        return this;
+    }
+
     @Override
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return TokenServiceGrpc.getCreateTokenMethod();

@@ -126,6 +126,8 @@ public class TokenInfo {
 
     public final long maxSupply;
 
+    public final CustomFeeList customFeeList;
+
     TokenInfo(com.hedera.hashgraph.proto.TokenInfo info) {
         TokenFreezeStatus defaultFreezeStatus = info.getDefaultFreezeStatus();
         TokenKycStatus defaultKycStatus = info.getDefaultKycStatus();
@@ -150,6 +152,7 @@ public class TokenInfo {
         this.tokenType = TokenType.valueOf(info.getTokenType());
         this.supplyType = TokenSupplyType.valueOf(info.getSupplyType());
         this.maxSupply = info.getMaxSupply();
+        this.customFeeList = new CustomFeeList(info.getCustomFees());
     }
 
     static TokenInfo fromResponse(Response response) {

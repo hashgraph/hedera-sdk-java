@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.schedule.ScheduleId;
 import com.hedera.hashgraph.sdk.contract.ContractFunctionResult;
+import com.hedera.hashgraph.sdk.token.AssessedCustomFee;
 import com.hedera.hashgraph.sdk.token.TokenId;
 
 import java.time.Instant;
@@ -46,6 +47,8 @@ public final class TransactionRecord {
 
     public final ScheduleId scheduleRef;
 
+    public final List<AssessedCustomFee> accessedCustomFees;
+
     private final com.hedera.hashgraph.proto.TransactionRecord inner;
 
     @Internal
@@ -87,6 +90,11 @@ public final class TransactionRecord {
         this.tokenTransfers = tokenTransfers;
 
         this.scheduleRef = new ScheduleId(inner.getScheduleRef());
+
+        this.accessedCustomFees = new ArrayList<AssessedCustomFee>(inner.getAssessedCustomFeesCount());
+        for(com.hedera.hashgraph.proto.AssessedCustomFee fee : inner.getAssessedCustomFeesList()) {
+            this.accessedCustomFees.add(new AssessedCustomFee(fee));
+        }
     }
 
     /**
