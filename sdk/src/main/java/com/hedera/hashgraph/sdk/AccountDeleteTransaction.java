@@ -1,7 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.CryptoDeleteTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -19,8 +22,10 @@ import java.util.Objects;
 public final class AccountDeleteTransaction extends Transaction<AccountDeleteTransaction> {
     private final CryptoDeleteTransactionBody.Builder builder;
 
-    AccountId accountId;
-    AccountId transferAccountId;
+    @Nullable
+    AccountId accountId = null;
+    @Nullable
+    AccountId transferAccountId = null;
 
     public AccountDeleteTransaction() {
         builder = CryptoDeleteTransactionBody.newBuilder();
@@ -66,6 +71,7 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
      * @return {@code this}
      */
     public AccountDeleteTransaction setAccountId(AccountId deleteAccountId) {
+        Objects.requireNonNull(deleteAccountId);
         requireNotFrozen();
         Objects.requireNonNull(deleteAccountId);
         this.accountId = deleteAccountId;

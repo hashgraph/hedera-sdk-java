@@ -29,6 +29,7 @@ public class FeeData {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.FeeData.parseFrom(bytes).toBuilder().build());
     }
 
+    @Nullable
     FeeComponents getNodeData() {
         return nodeData;
     }
@@ -38,6 +39,7 @@ public class FeeData {
         return this;
     }
 
+    @Nullable
     FeeComponents getNetworkData() {
         return networkData;
     }
@@ -47,6 +49,7 @@ public class FeeData {
         return this;
     }
 
+    @Nullable
     FeeComponents getServiceData() {
         return serviceData;
     }

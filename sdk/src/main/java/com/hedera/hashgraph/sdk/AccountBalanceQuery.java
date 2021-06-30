@@ -19,13 +19,16 @@ import java.util.Objects;
 public final class AccountBalanceQuery extends Query<AccountBalance, AccountBalanceQuery> {
     private final CryptoGetAccountBalanceQuery.Builder builder;
 
-    AccountId accountId;
-    ContractId contractId;
+    @Nullable
+    AccountId accountId = null;
+    @Nullable
+    ContractId contractId = null;
 
     public AccountBalanceQuery() {
         builder = CryptoGetAccountBalanceQuery.newBuilder();
     }
 
+    @Nullable
     public AccountId getAccountId() {
         return accountId;
     }
@@ -44,6 +47,7 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
         return this;
     }
 
+    @Nullable
     public ContractId getContractId() {
         return contractId;
     }

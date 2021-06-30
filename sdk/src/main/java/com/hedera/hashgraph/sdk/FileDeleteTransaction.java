@@ -1,12 +1,16 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.FileDeleteTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * <p>A transaction to delete a file on the Hedera network.
@@ -21,7 +25,8 @@ import java.util.LinkedHashMap;
 public final class FileDeleteTransaction extends Transaction<FileDeleteTransaction> {
     private final FileDeleteTransactionBody.Builder builder;
 
-    FileId fileId;
+    @Nullable
+    FileId fileId = null;
 
     public FileDeleteTransaction() {
         builder = FileDeleteTransactionBody.newBuilder();
@@ -59,6 +64,7 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
      * @return {@code this}
      */
     public FileDeleteTransaction setFileId(FileId fileId) {
+        Objects.requireNonNull(fileId);
         requireNotFrozen();
         this.fileId = fileId;
         return this;

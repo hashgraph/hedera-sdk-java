@@ -2,7 +2,10 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.ContractUpdateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
@@ -38,9 +41,12 @@ import java.util.Objects;
 public final class ContractUpdateTransaction extends Transaction<ContractUpdateTransaction> {
     private final ContractUpdateTransactionBody.Builder builder;
 
-    ContractId contractId;
-    AccountId proxyAccountId;
-    FileId bytecodeFileId;
+    @Nullable
+    ContractId contractId = null;
+    @Nullable
+    AccountId proxyAccountId = null;
+    @Nullable
+    FileId bytecodeFileId = null;
 
     public ContractUpdateTransaction() {
         builder = ContractUpdateTransactionBody.newBuilder();
@@ -191,13 +197,13 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * A copy will be made and held by the contract instance, and have the same expiration
      * time as the instance.
      *
-     * @param byteCodeFileId The FileId to be set
+     * @param bytecodeFileId The FileId to be set
      * @return {@code this}
      */
-    public ContractUpdateTransaction setBytecodeFileId(FileId byteCodeFileId) {
-        Objects.requireNonNull(byteCodeFileId);
+    public ContractUpdateTransaction setBytecodeFileId(FileId bytecodeFileId) {
+        Objects.requireNonNull(bytecodeFileId);
         requireNotFrozen();
-        this.bytecodeFileId = byteCodeFileId;
+        this.bytecodeFileId = bytecodeFileId;
         return this;
     }
 

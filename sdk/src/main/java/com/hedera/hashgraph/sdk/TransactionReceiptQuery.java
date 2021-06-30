@@ -22,7 +22,8 @@ public final class TransactionReceiptQuery
     extends Query<TransactionReceipt, TransactionReceiptQuery> {
     private final TransactionGetReceiptQuery.Builder builder;
 
-    TransactionId transactionId;
+    @Nullable
+    TransactionId transactionId = null;
 
     public TransactionReceiptQuery() {
         builder = TransactionGetReceiptQuery.newBuilder();
@@ -44,6 +45,7 @@ public final class TransactionReceiptQuery
      * @return {@code this}
      */
     public TransactionReceiptQuery setTransactionId(TransactionId transactionId) {
+        Objects.requireNonNull(transactionId);
         this.transactionId = transactionId;
         return this;
     }
@@ -56,7 +58,7 @@ public final class TransactionReceiptQuery
     @Override
     void validateNetworkOnIds(Client client) {
         if (transactionId != null) {
-            transactionId.accountId.validate(client);
+            Objects.requireNonNull(transactionId.accountId).validate(client);
         }
     }
 

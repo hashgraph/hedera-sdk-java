@@ -1,12 +1,16 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.ConsensusDeleteTopicTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Delete a topic.
@@ -19,7 +23,8 @@ import java.util.LinkedHashMap;
 public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransaction> {
     private final ConsensusDeleteTopicTransactionBody.Builder builder;
 
-    TopicId topicId;
+    @Nullable
+    TopicId topicId = null;
 
     public TopicDeleteTransaction() {
         builder = ConsensusDeleteTopicTransactionBody.newBuilder();
@@ -57,6 +62,7 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
      * @param topicId The TopicId to be set
      */
     public TopicDeleteTransaction setTopicId(TopicId topicId) {
+        Objects.requireNonNull(topicId);
         requireNotFrozen();
         this.topicId = topicId;
         return this;

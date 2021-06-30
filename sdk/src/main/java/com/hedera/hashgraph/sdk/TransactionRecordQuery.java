@@ -23,17 +23,16 @@ import java.util.Objects;
 public final class TransactionRecordQuery extends Query<TransactionRecord, TransactionRecordQuery> {
     private final TransactionGetRecordQuery.Builder builder;
 
-    TransactionId transactionId;
+    @Nullable
+    TransactionId transactionId = null;
 
     public TransactionRecordQuery() {
         this.builder = TransactionGetRecordQuery.newBuilder();
     }
 
+    @Nullable
+    @Override
     public TransactionId getTransactionId() {
-        if (transactionId == null) {
-            return TransactionId.fromProtobuf(builder.getTransactionID());
-        }
-
         return transactionId;
     }
 
@@ -44,6 +43,7 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
      * @param transactionId The TransactionId to be set
      */
     public TransactionRecordQuery setTransactionId(TransactionId transactionId) {
+        Objects.requireNonNull(transactionId);
         this.transactionId = transactionId;
         return this;
     }
@@ -51,7 +51,7 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     @Override
     void validateNetworkOnIds(Client client) {
         if (transactionId != null) {
-            transactionId.accountId.validate(client);
+            Objects.requireNonNull(transactionId.accountId).validate(client);
         }
     }
 

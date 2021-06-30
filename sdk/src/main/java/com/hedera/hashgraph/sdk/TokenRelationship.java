@@ -54,11 +54,11 @@ public class TokenRelationship {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.TokenRelationship.parseFrom(bytes).toBuilder().build());
     }
 
-    @Nullable static TokenFreezeStatus freezeStatusToProtobuf(@Nullable Boolean freezeStatus) {
+    static TokenFreezeStatus freezeStatusToProtobuf(@Nullable Boolean freezeStatus) {
         return freezeStatus == null ? TokenFreezeStatus.FreezeNotApplicable : freezeStatus ? TokenFreezeStatus.Frozen : TokenFreezeStatus.Unfrozen;
     }
 
-    @Nullable static TokenKycStatus kycStatusToProtobuf(@Nullable Boolean kycStatus) {
+    static TokenKycStatus kycStatusToProtobuf(@Nullable Boolean kycStatus) {
         return kycStatus == null ? TokenKycStatus.KycNotApplicable : kycStatus ? TokenKycStatus.Granted : TokenKycStatus.Revoked;
     }
 

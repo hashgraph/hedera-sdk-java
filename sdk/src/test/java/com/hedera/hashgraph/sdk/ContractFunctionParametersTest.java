@@ -502,6 +502,7 @@ public class ContractFunctionParametersTest {
         );
     }
 
+    @SuppressWarnings("unused")
     private static List<Arguments> uInt256Arguments() {
         return Lists.of(
             Arguments.of(0, "0000000000000000000000000000000000000000000000000000000000000000", 8),

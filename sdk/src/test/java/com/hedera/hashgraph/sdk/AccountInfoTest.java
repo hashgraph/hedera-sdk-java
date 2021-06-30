@@ -17,7 +17,7 @@ public class AccountInfoTest {
     private static final PrivateKey privateKey = PrivateKey.fromString(
         "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
 
-    public static final byte[] hash = {0, 1, 2};
+    public static byte[] hash = {0, 1, 2};
 
     public static final LiveHash liveHash = LiveHash.newBuilder().setAccountId(new AccountId(10).toProtobuf())
         .setDuration(DurationConverter.toProtobuf(Duration.ofDays(11)))

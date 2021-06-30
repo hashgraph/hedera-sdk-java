@@ -17,12 +17,14 @@ import java.util.Objects;
 public final class ContractByteCodeQuery extends Query<ByteString, ContractByteCodeQuery> {
     private final ContractGetBytecodeQuery.Builder builder;
 
-    ContractId contractId;
+    @Nullable
+    ContractId contractId = null;
 
     public ContractByteCodeQuery() {
         this.builder = ContractGetBytecodeQuery.newBuilder();
     }
 
+    @Nullable
     public ContractId getContractId() {
         return contractId;
     }

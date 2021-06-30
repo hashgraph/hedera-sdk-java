@@ -1,7 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.TokenCreateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
@@ -9,12 +12,15 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> {
     private final TokenCreateTransactionBody.Builder builder;
 
-    AccountId treasuryAccountId;
-    AccountId autoRenewAccountId;
+    @Nullable
+    AccountId treasuryAccountId = null;
+    @Nullable
+    AccountId autoRenewAccountId = null;
 
     public TokenCreateTransaction() {
         builder = TokenCreateTransactionBody.newBuilder();
@@ -43,11 +49,13 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         }
     }
 
+    @Nullable
     public String getTokenName() {
         return builder.getName();
     }
 
     public TokenCreateTransaction setTokenName(String name) {
+        Objects.requireNonNull(name);
         requireNotFrozen();
         builder.setName(name);
         return this;
@@ -58,6 +66,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     public TokenCreateTransaction setTokenSymbol(String symbol) {
+        Objects.requireNonNull(symbol);
         requireNotFrozen();
         builder.setSymbol(symbol);
         return this;
@@ -83,11 +92,13 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return this;
     }
 
+    @Nullable
     public AccountId getTreasuryAccountId() {
         return treasuryAccountId;
     }
 
     public TokenCreateTransaction setTreasuryAccountId(AccountId accountId) {
+        Objects.requireNonNull(accountId);
         requireNotFrozen();
         this.treasuryAccountId = accountId;
         return this;
@@ -118,6 +129,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     public TokenCreateTransaction setFreezeKey(Key key) {
+        Objects.requireNonNull(key);
         requireNotFrozen();
         builder.setFreezeKey(key.toProtobufKey());
         return this;
@@ -128,6 +140,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     public TokenCreateTransaction setWipeKey(Key key) {
+        Objects.requireNonNull(key);
         requireNotFrozen();
         builder.setWipeKey(key.toProtobufKey());
         return this;
@@ -138,6 +151,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     public TokenCreateTransaction setSupplyKey(Key key) {
+        Objects.requireNonNull(key);
         requireNotFrozen();
         builder.setSupplyKey(key.toProtobufKey());
         return this;
@@ -158,17 +172,20 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     public TokenCreateTransaction setExpirationTime(Instant expirationTime) {
+        Objects.requireNonNull(expirationTime);
         requireNotFrozen();
         builder.clearAutoRenewPeriod();
         builder.setExpiry(InstantConverter.toProtobuf(expirationTime));
         return this;
     }
 
+    @Nullable
     public AccountId getAutoRenewAccountId() {
         return autoRenewAccountId;
     }
 
     public TokenCreateTransaction setAutoRenewAccountId(AccountId accountId) {
+        Objects.requireNonNull(accountId);
         requireNotFrozen();
         this.autoRenewAccountId = accountId;
         return this;
@@ -179,6 +196,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     public TokenCreateTransaction setAutoRenewPeriod(Duration period) {
+        Objects.requireNonNull(period);
         requireNotFrozen();
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(period));
         return this;
@@ -189,11 +207,13 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     public TokenCreateTransaction setTokenMemo(String memo) {
+        Objects.requireNonNull(memo);
         requireNotFrozen();
         this.builder.setMemo(memo);
         return this;
     }
 
+    @Override
     public TokenCreateTransaction freezeWith(@Nullable Client client) {
         if (
             builder.hasAutoRenewPeriod() &&

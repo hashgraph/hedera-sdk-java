@@ -26,6 +26,7 @@ abstract class ManagedNode {
         lastUsed = System.currentTimeMillis();
     }
 
+    
     synchronized ManagedChannel getChannel() {
         if (channel != null) {
             return channel;

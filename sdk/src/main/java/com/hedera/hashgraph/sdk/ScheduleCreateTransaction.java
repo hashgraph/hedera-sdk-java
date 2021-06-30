@@ -15,7 +15,8 @@ import java.util.Objects;
 public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateTransaction> {
     private final ScheduleCreateTransactionBody.Builder builder;
 
-    AccountId payerAccountId;
+    @Nullable
+    AccountId payerAccountId = null;
 
     public ScheduleCreateTransaction() {
         builder = ScheduleCreateTransactionBody.newBuilder();
@@ -33,11 +34,13 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         }
     }
 
+    @Nullable
     public AccountId getPayerAccountId() {
         return payerAccountId;
     }
 
     public ScheduleCreateTransaction setPayerAccountId(AccountId accountId) {
+        Objects.requireNonNull(accountId);
         requireNotFrozen();
         this.payerAccountId = accountId;
         return this;
@@ -109,7 +112,8 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         TransactionResponse transactionResponse,
         AccountId nodeId,
         com.hedera.hashgraph.sdk.proto.Transaction request,
-        @Nullable NetworkName networkName) {
+        @Nullable NetworkName networkName
+    ) {
         var transactionId = Objects.requireNonNull(getTransactionId()).setScheduled(true);
         var hash = hash(request.getSignedTransactionBytes().toByteArray());
         nextTransactionIndex = (nextTransactionIndex + 1) % transactionIds.size();
