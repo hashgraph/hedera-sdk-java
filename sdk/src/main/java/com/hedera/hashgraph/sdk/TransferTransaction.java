@@ -73,13 +73,13 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return nftTransfers;
     }
 
-    public TransferTransaction addTokenNftTransfer(NftId nftId, AccountId sender, AccountId receiver) {
+    public TransferTransaction addNftTransfer(NftId nftId, AccountId sender, AccountId receiver) {
         requireNotFrozen();
         getNftTransferList(nftId.tokenId).add(new NftTransfer(sender, receiver, nftId.serial));
         return this;
     }
 
-    public TransferTransaction addTokenNftTransfers(TokenId tokenId, List<Long> serialList, AccountId sender, AccountId receiver) {
+    public TransferTransaction addNftTransfers(TokenId tokenId, List<Long> serialList, AccountId sender, AccountId receiver) {
         requireNotFrozen();
         var transferList = getNftTransferList(tokenId);
         for(var serial : serialList) {

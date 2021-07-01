@@ -97,7 +97,7 @@ class TokenNftInfoIntegrationTest {
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .setAmount(100)
-                .addMetadatas(metadatas)
+                .setMetadata(metadatas)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -156,7 +156,7 @@ class TokenNftInfoIntegrationTest {
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .setAmount(100)
-                .addMetadatas(metadatas)
+                .setMetadata(metadatas)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 

@@ -144,7 +144,7 @@ class TokenWipeIntegrationTest {
 
             new TransferTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
-                .addTokenNftTransfers(tokenId, serialsToTransfer, testEnv.operatorId, accountId)
+                .addNftTransfers(tokenId, serialsToTransfer, testEnv.operatorId, accountId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
