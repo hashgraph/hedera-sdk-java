@@ -152,7 +152,7 @@ public class ScheduleCreateIntegrationTest {
                 .addHbarTransfer(testEnv.operatorId, new Hbar(1));
 
             // Schedule the transactoin
-            ScheduleCreateTransaction scheduled = transfer.schedule();
+            ScheduleCreateTransaction scheduled = transfer.schedule().setNodeAccountIds(testEnv.nodeAccountIds);
 
             receipt = scheduled.execute(testEnv.client).getReceipt(testEnv.client);
 

@@ -134,7 +134,7 @@ class AccountBalanceIntegrationTest {
                 .execute(testEnv.client);
 
             assertEquals(balance.tokens.get(tokenId), 10000);
-            assertEquals(balance.tokenDecimals.get(balance.tokens.get(tokenId)), 50);
+            assertEquals(balance.tokenDecimals.get(tokenId), 50);
 
             testEnv.client.close();
         });

@@ -363,6 +363,11 @@ public final class Client implements AutoCloseable {
         return this;
     }
 
+    public synchronized Client setMaxNodesPerTransaction(int maxNodesPerTransaction) {
+        this.network.setMaxNodesPerTransaction(maxNodesPerTransaction);
+        return this;
+    }
+
     /**
      * Get the ID of the operator. Useful when the client was constructed from file.
      *
