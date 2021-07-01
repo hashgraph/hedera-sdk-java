@@ -17,11 +17,7 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class Ed25519PrivateKeyTest {
 
@@ -142,6 +138,12 @@ class Ed25519PrivateKeyTest {
     @Test
     @DisplayName("derived key matches that of the mobile wallets")
     void deriveKeyIndex0() {
+        Mnemonic mnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(mnemonicString));
+        Ed25519PrivateKey mnemonicKey = Ed25519PrivateKey.fromMnemonic(mnemonic);
+
+        Ed25519PrivateKey mnemonicDerivedKey = mnemonicKey.derive(0);
+        assertEquals("302e020100300506032b657004220420f8dcc99a1ced1cc59bc2fee161c26ca6d6af657da9aa654da724441343ecd16f", mnemonicDerivedKey.toString());
+
         final Mnemonic iosMnemonic = Mnemonic.fromString(iosMnemonicString);
         final Ed25519PrivateKey iosKey = Ed25519PrivateKey.fromMnemonic(iosMnemonic);
 

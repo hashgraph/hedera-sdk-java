@@ -38,7 +38,9 @@ public class MnemonicTest {
 //        MnemonicValidationResult validationResult = mnemonic.validate();
 
         Ed25519PrivateKey key = mnemonic.toLegacyPrivateKey();
+        Ed25519PrivateKey keyDerived = key.legacyDerive(-1);
 
+        assertEquals(keyDerived.toString(), "302e020100300506032b657004220420b129a7f29e223acabddecc8d3750b8e34f56d05654130584c972b3ac748ee1c0");
         assertEquals(key.toString(), "302e020100300506032b657004220420882a565ad8cb45643892b5366c1ee1c1ef4a730c5ce821a219ff49b6bf173ddf");
     }
 
@@ -51,7 +53,9 @@ public class MnemonicTest {
         Mnemonic mnemonic = Mnemonic.fromString(mnemonicStr);
 
         Ed25519PrivateKey key = mnemonic.toLegacyPrivateKey();
+        Ed25519PrivateKey keyDerived = key.legacyDerive(0);
 
+        assertEquals(keyDerived.toString(), "302e020100300506032b657004220420f17441bffadd29c1483c945cd30f014b2ad0fe246e084afae158da1b996bf6d3");
         assertEquals(key.toString(), "302e020100300506032b6570042204202b7345f302a10c2a6d55bf8b7af40f125ec41d780957826006d30776f0c441fb");
     }
 
