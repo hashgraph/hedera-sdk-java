@@ -9,6 +9,7 @@ import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.ThrowingSupplier;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -172,6 +173,12 @@ class Ed25519PrivateKeyTest {
     @Test
     @DisplayName("derived key matches that of the mobile wallets")
     void deriveKeyIndex0() {
+        Mnemonic mnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(MNEMONIC_STRING));
+        PrivateKey mnemonicKey = PrivateKey.fromMnemonic(mnemonic);
+
+        PrivateKey mnemonicDerivedKey = mnemonicKey.derive(0);
+        assertEquals("302e020100300506032b657004220420f8dcc99a1ced1cc59bc2fee161c26ca6d6af657da9aa654da724441343ecd16f", mnemonicDerivedKey.toString());
+
         Mnemonic iosMnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(IOS_MNEMONIC_STRING));
         PrivateKey iosKey = PrivateKey.fromMnemonic(iosMnemonic);
 
@@ -185,6 +192,13 @@ class Ed25519PrivateKeyTest {
 
         PrivateKey androidDerivedKey = androidKey.derive(0);
         PrivateKey androidExpectedKey = PrivateKey.fromString(ANDROID_DEFAULT_PRIVATE_KEY);
+
+        Mnemonic legacy = assertDoesNotThrow(() -> Mnemonic.fromString(MNEMONIC_LEGACY_STRING));
+        PrivateKey legacyKey = assertDoesNotThrow(legacy::toLegacyPrivateKey);
+
+        PrivateKey legacyDerivedKey = legacyKey.legacyDerive(0);
+        assertEquals(legacyKey.toString(), "302e020100300506032b657004220420882a565ad8cb45643892b5366c1ee1c1ef4a730c5ce821a219ff49b6bf173ddf");
+        assertEquals(legacyDerivedKey.toString(), "302e020100300506032b65700422042085c30624eb42423e159dde4571a621b454b8660055fb491b392c487569a9215f");
 
         assertArrayEquals(androidDerivedKey.toBytes(), androidExpectedKey.toBytes());
     }

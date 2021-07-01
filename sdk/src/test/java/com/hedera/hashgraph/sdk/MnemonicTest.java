@@ -199,6 +199,8 @@ public class MnemonicTest {
             Mnemonic mnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(MNEMONIC3_STRING));
             PrivateKey key = mnemonic.toLegacyPrivateKey();
             assertEquals(key.toString(), MNEMONIC3_KEY);
+            PrivateKey derivedKey = key.legacyDerive(0);
+            assertEquals(derivedKey.toString(), "302e020100300506032b657004220420f17441bffadd29c1483c945cd30f014b2ad0fe246e084afae158da1b996bf6d3");
         });
     }
 

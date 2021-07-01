@@ -340,12 +340,9 @@ public final class PrivateKey extends Key {
 
     static byte[] legacyDeriveChildKey(byte[] entropy, int index) {
         byte[] seed = new byte[entropy.length + 8];
-        if(index >= 0){
-            Arrays.fill(seed, entropy.length, entropy.length + 4, (byte)0);
-        } else {
-            Arrays.fill(seed, entropy.length, entropy.length + 4, (byte)-1);
-        }
-        Arrays.fill(seed, entropy.length + 4, entropy.length + 8, (byte)index);
+        Arrays.fill(seed, 0, seed.length, (byte)0);
+
+        Arrays.fill(seed, entropy.length, seed.length, (byte)index);
         System.arraycopy(entropy, 0, seed, 0, entropy.length);
 
         byte[] salt = new byte[1];
