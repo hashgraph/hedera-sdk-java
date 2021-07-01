@@ -4,6 +4,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.common.base.MoreObjects;
 import javax.annotation.Nullable;
 import java.util.Objects;
+import java.util.List;
+import java.util.ArrayList;
 
 abstract public class CustomFee {
     @Nullable
@@ -33,6 +35,14 @@ abstract public class CustomFee {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee.parseFrom(bytes).toBuilder().build());
     }
 
+    public static List<CustomFee> deepCloneList(List<CustomFee> customFees) {
+        var returnCustomFees = new ArrayList<CustomFee>(customFees.size());
+        for(var fee : customFees) {
+            returnCustomFees.add(fee.deepClone());
+        }
+        return returnCustomFees;
+    }
+
     @Nullable 
     public AccountId getFeeCollectorAccountId() {
         return feeCollectorAccountId;
@@ -57,6 +67,12 @@ abstract public class CustomFee {
                 .setDenominator(fractionalFee.getDenominator())
                 .setMin(fractionalFee.getMin())
                 .setMax(fractionalFee.getMax());
+        }
+    }
+
+    void validate(Client client) {
+        if(feeCollectorAccountId != null) {
+            feeCollectorAccountId.validate(client);
         }
     }
 

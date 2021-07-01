@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenMintTransaction> {
     private final TokenMintTransactionBody.Builder builder;
@@ -71,7 +72,7 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     public TokenMintTransaction setMetadata(List<byte[]> metadatas) {
         requireNotFrozen();
         builder.clearMetadata();
-        for(var metadata : metadatas) {
+        for(var metadata : Objects.requireNonNull(metadatas)) {
             builder.addMetadata(ByteString.copyFrom(metadata));
         }
         return this;

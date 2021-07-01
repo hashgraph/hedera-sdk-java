@@ -874,9 +874,9 @@ public enum Status {
     CUSTOM_FEE_MUST_BE_POSITIVE(ResponseCodeEnum.CUSTOM_FEE_MUST_BE_POSITIVE),
 
     /**
-     * Once custom fees are marked as immutable, they can never be changed (or made mutable again)
+     * Fee schedule key is not set on token
      */
-    CUSTOM_FEES_ARE_MARKED_IMMUTABLE(ResponseCodeEnum.CUSTOM_FEES_ARE_MARKED_IMMUTABLE),
+    TOKEN_HAS_NO_FEE_SCHEDULE_KEY(ResponseCodeEnum.TOKEN_HAS_NO_FEE_SCHEDULE_KEY),
 
     /**
      * A fractional custom fee exceeded the range of a 64-bit signed integer
@@ -961,7 +961,17 @@ public enum Status {
     /**
      * The range of data to be gathered exceeds the limit
      */
-    QUERY_RANGE_LIMIT_EXCEEDED(ResponseCodeEnum.QUERY_RANGE_LIMIT_EXCEEDED);
+    INVALID_QUERY_RANGE(ResponseCodeEnum.INVALID_QUERY_RANGE),
+
+    /**
+     * Each fractional custom fee must have its maximum_amount, if specified, at least its minimum_amount
+     */
+    FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT(ResponseCodeEnum.FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT),
+
+    /**
+     * A fee schedule update tried to clear the custom fees from a token whose fee schedule was already empty
+     */
+    CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES(ResponseCodeEnum.CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES);
 
 
     final ResponseCodeEnum code;
@@ -1338,8 +1348,8 @@ public enum Status {
                 return CUSTOM_FEE_NOT_FULLY_SPECIFIED;
             case CUSTOM_FEE_MUST_BE_POSITIVE:
                 return CUSTOM_FEE_MUST_BE_POSITIVE;
-            case CUSTOM_FEES_ARE_MARKED_IMMUTABLE:
-                return CUSTOM_FEES_ARE_MARKED_IMMUTABLE;
+            case TOKEN_HAS_NO_FEE_SCHEDULE_KEY:
+                return TOKEN_HAS_NO_FEE_SCHEDULE_KEY;
             case CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE:
                 return CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE;
             case INVALID_CUSTOM_FRACTIONAL_FEES_SUM:
@@ -1372,8 +1382,12 @@ public enum Status {
                 return METADATA_TOO_LONG;
             case BATCH_SIZE_LIMIT_EXCEEDED:
                 return BATCH_SIZE_LIMIT_EXCEEDED;
-            case QUERY_RANGE_LIMIT_EXCEEDED:
-                return QUERY_RANGE_LIMIT_EXCEEDED;
+            case INVALID_QUERY_RANGE:
+                return INVALID_QUERY_RANGE;
+            case FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT:
+                return FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT;
+            case CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES:
+                return CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

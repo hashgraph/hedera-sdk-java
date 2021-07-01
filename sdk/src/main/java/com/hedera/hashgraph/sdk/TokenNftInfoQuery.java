@@ -2,7 +2,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.TokenGetNftInfoQuery;
 import com.hedera.hashgraph.sdk.proto.TokenGetNftInfosQuery;
-import com.hedera.hashgraph.sdk.proto.TokenGetAccountNftInfoQuery;
+import com.hedera.hashgraph.sdk.proto.TokenGetAccountNftInfosQuery;
 import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
@@ -23,7 +23,7 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
     @Nullable
     private TokenGetNftInfosQuery.Builder byTokenBuilder = null;
     @Nullable
-    private TokenGetAccountNftInfoQuery.Builder byAccountBuilder = null;
+    private TokenGetAccountNftInfosQuery.Builder byAccountBuilder = null;
     @Nullable
     private NftId nftId = null;
     @Nullable
@@ -93,7 +93,7 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
      * 
      */
     public TokenNftInfoQuery byAccountId(AccountId accountId) {
-        byAccountBuilder = TokenGetAccountNftInfoQuery
+        byAccountBuilder = TokenGetAccountNftInfosQuery
             .newBuilder()
             .setAccountID(Objects.requireNonNull(accountId).toProtobuf());
         this.accountId = accountId;
@@ -153,7 +153,7 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
         } else if(isByToken()) {
             queryBuilder.setTokenGetNftInfos(Objects.requireNonNull(byTokenBuilder).setStart(start).setEnd(end).setHeader(header));
         } else /* is by account */ {
-            queryBuilder.setTokenGetAccountNftInfo(Objects.requireNonNull(byAccountBuilder).setStart(start).setEnd(end).setHeader(header));
+            queryBuilder.setTokenGetAccountNftInfos(Objects.requireNonNull(byAccountBuilder).setStart(start).setEnd(end).setHeader(header));
         }
     }
 
@@ -164,7 +164,7 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
         } else if(isByToken()) {
             return response.getTokenGetNftInfos().getHeader();
         } else /* is by account */ {
-            return response.getTokenGetAccountNftInfo().getHeader();
+            return response.getTokenGetAccountNftInfos().getHeader();
         }
     }
 
@@ -175,7 +175,7 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
         } else if(isByToken()) {
             return request.getTokenGetNftInfos().getHeader();
         } else /* is by account */ {
-            return request.getTokenGetAccountNftInfo().getHeader();
+            return request.getTokenGetAccountNftInfos().getHeader();
         }
     }
 
@@ -194,7 +194,7 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
         } else if(isByToken()) {
             return infosFromProtos(response.getTokenGetNftInfos().getNftsList(), networkName);
         } else /* is by account */ {
-            return infosFromProtos(response.getTokenGetAccountNftInfo().getNftsList(), networkName);
+            return infosFromProtos(response.getTokenGetAccountNftInfos().getNftsList(), networkName);
         }
     }
 
@@ -205,7 +205,7 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
         } else if(isByToken()) {
             return TokenServiceGrpc.getGetTokenNftInfosMethod();
         } else /* is by account */ {
-            return TokenServiceGrpc.getGetAccountNftInfoMethod();
+            return TokenServiceGrpc.getGetAccountNftInfosMethod();
         }
     }
 

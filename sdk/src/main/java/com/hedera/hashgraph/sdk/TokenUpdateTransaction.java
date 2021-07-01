@@ -24,8 +24,6 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     AccountId treasuryAccountId = null;
     @Nullable
     AccountId autoRenewAccountId = null;
-    @Nullable
-    CustomFeeList customFeeList = null;
 
 
     public TokenUpdateTransaction() {
@@ -161,6 +159,16 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         return this;
     }
 
+    public Key getCustomFeeKey() {
+        return Key.fromProtobufKey(builder.getFeeScheduleKey());
+    }
+
+    public TokenUpdateTransaction setCustomFeeKey(Key key) {
+        requireNotFrozen();
+        builder.setFeeScheduleKey(key.toProtobufKey());
+        return this;
+    }
+
     public Instant getExpirationTime() {
         return InstantConverter.fromProtobuf(builder.getExpiry());
     }
@@ -212,16 +220,6 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         return this;
     }
 
-    public TokenUpdateTransaction setCustomFeeList(@Nullable CustomFeeList customFeeList) {
-        requireNotFrozen();
-        this.customFeeList = customFeeList;
-        return this;
-    }
-
-    public CustomFeeList getCustomFeeList() {
-        return customFeeList != null ? customFeeList.deepClone() : null;
-    }
-
     TokenUpdateTransactionBody.Builder build() {
         if (tokenId != null) {
             builder.setToken(tokenId.toProtobuf());
@@ -233,10 +231,6 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
 
         if (autoRenewAccountId != null) {
             builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
-        }
-
-        if(customFeeList != null) {
-            builder.setCustomFees(customFeeList.toProtobuf());
         }
 
         return builder;
@@ -254,10 +248,6 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
 
         if (autoRenewAccountId != null) {
             autoRenewAccountId.validate(client);
-        }
-
-        if(customFeeList != null) {
-            customFeeList.validateNetworkOnIds(client);
         }
     }
 

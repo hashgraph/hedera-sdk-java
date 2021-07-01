@@ -48,6 +48,14 @@ public class CustomFixedFee extends CustomFee {
     }
 
     @Override
+    void validate(Client client) {
+        super.validate(client);
+        if(denominatingTokenId != null) {
+            denominatingTokenId.validate(client);
+        }
+    }
+
+    @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
             .add("feeCollectorAccountId", getFeeCollectorAccountId())

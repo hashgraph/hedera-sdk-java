@@ -28,6 +28,7 @@ class TokenCreateIntegrationTest {
                 .setWipeKey(testEnv.operatorKey)
                 .setKycKey(testEnv.operatorKey)
                 .setSupplyKey(testEnv.operatorKey)
+                .setCustomFeeKey(testEnv.operatorKey)
                 .setFreezeDefault(false)
                 .execute(testEnv.client);
 
@@ -182,9 +183,8 @@ class TokenCreateIntegrationTest {
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
-                .setCustomFeeList(new CustomFeeList()
-                    .addCustomFee(new CustomFixedFee().setAmount(10).setFeeCollectorAccountId(testEnv.operatorId))
-                    .addCustomFee(new CustomFractionalFee().setNumerator(1).setDenominator(20).setMin(1).setMax(10)))
+                .addCustomFee(new CustomFixedFee().setAmount(10).setFeeCollectorAccountId(testEnv.operatorId))
+                .addCustomFee(new CustomFractionalFee().setNumerator(1).setDenominator(20).setMin(1).setMax(10))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
             testEnv.client.close();

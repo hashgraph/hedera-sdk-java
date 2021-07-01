@@ -302,7 +302,7 @@ public enum RequestType {
     /*
      * Get Token Account Nft Information
      */
-    TOKEN_GET_ACCOUNT_NFT_INFO(HederaFunctionality.TokenGetAccountNftInfo),
+    TOKEN_GET_ACCOUNT_NFT_INFOS(HederaFunctionality.TokenGetAccountNftInfos),
 
     /*
      * Get Token Nft Information
@@ -442,8 +442,8 @@ public enum RequestType {
                 return SCHEDULE_SIGN;
             case ScheduleGetInfo:
                 return SCHEDULE_GET_INFO;
-            case TokenGetAccountNftInfo:
-                return TOKEN_GET_ACCOUNT_NFT_INFO;
+            case TokenGetAccountNftInfos:
+                return TOKEN_GET_ACCOUNT_NFT_INFOS;
             case TokenGetNftInfo:
                 return TOKEN_GET_NFT_INFO;
             case TokenGetNftInfos:
@@ -577,8 +577,8 @@ public enum RequestType {
                 return "SCHEDULE_SIGN";
             case SCHEDULE_GET_INFO:
                 return "SCHEDULE_GET_INFO";
-            case TOKEN_GET_ACCOUNT_NFT_INFO:
-                return "TOKEN_GET_ACCOUNT_NFT_INFO";
+            case TOKEN_GET_ACCOUNT_NFT_INFOS:
+                return "TOKEN_GET_ACCOUNT_NFT_INFOS";
             case TOKEN_GET_NFT_INFO:
                 return "TOKEN_GET_NFT_INFO";
             case TOKEN_GET_NFT_INFOS:

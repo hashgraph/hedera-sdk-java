@@ -13,12 +13,13 @@ import org.threeten.bp.Instant;
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import java.util.List;
+import java.util.ArrayList;
 
 public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> {
     private final TokenCreateTransactionBody.Builder builder;
 
-    @Nullable
-    CustomFeeList customFeeList = null;
+    List<CustomFee> customFees = new ArrayList<>();
     @Nullable
     AccountId treasuryAccountId = null;
     @Nullable
@@ -40,6 +41,10 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         if (builder.hasTreasury()) {
             treasuryAccountId = AccountId.fromProtobuf(builder.getTreasury());
         }
+
+        for(var fee : builder.getCustomFeesList()) {
+            customFees.add(CustomFee.fromProtobuf(fee));
+        }
     }
 
     TokenCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
@@ -49,6 +54,10 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
 
         if (builder.hasTreasury()) {
             treasuryAccountId = AccountId.fromProtobuf(builder.getTreasury());
+        }
+
+        for(var fee : builder.getCustomFeesList()) {
+            customFees.add(CustomFee.fromProtobuf(fee));
         }
     }
 
@@ -160,6 +169,16 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return this;
     }
 
+    public Key getCustomFeeKey() {
+        return Key.fromProtobufKey(builder.getFeeScheduleKey());
+    }
+
+    public TokenCreateTransaction setCustomFeeKey(Key key) {
+        requireNotFrozen();
+        builder.setFeeScheduleKey(key.toProtobufKey());
+        return this;
+    }
+
     public boolean getFreezeDefault() {
         return builder.getFreezeDefault();
     }
@@ -216,15 +235,21 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return this;
     }
 
-    public TokenCreateTransaction setCustomFeeList(@Nullable CustomFeeList customFeeList) {
+    public TokenCreateTransaction setCustomFees(List<CustomFee> customFees) {
         requireNotFrozen();
-        this.customFeeList = customFeeList;
+        this.customFees = customFees;
+        return this;
+    }
+
+    public TokenCreateTransaction addCustomFee(CustomFee customFee) {
+        requireNotFrozen();
+        customFees.add(customFee);
         return this;
     }
 
     @Nullable
-    public CustomFeeList getCustomFeeList() {
-        return customFeeList != null ? customFeeList.deepClone() : null;
+    public List<CustomFee> getCustomFeeList() {
+        return CustomFee.deepCloneList(customFees);
     }
     
     public TokenType getTokenType() {
@@ -280,8 +305,9 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
             builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
         }
 
-        if(customFeeList != null) {
-            builder.setCustomFees(customFeeList.toProtobuf());
+        builder.clearCustomFees();
+        for(var fee : customFees) {
+            builder.addCustomFees(fee.toProtobuf());
         }
 
         return builder;
@@ -289,9 +315,10 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
 
     @Override
     void validateNetworkOnIds(Client client) {
-        if(customFeeList != null) {
-            customFeeList.validateNetworkOnIds(client);
+        for(var fee : customFees) {
+            fee.validate(client);
         }
+
         if (treasuryAccountId != null) {
             treasuryAccountId.validate(client);
         }
