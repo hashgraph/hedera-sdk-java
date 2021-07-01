@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.8
+
+### Added
+
+ * Sign on demand functionality which should improve performance slightly
+
+### Fixed
+
+ * `AccountBalance.tokenDecimals` incorrectly using `Long` as the key in the map instead of
+   `TokenId`. Since this was a major bug making `tokenDecimals` completely unusable, the change
+   has been made directly on `tokenDecimals` instead of deprecating and adding another field.
+
 ## v2.0.7
 
 ### Added
