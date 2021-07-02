@@ -272,6 +272,9 @@ public class TokenInfo {
         if(supplyKey != null) {
             tokenInfoBuilder.setSupplyKey(supplyKey.toProtobufKey());
         }
+        if(customFeeKey != null) {
+            tokenInfoBuilder.setFeeScheduleKey(customFeeKey.toProtobufKey());
+        }
         if(autoRenewAccount != null) {
             tokenInfoBuilder.setAutoRenewAccount(autoRenewAccount.toProtobuf());
         }
@@ -280,6 +283,9 @@ public class TokenInfo {
         }
         if(expirationTime != null) {
             tokenInfoBuilder.setExpiry(InstantConverter.toProtobuf(expirationTime));
+        }
+        for(var fee : customFees) {
+            tokenInfoBuilder.addCustomFees(fee.toProtobuf());
         }
         return TokenGetInfoResponse.newBuilder().setTokenInfo(tokenInfoBuilder).build();
     }
