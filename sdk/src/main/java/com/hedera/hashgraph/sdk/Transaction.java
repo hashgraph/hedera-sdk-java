@@ -294,6 +294,9 @@ public abstract class Transaction<T extends Transaction<T>>
             case TOKENWIPE:
                 return new TokenWipeTransaction(txs);
 
+            case TOKEN_FEE_SCHEDULE_UPDATE:
+                return new TokenCustomFeeUpdateTransaction(txs);
+
             case SCHEDULECREATE:
                 return new ScheduleCreateTransaction(txs);
 
