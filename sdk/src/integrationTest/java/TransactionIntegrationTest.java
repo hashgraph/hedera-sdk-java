@@ -242,6 +242,8 @@ public class TransactionIntegrationTest {
             var resp = tx.execute(testEnv.client);
 
             resp.getReceipt(testEnv.client);
+
+            testEnv.client.close();
         });
     }
 }

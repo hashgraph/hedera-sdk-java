@@ -276,6 +276,8 @@ public class ScheduleCreateIntegrationTest {
                 .execute(testEnv.client);
 
             assertNotNull(info.executedAt);
+
+            testEnv.client.close();
         });
     }
 }

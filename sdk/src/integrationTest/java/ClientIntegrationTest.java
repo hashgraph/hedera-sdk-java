@@ -73,6 +73,7 @@ public class ClientIntegrationTest {
             new AccountCreateTransaction()
                 .setTransactionId(TransactionId.generate(AccountId.fromString("0.0.123-rmkyk")))
                 .execute(client);
+            client.close();
         });
     }
 
