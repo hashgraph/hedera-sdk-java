@@ -8,8 +8,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.ArrayList;
 
-// TODO: update this, test deepClone()
-
 public class CustomFeeListTest {
     @BeforeAll
     public static void beforeAll() {

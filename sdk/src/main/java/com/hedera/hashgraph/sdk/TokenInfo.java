@@ -127,7 +127,7 @@ public class TokenInfo {
 
     public final long maxSupply;
 
-    private TokenInfo(
+    TokenInfo(
         TokenId tokenId,
         String name,
         String symbol,

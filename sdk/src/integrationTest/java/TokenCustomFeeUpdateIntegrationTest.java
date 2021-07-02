@@ -62,7 +62,7 @@ class TokenCustomFeeUpdateIntegrationTest {
             assertFalse(info.defaultKycStatus);
             assertEquals(info.customFees.size(), 0);
 
-            new TokenCustomFeeUpdateTransaction()
+            new CustomFeeUpdateTransaction()
                 .setTokenId(tokenId)
                 .addCustomFee(new CustomFixedFee().setAmount(10).setFeeCollectorAccountId(testEnv.operatorId))
                 .addCustomFee(new CustomFractionalFee().setNumerator(1).setDenominator(20).setMin(1).setMax(10))

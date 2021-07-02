@@ -170,8 +170,7 @@ public class FeeComponents {
         return this;
     }
 
-    com.hedera.hashgraph.sdk.proto.FeeComponents toProtobuf()
-    {
+    com.hedera.hashgraph.sdk.proto.FeeComponents toProtobuf() {
         return com.hedera.hashgraph.sdk.proto.FeeComponents.newBuilder()
             .setMin(getMin())
             .setMax(getMax())
