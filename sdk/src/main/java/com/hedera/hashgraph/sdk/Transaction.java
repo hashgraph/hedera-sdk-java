@@ -550,6 +550,10 @@ public abstract class Transaction<T extends Transaction<T>>
         return list.build().toByteArray();
     }
 
+    public List<com.hedera.hashgraph.sdk.proto.SignedTransaction.Builder> getSignedTransactions() {
+        return signedTransactions;
+    }
+
     public byte[] getTransactionHash() {
         if (!this.isFrozen()) {
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
