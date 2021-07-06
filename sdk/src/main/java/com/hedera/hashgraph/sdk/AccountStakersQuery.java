@@ -21,12 +21,14 @@ import java.util.Objects;
 public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountStakersQuery> {
     private final CryptoGetStakersQuery.Builder builder;
 
-    AccountId accountId;
+    @Nullable
+    AccountId accountId = null;
 
     public AccountStakersQuery() {
         builder = CryptoGetStakersQuery.newBuilder();
     }
 
+    @Nullable
     public AccountId getAccountId() {
         return accountId;
     }

@@ -1,17 +1,24 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.TokenRevokeKycTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import java.util.LinkedHashMap;
+import javax.annotation.Nullable;
+import java.util.Objects;
 
 public class TokenRevokeKycTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenRevokeKycTransaction> {
     private final TokenRevokeKycTransactionBody.Builder builder;
 
-    TokenId tokenId;
-    AccountId accountId;
+    @Nullable
+    TokenId tokenId = null;
+    @Nullable
+    AccountId accountId = null;
 
     public TokenRevokeKycTransaction() {
         builder = TokenRevokeKycTransactionBody.newBuilder();
@@ -45,21 +52,25 @@ public class TokenRevokeKycTransaction extends com.hedera.hashgraph.sdk.Transact
         }
     }
 
+    @Nullable
     public TokenId getTokenId() {
         return tokenId;
     }
 
     public TokenRevokeKycTransaction setTokenId(TokenId tokenId) {
+        Objects.requireNonNull(tokenId);
         requireNotFrozen();
         this.tokenId = tokenId;
         return this;
     }
 
+    @Nullable
     public AccountId getAccountId() {
         return accountId;
     }
 
     public TokenRevokeKycTransaction setAccountId(AccountId accountId) {
+        Objects.requireNonNull(accountId);
         requireNotFrozen();
         this.accountId = accountId;
         return this;

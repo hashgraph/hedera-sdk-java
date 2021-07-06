@@ -13,13 +13,14 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
+import java8.util.function.BiConsumer;
+import java8.util.function.Consumer;
+import java8.util.function.Predicate;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.threeten.bp.Instant;
+import com.google.errorprone.annotations.Var;
 
 import com.hedera.hashgraph.sdk.proto.TransactionID;
 import com.hedera.hashgraph.sdk.proto.mirror.ConsensusServiceGrpc;
@@ -127,16 +128,17 @@ public final class TopicMessageQuery {
      * @param throwable the potentially retryable exception
      * @return if the request should be retried or not
      */
+    @SuppressWarnings("MethodCanBeStatic")
     private boolean shouldRetry(Throwable throwable) {
         if (throwable instanceof StatusRuntimeException) {
             var statusRuntimeException = (StatusRuntimeException) throwable;
             var code = statusRuntimeException.getStatus().getCode();
             var description = statusRuntimeException.getStatus().getDescription();
 
-            return code == Status.Code.NOT_FOUND ||
-                    code == Status.Code.UNAVAILABLE ||
-                    code == Status.Code.RESOURCE_EXHAUSTED ||
-                    code == Status.Code.INTERNAL && RST_STREAM.matcher(description).matches();
+            return (code == Status.Code.NOT_FOUND) ||
+                    (code == Status.Code.UNAVAILABLE) ||
+                    (code == Status.Code.RESOURCE_EXHAUSTED) ||
+                    ((code == Status.Code.INTERNAL) && RST_STREAM.matcher(description).matches());
         }
 
         return false;
@@ -165,6 +167,7 @@ public final class TopicMessageQuery {
             call.cancel("unsubscribe", null);
         });
 
+        @Var
         var newBuilder = builder;
 
         // Update the start time and limit on retry

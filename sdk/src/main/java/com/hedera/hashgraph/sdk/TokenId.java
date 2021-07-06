@@ -41,6 +41,7 @@ public class TokenId {
         this.checksum = null;
     }
 
+    @SuppressWarnings("InconsistentOverloads")
     TokenId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable NetworkName network, @Nullable String checksum) {
         this.shard = shard;
         this.realm = realm;

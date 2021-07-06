@@ -1,7 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.ContractDeleteTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -15,9 +18,12 @@ import java.util.Objects;
 public final class ContractDeleteTransaction extends Transaction<ContractDeleteTransaction> {
     private final ContractDeleteTransactionBody.Builder builder;
 
-    ContractId contractId;
-    ContractId transferContractId;
-    AccountId transferAccountId;
+    @Nullable
+    ContractId contractId = null;
+    @Nullable
+    ContractId transferContractId = null;
+    @Nullable
+    AccountId transferAccountId = null;
 
     public ContractDeleteTransaction() {
         builder = ContractDeleteTransactionBody.newBuilder();

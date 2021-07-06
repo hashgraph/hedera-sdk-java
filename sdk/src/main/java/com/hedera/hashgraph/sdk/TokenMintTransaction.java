@@ -1,17 +1,23 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.TokenMintTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import java.util.LinkedHashMap;
+import javax.annotation.Nullable;
+import java.util.Objects;
 
 public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenMintTransaction> {
     private final TokenMintTransactionBody.Builder builder;
 
-    TokenId tokenId;
+    @Nullable
+    TokenId tokenId = null;
 
     public TokenMintTransaction() {
         builder = TokenMintTransactionBody.newBuilder();
@@ -37,11 +43,13 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         }
     }
 
+    @Nullable
     public TokenId getTokenId() {
         return tokenId;
     }
 
-    public TokenMintTransaction setTokenId(TokenId tokenId) {
+    public TokenMintTransaction setTokenId(@Nullable TokenId tokenId) {
+        Objects.requireNonNull(tokenId);
         requireNotFrozen();
         this.tokenId = tokenId;
         return this;

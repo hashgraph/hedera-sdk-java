@@ -12,6 +12,7 @@ import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * <p>A transaction specifically to append data to a file on the network.
@@ -22,7 +23,8 @@ import java.util.LinkedHashMap;
 public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTransaction> {
     private final FileAppendTransactionBody.Builder builder;
 
-    FileId fileId;
+    @Nullable
+    FileId fileId = null;
 
     public FileAppendTransaction() {
         super();
@@ -78,6 +80,7 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
      * @return {@code this}
      */
     public FileAppendTransaction setFileId(FileId fileId) {
+        Objects.requireNonNull(fileId);
         requireNotFrozen();
         this.fileId = fileId;
         return this;

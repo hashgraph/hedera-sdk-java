@@ -9,11 +9,14 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import java.util.LinkedHashMap;
+import javax.annotation.Nullable;
+import java.util.Objects;
 
 public final class ScheduleSignTransaction extends Transaction<ScheduleSignTransaction> {
     private final ScheduleSignTransactionBody.Builder builder;
 
-    ScheduleId scheduleId;
+    @Nullable
+    ScheduleId scheduleId = null;
 
     public ScheduleSignTransaction() {
         builder = ScheduleSignTransactionBody.newBuilder();
@@ -31,11 +34,13 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
         }
     }
 
+    @Nullable
     public ScheduleId getScheduleId() {
         return scheduleId;
     }
 
     public ScheduleSignTransaction setScheduleId(ScheduleId scheduleId) {
+        Objects.requireNonNull(scheduleId);
         requireNotFrozen();
         this.scheduleId = scheduleId;
         return this;

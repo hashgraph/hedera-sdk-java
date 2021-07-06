@@ -61,8 +61,10 @@ import java.util.Objects;
 public final class ContractCreateTransaction extends Transaction<ContractCreateTransaction> {
     private final ContractCreateTransactionBody.Builder builder;
 
-    FileId bytecodeFileId;
-    AccountId proxyAccountId;
+    @Nullable
+    FileId bytecodeFileId = null;
+    @Nullable
+    AccountId proxyAccountId = null;
 
     public ContractCreateTransaction() {
         builder = ContractCreateTransactionBody.newBuilder();
@@ -96,13 +98,13 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      * <p>
      * The file must be the ASCII hexadecimal representation of the smart contract bytecode.
      *
-     * @param byteCodeFileId The FileId to be set
+     * @param bytecodeFileId The FileId to be set
      * @return {@code this}
      */
-    public ContractCreateTransaction setBytecodeFileId(FileId byteCodeFileId) {
-        Objects.requireNonNull(byteCodeFileId);
+    public ContractCreateTransaction setBytecodeFileId(FileId bytecodeFileId) {
+        Objects.requireNonNull(bytecodeFileId);
         requireNotFrozen();
-        this.bytecodeFileId = byteCodeFileId;
+        this.bytecodeFileId = bytecodeFileId;
         return this;
     }
 
@@ -164,7 +166,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
 
     @Nullable
     public AccountId getProxyAccountId() {
-        return builder.hasProxyAccountID() ? AccountId.fromProtobuf(builder.getProxyAccountID()) : null;
+        return proxyAccountId;
     }
 
     /**

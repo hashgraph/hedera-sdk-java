@@ -813,8 +813,6 @@ public abstract class Transaction<T extends Transaction<T>>
 
     /**
      * Will build the specific transaction at {@code index} and will fill with `null` for any empty indices before it
-     *
-     * @param index
      */
     void buildTransaction(int index) {
         if (transactions.size() < index) {
@@ -842,8 +840,6 @@ public abstract class Transaction<T extends Transaction<T>>
 
     /**
      * Will sign the specific transaction at {@code index} and will fill with `null` for any empty indices before it
-     *
-     * @param index
      */
     void signTransaction(int index) {
         if (signatures.get(index).getSigPairCount() != 0) {

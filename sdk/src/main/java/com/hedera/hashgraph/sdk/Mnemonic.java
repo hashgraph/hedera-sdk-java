@@ -44,6 +44,7 @@ public final class Mnemonic {
     @Nullable
     private String asString;
 
+    
     private Mnemonic(List<? extends CharSequence> words) {
         if(words.size() == 22){
             isLegacy = true;

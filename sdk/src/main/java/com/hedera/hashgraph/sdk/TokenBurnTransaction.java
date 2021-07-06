@@ -10,11 +10,14 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import java.util.LinkedHashMap;
+import javax.annotation.Nullable;
+import java.util.Objects;
 
 public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenBurnTransaction> {
     private final TokenBurnTransactionBody.Builder builder;
 
-    TokenId tokenId;
+    @Nullable
+    TokenId tokenId = null;
 
     public TokenBurnTransaction() {
         builder = TokenBurnTransactionBody.newBuilder();
@@ -40,11 +43,13 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         }
     }
 
+    @Nullable
     public TokenId getTokenId() {
         return tokenId;
     }
 
     public TokenBurnTransaction setTokenId(TokenId tokenId) {
+        Objects.requireNonNull(tokenId);
         requireNotFrozen();
         this.tokenId = tokenId;
         return this;

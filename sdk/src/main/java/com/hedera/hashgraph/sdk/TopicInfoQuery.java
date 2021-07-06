@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * Retrieve the latest state of a topic.
@@ -17,12 +18,14 @@ import javax.annotation.Nullable;
 public final class TopicInfoQuery extends Query<TopicInfo, TopicInfoQuery> {
     private final ConsensusGetTopicInfoQuery.Builder builder;
 
-    TopicId topicId;
+    @Nullable
+    TopicId topicId = null;
 
     public TopicInfoQuery() {
         builder = ConsensusGetTopicInfoQuery.newBuilder();
     }
 
+    @Nullable
     public TopicId getTopicId() {
         return topicId;
     }
@@ -34,6 +37,7 @@ public final class TopicInfoQuery extends Query<TopicInfo, TopicInfoQuery> {
      * @param topicId The TopicId to be set
      */
     public TopicInfoQuery setTopicId(TopicId topicId) {
+        Objects.requireNonNull(topicId);
         this.topicId = topicId;
         return this;
     }

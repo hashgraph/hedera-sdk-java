@@ -428,7 +428,7 @@ public enum RequestType {
             case ScheduleGetInfo:
                 return SCHEDULE_GET_INFO;
             default:
-                throw new IllegalStateException("(BUG) unhandled HederaFunctionality " + code);
+                throw new IllegalStateException("(BUG) unhandled HederaFunctionality " + code.getNumber());
         }
     }
 

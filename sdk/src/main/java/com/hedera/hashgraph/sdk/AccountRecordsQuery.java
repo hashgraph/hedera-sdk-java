@@ -19,12 +19,14 @@ import java.util.Objects;
 public final class AccountRecordsQuery extends Query<List<TransactionRecord>, AccountRecordsQuery> {
     private final CryptoGetAccountRecordsQuery.Builder builder;
 
-    AccountId accountId;
+    @Nullable
+    AccountId accountId = null;
 
     public AccountRecordsQuery() {
         this.builder = CryptoGetAccountRecordsQuery.newBuilder();
     }
 
+    @Nullable
     public AccountId getAccountId() {
         return accountId;
     }

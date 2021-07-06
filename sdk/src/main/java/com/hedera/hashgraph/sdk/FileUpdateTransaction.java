@@ -3,7 +3,10 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.FileUpdateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Instant;
@@ -11,6 +14,7 @@ import org.threeten.bp.Instant;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Updates a file by submitting the transaction.
@@ -18,7 +22,8 @@ import java.util.LinkedHashMap;
 public final class FileUpdateTransaction extends Transaction<FileUpdateTransaction> {
     private final FileUpdateTransactionBody.Builder builder;
 
-    FileId fileId;
+    @Nullable
+    FileId fileId = null;
 
     public FileUpdateTransaction() {
         builder = FileUpdateTransactionBody.newBuilder();
@@ -56,6 +61,7 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
      * @return {@code this}
      */
     public FileUpdateTransaction setFileId(FileId fileId) {
+        Objects.requireNonNull(fileId);
         requireNotFrozen();
         this.fileId = fileId;
         return this;
@@ -100,6 +106,7 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
      * @return {@code this}
      */
     public FileUpdateTransaction setExpirationTime(Instant expirationTime) {
+        Objects.requireNonNull(expirationTime);
         requireNotFrozen();
         builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
         return this;
@@ -159,6 +166,7 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
      * @see FileAppendTransaction if you merely want to add data to a file's existing contents.
      */
     public FileUpdateTransaction setContents(String text) {
+        Objects.requireNonNull(text);
         requireNotFrozen();
         builder.setContents(ByteString.copyFromUtf8(text));
         return this;
@@ -169,6 +177,7 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     }
 
     public FileUpdateTransaction setFileMemo(String memo) {
+        Objects.requireNonNull(memo);
         requireNotFrozen();
         this.builder.setMemo(StringValue.of(memo));
         return this;

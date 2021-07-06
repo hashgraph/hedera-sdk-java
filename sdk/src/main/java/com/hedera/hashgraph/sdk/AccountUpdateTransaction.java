@@ -4,7 +4,10 @@ import com.google.protobuf.BoolValue;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
 import com.google.protobuf.UInt64Value;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.CryptoUpdateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
@@ -33,8 +36,10 @@ import java.util.Objects;
 public final class AccountUpdateTransaction extends Transaction<AccountUpdateTransaction> {
     private final CryptoUpdateTransactionBody.Builder builder;
 
-    AccountId accountId;
-    AccountId proxyAccountId;
+    @Nullable
+    AccountId accountId = null;
+    @Nullable
+    AccountId proxyAccountId = null;
 
     public AccountUpdateTransaction() {
         builder = CryptoUpdateTransactionBody.newBuilder();

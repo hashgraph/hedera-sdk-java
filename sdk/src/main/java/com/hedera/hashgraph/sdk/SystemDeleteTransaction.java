@@ -1,13 +1,19 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.SystemDeleteTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.TimestampSeconds;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Delete a file or smart contract - can only be done with a Hedera admin.
@@ -23,8 +29,10 @@ import java.util.LinkedHashMap;
 public final class SystemDeleteTransaction extends Transaction<SystemDeleteTransaction> {
     private final SystemDeleteTransactionBody.Builder builder;
 
-    FileId fileId;
-    ContractId contractId;
+    @Nullable
+    FileId fileId = null;
+    @Nullable
+    ContractId contractId = null;
 
     public SystemDeleteTransaction() {
         builder = SystemDeleteTransactionBody.newBuilder();
@@ -56,6 +64,7 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
      * @return {@code this}
      */
     public SystemDeleteTransaction setFileId(FileId fileId) {
+        Objects.requireNonNull(fileId);
         requireNotFrozen();
         this.fileId = fileId;
         return this;
@@ -75,6 +84,7 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
      * @return {@code this}
      */
     public SystemDeleteTransaction setContractId(ContractId contractId) {
+        Objects.requireNonNull(contractId);
         requireNotFrozen();
         this.contractId = contractId;
         return this;
@@ -93,6 +103,7 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
      * @return {@code this}
      */
     public SystemDeleteTransaction setExpirationTime(Instant expirationTime) {
+        Objects.requireNonNull(expirationTime);
         requireNotFrozen();
 
         builder.setExpirationTime(TimestampSeconds.newBuilder()
