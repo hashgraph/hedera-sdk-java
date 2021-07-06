@@ -113,6 +113,20 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
             builder.addTokenTransfers(list);
         }
 
+        for(var entry : nftTransfers.entrySet()) {
+            var list = TokenTransferList.newBuilder()
+                .setToken(entry.getKey().toProtobuf());
+            
+            for(var nftTransfer : entry.getValue()) {
+                list.addNftTransfers(com.hedera.hashgraph.sdk.proto.NftTransfer.newBuilder()
+                    .setSenderAccountID(nftTransfer.sender.toProtobuf())
+                    .setReceiverAccountID(nftTransfer.receiver.toProtobuf())
+                    .setSerialNumber(nftTransfer.serial));
+            }
+
+            builder.addTokenTransfers(list);
+        }
+
         var list = TransferList.newBuilder();
         for (var entry : hbarTransfers.entrySet()) {
             list.addAccountAmounts(AccountAmount.newBuilder()
@@ -129,6 +143,15 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     void validateNetworkOnIds(Client client) {
         for (var a : hbarTransfers.keySet()) {
             a.validate(client);
+        }
+
+        for(var entry : nftTransfers.entrySet()) {
+            entry.getKey().validate(client);
+
+            for(var nftTransfer : entry.getValue()) {
+                nftTransfer.sender.validate(client);
+                nftTransfer.receiver.validate(client);
+            }
         }
 
         for (var entry : tokenTransfers.entrySet()) {
