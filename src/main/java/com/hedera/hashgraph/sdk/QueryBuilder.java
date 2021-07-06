@@ -263,8 +263,8 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
                 return raw.getTokenGetInfo().getHeader();
             case SCHEDULEGETINFO:
                 return raw.getScheduleGetInfo().getHeader();
-            case TOKENGETACCOUNTNFTINFO:
-                return raw.getTokenGetAccountNftInfo().getHeader();
+            case TOKENGETACCOUNTNFTINFOS:
+                return raw.getTokenGetAccountNftInfos().getHeader();
             case TOKENGETNFTINFO:
                 return raw.getTokenGetNftInfo().getHeader();
             case TOKENGETNFTINFOS:

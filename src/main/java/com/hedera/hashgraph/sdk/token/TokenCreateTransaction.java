@@ -10,6 +10,7 @@ import com.hedera.hashgraph.sdk.crypto.PublicKey;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 
 import io.grpc.MethodDescriptor;
 
@@ -220,8 +221,10 @@ public final class TokenCreateTransaction extends SingleTransactionBuilder<Token
         return this;
     }
 
-    public TokenCreateTransaction setCustomFeeList(CustomFeeList customFeeList) {
-        this.builder.setCustomFees(customFeeList.toProto());
+    public TokenCreateTransaction setCustomFeeList(List<CustomFee> fees) {
+        for (CustomFee fee : fees) {
+            this.builder.addCustomFees(fee.toProto());
+        }
         return this;
     }
 

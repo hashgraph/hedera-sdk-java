@@ -2,9 +2,9 @@ package com.hedera.hashgraph.sdk.token;
 
 import com.hedera.hashgraph.proto.Query;
 import com.hedera.hashgraph.proto.QueryHeader;
+import com.hedera.hashgraph.proto.TokenGetAccountNftInfosQuery;
 import com.hedera.hashgraph.proto.TokenGetNftInfoQuery;
 import com.hedera.hashgraph.proto.TokenGetNftInfosQuery;
-import com.hedera.hashgraph.proto.TokenGetAccountNftInfoQuery;
 import com.hedera.hashgraph.proto.Response;
 import com.hedera.hashgraph.proto.TokenServiceGrpc;
 import com.hedera.hashgraph.sdk.Client;
@@ -25,14 +25,14 @@ import javax.annotation.Nonnegative;
 public class TokenNftInfoQuery extends QueryBuilder<List<TokenNftInfo>, TokenNftInfoQuery> {
     private TokenGetNftInfoQuery.Builder byNftBuilder;
     private TokenGetNftInfosQuery.Builder byTokenBuilder;
-    private TokenGetAccountNftInfoQuery.Builder byAccountBuilder;
+    private TokenGetAccountNftInfosQuery.Builder byAccountBuilder;
 
     public TokenNftInfoQuery() {
         super();
 
         byNftBuilder = inner.getTokenGetNftInfoBuilder();
         byTokenBuilder = inner.getTokenGetNftInfosBuilder();
-        byAccountBuilder = inner.getTokenGetAccountNftInfoBuilder();
+        byAccountBuilder = inner.getTokenGetAccountNftInfosBuilder();
     }
 
     private boolean isByNft() {
@@ -103,7 +103,7 @@ public class TokenNftInfoQuery extends QueryBuilder<List<TokenNftInfo>, TokenNft
         } else if(isByToken()) {
             return TokenServiceGrpc.getGetTokenNftInfosMethod();
         } else /* is by account */ {
-            return TokenServiceGrpc.getGetAccountNftInfoMethod();
+            return TokenServiceGrpc.getGetAccountNftInfosMethod();
         }
     }
 
@@ -114,7 +114,7 @@ public class TokenNftInfoQuery extends QueryBuilder<List<TokenNftInfo>, TokenNft
         } else if(isByToken()) {
             return infosFromProtos(raw.getTokenGetNftInfos().getNftsList());
         } else /* is by account */ {
-            return infosFromProtos(raw.getTokenGetAccountNftInfo().getNftsList());
+            return infosFromProtos(raw.getTokenGetAccountNftInfos().getNftsList());
         }
     }
 

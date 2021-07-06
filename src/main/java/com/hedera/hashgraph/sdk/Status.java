@@ -177,6 +177,20 @@ public enum Status {
     ScheduleAlreadyDeleted(ResponseCodeEnum.SCHEDULE_ALREADY_DELETED),
     ScheduleAlreadyExecuted(ResponseCodeEnum.SCHEDULE_ALREADY_EXECUTED),
     MessageSizeTooLarge(ResponseCodeEnum.MESSAGE_SIZE_TOO_LARGE),
+    ReceiverSigRequired(ResponseCodeEnum.RECEIVER_SIG_REQUIRED),
+    FractionDividesByZero(ResponseCodeEnum.FRACTION_DIVIDES_BY_ZERO),
+    InsufficientPayerBalanceForCustomFee(ResponseCodeEnum.INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE),
+    CustomFeesListTooLong(ResponseCodeEnum.CUSTOM_FEES_LIST_TOO_LONG),
+    InvalidCustomFeeCollector(ResponseCodeEnum.INVALID_CUSTOM_FEE_COLLECTOR),
+    InvalidTokenIdInCustomFees(ResponseCodeEnum.INVALID_TOKEN_ID_IN_CUSTOM_FEES),
+    TokenNotAssociatedToFeeCollector(ResponseCodeEnum.TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR),
+    TokenMaxSupplyReached(ResponseCodeEnum.TOKEN_MAX_SUPPLY_REACHED),
+    SenderDoesNotOwnNftSerialNo(ResponseCodeEnum.SENDER_DOES_NOT_OWN_NFT_SERIAL_NO),
+    CustomFeeNotFullySpecified(ResponseCodeEnum.CUSTOM_FEE_NOT_FULLY_SPECIFIED),
+    CustomFeeMustBePositive(ResponseCodeEnum.CUSTOM_FEE_MUST_BE_POSITIVE),
+    TokenHasNoFeeScheduleKey(ResponseCodeEnum.TOKEN_HAS_NO_FEE_SCHEDULE_KEY),
+    CustomFeeOutsideNumericRange(ResponseCodeEnum.CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE),
+    InvalidCustomFractionalFeesSum(ResponseCodeEnum.INVALID_CUSTOM_FRACTIONAL_FEES_SUM),
     OperationRepeatedInBucketGroups(ResponseCodeEnum.OPERATION_REPEATED_IN_BUCKET_GROUPS),
     BucketCapacityOverflow(ResponseCodeEnum.BUCKET_CAPACITY_OVERFLOW),
     NodeCapacityNotSufficientForOperation(ResponseCodeEnum.NODE_CAPACITY_NOT_SUFFICIENT_FOR_OPERATION),
@@ -184,7 +198,16 @@ public enum Status {
     ThrottleGroupHasZeroOpsPerSec(ResponseCodeEnum.THROTTLE_GROUP_HAS_ZERO_OPS_PER_SEC),
     SuccessButMissingExpectedOperation(ResponseCodeEnum.SUCCESS_BUT_MISSING_EXPECTED_OPERATION),
     UnparseableThrottleDefinitions(ResponseCodeEnum.UNPARSEABLE_THROTTLE_DEFINITIONS),
-    InvalidThrottleDefinitions(ResponseCodeEnum.INVALID_THROTTLE_DEFINITIONS);
+    InvalidThrottleDefinitions(ResponseCodeEnum.INVALID_THROTTLE_DEFINITIONS),
+    AccountExpiredAndPendingRemoval(ResponseCodeEnum.ACCOUNT_EXPIRED_AND_PENDING_REMOVAL),
+    InvalidTokenMaxSupply(ResponseCodeEnum.INVALID_TOKEN_MAX_SUPPLY),
+    InvalidTokenNftSerialNumber(ResponseCodeEnum.INVALID_TOKEN_NFT_SERIAL_NUMBER),
+    InvalidNftId(ResponseCodeEnum.INVALID_NFT_ID),
+    MetadataTooLong(ResponseCodeEnum.METADATA_TOO_LONG),
+    BatchSizeLimitExceeded(ResponseCodeEnum.BATCH_SIZE_LIMIT_EXCEEDED),
+    InvalidQueryRange(ResponseCodeEnum.INVALID_QUERY_RANGE),
+    FractionalFeeMaxAmountLessThanMinAmount(ResponseCodeEnum.FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT),
+    CustomScheduleAlreadyHasNoFees(ResponseCodeEnum.CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES);
 
     private final ResponseCodeEnum responseCode;
 
@@ -377,6 +400,20 @@ public enum Status {
             case SCHEDULE_ALREADY_DELETED: return ScheduleAlreadyDeleted;
             case SCHEDULE_ALREADY_EXECUTED: return ScheduleAlreadyExecuted;
             case MESSAGE_SIZE_TOO_LARGE: return MessageSizeTooLarge;
+            case RECEIVER_SIG_REQUIRED: return ReceiverSigRequired;
+            case FRACTION_DIVIDES_BY_ZERO: return FractionDividesByZero;
+            case INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE: return InsufficientPayerBalanceForCustomFee;
+            case CUSTOM_FEES_LIST_TOO_LONG: return CustomFeesListTooLong;
+            case INVALID_CUSTOM_FEE_COLLECTOR: return InvalidCustomFeeCollector;
+            case INVALID_TOKEN_ID_IN_CUSTOM_FEES: return InvalidTokenIdInCustomFees;
+            case TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR: return TokenNotAssociatedToFeeCollector;
+            case TOKEN_MAX_SUPPLY_REACHED: return TokenMaxSupplyReached;
+            case SENDER_DOES_NOT_OWN_NFT_SERIAL_NO: return SenderDoesNotOwnNftSerialNo;
+            case CUSTOM_FEE_NOT_FULLY_SPECIFIED: return CustomFeeNotFullySpecified;
+            case CUSTOM_FEE_MUST_BE_POSITIVE: return CustomFeeMustBePositive;
+            case TOKEN_HAS_NO_FEE_SCHEDULE_KEY: return TokenHasNoFeeScheduleKey;
+            case CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE: return CustomFeeOutsideNumericRange;
+            case INVALID_CUSTOM_FRACTIONAL_FEES_SUM: return InvalidCustomFractionalFeesSum;
             case OPERATION_REPEATED_IN_BUCKET_GROUPS: return OperationRepeatedInBucketGroups;
             case BUCKET_CAPACITY_OVERFLOW: return BucketCapacityOverflow;
             case NODE_CAPACITY_NOT_SUFFICIENT_FOR_OPERATION: return NodeCapacityNotSufficientForOperation;
@@ -385,7 +422,15 @@ public enum Status {
             case SUCCESS_BUT_MISSING_EXPECTED_OPERATION: return SuccessButMissingExpectedOperation;
             case UNPARSEABLE_THROTTLE_DEFINITIONS: return UnparseableThrottleDefinitions;
             case INVALID_THROTTLE_DEFINITIONS: return InvalidThrottleDefinitions;
-
+            case ACCOUNT_EXPIRED_AND_PENDING_REMOVAL: return AccountExpiredAndPendingRemoval;
+            case INVALID_TOKEN_MAX_SUPPLY: return InvalidTokenMaxSupply;
+            case INVALID_TOKEN_NFT_SERIAL_NUMBER: return InvalidTokenNftSerialNumber;
+            case INVALID_NFT_ID: return InvalidNftId;
+            case METADATA_TOO_LONG: return MetadataTooLong;
+            case BATCH_SIZE_LIMIT_EXCEEDED: return BatchSizeLimitExceeded;
+            case INVALID_QUERY_RANGE: return InvalidQueryRange;
+            case FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT: return FractionalFeeMaxAmountLessThanMinAmount;
+            case CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES: return CustomScheduleAlreadyHasNoFees;
             case UNRECOGNIZED:
                 // protobufs won't give us the actual value that was unexpected, unfortunately
                 throw new IllegalArgumentException(
