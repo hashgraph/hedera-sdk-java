@@ -18,12 +18,12 @@ buildscript {
 
 allprojects {
     repositories {
-		// resolve locally installed version first (mostly for CI, you can omit this)
-		mavenLocal()
+        // resolve locally installed version first (mostly for CI, you can omit this)
+        mavenLocal()
         google()
         jcenter()
-		// hashgraph SDK is published to Maven Central only
-		mavenCentral()
+        // hashgraph SDK is published to Maven Central only
+        mavenCentral()
     }
 }
 
