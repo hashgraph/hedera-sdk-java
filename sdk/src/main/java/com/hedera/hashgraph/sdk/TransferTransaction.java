@@ -67,15 +67,6 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return this;
     }
 
-    public TransferTransaction addNftTransfers(TokenId tokenId, List<Long> serialList, AccountId sender, AccountId receiver) {
-        requireNotFrozen();
-        var transferList = getNftTransferList(tokenId);
-        for(var serial : serialList) {
-            transferList.add(new TokenNftTransfer(sender, receiver, serial));
-        }
-        return this;
-    }
-
     public Map<AccountId, Hbar> getHbarTransfers() {
         return hbarTransfers;
     }

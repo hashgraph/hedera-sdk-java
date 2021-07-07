@@ -73,12 +73,12 @@ class TokenNftTransferIntegrationTest {
                 .getReceipt(testEnv.client);
 
             var serialsToTransfer = mintReceipt.serials.subList(0, 10);
-
-            new TransferTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
-                .addNftTransfers(tokenId, serialsToTransfer, testEnv.operatorId, accountId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+            var transfer = new TransferTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds);
+            for(var serial : serialsToTransfer) {
+                transfer.addNftTransfer(tokenId.nft(serial), testEnv.operatorId, accountId);
+            }
+            transfer.execute(testEnv.client).getReceipt(testEnv.client);
 
             new TokenWipeTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
