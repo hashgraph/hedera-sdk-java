@@ -30,7 +30,6 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
 
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
         setMaxTransactionFee(new Hbar(30));
-        setInitialSupply(0);
     }
 
     TokenCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
@@ -258,6 +257,16 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
 
     public TokenCreateTransaction setTokenType(TokenType tokenType) {
         requireNotFrozen();
+        if(tokenType == TokenType.NON_FUNGIBLE_UNIQUE) {
+            /*
+            Comments on initialSupply from protobuf:
+            "Specifies the initial supply of tokens to be put in circulation. 
+            The initial supply is sent to the Treasury Account. 
+            The supply is in the lowest denomination possible. 
+            >>>In the case for NON_FUNGIBLE_UNIQUE Type the value must be 0<<<
+            */
+            setInitialSupply(0);
+        }
         builder.setTokenType(tokenType.code);
         return this;
     }
