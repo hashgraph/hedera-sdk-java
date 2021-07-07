@@ -14,18 +14,18 @@ import java.util.Objects;
 import java.util.List;
 import java.util.ArrayList;
 
-public class CustomFeeUpdateTransaction extends Transaction<CustomFeeUpdateTransaction> {
+public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeScheduleUpdateTransaction> {
     private final TokenFeeScheduleUpdateTransactionBody.Builder builder;
 
     @Nullable
     TokenId tokenId = null;
     List<CustomFee> customFees = new ArrayList<>();
 
-    public CustomFeeUpdateTransaction() {
+    public TokenFeeScheduleUpdateTransaction() {
         builder = TokenFeeScheduleUpdateTransactionBody.newBuilder();
     }
 
-    CustomFeeUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    TokenFeeScheduleUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
 
         builder = bodyBuilder.getTokenFeeScheduleUpdate().toBuilder();
@@ -39,7 +39,7 @@ public class CustomFeeUpdateTransaction extends Transaction<CustomFeeUpdateTrans
         }
     }
 
-    CustomFeeUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
+    TokenFeeScheduleUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getTokenFeeScheduleUpdate().toBuilder();
@@ -58,7 +58,7 @@ public class CustomFeeUpdateTransaction extends Transaction<CustomFeeUpdateTrans
         return tokenId;
     }
 
-    public CustomFeeUpdateTransaction setTokenId(TokenId tokenId) {
+    public TokenFeeScheduleUpdateTransaction setTokenId(TokenId tokenId) {
         Objects.requireNonNull(tokenId);
         requireNotFrozen();
         this.tokenId = tokenId;
@@ -69,14 +69,14 @@ public class CustomFeeUpdateTransaction extends Transaction<CustomFeeUpdateTrans
         return CustomFee.deepCloneList(customFees);
     }
 
-    public CustomFeeUpdateTransaction setCustomFees(List<CustomFee> customFees) {
+    public TokenFeeScheduleUpdateTransaction setCustomFees(List<CustomFee> customFees) {
         Objects.requireNonNull(customFees);
         requireNotFrozen();
         this.customFees = customFees;
         return this;
     }
 
-    public CustomFeeUpdateTransaction addCustomFee(CustomFee customFee) {
+    public TokenFeeScheduleUpdateTransaction addCustomFee(CustomFee customFee) {
         Objects.requireNonNull(customFee);
         requireNotFrozen();
         customFees.add(customFee);
@@ -120,6 +120,6 @@ public class CustomFeeUpdateTransaction extends Transaction<CustomFeeUpdateTrans
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        throw new IllegalStateException("CustomFeeUpdateTransaction cannot be scheduled");
+        throw new IllegalStateException("TokenFeeScheduleUpdateTransaction cannot be scheduled");
     }
 }

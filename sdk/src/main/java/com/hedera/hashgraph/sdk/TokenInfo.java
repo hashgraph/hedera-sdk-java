@@ -77,7 +77,7 @@ public class TokenInfo {
      * The key which can change the custom fees of the token; if not set, the fees are immutable
      */
     @Nullable
-    public final Key customFeeKey;
+    public final Key feeScheduleKey;
 
     /**
      * The default Freeze status (not applicable, frozen or unfrozen) of Hedera accounts relative to this token. FreezeNotApplicable is returned if Token Freeze Key is empty. Frozen is returned if Token Freeze Key is set and defaultFreeze is set to true. Unfrozen is returned if Token Freeze Key is set and defaultFreeze is set to false
@@ -139,7 +139,7 @@ public class TokenInfo {
         @Nullable Key freezeKey,
         @Nullable Key wipeKey,
         @Nullable Key supplyKey,
-        @Nullable Key customFeeKey,
+        @Nullable Key feeScheduleKey,
         @Nullable Boolean defaultFreezeStatus,
         @Nullable Boolean defaultKycStatus,
         boolean isDeleted,
@@ -163,7 +163,7 @@ public class TokenInfo {
         this.freezeKey = freezeKey;
         this.wipeKey = wipeKey;
         this.supplyKey = supplyKey;
-        this.customFeeKey = customFeeKey;
+        this.feeScheduleKey = feeScheduleKey;
         this.defaultFreezeStatus = defaultFreezeStatus;
         this.defaultKycStatus = defaultKycStatus;
         this.isDeleted = isDeleted;
@@ -272,8 +272,8 @@ public class TokenInfo {
         if(supplyKey != null) {
             tokenInfoBuilder.setSupplyKey(supplyKey.toProtobufKey());
         }
-        if(customFeeKey != null) {
-            tokenInfoBuilder.setFeeScheduleKey(customFeeKey.toProtobufKey());
+        if(feeScheduleKey != null) {
+            tokenInfoBuilder.setFeeScheduleKey(feeScheduleKey.toProtobufKey());
         }
         if(autoRenewAccount != null) {
             tokenInfoBuilder.setAutoRenewAccount(autoRenewAccount.toProtobuf());
@@ -304,7 +304,7 @@ public class TokenInfo {
             .add("freezeKey", freezeKey)
             .add("wipeKey", wipeKey)
             .add("supplyKey", supplyKey)
-            .add("customFeeKey", customFeeKey)
+            .add("feeScheduleKey", feeScheduleKey)
             .add("defaultFreezeStatus", defaultFreezeStatus)
             .add("defaultKycStatus", defaultKycStatus)
             .add("isDeleted", isDeleted)

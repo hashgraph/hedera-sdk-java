@@ -29,7 +29,7 @@ class TokenCustomFeeUpdateIntegrationTest {
                 .setWipeKey(testEnv.operatorKey)
                 .setKycKey(testEnv.operatorKey)
                 .setSupplyKey(testEnv.operatorKey)
-                .setCustomFeeKey(testEnv.operatorKey)
+                .setFeeScheduleKey(testEnv.operatorKey)
                 .setFreezeDefault(false)
                 .execute(testEnv.client);
 
@@ -55,14 +55,14 @@ class TokenCustomFeeUpdateIntegrationTest {
             assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.wipeKey.toString());
             assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.kycKey.toString());
             assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.supplyKey.toString());
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.customFeeKey.toString());
+            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.feeScheduleKey.toString());
             assertNotNull(info.defaultFreezeStatus);
             assertFalse(info.defaultFreezeStatus);
             assertNotNull(info.defaultKycStatus);
             assertFalse(info.defaultKycStatus);
             assertEquals(info.customFees.size(), 0);
 
-            new CustomFeeUpdateTransaction()
+            new TokenFeeScheduleUpdateTransaction()
                 .setTokenId(tokenId)
                 .addCustomFee(new CustomFixedFee().setAmount(10).setFeeCollectorAccountId(testEnv.operatorId))
                 .addCustomFee(new CustomFractionalFee().setNumerator(1).setDenominator(20).setMin(1).setMax(10))
@@ -89,7 +89,7 @@ class TokenCustomFeeUpdateIntegrationTest {
             assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.wipeKey.toString());
             assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.kycKey.toString());
             assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.supplyKey.toString());
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.customFeeKey.toString());
+            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.feeScheduleKey.toString());
             assertNotNull(info.defaultFreezeStatus);
             assertFalse(info.defaultFreezeStatus);
             assertNotNull(info.defaultKycStatus);

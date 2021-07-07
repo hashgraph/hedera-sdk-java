@@ -169,11 +169,11 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return this;
     }
 
-    public Key getCustomFeeKey() {
+    public Key getFeeScheduleKey() {
         return Key.fromProtobufKey(builder.getFeeScheduleKey());
     }
 
-    public TokenCreateTransaction setCustomFeeKey(Key key) {
+    public TokenCreateTransaction setFeeScheduleKey(Key key) {
         requireNotFrozen();
         builder.setFeeScheduleKey(key.toProtobufKey());
         return this;

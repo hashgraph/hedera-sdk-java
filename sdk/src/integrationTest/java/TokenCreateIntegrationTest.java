@@ -28,7 +28,7 @@ class TokenCreateIntegrationTest {
                 .setWipeKey(testEnv.operatorKey)
                 .setKycKey(testEnv.operatorKey)
                 .setSupplyKey(testEnv.operatorKey)
-                .setCustomFeeKey(testEnv.operatorKey)
+                .setFeeScheduleKey(testEnv.operatorKey)
                 .setFreezeDefault(false)
                 .execute(testEnv.client);
 

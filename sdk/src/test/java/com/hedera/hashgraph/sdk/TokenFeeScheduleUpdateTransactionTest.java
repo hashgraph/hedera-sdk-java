@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import org.threeten.bp.Instant;
 
-public class CustomFeeUpdateTransactionTest {
+public class TokenFeeScheduleUpdateTransactionTest {
     final Instant validStart = Instant.ofEpochSecond(1554158542);
 
     @BeforeAll
@@ -23,8 +23,8 @@ public class CustomFeeUpdateTransactionTest {
         SnapshotMatcher.validateSnapshots();
     }
 
-    private CustomFeeUpdateTransaction spawnCustomFeeUpdateTransactionExample() {
-        return new CustomFeeUpdateTransaction()
+    private TokenFeeScheduleUpdateTransaction spawnTokenFeeScheduleUpdateTransactionExample() {
+        return new TokenFeeScheduleUpdateTransaction()
             .setTokenId(new TokenId(8798))
             .addCustomFee(new CustomFixedFee()
                 .setFeeCollectorAccountId(new AccountId(4322))
@@ -44,9 +44,9 @@ public class CustomFeeUpdateTransactionTest {
     @Test
     void shouldSerialize() {
         assertDoesNotThrow(() -> {
-            var originalUpdate = spawnCustomFeeUpdateTransactionExample();
+            var originalUpdate = spawnTokenFeeScheduleUpdateTransactionExample();
             byte[] updateBytes = originalUpdate.toBytes();
-            var copyUpdate = CustomFeeUpdateTransaction.fromBytes(updateBytes);
+            var copyUpdate = TokenFeeScheduleUpdateTransaction.fromBytes(updateBytes);
             assertTrue(originalUpdate.toString().equals(copyUpdate.toString()));
             SnapshotMatcher.expect(originalUpdate.toString()).toMatchSnapshot();
         });
