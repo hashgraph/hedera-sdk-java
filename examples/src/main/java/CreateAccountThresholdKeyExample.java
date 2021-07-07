@@ -34,20 +34,26 @@ public final class CreateAccountThresholdKeyExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        // Generate three new Ed25519 private, public key pairs
-        PrivateKey[] keys = new PrivateKey[3];
+        // Generate three new Ed25519 private, public key pairs.
+        // You do not need the private keys to create the Threshold Key List,
+        // you only need the public keys, and if you're doing things correctly, 
+        // you probably shouldn't have these private keys.
+        PrivateKey[] privateKeys = new PrivateKey[3];
+        PublicKey[] publicKeys = new PublicKey[3];
         for (int i = 0; i < 3; i++) {
-            keys[i] = PrivateKey.generate();
+            var key = PrivateKey.generate();
+            privateKeys[i] = key;
+            publicKeys[i] = key.getPublicKey();
         }
 
-        System.out.println("private keys: ");
-        for (Key key : keys) {
+        System.out.println("public keys: ");
+        for (Key key : publicKeys) {
             System.out.println(key);
         }
 
         // require 2 of the 3 keys we generated to sign on anything modifying this account
         KeyList transactionKey = KeyList.withThreshold(2);
-        Collections.addAll(transactionKey, keys);
+        Collections.addAll(transactionKey, publicKeys);
 
         TransactionResponse transactionResponse = new AccountCreateTransaction()
             .setKey(transactionKey)
@@ -67,8 +73,8 @@ public final class CreateAccountThresholdKeyExample {
             // To manually sign, you must explicitly build the Transaction
             .freezeWith(client)
             // we sign with 2 of the 3 keys
-            .sign(keys[0])
-            .sign(keys[1])
+            .sign(privateKeys[0])
+            .sign(privateKeys[1])
             .execute(client);
 
 
