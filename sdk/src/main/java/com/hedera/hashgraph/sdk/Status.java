@@ -971,7 +971,23 @@ public enum Status {
     /**
      * A fee schedule update tried to clear the custom fees from a token whose fee schedule was already empty
      */
-    CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES(ResponseCodeEnum.CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES);
+    CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES(ResponseCodeEnum.CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES),
+
+    /**
+     * Only tokens of type FUNGIBLE_COMMON can be used to as fee schedule denominations
+     */
+    CUSTOM_FEE_DENOMINATION_MUST_BE_FUNGIBLE_COMMON(ResponseCodeEnum.CUSTOM_FEE_DENOMINATION_MUST_BE_FUNGIBLE_COMMON),
+
+    /**
+     * Only tokens of type FUNGIBLE_COMMON can have fractional fees
+     */
+    CUSTOM_FRACTIONAL_FEE_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON(ResponseCodeEnum.CUSTOM_FRACTIONAL_FEE_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON),
+
+    /**
+     * The provided custom fee schedule key was invalid
+     */
+    INVALID_CUSTOM_FEE_SCHEDULE_KEY(ResponseCodeEnum.INVALID_CUSTOM_FEE_SCHEDULE_KEY);
+
 
 
     final ResponseCodeEnum code;
@@ -1388,6 +1404,12 @@ public enum Status {
                 return FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT;
             case CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES:
                 return CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES;
+            case CUSTOM_FEE_DENOMINATION_MUST_BE_FUNGIBLE_COMMON:
+                return CUSTOM_FEE_DENOMINATION_MUST_BE_FUNGIBLE_COMMON;
+            case CUSTOM_FRACTIONAL_FEE_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON:
+                return CUSTOM_FRACTIONAL_FEE_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON;
+            case INVALID_CUSTOM_FEE_SCHEDULE_KEY:
+                return INVALID_CUSTOM_FEE_SCHEDULE_KEY;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

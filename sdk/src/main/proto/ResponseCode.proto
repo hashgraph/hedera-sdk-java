@@ -22,7 +22,7 @@ package proto;
  * ‍
  */
 
-option java_package = "com.hedera.hashgraph.sdk.proto";
+ option java_package = "com.hedera.hashgraph.sdk.proto";
 option java_multiple_files = true;
 
 enum ResponseCodeEnum {
@@ -254,4 +254,7 @@ enum ResponseCodeEnum {
   INVALID_CUSTOM_FRACTIONAL_FEES_SUM = 242; // The sum of all custom fractional fees must be strictly less than 1
   FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT = 243; // Each fractional custom fee must have its maximum_amount, if specified, at least its minimum_amount
   CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES = 244; // A fee schedule update tried to clear the custom fees from a token whose fee schedule was already empty
+  CUSTOM_FEE_DENOMINATION_MUST_BE_FUNGIBLE_COMMON = 245; // Only tokens of type FUNGIBLE_COMMON can be used to as fee schedule denominations
+  CUSTOM_FRACTIONAL_FEE_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON = 246; // Only tokens of type FUNGIBLE_COMMON can have fractional fees
+  INVALID_CUSTOM_FEE_SCHEDULE_KEY = 247; // The provided custom fee schedule key was invalid
 }
