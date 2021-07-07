@@ -73,6 +73,8 @@ public final class TransactionRecord {
 
     public final Map<TokenId, Map<AccountId, Long>> tokenTransfers;
 
+    public final Map<TokenId, List<TokenNftTransfer>> tokenNftTransfers;
+
     @Nullable
     public final ScheduleId scheduleRef;
 
@@ -88,6 +90,7 @@ public final class TransactionRecord {
         @Nullable ContractFunctionResult contractFunctionResult,
         List<Transfer> transfers,
         Map<TokenId, Map<AccountId, Long>> tokenTransfers,
+        Map<TokenId, List<TokenNftTransfer>> tokenNftTransfers,
         @Nullable ScheduleId scheduleRef,
         List<AssessedCustomFee> assessedCustomFees
     ) {
@@ -100,6 +103,7 @@ public final class TransactionRecord {
         this.contractFunctionResult = contractFunctionResult;
         this.transactionFee = Hbar.fromTinybars(transactionFee);
         this.tokenTransfers = tokenTransfers;
+        this.tokenNftTransfers = tokenNftTransfers;
         this.scheduleRef = scheduleRef;
         this.assessedCustomFees = assessedCustomFees;
     }
@@ -114,14 +118,23 @@ public final class TransactionRecord {
             transfers.add(Transfer.fromProtobuf(accountAmount, networkName));
         }
 
-        var tokenTransfers = new HashMap<TokenId, Map<AccountId, Long>>(transactionRecord.getTokenTransferListsCount());
+        var tokenTransfers = new HashMap<TokenId, Map<AccountId, Long>>();
+        var tokenNftTransfers = new HashMap<TokenId, List<TokenNftTransfer>>();
         for (var tokenTransfersList : transactionRecord.getTokenTransferListsList()) {
-            var accountAmounts = new HashMap<AccountId, Long>();
-            for (var accountAmount : tokenTransfersList.getTransfersList()) {
-                accountAmounts.put(AccountId.fromProtobuf(accountAmount.getAccountID(), networkName), accountAmount.getAmount());
+            if(tokenTransfersList.getTransfersCount() > 0) {
+                var accountAmounts = new HashMap<AccountId, Long>();
+                for (var accountAmount : tokenTransfersList.getTransfersList()) {
+                    accountAmounts.put(AccountId.fromProtobuf(accountAmount.getAccountID(), networkName), accountAmount.getAmount());
+                }
+                tokenTransfers.put(TokenId.fromProtobuf(tokenTransfersList.getToken(), networkName), accountAmounts);
             }
-
-            tokenTransfers.put(TokenId.fromProtobuf(tokenTransfersList.getToken(), networkName), accountAmounts);
+            else if(tokenTransfersList.getNftTransfersCount() > 0) {
+                var nftTransfers = new ArrayList<TokenNftTransfer>();
+                for(var transfer : tokenTransfersList.getNftTransfersList()) {
+                    nftTransfers.add(TokenNftTransfer.fromProtobuf(transfer, networkName));
+                }
+                tokenNftTransfers.put(TokenId.fromProtobuf(tokenTransfersList.getToken(), networkName), nftTransfers);
+            }
         }
 
         var fees = new ArrayList<AssessedCustomFee>(transactionRecord.getAssessedCustomFeesCount());
@@ -146,6 +159,7 @@ public final class TransactionRecord {
             contractFunctionResult,
             transfers,
             tokenTransfers,
+            tokenNftTransfers,
             transactionRecord.hasScheduleRef() ? ScheduleId.fromProtobuf(transactionRecord.getScheduleRef(), networkName) : null,
             fees
         );
@@ -210,6 +224,7 @@ public final class TransactionRecord {
             .add("contractFunctionResult", contractFunctionResult)
             .add("transfers", transfers)
             .add("tokenTransfers", tokenTransfers)
+            .add("tokenNftTransfers", tokenNftTransfers)
             .add("scheduleRef", scheduleRef)
             .toString();
     }

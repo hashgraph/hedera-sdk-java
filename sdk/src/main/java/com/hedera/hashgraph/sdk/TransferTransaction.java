@@ -22,20 +22,8 @@ import javax.annotation.Nullable;
 public class TransferTransaction extends Transaction<TransferTransaction> {
     private final CryptoTransferTransactionBody.Builder builder;
     private final Map<TokenId, Map<AccountId, Long>> tokenTransfers = new HashMap<>();
-    private final Map<TokenId, List<NftTransfer>> nftTransfers = new HashMap<>();
+    private final Map<TokenId, List<TokenNftTransfer>> nftTransfers = new HashMap<>();
     private final Map<AccountId, Hbar> hbarTransfers = new HashMap<>();
-
-    class NftTransfer {
-        @Nullable
-        public AccountId sender, receiver;
-        public long serial;
-
-        public NftTransfer(@Nullable AccountId sender, @Nullable AccountId receiver, long serial) {
-            this.sender = sender;
-            this.receiver = receiver;
-            this.serial = serial;
-        }
-    };
 
     public TransferTransaction() {
         builder = CryptoTransferTransactionBody.newBuilder();
@@ -69,13 +57,13 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return this;
     }
 
-    public Map<TokenId, List<NftTransfer>> getTokenNftTransfers() {
+    public Map<TokenId, List<TokenNftTransfer>> getTokenNftTransfers() {
         return nftTransfers;
     }
 
     public TransferTransaction addNftTransfer(NftId nftId, AccountId sender, AccountId receiver) {
         requireNotFrozen();
-        getNftTransferList(nftId.tokenId).add(new NftTransfer(sender, receiver, nftId.serial));
+        getNftTransferList(nftId.tokenId).add(new TokenNftTransfer(sender, receiver, nftId.serial));
         return this;
     }
 
@@ -83,7 +71,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         requireNotFrozen();
         var transferList = getNftTransferList(tokenId);
         for(var serial : serialList) {
-            transferList.add(new NftTransfer(sender, receiver, serial));
+            transferList.add(new TokenNftTransfer(sender, receiver, serial));
         }
         return this;
     }
@@ -118,10 +106,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
                 .setToken(entry.getKey().toProtobuf());
             
             for(var nftTransfer : entry.getValue()) {
-                list.addNftTransfers(com.hedera.hashgraph.sdk.proto.NftTransfer.newBuilder()
-                    .setSenderAccountID(nftTransfer.sender.toProtobuf())
-                    .setReceiverAccountID(nftTransfer.receiver.toProtobuf())
-                    .setSerialNumber(nftTransfer.serial));
+                list.addNftTransfers(nftTransfer.toProtobuf());
             }
 
             builder.addTokenTransfers(list);
@@ -188,11 +173,11 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return map;
     }
 
-    private List<NftTransfer> getNftTransferList(TokenId tokenId) {
+    private List<TokenNftTransfer> getNftTransferList(TokenId tokenId) {
         // Cannot use `Map.merge()` as it uses `BiFunction`
         var list = nftTransfers.containsKey(tokenId) ?
             Objects.requireNonNull(nftTransfers.get(tokenId)) :
-            new ArrayList<NftTransfer>();
+            new ArrayList<TokenNftTransfer>();
         nftTransfers.put(tokenId, list);
         return list;
     }
@@ -230,12 +215,8 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
             if(tokenTransferList.getNftTransfersCount() > 0) {
                 var list = getNftTransferList(token);
-
                 for(var nftTransfer : tokenTransferList.getNftTransfersList()) {
-                    list.add(new NftTransfer(
-                        AccountId.fromProtobuf(nftTransfer.getSenderAccountID()), 
-                        AccountId.fromProtobuf(nftTransfer.getReceiverAccountID()), 
-                        nftTransfer.getSerialNumber()));
+                    list.add(TokenNftTransfer.fromProtobuf(nftTransfer));
                 }
             }
         }
