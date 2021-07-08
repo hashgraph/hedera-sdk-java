@@ -1,6 +1,7 @@
 import com.hedera.hashgraph.sdk.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.Objects;
 
@@ -136,6 +137,51 @@ class TokenBurnIntegrationTest {
             });
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
+
+            testEnv.client.close();
+        });
+    }
+
+    @Disabled
+    @Test
+    @DisplayName("Can burn NFTs")
+    void canBurnNfts() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv();
+
+            var createReceipt = new TokenCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setDecimals(3)
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setFreezeKey(testEnv.operatorKey)
+                .setWipeKey(testEnv.operatorKey)
+                .setKycKey(testEnv.operatorKey)
+                .setSupplyKey(testEnv.operatorKey)
+                .setFreezeDefault(false)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            var tokenId = Objects.requireNonNull(createReceipt.tokenId);
+            
+            var mintReceipt = new TokenMintTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setTokenId(tokenId)
+                .setAmount(100)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            var receipt = new TokenBurnTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setSerials(mintReceipt.serials.subList(0, 10))
+                .setTokenId(tokenId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            assertEquals(receipt.totalSupply, 100 - 10);
 
             testEnv.client.close();
         });

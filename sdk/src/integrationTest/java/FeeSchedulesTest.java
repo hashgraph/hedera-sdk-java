@@ -25,7 +25,7 @@ public class FeeSchedulesTest {
              * Test whether the file 0.0.111 actually contains stuff
              */
             assertNotNull(feeSchedules.getCurrent());
-            
+
             testEnv.client.close();
         });
     }

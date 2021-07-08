@@ -58,6 +58,10 @@ public class TokenId {
         }
     }
 
+    public NftId nft(@Nonnegative long serial) {
+        return new NftId(this, serial);
+    }
+
     public static TokenId fromString(String id) {
         return EntityIdHelper.fromString(id, TokenId::new);
     }

@@ -13,10 +13,13 @@ import org.threeten.bp.Instant;
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import java.util.List;
+import java.util.ArrayList;
 
 public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> {
     private final TokenCreateTransactionBody.Builder builder;
 
+    List<CustomFee> customFees = new ArrayList<>();
     @Nullable
     AccountId treasuryAccountId = null;
     @Nullable
@@ -37,6 +40,10 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         if (builder.hasTreasury()) {
             treasuryAccountId = AccountId.fromProtobuf(builder.getTreasury());
         }
+
+        for(var fee : builder.getCustomFeesList()) {
+            customFees.add(CustomFee.fromProtobuf(fee));
+        }
     }
 
     TokenCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
@@ -46,6 +53,10 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
 
         if (builder.hasTreasury()) {
             treasuryAccountId = AccountId.fromProtobuf(builder.getTreasury());
+        }
+
+        for(var fee : builder.getCustomFeesList()) {
+            customFees.add(CustomFee.fromProtobuf(fee));
         }
     }
 
@@ -157,6 +168,16 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return this;
     }
 
+    public Key getFeeScheduleKey() {
+        return Key.fromProtobufKey(builder.getFeeScheduleKey());
+    }
+
+    public TokenCreateTransaction setFeeScheduleKey(Key key) {
+        requireNotFrozen();
+        builder.setFeeScheduleKey(key.toProtobufKey());
+        return this;
+    }
+
     public boolean getFreezeDefault() {
         return builder.getFreezeDefault();
     }
@@ -213,6 +234,63 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return this;
     }
 
+    public TokenCreateTransaction setCustomFees(List<CustomFee> customFees) {
+        requireNotFrozen();
+        this.customFees = customFees;
+        return this;
+    }
+
+    public TokenCreateTransaction addCustomFee(CustomFee customFee) {
+        requireNotFrozen();
+        customFees.add(customFee);
+        return this;
+    }
+
+    @Nullable
+    public List<CustomFee> getCustomFeeList() {
+        return CustomFee.deepCloneList(customFees);
+    }
+    
+    public TokenType getTokenType() {
+        return TokenType.valueOf(builder.getTokenType());
+    }
+
+    public TokenCreateTransaction setTokenType(TokenType tokenType) {
+        requireNotFrozen();
+        if(tokenType == TokenType.NON_FUNGIBLE_UNIQUE) {
+            /*
+            Comments on initialSupply from protobuf:
+            "Specifies the initial supply of tokens to be put in circulation. 
+            The initial supply is sent to the Treasury Account. 
+            The supply is in the lowest denomination possible. 
+            >>>In the case for NON_FUNGIBLE_UNIQUE Type the value must be 0<<<
+            */
+            setInitialSupply(0);
+        }
+        builder.setTokenType(tokenType.code);
+        return this;
+    }
+
+    public TokenSupplyType getSupplyType() {
+        return TokenSupplyType.valueOf(builder.getSupplyType());
+    }
+
+    public TokenCreateTransaction setSupplyType(TokenSupplyType supplyType) {
+        requireNotFrozen();
+        builder.setSupplyType(supplyType.code);
+        return this;
+    }
+
+    public long getMaxSupply() {
+        return builder.getMaxSupply();
+    }
+
+    public TokenCreateTransaction setMaxSupply(long maxSupply) {
+        requireNotFrozen();
+        builder.setMaxSupply(maxSupply);
+        return this;
+    }
+
     @Override
     public TokenCreateTransaction freezeWith(@Nullable Client client) {
         if (
@@ -236,11 +314,20 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
             builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
         }
 
+        builder.clearCustomFees();
+        for(var fee : customFees) {
+            builder.addCustomFees(fee.toProtobuf());
+        }
+
         return builder;
     }
 
     @Override
     void validateNetworkOnIds(Client client) {
+        for(var fee : customFees) {
+            fee.validate(client);
+        }
+
         if (treasuryAccountId != null) {
             treasuryAccountId.validate(client);
         }

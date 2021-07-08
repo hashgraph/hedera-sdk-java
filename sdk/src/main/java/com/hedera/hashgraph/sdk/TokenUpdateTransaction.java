@@ -25,6 +25,7 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     @Nullable
     AccountId autoRenewAccountId = null;
 
+
     public TokenUpdateTransaction() {
         builder = TokenUpdateTransactionBody.newBuilder();
     }
@@ -155,6 +156,16 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         Objects.requireNonNull(key);
         requireNotFrozen();
         builder.setSupplyKey(key.toProtobufKey());
+        return this;
+    }
+
+    public Key getFeeScheduleKey() {
+        return Key.fromProtobufKey(builder.getFeeScheduleKey());
+    }
+
+    public TokenUpdateTransaction setFeeScheduleKey(Key key) {
+        requireNotFrozen();
+        builder.setFeeScheduleKey(key.toProtobufKey());
         return this;
     }
 

@@ -40,6 +40,11 @@ public class FeeSchedule {
         return this;
     }
 
+    public FeeSchedule addTransactionFeeSchedule(TransactionFeeSchedule transactionFeeSchedule) {
+        transactionFeeSchedules.add(Objects.requireNonNull(transactionFeeSchedule));
+        return this;
+    }
+
     @Nullable
     public Instant getExpirationTime() {
         return expirationTime;

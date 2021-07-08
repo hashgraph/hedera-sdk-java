@@ -1,6 +1,7 @@
 import com.hedera.hashgraph.sdk.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.Objects;
 
@@ -27,6 +28,7 @@ class TokenCreateIntegrationTest {
                 .setWipeKey(testEnv.operatorKey)
                 .setKycKey(testEnv.operatorKey)
                 .setSupplyKey(testEnv.operatorKey)
+                .setFeeScheduleKey(testEnv.operatorKey)
                 .setFreezeDefault(false)
                 .execute(testEnv.client);
 
@@ -164,6 +166,53 @@ class TokenCreateIntegrationTest {
             });
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
+
+            testEnv.client.close();
+        });
+    }
+
+    @Disabled
+    @Test
+    @DisplayName("Can create token with custom fees")
+    void canCreateTokenWithCustomFees() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv();
+
+            new TokenCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTreasuryAccountId(testEnv.operatorId)
+                .addCustomFee(new CustomFixedFee().setAmount(10).setFeeCollectorAccountId(testEnv.operatorId))
+                .addCustomFee(new CustomFractionalFee().setNumerator(1).setDenominator(20).setMin(1).setMax(10))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+            testEnv.client.close();
+        });
+    }
+
+    @Disabled
+    @DisplayName("Can create NFT")
+    void canCreateNfts() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv();
+
+            var response = new TokenCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setDecimals(3)
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setFreezeKey(testEnv.operatorKey)
+                .setWipeKey(testEnv.operatorKey)
+                .setKycKey(testEnv.operatorKey)
+                .setSupplyKey(testEnv.operatorKey)
+                .setFreezeDefault(false)
+                .execute(testEnv.client);
+
+            var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             testEnv.client.close();
         });

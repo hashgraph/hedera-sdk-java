@@ -11,6 +11,8 @@ import io.grpc.MethodDescriptor;
 import java.util.LinkedHashMap;
 import javax.annotation.Nullable;
 import java.util.Objects;
+import java.util.List;
+import java.util.Objects;
 
 public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenWipeTransaction> {
     private final TokenWipeAccountTransactionBody.Builder builder;
@@ -107,6 +109,25 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         if (accountId != null) {
             accountId.validate(client);
         }
+    }
+    
+    public List<Long> getSerials() {
+        return builder.getSerialNumbersList();
+    }
+    
+    public TokenWipeTransaction addSerial(long serial) {
+        requireNotFrozen();
+        builder.addSerialNumbers(serial);
+        return this;
+    }
+
+    public TokenWipeTransaction setSerials(List<Long> serials) {
+        requireNotFrozen();
+        builder.clearSerialNumbers();
+        for(var serial : Objects.requireNonNull(serials)) {
+            builder.addSerialNumbers(serial);
+        }
+        return this;
     }
 
     @Override
