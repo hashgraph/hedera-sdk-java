@@ -207,7 +207,10 @@ public enum Status {
     BatchSizeLimitExceeded(ResponseCodeEnum.BATCH_SIZE_LIMIT_EXCEEDED),
     InvalidQueryRange(ResponseCodeEnum.INVALID_QUERY_RANGE),
     FractionalFeeMaxAmountLessThanMinAmount(ResponseCodeEnum.FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT),
-    CustomScheduleAlreadyHasNoFees(ResponseCodeEnum.CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES);
+    CustomScheduleAlreadyHasNoFees(ResponseCodeEnum.CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES),
+    CustomFeeDenominationMustBeFungibleCommon(ResponseCodeEnum.CUSTOM_FEE_DENOMINATION_MUST_BE_FUNGIBLE_COMMON),
+    CustomFractionalFeeOnlyAllowedForFungibleCommon(ResponseCodeEnum.CUSTOM_FRACTIONAL_FEE_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON),
+    InvalidCustomFeeScheduleKey(ResponseCodeEnum.INVALID_CUSTOM_FEE_SCHEDULE_KEY);
 
     private final ResponseCodeEnum responseCode;
 
@@ -431,6 +434,9 @@ public enum Status {
             case INVALID_QUERY_RANGE: return InvalidQueryRange;
             case FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT: return FractionalFeeMaxAmountLessThanMinAmount;
             case CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES: return CustomScheduleAlreadyHasNoFees;
+            case CUSTOM_FEE_DENOMINATION_MUST_BE_FUNGIBLE_COMMON: return CustomFeeDenominationMustBeFungibleCommon;
+            case CUSTOM_FRACTIONAL_FEE_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON: return CustomFractionalFeeOnlyAllowedForFungibleCommon;
+            case INVALID_CUSTOM_FEE_SCHEDULE_KEY: return InvalidCustomFeeScheduleKey;
             case UNRECOGNIZED:
                 // protobufs won't give us the actual value that was unexpected, unfortunately
                 throw new IllegalArgumentException(
