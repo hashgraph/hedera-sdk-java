@@ -1,12 +1,10 @@
 package com.hedera.hashgraph.sdk.token;
 
-import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.hedera.hashgraph.proto.Fraction;
 import com.hedera.hashgraph.proto.FractionalFee;
 import com.hedera.hashgraph.sdk.account.AccountId;
 
-@Beta
 public class CustomFractionalFee extends CustomFee {
     private long numerator = 0, denominator = 1, min = 0, max = 0;
 

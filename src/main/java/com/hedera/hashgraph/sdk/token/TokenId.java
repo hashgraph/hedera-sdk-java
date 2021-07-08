@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk.token;
 
-import com.google.common.annotations.Beta;
 import com.hedera.hashgraph.proto.TokenID;
 import com.hedera.hashgraph.proto.TokenIDOrBuilder;
 import com.hedera.hashgraph.sdk.IdUtil;
@@ -39,7 +38,6 @@ public final class TokenId {
         return SolidityUtil.parseAddress(address, TokenId::new);
     }
 
-    @Beta
     public NftId nft(@Nonnegative long serial) {
         return new NftId(this, serial);
     }

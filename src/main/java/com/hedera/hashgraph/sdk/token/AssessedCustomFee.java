@@ -1,13 +1,11 @@
 package com.hedera.hashgraph.sdk.token;
 
-import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.hedera.hashgraph.sdk.Internal;
 import com.hedera.hashgraph.sdk.account.AccountId;
 
 import javax.annotation.Nullable;
 
-@Beta
 public class AssessedCustomFee {
     public final long amount;
     @Nullable

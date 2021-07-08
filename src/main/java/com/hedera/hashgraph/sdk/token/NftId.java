@@ -1,10 +1,8 @@
 package com.hedera.hashgraph.sdk.token;
 
-import com.google.common.annotations.Beta;
 import javax.annotation.Nonnegative;
 import java.util.Objects;
 
-@Beta
 public class NftId {
     /*
      * The (non-fungible) token of which this NFT is an instance

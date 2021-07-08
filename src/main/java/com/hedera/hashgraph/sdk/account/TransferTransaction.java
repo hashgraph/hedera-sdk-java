@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk.account;
 
-import com.google.common.annotations.Beta;
 import com.hedera.hashgraph.proto.*;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
@@ -58,7 +57,6 @@ public final class TransferTransaction extends SingleTransactionBuilder<Transfer
         return this;
     }
 
-    @Beta
     public TransferTransaction addNftTransfer(NftId nftId, AccountId sender, AccountId receiver) {
         Integer index = tokenIndexes.get(nftId.tokenId);
         int size = builder.getTokenTransfersCount();

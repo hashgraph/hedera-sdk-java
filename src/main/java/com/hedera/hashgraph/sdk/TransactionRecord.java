@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.annotations.Beta;
 import com.hedera.hashgraph.proto.NftTransfer;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.schedule.ScheduleId;
@@ -48,12 +47,10 @@ public final class TransactionRecord {
 
     public final Map<TokenId, Map<AccountId, List<Long>>> tokenTransfers;
 
-    @Beta
     public final Map<TokenId, List<TokenNftTransfer>> nftTransfers;
 
     public final ScheduleId scheduleRef;
 
-    @Beta
     public final List<AssessedCustomFee> accessedCustomFees;
 
     private final com.hedera.hashgraph.proto.TransactionRecord inner;

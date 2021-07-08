@@ -1,11 +1,9 @@
 package com.hedera.hashgraph.sdk.token;
 
-import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.hedera.hashgraph.sdk.Internal;
 import com.hedera.hashgraph.sdk.account.AccountId;
 
-@Beta
 public class TokenNftTransfer {
     public final AccountId sender;
     public final AccountId receiver;

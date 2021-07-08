@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk.token;
 
-import com.google.common.annotations.Beta;
 import com.hedera.hashgraph.proto.*;
 import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
 
@@ -66,13 +65,11 @@ public final class TokenWipeTransaction extends SingleTransactionBuilder<TokenWi
         return this;
     }
 
-    @Beta
     public TokenWipeTransaction addSerial(long serial) {
         builder.addSerialNumbers(serial);
         return this;
     }
 
-    @Beta
     public TokenWipeTransaction setSerials(List<Long> serials) {
         builder.clearSerialNumbers();
         builder.addAllSerialNumbers(serials);

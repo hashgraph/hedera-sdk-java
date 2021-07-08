@@ -1,12 +1,10 @@
 package com.hedera.hashgraph.sdk.token;
 
-import com.google.common.annotations.Beta;
 import com.hedera.hashgraph.sdk.account.AccountId;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
 
-@Beta
 abstract public class CustomFee {
     @Nullable
     AccountId feeCollectorAccountId = null;

@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk.token;
 
-import com.google.common.annotations.Beta;
 import com.hedera.hashgraph.proto.Response;
 import com.hedera.hashgraph.proto.TokenFreezeStatus;
 import com.hedera.hashgraph.proto.TokenGetInfoResponse;
@@ -123,20 +122,15 @@ public class TokenInfo {
      */
     public final Instant expiry;
 
-    @Beta
     public final TokenType tokenType;
 
-    @Beta
     public final TokenSupplyType supplyType;
 
-    @Beta
     public final long maxSupply;
 
-    @Beta
     @Nullable
     public final PublicKey feeScheduleKey;
 
-    @Beta
     public final List<CustomFee> customFees;
 
     TokenInfo(com.hedera.hashgraph.proto.TokenInfo info) {

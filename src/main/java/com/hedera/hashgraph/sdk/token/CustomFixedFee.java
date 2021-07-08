@@ -1,13 +1,11 @@
 package com.hedera.hashgraph.sdk.token;
 
-import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.hedera.hashgraph.proto.FixedFee;
 import com.hedera.hashgraph.sdk.account.AccountId;
 
 import javax.annotation.Nullable;
 
-@Beta
 public class CustomFixedFee extends CustomFee {
     private long amount = 0;
     @Nullable

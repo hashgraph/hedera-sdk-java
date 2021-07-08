@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk.token;
 
-import com.google.common.annotations.Beta;
 import com.google.protobuf.StringValue;
 import com.hedera.hashgraph.proto.TokenUpdateTransactionBody;
 import com.hedera.hashgraph.proto.TokenServiceGrpc;
@@ -12,7 +11,6 @@ import com.hedera.hashgraph.sdk.crypto.PublicKey;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 
 import io.grpc.MethodDescriptor;
 
@@ -167,7 +165,6 @@ public final class TokenUpdateTransaction extends SingleTransactionBuilder<Token
         return this;
     }
 
-    @Beta
     public TokenUpdateTransaction setFeeScheduleKey(PublicKey key) {
         builder.setFeeScheduleKey(key.toKeyProto());
         return this;

@@ -1,13 +1,11 @@
 package com.hedera.hashgraph.sdk.token;
 
-import com.google.common.annotations.Beta;
 import com.hedera.hashgraph.proto.*;
 import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
 
 import io.grpc.MethodDescriptor;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Burns tokens from the Token's treasury Account. If no Supply Key is defined, the transaction will resolve to
@@ -46,13 +44,11 @@ public final class TokenBurnTransaction extends SingleTransactionBuilder<TokenBu
         return this;
     }
 
-    @Beta
     public TokenBurnTransaction addSerial(long serial) {
         builder.addSerialNumbers(serial);
         return this;
     }
 
-    @Beta
     public TokenBurnTransaction setSerials(List<Long> serials) {
         builder.clearSerialNumbers();
         builder.addAllSerialNumbers(serials);
