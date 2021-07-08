@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TokenFreezeStatus;
@@ -120,16 +119,12 @@ public class TokenInfo {
      */
     public final String tokenMemo;
 
-    @Beta
     public final List<CustomFee> customFees;
 
-    @Beta
     public final TokenType tokenType;
 
-    @Beta
     public final TokenSupplyType supplyType;
 
-    @Beta
     public final long maxSupply;
 
     TokenInfo(

@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -74,13 +73,11 @@ public final class TransactionRecord {
 
     public final Map<TokenId, Map<AccountId, Long>> tokenTransfers;
 
-    @Beta
     public final Map<TokenId, List<TokenNftTransfer>> tokenNftTransfers;
 
     @Nullable
     public final ScheduleId scheduleRef;
 
-    @Beta
     public final List<AssessedCustomFee> assessedCustomFees;
 
     private TransactionRecord(

@@ -1,14 +1,11 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.annotations.Beta;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.common.base.MoreObjects;
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.List;
 import java.util.ArrayList;
 
-@Beta
 abstract public class CustomFee {
     @Nullable
     private AccountId feeCollectorAccountId = null;

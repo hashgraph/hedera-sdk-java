@@ -887,7 +887,7 @@ public enum Status {
      * The sum of all custom fractional fees must be strictly less than 1
      */
     INVALID_CUSTOM_FRACTIONAL_FEES_SUM(ResponseCodeEnum.INVALID_CUSTOM_FRACTIONAL_FEES_SUM),
-    
+
     /**
      * An operation was assigned to more than one throttle group in a given bucket
      */
@@ -987,8 +987,6 @@ public enum Status {
      * The provided custom fee schedule key was invalid
      */
     INVALID_CUSTOM_FEE_SCHEDULE_KEY(ResponseCodeEnum.INVALID_CUSTOM_FEE_SCHEDULE_KEY);
-
-
 
     final ResponseCodeEnum code;
 

@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -9,7 +8,6 @@ import com.hedera.hashgraph.sdk.proto.TimestampSeconds;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * The consensus result for a transaction, which might not be currently
@@ -78,7 +76,6 @@ public final class TransactionReceipt {
     @Nullable
     public final TransactionId scheduledTransactionId;
 
-    @Beta
     public final List<Long> serials;
 
     private TransactionReceipt(

@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.annotations.Beta;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TokenMintTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
@@ -16,7 +15,6 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenMintTransaction> {
     private final TokenMintTransactionBody.Builder builder;
@@ -70,14 +68,12 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         return this;
     }
 
-    @Beta
     public TokenMintTransaction addMetadata(byte[] metadata) {
         requireNotFrozen();
         builder.addMetadata(ByteString.copyFrom(metadata));
         return this;
     }
 
-    @Beta
     public TokenMintTransaction setMetadata(List<byte[]> metadatas) {
         requireNotFrozen();
         builder.clearMetadata();
@@ -87,7 +83,6 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         return this;
     }
 
-    @Beta
     public List<byte[]> getMetadata() {
         var metadata = new ArrayList<byte[]>();
         for(var datum : builder.getMetadataList()) {

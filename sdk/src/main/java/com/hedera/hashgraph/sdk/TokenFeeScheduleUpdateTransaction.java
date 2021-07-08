@@ -1,13 +1,9 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.annotations.Beta;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.protobuf.StringValue;
 import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
-import org.threeten.bp.Duration;
-import org.threeten.bp.Instant;
 
 import java.util.LinkedHashMap;
 import javax.annotation.Nullable;
@@ -15,7 +11,6 @@ import java.util.Objects;
 import java.util.List;
 import java.util.ArrayList;
 
-@Beta
 public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeScheduleUpdateTransaction> {
     private final TokenFeeScheduleUpdateTransactionBody.Builder builder;
 

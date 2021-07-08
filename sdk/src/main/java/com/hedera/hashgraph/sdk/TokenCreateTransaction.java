@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.annotations.Beta;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TokenCreateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
@@ -235,32 +234,27 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return this;
     }
 
-    @Beta
     public TokenCreateTransaction setCustomFees(List<CustomFee> customFees) {
         requireNotFrozen();
         this.customFees = customFees;
         return this;
     }
 
-    @Beta
     public TokenCreateTransaction addCustomFee(CustomFee customFee) {
         requireNotFrozen();
         customFees.add(customFee);
         return this;
     }
 
-    @Beta
     @Nullable
     public List<CustomFee> getCustomFees() {
         return CustomFee.deepCloneList(customFees);
     }
 
-    @Beta
     public TokenType getTokenType() {
         return TokenType.valueOf(builder.getTokenType());
     }
 
-    @Beta
     public TokenCreateTransaction setTokenType(TokenType tokenType) {
         requireNotFrozen();
         if(tokenType == TokenType.NON_FUNGIBLE_UNIQUE) {
@@ -277,24 +271,20 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return this;
     }
 
-    @Beta
     public TokenSupplyType getSupplyType() {
         return TokenSupplyType.valueOf(builder.getSupplyType());
     }
 
-    @Beta
     public TokenCreateTransaction setSupplyType(TokenSupplyType supplyType) {
         requireNotFrozen();
         builder.setSupplyType(supplyType.code);
         return this;
     }
 
-    @Beta
     public long getMaxSupply() {
         return builder.getMaxSupply();
     }
 
-    @Beta
     public TokenCreateTransaction setMaxSupply(long maxSupply) {
         requireNotFrozen();
         builder.setMaxSupply(maxSupply);

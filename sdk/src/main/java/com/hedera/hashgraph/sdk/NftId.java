@@ -1,13 +1,11 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.annotations.Beta;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import javax.annotation.Nonnegative;
 import java.util.Objects;
 import javax.annotation.Nullable;
 
-@Beta
 public class NftId {
     /**
      * The (non-fungible) token of which this NFT is an instance

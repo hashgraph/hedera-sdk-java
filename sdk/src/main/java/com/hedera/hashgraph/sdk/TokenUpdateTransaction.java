@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.annotations.Beta;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
 import com.hedera.hashgraph.sdk.proto.TokenUpdateTransactionBody;
@@ -160,12 +159,10 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         return this;
     }
 
-    @Beta
     public Key getFeeScheduleKey() {
         return Key.fromProtobufKey(builder.getFeeScheduleKey());
     }
 
-    @Beta
     public TokenUpdateTransaction setFeeScheduleKey(Key key) {
         requireNotFrozen();
         builder.setFeeScheduleKey(key.toProtobufKey());

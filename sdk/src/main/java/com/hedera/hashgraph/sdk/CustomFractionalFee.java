@@ -1,9 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 
-@Beta
 public class CustomFractionalFee extends CustomFee {
     private long numerator = 0, denominator = 1, min = 0, max = 0;
 

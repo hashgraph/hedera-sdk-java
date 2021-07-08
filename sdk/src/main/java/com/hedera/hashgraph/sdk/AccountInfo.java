@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoGetInfoResponse;
@@ -97,7 +96,6 @@ public final class AccountInfo {
 
     public final String accountMemo;
 
-    @Beta
     public final long ownedNfts;
 
     private AccountInfo(

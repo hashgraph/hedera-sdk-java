@@ -1,13 +1,9 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
-import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import javax.annotation.Nullable;
 
-
-@Beta
 class TokenNftTransfer {
     public final AccountId sender;
     public final AccountId receiver;

@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.annotations.Beta;
 import com.hedera.hashgraph.sdk.proto.TokenGetNftInfoQuery;
 import com.hedera.hashgraph.sdk.proto.TokenGetNftInfosQuery;
 import com.hedera.hashgraph.sdk.proto.TokenGetAccountNftInfosQuery;
@@ -18,7 +17,6 @@ import java.util.Objects;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 
-@Beta
 public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<TokenNftInfo>, TokenNftInfoQuery> {
     @Nullable
     private TokenGetNftInfoQuery.Builder byNftBuilder = null;

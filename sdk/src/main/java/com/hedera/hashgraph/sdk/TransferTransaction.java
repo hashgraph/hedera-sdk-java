@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.annotations.Beta;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoTransferTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
@@ -18,7 +17,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.List;
 import java.util.ArrayList;
-import javax.annotation.Nullable;
 
 public class TransferTransaction extends Transaction<TransferTransaction> {
     private final CryptoTransferTransactionBody.Builder builder;
@@ -58,12 +56,10 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return this;
     }
 
-    @Beta
     public Map<TokenId, List<TokenNftTransfer>> getTokenNftTransfers() {
         return nftTransfers;
     }
 
-    @Beta
     public TransferTransaction addNftTransfer(NftId nftId, AccountId sender, AccountId receiver) {
         requireNotFrozen();
         getNftTransferList(nftId.tokenId).add(new TokenNftTransfer(sender, receiver, nftId.serial));
