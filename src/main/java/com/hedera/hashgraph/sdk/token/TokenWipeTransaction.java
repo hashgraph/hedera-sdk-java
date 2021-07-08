@@ -6,6 +6,8 @@ import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import io.grpc.MethodDescriptor;
 
+import java.util.List;
+
 /**
  * Wipes the provided amount of tokens from the specified Account. Must be signed by the Token's Wipe key.
  * If the provided account is not found, the transaction will resolve to INVALID_ACCOUNT_ID.
@@ -60,6 +62,17 @@ public final class TokenWipeTransaction extends SingleTransactionBuilder<TokenWi
      */
     public TokenWipeTransaction setAmount(long amount) {
         builder.setAmount(amount);
+        return this;
+    }
+
+    public TokenWipeTransaction addSerial(long serial) {
+        builder.addSerialNumbers(serial);
+        return this;
+    }
+
+    public TokenWipeTransaction setSerials(List<Long> serials) {
+        builder.clearSerialNumbers();
+        builder.addAllSerialNumbers(serials);
         return this;
     }
 

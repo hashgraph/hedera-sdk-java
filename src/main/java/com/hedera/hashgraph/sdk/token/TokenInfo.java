@@ -13,6 +13,8 @@ import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TokenInfo {
     /**
@@ -120,6 +122,17 @@ public class TokenInfo {
      */
     public final Instant expiry;
 
+    public final TokenType tokenType;
+
+    public final TokenSupplyType supplyType;
+
+    public final long maxSupply;
+
+    @Nullable
+    public final PublicKey feeScheduleKey;
+
+    public final List<CustomFee> customFees;
+
     TokenInfo(com.hedera.hashgraph.proto.TokenInfo info) {
         TokenFreezeStatus defaultFreezeStatus = info.getDefaultFreezeStatus();
         TokenKycStatus defaultKycStatus = info.getDefaultKycStatus();
@@ -141,6 +154,16 @@ public class TokenInfo {
         this.autoRenewAccount = info.hasAutoRenewAccount() ? new AccountId(info.getAutoRenewAccountOrBuilder()) : null;
         this.autoRenewPeriod = DurationHelper.durationTo(info.getAutoRenewPeriod());
         this.expiry = TimestampHelper.timestampTo(info.getExpiry());
+        this.tokenType = TokenType.valueOf(info.getTokenType());
+        this.supplyType = TokenSupplyType.valueOf(info.getSupplyType());
+        this.maxSupply = info.getMaxSupply();
+        this.feeScheduleKey = info.hasFeeScheduleKey() ? Ed25519PublicKey.fromProtoKey(info.getFeeScheduleKey()) : null;
+
+        List<CustomFee> customFees = new ArrayList<>();
+        for (com.hedera.hashgraph.proto.CustomFee fee : info.getCustomFeesList()) {
+            customFees.add(CustomFee.fromProto(fee));
+        }
+        this.customFees = customFees;
     }
 
     static TokenInfo fromResponse(Response response) {

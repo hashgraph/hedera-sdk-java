@@ -10,6 +10,8 @@ import com.hedera.hashgraph.proto.ResponseCodeEnum;
 import com.hedera.hashgraph.sdk.schedule.ScheduleId;
 import com.hedera.hashgraph.sdk.token.TokenId;
 
+import java.util.List;
+
 public final class TransactionReceipt {
     public final Status status;
 
@@ -103,6 +105,10 @@ public final class TransactionReceipt {
         // FIXME[@mike-burrage-hedera]: Should this bail if there is no Topic ID
 
         return inner.getTopicRunningHash().toByteArray();
+    }
+
+    public List<Long> getSerials() {
+        return inner.getSerialNumbersList();
     }
 
     @Internal

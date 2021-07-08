@@ -263,6 +263,12 @@ public abstract class QueryBuilder<Resp, T extends QueryBuilder<Resp, T>> extend
                 return raw.getTokenGetInfo().getHeader();
             case SCHEDULEGETINFO:
                 return raw.getScheduleGetInfo().getHeader();
+            case TOKENGETACCOUNTNFTINFOS:
+                return raw.getTokenGetAccountNftInfos().getHeader();
+            case TOKENGETNFTINFO:
+                return raw.getTokenGetNftInfo().getHeader();
+            case TOKENGETNFTINFOS:
+                return raw.getTokenGetNftInfos().getHeader();
             default:
                 // NOTE: TRANSACTIONGETFASTRECORD shouldn't be handled as we don't expose that query
                 throw new RuntimeException("Unhandled response case");

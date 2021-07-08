@@ -10,6 +10,7 @@ import com.hedera.hashgraph.sdk.crypto.PublicKey;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 
 import io.grpc.MethodDescriptor;
 
@@ -202,6 +203,28 @@ public final class TokenCreateTransaction extends SingleTransactionBuilder<Token
      */
     public TokenCreateTransaction setAutoRenewPeriod(Duration period) {
         builder.setAutoRenewPeriod(DurationHelper.durationFrom(period));
+        return this;
+    }
+
+    public TokenCreateTransaction setTokenType(TokenType tokenType) {
+        builder.setTokenType(tokenType.code);
+        return this;
+    }
+
+    public TokenCreateTransaction setSupplyType(TokenSupplyType supplyType) {
+        builder.setSupplyType(supplyType.code);
+        return this;
+    }
+
+    public TokenCreateTransaction setMaxSupply(long maxSupply) {
+        builder.setMaxSupply(maxSupply);
+        return this;
+    }
+
+    public TokenCreateTransaction setCustomFees(List<CustomFee> fees) {
+        for (CustomFee fee : fees) {
+            this.builder.addCustomFees(fee.toProto());
+        }
         return this;
     }
 

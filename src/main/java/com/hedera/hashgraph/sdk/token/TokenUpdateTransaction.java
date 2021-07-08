@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk.token;
 
+import com.google.protobuf.StringValue;
 import com.hedera.hashgraph.proto.TokenUpdateTransactionBody;
 import com.hedera.hashgraph.proto.TokenServiceGrpc;
 import com.hedera.hashgraph.proto.Transaction;
@@ -161,6 +162,21 @@ public final class TokenUpdateTransaction extends SingleTransactionBuilder<Token
      */
     public TokenUpdateTransaction setAutoRenewPeriod(Duration period) {
         builder.setAutoRenewPeriod(DurationHelper.durationFrom(period));
+        return this;
+    }
+
+    public TokenUpdateTransaction setFeeScheduleKey(PublicKey key) {
+        builder.setFeeScheduleKey(key.toKeyProto());
+        return this;
+    }
+
+    public TokenUpdateTransaction setTokenMemo(String memo) {
+        builder.setMemo(StringValue.newBuilder().setValue(memo).build());
+        return this;
+    }
+
+    public TokenUpdateTransaction clearTokenMemo() {
+        builder.clearMemo();
         return this;
     }
 

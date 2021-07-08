@@ -1,9 +1,12 @@
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.proto.NftTransfer;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.schedule.ScheduleId;
 import com.hedera.hashgraph.sdk.contract.ContractFunctionResult;
+import com.hedera.hashgraph.sdk.token.AssessedCustomFee;
 import com.hedera.hashgraph.sdk.token.TokenId;
+import com.hedera.hashgraph.sdk.token.TokenNftTransfer;
 
 import java.time.Instant;
 import java.util.*;
@@ -44,7 +47,11 @@ public final class TransactionRecord {
 
     public final Map<TokenId, Map<AccountId, List<Long>>> tokenTransfers;
 
+    public final Map<TokenId, List<TokenNftTransfer>> nftTransfers;
+
     public final ScheduleId scheduleRef;
+
+    public final List<AssessedCustomFee> accessedCustomFees;
 
     private final com.hedera.hashgraph.proto.TransactionRecord inner;
 
@@ -70,10 +77,17 @@ public final class TransactionRecord {
             : Collections.emptyList();
 
         HashMap<TokenId, Map<AccountId, List<Long>>> tokenTransfers = new HashMap<>();
+        HashMap<TokenId, List<TokenNftTransfer>> nftTransfers = new HashMap<>();
+
         for (com.hedera.hashgraph.proto.TokenTransferList list : inner.getTokenTransferListsList()) {
             Map<AccountId, List<Long>> transfers = tokenTransfers.computeIfAbsent(
                 new TokenId(list.getTokenOrBuilder()),
                 k -> new HashMap<>()
+            );
+
+            List<TokenNftTransfer> nftTransfersList = nftTransfers.computeIfAbsent(
+                new TokenId(list.getTokenOrBuilder()),
+                k -> new ArrayList<>()
             );
 
             for (com.hedera.hashgraph.proto.AccountAmount aa : list.getTransfersList()) {
@@ -82,11 +96,24 @@ public final class TransactionRecord {
                     k -> new ArrayList<>()
                 ).add(aa.getAmount());
             }
+
+            for (NftTransfer transfer : list.getNftTransfersList()) {
+                nftTransfersList.add(new TokenNftTransfer(transfer));
+            }
         }
 
         this.tokenTransfers = tokenTransfers;
+        this.nftTransfers = nftTransfers;
 
         this.scheduleRef = new ScheduleId(inner.getScheduleRef());
+
+        this.accessedCustomFees = new ArrayList<AssessedCustomFee>(inner.getAssessedCustomFeesCount());
+        for(com.hedera.hashgraph.proto.AssessedCustomFee fee : inner.getAssessedCustomFeesList()) {
+            this.accessedCustomFees.add(new AssessedCustomFee(fee));
+        }
+
+
+
     }
 
     /**
