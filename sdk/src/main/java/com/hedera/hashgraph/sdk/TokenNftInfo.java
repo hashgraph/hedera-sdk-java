@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -9,6 +10,7 @@ import org.threeten.bp.Instant;
 import java.util.Objects;
 import javax.annotation.Nullable;
 
+@Beta
 public class TokenNftInfo {
     /**
      * The ID of the NFT

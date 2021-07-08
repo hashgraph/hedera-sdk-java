@@ -1,10 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import javax.annotation.Nullable;
-import java.util.Objects;
 
+@Beta
 public class CustomFixedFee extends CustomFee {
     private long amount = 0;
     @Nullable
@@ -16,10 +16,10 @@ public class CustomFixedFee extends CustomFee {
     static CustomFixedFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee, @Nullable NetworkName networkName) {
         var fixedFee = customFee.getFixedFee();
         return new CustomFixedFee()
-            .setFeeCollectorAccountId(customFee.hasFeeCollectorAccountId() ? 
+            .setFeeCollectorAccountId(customFee.hasFeeCollectorAccountId() ?
                 AccountId.fromProtobuf(customFee.getFeeCollectorAccountId(), networkName) : null)
             .setAmount(fixedFee.getAmount())
-            .setDenominatingTokenId(fixedFee.hasDenominatingTokenId() ? 
+            .setDenominatingTokenId(fixedFee.hasDenominatingTokenId() ?
                 TokenId.fromProtobuf(fixedFee.getDenominatingTokenId(), networkName) : null);
     }
 

@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.annotations.Beta;
 import com.hedera.hashgraph.sdk.proto.TokenGetNftInfoQuery;
 import com.hedera.hashgraph.sdk.proto.TokenGetNftInfosQuery;
 import com.hedera.hashgraph.sdk.proto.TokenGetAccountNftInfosQuery;
@@ -17,6 +18,7 @@ import java.util.Objects;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 
+@Beta
 public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<TokenNftInfo>, TokenNftInfoQuery> {
     @Nullable
     private TokenGetNftInfoQuery.Builder byNftBuilder = null;
@@ -39,7 +41,7 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
     private boolean isByNft() {
         return byNftBuilder != null;
     }
-    
+
     private boolean isByToken() {
         return byTokenBuilder != null;
     }
@@ -90,7 +92,7 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
      *
      * @return {@code this}
      * @param accountId The Account ID for which information is requested
-     * 
+     *
      */
     public TokenNftInfoQuery byAccountId(AccountId accountId) {
         byAccountBuilder = TokenGetAccountNftInfosQuery
@@ -135,7 +137,7 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
         return end;
     }
 
-    @Override 
+    @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
         int modesEnabled = (isByNft() ? 1 : 0) + (isByToken() ? 1 : 0) + (isByAccount() ? 1 : 0);
         if(modesEnabled > 1) {

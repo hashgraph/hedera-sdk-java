@@ -1,11 +1,13 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import javax.annotation.Nullable;
 
 
+@Beta
 class TokenNftTransfer {
     public final AccountId sender;
     public final AccountId receiver;
@@ -19,8 +21,8 @@ class TokenNftTransfer {
 
     static TokenNftTransfer fromProtobuf(com.hedera.hashgraph.sdk.proto.NftTransfer nftTransfer, @Nullable NetworkName networkName) {
         return new TokenNftTransfer(
-            AccountId.fromProtobuf(nftTransfer.getSenderAccountID()), 
-            AccountId.fromProtobuf(nftTransfer.getReceiverAccountID()), 
+            AccountId.fromProtobuf(nftTransfer.getSenderAccountID()),
+            AccountId.fromProtobuf(nftTransfer.getReceiverAccountID()),
             nftTransfer.getSerialNumber()
         );
     }

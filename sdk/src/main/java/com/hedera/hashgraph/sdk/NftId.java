@@ -1,11 +1,13 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.annotations.Beta;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import javax.annotation.Nonnegative;
 import java.util.Objects;
 import javax.annotation.Nullable;
 
+@Beta
 public class NftId {
     /**
      * The (non-fungible) token of which this NFT is an instance
@@ -42,7 +44,7 @@ public class NftId {
         if(networkName != null) {
             returnNftId.tokenId.setNetwork(networkName);
         }
-        return returnNftId; 
+        return returnNftId;
     }
 
     static NftId fromProtobuf(com.hedera.hashgraph.sdk.proto.NftID nftId) {

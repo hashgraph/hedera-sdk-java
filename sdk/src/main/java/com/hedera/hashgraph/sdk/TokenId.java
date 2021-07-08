@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.annotations.Beta;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TokenID;
 
@@ -58,6 +59,7 @@ public class TokenId {
         }
     }
 
+    @Beta
     public NftId nft(@Nonnegative long serial) {
         return new NftId(this, serial);
     }

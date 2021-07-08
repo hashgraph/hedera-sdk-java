@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TokenFreezeStatus;
@@ -73,7 +74,7 @@ public class TokenInfo {
     @Nullable
     public final Key supplyKey;
 
-    /** 
+    /**
      * The key which can change the custom fees of the token; if not set, the fees are immutable
      */
     @Nullable
@@ -115,16 +116,20 @@ public class TokenInfo {
     public final Instant expirationTime;
 
     /**
-     * The memo associated with the token 
+     * The memo associated with the token
      */
     public final String tokenMemo;
 
+    @Beta
     public final List<CustomFee> customFees;
-    
+
+    @Beta
     public final TokenType tokenType;
 
+    @Beta
     public final TokenSupplyType supplyType;
 
+    @Beta
     public final long maxSupply;
 
     TokenInfo(

@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.annotations.Beta;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TokenWipeAccountTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
@@ -110,17 +111,20 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
             accountId.validate(client);
         }
     }
-    
+
+    @Beta
     public List<Long> getSerials() {
         return builder.getSerialNumbersList();
     }
-    
+
+    @Beta
     public TokenWipeTransaction addSerial(long serial) {
         requireNotFrozen();
         builder.addSerialNumbers(serial);
         return this;
     }
 
+    @Beta
     public TokenWipeTransaction setSerials(List<Long> serials) {
         requireNotFrozen();
         builder.clearSerialNumbers();

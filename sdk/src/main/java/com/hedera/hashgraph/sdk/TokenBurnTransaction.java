@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.annotations.Beta;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TokenBurnTransactionBody;
@@ -81,17 +82,20 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
             tokenId.validate(client);
         }
     }
-    
+
+    @Beta
     public List<Long> getSerials() {
         return builder.getSerialNumbersList();
     }
 
+    @Beta
     public TokenBurnTransaction addSerial(long serial) {
         requireNotFrozen();
         builder.addSerialNumbers(serial);
         return this;
     }
 
+    @Beta
     public TokenBurnTransaction setSerials(List<Long> serials) {
         requireNotFrozen();
         builder.clearSerialNumbers();

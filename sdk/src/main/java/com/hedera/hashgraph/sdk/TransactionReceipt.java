@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -77,6 +78,7 @@ public final class TransactionReceipt {
     @Nullable
     public final TransactionId scheduledTransactionId;
 
+    @Beta
     public final List<Long> serials;
 
     private TransactionReceipt(

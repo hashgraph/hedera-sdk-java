@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.annotations.Beta;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
 import com.hedera.hashgraph.sdk.proto.*;
@@ -14,6 +15,7 @@ import java.util.Objects;
 import java.util.List;
 import java.util.ArrayList;
 
+@Beta
 public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeScheduleUpdateTransaction> {
     private final TokenFeeScheduleUpdateTransactionBody.Builder builder;
 

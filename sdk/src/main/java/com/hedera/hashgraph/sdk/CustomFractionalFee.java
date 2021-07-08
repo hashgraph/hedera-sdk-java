@@ -1,10 +1,9 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
-import javax.annotation.Nullable;
-import java.util.Objects;
 
+@Beta
 public class CustomFractionalFee extends CustomFee {
     private long numerator = 0, denominator = 1, min = 0, max = 0;
 
@@ -15,7 +14,7 @@ public class CustomFractionalFee extends CustomFee {
         var fractionalFee = customFee.getFractionalFee();
         var fraction = fractionalFee.getFractionalAmount();
         return new CustomFractionalFee()
-            .setFeeCollectorAccountId(customFee.hasFeeCollectorAccountId() ? 
+            .setFeeCollectorAccountId(customFee.hasFeeCollectorAccountId() ?
                 AccountId.fromProtobuf(customFee.getFeeCollectorAccountId()) : null)
             .setNumerator(fraction.getNumerator())
             .setDenominator(fraction.getDenominator())

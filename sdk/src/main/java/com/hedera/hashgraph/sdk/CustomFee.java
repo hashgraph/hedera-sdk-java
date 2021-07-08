@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.annotations.Beta;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.common.base.MoreObjects;
 import javax.annotation.Nullable;
@@ -7,6 +8,7 @@ import java.util.Objects;
 import java.util.List;
 import java.util.ArrayList;
 
+@Beta
 abstract public class CustomFee {
     @Nullable
     private AccountId feeCollectorAccountId = null;
@@ -18,10 +20,10 @@ abstract public class CustomFee {
         switch(customFee.getFeeCase()) {
             case FIXED_FEE:
                 return CustomFixedFee.fromProtobuf(customFee, networkName);
-            
+
             case FRACTIONAL_FEE:
                 return CustomFractionalFee.fromProtobuf(customFee);
-            
+
             default:
                 throw new IllegalStateException("CustomFee#fromProtobuf: unhandled fee case: " + customFee.getFeeCase());
         }
@@ -43,7 +45,7 @@ abstract public class CustomFee {
         return returnCustomFees;
     }
 
-    @Nullable 
+    @Nullable
     public AccountId getFeeCollectorAccountId() {
         return feeCollectorAccountId;
     }
@@ -77,7 +79,7 @@ abstract public class CustomFee {
     }
 
     abstract com.hedera.hashgraph.sdk.proto.CustomFee toProtobuf();
-    
+
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }
