@@ -10,6 +10,7 @@ public class IntegrationTestEnv {
     public PrivateKey operatorKey;
     public AccountId operatorId;
     public List<AccountId> nodeAccountIds;
+    public List<AccountId> nodeAccountIdsForChunked;
 
     public static Random random = new Random();
 
@@ -52,6 +53,16 @@ public class IntegrationTestEnv {
         operatorId = Objects.requireNonNull(response.getReceipt(client).accountId);
         operatorKey = key;
         nodeAccountIds = Collections.singletonList(response.nodeId);
+        // chunked transactions can have tricky bugs when there are multiple nodes
+        // and multiple chunks.  Need to add a second nodeId to catch these bugs.
+        nodeAccountIdsForChunked = new ArrayList<>();
+        nodeAccountIdsForChunked.add(response.nodeId);
+        for(var nodeId : client.getNetwork().values()) {
+            if( ! nodeAccountIdsForChunked.contains(nodeId)) {
+                nodeAccountIdsForChunked.add(nodeId);
+                break;
+            }
+        }
         client.setOperator(operatorId, operatorKey);
     }
 }
