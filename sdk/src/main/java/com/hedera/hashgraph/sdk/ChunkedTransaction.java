@@ -244,6 +244,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
                             .toByteString()
                     )
                 );
+                transactions.add(null);
             }
 
             // add 1 ns to the validStart to make cascading transaction IDs
