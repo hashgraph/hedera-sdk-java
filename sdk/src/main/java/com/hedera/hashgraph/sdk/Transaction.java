@@ -623,7 +623,9 @@ public abstract class Transaction<T extends Transaction<T>>
             return (T) this;
         }
 
-        transactions.clear();
+        for(int i = 0; i < transactions.size(); i++) {
+            transactions.set(i, null);
+        }
         publicKeys.add(publicKey);
         signers.add(transactionSigner);
 
@@ -673,7 +675,9 @@ public abstract class Transaction<T extends Transaction<T>>
             return (T) this;
         }
 
-        transactions.clear();
+        for(int i = 0; i < transactions.size(); i++) {
+            transactions.set(i, null);
+        }
         publicKeys.add(publicKey);
         signers.add(null);
         signatures.get(0).addSigPair(publicKey.toSignaturePairProtobuf(signature));
@@ -799,6 +803,7 @@ public abstract class Transaction<T extends Transaction<T>>
                     .build()
                     .toByteString()
                 ));
+            transactions.add(null);
         }
 
         // noinspection unchecked
@@ -815,12 +820,7 @@ public abstract class Transaction<T extends Transaction<T>>
      * Will build the specific transaction at {@code index} and will fill with `null` for any empty indices before it
      */
     void buildTransaction(int index) {
-        if (transactions.size() < index) {
-            for (var i = transactions.size(); i < index - 1; ++i) {
-                transactions.add(null);
-            }
-        } else if (
-            transactions.size() > index &&
+        if (
                 transactions.get(index) != null &&
                 !transactions.get(index).getSignedTransactionBytes().isEmpty()
         ) {
@@ -829,7 +829,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
         signTransaction(index);
 
-        transactions.add(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
+        transactions.set(index, com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
             .setSignedTransactionBytes(
                 signedTransactions.get(index)
                     .setSigMap(signatures.get(index))
@@ -839,7 +839,7 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     /**
-     * Will sign the specific transaction at {@code index} and will fill with `null` for any empty indices before it
+     * Will sign the specific transaction at {@code index}
      */
     void signTransaction(int index) {
         if (signatures.get(index).getSigPairCount() != 0) {
@@ -847,9 +847,12 @@ public abstract class Transaction<T extends Transaction<T>>
                 var publicKey = publicKeys.get(i);
                 var signer = signers.get(i);
 
-                if (signer != null &&
-                        signatures.get(index).getSigPair(0).getPubKeyPrefix().equals(ByteString.copyFrom(publicKey.toBytes()))) {
-                    return;
+                if (signer != null) {
+                    for(var pair : signatures.get(index).getSigPairList()) {
+                        if(pair.getPubKeyPrefix().equals(ByteString.copyFrom(publicKey.toBytes()))) {
+                            return;
+                        }
+                    }
                 }
             }
         }
