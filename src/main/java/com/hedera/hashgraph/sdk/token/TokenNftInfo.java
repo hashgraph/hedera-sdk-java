@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk.token;
 
+import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.account.AccountId;
@@ -7,6 +8,7 @@ import com.hedera.hashgraph.sdk.account.AccountId;
 import java.time.Instant;
 import java.util.Objects;
 
+@Beta
 public class TokenNftInfo {
     /**
      * The ID of the NFT

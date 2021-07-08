@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk.token;
 
+import com.google.common.annotations.Beta;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.proto.*;
 import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
@@ -46,17 +47,20 @@ public final class TokenMintTransaction extends SingleTransactionBuilder<TokenMi
         return this;
     }
 
+    @Beta
     public TokenMintTransaction addMetadata(String metadata) {
         builder.addMetadata(ByteString.copyFrom(Hex.decode(metadata)));
         return this;
     }
 
+    @Beta
     public TokenMintTransaction addMetadata(byte[] metadata) {
         builder.addMetadata(ByteString.copyFrom(metadata));
         return this;
     }
 
-    public TokenMintTransaction addMetadatas(List<byte[]> metadatas) {
+    @Beta
+    public TokenMintTransaction addMetadata(List<byte[]> metadatas) {
         for(byte[] metadata : metadatas) {
             builder.addMetadata(ByteString.copyFrom(metadata));
         }

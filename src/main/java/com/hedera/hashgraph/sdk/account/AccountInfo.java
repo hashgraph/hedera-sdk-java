@@ -41,6 +41,8 @@ public final class AccountInfo {
 
     public final Map<TokenId, TokenRelationship> tokenRelationships;
 
+    public final long ownedNfts;
+
     AccountInfo(CryptoGetInfoResponse.AccountInfoOrBuilder info) {
         if (!info.hasKey()) {
             throw new IllegalArgumentException("query response missing key");
@@ -67,6 +69,7 @@ public final class AccountInfo {
         }
 
         this.tokenRelationships = Collections.unmodifiableMap(relationships);
+        this.ownedNfts = info.getOwnedNfts();
     }
 
     static AccountInfo fromResponse(Response response) {
@@ -95,6 +98,7 @@ public final class AccountInfo {
             .add("expirationTime", expirationTime)
             .add("autoRenewPeriod", autoRenewPeriod)
             .add("tokenRelationships", tokenRelationships)
+            .add("ownedNfts", ownedNfts)
             .toString();
     }
 }

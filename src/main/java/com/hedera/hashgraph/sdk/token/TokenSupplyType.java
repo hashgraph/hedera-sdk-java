@@ -1,5 +1,8 @@
 package com.hedera.hashgraph.sdk.token;
 
+import com.google.common.annotations.Beta;
+
+@Beta
 public enum TokenSupplyType {
     /*
      * Indicates that tokens of that type have an upper bound of Long.MAX_VALUE.

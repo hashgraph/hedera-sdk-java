@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.annotations.Beta;
 import com.hedera.hashgraph.proto.Response;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
@@ -107,6 +108,7 @@ public final class TransactionReceipt {
         return inner.getTopicRunningHash().toByteArray();
     }
 
+    @Beta
     public List<Long> getSerials() {
         return inner.getSerialNumbersList();
     }

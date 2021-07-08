@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk.token;
 
+import com.google.common.annotations.Beta;
 import com.hedera.hashgraph.proto.TokenCreateTransactionBody;
 import com.hedera.hashgraph.proto.TokenServiceGrpc;
 import com.hedera.hashgraph.proto.Transaction;
@@ -206,22 +207,26 @@ public final class TokenCreateTransaction extends SingleTransactionBuilder<Token
         return this;
     }
 
+    @Beta
     public TokenCreateTransaction setTokenType(TokenType tokenType) {
         builder.setTokenType(tokenType.code);
         return this;
     }
 
+    @Beta
     public TokenCreateTransaction setSupplyType(TokenSupplyType supplyType) {
         builder.setSupplyType(supplyType.code);
         return this;
     }
 
+    @Beta
     public TokenCreateTransaction setMaxSupply(long maxSupply) {
         builder.setMaxSupply(maxSupply);
         return this;
     }
 
-    public TokenCreateTransaction setCustomFeeList(List<CustomFee> fees) {
+    @Beta
+    public TokenCreateTransaction setCustomFees(List<CustomFee> fees) {
         for (CustomFee fee : fees) {
             this.builder.addCustomFees(fee.toProto());
         }

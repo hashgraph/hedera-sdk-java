@@ -1,5 +1,8 @@
 package com.hedera.hashgraph.sdk.token;
 
+import com.google.common.annotations.Beta;
+
+@Beta
 public enum TokenType {
     /**
      * Interchangeable value with one another, where any quantity of them has the same value as another equal quantity if they are in the same class.

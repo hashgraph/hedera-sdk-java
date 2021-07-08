@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk.token;
 
+import com.google.common.annotations.Beta;
 import com.hedera.hashgraph.proto.Query;
 import com.hedera.hashgraph.proto.QueryHeader;
 import com.hedera.hashgraph.proto.TokenGetAccountNftInfosQuery;
@@ -22,6 +23,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import javax.annotation.Nonnegative;
 
+@Beta
 public class TokenNftInfoQuery extends QueryBuilder<List<TokenNftInfo>, TokenNftInfoQuery> {
     private TokenGetNftInfoQuery.Builder byNftBuilder;
     private TokenGetNftInfosQuery.Builder byTokenBuilder;

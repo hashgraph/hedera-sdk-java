@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk.token;
 
+import com.google.common.annotations.Beta;
 import com.hedera.hashgraph.proto.TokenFeeScheduleUpdateTransactionBody;
 import com.hedera.hashgraph.proto.TokenServiceGrpc;
 import com.hedera.hashgraph.proto.Transaction;
@@ -10,6 +11,7 @@ import java.util.List;
 
 import io.grpc.MethodDescriptor;
 
+@Beta
 public final class TokenFeeScheduleUpdateTransaction extends SingleTransactionBuilder<TokenFeeScheduleUpdateTransaction> {
     private final TokenFeeScheduleUpdateTransactionBody.Builder builder = bodyBuilder.getTokenFeeScheduleUpdateBuilder();
 
@@ -22,7 +24,7 @@ public final class TokenFeeScheduleUpdateTransaction extends SingleTransactionBu
         return this;
     }
 
-    public TokenFeeScheduleUpdateTransaction setCustomFeeList(List<CustomFee> fees) {
+    public TokenFeeScheduleUpdateTransaction setCustomFees(List<CustomFee> fees) {
         for (CustomFee fee : fees) {
             this.builder.addCustomFees(fee.toProto());
         }

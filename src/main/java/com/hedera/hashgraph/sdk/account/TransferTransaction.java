@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk.account;
 
+import com.google.common.annotations.Beta;
 import com.hedera.hashgraph.proto.*;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.SingleTransactionBuilder;
@@ -7,9 +8,7 @@ import com.hedera.hashgraph.sdk.token.NftId;
 import com.hedera.hashgraph.sdk.token.TokenId;
 import io.grpc.MethodDescriptor;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
-import java.util.Map;
 
 public final class TransferTransaction extends SingleTransactionBuilder<TransferTransaction> {
     private final CryptoTransferTransactionBody.Builder builder = bodyBuilder.getCryptoTransferBuilder();
@@ -59,7 +58,8 @@ public final class TransferTransaction extends SingleTransactionBuilder<Transfer
         return this;
     }
 
-    public TransferTransaction addTokenNftTransfer(NftId nftId, AccountId sender, AccountId receiver) {
+    @Beta
+    public TransferTransaction addNftTransfer(NftId nftId, AccountId sender, AccountId receiver) {
         Integer index = tokenIndexes.get(nftId.tokenId);
         int size = builder.getTokenTransfersCount();
 
@@ -79,6 +79,7 @@ public final class TransferTransaction extends SingleTransactionBuilder<Transfer
             .setSenderAccountID(sender.toProto())
             .setSerialNumber(nftId.serial)
         );
+
         return this;
     }
 
@@ -89,17 +90,5 @@ public final class TransferTransaction extends SingleTransactionBuilder<Transfer
     @Override
     protected MethodDescriptor<Transaction, TransactionResponse> getMethod() {
         return CryptoServiceGrpc.getCryptoTransferMethod();
-    }
-
-    class NftTransfer {
-        @Nullable
-        public AccountId sender, receiver;
-        public long serial;
-
-        public NftTransfer(@Nullable AccountId sender, @Nullable AccountId receiver, long serial) {
-            this.sender = sender;
-            this.receiver = receiver;
-            this.serial = serial;
-        }
     }
 }
