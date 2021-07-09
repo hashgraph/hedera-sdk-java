@@ -1038,7 +1038,22 @@ public enum Status {
     /**
      * The provided custom fee schedule key was invalid
      */
-    INVALID_CUSTOM_FEE_SCHEDULE_KEY(ResponseCodeEnum.INVALID_CUSTOM_FEE_SCHEDULE_KEY);
+    INVALID_CUSTOM_FEE_SCHEDULE_KEY(ResponseCodeEnum.INVALID_CUSTOM_FEE_SCHEDULE_KEY),
+
+    /** 
+     * The requested token mint metadata was invalid
+     */
+    INVALID_TOKEN_MINT_METADATA(ResponseCodeEnum.INVALID_TOKEN_MINT_METADATA),
+
+    /** 
+     * The requested token burn metadata was invalid
+     */
+    INVALID_TOKEN_BURN_METADATA(ResponseCodeEnum.INVALID_TOKEN_BURN_METADATA),
+
+    /** 
+     * The treasury for a unique token cannot be changed until it owns no NFTs
+     */
+    CURRENT_TREASURY_STILL_OWNS_NFTS(ResponseCodeEnum.CURRENT_TREASURY_STILL_OWNS_NFTS);
 
     final ResponseCodeEnum code;
 
@@ -1461,6 +1476,12 @@ public enum Status {
                 return CUSTOM_FRACTIONAL_FEE_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON;
             case INVALID_CUSTOM_FEE_SCHEDULE_KEY:
                 return INVALID_CUSTOM_FEE_SCHEDULE_KEY;
+            case INVALID_TOKEN_MINT_METADATA:
+                return INVALID_TOKEN_MINT_METADATA;
+            case INVALID_TOKEN_BURN_METADATA:
+                return INVALID_TOKEN_BURN_METADATA;
+            case CURRENT_TREASURY_STILL_OWNS_NFTS:
+                return CURRENT_TREASURY_STILL_OWNS_NFTS;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
