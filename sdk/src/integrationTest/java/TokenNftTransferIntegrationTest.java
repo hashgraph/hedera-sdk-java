@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Disabled;
 
 import java.util.Collections;
 import java.util.Objects;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,7 +35,6 @@ class TokenNftTransferIntegrationTest {
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
-                .setDecimals(3)
                 .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
                 .setTreasuryAccountId(testEnv.operatorId)
                 .setAdminKey(testEnv.operatorKey)
@@ -51,7 +51,7 @@ class TokenNftTransferIntegrationTest {
             var mintReceipt = new TokenMintTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
-                .setAmount(100)
+                .setMetadata(NftMetadataGenerator.generate((byte)10))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -72,7 +72,7 @@ class TokenNftTransferIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            var serialsToTransfer = mintReceipt.serials.subList(0, 10);
+            var serialsToTransfer = new ArrayList<Long>(mintReceipt.serials.subList(0, 4));
             var transfer = new TransferTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds);
             for(var serial : serialsToTransfer) {

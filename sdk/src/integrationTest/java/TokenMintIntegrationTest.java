@@ -210,7 +210,6 @@ class TokenMintIntegrationTest {
                     .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
-                    .setDecimals(3)
                     .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
                     .setTreasuryAccountId(testEnv.operatorId)
                     .setAdminKey(testEnv.operatorKey)
@@ -226,12 +225,11 @@ class TokenMintIntegrationTest {
 
             var receipt = new TokenMintTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
-                .setAmount(10)
+                .setMetadata(NftMetadataGenerator.generate((byte)10))
                 .setTokenId(tokenId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            assertEquals(receipt.totalSupply, 10);
             assertEquals(receipt.serials.size(), 10);
 
             testEnv.client.close();

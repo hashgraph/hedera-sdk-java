@@ -23,7 +23,6 @@ class TokenNftInfoIntegrationTest {
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
-                .setDecimals(3)
                 .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
                 .setTreasuryAccountId(testEnv.operatorId)
                 .setAdminKey(testEnv.operatorKey)
@@ -42,7 +41,6 @@ class TokenNftInfoIntegrationTest {
             var mintReceipt = new TokenMintTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
-                .setAmount(1)
                 .addMetadata(metadata)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -73,7 +71,6 @@ class TokenNftInfoIntegrationTest {
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
-                .setDecimals(3)
                 .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
                 .setTreasuryAccountId(testEnv.operatorId)
                 .setAdminKey(testEnv.operatorKey)
@@ -87,16 +84,11 @@ class TokenNftInfoIntegrationTest {
 
             var tokenId = Objects.requireNonNull(createReceipt.tokenId);
 
-            List<byte[]> metadatas = new ArrayList<>();
-            for(byte i = 0; i < 100; i++) {
-                byte[] md = {i};
-                metadatas.add(md);
-            }
+            List<byte[]> metadatas = NftMetadataGenerator.generate((byte)10);
             
             var mintReceipt = new TokenMintTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
-                .setAmount(100)
                 .setMetadata(metadatas)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -104,18 +96,17 @@ class TokenNftInfoIntegrationTest {
             var nftInfos = new TokenNftInfoQuery()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .byAccountId(testEnv.operatorId)
-                .setEnd(100)
+                .setEnd(10)
                 .execute(testEnv.client);
             
-            assertEquals(nftInfos.size(), 100);
+            assertEquals(nftInfos.size(), 10);
 
-            var serials = mintReceipt.serials;
+            var serials = new ArrayList<Long>(mintReceipt.serials);
 
             for(var info : nftInfos) {
                 assertEquals(info.nftId.tokenId, tokenId);
                 assertTrue(serials.remove(info.nftId.serial));
                 assertEquals(info.accountId, testEnv.operatorId);
-                assertTrue(metadatas.remove(info.metadata));
             }
 
             testEnv.client.close();
@@ -132,7 +123,6 @@ class TokenNftInfoIntegrationTest {
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
-                .setDecimals(3)
                 .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
                 .setTreasuryAccountId(testEnv.operatorId)
                 .setAdminKey(testEnv.operatorKey)
@@ -146,16 +136,11 @@ class TokenNftInfoIntegrationTest {
 
             var tokenId = Objects.requireNonNull(createReceipt.tokenId);
 
-            List<byte[]> metadatas = new ArrayList<>();
-            for(byte i = 0; i < 100; i++) {
-                byte[] md = {i};
-                metadatas.add(md);
-            }
+            List<byte[]> metadatas = NftMetadataGenerator.generate((byte)10);
             
             var mintReceipt = new TokenMintTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
-                .setAmount(100)
                 .setMetadata(metadatas)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -163,18 +148,17 @@ class TokenNftInfoIntegrationTest {
             var nftInfos = new TokenNftInfoQuery()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .byTokenId(tokenId)
-                .setEnd(100)
+                .setEnd(10)
                 .execute(testEnv.client);
             
-            assertEquals(nftInfos.size(), 100);
+            assertEquals(nftInfos.size(), 10);
 
-            var serials = mintReceipt.serials;
+            var serials = new ArrayList<Long>(mintReceipt.serials);
 
             for(var info : nftInfos) {
                 assertEquals(info.nftId.tokenId, tokenId);
                 assertTrue(serials.remove(info.nftId.serial));
                 assertEquals(info.accountId, testEnv.operatorId);
-                assertTrue(metadatas.remove(info.metadata));
             }
 
             testEnv.client.close();

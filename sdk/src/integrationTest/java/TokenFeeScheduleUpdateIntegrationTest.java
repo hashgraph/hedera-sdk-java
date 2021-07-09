@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @Disabled
-class TokenCustomFeeUpdateIntegrationTest {
+class TokenFeeScheduleUpdateIntegrationTest {
     @Test
     @DisplayName("Can update token")
     void canUpdateToken() {
@@ -64,8 +64,15 @@ class TokenCustomFeeUpdateIntegrationTest {
 
             new TokenFeeScheduleUpdateTransaction()
                 .setTokenId(tokenId)
-                .addCustomFee(new CustomFixedFee().setAmount(10).setFeeCollectorAccountId(testEnv.operatorId))
-                .addCustomFee(new CustomFractionalFee().setNumerator(1).setDenominator(20).setMin(1).setMax(10))
+                .addCustomFee(new CustomFixedFee()
+                    .setAmount(10)
+                    .setFeeCollectorAccountId(testEnv.operatorId))
+                .addCustomFee(new CustomFractionalFee()
+                    .setNumerator(1)
+                    .setDenominator(20)
+                    .setMin(1)
+                    .setMax(10)
+                    .setFeeCollectorAccountId(testEnv.operatorId))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -75,8 +82,8 @@ class TokenCustomFeeUpdateIntegrationTest {
                 .execute(testEnv.client);
 
             assertEquals(tokenId, info.tokenId);
-            assertEquals(info.name, "aaaa");
-            assertEquals(info.symbol, "A");
+            assertEquals(info.name, "ffff");
+            assertEquals(info.symbol, "F");
             assertEquals(info.decimals, 3);
             assertEquals(testEnv.operatorId, info.treasuryAccountId);
             assertNotNull(info.adminKey);
