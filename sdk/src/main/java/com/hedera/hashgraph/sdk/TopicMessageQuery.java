@@ -31,8 +31,7 @@ public final class TopicMessageQuery {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TopicMessageQuery.class);
     private static final Pattern RST_STREAM = Pattern
-            .compile(".*(rst.stream.*internal.error|internal.error.*rst.stream).*",
-                    Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+            .compile(".*\\brst[^0-9a-zA-Z]stream\\b.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
     private final ConsensusTopicQuery.Builder builder;
     private Runnable completionHandler = this::onComplete;
@@ -138,7 +137,7 @@ public final class TopicMessageQuery {
             return (code == Status.Code.NOT_FOUND) ||
                     (code == Status.Code.UNAVAILABLE) ||
                     (code == Status.Code.RESOURCE_EXHAUSTED) ||
-                    ((code == Status.Code.INTERNAL) && RST_STREAM.matcher(description).matches());
+                    (code == Status.Code.INTERNAL && description != null && RST_STREAM.matcher(description).matches());
         }
 
         return false;
