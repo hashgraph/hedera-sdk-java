@@ -517,7 +517,7 @@ public enum Status {
     ENTITY_NOT_ALLOWED_TO_DELETE(ResponseCodeEnum.ENTITY_NOT_ALLOWED_TO_DELETE),
 
     /**
-     * Violating one of these rules: 1) treasury account can update all entities below 0.0.1000, 2) account 0.0.50 can update all entities from 0.0.51 - 0.0.80, 3) Network Function Master Account A/c 0.0.50 - Update all Network Function accounts and perform all the Network Functions listed below, 4) Network Function Accounts: i) A/c 0.0.55 - Update Address Book files (0.0.101/102), ii) A/c 0.0.56 - Update Fee schedule (0.0.111), iii) A/c 0.0.57 - Update Exchange Rate (0.0.112).
+     * Violating one of these rules: 1) treasury account can update all entities below 0.0.1000, 2) account 0.0.50 can update all entities from 0.0.51 - 0.0.80, 3) Network Function Master Account A/c 0.0.50 - Update all Network Function accounts &amp; perform all the Network Functions listed below, 4) Network Function Accounts: i) A/c 0.0.55 - Update Address Book files (0.0.101/102), ii) A/c 0.0.56 - Update Fee schedule (0.0.111), iii) A/c 0.0.57 - Update Exchange Rate (0.0.112).
      */
     AUTHORIZATION_FAILED(ResponseCodeEnum.AUTHORIZATION_FAILED),
 
@@ -1038,7 +1038,22 @@ public enum Status {
     /**
      * The provided custom fee schedule key was invalid
      */
-    INVALID_CUSTOM_FEE_SCHEDULE_KEY(ResponseCodeEnum.INVALID_CUSTOM_FEE_SCHEDULE_KEY);
+    INVALID_CUSTOM_FEE_SCHEDULE_KEY(ResponseCodeEnum.INVALID_CUSTOM_FEE_SCHEDULE_KEY),
+
+    /** 
+     * The requested token mint metadata was invalid
+     */
+    INVALID_TOKEN_MINT_METADATA(ResponseCodeEnum.INVALID_TOKEN_MINT_METADATA),
+
+    /** 
+     * The requested token burn metadata was invalid
+     */
+    INVALID_TOKEN_BURN_METADATA(ResponseCodeEnum.INVALID_TOKEN_BURN_METADATA),
+
+    /** 
+     * The treasury for a unique token cannot be changed until it owns no NFTs
+     */
+    CURRENT_TREASURY_STILL_OWNS_NFTS(ResponseCodeEnum.CURRENT_TREASURY_STILL_OWNS_NFTS);
 
     final ResponseCodeEnum code;
 
@@ -1461,6 +1476,12 @@ public enum Status {
                 return CUSTOM_FRACTIONAL_FEE_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON;
             case INVALID_CUSTOM_FEE_SCHEDULE_KEY:
                 return INVALID_CUSTOM_FEE_SCHEDULE_KEY;
+            case INVALID_TOKEN_MINT_METADATA:
+                return INVALID_TOKEN_MINT_METADATA;
+            case INVALID_TOKEN_BURN_METADATA:
+                return INVALID_TOKEN_BURN_METADATA;
+            case CURRENT_TREASURY_STILL_OWNS_NFTS:
+                return CURRENT_TREASURY_STILL_OWNS_NFTS;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
