@@ -2,12 +2,16 @@ package com.hedera.hashgraph.sdk;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.inprocess.InProcessChannelBuilder;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 
 abstract class ManagedNode {
+
+    private static final String IN_PROCESS = "in-process:";
+
     String address;
     final ExecutorService executor;
     long lastUsed = 0;
@@ -32,7 +36,14 @@ abstract class ManagedNode {
             return channel;
         }
 
-        var channelBuilder = ManagedChannelBuilder.forTarget(address);
+        ManagedChannelBuilder channelBuilder;
+
+        if (address.startsWith(IN_PROCESS)) {
+          String name = address.substring(IN_PROCESS.length());
+          channelBuilder = InProcessChannelBuilder.forName(name);
+        } else {
+          channelBuilder = ManagedChannelBuilder.forTarget(address);
+        }
 
         if (address.endsWith(":50212") || address.endsWith(":443")) {
             channelBuilder.useTransportSecurity();
