@@ -103,7 +103,6 @@ class TokenWipeIntegrationTest {
                     .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
-                    .setDecimals(3)
                     .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
                     .setTreasuryAccountId(testEnv.operatorId)
                     .setAdminKey(testEnv.operatorKey)
@@ -120,7 +119,7 @@ class TokenWipeIntegrationTest {
             var mintReceipt = new TokenMintTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
-                .setAmount(100)
+                .setMetadata(NftMetadataGenerator.generate((byte)10))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -140,7 +139,7 @@ class TokenWipeIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            var serialsToTransfer = mintReceipt.serials.subList(0, 10);
+            var serialsToTransfer = mintReceipt.serials.subList(0, 4);
             var transfer = new TransferTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds);
             for(var serial : serialsToTransfer) {

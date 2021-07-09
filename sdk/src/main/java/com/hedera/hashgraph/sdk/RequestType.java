@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.hedera.hashgraph.sdk.proto.HederaFunctionality;
 
 public enum RequestType {
+
     /**
      * UNSPECIFIED - Need to keep first value as unspecified because first element is ignored and not parsed (0 is ignored by parser)
      */
@@ -214,6 +215,7 @@ public enum RequestType {
     CONSENSUS_SUBMIT_MESSAGE(HederaFunctionality.ConsensusSubmitMessage),
 
     UNCHECKED_SUBMIT(HederaFunctionality.UncheckedSubmit),
+
     /**
      * Create Token
      */
@@ -299,20 +301,25 @@ public enum RequestType {
      */
     SCHEDULE_GET_INFO(HederaFunctionality.ScheduleGetInfo),
 
-    /*
+    /**
      * Get Token Account Nft Information
      */
     TOKEN_GET_ACCOUNT_NFT_INFOS(HederaFunctionality.TokenGetAccountNftInfos),
 
-    /*
+    /**
      * Get Token Nft Information
      */
     TOKEN_GET_NFT_INFO(HederaFunctionality.TokenGetNftInfo),
 
-    /*
+    /**
      * Get Token Nft List Information
      */
-    TOKEN_GET_NFT_INFOS(HederaFunctionality.TokenGetNftInfos);
+    TOKEN_GET_NFT_INFOS(HederaFunctionality.TokenGetNftInfos),
+
+    /**
+     * Update a token's custom fee schedule, if permissible
+     */
+    TOKEN_FEE_SCHEDULE_UPDATE(HederaFunctionality.TokenFeeScheduleUpdate);
 
     final HederaFunctionality code;
 
@@ -322,6 +329,7 @@ public enum RequestType {
 
     static RequestType valueOf(HederaFunctionality code) {
         switch (code) {
+
             case NONE:
                 return NONE;
             case CryptoTransfer:
@@ -448,14 +456,17 @@ public enum RequestType {
                 return TOKEN_GET_NFT_INFO;
             case TokenGetNftInfos:
                 return TOKEN_GET_NFT_INFOS;
+            case TokenFeeScheduleUpdate:
+                return TOKEN_FEE_SCHEDULE_UPDATE;
             default:
-                throw new IllegalStateException("(BUG) unhandled HederaFunctionality " + code.getNumber());
+                throw new IllegalStateException("(BUG) unhandled HederaFunctionality");
         }
     }
 
     @Override
     public String toString() {
         switch(this) {
+
             case NONE:
                 return "NONE";
             case CRYPTO_TRANSFER:
@@ -582,6 +593,8 @@ public enum RequestType {
                 return "TOKEN_GET_NFT_INFO";
             case TOKEN_GET_NFT_INFOS:
                 return "TOKEN_GET_NFT_INFOS";
+            case TOKEN_FEE_SCHEDULE_UPDATE:
+                return "TOKEN_FEE_SCHEDULE_UPDATE";
             default:
                 return "<UNRECOGNIZED VALUE>";
         }

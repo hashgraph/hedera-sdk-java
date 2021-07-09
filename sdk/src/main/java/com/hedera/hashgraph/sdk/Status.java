@@ -10,8 +10,9 @@ import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
  * successful transaction.
  */
 public enum Status {
+
     /**
-     * The transaction passed the pre-check validation.
+     * The transaction passed the precheck validations.
      */
     OK(ResponseCodeEnum.OK),
 
@@ -26,14 +27,12 @@ public enum Status {
     PAYER_ACCOUNT_NOT_FOUND(ResponseCodeEnum.PAYER_ACCOUNT_NOT_FOUND),
 
     /**
-     * Node Account provided does not match the node account of the node the transaction was
-     * submitted to.
+     * Node Account provided does not match the node account of the node the transaction was submitted to.
      */
     INVALID_NODE_ACCOUNT(ResponseCodeEnum.INVALID_NODE_ACCOUNT),
 
     /**
-     * Pre-Check error when TransactionValidStart + transactionValidDuration is less than current
-     * consensus time.
+     * Pre-Check error when TransactionValidStart + transactionValidDuration is less than current consensus time.
      */
     TRANSACTION_EXPIRED(ResponseCodeEnum.TRANSACTION_EXPIRED),
 
@@ -68,8 +67,7 @@ public enum Status {
     INSUFFICIENT_PAYER_BALANCE(ResponseCodeEnum.INSUFFICIENT_PAYER_BALANCE),
 
     /**
-     * This transaction ID is a duplicate of one that was submitted to this node or reached
-     * consensus in the last 180 seconds (receipt period)
+     * This transaction ID is a duplicate of one that was submitted to this node or reached consensus in the last 180 seconds (receipt period)
      */
     DUPLICATE_TRANSACTION(ResponseCodeEnum.DUPLICATE_TRANSACTION),
 
@@ -119,7 +117,7 @@ public enum Status {
     INVALID_SOLIDITY_ID(ResponseCodeEnum.INVALID_SOLIDITY_ID),
 
     /**
-     * Transaction hasn't yet reached consensus, or has already expired
+     * The responding node has submitted the transaction to the network. Its final status is still unknown.
      */
     UNKNOWN(ResponseCodeEnum.UNKNOWN),
 
@@ -189,8 +187,7 @@ public enum Status {
     CONTRACT_EXECUTION_EXCEPTION(ResponseCodeEnum.CONTRACT_EXECUTION_EXCEPTION),
 
     /**
-     * In Query validation, account with +ve(amount) value should be Receiving node account, the
-     * receiver account should be only one account in the list
+     * In Query validation, account with +ve(amount) value should be Receiving node account, the receiver account should be only one account in the list
      */
     INVALID_RECEIVING_NODE_ACCOUNT(ResponseCodeEnum.INVALID_RECEIVING_NODE_ACCOUNT),
 
@@ -270,37 +267,34 @@ public enum Status {
     INVALID_TRANSACTION_BODY(ResponseCodeEnum.INVALID_TRANSACTION_BODY),
 
     /**
-     * the type of key (base ed25519 key, KeyList, or ThresholdKey) does not match the type of
-     * signature (base ed25519 signature, SignatureList, or ThresholdKeySignature)
+     * the type of key (base ed25519 key, KeyList, or ThresholdKey) does not match the type of signature (base ed25519 signature, SignatureList, or ThresholdKeySignature)
      */
     INVALID_SIGNATURE_TYPE_MISMATCHING_KEY(ResponseCodeEnum.INVALID_SIGNATURE_TYPE_MISMATCHING_KEY),
 
     /**
-     * the number of key (KeyList, or ThresholdKey) does not match that of signature (SignatureList,
-     * or ThresholdKeySignature). e.g. if a keyList has 3 base keys, then the corresponding
-     * signatureList should also have 3 base signatures.
+     * the number of key (KeyList, or ThresholdKey) does not match that of signature (SignatureList, or ThresholdKeySignature). e.g. if a keyList has 3 base keys, then the corresponding signatureList should also have 3 base signatures.
      */
     INVALID_SIGNATURE_COUNT_MISMATCHING_KEY(ResponseCodeEnum.INVALID_SIGNATURE_COUNT_MISMATCHING_KEY),
 
     /**
-     * the claim body is empty
+     * the livehash body is empty
      */
     EMPTY_LIVE_HASH_BODY(ResponseCodeEnum.EMPTY_LIVE_HASH_BODY),
 
     /**
-     * the hash for the claim is empty
+     * the livehash data is missing
      */
-    EMPTY_LIVE_HASH_HASH(ResponseCodeEnum.EMPTY_LIVE_HASH),
+    EMPTY_LIVE_HASH(ResponseCodeEnum.EMPTY_LIVE_HASH),
 
     /**
-     * the key list is empty
+     * the keys for a livehash are missing
      */
     EMPTY_LIVE_HASH_KEYS(ResponseCodeEnum.EMPTY_LIVE_HASH_KEYS),
 
     /**
-     * the size of the claim hash is not 48 bytes
+     * the livehash data is not the output of a SHA-384 digest
      */
-    INVALID_LIVE_HASH_HASH_SIZE(ResponseCodeEnum.INVALID_LIVE_HASH_SIZE),
+    INVALID_LIVE_HASH_SIZE(ResponseCodeEnum.INVALID_LIVE_HASH_SIZE),
 
     /**
      * the query body is empty
@@ -308,12 +302,12 @@ public enum Status {
     EMPTY_QUERY_BODY(ResponseCodeEnum.EMPTY_QUERY_BODY),
 
     /**
-     * the crypto claim query is empty
+     * the crypto livehash query is empty
      */
     EMPTY_LIVE_HASH_QUERY(ResponseCodeEnum.EMPTY_LIVE_HASH_QUERY),
 
     /**
-     * the crypto claim doesn't exists in the file system. It expired or was never persisted.
+     * the livehash is not present
      */
     LIVE_HASH_NOT_FOUND(ResponseCodeEnum.LIVE_HASH_NOT_FOUND),
 
@@ -323,7 +317,7 @@ public enum Status {
     ACCOUNT_ID_DOES_NOT_EXIST(ResponseCodeEnum.ACCOUNT_ID_DOES_NOT_EXIST),
 
     /**
-     * the claim hash already exists
+     * the livehash already exists for a given account
      */
     LIVE_HASH_ALREADY_EXISTS(ResponseCodeEnum.LIVE_HASH_ALREADY_EXISTS),
 
@@ -363,8 +357,7 @@ public enum Status {
     KEY_PREFIX_MISMATCH(ResponseCodeEnum.KEY_PREFIX_MISMATCH),
 
     /**
-     * transaction not created by platform due to either large backlog or message size exceeded
-     * transactionMaxBytes
+     * transaction not created by platform due to large backlog
      */
     PLATFORM_TRANSACTION_NOT_CREATED(ResponseCodeEnum.PLATFORM_TRANSACTION_NOT_CREATED),
 
@@ -399,14 +392,12 @@ public enum Status {
     SETTING_NEGATIVE_ACCOUNT_BALANCE(ResponseCodeEnum.SETTING_NEGATIVE_ACCOUNT_BALANCE),
 
     /**
-     * when deleting smart contract that has crypto balance either transfer account or transfer
-     * smart contract is required
+     * when deleting smart contract that has crypto balance either transfer account or transfer smart contract is required
      */
     OBTAINER_REQUIRED(ResponseCodeEnum.OBTAINER_REQUIRED),
 
     /**
-     * when deleting smart contract that has crypto balance you can not use the same contract id as
-     * transferContractId as the one being deleted
+     * when deleting smart contract that has crypto balance you can not use the same contract id as transferContractId as the one being deleted
      */
     OBTAINER_SAME_CONTRACT_ID(ResponseCodeEnum.OBTAINER_SAME_CONTRACT_ID),
 
@@ -416,8 +407,7 @@ public enum Status {
     OBTAINER_DOES_NOT_EXIST(ResponseCodeEnum.OBTAINER_DOES_NOT_EXIST),
 
     /**
-     * attempting to modify (update or delete a immutable smart contract, i.e. one created without a
-     * admin key)
+     * attempting to modify (update or delete a immutable smart contract, i.e. one created without a admin key)
      */
     MODIFYING_IMMUTABLE_CONTRACT(ResponseCodeEnum.MODIFYING_IMMUTABLE_CONTRACT),
 
@@ -432,8 +422,7 @@ public enum Status {
     AUTORENEW_DURATION_NOT_IN_RANGE(ResponseCodeEnum.AUTORENEW_DURATION_NOT_IN_RANGE),
 
     /**
-     * Decoding the smart contract binary to a byte array failed. Check that the input is a valid
-     * hex string.
+     * Decoding the smart contract binary to a byte array failed. Check that the input is a valid hex string.
      */
     ERROR_DECODING_BYTESTRING(ResponseCodeEnum.ERROR_DECODING_BYTESTRING),
 
@@ -453,18 +442,17 @@ public enum Status {
     INVALID_INITIAL_BALANCE(ResponseCodeEnum.INVALID_INITIAL_BALANCE),
 
     /**
-     * attempt to set negative receive record threshold
+     * [Deprecated]. attempt to set negative receive record threshold
      */
     INVALID_RECEIVE_RECORD_THRESHOLD(ResponseCodeEnum.INVALID_RECEIVE_RECORD_THRESHOLD),
 
     /**
-     * attempt to set negative send record threshold
+     * [Deprecated]. attempt to set negative send record threshold
      */
     INVALID_SEND_RECORD_THRESHOLD(ResponseCodeEnum.INVALID_SEND_RECORD_THRESHOLD),
 
     /**
-     * Special Account Operations should be performed by only Genesis account, return this code if
-     * it is not Genesis Account
+     * Special Account Operations should be performed by only Genesis account, return this code if it is not Genesis Account
      */
     ACCOUNT_IS_NOT_GENESIS_ACCOUNT(ResponseCodeEnum.ACCOUNT_IS_NOT_GENESIS_ACCOUNT),
 
@@ -529,12 +517,7 @@ public enum Status {
     ENTITY_NOT_ALLOWED_TO_DELETE(ResponseCodeEnum.ENTITY_NOT_ALLOWED_TO_DELETE),
 
     /**
-     * Violating one of these rules: 1) treasury account can update all entities below 0.0.1000, 2)
-     * account 0.0.50 can update all entities from 0.0.51 - 0.0.80, 3) Network Function Master
-     * Account A/c 0.0.50 - Update all Network Function accounts &amp; perform all the Network Functions
-     * listed below, 4) Network Function Accounts: i) A/c 0.0.55 - Update Address Book files
-     * (0.0.101/102), ii) A/c 0.0.56 - Update Fee schedule (0.0.111), iii) A/c 0.0.57 - Update
-     * Exchange Rate (0.0.112).
+     * Violating one of these rules: 1) treasury account can update all entities below 0.0.1000, 2) account 0.0.50 can update all entities from 0.0.51 - 0.0.80, 3) Network Function Master Account A/c 0.0.50 - Update all Network Function accounts & perform all the Network Functions listed below, 4) Network Function Accounts: i) A/c 0.0.55 - Update Address Book files (0.0.101/102), ii) A/c 0.0.56 - Update Fee schedule (0.0.111), iii) A/c 0.0.57 - Update Exchange Rate (0.0.112).
      */
     AUTHORIZATION_FAILED(ResponseCodeEnum.AUTHORIZATION_FAILED),
 
@@ -586,12 +569,23 @@ public enum Status {
     MAX_FILE_SIZE_EXCEEDED(ResponseCodeEnum.MAX_FILE_SIZE_EXCEEDED),
 
     /**
+     * When a valid signature is not provided for operations on account with receiverSigRequired=true
+     */
+    RECEIVER_SIG_REQUIRED(ResponseCodeEnum.RECEIVER_SIG_REQUIRED),
+
+    /**
      * The Topic ID specified is not in the system.
      */
     INVALID_TOPIC_ID(ResponseCodeEnum.INVALID_TOPIC_ID),
 
+    /**
+     * A provided admin key was invalid.
+     */
     INVALID_ADMIN_KEY(ResponseCodeEnum.INVALID_ADMIN_KEY),
 
+    /**
+     * A provided submit key was invalid.
+     */
     INVALID_SUBMIT_KEY(ResponseCodeEnum.INVALID_SUBMIT_KEY),
 
     /**
@@ -615,9 +609,9 @@ public enum Status {
     AUTORENEW_ACCOUNT_NOT_ALLOWED(ResponseCodeEnum.AUTORENEW_ACCOUNT_NOT_ALLOWED),
 
     /**
-     * The topic has expired, was not automatically renewed, and is in a 7 day grace period before
-     * the topic will be deleted unrecoverably. This error response code will not be returned until
-     * autoRenew functionality is supported by HAPI.
+     * The topic has expired, was not automatically renewed, and is in a 7 day grace period before the topic will be
+     * deleted unrecoverably. This error response code will not be returned until autoRenew functionality is supported
+     * by HAPI.
      */
     TOPIC_EXPIRED(ResponseCodeEnum.TOPIC_EXPIRED),
 
@@ -632,12 +626,12 @@ public enum Status {
     INVALID_CHUNK_TRANSACTION_ID(ResponseCodeEnum.INVALID_CHUNK_TRANSACTION_ID),
 
     /**
-     *  Account is frozen and cannot transact with the token
+     * Account is frozen and cannot transact with the token
      */
     ACCOUNT_FROZEN_FOR_TOKEN(ResponseCodeEnum.ACCOUNT_FROZEN_FOR_TOKEN),
 
     /**
-     * Maximum number of token relations for agiven account is exceeded
+     * An involved account already has more than <tt>tokens.maxPerAccount</tt> associations with non-deleted tokens.
      */
     TOKENS_PER_ACCOUNT_LIMIT_EXCEEDED(ResponseCodeEnum.TOKENS_PER_ACCOUNT_LIMIT_EXCEEDED),
 
@@ -654,7 +648,7 @@ public enum Status {
     /**
      * Invalid token initial supply
      */
-    INVALID_TOKEN_INITIAL_SUPPLY(ResponseCodeEnum.INVALID_TOKEN_INITIAL_SUPPLY) ,
+    INVALID_TOKEN_INITIAL_SUPPLY(ResponseCodeEnum.INVALID_TOKEN_INITIAL_SUPPLY),
 
     /**
      * Treasury Account does not exist or is deleted
@@ -677,12 +671,12 @@ public enum Status {
     TRANSFERS_NOT_ZERO_SUM_FOR_TOKEN(ResponseCodeEnum.TRANSFERS_NOT_ZERO_SUM_FOR_TOKEN),
 
     /**
-     * Token Symbol is not provided
+     * A token symbol was not provided
      */
     MISSING_TOKEN_SYMBOL(ResponseCodeEnum.MISSING_TOKEN_SYMBOL),
 
     /**
-     * Token Symbol is too long
+     * The provided token symbol was too long
      */
     TOKEN_SYMBOL_TOO_LONG(ResponseCodeEnum.TOKEN_SYMBOL_TOO_LONG),
 
@@ -716,23 +710,44 @@ public enum Status {
      */
     TOKEN_HAS_NO_WIPE_KEY(ResponseCodeEnum.TOKEN_HAS_NO_WIPE_KEY),
 
+    /**
+     * The requested token mint amount would cause an invalid total supply
+     */
     INVALID_TOKEN_MINT_AMOUNT(ResponseCodeEnum.INVALID_TOKEN_MINT_AMOUNT),
 
+    /**
+     * The requested token burn amount would cause an invalid total supply
+     */
     INVALID_TOKEN_BURN_AMOUNT(ResponseCodeEnum.INVALID_TOKEN_BURN_AMOUNT),
 
+    /**
+     * A required token-account relationship is missing
+     */
     TOKEN_NOT_ASSOCIATED_TO_ACCOUNT(ResponseCodeEnum.TOKEN_NOT_ASSOCIATED_TO_ACCOUNT),
 
     /**
-     * Cannot execute wipe operation on treasury account
+     * The target of a wipe operation was the token treasury account
      */
     CANNOT_WIPE_TOKEN_TREASURY_ACCOUNT(ResponseCodeEnum.CANNOT_WIPE_TOKEN_TREASURY_ACCOUNT),
 
+    /**
+     * The provided KYC key was invalid.
+     */
     INVALID_KYC_KEY(ResponseCodeEnum.INVALID_KYC_KEY),
 
+    /**
+     * The provided wipe key was invalid.
+     */
     INVALID_WIPE_KEY(ResponseCodeEnum.INVALID_WIPE_KEY),
 
+    /**
+     * The provided freeze key was invalid.
+     */
     INVALID_FREEZE_KEY(ResponseCodeEnum.INVALID_FREEZE_KEY),
 
+    /**
+     * The provided supply key was invalid.
+     */
     INVALID_SUPPLY_KEY(ResponseCodeEnum.INVALID_SUPPLY_KEY),
 
     /**
@@ -756,7 +771,7 @@ public enum Status {
     TOKEN_IS_IMMUTABLE(ResponseCodeEnum.TOKEN_IS_IMMUTABLE),
 
     /**
-     * An associateToken operation specified a token already associated to the account
+     * An <tt>associateToken</tt> operation specified a token already associated to the account
      */
     TOKEN_ALREADY_ASSOCIATED_TO_ACCOUNT(ResponseCodeEnum.TOKEN_ALREADY_ASSOCIATED_TO_ACCOUNT),
 
@@ -766,7 +781,7 @@ public enum Status {
     TRANSACTION_REQUIRES_ZERO_TOKEN_BALANCES(ResponseCodeEnum.TRANSACTION_REQUIRES_ZERO_TOKEN_BALANCES),
 
     /**
-     * An attempted operation is invalid because the account is a treasury;
+     * An attempted operation is invalid because the account is a treasury
      */
     ACCOUNT_IS_TREASURY(ResponseCodeEnum.ACCOUNT_IS_TREASURY),
 
@@ -790,103 +805,75 @@ public enum Status {
      */
     EMPTY_TOKEN_TRANSFER_ACCOUNT_AMOUNTS(ResponseCodeEnum.EMPTY_TOKEN_TRANSFER_ACCOUNT_AMOUNTS),
 
+    /**
+     * The Scheduled entity does not exist; or has now expired, been deleted, or been executed
+     */
     INVALID_SCHEDULE_ID(ResponseCodeEnum.INVALID_SCHEDULE_ID),
 
+    /**
+     * The Scheduled entity cannot be modified. Admin key not set
+     */
     SCHEDULE_IS_IMMUTABLE(ResponseCodeEnum.SCHEDULE_IS_IMMUTABLE),
 
+    /**
+     * The provided Scheduled Payer does not exist
+     */
     INVALID_SCHEDULE_PAYER_ID(ResponseCodeEnum.INVALID_SCHEDULE_PAYER_ID),
 
+    /**
+     * The Schedule Create Transaction TransactionID account does not exist
+     */
     INVALID_SCHEDULE_ACCOUNT_ID(ResponseCodeEnum.INVALID_SCHEDULE_ACCOUNT_ID),
 
+    /**
+     * The provided sig map did not contain any new valid signatures from required signers of the scheduled transaction
+     */
     NO_NEW_VALID_SIGNATURES(ResponseCodeEnum.NO_NEW_VALID_SIGNATURES),
 
+    /**
+     * The required signers for a scheduled transaction cannot be resolved, for example because they do not exist or have been deleted
+     */
     UNRESOLVABLE_REQUIRED_SIGNERS(ResponseCodeEnum.UNRESOLVABLE_REQUIRED_SIGNERS),
 
+    /**
+     * Only whitelisted transaction types may be scheduled
+     */
     SCHEDULED_TRANSACTION_NOT_IN_WHITELIST(ResponseCodeEnum.SCHEDULED_TRANSACTION_NOT_IN_WHITELIST),
 
+    /**
+     * At least one of the signatures in the provided sig map did not represent a valid signature for any required signer
+     */
     SOME_SIGNATURES_WERE_INVALID(ResponseCodeEnum.SOME_SIGNATURES_WERE_INVALID),
 
+    /**
+     * The scheduled field in the TransactionID may not be set to true
+     */
     TRANSACTION_ID_FIELD_NOT_ALLOWED(ResponseCodeEnum.TRANSACTION_ID_FIELD_NOT_ALLOWED),
 
+    /**
+     * A schedule already exists with the same identifying fields of an attempted ScheduleCreate (that is, all fields other than scheduledPayerAccountID)
+     */
     IDENTICAL_SCHEDULE_ALREADY_CREATED(ResponseCodeEnum.IDENTICAL_SCHEDULE_ALREADY_CREATED),
 
+    /**
+     * A string field in the transaction has a UTF-8 encoding with the prohibited zero byte
+     */
     INVALID_ZERO_BYTE_IN_STRING(ResponseCodeEnum.INVALID_ZERO_BYTE_IN_STRING),
 
+    /**
+     * A schedule being signed or deleted has already been deleted
+     */
     SCHEDULE_ALREADY_DELETED(ResponseCodeEnum.SCHEDULE_ALREADY_DELETED),
 
+    /**
+     * A schedule being signed or deleted has already been executed
+     */
     SCHEDULE_ALREADY_EXECUTED(ResponseCodeEnum.SCHEDULE_ALREADY_EXECUTED),
 
+    /**
+     * ConsensusSubmitMessage request's message size is larger than allowed.
+     */
     MESSAGE_SIZE_TOO_LARGE(ResponseCodeEnum.MESSAGE_SIZE_TOO_LARGE),
-
-    /**
-     * When a valid signature is not provided for operations on account with receiverSigRequired=true
-     */
-    RECEIVER_SIG_REQUIRED(ResponseCodeEnum.RECEIVER_SIG_REQUIRED),
-
-    /**
-     * A custom fractional fee set a denominator of zero
-     */
-    FRACTION_DIVIDES_BY_ZERO(ResponseCodeEnum.FRACTION_DIVIDES_BY_ZERO),
-
-    /**
-     * The transaction payer could not afford a custom fee
-     */
-    INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE(ResponseCodeEnum.INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE),
-
-    /**
-     * The customFees list is longer than allowed limit 10
-     */
-    CUSTOM_FEES_LIST_TOO_LONG(ResponseCodeEnum.CUSTOM_FEES_LIST_TOO_LONG),
-
-    /**
-     * Any of the feeCollector accounts for customFees is invalid
-     */
-    INVALID_CUSTOM_FEE_COLLECTOR(ResponseCodeEnum.INVALID_CUSTOM_FEE_COLLECTOR),
-
-    /**
-     * Any of the token Ids in customFees is invalid
-     */
-    INVALID_TOKEN_ID_IN_CUSTOM_FEES(ResponseCodeEnum.INVALID_TOKEN_ID_IN_CUSTOM_FEES),
-
-    /**
-     * Any of the token Ids in customFees are not associated to feeCollector
-     */
-    TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR(ResponseCodeEnum.TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR),
-
-    /**
-     * A token cannot have more units minted due to its configured supply ceiling
-     */
-    TOKEN_MAX_SUPPLY_REACHED(ResponseCodeEnum.TOKEN_MAX_SUPPLY_REACHED),
-
-    /**
-     * The transaction attempted to move an NFT serial number from an account other than its owner
-     */
-    SENDER_DOES_NOT_OWN_NFT_SERIAL_NO(ResponseCodeEnum.SENDER_DOES_NOT_OWN_NFT_SERIAL_NO),
-
-    /**
-     * A custom fee schedule entry did not specify either a fixed or fractional fee
-     */
-    CUSTOM_FEE_NOT_FULLY_SPECIFIED(ResponseCodeEnum.CUSTOM_FEE_NOT_FULLY_SPECIFIED),
-
-    /**
-     * Only positive fees may be assessed at this time
-     */
-    CUSTOM_FEE_MUST_BE_POSITIVE(ResponseCodeEnum.CUSTOM_FEE_MUST_BE_POSITIVE),
-
-    /**
-     * Fee schedule key is not set on token
-     */
-    TOKEN_HAS_NO_FEE_SCHEDULE_KEY(ResponseCodeEnum.TOKEN_HAS_NO_FEE_SCHEDULE_KEY),
-
-    /**
-     * A fractional custom fee exceeded the range of a 64-bit signed integer
-     */
-    CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE(ResponseCodeEnum.CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE),
-
-    /**
-     * The sum of all custom fractional fees must be strictly less than 1
-     */
-    INVALID_CUSTOM_FRACTIONAL_FEES_SUM(ResponseCodeEnum.INVALID_CUSTOM_FRACTIONAL_FEES_SUM),
 
     /**
      * An operation was assigned to more than one throttle group in a given bucket
@@ -959,9 +946,74 @@ public enum Status {
     BATCH_SIZE_LIMIT_EXCEEDED(ResponseCodeEnum.BATCH_SIZE_LIMIT_EXCEEDED),
 
     /**
-     * The range of data to be gathered exceeds the limit
+     * The range of data to be gathered is out of the set boundaries
      */
     INVALID_QUERY_RANGE(ResponseCodeEnum.INVALID_QUERY_RANGE),
+
+    /**
+     * A custom fractional fee set a denominator of zero
+     */
+    FRACTION_DIVIDES_BY_ZERO(ResponseCodeEnum.FRACTION_DIVIDES_BY_ZERO),
+
+    /**
+     * The transaction payer could not afford a custom fee
+     */
+    INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE(ResponseCodeEnum.INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE),
+
+    /**
+     * The customFees list is longer than allowed limit 10
+     */
+    CUSTOM_FEES_LIST_TOO_LONG(ResponseCodeEnum.CUSTOM_FEES_LIST_TOO_LONG),
+
+    /**
+     * Any of the feeCollector accounts for customFees is invalid
+     */
+    INVALID_CUSTOM_FEE_COLLECTOR(ResponseCodeEnum.INVALID_CUSTOM_FEE_COLLECTOR),
+
+    /**
+     * Any of the token Ids in customFees is invalid
+     */
+    INVALID_TOKEN_ID_IN_CUSTOM_FEES(ResponseCodeEnum.INVALID_TOKEN_ID_IN_CUSTOM_FEES),
+
+    /**
+     * Any of the token Ids in customFees are not associated to feeCollector
+     */
+    TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR(ResponseCodeEnum.TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR),
+
+    /**
+     * A token cannot have more units minted due to its configured supply ceiling
+     */
+    TOKEN_MAX_SUPPLY_REACHED(ResponseCodeEnum.TOKEN_MAX_SUPPLY_REACHED),
+
+    /**
+     * The transaction attempted to move an NFT serial number from an account other than its owner
+     */
+    SENDER_DOES_NOT_OWN_NFT_SERIAL_NO(ResponseCodeEnum.SENDER_DOES_NOT_OWN_NFT_SERIAL_NO),
+
+    /**
+     * A custom fee schedule entry did not specify either a fixed or fractional fee
+     */
+    CUSTOM_FEE_NOT_FULLY_SPECIFIED(ResponseCodeEnum.CUSTOM_FEE_NOT_FULLY_SPECIFIED),
+
+    /**
+     * Only positive fees may be assessed at this time
+     */
+    CUSTOM_FEE_MUST_BE_POSITIVE(ResponseCodeEnum.CUSTOM_FEE_MUST_BE_POSITIVE),
+
+    /**
+     * Fee schedule key is not set on token
+     */
+    TOKEN_HAS_NO_FEE_SCHEDULE_KEY(ResponseCodeEnum.TOKEN_HAS_NO_FEE_SCHEDULE_KEY),
+
+    /**
+     * A fractional custom fee exceeded the range of a 64-bit signed integer
+     */
+    CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE(ResponseCodeEnum.CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE),
+
+    /**
+     * The sum of all custom fractional fees must be strictly less than 1
+     */
+    INVALID_CUSTOM_FRACTIONAL_FEES_SUM(ResponseCodeEnum.INVALID_CUSTOM_FRACTIONAL_FEES_SUM),
 
     /**
      * Each fractional custom fee must have its maximum_amount, if specified, at least its minimum_amount
@@ -996,6 +1048,7 @@ public enum Status {
 
     static Status valueOf(ResponseCodeEnum code) {
         switch (code) {
+
             case OK:
                 return OK;
             case INVALID_TRANSACTION:
@@ -1105,11 +1158,11 @@ public enum Status {
             case EMPTY_LIVE_HASH_BODY:
                 return EMPTY_LIVE_HASH_BODY;
             case EMPTY_LIVE_HASH:
-                return EMPTY_LIVE_HASH_HASH;
+                return EMPTY_LIVE_HASH;
             case EMPTY_LIVE_HASH_KEYS:
                 return EMPTY_LIVE_HASH_KEYS;
             case INVALID_LIVE_HASH_SIZE:
-                return INVALID_LIVE_HASH_HASH_SIZE;
+                return INVALID_LIVE_HASH_SIZE;
             case EMPTY_QUERY_BODY:
                 return EMPTY_QUERY_BODY;
             case EMPTY_LIVE_HASH_QUERY:
@@ -1220,6 +1273,8 @@ public enum Status {
                 return MAX_GAS_LIMIT_EXCEEDED;
             case MAX_FILE_SIZE_EXCEEDED:
                 return MAX_FILE_SIZE_EXCEEDED;
+            case RECEIVER_SIG_REQUIRED:
+                return RECEIVER_SIG_REQUIRED;
             case INVALID_TOPIC_ID:
                 return INVALID_TOPIC_ID;
             case INVALID_ADMIN_KEY:
@@ -1340,34 +1395,6 @@ public enum Status {
                 return SCHEDULE_ALREADY_EXECUTED;
             case MESSAGE_SIZE_TOO_LARGE:
                 return MESSAGE_SIZE_TOO_LARGE;
-            case RECEIVER_SIG_REQUIRED:
-                return RECEIVER_SIG_REQUIRED;
-            case FRACTION_DIVIDES_BY_ZERO:
-                return FRACTION_DIVIDES_BY_ZERO;
-            case INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE:
-                return INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE;
-            case CUSTOM_FEES_LIST_TOO_LONG:
-                return CUSTOM_FEES_LIST_TOO_LONG;
-            case INVALID_CUSTOM_FEE_COLLECTOR:
-                return INVALID_CUSTOM_FEE_COLLECTOR;
-            case INVALID_TOKEN_ID_IN_CUSTOM_FEES:
-                return INVALID_TOKEN_ID_IN_CUSTOM_FEES;
-            case TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR:
-                return TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR;
-            case TOKEN_MAX_SUPPLY_REACHED:
-                return TOKEN_MAX_SUPPLY_REACHED;
-            case SENDER_DOES_NOT_OWN_NFT_SERIAL_NO:
-                return SENDER_DOES_NOT_OWN_NFT_SERIAL_NO;
-            case CUSTOM_FEE_NOT_FULLY_SPECIFIED:
-                return CUSTOM_FEE_NOT_FULLY_SPECIFIED;
-            case CUSTOM_FEE_MUST_BE_POSITIVE:
-                return CUSTOM_FEE_MUST_BE_POSITIVE;
-            case TOKEN_HAS_NO_FEE_SCHEDULE_KEY:
-                return TOKEN_HAS_NO_FEE_SCHEDULE_KEY;
-            case CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE:
-                return CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE;
-            case INVALID_CUSTOM_FRACTIONAL_FEES_SUM:
-                return INVALID_CUSTOM_FRACTIONAL_FEES_SUM;
             case OPERATION_REPEATED_IN_BUCKET_GROUPS:
                 return OPERATION_REPEATED_IN_BUCKET_GROUPS;
             case BUCKET_CAPACITY_OVERFLOW:
@@ -1398,6 +1425,32 @@ public enum Status {
                 return BATCH_SIZE_LIMIT_EXCEEDED;
             case INVALID_QUERY_RANGE:
                 return INVALID_QUERY_RANGE;
+            case FRACTION_DIVIDES_BY_ZERO:
+                return FRACTION_DIVIDES_BY_ZERO;
+            case INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE:
+                return INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE;
+            case CUSTOM_FEES_LIST_TOO_LONG:
+                return CUSTOM_FEES_LIST_TOO_LONG;
+            case INVALID_CUSTOM_FEE_COLLECTOR:
+                return INVALID_CUSTOM_FEE_COLLECTOR;
+            case INVALID_TOKEN_ID_IN_CUSTOM_FEES:
+                return INVALID_TOKEN_ID_IN_CUSTOM_FEES;
+            case TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR:
+                return TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR;
+            case TOKEN_MAX_SUPPLY_REACHED:
+                return TOKEN_MAX_SUPPLY_REACHED;
+            case SENDER_DOES_NOT_OWN_NFT_SERIAL_NO:
+                return SENDER_DOES_NOT_OWN_NFT_SERIAL_NO;
+            case CUSTOM_FEE_NOT_FULLY_SPECIFIED:
+                return CUSTOM_FEE_NOT_FULLY_SPECIFIED;
+            case CUSTOM_FEE_MUST_BE_POSITIVE:
+                return CUSTOM_FEE_MUST_BE_POSITIVE;
+            case TOKEN_HAS_NO_FEE_SCHEDULE_KEY:
+                return TOKEN_HAS_NO_FEE_SCHEDULE_KEY;
+            case CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE:
+                return CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE;
+            case INVALID_CUSTOM_FRACTIONAL_FEES_SUM:
+                return INVALID_CUSTOM_FRACTIONAL_FEES_SUM;
             case FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT:
                 return FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT;
             case CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES:

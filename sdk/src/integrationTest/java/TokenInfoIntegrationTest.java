@@ -132,6 +132,7 @@ class TokenInfoIntegrationTest {
                 .setSupplyType(TokenSupplyType.FINITE)
                 .setMaxSupply(5000)
                 .setTreasuryAccountId(testEnv.operatorId)
+                .setSupplyKey(testEnv.operatorKey)
                 .execute(testEnv.client);
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
@@ -139,11 +140,11 @@ class TokenInfoIntegrationTest {
             var mintReceipt = new TokenMintTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
-                .setAmount(100)
+                .setMetadata(NftMetadataGenerator.generate((byte)10))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            assertEquals(mintReceipt.serials.size(), 100);
+            assertEquals(mintReceipt.serials.size(), 10);
 
             var info = new TokenInfoQuery()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
@@ -154,17 +155,17 @@ class TokenInfoIntegrationTest {
             assertEquals(info.name, "ffff");
             assertEquals(info.symbol, "F");
             assertEquals(info.decimals, 0);
-            assertEquals(info.totalSupply, 100);
+            assertEquals(info.totalSupply, 10);
             assertEquals(testEnv.operatorId, info.treasuryAccountId);
             assertNull(info.adminKey);
             assertNull(info.freezeKey);
             assertNull(info.wipeKey);
             assertNull(info.kycKey);
-            assertNull(info.supplyKey);
+            assertNotNull(info.supplyKey);
             assertNull(info.defaultFreezeStatus);
             assertNull(info.defaultKycStatus);
-            assertEquals(info.tokenType, TokenType.FUNGIBLE_COMMON);
-            assertEquals(info.supplyType, TokenSupplyType.INFINITE);
+            assertEquals(info.tokenType, TokenType.NON_FUNGIBLE_UNIQUE);
+            assertEquals(info.supplyType, TokenSupplyType.FINITE);
             assertEquals(info.maxSupply, 5000);
 
             testEnv.client.close();

@@ -183,8 +183,15 @@ class TokenCreateIntegrationTest {
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
-                .addCustomFee(new CustomFixedFee().setAmount(10).setFeeCollectorAccountId(testEnv.operatorId))
-                .addCustomFee(new CustomFractionalFee().setNumerator(1).setDenominator(20).setMin(1).setMax(10))
+                .addCustomFee(new CustomFixedFee()
+                    .setAmount(10)
+                    .setFeeCollectorAccountId(testEnv.operatorId))
+                .addCustomFee(new CustomFractionalFee()
+                    .setNumerator(1)
+                    .setDenominator(20)
+                    .setMin(1)
+                    .setMax(10)
+                    .setFeeCollectorAccountId(testEnv.operatorId))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
             testEnv.client.close();
@@ -192,6 +199,7 @@ class TokenCreateIntegrationTest {
     }
 
     @Disabled
+    @Test
     @DisplayName("Can create NFT")
     void canCreateNfts() {
         assertDoesNotThrow(() -> {
@@ -201,7 +209,6 @@ class TokenCreateIntegrationTest {
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
-                .setDecimals(3)
                 .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
                 .setTreasuryAccountId(testEnv.operatorId)
                 .setAdminKey(testEnv.operatorKey)

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
 
 import java.util.Objects;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -153,7 +154,6 @@ class TokenBurnIntegrationTest {
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
-                .setDecimals(3)
                 .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
                 .setTreasuryAccountId(testEnv.operatorId)
                 .setAdminKey(testEnv.operatorKey)
@@ -170,18 +170,29 @@ class TokenBurnIntegrationTest {
             var mintReceipt = new TokenMintTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
-                .setAmount(100)
+                .setMetadata(NftMetadataGenerator.generate((byte)10))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            var receipt = new TokenBurnTransaction()
+            new TokenBurnTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
-                .setSerials(mintReceipt.serials.subList(0, 10))
+                .setSerials(mintReceipt.serials.subList(0, 4))
                 .setTokenId(tokenId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            assertEquals(receipt.totalSupply, 100 - 10);
+
+            var serialsLeft = new ArrayList<Long>(mintReceipt.serials.subList(4, 10));
+
+            var nftInfos = new TokenNftInfoQuery()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .byTokenId(tokenId)
+                .setEnd(6)
+                .execute(testEnv.client);
+            
+            for(var info : nftInfos) {
+                assertTrue(serialsLeft.remove(info.nftId.serial));
+            }
 
             testEnv.client.close();
         });
