@@ -1,15 +1,16 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.proto.TransactionID;
 import com.hedera.hashgraph.sdk.account.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.account.TransferTransaction;
+import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
+import com.hedera.hashgraph.sdk.consensus.ConsensusTopicCreateTransaction;
+import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hashgraph.sdk.crypto.KeyList;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.integration_tests.TestEnv;
 import com.hedera.hashgraph.sdk.schedule.ScheduleCreateTransaction;
-import com.hedera.hashgraph.sdk.schedule.ScheduleDeleteTransaction;
 import com.hedera.hashgraph.sdk.schedule.ScheduleId;
 import com.hedera.hashgraph.sdk.schedule.ScheduleInfo;
 import com.hedera.hashgraph.sdk.schedule.ScheduleInfoQuery;
@@ -18,9 +19,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 
 public class ScheduleTest {
     private final TestEnv testEnv = new TestEnv();
@@ -172,5 +177,61 @@ public class ScheduleTest {
             .execute(testEnv.client);
 
         Assertions.assertNotNull(info.executionTime);
+    }
+
+    @Test
+    void testScheduleConsensusMessageSubmit() throws HederaStatusException, InvalidProtocolBufferException, InterruptedException, TimeoutException {
+        Ed25519PrivateKey key = Ed25519PrivateKey.generate();
+
+        // Creat the account with the `KeyList`
+        TransactionId transactionId = new ConsensusTopicCreateTransaction()
+            .setAdminKey(testEnv.operatorKey.publicKey)
+            .setSubmitKey(key.publicKey)
+            .execute(testEnv.client);
+
+        // This will wait for the receipt to become available
+        TransactionReceipt receipt = transactionId.getReceipt(testEnv.client);
+
+        ConsensusTopicId topicId = Objects.requireNonNull(receipt.getConsensusTopicId());
+
+        // Generate a `TransactionId`. This id is used to query the inner scheduled transaction
+        // after we expect it to have been executed
+        transactionId = new TransactionId(testEnv.operatorId);
+
+        // Create a transfer transaction with 2/3 signatures.
+        ConsensusMessageSubmitTransaction transfer = new ConsensusMessageSubmitTransaction()
+            .setTransactionId(transactionId)
+            .setTopicId(topicId)
+            .setMessage("Hello, scheduled transaction");
+
+        // Schedule the transactoin
+        ScheduleCreateTransaction scheduled = new ArrayList<>(transfer.build(testEnv.client).getTransactions())
+            .get(0).schedule();
+
+        receipt = scheduled.execute(testEnv.client).getReceipt(testEnv.client);
+
+        // Get the schedule ID from the receipt
+        ScheduleId scheduleId = Objects.requireNonNull(receipt.getScheduleId());
+
+        // Get the schedule info to see if `signatories` is populated with 2/3 signatures
+        ScheduleInfo info = new ScheduleInfoQuery()
+            .setScheduleId(scheduleId)
+            .execute(testEnv.client);
+
+        assertNull(info.executionTime);
+
+        // Finally send this last signature to Hedera. This last signature _should_ mean the transaction executes
+        // since all 3 signatures have been provided.
+        Transaction transaction = new ScheduleSignTransaction()
+            .setScheduleId(scheduleId)
+            .build(testEnv.client);
+
+        transaction.sign(key).execute(testEnv.client).getReceipt(testEnv.client);
+
+        info = new ScheduleInfoQuery()
+            .setScheduleId(scheduleId)
+            .execute(testEnv.client);
+
+        assertNotNull(info.executionTime);
     }
 }
