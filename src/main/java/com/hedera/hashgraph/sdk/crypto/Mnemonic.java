@@ -110,10 +110,10 @@ public final class Mnemonic {
 
     public Ed25519PrivateKey toLegacyPrivateKey() {
         if(this.words.size() == 22){
-            return Ed25519PrivateKey.fromBytes(Ed25519PrivateKey.legacyDeriveChildKey(this.wordsToLegacyEntropy(), -1));
+            return Ed25519PrivateKey.fromBytes(this.wordsToLegacyEntropy());
         }
 
-        return Ed25519PrivateKey.fromBytes(Ed25519PrivateKey.legacyDeriveChildKey(this.wordsToLegacyEntropy2(), 0));
+        return Ed25519PrivateKey.fromBytes(this.wordsToLegacyEntropy2());
     }
 
     /**
@@ -205,7 +205,6 @@ public final class Mnemonic {
         int crc2 = crc8(result);
         if (crc != crc2) {
             throw new Error("Legacy mnemonic checksum mismatch.");
-
         }
 
         byte[] array = byteBuffer.array();
