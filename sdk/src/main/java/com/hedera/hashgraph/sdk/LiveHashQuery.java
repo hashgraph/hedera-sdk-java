@@ -9,6 +9,7 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * Requests a livehash associated to an account.
@@ -16,12 +17,14 @@ import javax.annotation.Nullable;
 public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
     private final CryptoGetLiveHashQuery.Builder builder;
 
-    AccountId accountId;
+    @Nullable
+    AccountId accountId = null;
 
     public LiveHashQuery() {
         builder = CryptoGetLiveHashQuery.newBuilder();
     }
 
+    @Nullable
     public AccountId getAccountId() {
         return accountId;
     }
@@ -33,6 +36,7 @@ public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
      * @return {@code this}
      */
     public LiveHashQuery setAccountId(AccountId accountId) {
+        Objects.requireNonNull(accountId);
         this.accountId = accountId;
         return this;
     }

@@ -29,12 +29,14 @@ import java.util.Objects;
 public final class ContractCallQuery extends Query<ContractFunctionResult, ContractCallQuery> {
     private final ContractCallLocalQuery.Builder builder;
 
-    ContractId contractId;
+    @Nullable
+    ContractId contractId = null;
 
     public ContractCallQuery() {
         builder = ContractCallLocalQuery.newBuilder();
     }
 
+    @Nullable
     public ContractId getContractId() {
         return contractId;
     }

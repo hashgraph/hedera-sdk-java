@@ -2,12 +2,16 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.CryptoDeleteLiveHashTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * At consensus, deletes a livehash associated to the given account. The transaction must be signed
@@ -16,7 +20,8 @@ import java.util.LinkedHashMap;
 public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteTransaction> {
     private final CryptoDeleteLiveHashTransactionBody.Builder builder;
 
-    AccountId accountId;
+    @Nullable
+    AccountId accountId = null;
 
     public LiveHashDeleteTransaction() {
         builder = CryptoDeleteLiveHashTransactionBody.newBuilder();
@@ -44,6 +49,7 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
      * @return {@code this}
      */
     public LiveHashDeleteTransaction setAccountId(AccountId accountId) {
+        Objects.requireNonNull(accountId);
         requireNotFrozen();
         this.accountId = accountId;
         return this;

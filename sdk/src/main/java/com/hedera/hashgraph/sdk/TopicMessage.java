@@ -57,7 +57,7 @@ public final class TopicMessage {
 
     static TopicMessage ofMany(List<ConsensusTopicResponse> responses) {
         // response should be in the order of oldest to newest (not chunk order)
-        @Var var chunks = new TopicMessageChunk[responses.size()];
+        var chunks = new TopicMessageChunk[responses.size()];
         @Var TransactionId transactionId = null;
         var contents = new ByteString[responses.size()];
         @Var long totalSize = 0;

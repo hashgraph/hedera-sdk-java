@@ -1,7 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.TokenCreateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -10,12 +13,18 @@ import java.time.Instant;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
+import java.util.Objects;
+import java.util.List;
+import java.util.ArrayList;
 
 public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> {
     private final TokenCreateTransactionBody.Builder builder;
 
-    AccountId treasuryAccountId;
-    AccountId autoRenewAccountId;
+    List<CustomFee> customFees = new ArrayList<>();
+    @Nullable
+    AccountId treasuryAccountId = null;
+    @Nullable
+    AccountId autoRenewAccountId = null;
 
     public TokenCreateTransaction() {
         builder = TokenCreateTransactionBody.newBuilder();
@@ -32,6 +41,10 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         if (builder.hasTreasury()) {
             treasuryAccountId = AccountId.fromProtobuf(builder.getTreasury());
         }
+
+        for(var fee : builder.getCustomFeesList()) {
+            customFees.add(CustomFee.fromProtobuf(fee));
+        }
     }
 
     TokenCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
@@ -42,13 +55,19 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         if (builder.hasTreasury()) {
             treasuryAccountId = AccountId.fromProtobuf(builder.getTreasury());
         }
+
+        for(var fee : builder.getCustomFeesList()) {
+            customFees.add(CustomFee.fromProtobuf(fee));
+        }
     }
 
+    @Nullable
     public String getTokenName() {
         return builder.getName();
     }
 
     public TokenCreateTransaction setTokenName(String name) {
+        Objects.requireNonNull(name);
         requireNotFrozen();
         builder.setName(name);
         return this;
@@ -59,6 +78,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     public TokenCreateTransaction setTokenSymbol(String symbol) {
+        Objects.requireNonNull(symbol);
         requireNotFrozen();
         builder.setSymbol(symbol);
         return this;
@@ -84,11 +104,13 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return this;
     }
 
+    @Nullable
     public AccountId getTreasuryAccountId() {
         return treasuryAccountId;
     }
 
     public TokenCreateTransaction setTreasuryAccountId(AccountId accountId) {
+        Objects.requireNonNull(accountId);
         requireNotFrozen();
         this.treasuryAccountId = accountId;
         return this;
@@ -119,6 +141,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     public TokenCreateTransaction setFreezeKey(Key key) {
+        Objects.requireNonNull(key);
         requireNotFrozen();
         builder.setFreezeKey(key.toProtobufKey());
         return this;
@@ -129,6 +152,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     public TokenCreateTransaction setWipeKey(Key key) {
+        Objects.requireNonNull(key);
         requireNotFrozen();
         builder.setWipeKey(key.toProtobufKey());
         return this;
@@ -139,8 +163,19 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     public TokenCreateTransaction setSupplyKey(Key key) {
+        Objects.requireNonNull(key);
         requireNotFrozen();
         builder.setSupplyKey(key.toProtobufKey());
+        return this;
+    }
+
+    public Key getFeeScheduleKey() {
+        return Key.fromProtobufKey(builder.getFeeScheduleKey());
+    }
+
+    public TokenCreateTransaction setFeeScheduleKey(Key key) {
+        requireNotFrozen();
+        builder.setFeeScheduleKey(key.toProtobufKey());
         return this;
     }
 
@@ -159,17 +194,20 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     public TokenCreateTransaction setExpirationTime(Instant expirationTime) {
+        Objects.requireNonNull(expirationTime);
         requireNotFrozen();
         builder.clearAutoRenewPeriod();
         builder.setExpiry(InstantConverter.toProtobuf(expirationTime));
         return this;
     }
 
+    @Nullable
     public AccountId getAutoRenewAccountId() {
         return autoRenewAccountId;
     }
 
     public TokenCreateTransaction setAutoRenewAccountId(AccountId accountId) {
+        Objects.requireNonNull(accountId);
         requireNotFrozen();
         this.autoRenewAccountId = accountId;
         return this;
@@ -180,6 +218,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     public TokenCreateTransaction setAutoRenewPeriod(Duration period) {
+        Objects.requireNonNull(period);
         requireNotFrozen();
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(period));
         return this;
@@ -190,11 +229,70 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     public TokenCreateTransaction setTokenMemo(String memo) {
+        Objects.requireNonNull(memo);
         requireNotFrozen();
         this.builder.setMemo(memo);
         return this;
     }
 
+    public TokenCreateTransaction setCustomFees(List<CustomFee> customFees) {
+        requireNotFrozen();
+        this.customFees = customFees;
+        return this;
+    }
+
+    public TokenCreateTransaction addCustomFee(CustomFee customFee) {
+        requireNotFrozen();
+        customFees.add(customFee);
+        return this;
+    }
+
+    @Nullable
+    public List<CustomFee> getCustomFees() {
+        return CustomFee.deepCloneList(customFees);
+    }
+
+    public TokenType getTokenType() {
+        return TokenType.valueOf(builder.getTokenType());
+    }
+
+    public TokenCreateTransaction setTokenType(TokenType tokenType) {
+        requireNotFrozen();
+        if(tokenType == TokenType.NON_FUNGIBLE_UNIQUE) {
+            /*
+            Comments on initialSupply from protobuf:
+            "Specifies the initial supply of tokens to be put in circulation.
+            The initial supply is sent to the Treasury Account.
+            The supply is in the lowest denomination possible.
+            >>>In the case for NON_FUNGIBLE_UNIQUE Type the value must be 0<<<
+            */
+            setInitialSupply(0);
+        }
+        builder.setTokenType(tokenType.code);
+        return this;
+    }
+
+    public TokenSupplyType getSupplyType() {
+        return TokenSupplyType.valueOf(builder.getSupplyType());
+    }
+
+    public TokenCreateTransaction setSupplyType(TokenSupplyType supplyType) {
+        requireNotFrozen();
+        builder.setSupplyType(supplyType.code);
+        return this;
+    }
+
+    public long getMaxSupply() {
+        return builder.getMaxSupply();
+    }
+
+    public TokenCreateTransaction setMaxSupply(long maxSupply) {
+        requireNotFrozen();
+        builder.setMaxSupply(maxSupply);
+        return this;
+    }
+
+    @Override
     public TokenCreateTransaction freezeWith(@Nullable Client client) {
         if (
             builder.hasAutoRenewPeriod() &&
@@ -217,11 +315,20 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
             builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
         }
 
+        builder.clearCustomFees();
+        for(var fee : customFees) {
+            builder.addCustomFees(fee.toProtobuf());
+        }
+
         return builder;
     }
 
     @Override
     void validateNetworkOnIds(Client client) {
+        for(var fee : customFees) {
+            fee.validate(client);
+        }
+
         if (treasuryAccountId != null) {
             treasuryAccountId.validate(client);
         }

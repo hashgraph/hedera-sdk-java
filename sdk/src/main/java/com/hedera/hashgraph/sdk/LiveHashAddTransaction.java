@@ -2,7 +2,10 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.CryptoAddLiveHashTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.LiveHash;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
@@ -12,6 +15,7 @@ import java.time.Duration;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * A hash---presumably of some kind of credential or certificate---along with a list of keys,
@@ -21,7 +25,8 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
     private final CryptoAddLiveHashTransactionBody.Builder builder;
     private final LiveHash.Builder hashBuilder;
 
-    AccountId accountId;
+    @Nullable
+    AccountId accountId = null;
 
     public LiveHashAddTransaction() {
         builder = CryptoAddLiveHashTransactionBody.newBuilder();
@@ -51,6 +56,7 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
      * @return {@code this}
      */
     public LiveHashAddTransaction setAccountId(AccountId accountId) {
+        Objects.requireNonNull(accountId);
         requireNotFrozen();
         this.accountId = accountId;
         return this;

@@ -97,7 +97,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         });
     }
 
-    private void setNodesFromNodeAccountIds(Client client) throws IllegalStateException {
+    private void setNodesFromNodeAccountIds(Client client) {
         for(var accountId : nodeAccountIds) {
             @Nullable
             var node = client.network.networkNodes.get(accountId);

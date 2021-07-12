@@ -24,7 +24,11 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Disabled;
 
 public class TransactionIntegrationTest {
     @Test
@@ -77,7 +81,6 @@ public class TransactionIntegrationTest {
             var transaction = new AccountCreateTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
-                .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                 .freezeWith(testEnv.client)
                 .signWithOperator(testEnv.client);
 
@@ -114,6 +117,7 @@ public class TransactionIntegrationTest {
         });
     }
 
+    @Disabled
     @Test
     @DisplayName("transaction can be serialized into bytes, deserialized, signature added and executed")
     void transactionFromToBytes2() {
@@ -242,6 +246,8 @@ public class TransactionIntegrationTest {
             var resp = tx.execute(testEnv.client);
 
             resp.getReceipt(testEnv.client);
+
+            testEnv.client.close();
         });
     }
 }

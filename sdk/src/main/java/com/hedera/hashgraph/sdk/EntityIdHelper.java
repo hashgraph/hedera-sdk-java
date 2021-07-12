@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.base.Splitter;
 import com.google.errorprone.annotations.Var;
 
 import java.lang.FunctionalInterface;
@@ -12,7 +11,6 @@ import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 class EntityIdHelper {
@@ -26,6 +24,10 @@ class EntityIdHelper {
      */
     static final int SOLIDITY_ADDRESS_LEN_HEX = SOLIDITY_ADDRESS_LEN * 2;
 
+    private static final Pattern regex1 = Pattern.compile("(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))(?:-([a-z]{5}))?$");
+
+    private EntityIdHelper() {}
+
     static <R> R fromString(String id, WithIdNums<R> withIdNums) {
         for (var network : NetworkName.values()) {
             try {
@@ -38,6 +40,7 @@ class EntityIdHelper {
         return EntityIdHelper.fromString(id, null, withIdNums);
     }
 
+    @SuppressWarnings("InconsistentOverloads")
     static <R> R fromString(String id, @Nullable NetworkName name, WithIdNums<R> withIdNums) {
         var result = parseAddress(name != null ? Integer.toString(name.id) : "", id);
 
@@ -100,10 +103,10 @@ class EntityIdHelper {
     }
 
     static ParseAddressResult parseAddress(String ledgerId, String addr ) {
-        Pattern regex1 = Pattern.compile("(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))(?:-([a-z]{5}))?$");
+        //Pattern regex1 = Pattern.compile("(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))(?:-([a-z]{5}))?$");
         var match = regex1.matcher(addr);
         if(!match.find()){
-            return new ParseAddressResult(0);
+            return new ParseAddressResult();
         }
 
         var a = new Long[]{Long.parseLong(match.group(1)), Long.parseLong(match.group(2)), Long.parseLong(match.group(3))};
@@ -116,14 +119,20 @@ class EntityIdHelper {
     static String checksum(String ledgerId, String addr) {
         StringBuilder answer = new StringBuilder();
         List<Integer> d = new ArrayList<>(); // Digits with 10 for ".", so if addr == "0.0.123" then d == [0, 10, 0, 10, 1, 2, 3]
+        @Var
         long s0 = 0; // Sum of even positions (mod 11)
+        @Var
         long s1 = 0; // Sum of odd positions (mod 11)
+        @Var
         long s = 0; // Weighted sum of all positions (mod p3)
+        @Var
         long sh = 0; // Hash of the ledger ID
+        @SuppressWarnings("UnusedVariable")
+        @Var
         long c = 0; // The checksum, as a single number
         long p3 = 26 * 26 * 26; // 3 digits in base 26
         long p5 = 26 * 26 * 26 * 26 * 26; // 5 digits in base 26
-        long ascii_a = Character.codePointAt("a", 0); // 97
+        long asciiA = Character.codePointAt("a", 0); // 97
         long m = 1_000_003; //min prime greater than a million. Used for the final permutation.
         long w = 31; // Sum s of digit values weights them by powers of w. Should be coprime to p5.
 
@@ -151,7 +160,7 @@ class EntityIdHelper {
         c = (c * m) % p5;
 
         for (var i = 0; i < 5; i++) {
-            answer.append((char)  (ascii_a + (c % 26)));
+            answer.append((char)  (asciiA + (c % 26)));
             c /= 26;
         }
 
@@ -160,7 +169,7 @@ class EntityIdHelper {
 
     @FunctionalInterface
     interface WithIdNums<R> {
-        R apply(long shard, long realm, long num, @Nullable NetworkName name, String checksum);
+        R apply(long shard, long realm, long num, @Nullable NetworkName name, @Nullable String checksum);
     }
 
     static void validate(long shard, long realm, long num, Client client, @Nullable String checksum) {

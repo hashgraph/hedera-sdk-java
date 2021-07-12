@@ -1,7 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.ConsensusCreateTopicTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -9,6 +12,7 @@ import java.time.Duration;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Create a topic to be used for consensus.
@@ -22,7 +26,8 @@ import java.util.LinkedHashMap;
 public final class TopicCreateTransaction extends Transaction<TopicCreateTransaction> {
     private final ConsensusCreateTopicTransactionBody.Builder builder;
 
-    AccountId autoRenewAccountId;
+    @Nullable
+    AccountId autoRenewAccountId = null;
 
     public TopicCreateTransaction() {
         builder = ConsensusCreateTopicTransactionBody.newBuilder();
@@ -61,6 +66,7 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
      * @return {@code this}
      */
     public TopicCreateTransaction setTopicMemo(String memo) {
+        Objects.requireNonNull(memo);
         requireNotFrozen();
         builder.setMemo(memo);
         return this;
@@ -84,6 +90,7 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
      * @return {@code this}
      */
     public TopicCreateTransaction setAdminKey(Key adminKey) {
+        Objects.requireNonNull(adminKey);
         requireNotFrozen();
         builder.setAdminKey(adminKey.toProtobufKey());
         return this;
@@ -104,6 +111,7 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
      * @return {@code this}
      */
     public TopicCreateTransaction setSubmitKey(Key submitKey) {
+        Objects.requireNonNull(submitKey);
         requireNotFrozen();
         builder.setSubmitKey(submitKey.toProtobufKey());
         return this;
@@ -125,6 +133,7 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
      * @return {@code this}
      */
     public TopicCreateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
+        Objects.requireNonNull(autoRenewPeriod);
         requireNotFrozen();
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         return this;
@@ -151,6 +160,7 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
      * @return {@code this}
      */
     public TopicCreateTransaction setAutoRenewAccountId(AccountId autoRenewAccountId) {
+        Objects.requireNonNull(autoRenewAccountId);
         requireNotFrozen();
         this.autoRenewAccountId = autoRenewAccountId;
         return this;

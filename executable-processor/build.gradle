@@ -1,5 +1,5 @@
 dependencies {
-	implementation project(":executable-annotation")
+    implementation project(":executable-annotation")
 
 	implementation 'com.squareup:javapoet:1.13.0'
 }

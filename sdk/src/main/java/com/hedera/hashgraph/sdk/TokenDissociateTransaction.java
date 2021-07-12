@@ -1,18 +1,24 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.TokenDissociateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenDissociateTransaction> {
     private final TokenDissociateTransactionBody.Builder builder;
 
-    AccountId accountId;
+    @Nullable
+    AccountId accountId = null;
     List<TokenId> tokenIds = new ArrayList<>();
 
     public TokenDissociateTransaction() {
@@ -49,15 +55,13 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
         }
     }
 
+    @Nullable
     public AccountId getAccountId() {
-        if (accountId != null) {
-            return new AccountId(0);
-        }
-
         return accountId;
     }
 
     public TokenDissociateTransaction setAccountId(AccountId accountId) {
+        Objects.requireNonNull(accountId);
         requireNotFrozen();
         this.accountId = accountId;
         return this;

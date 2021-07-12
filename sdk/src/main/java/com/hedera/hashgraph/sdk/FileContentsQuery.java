@@ -11,6 +11,7 @@ import io.grpc.MethodDescriptor;
 import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * Get the contents of a file. The content field is empty (no bytes) if the file is empty.
@@ -18,12 +19,14 @@ import javax.annotation.Nullable;
 public final class FileContentsQuery extends Query<ByteString, FileContentsQuery> {
     private final FileGetContentsQuery.Builder builder;
 
-    FileId fileId;
+    @Nullable
+    FileId fileId = null;
 
     public FileContentsQuery() {
         this.builder = FileGetContentsQuery.newBuilder();
     }
 
+    @Nullable
     public FileId getFileId() {
         return fileId;
     }
@@ -35,6 +38,7 @@ public final class FileContentsQuery extends Query<ByteString, FileContentsQuery
      * @param fileId The FileId to be set
      */
     public FileContentsQuery setFileId(FileId fileId) {
+        Objects.requireNonNull(fileId);
         this.fileId = fileId;
         return this;
     }

@@ -24,7 +24,7 @@ class Network {
     HashMap<AccountId, Node> networkNodes = new HashMap<>();
 
     @Nullable
-    NetworkName networkName;
+    NetworkName networkName = null;
 
     List<Node> nodes = new ArrayList<>();
     final ExecutorService executor;

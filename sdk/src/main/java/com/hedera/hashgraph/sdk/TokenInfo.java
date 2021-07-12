@@ -10,6 +10,8 @@ import java.time.Duration;
 import java.time.Instant;
 
 import javax.annotation.Nullable;
+import java.util.List;
+import java.util.ArrayList;
 
 public class TokenInfo {
     /**
@@ -38,78 +40,95 @@ public class TokenInfo {
     public final long totalSupply;
 
     /**
-     *
+     * The ID of the account which is set as Treasury
      */
     public final AccountId treasuryAccountId;
 
     /**
-     *
+     * The key which can perform update/delete operations on the token. If empty, the token can be perceived as immutable (not being able to be updated/deleted)
      */
     @Nullable
     public final Key adminKey;
 
     /**
-     *
+     * The key which can grant or revoke KYC of an account for the token's transactions. If empty, KYC is not required, and KYC grant or revoke operations are not possible.
      */
     @Nullable
     public final Key kycKey;
 
     /**
-     *
+     * The key which can freeze or unfreeze an account for token transactions. If empty, freezing is not possible
      */
     @Nullable
     public final Key freezeKey;
 
     /**
-     *
+     * The key which can wipe token balance of an account. If empty, wipe is not possible
      */
     @Nullable
     public final Key wipeKey;
 
     /**
-     *
+     * The key which can change the supply of a token. The key is used to sign Token Mint/Burn operations
      */
     @Nullable
     public final Key supplyKey;
 
     /**
-     *
+     * The key which can change the custom fees of the token; if not set, the fees are immutable
+     */
+    @Nullable
+    public final Key feeScheduleKey;
+
+    /**
+     * The default Freeze status (not applicable, frozen or unfrozen) of Hedera accounts relative to this token. FreezeNotApplicable is returned if Token Freeze Key is empty. Frozen is returned if Token Freeze Key is set and defaultFreeze is set to true. Unfrozen is returned if Token Freeze Key is set and defaultFreeze is set to false
      */
     @Nullable
     public final Boolean defaultFreezeStatus;
 
     /**
-     *
+     * The default KYC status (KycNotApplicable or Revoked) of Hedera accounts relative to this token. KycNotApplicable is returned if KYC key is not set, otherwise Revoked
      */
     @Nullable
     public final Boolean defaultKycStatus;
 
     /**
-     *
+     * Specifies whether the token was deleted or not
      */
     public final boolean isDeleted;
 
     /**
-     *
+     * An account which will be automatically charged to renew the token's expiration, at autoRenewPeriod interval
      */
     @Nullable
     public final AccountId autoRenewAccount;
 
     /**
-     *
+     * The interval at which the auto-renew account will be charged to extend the token's expiry
      */
     @Nullable
     public final Duration autoRenewPeriod;
 
     /**
-     *
+     * The epoch second at which the token will expire
      */
     @Nullable
     public final Instant expirationTime;
 
+    /**
+     * The memo associated with the token
+     */
     public final String tokenMemo;
 
-    private TokenInfo(
+    public final List<CustomFee> customFees;
+
+    public final TokenType tokenType;
+
+    public final TokenSupplyType supplyType;
+
+    public final long maxSupply;
+
+    TokenInfo(
         TokenId tokenId,
         String name,
         String symbol,
@@ -121,13 +140,18 @@ public class TokenInfo {
         @Nullable Key freezeKey,
         @Nullable Key wipeKey,
         @Nullable Key supplyKey,
+        @Nullable Key feeScheduleKey,
         @Nullable Boolean defaultFreezeStatus,
         @Nullable Boolean defaultKycStatus,
         boolean isDeleted,
         @Nullable AccountId autoRenewAccount,
         @Nullable Duration autoRenewPeriod,
         @Nullable Instant expirationTime,
-        String tokenMemo
+        String tokenMemo,
+        List<CustomFee> customFees,
+        TokenType tokenType,
+        TokenSupplyType supplyType,
+        long maxSupply
     ) {
         this.tokenId = tokenId;
         this.name = name;
@@ -140,6 +164,7 @@ public class TokenInfo {
         this.freezeKey = freezeKey;
         this.wipeKey = wipeKey;
         this.supplyKey = supplyKey;
+        this.feeScheduleKey = feeScheduleKey;
         this.defaultFreezeStatus = defaultFreezeStatus;
         this.defaultKycStatus = defaultKycStatus;
         this.isDeleted = isDeleted;
@@ -147,6 +172,10 @@ public class TokenInfo {
         this.autoRenewPeriod = autoRenewPeriod;
         this.expirationTime = expirationTime;
         this.tokenMemo = tokenMemo;
+        this.customFees = customFees;
+        this.tokenType = tokenType;
+        this.supplyType = supplyType;
+        this.maxSupply = maxSupply;
     }
 
     @Nullable
@@ -178,13 +207,18 @@ public class TokenInfo {
             info.hasFreezeKey() ? Key.fromProtobufKey(info.getFreezeKey(), networkName) : null,
             info.hasWipeKey() ? Key.fromProtobufKey(info.getWipeKey(), networkName) : null,
             info.hasSupplyKey() ? Key.fromProtobufKey(info.getSupplyKey(), networkName) : null,
+            info.hasFeeScheduleKey() ? Key.fromProtobufKey(info.getFeeScheduleKey(), networkName) : null,
             freezeStatusFromProtobuf(info.getDefaultFreezeStatus()),
             kycStatusFromProtobuf(info.getDefaultKycStatus()),
             info.getDeleted(),
             info.hasAutoRenewAccount() ? AccountId.fromProtobuf(info.getAutoRenewAccount(), networkName) : null,
             info.hasAutoRenewPeriod() ? DurationConverter.fromProtobuf(info.getAutoRenewPeriod()) : null,
             info.hasExpiry() ? InstantConverter.fromProtobuf(info.getExpiry()) : null,
-            info.getMemo()
+            info.getMemo(),
+            customFeesFromProto(info),
+            TokenType.valueOf(info.getTokenType()),
+            TokenSupplyType.valueOf(info.getSupplyType()),
+            info.getMaxSupply()
         );
     }
 
@@ -192,38 +226,69 @@ public class TokenInfo {
         return fromProtobuf(TokenGetInfoResponse.parseFrom(bytes).toBuilder().build());
     }
 
+    private static List<CustomFee> customFeesFromProto(com.hedera.hashgraph.sdk.proto.TokenInfo info) {
+        var returnCustomFees = new ArrayList<CustomFee>(info.getCustomFeesCount());
+        for(var feeProto : info.getCustomFeesList()) {
+            returnCustomFees.add(CustomFee.fromProtobuf(feeProto));
+        }
+        return returnCustomFees;
+    }
+
     @Nullable
     static TokenFreezeStatus freezeStatusToProtobuf(@Nullable Boolean freezeStatus) {
         return freezeStatus == null ? TokenFreezeStatus.FreezeNotApplicable : freezeStatus ? TokenFreezeStatus.Frozen : TokenFreezeStatus.Unfrozen;
     }
 
-    @Nullable
     static TokenKycStatus kycStatusToProtobuf(@Nullable Boolean kycStatus) {
         return kycStatus == null ? TokenKycStatus.KycNotApplicable : kycStatus ? TokenKycStatus.Granted : TokenKycStatus.Revoked;
     }
 
     TokenGetInfoResponse toProtobuf() {
-        return TokenGetInfoResponse.newBuilder().setTokenInfo(
-            com.hedera.hashgraph.sdk.proto.TokenInfo.newBuilder()
-                .setTokenId(tokenId.toProtobuf())
-                .setName(name)
-                .setSymbol(symbol)
-                .setDecimals(decimals)
-                .setTotalSupply(totalSupply)
-                .setTreasury(treasuryAccountId.toProtobuf())
-                .setAdminKey(adminKey != null ? adminKey.toProtobufKey() : null)
-                .setKycKey(kycKey != null ? kycKey.toProtobufKey() : null)
-                .setFreezeKey(freezeKey != null ? freezeKey.toProtobufKey() : null)
-                .setWipeKey(wipeKey != null ? wipeKey.toProtobufKey() : null)
-                .setSupplyKey(supplyKey != null ? supplyKey.toProtobufKey() : null)
-                .setDefaultFreezeStatus(freezeStatusToProtobuf(defaultFreezeStatus))
-                .setDefaultKycStatus(kycStatusToProtobuf(defaultKycStatus))
-                .setDeleted(isDeleted)
-                .setAutoRenewAccount(autoRenewAccount != null ? autoRenewAccount.toProtobuf() : null)
-                .setAutoRenewPeriod(autoRenewPeriod != null ? DurationConverter.toProtobuf(autoRenewPeriod) : null)
-                .setExpiry(expirationTime != null ? InstantConverter.toProtobuf(expirationTime) : null)
-                .setMemo(tokenMemo)
-        ).build();
+        var tokenInfoBuilder = com.hedera.hashgraph.sdk.proto.TokenInfo.newBuilder()
+            .setTokenId(tokenId.toProtobuf())
+            .setName(name)
+            .setSymbol(symbol)
+            .setDecimals(decimals)
+            .setTotalSupply(totalSupply)
+            .setTreasury(treasuryAccountId.toProtobuf())
+            .setDefaultFreezeStatus(freezeStatusToProtobuf(defaultFreezeStatus))
+            .setDefaultKycStatus(kycStatusToProtobuf(defaultKycStatus))
+            .setDeleted(isDeleted)
+            .setMemo(tokenMemo)
+            .setTokenType(tokenType.code)
+            .setSupplyType(supplyType.code)
+            .setMaxSupply(maxSupply);
+        if(adminKey != null) {
+            tokenInfoBuilder.setAdminKey(adminKey.toProtobufKey());
+        }
+        if(kycKey != null) {
+            tokenInfoBuilder.setKycKey(kycKey.toProtobufKey());
+        }
+        if(freezeKey != null) {
+            tokenInfoBuilder.setFreezeKey(freezeKey.toProtobufKey());
+        }
+        if(wipeKey != null) {
+            tokenInfoBuilder.setWipeKey(wipeKey.toProtobufKey());
+        }
+        if(supplyKey != null) {
+            tokenInfoBuilder.setSupplyKey(supplyKey.toProtobufKey());
+        }
+        if(feeScheduleKey != null) {
+            tokenInfoBuilder.setFeeScheduleKey(feeScheduleKey.toProtobufKey());
+        }
+        if(autoRenewAccount != null) {
+            tokenInfoBuilder.setAutoRenewAccount(autoRenewAccount.toProtobuf());
+        }
+        if(autoRenewPeriod != null) {
+            tokenInfoBuilder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
+        }
+        if(expirationTime != null) {
+            tokenInfoBuilder.setExpiry(InstantConverter.toProtobuf(expirationTime));
+        }
+        for(var fee : customFees) {
+            tokenInfoBuilder.addCustomFees(fee.toProtobuf());
+        }
+        return TokenGetInfoResponse.newBuilder().setTokenInfo(tokenInfoBuilder).build();
     }
 
     @Override
@@ -240,6 +305,7 @@ public class TokenInfo {
             .add("freezeKey", freezeKey)
             .add("wipeKey", wipeKey)
             .add("supplyKey", supplyKey)
+            .add("feeScheduleKey", feeScheduleKey)
             .add("defaultFreezeStatus", defaultFreezeStatus)
             .add("defaultKycStatus", defaultKycStatus)
             .add("isDeleted", isDeleted)
@@ -247,6 +313,10 @@ public class TokenInfo {
             .add("autoRenewPeriod", autoRenewPeriod)
             .add("expirationTime", expirationTime)
             .add("tokenMemo", tokenMemo)
+            .add("customFees", customFees)
+            .add("tokenType", tokenType)
+            .add("supplyType", supplyType)
+            .add("maxSupply", maxSupply)
             .toString();
     }
 

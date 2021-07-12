@@ -1,7 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.CryptoCreateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -16,7 +19,8 @@ import java.util.Objects;
 public final class AccountCreateTransaction extends Transaction<AccountCreateTransaction> {
     private static final Hbar DEFAULT_RECORD_THRESHOLD = Hbar.fromTinybars(Long.MAX_VALUE);
 
-    AccountId proxyAccountId;
+    @Nullable
+    AccountId proxyAccountId = null;
 
     private final CryptoCreateTransactionBody.Builder builder;
 
@@ -196,6 +200,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     public AccountCreateTransaction setAccountMemo(String memo) {
+        Objects.requireNonNull(memo);
         requireNotFrozen();
         this.builder.setMemo(memo);
         return this;

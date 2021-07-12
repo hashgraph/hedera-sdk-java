@@ -10,6 +10,7 @@ import java.util.HashMap;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 public class AccountBalance {
     @Nonnegative
@@ -61,7 +62,7 @@ public class AccountBalance {
             protobuf.addTokenBalances(TokenBalance.newBuilder()
                 .setTokenId(entry.getKey().toProtobuf())
                 .setBalance(entry.getValue())
-                .setDecimals(tokenDecimals.get(entry.getKey()))
+                .setDecimals(Objects.requireNonNull(tokenDecimals.get(entry.getKey())))
             );
         }
 

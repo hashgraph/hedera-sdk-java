@@ -11,11 +11,13 @@ import io.grpc.MethodDescriptor;
 import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 public class TokenInfoQuery extends com.hedera.hashgraph.sdk.Query<TokenInfo, TokenInfoQuery> {
     private final TokenGetInfoQuery.Builder builder;
 
-    TokenId tokenId;
+    @Nullable
+    TokenId tokenId = null;
 
     public TokenInfoQuery() {
         builder = TokenGetInfoQuery.newBuilder();
@@ -28,10 +30,12 @@ public class TokenInfoQuery extends com.hedera.hashgraph.sdk.Query<TokenInfo, To
      * @param tokenId The TokenId to be set
      */
     public TokenInfoQuery setTokenId(TokenId tokenId) {
+        Objects.requireNonNull(tokenId);
         this.tokenId = tokenId;
         return this;
     }
 
+    @Nullable
     public TokenId getTokenId() {
         return tokenId;
     }

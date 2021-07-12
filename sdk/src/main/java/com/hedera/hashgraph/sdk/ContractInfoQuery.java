@@ -21,12 +21,14 @@ import java.util.Objects;
 public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQuery> {
     private final ContractGetInfoQuery.Builder builder;
 
-    ContractId contractId;
+    @Nullable
+    ContractId contractId = null;
 
     public ContractInfoQuery() {
         builder = ContractGetInfoQuery.newBuilder();
     }
 
+    @Nullable
     public ContractId getContractId() {
         return contractId;
     }

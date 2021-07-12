@@ -10,21 +10,25 @@ import io.grpc.MethodDescriptor;
 import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 public class ScheduleInfoQuery extends com.hedera.hashgraph.sdk.Query<ScheduleInfo, ScheduleInfoQuery> {
     private final ScheduleGetInfoQuery.Builder builder;
 
-    ScheduleId scheduleId;
+    @Nullable
+    ScheduleId scheduleId = null;
 
     public ScheduleInfoQuery() {
         builder = ScheduleGetInfoQuery.newBuilder();
     }
 
     public ScheduleInfoQuery setScheduleId(ScheduleId scheduleId) {
+        Objects.requireNonNull(scheduleId);
         this.scheduleId = scheduleId;
         return this;
     }
 
+    @Nullable
     public ScheduleId getScheduleId() {
         return scheduleId;
     }
