@@ -18,12 +18,14 @@ import java.util.Objects;
 public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery> {
     private final CryptoGetInfoQuery.Builder builder;
 
-    AccountId accountId;
+    @Nullable
+    AccountId accountId = null;
 
     public AccountInfoQuery() {
         builder = CryptoGetInfoQuery.newBuilder();
     }
 
+    @Nullable
     public AccountId getAccountId() {
         return accountId;
     }

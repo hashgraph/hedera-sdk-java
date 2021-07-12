@@ -4,9 +4,11 @@ import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 import org.threeten.bp.Instant;
 import java.util.Collections;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FeeSchedulesTest {
     @BeforeAll
@@ -24,22 +26,30 @@ public class FeeSchedulesTest {
         return new FeeSchedules()
             .setCurrent(new FeeSchedule()
                 .setExpirationTime(Instant.ofEpochSecond(1554158542))
-                .setTransactionFeeSchedules(Collections.singletonList(new TransactionFeeSchedule()
-                    .setFeeData(new FeeData()
+                .addTransactionFeeSchedule(new TransactionFeeSchedule()
+                    .addFee(new FeeData()
                         .setNodeData(new FeeComponents())
                         .setNetworkData(new FeeComponents()
                             .setMin(2)
-                            .setMax(5))
-                        .setServiceData(new FeeComponents())))))
+                            .setMax(5)
+                        )
+                        .setServiceData(new FeeComponents())
+                    )
+                )
+            )
             .setNext(new FeeSchedule()
                 .setExpirationTime(Instant.ofEpochSecond(1554158222))
-                .setTransactionFeeSchedules(Collections.singletonList(new TransactionFeeSchedule()
-                    .setFeeData(new FeeData()
+                .addTransactionFeeSchedule(new TransactionFeeSchedule()
+                    .addFee(new FeeData()
                         .setNodeData(new FeeComponents()
                             .setMin(1)
-                            .setMax(2))
+                            .setMax(2)
+                        )
                         .setNetworkData(new FeeComponents())
-                        .setServiceData(new FeeComponents())))));
+                        .setServiceData(new FeeComponents())
+                    )
+                )
+            );
     }
 
     @Test

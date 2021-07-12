@@ -1,18 +1,24 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.TokenAssociateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import javax.annotation.Nullable;
+import java.util.Objects;
 
 public class TokenAssociateTransaction extends Transaction<TokenAssociateTransaction> {
     private final TokenAssociateTransactionBody.Builder builder;
 
-    AccountId accountId;
+    @Nullable
+    AccountId accountId = null;
     List<TokenId> tokenIds = new ArrayList<>();
 
     public TokenAssociateTransaction() {
@@ -49,15 +55,13 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
         }
     }
 
+    @Nullable
     public AccountId getAccountId() {
-        if (accountId != null) {
-            return new AccountId(0);
-        }
-
         return accountId;
     }
 
     public TokenAssociateTransaction setAccountId(AccountId accountId) {
+        Objects.requireNonNull(accountId);
         requireNotFrozen();
         this.accountId = accountId;
         return this;
@@ -68,6 +72,7 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
     }
 
     public TokenAssociateTransaction setTokenIds(List<TokenId> tokens) {
+        Objects.requireNonNull(tokens);
         requireNotFrozen();
         this.tokenIds = tokens;
         return this;
@@ -89,6 +94,7 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
 
     @Override
     void validateNetworkOnIds(Client client) {
+        Objects.requireNonNull(client);
         if (accountId != null) {
             accountId.validate(client);
         }

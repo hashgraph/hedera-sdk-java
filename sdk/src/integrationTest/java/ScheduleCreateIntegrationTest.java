@@ -6,10 +6,12 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ScheduleCreateIntegrationTest {
     @Test
@@ -276,6 +278,8 @@ public class ScheduleCreateIntegrationTest {
                 .execute(testEnv.client);
 
             assertNotNull(info.executedAt);
+
+            testEnv.client.close();
         });
     }
 }

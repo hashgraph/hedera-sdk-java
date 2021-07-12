@@ -2,7 +2,10 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.ConsensusUpdateTopicTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.KeyList;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
@@ -10,6 +13,7 @@ import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Update a topic.
@@ -24,8 +28,10 @@ import java.util.LinkedHashMap;
 public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransaction> {
     private final ConsensusUpdateTopicTransactionBody.Builder builder;
 
-    TopicId topicId;
-    AccountId autoRenewAccountId;
+    @Nullable
+    TopicId topicId = null;
+    @Nullable
+    AccountId autoRenewAccountId = null;
 
     public TopicUpdateTransaction() {
         builder = ConsensusUpdateTopicTransactionBody.newBuilder();
@@ -63,6 +69,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
      * @return {@code this}
      */
     public TopicUpdateTransaction setTopicId(TopicId topicId) {
+        Objects.requireNonNull(topicId);
         requireNotFrozen();
         this.topicId = topicId;
         return this;
@@ -80,6 +87,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
      * @return {@code this}
      */
     public TopicUpdateTransaction setTopicMemo(String memo) {
+        Objects.requireNonNull(memo);
         requireNotFrozen();
         builder.setMemo(StringValue.of(memo));
         return this;
@@ -108,6 +116,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
      * @return {@code this}
      */
     public TopicUpdateTransaction setAdminKey(Key adminKey) {
+        Objects.requireNonNull(adminKey);
         requireNotFrozen();
         builder.setAdminKey(adminKey.toProtobufKey());
         return this;
@@ -140,6 +149,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
      * @return {@code this}
      */
     public TopicUpdateTransaction setSubmitKey(Key submitKey) {
+        Objects.requireNonNull(submitKey);
         requireNotFrozen();
         builder.setSubmitKey(submitKey.toProtobufKey());
         return this;
@@ -171,6 +181,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
      * @return {@code this}
      */
     public TopicUpdateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
+        Objects.requireNonNull(autoRenewPeriod);
         requireNotFrozen();
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         return this;
@@ -188,6 +199,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
      * @return {@code this}
      */
     public TopicUpdateTransaction setAutoRenewAccountId(AccountId autoRenewAccountId) {
+        Objects.requireNonNull(autoRenewAccountId);
         requireNotFrozen();
         this.autoRenewAccountId = autoRenewAccountId;
         return this;
@@ -201,10 +213,11 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
      * @param autoRenewAccountId The AccountId to be cleared for auto renewal
      * @return {@code this}
      */
+    @SuppressWarnings("MissingSummary")
     @Deprecated
     public TopicUpdateTransaction clearAutoRenewAccountId(AccountId autoRenewAccountId) {
         requireNotFrozen();
-        autoRenewAccountId = null;
+        this.autoRenewAccountId = null;
         return this;
     }
 

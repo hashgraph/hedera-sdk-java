@@ -6,29 +6,29 @@ import com.google.common.base.MoreObjects;
 
 public class FeeData {
     @Nullable
-    private FeeComponents nodeData;
+    private FeeComponents nodeData = null;
     @Nullable
-    private FeeComponents networkData;
+    private FeeComponents networkData = null;
     @Nullable
-    private FeeComponents serviceData;
+    private FeeComponents serviceData = null;
+    private FeeDataType type = FeeDataType.DEFAULT;
 
     public FeeData() {
-        nodeData = null;
-        networkData = null;
-        serviceData = null;
     }
 
     static FeeData fromProtobuf(com.hedera.hashgraph.sdk.proto.FeeData feeData) {
         return new FeeData()
             .setNodeData(feeData.hasNodedata() ? FeeComponents.fromProtobuf(feeData.getNodedata()) : null)
             .setNetworkData(feeData.hasNetworkdata() ? FeeComponents.fromProtobuf(feeData.getNetworkdata()) : null)
-            .setServiceData(feeData.hasNodedata() ? FeeComponents.fromProtobuf(feeData.getServicedata()) : null);
+            .setServiceData(feeData.hasNodedata() ? FeeComponents.fromProtobuf(feeData.getServicedata()) : null)
+            .setType(FeeDataType.valueOf(feeData.getSubType()));
     }
 
     public static FeeData fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.FeeData.parseFrom(bytes).toBuilder().build());
     }
 
+    @Nullable
     FeeComponents getNodeData() {
         return nodeData;
     }
@@ -38,6 +38,7 @@ public class FeeData {
         return this;
     }
 
+    @Nullable
     FeeComponents getNetworkData() {
         return networkData;
     }
@@ -47,6 +48,7 @@ public class FeeData {
         return this;
     }
 
+    @Nullable
     FeeComponents getServiceData() {
         return serviceData;
     }
@@ -56,12 +58,27 @@ public class FeeData {
         return this;
     }
 
+    FeeDataType getType() {
+        return type;
+    }
+
+    FeeData setType(FeeDataType type) {
+        this.type = type;
+        return this;
+    }
+
     com.hedera.hashgraph.sdk.proto.FeeData toProtobuf() {
-        return com.hedera.hashgraph.sdk.proto.FeeData.newBuilder()
-            .setNodedata(nodeData != null ? nodeData.toProtobuf() : null)
-            .setNetworkdata(networkData != null ? networkData.toProtobuf() : null)
-            .setServicedata(serviceData != null ? serviceData.toProtobuf() : null)
-            .build();
+        var builder = com.hedera.hashgraph.sdk.proto.FeeData.newBuilder().setSubType(type.code);
+        if(nodeData != null) {
+            builder.setNodedata(nodeData.toProtobuf());
+        }
+        if(networkData != null) {
+            builder.setNetworkdata(networkData.toProtobuf());
+        }
+        if(serviceData != null) {
+            builder.setServicedata(serviceData.toProtobuf());
+        }
+        return builder.build();
     }
 
     @Override
@@ -70,6 +87,7 @@ public class FeeData {
             .add("nodeData", getNodeData())
             .add("networkData", getNetworkData())
             .add("serviceData", getServiceData())
+            .add("type", getType())
             .toString();
     }
 

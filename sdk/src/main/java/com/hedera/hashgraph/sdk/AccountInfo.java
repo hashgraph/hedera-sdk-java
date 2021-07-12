@@ -96,6 +96,8 @@ public final class AccountInfo {
 
     public final String accountMemo;
 
+    public final long ownedNfts;
+
     private AccountInfo(
         AccountId accountId,
         String contractAccountId,
@@ -111,7 +113,8 @@ public final class AccountInfo {
         Duration autoRenewPeriod,
         List<LiveHash> liveHashes,
         Map<TokenId, TokenRelationship> tokenRelationships,
-        String accountMemo
+        String accountMemo,
+        long ownedNfts
     ) {
         this.accountId = accountId;
         this.contractAccountId = contractAccountId;
@@ -128,6 +131,7 @@ public final class AccountInfo {
         this.liveHashes = liveHashes;
         this.tokenRelationships = Collections.unmodifiableMap(tokenRelationships);
         this.accountMemo = accountMemo;
+        this.ownedNfts = ownedNfts;
     }
 
     static AccountInfo fromProtobuf(CryptoGetInfoResponse.AccountInfo accountInfo) {
@@ -167,7 +171,8 @@ public final class AccountInfo {
             DurationConverter.fromProtobuf(accountInfo.getAutoRenewPeriod()),
             liveHashes,
             relationships,
-            accountInfo.getMemo()
+            accountInfo.getMemo(),
+            accountInfo.getOwnedNfts()
         );
     }
 
@@ -192,7 +197,8 @@ public final class AccountInfo {
             .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
             .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod))
             .addAllLiveHashes(hashes)
-            .setMemo(accountMemo);
+            .setMemo(accountMemo)
+            .setOwnedNfts(ownedNfts);
 
         if (contractAccountId != null) {
             accountInfoBuilder.setContractAccountID(contractAccountId);
@@ -223,6 +229,7 @@ public final class AccountInfo {
             .add("liveHashes", liveHashes)
             .add("tokenRelationships", tokenRelationships)
             .add("accountMemo", accountMemo)
+            .add("ownedNfts", ownedNfts)
             .toString();
     }
 

@@ -9,6 +9,7 @@ import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * Get all of the information about a file, except for its contents.
@@ -23,12 +24,14 @@ import javax.annotation.Nullable;
 public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
     private final FileGetInfoQuery.Builder builder;
 
-    FileId fileId;
+    @Nullable
+    FileId fileId = null;
 
     public FileInfoQuery() {
         builder = FileGetInfoQuery.newBuilder();
     }
 
+    @Nullable
     public FileId getFileId() {
         return fileId;
     }
@@ -39,6 +42,7 @@ public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
      * @param fileId The FileId to be set
      */
     public FileInfoQuery setFileId(FileId fileId) {
+        Objects.requireNonNull(fileId);
         this.fileId = fileId;
         return this;
     }

@@ -3,7 +3,6 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.collect.HashBiMap;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
-import com.google.errorprone.annotations.Var;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ class Network {
     HashMap<AccountId, Node> networkNodes = new HashMap<>();
 
     @Nullable
-    NetworkName networkName;
+    NetworkName networkName = null;
 
     List<Node> nodes = new ArrayList<>();
     final ExecutorService executor;

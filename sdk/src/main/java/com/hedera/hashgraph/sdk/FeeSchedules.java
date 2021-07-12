@@ -7,7 +7,8 @@ import com.google.common.base.MoreObjects;
 
 public class FeeSchedules {
     @Nullable
-    private FeeSchedule current, next;
+    private FeeSchedule current;
+    private FeeSchedule next;
 
     public FeeSchedules() {
         current = next = null;

@@ -5,7 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import com.google.protobuf.ByteString;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class FeeSchedulesTest {
     @Test
@@ -24,6 +25,8 @@ public class FeeSchedulesTest {
              * Test whether the file 0.0.111 actually contains stuff
              */
             assertNotNull(feeSchedules.getCurrent());
+
+            testEnv.client.close();
         });
     }
 }

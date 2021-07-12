@@ -29,7 +29,8 @@ import java.util.Objects;
 public final class TopicMessageSubmitTransaction extends ChunkedTransaction<TopicMessageSubmitTransaction> {
     private final ConsensusSubmitMessageTransactionBody.Builder builder;
 
-    TopicId topicId;
+    @Nullable
+    TopicId topicId = null;
 
     public TopicMessageSubmitTransaction() {
         super();
@@ -77,6 +78,7 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
     }
 
     public TopicMessageSubmitTransaction setTopicId(TopicId topicId) {
+        Objects.requireNonNull(topicId);
         requireNotFrozen();
         this.topicId = topicId;
         return this;

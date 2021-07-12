@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.proto.ExchangeRateSet;
 import com.hedera.hashgraph.sdk.proto.TimestampSeconds;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * The consensus result for a transaction, which might not be currently
@@ -75,6 +76,8 @@ public final class TransactionReceipt {
     @Nullable
     public final TransactionId scheduledTransactionId;
 
+    public final List<Long> serials;
+
     private TransactionReceipt(
         Status status,
         ExchangeRate exchangeRate,
@@ -87,7 +90,8 @@ public final class TransactionReceipt {
         @Nullable ByteString topicRunningHash,
         Long totalSupply,
         @Nullable ScheduleId scheduleId,
-        @Nullable TransactionId scheduledTransactionId
+        @Nullable TransactionId scheduledTransactionId,
+        List<Long> serials
     ) {
         this.status = status;
         this.exchangeRate = exchangeRate;
@@ -101,6 +105,7 @@ public final class TransactionReceipt {
         this.totalSupply = totalSupply;
         this.scheduleId = scheduleId;
         this.scheduledTransactionId = scheduledTransactionId;
+        this.serials = serials;
     }
 
     static TransactionReceipt fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionReceipt transactionReceipt) {
@@ -160,6 +165,8 @@ public final class TransactionReceipt {
                 ? TransactionId.fromProtobuf(transactionReceipt.getScheduledTransactionID(), networkName)
                 : null;
 
+        var serials = transactionReceipt.getSerialNumbersList();
+
         return new TransactionReceipt(
             status,
             exchangeRate,
@@ -172,7 +179,8 @@ public final class TransactionReceipt {
             topicRunningHash,
             totalSupply,
             scheduleId,
-            scheduledTransactionId
+            scheduledTransactionId,
+            serials
         );
     }
 
@@ -230,6 +238,10 @@ public final class TransactionReceipt {
             transactionReceiptBuilder.setScheduledTransactionID(scheduledTransactionId.toProtobuf());
         }
 
+        for(var serial : serials) {
+            transactionReceiptBuilder.addSerialNumbers(serial);
+        }
+
         return transactionReceiptBuilder.build();
     }
 
@@ -247,6 +259,7 @@ public final class TransactionReceipt {
             .add("topicRunningHash", topicRunningHash)
             .add("totalSupply", totalSupply)
             .add("scheduleId", scheduleId)
+            .add("serials", serials)
             .toString();
     }
 

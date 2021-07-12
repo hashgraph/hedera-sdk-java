@@ -44,6 +44,7 @@ public final class ContractId extends Key {
         this.checksum = null;
     }
 
+    @SuppressWarnings("InconsistentOverloads")
     ContractId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable NetworkName network, @Nullable String checksum) {
         this.shard = shard;
         this.realm = realm;
