@@ -1,27 +1,23 @@
 package com.hedera.hashgraph.sdk;
 
-/*
-DEFAULT = 0;
-TOKEN_FUNGIBLE_COMMON = 1;
-TOKEN_NON_FUNGIBLE_UNIQUE = 2;
-*/
+import com.hedera.hashgraph.sdk.proto.SubType;
 
 
 public enum FeeDataType {
-    
-    DEFAULT(com.hedera.hashgraph.sdk.proto.SubType.DEFAULT),
-    
-    TOKEN_FUNGIBLE_COMMON(com.hedera.hashgraph.sdk.proto.SubType.TOKEN_FUNGIBLE_COMMON),
 
-    TOKEN_NON_FUNGIBLE_UNIQUE(com.hedera.hashgraph.sdk.proto.SubType.TOKEN_NON_FUNGIBLE_UNIQUE);
+    DEFAULT(SubType.DEFAULT),
 
-    final com.hedera.hashgraph.sdk.proto.SubType code;
+    TOKEN_FUNGIBLE_COMMON(SubType.TOKEN_FUNGIBLE_COMMON),
 
-    FeeDataType(com.hedera.hashgraph.sdk.proto.SubType code) {
+    TOKEN_NON_FUNGIBLE_UNIQUE(SubType.TOKEN_NON_FUNGIBLE_UNIQUE);
+
+    final SubType code;
+
+    FeeDataType(SubType code) {
         this.code = code;
     }
 
-    static FeeDataType valueOf(com.hedera.hashgraph.sdk.proto.SubType code) {
+    static FeeDataType valueOf(SubType code) {
         switch (code) {
             case DEFAULT:
                 return DEFAULT;
@@ -30,7 +26,7 @@ public enum FeeDataType {
             case TOKEN_NON_FUNGIBLE_UNIQUE:
                 return TOKEN_NON_FUNGIBLE_UNIQUE;
             default:
-                throw new IllegalStateException("(BUG) unhandled SubType (FeeDataType) " + code);
+                throw new IllegalStateException("(BUG) unhandled SubType (FeeDataType)");
         }
     }
 

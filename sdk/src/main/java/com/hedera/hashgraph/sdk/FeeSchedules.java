@@ -8,6 +8,7 @@ import com.google.common.base.MoreObjects;
 public class FeeSchedules {
     @Nullable
     private FeeSchedule current;
+    @Nullable
     private FeeSchedule next;
 
     public FeeSchedules() {
@@ -38,7 +39,7 @@ public class FeeSchedules {
     public FeeSchedule getNext() {
         return next;
     }
-    
+
     public FeeSchedules setNext(@Nullable FeeSchedule next) {
         this.next = next;
         return this;
