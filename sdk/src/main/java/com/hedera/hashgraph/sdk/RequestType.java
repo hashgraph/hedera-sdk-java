@@ -3,7 +3,6 @@ package com.hedera.hashgraph.sdk;
 import com.hedera.hashgraph.sdk.proto.HederaFunctionality;
 
 public enum RequestType {
-
     /**
      * UNSPECIFIED - Need to keep first value as unspecified because first element is ignored and not parsed (0 is ignored by parser)
      */
@@ -329,7 +328,6 @@ public enum RequestType {
 
     static RequestType valueOf(HederaFunctionality code) {
         switch (code) {
-
             case NONE:
                 return NONE;
             case CryptoTransfer:
@@ -466,7 +464,6 @@ public enum RequestType {
     @Override
     public String toString() {
         switch(this) {
-
             case NONE:
                 return "NONE";
             case CRYPTO_TRANSFER:
