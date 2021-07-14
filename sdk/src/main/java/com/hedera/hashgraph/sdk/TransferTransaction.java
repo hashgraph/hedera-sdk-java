@@ -77,6 +77,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     }
 
     CryptoTransferTransactionBody.Builder build() {
+        builder.clearTokenTransfers();
         for (var entry : tokenTransfers.entrySet()) {
             var list = TokenTransferList.newBuilder()
                 .setToken(entry.getKey().toProtobuf());
@@ -102,6 +103,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
             builder.addTokenTransfers(list);
         }
 
+        builder.clearTransfers();
         var list = TransferList.newBuilder();
         for (var entry : hbarTransfers.entrySet()) {
             list.addAccountAmounts(AccountAmount.newBuilder()
