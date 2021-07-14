@@ -1,0 +1,5 @@
+package com.hedera.hashgraph.sdk;
+
+import com.hedera.hashgraph.sdk.proto.HederaFunctionality;
+
+public enum RequestType {

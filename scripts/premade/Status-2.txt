@@ -1,0 +1,8 @@
+    final ResponseCodeEnum code;
+
+    Status(ResponseCodeEnum code) {
+        this.code = code;
+    }
+
+    static Status valueOf(ResponseCodeEnum code) {
+        switch (code) {

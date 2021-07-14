@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -184,6 +185,72 @@ public class ScheduleCreateIntegrationTest {
                 .execute(testEnv.client);
 
             assertNotNull(info.executedAt);
+
+            testEnv.client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Can schedule token transfer")
+    void canScheduleTokenTransaction() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv();
+
+            PrivateKey key = PrivateKey.generate();
+
+            var accountId = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setReceiverSignatureRequired(true)
+                .setKey(key)
+                .setInitialBalance(new Hbar(10))
+                .freezeWith(testEnv.client)
+                .sign(key)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .accountId;
+
+            var tokenId = new TokenCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setInitialSupply(100)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId;
+
+            new TokenAssociateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setAccountId(accountId)
+                .setTokenIds(Collections.singletonList(tokenId))
+                .freezeWith(testEnv.client)
+                .sign(key)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            var scheduleId = new TransferTransaction()
+                .addTokenTransfer(tokenId, testEnv.operatorId, -10)
+                .addTokenTransfer(tokenId, accountId, 10)
+                .schedule()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .scheduleId;;
+
+            new ScheduleSignTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setScheduleId(scheduleId)
+                .freezeWith(testEnv.client)
+                .sign(key)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            var balanceQuery = new AccountBalanceQuery()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setAccountId(accountId)
+                .execute(testEnv.client);
+
+            assertEquals(balanceQuery.tokens.get(tokenId), 10);
 
             testEnv.client.close();
         });

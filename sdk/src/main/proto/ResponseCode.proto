@@ -260,4 +260,8 @@ enum ResponseCodeEnum {
   INVALID_TOKEN_MINT_METADATA = 248; // The requested token mint metadata was invalid
   INVALID_TOKEN_BURN_METADATA = 249; // The requested token burn metadata was invalid
   CURRENT_TREASURY_STILL_OWNS_NFTS = 250; // The treasury for a unique token cannot be changed until it owns no NFTs
+  ACCOUNT_STILL_OWNS_NFTS = 251; // An account cannot be dissociated from a unique token if it owns NFTs for the token
+  TREASURY_MUST_OWN_BURNED_NFT = 252; // A NFT can only be burned when owned by the unique token's treasury
+  ACCOUNT_DOES_NOT_OWN_WIPED_NFT = 253; // An account did not own the NFT to be wiped
+  ACCOUNT_AMOUNT_TRANSFERS_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON = 254; // An AccountAmount token transfers list referenced a token type other than FUNGIBLE_COMMON
 }
