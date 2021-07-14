@@ -1,9 +1,14 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
+import com.hedera.hashgraph.sdk.proto.Fraction;
+import com.hedera.hashgraph.sdk.proto.FractionalFee;
 
 public class CustomFractionalFee extends CustomFee {
-    private long numerator = 0, denominator = 1, min = 0, max = 0;
+    private long numerator = 0;
+    private long denominator = 1;
+    private long min = 0;
+    private long max = 0;
 
     public CustomFractionalFee() {
     }
@@ -11,13 +16,15 @@ public class CustomFractionalFee extends CustomFee {
     static CustomFractionalFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
         var fractionalFee = customFee.getFractionalFee();
         var fraction = fractionalFee.getFractionalAmount();
-        return new CustomFractionalFee()
-            .setFeeCollectorAccountId(customFee.hasFeeCollectorAccountId() ?
-                AccountId.fromProtobuf(customFee.getFeeCollectorAccountId()) : null)
+        var returnFee = new CustomFractionalFee()
             .setNumerator(fraction.getNumerator())
             .setDenominator(fraction.getDenominator())
             .setMin(fractionalFee.getMinimumAmount())
             .setMax(fractionalFee.getMaximumAmount());
+        if(customFee.hasFeeCollectorAccountId()) {
+            returnFee.setFeeCollectorAccountId(AccountId.fromProtobuf(customFee.getFeeCollectorAccountId()));
+        }
+        return returnFee;
     }
 
     public CustomFractionalFee setFeeCollectorAccountId(AccountId feeCollectorAccountId) {
@@ -76,11 +83,11 @@ public class CustomFractionalFee extends CustomFee {
     com.hedera.hashgraph.sdk.proto.CustomFee toProtobuf() {
         var customFeeBuilder = com.hedera.hashgraph.sdk.proto.CustomFee.newBuilder()
             .setFractionalFee(
-                com.hedera.hashgraph.sdk.proto.FractionalFee.newBuilder()
+                FractionalFee.newBuilder()
                     .setMinimumAmount(getMin())
                     .setMaximumAmount(getMax())
                     .setFractionalAmount(
-                        com.hedera.hashgraph.sdk.proto.Fraction.newBuilder()
+                        Fraction.newBuilder()
                             .setNumerator(getNumerator())
                             .setDenominator(getDenominator())
                     )

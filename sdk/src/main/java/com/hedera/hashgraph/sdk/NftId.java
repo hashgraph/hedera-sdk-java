@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.sdk.proto.NftID;
 
 import javax.annotation.Nonnegative;
 import java.util.Objects;
@@ -24,18 +25,15 @@ public class NftId {
     }
 
     public static NftId fromString(String id) {
+        @SuppressWarnings("StringSplitter")
         var parts = id.split("@");
         if(parts.length != 2) {
             throw new IllegalArgumentException("Expecting {shardNum}.{realmNum}.{idNum}-{checksum}@{serialNum}");
         }
-        try {
-            return new NftId(TokenId.fromString(parts[0]), Long.parseLong(parts[1]));
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid Id format, should be in format {shardNum}.{realmNum}.{idNum}-{checksum}@{serialNum}", e);
-        }
+        return new NftId(TokenId.fromString(parts[0]), Long.parseLong(parts[1]));
     }
 
-    static NftId fromProtobuf(com.hedera.hashgraph.sdk.proto.NftID nftId, @Nullable NetworkName networkName) {
+    static NftId fromProtobuf(NftID nftId, @Nullable NetworkName networkName) {
         Objects.requireNonNull(nftId);
         var tokenId = nftId.getTokenID();
         var returnNftId = new NftId(TokenId.fromProtobuf(tokenId), nftId.getSerialNumber());
@@ -45,16 +43,16 @@ public class NftId {
         return returnNftId;
     }
 
-    static NftId fromProtobuf(com.hedera.hashgraph.sdk.proto.NftID nftId) {
+    static NftId fromProtobuf(NftID nftId) {
         return fromProtobuf(nftId, null);
     }
 
     public static NftId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(com.hedera.hashgraph.sdk.proto.NftID.parseFrom(bytes).toBuilder().build());
+        return fromProtobuf(NftID.parseFrom(bytes).toBuilder().build());
     }
 
-    com.hedera.hashgraph.sdk.proto.NftID toProtobuf() {
-        return com.hedera.hashgraph.sdk.proto.NftID.newBuilder()
+    NftID toProtobuf() {
+        return NftID.newBuilder()
             .setTokenID(tokenId.toProtobuf())
             .setSerialNumber(serial)
             .build();

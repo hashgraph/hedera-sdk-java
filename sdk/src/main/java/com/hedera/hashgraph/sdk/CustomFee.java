@@ -10,10 +10,10 @@ abstract public class CustomFee {
     @Nullable
     private AccountId feeCollectorAccountId = null;
 
-    public CustomFee() {
+    CustomFee() {
     }
 
-    static CustomFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee, @Nullable NetworkName networkName) throws IllegalStateException {
+    static CustomFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee, @Nullable NetworkName networkName) {
         switch(customFee.getFeeCase()) {
             case FIXED_FEE:
                 return CustomFixedFee.fromProtobuf(customFee, networkName);
@@ -26,7 +26,7 @@ abstract public class CustomFee {
         }
     }
 
-    static CustomFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) throws IllegalStateException {
+    static CustomFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
         return fromProtobuf(customFee, null);
     }
 
@@ -54,18 +54,25 @@ abstract public class CustomFee {
     CustomFee deepClone() {
         if(this instanceof CustomFixedFee) {
             var fixedFee = (CustomFixedFee)this;
-            return new CustomFixedFee()
-                .setFeeCollectorAccountId(fixedFee.getFeeCollectorAccountId())
-                .setAmount(fixedFee.getAmount())
-                .setDenominatingTokenId(fixedFee.getDenominatingTokenId());
+            var returnFee = new CustomFixedFee().setAmount(fixedFee.getAmount());
+            if(fixedFee.getFeeCollectorAccountId() != null) {
+                returnFee.setFeeCollectorAccountId(fixedFee.getFeeCollectorAccountId());
+            }
+            if(fixedFee.getDenominatingTokenId() != null) {
+                returnFee.setDenominatingTokenId(fixedFee.getDenominatingTokenId());
+            }
+            return returnFee;
         } else {
             var fractionalFee = (CustomFractionalFee)this;
-            return new CustomFractionalFee()
-                .setFeeCollectorAccountId(fractionalFee.getFeeCollectorAccountId())
+            var returnFee = new CustomFractionalFee()
                 .setNumerator(fractionalFee.getNumerator())
                 .setDenominator(fractionalFee.getDenominator())
                 .setMin(fractionalFee.getMin())
                 .setMax(fractionalFee.getMax());
+            if(fractionalFee.getFeeCollectorAccountId() != null) {
+                returnFee.setFeeCollectorAccountId(fractionalFee.getFeeCollectorAccountId());
+            }
+            return returnFee;
         }
     }
 

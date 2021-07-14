@@ -174,7 +174,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return list;
     }
 
-    private void doAddTokenTransfer(Map<AccountId, Long> tokenTransferMap, AccountId accountId, long amount) {
+    private static void doAddTokenTransfer(Map<AccountId, Long> tokenTransferMap, AccountId accountId, long amount) {
         var current = tokenTransferMap.containsKey(accountId) ?
             Objects.requireNonNull(tokenTransferMap.get(accountId)) :
             0L;

@@ -25,7 +25,7 @@ public enum TokenType {
             case NON_FUNGIBLE_UNIQUE:
                 return NON_FUNGIBLE_UNIQUE;
             default:
-                throw new IllegalStateException("(BUG) unhandled TokenType " + code);
+                throw new IllegalStateException("(BUG) unhandled TokenType");
         }
     }
 

@@ -179,7 +179,7 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
         }
     }
 
-    private List<TokenNftInfo> infosFromProtos(List<com.hedera.hashgraph.sdk.proto.TokenNftInfo> protoList, @Nullable NetworkName networkName) {
+    private static List<TokenNftInfo> infosFromProtos(List<com.hedera.hashgraph.sdk.proto.TokenNftInfo> protoList, @Nullable NetworkName networkName) {
         var infos = new ArrayList<TokenNftInfo>();
         for(var proto : protoList) {
             infos.add(TokenNftInfo.fromProtobuf(proto, networkName));
