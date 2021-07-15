@@ -1,9 +1,13 @@
+import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.*;
 
 import java.util.*;
+import javax.annotation.Nullable;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+// TODO: I think TokenDeleteTransaction may actually work.  Try it.
 
 public class IntegrationTestEnv {
     public Client client;
@@ -11,8 +15,17 @@ public class IntegrationTestEnv {
     public AccountId operatorId;
     public List<AccountId> nodeAccountIds;
     public List<AccountId> nodeAccountIdsForChunked;
-
     public static Random random = new Random();
+
+    private AccountId originalOperatorId;
+
+    // Area for tests to play in which will be cleaned up.
+    @Nullable
+    public AccountId newAccountId = null;
+    @Nullable
+    public PrivateKey newAccountKey = null;
+    @Nullable
+    public TokenId newTokenId = null;
 
     public IntegrationTestEnv() throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
         if (System.getProperty("HEDERA_NETWORK").equals("previewnet")) {
@@ -63,6 +76,34 @@ public class IntegrationTestEnv {
                 break;
             }
         }
+        originalOperatorId = client.getOperatorAccountId();
         client.setOperator(operatorId, operatorKey);
+    }
+
+    public void cleanUpAndClose() throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
+        if (newTokenId != null) {
+            new TokenDeleteTransaction()
+                .setNodeAccountIds(nodeAccountIds)
+                .setTokenId(newTokenId)
+                .execute(client);
+        }
+
+        if(newAccountId != null) {
+            new AccountDeleteTransaction()
+                .setNodeAccountIds(nodeAccountIds)
+                .setTransferAccountId(originalOperatorId)
+                .setAccountId(newAccountId)
+                .freezeWith(client)
+                .sign(newAccountKey)
+                .execute(client);
+        }
+
+        new AccountDeleteTransaction()
+            .setNodeAccountIds(nodeAccountIds)
+            .setTransferAccountId(originalOperatorId)
+            .setAccountId(operatorId)
+            .execute(client);
+
+        client.close();
     }
 }
