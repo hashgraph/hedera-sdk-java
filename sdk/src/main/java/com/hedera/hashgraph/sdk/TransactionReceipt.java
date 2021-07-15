@@ -259,6 +259,7 @@ public final class TransactionReceipt {
             .add("topicRunningHash", topicRunningHash)
             .add("totalSupply", totalSupply)
             .add("scheduleId", scheduleId)
+            .add("scheduledTransactionId", scheduledTransactionId)
             .add("serials", serials)
             .toString();
     }

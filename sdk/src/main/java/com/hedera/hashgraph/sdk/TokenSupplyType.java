@@ -23,7 +23,7 @@ public enum TokenSupplyType {
             case FINITE:
                 return FINITE;
             default:
-                throw new IllegalStateException("(BUG) unhandled TokenSupplyType " + code);
+                throw new IllegalStateException("(BUG) unhandled TokenSupplyType");
         }
     }
 

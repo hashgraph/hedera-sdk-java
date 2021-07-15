@@ -216,9 +216,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     @SuppressWarnings("MissingSummary")
     @Deprecated
     public TopicUpdateTransaction clearAutoRenewAccountId(AccountId autoRenewAccountId) {
-        requireNotFrozen();
-        this.autoRenewAccountId = null;
-        return this;
+        return clearAutoRenewAccountId();
     }
 
     /**
@@ -228,7 +226,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
      */
     public TopicUpdateTransaction clearAutoRenewAccountId() {
         requireNotFrozen();
-        autoRenewAccountId = null;
+        autoRenewAccountId = new AccountId(0);
         return this;
     }
 
@@ -250,7 +248,9 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
             topicId.validate(client);
         }
 
-        if (autoRenewAccountId != null) {
+        if ((autoRenewAccountId != null) &&
+            ( ! autoRenewAccountId.equals(new AccountId(0)))
+        ) {
             autoRenewAccountId.validate(client);
         }
     }
