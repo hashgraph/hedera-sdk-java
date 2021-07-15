@@ -73,7 +73,14 @@ class TokenInfoIntegrationTest {
             assertEquals(info.tokenType, TokenType.FUNGIBLE_COMMON);
             assertEquals(info.supplyType, TokenSupplyType.INFINITE);
 
-            testEnv.client.close();
+            new TokenDeleteTransaction()
+                .setTokenId(tokenId)
+                .freezeWith(testEnv.client)
+                .sign(key1)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -113,6 +120,8 @@ class TokenInfoIntegrationTest {
             assertEquals(info.tokenType, TokenType.FUNGIBLE_COMMON);
             assertEquals(info.supplyType, TokenSupplyType.INFINITE);
 
+
+            // TODO: we lose this account
             testEnv.client.close();
         });
     }
@@ -132,6 +141,7 @@ class TokenInfoIntegrationTest {
                 .setSupplyType(TokenSupplyType.FINITE)
                 .setMaxSupply(5000)
                 .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
                 .setSupplyKey(testEnv.operatorKey)
                 .execute(testEnv.client);
 
@@ -168,7 +178,7 @@ class TokenInfoIntegrationTest {
             assertEquals(info.supplyType, TokenSupplyType.FINITE);
             assertEquals(info.maxSupply, 5000);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 
@@ -183,6 +193,7 @@ class TokenInfoIntegrationTest {
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
                 .execute(testEnv.client);
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
@@ -195,7 +206,7 @@ class TokenInfoIntegrationTest {
 
             infoQuery.setQueryPayment(cost).execute(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 
@@ -210,6 +221,7 @@ class TokenInfoIntegrationTest {
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
                 .execute(testEnv.client);
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
@@ -223,7 +235,7 @@ class TokenInfoIntegrationTest {
 
             infoQuery.setQueryPayment(cost).execute(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 
@@ -238,6 +250,7 @@ class TokenInfoIntegrationTest {
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
                 .execute(testEnv.client);
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
@@ -255,7 +268,7 @@ class TokenInfoIntegrationTest {
 
             assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for TokenInfoQuery, of "+cost.toString()+", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 
@@ -270,6 +283,7 @@ class TokenInfoIntegrationTest {
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
                 .execute(testEnv.client);
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
@@ -287,7 +301,7 @@ class TokenInfoIntegrationTest {
 
             assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 }

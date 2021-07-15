@@ -57,6 +57,7 @@ public class ClientIntegrationTest {
 
             testEnv.client.setNetwork(network);
 
+            // TODO: not sure what's going on here, cleanUpAndClose() fails with PAYER_ACCOUNT_NOT_FOUND
             testEnv.client.close();
         });
     }
@@ -88,7 +89,7 @@ public class ClientIntegrationTest {
             assertNotNull(transaction.getNodeAccountIds());
             assertEquals(1, transaction.getNodeAccountIds().size());
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

@@ -134,6 +134,7 @@ class TokenFeeScheduleUpdateIntegrationTest {
             assertEquals(fixedCount, 1);
             assertEquals(fractionalCount, 1);
 
+            testEnv.cleanUpAndClose(tokenId);
             testEnv.client.close();
         });
     }

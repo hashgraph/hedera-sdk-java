@@ -35,7 +35,7 @@ class TokenNftInfoIntegrationTest {
                 .getReceipt(testEnv.client);
 
             var tokenId = Objects.requireNonNull(createReceipt.tokenId);
-            
+
             byte[] metadata = {50};
 
             var mintReceipt = new TokenMintTransaction()
@@ -51,13 +51,13 @@ class TokenNftInfoIntegrationTest {
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .byNftId(nftId)
                 .execute(testEnv.client);
-                
+
             assertEquals(nftInfos.size(), 1);
             assertEquals(nftInfos.get(0).nftId, nftId);
             assertEquals(nftInfos.get(0).accountId, testEnv.operatorId);
             assertEquals(nftInfos.get(0).metadata[0], 50);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 
@@ -85,7 +85,7 @@ class TokenNftInfoIntegrationTest {
             var tokenId = Objects.requireNonNull(createReceipt.tokenId);
 
             List<byte[]> metadatas = NftMetadataGenerator.generate((byte)10);
-            
+
             var mintReceipt = new TokenMintTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
@@ -98,7 +98,7 @@ class TokenNftInfoIntegrationTest {
                 .byAccountId(testEnv.operatorId)
                 .setEnd(10)
                 .execute(testEnv.client);
-            
+
             assertEquals(nftInfos.size(), 10);
 
             var serials = new ArrayList<Long>(mintReceipt.serials);
@@ -109,7 +109,7 @@ class TokenNftInfoIntegrationTest {
                 assertEquals(info.accountId, testEnv.operatorId);
             }
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 
@@ -137,7 +137,7 @@ class TokenNftInfoIntegrationTest {
             var tokenId = Objects.requireNonNull(createReceipt.tokenId);
 
             List<byte[]> metadatas = NftMetadataGenerator.generate((byte)10);
-            
+
             var mintReceipt = new TokenMintTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
@@ -150,7 +150,7 @@ class TokenNftInfoIntegrationTest {
                 .byTokenId(tokenId)
                 .setEnd(10)
                 .execute(testEnv.client);
-            
+
             assertEquals(nftInfos.size(), 10);
 
             var serials = new ArrayList<Long>(mintReceipt.serials);
@@ -161,7 +161,7 @@ class TokenNftInfoIntegrationTest {
                 assertEquals(info.accountId, testEnv.operatorId);
             }
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 }

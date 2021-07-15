@@ -46,7 +46,7 @@ public class FileDeleteIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -83,7 +83,7 @@ public class FileDeleteIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.UNAUTHORIZED.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

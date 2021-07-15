@@ -65,7 +65,7 @@ public class FileUpdateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -103,7 +103,7 @@ public class FileUpdateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.UNAUTHORIZED.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -123,7 +123,7 @@ public class FileUpdateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_FILE_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

@@ -32,7 +32,7 @@ class AccountInfoIntegrationTest {
             assertNull(info.proxyAccountId);
             assertEquals(info.proxyReceived, Hbar.ZERO);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -53,7 +53,7 @@ class AccountInfoIntegrationTest {
 
             assertEquals(accInfo.accountId, testEnv.operatorId);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -74,7 +74,7 @@ class AccountInfoIntegrationTest {
 
             assertEquals(accInfo.accountId, testEnv.operatorId);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -98,7 +98,7 @@ class AccountInfoIntegrationTest {
 
             assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for AccountInfoQuery, of "+cost.toString()+", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -119,7 +119,7 @@ class AccountInfoIntegrationTest {
 
             assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

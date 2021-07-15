@@ -17,16 +17,6 @@ class TokenMintIntegrationTest {
         assertDoesNotThrow(() -> {
             var testEnv = new IntegrationTestEnv();
 
-            var key = PrivateKey.generate();
-
-            var response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
-                .setKey(key)
-                .setInitialBalance(new Hbar(1))
-                .execute(testEnv.client);
-
-            Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
-
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
                     .setNodeAccountIds(testEnv.nodeAccountIds)
@@ -55,7 +45,7 @@ class TokenMintIntegrationTest {
 
             assertEquals(receipt.totalSupply, 1000000 + 10);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 
@@ -103,16 +93,6 @@ class TokenMintIntegrationTest {
         assertDoesNotThrow(() -> {
             var testEnv = new IntegrationTestEnv();
 
-            var key = PrivateKey.generate();
-
-            var response = new AccountCreateTransaction()
-                .setKey(key)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
-                .setInitialBalance(new Hbar(1))
-                .execute(testEnv.client);
-
-            Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
-
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenMintTransaction()
                     .setNodeAccountIds(testEnv.nodeAccountIds)
@@ -123,7 +103,7 @@ class TokenMintIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -132,16 +112,6 @@ class TokenMintIntegrationTest {
     void cannotMintTokensWhenAmountIsNotSet() {
         assertDoesNotThrow(() -> {
             var testEnv = new IntegrationTestEnv();
-
-            var key = PrivateKey.generate();
-
-            var response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
-                .setKey(key)
-                .setInitialBalance(new Hbar(1))
-                .execute(testEnv.client);
-
-            Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
@@ -172,7 +142,7 @@ class TokenMintIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_MINT_AMOUNT.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 
@@ -222,7 +192,7 @@ class TokenMintIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId, accountId, key);
         });
     }
 
@@ -232,16 +202,6 @@ class TokenMintIntegrationTest {
     void canMintNfts() {
         assertDoesNotThrow(() -> {
             var testEnv = new IntegrationTestEnv();
-
-            var key = PrivateKey.generate();
-
-            var response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
-                .setKey(key)
-                .setInitialBalance(new Hbar(1))
-                .execute(testEnv.client);
-
-            Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
@@ -270,7 +230,7 @@ class TokenMintIntegrationTest {
 
             assertEquals(receipt.serials.size(), 10);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 }

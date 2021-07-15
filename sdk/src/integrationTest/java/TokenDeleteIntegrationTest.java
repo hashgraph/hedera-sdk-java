@@ -40,7 +40,7 @@ class TokenDeleteIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -67,7 +67,7 @@ class TokenDeleteIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -102,7 +102,14 @@ class TokenDeleteIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            testEnv.client.close();
+            new TokenDeleteTransaction()
+                .setTokenId(tokenId)
+                .freezeWith(testEnv.client)
+                .sign(key)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -122,7 +129,7 @@ class TokenDeleteIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

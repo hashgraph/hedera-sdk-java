@@ -65,7 +65,7 @@ public class ContractCallIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -118,7 +118,7 @@ public class ContractCallIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.CONTRACT_REVERT_EXECUTED.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -171,7 +171,7 @@ public class ContractCallIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INSUFFICIENT_GAS.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -224,7 +224,7 @@ public class ContractCallIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_CONTRACT_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -279,7 +279,7 @@ public class ContractCallIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -335,7 +335,7 @@ public class ContractCallIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -391,7 +391,7 @@ public class ContractCallIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

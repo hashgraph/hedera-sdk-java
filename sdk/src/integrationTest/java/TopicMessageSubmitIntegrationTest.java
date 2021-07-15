@@ -58,7 +58,7 @@ public class TopicMessageSubmitIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -116,7 +116,7 @@ public class TopicMessageSubmitIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -154,7 +154,7 @@ public class TopicMessageSubmitIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TOPIC_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -191,7 +191,7 @@ public class TopicMessageSubmitIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TOPIC_MESSAGE.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

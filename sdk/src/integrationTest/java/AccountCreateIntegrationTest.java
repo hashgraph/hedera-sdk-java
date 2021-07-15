@@ -51,7 +51,7 @@ class AccountCreateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -92,7 +92,7 @@ class AccountCreateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -112,7 +112,7 @@ class AccountCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.KEY_REQUIRED.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

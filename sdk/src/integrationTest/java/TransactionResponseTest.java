@@ -42,7 +42,7 @@ public class TransactionResponseTest {
                 .sign(key)
                 .execute(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

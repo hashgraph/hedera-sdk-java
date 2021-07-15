@@ -36,7 +36,7 @@ public class ReceiptQueryIntegrationTest {
                 .sign(key)
                 .execute(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -71,7 +71,7 @@ public class ReceiptQueryIntegrationTest {
                 .sign(key)
                 .execute(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -109,7 +109,7 @@ public class ReceiptQueryIntegrationTest {
                 .sign(key)
                 .execute(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -148,7 +148,7 @@ public class ReceiptQueryIntegrationTest {
                 .sign(key)
                 .execute(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -192,7 +192,7 @@ public class ReceiptQueryIntegrationTest {
                 .sign(key)
                 .execute(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -231,7 +231,7 @@ public class ReceiptQueryIntegrationTest {
                 .sign(key)
                 .execute(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

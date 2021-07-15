@@ -57,7 +57,7 @@ public class ContractExecuteIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -78,7 +78,7 @@ public class ContractExecuteIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_CONTRACT_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -132,7 +132,7 @@ public class ContractExecuteIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -186,7 +186,7 @@ public class ContractExecuteIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

@@ -66,7 +66,7 @@ public class TransactionIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -113,9 +113,13 @@ public class TransactionIntegrationTest {
 
             response.getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
+
+
+    // TODO: this test has a bunch of things hard-coded into it, which is kinda dumb, but it's a good idea for a test.
+    //       Any way to fix it and bring it back?
 
     @Disabled
     @Test
@@ -247,7 +251,7 @@ public class TransactionIntegrationTest {
 
             resp.getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

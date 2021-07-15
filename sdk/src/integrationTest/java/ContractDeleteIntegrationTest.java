@@ -64,7 +64,7 @@ public class ContractDeleteIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
     @Test
@@ -115,7 +115,7 @@ public class ContractDeleteIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.MODIFYING_IMMUTABLE_CONTRACT.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -134,7 +134,7 @@ public class ContractDeleteIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_CONTRACT_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }
