@@ -21,6 +21,7 @@ public class ContractBytecodeIntegrationTest {
             var testEnv = new IntegrationTestEnv();
 
             @Var var response = new FileCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -68,6 +69,7 @@ public class ContractBytecodeIntegrationTest {
             var testEnv = new IntegrationTestEnv();
 
             @Var var response = new FileCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -119,6 +121,7 @@ public class ContractBytecodeIntegrationTest {
             var testEnv = new IntegrationTestEnv();
 
             @Var var response = new FileCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);

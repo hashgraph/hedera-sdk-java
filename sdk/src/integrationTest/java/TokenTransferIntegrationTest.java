@@ -13,16 +13,16 @@ class TokenTransferIntegrationTest {
         assertDoesNotThrow(() -> {
             var testEnv = new IntegrationTestEnv();
 
-            PrivateKey key = PrivateKey.generate();
+            testEnv.newAccountKey = PrivateKey.generate();
 
             TransactionResponse response = new AccountCreateTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
-                .setKey(key)
+                .setKey(testEnv.newAccountKey)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
 
-            AccountId accountId = response.getReceipt(testEnv.client).accountId;
-            assertNotNull(accountId);
+            testEnv.newAccountId = response.getReceipt(testEnv.client).accountId;
+            assertNotNull(testEnv.newAccountId);
 
             response = new TokenCreateTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
@@ -39,42 +39,34 @@ class TokenTransferIntegrationTest {
                 .setFreezeDefault(false)
                 .execute(testEnv.client);
 
-            TokenId tokenId = response.getReceipt(testEnv.client).tokenId;
-            assertNotNull(tokenId);
+            testEnv.newTokenId = response.getReceipt(testEnv.client).tokenId;
+            assertNotNull(testEnv.newTokenId);
 
             new TokenAssociateTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
-                .setAccountId(accountId)
-                .setTokenIds(Collections.singletonList(tokenId))
+                .setAccountId(testEnv.newAccountId)
+                .setTokenIds(Collections.singletonList(testEnv.newTokenId))
                 .freezeWith(testEnv.client)
                 .signWithOperator(testEnv.client)
-                .sign(key)
+                .sign(testEnv.newAccountKey)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new TokenGrantKycTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
-                .setAccountId(accountId)
-                .setTokenId(tokenId)
+                .setAccountId(testEnv.newAccountId)
+                .setTokenId(testEnv.newTokenId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new TransferTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
-                .addTokenTransfer(tokenId, testEnv.operatorId, -10)
-                .addTokenTransfer(tokenId, accountId, 10)
+                .addTokenTransfer(testEnv.newTokenId, testEnv.operatorId, -10)
+                .addTokenTransfer(testEnv.newTokenId, testEnv.newAccountId, 10)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            new TokenWipeTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
-                .setTokenId(tokenId)
-                .setAccountId(accountId)
-                .setAmount(10)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
