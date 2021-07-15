@@ -45,7 +45,7 @@ public class TopicUpdateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

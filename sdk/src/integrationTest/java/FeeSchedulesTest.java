@@ -18,15 +18,15 @@ public class FeeSchedulesTest {
             ByteString feeSchedulesBytes = new FileContentsQuery()
                 .setFileId(new FileId(0, 0, 111))
                 .execute(testEnv.client);
-            
+
             FeeSchedules feeSchedules = FeeSchedules.fromBytes(feeSchedulesBytes.toByteArray());
-            
+
             /*
              * Test whether the file 0.0.111 actually contains stuff
              */
             assertNotNull(feeSchedules.getCurrent());
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

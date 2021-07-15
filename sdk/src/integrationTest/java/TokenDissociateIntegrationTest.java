@@ -63,7 +63,7 @@ class TokenDissociateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId, accountId, key);
         });
     }
 
@@ -91,7 +91,7 @@ class TokenDissociateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(accountId, key);
         });
     }
 
@@ -109,7 +109,7 @@ class TokenDissociateIntegrationTest {
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
 
-            Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
+            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenDissociateTransaction()
@@ -122,7 +122,7 @@ class TokenDissociateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(accountId, key);
         });
     }
 
@@ -172,7 +172,7 @@ class TokenDissociateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId, accountId, key);
         });
     }
 
@@ -224,7 +224,7 @@ class TokenDissociateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.TOKEN_NOT_ASSOCIATED_TO_ACCOUNT.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId, accountId, key);
         });
     }
 }

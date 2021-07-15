@@ -24,7 +24,7 @@ class AccountBalanceIntegrationTest {
 
             assertTrue(balance.hbars.toTinybars() > 0);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -46,7 +46,7 @@ class AccountBalanceIntegrationTest {
             assertTrue(accBalance.hbars.toTinybars() > 0);
             assertEquals(cost.toTinybars(), 0);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -67,7 +67,7 @@ class AccountBalanceIntegrationTest {
 
             assertTrue(accBalance.hbars.toTinybars() > 0);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -88,7 +88,7 @@ class AccountBalanceIntegrationTest {
 
             assertTrue(accBalance.hbars.toTinybars() > 0);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -107,7 +107,7 @@ class AccountBalanceIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -139,7 +139,7 @@ class AccountBalanceIntegrationTest {
             assertEquals(balance.tokens.get(tokenId), 10000);
             assertEquals(balance.tokenDecimals.get(tokenId), 50);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 }

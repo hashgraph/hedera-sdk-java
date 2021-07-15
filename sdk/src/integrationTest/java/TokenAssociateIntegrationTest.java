@@ -54,7 +54,7 @@ class TokenAssociateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId, accountId, key);
         });
     }
 
@@ -82,7 +82,7 @@ class TokenAssociateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(accountId, key);
         });
     }
 
@@ -113,7 +113,7 @@ class TokenAssociateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(accountId, key);
         });
     }
 
@@ -163,7 +163,7 @@ class TokenAssociateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId, accountId, key);
         });
     }
 }

@@ -28,7 +28,7 @@ public class TopicDeleteIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -54,7 +54,7 @@ public class TopicDeleteIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.UNAUTHORIZED.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

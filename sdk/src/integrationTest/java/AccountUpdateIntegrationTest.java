@@ -74,7 +74,7 @@ class AccountUpdateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -93,7 +93,7 @@ class AccountUpdateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

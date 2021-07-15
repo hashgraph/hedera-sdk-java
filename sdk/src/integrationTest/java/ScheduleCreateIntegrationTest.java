@@ -44,7 +44,7 @@ public class ScheduleCreateIntegrationTest {
 
             assertNotNull(info.executedAt);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -78,7 +78,7 @@ public class ScheduleCreateIntegrationTest {
             assertNotNull(info.executedAt);
             assertNotNull(info.getScheduledTransaction());
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -112,7 +112,7 @@ public class ScheduleCreateIntegrationTest {
             assertNotNull(info.executedAt);
             assertNotNull(info.getScheduledTransaction());
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -186,13 +186,14 @@ public class ScheduleCreateIntegrationTest {
 
             assertNotNull(info.executedAt);
 
-            testEnv.client.close();
+            // TODO: we lose account, I think I have to manually delete account using KeyList
+            testEnv.cleanUpAndClose();
         });
     }
 
     @Test
     @DisplayName("Can schedule token transfer")
-    void canScheduleTokenTransaction() {
+    void canScheduleTokenTransfer() {
         assertDoesNotThrow(() -> {
             var testEnv = new IntegrationTestEnv();
 
@@ -215,6 +216,7 @@ public class ScheduleCreateIntegrationTest {
                 .setTokenSymbol("F")
                 .setInitialSupply(100)
                 .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client)
                 .tokenId;
@@ -252,7 +254,7 @@ public class ScheduleCreateIntegrationTest {
 
             assertEquals(balanceQuery.tokens.get(tokenId), 10);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId, accountId, key);
         });
     }
 
@@ -346,7 +348,7 @@ public class ScheduleCreateIntegrationTest {
 
             assertNotNull(info.executedAt);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

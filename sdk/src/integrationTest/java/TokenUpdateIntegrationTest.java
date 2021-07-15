@@ -94,7 +94,7 @@ class TokenUpdateIntegrationTest {
             assertNotNull(info.defaultKycStatus);
             assertFalse(info.defaultKycStatus);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 
@@ -125,6 +125,7 @@ class TokenUpdateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.TOKEN_IS_IMMUTABLE.toString()));
 
+            // TODO: I think we're going to lose this account
             testEnv.client.close();
         });
     }

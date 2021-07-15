@@ -64,7 +64,7 @@ public class ContractCreateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -105,7 +105,7 @@ public class ContractCreateIntegrationTest {
             assertEquals(info.storage, 926);
             assertEquals(info.contractMemo, "[e2e::ContractCreateTransaction]");
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -142,7 +142,7 @@ public class ContractCreateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -179,7 +179,7 @@ public class ContractCreateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -202,7 +202,7 @@ public class ContractCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_FILE_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

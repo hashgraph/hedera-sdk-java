@@ -27,7 +27,7 @@ public class TopicCreateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -42,7 +42,7 @@ public class TopicCreateIntegrationTest {
                 .execute(testEnv.client);
             assertNotNull(response.getReceipt(testEnv.client).topicId);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

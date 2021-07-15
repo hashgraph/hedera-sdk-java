@@ -15,7 +15,7 @@ public class NetworkVersionInfoIntegrationTest {
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

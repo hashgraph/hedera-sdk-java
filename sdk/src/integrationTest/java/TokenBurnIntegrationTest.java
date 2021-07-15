@@ -44,7 +44,7 @@ class TokenBurnIntegrationTest {
 
             assertEquals(receipt.totalSupply, 1000000 - 10);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 
@@ -64,7 +64,7 @@ class TokenBurnIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -101,7 +101,7 @@ class TokenBurnIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_BURN_AMOUNT.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 
@@ -139,7 +139,7 @@ class TokenBurnIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 
@@ -166,7 +166,7 @@ class TokenBurnIntegrationTest {
                 .getReceipt(testEnv.client);
 
             var tokenId = Objects.requireNonNull(createReceipt.tokenId);
-            
+
             var mintReceipt = new TokenMintTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
@@ -189,12 +189,12 @@ class TokenBurnIntegrationTest {
                 .byTokenId(tokenId)
                 .setEnd(6)
                 .execute(testEnv.client);
-            
+
             for(var info : nftInfos) {
                 assertTrue(serialsLeft.remove(info.nftId.serial));
             }
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 }

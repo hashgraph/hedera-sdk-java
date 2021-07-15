@@ -26,7 +26,7 @@ class AccountStakersIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

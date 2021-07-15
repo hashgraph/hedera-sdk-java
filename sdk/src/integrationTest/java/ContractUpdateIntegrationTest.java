@@ -85,7 +85,7 @@ public class ContractUpdateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -105,7 +105,7 @@ public class ContractUpdateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_CONTRACT_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -146,7 +146,7 @@ public class ContractUpdateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.MODIFYING_IMMUTABLE_CONTRACT.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

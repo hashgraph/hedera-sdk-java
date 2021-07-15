@@ -48,7 +48,7 @@ public class FileCreateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -83,7 +83,7 @@ public class FileCreateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -109,7 +109,7 @@ public class FileCreateIntegrationTest {
             assertFalse(info.isDeleted);
             assertNull(info.keys);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 }

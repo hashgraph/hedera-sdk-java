@@ -77,7 +77,7 @@ class TokenWipeIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId, accountId, key);
         });
     }
 
@@ -155,7 +155,7 @@ class TokenWipeIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId, accountId, key);
         });
     }
 
@@ -228,7 +228,7 @@ class TokenWipeIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId, accountId, key);
         });
     }
 
@@ -301,7 +301,7 @@ class TokenWipeIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId, accountId, key);
         });
     }
 
@@ -374,7 +374,7 @@ class TokenWipeIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_WIPING_AMOUNT.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId, accountId, key);
         });
     }
 }

@@ -34,7 +34,7 @@ class TokenCreateIntegrationTest {
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 
@@ -44,14 +44,16 @@ class TokenCreateIntegrationTest {
         assertDoesNotThrow(() -> {
             var testEnv = new IntegrationTestEnv();
 
-            new TokenCreateTransaction()
+            var tokenId = new TokenCreateTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
                 .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                .getReceipt(testEnv.client)
+                .tokenId;
 
+            // TODO: we lose this account
             testEnv.client.close();
         });
     }
@@ -74,7 +76,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.MISSING_TOKEN_NAME.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -96,7 +98,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.MISSING_TOKEN_SYMBOL.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -118,7 +120,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TREASURY_ACCOUNT_FOR_TOKEN.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -141,7 +143,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -167,7 +169,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -178,11 +180,12 @@ class TokenCreateIntegrationTest {
         assertDoesNotThrow(() -> {
             var testEnv = new IntegrationTestEnv();
 
-            new TokenCreateTransaction()
+            var tokenId = new TokenCreateTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
                 .addCustomFee(new CustomFixedFee()
                     .setAmount(10)
                     .setFeeCollectorAccountId(testEnv.operatorId))
@@ -193,8 +196,10 @@ class TokenCreateIntegrationTest {
                     .setMax(10)
                     .setFeeCollectorAccountId(testEnv.operatorId))
                 .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-            testEnv.client.close();
+                .getReceipt(testEnv.client)
+                .tokenId;
+
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 
@@ -221,7 +226,7 @@ class TokenCreateIntegrationTest {
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 }
