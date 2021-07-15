@@ -234,7 +234,6 @@ public class TokenInfo {
         return returnCustomFees;
     }
 
-    @Nullable
     static TokenFreezeStatus freezeStatusToProtobuf(@Nullable Boolean freezeStatus) {
         return freezeStatus == null ? TokenFreezeStatus.FreezeNotApplicable : freezeStatus ? TokenFreezeStatus.Frozen : TokenFreezeStatus.Unfrozen;
     }

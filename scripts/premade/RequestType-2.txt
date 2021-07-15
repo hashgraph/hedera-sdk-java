@@ -1,0 +1,8 @@
+    final HederaFunctionality code;
+
+    RequestType(HederaFunctionality code) {
+        this.code = code;
+    }
+
+    static RequestType valueOf(HederaFunctionality code) {
+        switch (code) {

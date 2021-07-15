@@ -90,7 +90,8 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     @Override
     @FunctionalExecutable(type = "Hbar")
     public CompletableFuture<Hbar> getCostAsync(Client client) {
-        return getCostExecutable().executeAsync(client);
+        initWithNodeIds(client);
+        return getCostExecutable().setNodeAccountIds(getNodeAccountIds()).executeAsync(client);
     }
 
     boolean isPaymentRequired() {
@@ -121,16 +122,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
 
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
-        validateNetworkOnIds(client);
-
-        if (nodeAccountIds.size() == 0) {
-            // Get a list of node AccountId's if the user has not set them manually.
-            try {
-                nodeAccountIds = client.network.getNodeAccountIdsForExecute();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        initWithNodeIds(client);
 
         if ((paymentTransactions != null) || !isPaymentRequired()) {
             return CompletableFuture.completedFuture(null);
@@ -183,6 +175,19 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
                     ));
                 }
             });
+    }
+
+    private void initWithNodeIds(Client client) {
+        validateNetworkOnIds(client);
+
+        if (nodeAccountIds.size() == 0) {
+            // Get a list of node AccountId's if the user has not set them manually.
+            try {
+                nodeAccountIds = client.network.getNodeAccountIdsForExecute();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     private static Transaction makePaymentTransaction(

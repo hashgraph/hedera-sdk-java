@@ -47,7 +47,7 @@ class EntityIdHelper {
         switch (result.status) {
             case 0: // Syntax error
                 throw new IllegalArgumentException(
-                    "Invalid ID: format should look like 0.0.123 or 0.0.123-vfmkw"
+                    "Invalid ID \"" + id + "\": format should look like 0.0.123 or 0.0.123-vfmkw"
                 );
             case 1: // An invalid with-checksum address
                 throw new IllegalArgumentException("Invalid ID: checksum does not match, received: " + result.givenChecksum + " expected: " + result.correctChecksum);

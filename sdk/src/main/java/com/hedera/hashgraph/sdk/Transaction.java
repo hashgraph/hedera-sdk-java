@@ -760,16 +760,20 @@ public abstract class Transaction<T extends Transaction<T>>
             bodyBuilder.setTransactionFee(client.maxTransactionFee.toTinybars());
         }
 
-        if (transactionIds.isEmpty() && client != null) {
-            var operator = client.getOperator();
+        if (transactionIds.isEmpty()) {
+            if(client != null) {
+                var operator = client.getOperator();
 
-            if (operator != null) {
-                // Set a default transaction ID, generated from the operator account ID
-                setTransactionId(TransactionId.generate(operator.accountId));
+                if (operator != null) {
+                    // Set a default transaction ID, generated from the operator account ID
+                    setTransactionId(TransactionId.generate(operator.accountId));
+                } else {
+                    // no client means there must be an explicitly set node ID and transaction ID
+                    throw new IllegalStateException(
+                        "`client` must have an `operator` or `transactionId` must be set");
+                }
             } else {
-                // no client means there must be an explicitly set node ID and transaction ID
-                throw new IllegalStateException(
-                    "`client` must have an `operator` or `transactionId` must be set");
+                throw new IllegalStateException("Transaction ID must be set, or operator must be provided via freezeWith()");
             }
         }
 

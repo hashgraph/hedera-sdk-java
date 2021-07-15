@@ -19,7 +19,7 @@ public class TopicMessageSubmitIntegrationTest {
             var testEnv = new IntegrationTestEnv();
 
             var response = new TopicCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
                 .execute(testEnv.client);
@@ -28,7 +28,7 @@ public class TopicMessageSubmitIntegrationTest {
 
             @Var var info = new TopicInfoQuery()
                 .setTopicId(topicId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .execute(testEnv.client);
 
             assertEquals(info.topicId, topicId);
@@ -37,7 +37,7 @@ public class TopicMessageSubmitIntegrationTest {
             assertEquals(info.adminKey, testEnv.operatorKey.getPublicKey());
 
             new TopicMessageSubmitTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .setTopicId(topicId)
                 .setMessage("Hello, from HCS!")
                 .execute(testEnv.client)
@@ -45,7 +45,7 @@ public class TopicMessageSubmitIntegrationTest {
 
             info = new TopicInfoQuery()
                 .setTopicId(topicId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .execute(testEnv.client);
 
             assertEquals(info.topicId, topicId);
@@ -72,7 +72,7 @@ public class TopicMessageSubmitIntegrationTest {
             var testEnv = new IntegrationTestEnv();
 
             var response = new TopicCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
                 .execute(testEnv.client);
@@ -81,7 +81,7 @@ public class TopicMessageSubmitIntegrationTest {
 
             @Var var info = new TopicInfoQuery()
                 .setTopicId(topicId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .execute(testEnv.client);
 
             assertEquals(info.topicId, topicId);
@@ -90,7 +90,7 @@ public class TopicMessageSubmitIntegrationTest {
             assertEquals(info.adminKey, testEnv.operatorKey.getPublicKey());
 
             var responses = new TopicMessageSubmitTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .setTopicId(topicId)
                 .setMaxChunks(15)
                 .setMessage(Contents.BIG_CONTENTS)
@@ -102,7 +102,7 @@ public class TopicMessageSubmitIntegrationTest {
 
             info = new TopicInfoQuery()
                 .setTopicId(topicId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .execute(testEnv.client);
 
             assertEquals(info.topicId, topicId);
@@ -111,7 +111,7 @@ public class TopicMessageSubmitIntegrationTest {
             assertEquals(info.adminKey, testEnv.operatorKey.getPublicKey());
 
             new TopicDeleteTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .setTopicId(topicId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -130,7 +130,7 @@ public class TopicMessageSubmitIntegrationTest {
             var testEnv = new IntegrationTestEnv();
 
             var response = new TopicCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
                 .execute(testEnv.client);
@@ -139,7 +139,7 @@ public class TopicMessageSubmitIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TopicMessageSubmitTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                     .setMessage(Contents.BIG_CONTENTS)
                     .setMaxChunks(15)
                     .execute(testEnv.client)
@@ -147,7 +147,7 @@ public class TopicMessageSubmitIntegrationTest {
             });
 
             new TopicDeleteTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .setTopicId(topicId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -168,7 +168,7 @@ public class TopicMessageSubmitIntegrationTest {
             var testEnv = new IntegrationTestEnv();
 
             var response = new TopicCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
                 .execute(testEnv.client);
@@ -177,14 +177,14 @@ public class TopicMessageSubmitIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TopicMessageSubmitTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                     .setTopicId(topicId)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
             });
 
             new TopicDeleteTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .setTopicId(topicId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
