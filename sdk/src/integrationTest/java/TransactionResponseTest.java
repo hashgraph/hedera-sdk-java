@@ -16,14 +16,14 @@ public class TransactionResponseTest {
     @DisplayName("transaction hash in transaction record is equal to the transaction response transaction hash")
     void transactionHashInTransactionRecordIsEqualToTheTransactionResponseTransactionHash() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withOneNode();
 
             var key = PrivateKey.generate();
 
             var transaction = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
-                .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
+                //.setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                 .execute(testEnv.client);
 
             var record = transaction.getRecord(testEnv.client);
@@ -33,16 +33,7 @@ public class TransactionResponseTest {
             var accountId = record.receipt.accountId;
             assertNotNull(accountId);
 
-            new AccountDeleteTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
-                .setAccountId(accountId)
-                .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
-                .setTransferAccountId(testEnv.operatorId)
-                .freezeWith(testEnv.client)
-                .sign(key)
-                .execute(testEnv.client);
-
-            testEnv.cleanUpAndClose();
+            testEnv.cleanUpAndClose(accountId, key);
         });
     }
 }

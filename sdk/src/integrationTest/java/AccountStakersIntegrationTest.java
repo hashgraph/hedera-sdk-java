@@ -14,11 +14,11 @@ class AccountStakersIntegrationTest {
     @DisplayName("Cannot query account stakers since it is not supported")
     void cannotQueryAccountStakersSinceItIsNotSupported() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withOneNode();
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new AccountStakersQuery()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setAccountId(testEnv.operatorId)
                     .setMaxQueryPayment(new Hbar(1))
                     .execute(testEnv.client);

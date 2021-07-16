@@ -18,10 +18,10 @@ class TokenUpdateIntegrationTest {
     @DisplayName("Can update token")
     void canUpdateToken() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
@@ -38,7 +38,7 @@ class TokenUpdateIntegrationTest {
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             @Var var info = new TokenInfoQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .execute(testEnv.client);
 
@@ -52,11 +52,11 @@ class TokenUpdateIntegrationTest {
             assertNotNull(info.wipeKey);
             assertNotNull(info.kycKey);
             assertNotNull(info.supplyKey);
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.adminKey.toString());
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.freezeKey.toString());
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.wipeKey.toString());
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.kycKey.toString());
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.supplyKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.adminKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.freezeKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.wipeKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.kycKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.supplyKey.toString());
             assertNotNull(info.defaultFreezeStatus);
             assertFalse(info.defaultFreezeStatus);
             assertNotNull(info.defaultKycStatus);
@@ -70,7 +70,7 @@ class TokenUpdateIntegrationTest {
                 .getReceipt(testEnv.client);
 
             info = new TokenInfoQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .execute(testEnv.client);
 
@@ -84,11 +84,11 @@ class TokenUpdateIntegrationTest {
             assertNotNull(info.wipeKey);
             assertNotNull(info.kycKey);
             assertNotNull(info.supplyKey);
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.adminKey.toString());
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.freezeKey.toString());
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.wipeKey.toString());
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.kycKey.toString());
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.supplyKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.adminKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.freezeKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.wipeKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.kycKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.supplyKey.toString());
             assertNotNull(info.defaultFreezeStatus);
             assertFalse(info.defaultFreezeStatus);
             assertNotNull(info.defaultKycStatus);
@@ -102,10 +102,10 @@ class TokenUpdateIntegrationTest {
     @DisplayName("Cannot update immutable token")
     void cannotUpdateImmutableToken() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)

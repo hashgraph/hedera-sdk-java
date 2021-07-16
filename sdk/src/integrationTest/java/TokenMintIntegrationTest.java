@@ -15,11 +15,11 @@ class TokenMintIntegrationTest {
     @DisplayName("Can mint tokens")
     void canMintTokens() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setDecimals(3)
@@ -37,7 +37,7 @@ class TokenMintIntegrationTest {
             );
 
             var receipt = new TokenMintTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAmount(10)
                 .setTokenId(tokenId)
                 .execute(testEnv.client)
@@ -53,11 +53,11 @@ class TokenMintIntegrationTest {
     @DisplayName("Cannot mint tokens when token ID is not set")
     void cannotMintTokensWhenTokenIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenMintTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setAmount(10)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
@@ -73,11 +73,11 @@ class TokenMintIntegrationTest {
     @DisplayName("Cannot mint tokens when amount is not set")
     void cannotMintTokensWhenAmountIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setDecimals(3)
@@ -96,7 +96,7 @@ class TokenMintIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenMintTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenId(tokenId)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
@@ -112,12 +112,12 @@ class TokenMintIntegrationTest {
     @DisplayName("Cannot mint tokens when supply key does not sign transaction")
     void cannotMintTokensWhenSupplyKeyDoesNotSignTransaction() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -126,7 +126,7 @@ class TokenMintIntegrationTest {
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setDecimals(3)
@@ -145,7 +145,7 @@ class TokenMintIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenMintTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenId(tokenId)
                     .setAmount(10)
                     .execute(testEnv.client)
@@ -163,11 +163,11 @@ class TokenMintIntegrationTest {
     @DisplayName("Can mint NFTs")
     void canMintNfts() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
@@ -184,7 +184,7 @@ class TokenMintIntegrationTest {
             );
 
             var receipt = new TokenMintTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setMetadata(NftMetadataGenerator.generate((byte)10))
                 .setTokenId(tokenId)
                 .execute(testEnv.client)

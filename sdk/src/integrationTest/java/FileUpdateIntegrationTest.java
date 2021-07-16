@@ -18,10 +18,10 @@ public class FileUpdateIntegrationTest {
     @DisplayName("Can update file")
     void canUpdateFile() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new FileCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
                 .execute(testEnv.client);
@@ -30,7 +30,7 @@ public class FileUpdateIntegrationTest {
 
             @Var var info = new FileInfoQuery()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
@@ -38,18 +38,18 @@ public class FileUpdateIntegrationTest {
             assertFalse(info.isDeleted);
             assertNotNull(info.keys);
             assertNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(testEnv.operatorKey.getPublicKey()));
+            assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
 
             new FileUpdateTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContents("[e2e::FileUpdateTransaction]")
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             info = new FileInfoQuery()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
@@ -57,11 +57,11 @@ public class FileUpdateIntegrationTest {
             assertFalse(info.isDeleted);
             assertNotNull(info.keys);
             assertNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(testEnv.operatorKey.getPublicKey()));
+            assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -73,10 +73,10 @@ public class FileUpdateIntegrationTest {
     @DisplayName("Cannot update immutable file")
     void cannotUpdateImmutableFile() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new FileCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContents("[e2e::FileCreateTransaction]")
                 .execute(testEnv.client);
 
@@ -84,7 +84,7 @@ public class FileUpdateIntegrationTest {
 
             var info = new FileInfoQuery()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
@@ -95,7 +95,7 @@ public class FileUpdateIntegrationTest {
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new FileUpdateTransaction()
                     .setFileId(fileId)
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setContents("[e2e::FileUpdateTransaction]")
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
@@ -111,11 +111,11 @@ public class FileUpdateIntegrationTest {
     @DisplayName("Cannot update file when file ID is not set")
     void cannotUpdateFileWhenFileIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withOneNode();
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new FileUpdateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setContents("[e2e::FileUpdateTransaction]")
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);

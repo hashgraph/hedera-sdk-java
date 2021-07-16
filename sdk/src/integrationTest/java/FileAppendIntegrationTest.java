@@ -20,10 +20,10 @@ public class FileAppendIntegrationTest {
     @DisplayName("Can append to file")
     void canAppendToFile() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withTwoNodes();
 
             var response = new FileCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
+                //.setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .setKeys(testEnv.operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
                 .execute(testEnv.client);
@@ -31,7 +31,7 @@ public class FileAppendIntegrationTest {
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
             @Var var info = new FileInfoQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
+                //.setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .setFileId(fileId)
                 .execute(testEnv.client);
 
@@ -40,18 +40,18 @@ public class FileAppendIntegrationTest {
             assertFalse(info.isDeleted);
             assertNotNull(info.keys);
             assertNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(testEnv.operatorKey.getPublicKey()));
+            assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
 
             new FileAppendTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
+                //.setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .setContents("[e2e::FileAppendTransaction]")
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             info = new FileInfoQuery()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
+                //.setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
@@ -59,11 +59,11 @@ public class FileAppendIntegrationTest {
             assertFalse(info.isDeleted);
             assertNotNull(info.keys);
             assertNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(testEnv.operatorKey.getPublicKey()));
+            assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
+                //.setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -75,10 +75,10 @@ public class FileAppendIntegrationTest {
     @DisplayName("Can append large contents to file")
     void canAppendLargeContentsToFile() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withTwoNodes();
 
             var response = new FileCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
+                //.setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .setKeys(testEnv.operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
                 .execute(testEnv.client);
@@ -86,7 +86,7 @@ public class FileAppendIntegrationTest {
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
             @Var var info = new FileInfoQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
+                //.setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .setFileId(fileId)
                 .execute(testEnv.client);
 
@@ -95,18 +95,18 @@ public class FileAppendIntegrationTest {
             assertFalse(info.isDeleted);
             assertNotNull(info.keys);
             assertNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(testEnv.operatorKey.getPublicKey()));
+            assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
 
             new FileAppendTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
+                //.setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .setContents(Contents.BIG_CONTENTS)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             info = new FileInfoQuery()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
+                //.setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
@@ -114,11 +114,11 @@ public class FileAppendIntegrationTest {
             assertFalse(info.isDeleted);
             assertNotNull(info.keys);
             assertNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(testEnv.operatorKey.getPublicKey()));
+            assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
+                //.setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
