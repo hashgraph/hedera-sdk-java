@@ -17,7 +17,6 @@ public class TopicUpdateIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new TopicCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAdminKey(testEnv.operatorKey)
                 .setAutoRenewAccountId(testEnv.operatorId)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
@@ -26,7 +25,6 @@ public class TopicUpdateIntegrationTest {
             var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
             new TopicUpdateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .clearAutoRenewAccountId()
                 .setTopicMemo("hello")
                 .setTopicId(topicId)

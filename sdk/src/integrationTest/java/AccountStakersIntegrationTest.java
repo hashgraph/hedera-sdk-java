@@ -18,7 +18,6 @@ class AccountStakersIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new AccountStakersQuery()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setAccountId(testEnv.operatorId)
                     .setMaxQueryPayment(new Hbar(1))
                     .execute(testEnv.client);

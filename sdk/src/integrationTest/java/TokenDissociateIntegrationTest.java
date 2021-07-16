@@ -19,7 +19,6 @@ class TokenDissociateIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -28,7 +27,6 @@ class TokenDissociateIntegrationTest {
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setDecimals(3)
@@ -46,7 +44,6 @@ class TokenDissociateIntegrationTest {
             );
 
             new TokenAssociateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTokenIds(Collections.singletonList(tokenId))
                 .freezeWith(testEnv.client)
@@ -55,7 +52,6 @@ class TokenDissociateIntegrationTest {
                 .getReceipt(testEnv.client);
 
             new TokenDissociateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTokenIds(Collections.singletonList(tokenId))
                 .freezeWith(testEnv.client)
@@ -76,7 +72,6 @@ class TokenDissociateIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -84,7 +79,6 @@ class TokenDissociateIntegrationTest {
             var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
             new TokenDissociateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .freezeWith(testEnv.client)
                 .sign(key)
@@ -104,7 +98,6 @@ class TokenDissociateIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -113,7 +106,6 @@ class TokenDissociateIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenDissociateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .freezeWith(testEnv.client)
                     .sign(key)
                     .execute(testEnv.client)
@@ -135,7 +127,6 @@ class TokenDissociateIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -144,7 +135,6 @@ class TokenDissociateIntegrationTest {
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setDecimals(3)
@@ -163,7 +153,6 @@ class TokenDissociateIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenDissociateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setAccountId(accountId)
                     .setTokenIds(Collections.singletonList(tokenId))
                     .execute(testEnv.client)
@@ -185,7 +174,6 @@ class TokenDissociateIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -194,7 +182,6 @@ class TokenDissociateIntegrationTest {
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setDecimals(3)
@@ -213,7 +200,6 @@ class TokenDissociateIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenDissociateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setAccountId(accountId)
                     .setTokenIds(Collections.singletonList(tokenId))
                     .freezeWith(testEnv.client)

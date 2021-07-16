@@ -21,7 +21,6 @@ public class FileDeleteIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
                 .execute(testEnv.client);
@@ -30,7 +29,6 @@ public class FileDeleteIntegrationTest {
 
             @Var var info = new FileInfoQuery()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
@@ -42,7 +40,6 @@ public class FileDeleteIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -57,7 +54,6 @@ public class FileDeleteIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContents("[e2e::FileCreateTransaction]")
                 .execute(testEnv.client);
 
@@ -65,7 +61,6 @@ public class FileDeleteIntegrationTest {
 
             @Var var info = new FileInfoQuery()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
@@ -76,7 +71,6 @@ public class FileDeleteIntegrationTest {
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new FileDeleteTransaction()
                     .setFileId(fileId)
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
             });

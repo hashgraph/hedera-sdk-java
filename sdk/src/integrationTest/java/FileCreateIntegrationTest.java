@@ -23,7 +23,6 @@ public class FileCreateIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
                 .execute(testEnv.client);
@@ -32,7 +31,6 @@ public class FileCreateIntegrationTest {
 
             @Var var info = new FileInfoQuery()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
@@ -44,7 +42,6 @@ public class FileCreateIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -59,7 +56,6 @@ public class FileCreateIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .execute(testEnv.client);
 
@@ -67,7 +63,6 @@ public class FileCreateIntegrationTest {
 
             @Var var info = new FileInfoQuery()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
@@ -79,7 +74,6 @@ public class FileCreateIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -94,14 +88,12 @@ public class FileCreateIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
             @Var var info = new FileInfoQuery()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);

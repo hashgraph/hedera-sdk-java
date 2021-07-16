@@ -17,7 +17,6 @@ class TokenDeleteIntegrationTest {
             var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
@@ -34,7 +33,6 @@ class TokenDeleteIntegrationTest {
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             new TokenDeleteTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -50,7 +48,6 @@ class TokenDeleteIntegrationTest {
             var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
@@ -72,7 +69,6 @@ class TokenDeleteIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new TokenCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
@@ -85,7 +81,6 @@ class TokenDeleteIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenDeleteTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenId(tokenId)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
@@ -112,7 +107,6 @@ class TokenDeleteIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenDeleteTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
             });

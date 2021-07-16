@@ -22,7 +22,6 @@ public class ContractUpdateIntegrationTest {
             ;
 
             @Var var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -31,7 +30,6 @@ public class ContractUpdateIntegrationTest {
 
             response = new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
@@ -42,7 +40,6 @@ public class ContractUpdateIntegrationTest {
 
             @Var var info = new ContractInfoQuery()
                 .setContractId(contractId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.contractId, contractId);
@@ -55,14 +52,12 @@ public class ContractUpdateIntegrationTest {
 
             new ContractUpdateTransaction()
                 .setContractId(contractId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContractMemo("[e2e::ContractUpdateTransaction]")
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             info = new ContractInfoQuery()
                 .setContractId(contractId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.contractId, contractId);
@@ -75,13 +70,11 @@ public class ContractUpdateIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contractId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -97,7 +90,6 @@ public class ContractUpdateIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractUpdateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setContractMemo("[e2e::ContractUpdateTransaction]")
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
@@ -116,7 +108,6 @@ public class ContractUpdateIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             @Var var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -125,7 +116,6 @@ public class ContractUpdateIntegrationTest {
 
             var contractId = Objects.requireNonNull(
                 new ContractCreateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setGas(2000)
                     .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                     .setBytecodeFileId(fileId)
@@ -138,7 +128,6 @@ public class ContractUpdateIntegrationTest {
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new ContractUpdateTransaction()
                     .setContractId(contractId)
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setContractMemo("[e2e::ContractUpdateTransaction]")
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);

@@ -16,7 +16,6 @@ class TokenTransferIntegrationTest {
             var key = PrivateKey.generate();
 
             TransactionResponse response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -25,7 +24,6 @@ class TokenTransferIntegrationTest {
             assertNotNull(accountId);
 
             response = new TokenCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
@@ -43,7 +41,6 @@ class TokenTransferIntegrationTest {
             assertNotNull(tokenId);
 
             new TokenAssociateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTokenIds(Collections.singletonList(tokenId))
                 .freezeWith(testEnv.client)
@@ -53,14 +50,12 @@ class TokenTransferIntegrationTest {
                 .getReceipt(testEnv.client);
 
             new TokenGrantKycTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTokenId(tokenId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new TransferTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .addTokenTransfer(tokenId, testEnv.operatorId, -10)
                 .addTokenTransfer(tokenId, accountId, 10)
                 .execute(testEnv.client)

@@ -22,17 +22,14 @@ class LiveHashDeleteIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
-                //.setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                 .execute(testEnv.client);
 
             var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new LiveHashDeleteTransaction()
-                    //.setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                     .setAccountId(accountId)
                     .setHash(HASH)
                     .execute(testEnv.client)

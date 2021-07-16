@@ -18,7 +18,6 @@ public class TopicInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new TopicCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
                 .execute(testEnv.client);
@@ -27,13 +26,11 @@ public class TopicInfoIntegrationTest {
 
             var info = new TopicInfoQuery()
                 .setTopicId(topicId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
 
             new TopicDeleteTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -49,7 +46,6 @@ public class TopicInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new TopicCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
                 .execute(testEnv.client);
@@ -58,7 +54,6 @@ public class TopicInfoIntegrationTest {
 
             var infoQuery = new TopicInfoQuery()
                 .setTopicId(topicId);
-                //.setNodeAccountIds(testEnv.nodeAccountIds);
 
             var cost = infoQuery.getCost(testEnv.client);
 
@@ -69,7 +64,6 @@ public class TopicInfoIntegrationTest {
             assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
 
             new TopicDeleteTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -85,7 +79,6 @@ public class TopicInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new TopicCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
                 .execute(testEnv.client);
@@ -94,7 +87,6 @@ public class TopicInfoIntegrationTest {
 
             var infoQuery = new TopicInfoQuery()
                 .setTopicId(topicId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setMaxQueryPayment(new Hbar(1000));
 
             var cost = infoQuery.getCost(testEnv.client);
@@ -106,7 +98,6 @@ public class TopicInfoIntegrationTest {
             assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
 
             new TopicDeleteTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -122,7 +113,6 @@ public class TopicInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new TopicCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
                 .execute(testEnv.client);
@@ -131,7 +121,6 @@ public class TopicInfoIntegrationTest {
 
             var infoQuery = new TopicInfoQuery()
                 .setTopicId(topicId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setMaxQueryPayment(Hbar.fromTinybars(1));
 
             var cost = infoQuery.getCost(testEnv.client);
@@ -145,7 +134,6 @@ public class TopicInfoIntegrationTest {
             assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for TopicInfoQuery, of "+cost.toString()+", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
 
             new TopicDeleteTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -161,7 +149,6 @@ public class TopicInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new TopicCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
                 .execute(testEnv.client);
@@ -170,7 +157,6 @@ public class TopicInfoIntegrationTest {
 
             var infoQuery = new TopicInfoQuery()
                 .setTopicId(topicId);
-                //.setNodeAccountIds(testEnv.nodeAccountIds);
 
             var cost = infoQuery.getCost(testEnv.client);
 
@@ -183,7 +169,6 @@ public class TopicInfoIntegrationTest {
             assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
 
             new TopicDeleteTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);

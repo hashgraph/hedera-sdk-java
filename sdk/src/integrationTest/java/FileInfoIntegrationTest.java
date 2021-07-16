@@ -26,7 +26,6 @@ public class FileInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
                 .execute(testEnv.client);
@@ -35,7 +34,6 @@ public class FileInfoIntegrationTest {
 
             @Var var info = new FileInfoQuery()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
@@ -47,7 +45,6 @@ public class FileInfoIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -62,14 +59,12 @@ public class FileInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
             @Var var info = new FileInfoQuery()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
@@ -88,7 +83,6 @@ public class FileInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
                 .execute(testEnv.client);
@@ -97,7 +91,6 @@ public class FileInfoIntegrationTest {
 
             @Var var infoQuery = new FileInfoQuery()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setMaxQueryPayment(new Hbar(1000));
 
             var cost = infoQuery.getCost(testEnv.client);
@@ -106,7 +99,6 @@ public class FileInfoIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -121,7 +113,6 @@ public class FileInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
                 .execute(testEnv.client);
@@ -130,7 +121,6 @@ public class FileInfoIntegrationTest {
 
             @Var var infoQuery = new FileInfoQuery()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setMaxQueryPayment(Hbar.fromTinybars(1));
 
             var cost = infoQuery.getCost(testEnv.client);
@@ -144,7 +134,6 @@ public class FileInfoIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -159,7 +148,6 @@ public class FileInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
                 .execute(testEnv.client);
@@ -168,7 +156,6 @@ public class FileInfoIntegrationTest {
 
             @Var var infoQuery = new FileInfoQuery()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setMaxQueryPayment(Hbar.fromTinybars(1));
 
             var cost = infoQuery.getCost(testEnv.client);
@@ -181,7 +168,6 @@ public class FileInfoIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 

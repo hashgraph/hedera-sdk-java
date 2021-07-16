@@ -20,7 +20,6 @@ class TokenNftInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var createReceipt = new TokenCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
@@ -39,7 +38,6 @@ class TokenNftInfoIntegrationTest {
             byte[] metadata = {50};
 
             var mintReceipt = new TokenMintTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .addMetadata(metadata)
                 .execute(testEnv.client)
@@ -48,7 +46,6 @@ class TokenNftInfoIntegrationTest {
             var nftId = tokenId.nft(mintReceipt.serials.get(0));
 
             var nftInfos = new TokenNftInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .byNftId(nftId)
                 .execute(testEnv.client);
 
@@ -68,7 +65,6 @@ class TokenNftInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var createReceipt = new TokenCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
@@ -87,14 +83,12 @@ class TokenNftInfoIntegrationTest {
             List<byte[]> metadatas = NftMetadataGenerator.generate((byte)10);
 
             var mintReceipt = new TokenMintTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .setMetadata(metadatas)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             var nftInfos = new TokenNftInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .byAccountId(testEnv.operatorId)
                 .setEnd(10)
                 .execute(testEnv.client);
@@ -120,7 +114,6 @@ class TokenNftInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var createReceipt = new TokenCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
@@ -139,14 +132,12 @@ class TokenNftInfoIntegrationTest {
             List<byte[]> metadatas = NftMetadataGenerator.generate((byte)10);
 
             var mintReceipt = new TokenMintTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .setMetadata(metadatas)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             var nftInfos = new TokenNftInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .byTokenId(tokenId)
                 .setEnd(10)
                 .execute(testEnv.client);

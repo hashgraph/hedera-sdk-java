@@ -22,7 +22,6 @@ public class ContractInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             @Var var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -31,7 +30,6 @@ public class ContractInfoIntegrationTest {
 
             response = new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
@@ -42,7 +40,6 @@ public class ContractInfoIntegrationTest {
 
             @Var var info = new ContractInfoQuery()
                 .setContractId(contractId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.contractId, contractId);
@@ -55,13 +52,11 @@ public class ContractInfoIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contractId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -76,7 +71,6 @@ public class ContractInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             @Var var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -84,7 +78,6 @@ public class ContractInfoIntegrationTest {
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
             response = new ContractCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
@@ -95,7 +88,6 @@ public class ContractInfoIntegrationTest {
 
             @Var var info = new ContractInfoQuery()
                 .setContractId(contractId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.contractId, contractId);
@@ -118,7 +110,6 @@ public class ContractInfoIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractInfoQuery()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .execute(testEnv.client);
             });
 
@@ -135,7 +126,6 @@ public class ContractInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             @Var var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -144,7 +134,6 @@ public class ContractInfoIntegrationTest {
 
             response = new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
@@ -154,7 +143,6 @@ public class ContractInfoIntegrationTest {
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
             var infoQuery = new ContractInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContractId(contractId)
                 .setMaxQueryPayment(new Hbar(10000));
 
@@ -165,13 +153,11 @@ public class ContractInfoIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contractId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -186,7 +172,6 @@ public class ContractInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             @Var var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -195,7 +180,6 @@ public class ContractInfoIntegrationTest {
 
             response = new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
@@ -205,7 +189,6 @@ public class ContractInfoIntegrationTest {
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
             var infoQuery = new ContractInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContractId(contractId)
                 .setMaxQueryPayment(Hbar.fromTinybars(1));
 
@@ -219,13 +202,11 @@ public class ContractInfoIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contractId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -240,7 +221,6 @@ public class ContractInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             @Var var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -249,7 +229,6 @@ public class ContractInfoIntegrationTest {
 
             response = new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
@@ -259,7 +238,6 @@ public class ContractInfoIntegrationTest {
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
             var infoQuery = new ContractInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContractId(contractId)
                 .setMaxQueryPayment(new Hbar(100));
 
@@ -273,13 +251,11 @@ public class ContractInfoIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contractId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 

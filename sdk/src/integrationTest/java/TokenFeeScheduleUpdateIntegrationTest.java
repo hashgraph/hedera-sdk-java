@@ -21,7 +21,6 @@ class TokenFeeScheduleUpdateIntegrationTest {
             var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
@@ -39,7 +38,6 @@ class TokenFeeScheduleUpdateIntegrationTest {
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             @Var var info = new TokenInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .execute(testEnv.client);
 
@@ -85,7 +83,6 @@ class TokenFeeScheduleUpdateIntegrationTest {
                 .getReceipt(testEnv.client);
 
             info = new TokenInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .execute(testEnv.client);
 

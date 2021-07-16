@@ -17,7 +17,6 @@ public class FileContentsIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
                 .execute(testEnv.client);
@@ -26,14 +25,12 @@ public class FileContentsIntegrationTest {
 
             var contents = new FileContentsQuery()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(contents.toStringUtf8(), "[e2e::FileCreateTransaction]");
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -48,7 +45,6 @@ public class FileContentsIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .execute(testEnv.client);
 
@@ -56,14 +52,12 @@ public class FileContentsIntegrationTest {
 
             var contents = new FileContentsQuery()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(contents.size(), 0);
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -95,7 +89,6 @@ public class FileContentsIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
                 .execute(testEnv.client);
@@ -104,7 +97,6 @@ public class FileContentsIntegrationTest {
 
             var contentsQuery = new FileContentsQuery()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setMaxQueryPayment(new Hbar(1000));
 
             var cost = contentsQuery.getCost(testEnv.client);
@@ -115,7 +107,6 @@ public class FileContentsIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -130,7 +121,6 @@ public class FileContentsIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
                 .execute(testEnv.client);
@@ -139,7 +129,6 @@ public class FileContentsIntegrationTest {
 
             var contentsQuery = new FileContentsQuery()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setMaxQueryPayment(Hbar.fromTinybars(1));
 
             var cost = contentsQuery.getCost(testEnv.client);
@@ -152,7 +141,6 @@ public class FileContentsIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -167,7 +155,6 @@ public class FileContentsIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
                 .execute(testEnv.client);
@@ -176,7 +163,6 @@ public class FileContentsIntegrationTest {
 
             var contentsQuery = new FileContentsQuery()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setMaxQueryPayment(new Hbar(100));
 
             var cost = contentsQuery.getCost(testEnv.client);
@@ -189,7 +175,6 @@ public class FileContentsIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 

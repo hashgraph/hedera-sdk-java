@@ -18,14 +18,11 @@ public class ReceiptQueryIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
-                //.setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                 .execute(testEnv.client);
 
             var receipt = new TransactionReceiptQuery()
                 .setTransactionId(response.transactionId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             testEnv.cleanUpAndClose(receipt.accountId, key);
@@ -40,19 +37,15 @@ public class ReceiptQueryIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
-                //.setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                 .execute(testEnv.client);
 
             new TransactionReceiptQuery()
                 .setTransactionId(response.transactionId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             var record = new TransactionRecordQuery()
                 .setTransactionId(response.transactionId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             testEnv.cleanUpAndClose(record.receipt.accountId, key);
@@ -67,19 +60,15 @@ public class ReceiptQueryIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
-                //.setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                 .execute(testEnv.client);
 
             new TransactionReceiptQuery()
                 .setTransactionId(response.transactionId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             var recordQuery = new TransactionRecordQuery()
                 .setTransactionId(response.transactionId);
-                //.setNodeAccountIds(testEnv.nodeAccountIds);
 
             var cost = recordQuery.getCost(testEnv.client);
 
@@ -97,19 +86,15 @@ public class ReceiptQueryIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
-                //.setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                 .execute(testEnv.client);
 
             new TransactionReceiptQuery()
                 .setTransactionId(response.transactionId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             var recordQuery = new TransactionRecordQuery()
                 .setTransactionId(response.transactionId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setMaxQueryPayment(new Hbar(1000));
 
             var cost = recordQuery.getCost(testEnv.client);
@@ -128,19 +113,15 @@ public class ReceiptQueryIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
-                //.setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                 .execute(testEnv.client);
 
             var receipt = new TransactionReceiptQuery()
                 .setTransactionId(response.transactionId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             var recordQuery = new TransactionRecordQuery()
                 .setTransactionId(response.transactionId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setMaxQueryPayment(Hbar.fromTinybars(1));
 
             var cost = recordQuery.getCost(testEnv.client);
@@ -163,18 +144,15 @@ public class ReceiptQueryIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .execute(testEnv.client);
 
             var receipt = new TransactionReceiptQuery()
                 .setTransactionId(response.transactionId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             var recordQuery = new TransactionRecordQuery()
                 .setTransactionId(response.transactionId);
-                //.setNodeAccountIds(testEnv.nodeAccountIds);
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 recordQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);

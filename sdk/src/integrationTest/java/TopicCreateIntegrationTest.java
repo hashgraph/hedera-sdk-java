@@ -15,7 +15,6 @@ public class TopicCreateIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new TopicCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
                 .execute(testEnv.client);
@@ -38,7 +37,6 @@ public class TopicCreateIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new TopicCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
             assertNotNull(response.getReceipt(testEnv.client).topicId);
 
