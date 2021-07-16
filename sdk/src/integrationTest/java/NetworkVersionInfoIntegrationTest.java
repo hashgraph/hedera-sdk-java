@@ -12,7 +12,6 @@ public class NetworkVersionInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             new NetworkVersionInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             testEnv.cleanUpAndClose();

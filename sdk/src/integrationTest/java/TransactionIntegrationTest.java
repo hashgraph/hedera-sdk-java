@@ -40,9 +40,7 @@ public class TransactionIntegrationTest {
             var key = PrivateKey.generate();
 
             var transaction = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
-                //.setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                 .freezeWith(testEnv.client)
                 .signWithOperator(testEnv.client);
 
@@ -70,7 +68,6 @@ public class TransactionIntegrationTest {
             var key = PrivateKey.generate();
 
             var transaction = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .freezeWith(testEnv.client)
                 .signWithOperator(testEnv.client);
@@ -87,7 +84,6 @@ public class TransactionIntegrationTest {
             assertNotNull(accountId);
 
             var deleteTransaction = new AccountDeleteTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTransferAccountId(testEnv.operatorId)
                 .freezeWith(testEnv.client);

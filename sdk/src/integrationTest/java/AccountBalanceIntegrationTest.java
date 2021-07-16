@@ -23,7 +23,6 @@ class AccountBalanceIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             @Var var balance = new AccountBalanceQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(testEnv.operatorId)
                 .execute(testEnv.client);
 
@@ -40,7 +39,6 @@ class AccountBalanceIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             @Var var balance = new AccountBalanceQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(testEnv.operatorId)
                 .setMaxQueryPayment(new Hbar(1));
 
@@ -62,7 +60,6 @@ class AccountBalanceIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             @Var var balance = new AccountBalanceQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(testEnv.operatorId)
                 .setMaxQueryPayment(new Hbar(1000000));
 
@@ -83,7 +80,6 @@ class AccountBalanceIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             @Var var balance = new AccountBalanceQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(testEnv.operatorId)
                 .setMaxQueryPayment(Hbar.fromTinybars(1));
 
@@ -105,7 +101,6 @@ class AccountBalanceIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new AccountBalanceQuery()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setAccountId(AccountId.fromString("1.0.3"))
                     .execute(testEnv.client);
             });
@@ -123,7 +118,6 @@ class AccountBalanceIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new TokenCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setInitialSupply(10000)
@@ -137,7 +131,6 @@ class AccountBalanceIntegrationTest {
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             @Var var balance = new AccountBalanceQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(testEnv.operatorId)
                 .execute(testEnv.client);
 

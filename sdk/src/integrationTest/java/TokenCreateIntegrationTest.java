@@ -17,7 +17,6 @@ class TokenCreateIntegrationTest {
             var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
@@ -45,7 +44,6 @@ class TokenCreateIntegrationTest {
             var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var tokenId = new TokenCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
@@ -66,7 +64,6 @@ class TokenCreateIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenSymbol("F")
                     .setTreasuryAccountId(testEnv.operatorId)
                     .execute(testEnv.client)
@@ -88,7 +85,6 @@ class TokenCreateIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTreasuryAccountId(testEnv.operatorId)
                     .execute(testEnv.client)
@@ -110,7 +106,6 @@ class TokenCreateIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .execute(testEnv.client)
@@ -132,7 +127,6 @@ class TokenCreateIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setTreasuryAccountId(AccountId.fromString("0.0.3"))
@@ -157,7 +151,6 @@ class TokenCreateIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setTreasuryAccountId(testEnv.operatorId)
@@ -181,7 +174,6 @@ class TokenCreateIntegrationTest {
             var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var tokenId = new TokenCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
@@ -211,7 +203,6 @@ class TokenCreateIntegrationTest {
             var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)

@@ -19,7 +19,6 @@ class TokenAssociateIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -28,7 +27,6 @@ class TokenAssociateIntegrationTest {
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setDecimals(3)
@@ -46,7 +44,6 @@ class TokenAssociateIntegrationTest {
             );
 
             new TokenAssociateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTokenIds(Collections.singletonList(tokenId))
                 .freezeWith(testEnv.client)
@@ -67,7 +64,6 @@ class TokenAssociateIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -75,7 +71,6 @@ class TokenAssociateIntegrationTest {
             var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
             new TokenAssociateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .freezeWith(testEnv.client)
                 .sign(key)
@@ -95,7 +90,6 @@ class TokenAssociateIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -104,7 +98,6 @@ class TokenAssociateIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenAssociateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .freezeWith(testEnv.client)
                     .sign(key)
                     .execute(testEnv.client)
@@ -126,7 +119,6 @@ class TokenAssociateIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -135,7 +127,6 @@ class TokenAssociateIntegrationTest {
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setDecimals(3)
@@ -154,7 +145,6 @@ class TokenAssociateIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenAssociateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setAccountId(accountId)
                     .setTokenIds(Collections.singletonList(tokenId))
                     .execute(testEnv.client)

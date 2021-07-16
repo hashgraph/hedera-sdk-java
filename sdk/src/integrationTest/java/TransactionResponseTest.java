@@ -21,9 +21,7 @@ public class TransactionResponseTest {
             var key = PrivateKey.generate();
 
             var transaction = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
-                //.setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                 .execute(testEnv.client);
 
             var record = transaction.getRecord(testEnv.client);

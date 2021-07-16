@@ -19,7 +19,6 @@ class TokenRevokeKycIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -28,7 +27,6 @@ class TokenRevokeKycIntegrationTest {
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setDecimals(3)
@@ -46,7 +44,6 @@ class TokenRevokeKycIntegrationTest {
             );
 
             new TokenAssociateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTokenIds(Collections.singletonList(tokenId))
                 .freezeWith(testEnv.client)
@@ -55,7 +52,6 @@ class TokenRevokeKycIntegrationTest {
                 .getReceipt(testEnv.client);
 
             new TokenRevokeKycTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTokenId(tokenId)
                 .freezeWith(testEnv.client)
@@ -76,7 +72,6 @@ class TokenRevokeKycIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -85,7 +80,6 @@ class TokenRevokeKycIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenRevokeKycTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setAccountId(accountId)
                     .freezeWith(testEnv.client)
                     .sign(key)
@@ -108,7 +102,6 @@ class TokenRevokeKycIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new TokenCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
@@ -126,7 +119,6 @@ class TokenRevokeKycIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenRevokeKycTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenId(tokenId)
                     .freezeWith(testEnv.client)
                     .sign(key)
@@ -149,7 +141,6 @@ class TokenRevokeKycIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -158,7 +149,6 @@ class TokenRevokeKycIntegrationTest {
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setDecimals(3)
@@ -177,7 +167,6 @@ class TokenRevokeKycIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenRevokeKycTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setAccountId(accountId)
                     .setTokenId(tokenId)
                     .freezeWith(testEnv.client)

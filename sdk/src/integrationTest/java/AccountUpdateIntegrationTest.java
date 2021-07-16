@@ -24,7 +24,6 @@ class AccountUpdateIntegrationTest {
             var key2 = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key1)
                 .execute(testEnv.client);
 
@@ -32,7 +31,6 @@ class AccountUpdateIntegrationTest {
 
             @Var var info = new AccountInfoQuery()
                 .setAccountId(accountId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.accountId, accountId);
@@ -45,7 +43,6 @@ class AccountUpdateIntegrationTest {
 
             new AccountUpdateTransaction()
                 .setAccountId(accountId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key2.getPublicKey())
                 .freezeWith(testEnv.client)
                 .sign(key1)
@@ -77,7 +74,6 @@ class AccountUpdateIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new AccountUpdateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
             });

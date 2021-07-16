@@ -21,7 +21,6 @@ class AccountInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var info = new AccountInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(testEnv.operatorId)
                 .execute(testEnv.client);
 
@@ -43,7 +42,6 @@ class AccountInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var info = new AccountInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(testEnv.operatorId)
                 .setMaxQueryPayment(new Hbar(1));
 
@@ -64,7 +62,6 @@ class AccountInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var info = new AccountInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(testEnv.operatorId)
                 .setMaxQueryPayment(Hbar.MAX);
 
@@ -86,7 +83,6 @@ class AccountInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var info = new AccountInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(testEnv.operatorId)
                 .setMaxQueryPayment(Hbar.fromTinybars(1));
 
@@ -109,7 +105,6 @@ class AccountInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var info = new AccountInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(testEnv.operatorId)
                 .setMaxQueryPayment(Hbar.fromTinybars(10000));
 

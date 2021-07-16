@@ -23,7 +23,6 @@ class AccountDeleteIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -32,7 +31,6 @@ class AccountDeleteIntegrationTest {
 
             var info = new AccountInfoQuery()
                 .setAccountId(accountId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.accountId, accountId);
@@ -55,7 +53,6 @@ class AccountDeleteIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new AccountDeleteTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTransferAccountId(testEnv.operatorId)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
@@ -76,7 +73,6 @@ class AccountDeleteIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);

@@ -19,7 +19,6 @@ public class TopicMessageIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new TopicCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
                 .execute(testEnv.client);
@@ -28,7 +27,6 @@ public class TopicMessageIntegrationTest {
 
             @Var var info = new TopicInfoQuery()
                 .setTopicId(topicId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.topicId, topicId);
@@ -47,7 +45,6 @@ public class TopicMessageIntegrationTest {
                 });
 
             new TopicMessageSubmitTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
                 .setMessage("Hello, from HCS!")
                 .execute(testEnv.client)
@@ -79,7 +76,6 @@ public class TopicMessageIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new TopicCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
                 .execute(testEnv.client);
@@ -88,7 +84,6 @@ public class TopicMessageIntegrationTest {
 
             @Var var info = new TopicInfoQuery()
                 .setTopicId(topicId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.topicId, topicId);
@@ -107,7 +102,6 @@ public class TopicMessageIntegrationTest {
                 });
 
             new TopicMessageSubmitTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
                 .setMessage(Contents.BIG_CONTENTS)
                 .execute(testEnv.client)

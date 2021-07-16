@@ -19,7 +19,6 @@ class TokenMintIntegrationTest {
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setDecimals(3)
@@ -37,7 +36,6 @@ class TokenMintIntegrationTest {
             );
 
             var receipt = new TokenMintTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAmount(10)
                 .setTokenId(tokenId)
                 .execute(testEnv.client)
@@ -57,7 +55,6 @@ class TokenMintIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenMintTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setAmount(10)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
@@ -77,7 +74,6 @@ class TokenMintIntegrationTest {
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setDecimals(3)
@@ -96,7 +92,6 @@ class TokenMintIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenMintTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenId(tokenId)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
@@ -117,7 +112,6 @@ class TokenMintIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -126,7 +120,6 @@ class TokenMintIntegrationTest {
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setDecimals(3)
@@ -145,7 +138,6 @@ class TokenMintIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenMintTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenId(tokenId)
                     .setAmount(10)
                     .execute(testEnv.client)
@@ -167,7 +159,6 @@ class TokenMintIntegrationTest {
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
@@ -184,7 +175,6 @@ class TokenMintIntegrationTest {
             );
 
             var receipt = new TokenMintTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setMetadata(NftMetadataGenerator.generate((byte)10))
                 .setTokenId(tokenId)
                 .execute(testEnv.client)

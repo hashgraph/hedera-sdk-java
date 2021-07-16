@@ -24,10 +24,8 @@ class LiveHashAddIntegrationTest {
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
-                //.setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                 .execute(testEnv.client);
 
             var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
@@ -36,7 +34,6 @@ class LiveHashAddIntegrationTest {
                 new LiveHashAddTransaction()
                     .setAccountId(accountId)
                     .setDuration(Duration.ofDays(30))
-                    //.setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                     .setHash(HASH)
                     .setKeys(key)
                     .execute(testEnv.client)

@@ -47,7 +47,6 @@ class TokenInfoIntegrationTest {
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             var info = new TokenInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .execute(testEnv.client);
 
@@ -91,7 +90,6 @@ class TokenInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
@@ -100,7 +98,6 @@ class TokenInfoIntegrationTest {
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             var info = new TokenInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .execute(testEnv.client);
 
@@ -134,7 +131,6 @@ class TokenInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
@@ -148,7 +144,6 @@ class TokenInfoIntegrationTest {
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             var mintReceipt = new TokenMintTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .setMetadata(NftMetadataGenerator.generate((byte)10))
                 .execute(testEnv.client)
@@ -157,7 +152,6 @@ class TokenInfoIntegrationTest {
             assertEquals(mintReceipt.serials.size(), 10);
 
             var info = new TokenInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .execute(testEnv.client);
 
@@ -189,7 +183,6 @@ class TokenInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
@@ -199,7 +192,6 @@ class TokenInfoIntegrationTest {
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             var infoQuery = new TokenInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId);
 
             var cost = infoQuery.getCost(testEnv.client);
@@ -217,7 +209,6 @@ class TokenInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
@@ -227,7 +218,6 @@ class TokenInfoIntegrationTest {
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             var infoQuery = new TokenInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .setMaxQueryPayment(new Hbar(1000));
 
@@ -246,7 +236,6 @@ class TokenInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
@@ -256,7 +245,6 @@ class TokenInfoIntegrationTest {
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             var infoQuery = new TokenInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .setMaxQueryPayment(Hbar.fromTinybars(1));
 
@@ -279,7 +267,6 @@ class TokenInfoIntegrationTest {
             var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
@@ -289,7 +276,6 @@ class TokenInfoIntegrationTest {
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             var infoQuery = new TokenInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .setMaxQueryPayment(new Hbar(1000));
 

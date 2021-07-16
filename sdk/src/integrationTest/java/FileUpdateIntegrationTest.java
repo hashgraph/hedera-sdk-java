@@ -21,7 +21,6 @@ public class FileUpdateIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
                 .execute(testEnv.client);
@@ -30,7 +29,6 @@ public class FileUpdateIntegrationTest {
 
             @Var var info = new FileInfoQuery()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
@@ -42,14 +40,12 @@ public class FileUpdateIntegrationTest {
 
             new FileUpdateTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContents("[e2e::FileUpdateTransaction]")
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             info = new FileInfoQuery()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
@@ -61,7 +57,6 @@ public class FileUpdateIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -76,7 +71,6 @@ public class FileUpdateIntegrationTest {
             var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContents("[e2e::FileCreateTransaction]")
                 .execute(testEnv.client);
 
@@ -84,7 +78,6 @@ public class FileUpdateIntegrationTest {
 
             var info = new FileInfoQuery()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
@@ -95,7 +88,6 @@ public class FileUpdateIntegrationTest {
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new FileUpdateTransaction()
                     .setFileId(fileId)
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setContents("[e2e::FileUpdateTransaction]")
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
@@ -115,7 +107,6 @@ public class FileUpdateIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new FileUpdateTransaction()
-                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setContents("[e2e::FileUpdateTransaction]")
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
