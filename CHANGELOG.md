@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+ * `Client.getRequestTimeout()`
+ * `Client.pingAsync()` and `Client.pingAllAsync()` useful for validating all nodes within the
+   network before executing any real request
+ * `Client.[set|get]MaxAttempts()` default max attempts for all transactions
+ * `Client.[set|get]MaxNodeAttempts()` set max attempts to retry a node which returns bad gRPC status
+   such as `UNAVAILBLE`
+ * `Client.[set|get]NodeWaitTime()` change the default delay before attempting a node again which has
+   returned a bad gRPC status
+
 ## v2.0.9
 
 ### Fixed
@@ -19,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
- * `TokenUpdateTransaction.clearAutoRenewAccountId()` 
+ * `TokenUpdateTransaction.clearAutoRenewAccountId()`
  * Scheduled `TransferTransaction`
 
 ## v2.0.9-beta.1
@@ -60,7 +73,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * Null checks for most parameters to catch stray `NullPointerException`'s
 
 ### Fixed
- 
+
  * `RequestType` missing `UNCHECKED_SUBMIT` for `toString()` and `valueOf()` methods.
  * `FeeSchedules` incorrectly serializing nulls causing `NullPointerException`
 
