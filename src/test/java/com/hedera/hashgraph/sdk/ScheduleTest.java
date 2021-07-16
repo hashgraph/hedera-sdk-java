@@ -17,6 +17,7 @@ import com.hedera.hashgraph.sdk.schedule.ScheduleSignTransaction;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.Collections;
 import java.util.Objects;
@@ -29,6 +30,7 @@ public class ScheduleTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("Create schedule")
     void testScheduleMultiKey() throws HederaStatusException {
         Ed25519PrivateKey key = Ed25519PrivateKey.generate();
@@ -67,6 +69,7 @@ public class ScheduleTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("Create with schedule()")
     void testCreateWithSchedule() throws HederaStatusException {
         Ed25519PrivateKey key = Ed25519PrivateKey.generate();
@@ -105,6 +108,7 @@ public class ScheduleTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("Can sign schedule")
     void canSignSchedule2() throws HederaStatusException {
         Ed25519PrivateKey key1 = Ed25519PrivateKey.generate();
