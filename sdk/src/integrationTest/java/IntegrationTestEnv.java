@@ -1,6 +1,8 @@
+import com.google.common.collect.HashBiMap;
 import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.*;
 
+import java.sql.Time;
 import java.util.*;
 import javax.annotation.Nullable;
 import java.util.concurrent.TimeoutException;
@@ -10,65 +12,102 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class IntegrationTestEnv {
     public Client client;
-    public PrivateKey operatorKey;
+    public PublicKey operatorKey;
     public AccountId operatorId;
-    public List<AccountId> nodeAccountIds;
-    public List<AccountId> nodeAccountIdsForChunked;
     public static Random random = new Random();
-
     private AccountId originalOperatorId;
 
-    public IntegrationTestEnv() throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
+    private IntegrationTestEnv(Client client, AccountId originalOperatorId) {
+        this.client = client;
+        this.operatorKey = client.getOperatorPublicKey();
+        operatorId = client.getOperatorAccountId();
+        this.originalOperatorId = originalOperatorId;
+
+        try {
+            var operatorPrivateKey = PrivateKey.fromString(System.getProperty("OPERATOR_KEY"));
+            operatorKey = operatorPrivateKey.getPublicKey();
+            operatorId = AccountId.fromString(System.getProperty("OPERATOR_ID"));
+
+            client.setOperator(operatorId, operatorPrivateKey);
+        } catch (Exception e) {
+        }
+
+        assertNotNull(client.getOperatorAccountId());
+        assertNotNull(client.getOperatorPublicKey());
+    }
+
+    private static Client createClient() {
         if (System.getProperty("HEDERA_NETWORK").equals("previewnet")) {
-            client = Client.forPreviewnet();
+            return Client.forPreviewnet();
         } else if (System.getProperty("HEDERA_NETWORK").equals("localhost")) {
             var network = new Hashtable<String, AccountId>();
             network.put("127.0.0.1:50213", new AccountId(3));
             network.put("127.0.0.1:50214", new AccountId(4));
             network.put("127.0.0.1:50215", new AccountId(5));
 
-            client = Client.forNetwork(network);
+            return Client.forNetwork(network);
         } else {
             try {
-                client = Client.fromConfigFile(System.getProperty("CONFIG_FILE"));
+                var client = Client.fromConfigFile(System.getProperty("CONFIG_FILE"));
+                return client;
             } catch (Exception e) {
-                client = Client.forTestnet();
+                return Client.forTestnet();
             }
         }
+    }
 
-        try {
-            operatorKey = PrivateKey.fromString(System.getProperty("OPERATOR_KEY"));
-            operatorId = AccountId.fromString(System.getProperty("OPERATOR_ID"));
+    public static IntegrationTestEnv withOneNode() throws PrecheckStatusException, TimeoutException, InterruptedException {
+        var client = createClient();
 
-            client.setOperator(operatorId, operatorKey);
-        } catch (Exception e) {
-        }
+        var nodeId = new AccountCreateTransaction()
+            .setKey(PrivateKey.generate())
+            .execute(client)
+            .nodeId;
 
-        assertNotNull(client.getOperatorAccountId());
-        assertNotNull(client.getOperatorPublicKey());
+        var inverseNetwork = HashBiMap.create(client.getNetwork()).inverse();
+        var newNetwork = new HashMap<String, AccountId>();
+        newNetwork.put(Objects.requireNonNull(inverseNetwork.get(nodeId)), nodeId);
+        client.setNetwork(newNetwork);
+        return new IntegrationTestEnv(client, client.getOperatorAccountId());
+    }
+
+    public static IntegrationTestEnv withTwoNodes() throws PrecheckStatusException, TimeoutException, InterruptedException {
+        var client = createClient();
+
+        var nodeId1 = new AccountCreateTransaction()
+            .setKey(PrivateKey.generate())
+            .execute(client)
+            .nodeId;
+
+        var nodeId2 = new AccountCreateTransaction()
+            .setKey(PrivateKey.generate())
+            .execute(client)
+            .nodeId;
+
+        var inverseNetwork = HashBiMap.create(client.getNetwork()).inverse();
+        var newNetwork = new HashMap<String, AccountId>();
+        newNetwork.put(Objects.requireNonNull(inverseNetwork.get(nodeId1)), nodeId1);
+        newNetwork.put(Objects.requireNonNull(inverseNetwork.get(nodeId2)), nodeId2);
+        client.setNetwork(newNetwork);
+        return new IntegrationTestEnv(client, client.getOperatorAccountId());
+    }
+
+    public static IntegrationTestEnv forTokenTest() throws PrecheckStatusException, TimeoutException, InterruptedException {
+        var client = createClient();
+        var originalOperatorId = client.getOperatorAccountId();
 
         var key = PrivateKey.generate();
-
-        var response = new AccountCreateTransaction()
+        var nodeId = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(130))
             .setKey(key)
-            .execute(client);
+            .execute(client)
+            .nodeId;
 
-        operatorId = Objects.requireNonNull(response.getReceipt(client).accountId);
-        operatorKey = key;
-        nodeAccountIds = Collections.singletonList(response.nodeId);
-        // chunked transactions can have tricky bugs when there are multiple nodes
-        // and multiple chunks.  Need to add a second nodeId to catch these bugs.
-        nodeAccountIdsForChunked = new ArrayList<>();
-        nodeAccountIdsForChunked.add(response.nodeId);
-        for(var nodeId : client.getNetwork().values()) {
-            if( ! nodeAccountIdsForChunked.contains(nodeId)) {
-                nodeAccountIdsForChunked.add(nodeId);
-                break;
-            }
-        }
-        originalOperatorId = client.getOperatorAccountId();
-        client.setOperator(operatorId, operatorKey);
+        var inverseNetwork = HashBiMap.create(client.getNetwork()).inverse();
+        var newNetwork = new HashMap<String, AccountId>();
+        newNetwork.put(Objects.requireNonNull(inverseNetwork.get(nodeId)), nodeId);
+        client.setNetwork(newNetwork);
+        return new IntegrationTestEnv(client, originalOperatorId);
     }
 
     public void cleanUpAndClose(
@@ -78,7 +117,6 @@ public class IntegrationTestEnv {
     ) throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
         if (newTokenId != null) {
             new TokenDeleteTransaction()
-                .setNodeAccountIds(nodeAccountIds)
                 .setTokenId(newTokenId)
                 .execute(client)
                 .getReceipt(client);
@@ -86,21 +124,21 @@ public class IntegrationTestEnv {
 
         if(newAccountId != null) {
             new AccountDeleteTransaction()
-                .setNodeAccountIds(nodeAccountIds)
                 .setTransferAccountId(originalOperatorId)
                 .setAccountId(newAccountId)
                 .freezeWith(client)
-                .sign(newAccountKey)
+                .sign(Objects.requireNonNull(newAccountKey))
                 .execute(client)
                 .getReceipt(client);
         }
 
-        new AccountDeleteTransaction()
-            .setNodeAccountIds(nodeAccountIds)
-            .setTransferAccountId(originalOperatorId)
-            .setAccountId(operatorId)
-            .execute(client)
-            .getReceipt(client);
+        if(!operatorId.equals(originalOperatorId)) {
+            new AccountDeleteTransaction()
+                .setTransferAccountId(originalOperatorId)
+                .setAccountId(operatorId)
+                .execute(client)
+                .getReceipt(client);
+        }
 
         client.close();
     }
