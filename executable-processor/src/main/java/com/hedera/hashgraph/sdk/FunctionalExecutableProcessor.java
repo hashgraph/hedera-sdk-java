@@ -52,6 +52,10 @@ public class FunctionalExecutableProcessor extends AbstractProcessor {
             var isGeneric = annotation.type().isEmpty();
             var outputType = isGeneric ? TypeVariableName.get("O") : ClassName.get(packageName, annotation.type());
 
+            var parameterType = annotation.onClient() ? (annotation.inputType().isEmpty() ? null : ClassName.get(packageName, annotation.inputType())) : clientClazz;
+            var parameterName = annotation.onClient() ? annotation.inputType().toLowerCase() : "client";
+            var clientVariableName = annotation.onClient() ? "this" : "client";
+
             // are there any additional (checked) exceptions being through
             var moreExceptions = new TypeName[annotation.exceptionTypes().length];
             for (var i = 0; i < moreExceptions.length; ++i) {
@@ -69,78 +73,156 @@ public class FunctionalExecutableProcessor extends AbstractProcessor {
             // Return type for {name}Async()
             var futureReturnTy = ParameterizedTypeName.get(ClassName.get(CompletableFuture.class), outputType);
 
-            var methodAsync = methodBuilder(methodAsyncName)
-                .addParameter(clientClazz, "client")
+            var methodGetRequestTimeout = methodBuilder("getRequestTimeout")
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .returns(Duration.class)
+                .build();
+
+            // --------------------------------------------------------------------------------------------------------
+
+            var methodAsyncBuilder = methodBuilder(methodAsyncName)
                 .addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC)
-                .returns(futureReturnTy)
-                .build();
+                .returns(futureReturnTy);
 
-            var methodAsyncBiConsumer = methodBuilder(methodAsyncName)
-                .addParameter(clientClazz, "client")
-                .addParameter(biCallbackTy, "callback")
+            if (parameterType != null) {
+                methodAsyncBuilder.addParameter(parameterType, parameterName);
+            }
+
+            // --------------------------------------------------------------------------------------------------------
+
+            var methodAsyncBiConsumerBuilder = methodBuilder(methodAsyncName)
                 .addModifiers(Modifier.DEFAULT, Modifier.PUBLIC)
-                .addStatement("$L (client, client.requestTimeout, callback)", methodAsyncName)
-                .returns(void.class)
-                .build();
+                .returns(void.class);
 
-            var methodAsyncBiConsumerWithTimeout = methodBuilder(methodAsyncName)
-                .addParameter(clientClazz, "client")
+            if (parameterType != null) {
+                methodAsyncBiConsumerBuilder.addParameter(parameterType, parameterName);
+            }
+
+            methodAsyncBiConsumerBuilder.addParameter(biCallbackTy, "callback");
+
+            if (parameterType != null) {
+                methodAsyncBiConsumerBuilder.addStatement("$L ($L, $L.getRequestTimeout(), callback)", methodAsyncName, parameterName, clientVariableName);
+            } else {
+                methodAsyncBiConsumerBuilder.addStatement("$L ($L.getRequestTimeout(), callback)", methodAsyncName, clientVariableName);
+            }
+
+            // --------------------------------------------------------------------------------------------------------
+
+            var methodAsyncBiConsumerWithTimeoutBuilder = methodBuilder(methodAsyncName)
+                .addModifiers(Modifier.DEFAULT, Modifier.PUBLIC)
+                .returns(void.class);
+
+            if (parameterType != null) {
+                methodAsyncBiConsumerWithTimeoutBuilder
+                    .addParameter(parameterType, parameterName)
+                    .addStatement("$L ($L)" +
+                            ".orTimeout(timeout.toMillis(), $T.MILLISECONDS)" +
+                            ".whenComplete(callback)",
+                        methodAsyncName, parameterName, TimeUnit.class);
+            } else {
+                methodAsyncBiConsumerWithTimeoutBuilder
+                    .addStatement("$L ()" +
+                            ".orTimeout(timeout.toMillis(), $T.MILLISECONDS)" +
+                            ".whenComplete(callback)",
+                        methodAsyncName, TimeUnit.class);
+            }
+
+            methodAsyncBiConsumerWithTimeoutBuilder
                 .addParameter(Duration.class, "timeout")
-                .addParameter(biCallbackTy, "callback")
-                .addModifiers(Modifier.DEFAULT, Modifier.PUBLIC)
-                .addStatement("$L (client)" +
-                        ".orTimeout(timeout.toMillis(), $T.MILLISECONDS)" +
-                        ".whenComplete(callback)",
-                    methodAsyncName, TimeUnit.class)
-                .returns(void.class)
-                .build();
+                .addParameter(biCallbackTy, "callback");
 
-            var methodAsyncConsumer = methodBuilder(methodAsyncName)
-                .addParameter(clientClazz, "client")
-                .addParameter(outCallbackTy, "onSuccess")
-                .addParameter(errCallbackTy, "onFailure")
-                .addModifiers(Modifier.DEFAULT, Modifier.PUBLIC)
-                .addStatement("$L (client, client.requestTimeout, onSuccess, onFailure)", methodAsyncName)
-                .returns(void.class)
-                .build();
+            // --------------------------------------------------------------------------------------------------------
 
-            var methodAsyncConsumerWithTimeout = methodBuilder(methodAsyncName)
-                .addParameter(clientClazz, "client")
-                .addParameter(Duration.class, "timeout")
-                .addParameter(outCallbackTy, "onSuccess")
-                .addParameter(errCallbackTy, "onFailure")
+            var methodAsyncConsumerBuilder = methodBuilder(methodAsyncName)
                 .addModifiers(Modifier.DEFAULT, Modifier.PUBLIC)
-                .addStatement("$L (client)" +
+                .returns(void.class);
+
+            if (parameterType != null) {
+                methodAsyncConsumerBuilder
+                    .addParameter(parameterType, parameterName)
+                    .addStatement("$L ($L, $L.getRequestTimeout(), onSuccess, onFailure)", methodAsyncName, parameterName, clientVariableName);
+            } else {
+                methodAsyncConsumerBuilder
+                    .addStatement("$L ($L.getRequestTimeout(), onSuccess, onFailure)", methodAsyncName, clientVariableName);
+            }
+
+            methodAsyncConsumerBuilder
+                .addParameter(outCallbackTy, "onSuccess")
+                .addParameter(errCallbackTy, "onFailure");
+
+            // --------------------------------------------------------------------------------------------------------
+
+            var methodAsyncConsumerWithTimeoutBuilder = methodBuilder(methodAsyncName)
+                .addModifiers(Modifier.DEFAULT, Modifier.PUBLIC)
+                .returns(void.class);
+
+            if (parameterType != null) {
+                methodAsyncConsumerWithTimeoutBuilder.addParameter(parameterType, parameterName)
+                    .addStatement("$L ($L)" +
+                            ".orTimeout(timeout.toMillis(), $T.MILLISECONDS)" +
+                            ".whenComplete((output, error) -> {" +
+                            "if (error != null) { onFailure.accept(error); }" +
+                            "else { onSuccess.accept(output); }" +
+                            "})",
+                        methodAsyncName, parameterName, TimeUnit.class);
+            } else {
+                methodAsyncConsumerWithTimeoutBuilder.addStatement("$L ()" +
                         ".orTimeout(timeout.toMillis(), $T.MILLISECONDS)" +
                         ".whenComplete((output, error) -> {" +
                         "if (error != null) { onFailure.accept(error); }" +
                         "else { onSuccess.accept(output); }" +
                         "})",
-                    methodAsyncName, TimeUnit.class)
-                .returns(void.class)
-                .build();
+                    methodAsyncName, TimeUnit.class);
+            }
 
-            var methodSync = methodBuilder(methodName)
-                .addParameter(clientClazz, "client")
+            methodAsyncConsumerWithTimeoutBuilder
+                .addParameter(Duration.class, "timeout")
+                .addParameter(outCallbackTy, "onSuccess")
+                .addParameter(errCallbackTy, "onFailure");
+
+            // --------------------------------------------------------------------------------------------------------
+
+            var methodSyncBuilder = methodBuilder(methodName)
+                .addModifiers(Modifier.DEFAULT, Modifier.PUBLIC)
                 .addException(TimeoutException.class)
                 .addException(preCheckStatusException)
                 .addExceptions(Arrays.asList(moreExceptions))
-                .addModifiers(Modifier.DEFAULT, Modifier.PUBLIC)
-                .addStatement("return $L (client, client.requestTimeout)", methodName)
-                .returns(outputType)
-                .build();
+                .returns(outputType);
+
+            if (parameterType != null) {
+                methodSyncBuilder
+                    .addParameter(parameterType, parameterName)
+                    .addStatement("return $L ($L, $L.getRequestTimeout())", methodName, parameterName, clientVariableName);
+            } else {
+                methodSyncBuilder.addStatement("return $L ($L.getRequestTimeout())", methodName, clientVariableName);
+            }
+
+            // --------------------------------------------------------------------------------------------------------
 
             var methodSyncWithTimeoutBuilder = methodBuilder(methodName)
-                .addParameter(clientClazz, "client")
-                .addParameter(Duration.class, "timeout")
+                .addModifiers(Modifier.DEFAULT, Modifier.PUBLIC)
                 .addException(TimeoutException.class)
                 .addException(preCheckStatusException)
                 .addExceptions(Arrays.asList(moreExceptions))
-                .addModifiers(Modifier.DEFAULT, Modifier.PUBLIC);
+                .returns(outputType);
+
+            if (parameterType != null) {
+                methodSyncWithTimeoutBuilder.addParameter(parameterType, parameterName);
+            }
 
             methodSyncWithTimeoutBuilder
-                .beginControlFlow("try")
-                .addStatement("return $L (client).get(timeout.toMillis(), $T.MILLISECONDS)", methodAsyncName, TimeUnit.class)
+                .addParameter(Duration.class, "timeout")
+                .beginControlFlow("try");
+
+            if (parameterType != null) {
+                methodSyncWithTimeoutBuilder
+                    .addStatement("return $L ($L).get(timeout.toMillis(), $T.MILLISECONDS)", methodAsyncName, parameterName, TimeUnit.class);
+            } else {
+                methodSyncWithTimeoutBuilder
+                    .addStatement("return $L ().get(timeout.toMillis(), $T.MILLISECONDS)", methodAsyncName, TimeUnit.class);
+            }
+
+            methodSyncWithTimeoutBuilder
                 .nextControlFlow("catch ($T e)", InterruptedException.class)
                 .addStatement("throw new RuntimeException(e)")
                 .nextControlFlow("catch ($T e)", ExecutionException.class)
@@ -165,10 +247,7 @@ public class FunctionalExecutableProcessor extends AbstractProcessor {
             methodSyncWithTimeoutBuilder
                 // any other exception must be thrown as an unchecked exception
                 .addStatement("throw new RuntimeException(cause)")
-                .endControlFlow()
-                .returns(outputType);
-
-            var methodSyncWithTimeout = methodSyncWithTimeoutBuilder.build();
+                .endControlFlow();
 
             var tyBuilder = interfaceBuilder(interfaceName);
 
@@ -176,15 +255,19 @@ public class FunctionalExecutableProcessor extends AbstractProcessor {
                 tyBuilder.addTypeVariable((TypeVariableName) outputType);
             }
 
+            if (annotation.onClient()) {
+                tyBuilder.addMethod(methodGetRequestTimeout);
+            }
+
             var ty = tyBuilder
                 .addModifiers(Modifier.PUBLIC)
-                .addMethod(methodAsync)
-                .addMethod(methodAsyncBiConsumer)
-                .addMethod(methodAsyncBiConsumerWithTimeout)
-                .addMethod(methodAsyncConsumer)
-                .addMethod(methodAsyncConsumerWithTimeout)
-                .addMethod(methodSync)
-                .addMethod(methodSyncWithTimeout)
+                .addMethod(methodAsyncBuilder.build())
+                .addMethod(methodAsyncBiConsumerBuilder.build())
+                .addMethod(methodAsyncBiConsumerWithTimeoutBuilder.build())
+                .addMethod(methodAsyncConsumerBuilder.build())
+                .addMethod(methodAsyncConsumerWithTimeoutBuilder.build())
+                .addMethod(methodSyncBuilder.build())
+                .addMethod(methodSyncWithTimeoutBuilder.build())
                 .build();
 
             var output = JavaFile.builder("com.hedera.hashgraph.sdk", ty).build();

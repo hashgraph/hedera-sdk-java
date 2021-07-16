@@ -13,4 +13,8 @@ public @interface FunctionalExecutable {
 
     // empty string means make this generic
     String type() default "";
+
+    String inputType() default "";
+
+    boolean onClient() default false;
 }

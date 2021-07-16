@@ -20,7 +20,7 @@ import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
 abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements WithExecute<O> {
     private static final Logger logger = LoggerFactory.getLogger(Executable.class);
 
-    protected int maxAttempts = 10;
+    protected int maxAttempts = Client.DEFAULT_MAX_ATTEMPTS;
     protected int nextNodeIndex = 0;
     protected List<AccountId> nodeAccountIds = Collections.emptyList();
     protected List<Node> nodes = new ArrayList<>();
@@ -86,6 +86,10 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     @Override
     @FunctionalExecutable
     public CompletableFuture<O> executeAsync(Client client) {
+        if (maxAttempts == Client.DEFAULT_MAX_ATTEMPTS) {
+            maxAttempts = client.getMaxAttempts();
+        }
+
         return onExecuteAsync(client).thenCompose((v) -> {
             if(nodeAccountIds.isEmpty()) {
                 throw new IllegalStateException("Request node account IDs were not set before executing");
