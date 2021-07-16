@@ -17,11 +17,11 @@ public class SystemIntegrationTest {
     @DisplayName("All system transactions are not supported")
     void allSystemTransactionsAreNotSupported() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withOneNode();
 
             var fileId = Objects.requireNonNull(
                 new FileCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setContents(SMART_CONTRACT_BYTECODE)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)
@@ -31,7 +31,7 @@ public class SystemIntegrationTest {
             var contractId = Objects.requireNonNull(
                 new ContractCreateTransaction()
                     .setAdminKey(testEnv.operatorKey)
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setGas(2000)
                     .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                     .setBytecodeFileId(fileId)
@@ -43,7 +43,7 @@ public class SystemIntegrationTest {
 
             @Var var error = assertThrows(PrecheckStatusException.class, () -> {
                 new SystemDeleteTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setContractId(contractId)
                     .setExpirationTime(Instant.now())
                     .execute(testEnv.client);
@@ -53,7 +53,7 @@ public class SystemIntegrationTest {
 
             error = assertThrows(PrecheckStatusException.class, () -> {
                 new SystemDeleteTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setFileId(fileId)
                     .setExpirationTime(Instant.now())
                     .execute(testEnv.client);
@@ -63,7 +63,7 @@ public class SystemIntegrationTest {
 
             error = assertThrows(PrecheckStatusException.class, () -> {
                 new SystemUndeleteTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setContractId(contractId)
                     .execute(testEnv.client);
             });
@@ -72,7 +72,7 @@ public class SystemIntegrationTest {
 
             error = assertThrows(PrecheckStatusException.class, () -> {
                 new SystemUndeleteTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setFileId(fileId)
                     .execute(testEnv.client);
             });

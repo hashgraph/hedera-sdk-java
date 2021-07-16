@@ -18,10 +18,10 @@ public class ContractDeleteIntegrationTest {
     @DisplayName("Can delete contract with admin key")
     void canDeleteContractWithAdminKey() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withOneNode();
 
             @Var var response = new FileCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -30,7 +30,7 @@ public class ContractDeleteIntegrationTest {
 
             response = new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
@@ -41,26 +41,26 @@ public class ContractDeleteIntegrationTest {
 
             @Var var info = new ContractInfoQuery()
                 .setContractId(contractId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.contractId, contractId);
             assertNotNull(info.accountId);
             assertEquals(Objects.requireNonNull(info.accountId).toString(), contractId.toString());
             assertNotNull(info.adminKey);
-            assertEquals(Objects.requireNonNull(info.adminKey).toString(), Objects.requireNonNull(testEnv.operatorKey.getPublicKey()).toString());
+            assertEquals(Objects.requireNonNull(info.adminKey).toString(), Objects.requireNonNull(testEnv.operatorKey).toString());
             assertEquals(info.storage, 926);
             assertEquals(info.contractMemo, "[e2e::ContractCreateTransaction]");
 
             new ContractDeleteTransaction()
                 .setContractId(contractId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -71,10 +71,10 @@ public class ContractDeleteIntegrationTest {
     @DisplayName("Can delete contract which has no admin key")
     void cannotDeleteContractWhichHasNoAdminKey() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new FileCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -82,7 +82,7 @@ public class ContractDeleteIntegrationTest {
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
             var contractId = Objects.requireNonNull(new ContractCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
@@ -94,7 +94,7 @@ public class ContractDeleteIntegrationTest {
 
             @Var var info = new ContractInfoQuery()
                 .setContractId(contractId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.contractId, contractId);
@@ -108,7 +108,7 @@ public class ContractDeleteIntegrationTest {
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new ContractDeleteTransaction()
                     .setContractId(contractId)
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
             });
@@ -123,11 +123,11 @@ public class ContractDeleteIntegrationTest {
     @DisplayName("Cannot delete contract when contract ID is not set")
     void cannotDeleteContractWhenContractIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withOneNode();
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractDeleteTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
             });

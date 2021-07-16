@@ -18,12 +18,12 @@ class AccountDeleteIntegrationTest {
     @DisplayName("Can delete account")
     void canDeleteAccount() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withOneNode();
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -32,7 +32,7 @@ class AccountDeleteIntegrationTest {
 
             var info = new AccountInfoQuery()
                 .setAccountId(accountId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.accountId, accountId);
@@ -43,16 +43,7 @@ class AccountDeleteIntegrationTest {
             assertNull(info.proxyAccountId);
             assertEquals(info.proxyReceived, Hbar.ZERO);
 
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
-                .setTransferAccountId(testEnv.operatorId)
-                .freezeWith(testEnv.client)
-                .sign(key)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
-            testEnv.cleanUpAndClose();
+            testEnv.cleanUpAndClose(accountId, key);
         });
     }
 
@@ -60,11 +51,11 @@ class AccountDeleteIntegrationTest {
     @DisplayName("Cannot delete invalid account ID")
     void cannotCreateAccountWithNoKey() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withOneNode();
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new AccountDeleteTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTransferAccountId(testEnv.operatorId)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
@@ -80,12 +71,12 @@ class AccountDeleteIntegrationTest {
     @DisplayName("Cannot delete account that has not signed transaction")
     void cannotDeleteAccountThatHasNotSignedTransaction() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withOneNode();
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);

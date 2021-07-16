@@ -14,12 +14,12 @@ class TokenFreezeIntegrationTest {
     @DisplayName("Can freeze account with token")
     void canFreezeAccountWithToken() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -28,7 +28,7 @@ class TokenFreezeIntegrationTest {
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setDecimals(3)
@@ -46,7 +46,7 @@ class TokenFreezeIntegrationTest {
             );
 
             new TokenAssociateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTokenIds(Collections.singletonList(tokenId))
                 .freezeWith(testEnv.client)
@@ -55,7 +55,7 @@ class TokenFreezeIntegrationTest {
                 .getReceipt(testEnv.client);
 
             new TokenFreezeTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTokenId(tokenId)
                 .freezeWith(testEnv.client)
@@ -71,12 +71,12 @@ class TokenFreezeIntegrationTest {
     @DisplayName("Cannot freeze account on token when token ID is not set")
     void cannotFreezeAccountOnTokenWhenTokenIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -85,7 +85,7 @@ class TokenFreezeIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenFreezeTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setAccountId(accountId)
                     .freezeWith(testEnv.client)
                     .sign(key)
@@ -103,12 +103,12 @@ class TokenFreezeIntegrationTest {
     @DisplayName("Cannot freeze account on token when account ID is not set")
     void cannotFreezeAccountOnTokenWhenAccountIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var key = PrivateKey.generate();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
@@ -126,7 +126,7 @@ class TokenFreezeIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenFreezeTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenId(tokenId)
                     .freezeWith(testEnv.client)
                     .sign(key)
@@ -144,12 +144,12 @@ class TokenFreezeIntegrationTest {
     @DisplayName("Cannot freeze account on token when account was not associated with")
     void cannotFreezeAccountOnTokenWhenAccountWasNotAssociatedWith() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -158,7 +158,7 @@ class TokenFreezeIntegrationTest {
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setDecimals(3)
@@ -177,7 +177,7 @@ class TokenFreezeIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenFreezeTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setAccountId(accountId)
                     .setTokenId(tokenId)
                     .freezeWith(testEnv.client)

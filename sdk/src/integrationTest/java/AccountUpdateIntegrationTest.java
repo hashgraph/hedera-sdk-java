@@ -18,13 +18,13 @@ class AccountUpdateIntegrationTest {
     @DisplayName("Can update account with a new key")
     void canUpdateAccountWithNewKey() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withOneNode();
 
             var key1 = PrivateKey.generate();
             var key2 = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key1)
                 .execute(testEnv.client);
 
@@ -32,7 +32,7 @@ class AccountUpdateIntegrationTest {
 
             @Var var info = new AccountInfoQuery()
                 .setAccountId(accountId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.accountId, accountId);
@@ -45,7 +45,7 @@ class AccountUpdateIntegrationTest {
 
             new AccountUpdateTransaction()
                 .setAccountId(accountId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key2.getPublicKey())
                 .freezeWith(testEnv.client)
                 .sign(key1)
@@ -65,16 +65,7 @@ class AccountUpdateIntegrationTest {
             assertNull(info.proxyAccountId);
             assertEquals(info.proxyReceived, Hbar.ZERO);
 
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
-                .setTransferAccountId(testEnv.operatorId)
-                .freezeWith(testEnv.client)
-                .sign(key2)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
-            testEnv.cleanUpAndClose();
+            testEnv.cleanUpAndClose(accountId, key2);
         });
     }
 
@@ -82,11 +73,11 @@ class AccountUpdateIntegrationTest {
     @DisplayName("Cannot update account when account ID is not set")
     void cannotUpdateAccountWhenAccountIdIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withOneNode();
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new AccountUpdateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
             });

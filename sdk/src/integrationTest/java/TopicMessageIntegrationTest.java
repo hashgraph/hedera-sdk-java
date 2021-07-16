@@ -16,10 +16,10 @@ public class TopicMessageIntegrationTest {
     @DisplayName("Can receive a topic message")
     void canReceiveATopicMessage() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new TopicCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
                 .execute(testEnv.client);
@@ -28,13 +28,13 @@ public class TopicMessageIntegrationTest {
 
             @Var var info = new TopicInfoQuery()
                 .setTopicId(topicId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.topicId, topicId);
             assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
             assertEquals(info.sequenceNumber, 0);
-            assertEquals(info.adminKey, testEnv.operatorKey.getPublicKey());
+            assertEquals(info.adminKey, testEnv.operatorKey);
 
             var receivedMessage = new boolean[]{false};
             var start = Instant.now();
@@ -47,7 +47,7 @@ public class TopicMessageIntegrationTest {
                 });
 
             new TopicMessageSubmitTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
                 .setMessage("Hello, from HCS!")
                 .execute(testEnv.client)
@@ -76,10 +76,10 @@ public class TopicMessageIntegrationTest {
     @DisplayName("Can receive a large topic message")
     void canReceiveALargeTopicMessage() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withOneNode();
 
             var response = new TopicCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
                 .execute(testEnv.client);
@@ -88,13 +88,13 @@ public class TopicMessageIntegrationTest {
 
             @Var var info = new TopicInfoQuery()
                 .setTopicId(topicId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.topicId, topicId);
             assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
             assertEquals(info.sequenceNumber, 0);
-            assertEquals(info.adminKey, testEnv.operatorKey.getPublicKey());
+            assertEquals(info.adminKey, testEnv.operatorKey);
 
             var receivedMessage = new boolean[]{false};
             var start = Instant.now();
@@ -107,7 +107,7 @@ public class TopicMessageIntegrationTest {
                 });
 
             new TopicMessageSubmitTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTopicId(topicId)
                 .setMessage(Contents.BIG_CONTENTS)
                 .execute(testEnv.client)

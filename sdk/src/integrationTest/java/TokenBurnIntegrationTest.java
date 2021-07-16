@@ -16,10 +16,10 @@ class TokenBurnIntegrationTest {
     @DisplayName("Can burn tokens")
     void canBurnTokens() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
@@ -36,7 +36,7 @@ class TokenBurnIntegrationTest {
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             var receipt = new TokenBurnTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAmount(10)
                 .setTokenId(tokenId)
                 .execute(testEnv.client)
@@ -52,11 +52,11 @@ class TokenBurnIntegrationTest {
     @DisplayName("Cannot burn tokens when token ID is not set")
     void cannotBurnTokensWhenTokenIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenBurnTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setAmount(10)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
@@ -72,10 +72,10 @@ class TokenBurnIntegrationTest {
     @DisplayName("Cannot burn tokens when amount is not set")
     void cannotBurnTokensWhenAmountIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
@@ -93,7 +93,7 @@ class TokenBurnIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenBurnTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenId(tokenId)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
@@ -109,10 +109,10 @@ class TokenBurnIntegrationTest {
     @DisplayName("Cannot burn tokens when supply key does not sign transaction")
     void cannotBurnTokensWhenSupplyKeyDoesNotSignTransaction() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
@@ -130,7 +130,7 @@ class TokenBurnIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenBurnTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    //.setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenId(tokenId)
                     .setAmount(10)
                     .execute(testEnv.client)
@@ -148,10 +148,10 @@ class TokenBurnIntegrationTest {
     @DisplayName("Can burn NFTs")
     void canBurnNfts() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var createReceipt = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
@@ -168,14 +168,14 @@ class TokenBurnIntegrationTest {
             var tokenId = Objects.requireNonNull(createReceipt.tokenId);
 
             var mintReceipt = new TokenMintTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .setMetadata(NftMetadataGenerator.generate((byte)10))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new TokenBurnTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .setSerials(mintReceipt.serials.subList(0, 4))
                 .setTokenId(tokenId)
                 .execute(testEnv.client)
@@ -185,7 +185,7 @@ class TokenBurnIntegrationTest {
             var serialsLeft = new ArrayList<Long>(mintReceipt.serials.subList(4, 10));
 
             var nftInfos = new TokenNftInfoQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+                //.setNodeAccountIds(testEnv.nodeAccountIds)
                 .byTokenId(tokenId)
                 .setEnd(6)
                 .execute(testEnv.client);
