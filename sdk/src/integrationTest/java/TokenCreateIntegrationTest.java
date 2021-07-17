@@ -14,10 +14,9 @@ class TokenCreateIntegrationTest {
     @DisplayName("Can create token with operator as all keys")
     void canCreateTokenWithOperatorAsAllKeys() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
@@ -34,7 +33,7 @@ class TokenCreateIntegrationTest {
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 
@@ -42,16 +41,17 @@ class TokenCreateIntegrationTest {
     @DisplayName("Can create token with minimal properties set")
     void canCreateTokenWithMinimalPropertiesSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount(5);
 
-            new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+            var tokenId = new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
                 .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                .getReceipt(testEnv.client)
+                .tokenId;
 
+            // we lose this IntegrationTestEnv throwaway account
             testEnv.client.close();
         });
     }
@@ -60,11 +60,10 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create token when token name is not set")
     void cannotCreateTokenWhenTokenNameIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenSymbol("F")
                     .setTreasuryAccountId(testEnv.operatorId)
                     .execute(testEnv.client)
@@ -74,7 +73,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.MISSING_TOKEN_NAME.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -82,11 +81,10 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create token when token symbol is not set")
     void cannotCreateTokenWhenTokenSymbolIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTreasuryAccountId(testEnv.operatorId)
                     .execute(testEnv.client)
@@ -96,7 +94,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.MISSING_TOKEN_SYMBOL.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -104,11 +102,10 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create token when token treasury account ID is not set")
     void cannotCreateTokenWhenTokenTreasuryAccountIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .execute(testEnv.client)
@@ -118,7 +115,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TREASURY_ACCOUNT_FOR_TOKEN.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -126,11 +123,10 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create token when token treasury account ID does not sign transaction")
     void cannotCreateTokenWhenTokenTreasuryAccountIDDoesNotSignTransaction() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setTreasuryAccountId(AccountId.fromString("0.0.3"))
@@ -141,7 +137,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -149,13 +145,12 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create token when admin key does not sign transaction")
     void cannotCreateTokenWhenAdminKeyDoesNotSignTransaction() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var key = PrivateKey.generate();
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setTreasuryAccountId(testEnv.operatorId)
@@ -167,7 +162,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose();
         });
     }
 
@@ -176,13 +171,13 @@ class TokenCreateIntegrationTest {
     @DisplayName("Can create token with custom fees")
     void canCreateTokenWithCustomFees() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
-            new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+            var tokenId = new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
                 .addCustomFee(new CustomFixedFee()
                     .setAmount(10)
                     .setFeeCollectorAccountId(testEnv.operatorId))
@@ -193,8 +188,10 @@ class TokenCreateIntegrationTest {
                     .setMax(10)
                     .setFeeCollectorAccountId(testEnv.operatorId))
                 .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-            testEnv.client.close();
+                .getReceipt(testEnv.client)
+                .tokenId;
+
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 
@@ -203,10 +200,9 @@ class TokenCreateIntegrationTest {
     @DisplayName("Can create NFT")
     void canCreateNfts() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
@@ -221,7 +217,7 @@ class TokenCreateIntegrationTest {
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-            testEnv.client.close();
+            testEnv.cleanUpAndClose(tokenId);
         });
     }
 }

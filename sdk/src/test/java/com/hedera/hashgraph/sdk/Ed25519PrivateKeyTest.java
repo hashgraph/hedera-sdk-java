@@ -159,7 +159,7 @@ class Ed25519PrivateKeyTest {
     void validateLegacyMnemonic() {
         Mnemonic mnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(MNEMONIC_LEGACY_STRING));
         PrivateKey key = assertDoesNotThrow(mnemonic::toLegacyPrivateKey);
-        assertEquals(key.toString(), MNEMONIC_LEGACY_PRIVATE_KEY);
+        assertEquals(key.legacyDerive(-1).toString(), MNEMONIC_LEGACY_PRIVATE_KEY);
     }
 
     @Test
