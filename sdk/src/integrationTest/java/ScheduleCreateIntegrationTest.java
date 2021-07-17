@@ -177,7 +177,14 @@ public class ScheduleCreateIntegrationTest {
 
             assertNotNull(info.executedAt);
 
-            // TODO: we lose account, I think I have to manually delete account using KeyList
+            new AccountDeleteTransaction()
+                .setAccountId(accountId)
+                .setTransferAccountId(testEnv.operatorId)
+                .freezeWith(testEnv.client)
+                .sign(key1).sign(key2).sign(key3)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
             testEnv.cleanUpAndClose();
         });
     }
@@ -186,7 +193,7 @@ public class ScheduleCreateIntegrationTest {
     @DisplayName("Can schedule token transfer")
     void canScheduleTokenTransfer() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount(20);
+            var testEnv = IntegrationTestEnv.withThrowawayAccount();
 
             PrivateKey key = PrivateKey.generate();
 

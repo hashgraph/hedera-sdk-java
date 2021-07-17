@@ -20,6 +20,7 @@ public class FileAppendIntegrationTest {
     @DisplayName("Can append to file")
     void canAppendToFile() {
         assertDoesNotThrow(() -> {
+            // There are potential bugs in FileAppendTransaction which require more than one node to trigger.
             var testEnv = IntegrationTestEnv.withTwoNodes();
 
             var response = new FileCreateTransaction()
@@ -75,6 +76,7 @@ public class FileAppendIntegrationTest {
     @DisplayName("Can append large contents to file")
     void canAppendLargeContentsToFile() {
         assertDoesNotThrow(() -> {
+            // There are potential bugs in FileAppendTransaction which require more than one node to trigger.
             var testEnv = IntegrationTestEnv.withTwoNodes();
 
             var response = new FileCreateTransaction()

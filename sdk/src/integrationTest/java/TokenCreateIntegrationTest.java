@@ -45,7 +45,7 @@ class TokenCreateIntegrationTest {
     @DisplayName("Can create token with minimal properties set")
     void canCreateTokenWithMinimalPropertiesSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount(5);
 
             var tokenId = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -55,7 +55,7 @@ class TokenCreateIntegrationTest {
                 .getReceipt(testEnv.client)
                 .tokenId;
 
-            // TODO: we lose this account
+            // we lose this IntegrationTestEnv throwaway account
             testEnv.client.close();
         });
     }

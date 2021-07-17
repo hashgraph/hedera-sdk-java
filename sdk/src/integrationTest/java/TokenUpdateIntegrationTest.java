@@ -99,7 +99,7 @@ class TokenUpdateIntegrationTest {
     @DisplayName("Cannot update immutable token")
     void cannotUpdateImmutableToken() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount(5);
 
             var response = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -121,7 +121,7 @@ class TokenUpdateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.TOKEN_IS_IMMUTABLE.toString()));
 
-            // TODO: I think we're going to lose this account
+            // we lose this IntegrationTestEnv throwaway account
             testEnv.client.close();
         });
     }

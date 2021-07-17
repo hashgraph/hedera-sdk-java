@@ -87,7 +87,7 @@ class TokenInfoIntegrationTest {
     @DisplayName("Can query token with minimal properties")
     void canQueryTokenInfoWhenTokenIsCreatedWithMinimalProperties() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = IntegrationTestEnv.withThrowawayAccount(5);
 
             var response = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -117,8 +117,7 @@ class TokenInfoIntegrationTest {
             assertEquals(info.tokenType, TokenType.FUNGIBLE_COMMON);
             assertEquals(info.supplyType, TokenSupplyType.INFINITE);
 
-
-            // TODO: we lose this account
+            // we lose this IntegrationTestEnv throwaway account
             testEnv.client.close();
         });
     }
@@ -161,7 +160,7 @@ class TokenInfoIntegrationTest {
             assertEquals(info.decimals, 0);
             assertEquals(info.totalSupply, 10);
             assertEquals(testEnv.operatorId, info.treasuryAccountId);
-            assertNull(info.adminKey);
+            assertNotNull(info.adminKey);
             assertNull(info.freezeKey);
             assertNull(info.wipeKey);
             assertNull(info.kycKey);

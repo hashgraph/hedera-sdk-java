@@ -91,19 +91,16 @@ public class IntegrationTestEnv {
             while(true) {
                 var node = nodes.get(index);
                 try {
-                    var accountBalance = new AccountBalanceQuery()
+                    new AccountBalanceQuery()
                         .setNodeAccountIds(Collections.singletonList(node.getValue()))
                         .setMaxAttempts(1)
                         .setAccountId(client.getOperatorAccountId())
                         .execute(client);
                     nodes.remove(index);
-                    System.out.println("Account balance: " + accountBalance.hbars);
-                    System.out.println("Picked node: " + node.getValue());
                     outMap.put(node.getKey(), node.getValue());
                     return;
                 } catch(Exception exc) {
                 }
-                System.out.println("Node " + node + " failed");
                 index++;
                 if(index >= nodes.size()) {
                     attempts++;
@@ -145,21 +142,16 @@ public class IntegrationTestEnv {
             .setKey(key)
             .execute(client);
         var nodeId = response.nodeId;
-        System.out.println("Picked node: " + nodeId);
         client.setOperator(response.getReceipt(client).accountId, key);
         var inverseNetwork = HashBiMap.create(client.getNetwork()).inverse();
         var newNetwork = new HashMap<String, AccountId>();
         newNetwork.put(Objects.requireNonNull(inverseNetwork.get(nodeId)), nodeId);
         client.setNetwork(newNetwork);
-        var accountBalance = new AccountBalanceQuery()
-            .setAccountId(originalOperatorId)
-            .execute(client);
-        System.out.println("Account balance: " + accountBalance.hbars);
         return new IntegrationTestEnv(client, originalOperatorId);
     }
 
     public static IntegrationTestEnv withThrowawayAccount() throws Exception {
-        return withThrowawayAccount(5);
+        return withThrowawayAccount(20);
     }
 
     public void cleanUpAndClose(
