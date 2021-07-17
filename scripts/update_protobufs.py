@@ -44,6 +44,7 @@ PROTO_OUT_PATH = os.path.join(MAIN_PATH, "proto")
 JAVA_OUT_PATH = os.path.join(MAIN_PATH, "java", "com", "hedera", "hashgraph", "sdk")
 REQUEST_TYPE_OUT_PATH = os.path.join(JAVA_OUT_PATH, "RequestType.java")
 STATUS_OUT_PATH = os.path.join(JAVA_OUT_PATH, "Status.java")
+FEE_DATA_TYPE_OUT_PATH = os.path.join(JAVA_OUT_PATH, "FeeDataType.java")
 
 
 PROTO_DO_NOT_REMOVE = (
@@ -87,6 +88,8 @@ def main():
     generate_RequestType()
     print(">>> Generating Status.java")
     generate_Status()
+    print(">>> Generating FeeDataType.java")
+    generate_FeeDataType()
     print(">>> Clearing proto output directory")
     clear_proto_dir()
     print(">>> Generating modified proto files")
@@ -140,6 +143,15 @@ def generate_Status():
     output_java_file(STATUS_OUT_PATH, Status_sections)
 
 
+def generate_FeeDataType():
+    parse_file(
+        BASIC_TYPES_PATH,
+        "SubType",
+        add_to_FeeDataType,
+        finalize_FeeDataType)
+    output_java_file(FEE_DATA_TYPE_OUT_PATH, FeeDataType_sections)
+
+
 def clear_proto_dir():
     for name in os.listdir(PROTO_OUT_PATH):
         if name in PROTO_DO_NOT_REMOVE:
@@ -186,6 +198,17 @@ Status_sections = [
 ]
 
 
+FeeDataType_sections = [
+    premade("FeeDataType", 0),
+    "",
+    premade("FeeDataType", 2),
+    "",
+    premade("FeeDataType", 4),
+    "",
+    premade("FeeDataType", 6)
+]
+
+
 def output_java_file(out_path, section_list):
     out_file = open(out_path, "w")
     for section in section_list:
@@ -210,6 +233,13 @@ def add_to_Status(original_name, cap_snake_name, comment_lines):
     Status_sections[3] += generate_valueOf(original_name, cap_snake_name, 3)
 
 
+def add_to_FeeDataType(original_name, cap_snake_name, comment_lines):
+    FeeDataType_sections[1] += \
+        generate_enum(original_name, cap_snake_name, comment_lines, "SubType", 1)
+    FeeDataType_sections[3] += generate_valueOf(original_name, cap_snake_name, 3)
+    FeeDataType_sections[5] += generate_toString(original_name, cap_snake_name, 3)
+
+
 def replace_last_enum_comma(s):
     return s[0:-3] + ";\n\n"
 
@@ -220,6 +250,10 @@ def finalize_RequestType():
 
 def finalize_Status():
     Status_sections[1] = replace_last_enum_comma(Status_sections[1])
+
+
+def finalize_FeeDataType():
+    FeeDataType_sections[1] = replace_last_enum_comma(FeeDataType_sections[1])
 
 
 
