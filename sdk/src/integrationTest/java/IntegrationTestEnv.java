@@ -128,6 +128,7 @@ public class IntegrationTestEnv {
         nodeGetter.nextNode(network);
         nodeGetter.nextNode(network);
         client.setNetwork(network);
+        client.setMaxNodesPerTransaction(2);
         return new IntegrationTestEnv(client, client.getOperatorAccountId());
     }
 
