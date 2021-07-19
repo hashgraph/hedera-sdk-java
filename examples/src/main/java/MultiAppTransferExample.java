@@ -1,5 +1,15 @@
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.AccountBalanceQuery;
+import com.hedera.hashgraph.sdk.AccountCreateTransaction;
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hedera.hashgraph.sdk.Transaction;
+import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.TransferTransaction;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
@@ -10,8 +20,8 @@ public final class MultiAppTransferExample {
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
-    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK");
-    private static final String CONFIG_FILE = Dotenv.load().get("CONFIG_FILE");
+    // HEDERA_NETWORK defaults to testnet if not specified in dotenv
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
     // the exchange should possess this key, we're only generating it for demonstration purposes
     private static final PrivateKey exchangeKey = PrivateKey.generate();
@@ -20,21 +30,11 @@ public final class MultiAppTransferExample {
     private static final Client client;
 
     static {
-        Client c;
-
-        if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {
-            c = Client.forPreviewnet();
-        } else {
-            try {
-                c = Client.fromConfigFile(CONFIG_FILE != null ? CONFIG_FILE : "");
-            } catch (Exception e) {
-                c = Client.forTestnet();
-            }
-        }
+        client = Client.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
-        client = c.setOperator(OPERATOR_ID, OPERATOR_KEY);
+        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
     }
 
     private MultiAppTransferExample() {

@@ -1,9 +1,22 @@
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.Objects;
 
-import com.hedera.hashgraph.sdk.*;
+import com.google.errorprone.annotations.Var;
+import com.hedera.hashgraph.sdk.AccountCreateTransaction;
+import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
+import com.hedera.hashgraph.sdk.TokenCreateTransaction;
+import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
+import com.hedera.hashgraph.sdk.TokenGrantKycTransaction;
+import com.hedera.hashgraph.sdk.TokenId;
+import com.hedera.hashgraph.sdk.TokenWipeTransaction;
+import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.TransferTransaction;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public final class TransferTokensExample {
@@ -12,24 +25,14 @@ public final class TransferTokensExample {
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
-    private static final String CONFIG_FILE = Dotenv.load().get("CONFIG_FILE");
-    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK");
+    // HEDERA_NETWORK defaults to testnet if not specified in dotenv
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
     private TransferTokensExample() {
     }
 
     public static void main(String[] args) throws Exception {
-        Client client;
-
-        if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {
-            client = Client.forPreviewnet();
-        } else {
-            try {
-                client = Client.fromConfigFile(CONFIG_FILE != null ? CONFIG_FILE : "");
-            } catch (Exception e) {
-                client = Client.forTestnet();
-            }
-        }
+        Client client = Client.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
@@ -44,14 +47,14 @@ public final class TransferTokensExample {
         System.out.println("private key = " + key2);
         System.out.println("public key = " + key2.getPublicKey());
 
-        TransactionResponse response = new AccountCreateTransaction()
+        @Var TransactionResponse response = new AccountCreateTransaction()
             // The only _required_ property here is `key`
             .setKey(key1.getPublicKey())
             .setInitialBalance(Hbar.fromTinybars(1000))
             .execute(client);
 
         // This will wait for the receipt to become available
-        TransactionReceipt receipt = response.getReceipt(client);
+        @Var TransactionReceipt receipt = response.getReceipt(client);
 
         AccountId accountId1 = Objects.requireNonNull(receipt.accountId);
 

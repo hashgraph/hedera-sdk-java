@@ -1,7 +1,15 @@
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.PublicKey;
+import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hedera.hashgraph.sdk.TopicCreateTransaction;
+import com.hedera.hashgraph.sdk.TopicId;
+import com.hedera.hashgraph.sdk.TopicMessageQuery;
+import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
+import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
-import java8.util.Lists;
 import org.threeten.bp.Instant;
 
 import java.nio.charset.StandardCharsets;
@@ -17,13 +25,21 @@ import java.util.concurrent.TimeoutException;
  * Publishes a number of messages to the topic signed by the submitKey.
  */
 public class ConsensusPubSubWithSubmitKeyExample {
+
+    // see `.env.sample` in the repository root for how to specify these values
+    // or set environment variables with the same names
+    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    // HEDERA_NETWORK defaults to testnet if not specified in dotenv
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
+
     private final int messagesToPublish;
     private final int millisBetweenMessages;
     private Client client;
     private TopicId topicId;
     private PrivateKey submitKey;
 
-    public ConsensusPubSubWithSubmitKeyExample(int messagesToPublish, int millisBetweenMessages) throws InterruptedException {
+    public ConsensusPubSubWithSubmitKeyExample(int messagesToPublish, int millisBetweenMessages) {
         this.messagesToPublish = messagesToPublish;
         this.millisBetweenMessages = millisBetweenMessages;
         setupClient();
@@ -42,33 +58,12 @@ public class ConsensusPubSubWithSubmitKeyExample {
         publishMessagesToTopic();
     }
 
-    private void setupClient() throws InterruptedException {
-        // Transaction payer's account ID and ED25519 private key.
-        AccountId payerId = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
-        PrivateKey payerPrivateKey =
-            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
-
-        String hederaNetwork = Dotenv.load().get("HEDERA_NETWORK");
-        String configFile = Dotenv.load().get("CONFIG_FILE");
-
-        Client c;
-
-        if (hederaNetwork != null && hederaNetwork.equals("previewnet")) {
-            c = Client.forPreviewnet();
-        } else {
-            try {
-                c = Client.fromConfigFile(configFile != null ? configFile : "");
-            } catch (Exception e) {
-                c = Client.forTestnet();
-            }
-        }
+    private void setupClient() {
+        client = Client.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for by this
         // account and be signed by this key
-        c.setOperator(payerId, payerPrivateKey);
-        c.setMirrorNetwork(Lists.of(Objects.requireNonNull(Dotenv.load().get("MIRROR_NODE_ADDRESS"))));
-
-        client = c;
+        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
     }
 
     /**
