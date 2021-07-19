@@ -24,7 +24,6 @@ public class FileAppendIntegrationTest {
             var testEnv = IntegrationTestEnv.withTwoNodes();
 
             var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .setKeys(testEnv.operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
                 .execute(testEnv.client);
@@ -32,7 +31,6 @@ public class FileAppendIntegrationTest {
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
             @Var var info = new FileInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .setFileId(fileId)
                 .execute(testEnv.client);
 
@@ -45,14 +43,12 @@ public class FileAppendIntegrationTest {
 
             new FileAppendTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .setContents("[e2e::FileAppendTransaction]")
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             info = new FileInfoQuery()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
@@ -64,7 +60,6 @@ public class FileAppendIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -80,7 +75,6 @@ public class FileAppendIntegrationTest {
             var testEnv = IntegrationTestEnv.withTwoNodes();
 
             var response = new FileCreateTransaction()
-                //.setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .setKeys(testEnv.operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
                 .execute(testEnv.client);
@@ -88,7 +82,6 @@ public class FileAppendIntegrationTest {
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
             @Var var info = new FileInfoQuery()
-                //.setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .setFileId(fileId)
                 .execute(testEnv.client);
 
@@ -101,14 +94,12 @@ public class FileAppendIntegrationTest {
 
             new FileAppendTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .setContents(Contents.BIG_CONTENTS)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             info = new FileInfoQuery()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
@@ -120,7 +111,6 @@ public class FileAppendIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                //.setNodeAccountIds(testEnv.nodeAccountIdsForChunked)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
