@@ -41,7 +41,7 @@ public final class Hbar implements Comparable<Hbar> {
 
     Hbar(BigDecimal amount, HbarUnit unit) {
         var tinybars = amount.multiply(BigDecimal.valueOf(unit.tinybar));
-
+        
         if (tinybars.doubleValue() % 1 != 0) {
             throw new IllegalArgumentException("Amount and Unit combination results in a fractional value for tinybar.  Ensure tinybar value is a whole number.");
         }
@@ -64,6 +64,28 @@ public final class Hbar implements Comparable<Hbar> {
      */
     public static final Hbar MIN = Hbar.from(-50_000_000_000L);
 
+    private static int findNumber(CharSequence text) {
+        for(int i = 0; i < text.length(); i++) {
+            var c = text.charAt(i);
+            if(Character.isDigit(c) || c == '+' || c == '-') {
+                return i;
+            }
+        }
+        throw new IllegalArgumentException("Attempted to convert string \"" + text + "\" to Hbar, but no number was found");
+    }
+
+    private static HbarUnit getUnit(String symbolString) {
+        if(symbolString.length() == 0) {
+            return HbarUnit.HBAR;
+        }
+        for(var unit : HbarUnit.values()) {
+            if(unit.getSymbol().equals(symbolString)) {
+                return unit;
+            }
+        }
+        throw new IllegalArgumentException("Attempted to convert string to Hbar, but symbol \"" + symbolString + "\" was not recognized");
+    }
+
     /**
      * Converts the provided string into an amount of hbars.
      *
@@ -71,7 +93,10 @@ public final class Hbar implements Comparable<Hbar> {
      * @return {@link com.hedera.hashgraph.sdk.Hbar}
      */
     public static Hbar fromString(CharSequence text) {
-        return new Hbar(new BigDecimal(text.toString()), HbarUnit.HBAR);
+        int number_i = findNumber(text);
+        String symbolString = text.subSequence(0, number_i).toString().trim();
+        String numberString = text.subSequence(number_i, text.length()).toString().trim();
+        return new Hbar(new BigDecimal(numberString), getUnit(symbolString));
     }
 
     /**

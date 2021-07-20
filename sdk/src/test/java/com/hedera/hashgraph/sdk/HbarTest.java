@@ -83,7 +83,9 @@ public class HbarTest {
 
     @Test
     void fromString() {
-        assertEquals(Hbar.fromString("1").toTinybars(), 100000000);
+        assertEquals(Hbar.fromString("1").toTinybars(), 100_000_000);
+        assertEquals(Hbar.fromString("ℏ 1").toTinybars(), 100_000_000);
+        assertEquals(Hbar.fromString("mℏ1").toTinybars(), 100_000);
     }
 
     @Test
