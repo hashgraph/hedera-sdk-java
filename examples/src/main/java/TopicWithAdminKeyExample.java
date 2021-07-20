@@ -2,9 +2,19 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.KeyList;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
-
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hedera.hashgraph.sdk.TopicCreateTransaction;
+import com.hedera.hashgraph.sdk.TopicId;
+import com.hedera.hashgraph.sdk.TopicInfo;
+import com.hedera.hashgraph.sdk.TopicInfoQuery;
+import com.hedera.hashgraph.sdk.TopicUpdateTransaction;
+import com.hedera.hashgraph.sdk.Transaction;
+import com.hedera.hashgraph.sdk.TransactionResponse;
 import java8.util.J8Arrays;
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -18,6 +28,14 @@ import javax.annotation.Nullable;
  * Updates the HCS topic to a 3-of-4 threshold key for the adminKey.
  */
 class TopicWithAdminKeyExample {
+
+    // see `.env.sample` in the repository root for how to specify these values
+    // or set environment variables with the same names
+    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    // HEDERA_NETWORK defaults to testnet if not specified in dotenv
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
+
     private Client hapiClient;
 
     @Nullable
@@ -40,29 +58,11 @@ class TopicWithAdminKeyExample {
     }
 
     private void setupHapiClient() {
-        // Transaction payer's account ID and ED25519 private key.
-        AccountId payerId = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
-        PrivateKey payerPrivateKey =
-            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
-
-        String hederaNetwork = Dotenv.load().get("HEDERA_NETWORK");
-        String configFile = Dotenv.load().get("CONFIG_FILE");
-
-        Client client;
-
-        if (hederaNetwork != null && hederaNetwork.equals("previewnet")) {
-            client = Client.forPreviewnet();
-        } else {
-            try {
-                client = Client.fromConfigFile(configFile != null ? configFile : "");
-            } catch (Exception e) {
-                client = Client.forTestnet();
-            }
-        }
+        hapiClient = Client.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for by this
         // account and be signed by this key
-        hapiClient = client.setOperator(payerId, payerPrivateKey);
+        hapiClient.setOperator(OPERATOR_ID, OPERATOR_KEY);
     }
 
     private void createTopicWithAdminKey() throws TimeoutException, PrecheckStatusException, ReceiptStatusException {

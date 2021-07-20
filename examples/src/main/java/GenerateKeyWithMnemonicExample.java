@@ -3,8 +3,6 @@ import com.hedera.hashgraph.sdk.Mnemonic;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 
-import java.security.NoSuchAlgorithmException;
-
 class GenerateKeyWithMnemonicExample {
     private GenerateKeyWithMnemonicExample() {
     }
