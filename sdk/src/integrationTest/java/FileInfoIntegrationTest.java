@@ -23,7 +23,7 @@ public class FileInfoIntegrationTest {
     @DisplayName("Can query file info")
     void canQueryFileInfo() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -48,7 +48,7 @@ public class FileInfoIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -56,7 +56,7 @@ public class FileInfoIntegrationTest {
     @DisplayName("Can query file info with no admin key or contents")
     void canQueryFileInfoWithNoAdminKeyOrContents() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
                 .execute(testEnv.client);
@@ -72,7 +72,7 @@ public class FileInfoIntegrationTest {
             assertFalse(info.isDeleted);
             assertNull(info.keys);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -80,7 +80,7 @@ public class FileInfoIntegrationTest {
     @DisplayName("Can get cost, even with a big max")
     void getCostBigMaxQueryFileInfo() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -102,7 +102,7 @@ public class FileInfoIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -110,7 +110,7 @@ public class FileInfoIntegrationTest {
     @DisplayName("Error, max is smaller than set payment.")
     void getCostSmallMaxQueryFileInfo() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -137,7 +137,7 @@ public class FileInfoIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -145,7 +145,7 @@ public class FileInfoIntegrationTest {
     @DisplayName("Insufficient tx fee error.")
     void getCostInsufficientTxFeeQueryFileInfo() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -171,7 +171,7 @@ public class FileInfoIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

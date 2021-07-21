@@ -13,7 +13,7 @@ public class FeeSchedulesTest {
     @DisplayName("FeeSchedules (CurrentAndNextFeeSchedule) is fetched and parsed from file 0.0.111")
     void canFetchFeeSchedules() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             ByteString feeSchedulesBytes = new FileContentsQuery()
                 .setFileId(new FileId(0, 0, 111))
@@ -26,7 +26,7 @@ public class FeeSchedulesTest {
              */
             assertNotNull(feeSchedules.getCurrent());
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

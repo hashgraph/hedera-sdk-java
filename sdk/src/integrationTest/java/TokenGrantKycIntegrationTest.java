@@ -14,7 +14,7 @@ class TokenGrantKycIntegrationTest {
     @DisplayName("Can grant kyc to account with token")
     void canGrantKycAccountWithToken() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
@@ -59,7 +59,7 @@ class TokenGrantKycIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose(tokenId, accountId, key);
+            testEnv.close(tokenId, accountId, key);
         });
     }
 
@@ -67,7 +67,7 @@ class TokenGrantKycIntegrationTest {
     @DisplayName("Cannot grant kyc to account on token when token ID is not set")
     void cannotGrantKycToAccountOnTokenWhenTokenIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
@@ -89,7 +89,7 @@ class TokenGrantKycIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_ID.toString()));
 
-            testEnv.cleanUpAndClose(accountId, key);
+            testEnv.close(accountId, key);
         });
     }
 
@@ -97,7 +97,7 @@ class TokenGrantKycIntegrationTest {
     @DisplayName("Cannot grant kyc to account on token when account ID is not set")
     void cannotGrantKycToAccountOnTokenWhenAccountIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
@@ -128,7 +128,7 @@ class TokenGrantKycIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 
@@ -136,7 +136,7 @@ class TokenGrantKycIntegrationTest {
     @DisplayName("Cannot grant kyc to account on token when account was not associated with")
     void cannotGrantKycToAccountOnTokenWhenAccountWasNotAssociatedWith() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
@@ -177,7 +177,7 @@ class TokenGrantKycIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.TOKEN_NOT_ASSOCIATED_TO_ACCOUNT.toString()));
 
-            testEnv.cleanUpAndClose(tokenId, accountId, key);
+            testEnv.close(tokenId, accountId, key);
         });
     }
 }

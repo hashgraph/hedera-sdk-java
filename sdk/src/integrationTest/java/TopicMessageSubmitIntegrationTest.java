@@ -16,7 +16,7 @@ public class TopicMessageSubmitIntegrationTest {
     @DisplayName("Can submit a topic message")
     void canSubmitATopicMessage() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
@@ -54,7 +54,7 @@ public class TopicMessageSubmitIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -65,7 +65,7 @@ public class TopicMessageSubmitIntegrationTest {
         Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
 
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
@@ -107,7 +107,7 @@ public class TopicMessageSubmitIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -118,7 +118,7 @@ public class TopicMessageSubmitIntegrationTest {
         Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
 
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
@@ -142,7 +142,7 @@ public class TopicMessageSubmitIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TOPIC_ID.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -153,7 +153,7 @@ public class TopicMessageSubmitIntegrationTest {
         Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
 
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
@@ -176,7 +176,7 @@ public class TopicMessageSubmitIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TOPIC_MESSAGE.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

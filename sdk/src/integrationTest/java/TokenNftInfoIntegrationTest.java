@@ -17,7 +17,7 @@ class TokenNftInfoIntegrationTest {
     @DisplayName("Can query NFT info by NftId")
     void canQueryNftInfoByNftId() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var createReceipt = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -54,7 +54,7 @@ class TokenNftInfoIntegrationTest {
             assertEquals(nftInfos.get(0).accountId, testEnv.operatorId);
             assertEquals(nftInfos.get(0).metadata[0], 50);
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 
@@ -62,7 +62,7 @@ class TokenNftInfoIntegrationTest {
     @DisplayName("Can query NFT info by AccountId")
     void canQueryNftInfoByAccountId() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var createReceipt = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -103,7 +103,7 @@ class TokenNftInfoIntegrationTest {
                 assertEquals(info.accountId, testEnv.operatorId);
             }
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 
@@ -111,7 +111,7 @@ class TokenNftInfoIntegrationTest {
     @DisplayName("Can query NFT info by TokenId")
     void canQueryNftInfoByTokenId() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var createReceipt = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -152,7 +152,7 @@ class TokenNftInfoIntegrationTest {
                 assertEquals(info.accountId, testEnv.operatorId);
             }
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 }

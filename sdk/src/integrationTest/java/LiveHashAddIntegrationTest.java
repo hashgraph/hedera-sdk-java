@@ -19,7 +19,7 @@ class LiveHashAddIntegrationTest {
     @DisplayName("Cannot create live hash because it's not supported")
     void cannotCreateLiveHashBecauseItsNotSupported() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
@@ -42,7 +42,7 @@ class LiveHashAddIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
 
-            testEnv.cleanUpAndClose(accountId, key);
+            testEnv.close(accountId, key);
         });
     }
 }

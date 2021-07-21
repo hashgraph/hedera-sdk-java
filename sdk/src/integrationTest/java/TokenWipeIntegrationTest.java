@@ -15,7 +15,7 @@ class TokenWipeIntegrationTest {
     @DisplayName("Can wipe accounts balance")
     void canWipeAccountsBalance() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -71,7 +71,7 @@ class TokenWipeIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose(tokenId, accountId, key);
+            testEnv.close(tokenId, accountId, key);
         });
     }
 
@@ -80,7 +80,7 @@ class TokenWipeIntegrationTest {
     @DisplayName("Can wipe accounts NFTs")
     void canWipeAccountsNfts() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -142,7 +142,7 @@ class TokenWipeIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose(tokenId, accountId, key);
+            testEnv.close(tokenId, accountId, key);
         });
     }
 
@@ -150,7 +150,7 @@ class TokenWipeIntegrationTest {
     @DisplayName("Cannot wipe accounts balance when account ID is not set")
     void cannotWipeAccountsBalanceWhenAccountIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -209,7 +209,7 @@ class TokenWipeIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
 
-            testEnv.cleanUpAndClose(tokenId, accountId, key);
+            testEnv.close(tokenId, accountId, key);
         });
     }
 
@@ -217,7 +217,7 @@ class TokenWipeIntegrationTest {
     @DisplayName("Cannot wipe accounts balance when token ID is not set")
     void cannotWipeAccountsBalanceWhenTokenIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -276,7 +276,7 @@ class TokenWipeIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_ID.toString()));
 
-            testEnv.cleanUpAndClose(tokenId, accountId, key);
+            testEnv.close(tokenId, accountId, key);
         });
     }
 
@@ -284,7 +284,7 @@ class TokenWipeIntegrationTest {
     @DisplayName("Cannot wipe accounts balance when amount is not set")
     void cannotWipeAccountsBalanceWhenAmountIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -343,7 +343,7 @@ class TokenWipeIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_WIPING_AMOUNT.toString()));
 
-            testEnv.cleanUpAndClose(tokenId, accountId, key);
+            testEnv.close(tokenId, accountId, key);
         });
     }
 }

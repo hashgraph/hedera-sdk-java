@@ -15,7 +15,7 @@ public class TopicInfoIntegrationTest {
     @DisplayName("Can query topic info")
     void canQueryTopicInfo() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
@@ -35,7 +35,7 @@ public class TopicInfoIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -43,7 +43,7 @@ public class TopicInfoIntegrationTest {
     @DisplayName("Can get cost for topic info query")
     void getCostQueryTopicInfo() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
@@ -68,7 +68,7 @@ public class TopicInfoIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -76,7 +76,7 @@ public class TopicInfoIntegrationTest {
     @DisplayName("Can get cost for topic info query")
     void getCostBigMaxQueryTopicInfo() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
@@ -102,7 +102,7 @@ public class TopicInfoIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -110,7 +110,7 @@ public class TopicInfoIntegrationTest {
     @DisplayName("Can get cost for topic info query")
     void getCostSmallMaxQueryTopicInfo() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
@@ -138,7 +138,7 @@ public class TopicInfoIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -146,7 +146,7 @@ public class TopicInfoIntegrationTest {
     @DisplayName("Can get cost for topic info query")
     void getCostInsufficientTxFeeQueryTopicInfo() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
@@ -173,7 +173,7 @@ public class TopicInfoIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 

@@ -18,7 +18,7 @@ class AccountUpdateIntegrationTest {
     @DisplayName("Can update account with a new key")
     void canUpdateAccountWithNewKey() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key1 = PrivateKey.generate();
             var key2 = PrivateKey.generate();
@@ -62,7 +62,7 @@ class AccountUpdateIntegrationTest {
             assertNull(info.proxyAccountId);
             assertEquals(info.proxyReceived, Hbar.ZERO);
 
-            testEnv.cleanUpAndClose(accountId, key2);
+            testEnv.close(accountId, key2);
         });
     }
 
@@ -70,7 +70,7 @@ class AccountUpdateIntegrationTest {
     @DisplayName("Cannot update account when account ID is not set")
     void cannotUpdateAccountWhenAccountIdIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new AccountUpdateTransaction()
@@ -80,7 +80,7 @@ class AccountUpdateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

@@ -18,7 +18,7 @@ public class ContractCreateIntegrationTest {
     @DisplayName("Can create contract")
     void canCreateContract() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -59,7 +59,7 @@ public class ContractCreateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -67,7 +67,7 @@ public class ContractCreateIntegrationTest {
     @DisplayName("Can create contract with no admin key")
     void canCreateContractWithNoAdminKey() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -97,7 +97,7 @@ public class ContractCreateIntegrationTest {
             assertEquals(info.storage, 926);
             assertEquals(info.contractMemo, "[e2e::ContractCreateTransaction]");
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -105,7 +105,7 @@ public class ContractCreateIntegrationTest {
     @DisplayName("Cannot create contract when gas is not set")
     void cannotCreateContractWhenGasIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -131,7 +131,7 @@ public class ContractCreateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -139,7 +139,7 @@ public class ContractCreateIntegrationTest {
     @DisplayName("Cannot create contract when constructor parameters are not set")
     void cannotCreateContractWhenConstructorParametersAreNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -165,7 +165,7 @@ public class ContractCreateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -173,7 +173,7 @@ public class ContractCreateIntegrationTest {
     @DisplayName("Cannot create contract when bytecode file ID is not set")
     void cannotCreateContractWhenBytecodeFileIdIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new ContractCreateTransaction()
@@ -187,7 +187,7 @@ public class ContractCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_FILE_ID.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

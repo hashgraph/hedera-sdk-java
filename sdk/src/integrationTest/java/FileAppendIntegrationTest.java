@@ -21,7 +21,7 @@ public class FileAppendIntegrationTest {
     void canAppendToFile() {
         assertDoesNotThrow(() -> {
             // There are potential bugs in FileAppendTransaction which require more than one node to trigger.
-            var testEnv = IntegrationTestEnv.withTwoNodes();
+            var testEnv = new IntegrationTestEnv(2);
 
             var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -63,7 +63,7 @@ public class FileAppendIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -72,7 +72,7 @@ public class FileAppendIntegrationTest {
     void canAppendLargeContentsToFile() {
         assertDoesNotThrow(() -> {
             // There are potential bugs in FileAppendTransaction which require more than one node to trigger.
-            var testEnv = IntegrationTestEnv.withTwoNodes();
+            var testEnv = new IntegrationTestEnv(2);
 
             var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -114,7 +114,7 @@ public class FileAppendIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

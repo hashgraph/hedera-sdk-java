@@ -15,7 +15,7 @@ class TokenMintIntegrationTest {
     @DisplayName("Can mint tokens")
     void canMintTokens() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
@@ -43,7 +43,7 @@ class TokenMintIntegrationTest {
 
             assertEquals(receipt.totalSupply, 1000000 + 10);
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 
@@ -51,7 +51,7 @@ class TokenMintIntegrationTest {
     @DisplayName("Cannot mint tokens when token ID is not set")
     void cannotMintTokensWhenTokenIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenMintTransaction()
@@ -62,7 +62,7 @@ class TokenMintIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_ID.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -70,7 +70,7 @@ class TokenMintIntegrationTest {
     @DisplayName("Cannot mint tokens when amount is not set")
     void cannotMintTokensWhenAmountIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
@@ -99,7 +99,7 @@ class TokenMintIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_MINT_AMOUNT.toString()));
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 
@@ -107,7 +107,7 @@ class TokenMintIntegrationTest {
     @DisplayName("Cannot mint tokens when supply key does not sign transaction")
     void cannotMintTokensWhenSupplyKeyDoesNotSignTransaction() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -146,7 +146,7 @@ class TokenMintIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            testEnv.cleanUpAndClose(tokenId, accountId, key);
+            testEnv.close(tokenId, accountId, key);
         });
     }
 
@@ -155,7 +155,7 @@ class TokenMintIntegrationTest {
     @DisplayName("Can mint NFTs")
     void canMintNfts() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
@@ -182,7 +182,7 @@ class TokenMintIntegrationTest {
 
             assertEquals(receipt.serials.size(), 10);
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 }

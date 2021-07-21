@@ -18,7 +18,7 @@ class AccountDeleteIntegrationTest {
     @DisplayName("Can delete account")
     void canDeleteAccount() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
@@ -41,7 +41,7 @@ class AccountDeleteIntegrationTest {
             assertNull(info.proxyAccountId);
             assertEquals(info.proxyReceived, Hbar.ZERO);
 
-            testEnv.cleanUpAndClose(accountId, key);
+            testEnv.close(accountId, key);
         });
     }
 
@@ -49,7 +49,7 @@ class AccountDeleteIntegrationTest {
     @DisplayName("Cannot delete invalid account ID")
     void cannotCreateAccountWithNoKey() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new AccountDeleteTransaction()
@@ -60,7 +60,7 @@ class AccountDeleteIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.ACCOUNT_ID_DOES_NOT_EXIST.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -68,7 +68,7 @@ class AccountDeleteIntegrationTest {
     @DisplayName("Cannot delete account that has not signed transaction")
     void cannotDeleteAccountThatHasNotSignedTransaction() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
@@ -89,7 +89,7 @@ class AccountDeleteIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            testEnv.cleanUpAndClose(accountId, key);
+            testEnv.close(accountId, key);
         });
     }
 }

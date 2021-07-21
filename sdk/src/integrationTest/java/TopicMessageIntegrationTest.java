@@ -16,7 +16,7 @@ public class TopicMessageIntegrationTest {
     @DisplayName("Can receive a topic message")
     void canReceiveATopicMessage() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
@@ -65,7 +65,7 @@ public class TopicMessageIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -73,7 +73,7 @@ public class TopicMessageIntegrationTest {
     @DisplayName("Can receive a large topic message")
     void canReceiveALargeTopicMessage() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
@@ -122,7 +122,7 @@ public class TopicMessageIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

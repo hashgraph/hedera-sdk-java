@@ -14,7 +14,7 @@ public class TopicUpdateIntegrationTest {
     @DisplayName("Can update topic")
     void canUpdateTopic() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
@@ -43,7 +43,7 @@ public class TopicUpdateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

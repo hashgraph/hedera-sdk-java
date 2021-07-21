@@ -14,7 +14,7 @@ public class FileContentsIntegrationTest {
     @DisplayName("Can query file contents")
     void canQueryFileContents() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -34,7 +34,7 @@ public class FileContentsIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -42,7 +42,7 @@ public class FileContentsIntegrationTest {
     @DisplayName("Can query empty file contents")
     void canQueryEmptyFileContents() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -61,7 +61,7 @@ public class FileContentsIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -69,7 +69,7 @@ public class FileContentsIntegrationTest {
     @DisplayName("Cannot query file contents when file ID is not set")
     void cannotQueryFileContentsWhenFileIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
            var error = assertThrows(PrecheckStatusException.class, () -> {
                new FileContentsQuery()
@@ -78,7 +78,7 @@ public class FileContentsIntegrationTest {
 
            assertTrue(error.getMessage().contains(Status.INVALID_FILE_ID.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -86,7 +86,7 @@ public class FileContentsIntegrationTest {
     @DisplayName("Can get cost, even with a big max")
     void getCostBigMaxQueryFileContents() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -110,7 +110,7 @@ public class FileContentsIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -118,7 +118,7 @@ public class FileContentsIntegrationTest {
     @DisplayName("Error, max is smaller than set payment.")
     void getCostSmallMaxQueryFileContents() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -144,7 +144,7 @@ public class FileContentsIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -152,7 +152,7 @@ public class FileContentsIntegrationTest {
     @DisplayName("Insufficient tx fee error.")
     void getCostInsufficientTxFeeQueryFileContents() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -178,7 +178,7 @@ public class FileContentsIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

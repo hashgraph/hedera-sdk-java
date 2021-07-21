@@ -14,7 +14,7 @@ class TokenDissociateIntegrationTest {
     @DisplayName("Can dissociate account with token")
     void canAssociateAccountWithToken() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -59,7 +59,7 @@ class TokenDissociateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose(tokenId, accountId, key);
+            testEnv.close(tokenId, accountId, key);
         });
     }
 
@@ -67,7 +67,7 @@ class TokenDissociateIntegrationTest {
     @DisplayName("Can execute token dissociate transaction even when token IDs are not set")
     void canExecuteTokenDissociateTransactionEvenWhenTokenIDsAreNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -85,7 +85,7 @@ class TokenDissociateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose(accountId, key);
+            testEnv.close(accountId, key);
         });
     }
 
@@ -93,7 +93,7 @@ class TokenDissociateIntegrationTest {
     @DisplayName("Cannot dissociate account with tokens when account ID is not set")
     void cannotDissociateAccountWithTokensWhenAccountIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -114,7 +114,7 @@ class TokenDissociateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
 
-            testEnv.cleanUpAndClose(accountId, key);
+            testEnv.close(accountId, key);
         });
     }
 
@@ -122,7 +122,7 @@ class TokenDissociateIntegrationTest {
     @DisplayName("Cannot dissociate account with tokens when account does not sign transaction")
     void cannotDissociateAccountWhenAccountDoesNotSignTransaction() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -161,7 +161,7 @@ class TokenDissociateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            testEnv.cleanUpAndClose(tokenId, accountId, key);
+            testEnv.close(tokenId, accountId, key);
         });
     }
 
@@ -169,7 +169,7 @@ class TokenDissociateIntegrationTest {
     @DisplayName("Cannot dissociate account from token when account was not associated with")
     void cannotDissociateAccountFromTokenWhenAccountWasNotAssociatedWith() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -210,7 +210,7 @@ class TokenDissociateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.TOKEN_NOT_ASSOCIATED_TO_ACCOUNT.toString()));
 
-            testEnv.cleanUpAndClose(tokenId, accountId, key);
+            testEnv.close(tokenId, accountId, key);
         });
     }
 }

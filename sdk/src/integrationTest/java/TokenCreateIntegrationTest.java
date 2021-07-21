@@ -14,7 +14,7 @@ class TokenCreateIntegrationTest {
     @DisplayName("Can create token with operator as all keys")
     void canCreateTokenWithOperatorAsAllKeys() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -33,7 +33,7 @@ class TokenCreateIntegrationTest {
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 
@@ -41,7 +41,7 @@ class TokenCreateIntegrationTest {
     @DisplayName("Can create token with minimal properties set")
     void canCreateTokenWithMinimalPropertiesSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount(5);
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount(new Hbar(5));
 
             var tokenId = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -60,7 +60,7 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create token when token name is not set")
     void cannotCreateTokenWhenTokenNameIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenCreateTransaction()
@@ -73,7 +73,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.MISSING_TOKEN_NAME.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -81,7 +81,7 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create token when token symbol is not set")
     void cannotCreateTokenWhenTokenSymbolIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenCreateTransaction()
@@ -94,7 +94,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.MISSING_TOKEN_SYMBOL.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -102,7 +102,7 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create token when token treasury account ID is not set")
     void cannotCreateTokenWhenTokenTreasuryAccountIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenCreateTransaction()
@@ -115,7 +115,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TREASURY_ACCOUNT_FOR_TOKEN.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -123,7 +123,7 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create token when token treasury account ID does not sign transaction")
     void cannotCreateTokenWhenTokenTreasuryAccountIDDoesNotSignTransaction() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
@@ -137,7 +137,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -145,7 +145,7 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create token when admin key does not sign transaction")
     void cannotCreateTokenWhenAdminKeyDoesNotSignTransaction() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -162,7 +162,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -171,7 +171,7 @@ class TokenCreateIntegrationTest {
     @DisplayName("Can create token with custom fees")
     void canCreateTokenWithCustomFees() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var tokenId = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -191,7 +191,7 @@ class TokenCreateIntegrationTest {
                 .getReceipt(testEnv.client)
                 .tokenId;
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 
@@ -200,7 +200,7 @@ class TokenCreateIntegrationTest {
     @DisplayName("Can create NFT")
     void canCreateNfts() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -217,7 +217,7 @@ class TokenCreateIntegrationTest {
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 }

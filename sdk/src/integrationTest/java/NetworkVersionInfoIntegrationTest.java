@@ -9,12 +9,12 @@ public class NetworkVersionInfoIntegrationTest {
     @DisplayName("Cannot query network version info")
     void cannotQueryNetworkVersionInfo() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             new NetworkVersionInfoQuery()
                 .execute(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

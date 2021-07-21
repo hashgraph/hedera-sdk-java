@@ -14,7 +14,7 @@ class TokenUnfreezeIntegrationTest {
     @DisplayName("Can unfreeze account with token")
     void canUnfreezeAccountWithToken() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -59,7 +59,7 @@ class TokenUnfreezeIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose(tokenId, accountId, key);
+            testEnv.close(tokenId, accountId, key);
         });
     }
 
@@ -67,7 +67,7 @@ class TokenUnfreezeIntegrationTest {
     @DisplayName("Cannot unfreeze account on token when token ID is not set")
     void cannotUnfreezeAccountOnTokenWhenTokenIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -89,7 +89,7 @@ class TokenUnfreezeIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_ID.toString()));
 
-            testEnv.cleanUpAndClose(accountId, key);
+            testEnv.close(accountId, key);
         });
     }
 
@@ -97,7 +97,7 @@ class TokenUnfreezeIntegrationTest {
     @DisplayName("Cannot unfreeze account on token when account ID is not set")
     void cannotUnfreezeAccountOnTokenWhenAccountIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -128,7 +128,7 @@ class TokenUnfreezeIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 
@@ -136,7 +136,7 @@ class TokenUnfreezeIntegrationTest {
     @DisplayName("Cannot unfreeze account on token when account was not associated with")
     void cannotUnfreezeAccountOnTokenWhenAccountWasNotAssociatedWith() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -177,7 +177,7 @@ class TokenUnfreezeIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.TOKEN_NOT_ASSOCIATED_TO_ACCOUNT.toString()));
 
-            testEnv.cleanUpAndClose(tokenId, accountId, key);
+            testEnv.close(tokenId, accountId, key);
         });
     }
 }

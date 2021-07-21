@@ -23,7 +23,7 @@ class AccountCreateIntegrationTest {
     @DisplayName("Can create account with only initial balance and key")
     void canCreateAccountWithOnlyInitialBalanceAndKey() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
@@ -46,7 +46,7 @@ class AccountCreateIntegrationTest {
             assertNull(info.proxyAccountId);
             assertEquals(info.proxyReceived, Hbar.ZERO);
 
-            testEnv.cleanUpAndClose(accountId, key);
+            testEnv.close(accountId, key);
         });
     }
 
@@ -54,7 +54,7 @@ class AccountCreateIntegrationTest {
     @DisplayName("Can create account with no initial balance")
     void canCreateAccountWithNoInitialBalance() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
@@ -76,7 +76,7 @@ class AccountCreateIntegrationTest {
             assertNull(info.proxyAccountId);
             assertEquals(info.proxyReceived, Hbar.ZERO);
 
-            testEnv.cleanUpAndClose(accountId, key);
+            testEnv.close(accountId, key);
         });
     }
 
@@ -84,7 +84,7 @@ class AccountCreateIntegrationTest {
     @DisplayName("Cannot create account with no key")
     void canNotCreateAccountWithNoKey() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new AccountCreateTransaction()
@@ -95,7 +95,7 @@ class AccountCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.KEY_REQUIRED.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

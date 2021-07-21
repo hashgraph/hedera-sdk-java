@@ -13,7 +13,7 @@ public class ReceiptQueryIntegrationTest {
     @DisplayName("Can get Receipt")
     void canGetTransactionReceipt() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
@@ -25,7 +25,7 @@ public class ReceiptQueryIntegrationTest {
                 .setTransactionId(response.transactionId)
                 .execute(testEnv.client);
 
-            testEnv.cleanUpAndClose(receipt.accountId, key);
+            testEnv.close(receipt.accountId, key);
         });
     }
 
@@ -33,7 +33,7 @@ public class ReceiptQueryIntegrationTest {
     @DisplayName("Can get Record")
     void canGetTransactionRecord() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
@@ -48,7 +48,7 @@ public class ReceiptQueryIntegrationTest {
                 .setTransactionId(response.transactionId)
                 .execute(testEnv.client);
 
-            testEnv.cleanUpAndClose(record.receipt.accountId, key);
+            testEnv.close(record.receipt.accountId, key);
         });
     }
 
@@ -56,7 +56,7 @@ public class ReceiptQueryIntegrationTest {
     @DisplayName("Can get Record cost")
     void getCostTransactionRecord() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
@@ -74,7 +74,7 @@ public class ReceiptQueryIntegrationTest {
 
             var record = recordQuery.execute(testEnv.client);
 
-            testEnv.cleanUpAndClose(record.receipt.accountId, key);
+            testEnv.close(record.receipt.accountId, key);
         });
     }
 
@@ -82,7 +82,7 @@ public class ReceiptQueryIntegrationTest {
     @DisplayName("Can get Record cost with big max set")
     void getCostBigMaxTransactionRecord() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
@@ -101,7 +101,7 @@ public class ReceiptQueryIntegrationTest {
 
             var record = recordQuery.execute(testEnv.client);
 
-            testEnv.cleanUpAndClose(record.receipt.accountId, key);
+            testEnv.close(record.receipt.accountId, key);
         });
     }
 
@@ -109,7 +109,7 @@ public class ReceiptQueryIntegrationTest {
     @DisplayName("Error at very small max, getRecord")
     void getCostSmallMaxTransactionRecord() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
@@ -132,7 +132,7 @@ public class ReceiptQueryIntegrationTest {
 
             assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for TransactionRecordQuery, of "+cost.toString()+", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
 
-            testEnv.cleanUpAndClose(receipt.accountId, key);
+            testEnv.close(receipt.accountId, key);
         });
     }
 
@@ -140,7 +140,7 @@ public class ReceiptQueryIntegrationTest {
     @DisplayName("Insufficient transaction fee error for transaction record query")
     void getCostInsufficientTxFeeTransactionRecord() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
@@ -160,7 +160,7 @@ public class ReceiptQueryIntegrationTest {
 
             assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
 
-            testEnv.cleanUpAndClose(receipt.accountId, key);
+            testEnv.close(receipt.accountId, key);
         });
     }
 }

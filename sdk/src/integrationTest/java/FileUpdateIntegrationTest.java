@@ -18,7 +18,7 @@ public class FileUpdateIntegrationTest {
     @DisplayName("Can update file")
     void canUpdateFile() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -60,7 +60,7 @@ public class FileUpdateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -68,7 +68,7 @@ public class FileUpdateIntegrationTest {
     @DisplayName("Cannot update immutable file")
     void cannotUpdateImmutableFile() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
                 .setContents("[e2e::FileCreateTransaction]")
@@ -95,7 +95,7 @@ public class FileUpdateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.UNAUTHORIZED.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -103,7 +103,7 @@ public class FileUpdateIntegrationTest {
     @DisplayName("Cannot update file when file ID is not set")
     void cannotUpdateFileWhenFileIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new FileUpdateTransaction()
@@ -114,7 +114,7 @@ public class FileUpdateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_FILE_ID.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

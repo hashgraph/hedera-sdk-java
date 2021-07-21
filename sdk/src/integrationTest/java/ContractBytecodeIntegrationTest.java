@@ -18,7 +18,7 @@ public class ContractBytecodeIntegrationTest {
     @DisplayName("Can query contract bytecode")
     void canQueryContractBytecode() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -53,7 +53,7 @@ public class ContractBytecodeIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -61,7 +61,7 @@ public class ContractBytecodeIntegrationTest {
     @DisplayName("Can get cost, even with a big max")
     void getCostBigMaxQueryContractBytecode() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -100,7 +100,7 @@ public class ContractBytecodeIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -108,7 +108,7 @@ public class ContractBytecodeIntegrationTest {
     @DisplayName("Error, max is smaller than set payment.")
     void getCostSmallMaxQueryContractBytecode() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -149,7 +149,7 @@ public class ContractBytecodeIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -157,7 +157,7 @@ public class ContractBytecodeIntegrationTest {
     @DisplayName("Insufficient tx fee error.")
     void getCostInsufficientTxFeeQueryContractBytecode() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -198,7 +198,7 @@ public class ContractBytecodeIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -206,7 +206,7 @@ public class ContractBytecodeIntegrationTest {
     @DisplayName("Cannot query contract bytecode when contract ID is not set")
     void cannotQueryContractBytecodeWhenContractIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractByteCodeQuery()
@@ -215,7 +215,7 @@ public class ContractBytecodeIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_CONTRACT_ID.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

@@ -18,7 +18,7 @@ public class ContractUpdateIntegrationTest {
     @DisplayName("Can update contract")
     void canUpdateContract() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
             ;
 
             @Var var response = new FileCreateTransaction()
@@ -78,7 +78,7 @@ public class ContractUpdateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -86,7 +86,7 @@ public class ContractUpdateIntegrationTest {
     @DisplayName("Cannot update contract when contract ID is not set")
     void cannotUpdateContractWhenContractIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractUpdateTransaction()
@@ -97,7 +97,7 @@ public class ContractUpdateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_CONTRACT_ID.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -105,7 +105,7 @@ public class ContractUpdateIntegrationTest {
     @DisplayName("Cannot update contract that is immutable")
     void cannotUpdateContractThatIsImmutable() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -135,7 +135,7 @@ public class ContractUpdateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.MODIFYING_IMMUTABLE_CONTRACT.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

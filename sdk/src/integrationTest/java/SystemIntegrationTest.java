@@ -17,7 +17,7 @@ public class SystemIntegrationTest {
     @DisplayName("All system transactions are not supported")
     void allSystemTransactionsAreNotSupported() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var fileId = Objects.requireNonNull(
                 new FileCreateTransaction()
@@ -73,7 +73,7 @@ public class SystemIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

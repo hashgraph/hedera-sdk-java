@@ -18,7 +18,7 @@ public class FileDeleteIntegrationTest {
     @DisplayName("Can delete file")
     void canDeleteFile() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -43,7 +43,7 @@ public class FileDeleteIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -51,7 +51,7 @@ public class FileDeleteIntegrationTest {
     @DisplayName("Cannot delete immutable file")
     void cannotDeleteImmutableFile() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
                 .setContents("[e2e::FileCreateTransaction]")
@@ -77,7 +77,7 @@ public class FileDeleteIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.UNAUTHORIZED.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

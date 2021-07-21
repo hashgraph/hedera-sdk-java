@@ -29,7 +29,7 @@ public class ClientIntegrationTest {
             network.put("0.testnet.hedera.com:50211", new AccountId(3));
             network.put("1.testnet.hedera.com:50211", new AccountId(4));
 
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             testEnv.client
                 .setMaxQueryPayment(new Hbar(2))
@@ -79,7 +79,7 @@ public class ClientIntegrationTest {
     @DisplayName("`setMaxNodesPerTransaction()`")
     void testMaxNodesPerTransaction() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             testEnv.client.setMaxNodesPerTransaction(1);
 
@@ -90,7 +90,7 @@ public class ClientIntegrationTest {
             assertNotNull(transaction.getNodeAccountIds());
             assertEquals(1, transaction.getNodeAccountIds().size());
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

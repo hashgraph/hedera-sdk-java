@@ -20,7 +20,7 @@ public class ScheduleCreateIntegrationTest {
     @DisplayName("Can create schedule")
     void canCreateSchedule() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
@@ -42,7 +42,7 @@ public class ScheduleCreateIntegrationTest {
 
             assertNotNull(info.executedAt);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -51,7 +51,7 @@ public class ScheduleCreateIntegrationTest {
     @DisplayName("Can get Transaction")
     void canGetTransactionSchedule() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
@@ -74,7 +74,7 @@ public class ScheduleCreateIntegrationTest {
             assertNotNull(info.executedAt);
             assertNotNull(info.getScheduledTransaction());
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -83,7 +83,7 @@ public class ScheduleCreateIntegrationTest {
     @DisplayName("Can create schedule with schedule()")
     void canCreateWithSchedule() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
@@ -107,7 +107,7 @@ public class ScheduleCreateIntegrationTest {
             assertNotNull(info.executedAt);
             assertNotNull(info.getScheduledTransaction());
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -115,7 +115,7 @@ public class ScheduleCreateIntegrationTest {
     @DisplayName("Can sign schedule")
     void canSignSchedule2() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             PrivateKey key1 = PrivateKey.generate();
             PrivateKey key2 = PrivateKey.generate();
@@ -185,7 +185,7 @@ public class ScheduleCreateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -193,7 +193,7 @@ public class ScheduleCreateIntegrationTest {
     @DisplayName("Can schedule token transfer")
     void canScheduleTokenTransfer() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             PrivateKey key = PrivateKey.generate();
 
@@ -252,7 +252,7 @@ public class ScheduleCreateIntegrationTest {
 
             assertEquals(balanceQuery2.tokens.get(tokenId), 10);
 
-            testEnv.cleanUpAndClose(tokenId, accountId, key);
+            testEnv.close(tokenId, accountId, key);
         });
     }
 
@@ -260,7 +260,7 @@ public class ScheduleCreateIntegrationTest {
     @DisplayName("Can schedule topic message")
     void canScheduleTopicMessage() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             // Generate 3 random keys
             var key1 = PrivateKey.generate();
@@ -343,7 +343,7 @@ public class ScheduleCreateIntegrationTest {
 
             assertNotNull(info.executedAt);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

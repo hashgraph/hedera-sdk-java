@@ -19,7 +19,7 @@ public class ContractInfoIntegrationTest {
     @DisplayName("Can query contract info")
     void canQueryContractInfo() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -60,7 +60,7 @@ public class ContractInfoIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -68,7 +68,7 @@ public class ContractInfoIntegrationTest {
     @DisplayName("Can query contract info when admin key is null")
     void canQueryContractInfoWhenAdminKeyIsNull() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -98,7 +98,7 @@ public class ContractInfoIntegrationTest {
             assertEquals(info.storage, 926);
             assertEquals(info.contractMemo, "[e2e::ContractCreateTransaction]");
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -106,7 +106,7 @@ public class ContractInfoIntegrationTest {
     @DisplayName("Cannot query contract info when contract ID is not set")
     void cannotQueryContractInfoWhenContractIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractInfoQuery()
@@ -115,7 +115,7 @@ public class ContractInfoIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_CONTRACT_ID.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -123,7 +123,7 @@ public class ContractInfoIntegrationTest {
     @DisplayName("Can get cost, even with a big max")
     void getCostBigMaxContractInfoFunction() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -161,7 +161,7 @@ public class ContractInfoIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -169,7 +169,7 @@ public class ContractInfoIntegrationTest {
     @DisplayName("Error, max is smaller than set payment.")
     void getCostSmallMaxContractInfoFunction() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -210,7 +210,7 @@ public class ContractInfoIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -218,7 +218,7 @@ public class ContractInfoIntegrationTest {
     @DisplayName("Insufficient tx fee error.")
     void getCostInsufficientTxFeeContractInfoFunction() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -259,7 +259,7 @@ public class ContractInfoIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

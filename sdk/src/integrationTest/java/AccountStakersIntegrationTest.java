@@ -14,7 +14,7 @@ class AccountStakersIntegrationTest {
     @DisplayName("Cannot query account stakers since it is not supported")
     void cannotQueryAccountStakersSinceItIsNotSupported() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new AccountStakersQuery()
@@ -25,7 +25,7 @@ class AccountStakersIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }
