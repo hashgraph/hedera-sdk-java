@@ -20,7 +20,7 @@ public class FileCreateIntegrationTest {
     @DisplayName("Can create file")
     void canCreateFile() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -45,7 +45,7 @@ public class FileCreateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -53,7 +53,7 @@ public class FileCreateIntegrationTest {
     @DisplayName("Can create file with no contents")
     void canCreateFileWithNoContents() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -77,7 +77,7 @@ public class FileCreateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -85,7 +85,7 @@ public class FileCreateIntegrationTest {
     @DisplayName("Can create file with no keys")
     void canCreateFileWithNoKeys() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
                 .execute(testEnv.client);
@@ -101,7 +101,7 @@ public class FileCreateIntegrationTest {
             assertFalse(info.isDeleted);
             assertNull(info.keys);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

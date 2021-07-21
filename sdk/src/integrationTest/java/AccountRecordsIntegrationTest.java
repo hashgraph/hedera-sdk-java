@@ -12,7 +12,7 @@ class AccountRecordsIntegrationTest {
     @DisplayName("Can query account records")
     void canQueryAccountRecords() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
@@ -42,7 +42,7 @@ class AccountRecordsIntegrationTest {
 
             assertTrue(!records.isEmpty());
 
-            testEnv.cleanUpAndClose(accountId, key);
+            testEnv.close(accountId, key);
         });
     }
 }

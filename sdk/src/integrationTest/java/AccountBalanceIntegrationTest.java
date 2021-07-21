@@ -20,7 +20,7 @@ class AccountBalanceIntegrationTest {
     @DisplayName("Can fetch balance for client operator")
     void canFetchBalanceForClientOperator() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var balance = new AccountBalanceQuery()
                 .setAccountId(testEnv.operatorId)
@@ -28,7 +28,7 @@ class AccountBalanceIntegrationTest {
 
             assertTrue(balance.hbars.toTinybars() > 0);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -36,7 +36,7 @@ class AccountBalanceIntegrationTest {
     @DisplayName("Can fetch cost for the query")
     void getCostBalanceForClientOperator() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var balance = new AccountBalanceQuery()
                 .setAccountId(testEnv.operatorId)
@@ -49,7 +49,7 @@ class AccountBalanceIntegrationTest {
             assertTrue(accBalance.hbars.toTinybars() > 0);
             assertEquals(cost.toTinybars(), 0);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -57,7 +57,7 @@ class AccountBalanceIntegrationTest {
     @DisplayName("Can fetch cost for the query, big max set")
     void getCostBigMaxBalanceForClientOperator() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var balance = new AccountBalanceQuery()
                 .setAccountId(testEnv.operatorId)
@@ -69,7 +69,7 @@ class AccountBalanceIntegrationTest {
 
             assertTrue(accBalance.hbars.toTinybars() > 0);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -77,7 +77,7 @@ class AccountBalanceIntegrationTest {
     @DisplayName("Can fetch cost for the query, very small max set")
     void getCostSmallMaxBalanceForClientOperator() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var balance = new AccountBalanceQuery()
                 .setAccountId(testEnv.operatorId)
@@ -89,7 +89,7 @@ class AccountBalanceIntegrationTest {
 
             assertTrue(accBalance.hbars.toTinybars() > 0);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -97,7 +97,7 @@ class AccountBalanceIntegrationTest {
     @DisplayName("Cannot fetch balance for invalid account ID")
     void canNotFetchBalanceForInvalidAccountId() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new AccountBalanceQuery()
@@ -107,7 +107,7 @@ class AccountBalanceIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -115,7 +115,7 @@ class AccountBalanceIntegrationTest {
     @DisplayName("Can fetch token balances for client operator")
     void canFetchTokenBalancesForClientOperator() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -137,7 +137,7 @@ class AccountBalanceIntegrationTest {
             assertEquals(balance.tokens.get(tokenId), 10000);
             assertEquals(balance.tokenDecimals.get(tokenId), 50);
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 }

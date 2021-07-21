@@ -1,15 +1,6 @@
 import com.google.common.collect.HashBiMap;
 import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
-import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
-import com.hedera.hashgraph.sdk.TokenId;
+import com.hedera.hashgraph.sdk.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,28 +10,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.TimeoutException;
 import javax.annotation.Nullable;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 public class IntegrationTestEnv {
+    public static Random random = new Random();
+
     public Client client;
     public PublicKey operatorKey;
     public AccountId operatorId;
-    public static Random random = new Random();
     private AccountId originalOperatorId;
 
-    private IntegrationTestEnv(Client client, AccountId originalOperatorId) {
-        this.client = client;
-        this.operatorKey = client.getOperatorPublicKey();
+    public IntegrationTestEnv(int numberOfNodes) throws Exception {
+        client = createTestEnvClient()
+            .setMaxNodesPerTransaction(numberOfNodes);
+        operatorKey = client.getOperatorPublicKey();
         operatorId = client.getOperatorAccountId();
-        this.originalOperatorId = originalOperatorId;
+        originalOperatorId = operatorId;
 
         try {
             var operatorPrivateKey = PrivateKey.fromString(System.getProperty("OPERATOR_KEY"));
-            operatorKey = operatorPrivateKey.getPublicKey();
             operatorId = AccountId.fromString(System.getProperty("OPERATOR_ID"));
+            operatorKey = operatorPrivateKey.getPublicKey();
 
             client.setOperator(operatorId, operatorPrivateKey);
         } catch (Exception e) {
@@ -48,6 +42,13 @@ public class IntegrationTestEnv {
 
         assertNotNull(client.getOperatorAccountId());
         assertNotNull(client.getOperatorPublicKey());
+
+        var nodeGetter = new TestEnvNodeGetter(client);
+        var network = new HashMap<String, AccountId>();
+        for(@Var int i = 0; i < numberOfNodes; i++) {
+            nodeGetter.nextNode(network);
+        }
+        client.setNetwork(network);
     }
 
     private static Client createTestEnvClient() {
@@ -72,8 +73,8 @@ public class IntegrationTestEnv {
 
     private static class TestEnvNodeGetter {
         private Client client;
+        @Var
         private int index = 0;
-        private static final int MAX_ATTEMPTS = 10;
         private List<Map.Entry<String, AccountId>> nodes;
 
         public TestEnvNodeGetter(Client client) {
@@ -86,9 +87,7 @@ public class IntegrationTestEnv {
             if(nodes.isEmpty()) {
                 throw new IllegalStateException("IntegrationTestEnv needs another node, but there aren't enough nodes in client network");
             }
-            @Var
-            int attempts = 0;
-            while(true) {
+            for(; index < nodes.size(); index++) {
                 var node = nodes.get(index);
                 try {
                     new AccountBalanceQuery()
@@ -99,63 +98,31 @@ public class IntegrationTestEnv {
                     nodes.remove(index);
                     outMap.put(node.getKey(), node.getValue());
                     return;
-                } catch(Exception exc) {
-                }
-                index++;
-                if(index >= nodes.size()) {
-                    attempts++;
-                    if(attempts >= MAX_ATTEMPTS) {
-                        throw new Exception("Failed to find working node in " + nodes + " for IntegrationTestEnv within " + MAX_ATTEMPTS + " attempts.");
-                    }
-                    index = 0;
+                } catch(Exception ignored) {
                 }
             }
+            throw new Exception("Failed to find working node in " + nodes + " for IntegrationTestEnv");
         }
     }
 
-    public static IntegrationTestEnv withOneNode() throws Exception {
-        var client = createTestEnvClient();
-        var network = new HashMap<String, AccountId>();
-        new TestEnvNodeGetter(client).nextNode(network);
-        client.setNetwork(network);
-        return new IntegrationTestEnv(client, client.getOperatorAccountId());
-    }
-
-    public static IntegrationTestEnv withTwoNodes() throws Exception {
-        var client = createTestEnvClient();
-        var network = new HashMap<String, AccountId>();
-        var nodeGetter = new TestEnvNodeGetter(client);
-        nodeGetter.nextNode(network);
-        nodeGetter.nextNode(network);
-        client.setNetwork(network);
-        client.setMaxNodesPerTransaction(2);
-        return new IntegrationTestEnv(client, client.getOperatorAccountId());
-    }
-
-    // A throwaway account is needed for token tests to prevent us from running up against the 1000 token associations per account limit
-
-    public static IntegrationTestEnv withThrowawayAccount(int amount) throws Exception {
-        var client = createTestEnvClient();
-        var originalOperatorId = client.getOperatorAccountId();
+    public IntegrationTestEnv useThrowawayAccount(Hbar initialBalance) throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
         var key = PrivateKey.generate();
-        var response = new AccountCreateTransaction()
-            .setInitialBalance(new Hbar(amount))
+        operatorKey = key.getPublicKey();
+        operatorId = new AccountCreateTransaction()
+            .setInitialBalance(initialBalance)
             .setKey(key)
-            .execute(client);
-        var nodeId = response.nodeId;
-        client.setOperator(response.getReceipt(client).accountId, key);
-        var inverseNetwork = HashBiMap.create(client.getNetwork()).inverse();
-        var newNetwork = new HashMap<String, AccountId>();
-        newNetwork.put(Objects.requireNonNull(inverseNetwork.get(nodeId)), nodeId);
-        client.setNetwork(newNetwork);
-        return new IntegrationTestEnv(client, originalOperatorId);
+            .execute(client)
+            .getReceipt(client)
+            .accountId;
+        client.setOperator(operatorId, key);
+        return this;
     }
 
-    public static IntegrationTestEnv withThrowawayAccount() throws Exception {
-        return withThrowawayAccount(20);
+    public IntegrationTestEnv useThrowawayAccount() throws ReceiptStatusException, PrecheckStatusException, TimeoutException {
+        return useThrowawayAccount(new Hbar(20));
     }
 
-    public void cleanUpAndClose(
+    public void close(
         @Nullable TokenId newTokenId,
         @Nullable AccountId newAccountId,
         @Nullable PrivateKey newAccountKey
@@ -188,15 +155,15 @@ public class IntegrationTestEnv {
         client.close();
     }
 
-    public void cleanUpAndClose() throws Exception {
-        cleanUpAndClose(null, null, null);
+    public void close() throws Exception {
+        close(null, null, null);
     }
 
-    public void cleanUpAndClose(AccountId newAccountId, PrivateKey newAccountKey) throws Exception {
-        cleanUpAndClose(null, newAccountId, newAccountKey);
+    public void close(AccountId newAccountId, PrivateKey newAccountKey) throws Exception {
+        close(null, newAccountId, newAccountKey);
     }
 
-    public void cleanUpAndClose(TokenId newTokenId) throws Exception {
-        cleanUpAndClose(newTokenId, null, null);
+    public void close(TokenId newTokenId) throws Exception {
+        close(newTokenId, null, null);
     }
 }

@@ -19,7 +19,7 @@ class TokenInfoIntegrationTest {
     @DisplayName("Can query token info when all keys are different")
     void canQueryTokenInfoWhenAllKeysAreDifferent() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key1 = PrivateKey.generate();
             var key2 = PrivateKey.generate();
@@ -78,7 +78,7 @@ class TokenInfoIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -86,7 +86,7 @@ class TokenInfoIntegrationTest {
     @DisplayName("Can query token with minimal properties")
     void canQueryTokenInfoWhenTokenIsCreatedWithMinimalProperties() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount(5);
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount(new Hbar(5));
 
             var response = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -126,7 +126,7 @@ class TokenInfoIntegrationTest {
     @DisplayName("Can query NFT")
     void canQueryNfts() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -170,7 +170,7 @@ class TokenInfoIntegrationTest {
             assertEquals(info.supplyType, TokenSupplyType.FINITE);
             assertEquals(info.maxSupply, 5000);
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 
@@ -178,7 +178,7 @@ class TokenInfoIntegrationTest {
     @DisplayName("Get cost of token info query")
     void getCostQueryTokenInfo() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -196,7 +196,7 @@ class TokenInfoIntegrationTest {
 
             infoQuery.setQueryPayment(cost).execute(testEnv.client);
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 
@@ -204,7 +204,7 @@ class TokenInfoIntegrationTest {
     @DisplayName("Get cost of token info query, with big max")
     void getCostBigMaxQueryTokenInfo() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -223,7 +223,7 @@ class TokenInfoIntegrationTest {
 
             infoQuery.setQueryPayment(cost).execute(testEnv.client);
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 
@@ -231,7 +231,7 @@ class TokenInfoIntegrationTest {
     @DisplayName("Can query token info when all keys are different")
     void getCostSmallMaxTokenInfo() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -254,7 +254,7 @@ class TokenInfoIntegrationTest {
 
             assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for TokenInfoQuery, of "+cost.toString()+", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 
@@ -262,7 +262,7 @@ class TokenInfoIntegrationTest {
     @DisplayName("Throws insufficient transaction fee error")
     void getCostInsufficientTxFeeQueryTokenInfo() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -285,7 +285,7 @@ class TokenInfoIntegrationTest {
 
             assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 }

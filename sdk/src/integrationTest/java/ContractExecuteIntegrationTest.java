@@ -16,7 +16,7 @@ public class ContractExecuteIntegrationTest {
     @DisplayName("Can execute contract methods")
     void canExecuteContractMethods() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -52,7 +52,7 @@ public class ContractExecuteIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -60,7 +60,7 @@ public class ContractExecuteIntegrationTest {
     @DisplayName("Cannot execute contract when contract ID is not set")
     void cannotExecuteContractWhenContractIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractExecuteTransaction()
@@ -72,7 +72,7 @@ public class ContractExecuteIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_CONTRACT_ID.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -80,7 +80,7 @@ public class ContractExecuteIntegrationTest {
     @DisplayName("Cannot execute contract when contract function parameters are not set")
     void cannotExecuteContractWhenContractFunctionParametersAreNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -121,7 +121,7 @@ public class ContractExecuteIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -129,7 +129,7 @@ public class ContractExecuteIntegrationTest {
     @DisplayName("Cannot execute contract when gas is not set")
     void cannotExecuteContractWhenGasIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -170,7 +170,7 @@ public class ContractExecuteIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

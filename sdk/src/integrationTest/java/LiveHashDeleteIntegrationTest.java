@@ -17,7 +17,7 @@ class LiveHashDeleteIntegrationTest {
     @DisplayName("Cannot delete live hash because it's not supported")
     void cannotDeleteLiveHashBecauseItsNotSupported() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
@@ -38,7 +38,7 @@ class LiveHashDeleteIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
 
-            testEnv.cleanUpAndClose(accountId, key);
+            testEnv.close(accountId, key);
         });
     }
 }

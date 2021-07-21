@@ -16,7 +16,7 @@ public class TransactionResponseTest {
     @DisplayName("transaction hash in transaction record is equal to the transaction response transaction hash")
     void transactionHashInTransactionRecordIsEqualToTheTransactionResponseTransactionHash() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
@@ -31,7 +31,7 @@ public class TransactionResponseTest {
             var accountId = record.receipt.accountId;
             assertNotNull(accountId);
 
-            testEnv.cleanUpAndClose(accountId, key);
+            testEnv.close(accountId, key);
         });
     }
 }

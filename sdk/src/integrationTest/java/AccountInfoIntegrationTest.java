@@ -18,7 +18,7 @@ class AccountInfoIntegrationTest {
     @DisplayName("Can query account info for client operator")
     void canQueryAccountInfoForClientOperator() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var info = new AccountInfoQuery()
                 .setAccountId(testEnv.operatorId)
@@ -31,7 +31,7 @@ class AccountInfoIntegrationTest {
             assertNull(info.proxyAccountId);
             assertEquals(info.proxyReceived, Hbar.ZERO);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -39,7 +39,7 @@ class AccountInfoIntegrationTest {
     @DisplayName("Can get cost for account info query")
     void getCostAccountInfoForClientOperator() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var info = new AccountInfoQuery()
                 .setAccountId(testEnv.operatorId)
@@ -51,7 +51,7 @@ class AccountInfoIntegrationTest {
 
             assertEquals(accInfo.accountId, testEnv.operatorId);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -59,7 +59,7 @@ class AccountInfoIntegrationTest {
     @DisplayName("Can get cost for account info query, with a bix max")
     void getCostBigMaxAccountInfoForClientOperator() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var info = new AccountInfoQuery()
                 .setAccountId(testEnv.operatorId)
@@ -71,7 +71,7 @@ class AccountInfoIntegrationTest {
 
             assertEquals(accInfo.accountId, testEnv.operatorId);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -80,7 +80,7 @@ class AccountInfoIntegrationTest {
     @DisplayName("Can get cost for account info query, with a small max")
     void getCostSmallMaxAccountInfoForClientOperator() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var info = new AccountInfoQuery()
                 .setAccountId(testEnv.operatorId)
@@ -94,7 +94,7 @@ class AccountInfoIntegrationTest {
 
             assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for AccountInfoQuery, of "+cost.toString()+", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -102,7 +102,7 @@ class AccountInfoIntegrationTest {
     @DisplayName("Insufficient tx fee error.")
     void getCostInsufficientTxFeeAccountInfoForClientOperator() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var info = new AccountInfoQuery()
                 .setAccountId(testEnv.operatorId)
@@ -114,7 +114,7 @@ class AccountInfoIntegrationTest {
 
             assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

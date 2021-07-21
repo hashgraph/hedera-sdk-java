@@ -17,7 +17,7 @@ public class ContractCallIntegrationTest {
     @DisplayName("Can call contract function")
     void canCallContractFunction() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -59,7 +59,7 @@ public class ContractCallIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -67,7 +67,7 @@ public class ContractCallIntegrationTest {
     @DisplayName("Cannot call contract function when contract function is not set")
     void cannotCallContractFunctionWhenContractFunctionIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             final var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -107,7 +107,7 @@ public class ContractCallIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.CONTRACT_REVERT_EXECUTED.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -115,7 +115,7 @@ public class ContractCallIntegrationTest {
     @DisplayName("Cannot call contract function when gas is not set")
     void cannotCallContractFunctionWhenGasIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             final var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -155,7 +155,7 @@ public class ContractCallIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INSUFFICIENT_GAS.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -163,7 +163,7 @@ public class ContractCallIntegrationTest {
     @DisplayName("Cannot call contract function when contract ID is not set")
     void cannotCallContractFunctionWhenContractIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             final var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -203,7 +203,7 @@ public class ContractCallIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_CONTRACT_ID.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -211,7 +211,7 @@ public class ContractCallIntegrationTest {
     @DisplayName("Can get cost, even with a big max")
     void getCostBigMaxContractCallFunction() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -253,7 +253,7 @@ public class ContractCallIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -261,7 +261,7 @@ public class ContractCallIntegrationTest {
     @DisplayName("Error, max is smaller than set payment.")
     void getCostSmallMaxContractCallFunction() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -304,7 +304,7 @@ public class ContractCallIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -312,7 +312,7 @@ public class ContractCallIntegrationTest {
     @DisplayName("Insufficient tx fee error.")
     void getCostInsufficientTxFeeContractCallFunction() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -355,7 +355,7 @@ public class ContractCallIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

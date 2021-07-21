@@ -12,7 +12,7 @@ public class TopicCreateIntegrationTest {
     @DisplayName("Can create topic")
     void canCreateTopic() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
@@ -26,7 +26,7 @@ public class TopicCreateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -34,13 +34,13 @@ public class TopicCreateIntegrationTest {
     @DisplayName("Can create topic with no field set")
     void canCreateTopicWithNoFieldsSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
                 .execute(testEnv.client);
             assertNotNull(response.getReceipt(testEnv.client).topicId);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

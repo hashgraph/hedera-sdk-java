@@ -13,7 +13,7 @@ public class TopicDeleteIntegrationTest {
     @DisplayName("Can delete topic")
     void canDeleteTopic() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
@@ -27,7 +27,7 @@ public class TopicDeleteIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -35,7 +35,7 @@ public class TopicDeleteIntegrationTest {
     @DisplayName("Cannot delete immutable topic")
     void cannotDeleteImmutableTopic() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
                 .execute(testEnv.client);
@@ -51,7 +51,7 @@ public class TopicDeleteIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.UNAUTHORIZED.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

@@ -16,7 +16,7 @@ class TokenBurnIntegrationTest {
     @DisplayName("Can burn tokens")
     void canBurnTokens() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -42,7 +42,7 @@ class TokenBurnIntegrationTest {
 
             assertEquals(receipt.totalSupply, 1000000 - 10);
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 
@@ -50,7 +50,7 @@ class TokenBurnIntegrationTest {
     @DisplayName("Cannot burn tokens when token ID is not set")
     void cannotBurnTokensWhenTokenIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenBurnTransaction()
@@ -61,7 +61,7 @@ class TokenBurnIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_ID.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -69,7 +69,7 @@ class TokenBurnIntegrationTest {
     @DisplayName("Cannot burn tokens when amount is not set")
     void cannotBurnTokensWhenAmountIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -96,7 +96,7 @@ class TokenBurnIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_BURN_AMOUNT.toString()));
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 
@@ -104,7 +104,7 @@ class TokenBurnIntegrationTest {
     @DisplayName("Cannot burn tokens when supply key does not sign transaction")
     void cannotBurnTokensWhenSupplyKeyDoesNotSignTransaction() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -132,7 +132,7 @@ class TokenBurnIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 
@@ -141,7 +141,7 @@ class TokenBurnIntegrationTest {
     @DisplayName("Can burn NFTs")
     void canBurnNfts() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var createReceipt = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -183,7 +183,7 @@ class TokenBurnIntegrationTest {
                 assertTrue(serialsLeft.remove(info.nftId.serial));
             }
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 }

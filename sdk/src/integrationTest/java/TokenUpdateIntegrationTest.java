@@ -18,7 +18,7 @@ class TokenUpdateIntegrationTest {
     @DisplayName("Can update token")
     void canUpdateToken() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -91,7 +91,7 @@ class TokenUpdateIntegrationTest {
             assertNotNull(info.defaultKycStatus);
             assertFalse(info.defaultKycStatus);
 
-            testEnv.cleanUpAndClose(tokenId);
+            testEnv.close(tokenId);
         });
     }
 
@@ -99,7 +99,7 @@ class TokenUpdateIntegrationTest {
     @DisplayName("Cannot update immutable token")
     void cannotUpdateImmutableToken() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount(5);
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount(new Hbar(5));
 
             var response = new TokenCreateTransaction()
                 .setTokenName("ffff")

@@ -18,7 +18,7 @@ class TokenFeeScheduleUpdateIntegrationTest {
     @DisplayName("Can update token fees")
     void canUpdateToken() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -131,8 +131,7 @@ class TokenFeeScheduleUpdateIntegrationTest {
             assertEquals(fixedCount, 1);
             assertEquals(fractionalCount, 1);
 
-            testEnv.cleanUpAndClose(tokenId);
-            testEnv.client.close();
+            testEnv.close(tokenId);
         });
     }
 

@@ -14,7 +14,7 @@ class TokenAssociateIntegrationTest {
     @DisplayName("Can associate account with token")
     void canAssociateAccountWithToken() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -51,7 +51,7 @@ class TokenAssociateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose(tokenId, accountId, key);
+            testEnv.close(tokenId, accountId, key);
         });
     }
 
@@ -59,7 +59,7 @@ class TokenAssociateIntegrationTest {
     @DisplayName("Can execute token associate transaction even when token IDs are not set")
     void canExecuteTokenAssociateTransactionEvenWhenTokenIDsAreNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -77,7 +77,7 @@ class TokenAssociateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose(accountId, key);
+            testEnv.close(accountId, key);
         });
     }
 
@@ -85,7 +85,7 @@ class TokenAssociateIntegrationTest {
     @DisplayName("Cannot associate account with tokens when account ID is not set")
     void cannotAssociateAccountWithTokensWhenAccountIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -106,7 +106,7 @@ class TokenAssociateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
 
-            testEnv.cleanUpAndClose(accountId, key);
+            testEnv.close(accountId, key);
         });
     }
 
@@ -114,7 +114,7 @@ class TokenAssociateIntegrationTest {
     @DisplayName("Cannot associate account with tokens when account does not sign transaction")
     void cannotAssociateAccountWhenAccountDoesNotSignTransaction() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withThrowawayAccount();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -153,7 +153,7 @@ class TokenAssociateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            testEnv.cleanUpAndClose(tokenId, accountId, key);
+            testEnv.close(tokenId, accountId, key);
         });
     }
 }

@@ -18,7 +18,7 @@ public class ContractDeleteIntegrationTest {
     @DisplayName("Can delete contract with admin key")
     void canDeleteContractWithAdminKey() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -59,14 +59,14 @@ public class ContractDeleteIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
     @Test
     @DisplayName("Can delete contract which has no admin key")
     void cannotDeleteContractWhichHasNoAdminKey() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -106,7 +106,7 @@ public class ContractDeleteIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.MODIFYING_IMMUTABLE_CONTRACT.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -114,7 +114,7 @@ public class ContractDeleteIntegrationTest {
     @DisplayName("Cannot delete contract when contract ID is not set")
     void cannotDeleteContractWhenContractIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractDeleteTransaction()
@@ -124,7 +124,7 @@ public class ContractDeleteIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_CONTRACT_ID.toString()));
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }

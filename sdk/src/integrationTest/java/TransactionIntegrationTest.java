@@ -35,7 +35,7 @@ public class TransactionIntegrationTest {
     @DisplayName("transaction hash in transaction record is equal to the derived transaction hash")
     void transactionHashInTransactionRecordIsEqualToTheDerivedTransactionHash() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
@@ -55,7 +55,7 @@ public class TransactionIntegrationTest {
             var accountId = record.receipt.accountId;
             assertNotNull(accountId);
 
-            testEnv.cleanUpAndClose(accountId, key);
+            testEnv.close(accountId, key);
         });
     }
 
@@ -63,7 +63,7 @@ public class TransactionIntegrationTest {
     @DisplayName("transaction can be serialized into bytes, deserialized, signature added and executed")
     void transactionFromToBytes() {
         assertDoesNotThrow(() -> {
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
@@ -100,7 +100,7 @@ public class TransactionIntegrationTest {
 
             response.getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 
@@ -218,7 +218,7 @@ public class TransactionIntegrationTest {
 
             var tx = (TransferTransaction)Transaction.fromBytes(byts.toByteArray());
 
-            var testEnv = IntegrationTestEnv.withOneNode();
+            var testEnv = new IntegrationTestEnv(1);
 
             assertEquals(tx.getHbarTransfers().get(new AccountId(542348)).toTinybars(),-10);
             assertEquals(tx.getHbarTransfers().get(new AccountId(47439)).toTinybars(),10);
@@ -238,7 +238,7 @@ public class TransactionIntegrationTest {
 
             resp.getReceipt(testEnv.client);
 
-            testEnv.cleanUpAndClose();
+            testEnv.close();
         });
     }
 }
