@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -200,6 +201,47 @@ class TokenCreateIntegrationTest {
                 .setCustomFees(customFees)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
+            testEnv.client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Cannot create custom fee with 0 denominator")
+    void cannotCreateZeroDenominator() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv();
+
+            var customFees = new ArrayList<CustomFee>();
+            customFees.add(new CustomFixedFee()
+                .setAmount(10)
+                .setFeeCollectorAccountId(testEnv.operatorId)
+            );
+            customFees.add(new CustomFractionalFee()
+                .setNumerator(1)
+                .setDenominator(0)
+                .setMin(1)
+                .setMax(10)
+                .setFeeCollectorAccountId(testEnv.operatorId)
+            );
+
+            var error = assertThrows(PrecheckStatusException.class, () -> {
+                new TokenCreateTransaction()
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setCustomFees(Collections.singletonList(new CustomFractionalFee()
+                        .setNumerator(1)
+                        .setDenominator(0)
+                        .setMin(1)
+                        .setMax(10)
+                        .setFeeCollectorAccountId(testEnv.operatorId)))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            });
+
+            assertTrue(error.getMessage().contains(Status.FRACTION_DIVIDES_BY_ZERO.toString()));
+
             testEnv.client.close();
         });
     }
