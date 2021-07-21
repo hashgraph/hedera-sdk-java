@@ -325,20 +325,18 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
             .setAccountId(nodeAccountId)
             .setNodeAccountIds(Collections.singletonList(nodeAccountId))
             .executeAsync(this)
-            .thenApply((v) -> null);
+            .handle((balance, e) -> {
+                // Do nothing
+                return null;
+            });
     }
 
     @FunctionalExecutable(type = "Void", onClient = true)
     public synchronized CompletableFuture<Void> pingAllAsync() {
-        var list = new ArrayList<CompletableFuture<AccountBalance>>(network.network.size());
+        var list = new ArrayList<CompletableFuture<Void>>(network.network.size());
 
         for (var nodeAccountId : network.network.values()) {
-            list.add(new AccountBalanceQuery()
-                .setNodeAccountIds(Collections.singletonList(nodeAccountId))
-                .setAccountId(nodeAccountId)
-                .setNodeAccountIds(Collections.singletonList(nodeAccountId))
-                .executeAsync(this)
-            );
+            list.add(pingAsync(nodeAccountId));
         }
 
         return CompletableFuture.allOf(list.toArray(new CompletableFuture<?>[0])).thenApply((v) -> null);

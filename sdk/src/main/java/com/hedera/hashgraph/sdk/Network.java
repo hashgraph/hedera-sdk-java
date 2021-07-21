@@ -119,14 +119,16 @@ class Network {
         Collections.sort(nodes);
 
         // Remove nodes which have surpassed max attempts
-        for (var i = 0; i < nodes.size(); i++) {
-            var node = Objects.requireNonNull(nodes.get(i));
-            if (node.attempts >= maxNodeAttempts) {
-                node.close(30);
-                nodes.remove(i);
-                network.remove(node.address);
-                networkNodes.remove(node.accountId);
-                i--;
+        if (maxNodeAttempts > 0) {
+            for (var i = 0; i < nodes.size(); i++) {
+                var node = Objects.requireNonNull(nodes.get(i));
+                if (node.attempts >= maxNodeAttempts) {
+                    node.close(30);
+                    nodes.remove(i);
+                    network.remove(node.address);
+                    networkNodes.remove(node.accountId);
+                    i--;
+                }
             }
         }
 
