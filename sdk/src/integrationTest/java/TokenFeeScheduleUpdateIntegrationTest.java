@@ -4,6 +4,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -62,17 +65,22 @@ class TokenFeeScheduleUpdateIntegrationTest {
             assertFalse(info.defaultKycStatus);
             assertEquals(info.customFees.size(), 0);
 
+            var customFees = new ArrayList<CustomFee>();
+            customFees.add(new CustomFixedFee()
+                .setAmount(10)
+                .setFeeCollectorAccountId(testEnv.operatorId)
+            );
+            customFees.add(new CustomFractionalFee()
+                .setNumerator(1)
+                .setDenominator(20)
+                .setMin(1)
+                .setMax(10)
+                .setFeeCollectorAccountId(testEnv.operatorId)
+            );
+
             new TokenFeeScheduleUpdateTransaction()
                 .setTokenId(tokenId)
-                .addCustomFee(new CustomFixedFee()
-                    .setAmount(10)
-                    .setFeeCollectorAccountId(testEnv.operatorId))
-                .addCustomFee(new CustomFractionalFee()
-                    .setNumerator(1)
-                    .setDenominator(20)
-                    .setMin(1)
-                    .setMax(10)
-                    .setFeeCollectorAccountId(testEnv.operatorId))
+                .setCustomFees(customFees)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 

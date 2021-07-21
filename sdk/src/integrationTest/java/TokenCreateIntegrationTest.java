@@ -3,6 +3,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -178,20 +179,25 @@ class TokenCreateIntegrationTest {
         assertDoesNotThrow(() -> {
             var testEnv = new IntegrationTestEnv();
 
+            var customFees = new ArrayList<CustomFee>();
+            customFees.add(new CustomFixedFee()
+                .setAmount(10)
+                .setFeeCollectorAccountId(testEnv.operatorId)
+            );
+            customFees.add(new CustomFractionalFee()
+                .setNumerator(1)
+                .setDenominator(20)
+                .setMin(1)
+                .setMax(10)
+                .setFeeCollectorAccountId(testEnv.operatorId)
+            );
+
             new TokenCreateTransaction()
                 .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
-                .addCustomFee(new CustomFixedFee()
-                    .setAmount(10)
-                    .setFeeCollectorAccountId(testEnv.operatorId))
-                .addCustomFee(new CustomFractionalFee()
-                    .setNumerator(1)
-                    .setDenominator(20)
-                    .setMin(1)
-                    .setMax(10)
-                    .setFeeCollectorAccountId(testEnv.operatorId))
+                .setCustomFees(customFees)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
             testEnv.client.close();

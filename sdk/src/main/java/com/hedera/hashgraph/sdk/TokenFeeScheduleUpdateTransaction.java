@@ -76,13 +76,6 @@ public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeSched
         return this;
     }
 
-    public TokenFeeScheduleUpdateTransaction addCustomFee(CustomFee customFee) {
-        Objects.requireNonNull(customFee);
-        requireNotFrozen();
-        customFees.add(customFee);
-        return this;
-    }
-
     TokenFeeScheduleUpdateTransactionBody.Builder build() {
         if (tokenId != null) {
             builder.setTokenId(tokenId.toProtobuf());
