@@ -7,13 +7,16 @@ class Node extends ManagedNode implements Comparable<Node>{
     long delay;
     long delayUntil;
     long waitTime;
+    long attempts;
 
     Node(AccountId accountId, String address, long waitTime, ExecutorService executor) {
         super(address, executor);
 
         this.accountId = accountId;
         this.delay = waitTime;
+        this.waitTime = waitTime;
         this.delayUntil = 0;
+        this.attempts = 0;
     }
 
     void setWaitTime(long waitTime) {
@@ -30,6 +33,7 @@ class Node extends ManagedNode implements Comparable<Node>{
     }
 
     void increaseDelay() {
+        this.attempts++;
         this.delayUntil = System.currentTimeMillis() + this.delay;
         this.delay = Math.min(this.delay * 2, 8000);
     }

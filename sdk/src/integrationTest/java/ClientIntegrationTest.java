@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ClientIntegrationTest {
     @Test
@@ -93,4 +95,20 @@ public class ClientIntegrationTest {
             testEnv.close();
         });
     }
+
+    @Test
+    void ping() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv();
+            var network = testEnv.client.getNetwork();
+            var nodes = new ArrayList<AccountId>(network.values());
+
+            assertTrue(!nodes.isEmpty());
+
+            var node = nodes.get(0);
+
+            testEnv.client.ping(node);
+
+            testEnv.client.close();
+        });    }
 }
