@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class Ed25519PublicKeyTest {
     private static final String TEST_KEY_STR = "302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7";
+    private static final String TEST_KEY_STR_RAW = "e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7";
 
     @Test
     @DisplayName("private key can be recovered from bytes")
@@ -51,6 +52,8 @@ class Ed25519PublicKeyTest {
         assertNotNull(key);
         // the above are all the same key
         assertEquals(TEST_KEY_STR, key.toString());
+        assertEquals(TEST_KEY_STR, key.toStringDER());
+        assertEquals(TEST_KEY_STR_RAW, key.toStringRaw());
     }
 
     @Test
