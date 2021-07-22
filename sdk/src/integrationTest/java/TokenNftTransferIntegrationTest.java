@@ -18,21 +18,19 @@ class TokenNftTransferIntegrationTest {
     @Test
     void test() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-            PrivateKey key = PrivateKey.generate();
+            var key = PrivateKey.generate();
 
             TransactionResponse response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
 
-            AccountId accountId = response.getReceipt(testEnv.client).accountId;
+            var accountId = response.getReceipt(testEnv.client).accountId;
             assertNotNull(accountId);
 
             response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
@@ -45,18 +43,16 @@ class TokenNftTransferIntegrationTest {
                 .setFreezeDefault(false)
                 .execute(testEnv.client);
 
-            TokenId tokenId = response.getReceipt(testEnv.client).tokenId;
+            var tokenId = response.getReceipt(testEnv.client).tokenId;
             assertNotNull(tokenId);
 
             var mintReceipt = new TokenMintTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .setMetadata(NftMetadataGenerator.generate((byte)10))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new TokenAssociateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTokenIds(Collections.singletonList(tokenId))
                 .freezeWith(testEnv.client)
@@ -66,29 +62,26 @@ class TokenNftTransferIntegrationTest {
                 .getReceipt(testEnv.client);
 
             new TokenGrantKycTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTokenId(tokenId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             var serialsToTransfer = new ArrayList<Long>(mintReceipt.serials.subList(0, 4));
-            var transfer = new TransferTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds);
+            var transfer = new TransferTransaction();
             for(var serial : serialsToTransfer) {
                 transfer.addNftTransfer(tokenId.nft(serial), testEnv.operatorId, accountId);
             }
             transfer.execute(testEnv.client).getReceipt(testEnv.client);
 
             new TokenWipeTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .setAccountId(accountId)
                 .setSerials(serialsToTransfer)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close(tokenId, accountId, key);
         });
     }
 }

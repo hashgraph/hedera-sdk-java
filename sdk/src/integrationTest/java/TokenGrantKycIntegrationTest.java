@@ -14,12 +14,11 @@ class TokenGrantKycIntegrationTest {
     @DisplayName("Can grant kyc to account with token")
     void canGrantKycAccountWithToken() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -28,7 +27,6 @@ class TokenGrantKycIntegrationTest {
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setDecimals(3)
@@ -46,7 +44,6 @@ class TokenGrantKycIntegrationTest {
             );
 
             new TokenAssociateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTokenIds(Collections.singletonList(tokenId))
                 .freezeWith(testEnv.client)
@@ -55,7 +52,6 @@ class TokenGrantKycIntegrationTest {
                 .getReceipt(testEnv.client);
 
             new TokenGrantKycTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTokenId(tokenId)
                 .freezeWith(testEnv.client)
@@ -63,7 +59,7 @@ class TokenGrantKycIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close(tokenId, accountId, key);
         });
     }
 
@@ -71,12 +67,11 @@ class TokenGrantKycIntegrationTest {
     @DisplayName("Cannot grant kyc to account on token when token ID is not set")
     void cannotGrantKycToAccountOnTokenWhenTokenIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -85,7 +80,6 @@ class TokenGrantKycIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenGrantKycTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setAccountId(accountId)
                     .freezeWith(testEnv.client)
                     .sign(key)
@@ -93,18 +87,9 @@ class TokenGrantKycIntegrationTest {
                     .getReceipt(testEnv.client);
             });
 
-            new AccountDeleteTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
-                .setAccountId(accountId)
-                .setTransferAccountId(testEnv.operatorId)
-                .freezeWith(testEnv.client)
-                .sign(key)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
             assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.close(accountId, key);
         });
     }
 
@@ -112,12 +97,11 @@ class TokenGrantKycIntegrationTest {
     @DisplayName("Cannot grant kyc to account on token when account ID is not set")
     void cannotGrantKycToAccountOnTokenWhenAccountIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
@@ -135,7 +119,6 @@ class TokenGrantKycIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenGrantKycTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenId(tokenId)
                     .freezeWith(testEnv.client)
                     .sign(key)
@@ -145,7 +128,7 @@ class TokenGrantKycIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.close(tokenId);
         });
     }
 
@@ -153,12 +136,11 @@ class TokenGrantKycIntegrationTest {
     @DisplayName("Cannot grant kyc to account on token when account was not associated with")
     void cannotGrantKycToAccountOnTokenWhenAccountWasNotAssociatedWith() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -167,7 +149,6 @@ class TokenGrantKycIntegrationTest {
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setDecimals(3)
@@ -186,7 +167,6 @@ class TokenGrantKycIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenGrantKycTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setAccountId(accountId)
                     .setTokenId(tokenId)
                     .freezeWith(testEnv.client)
@@ -197,7 +177,7 @@ class TokenGrantKycIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.TOKEN_NOT_ASSOCIATED_TO_ACCOUNT.toString()));
 
-            testEnv.client.close();
+            testEnv.close(tokenId, accountId, key);
         });
     }
 }

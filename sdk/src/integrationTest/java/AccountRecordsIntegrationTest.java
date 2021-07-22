@@ -12,11 +12,10 @@ class AccountRecordsIntegrationTest {
     @DisplayName("Can query account records")
     void canQueryAccountRecords() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -24,14 +23,12 @@ class AccountRecordsIntegrationTest {
             var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
             new TransferTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .addHbarTransfer(testEnv.operatorId, new Hbar(1).negated())
                 .addHbarTransfer(accountId, new Hbar(1))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new TransferTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .addHbarTransfer(testEnv.operatorId, new Hbar(1))
                 .addHbarTransfer(accountId, new Hbar(1).negated())
                 .freezeWith(testEnv.client)
@@ -40,22 +37,12 @@ class AccountRecordsIntegrationTest {
                 .getReceipt(testEnv.client);
 
             var records = new AccountRecordsQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(testEnv.operatorId)
                 .execute(testEnv.client);
 
             assertTrue(!records.isEmpty());
 
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
-                .setTransferAccountId(testEnv.operatorId)
-                .freezeWith(testEnv.client)
-                .sign(key)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
-            testEnv.client.close();
+            testEnv.close(accountId, key);
         });
     }
 }

@@ -13,10 +13,9 @@ public class TopicDeleteIntegrationTest {
     @DisplayName("Can delete topic")
     void canDeleteTopic() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
                 .execute(testEnv.client);
@@ -28,7 +27,7 @@ public class TopicDeleteIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -36,10 +35,9 @@ public class TopicDeleteIntegrationTest {
     @DisplayName("Cannot delete immutable topic")
     void cannotDeleteImmutableTopic() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
@@ -47,14 +45,13 @@ public class TopicDeleteIntegrationTest {
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TopicDeleteTransaction()
                     .setTopicId(topicId)
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
             });
 
             assertTrue(error.getMessage().contains(Status.UNAUTHORIZED.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 }

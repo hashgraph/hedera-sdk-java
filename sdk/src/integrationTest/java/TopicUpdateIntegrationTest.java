@@ -14,10 +14,9 @@ public class TopicUpdateIntegrationTest {
     @DisplayName("Can update topic")
     void canUpdateTopic() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAdminKey(testEnv.operatorKey)
                 .setAutoRenewAccountId(testEnv.operatorId)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
@@ -26,7 +25,6 @@ public class TopicUpdateIntegrationTest {
             var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
             new TopicUpdateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .clearAutoRenewAccountId()
                 .setTopicMemo("hello")
                 .setTopicId(topicId)
@@ -45,7 +43,7 @@ public class TopicUpdateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 }

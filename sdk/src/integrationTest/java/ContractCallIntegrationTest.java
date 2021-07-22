@@ -17,10 +17,9 @@ public class ContractCallIntegrationTest {
     @DisplayName("Can call contract function")
     void canCallContractFunction() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -29,7 +28,6 @@ public class ContractCallIntegrationTest {
 
             response = new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
@@ -39,7 +37,6 @@ public class ContractCallIntegrationTest {
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
             var callQuery = new ContractCallQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContractId(contractId)
                 .setGas(2000)
                 .setFunction("getMessage");
@@ -47,7 +44,6 @@ public class ContractCallIntegrationTest {
             var cost = callQuery.getCost(testEnv.client);
 
             @Var var result = callQuery
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setMaxQueryPayment(Objects.requireNonNull(cost))
                 .execute(testEnv.client);
 
@@ -55,17 +51,15 @@ public class ContractCallIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contractId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -73,10 +67,9 @@ public class ContractCallIntegrationTest {
     @DisplayName("Cannot call contract function when contract function is not set")
     void cannotCallContractFunctionWhenContractFunctionIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             final var response = new FileCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -86,7 +79,6 @@ public class ContractCallIntegrationTest {
             var contractId = Objects.requireNonNull(
                 new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
@@ -98,7 +90,6 @@ public class ContractCallIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractCallQuery()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setContractId(contractId)
                     .setGas(2000)
                     .execute(testEnv.client);
@@ -106,19 +97,17 @@ public class ContractCallIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contractId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             assertTrue(error.getMessage().contains(Status.CONTRACT_REVERT_EXECUTED.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -126,10 +115,9 @@ public class ContractCallIntegrationTest {
     @DisplayName("Cannot call contract function when gas is not set")
     void cannotCallContractFunctionWhenGasIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             final var response = new FileCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -139,7 +127,6 @@ public class ContractCallIntegrationTest {
             var contractId = Objects.requireNonNull(
                 new ContractCreateTransaction()
                     .setAdminKey(testEnv.operatorKey)
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setGas(2000)
                     .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                     .setBytecodeFileId(fileId)
@@ -151,7 +138,6 @@ public class ContractCallIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractCallQuery()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setContractId(contractId)
                     .setFunction("getMessage")
                     .execute(testEnv.client);
@@ -159,19 +145,17 @@ public class ContractCallIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contractId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             assertTrue(error.getMessage().contains(Status.INSUFFICIENT_GAS.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -179,10 +163,9 @@ public class ContractCallIntegrationTest {
     @DisplayName("Cannot call contract function when contract ID is not set")
     void cannotCallContractFunctionWhenContractIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             final var response = new FileCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -192,7 +175,6 @@ public class ContractCallIntegrationTest {
             var contractId = Objects.requireNonNull(
                 new ContractCreateTransaction()
                     .setAdminKey(testEnv.operatorKey)
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setGas(2000)
                     .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                     .setBytecodeFileId(fileId)
@@ -204,7 +186,6 @@ public class ContractCallIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractCallQuery()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setGas(2000)
                     .setFunction("getMessage")
                     .execute(testEnv.client);
@@ -212,19 +193,17 @@ public class ContractCallIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contractId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             assertTrue(error.getMessage().contains(Status.INVALID_CONTRACT_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -232,10 +211,9 @@ public class ContractCallIntegrationTest {
     @DisplayName("Can get cost, even with a big max")
     void getCostBigMaxContractCallFunction() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -244,7 +222,6 @@ public class ContractCallIntegrationTest {
 
             response = new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
@@ -254,7 +231,6 @@ public class ContractCallIntegrationTest {
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
             var callQuery = new ContractCallQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContractId(contractId)
                 .setGas(2000)
                 .setFunction("getMessage")
@@ -269,17 +245,15 @@ public class ContractCallIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contractId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -287,10 +261,9 @@ public class ContractCallIntegrationTest {
     @DisplayName("Error, max is smaller than set payment.")
     void getCostSmallMaxContractCallFunction() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -299,7 +272,6 @@ public class ContractCallIntegrationTest {
 
             response = new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
@@ -309,7 +281,6 @@ public class ContractCallIntegrationTest {
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
             var callQuery = new ContractCallQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContractId(contractId)
                 .setGas(2000)
                 .setFunction("getMessage")
@@ -325,17 +296,15 @@ public class ContractCallIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contractId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -343,10 +312,9 @@ public class ContractCallIntegrationTest {
     @DisplayName("Insufficient tx fee error.")
     void getCostInsufficientTxFeeContractCallFunction() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -355,7 +323,6 @@ public class ContractCallIntegrationTest {
 
             response = new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
@@ -365,7 +332,6 @@ public class ContractCallIntegrationTest {
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
             var callQuery = new ContractCallQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContractId(contractId)
                 .setGas(2000)
                 .setFunction("getMessage")
@@ -381,17 +347,15 @@ public class ContractCallIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contractId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 }

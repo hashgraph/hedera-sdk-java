@@ -56,6 +56,8 @@ class Network {
                 this.nodes.add(node);
             }
 
+            Collections.shuffle(nodes);
+
             lock.release();
             return;
         }
@@ -93,6 +95,8 @@ class Network {
                 networkNodes.put(entry.getKey(), node);
             }
         }
+
+        Collections.shuffle(nodes);
 
         lock.release();
     }

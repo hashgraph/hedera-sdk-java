@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.TransactionId;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ClientIntegrationTest {
     @Test
+    @Disabled
     @DisplayName("setNetwork() functions correctly")
     void testReplaceNodes() {
         assertDoesNotThrow(() -> {
@@ -27,13 +29,13 @@ public class ClientIntegrationTest {
             network.put("0.testnet.hedera.com:50211", new AccountId(3));
             network.put("1.testnet.hedera.com:50211", new AccountId(4));
 
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             testEnv.client
                 .setMaxQueryPayment(new Hbar(2))
-                .setRequestTimeout(Duration.ofMinutes(2));
+                .setRequestTimeout(Duration.ofMinutes(2))
+                .setNetwork(network);
 
-            var operatorId = testEnv.client.getOperatorAccountId();
             assertNotNull(testEnv.operatorId);
 
             // Execute two simple queries so we create a channel for each network node.
@@ -57,7 +59,7 @@ public class ClientIntegrationTest {
 
             testEnv.client.setNetwork(network);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -77,7 +79,7 @@ public class ClientIntegrationTest {
     @DisplayName("`setMaxNodesPerTransaction()`")
     void testMaxNodesPerTransaction() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             testEnv.client.setMaxNodesPerTransaction(1);
 
@@ -88,7 +90,7 @@ public class ClientIntegrationTest {
             assertNotNull(transaction.getNodeAccountIds());
             assertEquals(1, transaction.getNodeAccountIds().size());
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 }
