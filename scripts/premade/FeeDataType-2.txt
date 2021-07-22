@@ -1,0 +1,9 @@
+
+    final SubType code;
+
+    FeeDataType(SubType code) {
+        this.code = code;
+    }
+
+    static FeeDataType valueOf(SubType code) {
+        switch (code) {

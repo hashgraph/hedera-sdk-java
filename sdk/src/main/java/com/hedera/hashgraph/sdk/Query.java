@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Base class for all queries that can be submitted to Hedera.
@@ -91,7 +92,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     @FunctionalExecutable(type = "Hbar")
     public CompletableFuture<Hbar> getCostAsync(Client client) {
         initWithNodeIds(client);
-        return getCostExecutable().setNodeAccountIds(getNodeAccountIds()).executeAsync(client);
+        return getCostExecutable().setNodeAccountIds(Objects.requireNonNull(getNodeAccountIds())).executeAsync(client);
     }
 
     boolean isPaymentRequired() {

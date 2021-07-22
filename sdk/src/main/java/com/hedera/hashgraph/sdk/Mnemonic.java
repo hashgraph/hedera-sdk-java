@@ -44,7 +44,7 @@ public final class Mnemonic {
     @Nullable
     private String asString;
 
-    
+
     private Mnemonic(List<? extends CharSequence> words) {
         if(words.size() == 22){
             isLegacy = true;
@@ -249,17 +249,17 @@ public final class Mnemonic {
             if(passphrase.compareTo("") != 0){
                 throw new Error("Legacy mnemonic doesn't support passphrases");
             }
-            return PrivateKey.fromBytes(PrivateKey.legacyDeriveChildKey(this.wordsToLegacyEntropy(), -1));
+            return this.toLegacyPrivateKey();
         }
         return PrivateKey.fromMnemonic(this, passphrase);
     }
 
     public PrivateKey toLegacyPrivateKey() throws BadMnemonicException{
         if(this.words.size() == 22){
-            return PrivateKey.fromBytes(PrivateKey.legacyDeriveChildKey(this.wordsToLegacyEntropy(), -1));
+            return PrivateKey.fromBytes(this.wordsToLegacyEntropy());
         }
 
-        return PrivateKey.fromBytes(PrivateKey.legacyDeriveChildKey(this.wordsToLegacyEntropy2(), 0));
+        return PrivateKey.fromBytes(this.wordsToLegacyEntropy2());
     }
 
     /**

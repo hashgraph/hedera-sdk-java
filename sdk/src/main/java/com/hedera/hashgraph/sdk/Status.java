@@ -960,7 +960,7 @@ public enum Status {
     INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE(ResponseCodeEnum.INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE),
 
     /**
-     * The customFees list is longer than allowed limit 10
+     * More than 10 custom fees were specified
      */
     CUSTOM_FEES_LIST_TOO_LONG(ResponseCodeEnum.CUSTOM_FEES_LIST_TOO_LONG),
 
@@ -1072,7 +1072,27 @@ public enum Status {
     /**
      * An AccountAmount token transfers list referenced a token type other than FUNGIBLE_COMMON
      */
-    ACCOUNT_AMOUNT_TRANSFERS_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON(ResponseCodeEnum.ACCOUNT_AMOUNT_TRANSFERS_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON);
+    ACCOUNT_AMOUNT_TRANSFERS_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON(ResponseCodeEnum.ACCOUNT_AMOUNT_TRANSFERS_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON),
+
+    /**
+     * All the NFTs allowed in the current price regime have already been minted
+     */
+    MAX_NFTS_IN_PRICE_REGIME_HAVE_BEEN_MINTED(ResponseCodeEnum.MAX_NFTS_IN_PRICE_REGIME_HAVE_BEEN_MINTED),
+
+    /**
+     * The payer account has been marked as deleted
+     */
+    PAYER_ACCOUNT_DELETED(ResponseCodeEnum.PAYER_ACCOUNT_DELETED),
+
+    /**
+     * The reference chain of custom fees for a transferred token exceeded the maximum length of 2
+     */
+    CUSTOM_FEE_CHARGING_EXCEEDED_MAX_RECURSION_DEPTH(ResponseCodeEnum.CUSTOM_FEE_CHARGING_EXCEEDED_MAX_RECURSION_DEPTH),
+
+    /**
+     * More than 20 balance adjustments were to satisfy a CryptoTransfer and its implied custom fee payments
+     */
+    CUSTOM_FEE_CHARGING_EXCEEDED_MAX_ACCOUNT_AMOUNTS(ResponseCodeEnum.CUSTOM_FEE_CHARGING_EXCEEDED_MAX_ACCOUNT_AMOUNTS);
 
     final ResponseCodeEnum code;
 
@@ -1508,6 +1528,14 @@ public enum Status {
                 return ACCOUNT_DOES_NOT_OWN_WIPED_NFT;
             case ACCOUNT_AMOUNT_TRANSFERS_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON:
                 return ACCOUNT_AMOUNT_TRANSFERS_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON;
+            case MAX_NFTS_IN_PRICE_REGIME_HAVE_BEEN_MINTED:
+                return MAX_NFTS_IN_PRICE_REGIME_HAVE_BEEN_MINTED;
+            case PAYER_ACCOUNT_DELETED:
+                return PAYER_ACCOUNT_DELETED;
+            case CUSTOM_FEE_CHARGING_EXCEEDED_MAX_RECURSION_DEPTH:
+                return CUSTOM_FEE_CHARGING_EXCEEDED_MAX_RECURSION_DEPTH;
+            case CUSTOM_FEE_CHARGING_EXCEEDED_MAX_ACCOUNT_AMOUNTS:
+                return CUSTOM_FEE_CHARGING_EXCEEDED_MAX_ACCOUNT_AMOUNTS;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
