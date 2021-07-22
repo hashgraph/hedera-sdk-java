@@ -3,8 +3,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
 
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -173,7 +175,7 @@ class TokenCreateIntegrationTest {
         });
     }
 
-    @Disabled
+
     @Test
     @DisplayName("Can create token with custom fees")
     void canCreateTokenWithCustomFees() {
@@ -205,26 +207,178 @@ class TokenCreateIntegrationTest {
         });
     }
 
+    private static List<CustomFee> createFixedFeeList(int count, AccountId feeCollector) {
+        var feeList = new ArrayList<CustomFee>();
+        for(int i = 0; i < count; i++) {
+            feeList.add(new CustomFixedFee()
+                .setAmount(10)
+                .setFeeCollectorAccountId(feeCollector));
+        }
+        return feeList;
+    }
+
+    private static List<CustomFee> createFractionalFeeList(int count, AccountId feeCollector) {
+        var feeList = new ArrayList<CustomFee>();
+        for(int i = 0; i < count; i++) {
+            feeList.add(new CustomFractionalFee()
+                .setNumerator(1)
+                .setDenominator(20)
+                .setMin(1)
+                .setMax(10)
+                .setFeeCollectorAccountId(feeCollector));
+        }
+        return feeList;
+    }
+
+
+    @Test
+    @DisplayName("Cannot create custom fee list with > 10 entries")
+    void cannotCreateMoreThanTenCustomFees() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv();
+
+            var error = assertThrows(ReceiptStatusException.class, () -> {
+                new TokenCreateTransaction()
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setCustomFees(createFixedFeeList(11, testEnv.operatorId))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            });
+
+            assertTrue(error.getMessage().contains(Status.CUSTOM_FEES_LIST_TOO_LONG.toString()));
+
+            testEnv.client.close();
+        });
+    }
+
+
+    @Test
+    @DisplayName("Can create custom fee list with 10 fixed fees")
+    void canCreateTenFixedFees() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv();
+
+            new TokenCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setCustomFees(createFixedFeeList(10, testEnv.operatorId))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            testEnv.client.close();
+        });
+    }
+
+
+    @Test
+    @DisplayName("Can create custom fee list with 10 fractional fees")
+    void canCreateTenFractionalFees() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv();
+
+            new TokenCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setCustomFees(createFractionalFeeList(10, testEnv.operatorId))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            testEnv.client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Cannot create a token with a custom fee where min > max")
+    void cannotCreateMinGreaterThanMax() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv();
+
+            var error = assertThrows(ReceiptStatusException.class, () -> {
+                new TokenCreateTransaction()
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setCustomFees(Collections.singletonList(new CustomFractionalFee()
+                        .setNumerator(1)
+                        .setDenominator(3)
+                        .setMin(3)
+                        .setMax(2)
+                        .setFeeCollectorAccountId(testEnv.operatorId)))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            });
+
+            assertTrue(error.getMessage().contains(Status.FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT.toString()));
+
+            testEnv.client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Cannot create a token with invalid fee collector account ID")
+    void cannotCreateInvalidFeeCollector() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv();
+
+            var error = assertThrows(ReceiptStatusException.class, () -> {
+                new TokenCreateTransaction()
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setCustomFees(Collections.singletonList(new CustomFixedFee()
+                        .setAmount(1)))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            });
+
+            assertTrue(error.getMessage().contains(Status.INVALID_CUSTOM_FEE_COLLECTOR.toString()));
+
+            testEnv.client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Cannot create a token with a negative custom fee")
+    void cannotCreateNegativeFee() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv();
+
+            var error = assertThrows(ReceiptStatusException.class, () -> {
+                new TokenCreateTransaction()
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setCustomFees(Collections.singletonList(new CustomFixedFee()
+                        .setAmount(-1)
+                        .setFeeCollectorAccountId(testEnv.operatorId)))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            });
+
+            assertTrue(error.getMessage().contains(Status.CUSTOM_FEE_MUST_BE_POSITIVE.toString()));
+
+            testEnv.client.close();
+        });
+    }
+
+
     @Test
     @DisplayName("Cannot create custom fee with 0 denominator")
     void cannotCreateZeroDenominator() {
         assertDoesNotThrow(() -> {
             var testEnv = new IntegrationTestEnv();
 
-            var customFees = new ArrayList<CustomFee>();
-            customFees.add(new CustomFixedFee()
-                .setAmount(10)
-                .setFeeCollectorAccountId(testEnv.operatorId)
-            );
-            customFees.add(new CustomFractionalFee()
-                .setNumerator(1)
-                .setDenominator(0)
-                .setMin(1)
-                .setMax(10)
-                .setFeeCollectorAccountId(testEnv.operatorId)
-            );
-
-            var error = assertThrows(PrecheckStatusException.class, () -> {
+            var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
                     .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
