@@ -59,6 +59,44 @@ class TokenMintIntegrationTest {
         });
     }
 
+
+    @Test
+    @DisplayName("Cannot mint more tokens than max supply")
+    void cannotMintMoreThanMaxSupply() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv();
+
+            var tokenId = Objects.requireNonNull(
+                new TokenCreateTransaction()
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setSupplyType(TokenSupplyType.FINITE)
+                    .setMaxSupply(5)
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(testEnv.operatorKey)
+                    .setSupplyKey(testEnv.operatorKey)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client)
+                    .tokenId
+            );
+
+
+            var error = assertThrows(ReceiptStatusException.class, () -> {
+                new TokenMintTransaction()
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    .setTokenId(tokenId)
+                    .setAmount(6)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            });
+
+            assertTrue(error.getMessage().contains(Status.TOKEN_MAX_SUPPLY_REACHED.toString()));
+
+            testEnv.client.close();
+        });
+    }
+
     @Test
     @DisplayName("Cannot mint tokens when token ID is not set")
     void cannotMintTokensWhenTokenIDIsNotSet() {

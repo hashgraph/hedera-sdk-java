@@ -1,14 +1,15 @@
 import com.hedera.hashgraph.sdk.*;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TokenTransferIntegrationTest {
     @Test
-    void test() {
+    @DisplayName("Can transfer tokens")
+    void tokenTransferTest() {
         assertDoesNotThrow(() -> {
             var testEnv = new IntegrationTestEnv();
 
@@ -72,6 +73,89 @@ class TokenTransferIntegrationTest {
                 .setAmount(10)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
+
+            testEnv.client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Cannot transfer tokens if balance is insufficient to pay fee")
+    void insufficientBalanceForFee() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv();
+
+            PrivateKey key1 = PrivateKey.generate();
+            PrivateKey key2 = PrivateKey.generate();
+            var accountId1 = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setKey(key1)
+                .setInitialBalance(new Hbar(20))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .accountId;
+            var accountId2 = new AccountCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setKey(key2)
+                .setInitialBalance(new Hbar(20))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .accountId;
+
+            var tokenId = new TokenCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setInitialSupply(1)
+                .setCustomFees(Collections.singletonList(new CustomFixedFee()
+                    .setAmount(5000_000_000L)
+                    .setFeeCollectorAccountId(testEnv.operatorId)))
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setFeeScheduleKey(testEnv.operatorKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId;
+
+            new TokenAssociateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setAccountId(accountId1)
+                .setTokenIds(Collections.singletonList(tokenId))
+                .freezeWith(testEnv.client)
+                .sign(key1)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            new TokenAssociateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setAccountId(accountId2)
+                .setTokenIds(Collections.singletonList(tokenId))
+                .freezeWith(testEnv.client)
+                .sign(key2)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            new TransferTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .addTokenTransfer(tokenId, testEnv.operatorId, -1)
+                .addTokenTransfer(tokenId, accountId1, 1)
+                .freezeWith(testEnv.client)
+                .sign(key1)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            var error = assertThrows(ReceiptStatusException.class, () -> {
+                new TransferTransaction()
+                    .setNodeAccountIds(testEnv.nodeAccountIds)
+                    .addTokenTransfer(tokenId, accountId1, -1)
+                    .addTokenTransfer(tokenId, accountId2, 1)
+                    .freezeWith(testEnv.client)
+                    .sign(key1)
+                    .sign(key2)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            });
+
+            assertTrue(error.getMessage().contains(Status.INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE.toString()));
 
             testEnv.client.close();
         });
