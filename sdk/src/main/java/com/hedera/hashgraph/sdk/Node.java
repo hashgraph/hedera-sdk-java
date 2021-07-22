@@ -1,13 +1,11 @@
 package com.hedera.hashgraph.sdk;
 
-import java.util.Random;
 import java.util.concurrent.ExecutorService;
 
 class Node extends ManagedNode implements Comparable<Node>{
     AccountId accountId;
     long delay;
     long delayUntil;
-    static Random random = new Random();
 
     Node(AccountId accountId, String address, ExecutorService executor) {
         super(address, executor);
@@ -58,7 +56,7 @@ class Node extends ManagedNode implements Comparable<Node>{
             } else if (this.lastUsed > node.lastUsed) {
                 return 1;
             } else {
-                return random.nextInt(3) - 1;
+                return 0;
             }
         }
     }
