@@ -45,7 +45,7 @@ class TokenCreateIntegrationTest {
     @DisplayName("Can create token with minimal properties set")
     void canCreateTokenWithMinimalPropertiesSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount(new Hbar(5));
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount(new Hbar(10));
 
             var tokenId = new TokenCreateTransaction()
                 .setTokenName("ffff")
@@ -197,7 +197,8 @@ class TokenCreateIntegrationTest {
                 .setAdminKey(testEnv.operatorKey)
                 .setCustomFees(customFees)
                 .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                .getReceipt(testEnv.client)
+                .tokenId;
             testEnv.close(tokenId);
         });
     }
@@ -230,13 +231,13 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create custom fee list with > 10 entries")
     void cannotCreateMoreThanTenCustomFees() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
+                    .setAdminKey(testEnv.operatorKey)
                     .setTreasuryAccountId(testEnv.operatorId)
                     .setCustomFees(createFixedFeeList(11, testEnv.operatorId))
                     .execute(testEnv.client)
@@ -245,7 +246,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.CUSTOM_FEES_LIST_TOO_LONG.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -254,18 +255,19 @@ class TokenCreateIntegrationTest {
     @DisplayName("Can create custom fee list with 10 fixed fees")
     void canCreateTenFixedFees() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-            new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+            var tokenId = new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
                 .setCustomFees(createFixedFeeList(10, testEnv.operatorId))
                 .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                .getReceipt(testEnv.client)
+                .tokenId;
 
-            testEnv.close();
+            testEnv.close(tokenId);
         });
     }
 
@@ -274,18 +276,19 @@ class TokenCreateIntegrationTest {
     @DisplayName("Can create custom fee list with 10 fractional fees")
     void canCreateTenFractionalFees() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-            new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+            var tokenId = new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
+                .setAdminKey(testEnv.operatorKey)
                 .setTreasuryAccountId(testEnv.operatorId)
                 .setCustomFees(createFractionalFeeList(10, testEnv.operatorId))
                 .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                .getReceipt(testEnv.client)
+                .tokenId;
 
-            testEnv.close();
+            testEnv.close(tokenId);
         });
     }
 
@@ -293,14 +296,14 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create a token with a custom fee where min > max")
     void cannotCreateMinGreaterThanMax() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(testEnv.operatorKey)
                     .setCustomFees(Collections.singletonList(new CustomFractionalFee()
                         .setNumerator(1)
                         .setDenominator(3)
@@ -321,13 +324,13 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create a token with invalid fee collector account ID")
     void cannotCreateInvalidFeeCollector() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
+                    .setAdminKey(testEnv.operatorKey)
                     .setTreasuryAccountId(testEnv.operatorId)
                     .setCustomFees(Collections.singletonList(new CustomFixedFee()
                         .setAmount(1)))
@@ -337,7 +340,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_CUSTOM_FEE_COLLECTOR.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -345,13 +348,13 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create a token with a negative custom fee")
     void cannotCreateNegativeFee() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
+                    .setAdminKey(testEnv.operatorKey)
                     .setTreasuryAccountId(testEnv.operatorId)
                     .setCustomFees(Collections.singletonList(new CustomFixedFee()
                         .setAmount(-1)
@@ -362,7 +365,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.CUSTOM_FEE_MUST_BE_POSITIVE.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -371,14 +374,14 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create custom fee with 0 denominator")
     void cannotCreateZeroDenominator() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(testEnv.operatorKey)
                     .setCustomFees(Collections.singletonList(new CustomFractionalFee()
                         .setNumerator(1)
                         .setDenominator(0)
@@ -391,7 +394,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.FRACTION_DIVIDES_BY_ZERO.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 

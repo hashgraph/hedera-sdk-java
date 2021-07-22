@@ -59,7 +59,7 @@ public class ClientIntegrationTest {
 
             testEnv.client.setNetwork(network);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 

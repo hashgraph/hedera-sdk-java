@@ -139,10 +139,9 @@ class TokenFeeScheduleUpdateIntegrationTest {
     @DisplayName("Cannot update fee schedule with any key other than fee schedule key")
     void cannotUpdateWithAnyOtherKey() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
@@ -176,7 +175,7 @@ class TokenFeeScheduleUpdateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            testEnv.client.close();
+            testEnv.close(tokenId);
         });
     }
 }

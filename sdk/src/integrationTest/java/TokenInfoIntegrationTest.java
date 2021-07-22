@@ -86,7 +86,7 @@ class TokenInfoIntegrationTest {
     @DisplayName("Can query token with minimal properties")
     void canQueryTokenInfoWhenTokenIsCreatedWithMinimalProperties() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount(new Hbar(5));
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount(new Hbar(10));
 
             var response = new TokenCreateTransaction()
                 .setTokenName("ffff")

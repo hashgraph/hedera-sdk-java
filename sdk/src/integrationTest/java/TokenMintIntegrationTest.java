@@ -52,11 +52,10 @@ class TokenMintIntegrationTest {
     @DisplayName("Cannot mint more tokens than max supply")
     void cannotMintMoreThanMaxSupply() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setSupplyType(TokenSupplyType.FINITE)
@@ -72,7 +71,6 @@ class TokenMintIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenMintTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenId(tokenId)
                     .setAmount(6)
                     .execute(testEnv.client)
@@ -81,7 +79,7 @@ class TokenMintIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.TOKEN_MAX_SUPPLY_REACHED.toString()));
 
-            testEnv.client.close();
+            testEnv.close(tokenId);
         });
     }
 
