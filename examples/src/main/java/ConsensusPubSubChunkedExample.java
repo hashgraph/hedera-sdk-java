@@ -24,31 +24,18 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public final class ConsensusPubSubChunkedExample {
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
-    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK");
-    private static final String CONFIG_FILE = Dotenv.load().get("CONFIG_FILE");
+    // HEDERA_NETWORK defaults to testnet if not specified in dotenv
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
     private ConsensusPubSubChunkedExample() {
     }
 
     public static void main(String[] args) throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException, InvalidProtocolBufferException {
-        Client client;
-
-        if (HEDERA_NETWORK != null && HEDERA_NETWORK.equals("previewnet")) {
-            client = Client.forPreviewnet();
-        } else {
-            try {
-                client = Client.fromConfigFile(CONFIG_FILE != null ? CONFIG_FILE : "");
-            } catch (Exception e) {
-                client = Client.forTestnet();
-            }
-        }
+        Client client = Client.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
-
-        // prepare a second client without an operator for use by "somewhere else"
-        Client clientWithoutOperator = Client.forTestnet();
 
         // generate a submit key to use with the topic
         PrivateKey submitKey = PrivateKey.generate();

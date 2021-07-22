@@ -24,18 +24,23 @@ public class TokenFeeScheduleUpdateTransactionTest {
     }
 
     private TokenFeeScheduleUpdateTransaction spawnTokenFeeScheduleUpdateTransactionExample() {
+        var customFees = new ArrayList<CustomFee>();
+        customFees.add(new CustomFixedFee()
+            .setFeeCollectorAccountId(new AccountId(4322))
+            .setDenominatingTokenId(new TokenId(483902))
+            .setAmount(10)
+        );
+        customFees.add(new CustomFractionalFee()
+            .setFeeCollectorAccountId(new AccountId(389042))
+            .setNumerator(3)
+            .setDenominator(7)
+            .setMin(3)
+            .setMax(100)
+        );
+
         return new TokenFeeScheduleUpdateTransaction()
             .setTokenId(new TokenId(8798))
-            .addCustomFee(new CustomFixedFee()
-                .setFeeCollectorAccountId(new AccountId(4322))
-                .setDenominatingTokenId(new TokenId(483902))
-                .setAmount(10))
-            .addCustomFee(new CustomFractionalFee()
-                .setFeeCollectorAccountId(new AccountId(389042))
-                .setNumerator(3)
-                .setDenominator(7)
-                .setMin(3)
-                .setMax(100))
+            .setCustomFees(customFees)
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .freeze();

@@ -4,12 +4,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 
-@Disabled
+
 class TokenFeeScheduleUpdateIntegrationTest {
     @Test
     @DisplayName("Can update token")
@@ -62,17 +65,22 @@ class TokenFeeScheduleUpdateIntegrationTest {
             assertFalse(info.defaultKycStatus);
             assertEquals(info.customFees.size(), 0);
 
+            var customFees = new ArrayList<CustomFee>();
+            customFees.add(new CustomFixedFee()
+                .setAmount(10)
+                .setFeeCollectorAccountId(testEnv.operatorId)
+            );
+            customFees.add(new CustomFractionalFee()
+                .setNumerator(1)
+                .setDenominator(20)
+                .setMin(1)
+                .setMax(10)
+                .setFeeCollectorAccountId(testEnv.operatorId)
+            );
+
             new TokenFeeScheduleUpdateTransaction()
                 .setTokenId(tokenId)
-                .addCustomFee(new CustomFixedFee()
-                    .setAmount(10)
-                    .setFeeCollectorAccountId(testEnv.operatorId))
-                .addCustomFee(new CustomFractionalFee()
-                    .setNumerator(1)
-                    .setDenominator(20)
-                    .setMin(1)
-                    .setMax(10)
-                    .setFeeCollectorAccountId(testEnv.operatorId))
+                .setCustomFees(customFees)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -125,6 +133,51 @@ class TokenFeeScheduleUpdateIntegrationTest {
             }
             assertEquals(fixedCount, 1);
             assertEquals(fractionalCount, 1);
+
+            testEnv.client.close();
+        });
+    }
+
+    @Test
+    @DisplayName("Cannot update fee schedule with any key other than fee schedule key")
+    void cannotUpdateWithAnyOtherKey() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv();
+
+            var response = new TokenCreateTransaction()
+                .setNodeAccountIds(testEnv.nodeAccountIds)
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setFeeScheduleKey(PrivateKey.generate())
+                .setFreezeDefault(false)
+                .execute(testEnv.client);
+
+            var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
+
+            var customFees = new ArrayList<CustomFee>();
+            customFees.add(new CustomFixedFee()
+                .setAmount(10)
+                .setFeeCollectorAccountId(testEnv.operatorId)
+            );
+            customFees.add(new CustomFractionalFee()
+                .setNumerator(1)
+                .setDenominator(20)
+                .setMin(1)
+                .setMax(10)
+                .setFeeCollectorAccountId(testEnv.operatorId)
+            );
+
+            var error = assertThrows(ReceiptStatusException.class, () -> {
+                new TokenFeeScheduleUpdateTransaction()
+                    .setTokenId(tokenId)
+                    .setCustomFees(customFees)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            });
+
+            assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
             testEnv.client.close();
         });

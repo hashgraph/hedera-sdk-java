@@ -241,12 +241,6 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return this;
     }
 
-    public TokenCreateTransaction addCustomFee(CustomFee customFee) {
-        requireNotFrozen();
-        customFees.add(customFee);
-        return this;
-    }
-
     @Nullable
     public List<CustomFee> getCustomFees() {
         return CustomFee.deepCloneList(customFees);

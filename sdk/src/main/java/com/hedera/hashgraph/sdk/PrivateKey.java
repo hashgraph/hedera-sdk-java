@@ -134,7 +134,13 @@ public final class PrivateKey extends Key {
     }
 
     public PrivateKey legacyDerive(int index) {
-        var keyBytes = legacyDeriveChildKey(this.keyData, index);
+        var keyBytes = legacyDeriveChildKey(this.keyData, (long) index);
+
+        return PrivateKey.fromBytes(keyBytes);
+    }
+
+    public PrivateKey legacyDerive(Long index) {
+        var keyBytes = legacyDeriveChildKey(this.keyData,index);
 
         return PrivateKey.fromBytes(keyBytes);
     }
@@ -338,14 +344,20 @@ public final class PrivateKey extends Key {
         return getPublicKey().toProtobufKey();
     }
 
-    static byte[] legacyDeriveChildKey(byte[] entropy, int index) {
+    static byte[] legacyDeriveChildKey(byte[] entropy, Long index) {
         byte[] seed = new byte[entropy.length + 8];
-        if(index >= 0){
-            Arrays.fill(seed, entropy.length, entropy.length + 4, (byte)0);
-        } else {
-            Arrays.fill(seed, entropy.length, entropy.length + 4, (byte)-1);
+        Arrays.fill(seed, 0, seed.length, (byte)0);
+        if ( index == 0xffffffffffL) {
+            seed[entropy.length+3] = (byte)0xff;
+            Arrays.fill(seed, entropy.length+4, seed.length, (byte)(index >>> 32));
+        }else{
+            if(index < 0){
+                Arrays.fill(seed, entropy.length, entropy.length + 4, (byte)-1);
+            } else {
+                Arrays.fill(seed, entropy.length, entropy.length + 4, (byte)0);
+            }
+            Arrays.fill(seed, entropy.length + 4, seed.length, index.byteValue());
         }
-        Arrays.fill(seed, entropy.length + 4, entropy.length + 8, (byte)index);
         System.arraycopy(entropy, 0, seed, 0, entropy.length);
 
         byte[] salt = new byte[1];
