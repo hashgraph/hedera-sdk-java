@@ -117,6 +117,7 @@ public enum Status {
     ExpirationReductionNotAllowed(ResponseCodeEnum.EXPIRATION_REDUCTION_NOT_ALLOWED),
     MaxGasLimitExceeded(ResponseCodeEnum.MAX_GAS_LIMIT_EXCEEDED),
     MaxFileSizeExceeded(ResponseCodeEnum.MAX_FILE_SIZE_EXCEEDED),
+    ReceiverSigRequired(ResponseCodeEnum.RECEIVER_SIG_REQUIRED),
     InvalidTopicId(ResponseCodeEnum.INVALID_TOPIC_ID),
     InvalidAdminKey(ResponseCodeEnum.INVALID_ADMIN_KEY),
     InvalidSubmitKey(ResponseCodeEnum.INVALID_SUBMIT_KEY),
@@ -177,20 +178,6 @@ public enum Status {
     ScheduleAlreadyDeleted(ResponseCodeEnum.SCHEDULE_ALREADY_DELETED),
     ScheduleAlreadyExecuted(ResponseCodeEnum.SCHEDULE_ALREADY_EXECUTED),
     MessageSizeTooLarge(ResponseCodeEnum.MESSAGE_SIZE_TOO_LARGE),
-    ReceiverSigRequired(ResponseCodeEnum.RECEIVER_SIG_REQUIRED),
-    FractionDividesByZero(ResponseCodeEnum.FRACTION_DIVIDES_BY_ZERO),
-    InsufficientPayerBalanceForCustomFee(ResponseCodeEnum.INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE),
-    CustomFeesListTooLong(ResponseCodeEnum.CUSTOM_FEES_LIST_TOO_LONG),
-    InvalidCustomFeeCollector(ResponseCodeEnum.INVALID_CUSTOM_FEE_COLLECTOR),
-    InvalidTokenIdInCustomFees(ResponseCodeEnum.INVALID_TOKEN_ID_IN_CUSTOM_FEES),
-    TokenNotAssociatedToFeeCollector(ResponseCodeEnum.TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR),
-    TokenMaxSupplyReached(ResponseCodeEnum.TOKEN_MAX_SUPPLY_REACHED),
-    SenderDoesNotOwnNftSerialNo(ResponseCodeEnum.SENDER_DOES_NOT_OWN_NFT_SERIAL_NO),
-    CustomFeeNotFullySpecified(ResponseCodeEnum.CUSTOM_FEE_NOT_FULLY_SPECIFIED),
-    CustomFeeMustBePositive(ResponseCodeEnum.CUSTOM_FEE_MUST_BE_POSITIVE),
-    TokenHasNoFeeScheduleKey(ResponseCodeEnum.TOKEN_HAS_NO_FEE_SCHEDULE_KEY),
-    CustomFeeOutsideNumericRange(ResponseCodeEnum.CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE),
-    InvalidCustomFractionalFeesSum(ResponseCodeEnum.INVALID_CUSTOM_FRACTIONAL_FEES_SUM),
     OperationRepeatedInBucketGroups(ResponseCodeEnum.OPERATION_REPEATED_IN_BUCKET_GROUPS),
     BucketCapacityOverflow(ResponseCodeEnum.BUCKET_CAPACITY_OVERFLOW),
     NodeCapacityNotSufficientForOperation(ResponseCodeEnum.NODE_CAPACITY_NOT_SUFFICIENT_FOR_OPERATION),
@@ -206,11 +193,35 @@ public enum Status {
     MetadataTooLong(ResponseCodeEnum.METADATA_TOO_LONG),
     BatchSizeLimitExceeded(ResponseCodeEnum.BATCH_SIZE_LIMIT_EXCEEDED),
     InvalidQueryRange(ResponseCodeEnum.INVALID_QUERY_RANGE),
+    FractionDividesByZero(ResponseCodeEnum.FRACTION_DIVIDES_BY_ZERO),
+    InsufficientPayerBalanceForCustomFee(ResponseCodeEnum.INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE),
+    CustomFeesListTooLong(ResponseCodeEnum.CUSTOM_FEES_LIST_TOO_LONG),
+    InvalidCustomFeeCollector(ResponseCodeEnum.INVALID_CUSTOM_FEE_COLLECTOR),
+    InvalidTokenIdInCustomFees(ResponseCodeEnum.INVALID_TOKEN_ID_IN_CUSTOM_FEES),
+    TokenNotAssociatedToFeeCollector(ResponseCodeEnum.TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR),
+    TokenMaxSupplyReached(ResponseCodeEnum.TOKEN_MAX_SUPPLY_REACHED),
+    SenderDoesNotOwnNftSerialNo(ResponseCodeEnum.SENDER_DOES_NOT_OWN_NFT_SERIAL_NO),
+    CustomFeeNotFullySpecified(ResponseCodeEnum.CUSTOM_FEE_NOT_FULLY_SPECIFIED),
+    CustomFeeMustBePositive(ResponseCodeEnum.CUSTOM_FEE_MUST_BE_POSITIVE),
+    TokenHasNoFeeScheduleKey(ResponseCodeEnum.TOKEN_HAS_NO_FEE_SCHEDULE_KEY),
+    CustomFeeOutsideNumericRange(ResponseCodeEnum.CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE),
+    InvalidCustomFractionalFeesSum(ResponseCodeEnum.INVALID_CUSTOM_FRACTIONAL_FEES_SUM),
     FractionalFeeMaxAmountLessThanMinAmount(ResponseCodeEnum.FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT),
     CustomScheduleAlreadyHasNoFees(ResponseCodeEnum.CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES),
     CustomFeeDenominationMustBeFungibleCommon(ResponseCodeEnum.CUSTOM_FEE_DENOMINATION_MUST_BE_FUNGIBLE_COMMON),
     CustomFractionalFeeOnlyAllowedForFungibleCommon(ResponseCodeEnum.CUSTOM_FRACTIONAL_FEE_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON),
-    InvalidCustomFeeScheduleKey(ResponseCodeEnum.INVALID_CUSTOM_FEE_SCHEDULE_KEY);
+    InvalidCustomFeeScheduleKey(ResponseCodeEnum.INVALID_CUSTOM_FEE_SCHEDULE_KEY),
+    InvalidTokenMintMetadata(ResponseCodeEnum.INVALID_TOKEN_MINT_METADATA),
+    InvalidTokenBurnMetadata(ResponseCodeEnum.INVALID_TOKEN_BURN_METADATA),
+    CurrentTreasuryStillOwnsNfts(ResponseCodeEnum.CURRENT_TREASURY_STILL_OWNS_NFTS),
+    AccountStillOwnsNfts(ResponseCodeEnum.ACCOUNT_STILL_OWNS_NFTS),
+    TreasuryMustOwnBurnedNft(ResponseCodeEnum.TREASURY_MUST_OWN_BURNED_NFT),
+    AccountDoesNotOwnWipedNft(ResponseCodeEnum.ACCOUNT_DOES_NOT_OWN_WIPED_NFT),
+    AccountAmountTransfersOnlyAllowedForFungibleCommon(ResponseCodeEnum.ACCOUNT_AMOUNT_TRANSFERS_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON),
+    MaxNftsInPriceRegimeHaveBeenMinted(ResponseCodeEnum.MAX_NFTS_IN_PRICE_REGIME_HAVE_BEEN_MINTED),
+    PayerAccountDeleted(ResponseCodeEnum.PAYER_ACCOUNT_DELETED),
+    CustomFeeChargingExceededMaxRecursionDepth(ResponseCodeEnum.CUSTOM_FEE_CHARGING_EXCEEDED_MAX_RECURSION_DEPTH),
+    CustomFeeChargingExceededMaxAccountAmounts(ResponseCodeEnum.CUSTOM_FEE_CHARGING_EXCEEDED_MAX_ACCOUNT_AMOUNTS);
 
     private final ResponseCodeEnum responseCode;
 
@@ -343,6 +354,7 @@ public enum Status {
             case EXPIRATION_REDUCTION_NOT_ALLOWED: return ExpirationReductionNotAllowed;
             case MAX_GAS_LIMIT_EXCEEDED: return MaxGasLimitExceeded;
             case MAX_FILE_SIZE_EXCEEDED: return MaxFileSizeExceeded;
+            case RECEIVER_SIG_REQUIRED: return ReceiverSigRequired;
             case INVALID_TOPIC_ID: return InvalidTopicId;
             case INVALID_ADMIN_KEY: return InvalidAdminKey;
             case INVALID_SUBMIT_KEY: return InvalidSubmitKey;
@@ -403,20 +415,6 @@ public enum Status {
             case SCHEDULE_ALREADY_DELETED: return ScheduleAlreadyDeleted;
             case SCHEDULE_ALREADY_EXECUTED: return ScheduleAlreadyExecuted;
             case MESSAGE_SIZE_TOO_LARGE: return MessageSizeTooLarge;
-            case RECEIVER_SIG_REQUIRED: return ReceiverSigRequired;
-            case FRACTION_DIVIDES_BY_ZERO: return FractionDividesByZero;
-            case INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE: return InsufficientPayerBalanceForCustomFee;
-            case CUSTOM_FEES_LIST_TOO_LONG: return CustomFeesListTooLong;
-            case INVALID_CUSTOM_FEE_COLLECTOR: return InvalidCustomFeeCollector;
-            case INVALID_TOKEN_ID_IN_CUSTOM_FEES: return InvalidTokenIdInCustomFees;
-            case TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR: return TokenNotAssociatedToFeeCollector;
-            case TOKEN_MAX_SUPPLY_REACHED: return TokenMaxSupplyReached;
-            case SENDER_DOES_NOT_OWN_NFT_SERIAL_NO: return SenderDoesNotOwnNftSerialNo;
-            case CUSTOM_FEE_NOT_FULLY_SPECIFIED: return CustomFeeNotFullySpecified;
-            case CUSTOM_FEE_MUST_BE_POSITIVE: return CustomFeeMustBePositive;
-            case TOKEN_HAS_NO_FEE_SCHEDULE_KEY: return TokenHasNoFeeScheduleKey;
-            case CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE: return CustomFeeOutsideNumericRange;
-            case INVALID_CUSTOM_FRACTIONAL_FEES_SUM: return InvalidCustomFractionalFeesSum;
             case OPERATION_REPEATED_IN_BUCKET_GROUPS: return OperationRepeatedInBucketGroups;
             case BUCKET_CAPACITY_OVERFLOW: return BucketCapacityOverflow;
             case NODE_CAPACITY_NOT_SUFFICIENT_FOR_OPERATION: return NodeCapacityNotSufficientForOperation;
@@ -432,11 +430,35 @@ public enum Status {
             case METADATA_TOO_LONG: return MetadataTooLong;
             case BATCH_SIZE_LIMIT_EXCEEDED: return BatchSizeLimitExceeded;
             case INVALID_QUERY_RANGE: return InvalidQueryRange;
+            case FRACTION_DIVIDES_BY_ZERO: return FractionDividesByZero;
+            case INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE: return InsufficientPayerBalanceForCustomFee;
+            case CUSTOM_FEES_LIST_TOO_LONG: return CustomFeesListTooLong;
+            case INVALID_CUSTOM_FEE_COLLECTOR: return InvalidCustomFeeCollector;
+            case INVALID_TOKEN_ID_IN_CUSTOM_FEES: return InvalidTokenIdInCustomFees;
+            case TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR: return TokenNotAssociatedToFeeCollector;
+            case TOKEN_MAX_SUPPLY_REACHED: return TokenMaxSupplyReached;
+            case SENDER_DOES_NOT_OWN_NFT_SERIAL_NO: return SenderDoesNotOwnNftSerialNo;
+            case CUSTOM_FEE_NOT_FULLY_SPECIFIED: return CustomFeeNotFullySpecified;
+            case CUSTOM_FEE_MUST_BE_POSITIVE: return CustomFeeMustBePositive;
+            case TOKEN_HAS_NO_FEE_SCHEDULE_KEY: return TokenHasNoFeeScheduleKey;
+            case CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE: return CustomFeeOutsideNumericRange;
+            case INVALID_CUSTOM_FRACTIONAL_FEES_SUM: return InvalidCustomFractionalFeesSum;
             case FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT: return FractionalFeeMaxAmountLessThanMinAmount;
             case CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES: return CustomScheduleAlreadyHasNoFees;
             case CUSTOM_FEE_DENOMINATION_MUST_BE_FUNGIBLE_COMMON: return CustomFeeDenominationMustBeFungibleCommon;
             case CUSTOM_FRACTIONAL_FEE_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON: return CustomFractionalFeeOnlyAllowedForFungibleCommon;
             case INVALID_CUSTOM_FEE_SCHEDULE_KEY: return InvalidCustomFeeScheduleKey;
+            case INVALID_TOKEN_MINT_METADATA: return InvalidTokenMintMetadata;
+            case INVALID_TOKEN_BURN_METADATA: return InvalidTokenBurnMetadata;
+            case CURRENT_TREASURY_STILL_OWNS_NFTS: return CurrentTreasuryStillOwnsNfts;
+            case ACCOUNT_STILL_OWNS_NFTS: return AccountStillOwnsNfts;
+            case TREASURY_MUST_OWN_BURNED_NFT: return TreasuryMustOwnBurnedNft;
+            case ACCOUNT_DOES_NOT_OWN_WIPED_NFT: return AccountDoesNotOwnWipedNft;
+            case ACCOUNT_AMOUNT_TRANSFERS_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON: return AccountAmountTransfersOnlyAllowedForFungibleCommon;
+            case MAX_NFTS_IN_PRICE_REGIME_HAVE_BEEN_MINTED: return MaxNftsInPriceRegimeHaveBeenMinted;
+            case PAYER_ACCOUNT_DELETED: return PayerAccountDeleted;
+            case CUSTOM_FEE_CHARGING_EXCEEDED_MAX_RECURSION_DEPTH: return CustomFeeChargingExceededMaxRecursionDepth;
+            case CUSTOM_FEE_CHARGING_EXCEEDED_MAX_ACCOUNT_AMOUNTS: return CustomFeeChargingExceededMaxAccountAmounts;
             case UNRECOGNIZED:
                 // protobufs won't give us the actual value that was unexpected, unfortunately
                 throw new IllegalArgumentException(
