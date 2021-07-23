@@ -47,7 +47,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
 
     Duration requestTimeout = Duration.ofMinutes(2);
 
-    int maxAttempts = DEFAULT_MAX_ATTEMPTS;
+    Integer maxAttempts = null;
 
     Client(Map<String, AccountId> network) {
         var threadFactory = new ThreadFactoryBuilder()
@@ -390,7 +390,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     }
 
     public synchronized int getMaxAttempts() {
-        return maxAttempts;
+        return maxAttempts != null ? maxAttempts : DEFAULT_MAX_ATTEMPTS;
     }
 
     public synchronized Client setMaxNodeAttempts(int maxNodeAttempts) {

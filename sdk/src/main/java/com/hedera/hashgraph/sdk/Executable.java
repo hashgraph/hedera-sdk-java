@@ -20,7 +20,7 @@ import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
 abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements WithExecute<O> {
     private static final Logger logger = LoggerFactory.getLogger(Executable.class);
 
-    protected int maxAttempts = Client.DEFAULT_MAX_ATTEMPTS;
+    protected Integer maxAttempts;
     protected int nextNodeIndex = 0;
     protected List<AccountId> nodeAccountIds = Collections.emptyList();
     protected List<Node> nodes = new ArrayList<>();
@@ -45,7 +45,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     }
 
     public final int getMaxAttempts() {
-        return maxAttempts;
+        return maxAttempts != null ? maxAttempts : Client.DEFAULT_MAX_ATTEMPTS;
     }
 
     public final SdkRequestT setMaxAttempts(int count) {
@@ -86,7 +86,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     @Override
     @FunctionalExecutable
     public CompletableFuture<O> executeAsync(Client client) {
-        if (maxAttempts == Client.DEFAULT_MAX_ATTEMPTS) {
+        if (maxAttempts == null) {
             maxAttempts = client.getMaxAttempts();
         }
 
