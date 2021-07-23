@@ -1,0 +1,101 @@
+{
+    "input": [
+        {
+            "key": "key1",
+            "value": "$this.generate.key"
+        },
+        {
+            "key": "key2",
+            "value": "$this.generate.key"
+        },
+        {
+            "key": "key3",
+            "value": "$this.generate.key"
+        },
+        {
+            "key": "keylist",
+            "value": [
+                "$this.input.key1",
+                "$this.input.key2",
+                "$this.input.key3"
+            ]
+        }
+    ],
+    "client": {
+        "operator": {
+            "accountId": "0.0.47439",
+            "privateKey": "302e020100300506032b6570042204208f4014a3f7f7a6c7147070da98d88f9cea074c13ed0554783471825d801888cf"
+        },
+        "network": "testnet",
+        "mirrorNetwork": "testnet"
+    },
+    "test": [
+        {
+            "request": {
+                "type": "AccoutnCreateTransaction",
+                "data": {
+                    "key": "$this.input.keylist",
+                    "iniital": "100 ℏ"
+                }
+            }
+        },
+        {
+            "name": "topicCreateTransaction",
+            "request": {
+                "type": "TopicCreateTransaction",
+                "data": {
+                    "adminKey": "$this.client.operatorKey",
+                    "autoRenewAccountId": "$this.client.operatorId",
+                    "topicMemo": "HCS Topic_",
+                    "submitKey": "$this.input.key2"
+                }
+            }
+        },
+        {
+            "request": {
+                "type": "ScheduleCreateTransaction",
+                "data": {
+                    "request": {
+                        "type": "TopicMessageSubmitTransaction",
+                        "data": {
+                            "message": "schedule hcs message"
+                        }
+                    },
+                    "adminKey": "$this.client.operatorKey",
+                    "payerAcocuntId": "$this.client.operatorId",
+                    "scheduleMemo": "mirror scheduled E2E signature on create and sign"
+                }
+            },
+            "delete": false
+        },
+        {
+            "request": {
+                "type": "ScheduleInfoQuery"
+            },
+            "response": {
+                "data": {
+                    "scheduledTransaction": {
+                        "topicId": "$this.test.topicCreateTransaction.topicId",
+                        "message": "schedule hcs message"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "type": "ScheduleSignTransaction",
+                "sign": [ "$this.input.key2" ]
+            }
+        },
+        {
+            "request": {
+                "type": "ScheduleInfoQuery"
+            },
+            "response": {
+                "data": {
+                    "executedAt": "$this.assert.nonNull"
+                }
+            }
+        },
+    ]
+}
