@@ -96,7 +96,7 @@ public class ClientIntegrationTest {
     @Test
     void ping() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
             var network = testEnv.client.getNetwork();
             var nodes = new ArrayList<>(network.values());
 
@@ -106,14 +106,14 @@ public class ClientIntegrationTest {
 
             testEnv.client.setMaxNodeAttempts(1);
             testEnv.client.ping(node);
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
     @Test
     void pingAll() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(3);
 
             testEnv.client.setMaxNodeAttempts(1);
             testEnv.client.pingAll();
@@ -129,14 +129,14 @@ public class ClientIntegrationTest {
                 .setAccountId(node)
                 .execute(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
     @Test
     void pingAllBadNetwork() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(3);
 
             testEnv.client.setMaxNodeAttempts(1);
             testEnv.client.setMaxNodesPerTransaction(2);
@@ -165,7 +165,7 @@ public class ClientIntegrationTest {
 
             assertEquals(1, testEnv.client.getNetwork().values().size());
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 }
