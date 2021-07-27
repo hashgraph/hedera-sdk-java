@@ -162,6 +162,14 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
         }
     }
 
+    public String toStringWithChecksum(Client client) {
+        if (accountId != null && validStart != null) {
+            return "" + accountId.toStringWithChecksum(client) + "@" + validStart.getEpochSecond() + "." + validStart.getNano() + (scheduled ? "?scheduled" : "");
+        } else {
+            throw new IllegalStateException("`TransactionId.toStringWithChecksum()` is non-exhaustive");
+        }
+    }
+
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

@@ -59,7 +59,7 @@ public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
     @Override
     void validateNetworkOnIds(Client client) {
         if (accountId != null) {
-            accountId.validate(client);
+            accountId.validateChecksum(client);
         }
     }
 

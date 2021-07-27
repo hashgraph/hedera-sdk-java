@@ -128,11 +128,11 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
     @Override
     void validateNetworkOnIds(Client client) {
         if (fileId != null) {
-            fileId.validate(client);
+            fileId.validateChecksum(client);
         }
 
         if (contractId != null) {
-            contractId.validate(client);
+            contractId.validateChecksum(client);
         }
     }
 

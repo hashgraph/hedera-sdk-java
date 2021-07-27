@@ -51,7 +51,7 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     @Override
     void validateNetworkOnIds(Client client) {
         if (transactionId != null) {
-            Objects.requireNonNull(transactionId.accountId).validate(client);
+            Objects.requireNonNull(transactionId.accountId).validateChecksum(client);
         }
     }
 

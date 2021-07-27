@@ -78,7 +78,7 @@ abstract public class CustomFee {
 
     void validate(Client client) {
         if(feeCollectorAccountId != null) {
-            feeCollectorAccountId.validate(client);
+            feeCollectorAccountId.validateChecksum(client);
         }
     }
 

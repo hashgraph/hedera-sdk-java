@@ -133,7 +133,7 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
     @Override
     void validateNetworkOnIds(Client client) {
         if (contractId != null) {
-            contractId.validate(client);
+            contractId.validateChecksum(client);
         }
     }
 

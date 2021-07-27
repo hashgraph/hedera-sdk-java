@@ -176,7 +176,7 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
     @Override
     void validateNetworkOnIds(Client client) {
         if (autoRenewAccountId != null) {
-            autoRenewAccountId.validate(client);
+            autoRenewAccountId.validateChecksum(client);
         }
     }
 

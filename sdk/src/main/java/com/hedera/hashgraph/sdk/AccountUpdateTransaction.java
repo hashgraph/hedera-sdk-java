@@ -251,10 +251,10 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     @Override
     void validateNetworkOnIds(Client client) {
         if (accountId != null) {
-            accountId.validate(client);
+            accountId.validateChecksum(client);
         }
         if (proxyAccountId != null) {
-            proxyAccountId.validate(client);
+            proxyAccountId.validateChecksum(client);
         }
     }
 

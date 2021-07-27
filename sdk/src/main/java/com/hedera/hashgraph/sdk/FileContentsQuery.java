@@ -53,7 +53,7 @@ public final class FileContentsQuery extends Query<ByteString, FileContentsQuery
     @Override
     void validateNetworkOnIds(Client client) {
         if (fileId != null) {
-            fileId.validate(client);
+            fileId.validateChecksum(client);
         }
     }
 

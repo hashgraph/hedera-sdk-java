@@ -30,7 +30,7 @@ public final class AccountId {
     public final long num;
 
     @Nullable
-    String checksum;
+    private final String checksum;
 
     public AccountId(@Nonnegative long num) {
         this(0, 0, num);
@@ -71,14 +71,7 @@ public final class AccountId {
 
     static AccountId fromProtobuf(AccountID accountId, @Nullable NetworkName networkName) {
         Objects.requireNonNull(accountId);
-
-        var id = new AccountId(accountId.getShardNum(), accountId.getRealmNum(), accountId.getAccountNum());
-
-        if (networkName != null) {
-            id.setNetwork(networkName);
-        }
-
-        return id;
+        return new AccountId(accountId.getShardNum(), accountId.getRealmNum(), accountId.getAccountNum(), networkName, null);
     }
 
     static AccountId fromProtobuf(AccountID accountId) {
@@ -101,21 +94,18 @@ public final class AccountId {
             .build();
     }
 
-    AccountId setNetworkWith(Client client) {
-        if (client.network.networkName != null) {
-            setNetwork(client.network.networkName);
-        }
-
-        return this;
-    }
-
-    AccountId setNetwork(NetworkName name) {
-        checksum = EntityIdHelper.checksum(Integer.toString(name.id), EntityIdHelper.toString(shard, realm, num));
-        return this;
-    }
-
+    @Deprecated
     public void validate(Client client) {
+        validateChecksum(client);
+    }
+
+    public void validateChecksum(Client client) {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
+    }
+
+    @Nullable
+    public String getChecksum() {
+        return checksum;
     }
 
     public byte[] toBytes() {
@@ -124,7 +114,11 @@ public final class AccountId {
 
     @Override
     public String toString() {
-        return EntityIdHelper.toString(shard, realm, num, checksum);
+        return EntityIdHelper.toString(shard, realm, num);
+    }
+
+    public String toStringWithChecksum(Client client) {
+        return EntityIdHelper.toStringWithChecksum(shard, realm, num, client, checksum);
     }
 
     @Override

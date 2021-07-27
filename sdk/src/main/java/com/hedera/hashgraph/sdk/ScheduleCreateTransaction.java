@@ -92,7 +92,7 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     @Override
     void validateNetworkOnIds(Client client) {
         if (payerAccountId != null) {
-            payerAccountId.validate(client);
+            payerAccountId.validateChecksum(client);
         }
     }
 

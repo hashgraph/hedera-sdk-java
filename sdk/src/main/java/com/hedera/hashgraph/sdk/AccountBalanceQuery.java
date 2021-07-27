@@ -69,11 +69,11 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
     @Override
     void validateNetworkOnIds(Client client) {
         if (accountId != null) {
-            accountId.validate(client);
+            accountId.validateChecksum(client);
         }
 
         if (contractId != null) {
-            contractId.validate(client);
+            contractId.validateChecksum(client);
         }
     }
 

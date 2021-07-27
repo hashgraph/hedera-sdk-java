@@ -30,7 +30,7 @@ public final class ContractId extends Key {
     public final long num;
 
     @Nullable
-    private String checksum;
+    private final String checksum;
 
     public ContractId(@Nonnegative long num) {
         this(0, 0, num);
@@ -71,14 +71,7 @@ public final class ContractId extends Key {
 
     static ContractId fromProtobuf(ContractID contractId, @Nullable NetworkName networkName) {
         Objects.requireNonNull(contractId);
-
-        var id = new ContractId(contractId.getShardNum(), contractId.getRealmNum(), contractId.getContractNum());
-
-        if (networkName != null) {
-            id.setNetwork(networkName);
-        }
-
-        return id;
+        return new ContractId(contractId.getShardNum(), contractId.getRealmNum(), contractId.getContractNum(), networkName, null);
     }
 
     static ContractId fromProtobuf(ContractID contractId) {
@@ -100,21 +93,18 @@ public final class ContractId extends Key {
             .build();
     }
 
-    ContractId setNetworkWith(Client client) {
-        if (client.network.networkName != null) {
-            setNetwork(client.network.networkName);
-        }
-
-        return this;
-    }
-
-    ContractId setNetwork(NetworkName name) {
-        checksum = EntityIdHelper.checksum(Integer.toString(name.id), EntityIdHelper.toString(shard, realm, num));
-        return this;
-    }
-
+    @Deprecated
     public void validate(Client client) {
+        validateChecksum(client);
+    }
+
+    public void validateChecksum(Client client) {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
+    }
+
+    @Nullable
+    public String getChecksum() {
+        return checksum;
     }
 
     @Override
@@ -131,7 +121,11 @@ public final class ContractId extends Key {
 
     @Override
     public String toString() {
-        return EntityIdHelper.toString(shard, realm, num, checksum);
+        return EntityIdHelper.toString(shard, realm, num);
+    }
+
+    public String toStringWithChecksum(Client client) {
+        return EntityIdHelper.toStringWithChecksum(shard, realm, num, client, checksum);
     }
 
     @Override

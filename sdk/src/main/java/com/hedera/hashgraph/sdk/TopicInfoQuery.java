@@ -45,7 +45,7 @@ public final class TopicInfoQuery extends Query<TopicInfo, TopicInfoQuery> {
     @Override
     void validateNetworkOnIds(Client client) {
         if (topicId != null) {
-            topicId.validate(client);
+            topicId.validateChecksum(client);
         }
     }
 

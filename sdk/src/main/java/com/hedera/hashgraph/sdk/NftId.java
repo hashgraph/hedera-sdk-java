@@ -36,10 +36,7 @@ public class NftId {
     static NftId fromProtobuf(NftID nftId, @Nullable NetworkName networkName) {
         Objects.requireNonNull(nftId);
         var tokenId = nftId.getTokenID();
-        var returnNftId = new NftId(TokenId.fromProtobuf(tokenId), nftId.getSerialNumber());
-        if(networkName != null) {
-            returnNftId.tokenId.setNetwork(networkName);
-        }
+        var returnNftId = new NftId(TokenId.fromProtobuf(tokenId, networkName), nftId.getSerialNumber());
         return returnNftId;
     }
 
@@ -65,6 +62,10 @@ public class NftId {
     @Override
     public String toString() {
         return tokenId.toString() + "@" + serial;
+    }
+
+    public String toStringWithChecksum(Client client) {
+        return tokenId.toStringWithChecksum(client) + "@" + serial;
     }
 
     @Override

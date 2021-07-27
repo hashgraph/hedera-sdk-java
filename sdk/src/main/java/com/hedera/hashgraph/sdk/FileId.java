@@ -30,7 +30,7 @@ public final class FileId {
     public final long num;
 
     @Nullable
-    private String checksum;
+    private final String checksum;
 
     /**
      * The public node address book for the current network.
@@ -86,14 +86,7 @@ public final class FileId {
 
     static FileId fromProtobuf(FileID fileId, @Nullable NetworkName networkName) {
         Objects.requireNonNull(fileId);
-
-        var id = new FileId(fileId.getShardNum(), fileId.getRealmNum(), fileId.getFileNum());
-
-        if (networkName != null) {
-            id.setNetwork(networkName);
-        }
-
-        return id;
+        return new FileId(fileId.getShardNum(), fileId.getRealmNum(), fileId.getFileNum(), networkName, null);
     }
 
     static FileId fromProtobuf(FileID fileId) {
@@ -108,21 +101,18 @@ public final class FileId {
             .build();
     }
 
-    FileId setNetworkWith(Client client) {
-        if (client.network.networkName != null) {
-            setNetwork(client.network.networkName);
-        }
-
-        return this;
-    }
-
-    FileId setNetwork(NetworkName name) {
-        checksum = EntityIdHelper.checksum(Integer.toString(name.id), EntityIdHelper.toString(shard, realm, num));
-        return this;
-    }
-
+    @Deprecated
     public void validate(Client client) {
+        validateChecksum(client);
+    }
+
+    public void validateChecksum(Client client) {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
+    }
+
+    @Nullable
+    public String getChecksum() {
+        return checksum;
     }
 
     public byte[] toBytes() {
@@ -131,7 +121,11 @@ public final class FileId {
 
     @Override
     public String toString() {
-        return EntityIdHelper.toString(shard, realm, num, checksum);
+        return EntityIdHelper.toString(shard, realm, num);
+    }
+
+    public String toStringWithChecksum(Client client) {
+        return EntityIdHelper.toStringWithChecksum(shard, realm, num, client, checksum);
     }
 
     @Override

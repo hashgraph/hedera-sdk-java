@@ -48,7 +48,7 @@ public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountS
     @Override
     void validateNetworkOnIds(Client client) {
         if (accountId != null) {
-            accountId.validate(client);
+            accountId.validateChecksum(client);
         }
     }
 

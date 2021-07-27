@@ -239,15 +239,15 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     @Override
     void validateNetworkOnIds(Client client) {
         if (tokenId != null) {
-            tokenId.validate(client);
+            tokenId.validateChecksum(client);
         }
 
         if (treasuryAccountId != null) {
-            treasuryAccountId.validate(client);
+            treasuryAccountId.validateChecksum(client);
         }
 
         if (autoRenewAccountId != null) {
-            autoRenewAccountId.validate(client);
+            autoRenewAccountId.validateChecksum(client);
         }
     }
 

@@ -66,7 +66,7 @@ public class TokenDeleteTransaction extends com.hedera.hashgraph.sdk.Transaction
     @Override
     void validateNetworkOnIds(Client client) {
         if (tokenId != null) {
-            tokenId.validate(client);
+            tokenId.validateChecksum(client);
         }
     }
 

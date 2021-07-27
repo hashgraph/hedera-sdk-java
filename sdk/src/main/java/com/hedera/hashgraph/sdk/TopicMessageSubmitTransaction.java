@@ -111,7 +111,7 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
     @Override
     void validateNetworkOnIds(Client client) {
         if (topicId != null) {
-            topicId.validate(client);
+            topicId.validateChecksum(client);
         }
     }
 

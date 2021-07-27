@@ -102,7 +102,7 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     @Override
     void validateNetworkOnIds(Client client) {
         if (tokenId != null) {
-            tokenId.validate(client);
+            tokenId.validateChecksum(client);
         }
     }
 

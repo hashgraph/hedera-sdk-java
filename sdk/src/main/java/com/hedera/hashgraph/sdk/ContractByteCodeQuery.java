@@ -44,7 +44,7 @@ public final class ContractByteCodeQuery extends Query<ByteString, ContractByteC
     @Override
     void validateNetworkOnIds(Client client) {
         if (contractId != null) {
-            contractId.validate(client);
+            contractId.validateChecksum(client);
         }
     }
 

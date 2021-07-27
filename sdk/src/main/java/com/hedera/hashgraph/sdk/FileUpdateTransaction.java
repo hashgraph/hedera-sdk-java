@@ -200,7 +200,7 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     @Override
     void validateNetworkOnIds(Client client) {
         if (fileId != null) {
-            fileId.validate(client);
+            fileId.validateChecksum(client);
         }
     }
 

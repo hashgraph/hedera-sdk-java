@@ -159,7 +159,7 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
     @Override
     void validateNetworkOnIds(Client client) {
         if (contractId != null) {
-            contractId.validate(client);
+            contractId.validateChecksum(client);
         }
     }
 

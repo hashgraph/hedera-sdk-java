@@ -245,13 +245,13 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     @Override
     void validateNetworkOnIds(Client client) {
         if (topicId != null) {
-            topicId.validate(client);
+            topicId.validateChecksum(client);
         }
 
         if ((autoRenewAccountId != null) &&
             ( ! autoRenewAccountId.equals(new AccountId(0)))
         ) {
-            autoRenewAccountId.validate(client);
+            autoRenewAccountId.validateChecksum(client);
         }
     }
 

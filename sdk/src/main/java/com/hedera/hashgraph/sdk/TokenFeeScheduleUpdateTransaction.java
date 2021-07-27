@@ -92,7 +92,7 @@ public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeSched
     @Override
     void validateNetworkOnIds(Client client) {
         if (tokenId != null) {
-            tokenId.validate(client);
+            tokenId.validateChecksum(client);
         }
 
         for(var fee : customFees) {

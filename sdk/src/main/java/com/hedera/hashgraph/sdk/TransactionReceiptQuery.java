@@ -58,7 +58,7 @@ public final class TransactionReceiptQuery
     @Override
     void validateNetworkOnIds(Client client) {
         if (transactionId != null) {
-            Objects.requireNonNull(transactionId.accountId).validate(client);
+            Objects.requireNonNull(transactionId.accountId).validateChecksum(client);
         }
     }
 

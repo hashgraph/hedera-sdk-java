@@ -45,7 +45,7 @@ public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery>
     @Override
     void validateNetworkOnIds(Client client) {
         if (accountId != null) {
-            accountId.validate(client);
+            accountId.validateChecksum(client);
         }
     }
 

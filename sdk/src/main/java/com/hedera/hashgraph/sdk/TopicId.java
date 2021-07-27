@@ -30,7 +30,7 @@ public final class TopicId {
     public final long num;
 
     @Nullable
-    private String checksum;
+    private final String checksum;
 
     public TopicId(@Nonnegative long num) {
         this(0, 0, num);
@@ -106,8 +106,18 @@ public final class TopicId {
         return this;
     }
 
+    @Deprecated
     public void validate(Client client) {
+        validateChecksum(client);
+    }
+
+    public void validateChecksum(Client client) {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
+    }
+
+    @Nullable
+    public String getChecksum() {
+        return checksum;
     }
 
     public byte[] toBytes() {
@@ -116,7 +126,11 @@ public final class TopicId {
 
     @Override
     public String toString() {
-        return EntityIdHelper.toString(shard, realm, num, checksum);
+        return EntityIdHelper.toString(shard, realm, num);
+    }
+
+    public String toStringWithChecksum(Client client) {
+        return EntityIdHelper.toStringWithChecksum(shard, realm, num, client, checksum);
     }
 
     @Override

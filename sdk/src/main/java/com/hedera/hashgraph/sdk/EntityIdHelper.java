@@ -170,10 +170,11 @@ class EntityIdHelper {
         R apply(long shard, long realm, long num, @Nullable NetworkName name, @Nullable String checksum);
     }
 
-    static void validate(long shard, long realm, long num, Client client, @Nullable String checksum) {
+    static void validate(long shard, long realm, long num, Client client, @Nullable String checksum) throws Exception {
         if (client.network.networkName != null && checksum != null &&
             !checksum.equals(EntityIdHelper.checksum(Integer.toString(client.network.networkName.id), EntityIdHelper.toString(shard, realm, num)))) {
-            throw new IllegalArgumentException("Entity ID is for a different network than client");
+            // TODO: add InvalidChecksumException
+            throw new Exception("Checksum was not as expected");
         }
     }
 
@@ -181,11 +182,13 @@ class EntityIdHelper {
         return "" + shard + "." + realm + "." + num;
     }
 
-    static String toString(long shard, long realm, long num, @Nullable String checksum) {
-        if (checksum != null) {
+    static String toStringWithChecksum(long shard, long realm, long num, Client client, @Nullable String checksum) {
+        if(checksum != null) {
             return "" + shard + "." + realm + "." + num + "-" + checksum;
+        } else if (client.getNetworkName() != null) {
+            return "" + shard + "." + realm + "." + num + "-" + checksum(Integer.toString(client.getNetworkName().id), EntityIdHelper.toString(shard, realm, num));
         } else {
-            return "" + shard + "." + realm + "." + num;
+            throw new IllegalStateException("Attempted to convert an entity ID to a string with a checksum, but it was impossible to derive the checksum.  Make sure the network name is set on the client.");
         }
     }
 }

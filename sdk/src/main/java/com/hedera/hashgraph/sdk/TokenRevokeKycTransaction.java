@@ -91,11 +91,11 @@ public class TokenRevokeKycTransaction extends com.hedera.hashgraph.sdk.Transact
     @Override
     void validateNetworkOnIds(Client client) {
         if (tokenId != null) {
-            tokenId.validate(client);
+            tokenId.validateChecksum(client);
         }
 
         if (accountId != null) {
-            accountId.validate(client);
+            accountId.validateChecksum(client);
         }
     }
 

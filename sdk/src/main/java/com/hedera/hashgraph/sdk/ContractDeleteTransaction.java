@@ -107,15 +107,15 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
     @Override
     void validateNetworkOnIds(Client client) {
         if (contractId != null) {
-            contractId.validate(client);
+            contractId.validateChecksum(client);
         }
 
         if (transferContractId != null) {
-            transferContractId.validate(client);
+            transferContractId.validateChecksum(client);
         }
 
         if (transferAccountId != null) {
-            transferAccountId.validate(client);
+            transferAccountId.validateChecksum(client);
         }
     }
 

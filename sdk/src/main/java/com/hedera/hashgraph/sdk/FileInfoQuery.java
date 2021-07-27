@@ -50,7 +50,7 @@ public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
     @Override
     void validateNetworkOnIds(Client client) {
         if (fileId != null) {
-            fileId.validate(client);
+            fileId.validateChecksum(client);
         }
     }
 

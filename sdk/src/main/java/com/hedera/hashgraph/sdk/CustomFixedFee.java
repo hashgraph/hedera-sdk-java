@@ -52,7 +52,7 @@ public class CustomFixedFee extends CustomFee {
     void validate(Client client) {
         super.validate(client);
         if(denominatingTokenId != null) {
-            denominatingTokenId.validate(client);
+            denominatingTokenId.validateChecksum(client);
         }
     }
 

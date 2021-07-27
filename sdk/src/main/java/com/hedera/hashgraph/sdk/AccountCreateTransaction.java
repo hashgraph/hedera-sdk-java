@@ -217,7 +217,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     @Override
     void validateNetworkOnIds(Client client) {
         if (proxyAccountId != null) {
-            proxyAccountId.validate(client);
+            proxyAccountId.validateChecksum(client);
         }
     }
 

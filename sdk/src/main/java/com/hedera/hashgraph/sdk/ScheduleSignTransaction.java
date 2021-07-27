@@ -63,7 +63,7 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
     @Override
     void validateNetworkOnIds(Client client) {
         if (scheduleId != null) {
-            scheduleId.validate(client);
+            scheduleId.validateChecksum(client);
         }
     }
 

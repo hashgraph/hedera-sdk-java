@@ -179,7 +179,9 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     }
 
     private void initWithNodeIds(Client client) {
-        validateNetworkOnIds(client);
+        if(client.isAutoValidateChecksumsEnabled()) {
+            validateNetworkOnIds(client);
+        }
 
         if (nodeAccountIds.size() == 0) {
             // Get a list of node AccountId's if the user has not set them manually.

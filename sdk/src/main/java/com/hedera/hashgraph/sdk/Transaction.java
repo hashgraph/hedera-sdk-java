@@ -929,9 +929,11 @@ public abstract class Transaction<T extends Transaction<T>>
         }
 
         var accountId = Objects.requireNonNull(Objects.requireNonNull(getTransactionId()).accountId);
-        accountId.validate(client);
 
-        validateNetworkOnIds(client);
+        if(client.isAutoValidateChecksumsEnabled()) {
+            accountId.validateChecksum(client);
+            validateNetworkOnIds(client);
+        }
 
         var operatorId = client.getOperatorAccountId();
         if (operatorId != null && operatorId.equals(accountId)) {

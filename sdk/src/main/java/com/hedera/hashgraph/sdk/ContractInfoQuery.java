@@ -55,7 +55,7 @@ public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQue
     @Override
     void validateNetworkOnIds(Client client) {
         if (contractId != null) {
-            contractId.validate(client);
+            contractId.validateChecksum(client);
         }
     }
 

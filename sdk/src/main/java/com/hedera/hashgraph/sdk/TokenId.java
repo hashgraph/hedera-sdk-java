@@ -27,7 +27,7 @@ public class TokenId {
     public final long num;
 
     @Nullable
-    private String checksum;
+    private final String checksum;
 
     public TokenId(@Nonnegative long num) {
         this(0, 0, num);
@@ -68,14 +68,7 @@ public class TokenId {
 
     static TokenId fromProtobuf(TokenID tokenId, @Nullable NetworkName networkName) {
         Objects.requireNonNull(tokenId);
-
-        var id = new TokenId(tokenId.getShardNum(), tokenId.getRealmNum(), tokenId.getTokenNum());
-
-        if (networkName != null) {
-            id.setNetwork(networkName);
-        }
-
-        return id;
+        return new TokenId(tokenId.getShardNum(), tokenId.getRealmNum(), tokenId.getTokenNum(), networkName, null);
     }
 
     static TokenId fromProtobuf(TokenID tokenId) {
@@ -94,21 +87,18 @@ public class TokenId {
             .build();
     }
 
-    TokenId setNetworkWith(Client client) {
-        if (client.network.networkName != null) {
-            setNetwork(client.network.networkName);
-        }
-
-        return this;
-    }
-
-    TokenId setNetwork(NetworkName name) {
-        checksum = EntityIdHelper.checksum(Integer.toString(name.id), EntityIdHelper.toString(shard, realm, num));
-        return this;
-    }
-
+    @Deprecated
     public void validate(Client client) {
+        validateChecksum(client);
+    }
+
+    public void validateChecksum(Client client) {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
+    }
+
+    @Nullable
+    public String getChecksum() {
+        return checksum;
     }
 
     public byte[] toBytes() {
@@ -117,7 +107,11 @@ public class TokenId {
 
     @Override
     public String toString() {
-        return EntityIdHelper.toString(shard, realm, num, checksum);
+        return EntityIdHelper.toString(shard, realm, num);
+    }
+
+    public String toStringWithChecksum(Client client) {
+        return EntityIdHelper.toStringWithChecksum(shard, realm, num, client, checksum);
     }
 
     @Override
