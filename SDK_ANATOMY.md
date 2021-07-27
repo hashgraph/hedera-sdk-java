@@ -34,6 +34,10 @@ Reports code coverage (how much code actually gets tested by tests).
 
 Augments the Java compiler to output more comprehensive errors and warnings.
 
+### JavaPoet:
+
+Library to assist in code generation (see **FunctionalExecutableProcessor**).
+
 
 
 
@@ -321,6 +325,29 @@ The proto messages used under the hood are defined in `"proto/mirror/ConsensusSe
 The responses may be chunked.  If they are, `TopicMessageQuery` will collect all of the chunks into one `TopicMessage` before passing it to the `onNext()` handler.  The `initialTransactionID` field of each responses' `chunkInfo` field is used to identify which pending message this response is a chunk of and store it appropriately.  `chunkInfo`'s `total` field is used to identify whether we've collected all of the chunks of a pending message, and if we have, we construct the `TopicMessage` and dispatch it to the `onNext()` handler.  Because grpc works over HTTP, we're guaranteed to receive all of the chunks, and in the correct order (unless an error occurs, obviously), though chunks from different topic messages may be interleaved.
 
 In addition to the `onNext()` handler, there are several optional handlers which can be set with `setCompletionHandler()`, `setErrorhandler()`, and `setRetryHandler()`.  The retry handler returns a boolean to indicate whether the query should be retried.
+
+
+
+
+
+### `FunctionalExecutable` and `FunctionalExecutableProcessor`
+
+These classes aren't themselves components of the SDK, they are components in the SDK's build process.  `FunctionalExecutable` is a custom annotation defined in the `executable-annotation` directory, and we use this annotation is in the SDK source code to mark methods that require additional processing during the build process.  This additional processing is performed by the `FunctionalExecutableProcessor`, which is defined in the `executable-processor` directory.
+
+The `FunctionalExecutableProcessor` uses the JavaPoet library to generate variations of the marked method.  It presumes that the marked method is named `"*Async"`, that it has a `Client` parameter, and that it returns a `CompletableFuture<O>` (you may specify a type other than `O`, as shown in the example below), and the `FunctionalExecutableProcessor` adds to the class several variations of that method which build on that original `*Async()` method.
+
+For example, if in class `Bar` you create the method `CompletableFuture<Integer> fooAsync(Client client)` and mark it with `@FunctionalExecutable(type=int.class)` (`type` here is the return type of the marked method), the `FunctionalExecutableProcessor` will add the following methods to `Bar`:
+
+- `void fooAsync(Client client, BiConsumer<Integer, Throwable> callback)`
+- `void fooAsync(Client client, Duration timeout, BiConsumer<Integer, Throwable> callback)`
+- `void fooAsync(Client client, Consumer<Integer> onSuccess, Consumer<Throwable> onFailure)`
+- `void fooAsync(Client client, Duration timeout, Consumer<Integer> onSuccess, Consumer<Throwable> onFailure)`
+- `Integer foo(Client client)`
+- `Integer foo(Client client, Duration timeout)`
+
+Note that the last two are synchronous versions.
+
+The `FunctionalAnnotationProcessor` can't add these methods to `Bar` directly.  Instead, it will generate a new interface called `WithFoo`.  The `WithFoo` interface will have an abstract `CompletableFuture<Integer> fooAsync(Client client)` method, and it will have all of the variations of the `fooAsync()` and `foo()` methods which are listed above, which will use and build on the abstract `fooAsync()` method.  You are expected to declare `Bar` as an implementation of this generated `WithFoo` interface.  You should use the `@Override` annotation on your `fooAsync()` method in `Bar` to make sure that it overrides the abstract `fooAsync()` method from `WithFoo`.
 
 
 
