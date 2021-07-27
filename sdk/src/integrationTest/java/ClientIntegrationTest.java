@@ -11,13 +11,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ClientIntegrationTest {
     @Test
@@ -89,6 +88,82 @@ public class ClientIntegrationTest {
 
             assertNotNull(transaction.getNodeAccountIds());
             assertEquals(1, transaction.getNodeAccountIds().size());
+
+            testEnv.close();
+        });
+    }
+
+    @Test
+    void ping() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv(1);
+            var network = testEnv.client.getNetwork();
+            var nodes = new ArrayList<>(network.values());
+
+            assertFalse(nodes.isEmpty());
+
+            var node = nodes.get(0);
+
+            testEnv.client.setMaxNodeAttempts(1);
+            testEnv.client.ping(node);
+            testEnv.close();
+        });
+    }
+
+    @Test
+    void pingAll() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv(3);
+
+            testEnv.client.setMaxNodeAttempts(1);
+            testEnv.client.pingAll();
+
+            var network = testEnv.client.getNetwork();
+            var nodes = new ArrayList<>(network.values());
+
+            assertFalse(nodes.isEmpty());
+
+            var node = nodes.get(0);
+
+            new AccountBalanceQuery()
+                .setAccountId(node)
+                .execute(testEnv.client);
+
+            testEnv.close();
+        });
+    }
+
+    @Test
+    void pingAllBadNetwork() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv(3);
+
+            testEnv.client.setMaxNodeAttempts(1);
+            testEnv.client.setMaxNodesPerTransaction(2);
+
+            var network = testEnv.client.getNetwork();
+
+            var entries = new ArrayList<>(network.entrySet());
+            assertTrue(entries.size() > 1);
+
+            network.clear();
+            network.put("in-process:name", entries.get(0).getValue());
+            network.put(entries.get(1).getKey(), entries.get(1).getValue());
+
+            testEnv.client.setNetwork(network);
+
+            testEnv.client.pingAll();
+
+            var nodes = new ArrayList<>(testEnv.client.getNetwork().values());
+            assertFalse(nodes.isEmpty());
+
+            var node = nodes.get(0);
+
+            new AccountBalanceQuery()
+                .setAccountId(node)
+                .execute(testEnv.client);
+
+            assertEquals(1, testEnv.client.getNetwork().values().size());
 
             testEnv.close();
         });

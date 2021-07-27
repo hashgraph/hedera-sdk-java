@@ -7,6 +7,7 @@ import com.google.gson.JsonParseException;
 import java8.util.Lists;
 import java8.util.function.Consumer;
 import java8.util.function.Function;
+import java8.util.concurrent.CompletableFuture;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
@@ -28,9 +29,10 @@ import java.util.concurrent.TimeoutException;
 /**
  * Managed client for use on the Hedera Hashgraph network.
  */
-public final class Client implements AutoCloseable {
+public final class Client implements AutoCloseable, WithPing, WithPingAll {
     private static final Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
     private static final Hbar DEFAULT_MAX_TRANSACTION_FEE = new Hbar(1);
+    static final Integer DEFAULT_MAX_ATTEMPTS = 10;
 
     Hbar maxTransactionFee = DEFAULT_MAX_QUERY_PAYMENT;
     Hbar maxQueryPayment = DEFAULT_MAX_TRANSACTION_FEE;
@@ -44,6 +46,8 @@ public final class Client implements AutoCloseable {
     private Operator operator;
 
     Duration requestTimeout = Duration.ofMinutes(2);
+
+    Integer maxAttempts = null;
 
     Client(Map<String, AccountId> network) {
         var threadFactory = new ThreadFactoryBuilder()
@@ -315,11 +319,27 @@ public final class Client implements AutoCloseable {
         return network;
     }
 
-    public void ping(AccountId nodeAccountId) throws TimeoutException, PrecheckStatusException {
-        new AccountBalanceQuery()
+    @FunctionalExecutable(type = "Void", onClient = true, inputType = "AccountId")
+    public synchronized CompletableFuture<Void> pingAsync(AccountId nodeAccountId) {
+        return new AccountBalanceQuery()
             .setAccountId(nodeAccountId)
             .setNodeAccountIds(Collections.singletonList(nodeAccountId))
-            .execute(this);
+            .executeAsync(this)
+            .handle((balance, e) -> {
+                // Do nothing
+                return null;
+            });
+    }
+
+    @FunctionalExecutable(type = "Void", onClient = true)
+    public synchronized CompletableFuture<Void> pingAllAsync() {
+        var list = new ArrayList<CompletableFuture<Void>>(network.network.size());
+
+        for (var nodeAccountId : network.network.values()) {
+            list.add(pingAsync(nodeAccountId));
+        }
+
+        return CompletableFuture.allOf(list.toArray(new CompletableFuture<?>[0])).thenApply((v) -> null);
     }
 
     /**
@@ -362,6 +382,33 @@ public final class Client implements AutoCloseable {
 
         this.operator = new Operator(accountId, publicKey, transactionSigner);
         return this;
+    }
+
+    public synchronized Client setMaxAttempts(int maxAttempts) {
+        this.maxAttempts = maxAttempts;
+        return this;
+    }
+
+    public synchronized int getMaxAttempts() {
+        return maxAttempts != null ? maxAttempts : DEFAULT_MAX_ATTEMPTS;
+    }
+
+    public synchronized Client setMaxNodeAttempts(int maxNodeAttempts) {
+        this.network.setMaxNodeAttempts(maxNodeAttempts);
+        return this;
+    }
+
+    public synchronized int getMaxNodeAttempts() {
+        return network.getMaxNodeAttempts();
+    }
+
+    public synchronized Client setNodeWaitTime(Duration nodeWaitTime) {
+        network.setNodeWaitTime(nodeWaitTime);
+        return this;
+    }
+
+    public synchronized Duration getNodeWaitTime() {
+        return network.getNodeWaitTime();
     }
 
     public synchronized Client setMaxNodesPerTransaction(int maxNodesPerTransaction) {
@@ -446,6 +493,10 @@ public final class Client implements AutoCloseable {
     public synchronized Client setRequestTimeout(Duration requestTimeout) {
         this.requestTimeout = requestTimeout;
         return this;
+    }
+
+    public synchronized Duration getRequestTimeout() {
+        return requestTimeout;
     }
 
     @Nullable

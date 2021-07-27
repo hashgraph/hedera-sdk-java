@@ -6,13 +6,26 @@ class Node extends ManagedNode implements Comparable<Node>{
     AccountId accountId;
     long delay;
     long delayUntil;
+    long waitTime;
+    long attempts;
 
-    Node(AccountId accountId, String address, ExecutorService executor) {
+    Node(AccountId accountId, String address, long waitTime, ExecutorService executor) {
         super(address, executor);
 
         this.accountId = accountId;
-        this.delay = 250;
+        this.delay = waitTime;
+        this.waitTime = waitTime;
         this.delayUntil = 0;
+        this.attempts = 0;
+    }
+
+    void setWaitTime(long waitTime) {
+        // If delay is equal to the old waitTime we should change it to the new waitTime
+        if (delay == this.waitTime) {
+            delay = waitTime;
+        }
+
+        this.waitTime = waitTime;
     }
 
     boolean isHealthy() {
@@ -20,12 +33,13 @@ class Node extends ManagedNode implements Comparable<Node>{
     }
 
     void increaseDelay() {
+        this.attempts++;
         this.delayUntil = System.currentTimeMillis() + this.delay;
         this.delay = Math.min(this.delay * 2, 8000);
     }
 
     void decreaseDelay() {
-        this.delay = Math.max(this.delay / 2, 250);
+        this.delay = Math.max(this.delay / 2, waitTime);
     }
 
     long delay() {

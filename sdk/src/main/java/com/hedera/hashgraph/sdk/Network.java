@@ -17,8 +17,13 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.TimeUnit;
 
 class Network {
+    static final Integer DEFAULT_MAX_NODE_ATTEMPTS = -1;
+
     HashMap<String, AccountId> network = new HashMap<>();
     HashMap<AccountId, Node> networkNodes = new HashMap<>();
+
+    private int maxNodeAttempts = DEFAULT_MAX_NODE_ATTEMPTS;
+    private Duration nodeWaitTime = Duration.ofMillis(250);
 
     @Nullable
     NetworkName networkName = null;
@@ -51,7 +56,7 @@ class Network {
             this.network = new HashMap<>(network);
 
             for (var entry : network.entrySet()) {
-                var node = new Node(entry.getValue(), entry.getKey(), executor);
+                var node = new Node(entry.getValue(), entry.getKey(), nodeWaitTime.toMillis(), executor);
                 this.networkNodes.put(entry.getValue(), node);
                 this.nodes.add(node);
             }
@@ -89,7 +94,7 @@ class Network {
         // Add new nodes that are not present in the list
         for (var entry : inverted.entrySet()) {
             if (networkNodes.get(entry.getKey()) == null) {
-                var node = new Node(entry.getKey(), entry.getValue(), executor);
+                var node = new Node(entry.getKey(), entry.getValue(), nodeWaitTime.toMillis(), executor);
 
                 nodes.add(node);
                 networkNodes.put(entry.getKey(), node);
@@ -113,6 +118,20 @@ class Network {
 
         Collections.sort(nodes);
 
+        // Remove nodes which have surpassed max attempts
+        if (maxNodeAttempts > 0) {
+            for (var i = 0; i < nodes.size(); i++) {
+                var node = Objects.requireNonNull(nodes.get(i));
+                if (node.attempts >= maxNodeAttempts) {
+                    node.close(30);
+                    nodes.remove(i);
+                    network.remove(node.address);
+                    networkNodes.remove(node.accountId);
+                    i--;
+                }
+            }
+        }
+
         List<AccountId> resultNodeAccountIds = new ArrayList<>();
 
         for (int i = 0; i < getNumberOfNodesForTransaction(); i++) {
@@ -128,9 +147,28 @@ class Network {
         this.maxNodesPerTransaction = maxNodesPerTransaction;
     }
 
+    void setMaxNodeAttempts(int maxNodeAttempts) {
+        this.maxNodeAttempts = maxNodeAttempts;
+    }
+
+    int getMaxNodeAttempts() {
+        return maxNodeAttempts;
+    }
+
+    void setNodeWaitTime(Duration nodeWaitTime) {
+        this.nodeWaitTime = nodeWaitTime;
+        for (var node : nodes) {
+            node.setWaitTime(nodeWaitTime.toMillis());
+        }
+    }
+
+    Duration getNodeWaitTime() {
+        return nodeWaitTime;
+    }
+
     int getNumberOfNodesForTransaction() {
         if (maxNodesPerTransaction != null) {
-            return maxNodesPerTransaction;
+            return Math.min(maxNodesPerTransaction, nodes.size());
         } else {
             return (nodes.size() + 3 - 1) / 3;
         }
