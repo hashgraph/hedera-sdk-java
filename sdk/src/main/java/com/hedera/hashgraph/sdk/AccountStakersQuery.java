@@ -46,7 +46,7 @@ public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountS
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         if (accountId != null) {
             accountId.validateChecksum(client);
         }
@@ -72,12 +72,12 @@ public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountS
     }
 
     @Override
-    List<ProxyStaker> mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
+    List<ProxyStaker> mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
         var rawStakers = response.getCryptoGetProxyStakers().getStakers();
         var stakers = new ArrayList<ProxyStaker>(rawStakers.getProxyStakerCount());
 
         for (var i = 0; i < rawStakers.getProxyStakerCount(); ++i) {
-            stakers.add(ProxyStaker.fromProtobuf(rawStakers.getProxyStaker(i), networkName));
+            stakers.add(ProxyStaker.fromProtobuf(rawStakers.getProxyStaker(i)));
         }
 
         return stakers;

@@ -89,7 +89,7 @@ public class TokenFreezeTransaction extends com.hedera.hashgraph.sdk.Transaction
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         if (tokenId != null) {
             tokenId.validateChecksum(client);
         }

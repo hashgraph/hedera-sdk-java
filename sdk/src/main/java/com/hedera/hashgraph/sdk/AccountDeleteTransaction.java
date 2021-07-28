@@ -97,7 +97,7 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         if (accountId != null) {
             accountId.validateChecksum(client);
         }

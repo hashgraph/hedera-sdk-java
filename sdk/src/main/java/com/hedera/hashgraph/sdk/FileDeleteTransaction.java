@@ -79,7 +79,7 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         if (fileId != null) {
             fileId.validateChecksum(client);
         }

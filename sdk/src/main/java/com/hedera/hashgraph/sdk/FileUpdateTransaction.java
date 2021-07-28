@@ -68,7 +68,7 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     }
 
     public Collection<Key> getKeys() {
-        return KeyList.fromProtobuf(builder.getKeys(), null, null);
+        return KeyList.fromProtobuf(builder.getKeys(), null);
     }
 
     /**
@@ -198,7 +198,7 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         if (fileId != null) {
             fileId.validateChecksum(client);
         }

@@ -42,7 +42,7 @@ public final class ContractByteCodeQuery extends Query<ByteString, ContractByteC
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         if (contractId != null) {
             contractId.validateChecksum(client);
         }
@@ -68,7 +68,7 @@ public final class ContractByteCodeQuery extends Query<ByteString, ContractByteC
     }
 
     @Override
-    ByteString mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
+    ByteString mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
         return response.getContractGetBytecodeResponse().getBytecode();
     }
 

@@ -89,7 +89,7 @@ public class TokenRevokeKycTransaction extends com.hedera.hashgraph.sdk.Transact
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         if (tokenId != null) {
             tokenId.validateChecksum(client);
         }

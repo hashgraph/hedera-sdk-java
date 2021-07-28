@@ -13,10 +13,10 @@ abstract public class CustomFee {
     CustomFee() {
     }
 
-    static CustomFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee, @Nullable NetworkName networkName) {
+    static CustomFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
         switch(customFee.getFeeCase()) {
             case FIXED_FEE:
-                return CustomFixedFee.fromProtobuf(customFee, networkName);
+                return CustomFixedFee.fromProtobuf(customFee);
 
             case FRACTIONAL_FEE:
                 return CustomFractionalFee.fromProtobuf(customFee);
@@ -24,10 +24,6 @@ abstract public class CustomFee {
             default:
                 throw new IllegalStateException("CustomFee#fromProtobuf: unhandled fee case: " + customFee.getFeeCase());
         }
-    }
-
-    static CustomFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
-        return fromProtobuf(customFee, null);
     }
 
     public static CustomFee fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -76,7 +72,7 @@ abstract public class CustomFee {
         }
     }
 
-    void validate(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         if(feeCollectorAccountId != null) {
             feeCollectorAccountId.validateChecksum(client);
         }

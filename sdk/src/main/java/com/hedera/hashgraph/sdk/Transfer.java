@@ -27,11 +27,7 @@ public final class Transfer {
     }
 
     static Transfer fromProtobuf(AccountAmount accountAmount) {
-        return Transfer.fromProtobuf(accountAmount, null);
-    }
-
-    static Transfer fromProtobuf(AccountAmount accountAmount, @Nullable NetworkName networkName) {
-        return new Transfer(AccountId.fromProtobuf(accountAmount.getAccountID(), networkName), Hbar.fromTinybars(accountAmount.getAmount()));
+        return new Transfer(AccountId.fromProtobuf(accountAmount.getAccountID()), Hbar.fromTinybars(accountAmount.getAmount()));
     }
 
     AccountAmount toProtobuf() {

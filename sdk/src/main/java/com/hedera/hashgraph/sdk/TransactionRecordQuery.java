@@ -49,7 +49,7 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         if (transactionId != null) {
             Objects.requireNonNull(transactionId.accountId).validateChecksum(client);
         }
@@ -75,8 +75,8 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     }
 
     @Override
-    TransactionRecord mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
-        return TransactionRecord.fromProtobuf(response.getTransactionGetRecord().getTransactionRecord(), networkName);
+    TransactionRecord mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+        return TransactionRecord.fromProtobuf(response.getTransactionGetRecord().getTransactionRecord());
     }
 
     @Override
@@ -127,7 +127,7 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     }
 
     @Override
-    Exception mapStatusError(Status status, @Nullable TransactionId transactionId, Response response, @Nullable NetworkName networkName) {
+    Exception mapStatusError(Status status, @Nullable TransactionId transactionId, Response response) {
         if (status != Status.OK) {
             return new PrecheckStatusException(status, transactionId);
         }
@@ -135,7 +135,7 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
         // has reached consensus but not generated
         return new ReceiptStatusException(
             Objects.requireNonNull(transactionId),
-            TransactionReceipt.fromProtobuf(response.getTransactionGetRecord().getTransactionRecord().getReceipt(), networkName)
+            TransactionReceipt.fromProtobuf(response.getTransactionGetRecord().getTransactionRecord().getReceipt())
         );
     }
 }

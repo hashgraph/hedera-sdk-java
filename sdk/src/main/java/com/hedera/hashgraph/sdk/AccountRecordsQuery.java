@@ -44,7 +44,7 @@ public final class AccountRecordsQuery extends Query<List<TransactionRecord>, Ac
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         if (accountId != null) {
             accountId.validateChecksum(client);
         }
@@ -70,12 +70,12 @@ public final class AccountRecordsQuery extends Query<List<TransactionRecord>, Ac
     }
 
     @Override
-    List<TransactionRecord> mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
+    List<TransactionRecord> mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
         var rawTransactionRecords = response.getCryptoGetAccountRecords().getRecordsList();
         var transactionRecords = new ArrayList<TransactionRecord>(rawTransactionRecords.size());
 
         for (var record : rawTransactionRecords) {
-            transactionRecords.add(TransactionRecord.fromProtobuf(record, networkName));
+            transactionRecords.add(TransactionRecord.fromProtobuf(record));
         }
 
         return transactionRecords;

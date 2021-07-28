@@ -57,7 +57,7 @@ public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         if (accountId != null) {
             accountId.validateChecksum(client);
         }
@@ -73,8 +73,8 @@ public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
     }
 
     @Override
-    LiveHash mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
-        return LiveHash.fromProtobuf(response.getCryptoGetLiveHash().getLiveHash(), networkName);
+    LiveHash mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+        return LiveHash.fromProtobuf(response.getCryptoGetLiveHash().getLiveHash());
     }
 
     @Override

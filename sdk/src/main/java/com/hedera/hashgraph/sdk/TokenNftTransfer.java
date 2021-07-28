@@ -16,16 +16,12 @@ class TokenNftTransfer {
         this.serial = serial;
     }
 
-    static TokenNftTransfer fromProtobuf(NftTransfer nftTransfer, @Nullable NetworkName networkName) {
+    static TokenNftTransfer fromProtobuf(NftTransfer nftTransfer) {
         return new TokenNftTransfer(
             AccountId.fromProtobuf(nftTransfer.getSenderAccountID()),
             AccountId.fromProtobuf(nftTransfer.getReceiverAccountID()),
             nftTransfer.getSerialNumber()
         );
-    }
-
-    static TokenNftTransfer fromProtobuf(NftTransfer info) {
-        return fromProtobuf(info, null);
     }
 
     public static TokenNftTransfer fromBytes(byte[] bytes) throws InvalidProtocolBufferException {

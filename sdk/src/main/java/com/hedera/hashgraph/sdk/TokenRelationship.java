@@ -40,9 +40,9 @@ public class TokenRelationship {
         return TokenRelationship.fromProtobuf(tokenRelationship, null);
     }
 
-    static TokenRelationship fromProtobuf(com.hedera.hashgraph.sdk.proto.TokenRelationship tokenRelationship, @Nullable NetworkName networkName) {
+    static TokenRelationship fromProtobuf(com.hedera.hashgraph.sdk.proto.TokenRelationship tokenRelationship) {
         return new TokenRelationship(
-            TokenId.fromProtobuf(tokenRelationship.getTokenId(), networkName),
+            TokenId.fromProtobuf(tokenRelationship.getTokenId()),
             tokenRelationship.getSymbol(),
             tokenRelationship.getBalance(),
             kycStatusFromProtobuf(tokenRelationship.getKycStatus()),

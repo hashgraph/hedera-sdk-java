@@ -376,8 +376,12 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return {@code this}
      */
     public synchronized Client setOperatorWith(AccountId accountId, PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
-        if (accountId.getChecksum() != null) {
+        try {
             accountId.validateChecksum(this);
+        } catch(InvalidChecksumException exc) {
+            throw new IllegalArgumentException(
+                "Tried to set the client operator account ID to an account ID with an invalid checksum: \"" +
+                exc.shard + "." + exc.realm + "." + exc.num + "\" had checksum \"" + exc.presentChecksum + "\", but the expected checksum was \"" + exc.expectedChecksum + "\"");
         }
 
         this.operator = new Operator(accountId, publicKey, transactionSigner);

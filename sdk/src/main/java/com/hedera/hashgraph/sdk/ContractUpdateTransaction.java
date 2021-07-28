@@ -246,7 +246,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         if (contractId != null) {
             contractId.validateChecksum(client);
         }

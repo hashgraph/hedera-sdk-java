@@ -67,7 +67,7 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         if (accountId != null) {
             accountId.validateChecksum(client);
         }
@@ -96,8 +96,8 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
     }
 
     @Override
-    AccountBalance mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
-        return AccountBalance.fromProtobuf(response.getCryptogetAccountBalance(), networkName);
+    AccountBalance mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+        return AccountBalance.fromProtobuf(response.getCryptogetAccountBalance());
     }
 
     @Override

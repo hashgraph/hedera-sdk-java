@@ -153,7 +153,7 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         if (fileId != null) {
             fileId.validateChecksum(client);
         }

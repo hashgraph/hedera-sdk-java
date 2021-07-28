@@ -90,7 +90,7 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         if (accountId != null) {
             accountId.validateChecksum(client);
         }

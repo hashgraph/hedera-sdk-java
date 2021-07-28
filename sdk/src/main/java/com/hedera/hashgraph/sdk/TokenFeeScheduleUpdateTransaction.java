@@ -90,13 +90,13 @@ public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeSched
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         if (tokenId != null) {
             tokenId.validateChecksum(client);
         }
 
-        for(var fee : customFees) {
-            fee.validate(client);
+        for(CustomFee fee : customFees) {
+            fee.validateChecksums(client);
         }
     }
 

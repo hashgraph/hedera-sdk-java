@@ -117,7 +117,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         return new QueryCostQuery();
     }
 
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         // Do nothing
     }
 
@@ -180,7 +180,14 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
 
     private void initWithNodeIds(Client client) {
         if(client.isAutoValidateChecksumsEnabled()) {
-            validateNetworkOnIds(client);
+            try {
+                validateChecksums(client);
+            } catch (InvalidChecksumException exc) {
+                throw new IllegalArgumentException(
+                    "Upon attempting to execute a query, automatic checksum validation found that an entity ID involved in that transaction had an invalid checksum: \"" +
+                        exc.shard + "." + exc.realm + "." + exc.num + "\" had checksum \"" + exc.presentChecksum + "\", but the expected checksum was \"" + exc.expectedChecksum + "\""
+                );
+            }
         }
 
         if (nodeAccountIds.size() == 0) {
@@ -264,7 +271,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     @SuppressWarnings("NullableDereference")
     private class QueryCostQuery extends Query<Hbar, QueryCostQuery> {
         @Override
-        void validateNetworkOnIds(Client client) {
+        void validateChecksums(Client client) throws InvalidChecksumException {
         }
 
         @Override
@@ -296,7 +303,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         }
 
         @Override
-        Hbar mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
+        Hbar mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
             return Hbar.fromTinybars(mapResponseHeader(response).getCost());
         }
 

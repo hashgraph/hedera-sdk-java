@@ -109,10 +109,6 @@ public final class TransactionReceipt {
     }
 
     static TransactionReceipt fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionReceipt transactionReceipt) {
-        return TransactionReceipt.fromProtobuf(transactionReceipt, null);
-    }
-
-    static TransactionReceipt fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionReceipt transactionReceipt, @Nullable NetworkName networkName) {
         var status = Status.valueOf(transactionReceipt.getStatus());
 
         var rate = transactionReceipt.getExchangeRate();
@@ -120,27 +116,27 @@ public final class TransactionReceipt {
 
         var accountId =
             transactionReceipt.hasAccountID()
-                ? AccountId.fromProtobuf(transactionReceipt.getAccountID(), networkName)
+                ? AccountId.fromProtobuf(transactionReceipt.getAccountID())
                 : null;
 
         var fileId =
             transactionReceipt.hasFileID()
-                ? FileId.fromProtobuf(transactionReceipt.getFileID(), networkName)
+                ? FileId.fromProtobuf(transactionReceipt.getFileID())
                 : null;
 
         var contractId =
             transactionReceipt.hasContractID()
-                ? ContractId.fromProtobuf(transactionReceipt.getContractID(), networkName)
+                ? ContractId.fromProtobuf(transactionReceipt.getContractID())
                 : null;
 
         var topicId =
             transactionReceipt.hasTopicID()
-                ? TopicId.fromProtobuf(transactionReceipt.getTopicID(), networkName)
+                ? TopicId.fromProtobuf(transactionReceipt.getTopicID())
                 : null;
 
         var tokenId =
             transactionReceipt.hasTokenID()
-                ? TokenId.fromProtobuf(transactionReceipt.getTokenID(), networkName)
+                ? TokenId.fromProtobuf(transactionReceipt.getTokenID())
                 : null;
 
         var topicSequenceNumber =
@@ -157,12 +153,12 @@ public final class TransactionReceipt {
 
         var scheduleId =
             transactionReceipt.hasScheduleID()
-                ? ScheduleId.fromProtobuf(transactionReceipt.getScheduleID(), networkName)
+                ? ScheduleId.fromProtobuf(transactionReceipt.getScheduleID())
                 : null;
 
         var scheduledTransactionId =
             transactionReceipt.hasScheduledTransactionID()
-                ? TransactionId.fromProtobuf(transactionReceipt.getScheduledTransactionID(), networkName)
+                ? TransactionId.fromProtobuf(transactionReceipt.getScheduledTransactionID())
                 : null;
 
         var serials = transactionReceipt.getSerialNumbersList();

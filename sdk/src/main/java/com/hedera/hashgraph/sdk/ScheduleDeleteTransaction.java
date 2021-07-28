@@ -65,7 +65,7 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         if (scheduleId != null) {
             scheduleId.validateChecksum(client);
         }

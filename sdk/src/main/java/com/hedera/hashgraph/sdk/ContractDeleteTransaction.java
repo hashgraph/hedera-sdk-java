@@ -33,7 +33,18 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
         super(txs);
 
         builder = bodyBuilder.getContractDeleteInstance().toBuilder();
-        contractId = ContractId.fromProtobuf(builder.getContractID());
+
+        if(builder.hasContractID()) {
+            contractId = ContractId.fromProtobuf(builder.getContractID());
+        }
+
+        if(builder.hasTransferContractID()) {
+            transferContractId = ContractId.fromProtobuf(builder.getTransferContractID());
+        }
+
+        if(builder.hasTransferAccountID()) {
+            transferAccountId = AccountId.fromProtobuf(builder.getTransferAccountID());
+        }
     }
 
     ContractDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
@@ -41,8 +52,16 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
 
         builder = bodyBuilder.getContractDeleteInstance().toBuilder();
 
-        if (builder.hasContractID()) {
+        if(builder.hasContractID()) {
             contractId = ContractId.fromProtobuf(builder.getContractID());
+        }
+
+        if(builder.hasTransferContractID()) {
+            transferContractId = ContractId.fromProtobuf(builder.getTransferContractID());
+        }
+
+        if(builder.hasTransferAccountID()) {
+            transferAccountId = AccountId.fromProtobuf(builder.getTransferAccountID());
         }
     }
 
@@ -105,7 +124,7 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         if (contractId != null) {
             contractId.validateChecksum(client);
         }

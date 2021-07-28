@@ -79,11 +79,11 @@ public final class ContractId extends Key {
     }
 
     @Deprecated
-    public void validate(Client client) {
+    public void validate(Client client) throws InvalidChecksumException {
         validateChecksum(client);
     }
 
-    public void validateChecksum(Client client) {
+    public void validateChecksum(Client client) throws InvalidChecksumException {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
     }
 

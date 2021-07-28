@@ -117,7 +117,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         for (var a : hbarTransfers.keySet()) {
             a.validateChecksum(client);
         }

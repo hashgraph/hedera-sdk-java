@@ -43,7 +43,7 @@ public final class TopicInfoQuery extends Query<TopicInfo, TopicInfoQuery> {
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         if (topicId != null) {
             topicId.validateChecksum(client);
         }
@@ -69,8 +69,8 @@ public final class TopicInfoQuery extends Query<TopicInfo, TopicInfoQuery> {
     }
 
     @Override
-    TopicInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
-        return TopicInfo.fromProtobuf(response.getConsensusGetTopicInfo(), networkName);
+    TopicInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+        return TopicInfo.fromProtobuf(response.getConsensusGetTopicInfo());
     }
 
     @Override

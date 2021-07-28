@@ -42,6 +42,10 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         if (builder.hasTreasury()) {
             treasuryAccountId = AccountId.fromProtobuf(builder.getTreasury());
         }
+
+        if(builder.hasAutoRenewAccount()) {
+            autoRenewAccountId = AccountId.fromProtobuf(builder.getAutoRenewAccount());
+        }
     }
 
     TokenUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
@@ -55,6 +59,10 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
 
         if (builder.hasTreasury()) {
             treasuryAccountId = AccountId.fromProtobuf(builder.getTreasury());
+        }
+
+        if(builder.hasAutoRenewAccount()) {
+            autoRenewAccountId = AccountId.fromProtobuf(builder.getAutoRenewAccount());
         }
     }
 
@@ -237,7 +245,7 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         if (tokenId != null) {
             tokenId.validateChecksum(client);
         }

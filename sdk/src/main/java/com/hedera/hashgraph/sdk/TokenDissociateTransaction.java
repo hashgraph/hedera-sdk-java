@@ -92,7 +92,7 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         if (accountId != null) {
             accountId.validateChecksum(client);
         }

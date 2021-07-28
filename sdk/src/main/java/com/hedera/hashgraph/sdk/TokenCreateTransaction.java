@@ -317,9 +317,9 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws InvalidChecksumException {
         for(var fee : customFees) {
-            fee.validate(client);
+            fee.validateChecksums(client);
         }
 
         if (treasuryAccountId != null) {
