@@ -53,27 +53,15 @@ public final class FileId {
 
     @SuppressWarnings("InconsistentOverloads")
     public FileId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num) {
-        this.shard = shard;
-        this.realm = realm;
-        this.num = num;
-        this.checksum = null;
+        this(shard, realm, num, null);
     }
 
     @SuppressWarnings("InconsistentOverloads")
-    FileId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable NetworkName network, @Nullable String checksum) {
+    FileId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable String checksum) {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
-
-        if (network != null) {
-            if (checksum == null) {
-                this.checksum = EntityIdHelper.checksum(Integer.toString(network.id), shard + "." + realm + "." + num);
-            } else {
-                this.checksum = checksum;
-            }
-        } else {
-            this.checksum = null;
-        }
+        this.checksum = checksum;
     }
 
     public static FileId fromString(String id) {
@@ -84,13 +72,9 @@ public final class FileId {
         return fromProtobuf(FileID.parseFrom(bytes).toBuilder().build());
     }
 
-    static FileId fromProtobuf(FileID fileId, @Nullable NetworkName networkName) {
-        Objects.requireNonNull(fileId);
-        return new FileId(fileId.getShardNum(), fileId.getRealmNum(), fileId.getFileNum(), networkName, null);
-    }
-
     static FileId fromProtobuf(FileID fileId) {
-        return FileId.fromProtobuf(fileId, null);
+        Objects.requireNonNull(fileId);
+        return new FileId(fileId.getShardNum(), fileId.getRealmNum(), fileId.getFileNum());
     }
 
     FileID toProtobuf() {
@@ -102,11 +86,11 @@ public final class FileId {
     }
 
     @Deprecated
-    public void validate(Client client) {
+    public void validate(Client client) throws InvalidChecksumException {
         validateChecksum(client);
     }
 
-    public void validateChecksum(Client client) {
+    public void validateChecksum(Client client) throws InvalidChecksumException {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
     }
 

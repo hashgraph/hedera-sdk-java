@@ -33,15 +33,11 @@ public class NftId {
         return new NftId(TokenId.fromString(parts[0]), Long.parseLong(parts[1]));
     }
 
-    static NftId fromProtobuf(NftID nftId, @Nullable NetworkName networkName) {
+    static NftId fromProtobuf(NftID nftId) {
         Objects.requireNonNull(nftId);
         var tokenId = nftId.getTokenID();
-        var returnNftId = new NftId(TokenId.fromProtobuf(tokenId, networkName), nftId.getSerialNumber());
+        var returnNftId = new NftId(TokenId.fromProtobuf(tokenId), nftId.getSerialNumber());
         return returnNftId;
-    }
-
-    static NftId fromProtobuf(NftID nftId) {
-        return fromProtobuf(nftId, null);
     }
 
     public static NftId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {

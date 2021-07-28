@@ -376,9 +376,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return {@code this}
      */
     public synchronized Client setOperatorWith(AccountId accountId, PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
-        if (accountId.getChecksum() == null) {
-            accountId.setNetworkWith(this);
-        } else {
+        if (accountId.getChecksum() != null) {
             accountId.validateChecksum(this);
         }
 
@@ -443,7 +441,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return {AccountId}
      */
     @Nullable
-    public AccountId getOperatorAccountId() {
+    public synchronized AccountId getOperatorAccountId() {
         if (operator == null) {
             return null;
         }
@@ -457,7 +455,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return {PublicKey}
      */
     @Nullable
-    public PublicKey getOperatorPublicKey() {
+    public  synchronized PublicKey getOperatorPublicKey() {
         if (operator == null) {
             return null;
         }
@@ -521,7 +519,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     }
 
     @Nullable
-    Operator getOperator() {
+    Operator  getOperator() {
         return this.operator;
     }
 
@@ -546,7 +544,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      *
      * @param timeout The Duration to be set
      */
-    public void close(Duration timeout) throws TimeoutException {
+    public synchronized void close(Duration timeout) throws TimeoutException {
         network.close(timeout);
         mirrorNetwork.close(timeout);
     }

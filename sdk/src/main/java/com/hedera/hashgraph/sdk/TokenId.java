@@ -35,27 +35,15 @@ public class TokenId {
 
     @SuppressWarnings("InconsistentOverloads")
     public TokenId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num) {
-        this.shard = shard;
-        this.realm = realm;
-        this.num = num;
-        this.checksum = null;
+        this(shard, realm, num, null);
     }
 
     @SuppressWarnings("InconsistentOverloads")
-    TokenId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable NetworkName network, @Nullable String checksum) {
+    TokenId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable String checksum) {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
-
-        if (network != null) {
-            if (checksum == null) {
-                this.checksum = EntityIdHelper.checksum(Integer.toString(network.id), shard + "." + realm + "." + num);
-            } else {
-                this.checksum = checksum;
-            }
-        } else {
-            this.checksum = null;
-        }
+        this.checksum = checksum;
     }
 
     public NftId nft(@Nonnegative long serial) {
@@ -66,13 +54,9 @@ public class TokenId {
         return EntityIdHelper.fromString(id, TokenId::new);
     }
 
-    static TokenId fromProtobuf(TokenID tokenId, @Nullable NetworkName networkName) {
-        Objects.requireNonNull(tokenId);
-        return new TokenId(tokenId.getShardNum(), tokenId.getRealmNum(), tokenId.getTokenNum(), networkName, null);
-    }
-
     static TokenId fromProtobuf(TokenID tokenId) {
-        return TokenId.fromProtobuf(tokenId, null);
+        Objects.requireNonNull(tokenId);
+        return new TokenId(tokenId.getShardNum(), tokenId.getRealmNum(), tokenId.getTokenNum());
     }
 
     public static TokenId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -88,11 +72,11 @@ public class TokenId {
     }
 
     @Deprecated
-    public void validate(Client client) {
+    public void validate(Client client) throws InvalidChecksumException {
         validateChecksum(client);
     }
 
-    public void validateChecksum(Client client) {
+    public void validateChecksum(Client client) throws InvalidChecksumException {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
     }
 

@@ -38,47 +38,25 @@ public final class TopicId {
 
     @SuppressWarnings("InconsistentOverloads")
     public TopicId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num) {
-        this.shard = shard;
-        this.realm = realm;
-        this.num = num;
-        this.checksum = null;
+        this(shard, realm, num, null);
     }
 
     @SuppressWarnings("InconsistentOverloads")
-    TopicId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable NetworkName network, @Nullable String checksum) {
+    TopicId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable String checksum) {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
-
-        if (network != null) {
-            if (checksum == null) {
-                this.checksum = EntityIdHelper.checksum(Integer.toString(network.id), shard + "." + realm + "." + num);
-            } else {
-                this.checksum = checksum;
-            }
-        } else {
-            this.checksum = null;
-        }
+        this.checksum = checksum;
     }
 
     public static TopicId fromString(String id) {
         return EntityIdHelper.fromString(id, TopicId::new);
     }
 
-    static TopicId fromProtobuf(TopicID topicId, @Nullable NetworkName networkName) {
+    static TopicId fromProtobuf(TopicID topicId) {
         Objects.requireNonNull(topicId);
 
-        var id = new TopicId(topicId.getShardNum(), topicId.getRealmNum(), topicId.getTopicNum());
-
-        if (networkName != null) {
-            id.setNetwork(networkName);
-        }
-
-        return id;
-    }
-
-    static TopicId fromProtobuf(TopicID topicId) {
-        return TopicId.fromProtobuf(topicId, null);
+        return new TopicId(topicId.getShardNum(), topicId.getRealmNum(), topicId.getTopicNum());
     }
 
     public static TopicId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -93,25 +71,12 @@ public final class TopicId {
             .build();
     }
 
-    TopicId setNetworkWith(Client client) {
-        if (client.network.networkName != null) {
-            setNetwork(client.network.networkName);
-        }
-
-        return this;
-    }
-
-    TopicId setNetwork(NetworkName name) {
-        checksum = EntityIdHelper.checksum(Integer.toString(name.id), EntityIdHelper.toString(shard, realm, num));
-        return this;
-    }
-
     @Deprecated
-    public void validate(Client client) {
+    public void validate(Client client) throws InvalidChecksumException {
         validateChecksum(client);
     }
 
-    public void validateChecksum(Client client) {
+    public void validateChecksum(Client client) throws InvalidChecksumException {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
     }
 

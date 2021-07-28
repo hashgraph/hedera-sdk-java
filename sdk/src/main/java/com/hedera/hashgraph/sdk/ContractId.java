@@ -38,27 +38,15 @@ public final class ContractId extends Key {
 
     @SuppressWarnings("InconsistentOverloads")
     public ContractId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num) {
-        this.shard = shard;
-        this.realm = realm;
-        this.num = num;
-        this.checksum = null;
+        this(shard, realm, num, null);
     }
 
     @SuppressWarnings("InconsistentOverloads")
-    ContractId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable NetworkName network, @Nullable String checksum) {
+    ContractId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable String checksum) {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
-
-        if (network != null) {
-            if (checksum == null) {
-                this.checksum = EntityIdHelper.checksum(Integer.toString(network.id), shard + "." + realm + "." + num);
-            } else {
-                this.checksum = checksum;
-            }
-        } else {
-            this.checksum = null;
-        }
+        this.checksum = checksum;
     }
 
     public static ContractId fromString(String id) {
@@ -69,14 +57,11 @@ public final class ContractId extends Key {
         return EntityIdHelper.fromSolidityAddress(address, ContractId::new);
     }
 
-    static ContractId fromProtobuf(ContractID contractId, @Nullable NetworkName networkName) {
+    static ContractId fromProtobuf(ContractID contractId) {
         Objects.requireNonNull(contractId);
-        return new ContractId(contractId.getShardNum(), contractId.getRealmNum(), contractId.getContractNum(), networkName, null);
+        return new ContractId(contractId.getShardNum(), contractId.getRealmNum(), contractId.getContractNum());
     }
 
-    static ContractId fromProtobuf(ContractID contractId) {
-        return ContractId.fromProtobuf(contractId, null);
-    }
     public static ContractId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(ContractID.parseFrom(bytes).toBuilder().build());
     }
