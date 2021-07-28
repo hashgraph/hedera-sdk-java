@@ -11,9 +11,17 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class NftIdTest {
+
+    static Client mainnetClient = null;
+    static Client testnetClient = null;
+    static Client previewnetClient = null;
+
     @BeforeAll
     public static void beforeAll() {
         SnapshotMatcher.start();
+        mainnetClient = Client.forMainnet();
+        testnetClient = Client.forTestnet();
+        previewnetClient = Client.forPreviewnet();
     }
 
     @AfterClass
@@ -28,22 +36,17 @@ class NftIdTest {
 
     @Test
     void fromStringWithChecksumOnMainnet() {
-        SnapshotMatcher.expect(NftId.fromString("0.0.123-vfmkw@7584").toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(NftId.fromString("0.0.123-vfmkw@7584").toStringWithChecksum(mainnetClient)).toMatchSnapshot();
     }
 
     @Test
     void fromStringWithChecksumOnTestnet() {
-        SnapshotMatcher.expect(NftId.fromString("0.0.123-rmkyk@584903").toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(NftId.fromString("0.0.123-rmkyk@584903").toStringWithChecksum(testnetClient)).toMatchSnapshot();
     }
 
     @Test
     void fromStringWithChecksumOnPreviewnet() {
-        SnapshotMatcher.expect(NftId.fromString("0.0.123-ntjly@487302").toString()).toMatchSnapshot();
-    }
-
-    @Test
-    void fromStringWithChecksumOnUndefinedNetwork() {
-        assertThrows(IllegalArgumentException.class, () -> NftId.fromString("0.0.123-ghgna@3894"));
+        SnapshotMatcher.expect(NftId.fromString("0.0.123-ntjly@487302").toStringWithChecksum(previewnetClient)).toMatchSnapshot();
     }
 
     @Test

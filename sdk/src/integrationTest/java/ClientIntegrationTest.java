@@ -66,6 +66,7 @@ public class ClientIntegrationTest {
     void transactionIdNetworkIsVerified() {
         assertThrows(IllegalArgumentException.class, () -> {
             var client = Client.forPreviewnet();
+            client.setAutoValidateChecksums(true);
 
             new AccountCreateTransaction()
                 .setTransactionId(TransactionId.generate(AccountId.fromString("0.0.123-rmkyk")))

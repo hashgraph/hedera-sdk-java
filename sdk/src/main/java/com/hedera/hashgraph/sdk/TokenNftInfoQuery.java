@@ -136,6 +136,21 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
     }
 
     @Override
+    void validateChecksums(Client client) throws InvalidChecksumException {
+        if(nftId != null) {
+            nftId.tokenId.validateChecksum(client);
+        }
+
+        if(tokenId != null) {
+            tokenId.validateChecksum(client);
+        }
+
+        if(accountId != null) {
+            accountId.validateChecksum(client);
+        }
+    }
+
+    @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
         int modesEnabled = (isByNft() ? 1 : 0) + (isByToken() ? 1 : 0) + (isByAccount() ? 1 : 0);
         if(modesEnabled > 1) {
