@@ -1,13 +1,4 @@
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
-import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
@@ -23,6 +14,8 @@ public final class ValidateChecksumExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
+    private static final Scanner INPUT_SCANNER = new Scanner(System.in);
+
     private ValidateChecksumExample() {
     }
 
@@ -33,11 +26,9 @@ public final class ValidateChecksumExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        Scanner inputScanner = new Scanner(System.in);
-
         /*
          * Entity IDs, such as TokenId and AccountId, can be constructed from strings.
-         * For example, the AccountId::fromString(String inString) method will attempt to parse
+         * For example, the AccountId.fromString(inputString) static method will attempt to parse
          * the input string and construct the expected AccountId object, and will throw an
          * IllegalArgumentException if the string is incorrectly formatted.
          *
@@ -51,13 +42,13 @@ public final class ValidateChecksumExample {
          * For example, if the string being parsed is from a config file, or from user input,
          * it could contain typos.
          *
-         * You can use AccountId::getChecksum() to get the checksum of an accountId that was constructed
+         * You can use accountId.getChecksum() to get the checksum of an accountId object that was constructed
          * using fromString().  This will be the checksum from the input string.  fromString() will merely
          * parse the string and create an AccountId object with the expected shard, realm, num, and checksum
-         * values.  fromString() will NOT verify that the AccountId maps to a valid account on the hedera
+         * values.  fromString() will NOT verify that the AccountId maps to a valid account on the Hedera
          * network, and it will not verify the checksum.
          *
-         * To verify a checksum, call AccountId::validateChecksum(Client client).  If the checksum
+         * To verify a checksum, call accountId.validateChecksum(client).  If the checksum
          * is invalid, validateChecksum() will throw an InvalidChecksumException, otherwise it will return normally.
          *
          * The validity of a checksum depends on which network the client is connected to (EG mainnet or
@@ -67,7 +58,7 @@ public final class ValidateChecksumExample {
          * As far as fromString() is concerned, the checksum is optional.
          * If you use fromString() to generate an AccountId from a string that does not include a checksum,
          * such as "1.2.3", fromString() will work, but a call to the getChecksum() method on the resulting
-         * account ID will return null.
+         * AccountId object will return null.
          *
          * Generally speaking, AccountId objects can come from three places:
          * 1) AccountId.fromString(inString)
@@ -80,11 +71,84 @@ public final class ValidateChecksumExample {
          *
          * In the second and third cases, the AccountId object will not have a checksum.
          *
-         * AccountId::toString() will print the string with no checksum, AccountId::toStringWithChecksum(Client client)
-         * will print the string with a checksum.
+         * AccountId::toString() will stringify the account ID with no checksum,
+         * AccountId::toStringWithChecksum(Client client) will stringify the account ID with a checksum.
          */
 
+        System.out.println("An example of manual checksum validation:");
 
-        // TODO
+        while(true) {
+            try {
+                System.out.print("Enter an account ID with checksum: ");
+                String inString = INPUT_SCANNER.nextLine();
+
+                // Throws IllegalArgumentException if incorrectly formatted
+                AccountId id = AccountId.fromString(inString);
+
+                System.out.println("The ID with no checksum is " + id.toString());
+                System.out.println("The ID with a checksum is " + id.toStringWithChecksum(client));
+
+                if(id.getChecksum() == null) {
+                    System.out.println("Checksum is required.");
+                    continue;
+                }
+                System.out.println("The checksum entered was " + id.getChecksum());
+
+                // Throws InvalidChecksumException if checksum is incorrect
+                id.validateChecksum(client);
+
+                AccountBalance balance = new AccountBalanceQuery()
+                    .setAccountId(id)
+                    .execute(client);
+                System.out.println(balance);
+                break;
+            } catch(IllegalArgumentException exc) {
+                System.out.println(exc.getMessage());
+            } catch(InvalidChecksumException exc) {
+                System.out.println(exc.getMessage());
+                System.out.println(
+                    "You entered " + exc.invalidIdString() +
+                        ", the provided checksum was " + exc.presentChecksum +
+                        ", the expected checksum was " + exc.expectedChecksum
+                );
+            }
+        }
+
+        /*
+         * It is also possible to perform automatic checksum validation.
+         *
+         * Automatic checksum validation is disabled by default, but it can be enabled with
+         * client.setAutoValidateChecksums(true).  You can check whether automatic checksum
+         * validation is enabled with client.isAutoValidateChecksumsEnabled().
+         *
+         * When this feature is enabled, the execute() method of a transaction or query
+         * will automatically check the validity of checksums on any IDs in the
+         * transaction or query.  It will throw an IllegalArgumentException if an
+         * invalid checksum is encountered.
+         */
+
+        System.out.println("An example of automatic checksum validation:");
+
+        client.setAutoValidateChecksums(true);
+
+        while(true) {
+            try {
+                System.out.print("Enter an account ID with checksum: ");
+                AccountId id = AccountId.fromString(INPUT_SCANNER.nextLine());
+                if(id.getChecksum() == null) {
+                    System.out.println("Checksum is required.");
+                    continue;
+                }
+                AccountBalance balance = new AccountBalanceQuery()
+                    .setAccountId(id)
+                    .execute(client);
+                System.out.println(balance);
+                break;
+            } catch(IllegalArgumentException exc) {
+                System.out.println(exc.getMessage());
+            }
+        }
+
+        System.out.println("Example complete!");
     }
 }

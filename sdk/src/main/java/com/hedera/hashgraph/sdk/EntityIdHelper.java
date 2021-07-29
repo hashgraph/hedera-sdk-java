@@ -139,9 +139,12 @@ class EntityIdHelper {
     }
 
     static void validate(long shard, long realm, long num, Client client, @Nullable String checksum) throws InvalidChecksumException {
-        if(client.network.networkName != null && checksum != null) {
+        if(client.getNetworkName() == null) {
+            throw new IllegalStateException("Can't validate checksum without knowing which network the ID is for.  Ensure client's network name is set.");
+        }
+        if(checksum != null) {
             String expectedChecksum = EntityIdHelper.checksum(
-                Integer.toString(client.network.networkName.id),
+                Integer.toString(client.getNetworkName().id),
                 EntityIdHelper.toString(shard, realm, num)
             );
             if (!checksum.equals(expectedChecksum)) {
@@ -155,12 +158,10 @@ class EntityIdHelper {
     }
 
     static String toStringWithChecksum(long shard, long realm, long num, Client client, @Nullable String checksum) {
-        if(checksum != null) {
-            return "" + shard + "." + realm + "." + num + "-" + checksum;
-        } else if (client.getNetworkName() != null) {
+        if (client.getNetworkName() != null) {
             return "" + shard + "." + realm + "." + num + "-" + checksum(Integer.toString(client.getNetworkName().id), EntityIdHelper.toString(shard, realm, num));
         } else {
-            throw new IllegalStateException("Attempted to convert an entity ID to a string with a checksum, but it was impossible to derive the checksum.  Make sure the network name is set on the client.");
+            throw new IllegalStateException("Can't derive checksum for ID without knowing which network the ID is for.  Ensure client's network name is set.");
         }
     }
 }

@@ -15,9 +15,12 @@ public class InvalidChecksumException extends Exception {
         this.expectedChecksum = expectedChecksum;
     }
 
+    public String invalidIdString() {
+        return "" + shard + "." + realm + "." + num + "-" + presentChecksum;
+    }
+
     @Override
     public String getMessage() {
-        return "Invalid checksum for entity ID \"" + shard + "." + realm + "." + num +
-            "\": expected \"" + expectedChecksum + "\", but provided checksum was \"" + presentChecksum + "\"";
+        return "Entity ID \"" + invalidIdString() + "\" was incorrect.";
     }
 }

@@ -119,7 +119,7 @@ public class IntegrationTestEnv {
     }
 
     public IntegrationTestEnv useThrowawayAccount() throws ReceiptStatusException, PrecheckStatusException, TimeoutException {
-        return useThrowawayAccount(new Hbar(20));
+        return useThrowawayAccount(new Hbar(50));
     }
 
     public void close(

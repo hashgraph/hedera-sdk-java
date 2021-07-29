@@ -183,10 +183,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
             try {
                 validateChecksums(client);
             } catch (InvalidChecksumException exc) {
-                throw new IllegalArgumentException(
-                    "Upon attempting to execute a query, automatic checksum validation found that an entity ID involved in that transaction had an invalid checksum: \"" +
-                        exc.shard + "." + exc.realm + "." + exc.num + "\" had checksum \"" + exc.presentChecksum + "\", but the expected checksum was \"" + exc.expectedChecksum + "\""
-                );
+                throw new IllegalArgumentException(exc.getMessage());
             }
         }
 
