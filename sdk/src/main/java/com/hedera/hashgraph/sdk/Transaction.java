@@ -918,7 +918,7 @@ public abstract class Transaction<T extends Transaction<T>>
         return Status.valueOf(transactionResponse.getNodeTransactionPrecheckCode());
     }
 
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         // Do nothing
     }
 
@@ -934,7 +934,7 @@ public abstract class Transaction<T extends Transaction<T>>
             try {
                 accountId.validateChecksum(client);
                 validateChecksums(client);
-            } catch (InvalidChecksumException exc) {
+            } catch (BadEntityIdException exc) {
                 throw new IllegalArgumentException(exc.getMessage());
             }
         }

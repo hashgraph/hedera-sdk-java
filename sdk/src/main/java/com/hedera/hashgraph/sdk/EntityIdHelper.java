@@ -138,7 +138,7 @@ class EntityIdHelper {
         R apply(long shard, long realm, long num, @Nullable String checksum);
     }
 
-    static void validate(long shard, long realm, long num, Client client, @Nullable String checksum) throws InvalidChecksumException {
+    static void validate(long shard, long realm, long num, Client client, @Nullable String checksum) throws BadEntityIdException {
         if(client.getNetworkName() == null) {
             throw new IllegalStateException("Can't validate checksum without knowing which network the ID is for.  Ensure client's network name is set.");
         }
@@ -148,7 +148,7 @@ class EntityIdHelper {
                 EntityIdHelper.toString(shard, realm, num)
             );
             if (!checksum.equals(expectedChecksum)) {
-                throw new InvalidChecksumException(shard, realm, num, checksum, expectedChecksum);
+                throw new BadEntityIdException(shard, realm, num, checksum, expectedChecksum);
             }
         }
     }

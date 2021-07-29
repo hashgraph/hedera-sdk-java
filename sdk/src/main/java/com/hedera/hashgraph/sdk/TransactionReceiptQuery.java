@@ -56,7 +56,7 @@ public final class TransactionReceiptQuery
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (transactionId != null) {
             Objects.requireNonNull(transactionId.accountId).validateChecksum(client);
         }

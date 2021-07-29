@@ -43,7 +43,7 @@ public final class TopicInfoQuery extends Query<TopicInfo, TopicInfoQuery> {
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (topicId != null) {
             topicId.validateChecksum(client);
         }

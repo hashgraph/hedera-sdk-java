@@ -90,7 +90,7 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (payerAccountId != null) {
             payerAccountId.validateChecksum(client);
         }

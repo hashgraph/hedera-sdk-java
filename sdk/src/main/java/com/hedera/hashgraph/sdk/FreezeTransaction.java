@@ -77,7 +77,7 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
     }
 
 

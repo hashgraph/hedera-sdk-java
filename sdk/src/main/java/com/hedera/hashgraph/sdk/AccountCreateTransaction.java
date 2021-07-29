@@ -215,7 +215,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (proxyAccountId != null) {
             proxyAccountId.validateChecksum(client);
         }

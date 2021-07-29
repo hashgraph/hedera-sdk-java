@@ -138,7 +138,7 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (accountId != null) {
             accountId.validateChecksum(client);
         }

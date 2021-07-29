@@ -38,7 +38,7 @@ public final class ValidateChecksumExample {
          * fromString() expects the input to look something like this: "1.2.3-asdfg".
          * Here, 1 is the shard, 2 is the realm, 3 is the number, and "asdfg" is the checksum.
          *
-         * The checksum can be used to ensure that an entity ID is inputted correctly.
+         * The checksum can be used to ensure that an entity ID was inputted correctly.
          * For example, if the string being parsed is from a config file, or from user input,
          * it could contain typos.
          *
@@ -49,7 +49,7 @@ public final class ValidateChecksumExample {
          * network, and it will not verify the checksum.
          *
          * To verify a checksum, call accountId.validateChecksum(client).  If the checksum
-         * is invalid, validateChecksum() will throw an InvalidChecksumException, otherwise it will return normally.
+         * is invalid, validateChecksum() will throw a BadEntityIdException, otherwise it will return normally.
          *
          * The validity of a checksum depends on which network the client is connected to (EG mainnet or
          * testnet or previewnet).  For example, a checksum that is valid for a particular shard/realm/num
@@ -71,8 +71,9 @@ public final class ValidateChecksumExample {
          *
          * In the second and third cases, the AccountId object will not have a checksum.
          *
-         * AccountId::toString() will stringify the account ID with no checksum,
-         * AccountId::toStringWithChecksum(Client client) will stringify the account ID with a checksum.
+         * accountId.toString() will stringify the account ID with no checksum,
+         * accountId.toStringWithChecksum(client) will stringify the account ID with the correct checksum
+         * for that shard/realm/num on the client's network.
          */
 
         System.out.println("An example of manual checksum validation:");
@@ -86,29 +87,31 @@ public final class ValidateChecksumExample {
                 AccountId id = AccountId.fromString(inString);
 
                 System.out.println("The ID with no checksum is " + id.toString());
-                System.out.println("The ID with a checksum is " + id.toStringWithChecksum(client));
+                System.out.println("The ID with the correct checksum is " + id.toStringWithChecksum(client));
 
                 if(id.getChecksum() == null) {
-                    System.out.println("Checksum is required.");
+                    System.out.println("You must enter a checksum.");
                     continue;
                 }
                 System.out.println("The checksum entered was " + id.getChecksum());
 
-                // Throws InvalidChecksumException if checksum is incorrect
+                // Throws BadEntityIdException if checksum is incorrect
                 id.validateChecksum(client);
 
                 AccountBalance balance = new AccountBalanceQuery()
                     .setAccountId(id)
                     .execute(client);
                 System.out.println(balance);
+
+                // exit the loop
                 break;
+
             } catch(IllegalArgumentException exc) {
                 System.out.println(exc.getMessage());
-            } catch(InvalidChecksumException exc) {
+            } catch(BadEntityIdException exc) {
                 System.out.println(exc.getMessage());
                 System.out.println(
-                    "You entered " + exc.invalidIdString() +
-                        ", the provided checksum was " + exc.presentChecksum +
+                    "You entered " + exc.shard + "." + exc.realm + "." + exc.num + "-" + exc.presentChecksum +
                         ", the expected checksum was " + exc.expectedChecksum
                 );
             }
@@ -136,14 +139,17 @@ public final class ValidateChecksumExample {
                 System.out.print("Enter an account ID with checksum: ");
                 AccountId id = AccountId.fromString(INPUT_SCANNER.nextLine());
                 if(id.getChecksum() == null) {
-                    System.out.println("Checksum is required.");
+                    System.out.println("You must enter a checksum.");
                     continue;
                 }
                 AccountBalance balance = new AccountBalanceQuery()
                     .setAccountId(id)
                     .execute(client);
                 System.out.println(balance);
+
+                // exit the loop
                 break;
+
             } catch(IllegalArgumentException exc) {
                 System.out.println(exc.getMessage());
             }

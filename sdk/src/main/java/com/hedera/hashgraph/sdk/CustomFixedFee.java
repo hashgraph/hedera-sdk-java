@@ -49,7 +49,7 @@ public class CustomFixedFee extends CustomFee {
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         super.validateChecksums(client);
         if(denominatingTokenId != null) {
             denominatingTokenId.validateChecksum(client);

@@ -317,7 +317,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         for(var fee : customFees) {
             fee.validateChecksums(client);
         }

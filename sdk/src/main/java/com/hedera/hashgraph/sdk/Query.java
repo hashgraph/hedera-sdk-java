@@ -117,7 +117,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         return new QueryCostQuery();
     }
 
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         // Do nothing
     }
 
@@ -182,7 +182,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         if(client.isAutoValidateChecksumsEnabled()) {
             try {
                 validateChecksums(client);
-            } catch (InvalidChecksumException exc) {
+            } catch (BadEntityIdException exc) {
                 throw new IllegalArgumentException(exc.getMessage());
             }
         }
@@ -268,7 +268,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     @SuppressWarnings("NullableDereference")
     private class QueryCostQuery extends Query<Hbar, QueryCostQuery> {
         @Override
-        void validateChecksums(Client client) throws InvalidChecksumException {
+        void validateChecksums(Client client) throws BadEntityIdException {
         }
 
         @Override

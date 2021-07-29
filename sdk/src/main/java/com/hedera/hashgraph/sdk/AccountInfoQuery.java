@@ -43,7 +43,7 @@ public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery>
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (accountId != null) {
             accountId.validateChecksum(client);
         }

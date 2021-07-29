@@ -249,7 +249,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (accountId != null) {
             accountId.validateChecksum(client);
         }

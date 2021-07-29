@@ -174,7 +174,7 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (autoRenewAccountId != null) {
             autoRenewAccountId.validateChecksum(client);
         }

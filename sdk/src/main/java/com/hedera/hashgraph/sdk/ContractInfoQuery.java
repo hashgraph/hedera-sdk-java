@@ -53,7 +53,7 @@ public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQue
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (contractId != null) {
             contractId.validateChecksum(client);
         }

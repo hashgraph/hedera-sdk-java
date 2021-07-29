@@ -283,7 +283,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (bytecodeFileId != null) {
             bytecodeFileId.validateChecksum(client);
         }

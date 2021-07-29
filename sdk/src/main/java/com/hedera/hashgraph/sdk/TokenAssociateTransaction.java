@@ -93,7 +93,7 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         Objects.requireNonNull(client);
         if (accountId != null) {
             accountId.validateChecksum(client);

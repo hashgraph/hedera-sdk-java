@@ -72,7 +72,7 @@ abstract public class CustomFee {
         }
     }
 
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if(feeCollectorAccountId != null) {
             feeCollectorAccountId.validateChecksum(client);
         }

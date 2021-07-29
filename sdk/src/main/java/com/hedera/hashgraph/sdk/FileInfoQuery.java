@@ -48,7 +48,7 @@ public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (fileId != null) {
             fileId.validateChecksum(client);
         }

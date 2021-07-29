@@ -142,7 +142,7 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (fileId != null) {
             fileId.validateChecksum(client);
         }

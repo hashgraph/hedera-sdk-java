@@ -61,7 +61,7 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (scheduleId != null) {
             scheduleId.validateChecksum(client);
         }

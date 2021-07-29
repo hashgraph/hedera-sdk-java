@@ -75,7 +75,7 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (tokenId != null) {
             tokenId.validateChecksum(client);
         }

@@ -44,7 +44,7 @@ public final class AccountRecordsQuery extends Query<List<TransactionRecord>, Ac
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (accountId != null) {
             accountId.validateChecksum(client);
         }

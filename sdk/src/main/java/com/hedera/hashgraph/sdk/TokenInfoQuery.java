@@ -40,7 +40,7 @@ public class TokenInfoQuery extends com.hedera.hashgraph.sdk.Query<TokenInfo, To
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (tokenId != null) {
             tokenId.validateChecksum(client);
         }

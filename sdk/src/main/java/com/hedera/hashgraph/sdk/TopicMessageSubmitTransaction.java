@@ -109,7 +109,7 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (topicId != null) {
             topicId.validateChecksum(client);
         }

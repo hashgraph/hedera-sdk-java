@@ -117,7 +117,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         for (var a : hbarTransfers.keySet()) {
             a.validateChecksum(client);
         }

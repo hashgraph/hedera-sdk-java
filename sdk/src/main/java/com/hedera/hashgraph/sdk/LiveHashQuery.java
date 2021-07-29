@@ -57,7 +57,7 @@ public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (accountId != null) {
             accountId.validateChecksum(client);
         }

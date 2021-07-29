@@ -243,7 +243,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (topicId != null) {
             topicId.validateChecksum(client);
         }

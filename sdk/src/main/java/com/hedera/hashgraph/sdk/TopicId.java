@@ -71,12 +71,17 @@ public final class TopicId {
             .build();
     }
 
+    /**
+     * @param client
+     * @throws BadEntityIdException
+     * @deprecated Use {@link #validateChecksum(Client)} instead.
+     */
     @Deprecated
-    public void validate(Client client) throws InvalidChecksumException {
+    public void validate(Client client) throws BadEntityIdException {
         validateChecksum(client);
     }
 
-    public void validateChecksum(Client client) throws InvalidChecksumException {
+    public void validateChecksum(Client client) throws BadEntityIdException {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
     }
 

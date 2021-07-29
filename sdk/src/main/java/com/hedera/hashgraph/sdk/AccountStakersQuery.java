@@ -46,7 +46,7 @@ public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountS
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (accountId != null) {
             accountId.validateChecksum(client);
         }

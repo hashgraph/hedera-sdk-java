@@ -34,7 +34,7 @@ public class ScheduleInfoQuery extends com.hedera.hashgraph.sdk.Query<ScheduleIn
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (scheduleId != null) {
             scheduleId.validateChecksum(client);
         }

@@ -245,7 +245,7 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (tokenId != null) {
             tokenId.validateChecksum(client);
         }

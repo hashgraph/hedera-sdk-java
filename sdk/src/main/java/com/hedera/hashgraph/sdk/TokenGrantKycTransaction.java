@@ -89,7 +89,7 @@ public class TokenGrantKycTransaction extends com.hedera.hashgraph.sdk.Transacti
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (tokenId != null) {
             tokenId.validateChecksum(client);
         }

@@ -136,7 +136,7 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
     }
 
     @Override
-    void validateChecksums(Client client) throws InvalidChecksumException {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if(nftId != null) {
             nftId.tokenId.validateChecksum(client);
         }
