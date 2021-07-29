@@ -117,25 +117,25 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         for (var a : hbarTransfers.keySet()) {
-            a.validate(client);
+            a.validateChecksum(client);
         }
 
         for(var entry : nftTransfers.entrySet()) {
-            entry.getKey().validate(client);
+            entry.getKey().validateChecksum(client);
 
             for(var nftTransfer : entry.getValue()) {
-                nftTransfer.sender.validate(client);
-                nftTransfer.receiver.validate(client);
+                nftTransfer.sender.validateChecksum(client);
+                nftTransfer.receiver.validateChecksum(client);
             }
         }
 
         for (var entry : tokenTransfers.entrySet()) {
-            entry.getKey().validate(client);
+            entry.getKey().validateChecksum(client);
 
             for (var a : entry.getValue().keySet()) {
-                a.validate(client);
+                a.validateChecksum(client);
             }
         }
     }

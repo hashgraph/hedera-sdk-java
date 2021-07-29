@@ -64,7 +64,7 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
     }
 
     public Collection<Key> getKeys() {
-        return KeyList.fromProtobuf(builder.getKeys(), null, null);
+        return KeyList.fromProtobuf(builder.getKeys(), null);
     }
 
     /**

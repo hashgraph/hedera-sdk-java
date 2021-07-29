@@ -45,9 +45,11 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     @Nullable
     private Operator operator;
 
-    Duration requestTimeout = Duration.ofMinutes(2);
+    private Duration requestTimeout = Duration.ofMinutes(2);
 
-    Integer maxAttempts = null;
+    private Integer maxAttempts = null;
+
+    private boolean autoValidateChecksums = false;
 
     Client(Map<String, AccountId> network) {
         var threadFactory = new ThreadFactoryBuilder()
@@ -374,14 +376,26 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return {@code this}
      */
     public synchronized Client setOperatorWith(AccountId accountId, PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
-        if (accountId.checksum == null) {
-            accountId.setNetworkWith(this);
-        } else {
-            accountId.validate(this);
+        try {
+            accountId.validateChecksum(this);
+        } catch(BadEntityIdException exc) {
+            throw new IllegalArgumentException(
+                "Tried to set the client operator account ID to an account ID with an invalid checksum: " + exc.getMessage()
+            );
         }
 
         this.operator = new Operator(accountId, publicKey, transactionSigner);
         return this;
+    }
+
+    public synchronized Client setNetworkName(@Nullable NetworkName networkName) {
+        this.network.networkName = networkName;
+        return this;
+    }
+
+    @Nullable
+    public synchronized NetworkName getNetworkName() {
+        return network.networkName;
     }
 
     public synchronized Client setMaxAttempts(int maxAttempts) {
@@ -416,13 +430,22 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return this;
     }
 
+    public synchronized  Client setAutoValidateChecksums(boolean value) {
+        autoValidateChecksums = value;
+        return this;
+    }
+
+    public synchronized boolean isAutoValidateChecksumsEnabled() {
+        return autoValidateChecksums;
+    }
+
     /**
      * Get the ID of the operator. Useful when the client was constructed from file.
      *
      * @return {AccountId}
      */
     @Nullable
-    public AccountId getOperatorAccountId() {
+    public synchronized AccountId getOperatorAccountId() {
         if (operator == null) {
             return null;
         }
@@ -436,7 +459,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return {PublicKey}
      */
     @Nullable
-    public PublicKey getOperatorPublicKey() {
+    public synchronized PublicKey getOperatorPublicKey() {
         if (operator == null) {
             return null;
         }
@@ -525,7 +548,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      *
      * @param timeout The Duration to be set
      */
-    public void close(Duration timeout) throws TimeoutException {
+    public synchronized void close(Duration timeout) throws TimeoutException {
         network.close(timeout);
         mirrorNetwork.close(timeout);
     }

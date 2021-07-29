@@ -48,9 +48,9 @@ public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (fileId != null) {
-            fileId.validate(client);
+            fileId.validateChecksum(client);
         }
     }
 
@@ -74,8 +74,8 @@ public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
     }
 
     @Override
-    FileInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
-        return FileInfo.fromProtobuf(response.getFileGetInfo().getFileInfo(), networkName);
+    FileInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+        return FileInfo.fromProtobuf(response.getFileGetInfo().getFileInfo());
     }
 
     @Override

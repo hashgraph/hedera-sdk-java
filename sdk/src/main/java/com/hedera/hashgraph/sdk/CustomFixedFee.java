@@ -12,7 +12,7 @@ public class CustomFixedFee extends CustomFee {
     public CustomFixedFee() {
     }
 
-    static CustomFixedFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee, @Nullable NetworkName networkName) {
+    static CustomFixedFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
         var fixedFee = customFee.getFixedFee();
         var returnFee = new CustomFixedFee().setAmount(fixedFee.getAmount());
         if(customFee.hasFeeCollectorAccountId()) {
@@ -49,10 +49,10 @@ public class CustomFixedFee extends CustomFee {
     }
 
     @Override
-    void validate(Client client) {
-        super.validate(client);
+    void validateChecksums(Client client) throws BadEntityIdException {
+        super.validateChecksums(client);
         if(denominatingTokenId != null) {
-            denominatingTokenId.validate(client);
+            denominatingTokenId.validateChecksum(client);
         }
     }
 

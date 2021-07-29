@@ -246,17 +246,17 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (contractId != null) {
-            contractId.validate(client);
+            contractId.validateChecksum(client);
         }
 
         if (bytecodeFileId != null) {
-            bytecodeFileId.validate(client);
+            bytecodeFileId.validateChecksum(client);
         }
 
         if (proxyAccountId != null) {
-            proxyAccountId.validate(client);
+            proxyAccountId.validateChecksum(client);
         }
     }
 

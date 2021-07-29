@@ -117,7 +117,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         return new QueryCostQuery();
     }
 
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         // Do nothing
     }
 
@@ -179,7 +179,13 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     }
 
     private void initWithNodeIds(Client client) {
-        validateNetworkOnIds(client);
+        if(client.isAutoValidateChecksumsEnabled()) {
+            try {
+                validateChecksums(client);
+            } catch (BadEntityIdException exc) {
+                throw new IllegalArgumentException(exc.getMessage());
+            }
+        }
 
         if (nodeAccountIds.size() == 0) {
             // Get a list of node AccountId's if the user has not set them manually.
@@ -262,7 +268,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     @SuppressWarnings("NullableDereference")
     private class QueryCostQuery extends Query<Hbar, QueryCostQuery> {
         @Override
-        void validateNetworkOnIds(Client client) {
+        void validateChecksums(Client client) throws BadEntityIdException {
         }
 
         @Override
@@ -294,7 +300,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         }
 
         @Override
-        Hbar mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
+        Hbar mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
             return Hbar.fromTinybars(mapResponseHeader(response).getCost());
         }
 

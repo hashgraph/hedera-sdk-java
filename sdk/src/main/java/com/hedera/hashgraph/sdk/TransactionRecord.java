@@ -109,13 +109,9 @@ public final class TransactionRecord {
     }
 
     static TransactionRecord fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord) {
-        return TransactionRecord.fromProtobuf(transactionRecord, null);
-    }
-
-    static TransactionRecord fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord, @Nullable NetworkName networkName) {
         var transfers = new ArrayList<Transfer>(transactionRecord.getTransferList().getAccountAmountsCount());
         for (var accountAmount : transactionRecord.getTransferList().getAccountAmountsList()) {
-            transfers.add(Transfer.fromProtobuf(accountAmount, networkName));
+            transfers.add(Transfer.fromProtobuf(accountAmount));
         }
 
         var tokenTransfers = new HashMap<TokenId, Map<AccountId, Long>>();
@@ -124,22 +120,22 @@ public final class TransactionRecord {
             if(tokenTransfersList.getTransfersCount() > 0) {
                 var accountAmounts = new HashMap<AccountId, Long>();
                 for (var accountAmount : tokenTransfersList.getTransfersList()) {
-                    accountAmounts.put(AccountId.fromProtobuf(accountAmount.getAccountID(), networkName), accountAmount.getAmount());
+                    accountAmounts.put(AccountId.fromProtobuf(accountAmount.getAccountID()), accountAmount.getAmount());
                 }
-                tokenTransfers.put(TokenId.fromProtobuf(tokenTransfersList.getToken(), networkName), accountAmounts);
+                tokenTransfers.put(TokenId.fromProtobuf(tokenTransfersList.getToken()), accountAmounts);
             }
             else if(tokenTransfersList.getNftTransfersCount() > 0) {
                 var nftTransfers = new ArrayList<TokenNftTransfer>();
                 for(var transfer : tokenTransfersList.getNftTransfersList()) {
-                    nftTransfers.add(TokenNftTransfer.fromProtobuf(transfer, networkName));
+                    nftTransfers.add(TokenNftTransfer.fromProtobuf(transfer));
                 }
-                tokenNftTransfers.put(TokenId.fromProtobuf(tokenTransfersList.getToken(), networkName), nftTransfers);
+                tokenNftTransfers.put(TokenId.fromProtobuf(tokenTransfersList.getToken()), nftTransfers);
             }
         }
 
         var fees = new ArrayList<AssessedCustomFee>(transactionRecord.getAssessedCustomFeesCount());
         for(var fee : transactionRecord.getAssessedCustomFeesList()) {
-            fees.add(AssessedCustomFee.fromProtobuf(fee, networkName));
+            fees.add(AssessedCustomFee.fromProtobuf(fee));
         }
 
         // HACK: This is a bit bad, any takers to clean this up
@@ -153,14 +149,14 @@ public final class TransactionRecord {
             TransactionReceipt.fromProtobuf(transactionRecord.getReceipt()),
             transactionRecord.getTransactionHash(),
             InstantConverter.fromProtobuf(transactionRecord.getConsensusTimestamp()),
-            TransactionId.fromProtobuf(transactionRecord.getTransactionID(), networkName),
+            TransactionId.fromProtobuf(transactionRecord.getTransactionID()),
             transactionRecord.getMemo(),
             transactionRecord.getTransactionFee(),
             contractFunctionResult,
             transfers,
             tokenTransfers,
             tokenNftTransfers,
-            transactionRecord.hasScheduleRef() ? ScheduleId.fromProtobuf(transactionRecord.getScheduleRef(), networkName) : null,
+            transactionRecord.hasScheduleRef() ? ScheduleId.fromProtobuf(transactionRecord.getScheduleRef()) : null,
             fees
         );
     }

@@ -36,16 +36,12 @@ public class AccountBalance {
     }
 
     static AccountBalance fromProtobuf(CryptoGetAccountBalanceResponse protobuf) {
-        return AccountBalance.fromProtobuf(protobuf, null);
-    }
-
-    static AccountBalance fromProtobuf(CryptoGetAccountBalanceResponse protobuf, @Nullable NetworkName networkName) {
         var balanceList = protobuf.getTokenBalancesList();
         Map<TokenId, Long> map = new HashMap<>();
         Map<TokenId, Integer>  decimalMap = new HashMap<>();
         for (int i = 0; i < protobuf.getTokenBalancesCount(); i++) {
-            map.put(TokenId.fromProtobuf(balanceList.get(i).getTokenId(), networkName), balanceList.get(i).getBalance());
-            decimalMap.put(TokenId.fromProtobuf(balanceList.get(i).getTokenId(), networkName), balanceList.get(i).getDecimals());
+            map.put(TokenId.fromProtobuf(balanceList.get(i).getTokenId()), balanceList.get(i).getBalance());
+            decimalMap.put(TokenId.fromProtobuf(balanceList.get(i).getTokenId()), balanceList.get(i).getDecimals());
         }
 
         return new AccountBalance(Hbar.fromTinybars(protobuf.getBalance()), map, decimalMap);

@@ -136,6 +136,21 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
     }
 
     @Override
+    void validateChecksums(Client client) throws BadEntityIdException {
+        if(nftId != null) {
+            nftId.tokenId.validateChecksum(client);
+        }
+
+        if(tokenId != null) {
+            tokenId.validateChecksum(client);
+        }
+
+        if(accountId != null) {
+            accountId.validateChecksum(client);
+        }
+    }
+
+    @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
         int modesEnabled = (isByNft() ? 1 : 0) + (isByToken() ? 1 : 0) + (isByAccount() ? 1 : 0);
         if(modesEnabled > 1) {
@@ -179,22 +194,22 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
         }
     }
 
-    private static List<TokenNftInfo> infosFromProtos(List<com.hedera.hashgraph.sdk.proto.TokenNftInfo> protoList, @Nullable NetworkName networkName) {
+    private static List<TokenNftInfo> infosFromProtos(List<com.hedera.hashgraph.sdk.proto.TokenNftInfo> protoList) {
         var infos = new ArrayList<TokenNftInfo>();
         for(var proto : protoList) {
-            infos.add(TokenNftInfo.fromProtobuf(proto, networkName));
+            infos.add(TokenNftInfo.fromProtobuf(proto));
         }
         return infos;
     }
 
     @Override
-    List<TokenNftInfo> mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
+    List<TokenNftInfo> mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
         if(isByNft()) {
-            return Collections.singletonList(TokenNftInfo.fromProtobuf(response.getTokenGetNftInfo().getNft(), networkName));
+            return Collections.singletonList(TokenNftInfo.fromProtobuf(response.getTokenGetNftInfo().getNft()));
         } else if(isByToken()) {
-            return infosFromProtos(response.getTokenGetNftInfos().getNftsList(), networkName);
+            return infosFromProtos(response.getTokenGetNftInfos().getNftsList());
         } else /* is by account */ {
-            return infosFromProtos(response.getTokenGetAccountNftInfos().getNftsList(), networkName);
+            return infosFromProtos(response.getTokenGetAccountNftInfos().getNftsList());
         }
     }
 

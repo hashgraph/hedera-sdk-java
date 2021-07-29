@@ -14,22 +14,18 @@ public abstract class Key {
     static final ASN1ObjectIdentifier ID_ED25519 = new ASN1ObjectIdentifier("1.3.101.112");
 
     static Key fromProtobufKey(com.hedera.hashgraph.sdk.proto.Key key) {
-        return Key.fromProtobufKey(key, null);
-    }
-
-    static Key fromProtobufKey(com.hedera.hashgraph.sdk.proto.Key key, @Nullable NetworkName networkName) {
         switch (key.getKeyCase()) {
             case ED25519:
                 return new PublicKey(key.getEd25519().toByteArray());
 
             case KEYLIST:
-                return KeyList.fromProtobuf(key.getKeyList(), null, networkName);
+                return KeyList.fromProtobuf(key.getKeyList(), null);
 
             case THRESHOLDKEY:
-                return KeyList.fromProtobuf(key.getThresholdKey().getKeys(), key.getThresholdKey().getThreshold(), networkName);
+                return KeyList.fromProtobuf(key.getThresholdKey().getKeys(), key.getThresholdKey().getThreshold());
 
             case CONTRACTID:
-                return ContractId.fromProtobuf(key.getContractID(), networkName);
+                return ContractId.fromProtobuf(key.getContractID());
 
             default:
                 throw new IllegalStateException("Key#fromProtobuf: unhandled key case: " + key.getKeyCase());

@@ -317,17 +317,17 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         for(var fee : customFees) {
-            fee.validate(client);
+            fee.validateChecksums(client);
         }
 
         if (treasuryAccountId != null) {
-            treasuryAccountId.validate(client);
+            treasuryAccountId.validateChecksum(client);
         }
 
         if (autoRenewAccountId != null) {
-            autoRenewAccountId.validate(client);
+            autoRenewAccountId.validateChecksum(client);
         }
     }
 

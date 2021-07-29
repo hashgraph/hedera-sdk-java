@@ -88,7 +88,7 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
     }
 
     public Collection<Key> getKeys() {
-        return KeyList.fromProtobuf(hashBuilder.getKeys(), null, null);
+        return KeyList.fromProtobuf(hashBuilder.getKeys(), null);
     }
 
     /**
@@ -138,9 +138,9 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (accountId != null) {
-            accountId.validate(client);
+            accountId.validateChecksum(client);
         }
     }
 

@@ -64,9 +64,9 @@ public class TokenDeleteTransaction extends com.hedera.hashgraph.sdk.Transaction
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (tokenId != null) {
-            tokenId.validate(client);
+            tokenId.validateChecksum(client);
         }
     }
 

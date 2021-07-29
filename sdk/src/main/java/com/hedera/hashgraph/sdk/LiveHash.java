@@ -39,14 +39,10 @@ public class LiveHash {
     }
 
     protected static LiveHash fromProtobuf(com.hedera.hashgraph.sdk.proto.LiveHash liveHash) {
-        return LiveHash.fromProtobuf(liveHash, null);
-    }
-
-    protected static LiveHash fromProtobuf(com.hedera.hashgraph.sdk.proto.LiveHash liveHash, @Nullable NetworkName networkName) {
         return new LiveHash(
-            AccountId.fromProtobuf(liveHash.getAccountId(), networkName),
+            AccountId.fromProtobuf(liveHash.getAccountId()),
             liveHash.getHash(),
-            KeyList.fromProtobuf(liveHash.getKeys(), null, networkName),
+            KeyList.fromProtobuf(liveHash.getKeys(), null),
             DurationConverter.fromProtobuf(liveHash.getDuration())
         );
     }

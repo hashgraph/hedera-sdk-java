@@ -56,9 +56,9 @@ public final class TransactionReceiptQuery
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (transactionId != null) {
-            Objects.requireNonNull(transactionId.accountId).validate(client);
+            Objects.requireNonNull(transactionId.accountId).validateChecksum(client);
         }
     }
 
@@ -79,8 +79,8 @@ public final class TransactionReceiptQuery
     }
 
     @Override
-    TransactionReceipt mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
-        return TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt(), networkName);
+    TransactionReceipt mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+        return TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt());
     }
 
     @Override
@@ -134,7 +134,7 @@ public final class TransactionReceiptQuery
     }
 
     @Override
-    Exception mapStatusError(Status status, @Nullable TransactionId transactionId, Response response, @Nullable NetworkName networkName) {
+    Exception mapStatusError(Status status, @Nullable TransactionId transactionId, Response response) {
         if (status != Status.OK) {
             return new PrecheckStatusException(status, transactionId);
         }
@@ -142,7 +142,7 @@ public final class TransactionReceiptQuery
         // has reached consensus but not generated
         return new ReceiptStatusException(
             Objects.requireNonNull(transactionId),
-            TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt(), networkName)
+            TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt())
         );
     }
 }

@@ -27,7 +27,7 @@ public final class ScheduleId {
     public final long num;
 
     @Nullable
-    private String checksum;
+    private final String checksum;
 
     public ScheduleId(@Nonnegative long num) {
         this(0, 0, num);
@@ -35,47 +35,24 @@ public final class ScheduleId {
 
     @SuppressWarnings("InconsistentOverloads")
     public ScheduleId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num) {
-        this.shard = shard;
-        this.realm = realm;
-        this.num = num;
-        this.checksum = null;
+        this(shard, realm, num, null);
     }
 
     @SuppressWarnings("InconsistentOverloads")
-    ScheduleId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable NetworkName network, @Nullable String checksum) {
+    ScheduleId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable String checksum) {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
-
-        if (network != null) {
-            if (checksum == null) {
-                this.checksum = EntityIdHelper.checksum(Integer.toString(network.id), shard + "." + realm + "." + num);
-            } else {
-                this.checksum = checksum;
-            }
-        } else {
-            this.checksum = null;
-        }
+        this.checksum = checksum;
     }
 
     public static ScheduleId fromString(String id) {
         return EntityIdHelper.fromString(id, ScheduleId::new);
     }
 
-    static ScheduleId fromProtobuf(ScheduleID scheduleId, @Nullable NetworkName networkName) {
-        Objects.requireNonNull(scheduleId);
-
-        var id = new ScheduleId(scheduleId.getShardNum(), scheduleId.getRealmNum(), scheduleId.getScheduleNum());
-
-        if (networkName != null) {
-            id.setNetwork(networkName);
-        }
-
-        return id;
-    }
-
     static ScheduleId fromProtobuf(ScheduleID scheduleId) {
-        return ScheduleId.fromProtobuf(scheduleId, null);
+        Objects.requireNonNull(scheduleId);
+        return new ScheduleId(scheduleId.getShardNum(), scheduleId.getRealmNum(), scheduleId.getScheduleNum());
     }
 
     public static ScheduleId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -90,21 +67,23 @@ public final class ScheduleId {
             .build();
     }
 
-    ScheduleId setNetworkWith(Client client) {
-        if (client.network.networkName != null) {
-            setNetwork(client.network.networkName);
-        }
-
-        return this;
+    /**
+     * @param client
+     * @throws BadEntityIdException
+     * @deprecated Use {@link #validateChecksum(Client)} instead.
+     */
+    @Deprecated
+    public void validate(Client client) throws BadEntityIdException {
+        validateChecksum(client);
     }
 
-    ScheduleId setNetwork(NetworkName name) {
-        checksum = EntityIdHelper.checksum(Integer.toString(name.id), EntityIdHelper.toString(shard, realm, num));
-        return this;
-    }
-
-    public void validate(Client client) {
+    public void validateChecksum(Client client) throws BadEntityIdException {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
+    }
+
+    @Nullable
+    public String getChecksum() {
+        return checksum;
     }
 
     public byte[] toBytes() {
@@ -113,7 +92,11 @@ public final class ScheduleId {
 
     @Override
     public String toString() {
-        return EntityIdHelper.toString(shard, realm, num, checksum);
+        return EntityIdHelper.toString(shard, realm, num);
+    }
+
+    public String toStringWithChecksum(Client client) {
+        return EntityIdHelper.toStringWithChecksum(shard, realm, num, client, checksum);
     }
 
     @Override

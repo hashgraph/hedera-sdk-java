@@ -34,12 +34,28 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
         super(txs);
 
         builder = bodyBuilder.getSystemUndelete().toBuilder();
+
+        if(builder.hasFileID()) {
+            fileId = FileId.fromProtobuf(builder.getFileID());
+        }
+
+        if(builder.hasContractID()) {
+            contractId = ContractId.fromProtobuf(builder.getContractID());
+        }
     }
 
     SystemUndeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getSystemUndelete().toBuilder();
+
+        if(builder.hasFileID()) {
+            fileId = FileId.fromProtobuf(builder.getFileID());
+        }
+
+        if(builder.hasContractID()) {
+            contractId = ContractId.fromProtobuf(builder.getContractID());
+        }
     }
 
     @Nullable
@@ -95,13 +111,13 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (fileId != null) {
-            fileId.validate(client);
+            fileId.validateChecksum(client);
         }
 
         if (contractId != null) {
-            contractId.validate(client);
+            contractId.validateChecksum(client);
         }
     }
 

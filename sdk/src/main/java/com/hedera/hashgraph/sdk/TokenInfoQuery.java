@@ -40,9 +40,9 @@ public class TokenInfoQuery extends com.hedera.hashgraph.sdk.Query<TokenInfo, To
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (tokenId != null) {
-            tokenId.validate(client);
+            tokenId.validateChecksum(client);
         }
     }
 
@@ -66,8 +66,8 @@ public class TokenInfoQuery extends com.hedera.hashgraph.sdk.Query<TokenInfo, To
     }
 
     @Override
-    TokenInfo mapResponse(Response response, AccountId nodeId, Query request, @Nullable NetworkName networkName) {
-        return TokenInfo.fromProtobuf(response.getTokenGetInfo(), networkName);
+    TokenInfo mapResponse(Response response, AccountId nodeId, Query request) {
+        return TokenInfo.fromProtobuf(response.getTokenGetInfo());
     }
 
     @Override

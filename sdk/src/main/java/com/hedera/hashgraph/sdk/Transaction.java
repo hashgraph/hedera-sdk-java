@@ -905,8 +905,8 @@ public abstract class Transaction<T extends Transaction<T>>
     TransactionResponse mapResponse(
         com.hedera.hashgraph.sdk.proto.TransactionResponse transactionResponse,
         AccountId nodeId,
-        com.hedera.hashgraph.sdk.proto.Transaction request,
-        @Nullable NetworkName networkName) {
+        com.hedera.hashgraph.sdk.proto.Transaction request
+    ) {
         var transactionId = Objects.requireNonNull(getTransactionId());
         var hash = hash(request.getSignedTransactionBytes().toByteArray());
         nextTransactionIndex = (nextTransactionIndex + 1) % transactionIds.size();
@@ -918,7 +918,7 @@ public abstract class Transaction<T extends Transaction<T>>
         return Status.valueOf(transactionResponse.getNodeTransactionPrecheckCode());
     }
 
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         // Do nothing
     }
 
@@ -929,9 +929,15 @@ public abstract class Transaction<T extends Transaction<T>>
         }
 
         var accountId = Objects.requireNonNull(Objects.requireNonNull(getTransactionId()).accountId);
-        accountId.validate(client);
 
-        validateNetworkOnIds(client);
+        if(client.isAutoValidateChecksumsEnabled()) {
+            try {
+                accountId.validateChecksum(client);
+                validateChecksums(client);
+            } catch (BadEntityIdException exc) {
+                throw new IllegalArgumentException(exc.getMessage());
+            }
+        }
 
         var operatorId = client.getOperatorAccountId();
         if (operatorId != null && operatorId.equals(accountId)) {
