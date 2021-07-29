@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
    such as `UNAVAILBLE`
  * `Client.[set|get]NodeWaitTime()` change the default delay before attempting a node again which has
    returned a bad gRPC status
+ * `Client.setAutoValidateChecksums()` set whether checksums on ids will be automatically validated upon attempting to execute a transaction or query.  Disabled by default.  Check status with `Client.isAutoValidateChecksumsEnabled()`
+ * `*Id.toString()` no longer stringifies with checksums.  Use `*Id.getChecksum()` to get the checksum that was parsed, or use `*Id.toStringWithChecksum(client)` to stringify with the correct checksum for that ID on the client's network.
+ * `*Id.validateChecksum()` to validate a checksum.  Throws new `InvalidChecksumException`
+ * `Client.[set|get]NetworkName()` declare which network this client is connected to, for purposes of checksum validation.
 
 ## v2.0.9
 
