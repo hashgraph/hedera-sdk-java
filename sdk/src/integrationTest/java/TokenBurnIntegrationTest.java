@@ -3,6 +3,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
 
+import java.util.Collections;
 import java.util.Objects;
 import java.util.ArrayList;
 
@@ -184,6 +185,72 @@ class TokenBurnIntegrationTest {
             }
 
             testEnv.close(tokenId);
+        });
+    }
+
+    @Disabled
+    @Test
+    @DisplayName("Cannot burn NFTs when NFT is not owned by treasury")
+    void cannotBurnNftsWhenNftIsNotOwned() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+            var createReceipt = new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setFreezeKey(testEnv.operatorKey)
+                .setWipeKey(testEnv.operatorKey)
+                .setSupplyKey(testEnv.operatorKey)
+                .setFreezeDefault(false)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            var tokenId = Objects.requireNonNull(createReceipt.tokenId);
+
+            var serials = new TokenMintTransaction()
+                .setTokenId(tokenId)
+                .setMetadata(NftMetadataGenerator.generate((byte)1))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .serials;
+
+            var key = PrivateKey.generate();
+
+            var accountId = new AccountCreateTransaction()
+                .setKey(key)
+                .setInitialBalance(new Hbar(1))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .accountId;
+
+            new TokenAssociateTransaction()
+                .setAccountId(accountId)
+                .setTokenIds(Collections.singletonList(tokenId))
+                .freezeWith(testEnv.client)
+                .signWithOperator(testEnv.client)
+                .sign(key)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            new TransferTransaction()
+                .addNftTransfer(tokenId.nft(serials.get(0)), testEnv.operatorId, accountId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            var error = assertThrows(ReceiptStatusException.class, () -> {
+                new TokenBurnTransaction()
+                    .setSerials(serials)
+                    .setTokenId(tokenId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            });
+
+            assertTrue(error.getMessage().contains(Status.TREASURY_MUST_OWN_BURNED_NFT.toString()));
+
+            testEnv.close(tokenId, accountId, key);
         });
     }
 }

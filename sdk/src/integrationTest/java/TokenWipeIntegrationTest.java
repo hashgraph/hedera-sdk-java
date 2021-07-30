@@ -146,6 +146,77 @@ class TokenWipeIntegrationTest {
         });
     }
 
+    @Disabled
+    @Test
+    @DisplayName("Cannot wipe accounts NFTs if the account doesn't own them")
+    void cannotWipeAccountsNftsIfNotOwned() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+            var key = PrivateKey.generate();
+
+            var response = new AccountCreateTransaction()
+                .setKey(key)
+                .setInitialBalance(new Hbar(1))
+                .execute(testEnv.client);
+
+            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
+
+            var tokenId = Objects.requireNonNull(
+                new TokenCreateTransaction()
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(testEnv.operatorKey)
+                    .setFreezeKey(testEnv.operatorKey)
+                    .setWipeKey(testEnv.operatorKey)
+                    .setKycKey(testEnv.operatorKey)
+                    .setSupplyKey(testEnv.operatorKey)
+                    .setFreezeDefault(false)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client)
+                    .tokenId
+            );
+
+            var mintReceipt = new TokenMintTransaction()
+                .setTokenId(tokenId)
+                .setMetadata(NftMetadataGenerator.generate((byte)10))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            new TokenAssociateTransaction()
+                .setAccountId(accountId)
+                .setTokenIds(Collections.singletonList(tokenId))
+                .freezeWith(testEnv.client)
+                .sign(key)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            new TokenGrantKycTransaction()
+                .setAccountId(accountId)
+                .setTokenId(tokenId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            var serialsToTransfer = mintReceipt.serials.subList(0, 4);
+            // don't transfer them
+
+            var error = assertThrows(ReceiptStatusException.class, () -> {
+                new TokenWipeTransaction()
+                    .setTokenId(tokenId)
+                    .setAccountId(accountId)
+                    .setSerials(serialsToTransfer)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            });
+
+            assertTrue(error.getMessage().contains(Status.ACCOUNT_DOES_NOT_OWN_WIPED_NFT.toString()));
+
+            testEnv.close(tokenId, accountId, key);
+        });
+    }
+
     @Test
     @DisplayName("Cannot wipe accounts balance when account ID is not set")
     void cannotWipeAccountsBalanceWhenAccountIDIsNotSet() {
