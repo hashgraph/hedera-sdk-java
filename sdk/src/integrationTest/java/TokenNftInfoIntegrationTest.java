@@ -59,6 +59,96 @@ class TokenNftInfoIntegrationTest {
     }
 
     @Test
+    @DisplayName("Cannot query NFT info by invalid NftId")
+    void cannotQueryNftInfoByInvalidNftId() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+            var createReceipt = new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setFreezeKey(testEnv.operatorKey)
+                .setWipeKey(testEnv.operatorKey)
+                .setKycKey(testEnv.operatorKey)
+                .setSupplyKey(testEnv.operatorKey)
+                .setFreezeDefault(false)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            var tokenId = Objects.requireNonNull(createReceipt.tokenId);
+
+            byte[] metadata = {50};
+
+            var mintReceipt = new TokenMintTransaction()
+                .setTokenId(tokenId)
+                .addMetadata(metadata)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            var nftId = tokenId.nft(mintReceipt.serials.get(0));
+            var invalidNftId = new NftId(nftId.tokenId, nftId.serial + 1);
+
+            var error = assertThrows(PrecheckStatusException.class, () -> {
+                new TokenNftInfoQuery()
+                    .byNftId(invalidNftId)
+                    .execute(testEnv.client);
+            });
+
+            assertTrue(error.getMessage().contains(Status.INVALID_NFT_ID.toString()));
+
+            testEnv.close(tokenId);
+        });
+    }
+
+    @Test
+    @DisplayName("Cannot query NFT info by invalid NftId Serial Number")
+    void cannotQueryNftInfoByInvalidSerialNumber() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+            var createReceipt = new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setFreezeKey(testEnv.operatorKey)
+                .setWipeKey(testEnv.operatorKey)
+                .setKycKey(testEnv.operatorKey)
+                .setSupplyKey(testEnv.operatorKey)
+                .setFreezeDefault(false)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            var tokenId = Objects.requireNonNull(createReceipt.tokenId);
+
+            byte[] metadata = {50};
+
+            var mintReceipt = new TokenMintTransaction()
+                .setTokenId(tokenId)
+                .addMetadata(metadata)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            var nftId = tokenId.nft(mintReceipt.serials.get(0));
+            var invalidNftId = new NftId(nftId.tokenId, -1L);
+
+            var error = assertThrows(PrecheckStatusException.class, () -> {
+                new TokenNftInfoQuery()
+                    .byNftId(invalidNftId)
+                    .execute(testEnv.client);
+            });
+
+            assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_NFT_SERIAL_NUMBER.toString()));
+
+            testEnv.close(tokenId);
+        });
+    }
+
+    @Test
     @DisplayName("Can query NFT info by AccountId")
     void canQueryNftInfoByAccountId() {
         assertDoesNotThrow(() -> {

@@ -221,4 +221,42 @@ class TokenMintIntegrationTest {
             testEnv.close(tokenId);
         });
     }
+
+    @Disabled
+    @Test
+    @DisplayName("Cannot mint NFTs if metadata too big")
+    void cannotMintNftsIfMetadataTooBig() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+            var tokenId = Objects.requireNonNull(
+                new TokenCreateTransaction()
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(testEnv.operatorKey)
+                    .setFreezeKey(testEnv.operatorKey)
+                    .setWipeKey(testEnv.operatorKey)
+                    .setKycKey(testEnv.operatorKey)
+                    .setSupplyKey(testEnv.operatorKey)
+                    .setFreezeDefault(false)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client)
+                    .tokenId
+            );
+
+            var error = assertThrows(PrecheckStatusException.class, () -> {
+                new TokenMintTransaction()
+                    .setMetadata(NftMetadataGenerator.generateOneLarge())
+                    .setTokenId(tokenId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            });
+
+            assertTrue(error.getMessage().contains(Status.METADATA_TOO_LONG.toString()));
+
+            testEnv.close(tokenId);
+        });
+    }
 }
