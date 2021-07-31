@@ -156,5 +156,6 @@ public final class ValidateChecksumExample {
         }
 
         System.out.println("Example complete!");
+        client.close();
     }
 }
