@@ -14,6 +14,8 @@
 
 **NOTE**: v1 of the SDK is deprecated and support will be discontinued after October 2021. Please install the latest version 2.0.x or migrate from v1 to the latest 2.0.x version. You can reference the migration documentation [here](https://github.com/hashgraph/hedera-sdk-java/blob/master/MIGRATING_V1.md).
 
+**NOTE**: For users who want to clone this repository and use an IDE to jump around the project please install [Lombok)(https://projectlombok.org/) since we heavily use it throughout the project, and most IDEs do not support this out of the box.
+
 #### Gradle
 
 Select _one_ of the following depending on your target platform.
