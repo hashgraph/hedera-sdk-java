@@ -8,6 +8,11 @@ import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
+import lombok.experimental.Accessors;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.AccessLevel;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
@@ -16,16 +21,37 @@ import java.util.Objects;
 /**
  * Create a new Hedera™ account.
  */
+@Accessors(chain = true)
 public final class AccountCreateTransaction extends Transaction<AccountCreateTransaction> {
     private static final Hbar DEFAULT_RECORD_THRESHOLD = Hbar.fromTinybars(Long.MAX_VALUE);
 
-    @Nullable
-    private AccountId proxyAccountId = null;
-    @Nullable
-    private Key key = null;
+    @NonNull
+    @Getter
+    @Setter
+    private AccountId proxyAccountId;
+
+    @NonNull
+    @Getter
+    @Setter
+    private Key key;
+
+    @NonNull
+    @Getter
+    @Setter
     private String accountMemo = "";
+
+    @NonNull
+    @Getter
+    @Setter
     private Hbar initialBalance = new Hbar(0);
-    private boolean receiverSigRequired = false;
+
+    @Getter
+    @Setter
+    private boolean receiverSignatureRequired = false;
+
+    @NonNull
+    @Getter
+    @Setter
     private Duration autoRenewPeriod = DEFAULT_AUTO_RENEW_PERIOD;
 
     public AccountCreateTransaction() {
@@ -41,118 +67,16 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         initFromTransactionBody();
     }
 
-    @Nullable
-    public Key getKey() {
-        return key;
-    }
-
-    /**
-     * Set the key for this account.
-     *
-     * <p>The key that must sign each transfer out of the account. If receiverSignatureRequired is
-     * true, then it must also sign any transfer into the account.
-     *
-     * @param key the key for this account.
-     * @return {@code this}
-     */
-    public AccountCreateTransaction setKey(Key key) {
-        Objects.requireNonNull(key);
-        requireNotFrozen();
-        this.key = key;
-        return this;
-    }
-
-    public Hbar getInitialBalance() {
-        return initialBalance;
-    }
-
-    /**
-     * Set the initial amount to transfer into this account.
-     *
-     * @param initialBalance the initial balance.
-     * @return {@code this}
-     */
-    public AccountCreateTransaction setInitialBalance(Hbar initialBalance) {
-        Objects.requireNonNull(initialBalance);
-        requireNotFrozen();
-        this.initialBalance = initialBalance;
-        return this;
-    }
-
-    public boolean getReceiverSignatureRequired() {
-        return receiverSigRequired;
-    }
-
-    /**
-     * Set to true to require this account to sign any transfer of hbars to this account.
-     *
-     * <p>All transfers of hbars from this account must always be signed. This property only affects
-     * transfers to this account.
-     *
-     * @param receiveSignatureRequired true to require a signature when receiving hbars.
-     * @return {@code this}
-     */
-    public AccountCreateTransaction setReceiverSignatureRequired(boolean receiveSignatureRequired) {
-        requireNotFrozen();
-        receiverSigRequired = receiveSignatureRequired;
-        return this;
-    }
-
-    @Nullable
-    public AccountId getProxyAccountId() {
-        return proxyAccountId;
-    }
-
-    /**
-     * Set the ID of the account to which this account is proxy staked.
-     *
-     * @param proxyAccountId the proxy account ID.
-     * @return {@code this}
-     */
-    public AccountCreateTransaction setProxyAccountId(AccountId proxyAccountId) {
-        requireNotFrozen();
-        Objects.requireNonNull(proxyAccountId);
-        this.proxyAccountId = proxyAccountId;
-        return this;
-    }
-
-    @Nullable
-    public Duration getAutoRenewPeriod() {
-        return autoRenewPeriod;
-    }
-
-    /**
-     * Set the auto renew period for this account.
-     *
-     * <p>A Hedera™ account is charged to extend its expiration date every renew period. If it
-     * doesn't have enough balance, it extends as long as possible. If the balance is zero when it
-     * expires, then the account is deleted.
-     *
-     * <p>This is defaulted to 3 months by the SDK.
-     *
-     * @param autoRenewPeriod the auto renew period for this account.
-     * @return {@code this}
-     */
-    public AccountCreateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
-        requireNotFrozen();
-        Objects.requireNonNull(autoRenewPeriod);
-        this.autoRenewPeriod = autoRenewPeriod;
-        return this;
-    }
-
-    public String getAccountMemo() {
-        return accountMemo;
-    }
-
-    public AccountCreateTransaction setAccountMemo(String memo) {
-        Objects.requireNonNull(memo);
-        requireNotFrozen();
-        accountMemo = memo;
-        return this;
-    }
-
     CryptoCreateTransactionBody.Builder build() {
         var builder = CryptoCreateTransactionBody.newBuilder();
+
+        if (key != null) {
+            builder.setKey(key.toProtobufKey());
+        }
+
+        if (initialBalance != null) {
+            builder.setInitialBalance(initialBalance.toTinybars());
+        }
 
         if (proxyAccountId != null) {
             builder.setProxyAccountID(proxyAccountId.toProtobuf());
@@ -161,9 +85,13 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
             builder.setKey(key.toProtobufKey());
         }
         builder.setInitialBalance(initialBalance.toTinybars());
-        builder.setReceiverSigRequired(receiverSigRequired);
+        builder.setReceiverSigRequired(receiverSignatureRequired);
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         builder.setMemo(accountMemo);
+
+        if (autoRenewPeriod != null) {
+            builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
+        }
 
         return builder;
     }
@@ -189,7 +117,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         }
         initialBalance = Hbar.fromTinybars(body.getInitialBalance());
         accountMemo = body.getMemo();
-        receiverSigRequired = body.getReceiverSigRequired();
+        receiverSignatureRequired = body.getReceiverSigRequired();
     }
 
     @Override

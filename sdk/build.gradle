@@ -4,6 +4,7 @@ plugins {
     id "maven"
     id "com.bmuschko.nexus" version "2.3.1"
     id "com.google.protobuf" version "0.8.14"
+    id "io.freefair.lombok" version "6.0.0-m2"
 }
 
 group = "com.hedera.hashgraph"
