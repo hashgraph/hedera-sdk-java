@@ -71,6 +71,8 @@ public class ConstructClientExample {
         // network's name to testnet. If we don't do this, checksum validation won't work.
         // See ValidateChecksumExample.java.  You can use customClient.getNetworkName()
         // to check the network name.  If not set, it will return null.
+        // If you attempt to validate a checksum against a client whose networkName is not set,
+        // an IllegalStateException will be thrown.
         customClient.setNetworkName(NetworkName.TESTNET);
 
         // Let's generate a client from a config.json file.

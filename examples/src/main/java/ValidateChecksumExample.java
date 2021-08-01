@@ -32,7 +32,7 @@ public final class ValidateChecksumExample {
          * the input string and construct the expected AccountId object, and will throw an
          * IllegalArgumentException if the string is incorrectly formatted.
          *
-         * From here on, I'll talk about methods on accountId, but equivalent methods exist
+         * From here on, we'll talk about methods on accountId, but equivalent methods exist
          * on every entity ID type.
          *
          * fromString() expects the input to look something like this: "1.2.3-asdfg".
@@ -70,6 +70,9 @@ public final class ValidateChecksumExample {
          * include a checksum.
          *
          * In the second and third cases, the AccountId object will not have a checksum.
+         *
+         * If you call accountId.validateChecksum(client) and accountId has no checksum to validate,
+         * validateChecksum() will silently pass, and will not throw an exception.
          *
          * accountId.toString() will stringify the account ID with no checksum,
          * accountId.toStringWithChecksum(client) will stringify the account ID with the correct checksum
