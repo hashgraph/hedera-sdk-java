@@ -81,9 +81,6 @@ public abstract class Transaction<T extends Transaction<T>>
         // causes a `NullPointerException` in `TopicMessageSubmitTransaction#isFrozen()`. I assume the private
         // fields are not being set before the `super()` call which is why that is happening.
         bodyBuilder.setTransactionValidDuration(DurationConverter.toProtobuf(DEFAULT_TRANSACTION_VALID_DURATION));
-
-        // Default transaction fee is 2 Hbar
-        bodyBuilder.setTransactionFee(new Hbar(2).toTinybars());
     }
 
     Transaction(com.hedera.hashgraph.sdk.proto.Transaction tx) throws InvalidProtocolBufferException {
