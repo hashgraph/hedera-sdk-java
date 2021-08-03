@@ -1,10 +1,7 @@
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
-import org.checkerframework.checker.units.qual.A;
 
-import javax.swing.plaf.synth.SynthCheckBoxUI;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
@@ -103,17 +100,6 @@ public final class ScheduledTransferExample {
             .getReceipt(client)
             .scheduleId;
         Objects.requireNonNull(scheduleId);
-
-        /*
-         * The receipt contains two relevant fields:
-         *  - scheduleId
-         *  - scheduledTransactionId
-         *
-         * scheduleId is the ID by which we can refer to the scheduled transaction for the purposes of,
-         * say, signing it.
-         *
-         * scheduledTransactionId is the ID by which we can refer to the scheduled transaction itself.
-         */
         System.out.println("The scheduleId is: " + scheduleId.toStringWithChecksum(client));
 
         /*
