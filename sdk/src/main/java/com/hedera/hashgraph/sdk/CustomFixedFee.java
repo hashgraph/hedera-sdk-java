@@ -33,8 +33,18 @@ public class CustomFixedFee extends CustomFee {
         return amount;
     }
 
+    public Hbar getHbarAmount() {
+        return Hbar.fromTinybars(amount);
+    }
+
     public CustomFixedFee setAmount(long amount) {
         this.amount = amount;
+        return this;
+    }
+
+    public CustomFixedFee setHbarAmount(Hbar amount) {
+        denominatingTokenId = null;
+        this.amount = amount.toTinybars();
         return this;
     }
 
@@ -45,6 +55,11 @@ public class CustomFixedFee extends CustomFee {
 
     public CustomFixedFee setDenominatingTokenId(@Nullable TokenId tokenId) {
         denominatingTokenId = tokenId;
+        return this;
+    }
+
+    public CustomFixedFee setDemoninatingTokenToSameToken() {
+        denominatingTokenId = new TokenId(0, 0, 0);
         return this;
     }
 
