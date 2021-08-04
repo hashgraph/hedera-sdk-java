@@ -28,6 +28,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  * `*Id.validate()` use `*Id.validateChecksum()` instead
 
+### Fixed
+
+ * `ScheduleInfo.getTransaction()` incorrectly setting max transaction fee to 2 Hbars
+
 ## v2.0.9
 
 ### Fixed
