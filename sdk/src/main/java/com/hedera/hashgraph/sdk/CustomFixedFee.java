@@ -58,7 +58,7 @@ public class CustomFixedFee extends CustomFee {
         return this;
     }
 
-    public CustomFixedFee setDemoninatingTokenToSameToken() {
+    public CustomFixedFee setDenominatingTokenToSameToken() {
         denominatingTokenId = new TokenId(0, 0, 0);
         return this;
     }
