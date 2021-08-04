@@ -14,7 +14,7 @@ class TokenGrantKycIntegrationTest {
     @DisplayName("Can grant kyc to account with token")
     void canGrantKycAccountWithToken() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -97,7 +97,7 @@ class TokenGrantKycIntegrationTest {
     @DisplayName("Cannot grant kyc to account on token when account ID is not set")
     void cannotGrantKycToAccountOnTokenWhenAccountIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
@@ -136,7 +136,7 @@ class TokenGrantKycIntegrationTest {
     @DisplayName("Cannot grant kyc to account on token when account was not associated with")
     void cannotGrantKycToAccountOnTokenWhenAccountWasNotAssociatedWith() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 

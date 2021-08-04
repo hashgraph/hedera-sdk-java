@@ -115,7 +115,7 @@ class AccountBalanceIntegrationTest {
     @DisplayName("Can fetch token balances for client operator")
     void canFetchTokenBalancesForClientOperator() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
                 .setTokenName("ffff")
