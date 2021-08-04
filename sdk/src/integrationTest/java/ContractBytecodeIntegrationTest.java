@@ -18,7 +18,7 @@ public class ContractBytecodeIntegrationTest {
     @DisplayName("Can query contract bytecode")
     void canQueryContractBytecode() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -29,7 +29,6 @@ public class ContractBytecodeIntegrationTest {
 
             response = new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
@@ -39,7 +38,6 @@ public class ContractBytecodeIntegrationTest {
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
             var bytecode = new ContractByteCodeQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContractId(contractId)
                 .execute(testEnv.client);
 
@@ -47,17 +45,15 @@ public class ContractBytecodeIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contractId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -65,7 +61,7 @@ public class ContractBytecodeIntegrationTest {
     @DisplayName("Can get cost, even with a big max")
     void getCostBigMaxQueryContractBytecode() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -76,7 +72,6 @@ public class ContractBytecodeIntegrationTest {
 
             response = new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
@@ -86,7 +81,6 @@ public class ContractBytecodeIntegrationTest {
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
             var bytecodeQuery = new ContractByteCodeQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContractId(contractId)
                 .setMaxQueryPayment(new Hbar(1000));
 
@@ -98,17 +92,15 @@ public class ContractBytecodeIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contractId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -116,7 +108,7 @@ public class ContractBytecodeIntegrationTest {
     @DisplayName("Error, max is smaller than set payment.")
     void getCostSmallMaxQueryContractBytecode() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
                 .setKeys(testEnv.operatorKey)
@@ -127,7 +119,6 @@ public class ContractBytecodeIntegrationTest {
 
             response = new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
@@ -137,7 +128,6 @@ public class ContractBytecodeIntegrationTest {
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
             var bytecodeQuery = new ContractByteCodeQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContractId(contractId)
                 .setMaxQueryPayment(Hbar.fromTinybars(1));
 
@@ -151,17 +141,15 @@ public class ContractBytecodeIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contractId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -169,10 +157,9 @@ public class ContractBytecodeIntegrationTest {
     @DisplayName("Insufficient tx fee error.")
     void getCostInsufficientTxFeeQueryContractBytecode() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -181,7 +168,6 @@ public class ContractBytecodeIntegrationTest {
 
             response = new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
@@ -191,7 +177,6 @@ public class ContractBytecodeIntegrationTest {
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
             var bytecodeQuery = new ContractByteCodeQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContractId(contractId)
                 .setMaxQueryPayment(new Hbar(100));
 
@@ -205,17 +190,15 @@ public class ContractBytecodeIntegrationTest {
 
             new ContractDeleteTransaction()
                 .setContractId(contractId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -223,17 +206,16 @@ public class ContractBytecodeIntegrationTest {
     @DisplayName("Cannot query contract bytecode when contract ID is not set")
     void cannotQueryContractBytecodeWhenContractIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new ContractByteCodeQuery()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .execute(testEnv.client);
             });
 
             assertTrue(error.getMessage().contains(Status.INVALID_CONTRACT_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 }

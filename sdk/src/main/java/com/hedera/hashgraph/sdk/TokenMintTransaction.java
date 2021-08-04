@@ -100,9 +100,9 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (tokenId != null) {
-            tokenId.validate(client);
+            tokenId.validateChecksum(client);
         }
     }
 

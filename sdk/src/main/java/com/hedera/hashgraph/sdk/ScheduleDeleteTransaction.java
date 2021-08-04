@@ -65,9 +65,9 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (scheduleId != null) {
-            scheduleId.validate(client);
+            scheduleId.validateChecksum(client);
         }
     }
 

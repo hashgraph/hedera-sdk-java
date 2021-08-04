@@ -77,12 +77,28 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         super(txs);
 
         builder = bodyBuilder.getContractCreateInstance().toBuilder();
+
+        if(builder.hasFileID()) {
+            bytecodeFileId = FileId.fromProtobuf(builder.getFileID());
+        }
+
+        if(builder.hasProxyAccountID()) {
+            proxyAccountId = AccountId.fromProtobuf(builder.getProxyAccountID());
+        }
     }
 
     ContractCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
 
         builder = bodyBuilder.getContractCreateInstance().toBuilder();
+
+        if(builder.hasFileID()) {
+            bytecodeFileId = FileId.fromProtobuf(builder.getFileID());
+        }
+
+        if(builder.hasProxyAccountID()) {
+            proxyAccountId = AccountId.fromProtobuf(builder.getProxyAccountID());
+        }
     }
 
     @Nullable
@@ -267,13 +283,13 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (bytecodeFileId != null) {
-            bytecodeFileId.validate(client);
+            bytecodeFileId.validateChecksum(client);
         }
 
         if (proxyAccountId != null) {
-            proxyAccountId.validate(client);
+            proxyAccountId.validateChecksum(client);
         }
     }
 

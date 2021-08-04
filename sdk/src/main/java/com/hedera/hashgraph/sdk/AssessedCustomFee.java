@@ -17,16 +17,12 @@ public class AssessedCustomFee {
         this.feeCollectorAccountId = feeCollectorAccountId;
     }
 
-    static AssessedCustomFee fromProtobuf(com.hedera.hashgraph.sdk.proto.AssessedCustomFee assessedCustomFee, @Nullable NetworkName networkName) {
+    static AssessedCustomFee fromProtobuf(com.hedera.hashgraph.sdk.proto.AssessedCustomFee assessedCustomFee) {
         return new AssessedCustomFee(
             assessedCustomFee.getAmount(),
-            assessedCustomFee.hasTokenId() ? TokenId.fromProtobuf(assessedCustomFee.getTokenId(), networkName) : null,
-            assessedCustomFee.hasFeeCollectorAccountId() ? AccountId.fromProtobuf(assessedCustomFee.getFeeCollectorAccountId(), networkName) : null
+            assessedCustomFee.hasTokenId() ? TokenId.fromProtobuf(assessedCustomFee.getTokenId()) : null,
+            assessedCustomFee.hasFeeCollectorAccountId() ? AccountId.fromProtobuf(assessedCustomFee.getFeeCollectorAccountId()) : null
         );
-    }
-
-    static AssessedCustomFee fromProtobuf(com.hedera.hashgraph.sdk.proto.AssessedCustomFee assessedCustomFee) {
-        return fromProtobuf(assessedCustomFee, null);
     }
 
     public static AssessedCustomFee fromBytes(byte[] bytes) throws InvalidProtocolBufferException {

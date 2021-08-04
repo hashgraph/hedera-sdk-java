@@ -14,12 +14,11 @@ class TokenRevokeKycIntegrationTest {
     @DisplayName("Can revoke kyc to account with token")
     void canRevokeKycAccountWithToken() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -28,7 +27,6 @@ class TokenRevokeKycIntegrationTest {
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setDecimals(3)
@@ -46,7 +44,6 @@ class TokenRevokeKycIntegrationTest {
             );
 
             new TokenAssociateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTokenIds(Collections.singletonList(tokenId))
                 .freezeWith(testEnv.client)
@@ -55,7 +52,6 @@ class TokenRevokeKycIntegrationTest {
                 .getReceipt(testEnv.client);
 
             new TokenRevokeKycTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTokenId(tokenId)
                 .freezeWith(testEnv.client)
@@ -63,7 +59,7 @@ class TokenRevokeKycIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close(tokenId, accountId, key);
         });
     }
 
@@ -71,12 +67,11 @@ class TokenRevokeKycIntegrationTest {
     @DisplayName("Cannot revoke kyc to account on token when token ID is not set")
     void cannotRevokeKycToAccountOnTokenWhenTokenIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -85,7 +80,6 @@ class TokenRevokeKycIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenRevokeKycTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setAccountId(accountId)
                     .freezeWith(testEnv.client)
                     .sign(key)
@@ -95,7 +89,7 @@ class TokenRevokeKycIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.close(accountId, key);
         });
     }
 
@@ -103,12 +97,11 @@ class TokenRevokeKycIntegrationTest {
     @DisplayName("Cannot revoke kyc to account on token when account ID is not set")
     void cannotRevokeKycToAccountOnTokenWhenAccountIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
@@ -126,7 +119,6 @@ class TokenRevokeKycIntegrationTest {
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenRevokeKycTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenId(tokenId)
                     .freezeWith(testEnv.client)
                     .sign(key)
@@ -136,7 +128,7 @@ class TokenRevokeKycIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.close(tokenId);
         });
     }
 
@@ -144,12 +136,11 @@ class TokenRevokeKycIntegrationTest {
     @DisplayName("Cannot revoke kyc to account on token when account was not associated with")
     void cannotRevokeKycToAccountOnTokenWhenAccountWasNotAssociatedWith() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -158,7 +149,6 @@ class TokenRevokeKycIntegrationTest {
 
             var tokenId = Objects.requireNonNull(
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setDecimals(3)
@@ -177,7 +167,6 @@ class TokenRevokeKycIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenRevokeKycTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setAccountId(accountId)
                     .setTokenId(tokenId)
                     .freezeWith(testEnv.client)
@@ -188,7 +177,7 @@ class TokenRevokeKycIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.TOKEN_NOT_ASSOCIATED_TO_ACCOUNT.toString()));
 
-            testEnv.client.close();
+            testEnv.close(tokenId, accountId, key);
         });
     }
 }

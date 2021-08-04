@@ -12,10 +12,9 @@ public class TopicCreateIntegrationTest {
     @DisplayName("Can create topic")
     void canCreateTopic() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAdminKey(testEnv.operatorKey)
                 .setTopicMemo("[e2e::TopicCreateTransaction]")
                 .execute(testEnv.client);
@@ -27,7 +26,7 @@ public class TopicCreateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -35,14 +34,13 @@ public class TopicCreateIntegrationTest {
     @DisplayName("Can create topic with no field set")
     void canCreateTopicWithNoFieldsSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
             assertNotNull(response.getReceipt(testEnv.client).topicId);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 }

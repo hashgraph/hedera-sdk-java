@@ -20,12 +20,11 @@ public class ScheduleCreateIntegrationTest {
     @DisplayName("Can create schedule")
     void canCreateSchedule() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
             var transaction = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(10));
 
@@ -39,12 +38,11 @@ public class ScheduleCreateIntegrationTest {
 
             var info = new ScheduleInfoQuery()
                 .setScheduleId(scheduleId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertNotNull(info.executedAt);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -53,12 +51,11 @@ public class ScheduleCreateIntegrationTest {
     @DisplayName("Can get Transaction")
     void canGetTransactionSchedule() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
             var transaction = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(10));
 
@@ -72,13 +69,12 @@ public class ScheduleCreateIntegrationTest {
 
             var info = new ScheduleInfoQuery()
                 .setScheduleId(scheduleId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertNotNull(info.executedAt);
             assertNotNull(info.getScheduledTransaction());
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -87,7 +83,7 @@ public class ScheduleCreateIntegrationTest {
     @DisplayName("Can create schedule with schedule()")
     void canCreateWithSchedule() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
@@ -106,13 +102,12 @@ public class ScheduleCreateIntegrationTest {
 
             var info = new ScheduleInfoQuery()
                 .setScheduleId(scheduleId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertNotNull(info.executedAt);
             assertNotNull(info.getScheduledTransaction());
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -120,7 +115,7 @@ public class ScheduleCreateIntegrationTest {
     @DisplayName("Can sign schedule")
     void canSignSchedule2() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             PrivateKey key1 = PrivateKey.generate();
             PrivateKey key2 = PrivateKey.generate();
@@ -134,7 +129,6 @@ public class ScheduleCreateIntegrationTest {
 
             // Creat the account with the `KeyList`
             TransactionResponse response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(keyList)
                 .setInitialBalance(new Hbar(10))
                 .execute(testEnv.client);
@@ -155,7 +149,7 @@ public class ScheduleCreateIntegrationTest {
                 .addHbarTransfer(testEnv.operatorId, new Hbar(1));
 
             // Schedule the transactoin
-            ScheduleCreateTransaction scheduled = transfer.schedule().setNodeAccountIds(testEnv.nodeAccountIds);
+            ScheduleCreateTransaction scheduled = transfer.schedule();
 
             receipt = scheduled.execute(testEnv.client).getReceipt(testEnv.client);
 
@@ -164,7 +158,6 @@ public class ScheduleCreateIntegrationTest {
 
             // Get the schedule info to see if `signatories` is populated with 2/3 signatures
             ScheduleInfo info = new ScheduleInfoQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setScheduleId(scheduleId)
                 .execute(testEnv.client);
 
@@ -173,33 +166,38 @@ public class ScheduleCreateIntegrationTest {
             // Finally send this last signature to Hedera. This last signature _should_ mean the transaction executes
             // since all 3 signatures have been provided.
             ScheduleSignTransaction signTransaction = new ScheduleSignTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setScheduleId(scheduleId)
                 .freezeWith(testEnv.client);
 
             signTransaction.sign(key1).sign(key2).sign(key3).execute(testEnv.client).getReceipt(testEnv.client);
 
             info = new ScheduleInfoQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setScheduleId(scheduleId)
                 .execute(testEnv.client);
 
             assertNotNull(info.executedAt);
 
-            testEnv.client.close();
+            new AccountDeleteTransaction()
+                .setAccountId(accountId)
+                .setTransferAccountId(testEnv.operatorId)
+                .freezeWith(testEnv.client)
+                .sign(key1).sign(key2).sign(key3)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            testEnv.close();
         });
     }
 
     @Test
     @DisplayName("Can schedule token transfer")
-    void canScheduleTokenTransaction() {
+    void canScheduleTokenTransfer() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             PrivateKey key = PrivateKey.generate();
 
             var accountId = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setReceiverSignatureRequired(true)
                 .setKey(key)
                 .setInitialBalance(new Hbar(10))
@@ -210,17 +208,16 @@ public class ScheduleCreateIntegrationTest {
                 .accountId;
 
             var tokenId = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setInitialSupply(100)
                 .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client)
                 .tokenId;
 
             new TokenAssociateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTokenIds(Collections.singletonList(tokenId))
                 .freezeWith(testEnv.client)
@@ -232,27 +229,30 @@ public class ScheduleCreateIntegrationTest {
                 .addTokenTransfer(tokenId, testEnv.operatorId, -10)
                 .addTokenTransfer(tokenId, accountId, 10)
                 .schedule()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client)
-                .scheduleId;;
+                .scheduleId;
+
+            var balanceQuery1 = new AccountBalanceQuery()
+                .setAccountId(accountId)
+                .execute(testEnv.client);
+
+            assertEquals(balanceQuery1.tokens.get(tokenId), 0);
 
             new ScheduleSignTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setScheduleId(scheduleId)
                 .freezeWith(testEnv.client)
                 .sign(key)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            var balanceQuery = new AccountBalanceQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+            var balanceQuery2 = new AccountBalanceQuery()
                 .setAccountId(accountId)
                 .execute(testEnv.client);
 
-            assertEquals(balanceQuery.tokens.get(tokenId), 10);
+            assertEquals(balanceQuery2.tokens.get(tokenId), 10);
 
-            testEnv.client.close();
+            testEnv.close(tokenId, accountId, key);
         });
     }
 
@@ -260,7 +260,7 @@ public class ScheduleCreateIntegrationTest {
     @DisplayName("Can schedule topic message")
     void canScheduleTopicMessage() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             // Generate 3 random keys
             var key1 = PrivateKey.generate();
@@ -299,7 +299,6 @@ public class ScheduleCreateIntegrationTest {
 
             // create schedule
             var scheduledTx = transaction.schedule()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAdminKey(testEnv.operatorKey)
                 .setPayerAccountId(testEnv.operatorId)
                 .setScheduleMemo("mirror scheduled E2E signature on create and sign_" + Instant.now());
@@ -319,7 +318,6 @@ public class ScheduleCreateIntegrationTest {
             // verify schedule has been created and has 1 of 2 signatures
             var info = new ScheduleInfoQuery()
                 .setScheduleId(scheduleId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertNotNull(info);
@@ -341,12 +339,11 @@ public class ScheduleCreateIntegrationTest {
 
             info = new ScheduleInfoQuery()
                 .setScheduleId(scheduleId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertNotNull(info.executedAt);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 }

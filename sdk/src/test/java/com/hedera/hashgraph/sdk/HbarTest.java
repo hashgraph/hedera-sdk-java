@@ -83,7 +83,19 @@ public class HbarTest {
 
     @Test
     void fromString() {
-        assertEquals(Hbar.fromString("1").toTinybars(), 100000000);
+        assertEquals(Hbar.fromString("1").toTinybars(), 100_000_000);
+        assertEquals(Hbar.fromString("1 ℏ").toTinybars(), 100_000_000);
+        assertEquals(Hbar.fromString("1.5 mℏ").toTinybars(), 150_000);
+        assertEquals(Hbar.fromString("+1.5 mℏ").toTinybars(), 150_000);
+        assertEquals(Hbar.fromString("-1.5 mℏ").toTinybars(), -150_000);
+        assertEquals(Hbar.fromString("+3").toTinybars(), 300_000_000);
+        assertEquals(Hbar.fromString("-3").toTinybars(), -300_000_000);
+        assertThrows(IllegalArgumentException.class, () -> {
+            Hbar.fromString("1 h");
+        });
+        assertThrows(IllegalArgumentException.class, () -> {
+            Hbar.fromString("1ℏ");
+        });
     }
 
     @Test

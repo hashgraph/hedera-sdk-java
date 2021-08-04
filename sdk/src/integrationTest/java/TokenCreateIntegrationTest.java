@@ -18,10 +18,9 @@ class TokenCreateIntegrationTest {
     @DisplayName("Can create token with operator as all keys")
     void canCreateTokenWithOperatorAsAllKeys() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
@@ -38,7 +37,7 @@ class TokenCreateIntegrationTest {
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-            testEnv.client.close();
+            testEnv.close(tokenId);
         });
     }
 
@@ -46,16 +45,17 @@ class TokenCreateIntegrationTest {
     @DisplayName("Can create token with minimal properties set")
     void canCreateTokenWithMinimalPropertiesSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount(new Hbar(10));
 
-            new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+            var tokenId = new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
                 .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                .getReceipt(testEnv.client)
+                .tokenId;
 
+            // we lose this IntegrationTestEnv throwaway account
             testEnv.client.close();
         });
     }
@@ -64,11 +64,10 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create token when token name is not set")
     void cannotCreateTokenWhenTokenNameIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenSymbol("F")
                     .setTreasuryAccountId(testEnv.operatorId)
                     .execute(testEnv.client)
@@ -78,7 +77,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.MISSING_TOKEN_NAME.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -86,11 +85,10 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create token when token symbol is not set")
     void cannotCreateTokenWhenTokenSymbolIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTreasuryAccountId(testEnv.operatorId)
                     .execute(testEnv.client)
@@ -100,7 +98,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.MISSING_TOKEN_SYMBOL.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -108,11 +106,10 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create token when token treasury account ID is not set")
     void cannotCreateTokenWhenTokenTreasuryAccountIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .execute(testEnv.client)
@@ -122,7 +119,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_TREASURY_ACCOUNT_FOR_TOKEN.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -130,11 +127,10 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create token when token treasury account ID does not sign transaction")
     void cannotCreateTokenWhenTokenTreasuryAccountIDDoesNotSignTransaction() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setTreasuryAccountId(AccountId.fromString("0.0.3"))
@@ -145,7 +141,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -153,13 +149,12 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create token when admin key does not sign transaction")
     void cannotCreateTokenWhenAdminKeyDoesNotSignTransaction() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setTreasuryAccountId(testEnv.operatorId)
@@ -171,7 +166,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -180,7 +175,7 @@ class TokenCreateIntegrationTest {
     @DisplayName("Can create token with custom fees")
     void canCreateTokenWithCustomFees() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var customFees = new ArrayList<CustomFee>();
             customFees.add(new CustomFixedFee()
@@ -195,15 +190,16 @@ class TokenCreateIntegrationTest {
                 .setFeeCollectorAccountId(testEnv.operatorId)
             );
 
-            new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+            var tokenId = new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
                 .setCustomFees(customFees)
                 .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-            testEnv.client.close();
+                .getReceipt(testEnv.client)
+                .tokenId;
+            testEnv.close(tokenId);
         });
     }
 
@@ -235,13 +231,13 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create custom fee list with > 10 entries")
     void cannotCreateMoreThanTenCustomFees() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
+                    .setAdminKey(testEnv.operatorKey)
                     .setTreasuryAccountId(testEnv.operatorId)
                     .setCustomFees(createFixedFeeList(11, testEnv.operatorId))
                     .execute(testEnv.client)
@@ -250,7 +246,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.CUSTOM_FEES_LIST_TOO_LONG.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -259,18 +255,19 @@ class TokenCreateIntegrationTest {
     @DisplayName("Can create custom fee list with 10 fixed fees")
     void canCreateTenFixedFees() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-            new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+            var tokenId = new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
                 .setCustomFees(createFixedFeeList(10, testEnv.operatorId))
                 .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                .getReceipt(testEnv.client)
+                .tokenId;
 
-            testEnv.client.close();
+            testEnv.close(tokenId);
         });
     }
 
@@ -279,18 +276,19 @@ class TokenCreateIntegrationTest {
     @DisplayName("Can create custom fee list with 10 fractional fees")
     void canCreateTenFractionalFees() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-            new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
+            var tokenId = new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
+                .setAdminKey(testEnv.operatorKey)
                 .setTreasuryAccountId(testEnv.operatorId)
                 .setCustomFees(createFractionalFeeList(10, testEnv.operatorId))
                 .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                .getReceipt(testEnv.client)
+                .tokenId;
 
-            testEnv.client.close();
+            testEnv.close(tokenId);
         });
     }
 
@@ -298,14 +296,14 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create a token with a custom fee where min > max")
     void cannotCreateMinGreaterThanMax() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(testEnv.operatorKey)
                     .setCustomFees(Collections.singletonList(new CustomFractionalFee()
                         .setNumerator(1)
                         .setDenominator(3)
@@ -318,7 +316,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -326,13 +324,13 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create a token with invalid fee collector account ID")
     void cannotCreateInvalidFeeCollector() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
+                    .setAdminKey(testEnv.operatorKey)
                     .setTreasuryAccountId(testEnv.operatorId)
                     .setCustomFees(Collections.singletonList(new CustomFixedFee()
                         .setAmount(1)))
@@ -342,7 +340,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_CUSTOM_FEE_COLLECTOR.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -350,13 +348,13 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create a token with a negative custom fee")
     void cannotCreateNegativeFee() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
+                    .setAdminKey(testEnv.operatorKey)
                     .setTreasuryAccountId(testEnv.operatorId)
                     .setCustomFees(Collections.singletonList(new CustomFixedFee()
                         .setAmount(-1)
@@ -367,7 +365,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.CUSTOM_FEE_MUST_BE_POSITIVE.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -376,14 +374,14 @@ class TokenCreateIntegrationTest {
     @DisplayName("Cannot create custom fee with 0 denominator")
     void cannotCreateZeroDenominator() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenName("ffff")
                     .setTokenSymbol("F")
                     .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(testEnv.operatorKey)
                     .setCustomFees(Collections.singletonList(new CustomFractionalFee()
                         .setNumerator(1)
                         .setDenominator(0)
@@ -396,7 +394,7 @@ class TokenCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.FRACTION_DIVIDES_BY_ZERO.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -405,10 +403,9 @@ class TokenCreateIntegrationTest {
     @DisplayName("Can create NFT")
     void canCreateNfts() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
@@ -423,7 +420,7 @@ class TokenCreateIntegrationTest {
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-            testEnv.client.close();
+            testEnv.close(tokenId);
         });
     }
 }

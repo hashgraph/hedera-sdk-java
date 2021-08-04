@@ -1,5 +1,6 @@
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.NetworkName;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -65,6 +66,14 @@ public class ConstructClientExample {
         customNetwork.put("2.testnet.hedera.com:50211", new AccountId(5));
         customNetwork.put("3.testnet.hedera.com:50211", new AccountId(6));
         Client customClient = Client.forNetwork(customNetwork);
+
+        // since our customClient's network is in this case a subset of testnet, we should set the
+        // network's name to testnet. If we don't do this, checksum validation won't work.
+        // See ValidateChecksumExample.java.  You can use customClient.getNetworkName()
+        // to check the network name.  If not set, it will return null.
+        // If you attempt to validate a checksum against a client whose networkName is not set,
+        // an IllegalStateException will be thrown.
+        customClient.setNetworkName(NetworkName.TESTNET);
 
         // Let's generate a client from a config.json file.
         // A config file may specify a network by name, or it may provide a custom network

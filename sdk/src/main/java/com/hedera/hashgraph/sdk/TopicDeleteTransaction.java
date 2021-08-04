@@ -77,9 +77,9 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (topicId != null) {
-            topicId.validate(client);
+            topicId.validateChecksum(client);
         }
     }
 

@@ -15,13 +15,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TokenFeeScheduleUpdateIntegrationTest {
     @Test
-    @DisplayName("Can update token")
+    @DisplayName("Can update token fees")
     void canUpdateToken() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
@@ -39,7 +38,6 @@ class TokenFeeScheduleUpdateIntegrationTest {
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             @Var var info = new TokenInfoQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .execute(testEnv.client);
 
@@ -53,12 +51,12 @@ class TokenFeeScheduleUpdateIntegrationTest {
             assertNotNull(info.wipeKey);
             assertNotNull(info.kycKey);
             assertNotNull(info.supplyKey);
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.adminKey.toString());
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.freezeKey.toString());
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.wipeKey.toString());
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.kycKey.toString());
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.supplyKey.toString());
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.feeScheduleKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.adminKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.freezeKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.wipeKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.kycKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.supplyKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.feeScheduleKey.toString());
             assertNotNull(info.defaultFreezeStatus);
             assertFalse(info.defaultFreezeStatus);
             assertNotNull(info.defaultKycStatus);
@@ -85,7 +83,6 @@ class TokenFeeScheduleUpdateIntegrationTest {
                 .getReceipt(testEnv.client);
 
             info = new TokenInfoQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .execute(testEnv.client);
 
@@ -99,12 +96,12 @@ class TokenFeeScheduleUpdateIntegrationTest {
             assertNotNull(info.wipeKey);
             assertNotNull(info.kycKey);
             assertNotNull(info.supplyKey);
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.adminKey.toString());
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.freezeKey.toString());
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.wipeKey.toString());
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.kycKey.toString());
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.supplyKey.toString());
-            assertEquals(testEnv.operatorKey.getPublicKey().toString(), info.feeScheduleKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.adminKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.freezeKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.wipeKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.kycKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.supplyKey.toString());
+            assertEquals(testEnv.operatorKey.toString(), info.feeScheduleKey.toString());
             assertNotNull(info.defaultFreezeStatus);
             assertFalse(info.defaultFreezeStatus);
             assertNotNull(info.defaultKycStatus);
@@ -134,7 +131,7 @@ class TokenFeeScheduleUpdateIntegrationTest {
             assertEquals(fixedCount, 1);
             assertEquals(fractionalCount, 1);
 
-            testEnv.client.close();
+            testEnv.close(tokenId);
         });
     }
 
@@ -142,10 +139,9 @@ class TokenFeeScheduleUpdateIntegrationTest {
     @DisplayName("Cannot update fee schedule with any key other than fee schedule key")
     void cannotUpdateWithAnyOtherKey() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
@@ -179,7 +175,7 @@ class TokenFeeScheduleUpdateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            testEnv.client.close();
+            testEnv.close(tokenId);
         });
     }
 }

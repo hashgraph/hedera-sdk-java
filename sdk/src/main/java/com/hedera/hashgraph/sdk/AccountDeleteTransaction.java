@@ -97,13 +97,13 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (accountId != null) {
-            accountId.validate(client);
+            accountId.validateChecksum(client);
         }
 
         if (transferAccountId != null) {
-            transferAccountId.validate(client);
+            transferAccountId.validateChecksum(client);
         }
     }
 

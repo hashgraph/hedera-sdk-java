@@ -92,14 +92,14 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (accountId != null) {
-            accountId.validate(client);
+            accountId.validateChecksum(client);
         }
 
         for (var token : tokenIds) {
             if (token != null) {
-                token.validate(client);
+                token.validateChecksum(client);
             }
         }
     }

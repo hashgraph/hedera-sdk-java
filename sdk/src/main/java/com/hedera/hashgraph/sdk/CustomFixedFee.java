@@ -12,7 +12,7 @@ public class CustomFixedFee extends CustomFee {
     public CustomFixedFee() {
     }
 
-    static CustomFixedFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee, @Nullable NetworkName networkName) {
+    static CustomFixedFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
         var fixedFee = customFee.getFixedFee();
         var returnFee = new CustomFixedFee().setAmount(fixedFee.getAmount());
         if(customFee.hasFeeCollectorAccountId()) {
@@ -33,8 +33,18 @@ public class CustomFixedFee extends CustomFee {
         return amount;
     }
 
+    public Hbar getHbarAmount() {
+        return Hbar.fromTinybars(amount);
+    }
+
     public CustomFixedFee setAmount(long amount) {
         this.amount = amount;
+        return this;
+    }
+
+    public CustomFixedFee setHbarAmount(Hbar amount) {
+        denominatingTokenId = null;
+        this.amount = amount.toTinybars();
         return this;
     }
 
@@ -48,11 +58,16 @@ public class CustomFixedFee extends CustomFee {
         return this;
     }
 
+    public CustomFixedFee setDenominatingTokenToSameToken() {
+        denominatingTokenId = new TokenId(0, 0, 0);
+        return this;
+    }
+
     @Override
-    void validate(Client client) {
-        super.validate(client);
+    void validateChecksums(Client client) throws BadEntityIdException {
+        super.validateChecksums(client);
         if(denominatingTokenId != null) {
-            denominatingTokenId.validate(client);
+            denominatingTokenId.validateChecksum(client);
         }
     }
 

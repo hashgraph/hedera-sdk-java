@@ -77,7 +77,7 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
     }
 
 

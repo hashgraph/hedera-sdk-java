@@ -1,4 +1,10 @@
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.AccountCreateTransaction;
+import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
+import com.hedera.hashgraph.sdk.AccountInfoQuery;
+import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.Status;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
@@ -17,12 +23,11 @@ class AccountCreateIntegrationTest {
     @DisplayName("Can create account with only initial balance and key")
     void canCreateAccountWithOnlyInitialBalanceAndKey() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
@@ -31,7 +36,6 @@ class AccountCreateIntegrationTest {
 
             var info = new AccountInfoQuery()
                 .setAccountId(accountId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.accountId, accountId);
@@ -42,16 +46,7 @@ class AccountCreateIntegrationTest {
             assertNull(info.proxyAccountId);
             assertEquals(info.proxyReceived, Hbar.ZERO);
 
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
-                .setTransferAccountId(testEnv.operatorId)
-                .freezeWith(testEnv.client)
-                .sign(key)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
-            testEnv.client.close();
+            testEnv.close(accountId, key);
         });
     }
 
@@ -59,12 +54,11 @@ class AccountCreateIntegrationTest {
     @DisplayName("Can create account with no initial balance")
     void canCreateAccountWithNoInitialBalance() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .execute(testEnv.client);
 
@@ -72,7 +66,6 @@ class AccountCreateIntegrationTest {
 
             var info = new AccountInfoQuery()
                 .setAccountId(accountId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.accountId, accountId);
@@ -83,16 +76,7 @@ class AccountCreateIntegrationTest {
             assertNull(info.proxyAccountId);
             assertEquals(info.proxyReceived, Hbar.ZERO);
 
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
-                .setTransferAccountId(testEnv.operatorId)
-                .freezeWith(testEnv.client)
-                .sign(key)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
-            testEnv.client.close();
+            testEnv.close(accountId, key);
         });
     }
 
@@ -100,11 +84,10 @@ class AccountCreateIntegrationTest {
     @DisplayName("Cannot create account with no key")
     void canNotCreateAccountWithNoKey() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var error = assertThrows(PrecheckStatusException.class, () -> {
                 new AccountCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setInitialBalance(new Hbar(1))
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
@@ -112,7 +95,7 @@ class AccountCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.KEY_REQUIRED.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 }

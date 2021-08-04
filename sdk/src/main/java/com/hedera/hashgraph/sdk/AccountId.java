@@ -30,7 +30,7 @@ public final class AccountId {
     public final long num;
 
     @Nullable
-    String checksum;
+    private final String checksum;
 
     public AccountId(@Nonnegative long num) {
         this(0, 0, num);
@@ -38,27 +38,15 @@ public final class AccountId {
 
     @SuppressWarnings("InconsistentOverloads")
     public AccountId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num) {
-        this.shard = shard;
-        this.realm = realm;
-        this.num = num;
-        this.checksum = null;
+        this(shard, realm, num, null);
     }
 
     @SuppressWarnings("InconsistentOverloads")
-    AccountId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable NetworkName network, @Nullable String checksum) {
+    AccountId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable String checksum) {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
-
-        if (network != null) {
-            if (checksum == null) {
-                this.checksum = EntityIdHelper.checksum(Integer.toString(network.id), shard + "." + realm + "." + num);
-            } else {
-                this.checksum = checksum;
-            }
-        } else {
-            this.checksum = null;
-        }
+        this.checksum = checksum;
     }
 
     public static AccountId fromString(String id) {
@@ -69,20 +57,9 @@ public final class AccountId {
         return EntityIdHelper.fromSolidityAddress(address, AccountId::new);
     }
 
-    static AccountId fromProtobuf(AccountID accountId, @Nullable NetworkName networkName) {
-        Objects.requireNonNull(accountId);
-
-        var id = new AccountId(accountId.getShardNum(), accountId.getRealmNum(), accountId.getAccountNum());
-
-        if (networkName != null) {
-            id.setNetwork(networkName);
-        }
-
-        return id;
-    }
-
     static AccountId fromProtobuf(AccountID accountId) {
-        return AccountId.fromProtobuf(accountId, null);
+        Objects.requireNonNull(accountId);
+        return new AccountId(accountId.getShardNum(), accountId.getRealmNum(), accountId.getAccountNum());
     }
 
     public static AccountId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -101,21 +78,23 @@ public final class AccountId {
             .build();
     }
 
-    AccountId setNetworkWith(Client client) {
-        if (client.network.networkName != null) {
-            setNetwork(client.network.networkName);
-        }
-
-        return this;
+    /**
+     * @param client
+     * @throws BadEntityIdException
+     * @deprecated Use {@link #validateChecksum(Client)} instead.
+     */
+    @Deprecated
+    public void validate(Client client) throws BadEntityIdException {
+        validateChecksum(client);
     }
 
-    AccountId setNetwork(NetworkName name) {
-        checksum = EntityIdHelper.checksum(Integer.toString(name.id), EntityIdHelper.toString(shard, realm, num));
-        return this;
-    }
-
-    public void validate(Client client) {
+    public void validateChecksum(Client client) throws BadEntityIdException {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
+    }
+
+    @Nullable
+    public String getChecksum() {
+        return checksum;
     }
 
     public byte[] toBytes() {
@@ -124,7 +103,11 @@ public final class AccountId {
 
     @Override
     public String toString() {
-        return EntityIdHelper.toString(shard, realm, num, checksum);
+        return EntityIdHelper.toString(shard, realm, num);
+    }
+
+    public String toStringWithChecksum(Client client) {
+        return EntityIdHelper.toStringWithChecksum(shard, realm, num, client, checksum);
     }
 
     @Override

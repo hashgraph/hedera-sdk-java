@@ -11,14 +11,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TokenDeleteIntegrationTest {
     @Test
-    @Disabled
     @DisplayName("Can delete token")
     void canDeleteToken() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
@@ -35,24 +33,21 @@ class TokenDeleteIntegrationTest {
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             new TokenDeleteTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
     @Test
-    @Disabled
     @DisplayName("Can delete token with only admin key set")
     void canDeleteTokenWithOnlyAdminKeySet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
@@ -61,27 +56,19 @@ class TokenDeleteIntegrationTest {
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-            new TokenDeleteTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
-                .setTokenId(tokenId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
-            testEnv.client.close();
+            testEnv.close(tokenId);
         });
     }
 
     @Test
-    @Disabled
     @DisplayName("Cannot delete token when admin key does not sign transaction")
     void cannotDeleteTokenWhenAdminKeyDoesNotSignTransaction() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key = PrivateKey.generate();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
@@ -94,7 +81,6 @@ class TokenDeleteIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TokenDeleteTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setTokenId(tokenId)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
@@ -102,27 +88,32 @@ class TokenDeleteIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
 
-            testEnv.client.close();
+            new TokenDeleteTransaction()
+                .setTokenId(tokenId)
+                .freezeWith(testEnv.client)
+                .sign(key)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            testEnv.close();
         });
     }
 
     @Test
-    @Disabled
     @DisplayName("Cannot delete token when token ID is not set")
     void cannotDeleteTokenWhenTokenIDIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-            var error = assertThrows(ReceiptStatusException.class, () -> {
+            var error = assertThrows(PrecheckStatusException.class, () -> {
                 new TokenDeleteTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
             });
 
             assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 }

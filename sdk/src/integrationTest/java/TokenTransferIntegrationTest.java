@@ -11,21 +11,19 @@ class TokenTransferIntegrationTest {
     @DisplayName("Can transfer tokens")
     void tokenTransferTest() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-            PrivateKey key = PrivateKey.generate();
+            var key = PrivateKey.generate();
 
             TransactionResponse response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client);
 
-            AccountId accountId = response.getReceipt(testEnv.client).accountId;
+            var accountId = response.getReceipt(testEnv.client).accountId;
             assertNotNull(accountId);
 
             response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
@@ -39,11 +37,10 @@ class TokenTransferIntegrationTest {
                 .setFreezeDefault(false)
                 .execute(testEnv.client);
 
-            TokenId tokenId = response.getReceipt(testEnv.client).tokenId;
+            var tokenId = response.getReceipt(testEnv.client).tokenId;
             assertNotNull(tokenId);
 
             new TokenAssociateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTokenIds(Collections.singletonList(tokenId))
                 .freezeWith(testEnv.client)
@@ -53,28 +50,18 @@ class TokenTransferIntegrationTest {
                 .getReceipt(testEnv.client);
 
             new TokenGrantKycTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTokenId(tokenId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new TransferTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .addTokenTransfer(tokenId, testEnv.operatorId, -10)
                 .addTokenTransfer(tokenId, accountId, 10)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            new TokenWipeTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
-                .setTokenId(tokenId)
-                .setAccountId(accountId)
-                .setAmount(10)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
-            testEnv.client.close();
+            testEnv.close(tokenId, accountId, key);
         });
     }
 
@@ -82,27 +69,24 @@ class TokenTransferIntegrationTest {
     @DisplayName("Cannot transfer tokens if balance is insufficient to pay fee")
     void insufficientBalanceForFee() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             PrivateKey key1 = PrivateKey.generate();
             PrivateKey key2 = PrivateKey.generate();
             var accountId1 = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key1)
-                .setInitialBalance(new Hbar(20))
+                .setInitialBalance(new Hbar(2))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client)
                 .accountId;
             var accountId2 = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key2)
-                .setInitialBalance(new Hbar(20))
+                .setInitialBalance(new Hbar(2))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client)
                 .accountId;
 
             var tokenId = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setInitialSupply(1)
@@ -117,7 +101,6 @@ class TokenTransferIntegrationTest {
                 .tokenId;
 
             new TokenAssociateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId1)
                 .setTokenIds(Collections.singletonList(tokenId))
                 .freezeWith(testEnv.client)
@@ -126,7 +109,6 @@ class TokenTransferIntegrationTest {
                 .getReceipt(testEnv.client);
 
             new TokenAssociateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId2)
                 .setTokenIds(Collections.singletonList(tokenId))
                 .freezeWith(testEnv.client)
@@ -135,7 +117,6 @@ class TokenTransferIntegrationTest {
                 .getReceipt(testEnv.client);
 
             new TransferTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .addTokenTransfer(tokenId, testEnv.operatorId, -1)
                 .addTokenTransfer(tokenId, accountId1, 1)
                 .freezeWith(testEnv.client)
@@ -145,7 +126,6 @@ class TokenTransferIntegrationTest {
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new TransferTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .addTokenTransfer(tokenId, accountId1, -1)
                     .addTokenTransfer(tokenId, accountId2, 1)
                     .freezeWith(testEnv.client)
@@ -157,7 +137,28 @@ class TokenTransferIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE.toString()));
 
-            testEnv.client.close();
+            new TokenDeleteTransaction()
+                .setTokenId(tokenId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            new AccountDeleteTransaction()
+                .setAccountId(accountId1)
+                .setTransferAccountId(testEnv.operatorId)
+                .freezeWith(testEnv.client)
+                .sign(key1)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            new AccountDeleteTransaction()
+                .setAccountId(accountId2)
+                .setTransferAccountId(testEnv.operatorId)
+                .freezeWith(testEnv.client)
+                .sign(key2)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            testEnv.close();
         });
     }
 }

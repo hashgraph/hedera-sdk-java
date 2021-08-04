@@ -37,7 +37,7 @@ allprojects {
 
     jacoco {
         reportsDir = file("$buildDir/jacoco")
-        toolVersion = "0.8.5"
+        toolVersion = "0.8.7"
     }
 
     tasks.withType(Test) {

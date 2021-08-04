@@ -11,9 +11,17 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class AccountIdTest {
+
+    static Client mainnetClient = null;
+    static Client testnetClient = null;
+    static Client previewnetClient = null;
+
     @BeforeAll
     public static void beforeAll() {
         SnapshotMatcher.start();
+        mainnetClient = Client.forMainnet();
+        testnetClient = Client.forTestnet();
+        previewnetClient = Client.forPreviewnet();
     }
 
     @AfterClass
@@ -28,22 +36,17 @@ class AccountIdTest {
 
     @Test
     void fromStringWithChecksumOnMainnet() {
-        SnapshotMatcher.expect(AccountId.fromString("0.0.123-vfmkw").toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(AccountId.fromString("0.0.123-vfmkw").toStringWithChecksum(mainnetClient)).toMatchSnapshot();
     }
 
     @Test
     void fromStringWithChecksumOnTestnet() {
-        SnapshotMatcher.expect(AccountId.fromString("0.0.123-rmkyk").toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(AccountId.fromString("0.0.123-rmkyk").toStringWithChecksum(testnetClient)).toMatchSnapshot();
     }
 
     @Test
     void fromStringWithChecksumOnPreviewnet() {
-        SnapshotMatcher.expect(AccountId.fromString("0.0.123-ntjly").toString()).toMatchSnapshot();
-    }
-
-    @Test
-    void fromStringWithChecksumOnUndefinedNetwork() {
-        assertThrows(IllegalArgumentException.class, () -> AccountId.fromString("0.0.123-ghgna"));
+        SnapshotMatcher.expect(AccountId.fromString("0.0.123-ntjly").toStringWithChecksum(previewnetClient)).toMatchSnapshot();
     }
 
     @Test
