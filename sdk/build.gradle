@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.hedera.hashgraph"
-version = "2.0.9"
+version = "2.0.10"
 description = "Hedera™ Hashgraph SDK for Java"
 
 configurations {

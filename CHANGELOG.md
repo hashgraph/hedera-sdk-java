@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## v2.0.10
 
 ### Added
 
@@ -21,8 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `*Id.toString()` no longer stringifies with checksums.  Use `*Id.getChecksum()` to get the checksum that was parsed, or use `*Id.toStringWithChecksum(client)` to stringify with the correct checksum for that ID on the client's network.
  * `*Id.validateChecksum()` to validate a checksum.  Throws new `BadEntityIdException`
  * `Client.[set|get]NetworkName()` declare which network this client is connected to, for purposes of checksum validation.
-* `CustomFixedFee.[set|get]HbarAmount()` makes this fixed fee an Hbar fee of the specified amount
-* `CustomFixedFee.setDenominatingTokenToSameToken()` this fixed fee will be charged in the same token.
+ * `CustomFixedFee.[set|get]HbarAmount()` makes this fixed fee an Hbar fee of the specified amount
+ * `CustomFixedFee.setDenominatingTokenToSameToken()` this fixed fee will be charged in the same token.
+
+### Deprecated
+
+ * `*Id.validate()` use `*Id.validateChecksum()` instead
 
 ## v2.0.9
 
