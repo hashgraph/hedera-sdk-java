@@ -3,7 +3,6 @@ package com.hedera.hashgraph.sdk;
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-//import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.SignatureMap;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
@@ -37,6 +36,7 @@ public abstract class Transaction<T extends Transaction<T>>
     // Default transaction duration
     private static final Duration DEFAULT_TRANSACTION_VALID_DURATION = Duration.ofSeconds(120);
 
+    // TODO: make this private, should only be initialized on freezeWith(), used for buildTransaction()
     protected TransactionBody.Builder bodyBuilder;
 
     // A SDK [Transaction] is composed of multiple, raw protobuf transactions. These should be
@@ -65,55 +65,35 @@ public abstract class Transaction<T extends Transaction<T>>
     Transaction() {
         bodyBuilder = TransactionBody.newBuilder();
 
-        // Cannot call `Transaction#setTranscationValidDuration()` because it calls `isFrozen()` and
-        // causes a `NullPointerException` in `TopicMessageSubmitTransaction#isFrozen()`. I assume the private
-        // fields are not being set before the `super()` call which is why that is happening.
-        bodyBuilder.setTransactionValidDuration(DurationConverter.toProtobuf(DEFAULT_TRANSACTION_VALID_DURATION));
+        setTransactionValidDuration(DEFAULT_TRANSACTION_VALID_DURATION);
 
         // Default transaction fee is 2 Hbar
         bodyBuilder.setTransactionFee(new Hbar(2).toTinybars());
     }
+
+    // TODO: add transactionValidDuration and maxTransactionFee to Transaction
+    // TODO: add abstract initFromTransactionBody(txBody)
 
     Transaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
+        // TODO: extract transactionValidDuration and maxTransactionFee
         bodyBuilder = txBody.toBuilder();
-
-        // Cannot call `Transaction#setTranscationValidDuration()` because it calls `isFrozen()` and
-        // causes a `NullPointerException` in `TopicMessageSubmitTransaction#isFrozen()`. I assume the private
-        // fields are not being set before the `super()` call which is why that is happening.
-        bodyBuilder.setTransactionValidDuration(DurationConverter.toProtobuf(DEFAULT_TRANSACTION_VALID_DURATION));
-    }
-
-    Transaction(com.hedera.hashgraph.sdk.proto.Transaction tx) throws InvalidProtocolBufferException {
-        var transaction = SignedTransaction.parseFrom(tx.getSignedTransactionBytes());
-        transactions.add(tx);
-        signatures.add(transaction.getSigMap().toBuilder());
-        signedTransactions.add(transaction.toBuilder());
-
-        bodyBuilder = TransactionBody.parseFrom(signedTransactions.get(0).getBodyBytes()).toBuilder();
-
-        // Cannot call `Transaction#setTranscationValidDuration()` because it calls `isFrozen()` and
-        // causes a `NullPointerException` in `TopicMessageSubmitTransaction#isFrozen()`. I assume the private
-        // fields are not being set before the `super()` call which is why that is happening.
-        bodyBuilder.setTransactionValidDuration(DurationConverter.toProtobuf(DEFAULT_TRANSACTION_VALID_DURATION));
-
-        // Default transaction fee is 2 Hbar
-        bodyBuilder.setTransactionFee(new Hbar(2).toTinybars());
     }
 
     Transaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
-        var size = txs.values().iterator().next().size();
+        var txCount = txs.keySet().size();
+        var nodeCount = txs.values().iterator().next().size();
 
-        nodeAccountIds = new ArrayList<>(size);
-        signatures = new ArrayList<>(size * txs.keySet().size());
-        transactions = new ArrayList<>(size * txs.keySet().size());
-        signedTransactions = new ArrayList<>(size * txs.keySet().size());
-        transactionIds = new ArrayList<>(txs.keySet().size());
+        nodeAccountIds = new ArrayList<>(nodeCount);
+        signatures = new ArrayList<>(nodeCount * txCount);
+        transactions = new ArrayList<>(nodeCount * txCount);
+        signedTransactions = new ArrayList<>(nodeCount * txCount);
+        transactionIds = new ArrayList<>(txCount);
 
         for (var transactionEntry : txs.entrySet()) {
             transactionIds.add(transactionEntry.getKey());
 
             for (var nodeEntry : transactionEntry.getValue().entrySet()) {
-                if (nodeAccountIds.size() != size) {
+                if (nodeAccountIds.size() != nodeCount) {
                     nodeAccountIds.add(nodeEntry.getKey());
                 }
 
@@ -132,6 +112,8 @@ public abstract class Transaction<T extends Transaction<T>>
         }
 
         nodeAccountIds.remove(new AccountId(0));
+
+        // TODO: extract transactionValidDuration and maxTransactionFee
 
         bodyBuilder = TransactionBody.parseFrom(signedTransactions.get(0).getBodyBytes()).toBuilder();
     }
@@ -536,7 +518,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
     public byte[] toBytes() {
         if (!this.isFrozen()) {
-            throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
+            throw new IllegalStateException("transaction must have been frozen before conversion to bytes will be stable, try calling `freeze`");
         }
 
         buildAllTransactions();
@@ -714,6 +696,7 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     protected boolean isFrozen() {
+        // TODO: make bodyBuilder initially null, check if null for isFrozen
         return !signedTransactions.isEmpty();
     }
 
@@ -754,6 +737,7 @@ public abstract class Transaction<T extends Transaction<T>>
             return (T) this;
         }
 
+        // TODO: update this
         if (client != null && bodyBuilder.getTransactionFee() == 0) {
             bodyBuilder.setTransactionFee(client.maxTransactionFee.toTinybars());
         }
@@ -882,6 +866,7 @@ public abstract class Transaction<T extends Transaction<T>>
      * body is built. The intent is for the derived class to assign
      * their data variant to the transaction body.
      */
+    // TODO: should return void, boolean is never used.
     abstract boolean onFreeze(TransactionBody.Builder bodyBuilder);
 
     /**
