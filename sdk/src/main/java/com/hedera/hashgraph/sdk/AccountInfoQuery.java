@@ -44,9 +44,9 @@ public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery>
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (accountId != null) {
-            accountId.validate(client);
+            accountId.validateChecksum(client);
         }
     }
 
@@ -70,8 +70,8 @@ public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery>
     }
 
     @Override
-    AccountInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
-        return AccountInfo.fromProtobuf(response.getCryptoGetInfo().getAccountInfo(), networkName);
+    AccountInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+        return AccountInfo.fromProtobuf(response.getCryptoGetInfo().getAccountInfo());
     }
 
     @Override

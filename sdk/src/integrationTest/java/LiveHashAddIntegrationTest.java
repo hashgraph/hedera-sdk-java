@@ -19,15 +19,13 @@ class LiveHashAddIntegrationTest {
     @DisplayName("Cannot create live hash because it's not supported")
     void cannotCreateLiveHashBecauseItsNotSupported() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
             var response = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .setInitialBalance(new Hbar(1))
-                .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                 .execute(testEnv.client);
 
             var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
@@ -36,25 +34,15 @@ class LiveHashAddIntegrationTest {
                 new LiveHashAddTransaction()
                     .setAccountId(accountId)
                     .setDuration(Duration.ofDays(30))
-                    .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                     .setHash(HASH)
                     .setKeys(key)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
             });
 
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
-                .setTransferAccountId(testEnv.operatorId)
-                .freezeWith(testEnv.client)
-                .sign(key)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
             assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
 
-            testEnv.client.close();
+            testEnv.close(accountId, key);
         });
     }
 }

@@ -90,13 +90,13 @@ public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeSched
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (tokenId != null) {
-            tokenId.validate(client);
+            tokenId.validateChecksum(client);
         }
 
-        for(var fee : customFees) {
-            fee.validate(client);
+        for(CustomFee fee : customFees) {
+            fee.validateChecksums(client);
         }
     }
 

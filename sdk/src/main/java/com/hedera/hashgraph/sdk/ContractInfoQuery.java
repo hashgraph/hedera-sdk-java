@@ -54,9 +54,9 @@ public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQue
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (contractId != null) {
-            contractId.validate(client);
+            contractId.validateChecksum(client);
         }
     }
 
@@ -80,8 +80,8 @@ public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQue
     }
 
     @Override
-    ContractInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request, @Nullable NetworkName networkName) {
-        return ContractInfo.fromProtobuf(response.getContractGetInfo().getContractInfo(), networkName);
+    ContractInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+        return ContractInfo.fromProtobuf(response.getContractGetInfo().getContractInfo());
     }
 
     @Override

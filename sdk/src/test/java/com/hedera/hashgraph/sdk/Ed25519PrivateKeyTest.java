@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class Ed25519PrivateKeyTest {
     private static final String TEST_KEY_STR = "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10";
+    private static final String TEST_KEY_STR_RAW = "db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10";
     private static final String TEST_KEY_PEM = "-----BEGIN PRIVATE KEY-----\n"
         + "MC4CAQAwBQYDK2VwBCIEINtIS4KOZLLY8SzjwKDpOguMznrxu485yXcyOUSCU44Q\n"
         + "-----END PRIVATE KEY-----\n";
@@ -118,6 +119,8 @@ class Ed25519PrivateKeyTest {
             TEST_KEY_STR,
             key.toString()
         );
+        assertEquals(TEST_KEY_STR, key.toStringDER());
+        assertEquals(TEST_KEY_STR_RAW, key.toStringRaw());
     }
 
     @Test

@@ -43,6 +43,10 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         if (builder.hasTreasury()) {
             treasuryAccountId = AccountId.fromProtobuf(builder.getTreasury());
         }
+
+        if(builder.hasAutoRenewAccount()) {
+            autoRenewAccountId = AccountId.fromProtobuf(builder.getAutoRenewAccount());
+        }
     }
 
     TokenUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
@@ -56,6 +60,10 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
 
         if (builder.hasTreasury()) {
             treasuryAccountId = AccountId.fromProtobuf(builder.getTreasury());
+        }
+
+        if(builder.hasAutoRenewAccount()) {
+            autoRenewAccountId = AccountId.fromProtobuf(builder.getAutoRenewAccount());
         }
     }
 
@@ -238,17 +246,17 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (tokenId != null) {
-            tokenId.validate(client);
+            tokenId.validateChecksum(client);
         }
 
         if (treasuryAccountId != null) {
-            treasuryAccountId.validate(client);
+            treasuryAccountId.validateChecksum(client);
         }
 
         if (autoRenewAccountId != null) {
-            autoRenewAccountId.validate(client);
+            autoRenewAccountId.validateChecksum(client);
         }
     }
 

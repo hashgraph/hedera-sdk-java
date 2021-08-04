@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+ * `Client.getRequestTimeout()`
+ * `Client.pingAsync()` and `Client.pingAllAsync()` useful for validating all nodes within the
+   network before executing any real request
+ * `Client.[set|get]MaxAttempts()` default max attempts for all transactions
+ * `Client.[set|get]MaxNodeAttempts()` set max attempts to retry a node which returns bad gRPC status
+   such as `UNAVAILBLE`
+ * `Client.[set|get]NodeWaitTime()` change the default delay before attempting a node again which has
+   returned a bad gRPC status
+ * `Client.setAutoValidateChecksums()` set whether checksums on ids will be automatically validated upon attempting to execute a transaction or query.  Disabled by default.  Check status with `Client.isAutoValidateChecksumsEnabled()`
+ * `*Id.toString()` no longer stringifies with checksums.  Use `*Id.getChecksum()` to get the checksum that was parsed, or use `*Id.toStringWithChecksum(client)` to stringify with the correct checksum for that ID on the client's network.
+ * `*Id.validateChecksum()` to validate a checksum.  Throws new `BadEntityIdException`
+ * `Client.[set|get]NetworkName()` declare which network this client is connected to, for purposes of checksum validation.
+* `CustomFixedFee.[set|get]HbarAmount()` makes this fixed fee an Hbar fee of the specified amount
+* `CustomFixedFee.setDenominatingTokenToSameToken()` this fixed fee will be charged in the same token.
+
 ## v2.0.9
 
 ### Fixed
@@ -19,7 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
- * `TokenUpdateTransaction.clearAutoRenewAccountId()` 
+ * `TokenUpdateTransaction.clearAutoRenewAccountId()`
  * Scheduled `TransferTransaction`
 
 ## v2.0.9-beta.1
@@ -60,7 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * Null checks for most parameters to catch stray `NullPointerException`'s
 
 ### Fixed
- 
+
  * `RequestType` missing `UNCHECKED_SUBMIT` for `toString()` and `valueOf()` methods.
  * `FeeSchedules` incorrectly serializing nulls causing `NullPointerException`
 

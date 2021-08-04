@@ -41,17 +41,13 @@ public class TokenNftInfo {
         this.metadata = metadata;
     }
 
-    static TokenNftInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.TokenNftInfo info, @Nullable NetworkName networkName) {
+    static TokenNftInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.TokenNftInfo info) {
         return new TokenNftInfo(
-            NftId.fromProtobuf(info.getNftID(), networkName),
-            AccountId.fromProtobuf(info.getAccountID(), networkName),
+            NftId.fromProtobuf(info.getNftID()),
+            AccountId.fromProtobuf(info.getAccountID()),
             InstantConverter.fromProtobuf(info.getCreationTime()),
             info.getMetadata().toByteArray()
         );
-    }
-
-    static TokenNftInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.TokenNftInfo info) {
-        return fromProtobuf(info, null);
     }
 
     public static TokenNftInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {

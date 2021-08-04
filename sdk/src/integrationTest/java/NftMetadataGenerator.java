@@ -1,4 +1,4 @@
-
+import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -10,5 +10,9 @@ public class NftMetadataGenerator {
             metadatas.add(md);
         }
         return metadatas;
+    }
+
+    public static List<byte[]> generateOneLarge() {
+        return Collections.singletonList(new byte[101]);
     }
 }

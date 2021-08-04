@@ -1,8 +1,11 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.errorprone.annotations.Var;
+
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 /**
  * Represents a quantity of hbar.
@@ -11,6 +14,7 @@ import java.util.Objects;
  * in tinybars however the nominal unit is hbar.
  */
 public final class Hbar implements Comparable<Hbar> {
+    private static final Pattern FROM_STRING_PATTERN = Pattern.compile("^((?:\\+|\\-)?\\d+(?:\\.\\d+)?)(\\ (tℏ|μℏ|mℏ|ℏ|kℏ|Mℏ|Gℏ))?$");
     private final long valueInTinybar;
 
     /**
@@ -64,6 +68,15 @@ public final class Hbar implements Comparable<Hbar> {
      */
     public static final Hbar MIN = Hbar.from(-50_000_000_000L);
 
+    private static HbarUnit getUnit(String symbolString) {
+        for(var unit : HbarUnit.values()) {
+            if(unit.getSymbol().equals(symbolString)) {
+                return unit;
+            }
+        }
+        throw new IllegalArgumentException("Attempted to convert string to Hbar, but unit symbol \"" + symbolString + "\" was not recognized");
+    }
+
     /**
      * Converts the provided string into an amount of hbars.
      *
@@ -71,7 +84,12 @@ public final class Hbar implements Comparable<Hbar> {
      * @return {@link com.hedera.hashgraph.sdk.Hbar}
      */
     public static Hbar fromString(CharSequence text) {
-        return new Hbar(new BigDecimal(text.toString()), HbarUnit.HBAR);
+        var matcher = FROM_STRING_PATTERN.matcher(text);
+        if(!matcher.matches()) {
+            throw new IllegalArgumentException("Attempted to convert string to Hbar, but \"" + text + "\" was not correctly formatted");
+        }
+        String[] parts = text.toString().split(" ");
+        return new Hbar(new BigDecimal(parts[0]), parts.length == 2 ? getUnit(parts[1]) : HbarUnit.HBAR);
     }
 
     /**

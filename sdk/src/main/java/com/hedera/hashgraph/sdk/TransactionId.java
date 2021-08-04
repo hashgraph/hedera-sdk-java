@@ -65,11 +65,7 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
     }
 
     static TransactionId fromProtobuf(TransactionID transactionID) {
-        return TransactionId.fromProtobuf(transactionID, null);
-    }
-
-    static TransactionId fromProtobuf(TransactionID transactionID, @Nullable NetworkName networkName) {
-        var accountId = transactionID.hasAccountID() ? AccountId.fromProtobuf(transactionID.getAccountID(), networkName) : null;
+        var accountId = transactionID.hasAccountID() ? AccountId.fromProtobuf(transactionID.getAccountID()) : null;
         var validStart = transactionID.hasTransactionValidStart() ? InstantConverter.fromProtobuf(transactionID.getTransactionValidStart()) : null;
 
         return new TransactionId(accountId, validStart).setScheduled(transactionID.getScheduled());
@@ -159,6 +155,14 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
             return "" + accountId + "@" + validStart.getEpochSecond() + "." + validStart.getNano() + (scheduled ? "?scheduled" : "");
         } else {
             throw new IllegalStateException("`TransactionId.toString()` is non-exhaustive");
+        }
+    }
+
+    public String toStringWithChecksum(Client client) {
+        if (accountId != null && validStart != null) {
+            return "" + accountId.toStringWithChecksum(client) + "@" + validStart.getEpochSecond() + "." + validStart.getNano() + (scheduled ? "?scheduled" : "");
+        } else {
+            throw new IllegalStateException("`TransactionId.toStringWithChecksum()` is non-exhaustive");
         }
     }
 

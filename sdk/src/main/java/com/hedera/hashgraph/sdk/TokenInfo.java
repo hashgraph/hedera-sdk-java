@@ -189,29 +189,25 @@ public class TokenInfo {
     }
 
     static TokenInfo fromProtobuf(TokenGetInfoResponse response) {
-        return TokenInfo.fromProtobuf(response, null);
-    }
-
-    static TokenInfo fromProtobuf(TokenGetInfoResponse response, @Nullable NetworkName networkName) {
         var info = response.getTokenInfo();
 
         return new TokenInfo(
-            TokenId.fromProtobuf(info.getTokenId(), networkName),
+            TokenId.fromProtobuf(info.getTokenId()),
             info.getName(),
             info.getSymbol(),
             info.getDecimals(),
             info.getTotalSupply(),
-            AccountId.fromProtobuf(info.getTreasury(), networkName),
-            info.hasAdminKey() ? Key.fromProtobufKey(info.getAdminKey(), networkName) : null,
-            info.hasKycKey() ? Key.fromProtobufKey(info.getKycKey(), networkName) : null,
-            info.hasFreezeKey() ? Key.fromProtobufKey(info.getFreezeKey(), networkName) : null,
-            info.hasWipeKey() ? Key.fromProtobufKey(info.getWipeKey(), networkName) : null,
-            info.hasSupplyKey() ? Key.fromProtobufKey(info.getSupplyKey(), networkName) : null,
-            info.hasFeeScheduleKey() ? Key.fromProtobufKey(info.getFeeScheduleKey(), networkName) : null,
+            AccountId.fromProtobuf(info.getTreasury()),
+            info.hasAdminKey() ? Key.fromProtobufKey(info.getAdminKey()) : null,
+            info.hasKycKey() ? Key.fromProtobufKey(info.getKycKey()) : null,
+            info.hasFreezeKey() ? Key.fromProtobufKey(info.getFreezeKey()) : null,
+            info.hasWipeKey() ? Key.fromProtobufKey(info.getWipeKey()) : null,
+            info.hasSupplyKey() ? Key.fromProtobufKey(info.getSupplyKey()) : null,
+            info.hasFeeScheduleKey() ? Key.fromProtobufKey(info.getFeeScheduleKey()) : null,
             freezeStatusFromProtobuf(info.getDefaultFreezeStatus()),
             kycStatusFromProtobuf(info.getDefaultKycStatus()),
             info.getDeleted(),
-            info.hasAutoRenewAccount() ? AccountId.fromProtobuf(info.getAutoRenewAccount(), networkName) : null,
+            info.hasAutoRenewAccount() ? AccountId.fromProtobuf(info.getAutoRenewAccount()) : null,
             info.hasAutoRenewPeriod() ? DurationConverter.fromProtobuf(info.getAutoRenewPeriod()) : null,
             info.hasExpiry() ? InstantConverter.fromProtobuf(info.getExpiry()) : null,
             info.getMemo(),

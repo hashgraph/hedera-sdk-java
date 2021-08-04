@@ -22,10 +22,6 @@ public final class ProxyStaker {
     }
 
     static ProxyStaker fromProtobuf(com.hedera.hashgraph.sdk.proto.ProxyStaker proxyStaker) {
-        return ProxyStaker.fromProtobuf(proxyStaker, null);
-    }
-
-    static ProxyStaker fromProtobuf(com.hedera.hashgraph.sdk.proto.ProxyStaker proxyStaker, @Nullable NetworkName networkName) {
-        return new ProxyStaker(AccountId.fromProtobuf(proxyStaker.getAccountID(), networkName), proxyStaker.getAmount());
+        return new ProxyStaker(AccountId.fromProtobuf(proxyStaker.getAccountID()), proxyStaker.getAmount());
     }
 }

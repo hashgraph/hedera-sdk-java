@@ -69,7 +69,7 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     }
 
     public Collection<Key> getKeys() {
-        return KeyList.fromProtobuf(builder.getKeys(), null, null);
+        return KeyList.fromProtobuf(builder.getKeys(), null);
     }
 
     /**
@@ -199,9 +199,9 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (fileId != null) {
-            fileId.validate(client);
+            fileId.validateChecksum(client);
         }
     }
 

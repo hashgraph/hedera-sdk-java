@@ -18,10 +18,9 @@ public class ContractCreateIntegrationTest {
     @DisplayName("Can create contract")
     void canCreateContract() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -30,7 +29,6 @@ public class ContractCreateIntegrationTest {
 
             response = new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
@@ -40,7 +38,6 @@ public class ContractCreateIntegrationTest {
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
             @Var var info = new ContractInfoQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContractId(contractId)
                 .execute(testEnv.client);
 
@@ -48,23 +45,21 @@ public class ContractCreateIntegrationTest {
             assertNotNull(info.accountId);
             assertEquals(Objects.requireNonNull(info.accountId).toString(), Objects.requireNonNull(contractId).toString());
             assertNotNull(info.adminKey);
-            assertEquals(Objects.requireNonNull(info.adminKey).toString(), Objects.requireNonNull(testEnv.operatorKey.getPublicKey()).toString());
+            assertEquals(Objects.requireNonNull(info.adminKey).toString(), Objects.requireNonNull(testEnv.operatorKey).toString());
             assertEquals(info.storage, 926);
             assertEquals(info.contractMemo, "[e2e::ContractCreateTransaction]");
 
             new ContractDeleteTransaction()
                 .setContractId(contractId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -72,10 +67,9 @@ public class ContractCreateIntegrationTest {
     @DisplayName("Can create contract with no admin key")
     void canCreateContractWithNoAdminKey() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -83,7 +77,6 @@ public class ContractCreateIntegrationTest {
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
             response = new ContractCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
@@ -93,7 +86,6 @@ public class ContractCreateIntegrationTest {
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
             @Var var info = new ContractInfoQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContractId(contractId)
                 .execute(testEnv.client);
 
@@ -105,7 +97,7 @@ public class ContractCreateIntegrationTest {
             assertEquals(info.storage, 926);
             assertEquals(info.contractMemo, "[e2e::ContractCreateTransaction]");
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -113,10 +105,9 @@ public class ContractCreateIntegrationTest {
     @DisplayName("Cannot create contract when gas is not set")
     void cannotCreateContractWhenGasIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -126,7 +117,6 @@ public class ContractCreateIntegrationTest {
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new ContractCreateTransaction()
                     .setAdminKey(testEnv.operatorKey)
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                     .setBytecodeFileId(fileId)
                     .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -138,11 +128,10 @@ public class ContractCreateIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -150,10 +139,9 @@ public class ContractCreateIntegrationTest {
     @DisplayName("Cannot create contract when constructor parameters are not set")
     void cannotCreateContractWhenConstructorParametersAreNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             @Var var response = new FileCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents(SMART_CONTRACT_BYTECODE)
                 .execute(testEnv.client);
@@ -163,7 +151,6 @@ public class ContractCreateIntegrationTest {
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new ContractCreateTransaction()
                     .setAdminKey(testEnv.operatorKey)
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setGas(2000)
                     .setBytecodeFileId(fileId)
                     .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -175,11 +162,10 @@ public class ContractCreateIntegrationTest {
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -187,11 +173,10 @@ public class ContractCreateIntegrationTest {
     @DisplayName("Cannot create contract when bytecode file ID is not set")
     void cannotCreateContractWhenBytecodeFileIdIsNotSet() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new ContractCreateTransaction()
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .setAdminKey(testEnv.operatorKey)
                     .setGas(2000)
                     .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
@@ -202,7 +187,7 @@ public class ContractCreateIntegrationTest {
 
             assertTrue(error.getMessage().contains(Status.INVALID_FILE_ID.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 }

@@ -18,10 +18,9 @@ public class FileDeleteIntegrationTest {
     @DisplayName("Can delete file")
     void canDeleteFile() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKeys(testEnv.operatorKey)
                 .setContents("[e2e::FileCreateTransaction]")
                 .execute(testEnv.client);
@@ -30,7 +29,6 @@ public class FileDeleteIntegrationTest {
 
             @Var var info = new FileInfoQuery()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
@@ -38,15 +36,14 @@ public class FileDeleteIntegrationTest {
             assertFalse(info.isDeleted);
             assertNotNull(info.keys);
             assertNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(testEnv.operatorKey.getPublicKey()));
+            assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
 
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 
@@ -54,10 +51,9 @@ public class FileDeleteIntegrationTest {
     @DisplayName("Cannot delete immutable file")
     void cannotDeleteImmutableFile() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var response = new FileCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setContents("[e2e::FileCreateTransaction]")
                 .execute(testEnv.client);
 
@@ -65,7 +61,6 @@ public class FileDeleteIntegrationTest {
 
             @Var var info = new FileInfoQuery()
                 .setFileId(fileId)
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .execute(testEnv.client);
 
             assertEquals(info.fileId, fileId);
@@ -76,14 +71,13 @@ public class FileDeleteIntegrationTest {
             var error = assertThrows(ReceiptStatusException.class, () -> {
                 new FileDeleteTransaction()
                     .setFileId(fileId)
-                    .setNodeAccountIds(testEnv.nodeAccountIds)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
             });
 
             assertTrue(error.getMessage().contains(Status.UNAUTHORIZED.toString()));
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 }

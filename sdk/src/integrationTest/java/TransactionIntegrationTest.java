@@ -35,14 +35,12 @@ public class TransactionIntegrationTest {
     @DisplayName("transaction hash in transaction record is equal to the derived transaction hash")
     void transactionHashInTransactionRecordIsEqualToTheDerivedTransactionHash() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
             var transaction = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
-                .setNodeAccountIds(Collections.singletonList(new AccountId(5)))
                 .freezeWith(testEnv.client)
                 .signWithOperator(testEnv.client);
 
@@ -57,16 +55,7 @@ public class TransactionIntegrationTest {
             var accountId = record.receipt.accountId;
             assertNotNull(accountId);
 
-            new AccountDeleteTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
-                .setAccountId(accountId)
-                .setTransferAccountId(testEnv.operatorId)
-                .freezeWith(testEnv.client)
-                .sign(key)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
-            testEnv.client.close();
+            testEnv.close(accountId, key);
         });
     }
 
@@ -74,12 +63,11 @@ public class TransactionIntegrationTest {
     @DisplayName("transaction can be serialized into bytes, deserialized, signature added and executed")
     void transactionFromToBytes() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             var key = PrivateKey.generate();
 
             var transaction = new AccountCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setKey(key)
                 .freezeWith(testEnv.client)
                 .signWithOperator(testEnv.client);
@@ -96,7 +84,6 @@ public class TransactionIntegrationTest {
             assertNotNull(accountId);
 
             var deleteTransaction = new AccountDeleteTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setAccountId(accountId)
                 .setTransferAccountId(testEnv.operatorId)
                 .freezeWith(testEnv.client);
@@ -113,9 +100,13 @@ public class TransactionIntegrationTest {
 
             response.getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
+
+
+    // TODO: this test has a bunch of things hard-coded into it, which is kinda dumb, but it's a good idea for a test.
+    //       Any way to fix it and bring it back?
 
     @Disabled
     @Test
@@ -227,7 +218,7 @@ public class TransactionIntegrationTest {
 
             var tx = (TransferTransaction)Transaction.fromBytes(byts.toByteArray());
 
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1);
 
             assertEquals(tx.getHbarTransfers().get(new AccountId(542348)).toTinybars(),-10);
             assertEquals(tx.getHbarTransfers().get(new AccountId(47439)).toTinybars(),10);
@@ -247,7 +238,7 @@ public class TransactionIntegrationTest {
 
             resp.getReceipt(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close();
         });
     }
 }

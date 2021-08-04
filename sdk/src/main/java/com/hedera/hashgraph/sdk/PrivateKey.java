@@ -335,7 +335,15 @@ public final class PrivateKey extends Key {
 
     @Override
     public String toString() {
+        return toStringDER();
+    }
+
+    public String toStringDER() {
         return Hex.toHexString(toDER());
+    }
+
+    public String toStringRaw() {
+        return Hex.toHexString(keyData);
     }
 
     @Override

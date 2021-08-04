@@ -79,9 +79,9 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (fileId != null) {
-            fileId.validate(client);
+            fileId.validateChecksum(client);
         }
     }
 

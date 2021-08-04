@@ -79,26 +79,22 @@ public final class TopicInfo {
     }
 
     static TopicInfo fromProtobuf(ConsensusGetTopicInfoResponse topicInfoResponse) {
-        return TopicInfo.fromProtobuf(topicInfoResponse, null);
-    }
-
-    static TopicInfo fromProtobuf(ConsensusGetTopicInfoResponse topicInfoResponse, @Nullable NetworkName networkName) {
         var topicInfo = topicInfoResponse.getTopicInfo();
 
         var adminKey = topicInfo.hasAdminKey()
-            ? Key.fromProtobufKey(topicInfo.getAdminKey(), networkName)
+            ? Key.fromProtobufKey(topicInfo.getAdminKey())
             : null;
 
         var submitKey = topicInfo.hasSubmitKey()
-            ? Key.fromProtobufKey(topicInfo.getSubmitKey(), networkName)
+            ? Key.fromProtobufKey(topicInfo.getSubmitKey())
             : null;
 
         var autoRenewAccountId = topicInfo.hasAutoRenewAccount()
-            ? AccountId.fromProtobuf(topicInfo.getAutoRenewAccount(), networkName)
+            ? AccountId.fromProtobuf(topicInfo.getAutoRenewAccount())
             : null;
 
         return new TopicInfo(
-            TopicId.fromProtobuf(topicInfoResponse.getTopicID(), networkName),
+            TopicId.fromProtobuf(topicInfoResponse.getTopicID()),
             topicInfo.getMemo(),
             topicInfo.getRunningHash(),
             topicInfo.getSequenceNumber(),

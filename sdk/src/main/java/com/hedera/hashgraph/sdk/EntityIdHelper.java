@@ -24,40 +24,22 @@ class EntityIdHelper {
      */
     static final int SOLIDITY_ADDRESS_LEN_HEX = SOLIDITY_ADDRESS_LEN * 2;
 
-    private static final Pattern regex1 = Pattern.compile("(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))(?:-([a-z]{5}))?$");
+    private static final Pattern ENTITY_ID_REGEX = Pattern.compile("(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))(?:-([a-z]{5}))?$");
 
     private EntityIdHelper() {}
 
-    static <R> R fromString(String id, WithIdNums<R> withIdNums) {
-        for (var network : NetworkName.values()) {
-            try {
-                return EntityIdHelper.fromString(id, network, withIdNums);
-            } catch (IllegalArgumentException e) {
-                // Do nothing
-            }
+    static <R> R fromString(String idString, WithIdNums<R> constructObjectWithIdNums) {
+        var match = ENTITY_ID_REGEX.matcher(idString);
+        if(!match.find()){
+            throw new IllegalArgumentException(
+                "Invalid ID \"" + idString + "\": format should look like 0.0.123 or 0.0.123-vfmkw"
+            );
         }
-
-        return EntityIdHelper.fromString(id, null, withIdNums);
-    }
-
-    @SuppressWarnings("InconsistentOverloads")
-    static <R> R fromString(String id, @Nullable NetworkName name, WithIdNums<R> withIdNums) {
-        var result = parseAddress(name != null ? Integer.toString(name.id) : "", id);
-
-        switch (result.status) {
-            case 0: // Syntax error
-                throw new IllegalArgumentException(
-                    "Invalid ID \"" + id + "\": format should look like 0.0.123 or 0.0.123-vfmkw"
-                );
-            case 1: // An invalid with-checksum address
-                throw new IllegalArgumentException("Invalid ID: checksum does not match, received: " + result.givenChecksum + " expected: " + result.correctChecksum);
-            case 2: // A valid no-checksum address
-                return withIdNums.apply(result.num1, result.num2, result.num3, null, result.correctChecksum);
-            case 3: // A valid with-checksum address
-                return withIdNums.apply(result.num1, result.num2, result.num3, name, result.correctChecksum);
-            default:
-                throw new IllegalStateException("(BUG) checksum verification switch statement is non-exhaustive");
-        }
+        return constructObjectWithIdNums.apply(
+            Long.parseLong(match.group(1)),
+            Long.parseLong(match.group(2)),
+            Long.parseLong(match.group(3)),
+            match.group(4));
     }
 
     static <R> R fromSolidityAddress(String address, WithIdNums<R> withAddress) {
@@ -71,7 +53,7 @@ class EntityIdHelper {
         }
 
         var buf = ByteBuffer.wrap(address);
-        return withAddress.apply(buf.getInt(), buf.getLong(), buf.getLong(), null, null);
+        return withAddress.apply(buf.getInt(), buf.getLong(), buf.getLong(), null);
     }
 
     private static byte[] decodeSolidityAddress(@Var String address) {
@@ -100,20 +82,6 @@ class EntityIdHelper {
                 .putLong(realm)
                 .putLong(num)
                 .array());
-    }
-
-    static ParseAddressResult parseAddress(String ledgerId, String addr ) {
-        //Pattern regex1 = Pattern.compile("(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))(?:-([a-z]{5}))?$");
-        var match = regex1.matcher(addr);
-        if(!match.find()){
-            return new ParseAddressResult();
-        }
-
-        var a = new Long[]{Long.parseLong(match.group(1)), Long.parseLong(match.group(2)), Long.parseLong(match.group(3))};
-        var ad = a[0] + "." + a[1] + "." + a[2];
-        var c = checksum(ledgerId, ad);
-        var s = match.group(4) == null ? 2 : c.equals(match.group(4)) ? 3 : 1;
-        return new ParseAddressResult(s, a[0], a[1], a[2], c, match.group(4), ad,ad + "-" + c);
     }
 
     static String checksum(String ledgerId, String addr) {
@@ -169,13 +137,21 @@ class EntityIdHelper {
 
     @FunctionalInterface
     interface WithIdNums<R> {
-        R apply(long shard, long realm, long num, @Nullable NetworkName name, @Nullable String checksum);
+        R apply(long shard, long realm, long num, @Nullable String checksum);
     }
 
-    static void validate(long shard, long realm, long num, Client client, @Nullable String checksum) {
-        if (client.network.networkName != null && checksum != null &&
-            !checksum.equals(EntityIdHelper.checksum(Integer.toString(client.network.networkName.id), EntityIdHelper.toString(shard, realm, num)))) {
-            throw new IllegalArgumentException("Entity ID is for a different network than client");
+    static void validate(long shard, long realm, long num, Client client, @Nullable String checksum) throws BadEntityIdException {
+        if(client.getNetworkName() == null) {
+            throw new IllegalStateException("Can't validate checksum without knowing which network the ID is for.  Ensure client's network name is set.");
+        }
+        if(checksum != null) {
+            String expectedChecksum = EntityIdHelper.checksum(
+                Integer.toString(client.getNetworkName().id),
+                EntityIdHelper.toString(shard, realm, num)
+            );
+            if (!checksum.equals(expectedChecksum)) {
+                throw new BadEntityIdException(shard, realm, num, checksum, expectedChecksum);
+            }
         }
     }
 
@@ -183,11 +159,11 @@ class EntityIdHelper {
         return "" + shard + "." + realm + "." + num;
     }
 
-    static String toString(long shard, long realm, long num, @Nullable String checksum) {
-        if (checksum != null) {
-            return "" + shard + "." + realm + "." + num + "-" + checksum;
+    static String toStringWithChecksum(long shard, long realm, long num, Client client, @Nullable String checksum) {
+        if (client.getNetworkName() != null) {
+            return "" + shard + "." + realm + "." + num + "-" + checksum(Integer.toString(client.getNetworkName().id), EntityIdHelper.toString(shard, realm, num));
         } else {
-            return "" + shard + "." + realm + "." + num;
+            throw new IllegalStateException("Can't derive checksum for ID without knowing which network the ID is for.  Ensure client's network name is set.");
         }
     }
 }

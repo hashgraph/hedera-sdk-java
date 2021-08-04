@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoGetAccountBalanceResponse;
@@ -35,16 +36,12 @@ public class AccountBalance {
     }
 
     static AccountBalance fromProtobuf(CryptoGetAccountBalanceResponse protobuf) {
-        return AccountBalance.fromProtobuf(protobuf, null);
-    }
-
-    static AccountBalance fromProtobuf(CryptoGetAccountBalanceResponse protobuf, @Nullable NetworkName networkName) {
         var balanceList = protobuf.getTokenBalancesList();
         Map<TokenId, Long> map = new HashMap<>();
         Map<TokenId, Integer>  decimalMap = new HashMap<>();
         for (int i = 0; i < protobuf.getTokenBalancesCount(); i++) {
-            map.put(TokenId.fromProtobuf(balanceList.get(i).getTokenId(), networkName), balanceList.get(i).getBalance());
-            decimalMap.put(TokenId.fromProtobuf(balanceList.get(i).getTokenId(), networkName), balanceList.get(i).getDecimals());
+            map.put(TokenId.fromProtobuf(balanceList.get(i).getTokenId()), balanceList.get(i).getBalance());
+            decimalMap.put(TokenId.fromProtobuf(balanceList.get(i).getTokenId()), balanceList.get(i).getDecimals());
         }
 
         return new AccountBalance(Hbar.fromTinybars(protobuf.getBalance()), map, decimalMap);
@@ -71,5 +68,13 @@ public class AccountBalance {
 
     ByteString toBytes() {
         return toProtobuf().toByteString();
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("hbars", hbars)
+            .add("tokens", tokens)
+            .toString();
     }
 }

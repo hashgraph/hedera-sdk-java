@@ -91,9 +91,9 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     }
 
     @Override
-    void validateNetworkOnIds(Client client) {
+    void validateChecksums(Client client) throws BadEntityIdException {
         if (payerAccountId != null) {
-            payerAccountId.validate(client);
+            payerAccountId.validateChecksum(client);
         }
     }
 
@@ -112,8 +112,7 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     final com.hedera.hashgraph.sdk.TransactionResponse mapResponse(
         TransactionResponse transactionResponse,
         AccountId nodeId,
-        com.hedera.hashgraph.sdk.proto.Transaction request,
-        @Nullable NetworkName networkName
+        com.hedera.hashgraph.sdk.proto.Transaction request
     ) {
         var transactionId = Objects.requireNonNull(getTransactionId()).setScheduled(true);
         var hash = hash(request.getSignedTransactionBytes().toByteArray());

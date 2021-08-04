@@ -19,7 +19,7 @@ class TokenInfoIntegrationTest {
     @DisplayName("Can query token info when all keys are different")
     void canQueryTokenInfoWhenAllKeysAreDifferent() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var key1 = PrivateKey.generate();
             var key2 = PrivateKey.generate();
@@ -28,7 +28,6 @@ class TokenInfoIntegrationTest {
             var key5 = PrivateKey.generate();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setDecimals(3)
@@ -47,7 +46,6 @@ class TokenInfoIntegrationTest {
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             var info = new TokenInfoQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .execute(testEnv.client);
 
@@ -73,7 +71,14 @@ class TokenInfoIntegrationTest {
             assertEquals(info.tokenType, TokenType.FUNGIBLE_COMMON);
             assertEquals(info.supplyType, TokenSupplyType.INFINITE);
 
-            testEnv.client.close();
+            new TokenDeleteTransaction()
+                .setTokenId(tokenId)
+                .freezeWith(testEnv.client)
+                .sign(key1)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            testEnv.close();
         });
     }
 
@@ -81,10 +86,9 @@ class TokenInfoIntegrationTest {
     @DisplayName("Can query token with minimal properties")
     void canQueryTokenInfoWhenTokenIsCreatedWithMinimalProperties() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount(new Hbar(10));
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
@@ -93,7 +97,6 @@ class TokenInfoIntegrationTest {
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             var info = new TokenInfoQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .execute(testEnv.client);
 
@@ -113,6 +116,7 @@ class TokenInfoIntegrationTest {
             assertEquals(info.tokenType, TokenType.FUNGIBLE_COMMON);
             assertEquals(info.supplyType, TokenSupplyType.INFINITE);
 
+            // we lose this IntegrationTestEnv throwaway account
             testEnv.client.close();
         });
     }
@@ -122,23 +126,22 @@ class TokenInfoIntegrationTest {
     @DisplayName("Can query NFT")
     void canQueryNfts() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
                 .setSupplyType(TokenSupplyType.FINITE)
                 .setMaxSupply(5000)
                 .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
                 .setSupplyKey(testEnv.operatorKey)
                 .execute(testEnv.client);
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             var mintReceipt = new TokenMintTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .setMetadata(NftMetadataGenerator.generate((byte)10))
                 .execute(testEnv.client)
@@ -147,7 +150,6 @@ class TokenInfoIntegrationTest {
             assertEquals(mintReceipt.serials.size(), 10);
 
             var info = new TokenInfoQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .execute(testEnv.client);
 
@@ -157,7 +159,7 @@ class TokenInfoIntegrationTest {
             assertEquals(info.decimals, 0);
             assertEquals(info.totalSupply, 10);
             assertEquals(testEnv.operatorId, info.treasuryAccountId);
-            assertNull(info.adminKey);
+            assertNotNull(info.adminKey);
             assertNull(info.freezeKey);
             assertNull(info.wipeKey);
             assertNull(info.kycKey);
@@ -168,7 +170,7 @@ class TokenInfoIntegrationTest {
             assertEquals(info.supplyType, TokenSupplyType.FINITE);
             assertEquals(info.maxSupply, 5000);
 
-            testEnv.client.close();
+            testEnv.close(tokenId);
         });
     }
 
@@ -176,26 +178,25 @@ class TokenInfoIntegrationTest {
     @DisplayName("Get cost of token info query")
     void getCostQueryTokenInfo() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
                 .execute(testEnv.client);
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             var infoQuery = new TokenInfoQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId);
 
             var cost = infoQuery.getCost(testEnv.client);
 
             infoQuery.setQueryPayment(cost).execute(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close(tokenId);
         });
     }
 
@@ -203,19 +204,18 @@ class TokenInfoIntegrationTest {
     @DisplayName("Get cost of token info query, with big max")
     void getCostBigMaxQueryTokenInfo() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
                 .execute(testEnv.client);
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             var infoQuery = new TokenInfoQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .setMaxQueryPayment(new Hbar(1000));
 
@@ -223,7 +223,7 @@ class TokenInfoIntegrationTest {
 
             infoQuery.setQueryPayment(cost).execute(testEnv.client);
 
-            testEnv.client.close();
+            testEnv.close(tokenId);
         });
     }
 
@@ -231,19 +231,18 @@ class TokenInfoIntegrationTest {
     @DisplayName("Can query token info when all keys are different")
     void getCostSmallMaxTokenInfo() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
                 .execute(testEnv.client);
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             var infoQuery = new TokenInfoQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .setMaxQueryPayment(Hbar.fromTinybars(1));
 
@@ -255,7 +254,7 @@ class TokenInfoIntegrationTest {
 
             assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for TokenInfoQuery, of "+cost.toString()+", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
 
-            testEnv.client.close();
+            testEnv.close(tokenId);
         });
     }
 
@@ -263,19 +262,18 @@ class TokenInfoIntegrationTest {
     @DisplayName("Throws insufficient transaction fee error")
     void getCostInsufficientTxFeeQueryTokenInfo() {
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv();
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
             var response = new TokenCreateTransaction()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
                 .execute(testEnv.client);
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             var infoQuery = new TokenInfoQuery()
-                .setNodeAccountIds(testEnv.nodeAccountIds)
                 .setTokenId(tokenId)
                 .setMaxQueryPayment(new Hbar(1000));
 
@@ -287,7 +285,7 @@ class TokenInfoIntegrationTest {
 
             assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
 
-            testEnv.client.close();
+            testEnv.close(tokenId);
         });
     }
 }
