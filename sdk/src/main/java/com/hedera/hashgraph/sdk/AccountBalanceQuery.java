@@ -17,15 +17,12 @@ import java.util.Objects;
  * <p>This query is free.
  */
 public final class AccountBalanceQuery extends Query<AccountBalance, AccountBalanceQuery> {
-    private final CryptoGetAccountBalanceQuery.Builder builder;
-
     @Nullable
     AccountId accountId = null;
     @Nullable
     ContractId contractId = null;
 
     public AccountBalanceQuery() {
-        builder = CryptoGetAccountBalanceQuery.newBuilder();
     }
 
     @Nullable
@@ -84,6 +81,7 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        var builder = CryptoGetAccountBalanceQuery.newBuilder();
         if (accountId != null) {
             builder.setAccountID(accountId.toProtobuf());
         }

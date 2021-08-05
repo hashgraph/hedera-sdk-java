@@ -121,7 +121,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         return transactionHashes;
     }
 
-    @Override 
+    @Override
     @FunctionalExecutable(type = "java.util.List<TransactionResponse>")
     public CompletableFuture<List<com.hedera.hashgraph.sdk.TransactionResponse>> executeAllAsync(Client client) {
         if (!isFrozen()) {
@@ -179,7 +179,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         }
 
         onFreezeChunk(
-            bodyBuilder,
+            frozenBodyBuilder,
             null,
             0,
             data.size(),
@@ -225,7 +225,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
             transactionIds.add(TransactionId.fromProtobuf(nextTransactionId.build()));
 
             onFreezeChunk(
-                bodyBuilder.setTransactionID(nextTransactionId.build()),
+                frozenBodyBuilder.setTransactionID(nextTransactionId.build()),
                 initialTransactionId,
                 startIndex,
                 endIndex,
@@ -238,7 +238,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
                 signatures.add(SignatureMap.newBuilder());
                 signedTransactions.add(SignedTransaction.newBuilder()
                     .setBodyBytes(
-                        bodyBuilder
+                        frozenBodyBuilder
                             .setNodeAccountID(nodeId.toProtobuf())
                             .build()
                             .toByteString()

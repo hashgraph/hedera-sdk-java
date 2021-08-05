@@ -20,43 +20,21 @@ import java.util.Objects;
  * expiration extended in the normal way.
  */
 public final class AccountDeleteTransaction extends Transaction<AccountDeleteTransaction> {
-    private final CryptoDeleteTransactionBody.Builder builder;
-
     @Nullable
     AccountId accountId = null;
     @Nullable
     AccountId transferAccountId = null;
 
+
     public AccountDeleteTransaction() {
-        builder = CryptoDeleteTransactionBody.newBuilder();
     }
 
     AccountDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getCryptoDelete().toBuilder();
-
-        if (builder.hasDeleteAccountID()) {
-            accountId = AccountId.fromProtobuf(builder.getDeleteAccountID());
-        }
-
-        if (builder.hasTransferAccountID()) {
-            transferAccountId = AccountId.fromProtobuf(builder.getTransferAccountID());
-        }
     }
 
     AccountDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getCryptoDelete().toBuilder();
-
-        if (builder.hasDeleteAccountID()) {
-            accountId = AccountId.fromProtobuf(builder.getDeleteAccountID());
-        }
-
-        if (builder.hasTransferAccountID()) {
-            transferAccountId = AccountId.fromProtobuf(builder.getTransferAccountID());
-        }
     }
 
     @Nullable
@@ -73,7 +51,6 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
     public AccountDeleteTransaction setAccountId(AccountId deleteAccountId) {
         Objects.requireNonNull(deleteAccountId);
         requireNotFrozen();
-        Objects.requireNonNull(deleteAccountId);
         this.accountId = deleteAccountId;
         return this;
     }
@@ -113,6 +90,8 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
     }
 
     CryptoDeleteTransactionBody.Builder build() {
+        var builder = CryptoDeleteTransactionBody.newBuilder();
+
         if (accountId != null) {
             builder.setDeleteAccountID(accountId.toProtobuf());
         }
@@ -125,9 +104,20 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void initFromTransactionBody(TransactionBody txBody) {
+        var body = txBody.getCryptoDelete();
+        if (body.hasDeleteAccountID()) {
+            accountId = AccountId.fromProtobuf(body.getDeleteAccountID());
+        }
+
+        if (body.hasTransferAccountID()) {
+            transferAccountId = AccountId.fromProtobuf(body.getTransferAccountID());
+        }
+    }
+
+    @Override
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setCryptoDelete(build());
-        return true;
     }
 
     @Override

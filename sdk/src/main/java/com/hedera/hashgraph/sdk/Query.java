@@ -14,7 +14,6 @@ import java8.util.function.Consumer;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -31,16 +30,22 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     private final QueryHeader.Builder headerBuilder;
 
     @Nullable
-    protected TransactionId paymentTransactionId;
+    private Client.Operator paymentOperator = null;
 
     @Nullable
-    protected List<Transaction> paymentTransactions;
+    protected TransactionId paymentTransactionId = null;
 
     @Nullable
-    private Hbar queryPayment;
+    protected List<Transaction> paymentTransactions = null;
 
     @Nullable
-    private Hbar maxQueryPayment;
+    private Hbar queryPayment = null;
+
+    @Nullable
+    private Hbar maxQueryPayment = null;
+
+    @Nullable
+    private Hbar chosenQueryPayment = null;
 
     Query() {
         builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
@@ -164,16 +169,10 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         }, client.executor)
             .thenCompose(x -> x)
             .thenAccept((paymentAmount) -> {
-                paymentTransactionId = TransactionId.generate(operator.accountId);
-                paymentTransactions = new ArrayList<>(nodeAccountIds.size());
-
-                for (AccountId nodeId : nodeAccountIds) {
-                    paymentTransactions.add(makePaymentTransaction(
-                        paymentTransactionId,
-                        nodeId,
-                        operator,
-                        paymentAmount
-                    ));
+                chosenQueryPayment = paymentAmount;
+                paymentOperator = operator;
+                for(int i = 0; i < nodeAccountIds.size(); i++) {
+                    paymentTransactions.add(null);
                 }
             });
     }
@@ -214,11 +213,28 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
             .makeRequest();
     }
 
+    Transaction getPaymentTransaction(int index) {
+        var paymentTx = Objects.requireNonNull(paymentTransactions).get(index);
+        if(paymentTx != null) {
+            return paymentTx;
+        } else {
+            paymentTransactionId = TransactionId.generate(Objects.requireNonNull(paymentOperator).accountId);
+            var newPaymentTx = makePaymentTransaction(
+                paymentTransactionId,
+                nodeAccountIds.get(index),
+                paymentOperator,
+                Objects.requireNonNull(chosenQueryPayment)
+            );
+            paymentTransactions.set(index, newPaymentTx);
+            return newPaymentTx;
+        }
+    }
+
     @Override
     final com.hedera.hashgraph.sdk.proto.Query makeRequest() {
         // If payment is required, set the next payment transaction on the query
         if (isPaymentRequired() && paymentTransactions != null) {
-            headerBuilder.setPayment(paymentTransactions.get(nextNodeIndex));
+            headerBuilder.setPayment(getPaymentTransaction(nextNodeIndex));
         }
 
         // Delegate to the derived class to apply the header because the common header struct is

@@ -36,8 +36,8 @@ public abstract class Transaction<T extends Transaction<T>>
     // Default transaction duration
     private static final Duration DEFAULT_TRANSACTION_VALID_DURATION = Duration.ofSeconds(120);
 
-    // TODO: make this private, should only be initialized on freezeWith(), used for buildTransaction()
-    protected TransactionBody.Builder bodyBuilder;
+    @Nullable
+    protected TransactionBody.Builder frozenBodyBuilder = null;
 
     // A SDK [Transaction] is composed of multiple, raw protobuf transactions. These should be
     // functionally identical, with the exception of pointing to different nodes. When retrying a
@@ -62,23 +62,32 @@ public abstract class Transaction<T extends Transaction<T>>
     private List<PublicKey> publicKeys = new ArrayList<>();
     private List<Function<byte[], byte[]>> signers = new ArrayList<>();
 
-    Transaction() {
-        bodyBuilder = TransactionBody.newBuilder();
+    // TODO: setters and getters for these
+    @Nullable
+    private Duration transactionValidDuration;
+    private Hbar maxTransactionFee;
+    @Nullable
+    private String memo;
 
+    Transaction() {
         setTransactionValidDuration(DEFAULT_TRANSACTION_VALID_DURATION);
 
         // Default transaction fee is 2 Hbar
-        bodyBuilder.setTransactionFee(new Hbar(2).toTinybars());
+        setMaxTransactionFee(new Hbar(2));
+
+        memo = null;
     }
 
-    // TODO: add transactionValidDuration and maxTransactionFee to Transaction
-    // TODO: add abstract initFromTransactionBody(txBody)
-
+    // This constructor is used to construct from a scheduled transaction body
     Transaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
-        // TODO: extract transactionValidDuration and maxTransactionFee
-        bodyBuilder = txBody.toBuilder();
+        setTransactionValidDuration(DEFAULT_TRANSACTION_VALID_DURATION);
+        setMaxTransactionFee(Hbar.fromTinybars(txBody.getTransactionFee()));
+        setTransactionMemo(txBody.getMemo());
+
+        initFromTransactionBody(txBody);
     }
 
+    // This constructor is used to construct via fromBytes
     Transaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         var txCount = txs.keySet().size();
         var nodeCount = txs.values().iterator().next().size();
@@ -113,9 +122,13 @@ public abstract class Transaction<T extends Transaction<T>>
 
         nodeAccountIds.remove(new AccountId(0));
 
-        // TODO: extract transactionValidDuration and maxTransactionFee
+        TransactionBody txBody = TransactionBody.parseFrom(signedTransactions.get(0).getBodyBytes());
 
-        bodyBuilder = TransactionBody.parseFrom(signedTransactions.get(0).getBodyBytes()).toBuilder();
+        setTransactionValidDuration(DurationConverter.fromProtobuf(txBody.getTransactionValidDuration()));
+        setMaxTransactionFee(Hbar.fromTinybars(txBody.getTransactionFee()));
+        setTransactionMemo(txBody.getMemo());
+
+        initFromTransactionBody(txBody);
     }
 
     public static Transaction<?> fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -414,6 +427,8 @@ public abstract class Transaction<T extends Transaction<T>>
             );
         }
 
+        TransactionBody.Builder bodyBuilder = spawnBodyBuilder();
+
         onFreeze(bodyBuilder);
 
         var schedulable = SchedulableTransactionBody.newBuilder()
@@ -446,12 +461,13 @@ public abstract class Transaction<T extends Transaction<T>>
     @Override
     public final T setNodeAccountIds(List<AccountId> nodeAccountIds) {
         requireNotFrozen();
+        Objects.requireNonNull(nodeAccountIds);
         return super.setNodeAccountIds(nodeAccountIds);
     }
 
     @Nullable
     public final Duration getTransactionValidDuration() {
-        return bodyBuilder.hasTransactionValidDuration() ? DurationConverter.fromProtobuf(bodyBuilder.getTransactionValidDuration()) : null;
+        return transactionValidDuration;
     }
 
     /**
@@ -464,23 +480,15 @@ public abstract class Transaction<T extends Transaction<T>>
      */
     public final T setTransactionValidDuration(Duration validDuration) {
         requireNotFrozen();
-        bodyBuilder.setTransactionValidDuration(DurationConverter.toProtobuf(validDuration));
-
+        Objects.requireNonNull(validDuration);
+        transactionValidDuration = validDuration;
         // noinspection unchecked
         return (T) this;
     }
 
     @Nullable
     public final Hbar getMaxTransactionFee() {
-        var transactionFee = bodyBuilder.getTransactionFee();
-
-        if (transactionFee == 0) {
-            // a zero max fee is assumed to be _no_
-            // max fee has been set
-            return null;
-        }
-
-        return Hbar.fromTinybars(transactionFee);
+        return maxTransactionFee;
     }
 
     /**
@@ -491,14 +499,14 @@ public abstract class Transaction<T extends Transaction<T>>
      */
     public final T setMaxTransactionFee(Hbar maxTransactionFee) {
         requireNotFrozen();
-        bodyBuilder.setTransactionFee(maxTransactionFee.toTinybars());
-
+        Objects.requireNonNull(maxTransactionFee);
+        this.maxTransactionFee = maxTransactionFee;
         // noinspection unchecked
         return (T) this;
     }
 
     public final String getTransactionMemo() {
-        return bodyBuilder.getMemo();
+        return memo;
     }
 
     /**
@@ -510,8 +518,8 @@ public abstract class Transaction<T extends Transaction<T>>
      */
     public final T setTransactionMemo(String memo) {
         requireNotFrozen();
-        bodyBuilder.setMemo(memo);
-
+        Objects.requireNonNull(memo);
+        this.memo = memo;
         // noinspection unchecked
         return (T) this;
     }
@@ -696,8 +704,7 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     protected boolean isFrozen() {
-        // TODO: make bodyBuilder initially null, check if null for isFrozen
-        return !signedTransactions.isEmpty();
+        return frozenBodyBuilder != null;
     }
 
     protected void requireNotFrozen() {
@@ -710,6 +717,13 @@ public abstract class Transaction<T extends Transaction<T>>
         if (nodeAccountIds.size() != 1) {
             throw new IllegalStateException("transaction did not have exactly one node ID set");
         }
+    }
+
+    private TransactionBody.Builder spawnBodyBuilder() {
+        return TransactionBody.newBuilder()
+            .setTransactionFee(maxTransactionFee.toTinybars())
+            .setTransactionValidDuration(DurationConverter.toProtobuf(transactionValidDuration).toBuilder())
+            .setMemo(memo);
     }
 
     /**
@@ -737,9 +751,9 @@ public abstract class Transaction<T extends Transaction<T>>
             return (T) this;
         }
 
-        // TODO: update this
-        if (client != null && bodyBuilder.getTransactionFee() == 0) {
-            bodyBuilder.setTransactionFee(client.maxTransactionFee.toTinybars());
+        frozenBodyBuilder = spawnBodyBuilder();
+        if (client != null && frozenBodyBuilder.getTransactionFee() == 0) {
+            frozenBodyBuilder.setTransactionFee(client.maxTransactionFee.toTinybars());
         }
 
         if (transactionIds.isEmpty()) {
@@ -759,12 +773,9 @@ public abstract class Transaction<T extends Transaction<T>>
             }
         }
 
-        bodyBuilder.setTransactionID(transactionIds.get(0).toProtobuf());
+        frozenBodyBuilder.setTransactionID(transactionIds.get(0).toProtobuf());
 
-        if (!onFreeze(bodyBuilder)) {
-            // noinspection unchecked
-            return (T) this;
-        }
+        onFreeze(frozenBodyBuilder);
 
         if (nodeAccountIds.isEmpty()) {
             if (client == null) {
@@ -786,7 +797,7 @@ public abstract class Transaction<T extends Transaction<T>>
         for (AccountId nodeId : nodeAccountIds) {
             signatures.add(SignatureMap.newBuilder());
             signedTransactions.add(com.hedera.hashgraph.sdk.proto.SignedTransaction.newBuilder()
-                .setBodyBytes(bodyBuilder
+                .setBodyBytes(frozenBodyBuilder
                     .setNodeAccountID(nodeId.toProtobuf())
                     .build()
                     .toByteString()
@@ -866,13 +877,14 @@ public abstract class Transaction<T extends Transaction<T>>
      * body is built. The intent is for the derived class to assign
      * their data variant to the transaction body.
      */
-    // TODO: should return void, boolean is never used.
-    abstract boolean onFreeze(TransactionBody.Builder bodyBuilder);
+    abstract void onFreeze(TransactionBody.Builder bodyBuilder);
 
     /**
      * Called in {@link #schedule()} when convertin transaction into a scheduled version.
      */
     abstract void onScheduled(SchedulableTransactionBody.Builder scheduled);
+
+    abstract void initFromTransactionBody(TransactionBody txBody);
 
     @Override
     final com.hedera.hashgraph.sdk.proto.Transaction makeRequest() {
@@ -935,7 +947,7 @@ public abstract class Transaction<T extends Transaction<T>>
     @SuppressWarnings("LiteProtoToString")
     public String toString() {
         // NOTE: regex is for removing the instance address from the default debug output
-        TransactionBody.Builder body = TransactionBody.newBuilder().mergeFrom(this.bodyBuilder.buildPartial());
+        TransactionBody.Builder body = spawnBodyBuilder();
 
         onFreeze(body);
 

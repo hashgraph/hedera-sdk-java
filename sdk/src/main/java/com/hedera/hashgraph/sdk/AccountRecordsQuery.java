@@ -17,13 +17,10 @@ import java.util.Objects;
  * that were above the threshold, during the last 25 hours.
  */
 public final class AccountRecordsQuery extends Query<List<TransactionRecord>, AccountRecordsQuery> {
-    private final CryptoGetAccountRecordsQuery.Builder builder;
-
     @Nullable
     AccountId accountId = null;
 
     public AccountRecordsQuery() {
-        this.builder = CryptoGetAccountRecordsQuery.newBuilder();
     }
 
     @Nullable
@@ -52,6 +49,8 @@ public final class AccountRecordsQuery extends Query<List<TransactionRecord>, Ac
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        var builder = CryptoGetAccountRecordsQuery.newBuilder();
+
         if (accountId != null) {
             builder.setAccountID(accountId.toProtobuf());
         }

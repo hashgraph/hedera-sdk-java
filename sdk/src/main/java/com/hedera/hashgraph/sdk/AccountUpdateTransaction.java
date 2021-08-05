@@ -34,43 +34,30 @@ import java.util.Objects;
  * associated with the claims and the account.
  */
 public final class AccountUpdateTransaction extends Transaction<AccountUpdateTransaction> {
-    private final CryptoUpdateTransactionBody.Builder builder;
-
     @Nullable
     AccountId accountId = null;
     @Nullable
     AccountId proxyAccountId = null;
+    @Nullable
+    private Key key = null;
+    @Nullable
+    private Instant expirationTime = null;
+    @Nullable
+    private Duration autoRenewPeriod = null;
+    @Nullable
+    private Boolean receiverSigRequired = null;
+    @Nullable
+    private String accountMemo = null;
 
     public AccountUpdateTransaction() {
-        builder = CryptoUpdateTransactionBody.newBuilder();
     }
 
     AccountUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getCryptoUpdateAccount().toBuilder();
-
-        if (builder.hasAccountIDToUpdate()) {
-            accountId = AccountId.fromProtobuf(builder.getAccountIDToUpdate());
-        }
-
-        if (builder.hasProxyAccountID()) {
-            proxyAccountId = AccountId.fromProtobuf(builder.getProxyAccountID());
-        }
     }
 
     AccountUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getCryptoUpdateAccount().toBuilder();
-
-        if (builder.hasAccountIDToUpdate()) {
-            accountId = AccountId.fromProtobuf(builder.getAccountIDToUpdate());
-        }
-
-        if (builder.hasProxyAccountID()) {
-            proxyAccountId = AccountId.fromProtobuf(builder.getProxyAccountID());
-        }
     }
 
     @Nullable
@@ -93,7 +80,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
 
     @Nullable
     public Key getKey() {
-        return builder.hasKey() ? Key.fromProtobufKey(builder.getKey()) : null;
+        return key;
     }
 
     /**
@@ -105,7 +92,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     public AccountUpdateTransaction setKey(Key key) {
         Objects.requireNonNull(key);
         requireNotFrozen();
-        builder.setKey(key.toProtobufKey());
+        this.key = key;
         return this;
     }
 
@@ -136,46 +123,8 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     @Nullable
-    Hbar getSendRecordThreshold() {
-        return builder.hasSendRecordThresholdWrapper() ? Hbar.fromTinybars(builder.getSendRecordThresholdWrapper().getValue()) : null;
-    }
-
-    /**
-     * Sets the new threshold amount for which an account record is created
-     * for any send/withdraw transaction.
-     *
-     * @param sendRecordThreshold The Hbar to be set as the threshold
-     * @return {@code this}
-     */
-    AccountUpdateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
-        Objects.requireNonNull(sendRecordThreshold);
-        requireNotFrozen();
-        builder.setSendRecordThresholdWrapper(UInt64Value.of(sendRecordThreshold.toTinybars()));
-        return this;
-    }
-
-    @Nullable
-    Hbar getReceiveRecordThreshold() {
-        return builder.hasReceiveRecordThresholdWrapper() ? Hbar.fromTinybars(builder.getReceiveRecordThresholdWrapper().getValue()) : null;
-    }
-
-    /**
-     * Sets the new threshold amount for which an account record is created
-     * for any receive/deposit transaction.
-     *
-     * @param receiveRecordThreshold The Hbar to be set as the threshold
-     * @return {@code this}
-     */
-    AccountUpdateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
-        Objects.requireNonNull(receiveRecordThreshold);
-        requireNotFrozen();
-        builder.setReceiveRecordThresholdWrapper(UInt64Value.of(receiveRecordThreshold.toTinybars()));
-        return this;
-    }
-
-    @Nullable
     public Instant getExpirationTime() {
-        return builder.hasExpirationTime() ? InstantConverter.fromProtobuf(builder.getExpirationTime()) : null;
+        return expirationTime;
     }
 
     /**
@@ -188,13 +137,13 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     public AccountUpdateTransaction setExpirationTime(Instant expirationTime) {
         Objects.requireNonNull(expirationTime);
         requireNotFrozen();
-        builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
+        this.expirationTime = expirationTime;
         return this;
     }
 
     @Nullable
     public Duration getAutoRenewPeriod() {
-        return builder.hasAutoRenewPeriod() ? DurationConverter.fromProtobuf(builder.getAutoRenewPeriod()) : null;
+        return autoRenewPeriod;
     }
 
     /**
@@ -210,13 +159,13 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     public AccountUpdateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         Objects.requireNonNull(autoRenewPeriod);
         requireNotFrozen();
-        builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
+        this.autoRenewPeriod = autoRenewPeriod;
         return this;
     }
 
     @Nullable
     public Boolean getReceiverSignatureRequired() {
-        return builder.hasReceiverSigRequiredWrapper() ? builder.getReceiverSigRequiredWrapper().getValue() : null;
+        return receiverSigRequired;
     }
 
     /**
@@ -228,23 +177,24 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      */
     public AccountUpdateTransaction setReceiverSignatureRequired(boolean receiverSignatureRequired) {
         requireNotFrozen();
-        builder.setReceiverSigRequiredWrapper(BoolValue.of(receiverSignatureRequired));
+        receiverSigRequired = receiverSignatureRequired;
         return this;
     }
 
     public String getAccountMemo() {
-        return builder.getMemo().getValue();
+        return accountMemo;
     }
 
     public AccountUpdateTransaction setAccountMemo(String memo) {
         requireNotFrozen();
-        this.builder.setMemo(StringValue.of(memo));
+        Objects.requireNonNull(memo);
+        accountMemo = memo;
         return this;
     }
 
     public AccountUpdateTransaction clearMemo() {
         requireNotFrozen();
-        this.builder.clearMemo();
+        accountMemo = null;
         return this;
     }
 
@@ -259,26 +209,67 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     @Override
+    void initFromTransactionBody(TransactionBody txBody) {
+        var body = txBody.getCryptoUpdateAccount();
+
+        if (body.hasAccountIDToUpdate()) {
+            accountId = AccountId.fromProtobuf(body.getAccountIDToUpdate());
+        }
+        if (body.hasProxyAccountID()) {
+            proxyAccountId = AccountId.fromProtobuf(body.getProxyAccountID());
+        }
+        if(body.hasKey()) {
+            key = Key.fromProtobufKey(body.getKey());
+        }
+        if(body.hasExpirationTime()) {
+            expirationTime = InstantConverter.fromProtobuf(body.getExpirationTime());
+        }
+        if(body.hasAutoRenewPeriod()) {
+            autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
+        }
+        if(body.hasReceiverSigRequiredWrapper()) {
+            receiverSigRequired = body.getReceiverSigRequiredWrapper().getValue();
+        }
+        if(body.hasMemo()) {
+            accountMemo = body.getMemo().getValue();
+        }
+    }
+
+    @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return CryptoServiceGrpc.getUpdateAccountMethod();
     }
 
     CryptoUpdateTransactionBody.Builder build() {
+        var builder = CryptoUpdateTransactionBody.newBuilder();
         if (accountId != null) {
             builder.setAccountIDToUpdate(accountId.toProtobuf());
         }
-
         if (proxyAccountId != null) {
             builder.setProxyAccountID(proxyAccountId.toProtobuf());
+        }
+        if(key != null) {
+            builder.setKey(key.toProtobufKey());
+        }
+        if(expirationTime != null) {
+            builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
+        }
+        if(autoRenewPeriod != null) {
+            builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
+        }
+        if(receiverSigRequired != null) {
+            builder.setReceiverSigRequiredWrapper(BoolValue.of(receiverSigRequired));
+        }
+        if(accountMemo != null) {
+            builder.setMemo(StringValue.of(accountMemo));
         }
 
         return builder;
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setCryptoUpdateAccount(build());
-        return true;
     }
 
     @Override

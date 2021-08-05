@@ -15,13 +15,10 @@ import java.util.Objects;
  * Get the bytecode for a smart contract instance.
  */
 public final class ContractByteCodeQuery extends Query<ByteString, ContractByteCodeQuery> {
-    private final ContractGetBytecodeQuery.Builder builder;
-
     @Nullable
     ContractId contractId = null;
 
     public ContractByteCodeQuery() {
-        this.builder = ContractGetBytecodeQuery.newBuilder();
     }
 
     @Nullable
@@ -50,6 +47,7 @@ public final class ContractByteCodeQuery extends Query<ByteString, ContractByteC
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        var builder = ContractGetBytecodeQuery.newBuilder();
         if (contractId != null) {
             builder.setContractID(contractId.toProtobuf());
         }
