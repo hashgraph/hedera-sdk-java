@@ -13,43 +13,20 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenUnfreezeTransaction> {
-    private final TokenUnfreezeAccountTransactionBody.Builder builder;
-
     @Nullable
-    TokenId tokenId = null;
+    private TokenId tokenId = null;
     @Nullable
-    AccountId accountId = null;
+    private AccountId accountId = null;
 
     public TokenUnfreezeTransaction() {
-        builder = TokenUnfreezeAccountTransactionBody.newBuilder();
     }
 
     TokenUnfreezeTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getTokenUnfreeze().toBuilder();
-
-        if (builder.hasToken()) {
-            tokenId = TokenId.fromProtobuf(builder.getToken());
-        }
-
-        if (builder.hasAccount()) {
-            accountId = AccountId.fromProtobuf(builder.getAccount());
-        }
     }
 
     TokenUnfreezeTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getTokenUnfreeze().toBuilder();
-
-        if (builder.hasToken()) {
-            tokenId = TokenId.fromProtobuf(builder.getToken());
-        }
-
-        if (builder.hasAccount()) {
-            accountId = AccountId.fromProtobuf(builder.getAccount());
-        }
     }
 
     @Nullable
@@ -76,7 +53,20 @@ public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transacti
         return this;
     }
 
+    @Override
+    void initFromTransactionBody(TransactionBody txBody) {
+        var body = txBody.getTokenUnfreeze();
+        if (body.hasToken()) {
+            tokenId = TokenId.fromProtobuf(body.getToken());
+        }
+
+        if (body.hasAccount()) {
+            accountId = AccountId.fromProtobuf(body.getAccount());
+        }
+    }
+
     TokenUnfreezeAccountTransactionBody.Builder build() {
+        var builder = TokenUnfreezeAccountTransactionBody.newBuilder();
         if (tokenId != null) {
             builder.setToken(tokenId.toProtobuf());
         }
@@ -105,9 +95,8 @@ public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transacti
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setTokenUnfreeze(build());
-        return true;
     }
 
     @Override

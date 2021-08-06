@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
+import java8.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
@@ -109,13 +110,18 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
         }
     }
 
+    @Override
+    CompletableFuture<Void> onExecuteAsync(Client client) {
+        int modesEnabled = (fileId != null ? 1 : 0) + (contractId != null ? 1 : 0);
+        if(modesEnabled != 1) {
+            throw new IllegalStateException("SystemDeleteTransaction must have exactly 1 of the following fields set: contractId, fileId");
+        }
+        return super.onExecuteAsync(client);
+    }
+
 
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
-        int modeCount = (fileId != null ? 1 : 0) + (contractId != null ? 1 : 0);
-        if(modeCount != 1) {
-            throw new IllegalStateException("SystemDeleteTransaction must have exactly 1 of the following fields set: contractId, fileId");
-        }
         if(fileId != null) {
             return FileServiceGrpc.getSystemUndeleteMethod();
         } else {

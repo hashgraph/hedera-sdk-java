@@ -15,44 +15,20 @@ import java.util.List;
 import java.util.Objects;
 
 public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenDissociateTransaction> {
-    private final TokenDissociateTransactionBody.Builder builder;
-
     @Nullable
-    AccountId accountId = null;
-    List<TokenId> tokenIds = new ArrayList<>();
+    private AccountId accountId = null;
+    private List<TokenId> tokenIds = new ArrayList<>();
 
     public TokenDissociateTransaction() {
-        builder = TokenDissociateTransactionBody.newBuilder();
-
         setMaxTransactionFee(new Hbar(5));
     }
 
     TokenDissociateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getTokenDissociate().toBuilder();;
-
-        if (builder.hasAccount()) {
-            accountId = AccountId.fromProtobuf(builder.getAccount());
-        }
-
-        for (var token : builder.getTokensList()) {
-            tokenIds.add(TokenId.fromProtobuf(token));
-        }
     }
 
     TokenDissociateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getTokenDissociate().toBuilder();;
-
-        if (builder.hasAccount()) {
-            accountId = AccountId.fromProtobuf(builder.getAccount());
-        }
-
-        for (var token : builder.getTokensList()) {
-            tokenIds.add(TokenId.fromProtobuf(token));
-        }
     }
 
     @Nullable
@@ -77,7 +53,20 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
         return this;
     }
 
+    @Override
+    void initFromTransactionBody(TransactionBody txBody) {
+        var body = txBody.getTokenDissociate();
+        if (body.hasAccount()) {
+            accountId = AccountId.fromProtobuf(body.getAccount());
+        }
+
+        for (var token : body.getTokensList()) {
+            tokenIds.add(TokenId.fromProtobuf(token));
+        }
+    }
+
     TokenDissociateTransactionBody.Builder build() {
+        var builder = TokenDissociateTransactionBody.newBuilder();
         if (accountId != null) {
             builder.setAccount(accountId.toProtobuf());
         }
@@ -110,9 +99,8 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setTokenDissociate(build());
-        return true;
     }
 
     @Override
