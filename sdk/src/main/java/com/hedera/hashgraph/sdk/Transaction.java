@@ -945,6 +945,13 @@ public abstract class Transaction<T extends Transaction<T>>
         // NOTE: regex is for removing the instance address from the default debug output
         TransactionBody.Builder body = spawnBodyBuilder();
 
+        if(!transactionIds.isEmpty()) {
+            body.setTransactionID(transactionIds.get(0).toProtobuf());
+        }
+        if(!nodeAccountIds.isEmpty()) {
+            body.setNodeAccountID(nodeAccountIds.get(0).toProtobuf());
+        }
+
         onFreeze(body);
 
         return body.buildPartial().toString().replaceAll("@[A-Za-z0-9]+", "");
