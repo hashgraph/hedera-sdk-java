@@ -39,53 +39,30 @@ import java.util.Objects;
  * without an admin key, then such a key can never be added, and its bytecode will be immutable.
  */
 public final class ContractUpdateTransaction extends Transaction<ContractUpdateTransaction> {
-    private final ContractUpdateTransactionBody.Builder builder;
-
     @Nullable
-    ContractId contractId = null;
+    private ContractId contractId = null;
     @Nullable
-    AccountId proxyAccountId = null;
+    private AccountId proxyAccountId = null;
     @Nullable
-    FileId bytecodeFileId = null;
+    private FileId bytecodeFileId = null;
+    @Nullable
+    private Instant expirationTime = null;
+    @Nullable
+    private Key adminKey = null;
+    @Nullable
+    private Duration autoRenewPeriod = null;
+    @Nullable
+    private String contractMemo = null;
 
     public ContractUpdateTransaction() {
-        builder = ContractUpdateTransactionBody.newBuilder();
     }
 
     ContractUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getContractUpdateInstance().toBuilder();
-
-        if (builder.hasContractID()) {
-            contractId = ContractId.fromProtobuf(builder.getContractID());
-        }
-
-        if (builder.hasProxyAccountID()) {
-            proxyAccountId = AccountId.fromProtobuf(builder.getProxyAccountID());
-        }
-
-        if (builder.hasFileID()) {
-            bytecodeFileId = FileId.fromProtobuf(builder.getFileID());
-        }
     }
 
     ContractUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getContractUpdateInstance().toBuilder();
-
-        if (builder.hasContractID()) {
-            contractId = ContractId.fromProtobuf(builder.getContractID());
-        }
-
-        if (builder.hasProxyAccountID()) {
-            proxyAccountId = AccountId.fromProtobuf(builder.getProxyAccountID());
-        }
-
-        if (builder.hasFileID()) {
-            bytecodeFileId = FileId.fromProtobuf(builder.getFileID());
-        }
     }
 
     @Nullable
@@ -108,7 +85,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
 
     @Nullable
     public Instant getExpirationTime() {
-        return builder.hasExpirationTime() ? InstantConverter.fromProtobuf(builder.getExpirationTime()) : null;
+        return expirationTime;
     }
 
     /**
@@ -121,13 +98,13 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     public ContractUpdateTransaction setExpirationTime(Instant expirationTime) {
         Objects.requireNonNull(expirationTime);
         requireNotFrozen();
-        builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
+        this.expirationTime = expirationTime;
         return this;
     }
 
     @Nullable
     public Key getAdminKey() {
-        return builder.hasAdminKey() ? Key.fromProtobufKey(builder.getAdminKey()) : null;
+        return adminKey;
     }
 
     /**
@@ -139,7 +116,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     public ContractUpdateTransaction setAdminKey(Key adminKey) {
         Objects.requireNonNull(adminKey);
         requireNotFrozen();
-        builder.setAdminKey(adminKey.toProtobufKey());
+        this.adminKey = adminKey;
         return this;
     }
 
@@ -170,7 +147,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
 
     @Nullable
     public Duration getAutoRenewPeriod() {
-        return builder.hasAutoRenewPeriod() ? DurationConverter.fromProtobuf(builder.getAutoRenewPeriod()) : null;
+        return autoRenewPeriod;
     }
 
     /**
@@ -182,7 +159,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     public ContractUpdateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         Objects.requireNonNull(autoRenewPeriod);
         requireNotFrozen();
-        builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
+        this.autoRenewPeriod = autoRenewPeriod;
         return this;
     }
 
@@ -207,8 +184,9 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         return this;
     }
 
+    @Nullable
     public String getContractMemo() {
-        return builder.getMemoWrapper().getValue();
+        return contractMemo;
     }
 
     /**
@@ -218,30 +196,67 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @return {@code this}
      */
     public ContractUpdateTransaction setContractMemo(String memo) {
+        Objects.requireNonNull(memo);
         requireNotFrozen();
-        builder.setMemoWrapper(StringValue.of(memo));
+        contractMemo = memo;
         return this;
     }
 
     public ContractUpdateTransaction clearMemo() {
         requireNotFrozen();
-        builder.clearMemoWrapper();
+        contractMemo = null;
         return this;
     }
 
+    @Override
+    void initFromTransactionBody(TransactionBody txBody) {
+        var body = txBody.getContractUpdateInstance();
+        if (body.hasContractID()) {
+            contractId = ContractId.fromProtobuf(body.getContractID());
+        }
+        if (body.hasProxyAccountID()) {
+            proxyAccountId = AccountId.fromProtobuf(body.getProxyAccountID());
+        }
+        if (body.hasFileID()) {
+            bytecodeFileId = FileId.fromProtobuf(body.getFileID());
+        }
+        if(body.hasExpirationTime()) {
+            expirationTime = InstantConverter.fromProtobuf(body.getExpirationTime());
+        }
+        if(body.hasAdminKey()) {
+            adminKey = Key.fromProtobufKey(body.getAdminKey());
+        }
+        if(body.hasAutoRenewPeriod()) {
+            autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
+        }
+        if(body.hasMemoWrapper()) {
+            contractMemo = body.getMemoWrapper().getValue();
+        }
+    }
+
     ContractUpdateTransactionBody.Builder build() {
+        var builder = ContractUpdateTransactionBody.newBuilder();
         if (contractId != null) {
             builder.setContractID(contractId.toProtobuf());
         }
-
         if (proxyAccountId != null) {
             builder.setProxyAccountID(proxyAccountId.toProtobuf());
         }
-
         if (bytecodeFileId != null) {
             builder.setFileID(bytecodeFileId.toProtobuf());
         }
-
+        if(expirationTime != null) {
+            builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
+        }
+        if(adminKey != null) {
+            builder.setAdminKey(adminKey.toProtobufKey());
+        }
+        if(autoRenewPeriod != null) {
+            builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
+        }
+        if(contractMemo != null) {
+            builder.setMemoWrapper(StringValue.of(contractMemo));
+        }
         return builder;
     }
 
@@ -266,9 +281,8 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setContractUpdateInstance(build());
-        return true;
     }
 
     @Override

@@ -18,7 +18,7 @@ import java.util.Objects;
 public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery> {
 
     @Nullable
-    AccountId accountId = null;
+    private AccountId accountId = null;
 
     public AccountInfoQuery() {
     }

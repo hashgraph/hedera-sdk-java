@@ -59,46 +59,31 @@ import java.util.Objects;
  * changed after the smart contract is created.
  */
 public final class ContractCreateTransaction extends Transaction<ContractCreateTransaction> {
-    private final ContractCreateTransactionBody.Builder builder;
 
     @Nullable
-    FileId bytecodeFileId = null;
+    private FileId bytecodeFileId = null;
     @Nullable
-    AccountId proxyAccountId = null;
+    private AccountId proxyAccountId = null;
+    @Nullable
+    private Key adminKey = null;
+    private long gas = 0;
+    private Hbar initialBalance = new Hbar(0);
+    @Nullable
+    private Duration autoRenewPeriod = null;
+    private byte[] constructorParameters = {};
+    private String contractMemo = "";
 
     public ContractCreateTransaction() {
-        builder = ContractCreateTransactionBody.newBuilder();
-
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
         setMaxTransactionFee(new Hbar(20));
     }
 
     ContractCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getContractCreateInstance().toBuilder();
-
-        if(builder.hasFileID()) {
-            bytecodeFileId = FileId.fromProtobuf(builder.getFileID());
-        }
-
-        if(builder.hasProxyAccountID()) {
-            proxyAccountId = AccountId.fromProtobuf(builder.getProxyAccountID());
-        }
     }
 
     ContractCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getContractCreateInstance().toBuilder();
-
-        if(builder.hasFileID()) {
-            bytecodeFileId = FileId.fromProtobuf(builder.getFileID());
-        }
-
-        if(builder.hasProxyAccountID()) {
-            proxyAccountId = AccountId.fromProtobuf(builder.getProxyAccountID());
-        }
     }
 
     @Nullable
@@ -126,7 +111,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
 
     @Nullable
     public Key getAdminKey() {
-        return builder.hasAdminKey() ? Key.fromProtobufKey(builder.getAdminKey()) : null;
+        return adminKey;
     }
 
     /**
@@ -142,12 +127,12 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     public ContractCreateTransaction setAdminKey(Key adminKey) {
         Objects.requireNonNull(adminKey);
         requireNotFrozen();
-        builder.setAdminKey(adminKey.toProtobufKey());
+        this.adminKey = adminKey;
         return this;
     }
 
     public long getGas() {
-        return builder.getGas();
+        return gas;
     }
 
     /**
@@ -158,12 +143,12 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      */
     public ContractCreateTransaction setGas(long gas) {
         requireNotFrozen();
-        builder.setGas(gas);
+        this.gas = gas;
         return this;
     }
 
     public Hbar getInitialBalance() {
-        return Hbar.fromTinybars(builder.getInitialBalance());
+        return initialBalance;
     }
 
     /**
@@ -176,7 +161,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     public ContractCreateTransaction setInitialBalance(Hbar initialBalance) {
         Objects.requireNonNull(initialBalance);
         requireNotFrozen();
-        builder.setInitialBalance(initialBalance.toTinybars());
+        this.initialBalance = initialBalance;
         return this;
     }
 
@@ -206,7 +191,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
 
     @Nullable
     public Duration getAutoRenewPeriod() {
-        return builder.hasAutoRenewPeriod() ? DurationConverter.fromProtobuf(builder.getAutoRenewPeriod()) : null;
+        return autoRenewPeriod;
     }
 
     /**
@@ -218,12 +203,12 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     public ContractCreateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         Objects.requireNonNull(autoRenewPeriod);
         requireNotFrozen();
-        builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
+        this.autoRenewPeriod = autoRenewPeriod;
         return this;
     }
 
     public ByteString getConstructorParameters() {
-        return builder.getConstructorParameters();
+        return ByteString.copyFrom(constructorParameters);
     }
 
     /**
@@ -237,7 +222,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      */
     public ContractCreateTransaction setConstructorParameters(byte[] constructorParameters) {
         requireNotFrozen();
-        builder.setConstructorParameters(ByteString.copyFrom(constructorParameters));
+        this.constructorParameters = constructorParameters;
         return this;
     }
 
@@ -249,13 +234,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      */
     public ContractCreateTransaction setConstructorParameters(ContractFunctionParameters constructorParameters) {
         Objects.requireNonNull(constructorParameters);
-        requireNotFrozen();
-        builder.setConstructorParameters(constructorParameters.toBytes(null));
-        return this;
+        return setConstructorParameters(constructorParameters.toBytes(null).toByteArray());
     }
 
     public String getContractMemo() {
-        return builder.getMemo();
+        return contractMemo;
     }
 
     /**
@@ -266,18 +249,29 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      */
     public ContractCreateTransaction setContractMemo(String memo) {
         requireNotFrozen();
-        builder.setMemo(memo);
+        Objects.requireNonNull(memo);
+        contractMemo = memo;
         return this;
     }
 
     ContractCreateTransactionBody.Builder build() {
+        var builder = ContractCreateTransactionBody.newBuilder();
         if (bytecodeFileId != null) {
             builder.setFileID(bytecodeFileId.toProtobuf());
         }
-
         if (proxyAccountId != null) {
             builder.setProxyAccountID(proxyAccountId.toProtobuf());
         }
+        if(adminKey != null) {
+            builder.setAdminKey(adminKey.toProtobufKey());
+        }
+        if(autoRenewPeriod != null) {
+            builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
+        }
+        builder.setGas(gas);
+        builder.setInitialBalance(initialBalance.toTinybars());
+        builder.setConstructorParameters(ByteString.copyFrom(constructorParameters));
+        builder.setMemo(contractMemo);
 
         return builder;
     }
@@ -294,14 +288,35 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     @Override
+    void initFromTransactionBody(TransactionBody txBody) {
+        var body = txBody.getContractCreateInstance();
+
+        if(body.hasFileID()) {
+            bytecodeFileId = FileId.fromProtobuf(body.getFileID());
+        }
+        if(body.hasProxyAccountID()) {
+            proxyAccountId = AccountId.fromProtobuf(body.getProxyAccountID());
+        }
+        if(body.hasAdminKey()) {
+            adminKey = Key.fromProtobufKey(body.getAdminKey());
+        }
+        if(body.hasAutoRenewPeriod()) {
+            autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
+        }
+        gas = body.getGas();
+        initialBalance = Hbar.fromTinybars(body.getInitialBalance());
+        constructorParameters = body.getConstructorParameters().toByteArray();
+        contractMemo = body.getMemo();
+    }
+
+    @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return SmartContractServiceGrpc.getCreateContractMethod();
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setContractCreateInstance(build());
-        return true;
     }
 
     @Override

@@ -35,9 +35,9 @@ import java.util.Objects;
  */
 public final class AccountUpdateTransaction extends Transaction<AccountUpdateTransaction> {
     @Nullable
-    AccountId accountId = null;
+    private AccountId accountId = null;
     @Nullable
-    AccountId proxyAccountId = null;
+    private AccountId proxyAccountId = null;
     @Nullable
     private Key key = null;
     @Nullable
@@ -181,6 +181,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         return this;
     }
 
+    @Nullable
     public String getAccountMemo() {
         return accountMemo;
     }

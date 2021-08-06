@@ -18,9 +18,9 @@ import java.util.Objects;
  */
 public final class AccountBalanceQuery extends Query<AccountBalance, AccountBalanceQuery> {
     @Nullable
-    AccountId accountId = null;
+    private AccountId accountId = null;
     @Nullable
-    ContractId contractId = null;
+    private ContractId contractId = null;
 
     public AccountBalanceQuery() {
     }

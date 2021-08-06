@@ -21,9 +21,9 @@ import java.util.Objects;
  */
 public final class AccountDeleteTransaction extends Transaction<AccountDeleteTransaction> {
     @Nullable
-    AccountId accountId = null;
+    private AccountId accountId = null;
     @Nullable
-    AccountId transferAccountId = null;
+    private AccountId transferAccountId = null;
 
 
     public AccountDeleteTransaction() {

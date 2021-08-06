@@ -10,15 +10,12 @@ import io.grpc.MethodDescriptor;
 import javax.annotation.Nullable;
 
 public class NetworkVersionInfoQuery extends Query<NetworkVersionInfo, NetworkVersionInfoQuery> {
-    private final NetworkGetVersionInfoQuery.Builder builder;
-
     public NetworkVersionInfoQuery() {
-        builder = NetworkGetVersionInfoQuery.newBuilder();
     }
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
-        queryBuilder.setNetworkGetVersionInfo(builder.setHeader(header));
+        queryBuilder.setNetworkGetVersionInfo(NetworkGetVersionInfoQuery.newBuilder().setHeader(header));
     }
 
     @Override

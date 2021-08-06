@@ -23,33 +23,22 @@ import java.util.Objects;
  * added as part of the transaction fee.
  */
 public final class ContractExecuteTransaction extends Transaction<ContractExecuteTransaction> {
-    private final ContractCallTransactionBody.Builder builder;
 
     @Nullable
-    ContractId contractId = null;
+    private ContractId contractId = null;
+    private long gas = 0;
+    private Hbar payableAmount = new Hbar(0);
+    private byte[] functionParameters = {};
 
     public ContractExecuteTransaction() {
-        builder = ContractCallTransactionBody.newBuilder();
     }
 
     ContractExecuteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getContractCall().toBuilder();
-
-        if (builder.hasContractID()) {
-            contractId = ContractId.fromProtobuf(builder.getContractID());
-        }
     }
 
     ContractExecuteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getContractCall().toBuilder();
-
-        if (builder.hasContractID()) {
-            contractId = ContractId.fromProtobuf(builder.getContractID());
-        }
     }
 
     @Nullable
@@ -71,7 +60,7 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
     }
 
     public long getGas() {
-        return builder.getGas();
+        return gas;
     }
 
     /**
@@ -82,12 +71,12 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
      */
     public ContractExecuteTransaction setGas(long gas) {
         requireNotFrozen();
-        builder.setGas(gas);
+        this.gas = gas;
         return this;
     }
 
     public Hbar getPayableAmount() {
-        return Hbar.fromTinybars(builder.getAmount());
+        return payableAmount;
     }
 
     /**
@@ -99,12 +88,12 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
     public ContractExecuteTransaction setPayableAmount(Hbar amount) {
         Objects.requireNonNull(amount);
         requireNotFrozen();
-        builder.setAmount(amount.toTinybars());
+        payableAmount = amount;
         return this;
     }
 
     public ByteString getFunctionParameters() {
-        return builder.getFunctionParameters();
+        return ByteString.copyFrom(functionParameters);
     }
 
     /**
@@ -119,7 +108,7 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
     public ContractExecuteTransaction setFunctionParameters(ByteString functionParameters) {
         Objects.requireNonNull(functionParameters);
         requireNotFrozen();
-        builder.setFunctionParameters(functionParameters);
+        this.functionParameters = functionParameters.toByteArray();
         return this;
     }
 
@@ -148,10 +137,25 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
         return setFunctionParameters(params.toBytes(name));
     }
 
+    @Override
+    void initFromTransactionBody(TransactionBody txBody) {
+        var body = txBody.getContractCall();
+        if(body.hasContractID()) {
+            contractId = ContractId.fromProtobuf(body.getContractID());
+        }
+        gas = body.getGas();
+        payableAmount = Hbar.fromTinybars(body.getAmount());
+        functionParameters = body.getFunctionParameters().toByteArray();
+    }
+
     ContractCallTransactionBody.Builder build() {
+        var builder = ContractCallTransactionBody.newBuilder();
         if (contractId != null) {
             builder.setContractID(contractId.toProtobuf());
         }
+        builder.setGas(gas);
+        builder.setAmount(payableAmount.toTinybars());
+        builder.setFunctionParameters(ByteString.copyFrom(functionParameters));
 
         return builder;
     }
@@ -169,9 +173,8 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setContractCall(build());
-        return true;
     }
 
     @Override

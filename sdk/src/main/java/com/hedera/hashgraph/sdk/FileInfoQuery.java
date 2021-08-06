@@ -22,13 +22,11 @@ import java.util.Objects;
  * and its contents will be empty. Note that each file has a FileID, but does not have a filename.
  */
 public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
-    private final FileGetInfoQuery.Builder builder;
 
     @Nullable
-    FileId fileId = null;
+    private FileId fileId = null;
 
     public FileInfoQuery() {
-        builder = FileGetInfoQuery.newBuilder();
     }
 
     @Nullable
@@ -56,6 +54,7 @@ public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        var builder = FileGetInfoQuery.newBuilder();
         if (fileId != null) {
             builder.setFileID(fileId.toProtobuf());
         }

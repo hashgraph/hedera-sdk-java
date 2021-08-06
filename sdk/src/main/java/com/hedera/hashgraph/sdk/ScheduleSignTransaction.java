@@ -13,25 +13,16 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 public final class ScheduleSignTransaction extends Transaction<ScheduleSignTransaction> {
-    private final ScheduleSignTransactionBody.Builder builder;
 
     @Nullable
-    ScheduleId scheduleId = null;
+    private ScheduleId scheduleId = null;
 
     public ScheduleSignTransaction() {
-        builder = ScheduleSignTransactionBody.newBuilder();
-
         setMaxTransactionFee(new Hbar(5));
     }
 
     ScheduleSignTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getScheduleSign().toBuilder();
-
-        if (builder.hasScheduleID()) {
-            scheduleId = ScheduleId.fromProtobuf(builder.getScheduleID());
-        }
     }
 
     @Nullable
@@ -48,16 +39,25 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
 
     public ScheduleSignTransaction clearScheduleId() {
         requireNotFrozen();
-        builder.clearScheduleID();
+        this.scheduleId = null;
         return this;
     }
 
     ScheduleSignTransactionBody.Builder build() {
+        var builder = ScheduleSignTransactionBody.newBuilder();
         if (scheduleId != null) {
             builder.setScheduleID(scheduleId.toProtobuf());
         }
 
         return builder;
+    }
+
+    @Override
+    void initFromTransactionBody(TransactionBody txBody) {
+        var body = txBody.getScheduleSign();
+        if (body.hasScheduleID()) {
+            scheduleId = ScheduleId.fromProtobuf(body.getScheduleID());
+        }
     }
 
     @Override
@@ -73,9 +73,8 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setScheduleSign(build());
-        return true;
     }
 
     @Override

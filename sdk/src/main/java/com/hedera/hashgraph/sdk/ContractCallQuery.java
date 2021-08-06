@@ -23,7 +23,7 @@ import java.util.Objects;
  */
 public final class ContractCallQuery extends Query<ContractFunctionResult, ContractCallQuery> {
     @Nullable
-    ContractId contractId = null;
+    private ContractId contractId = null;
     private long gas = 0;
     private byte[] functionParameters = {};
     private long maxResultSize = 0;

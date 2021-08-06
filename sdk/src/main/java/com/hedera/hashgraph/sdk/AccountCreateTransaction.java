@@ -20,13 +20,13 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     private static final Hbar DEFAULT_RECORD_THRESHOLD = Hbar.fromTinybars(Long.MAX_VALUE);
 
     @Nullable
-    AccountId proxyAccountId = null;
+    private AccountId proxyAccountId = null;
     @Nullable
-    Key key = null;
-    String accountMemo = "";
-    Hbar initialBalance = new Hbar(0);
-    boolean receiverSigRequired = false;
-    Duration autoRenewPeriod = DEFAULT_AUTO_RENEW_PERIOD;
+    private Key key = null;
+    private String accountMemo = "";
+    private Hbar initialBalance = new Hbar(0);
+    private boolean receiverSigRequired = false;
+    private Duration autoRenewPeriod = DEFAULT_AUTO_RENEW_PERIOD;
 
     public AccountCreateTransaction() {
     }

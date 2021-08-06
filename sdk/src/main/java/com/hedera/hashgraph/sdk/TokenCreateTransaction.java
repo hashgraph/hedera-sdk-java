@@ -17,47 +17,49 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> {
-    private final TokenCreateTransactionBody.Builder builder;
-
-    List<CustomFee> customFees = new ArrayList<>();
+    private List<CustomFee> customFees = new ArrayList<>();
     @Nullable
-    AccountId treasuryAccountId = null;
+    private AccountId treasuryAccountId = null;
     @Nullable
-    AccountId autoRenewAccountId = null;
+    private AccountId autoRenewAccountId = null;
+    @Nullable
+    private String tokenName = null;
+    @Nullable
+    private String tokenSymbol = null;
+    @Nullable
+    private int decimals = 0;
+    private long initialSupply = 0;
+    @Nullable
+    private Key adminKey = null;
+    @Nullable
+    private Key kycKey = null;
+    @Nullable
+    private Key freezeKey = null;
+    @Nullable
+    private Key wipeKey = null;
+    @Nullable
+    private Key supplyKey = null;
+    @Nullable
+    private Key feeScheduleKey = null;
+    private boolean freezeDefault = false;
+    @Nullable
+    private Instant expirationTime = null;
+    @Nullable
+    private Duration autoRenewPeriod = null;
+    private String tokenMemo = "";
+    private TokenType token
 
     public TokenCreateTransaction() {
-        builder = TokenCreateTransactionBody.newBuilder();
-
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
         setMaxTransactionFee(new Hbar(30));
     }
 
     TokenCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getTokenCreation().toBuilder();
-
-        if (builder.hasTreasury()) {
-            treasuryAccountId = AccountId.fromProtobuf(builder.getTreasury());
-        }
-
-        for(var fee : builder.getCustomFeesList()) {
-            customFees.add(CustomFee.fromProtobuf(fee));
-        }
     }
 
     TokenCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getTokenCreation().toBuilder();
-
-        if (builder.hasTreasury()) {
-            treasuryAccountId = AccountId.fromProtobuf(builder.getTreasury());
-        }
-
-        for(var fee : builder.getCustomFeesList()) {
-            customFees.add(CustomFee.fromProtobuf(fee));
-        }
     }
 
     @Nullable
@@ -317,6 +319,21 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     @Override
+    void initFromTransactionBody(TransactionBody txBody) {
+        var body = txBody.getTokenCreation();
+        if (body.hasTreasury()) {
+            treasuryAccountId = AccountId.fromProtobuf(body.getTreasury());
+        }
+        if(body.hasAutoRenewAccount()) {
+            autoRenewAccountId = AccountId.fromProtobuf(body.getAutoRenewAccount());
+        }
+
+        for(var fee : body.getCustomFeesList()) {
+            customFees.add(CustomFee.fromProtobuf(fee));
+        }
+    }
+
+    @Override
     void validateChecksums(Client client) throws BadEntityIdException {
         for(var fee : customFees) {
             fee.validateChecksums(client);
@@ -337,9 +354,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setTokenCreation(build());
-        return true;
     }
 
     @Override

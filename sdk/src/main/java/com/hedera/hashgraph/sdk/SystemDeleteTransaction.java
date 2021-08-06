@@ -27,43 +27,22 @@ import java.util.Objects;
  * to exist, and is not affected by the expiration time here.
  */
 public final class SystemDeleteTransaction extends Transaction<SystemDeleteTransaction> {
-    private final SystemDeleteTransactionBody.Builder builder;
-
     @Nullable
-    FileId fileId = null;
+    private FileId fileId = null;
     @Nullable
-    ContractId contractId = null;
+    private ContractId contractId = null;
+    @Nullable
+    private Instant expirationTime = null;
 
     public SystemDeleteTransaction() {
-        builder = SystemDeleteTransactionBody.newBuilder();
     }
 
     SystemDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getSystemDelete().toBuilder();
-
-        if(builder.hasFileID()) {
-            fileId = FileId.fromProtobuf(builder.getFileID());
-        }
-
-        if(builder.hasContractID()) {
-            contractId = ContractId.fromProtobuf(builder.getContractID());
-        }
     }
 
     SystemDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getSystemDelete().toBuilder();
-
-        if(builder.hasFileID()) {
-            fileId = FileId.fromProtobuf(builder.getFileID());
-        }
-
-        if(builder.hasContractID()) {
-            contractId = ContractId.fromProtobuf(builder.getContractID());
-        }
     }
 
     @Nullable
@@ -108,7 +87,7 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
 
     @Nullable
     public final Instant getExpirationTime() {
-        return builder.hasExpirationTime() ? InstantConverter.fromProtobuf(builder.getExpirationTime()) : null;
+        return expirationTime;
     }
 
     /**
@@ -122,23 +101,38 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
         Objects.requireNonNull(expirationTime);
         requireNotFrozen();
 
-        builder.setExpirationTime(TimestampSeconds.newBuilder()
-            .setSeconds(expirationTime.getEpochSecond())
-            .build());
+        this.expirationTime = expirationTime;
 
         return this;
     }
 
     SystemDeleteTransactionBody.Builder build() {
+        var builder = SystemDeleteTransactionBody.newBuilder();
         if (fileId != null) {
             builder.setFileID(fileId.toProtobuf());
         }
-
         if (contractId != null) {
             builder.setContractID(contractId.toProtobuf());
         }
+        if(expirationTime != null) {
+            builder.setExpirationTime(InstantConverter.toSecondsProtobuf(expirationTime));
+        }
 
         return builder;
+    }
+
+    @Override
+    void initFromTransactionBody(TransactionBody txBody) {
+        var body = txBody.getSystemDelete();
+        if(body.hasFileID()) {
+            fileId = FileId.fromProtobuf(body.getFileID());
+        }
+        if(body.hasContractID()) {
+            contractId = ContractId.fromProtobuf(body.getContractID());
+        }
+        if(body.hasExpirationTime()) {
+            expirationTime = InstantConverter.fromProtobuf(body.getExpirationTime());
+        }
     }
 
     @Override
@@ -154,22 +148,20 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
 
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
-        switch (builder.getIdCase()) {
-            case FILEID:
-                return FileServiceGrpc.getSystemDeleteMethod();
-
-            case CONTRACTID:
-                return SmartContractServiceGrpc.getSystemDeleteMethod();
-
-            default:
-                throw new IllegalStateException("requires an ID to be set, try calling setFileId or setContractId");
+        int modeCount = (fileId != null ? 1 : 0) + (contractId != null ? 1 : 0);
+        if(modeCount != 1) {
+            throw new IllegalStateException("SystemDeleteTransaction must have exactly 1 of the following fields set: contractId, fileId");
+        }
+        if(fileId != null) {
+            return FileServiceGrpc.getSystemDeleteMethod();
+        } else {
+            return SmartContractServiceGrpc.getSystemDeleteMethod();
         }
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setSystemDelete(build());
-        return true;
     }
 
     @Override
