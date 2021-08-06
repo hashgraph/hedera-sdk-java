@@ -195,7 +195,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
 
     public AccountUpdateTransaction clearMemo() {
         requireNotFrozen();
-        accountMemo = null;
+        accountMemo = "";
         return this;
     }
 

@@ -204,7 +204,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
 
     public ContractUpdateTransaction clearMemo() {
         requireNotFrozen();
-        contractMemo = null;
+        contractMemo = "";
         return this;
     }
 

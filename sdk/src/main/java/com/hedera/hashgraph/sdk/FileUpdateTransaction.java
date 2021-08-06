@@ -172,7 +172,7 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
 
     public FileUpdateTransaction clearMemo() {
         requireNotFrozen();
-        fileMemo = null;
+        fileMemo = "";
         return this;
     }
 
