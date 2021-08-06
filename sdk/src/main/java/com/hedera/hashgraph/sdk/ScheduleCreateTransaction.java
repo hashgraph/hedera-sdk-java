@@ -27,6 +27,7 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
 
     ScheduleCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -95,8 +96,7 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         return builder;
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getScheduleCreate();
         if (body.hasPayerAccountID()) {
             payerAccountId = AccountId.fromProtobuf(body.getPayerAccountID());

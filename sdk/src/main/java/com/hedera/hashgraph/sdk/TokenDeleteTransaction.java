@@ -22,10 +22,12 @@ public class TokenDeleteTransaction extends com.hedera.hashgraph.sdk.Transaction
 
     TokenDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     TokenDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -40,8 +42,7 @@ public class TokenDeleteTransaction extends com.hedera.hashgraph.sdk.Transaction
         return this;
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getTokenDeletion();
         if (body.hasToken()) {
             tokenId = TokenId.fromProtobuf(body.getToken());

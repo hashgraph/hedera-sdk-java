@@ -80,10 +80,12 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
 
     ContractCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     ContractCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -287,8 +289,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         }
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getContractCreateInstance();
 
         if(body.hasFileID()) {

@@ -59,10 +59,12 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
 
     ContractUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     ContractUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -208,8 +210,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         return this;
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getContractUpdateInstance();
         if (body.hasContractID()) {
             contractId = ContractId.fromProtobuf(body.getContractID());

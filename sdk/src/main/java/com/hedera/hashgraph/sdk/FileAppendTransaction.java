@@ -33,10 +33,12 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
 
     FileAppendTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     FileAppendTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -135,8 +137,7 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
         return FileServiceGrpc.getAppendContentMethod();
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getFileAppend();
         if (body.hasFileID()) {
             fileId = FileId.fromProtobuf(body.getFileID());

@@ -27,10 +27,12 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
 
     TokenWipeTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     TokenWipeTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -84,8 +86,7 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         return this;
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getTokenWipe();
         if (body.hasToken()) {
             tokenId = TokenId.fromProtobuf(body.getToken());

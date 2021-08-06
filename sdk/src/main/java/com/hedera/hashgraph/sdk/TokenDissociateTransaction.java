@@ -25,10 +25,12 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
 
     TokenDissociateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     TokenDissociateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -53,8 +55,7 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
         return this;
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getTokenDissociate();
         if (body.hasAccount()) {
             accountId = AccountId.fromProtobuf(body.getAccount());

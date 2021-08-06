@@ -34,6 +34,7 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
 
     LiveHashAddTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -120,8 +121,7 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
         return this;
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getCryptoAddLiveHash();
         var hashBody = body.getLiveHash();
 

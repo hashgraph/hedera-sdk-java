@@ -46,10 +46,12 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
 
     TokenUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     TokenUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -211,8 +213,7 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         return this;
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getTokenUpdate();
         if (body.hasTreasury()) {
             treasuryAccountId = AccountId.fromProtobuf(body.getTreasury());

@@ -32,10 +32,12 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
 
     FileDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     FileDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -56,8 +58,7 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
         return this;
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getFileDelete();
         if (body.hasFileID()) {
             fileId = FileId.fromProtobuf(body.getFileID());

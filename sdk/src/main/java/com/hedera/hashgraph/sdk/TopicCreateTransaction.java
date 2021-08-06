@@ -39,10 +39,12 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
 
     TopicCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     TopicCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     public String getTopicMemo() {
@@ -156,8 +158,7 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
         return this;
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getConsensusCreateTopic();
         if (body.hasAutoRenewAccount()) {
             autoRenewAccountId = AccountId.fromProtobuf(body.getAutoRenewAccount());

@@ -26,10 +26,12 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
 
     TokenBurnTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     TokenBurnTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -85,8 +87,7 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         return builder;
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getTokenBurn();
         if (body.hasToken()) {
             tokenId = TokenId.fromProtobuf(body.getToken());

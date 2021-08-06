@@ -23,10 +23,12 @@ public class TokenRevokeKycTransaction extends com.hedera.hashgraph.sdk.Transact
 
     TokenRevokeKycTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     TokenRevokeKycTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -53,8 +55,7 @@ public class TokenRevokeKycTransaction extends com.hedera.hashgraph.sdk.Transact
         return this;
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getTokenRevokeKyc();
         if (body.hasToken()) {
             tokenId = TokenId.fromProtobuf(body.getToken());

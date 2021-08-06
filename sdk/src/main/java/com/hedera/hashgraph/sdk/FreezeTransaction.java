@@ -27,11 +27,13 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
     }
 
     FreezeTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
-        super(txs);;
+        super(txs);
+        initFromTransactionBody();
     }
 
     FreezeTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     public Instant getStartTime() {
@@ -84,8 +86,7 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
         return FreezeServiceGrpc.getFreezeMethod();
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getFreeze();
         startHour = body.getStartHour();
         startMinute = body.getStartMin();

@@ -35,10 +35,12 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
 
     FileCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     FileCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -162,8 +164,7 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
         return FileServiceGrpc.getCreateFileMethod();
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getFileCreate();
         if(body.hasExpirationTime()) {
             expirationTime = InstantConverter.fromProtobuf(body.getExpirationTime());

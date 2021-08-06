@@ -31,10 +31,12 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
 
     AccountDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     AccountDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -103,8 +105,7 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
         return builder;
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getCryptoDelete();
         if (body.hasDeleteAccountID()) {
             accountId = AccountId.fromProtobuf(body.getDeleteAccountID());

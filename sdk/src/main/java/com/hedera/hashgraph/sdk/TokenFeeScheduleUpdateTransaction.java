@@ -24,10 +24,12 @@ public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeSched
 
     TokenFeeScheduleUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     TokenFeeScheduleUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -53,8 +55,7 @@ public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeSched
         return this;
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getTokenFeeScheduleUpdate();
         if (body.hasTokenId()) {
             tokenId = TokenId.fromProtobuf(body.getTokenId());

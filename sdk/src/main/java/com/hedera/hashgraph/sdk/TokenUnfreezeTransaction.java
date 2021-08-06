@@ -23,10 +23,12 @@ public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transacti
 
     TokenUnfreezeTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     TokenUnfreezeTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -53,8 +55,7 @@ public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transacti
         return this;
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getTokenUnfreeze();
         if (body.hasToken()) {
             tokenId = TokenId.fromProtobuf(body.getToken());

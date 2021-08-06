@@ -35,10 +35,12 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
 
     TopicMessageSubmitTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     TopicMessageSubmitTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -69,8 +71,7 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
         return setData(message);
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getConsensusSubmitMessage();
         if (body.hasTopicID()) {
             topicId = TopicId.fromProtobuf(body.getTopicID());

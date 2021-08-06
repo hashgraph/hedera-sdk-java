@@ -34,10 +34,12 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
 
     FileUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     FileUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -176,8 +178,7 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         return this;
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getFileUpdate();
         if (body.hasFileID()) {
             fileId = FileId.fromProtobuf(body.getFileID());

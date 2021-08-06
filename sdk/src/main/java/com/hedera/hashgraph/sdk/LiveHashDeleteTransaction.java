@@ -27,6 +27,7 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
 
     LiveHashDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -75,8 +76,7 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
         return setHash(hash.toByteArray());
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getCryptoDeleteLiveHash();
         if (body.hasAccountOfLiveHash()) {
             accountId = AccountId.fromProtobuf(body.getAccountOfLiveHash());

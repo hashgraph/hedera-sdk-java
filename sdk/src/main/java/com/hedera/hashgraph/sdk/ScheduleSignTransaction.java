@@ -23,6 +23,7 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
 
     ScheduleSignTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -52,8 +53,7 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
         return builder;
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getScheduleSign();
         if (body.hasScheduleID()) {
             scheduleId = ScheduleId.fromProtobuf(body.getScheduleID());

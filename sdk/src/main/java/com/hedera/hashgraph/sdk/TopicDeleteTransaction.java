@@ -29,10 +29,12 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
 
     TopicDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     TopicDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -53,8 +55,7 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
         return this;
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getConsensusDeleteTopic();
         if (body.hasTopicID()) {
             topicId = TopicId.fromProtobuf(body.getTopicID());

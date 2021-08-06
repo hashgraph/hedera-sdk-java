@@ -43,10 +43,12 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
 
     TopicUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     TopicUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -215,8 +217,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         return this;
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getConsensusUpdateTopic();
         if (body.hasTopicID()) {
             topicId = TopicId.fromProtobuf(body.getTopicID());

@@ -62,20 +62,18 @@ public abstract class Transaction<T extends Transaction<T>>
     private List<PublicKey> publicKeys = new ArrayList<>();
     private List<Function<byte[], byte[]>> signers = new ArrayList<>();
 
-    // TODO: setters and getters for these
+    protected TransactionBody txBody;
+
     @Nullable
     private Duration transactionValidDuration;
     private Hbar maxTransactionFee;
-    @Nullable
-    private String memo;
+    private String memo = "";
 
     Transaction() {
         setTransactionValidDuration(DEFAULT_TRANSACTION_VALID_DURATION);
 
         // Default transaction fee is 2 Hbar
         setMaxTransactionFee(new Hbar(2));
-
-        memo = null;
     }
 
     // This constructor is used to construct from a scheduled transaction body
@@ -84,7 +82,7 @@ public abstract class Transaction<T extends Transaction<T>>
         setMaxTransactionFee(Hbar.fromTinybars(txBody.getTransactionFee()));
         setTransactionMemo(txBody.getMemo());
 
-        initFromTransactionBody(txBody);
+        this.txBody = txBody;
     }
 
     // This constructor is used to construct via fromBytes
@@ -128,7 +126,7 @@ public abstract class Transaction<T extends Transaction<T>>
         setMaxTransactionFee(Hbar.fromTinybars(txBody.getTransactionFee()));
         setTransactionMemo(txBody.getMemo());
 
-        initFromTransactionBody(txBody);
+        this.txBody = txBody;
     }
 
     public static Transaction<?> fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -883,8 +881,6 @@ public abstract class Transaction<T extends Transaction<T>>
      * Called in {@link #schedule()} when convertin transaction into a scheduled version.
      */
     abstract void onScheduled(SchedulableTransactionBody.Builder scheduled);
-
-    abstract void initFromTransactionBody(TransactionBody txBody);
 
     @Override
     final com.hedera.hashgraph.sdk.proto.Transaction makeRequest() {

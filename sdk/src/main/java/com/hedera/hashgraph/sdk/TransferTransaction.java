@@ -29,10 +29,12 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
     TransferTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     TransferTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     public Map<TokenId, Map<AccountId, Long>> getTokenTransfers() {
@@ -162,6 +164,8 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     }
 
     private static void doAddTokenTransfer(Map<AccountId, Long> tokenTransferMap, AccountId accountId, long amount) {
+        Objects.requireNonNull(tokenTransferMap);
+        Objects.requireNonNull(accountId);
         var current = tokenTransferMap.containsKey(accountId) ?
             Objects.requireNonNull(tokenTransferMap.get(accountId)) :
             0L;
@@ -169,6 +173,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     }
 
     private void doAddHbarTransfer(AccountId accountId, long amount) {
+        Objects.requireNonNull(accountId);
         var current = hbarTransfers.containsKey(accountId) ?
             Objects.requireNonNull(hbarTransfers.get(accountId)).toTinybars() :
             0L;
@@ -176,8 +181,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         hbarTransfers.put(accountId, Hbar.fromTinybars(current + amount));
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getCryptoTransfer();
         if(body.hasTransfers()) {
             for (var transfer : body.getTransfers().getAccountAmountsList()) {

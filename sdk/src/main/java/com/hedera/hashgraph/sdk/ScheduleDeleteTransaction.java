@@ -23,10 +23,12 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
 
     ScheduleDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     ScheduleDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -41,8 +43,7 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
         return this;
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getScheduleDelete();
         if (body.hasScheduleID()) {
             scheduleId = ScheduleId.fromProtobuf(body.getScheduleID());

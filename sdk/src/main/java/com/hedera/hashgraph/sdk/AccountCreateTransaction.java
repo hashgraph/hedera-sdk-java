@@ -33,13 +33,12 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
 
     AccountCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        // TODO: this belongs in init
-
+        initFromTransactionBody();
     }
 
     AccountCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -176,8 +175,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         }
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getCryptoCreateAccount();
 
         if (body.hasProxyAccountID()) {

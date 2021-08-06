@@ -54,10 +54,12 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
 
     AccountUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     AccountUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -209,8 +211,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         }
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getCryptoUpdateAccount();
 
         if (body.hasAccountIDToUpdate()) {

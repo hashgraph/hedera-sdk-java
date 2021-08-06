@@ -35,10 +35,12 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
 
     ContractExecuteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     ContractExecuteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -137,8 +139,7 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
         return setFunctionParameters(params.toBytes(name));
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getContractCall();
         if(body.hasContractID()) {
             contractId = ContractId.fromProtobuf(body.getContractID());

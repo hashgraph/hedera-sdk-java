@@ -29,10 +29,12 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
 
     ContractDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     ContractDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -114,8 +116,7 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
         return SmartContractServiceGrpc.getDeleteContractMethod();
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getContractDeleteInstance();
         if(body.hasContractID()) {
             contractId = ContractId.fromProtobuf(body.getContractID());

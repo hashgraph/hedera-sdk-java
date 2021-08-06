@@ -25,10 +25,12 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
 
     TokenAssociateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     TokenAssociateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -69,8 +71,7 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
         return builder;
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getTokenAssociate();
         if (body.hasAccount()) {
             accountId = AccountId.fromProtobuf(body.getAccount());

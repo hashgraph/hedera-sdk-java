@@ -27,10 +27,12 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
 
     TokenMintTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+        initFromTransactionBody();
     }
 
     TokenMintTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -72,8 +74,7 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         return metadataList;
     }
 
-    @Override
-    void initFromTransactionBody(TransactionBody txBody) {
+    void initFromTransactionBody() {
         var body = txBody.getTokenMint();
         if (body.hasToken()) {
             tokenId = TokenId.fromProtobuf(body.getToken());
