@@ -36,8 +36,17 @@ public abstract class Transaction<T extends Transaction<T>>
     // Default transaction duration
     private static final Duration DEFAULT_TRANSACTION_VALID_DURATION = Duration.ofSeconds(120);
 
+    // The builder that gets re-used to build each transaction.
+    // freeze() will create the frozenBodyBuilder.
+    // The presence of frozenBodyBuilder indicates that this transaction is frozen.
     @Nullable
     protected TransactionBody.Builder frozenBodyBuilder = null;
+    
+    // Transaction constructors end their work by setting txBody.
+    // The expectation is that the Transaction subclass constructor
+    // will pick up where the Transaction superclass constructor left off,
+    // and will unpack the data in the transaction body.
+    protected TransactionBody txBody;
 
     // A SDK [Transaction] is composed of multiple, raw protobuf transactions. These should be
     // functionally identical, with the exception of pointing to different nodes. When retrying a
@@ -62,9 +71,6 @@ public abstract class Transaction<T extends Transaction<T>>
     private List<PublicKey> publicKeys = new ArrayList<>();
     private List<Function<byte[], byte[]>> signers = new ArrayList<>();
 
-    protected TransactionBody txBody;
-
-    @Nullable
     private Duration transactionValidDuration;
     private Hbar maxTransactionFee;
     private String memo = "";
@@ -120,14 +126,16 @@ public abstract class Transaction<T extends Transaction<T>>
 
         nodeAccountIds.remove(new AccountId(0));
 
-        TransactionBody txBody = TransactionBody.parseFrom(signedTransactions.get(0).getBodyBytes());
+        txBody = TransactionBody.parseFrom(signedTransactions.get(0).getBodyBytes());
 
         setTransactionValidDuration(DurationConverter.fromProtobuf(txBody.getTransactionValidDuration()));
         setMaxTransactionFee(Hbar.fromTinybars(txBody.getTransactionFee()));
         setTransactionMemo(txBody.getMemo());
 
+        // This constructor is used in fromBytes(), which means we're reconstructing
+        // a transaction that was frozen and then serialized via toBytes(),
+        // so this transaction should be constructed as frozen.
         frozenBodyBuilder = txBody.toBuilder();
-        this.txBody = txBody;
     }
 
     public static Transaction<?> fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
