@@ -160,6 +160,7 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
         if (fileId != null) {
             builder.setFileID(fileId.toProtobuf());
         }
+        builder.setContents(data);
 
         return builder;
     }

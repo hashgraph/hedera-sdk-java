@@ -179,7 +179,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         }
 
         onFreezeChunk(
-            frozenBodyBuilder,
+            spawnBodyBuilder(),
             null,
             0,
             data.size(),

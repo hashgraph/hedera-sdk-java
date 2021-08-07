@@ -14,6 +14,7 @@ import java8.util.function.Consumer;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -171,6 +172,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
             .thenAccept((paymentAmount) -> {
                 chosenQueryPayment = paymentAmount;
                 paymentOperator = operator;
+                paymentTransactions = new ArrayList<>(nodeAccountIds.size());
                 for(int i = 0; i < nodeAccountIds.size(); i++) {
                     paymentTransactions.add(null);
                 }

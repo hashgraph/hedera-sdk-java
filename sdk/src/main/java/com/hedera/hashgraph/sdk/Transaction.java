@@ -126,6 +126,7 @@ public abstract class Transaction<T extends Transaction<T>>
         setMaxTransactionFee(Hbar.fromTinybars(txBody.getTransactionFee()));
         setTransactionMemo(txBody.getMemo());
 
+        frozenBodyBuilder = txBody.toBuilder();
         this.txBody = txBody;
     }
 
@@ -717,7 +718,7 @@ public abstract class Transaction<T extends Transaction<T>>
         }
     }
 
-    private TransactionBody.Builder spawnBodyBuilder() {
+    protected TransactionBody.Builder spawnBodyBuilder() {
         return TransactionBody.newBuilder()
             .setTransactionFee(maxTransactionFee.toTinybars())
             .setTransactionValidDuration(DurationConverter.toProtobuf(transactionValidDuration).toBuilder())
@@ -760,7 +761,8 @@ public abstract class Transaction<T extends Transaction<T>>
 
                 if (operator != null) {
                     // Set a default transaction ID, generated from the operator account ID
-                    setTransactionId(TransactionId.generate(operator.accountId));
+
+                    transactionIds = Collections.singletonList(TransactionId.generate(operator.accountId));
                 } else {
                     // no client means there must be an explicitly set node ID and transaction ID
                     throw new IllegalStateException(

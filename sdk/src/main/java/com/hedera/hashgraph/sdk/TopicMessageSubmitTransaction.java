@@ -94,6 +94,7 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
         if (topicId != null) {
             builder.setTopicID(topicId.toProtobuf());
         }
+        builder.setMessage(data);
 
         return builder;
     }

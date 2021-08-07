@@ -55,6 +55,18 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     @Nullable
+    public TokenId getTokenId() {
+        return tokenId;
+    }
+
+    public TokenUpdateTransaction setTokenId(TokenId tokenId) {
+        requireNotFrozen();
+        Objects.requireNonNull(tokenId);
+        this.tokenId = tokenId;
+        return this;
+    }
+
+    @Nullable
     public String getTokenName() {
         return tokenName;
     }
