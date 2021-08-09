@@ -41,7 +41,7 @@ public abstract class Transaction<T extends Transaction<T>>
     // The presence of frozenBodyBuilder indicates that this transaction is frozen.
     @Nullable
     protected TransactionBody.Builder frozenBodyBuilder = null;
-    
+
     // Transaction constructors end their work by setting txBody.
     // The expectation is that the Transaction subclass constructor
     // will pick up where the Transaction superclass constructor left off,
@@ -52,9 +52,9 @@ public abstract class Transaction<T extends Transaction<T>>
     // functionally identical, with the exception of pointing to different nodes. When retrying a
     // transaction after a network error or retry-able status response, we try a
     // different transaction and thus a different node.
-    protected List<com.hedera.hashgraph.sdk.proto.Transaction> transactions = Collections.emptyList();
-    protected List<com.hedera.hashgraph.sdk.proto.SignedTransaction.Builder> signedTransactions = Collections.emptyList();
-    protected List<SignatureMap.Builder> signatures = Collections.emptyList();
+    protected List<com.hedera.hashgraph.sdk.proto.Transaction> outerTransactions = Collections.emptyList();
+    protected List<com.hedera.hashgraph.sdk.proto.SignedTransaction.Builder> innerSignedTransactions = Collections.emptyList();
+    protected List<SignatureMap.Builder> sigPairListBuilders = Collections.emptyList();
     protected List<TransactionId> transactionIds = Collections.emptyList();
     // For SDK Transactions that require multiple protobuf transaction ID's this variable keeps track of the current
     // execution group.
@@ -68,6 +68,10 @@ public abstract class Transaction<T extends Transaction<T>>
     // ]
     int nextTransactionIndex = 0;
 
+    // publicKeys and signers are parallel arrays.
+    // If the signer associated with a public key is null, that means that the private key
+    // associated with that public key has already contributed a signature to sigPairListBuilders, but
+    // the signer is not available (likely because this came from fromBytes())
     private List<PublicKey> publicKeys = new ArrayList<>();
     private List<Function<byte[], byte[]>> signers = new ArrayList<>();
 
@@ -97,9 +101,9 @@ public abstract class Transaction<T extends Transaction<T>>
         var nodeCount = txs.values().iterator().next().size();
 
         nodeAccountIds = new ArrayList<>(nodeCount);
-        signatures = new ArrayList<>(nodeCount * txCount);
-        transactions = new ArrayList<>(nodeCount * txCount);
-        signedTransactions = new ArrayList<>(nodeCount * txCount);
+        sigPairListBuilders = new ArrayList<>(nodeCount * txCount);
+        outerTransactions = new ArrayList<>(nodeCount * txCount);
+        innerSignedTransactions = new ArrayList<>(nodeCount * txCount);
         transactionIds = new ArrayList<>(txCount);
 
         for (var transactionEntry : txs.entrySet()) {
@@ -111,9 +115,9 @@ public abstract class Transaction<T extends Transaction<T>>
                 }
 
                 var transaction = SignedTransaction.parseFrom(nodeEntry.getValue().getSignedTransactionBytes());
-                transactions.add(nodeEntry.getValue());
-                signatures.add(transaction.getSigMap().toBuilder());
-                signedTransactions.add(transaction.toBuilder());
+                outerTransactions.add(nodeEntry.getValue());
+                sigPairListBuilders.add(transaction.getSigMap().toBuilder());
+                innerSignedTransactions.add(transaction.toBuilder());
 
                 if (publicKeys.isEmpty()) {
                     for (var sigPair : transaction.getSigMap().getSigPairList()) {
@@ -126,7 +130,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
         nodeAccountIds.remove(new AccountId(0));
 
-        txBody = TransactionBody.parseFrom(signedTransactions.get(0).getBodyBytes());
+        txBody = TransactionBody.parseFrom(innerSignedTransactions.get(0).getBodyBytes());
 
         setTransactionValidDuration(DurationConverter.fromProtobuf(txBody.getTransactionValidDuration()));
         setMaxTransactionFee(Hbar.fromTinybars(txBody.getTransactionFee()));
@@ -540,7 +544,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
         var list = TransactionList.newBuilder();
 
-        for (var transaction : transactions) {
+        for (var transaction : outerTransactions) {
             list.addTransactionList(transaction);
         }
 
@@ -556,7 +560,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
         buildTransaction(index);
 
-        return hash(transactions.get(index).getSignedTransactionBytes().toByteArray());
+        return hash(outerTransactions.get(index).getSignedTransactionBytes().toByteArray());
     }
 
     public Map<AccountId, byte[]> getTransactionHashPerNode() {
@@ -568,8 +572,8 @@ public abstract class Transaction<T extends Transaction<T>>
 
         var hashes = new HashMap<AccountId, byte[]>();
 
-        for (var i = 0; i < transactions.size(); i++) {
-            hashes.put(nodeAccountIds.get(i), hash(transactions.get(i).getSignedTransactionBytes().toByteArray()));
+        for (var i = 0; i < outerTransactions.size(); i++) {
+            hashes.put(nodeAccountIds.get(i), hash(outerTransactions.get(i).getSignedTransactionBytes().toByteArray()));
         }
 
         return hashes;
@@ -620,8 +624,8 @@ public abstract class Transaction<T extends Transaction<T>>
             return (T) this;
         }
 
-        for(int i = 0; i < transactions.size(); i++) {
-            transactions.set(i, null);
+        for(int i = 0; i < outerTransactions.size(); i++) {
+            outerTransactions.set(i, null);
         }
         publicKeys.add(publicKey);
         signers.add(transactionSigner);
@@ -672,12 +676,12 @@ public abstract class Transaction<T extends Transaction<T>>
             return (T) this;
         }
 
-        for(int i = 0; i < transactions.size(); i++) {
-            transactions.set(i, null);
+        for(int i = 0; i < outerTransactions.size(); i++) {
+            outerTransactions.set(i, null);
         }
         publicKeys.add(publicKey);
         signers.add(null);
-        signatures.get(0).addSigPair(publicKey.toSignaturePairProtobuf(signature));
+        sigPairListBuilders.get(0).addSigPair(publicKey.toSignaturePairProtobuf(signature));
 
         // noinspection unchecked
         return (T) this;
@@ -686,12 +690,12 @@ public abstract class Transaction<T extends Transaction<T>>
     public Map<AccountId, Map<PublicKey, byte[]>> getSignatures() {
         var map = new HashMap<AccountId, Map<PublicKey, byte[]>>(nodeAccountIds.size());
 
-        if (signatures.size() == 0) {
+        if (sigPairListBuilders.size() == 0) {
             return map;
         }
 
         for (int i = 0; i < nodeAccountIds.size(); i++) {
-            var sigMap = signatures.get(i);
+            var sigMap = sigPairListBuilders.get(i);
             var nodeAccountId = nodeAccountIds.get(i);
 
             var keyMap = map.containsKey(nodeAccountId) ?
@@ -759,9 +763,6 @@ public abstract class Transaction<T extends Transaction<T>>
         }
 
         frozenBodyBuilder = spawnBodyBuilder();
-        if (client != null && frozenBodyBuilder.getTransactionFee() == 0) {
-            frozenBodyBuilder.setTransactionFee(client.maxTransactionFee.toTinybars());
-        }
 
         if (transactionIds.isEmpty()) {
             if(client != null) {
@@ -798,19 +799,19 @@ public abstract class Transaction<T extends Transaction<T>>
             }
         }
 
-        transactions = new ArrayList<>(nodeAccountIds.size());
-        signatures = new ArrayList<>(nodeAccountIds.size());
-        signedTransactions = new ArrayList<>(nodeAccountIds.size());
+        outerTransactions = new ArrayList<>(nodeAccountIds.size());
+        sigPairListBuilders = new ArrayList<>(nodeAccountIds.size());
+        innerSignedTransactions = new ArrayList<>(nodeAccountIds.size());
 
         for (AccountId nodeId : nodeAccountIds) {
-            signatures.add(SignatureMap.newBuilder());
-            signedTransactions.add(com.hedera.hashgraph.sdk.proto.SignedTransaction.newBuilder()
+            sigPairListBuilders.add(SignatureMap.newBuilder());
+            innerSignedTransactions.add(com.hedera.hashgraph.sdk.proto.SignedTransaction.newBuilder()
                 .setBodyBytes(frozenBodyBuilder
                     .setNodeAccountID(nodeId.toProtobuf())
                     .build()
                     .toByteString()
                 ));
-            transactions.add(null);
+            outerTransactions.add(null);
         }
 
         // noinspection unchecked
@@ -818,28 +819,31 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     void buildAllTransactions() {
-        for (var i = 0; i < signedTransactions.size(); ++i) {
+        for (var i = 0; i < innerSignedTransactions.size(); ++i) {
             buildTransaction(i);
         }
     }
 
     /**
-     * Will build the specific transaction at {@code index} and will fill with `null` for any empty indices before it
+     * Will build the specific transaction at {@code index}
+     * This function is only ever called after the transaction is frozen.
      */
     void buildTransaction(int index) {
+        // Check if transaction is already built.
+        // Every time a signer is added via sign() or signWith, all outerTransactions are nullified.
         if (
-                transactions.get(index) != null &&
-                !transactions.get(index).getSignedTransactionBytes().isEmpty()
+                outerTransactions.get(index) != null &&
+                !outerTransactions.get(index).getSignedTransactionBytes().isEmpty()
         ) {
             return;
         }
 
         signTransaction(index);
 
-        transactions.set(index, com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
+        outerTransactions.set(index, com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
             .setSignedTransactionBytes(
-                signedTransactions.get(index)
-                    .setSigMap(signatures.get(index))
+                innerSignedTransactions.get(index)
+                    .setSigMap(sigPairListBuilders.get(index))
                     .build()
                     .toByteString()
             ).build());
@@ -847,37 +851,27 @@ public abstract class Transaction<T extends Transaction<T>>
 
     /**
      * Will sign the specific transaction at {@code index}
+     * This function is only ever called after the transaction is frozen.
      */
     void signTransaction(int index) {
-        if (signatures.get(index).getSigPairCount() != 0) {
-            for (var i = 0; i < publicKeys.size(); i++) {
-                var publicKey = publicKeys.get(i);
-                var signer = signers.get(i);
-
-                if (signer != null) {
-                    for(var pair : signatures.get(index).getSigPairList()) {
-                        if(pair.getPubKeyPrefix().equals(ByteString.copyFrom(publicKey.toBytes()))) {
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-
-        var bodyBytes = signedTransactions.get(index).getBodyBytes().toByteArray();
+        var bodyBytes = innerSignedTransactions.get(index).getBodyBytes().toByteArray();
 
         for (var i = 0; i < publicKeys.size(); i++) {
             if (signers.get(i) == null) {
                 continue;
             }
+            for(var pair : sigPairListBuilders.get(index).getSigPairList()) {
+                if(pair.getPubKeyPrefix().equals(ByteString.copyFrom(publicKeys.get(i).toBytes()))) {
+                    continue;
+                }
+            }
 
             var signatureBytes = signers.get(i).apply(bodyBytes);
 
-            signatures
+            sigPairListBuilders
                 .get(index)
                 .addSigPair(publicKeys.get(i).toSignaturePairProtobuf(signatureBytes));
         }
-
     }
 
     /**
@@ -898,7 +892,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
         buildTransaction(index);
 
-        return transactions.get(index);
+        return outerTransactions.get(index);
     }
 
     @Override

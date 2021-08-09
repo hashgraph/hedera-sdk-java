@@ -84,7 +84,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
 
     @Override
     public byte[] getTransactionHash() {
-        if (transactions.size() > nodeAccountIds.size()) {
+        if (outerTransactions.size() > nodeAccountIds.size()) {
             throw new IllegalStateException("a single transaction hash can not be calculated for a chunked transaction, try calling `getAllTransactionHashesPerNode`");
         }
 
@@ -93,7 +93,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
 
     @Override
     public Map<AccountId, byte[]> getTransactionHashPerNode() {
-        if (transactions.size() > nodeAccountIds.size()) {
+        if (outerTransactions.size() > nodeAccountIds.size()) {
             throw new IllegalStateException("a single transaction hash can not be calculated for a chunked transaction, try calling `getAllTransactionHashesPerNode`");
         }
 
@@ -105,20 +105,30 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
-        var size = signedTransactions.size() / nodeAccountIds.size();
-        var transactionHashes = new ArrayList<Map<AccountId, byte[]>>(transactions.size() / nodeAccountIds.size());
+        buildAllTransactions();
+
+        var size = innerSignedTransactions.size() / nodeAccountIds.size();
+        var transactionHashes = new ArrayList<Map<AccountId, byte[]>>(outerTransactions.size() / nodeAccountIds.size());
 
         for (var group = 0; group < size; ++group) {
             var hashes = new HashMap<AccountId, byte[]>();
 
             for (var i = group * size; i < (group + 1) * size; ++i) {
-                hashes.put(nodeAccountIds.get(group), hash(transactions.get(i).getSignedTransactionBytes().toByteArray()));
+                hashes.put(nodeAccountIds.get(group), hash(outerTransactions.get(i).getSignedTransactionBytes().toByteArray()));
             }
 
             transactionHashes.add(hashes);
         }
 
         return transactionHashes;
+    }
+
+    @Override
+    public T addSignature(PublicKey publicKey, byte[] signature) {
+        if (data.size() > CHUNK_SIZE) {
+            throw new IllegalStateException("Cannot manually add signature to chunked transaction with length greater than " + CHUNK_SIZE);
+        }
+        return super.addSignature(publicKey, signature);
     }
 
     @Override
@@ -175,7 +185,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         requireNotFrozen();
 
         if (data.size() > CHUNK_SIZE) {
-            throw new IllegalStateException("Cannot schedule a topic message with length greater than " + CHUNK_SIZE);
+            throw new IllegalStateException("Cannot schedule a chunked transaction with length greater than " + CHUNK_SIZE);
         }
 
         onFreezeChunk(
@@ -207,9 +217,9 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
                     + " chunks but the maximum allowed chunks is " + maxChunks + ", try using setMaxChunks");
         }
 
-        signatures = new ArrayList<>(requiredChunks * nodeAccountIds.size());
-        transactions = new ArrayList<>(requiredChunks * nodeAccountIds.size());
-        signedTransactions = new ArrayList<>(requiredChunks * nodeAccountIds.size());
+        sigPairListBuilders = new ArrayList<>(requiredChunks * nodeAccountIds.size());
+        outerTransactions = new ArrayList<>(requiredChunks * nodeAccountIds.size());
+        innerSignedTransactions = new ArrayList<>(requiredChunks * nodeAccountIds.size());
         transactionIds = new ArrayList<>(requiredChunks);
 
         var nextTransactionId = initialTransactionId.toBuilder();
@@ -235,8 +245,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
 
             // For each node we add a transaction with that node
             for (var nodeId : nodeAccountIds) {
-                signatures.add(SignatureMap.newBuilder());
-                signedTransactions.add(SignedTransaction.newBuilder()
+                sigPairListBuilders.add(SignatureMap.newBuilder());
+                innerSignedTransactions.add(SignedTransaction.newBuilder()
                     .setBodyBytes(
                         frozenBodyBuilder
                             .setNodeAccountID(nodeId.toProtobuf())
@@ -244,7 +254,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
                             .toByteString()
                     )
                 );
-                transactions.add(null);
+                outerTransactions.add(null);
             }
 
             // add 1 ns to the validStart to make cascading transaction IDs

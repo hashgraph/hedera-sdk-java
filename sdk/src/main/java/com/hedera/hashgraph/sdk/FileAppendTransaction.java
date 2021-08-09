@@ -144,9 +144,9 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
         }
 
         try {
-            for (var i = 0; i < signedTransactions.size(); i += nodeAccountIds.isEmpty() ? 1 : nodeAccountIds.size()) {
+            for (var i = 0; i < innerSignedTransactions.size(); i += nodeAccountIds.isEmpty() ? 1 : nodeAccountIds.size()) {
                 data = data.concat(
-                    TransactionBody.parseFrom(signedTransactions.get(i).getBodyBytes())
+                    TransactionBody.parseFrom(innerSignedTransactions.get(i).getBodyBytes())
                         .getFileAppend().getContents()
                 );
             }
