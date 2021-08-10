@@ -429,19 +429,7 @@ public abstract class Transaction<T extends Transaction<T>>
         return hash;
     }
 
-    public ScheduleCreateTransaction schedule() {
-        requireNotFrozen();
-
-        if (!nodeAccountIds.isEmpty()) {
-            throw new IllegalStateException(
-                "The underlying transaction for a scheduled transaction cannot have node account IDs set"
-            );
-        }
-
-        TransactionBody.Builder bodyBuilder = spawnBodyBuilder();
-
-        onFreeze(bodyBuilder);
-
+    protected ScheduleCreateTransaction doSchedule(TransactionBody.Builder bodyBuilder) {
         var schedulable = SchedulableTransactionBody.newBuilder()
             .setTransactionFee(bodyBuilder.getTransactionFee())
             .setMemo(bodyBuilder.getMemo());
@@ -456,6 +444,21 @@ public abstract class Transaction<T extends Transaction<T>>
         }
 
         return scheduled;
+    }
+
+    public ScheduleCreateTransaction schedule() {
+        requireNotFrozen();
+        if (!nodeAccountIds.isEmpty()) {
+            throw new IllegalStateException(
+                "The underlying transaction for a scheduled transaction cannot have node account IDs set"
+            );
+        }
+
+        var bodyBuilder = spawnBodyBuilder();
+
+        onFreeze(bodyBuilder);
+
+        return doSchedule(bodyBuilder);
     }
 
     /**

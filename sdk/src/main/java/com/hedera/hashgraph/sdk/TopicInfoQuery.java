@@ -16,13 +16,10 @@ import java.util.Objects;
  * This method is unrestricted and allowed on any topic by any payer account.
  */
 public final class TopicInfoQuery extends Query<TopicInfo, TopicInfoQuery> {
-    private final ConsensusGetTopicInfoQuery.Builder builder;
-
     @Nullable
     TopicId topicId = null;
 
     public TopicInfoQuery() {
-        builder = ConsensusGetTopicInfoQuery.newBuilder();
     }
 
     @Nullable
@@ -51,6 +48,7 @@ public final class TopicInfoQuery extends Query<TopicInfo, TopicInfoQuery> {
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        var builder = ConsensusGetTopicInfoQuery.newBuilder();
         if (topicId != null) {
             builder.setTopicID(topicId.toProtobuf());
         }

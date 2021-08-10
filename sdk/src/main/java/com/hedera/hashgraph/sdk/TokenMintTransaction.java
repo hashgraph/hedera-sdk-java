@@ -11,6 +11,7 @@ import io.grpc.MethodDescriptor;
 import com.google.protobuf.ByteString;
 
 import java.util.LinkedHashMap;
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         return amount;
     }
 
-    public TokenMintTransaction setAmount(long amount) {
+    public TokenMintTransaction setAmount(@Nonnegative long amount) {
         requireNotFrozen();
         this.amount = amount;
         return this;
@@ -66,12 +67,12 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
 
     public TokenMintTransaction setMetadata(List<byte[]> metadataList) {
         requireNotFrozen();
-        this.metadataList = metadataList;
+        this.metadataList = new ArrayList<>(metadataList);
         return this;
     }
 
     public List<byte[]> getMetadata() {
-        return metadataList;
+        return new ArrayList<>(metadataList);
     }
 
     void initFromTransactionBody() {

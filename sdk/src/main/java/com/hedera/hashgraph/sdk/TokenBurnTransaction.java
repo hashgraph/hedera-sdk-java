@@ -11,6 +11,7 @@ import io.grpc.MethodDescriptor;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.List;
@@ -50,17 +51,17 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         return amount;
     }
 
-    public TokenBurnTransaction setAmount(long amount) {
+    public TokenBurnTransaction setAmount(@Nonnegative long amount) {
         requireNotFrozen();
         this.amount = amount;
         return this;
     }
 
     public List<Long> getSerials() {
-        return serials;
+        return new ArrayList<>(serials);
     }
 
-    public TokenBurnTransaction addSerial(long serial) {
+    public TokenBurnTransaction addSerial(@Nonnegative long serial) {
         requireNotFrozen();
         serials.add(serial);
         return this;
@@ -69,7 +70,7 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     public TokenBurnTransaction setSerials(List<Long> serials) {
         requireNotFrozen();
         Objects.requireNonNull(serials);
-        this.serials = serials;
+        this.serials = new ArrayList<>(serials);
         return this;
     }
 

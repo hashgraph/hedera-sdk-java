@@ -183,13 +183,21 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
     @Override
     public ScheduleCreateTransaction schedule() {
         requireNotFrozen();
-
+        if (!nodeAccountIds.isEmpty()) {
+            throw new IllegalStateException(
+                "The underlying transaction for a scheduled transaction cannot have node account IDs set"
+            );
+        }
         if (data.size() > CHUNK_SIZE) {
             throw new IllegalStateException("Cannot schedule a chunked transaction with length greater than " + CHUNK_SIZE);
         }
 
+        var bodyBuilder = spawnBodyBuilder();
+
+        onFreeze(bodyBuilder);
+
         onFreezeChunk(
-            spawnBodyBuilder(),
+            bodyBuilder,
             null,
             0,
             data.size(),
@@ -197,7 +205,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
             1
         );
 
-        return super.schedule();
+        return doSchedule(bodyBuilder);
     }
 
     @Override

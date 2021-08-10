@@ -46,12 +46,12 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
     }
 
     public List<TokenId> getTokenIds() {
-        return tokenIds;
+        return new ArrayList<>(tokenIds);
     }
 
     public TokenDissociateTransaction setTokenIds(List<TokenId> tokens) {
         requireNotFrozen();
-        this.tokenIds = tokens;
+        this.tokenIds = new ArrayList<>(tokens);
         return this;
     }
 

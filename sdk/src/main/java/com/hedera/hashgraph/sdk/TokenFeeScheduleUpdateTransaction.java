@@ -51,7 +51,7 @@ public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeSched
     public TokenFeeScheduleUpdateTransaction setCustomFees(List<CustomFee> customFees) {
         Objects.requireNonNull(customFees);
         requireNotFrozen();
-        this.customFees = customFees;
+        this.customFees = CustomFee.deepCloneList(customFees);
         return this;
     }
 

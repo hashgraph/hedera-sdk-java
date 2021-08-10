@@ -7,6 +7,7 @@ import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Objects;
@@ -87,7 +88,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return decimals;
     }
 
-    public TokenCreateTransaction setDecimals(int decimals) {
+    public TokenCreateTransaction setDecimals(@Nonnegative int decimals) {
         requireNotFrozen();
         this.decimals = decimals;
         return this;
@@ -97,7 +98,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return initialSupply;
     }
 
-    public TokenCreateTransaction setInitialSupply(long initialSupply) {
+    public TokenCreateTransaction setInitialSupply(@Nonnegative long initialSupply) {
         requireNotFrozen();
         this.initialSupply = initialSupply;
         return this;
@@ -245,7 +246,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
 
     public TokenCreateTransaction setCustomFees(List<CustomFee> customFees) {
         requireNotFrozen();
-        this.customFees = customFees;
+        this.customFees = CustomFee.deepCloneList(customFees);
         return this;
     }
 
@@ -280,7 +281,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return maxSupply;
     }
 
-    public TokenCreateTransaction setMaxSupply(long maxSupply) {
+    public TokenCreateTransaction setMaxSupply(@Nonnegative long maxSupply) {
         requireNotFrozen();
         this.maxSupply = maxSupply;
         return this;

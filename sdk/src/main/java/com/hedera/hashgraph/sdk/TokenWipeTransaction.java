@@ -10,6 +10,7 @@ import io.grpc.MethodDescriptor;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.List;
@@ -20,7 +21,7 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     @Nullable
     private AccountId accountId = null;
     private long amount = 0;
-    private List<Long> serialList = new ArrayList<>();
+    private List<Long> serials = new ArrayList<>();
 
     public TokenWipeTransaction() {
     }
@@ -63,26 +64,26 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         return amount;
     }
 
-    public TokenWipeTransaction setAmount(long amount) {
+    public TokenWipeTransaction setAmount(@Nonnegative long amount) {
         requireNotFrozen();
         this.amount = amount;
         return this;
     }
 
     public List<Long> getSerials() {
-        return serialList;
+        return serials;
     }
 
-    public TokenWipeTransaction addSerial(long serial) {
+    public TokenWipeTransaction addSerial(@Nonnegative long serial) {
         requireNotFrozen();
-        serialList.add(serial);
+        serials.add(serial);
         return this;
     }
 
-    public TokenWipeTransaction setSerials(List<Long> serialList) {
+    public TokenWipeTransaction setSerials(List<Long> serials) {
         requireNotFrozen();
-        Objects.requireNonNull(serialList);
-        this.serialList = serialList;
+        Objects.requireNonNull(serials);
+        this.serials = serials;
         return this;
     }
 
@@ -96,7 +97,7 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
             accountId = AccountId.fromProtobuf(body.getAccount());
         }
         amount = body.getAmount();
-        serialList = body.getSerialNumbersList();
+        serials = body.getSerialNumbersList();
     }
 
     TokenWipeAccountTransactionBody.Builder build() {
@@ -109,7 +110,7 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
             builder.setAccount(accountId.toProtobuf());
         }
         builder.setAmount(amount);
-        for(var serial : serialList) {
+        for(var serial : serials) {
             builder.addSerialNumbers(serial);
         }
 

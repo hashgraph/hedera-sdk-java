@@ -46,13 +46,13 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
     }
 
     public List<TokenId> getTokenIds() {
-        return tokenIds;
+        return new ArrayList<>(tokenIds);
     }
 
     public TokenAssociateTransaction setTokenIds(List<TokenId> tokens) {
         Objects.requireNonNull(tokens);
         requireNotFrozen();
-        this.tokenIds = tokens;
+        this.tokenIds = new ArrayList<>(tokens);
         return this;
     }
 
