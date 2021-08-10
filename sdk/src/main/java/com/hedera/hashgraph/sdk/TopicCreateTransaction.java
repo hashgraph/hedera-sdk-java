@@ -159,7 +159,7 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getConsensusCreateTopic();
+        var body = sourceTransactionBody.getConsensusCreateTopic();
         if (body.hasAutoRenewAccount()) {
             autoRenewAccountId = AccountId.fromProtobuf(body.getAutoRenewAccount());
         }

@@ -218,7 +218,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getConsensusUpdateTopic();
+        var body = sourceTransactionBody.getConsensusUpdateTopic();
         if (body.hasTopicID()) {
             topicId = TopicId.fromProtobuf(body.getTopicID());
         }

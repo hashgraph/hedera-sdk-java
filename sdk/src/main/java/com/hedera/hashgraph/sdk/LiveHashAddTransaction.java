@@ -122,7 +122,7 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getCryptoAddLiveHash();
+        var body = sourceTransactionBody.getCryptoAddLiveHash();
         var hashBody = body.getLiveHash();
 
         if (hashBody.hasAccountId()) {

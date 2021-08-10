@@ -165,7 +165,7 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getFileCreate();
+        var body = sourceTransactionBody.getFileCreate();
         if(body.hasExpirationTime()) {
             expirationTime = InstantConverter.fromProtobuf(body.getExpirationTime());
         }

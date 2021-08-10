@@ -211,7 +211,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getContractUpdateInstance();
+        var body = sourceTransactionBody.getContractUpdateInstance();
         if (body.hasContractID()) {
             contractId = ContractId.fromProtobuf(body.getContractID());
         }

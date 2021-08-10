@@ -6,7 +6,6 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.TimestampSeconds;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
@@ -125,7 +124,7 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getSystemDelete();
+        var body = sourceTransactionBody.getSystemDelete();
         if(body.hasFileID()) {
             fileId = FileId.fromProtobuf(body.getFileID());
         }

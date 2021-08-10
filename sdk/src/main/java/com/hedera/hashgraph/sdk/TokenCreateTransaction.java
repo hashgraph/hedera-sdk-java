@@ -352,7 +352,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getTokenCreation();
+        var body = sourceTransactionBody.getTokenCreation();
         if (body.hasTreasury()) {
             treasuryAccountId = AccountId.fromProtobuf(body.getTreasury());
         }

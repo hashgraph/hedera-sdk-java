@@ -56,7 +56,7 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getTokenDissociate();
+        var body = sourceTransactionBody.getTokenDissociate();
         if (body.hasAccount()) {
             accountId = AccountId.fromProtobuf(body.getAccount());
         }

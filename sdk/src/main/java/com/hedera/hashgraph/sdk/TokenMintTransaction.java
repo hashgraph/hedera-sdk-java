@@ -76,7 +76,7 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getTokenMint();
+        var body = sourceTransactionBody.getTokenMint();
         if (body.hasToken()) {
             tokenId = TokenId.fromProtobuf(body.getToken());
         }

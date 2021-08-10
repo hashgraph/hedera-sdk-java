@@ -36,17 +36,17 @@ public abstract class Transaction<T extends Transaction<T>>
     // Default transaction duration
     private static final Duration DEFAULT_TRANSACTION_VALID_DURATION = Duration.ofSeconds(120);
 
-    // The builder that gets re-used to build each transaction.
-    // freeze() will create the frozenBodyBuilder.
+    // The builder that gets re-used to build each outer transaction.
+    // freezeWith() will create the frozenBodyBuilder.
     // The presence of frozenBodyBuilder indicates that this transaction is frozen.
     @Nullable
     protected TransactionBody.Builder frozenBodyBuilder = null;
 
-    // Transaction constructors end their work by setting txBody.
+    // Transaction constructors end their work by setting sourceTransactionBody.
     // The expectation is that the Transaction subclass constructor
     // will pick up where the Transaction superclass constructor left off,
     // and will unpack the data in the transaction body.
-    protected TransactionBody txBody;
+    protected TransactionBody sourceTransactionBody;
 
     // A SDK [Transaction] is composed of multiple, raw protobuf transactions. These should be
     // functionally identical, with the exception of pointing to different nodes. When retrying a
@@ -54,7 +54,7 @@ public abstract class Transaction<T extends Transaction<T>>
     // different transaction and thus a different node.
     protected List<com.hedera.hashgraph.sdk.proto.Transaction> outerTransactions = Collections.emptyList();
     protected List<com.hedera.hashgraph.sdk.proto.SignedTransaction.Builder> innerSignedTransactions = Collections.emptyList();
-    protected List<SignatureMap.Builder> sigPairListBuilders = Collections.emptyList();
+    protected List<SignatureMap.Builder> sigPairLists = Collections.emptyList();
     protected List<TransactionId> transactionIds = Collections.emptyList();
     // For SDK Transactions that require multiple protobuf transaction ID's this variable keeps track of the current
     // execution group.
@@ -84,6 +84,8 @@ public abstract class Transaction<T extends Transaction<T>>
 
         // Default transaction fee is 2 Hbar
         setMaxTransactionFee(new Hbar(2));
+
+        sourceTransactionBody = TransactionBody.getDefaultInstance();
     }
 
     // This constructor is used to construct from a scheduled transaction body
@@ -92,7 +94,7 @@ public abstract class Transaction<T extends Transaction<T>>
         setMaxTransactionFee(Hbar.fromTinybars(txBody.getTransactionFee()));
         setTransactionMemo(txBody.getMemo());
 
-        this.txBody = txBody;
+        sourceTransactionBody = txBody;
     }
 
     // This constructor is used to construct via fromBytes
@@ -101,7 +103,7 @@ public abstract class Transaction<T extends Transaction<T>>
         var nodeCount = txs.values().iterator().next().size();
 
         nodeAccountIds = new ArrayList<>(nodeCount);
-        sigPairListBuilders = new ArrayList<>(nodeCount * txCount);
+        sigPairLists = new ArrayList<>(nodeCount * txCount);
         outerTransactions = new ArrayList<>(nodeCount * txCount);
         innerSignedTransactions = new ArrayList<>(nodeCount * txCount);
         transactionIds = new ArrayList<>(txCount);
@@ -116,7 +118,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
                 var transaction = SignedTransaction.parseFrom(nodeEntry.getValue().getSignedTransactionBytes());
                 outerTransactions.add(nodeEntry.getValue());
-                sigPairListBuilders.add(transaction.getSigMap().toBuilder());
+                sigPairLists.add(transaction.getSigMap().toBuilder());
                 innerSignedTransactions.add(transaction.toBuilder());
 
                 if (publicKeys.isEmpty()) {
@@ -130,16 +132,16 @@ public abstract class Transaction<T extends Transaction<T>>
 
         nodeAccountIds.remove(new AccountId(0));
 
-        txBody = TransactionBody.parseFrom(innerSignedTransactions.get(0).getBodyBytes());
+        sourceTransactionBody = TransactionBody.parseFrom(innerSignedTransactions.get(0).getBodyBytes());
 
-        setTransactionValidDuration(DurationConverter.fromProtobuf(txBody.getTransactionValidDuration()));
-        setMaxTransactionFee(Hbar.fromTinybars(txBody.getTransactionFee()));
-        setTransactionMemo(txBody.getMemo());
+        setTransactionValidDuration(DurationConverter.fromProtobuf(sourceTransactionBody.getTransactionValidDuration()));
+        setMaxTransactionFee(Hbar.fromTinybars(sourceTransactionBody.getTransactionFee()));
+        setTransactionMemo(sourceTransactionBody.getMemo());
 
         // This constructor is used in fromBytes(), which means we're reconstructing
         // a transaction that was frozen and then serialized via toBytes(),
         // so this transaction should be constructed as frozen.
-        frozenBodyBuilder = txBody.toBuilder();
+        frozenBodyBuilder = sourceTransactionBody.toBuilder();
     }
 
     public static Transaction<?> fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -684,7 +686,7 @@ public abstract class Transaction<T extends Transaction<T>>
         }
         publicKeys.add(publicKey);
         signers.add(null);
-        sigPairListBuilders.get(0).addSigPair(publicKey.toSignaturePairProtobuf(signature));
+        sigPairLists.get(0).addSigPair(publicKey.toSignaturePairProtobuf(signature));
 
         // noinspection unchecked
         return (T) this;
@@ -693,12 +695,12 @@ public abstract class Transaction<T extends Transaction<T>>
     public Map<AccountId, Map<PublicKey, byte[]>> getSignatures() {
         var map = new HashMap<AccountId, Map<PublicKey, byte[]>>(nodeAccountIds.size());
 
-        if (sigPairListBuilders.size() == 0) {
+        if (sigPairLists.size() == 0) {
             return map;
         }
 
         for (int i = 0; i < nodeAccountIds.size(); i++) {
-            var sigMap = sigPairListBuilders.get(i);
+            var sigMap = sigPairLists.get(i);
             var nodeAccountId = nodeAccountIds.get(i);
 
             var keyMap = map.containsKey(nodeAccountId) ?
@@ -765,8 +767,6 @@ public abstract class Transaction<T extends Transaction<T>>
             return (T) this;
         }
 
-        frozenBodyBuilder = spawnBodyBuilder();
-
         if (transactionIds.isEmpty()) {
             if(client != null) {
                 var operator = client.getOperator();
@@ -785,10 +785,6 @@ public abstract class Transaction<T extends Transaction<T>>
             }
         }
 
-        frozenBodyBuilder.setTransactionID(transactionIds.get(0).toProtobuf());
-
-        onFreeze(frozenBodyBuilder);
-
         if (nodeAccountIds.isEmpty()) {
             if (client == null) {
                 throw new IllegalStateException(
@@ -802,12 +798,15 @@ public abstract class Transaction<T extends Transaction<T>>
             }
         }
 
+        frozenBodyBuilder = spawnBodyBuilder().setTransactionID(transactionIds.get(0).toProtobuf());
+        onFreeze(frozenBodyBuilder);
+
         outerTransactions = new ArrayList<>(nodeAccountIds.size());
-        sigPairListBuilders = new ArrayList<>(nodeAccountIds.size());
+        sigPairLists = new ArrayList<>(nodeAccountIds.size());
         innerSignedTransactions = new ArrayList<>(nodeAccountIds.size());
 
         for (AccountId nodeId : nodeAccountIds) {
-            sigPairListBuilders.add(SignatureMap.newBuilder());
+            sigPairLists.add(SignatureMap.newBuilder());
             innerSignedTransactions.add(com.hedera.hashgraph.sdk.proto.SignedTransaction.newBuilder()
                 .setBodyBytes(frozenBodyBuilder
                     .setNodeAccountID(nodeId.toProtobuf())
@@ -833,7 +832,7 @@ public abstract class Transaction<T extends Transaction<T>>
      */
     void buildTransaction(int index) {
         // Check if transaction is already built.
-        // Every time a signer is added via sign() or signWith, all outerTransactions are nullified.
+        // Every time a signer is added via sign() or signWith(), all outerTransactions are nullified.
         if (
                 outerTransactions.get(index) != null &&
                 !outerTransactions.get(index).getSignedTransactionBytes().isEmpty()
@@ -846,7 +845,7 @@ public abstract class Transaction<T extends Transaction<T>>
         outerTransactions.set(index, com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
             .setSignedTransactionBytes(
                 innerSignedTransactions.get(index)
-                    .setSigMap(sigPairListBuilders.get(index))
+                    .setSigMap(sigPairLists.get(index))
                     .build()
                     .toByteString()
             ).build());
@@ -863,7 +862,7 @@ public abstract class Transaction<T extends Transaction<T>>
             if (signers.get(i) == null) {
                 continue;
             }
-            for(var pair : sigPairListBuilders.get(index).getSigPairList()) {
+            for(var pair : sigPairLists.get(index).getSigPairList()) {
                 if(pair.getPubKeyPrefix().equals(ByteString.copyFrom(publicKeys.get(i).toBytes()))) {
                     continue;
                 }
@@ -871,7 +870,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
             var signatureBytes = signers.get(i).apply(bodyBytes);
 
-            sigPairListBuilders
+            sigPairLists
                 .get(index)
                 .addSigPair(publicKeys.get(i).toSignaturePairProtobuf(signatureBytes));
         }

@@ -89,7 +89,7 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getTokenBurn();
+        var body = sourceTransactionBody.getTokenBurn();
         if (body.hasToken()) {
             tokenId = TokenId.fromProtobuf(body.getToken());
         }

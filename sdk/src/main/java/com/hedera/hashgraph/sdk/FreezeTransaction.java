@@ -87,7 +87,7 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getFreeze();
+        var body = sourceTransactionBody.getFreeze();
         startHour = body.getStartHour();
         startMinute = body.getStartMin();
         endHour = body.getEndHour();

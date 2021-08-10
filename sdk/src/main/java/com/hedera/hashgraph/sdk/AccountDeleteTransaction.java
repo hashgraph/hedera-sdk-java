@@ -106,7 +106,7 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getCryptoDelete();
+        var body = sourceTransactionBody.getCryptoDelete();
         if (body.hasDeleteAccountID()) {
             accountId = AccountId.fromProtobuf(body.getDeleteAccountID());
         }

@@ -43,7 +43,7 @@ public class TokenDeleteTransaction extends com.hedera.hashgraph.sdk.Transaction
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getTokenDeletion();
+        var body = sourceTransactionBody.getTokenDeletion();
         if (body.hasToken()) {
             tokenId = TokenId.fromProtobuf(body.getToken());
         }

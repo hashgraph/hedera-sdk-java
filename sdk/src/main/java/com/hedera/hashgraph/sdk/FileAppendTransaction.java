@@ -138,7 +138,7 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getFileAppend();
+        var body = sourceTransactionBody.getFileAppend();
         if (body.hasFileID()) {
             fileId = FileId.fromProtobuf(body.getFileID());
         }

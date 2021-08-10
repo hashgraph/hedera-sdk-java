@@ -56,7 +56,7 @@ public class TokenRevokeKycTransaction extends com.hedera.hashgraph.sdk.Transact
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getTokenRevokeKyc();
+        var body = sourceTransactionBody.getTokenRevokeKyc();
         if (body.hasToken()) {
             tokenId = TokenId.fromProtobuf(body.getToken());
         }

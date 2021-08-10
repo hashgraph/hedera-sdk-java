@@ -56,7 +56,7 @@ public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transacti
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getTokenUnfreeze();
+        var body = sourceTransactionBody.getTokenUnfreeze();
         if (body.hasToken()) {
             tokenId = TokenId.fromProtobuf(body.getToken());
         }

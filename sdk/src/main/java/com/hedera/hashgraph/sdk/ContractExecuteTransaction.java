@@ -140,7 +140,7 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getContractCall();
+        var body = sourceTransactionBody.getContractCall();
         if(body.hasContractID()) {
             contractId = ContractId.fromProtobuf(body.getContractID());
         }

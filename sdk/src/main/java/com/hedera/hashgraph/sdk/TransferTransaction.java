@@ -182,7 +182,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getCryptoTransfer();
+        var body = sourceTransactionBody.getCryptoTransfer();
         if(body.hasTransfers()) {
             for (var transfer : body.getTransfers().getAccountAmountsList()) {
                 doAddHbarTransfer(AccountId.fromProtobuf(transfer.getAccountID()), transfer.getAmount());

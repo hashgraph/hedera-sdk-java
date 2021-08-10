@@ -54,7 +54,7 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getScheduleSign();
+        var body = sourceTransactionBody.getScheduleSign();
         if (body.hasScheduleID()) {
             scheduleId = ScheduleId.fromProtobuf(body.getScheduleID());
         }

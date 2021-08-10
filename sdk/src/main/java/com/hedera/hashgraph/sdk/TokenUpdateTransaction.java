@@ -226,7 +226,7 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getTokenUpdate();
+        var body = sourceTransactionBody.getTokenUpdate();
         if (body.hasTreasury()) {
             treasuryAccountId = AccountId.fromProtobuf(body.getTreasury());
         }

@@ -71,7 +71,7 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     }
 
     public List<Long> getSerials() {
-        return serials;
+        return new ArrayList<>(serials);
     }
 
     public TokenWipeTransaction addSerial(@Nonnegative long serial) {
@@ -83,12 +83,12 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     public TokenWipeTransaction setSerials(List<Long> serials) {
         requireNotFrozen();
         Objects.requireNonNull(serials);
-        this.serials = serials;
+        this.serials = new ArrayList<>(serials);
         return this;
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getTokenWipe();
+        var body = sourceTransactionBody.getTokenWipe();
         if (body.hasToken()) {
             tokenId = TokenId.fromProtobuf(body.getToken());
         }

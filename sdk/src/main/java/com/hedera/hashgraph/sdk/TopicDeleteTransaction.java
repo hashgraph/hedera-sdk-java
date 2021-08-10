@@ -56,7 +56,7 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getConsensusDeleteTopic();
+        var body = sourceTransactionBody.getConsensusDeleteTopic();
         if (body.hasTopicID()) {
             topicId = TopicId.fromProtobuf(body.getTopicID());
         }

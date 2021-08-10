@@ -44,7 +44,7 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getScheduleDelete();
+        var body = sourceTransactionBody.getScheduleDelete();
         if (body.hasScheduleID()) {
             scheduleId = ScheduleId.fromProtobuf(body.getScheduleID());
         }

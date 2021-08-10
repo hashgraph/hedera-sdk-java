@@ -56,7 +56,7 @@ public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeSched
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getTokenFeeScheduleUpdate();
+        var body = sourceTransactionBody.getTokenFeeScheduleUpdate();
         if (body.hasTokenId()) {
             tokenId = TokenId.fromProtobuf(body.getTokenId());
         }

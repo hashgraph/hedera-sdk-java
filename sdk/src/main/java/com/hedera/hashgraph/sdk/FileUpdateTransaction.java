@@ -179,7 +179,7 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getFileUpdate();
+        var body = sourceTransactionBody.getFileUpdate();
         if (body.hasFileID()) {
             fileId = FileId.fromProtobuf(body.getFileID());
         }

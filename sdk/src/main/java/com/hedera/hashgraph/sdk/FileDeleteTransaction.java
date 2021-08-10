@@ -59,7 +59,7 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getFileDelete();
+        var body = sourceTransactionBody.getFileDelete();
         if (body.hasFileID()) {
             fileId = FileId.fromProtobuf(body.getFileID());
         }

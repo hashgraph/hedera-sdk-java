@@ -77,7 +77,7 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getCryptoDeleteLiveHash();
+        var body = sourceTransactionBody.getCryptoDeleteLiveHash();
         if (body.hasAccountOfLiveHash()) {
             accountId = AccountId.fromProtobuf(body.getAccountOfLiveHash());
         }

@@ -79,7 +79,7 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getSystemUndelete();
+        var body = sourceTransactionBody.getSystemUndelete();
         if(body.hasFileID()) {
             fileId = FileId.fromProtobuf(body.getFileID());
         }

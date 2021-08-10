@@ -107,14 +107,18 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
 
         buildAllTransactions();
 
-        var size = innerSignedTransactions.size() / nodeAccountIds.size();
+        var txCount = transactionIds.size();
+        var nodeCount = nodeAccountIds.size();
         var transactionHashes = new ArrayList<Map<AccountId, byte[]>>(outerTransactions.size() / nodeAccountIds.size());
 
-        for (var group = 0; group < size; ++group) {
+        for (var txIndex = 0; txIndex < txCount; ++txIndex) {
             var hashes = new HashMap<AccountId, byte[]>();
+            var offset = txIndex*nodeCount;
 
-            for (var i = group * size; i < (group + 1) * size; ++i) {
-                hashes.put(nodeAccountIds.get(group), hash(outerTransactions.get(i).getSignedTransactionBytes().toByteArray()));
+            for (var nodeIndex = 0; nodeIndex < nodeCount; ++nodeIndex) {
+                hashes.put(
+                    nodeAccountIds.get(nodeIndex),
+                    hash(outerTransactions.get(offset + nodeIndex).getSignedTransactionBytes().toByteArray()));
             }
 
             transactionHashes.add(hashes);
@@ -225,7 +229,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
                     + " chunks but the maximum allowed chunks is " + maxChunks + ", try using setMaxChunks");
         }
 
-        sigPairListBuilders = new ArrayList<>(requiredChunks * nodeAccountIds.size());
+        sigPairLists = new ArrayList<>(requiredChunks * nodeAccountIds.size());
         outerTransactions = new ArrayList<>(requiredChunks * nodeAccountIds.size());
         innerSignedTransactions = new ArrayList<>(requiredChunks * nodeAccountIds.size());
         transactionIds = new ArrayList<>(requiredChunks);
@@ -253,7 +257,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
 
             // For each node we add a transaction with that node
             for (var nodeId : nodeAccountIds) {
-                sigPairListBuilders.add(SignatureMap.newBuilder());
+                sigPairLists.add(SignatureMap.newBuilder());
                 innerSignedTransactions.add(SignedTransaction.newBuilder()
                     .setBodyBytes(
                         frozenBodyBuilder

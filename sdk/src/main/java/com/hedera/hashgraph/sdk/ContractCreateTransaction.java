@@ -290,7 +290,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getContractCreateInstance();
+        var body = sourceTransactionBody.getContractCreateInstance();
 
         if(body.hasFileID()) {
             bytecodeFileId = FileId.fromProtobuf(body.getFileID());

@@ -72,7 +72,7 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getTokenAssociate();
+        var body = sourceTransactionBody.getTokenAssociate();
         if (body.hasAccount()) {
             accountId = AccountId.fromProtobuf(body.getAccount());
         }

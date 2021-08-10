@@ -117,7 +117,7 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getContractDeleteInstance();
+        var body = sourceTransactionBody.getContractDeleteInstance();
         if(body.hasContractID()) {
             contractId = ContractId.fromProtobuf(body.getContractID());
         }

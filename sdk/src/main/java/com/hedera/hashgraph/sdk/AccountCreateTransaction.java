@@ -176,7 +176,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getCryptoCreateAccount();
+        var body = sourceTransactionBody.getCryptoCreateAccount();
 
         if (body.hasProxyAccountID()) {
             proxyAccountId = AccountId.fromProtobuf(body.getProxyAccountID());

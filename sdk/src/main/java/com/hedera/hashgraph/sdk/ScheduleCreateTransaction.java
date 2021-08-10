@@ -97,7 +97,7 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getScheduleCreate();
+        var body = sourceTransactionBody.getScheduleCreate();
         if (body.hasPayerAccountID()) {
             payerAccountId = AccountId.fromProtobuf(body.getPayerAccountID());
         }

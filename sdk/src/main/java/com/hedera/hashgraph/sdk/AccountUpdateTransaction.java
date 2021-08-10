@@ -3,7 +3,6 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.BoolValue;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
-import com.google.protobuf.UInt64Value;
 import com.hedera.hashgraph.sdk.proto.CryptoUpdateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
@@ -212,7 +211,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getCryptoUpdateAccount();
+        var body = sourceTransactionBody.getCryptoUpdateAccount();
 
         if (body.hasAccountIDToUpdate()) {
             accountId = AccountId.fromProtobuf(body.getAccountIDToUpdate());

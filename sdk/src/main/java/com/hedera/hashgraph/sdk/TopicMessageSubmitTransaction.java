@@ -72,7 +72,7 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getConsensusSubmitMessage();
+        var body = sourceTransactionBody.getConsensusSubmitMessage();
         if (body.hasTopicID()) {
             topicId = TopicId.fromProtobuf(body.getTopicID());
         }

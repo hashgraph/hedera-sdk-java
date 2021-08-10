@@ -56,7 +56,7 @@ public class TokenGrantKycTransaction extends com.hedera.hashgraph.sdk.Transacti
     }
 
     void initFromTransactionBody() {
-        var body = txBody.getTokenGrantKyc();
+        var body = sourceTransactionBody.getTokenGrantKyc();
         if (body.hasToken()) {
             tokenId = TokenId.fromProtobuf(body.getToken());
         }
