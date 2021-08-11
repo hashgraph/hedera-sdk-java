@@ -72,8 +72,8 @@ public abstract class Transaction<T extends Transaction<T>>
     // If the signer associated with a public key is null, that means that the private key
     // associated with that public key has already contributed a signature to sigPairListBuilders, but
     // the signer is not available (likely because this came from fromBytes())
-    private List<PublicKey> publicKeys = new ArrayList<>();
-    private List<Function<byte[], byte[]>> signers = new ArrayList<>();
+    protected List<PublicKey> publicKeys = new ArrayList<>();
+    protected List<Function<byte[], byte[]>> signers = new ArrayList<>();
 
     private Duration transactionValidDuration;
     private Hbar maxTransactionFee;
@@ -692,15 +692,11 @@ public abstract class Transaction<T extends Transaction<T>>
         return (T) this;
     }
 
-    public Map<AccountId, Map<PublicKey, byte[]>> getSignatures() {
+    protected Map<AccountId, Map<PublicKey, byte[]>> getSignaturesAtOffset(int offset) {
         var map = new HashMap<AccountId, Map<PublicKey, byte[]>>(nodeAccountIds.size());
 
-        if (sigPairLists.size() == 0) {
-            return map;
-        }
-
         for (int i = 0; i < nodeAccountIds.size(); i++) {
-            var sigMap = sigPairLists.get(i);
+            var sigMap = sigPairLists.get(i + offset);
             var nodeAccountId = nodeAccountIds.get(i);
 
             var keyMap = map.containsKey(nodeAccountId) ?
@@ -717,6 +713,16 @@ public abstract class Transaction<T extends Transaction<T>>
         }
 
         return map;
+    }
+
+    public Map<AccountId, Map<PublicKey, byte[]>> getSignatures() {
+        if (publicKeys.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        buildAllTransactions();
+
+        return getSignaturesAtOffset(0);
     }
 
     protected boolean isFrozen() {

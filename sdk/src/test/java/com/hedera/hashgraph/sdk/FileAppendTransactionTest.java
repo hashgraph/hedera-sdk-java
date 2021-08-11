@@ -17,6 +17,10 @@ public class FileAppendTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
         "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
 
+    private static final PrivateKey secondPrivateKey = PrivateKey.fromString(
+        "302e020100300506032b65700422042099b8587e5abccf6999b0d42b88c581c45284290450487ce90095561c85af11e4"
+    );
+
     public static final String BIG_CONTENTS = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur aliquam augue sem, ut mattis dui laoreet a. Curabitur consequat est euismod, scelerisque metus et, tristique dui. Nulla commodo mauris ut faucibus ultricies. Quisque venenatis nisl nec augue tempus, at efficitur elit eleifend. Duis pharetra felis metus, sed dapibus urna vehicula id. Duis non venenatis turpis, sit amet ornare orci. Donec non interdum quam. Sed finibus nunc et risus finibus, non sagittis lorem cursus. Proin pellentesque tempor aliquam. Sed congue nisl in enim bibendum, condimentum vehicula nisi feugiat.\n" +
         "\n" +
         "Suspendisse non sodales arcu. Suspendisse sodales, lorem ac mollis blandit, ipsum neque porttitor nulla, et sodales arcu ante fermentum tellus. Integer sagittis dolor sed augue fringilla accumsan. Cras vitae finibus arcu, sit amet varius dolor. Etiam id finibus dolor, vitae luctus velit. Proin efficitur augue nec pharetra accumsan. Aliquam lobortis nisl diam, vel fermentum purus finibus id. Etiam at finibus orci, et tincidunt turpis. Aliquam imperdiet congue lacus vel facilisis. Phasellus id magna vitae enim dapibus vestibulum vitae quis augue. Morbi eu consequat enim. Maecenas neque nulla, pulvinar sit amet consequat sed, tempor sed magna. Mauris lacinia sem feugiat faucibus aliquet. Etiam congue non turpis at commodo. Nulla facilisi.\n" +
@@ -121,5 +125,63 @@ public class FileAppendTransactionTest {
                 .getAllTransactionHashesPerNode()
             )
         ).toMatchSnapshot();
+    }
+
+    String signaturesToString(Map<AccountId, Map<PublicKey, byte[]>> signatures) {
+        var outString = new StringBuilder();
+        outString.append("{");
+        for(var nodeEntry : signatures.entrySet()) {
+            outString.append(nodeEntry.getKey()).append("={");
+            for(var sigEntry : nodeEntry.getValue().entrySet()) {
+                outString.append(sigEntry.getKey()).append("=").append(Hex.toHexString(sigEntry.getValue())).append(", ");
+            }
+            outString.append("}, ");
+        }
+        return outString + "}";
+    }
+
+    String allSignaturesToString(List<Map<AccountId, Map<PublicKey, byte[]>>> allSignatures) {
+        var outString = new StringBuilder();
+        outString.append("[");
+        for(var txEntry : allSignatures) {
+            outString.append(signaturesToString(txEntry)).append(", ");
+        }
+        return outString + "]";
+    }
+
+    @Test
+    void shouldGetSignatures() {
+        var nodeAccountIds = new ArrayList<AccountId>();
+        nodeAccountIds.add(AccountId.fromString("0.0.444"));
+        nodeAccountIds.add(AccountId.fromString("0.0.555"));
+        var signatures = new FileAppendTransaction()
+            .setNodeAccountIds(nodeAccountIds)
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+            .setFileId(FileId.fromString("0.0.6006"))
+            .setContents(new byte[]{1, 2, 3, 4})
+            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
+            .freeze()
+            .sign(unusedPrivateKey)
+            .sign(secondPrivateKey)
+            .getSignatures();
+        SnapshotMatcher.expect(signaturesToString(signatures)).toMatchSnapshot();
+    }
+
+    @Test
+    void shouldGetAllSignatures() {
+        var nodeAccountIds = new ArrayList<AccountId>();
+        nodeAccountIds.add(AccountId.fromString("0.0.444"));
+        nodeAccountIds.add(AccountId.fromString("0.0.555"));
+        var signatures = new FileAppendTransaction()
+            .setNodeAccountIds(nodeAccountIds)
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+            .setFileId(FileId.fromString("0.0.6006"))
+            .setContents(BIG_CONTENTS)
+            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
+            .freeze()
+            .sign(unusedPrivateKey)
+            .sign(secondPrivateKey)
+            .getAllSignatures();
+        SnapshotMatcher.expect(allSignaturesToString(signatures)).toMatchSnapshot();
     }
 }
