@@ -142,7 +142,6 @@ public class ListInputTest {
     @Test
     @DisplayName("TokenFeeScheduleUpdateTransaction list input is insulated")
     void tokenFeeScheduleUpdateListTest() {
-        // TODO
         var tx = new TokenFeeScheduleUpdateTransaction();
         var list = new ArrayList<CustomFee>();
         list.add(new CustomFixedFee().setAmount(1));

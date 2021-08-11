@@ -164,6 +164,11 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
         return FileServiceGrpc.getCreateFileMethod();
     }
 
+    @Override
+    void validateChecksums(Client client) {
+        // do nothing
+    }
+
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getFileCreate();
         if(body.hasExpirationTime()) {

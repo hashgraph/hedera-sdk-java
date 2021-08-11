@@ -109,7 +109,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
 
         var txCount = transactionIds.size();
         var nodeCount = nodeAccountIds.size();
-        var transactionHashes = new ArrayList<Map<AccountId, byte[]>>(outerTransactions.size() / nodeAccountIds.size());
+        var transactionHashes = new ArrayList<Map<AccountId, byte[]>>(txCount);
 
         for (var txIndex = 0; txIndex < txCount; ++txIndex) {
             var hashes = new HashMap<AccountId, byte[]>();

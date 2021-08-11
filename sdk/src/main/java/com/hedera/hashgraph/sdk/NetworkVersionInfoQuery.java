@@ -29,6 +29,11 @@ public class NetworkVersionInfoQuery extends Query<NetworkVersionInfo, NetworkVe
     }
 
     @Override
+    void validateChecksums(Client client) throws BadEntityIdException {
+        // do nothing
+    }
+
+    @Override
     NetworkVersionInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
         return NetworkVersionInfo.fromProtobuf(response.getNetworkGetVersionInfo());
     }

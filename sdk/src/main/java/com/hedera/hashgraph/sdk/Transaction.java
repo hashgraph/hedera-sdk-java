@@ -914,9 +914,7 @@ public abstract class Transaction<T extends Transaction<T>>
         return Status.valueOf(transactionResponse.getNodeTransactionPrecheckCode());
     }
 
-    void validateChecksums(Client client) throws BadEntityIdException {
-        // Do nothing
-    }
+    abstract void validateChecksums(Client client) throws BadEntityIdException;
 
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {

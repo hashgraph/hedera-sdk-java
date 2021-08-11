@@ -123,9 +123,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         return new QueryCostQuery();
     }
 
-    void validateChecksums(Client client) throws BadEntityIdException {
-        // Do nothing
-    }
+    abstract void validateChecksums(Client client) throws BadEntityIdException;
 
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
