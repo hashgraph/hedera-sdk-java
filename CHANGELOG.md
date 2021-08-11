@@ -5,15 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### Unreleased
+### v2.0.11
 
-- `ScheduleInfo.getScheduledTransaction()` should now return a transaction with the expected `transactionFee`
-- Fixed bugs in `Transaction.getSignatures()`
-- Added `ChunkedTransaction.getAllSignatures()`
-- Fixed bug in `TopicMessageQuery`
-- Fixed bugs in `ChunkedTransaction.getAllTransactionHashesPerNode()`
-- Setters and getters of `List` fields (such as `TokenBurnTransaction.setSerials()`) now ensure that the user can't gain mutable access to the List field in the Transaction or Query.
-- Misc bug fixes.
+### Added
+
+ * `ChunkedTransaction.getAllSignatures()`
+
+### Fixed
+
+ * `Transaction.getSignatures()` incorrectly building signature list
+ * `TopicMessageQuery` pending messages being discarded on retry
+ * `ChunkedTransaction.getAllTransactionHashesPerNode()` incorrectly building signature map
+ * `ScheduleInfo.getScheduledTransaction()` still not setting max fee appropriately
+
+### Changed
+
+ * `*.setSerials()` will now clone list passed in to prevent changes 
 
 ## v2.0.10
 
