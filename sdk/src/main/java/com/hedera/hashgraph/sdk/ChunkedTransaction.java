@@ -12,12 +12,7 @@ import java8.util.function.Function;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 
 import javax.annotation.Nullable;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Transaction<T> implements WithExecuteAll {
     private static final int CHUNK_SIZE = 1024;
@@ -133,6 +128,33 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
             throw new IllegalStateException("Cannot manually add signature to chunked transaction with length greater than " + CHUNK_SIZE);
         }
         return super.addSignature(publicKey, signature);
+    }
+
+    @Override
+    public Map<AccountId, Map<PublicKey, byte[]>> getSignatures() {
+        if (data.size() > CHUNK_SIZE) {
+            throw new IllegalStateException("Cannot call getSignatures() on a chunked transaction with length greater than " + CHUNK_SIZE);
+        }
+        return super.getSignatures();
+    }
+
+    public List<Map<AccountId, Map<PublicKey, byte[]>>> getAllSignatures() {
+        if (publicKeys.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        buildAllTransactions();
+
+        var txCount = transactionIds.size();
+        var nodeCount = nodeAccountIds.size();
+
+        var retval = new ArrayList<Map<AccountId, Map<PublicKey, byte[]>>>(txCount);
+
+        for(int i = 0; i < txCount; i++) {
+            retval.add(getSignaturesAtOffset(i * nodeCount));
+        }
+
+        return retval;
     }
 
     @Override
