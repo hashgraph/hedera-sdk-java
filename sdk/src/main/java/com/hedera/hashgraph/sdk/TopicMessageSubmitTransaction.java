@@ -27,49 +27,20 @@ import java.util.Objects;
  * topicRunningHash.
  */
 public final class TopicMessageSubmitTransaction extends ChunkedTransaction<TopicMessageSubmitTransaction> {
-    private final ConsensusSubmitMessageTransactionBody.Builder builder;
-
     @Nullable
-    TopicId topicId = null;
+    private TopicId topicId = null;
 
     public TopicMessageSubmitTransaction() {
-        super();
-
-        builder = ConsensusSubmitMessageTransactionBody.newBuilder();
     }
 
     TopicMessageSubmitTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getConsensusSubmitMessage().toBuilder();
-
-        if (builder.hasTopicID()) {
-            topicId = TopicId.fromProtobuf(builder.getTopicID());
-        }
-
-        for (var i = 0; i < signedTransactions.size(); i += nodeAccountIds.isEmpty() ? 1 : nodeAccountIds.size()) {
-            data = data.concat(
-                TransactionBody.parseFrom(signedTransactions.get(i).getBodyBytes())
-                    .getConsensusSubmitMessage().getMessage()
-            );
-        }
+        initFromTransactionBody();
     }
 
     TopicMessageSubmitTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
         super(txBody);
-
-        builder = bodyBuilder.getConsensusSubmitMessage().toBuilder();
-
-        if (builder.hasTopicID()) {
-            topicId = TopicId.fromProtobuf(builder.getTopicID());
-        }
-
-        for (var i = 0; i < signedTransactions.size(); i += nodeAccountIds.isEmpty() ? 1 : nodeAccountIds.size()) {
-            data = data.concat(
-                TransactionBody.parseFrom(signedTransactions.get(i).getBodyBytes())
-                    .getConsensusSubmitMessage().getMessage()
-            );
-        }
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -100,10 +71,30 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
         return setData(message);
     }
 
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getConsensusSubmitMessage();
+        if (body.hasTopicID()) {
+            topicId = TopicId.fromProtobuf(body.getTopicID());
+        }
+
+        try {
+            for (var i = 0; i < innerSignedTransactions.size(); i += nodeAccountIds.isEmpty() ? 1 : nodeAccountIds.size()) {
+                data = data.concat(
+                    TransactionBody.parseFrom(innerSignedTransactions.get(i).getBodyBytes())
+                        .getConsensusSubmitMessage().getMessage()
+                );
+            }
+        } catch(InvalidProtocolBufferException exc) {
+            throw new IllegalArgumentException(exc.getMessage());
+        }
+    }
+
     ConsensusSubmitMessageTransactionBody.Builder build() {
+        var builder = ConsensusSubmitMessageTransactionBody.newBuilder();
         if (topicId != null) {
             builder.setTopicID(topicId.toProtobuf());
         }
+        builder.setMessage(data);
 
         return builder;
     }
@@ -121,9 +112,8 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setConsensusSubmitMessage(build());
-        return true;
     }
 
     @Override

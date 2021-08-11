@@ -15,13 +15,11 @@ import java.util.Objects;
  * Requests a livehash associated to an account.
  */
 public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
-    private final CryptoGetLiveHashQuery.Builder builder;
-
     @Nullable
-    AccountId accountId = null;
+    private AccountId accountId = null;
+    private byte[] hash = {};
 
     public LiveHashQuery() {
-        builder = CryptoGetLiveHashQuery.newBuilder();
     }
 
     @Nullable
@@ -42,7 +40,7 @@ public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
     }
 
     public ByteString getHash() {
-      return builder.getHash();
+      return ByteString.copyFrom(hash);
     }
 
     /**
@@ -52,7 +50,7 @@ public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
      * @return {@code this}
      */
     public LiveHashQuery setHash(byte[] hash) {
-        builder.setHash(ByteString.copyFrom(hash));
+        this.hash = hash;
         return this;
     }
 
@@ -65,9 +63,11 @@ public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        var builder = CryptoGetLiveHashQuery.newBuilder();
         if (accountId != null) {
             builder.setAccountID(accountId.toProtobuf());
         }
+        builder.setHash(ByteString.copyFrom(hash));
 
         queryBuilder.setCryptoGetLiveHash(builder.setHeader(header));
     }

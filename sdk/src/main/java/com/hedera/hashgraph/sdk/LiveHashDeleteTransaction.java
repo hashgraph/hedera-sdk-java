@@ -18,23 +18,16 @@ import java.util.Objects;
  * by either the key of the owning account, or at least one of the keys associated to the livehash.
  */
 public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteTransaction> {
-    private final CryptoDeleteLiveHashTransactionBody.Builder builder;
-
     @Nullable
-    AccountId accountId = null;
+    private AccountId accountId = null;
+    private byte[] hash = {};
 
     public LiveHashDeleteTransaction() {
-        builder = CryptoDeleteLiveHashTransactionBody.newBuilder();
     }
 
     LiveHashDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getCryptoDeleteLiveHash().toBuilder();
-
-        if (builder.hasAccountOfLiveHash()) {
-            accountId = AccountId.fromProtobuf(builder.getAccountOfLiveHash());
-        }
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -56,7 +49,7 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
     }
 
     public ByteString getHash() {
-        return builder.getLiveHashToDelete();
+        return ByteString.copyFrom(hash);
     }
 
     /**
@@ -66,7 +59,10 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
      * @return {@code this}
      */
     public LiveHashDeleteTransaction setHash(byte[] hash) {
-        return setHash(ByteString.copyFrom(hash));
+        requireNotFrozen();
+        Objects.requireNonNull(hash);
+        this.hash = hash;
+        return this;
     }
 
     /**
@@ -76,15 +72,24 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
      * @return {@code this}
      */
     public LiveHashDeleteTransaction setHash(ByteString hash) {
-        requireNotFrozen();
-        builder.setLiveHashToDelete(hash);
-        return this;
+        Objects.requireNonNull(hash);
+        return setHash(hash.toByteArray());
+    }
+
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getCryptoDeleteLiveHash();
+        if (body.hasAccountOfLiveHash()) {
+            accountId = AccountId.fromProtobuf(body.getAccountOfLiveHash());
+        }
+        hash = body.getLiveHashToDelete().toByteArray();
     }
 
     CryptoDeleteLiveHashTransactionBody.Builder build() {
+        var builder = CryptoDeleteLiveHashTransactionBody.newBuilder();
         if (accountId != null) {
             builder.setAccountOfLiveHash(accountId.toProtobuf());
         }
+        builder.setLiveHashToDelete(ByteString.copyFrom(hash));
 
         return builder;
     }
@@ -102,9 +107,8 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setCryptoDeleteLiveHash(build());
-        return true;
     }
 
     @Override

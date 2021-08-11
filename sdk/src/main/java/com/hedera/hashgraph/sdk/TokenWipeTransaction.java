@@ -8,49 +8,32 @@ import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.List;
 
 public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenWipeTransaction> {
-    private final TokenWipeAccountTransactionBody.Builder builder;
-
     @Nullable
-    TokenId tokenId = null;
+    private TokenId tokenId = null;
     @Nullable
-    AccountId accountId = null;
+    private AccountId accountId = null;
+    private long amount = 0;
+    private List<Long> serials = new ArrayList<>();
 
     public TokenWipeTransaction() {
-        builder = TokenWipeAccountTransactionBody.newBuilder();
     }
 
     TokenWipeTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getTokenWipe().toBuilder();
-
-        if (builder.hasToken()) {
-            tokenId = TokenId.fromProtobuf(builder.getToken());
-        }
-
-        if (builder.hasAccount()) {
-            accountId = AccountId.fromProtobuf(builder.getAccount());
-        }
+        initFromTransactionBody();
     }
 
     TokenWipeTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getTokenWipe().toBuilder();
-
-        if (builder.hasToken()) {
-            tokenId = TokenId.fromProtobuf(builder.getToken());
-        }
-
-        if (builder.hasAccount()) {
-            accountId = AccountId.fromProtobuf(builder.getAccount());
-        }
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -78,22 +61,57 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     }
 
     public long getAmount() {
-        return builder.getAmount();
+        return amount;
     }
 
-    public TokenWipeTransaction setAmount(long amount) {
+    public TokenWipeTransaction setAmount(@Nonnegative long amount) {
         requireNotFrozen();
-        builder.setAmount(amount);
+        this.amount = amount;
         return this;
     }
 
+    public List<Long> getSerials() {
+        return new ArrayList<>(serials);
+    }
+
+    public TokenWipeTransaction addSerial(@Nonnegative long serial) {
+        requireNotFrozen();
+        serials.add(serial);
+        return this;
+    }
+
+    public TokenWipeTransaction setSerials(List<Long> serials) {
+        requireNotFrozen();
+        Objects.requireNonNull(serials);
+        this.serials = new ArrayList<>(serials);
+        return this;
+    }
+
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getTokenWipe();
+        if (body.hasToken()) {
+            tokenId = TokenId.fromProtobuf(body.getToken());
+        }
+
+        if (body.hasAccount()) {
+            accountId = AccountId.fromProtobuf(body.getAccount());
+        }
+        amount = body.getAmount();
+        serials = body.getSerialNumbersList();
+    }
+
     TokenWipeAccountTransactionBody.Builder build() {
+        var builder = TokenWipeAccountTransactionBody.newBuilder();
         if (tokenId != null) {
             builder.setToken(tokenId.toProtobuf());
         }
 
         if (accountId != null) {
             builder.setAccount(accountId.toProtobuf());
+        }
+        builder.setAmount(amount);
+        for(var serial : serials) {
+            builder.addSerialNumbers(serial);
         }
 
         return  builder;
@@ -110,34 +128,14 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         }
     }
 
-    public List<Long> getSerials() {
-        return builder.getSerialNumbersList();
-    }
-
-    public TokenWipeTransaction addSerial(long serial) {
-        requireNotFrozen();
-        builder.addSerialNumbers(serial);
-        return this;
-    }
-
-    public TokenWipeTransaction setSerials(List<Long> serials) {
-        requireNotFrozen();
-        builder.clearSerialNumbers();
-        for(var serial : Objects.requireNonNull(serials)) {
-            builder.addSerialNumbers(serial);
-        }
-        return this;
-    }
-
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return TokenServiceGrpc.getWipeTokenAccountMethod();
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setTokenWipe(build());
-        return true;
     }
 
     @Override

@@ -1,11 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.proto.ContractCallLocalQuery;
-import com.hedera.hashgraph.sdk.proto.QueryHeader;
-import com.hedera.hashgraph.sdk.proto.Response;
-import com.hedera.hashgraph.sdk.proto.ResponseHeader;
-import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 
@@ -26,13 +22,13 @@ import java.util.Objects;
  * It is faster and cheaper than a normal call, because it is purely local to a single  node.
  */
 public final class ContractCallQuery extends Query<ContractFunctionResult, ContractCallQuery> {
-    private final ContractCallLocalQuery.Builder builder;
-
     @Nullable
-    ContractId contractId = null;
+    private ContractId contractId = null;
+    private long gas = 0;
+    private byte[] functionParameters = {};
+    private long maxResultSize = 0;
 
     public ContractCallQuery() {
-        builder = ContractCallLocalQuery.newBuilder();
     }
 
     @Nullable
@@ -53,7 +49,7 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
     }
 
     public long getGas() {
-      return builder.getGas();
+      return gas;
     }
 
     /**
@@ -65,7 +61,7 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
      * @param gas The long to be set as gas
      */
     public ContractCallQuery setGas(long gas) {
-        builder.setGas(gas);
+        this.gas = gas;
         return this;
     }
 
@@ -76,7 +72,7 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
     }
 
     public ByteString getFunctionParameters() {
-      return builder.getFunctionParameters();
+      return ByteString.copyFrom(functionParameters);
     }
     /**
      * Sets the function parameters as their raw bytes.
@@ -88,7 +84,7 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
      * @param functionParameters The function parameters to be set
      */
     public ContractCallQuery setFunctionParameters(byte[] functionParameters) {
-        builder.setFunctionParameters(ByteString.copyFrom(functionParameters));
+        this.functionParameters = functionParameters;
         return this;
     }
 
@@ -114,7 +110,7 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
      */
     public ContractCallQuery setFunction(String name, ContractFunctionParameters params) {
         Objects.requireNonNull(params);
-        builder.setFunctionParameters(params.toBytes(name));
+        setFunctionParameters(params.toBytes(name).toByteArray());
         return this;
     }
 
@@ -126,8 +122,12 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
      * @param size The long to be set as size
      */
     public ContractCallQuery setMaxResultSize(long size) {
-        builder.setMaxResultSize(size);
+        maxResultSize = size;
         return this;
+    }
+
+    public long getMaxResultSize() {
+        return maxResultSize;
     }
 
     @Override
@@ -139,9 +139,13 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        var builder = ContractCallLocalQuery.newBuilder();
         if (contractId != null) {
             builder.setContractID(contractId.toProtobuf());
         }
+        builder.setGas(gas);
+        builder.setMaxResultSize(maxResultSize);
+        builder.setFunctionParameters(ByteString.copyFrom(functionParameters));
 
         queryBuilder.setContractCallLocal(builder.setHeader(header));
     }

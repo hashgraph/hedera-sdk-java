@@ -13,25 +13,21 @@ import java.util.LinkedHashMap;
 import java.util.Objects;
 
 public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateTransaction> {
-    private final ScheduleCreateTransactionBody.Builder builder;
-
     @Nullable
-    AccountId payerAccountId = null;
+    private AccountId payerAccountId = null;
+    @Nullable
+    private SchedulableTransactionBody transactionToSchedule = null;
+    @Nullable
+    private Key adminKey = null;
+    private String scheduleMemo = "";
 
     public ScheduleCreateTransaction() {
-        builder = ScheduleCreateTransactionBody.newBuilder();
-
         setMaxTransactionFee(new Hbar(5));
     }
 
     ScheduleCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getScheduleCreate().toBuilder();
-
-        if (builder.hasPayerAccountID()) {
-            payerAccountId = AccountId.fromProtobuf(builder.getPayerAccountID());
-        }
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -48,45 +44,70 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
 
     public ScheduleCreateTransaction setScheduledTransaction(Transaction<?> transaction) {
         requireNotFrozen();
+        Objects.requireNonNull(transaction);
 
         var scheduled = transaction.schedule();
-        builder.setScheduledTransactionBody(scheduled.builder.getScheduledTransactionBody());
+        transactionToSchedule = scheduled.transactionToSchedule;
 
         return this;
     }
 
     ScheduleCreateTransaction setScheduledTransactionBody(SchedulableTransactionBody tx) {
         requireNotFrozen();
-        builder.setScheduledTransactionBody(tx);
+        Objects.requireNonNull(tx);
+        transactionToSchedule = tx;
         return this;
     }
 
+    @Nullable
     public Key getAdminKey() {
-        return Key.fromProtobufKey(builder.getAdminKey());
+        return adminKey;
     }
 
     public ScheduleCreateTransaction setAdminKey(Key key) {
         requireNotFrozen();
-        builder.setAdminKey(key.toProtobufKey());
+        adminKey = key;
         return this;
     }
 
     public String getScheduleMemo() {
-        return builder.getMemo();
+        return scheduleMemo;
     }
 
     public ScheduleCreateTransaction setScheduleMemo(String memo) {
         requireNotFrozen();
-        builder.setMemo(memo);
+        scheduleMemo = memo;
         return this;
     }
 
     ScheduleCreateTransactionBody.Builder build() {
+        var builder = ScheduleCreateTransactionBody.newBuilder();
         if (payerAccountId != null) {
             builder.setPayerAccountID(payerAccountId.toProtobuf());
         }
+        if(transactionToSchedule != null) {
+            builder.setScheduledTransactionBody(transactionToSchedule);
+        }
+        if(adminKey != null) {
+            builder.setAdminKey(adminKey.toProtobufKey());
+        }
+        builder.setMemo(scheduleMemo);
 
         return builder;
+    }
+
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getScheduleCreate();
+        if (body.hasPayerAccountID()) {
+            payerAccountId = AccountId.fromProtobuf(body.getPayerAccountID());
+        }
+        if(body.hasScheduledTransactionBody()) {
+            transactionToSchedule = body.getScheduledTransactionBody();
+        }
+        if(body.hasAdminKey()) {
+            adminKey = Key.fromProtobufKey(body.getAdminKey());
+        }
+        scheduleMemo = body.getMemo();
     }
 
     @Override
@@ -102,9 +123,8 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setScheduleCreate(build());
-        return true;
     }
 
     @Override

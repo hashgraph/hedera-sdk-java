@@ -15,44 +15,22 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class TokenAssociateTransaction extends Transaction<TokenAssociateTransaction> {
-    private final TokenAssociateTransactionBody.Builder builder;
-
     @Nullable
-    AccountId accountId = null;
-    List<TokenId> tokenIds = new ArrayList<>();
+    private AccountId accountId = null;
+    private List<TokenId> tokenIds = new ArrayList<>();
 
     public TokenAssociateTransaction() {
-        builder = TokenAssociateTransactionBody.newBuilder();
-
         setMaxTransactionFee(new Hbar(5));
     }
 
     TokenAssociateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getTokenAssociate().toBuilder();
-
-        if (builder.hasAccount()) {
-            accountId = AccountId.fromProtobuf(builder.getAccount());
-        }
-
-        for (var token : builder.getTokensList()) {
-            tokenIds.add(TokenId.fromProtobuf(token));
-        }
+        initFromTransactionBody();
     }
 
     TokenAssociateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getTokenAssociate().toBuilder();
-
-        if (builder.hasAccount()) {
-            accountId = AccountId.fromProtobuf(builder.getAccount());
-        }
-
-        for (var token : builder.getTokensList()) {
-            tokenIds.add(TokenId.fromProtobuf(token));
-        }
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -68,17 +46,18 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
     }
 
     public List<TokenId> getTokenIds() {
-        return tokenIds;
+        return new ArrayList<>(tokenIds);
     }
 
     public TokenAssociateTransaction setTokenIds(List<TokenId> tokens) {
         Objects.requireNonNull(tokens);
         requireNotFrozen();
-        this.tokenIds = tokens;
+        this.tokenIds = new ArrayList<>(tokens);
         return this;
     }
 
     TokenAssociateTransactionBody.Builder build() {
+        var builder = TokenAssociateTransactionBody.newBuilder();
         if (accountId != null) {
             builder.setAccount(accountId.toProtobuf());
         }
@@ -90,6 +69,17 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
         }
 
         return builder;
+    }
+
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getTokenAssociate();
+        if (body.hasAccount()) {
+            accountId = AccountId.fromProtobuf(body.getAccount());
+        }
+
+        for (var token : body.getTokensList()) {
+            tokenIds.add(TokenId.fromProtobuf(token));
+        }
     }
 
     @Override
@@ -112,9 +102,8 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setTokenAssociate(build());
-        return true;
     }
 
     @Override

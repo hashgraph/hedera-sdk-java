@@ -13,35 +13,22 @@ import java.util.LinkedHashMap;
 import java.util.Objects;
 
 public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteTransaction> {
-    private final ScheduleDeleteTransactionBody.Builder builder;
 
     @Nullable
-    ScheduleId scheduleId = null;
+    private ScheduleId scheduleId = null;
 
     public ScheduleDeleteTransaction() {
-        builder = ScheduleDeleteTransactionBody.newBuilder();
-
         setMaxTransactionFee(new Hbar(5));
     }
 
     ScheduleDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getScheduleDelete().toBuilder();
-
-        if (builder.hasScheduleID()) {
-            scheduleId = ScheduleId.fromProtobuf(builder.getScheduleID());
-        }
+        initFromTransactionBody();
     }
 
     ScheduleDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getScheduleDelete().toBuilder();
-
-        if (builder.hasScheduleID()) {
-            scheduleId = ScheduleId.fromProtobuf(builder.getScheduleID());
-        }
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -56,7 +43,15 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
         return this;
     }
 
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getScheduleDelete();
+        if (body.hasScheduleID()) {
+            scheduleId = ScheduleId.fromProtobuf(body.getScheduleID());
+        }
+    }
+
     ScheduleDeleteTransactionBody.Builder build() {
+        var builder = ScheduleDeleteTransactionBody.newBuilder();
         if (scheduleId != null) {
             builder.setScheduleID(scheduleId.toProtobuf());
         }
@@ -77,9 +72,8 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setScheduleDelete(build());
-        return true;
     }
 
     @Override

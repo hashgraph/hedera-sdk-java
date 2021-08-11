@@ -23,33 +23,21 @@ import java.util.Objects;
  * of a {@link com.hedera.hashgraph.sdk.KeyList}.
  */
 public final class FileDeleteTransaction extends Transaction<FileDeleteTransaction> {
-    private final FileDeleteTransactionBody.Builder builder;
 
     @Nullable
-    FileId fileId = null;
+    private FileId fileId = null;
 
     public FileDeleteTransaction() {
-        builder = FileDeleteTransactionBody.newBuilder();
     }
 
     FileDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getFileDelete().toBuilder();
-
-        if (builder.hasFileID()) {
-            fileId = FileId.fromProtobuf(builder.getFileID());
-        }
+        initFromTransactionBody();
     }
 
     FileDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getFileDelete().toBuilder();
-
-        if (builder.hasFileID()) {
-            fileId = FileId.fromProtobuf(builder.getFileID());
-        }
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -70,7 +58,15 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
         return this;
     }
 
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getFileDelete();
+        if (body.hasFileID()) {
+            fileId = FileId.fromProtobuf(body.getFileID());
+        }
+    }
+
     FileDeleteTransactionBody.Builder build() {
+        var builder = FileDeleteTransactionBody.newBuilder();
         if (fileId != null) {
             builder.setFileID(fileId.toProtobuf());
         }
@@ -91,9 +87,8 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setFileDelete(build());
-        return true;
     }
 
     @Override

@@ -55,7 +55,7 @@ public final class PublicKey extends Key {
             transaction.freeze();
         }
 
-        for (var signedTransaction : transaction.signedTransactions) {
+        for (var signedTransaction : transaction.innerSignedTransactions) {
             @Var var found = false;
             for (var sigPair : signedTransaction.getSigMap().getSigPairList()) {
                 if (sigPair.getPubKeyPrefix().equals(ByteString.copyFrom(toBytes()))) {
