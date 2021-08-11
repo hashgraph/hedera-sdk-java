@@ -309,7 +309,7 @@ public final class PrivateKey extends Key {
             transaction.freeze();
         }
 
-        var builder = (SignedTransaction.Builder) transaction.signedTransactions.get(0);
+        var builder = (SignedTransaction.Builder) transaction.innerSignedTransactions.get(0);
         var signature = sign(builder.getBodyBytes().toByteArray());
 
         transaction.addSignature(getPublicKey(), signature);

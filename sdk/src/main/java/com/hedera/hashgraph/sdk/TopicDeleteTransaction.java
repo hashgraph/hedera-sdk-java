@@ -21,33 +21,20 @@ import java.util.Objects;
  * If there is no {@code adminKey}, this transaction will fail with {@link Status#UNAUTHORIZED}.
  */
 public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransaction> {
-    private final ConsensusDeleteTopicTransactionBody.Builder builder;
-
     @Nullable
-    TopicId topicId = null;
+    private TopicId topicId = null;
 
     public TopicDeleteTransaction() {
-        builder = ConsensusDeleteTopicTransactionBody.newBuilder();
     }
 
     TopicDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getConsensusDeleteTopic().toBuilder();
-
-        if (builder.hasTopicID()) {
-            topicId = TopicId.fromProtobuf(builder.getTopicID());
-        }
+        initFromTransactionBody();
     }
 
     TopicDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getConsensusDeleteTopic().toBuilder();
-
-        if (builder.hasTopicID()) {
-            topicId = TopicId.fromProtobuf(builder.getTopicID());
-        }
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -68,7 +55,15 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
         return this;
     }
 
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getConsensusDeleteTopic();
+        if (body.hasTopicID()) {
+            topicId = TopicId.fromProtobuf(body.getTopicID());
+        }
+    }
+
     ConsensusDeleteTopicTransactionBody.Builder build() {
+        var builder = ConsensusDeleteTopicTransactionBody.newBuilder();
         if (topicId != null) {
             builder.setTopicID(topicId.toProtobuf());
         }
@@ -89,9 +84,8 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setConsensusDeleteTopic(build());
-        return true;
     }
 
     @Override

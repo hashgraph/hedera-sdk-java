@@ -15,42 +15,21 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeScheduleUpdateTransaction> {
-    private final TokenFeeScheduleUpdateTransactionBody.Builder builder;
-
     @Nullable
-    TokenId tokenId = null;
-    List<CustomFee> customFees = new ArrayList<>();
+    private TokenId tokenId = null;
+    private List<CustomFee> customFees = new ArrayList<>();
 
     public TokenFeeScheduleUpdateTransaction() {
-        builder = TokenFeeScheduleUpdateTransactionBody.newBuilder();
     }
 
     TokenFeeScheduleUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getTokenFeeScheduleUpdate().toBuilder();
-
-        if (builder.hasTokenId()) {
-            tokenId = TokenId.fromProtobuf(builder.getTokenId());
-        }
-
-        for(var fee : builder.getCustomFeesList()) {
-            customFees.add(CustomFee.fromProtobuf(fee));
-        }
+        initFromTransactionBody();
     }
 
     TokenFeeScheduleUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getTokenFeeScheduleUpdate().toBuilder();
-
-        if (builder.hasTokenId()) {
-            tokenId = TokenId.fromProtobuf(builder.getTokenId());
-        }
-
-        for(var fee : builder.getCustomFeesList()) {
-            customFees.add(CustomFee.fromProtobuf(fee));
-        }
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -72,11 +51,23 @@ public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeSched
     public TokenFeeScheduleUpdateTransaction setCustomFees(List<CustomFee> customFees) {
         Objects.requireNonNull(customFees);
         requireNotFrozen();
-        this.customFees = customFees;
+        this.customFees = CustomFee.deepCloneList(customFees);
         return this;
     }
 
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getTokenFeeScheduleUpdate();
+        if (body.hasTokenId()) {
+            tokenId = TokenId.fromProtobuf(body.getTokenId());
+        }
+
+        for(var fee : body.getCustomFeesList()) {
+            customFees.add(CustomFee.fromProtobuf(fee));
+        }
+    }
+
     TokenFeeScheduleUpdateTransactionBody.Builder build() {
+        var builder = TokenFeeScheduleUpdateTransactionBody.newBuilder();
         if (tokenId != null) {
             builder.setTokenId(tokenId.toProtobuf());
         }
@@ -106,9 +97,8 @@ public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeSched
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setTokenFeeScheduleUpdate(build());
-        return true;
     }
 
     @Override

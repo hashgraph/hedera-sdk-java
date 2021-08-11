@@ -13,43 +13,22 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class TokenRevokeKycTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenRevokeKycTransaction> {
-    private final TokenRevokeKycTransactionBody.Builder builder;
-
     @Nullable
-    TokenId tokenId = null;
+    private TokenId tokenId = null;
     @Nullable
-    AccountId accountId = null;
+    private AccountId accountId = null;
 
     public TokenRevokeKycTransaction() {
-        builder = TokenRevokeKycTransactionBody.newBuilder();
     }
 
     TokenRevokeKycTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getTokenRevokeKyc().toBuilder();
-
-        if (builder.hasToken()) {
-            tokenId = TokenId.fromProtobuf(builder.getToken());
-        }
-
-        if (builder.hasAccount()) {
-            accountId = AccountId.fromProtobuf(builder.getAccount());
-        }
+        initFromTransactionBody();
     }
 
     TokenRevokeKycTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getTokenRevokeKyc().toBuilder();
-
-        if (builder.hasToken()) {
-            tokenId = TokenId.fromProtobuf(builder.getToken());
-        }
-
-        if (builder.hasAccount()) {
-            accountId = AccountId.fromProtobuf(builder.getAccount());
-        }
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -76,7 +55,19 @@ public class TokenRevokeKycTransaction extends com.hedera.hashgraph.sdk.Transact
         return this;
     }
 
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getTokenRevokeKyc();
+        if (body.hasToken()) {
+            tokenId = TokenId.fromProtobuf(body.getToken());
+        }
+
+        if (body.hasAccount()) {
+            accountId = AccountId.fromProtobuf(body.getAccount());
+        }
+    }
+
     TokenRevokeKycTransactionBody.Builder build() {
+        var builder = TokenRevokeKycTransactionBody.newBuilder();
         if (tokenId != null) {
             builder.setToken(tokenId.toProtobuf());
         }
@@ -105,9 +96,8 @@ public class TokenRevokeKycTransaction extends com.hedera.hashgraph.sdk.Transact
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setTokenRevokeKyc(build());
-        return true;
     }
 
     @Override

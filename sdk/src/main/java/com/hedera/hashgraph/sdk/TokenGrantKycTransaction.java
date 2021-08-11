@@ -13,43 +13,22 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class TokenGrantKycTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenGrantKycTransaction> {
-    private final TokenGrantKycTransactionBody.Builder builder;
-
     @Nullable
-    TokenId tokenId = null;
+    private TokenId tokenId = null;
     @Nullable
-    AccountId accountId = null;
+    private AccountId accountId = null;
 
     public TokenGrantKycTransaction() {
-        builder = TokenGrantKycTransactionBody.newBuilder();
     }
 
     TokenGrantKycTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getTokenGrantKyc().toBuilder();
-
-        if (builder.hasToken()) {
-            tokenId = TokenId.fromProtobuf(builder.getToken());
-        }
-
-        if (builder.hasAccount()) {
-            accountId = AccountId.fromProtobuf(builder.getAccount());
-        }
+        initFromTransactionBody();
     }
 
     TokenGrantKycTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getTokenGrantKyc().toBuilder();
-
-        if (builder.hasToken()) {
-            tokenId = TokenId.fromProtobuf(builder.getToken());
-        }
-
-        if (builder.hasAccount()) {
-            accountId = AccountId.fromProtobuf(builder.getAccount());
-        }
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -76,7 +55,19 @@ public class TokenGrantKycTransaction extends com.hedera.hashgraph.sdk.Transacti
         return this;
     }
 
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getTokenGrantKyc();
+        if (body.hasToken()) {
+            tokenId = TokenId.fromProtobuf(body.getToken());
+        }
+
+        if (body.hasAccount()) {
+            accountId = AccountId.fromProtobuf(body.getAccount());
+        }
+    }
+
     TokenGrantKycTransactionBody.Builder build() {
+        var builder = TokenGrantKycTransactionBody.newBuilder();
         if (tokenId != null) {
             builder.setToken(tokenId.toProtobuf());
         }
@@ -105,9 +96,8 @@ public class TokenGrantKycTransaction extends com.hedera.hashgraph.sdk.Transacti
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setTokenGrantKyc(build());
-        return true;
     }
 
     @Override

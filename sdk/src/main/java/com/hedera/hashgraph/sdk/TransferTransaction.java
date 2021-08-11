@@ -19,31 +19,22 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class TransferTransaction extends Transaction<TransferTransaction> {
-    private final CryptoTransferTransactionBody.Builder builder;
     private final Map<TokenId, Map<AccountId, Long>> tokenTransfers = new HashMap<>();
     private final Map<TokenId, List<TokenNftTransfer>> nftTransfers = new HashMap<>();
     private final Map<AccountId, Hbar> hbarTransfers = new HashMap<>();
 
     public TransferTransaction() {
-        builder = CryptoTransferTransactionBody.newBuilder();
-
         setMaxTransactionFee(new Hbar(1));
     }
 
     TransferTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getCryptoTransfer().toBuilder();
-
-        constructFromBuilder();
+        initFromTransactionBody();
     }
 
     TransferTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getCryptoTransfer().toBuilder();
-
-        constructFromBuilder();
+        initFromTransactionBody();
     }
 
     public Map<TokenId, Map<AccountId, Long>> getTokenTransfers() {
@@ -77,7 +68,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     }
 
     CryptoTransferTransactionBody.Builder build() {
-        builder.clearTokenTransfers();
+        var builder = CryptoTransferTransactionBody.newBuilder();
         for (var entry : tokenTransfers.entrySet()) {
             var list = TokenTransferList.newBuilder()
                 .setToken(entry.getKey().toProtobuf());
@@ -103,7 +94,6 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
             builder.addTokenTransfers(list);
         }
 
-        builder.clearTransfers();
         var list = TransferList.newBuilder();
         for (var entry : hbarTransfers.entrySet()) {
             list.addAccountAmounts(AccountAmount.newBuilder()
@@ -146,9 +136,8 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setCryptoTransfer(build());
-        return true;
     }
 
     @Override
@@ -175,6 +164,8 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     }
 
     private static void doAddTokenTransfer(Map<AccountId, Long> tokenTransferMap, AccountId accountId, long amount) {
+        Objects.requireNonNull(tokenTransferMap);
+        Objects.requireNonNull(accountId);
         var current = tokenTransferMap.containsKey(accountId) ?
             Objects.requireNonNull(tokenTransferMap.get(accountId)) :
             0L;
@@ -182,6 +173,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     }
 
     private void doAddHbarTransfer(AccountId accountId, long amount) {
+        Objects.requireNonNull(accountId);
         var current = hbarTransfers.containsKey(accountId) ?
             Objects.requireNonNull(hbarTransfers.get(accountId)).toTinybars() :
             0L;
@@ -189,12 +181,15 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         hbarTransfers.put(accountId, Hbar.fromTinybars(current + amount));
     }
 
-    private void constructFromBuilder() {
-        for (var transfer : bodyBuilder.getCryptoTransfer().getTransfers().getAccountAmountsList()) {
-            doAddHbarTransfer(AccountId.fromProtobuf(transfer.getAccountID()), transfer.getAmount());
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getCryptoTransfer();
+        if(body.hasTransfers()) {
+            for (var transfer : body.getTransfers().getAccountAmountsList()) {
+                doAddHbarTransfer(AccountId.fromProtobuf(transfer.getAccountID()), transfer.getAmount());
+            }
         }
 
-        for (var tokenTransferList : bodyBuilder.getCryptoTransfer().getTokenTransfersList()) {
+        for (var tokenTransferList : body.getTokenTransfersList()) {
             var token = TokenId.fromProtobuf(tokenTransferList.getToken());
 
             if(tokenTransferList.getTransfersCount() > 0) {

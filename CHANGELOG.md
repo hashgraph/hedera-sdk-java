@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### Unreleased
+
+- Fixed bugs in `ChunkedTransaction.getAllTransactionHashesPerNode()`
+- Setters and getters of `List` fields (such as `TokenBurnTransaction.setSerials()`) now ensure that the user can't gain mutable access to the List field in the Transaction or Query.
+- Misc bug fixes.
+
 ## v2.0.10
 
 ### Added
