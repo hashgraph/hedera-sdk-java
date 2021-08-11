@@ -19,12 +19,6 @@ import javax.annotation.Nullable;
 
 public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<TokenNftInfo>, TokenNftInfoQuery> {
     @Nullable
-    private TokenGetNftInfoQuery.Builder byNftBuilder = null;
-    @Nullable
-    private TokenGetNftInfosQuery.Builder byTokenBuilder = null;
-    @Nullable
-    private TokenGetAccountNftInfosQuery.Builder byAccountBuilder = null;
-    @Nullable
     private NftId nftId = null;
     @Nullable
     private TokenId tokenId = null;
@@ -36,18 +30,6 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
     public TokenNftInfoQuery() {
     }
 
-    private boolean isByNft() {
-        return byNftBuilder != null;
-    }
-
-    private boolean isByToken() {
-        return byTokenBuilder != null;
-    }
-
-    private boolean isByAccount() {
-        return byAccountBuilder != null;
-    }
-
     /**
      * Sets the NFT ID for which information is requested.
      *
@@ -55,8 +37,7 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
      * @param nftId The NftId to be set
      */
     public TokenNftInfoQuery byNftId(NftId nftId) {
-        byNftBuilder = TokenGetNftInfoQuery.newBuilder()
-            .setNftID(nftId.toProtobuf());
+        Objects.requireNonNull(nftId);
         this.nftId = nftId;
         return this;
     }
@@ -73,9 +54,7 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
      * @param tokenId The ID of the token for which information is requested
      */
     public TokenNftInfoQuery byTokenId(TokenId tokenId) {
-        byTokenBuilder = TokenGetNftInfosQuery
-            .newBuilder()
-            .setTokenID(Objects.requireNonNull(tokenId).toProtobuf());
+        Objects.requireNonNull(tokenId);
         this.tokenId = tokenId;
         return this;
     }
@@ -93,9 +72,7 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
      *
      */
     public TokenNftInfoQuery byAccountId(AccountId accountId) {
-        byAccountBuilder = TokenGetAccountNftInfosQuery
-            .newBuilder()
-            .setAccountID(Objects.requireNonNull(accountId).toProtobuf());
+        Objects.requireNonNull(accountId);
         this.accountId = accountId;
         return this;
     }
@@ -152,7 +129,7 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
 
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
-        int modesEnabled = (isByNft() ? 1 : 0) + (isByToken() ? 1 : 0) + (isByAccount() ? 1 : 0);
+        int modesEnabled = (nftId != null ? 1 : 0) + (tokenId != null ? 1 : 0) + (accountId != null ? 1 : 0);
         if(modesEnabled > 1) {
             throw new IllegalStateException("TokenNftInfoQuery must be one of byNftId, byTokenId, or byAccountId, but multiple of these modes have been selected");
         } else if(modesEnabled == 0) {
@@ -163,20 +140,36 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
-        if(isByNft()) {
-            queryBuilder.setTokenGetNftInfo(Objects.requireNonNull(byNftBuilder).setHeader(header));
-        } else if(isByToken()) {
-            queryBuilder.setTokenGetNftInfos(Objects.requireNonNull(byTokenBuilder).setStart(start).setEnd(end).setHeader(header));
+        if(nftId != null) {
+            queryBuilder.setTokenGetNftInfo(
+                TokenGetNftInfoQuery.newBuilder()
+                    .setNftID(nftId.toProtobuf())
+                    .setHeader(header)
+            );
+        } else if(tokenId != null) {
+            queryBuilder.setTokenGetNftInfos(
+                TokenGetNftInfosQuery.newBuilder()
+                    .setTokenID(tokenId.toProtobuf())
+                    .setStart(start)
+                    .setEnd(end)
+                    .setHeader(header)
+            );
         } else /* is by account */ {
-            queryBuilder.setTokenGetAccountNftInfos(Objects.requireNonNull(byAccountBuilder).setStart(start).setEnd(end).setHeader(header));
+            queryBuilder.setTokenGetAccountNftInfos(
+                TokenGetAccountNftInfosQuery.newBuilder()
+                    .setAccountID(accountId.toProtobuf())
+                    .setStart(start)
+                    .setEnd(end)
+                    .setHeader(header)
+            );
         }
     }
 
     @Override
     ResponseHeader mapResponseHeader(Response response) {
-        if(isByNft()) {
+        if(nftId != null) {
             return response.getTokenGetNftInfo().getHeader();
-        } else if(isByToken()) {
+        } else if(tokenId != null) {
             return response.getTokenGetNftInfos().getHeader();
         } else /* is by account */ {
             return response.getTokenGetAccountNftInfos().getHeader();
@@ -185,9 +178,9 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
 
     @Override
     QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request) {
-        if(isByNft()) {
+        if(nftId != null) {
             return request.getTokenGetInfo().getHeader();
-        } else if(isByToken()) {
+        } else if(tokenId != null) {
             return request.getTokenGetNftInfos().getHeader();
         } else /* is by account */ {
             return request.getTokenGetAccountNftInfos().getHeader();
@@ -195,18 +188,18 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
     }
 
     private static List<TokenNftInfo> infosFromProtos(List<com.hedera.hashgraph.sdk.proto.TokenNftInfo> protoList) {
-        var infos = new ArrayList<TokenNftInfo>();
+        var infoList = new ArrayList<TokenNftInfo>();
         for(var proto : protoList) {
-            infos.add(TokenNftInfo.fromProtobuf(proto));
+            infoList.add(TokenNftInfo.fromProtobuf(proto));
         }
-        return infos;
+        return infoList;
     }
 
     @Override
     List<TokenNftInfo> mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        if(isByNft()) {
+        if(nftId != null) {
             return Collections.singletonList(TokenNftInfo.fromProtobuf(response.getTokenGetNftInfo().getNft()));
-        } else if(isByToken()) {
+        } else if(tokenId != null) {
             return infosFromProtos(response.getTokenGetNftInfos().getNftsList());
         } else /* is by account */ {
             return infosFromProtos(response.getTokenGetAccountNftInfos().getNftsList());
@@ -215,9 +208,9 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
 
     @Override
     MethodDescriptor<Query, Response> getMethodDescriptor() {
-        if(isByNft()) {
+        if(nftId != null) {
             return TokenServiceGrpc.getGetTokenNftInfoMethod();
-        } else if(isByToken()) {
+        } else if(tokenId != null) {
             return TokenServiceGrpc.getGetTokenNftInfosMethod();
         } else /* is by account */ {
             return TokenServiceGrpc.getGetAccountNftInfosMethod();

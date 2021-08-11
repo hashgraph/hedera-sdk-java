@@ -24,39 +24,32 @@ import java.util.Objects;
  * On success, the resulting TransactionReceipt contains the newly created TopicId.
  */
 public final class TopicCreateTransaction extends Transaction<TopicCreateTransaction> {
-    private final ConsensusCreateTopicTransactionBody.Builder builder;
-
     @Nullable
-    AccountId autoRenewAccountId = null;
+    private AccountId autoRenewAccountId = null;
+    @Nullable
+    private Duration autoRenewPeriod = null;
+    private String topicMemo = "";
+    @Nullable
+    private Key adminKey = null;
+    @Nullable
+    private Key submitKey = null;
 
     public TopicCreateTransaction() {
-        builder = ConsensusCreateTopicTransactionBody.newBuilder();
-
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
     }
 
     TopicCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getConsensusCreateTopic().toBuilder();
-
-        if (builder.hasAutoRenewAccount()) {
-            autoRenewAccountId = AccountId.fromProtobuf(builder.getAutoRenewAccount());
-        }
+        initFromTransactionBody();
     }
 
     TopicCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getConsensusCreateTopic().toBuilder();
-
-        if (builder.hasAutoRenewAccount()) {
-            autoRenewAccountId = AccountId.fromProtobuf(builder.getAutoRenewAccount());
-        }
+        initFromTransactionBody();
     }
 
     public String getTopicMemo() {
-        return builder.getMemo();
+        return topicMemo;
     }
 
     /**
@@ -68,13 +61,13 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
     public TopicCreateTransaction setTopicMemo(String memo) {
         Objects.requireNonNull(memo);
         requireNotFrozen();
-        builder.setMemo(memo);
+        topicMemo = memo;
         return this;
     }
 
     @Nullable
     public Key getAdminKey() {
-        return builder.hasAdminKey() ? Key.fromProtobufKey(builder.getAdminKey()) : null;
+        return adminKey;
     }
 
     /**
@@ -92,13 +85,13 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
     public TopicCreateTransaction setAdminKey(Key adminKey) {
         Objects.requireNonNull(adminKey);
         requireNotFrozen();
-        builder.setAdminKey(adminKey.toProtobufKey());
+        this.adminKey = adminKey;
         return this;
     }
 
     @Nullable
     public Key getSubmitKey() {
-        return builder.hasSubmitKey() ? Key.fromProtobufKey(builder.getSubmitKey()) : null;
+        return submitKey;
     }
 
     /**
@@ -113,13 +106,13 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
     public TopicCreateTransaction setSubmitKey(Key submitKey) {
         Objects.requireNonNull(submitKey);
         requireNotFrozen();
-        builder.setSubmitKey(submitKey.toProtobufKey());
+        this.submitKey = submitKey;
         return this;
     }
 
     @Nullable
     public Duration getAutoRenewPeriod() {
-        return builder.hasAutoRenewPeriod() ? DurationConverter.fromProtobuf(builder.getAutoRenewPeriod()) : null;
+        return autoRenewPeriod;
     }
 
     /**
@@ -135,7 +128,7 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
     public TopicCreateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         Objects.requireNonNull(autoRenewPeriod);
         requireNotFrozen();
-        builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
+        this.autoRenewPeriod = autoRenewPeriod;
         return this;
     }
 
@@ -166,10 +159,38 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
         return this;
     }
 
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getConsensusCreateTopic();
+        if (body.hasAutoRenewAccount()) {
+            autoRenewAccountId = AccountId.fromProtobuf(body.getAutoRenewAccount());
+        }
+        if(body.hasAdminKey()) {
+            adminKey = Key.fromProtobufKey(body.getAdminKey());
+        }
+        if(body.hasSubmitKey()) {
+            submitKey = Key.fromProtobufKey(body.getSubmitKey());
+        }
+        if(body.hasAutoRenewPeriod()) {
+            autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
+        }
+        topicMemo = body.getMemo();
+    }
+
     ConsensusCreateTopicTransactionBody.Builder build() {
+        var builder = ConsensusCreateTopicTransactionBody.newBuilder();
         if (autoRenewAccountId != null) {
             builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
         }
+        if(adminKey != null) {
+            builder.setAdminKey(adminKey.toProtobufKey());
+        }
+        if(submitKey != null) {
+            builder.setSubmitKey(submitKey.toProtobufKey());
+        }
+        if(autoRenewPeriod != null) {
+            builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
+        }
+        builder.setMemo(topicMemo);
 
         return builder;
     }
@@ -187,9 +208,8 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setConsensusCreateTopic(build());
-        return true;
     }
 
     @Override

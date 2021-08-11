@@ -14,13 +14,10 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class TokenInfoQuery extends com.hedera.hashgraph.sdk.Query<TokenInfo, TokenInfoQuery> {
-    private final TokenGetInfoQuery.Builder builder;
-
     @Nullable
     TokenId tokenId = null;
 
     public TokenInfoQuery() {
-        builder = TokenGetInfoQuery.newBuilder();
     }
 
     /**
@@ -49,6 +46,7 @@ public class TokenInfoQuery extends com.hedera.hashgraph.sdk.Query<TokenInfo, To
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        var builder = TokenGetInfoQuery.newBuilder();
         if (tokenId != null) {
             builder.setToken(tokenId.toProtobuf());
         }

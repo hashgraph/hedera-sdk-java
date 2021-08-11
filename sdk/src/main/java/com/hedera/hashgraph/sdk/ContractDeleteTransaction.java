@@ -16,53 +16,25 @@ import java.util.Objects;
  * Marks a contract as deleted, moving all its current hbars to another account.
  */
 public final class ContractDeleteTransaction extends Transaction<ContractDeleteTransaction> {
-    private final ContractDeleteTransactionBody.Builder builder;
 
     @Nullable
-    ContractId contractId = null;
+    private ContractId contractId = null;
     @Nullable
-    ContractId transferContractId = null;
+    private ContractId transferContractId = null;
     @Nullable
-    AccountId transferAccountId = null;
+    private AccountId transferAccountId = null;
 
     public ContractDeleteTransaction() {
-        builder = ContractDeleteTransactionBody.newBuilder();
     }
 
     ContractDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getContractDeleteInstance().toBuilder();
-
-        if(builder.hasContractID()) {
-            contractId = ContractId.fromProtobuf(builder.getContractID());
-        }
-
-        if(builder.hasTransferContractID()) {
-            transferContractId = ContractId.fromProtobuf(builder.getTransferContractID());
-        }
-
-        if(builder.hasTransferAccountID()) {
-            transferAccountId = AccountId.fromProtobuf(builder.getTransferAccountID());
-        }
+        initFromTransactionBody();
     }
 
     ContractDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getContractDeleteInstance().toBuilder();
-
-        if(builder.hasContractID()) {
-            contractId = ContractId.fromProtobuf(builder.getContractID());
-        }
-
-        if(builder.hasTransferContractID()) {
-            transferContractId = ContractId.fromProtobuf(builder.getTransferContractID());
-        }
-
-        if(builder.hasTransferAccountID()) {
-            transferAccountId = AccountId.fromProtobuf(builder.getTransferAccountID());
-        }
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -144,7 +116,21 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
         return SmartContractServiceGrpc.getDeleteContractMethod();
     }
 
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getContractDeleteInstance();
+        if(body.hasContractID()) {
+            contractId = ContractId.fromProtobuf(body.getContractID());
+        }
+        if(body.hasTransferContractID()) {
+            transferContractId = ContractId.fromProtobuf(body.getTransferContractID());
+        }
+        if(body.hasTransferAccountID()) {
+            transferAccountId = AccountId.fromProtobuf(body.getTransferAccountID());
+        }
+    }
+
     ContractDeleteTransactionBody.Builder build() {
+        var builder = ContractDeleteTransactionBody.newBuilder();
         if (contractId != null) {
             builder.setContractID(contractId.toProtobuf());
         }
@@ -161,9 +147,8 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setContractDeleteInstance(build());
-        return true;
     }
 
     @Override

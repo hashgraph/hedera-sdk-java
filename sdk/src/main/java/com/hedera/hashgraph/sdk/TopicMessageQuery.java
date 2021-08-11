@@ -146,7 +146,8 @@ public final class TopicMessageQuery {
     // TODO: Refactor into a base class when we add more mirror query types
     public SubscriptionHandle subscribe(Client client, Consumer<TopicMessage> onNext) {
         SubscriptionHandle subscriptionHandle = new SubscriptionHandle();
-        makeStreamingCall(client, subscriptionHandle, onNext, 0, new AtomicLong(), new AtomicReference<>());
+        HashMap<TransactionID, ArrayList<ConsensusTopicResponse>> pendingMessages = new HashMap<>();
+        makeStreamingCall(client, subscriptionHandle, onNext, 0, new AtomicLong(), new AtomicReference<>(), pendingMessages);
         return subscriptionHandle;
     }
 
@@ -156,7 +157,8 @@ public final class TopicMessageQuery {
             Consumer<TopicMessage> onNext,
             int attempt,
             AtomicLong counter,
-            AtomicReference<ConsensusTopicResponse> lastMessage
+            AtomicReference<ConsensusTopicResponse> lastMessage,
+            HashMap<TransactionID, ArrayList<ConsensusTopicResponse>> pendingMessages
     ) {
         ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call =
                 client.mirrorNetwork.getNextMirrorNode().getChannel()
@@ -182,7 +184,6 @@ public final class TopicMessageQuery {
             newBuilder.setConsensusStartTime(nextStartTime);
         }
 
-        HashMap<TransactionID, ArrayList<ConsensusTopicResponse>> pendingMessages = new HashMap<>();
         ClientCalls.asyncServerStreamingCall(call, newBuilder.build(), new StreamObserver<>() {
             @Override
             public void onNext(ConsensusTopicResponse consensusTopicResponse) {
@@ -248,7 +249,7 @@ public final class TopicMessageQuery {
                     Thread.currentThread().interrupt();
                 }
 
-                makeStreamingCall(client, subscriptionHandle, onNext, attempt + 1, counter, lastMessage);
+                makeStreamingCall(client, subscriptionHandle, onNext, attempt + 1, counter, lastMessage, pendingMessages);
             }
 
             @Override

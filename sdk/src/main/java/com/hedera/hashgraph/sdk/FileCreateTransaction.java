@@ -12,37 +12,41 @@ import io.grpc.MethodDescriptor;
 import java.time.Instant;
 
 import javax.annotation.Nullable;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Creates a file with the content by submitting the transaction.
  */
 public final class FileCreateTransaction extends Transaction<FileCreateTransaction> {
-    private final FileCreateTransactionBody.Builder builder;
+
+    @Nullable
+    private Instant expirationTime = null;
+    @Nullable
+    private KeyList keys = null;
+    private byte[] contents = {};
+    private String fileMemo = "";
 
     public FileCreateTransaction() {
-        builder = FileCreateTransactionBody.newBuilder();
-
         setExpirationTime(Instant.now().plus(DEFAULT_AUTO_RENEW_PERIOD));
         setMaxTransactionFee(new Hbar(5));
     }
 
     FileCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getFileCreate().toBuilder();
+        initFromTransactionBody();
     }
 
     FileCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getFileCreate().toBuilder();
+        initFromTransactionBody();
     }
 
     @Nullable
     public Instant getExpirationTime() {
-        return builder.hasExpirationTime() ? InstantConverter.fromProtobuf(builder.getExpirationTime()) : null;
+        return expirationTime;
     }
 
     /**
@@ -59,13 +63,14 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
      */
     public FileCreateTransaction setExpirationTime(Instant expirationTime) {
         requireNotFrozen();
-        builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
-
+        Objects.requireNonNull(expirationTime);
+        this.expirationTime = expirationTime;
         return this;
     }
 
+    @Nullable
     public Collection<Key> getKeys() {
-        return KeyList.fromProtobuf(builder.getKeys(), null);
+        return keys;
     }
 
     /**
@@ -86,19 +91,12 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
      */
     public FileCreateTransaction setKeys(Key... keys) {
         requireNotFrozen();
-
-        var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
-
-        for (Key key : keys) {
-            keyList.addKeys(key.toProtobufKey());
-        }
-
-        builder.setKeys(keyList);
+        this.keys = KeyList.of(keys);
         return this;
     }
 
     public ByteString getContents() {
-        return builder.getContents();
+        return ByteString.copyFrom(contents);
     }
 
     /**
@@ -119,7 +117,8 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
      */
     public FileCreateTransaction setContents(byte[] bytes) {
         requireNotFrozen();
-        builder.setContents(ByteString.copyFrom(bytes));
+        Objects.requireNonNull(bytes);
+        contents = bytes;
         return this;
     }
 
@@ -145,17 +144,19 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
      */
     public FileCreateTransaction setContents(String text) {
         requireNotFrozen();
-        builder.setContents(ByteString.copyFromUtf8(text));
+        Objects.requireNonNull(text);
+        contents = text.getBytes(StandardCharsets.UTF_8);
         return this;
     }
 
     public String getFileMemo() {
-        return builder.getMemo();
+        return fileMemo;
     }
 
     public FileCreateTransaction setFileMemo(String memo) {
         requireNotFrozen();
-        this.builder.setMemo(memo);
+        Objects.requireNonNull(memo);
+        fileMemo = memo;
         return this;
     }
 
@@ -165,13 +166,44 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setFileCreate(builder);
-        return true;
+    void validateChecksums(Client client) {
+        // do nothing
+    }
+
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getFileCreate();
+        if(body.hasExpirationTime()) {
+            expirationTime = InstantConverter.fromProtobuf(body.getExpirationTime());
+        }
+        if(body.hasKeys()) {
+            keys = KeyList.fromProtobuf(body.getKeys(), null);
+        }
+        contents = body.getContents().toByteArray();
+        fileMemo = body.getMemo();
+    }
+
+    FileCreateTransactionBody.Builder build() {
+        var builder = FileCreateTransactionBody.newBuilder();
+
+        if(expirationTime != null) {
+            builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
+        }
+        if(keys != null) {
+            builder.setKeys(keys.toProtobuf());
+        }
+        builder.setContents(ByteString.copyFrom(contents));
+        builder.setMemo(fileMemo);
+
+        return builder;
+    }
+
+    @Override
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
+        bodyBuilder.setFileCreate(build());
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setFileCreate(builder);
+        scheduled.setFileCreate(build());
     }
 }

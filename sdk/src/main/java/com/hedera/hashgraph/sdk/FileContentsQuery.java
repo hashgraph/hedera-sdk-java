@@ -17,13 +17,11 @@ import java.util.Objects;
  * Get the contents of a file. The content field is empty (no bytes) if the file is empty.
  */
 public final class FileContentsQuery extends Query<ByteString, FileContentsQuery> {
-    private final FileGetContentsQuery.Builder builder;
 
     @Nullable
-    FileId fileId = null;
+    private FileId fileId = null;
 
     public FileContentsQuery() {
-        this.builder = FileGetContentsQuery.newBuilder();
     }
 
     @Nullable
@@ -60,6 +58,7 @@ public final class FileContentsQuery extends Query<ByteString, FileContentsQuery
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        var builder = FileGetContentsQuery.newBuilder();
         if (fileId != null) {
             builder.setFileID(fileId.toProtobuf());
         }

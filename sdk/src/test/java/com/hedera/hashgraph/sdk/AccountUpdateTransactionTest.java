@@ -33,8 +33,6 @@ public class AccountUpdateTransactionTest {
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setAccountId(AccountId.fromString("0.0.2002"))
             .setProxyAccountId(AccountId.fromString("0.0.1001"))
-            .setSendRecordThreshold(Hbar.fromTinybars(5))
-            .setReceiveRecordThreshold(Hbar.fromTinybars(6))
             .setAutoRenewPeriod(Duration.ofHours(10))
             .setExpirationTime(Instant.ofEpochSecond(1554158543))
             .setReceiverSignatureRequired(false)

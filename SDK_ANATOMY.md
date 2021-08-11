@@ -139,9 +139,7 @@ AccountBalance accountBalanceNew = new AccountBalanceQuery()
     .execute(client);
 ```
 
-`execute()` is a method of `Executable`, and how `execute()` actually
-behaves is determined by a handful of abstract methods that are
-overridden by `Executable`'s subclasses.
+`execute()` is a method of `Executable`, and how `execute()` actually behaves is determined by a handful of abstract methods that are overridden by `Executable`'s subclasses.
 
 The methods that are meant to be overridden by the subclasses are:
 
@@ -260,15 +258,15 @@ There is a `nextTransactionIndex`, which operates similarly to the `nextNodeInde
 Now we can discuss the various parallel arrays in a `Transaction` object and how they're related.  `T` = transaction count, `N` = node count:
 
 - `List<TransactionId> transactionIds[T]`
-- `List<proto.SignatureMap.Builder> signatures[T*N]`
-- `List<proto.SignedTransaction> signedTransactions[T*N]`
-- `List<proto.Transaction> transactions[T*N]`
+- `List<proto.SignatureMap.Builder> sigPairLists[T*N]`
+- `List<proto.SignedTransaction> innerSignedTransactions[T*N]`
+- `List<proto.Transaction> outerTransactions[T*N]`
 
 A `TransactionId` is used to uniquely identify each transaction, so that when the same transaction is submitted to multiple nodes, only one transaction with the same ID will be permitted.  It consists of the `AccountId` of the account who originated the transaction, and the timestamp.
 
-You may naively assume that the `transactions` list is filled first, and then the `signedTransactions` list is filled with the signed versions of the transactions, but that's incorrect.  Remember that the name of the proto message that's ultimately sent is `Transaction`, and that `signedTransactionBytes` is a field in the `Transaction` proto message.  So `signedTransactions` gets populated first, and then `transactions`.
+You may naively assume that the `outerTransactions` list is filled first, and then the `innerSignedTransactions` list is filled with the signed versions of the transactions, but that's incorrect.  Remember that the name of the proto message that's ultimately sent is `Transaction`, and that `signedTransactionBytes` is a field in the `Transaction` proto message.  So `innerSignedTransactions` gets populated first, and then `outerTransactions`.
 
-Also be sure to keep in mind that a `SignatureMap` is itself a list of signature pairs, so each element of signatures is not a single signature as the name implies, it is instead a list of signatures.  `SignatureMap`s permit for a transaction to be signed by multiple accounts.
+Also be sure to keep in mind that a `SignatureMap` is itself a list of signature pairs, so each element of `sigPairLists` is a list of signature pairs.  `SignatureMap`s permit for a transaction to be signed by multiple accounts.
 
 #### Factor C, Scheduled Transactions:
 
@@ -290,9 +288,7 @@ All methods that modify the transaction (including those of subclasses) are guar
 
 The `Transaction` is not immediately sent after freezing.  Instead, the user of the SDK has an opportunity to add signatures.  In `onExecuteAsync()`, The `Transaction` will be frozen if it is not already frozen, and it will be signed by the client's operator, but if any additional signatures are desired, they should be added after freezing and before executing.
 
-`this.signedTransactions` is populated by `freezeWith()`.  `freezeWith()` creates only a single row of `signedTransactions`.  `ChunkedTransaction` overrides `freezeWith()` to create an actual 2D array of `SignedTransactions`.  `this.transactions`, however, is not populated until `makeRequest()` or some other, similar method that requires `Transaction` proto messages builds them using `buildTransaction()`.
-
-**TODO:** some details may change in future versions of the SDK, particularly to do with how and when transactions are signed.
+`this.innerSignedTransactions` is populated by `freezeWith()`.  `freezeWith()` creates only a single row of `innerSignedTransactions`.  `ChunkedTransaction` overrides `freezeWith()` to create an actual 2D array of `SignedTransactions`.  `this.outerTransactions`, however, is not populated until `makeRequest()` or some other, similar method that requires `Transaction` proto messages builds them using `buildTransaction()`.
 
 #### Abstract methods:
 

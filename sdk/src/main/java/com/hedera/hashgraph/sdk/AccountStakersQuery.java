@@ -19,13 +19,10 @@ import java.util.Objects;
  * This is not yet implemented, but will be in a future version of the API.
  */
 public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountStakersQuery> {
-    private final CryptoGetStakersQuery.Builder builder;
-
     @Nullable
-    AccountId accountId = null;
+    private AccountId accountId = null;
 
     public AccountStakersQuery() {
-        builder = CryptoGetStakersQuery.newBuilder();
     }
 
     @Nullable
@@ -54,6 +51,8 @@ public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountS
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        var builder = CryptoGetStakersQuery.newBuilder();
+
         if (accountId != null) {
             builder.setAccountID(accountId.toProtobuf());
         }

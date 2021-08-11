@@ -10,6 +10,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
+import java.util.concurrent.CompletableFuture;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 
@@ -19,43 +20,22 @@ import java.util.Objects;
  * Can only be done with a Hedera admin.
  */
 public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteTransaction> {
-    private final SystemUndeleteTransactionBody.Builder builder;
-
     @Nullable
-    FileId fileId;
+    private FileId fileId;
     @Nullable
-    ContractId contractId;
+    private ContractId contractId;
 
     public SystemUndeleteTransaction() {
-        builder = SystemUndeleteTransactionBody.newBuilder();
     }
 
     SystemUndeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getSystemUndelete().toBuilder();
-
-        if(builder.hasFileID()) {
-            fileId = FileId.fromProtobuf(builder.getFileID());
-        }
-
-        if(builder.hasContractID()) {
-            contractId = ContractId.fromProtobuf(builder.getContractID());
-        }
+        initFromTransactionBody();
     }
 
     SystemUndeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getSystemUndelete().toBuilder();
-
-        if(builder.hasFileID()) {
-            fileId = FileId.fromProtobuf(builder.getFileID());
-        }
-
-        if(builder.hasContractID()) {
-            contractId = ContractId.fromProtobuf(builder.getContractID());
-        }
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -98,11 +78,21 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
         return this;
     }
 
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getSystemUndelete();
+        if(body.hasFileID()) {
+            fileId = FileId.fromProtobuf(body.getFileID());
+        }
+        if(body.hasContractID()) {
+            contractId = ContractId.fromProtobuf(body.getContractID());
+        }
+    }
+
     SystemUndeleteTransactionBody.Builder build() {
+        var builder = SystemUndeleteTransactionBody.newBuilder();
         if (fileId != null) {
             builder.setFileID(fileId.toProtobuf());
         }
-
         if (contractId != null) {
             builder.setContractID(contractId.toProtobuf());
         }
@@ -121,25 +111,28 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
         }
     }
 
+    @Override
+    CompletableFuture<Void> onExecuteAsync(Client client) {
+        int modesEnabled = (fileId != null ? 1 : 0) + (contractId != null ? 1 : 0);
+        if(modesEnabled != 1) {
+            throw new IllegalStateException("SystemDeleteTransaction must have exactly 1 of the following fields set: contractId, fileId");
+        }
+        return super.onExecuteAsync(client);
+    }
+
 
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
-        switch (builder.getIdCase()) {
-            case FILEID:
-                return FileServiceGrpc.getSystemUndeleteMethod();
-
-            case CONTRACTID:
-                return SmartContractServiceGrpc.getSystemUndeleteMethod();
-
-            default:
-                throw new IllegalStateException("requires an ID to be set, try calling setFileId or setContractId");
+        if(fileId != null) {
+            return FileServiceGrpc.getSystemUndeleteMethod();
+        } else {
+            return SmartContractServiceGrpc.getSystemUndeleteMethod();
         }
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setSystemUndelete(build());
-        return true;
     }
 
     @Override

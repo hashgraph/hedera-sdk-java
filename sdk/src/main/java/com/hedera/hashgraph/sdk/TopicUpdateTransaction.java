@@ -6,7 +6,6 @@ import com.hedera.hashgraph.sdk.proto.ConsensusUpdateTopicTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.KeyList;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -27,35 +26,30 @@ import java.util.Objects;
  * If a new autoRenewAccount is specified (not just being removed), that account must also sign the transaction.
  */
 public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransaction> {
-    private final ConsensusUpdateTopicTransactionBody.Builder builder;
-
     @Nullable
-    TopicId topicId = null;
+    private TopicId topicId = null;
     @Nullable
-    AccountId autoRenewAccountId = null;
+    private AccountId autoRenewAccountId = null;
+    @Nullable
+    private String topicMemo = null;
+    @Nullable
+    private Key adminKey = null;
+    @Nullable
+    private Key submitKey = null;
+    @Nullable
+    private Duration autoRenewPeriod = null;
 
     public TopicUpdateTransaction() {
-        builder = ConsensusUpdateTopicTransactionBody.newBuilder();
     }
 
     TopicUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getConsensusUpdateTopic().toBuilder();
-
-        if (builder.hasTopicID()) {
-            topicId = TopicId.fromProtobuf(builder.getTopicID());
-        }
+        initFromTransactionBody();
     }
 
     TopicUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getConsensusUpdateTopic().toBuilder();
-
-        if (builder.hasTopicID()) {
-            topicId = TopicId.fromProtobuf(builder.getTopicID());
-        }
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -78,7 +72,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
 
     @Nullable
     public String getTopicMemo() {
-        return builder.hasMemo() ? builder.getMemo().getValue() : null;
+        return topicMemo;
     }
 
     /**
@@ -90,7 +84,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     public TopicUpdateTransaction setTopicMemo(String memo) {
         Objects.requireNonNull(memo);
         requireNotFrozen();
-        builder.setMemo(StringValue.of(memo));
+        topicMemo = memo;
         return this;
     }
 
@@ -101,13 +95,13 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
      */
     public TopicUpdateTransaction clearTopicMemo() {
         requireNotFrozen();
-        builder.setMemo(StringValue.of(""));
+        topicMemo = "";
         return this;
     }
 
     @Nullable
     public Key getAdminKey() {
-        return builder.hasAdminKey() ? Key.fromProtobufKey(builder.getAdminKey()) : null;
+        return adminKey;
     }
 
     /**
@@ -119,7 +113,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     public TopicUpdateTransaction setAdminKey(Key adminKey) {
         Objects.requireNonNull(adminKey);
         requireNotFrozen();
-        builder.setAdminKey(adminKey.toProtobufKey());
+        this.adminKey = adminKey;
         return this;
     }
 
@@ -130,17 +124,13 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
      */
     public TopicUpdateTransaction clearAdminKey() {
         requireNotFrozen();
-
-        builder.setAdminKey(com.hedera.hashgraph.sdk.proto.Key.newBuilder()
-            .setKeyList(KeyList.getDefaultInstance())
-            .build());
-
+        adminKey = new KeyList();
         return this;
     }
 
     @Nullable
     public Key getSubmitKey() {
-        return builder.hasSubmitKey() ? Key.fromProtobufKey(builder.getSubmitKey()) : null;
+        return submitKey;
     }
 
     /**
@@ -152,7 +142,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     public TopicUpdateTransaction setSubmitKey(Key submitKey) {
         Objects.requireNonNull(submitKey);
         requireNotFrozen();
-        builder.setSubmitKey(submitKey.toProtobufKey());
+        this.submitKey = submitKey;
         return this;
     }
 
@@ -163,16 +153,13 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
      */
     public TopicUpdateTransaction clearSubmitKey() {
         requireNotFrozen();
-        builder.setSubmitKey(com.hedera.hashgraph.sdk.proto.Key.newBuilder()
-            .setKeyList(KeyList.getDefaultInstance())
-            .build());
-
+        submitKey = new KeyList();
         return this;
     }
 
     @Nullable
     public Duration getAutoRenewPeriod() {
-        return builder.hasAutoRenewPeriod() ? DurationConverter.fromProtobuf(builder.getAutoRenewPeriod()) : null;
+        return autoRenewPeriod;
     }
 
     /**
@@ -184,7 +171,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     public TopicUpdateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         Objects.requireNonNull(autoRenewPeriod);
         requireNotFrozen();
-        builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
+        this.autoRenewPeriod = autoRenewPeriod;
         return this;
     }
 
@@ -231,15 +218,45 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         return this;
     }
 
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getConsensusUpdateTopic();
+        if (body.hasTopicID()) {
+            topicId = TopicId.fromProtobuf(body.getTopicID());
+        }
+        if(body.hasAdminKey()) {
+            adminKey = Key.fromProtobufKey(body.getAdminKey());
+        }
+        if(body.hasSubmitKey()) {
+            submitKey = Key.fromProtobufKey(body.getSubmitKey());
+        }
+        if(body.hasAutoRenewPeriod()) {
+            autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
+        }
+        if(body.hasMemo()) {
+            topicMemo = body.getMemo().getValue();
+        }
+    }
+
     ConsensusUpdateTopicTransactionBody.Builder build() {
+        var builder = ConsensusUpdateTopicTransactionBody.newBuilder();
         if (topicId != null) {
             builder.setTopicID(topicId.toProtobuf());
         }
-
         if (autoRenewAccountId != null) {
             builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
         }
-
+        if(adminKey != null) {
+            builder.setAdminKey(adminKey.toProtobufKey());
+        }
+        if(submitKey != null) {
+            builder.setSubmitKey(submitKey.toProtobufKey());
+        }
+        if(autoRenewPeriod != null) {
+            builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
+        }
+        if(topicMemo != null) {
+            builder.setMemo(StringValue.of(topicMemo));
+        }
         return builder;
     }
 
@@ -262,9 +279,8 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setConsensusUpdateTopic(build());
-        return true;
     }
 
     @Override

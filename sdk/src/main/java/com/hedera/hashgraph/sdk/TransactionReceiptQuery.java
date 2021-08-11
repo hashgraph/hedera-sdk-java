@@ -20,21 +20,15 @@ import java.util.Objects;
  */
 public final class TransactionReceiptQuery
     extends Query<TransactionReceipt, TransactionReceiptQuery> {
-    private final TransactionGetReceiptQuery.Builder builder;
 
     @Nullable
     TransactionId transactionId = null;
 
     public TransactionReceiptQuery() {
-        builder = TransactionGetReceiptQuery.newBuilder();
     }
 
     @Override
     public TransactionId getTransactionId() {
-        if (transactionId == null) {
-            return TransactionId.fromProtobuf(builder.getTransactionID());
-        }
-
         return transactionId;
     }
 
@@ -64,6 +58,7 @@ public final class TransactionReceiptQuery
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        var builder = TransactionGetReceiptQuery.newBuilder();
         if (transactionId != null) {
             builder.setTransactionID(transactionId.toProtobuf());
         }

@@ -21,13 +21,10 @@ import java.util.Objects;
  * in the record, then the results field will be set to nothing.
  */
 public final class TransactionRecordQuery extends Query<TransactionRecord, TransactionRecordQuery> {
-    private final TransactionGetRecordQuery.Builder builder;
-
     @Nullable
     TransactionId transactionId = null;
 
     public TransactionRecordQuery() {
-        this.builder = TransactionGetRecordQuery.newBuilder();
     }
 
     @Nullable
@@ -57,6 +54,7 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        var builder = TransactionGetRecordQuery.newBuilder();
         if (transactionId != null) {
             builder.setTransactionID(transactionId.toProtobuf());
         }

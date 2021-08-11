@@ -22,51 +22,24 @@ import java.util.Objects;
  * (See {@link FileCreateTransaction#setKeys(Key...)} for more information.)
  */
 public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTransaction> {
-    private final FileAppendTransactionBody.Builder builder;
 
     @Nullable
-    FileId fileId = null;
+    private FileId fileId = null;
 
     public FileAppendTransaction() {
         super();
-
-        builder = FileAppendTransactionBody.newBuilder();
 
         setMaxTransactionFee(new Hbar(5));
     }
 
     FileAppendTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getFileAppend().toBuilder();
-
-        if (builder.hasFileID()) {
-            fileId = FileId.fromProtobuf(builder.getFileID());
-        }
-
-        for (var i = 0; i < signedTransactions.size(); i += nodeAccountIds.isEmpty() ? 1 : nodeAccountIds.size()) {
-            data = data.concat(
-                TransactionBody.parseFrom(signedTransactions.get(i).getBodyBytes())
-                    .getFileAppend().getContents()
-            );
-        }
+        initFromTransactionBody();
     }
 
     FileAppendTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
         super(txBody);
-
-        builder = bodyBuilder.getFileAppend().toBuilder();
-
-        if (builder.hasFileID()) {
-            fileId = FileId.fromProtobuf(builder.getFileID());
-        }
-
-        for (var i = 0; i < signedTransactions.size(); i += nodeAccountIds.isEmpty() ? 1 : nodeAccountIds.size()) {
-            data = data.concat(
-                TransactionBody.parseFrom(signedTransactions.get(i).getBodyBytes())
-                    .getFileAppend().getContents()
-            );
-        }
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -165,10 +138,30 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
         return FileServiceGrpc.getAppendContentMethod();
     }
 
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getFileAppend();
+        if (body.hasFileID()) {
+            fileId = FileId.fromProtobuf(body.getFileID());
+        }
+
+        try {
+            for (var i = 0; i < innerSignedTransactions.size(); i += nodeAccountIds.isEmpty() ? 1 : nodeAccountIds.size()) {
+                data = data.concat(
+                    TransactionBody.parseFrom(innerSignedTransactions.get(i).getBodyBytes())
+                        .getFileAppend().getContents()
+                );
+            }
+        } catch(InvalidProtocolBufferException exc) {
+            throw new IllegalArgumentException(exc.getMessage());
+        }
+    }
+
     FileAppendTransactionBody.Builder build() {
+        var builder = FileAppendTransactionBody.newBuilder();
         if (fileId != null) {
             builder.setFileID(fileId.toProtobuf());
         }
+        builder.setContents(data);
 
         return builder;
     }
@@ -184,9 +177,8 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setFileAppend(build());
-        return true;
     }
 
     @Override

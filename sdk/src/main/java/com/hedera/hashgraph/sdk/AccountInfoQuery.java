@@ -17,13 +17,11 @@ import java.util.Objects;
  * This does not get the list of account records.
  */
 public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery> {
-    private final CryptoGetInfoQuery.Builder builder;
 
     @Nullable
-    AccountId accountId = null;
+    private AccountId accountId = null;
 
     public AccountInfoQuery() {
-        builder = CryptoGetInfoQuery.newBuilder();
     }
 
     @Nullable
@@ -52,6 +50,8 @@ public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery>
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        var builder = CryptoGetInfoQuery.newBuilder();
+
         if (accountId != null) {
             builder.setAccountID(accountId.toProtobuf());
         }

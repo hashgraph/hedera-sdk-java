@@ -11,39 +11,29 @@ import io.grpc.MethodDescriptor;
 import com.google.protobuf.ByteString;
 
 import java.util.LinkedHashMap;
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenMintTransaction> {
-    private final TokenMintTransactionBody.Builder builder;
-
     @Nullable
-    TokenId tokenId = null;
+    private TokenId tokenId = null;
+    private List<byte[]> metadataList = new ArrayList<>();
+    private long amount = 0;
 
     public TokenMintTransaction() {
-        builder = TokenMintTransactionBody.newBuilder();
     }
 
     TokenMintTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getTokenMint().toBuilder();
-
-        if (builder.hasToken()) {
-            tokenId = TokenId.fromProtobuf(builder.getToken());
-        }
+        initFromTransactionBody();
     }
 
     TokenMintTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getTokenMint().toBuilder();
-
-        if (builder.hasToken()) {
-            tokenId = TokenId.fromProtobuf(builder.getToken());
-        }
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -59,41 +49,51 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     }
 
     public long getAmount() {
-        return builder.getAmount();
+        return amount;
     }
 
-    public TokenMintTransaction setAmount(long amount) {
+    public TokenMintTransaction setAmount(@Nonnegative long amount) {
         requireNotFrozen();
-        builder.setAmount(amount);
+        this.amount = amount;
         return this;
     }
 
     public TokenMintTransaction addMetadata(byte[] metadata) {
         requireNotFrozen();
-        builder.addMetadata(ByteString.copyFrom(metadata));
+        Objects.requireNonNull(metadata);
+        metadataList.add(metadata);
         return this;
     }
 
-    public TokenMintTransaction setMetadata(List<byte[]> metadatas) {
+    public TokenMintTransaction setMetadata(List<byte[]> metadataList) {
         requireNotFrozen();
-        builder.clearMetadata();
-        for(var metadata : Objects.requireNonNull(metadatas)) {
-            builder.addMetadata(ByteString.copyFrom(metadata));
-        }
+        this.metadataList = new ArrayList<>(metadataList);
         return this;
     }
 
     public List<byte[]> getMetadata() {
-        var metadata = new ArrayList<byte[]>();
-        for(var datum : builder.getMetadataList()) {
-            metadata.add(datum.toByteArray());
+        return new ArrayList<>(metadataList);
+    }
+
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getTokenMint();
+        if (body.hasToken()) {
+            tokenId = TokenId.fromProtobuf(body.getToken());
         }
-        return metadata;
+        amount = body.getAmount();
+        for(var metadata : body.getMetadataList()) {
+            metadataList.add(metadata.toByteArray());
+        }
     }
 
     TokenMintTransactionBody.Builder build() {
+        var builder = TokenMintTransactionBody.newBuilder();
         if (tokenId != null) {
             builder.setToken(tokenId.toProtobuf());
+        }
+        builder.setAmount(amount);
+        for(var metadata : metadataList) {
+            builder.addMetadata(ByteString.copyFrom(metadata));
         }
 
         return builder;
@@ -112,9 +112,8 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setTokenMint(build());
-        return true;
     }
 
     @Override

@@ -19,27 +19,27 @@ import java.util.LinkedHashMap;
  * This is used before safely shut down the platform for maintenance.
  */
 public final class FreezeTransaction extends Transaction<FreezeTransaction> {
-    private final FreezeTransactionBody.Builder builder;
+    int startHour = 0;
+    int startMinute = 0;
+    int endHour = 0;
+    int endMinute = 0;
 
     public FreezeTransaction() {
-        builder = FreezeTransactionBody.newBuilder();
     }
 
     FreezeTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getFreeze().toBuilder();
+        initFromTransactionBody();
     }
 
     FreezeTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getFreeze().toBuilder();
+        initFromTransactionBody();
     }
 
     @SuppressWarnings("FromTemporalAccessor")
     public Instant getStartTime() {
-        return Instant.from(OffsetTime.of(builder.getStartHour(), builder.getStartMin(), 0, 0, ZoneOffset.UTC));
+        return Instant.from(OffsetTime.of(startHour, startMinute, 0, 0, ZoneOffset.UTC));
     }
 
     /**
@@ -52,15 +52,15 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
     public FreezeTransaction setStartTime(int hour, int minute) {
         requireNotFrozen();
 
-        builder.setStartHour(hour);
-        builder.setStartMin(minute);
+        startHour = hour;
+        startMinute = minute;
 
         return this;
     }
 
     @SuppressWarnings("FromTemporalAccessor")
     public Instant getEndTime() {
-        return Instant.from(OffsetTime.of(builder.getEndHour(), builder.getEndMin(), 0, 0, ZoneOffset.UTC));
+        return Instant.from(OffsetTime.of(endHour, endMinute, 0, 0, ZoneOffset.UTC));
     }
 
     /**
@@ -73,8 +73,8 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
     public FreezeTransaction setEndTime(int hour, int minute) {
         requireNotFrozen();
 
-        builder.setEndHour(hour);
-        builder.setEndMin(minute);
+        endHour = hour;
+        endMinute = minute;
 
         return this;
     }
@@ -89,14 +89,30 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
         return FreezeServiceGrpc.getFreezeMethod();
     }
 
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getFreeze();
+        startHour = body.getStartHour();
+        startMinute = body.getStartMin();
+        endHour = body.getEndHour();
+        endMinute = body.getEndMin();
+    }
+
+    FreezeTransactionBody.Builder build() {
+        var builder = FreezeTransactionBody.newBuilder();
+        builder.setStartHour(startHour);
+        builder.setStartMin(startMinute);
+        builder.setEndHour(endHour);
+        builder.setEndMin(endMinute);
+        return builder;
+    }
+
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setFreeze(builder);
-        return true;
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
+        bodyBuilder.setFreeze(build());
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setFreeze(builder);
+        scheduled.setFreeze(build());
     }
 }

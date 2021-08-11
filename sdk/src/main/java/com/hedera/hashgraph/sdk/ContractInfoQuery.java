@@ -19,13 +19,10 @@ import java.util.Objects;
  * and the time when it will expire.
  */
 public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQuery> {
-    private final ContractGetInfoQuery.Builder builder;
-
     @Nullable
-    ContractId contractId = null;
+    private ContractId contractId = null;
 
     public ContractInfoQuery() {
-        builder = ContractGetInfoQuery.newBuilder();
     }
 
     @Nullable
@@ -62,6 +59,7 @@ public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQue
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        var builder = ContractGetInfoQuery.newBuilder();
         if (contractId != null) {
             builder.setContractID(contractId.toProtobuf());
         }

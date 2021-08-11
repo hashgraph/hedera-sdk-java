@@ -13,13 +13,10 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class ScheduleInfoQuery extends com.hedera.hashgraph.sdk.Query<ScheduleInfo, ScheduleInfoQuery> {
-    private final ScheduleGetInfoQuery.Builder builder;
-
     @Nullable
-    ScheduleId scheduleId = null;
+    private ScheduleId scheduleId = null;
 
     public ScheduleInfoQuery() {
-        builder = ScheduleGetInfoQuery.newBuilder();
     }
 
     public ScheduleInfoQuery setScheduleId(ScheduleId scheduleId) {
@@ -42,6 +39,7 @@ public class ScheduleInfoQuery extends com.hedera.hashgraph.sdk.Query<ScheduleIn
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        var builder = ScheduleGetInfoQuery.newBuilder();
         if (scheduleId != null) {
             builder.setScheduleID(scheduleId.toProtobuf());
         }

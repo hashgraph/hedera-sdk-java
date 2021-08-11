@@ -57,7 +57,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     @Nullable
     public final List<AccountId> getNodeAccountIds() {
         if (!nodeAccountIds.isEmpty()) {
-            return nodeAccountIds;
+            return new ArrayList<>(nodeAccountIds);
         }
 
         return null;
@@ -75,7 +75,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
      * @return {@code this}
      */
     public SdkRequestT setNodeAccountIds(List<AccountId> nodeAccountIds) {
-        this.nodeAccountIds = nodeAccountIds;
+        this.nodeAccountIds = new ArrayList<>(nodeAccountIds);
 
         // noinspection unchecked
         return (SdkRequestT) this;

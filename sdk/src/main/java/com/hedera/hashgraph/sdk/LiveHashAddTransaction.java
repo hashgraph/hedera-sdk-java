@@ -22,26 +22,20 @@ import java.util.Objects;
  * each of which may be either a primitive or a threshold key.
  */
 public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransaction> {
-    private final CryptoAddLiveHashTransactionBody.Builder builder;
-    private final LiveHash.Builder hashBuilder;
-
     @Nullable
-    AccountId accountId = null;
+    private AccountId accountId = null;
+    private byte[] hash = {};
+    @Nullable
+    private KeyList keys = null;
+    @Nullable
+    private Duration duration = null;
 
     public LiveHashAddTransaction() {
-        builder = CryptoAddLiveHashTransactionBody.newBuilder();
-        hashBuilder = LiveHash.newBuilder();
     }
 
     LiveHashAddTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getCryptoAddLiveHash().toBuilder();
-        hashBuilder = builder.getLiveHash().toBuilder();
-
-        if (hashBuilder.hasAccountId()) {
-            accountId = AccountId.fromProtobuf(hashBuilder.getAccountId());
-        }
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -63,7 +57,7 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
     }
 
     public ByteString getHash() {
-        return hashBuilder.getHash();
+        return ByteString.copyFrom(hash);
     }
 
     /**
@@ -73,7 +67,10 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
      * @return {@code this}
      */
     public LiveHashAddTransaction setHash(byte[] hash) {
-        return setHash(ByteString.copyFrom(hash));
+        requireNotFrozen();
+        Objects.requireNonNull(hash);
+        this.hash = hash;
+        return this;
     }
 
     /**
@@ -83,13 +80,13 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
      * @return {@code this}
      */
     public LiveHashAddTransaction setHash(ByteString hash) {
-        requireNotFrozen();
-        hashBuilder.setHash(hash);
-        return this;
+        Objects.requireNonNull(hash);
+        return setHash(hash.toByteArray());
     }
 
+    @Nullable
     public Collection<Key> getKeys() {
-        return KeyList.fromProtobuf(hashBuilder.getKeys(), null);
+        return keys;
     }
 
     /**
@@ -102,20 +99,14 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
     public LiveHashAddTransaction setKeys(Key... keys) {
         requireNotFrozen();
 
-        var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
-
-        for (Key key : keys) {
-            keyList.addKeys(key.toProtobufKey());
-        }
-
-        hashBuilder.setKeys(keyList);
+        this.keys = KeyList.of(keys);
 
         return this;
     }
 
     @Nullable
     public Duration getDuration() {
-        return hashBuilder.hasDuration() ? DurationConverter.fromProtobuf(hashBuilder.getDuration()) : null;
+        return duration;
     }
 
     /**
@@ -126,13 +117,39 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
      */
     public LiveHashAddTransaction setDuration(Duration duration) {
         requireNotFrozen();
-        hashBuilder.setDuration(DurationConverter.toProtobuf(duration));
+        Objects.requireNonNull(duration);
+        this.duration = duration;
         return this;
     }
 
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getCryptoAddLiveHash();
+        var hashBody = body.getLiveHash();
+
+        if (hashBody.hasAccountId()) {
+            accountId = AccountId.fromProtobuf(hashBody.getAccountId());
+        }
+        hash = hashBody.getHash().toByteArray();
+        if(hashBody.hasKeys()) {
+            keys = KeyList.fromProtobuf(hashBody.getKeys(), null);
+        }
+        if(hashBody.hasDuration()) {
+            duration = DurationConverter.fromProtobuf(hashBody.getDuration());
+        }
+    }
+
     CryptoAddLiveHashTransactionBody.Builder build() {
+        var builder = CryptoAddLiveHashTransactionBody.newBuilder();
+        var hashBuilder = LiveHash.newBuilder();
         if (accountId != null) {
             hashBuilder.setAccountId(accountId.toProtobuf());
+        }
+        hashBuilder.setHash(ByteString.copyFrom(hash));
+        if(keys != null) {
+            hashBuilder.setKeys(keys.toProtobuf());
+        }
+        if(duration != null) {
+            hashBuilder.setDuration(DurationConverter.toProtobuf(duration));
         }
 
         return builder.setLiveHash(hashBuilder);
@@ -151,9 +168,8 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setCryptoAddLiveHash(build());
-        return true;
     }
 
     @Override

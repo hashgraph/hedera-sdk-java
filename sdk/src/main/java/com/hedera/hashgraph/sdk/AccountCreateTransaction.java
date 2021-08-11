@@ -20,41 +20,30 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     private static final Hbar DEFAULT_RECORD_THRESHOLD = Hbar.fromTinybars(Long.MAX_VALUE);
 
     @Nullable
-    AccountId proxyAccountId = null;
-
-    private final CryptoCreateTransactionBody.Builder builder;
+    private AccountId proxyAccountId = null;
+    @Nullable
+    private Key key = null;
+    private String accountMemo = "";
+    private Hbar initialBalance = new Hbar(0);
+    private boolean receiverSigRequired = false;
+    private Duration autoRenewPeriod = DEFAULT_AUTO_RENEW_PERIOD;
 
     public AccountCreateTransaction() {
-        builder = CryptoCreateTransactionBody.newBuilder();
-
-        setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
-        setSendRecordThreshold(DEFAULT_RECORD_THRESHOLD);
-        setReceiveRecordThreshold(DEFAULT_RECORD_THRESHOLD);
     }
 
     AccountCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getCryptoCreateAccount().toBuilder();
-
-        if (builder.hasProxyAccountID()) {
-            proxyAccountId = AccountId.fromProtobuf(builder.getProxyAccountID());
-        }
+        initFromTransactionBody();
     }
 
     AccountCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getCryptoCreateAccount().toBuilder();
-
-        if (builder.hasProxyAccountID()) {
-            proxyAccountId = AccountId.fromProtobuf(builder.getProxyAccountID());
-        }
+        initFromTransactionBody();
     }
 
     @Nullable
     public Key getKey() {
-        return builder.hasKey() ? Key.fromProtobufKey(builder.getKey()) : null;
+        return key;
     }
 
     /**
@@ -69,12 +58,12 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     public AccountCreateTransaction setKey(Key key) {
         Objects.requireNonNull(key);
         requireNotFrozen();
-        builder.setKey(key.toProtobufKey());
+        this.key = key;
         return this;
     }
 
     public Hbar getInitialBalance() {
-        return Hbar.fromTinybars(builder.getInitialBalance());
+        return initialBalance;
     }
 
     /**
@@ -86,56 +75,12 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     public AccountCreateTransaction setInitialBalance(Hbar initialBalance) {
         Objects.requireNonNull(initialBalance);
         requireNotFrozen();
-        builder.setInitialBalance(initialBalance.toTinybars());
-        return this;
-    }
-
-    Hbar getSendRecordThreshold() {
-        return Hbar.fromTinybars(builder.getSendRecordThreshold());
-    }
-
-    /**
-     * Set the threshold amount for which a transaction record is created for any transfer of hbars
-     * from this account.
-     *
-     * <p>This is defaulted to {@code Hbar.MAX} by the SDK as the fee for threshold records
-     * can be surprising. Do not adjust the threshold unless you understand that you be charged an
-     * additional (small) fee any time your account sends money.
-     *
-     * @param sendRecordThreshold the threshold amount.
-     * @return {@code this}
-     */
-    AccountCreateTransaction setSendRecordThreshold(Hbar sendRecordThreshold) {
-        requireNotFrozen();
-        Objects.requireNonNull(sendRecordThreshold);
-        builder.setSendRecordThreshold(sendRecordThreshold.toTinybars());
-        return this;
-    }
-
-    Hbar getReceiveRecordThreshold() {
-        return Hbar.fromTinybars(builder.getReceiveRecordThreshold());
-    }
-
-    /**
-     * Set the threshold amount for which a transaction record is created for any transfer of hbars
-     * <b>to this account</b>.
-     *
-     * <p>This is defaulted to {@code Hbar.MAX} by the SDK as the fee for threshold records
-     * can be surprising. Do not adjust the threshold unless you understand that you be charged an
-     * additional (small) fee any time your account <b>receives</b> money.
-     *
-     * @param receiveRecordThreshold the threshold amount.
-     * @return {@code this}
-     */
-    AccountCreateTransaction setReceiveRecordThreshold(Hbar receiveRecordThreshold) {
-        requireNotFrozen();
-        Objects.requireNonNull(receiveRecordThreshold);
-        builder.setReceiveRecordThreshold(receiveRecordThreshold.toTinybars());
+        this.initialBalance = initialBalance;
         return this;
     }
 
     public boolean getReceiverSignatureRequired() {
-        return builder.getReceiverSigRequired();
+        return receiverSigRequired;
     }
 
     /**
@@ -149,7 +94,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
      */
     public AccountCreateTransaction setReceiverSignatureRequired(boolean receiveSignatureRequired) {
         requireNotFrozen();
-        builder.setReceiverSigRequired(receiveSignatureRequired);
+        receiverSigRequired = receiveSignatureRequired;
         return this;
     }
 
@@ -173,7 +118,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
 
     @Nullable
     public Duration getAutoRenewPeriod() {
-        return builder.hasAutoRenewPeriod() ? DurationConverter.fromProtobuf(builder.getAutoRenewPeriod()) : null;
+        return autoRenewPeriod;
     }
 
     /**
@@ -191,25 +136,34 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     public AccountCreateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         requireNotFrozen();
         Objects.requireNonNull(autoRenewPeriod);
-        builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
+        this.autoRenewPeriod = autoRenewPeriod;
         return this;
     }
 
     public String getAccountMemo() {
-        return builder.getMemo();
+        return accountMemo;
     }
 
     public AccountCreateTransaction setAccountMemo(String memo) {
         Objects.requireNonNull(memo);
         requireNotFrozen();
-        this.builder.setMemo(memo);
+        accountMemo = memo;
         return this;
     }
 
     CryptoCreateTransactionBody.Builder build() {
+        var builder = CryptoCreateTransactionBody.newBuilder();
+
         if (proxyAccountId != null) {
             builder.setProxyAccountID(proxyAccountId.toProtobuf());
         }
+        if(key != null) {
+            builder.setKey(key.toProtobufKey());
+        }
+        builder.setInitialBalance(initialBalance.toTinybars());
+        builder.setReceiverSigRequired(receiverSigRequired);
+        builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
+        builder.setMemo(accountMemo);
 
         return builder;
     }
@@ -221,15 +175,31 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         }
     }
 
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getCryptoCreateAccount();
+
+        if (body.hasProxyAccountID()) {
+            proxyAccountId = AccountId.fromProtobuf(body.getProxyAccountID());
+        }
+        if(body.hasKey()) {
+            key = Key.fromProtobufKey(body.getKey());
+        }
+        if(body.hasAutoRenewPeriod()) {
+            autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
+        }
+        initialBalance = Hbar.fromTinybars(body.getInitialBalance());
+        accountMemo = body.getMemo();
+        receiverSigRequired = body.getReceiverSigRequired();
+    }
+
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return CryptoServiceGrpc.getCreateAccountMethod();
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setCryptoCreateAccount(build());
-        return true;
     }
 
     @Override

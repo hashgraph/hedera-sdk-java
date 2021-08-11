@@ -2,10 +2,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
-import com.hedera.hashgraph.sdk.proto.TokenUpdateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -17,54 +14,45 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 
 public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> {
-    private final TokenUpdateTransactionBody.Builder builder;
-
     @Nullable
-    TokenId tokenId = null;
+    private TokenId tokenId = null;
     @Nullable
-    AccountId treasuryAccountId = null;
+    private AccountId treasuryAccountId = null;
     @Nullable
-    AccountId autoRenewAccountId = null;
+    private AccountId autoRenewAccountId = null;
+    private String tokenName = "";
+    private String tokenSymbol = "";
+    @Nullable
+    private Key adminKey = null;
+    @Nullable
+    private Key kycKey = null;
+    @Nullable
+    private Key freezeKey = null;
+    @Nullable
+    private Key wipeKey = null;
+    @Nullable
+    private Key supplyKey = null;
+    @Nullable
+    private Key feeScheduleKey = null;
+    @Nullable
+    private Instant expirationTime = null;
+    @Nullable
+    private Duration autoRenewPeriod = null;
+    @Nullable
+    private String tokenMemo = null;
 
 
     public TokenUpdateTransaction() {
-        builder = TokenUpdateTransactionBody.newBuilder();
     }
 
     TokenUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
-
-        builder = bodyBuilder.getTokenUpdate().toBuilder();
-
-        if (builder.hasToken()) {
-            tokenId = TokenId.fromProtobuf(builder.getToken());
-        }
-
-        if (builder.hasTreasury()) {
-            treasuryAccountId = AccountId.fromProtobuf(builder.getTreasury());
-        }
-
-        if(builder.hasAutoRenewAccount()) {
-            autoRenewAccountId = AccountId.fromProtobuf(builder.getAutoRenewAccount());
-        }
+        initFromTransactionBody();
     }
 
     TokenUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-
-        builder = bodyBuilder.getTokenUpdate().toBuilder();
-
-        if (builder.hasToken()) {
-            tokenId = TokenId.fromProtobuf(builder.getToken());
-        }
-
-        if (builder.hasTreasury()) {
-            treasuryAccountId = AccountId.fromProtobuf(builder.getTreasury());
-        }
-
-        if(builder.hasAutoRenewAccount()) {
-            autoRenewAccountId = AccountId.fromProtobuf(builder.getAutoRenewAccount());
-        }
+        initFromTransactionBody();
     }
 
     @Nullable
@@ -73,31 +61,32 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     public TokenUpdateTransaction setTokenId(TokenId tokenId) {
-        Objects.requireNonNull(tokenId);
         requireNotFrozen();
+        Objects.requireNonNull(tokenId);
         this.tokenId = tokenId;
         return this;
     }
 
+    @Nullable
     public String getTokenName() {
-        return builder.getName();
+        return tokenName;
     }
 
     public TokenUpdateTransaction setTokenName(String name) {
         Objects.requireNonNull(name);
         requireNotFrozen();
-        builder.setName(name);
+        tokenName = name;
         return this;
     }
 
     public String getTokenSymbol() {
-        return builder.getSymbol();
+        return tokenSymbol;
     }
 
     public TokenUpdateTransaction setTokenSymbol(String symbol) {
         Objects.requireNonNull(symbol);
         requireNotFrozen();
-        builder.setSymbol(symbol);
+        tokenSymbol = symbol;
         return this;
     }
 
@@ -113,79 +102,87 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         return this;
     }
 
+    @Nullable
     public Key getAdminKey() {
-        return Key.fromProtobufKey(builder.getAdminKey());
+        return adminKey;
     }
 
     public TokenUpdateTransaction setAdminKey(Key key) {
-        Objects.requireNonNull(key);
         requireNotFrozen();
-        builder.setAdminKey(key.toProtobufKey());
+        Objects.requireNonNull(key);
+        adminKey = key;
         return this;
     }
 
+    @Nullable
     public Key getKycKey() {
-        return Key.fromProtobufKey(builder.getKycKey());
+        return kycKey;
     }
 
     public TokenUpdateTransaction setKycKey(Key key) {
-        Objects.requireNonNull(key);
         requireNotFrozen();
-        builder.setKycKey(key.toProtobufKey());
+        kycKey = key;
         return this;
     }
 
+    @Nullable
     public Key getFreezeKey() {
-        return Key.fromProtobufKey(builder.getFreezeKey());
+        return freezeKey;
     }
 
     public TokenUpdateTransaction setFreezeKey(Key key) {
         Objects.requireNonNull(key);
         requireNotFrozen();
-        builder.setFreezeKey(key.toProtobufKey());
+        freezeKey = key;
         return this;
     }
 
+    @Nullable
     public Key getWipeKey() {
-        return Key.fromProtobufKey(builder.getWipeKey());
+        return wipeKey;
     }
 
     public TokenUpdateTransaction setWipeKey(Key key) {
         Objects.requireNonNull(key);
         requireNotFrozen();
-        builder.setWipeKey(key.toProtobufKey());
+        wipeKey = key;
         return this;
     }
 
+    @Nullable
     public Key getSupplyKey() {
-        return Key.fromProtobufKey(builder.getSupplyKey());
+        return supplyKey;
     }
 
     public TokenUpdateTransaction setSupplyKey(Key key) {
         Objects.requireNonNull(key);
         requireNotFrozen();
-        builder.setSupplyKey(key.toProtobufKey());
+        supplyKey = key;
         return this;
     }
 
+    @Nullable
     public Key getFeeScheduleKey() {
-        return Key.fromProtobufKey(builder.getFeeScheduleKey());
+        return feeScheduleKey;
     }
 
     public TokenUpdateTransaction setFeeScheduleKey(Key key) {
         requireNotFrozen();
-        builder.setFeeScheduleKey(key.toProtobufKey());
+        Objects.requireNonNull(key);
+        feeScheduleKey = key;
         return this;
     }
 
+    @Nullable
     public Instant getExpirationTime() {
-        return InstantConverter.fromProtobuf(builder.getExpiry());
+        return expirationTime;
     }
 
     public TokenUpdateTransaction setExpirationTime(Instant expirationTime) {
         Objects.requireNonNull(expirationTime);
         requireNotFrozen();
-        builder.setExpiry(InstantConverter.toProtobuf(expirationTime));
+        autoRenewPeriod = null;
+        this.expirationTime = expirationTime;
         return this;
     }
 
@@ -202,44 +199,112 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     public Duration getAutoRenewPeriod() {
-        return DurationConverter.fromProtobuf(builder.getAutoRenewPeriod());
+        return autoRenewPeriod;
     }
 
     public TokenUpdateTransaction setAutoRenewPeriod(Duration period) {
         Objects.requireNonNull(period);
         requireNotFrozen();
-        builder.setAutoRenewPeriod(DurationConverter.toProtobuf(period));
+        autoRenewPeriod = period;
         return this;
     }
 
     public String getTokenMemo() {
-        return builder.getMemo().getValue();
+        return tokenMemo;
     }
 
     public TokenUpdateTransaction setTokenMemo(String memo) {
         Objects.requireNonNull(memo);
         requireNotFrozen();
-        this.builder.setMemo(StringValue.of(memo));
+        tokenMemo = memo;
         return this;
     }
 
     public TokenUpdateTransaction clearMemo() {
         requireNotFrozen();
-        this.builder.clearMemo();
+        tokenMemo = "";
         return this;
     }
 
+    void initFromTransactionBody() {
+        var body = sourceTransactionBody.getTokenUpdate();
+        if (body.hasTreasury()) {
+            treasuryAccountId = AccountId.fromProtobuf(body.getTreasury());
+        }
+        if(body.hasAutoRenewAccount()) {
+            autoRenewAccountId = AccountId.fromProtobuf(body.getAutoRenewAccount());
+        }
+        tokenName = body.getName();
+        tokenSymbol = body.getSymbol();
+        if(body.hasAdminKey()) {
+            adminKey = Key.fromProtobufKey(body.getAdminKey());
+        }
+        if(body.hasKycKey()) {
+            kycKey = Key.fromProtobufKey(body.getKycKey());
+        }
+        if(body.hasFreezeKey()) {
+            freezeKey = Key.fromProtobufKey(body.getFreezeKey());
+        }
+        if(body.hasWipeKey()) {
+            wipeKey = Key.fromProtobufKey(body.getWipeKey());
+        }
+        if(body.hasSupplyKey()) {
+            supplyKey = Key.fromProtobufKey(body.getSupplyKey());
+        }
+        if(body.hasFeeScheduleKey()) {
+            feeScheduleKey = Key.fromProtobufKey(body.getFeeScheduleKey());
+        }
+        if(body.hasExpiry()) {
+            expirationTime = InstantConverter.fromProtobuf(body.getExpiry());
+        }
+        if(body.hasAutoRenewPeriod()) {
+            autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
+        }
+        if(body.hasMemo()) {
+            tokenMemo = body.getMemo().getValue();
+        }
+    }
+
     TokenUpdateTransactionBody.Builder build() {
-        if (tokenId != null) {
+        var builder = TokenUpdateTransactionBody.newBuilder();
+        if(tokenId != null) {
             builder.setToken(tokenId.toProtobuf());
         }
-
         if (treasuryAccountId != null) {
             builder.setTreasury(treasuryAccountId.toProtobuf());
         }
 
         if (autoRenewAccountId != null) {
             builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
+        }
+        builder.setName(tokenName);
+        builder.setSymbol(tokenSymbol);
+        if(adminKey != null) {
+            builder.setAdminKey(adminKey.toProtobufKey());
+        }
+        if(kycKey != null) {
+            builder.setKycKey(kycKey.toProtobufKey());
+        }
+        if(freezeKey != null) {
+            builder.setFreezeKey(freezeKey.toProtobufKey());
+        }
+        if(wipeKey != null) {
+            builder.setWipeKey(wipeKey.toProtobufKey());
+        }
+        if(supplyKey != null) {
+            builder.setSupplyKey(supplyKey.toProtobufKey());
+        }
+        if(feeScheduleKey != null) {
+            builder.setFeeScheduleKey(feeScheduleKey.toProtobufKey());
+        }
+        if(expirationTime != null) {
+            builder.setExpiry(InstantConverter.toProtobuf(expirationTime));
+        }
+        if(autoRenewPeriod != null) {
+            builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
+        }
+        if(tokenMemo != null) {
+            builder.setMemo(StringValue.of(tokenMemo));
         }
 
         return builder;
@@ -266,9 +331,8 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     @Override
-    boolean onFreeze(TransactionBody.Builder bodyBuilder) {
+    void onFreeze(TransactionBody.Builder bodyBuilder) {
         bodyBuilder.setTokenUpdate(build());
-        return true;
     }
 
     @Override
