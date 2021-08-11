@@ -38,6 +38,7 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
         return this;
     }
 
+    @Deprecated
     public ScheduleSignTransaction clearScheduleId() {
         requireNotFrozen();
         this.scheduleId = null;

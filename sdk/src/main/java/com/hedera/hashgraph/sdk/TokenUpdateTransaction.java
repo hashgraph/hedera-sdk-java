@@ -221,7 +221,7 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
 
     public TokenUpdateTransaction clearMemo() {
         requireNotFrozen();
-        tokenMemo = null;
+        tokenMemo = "";
         return this;
     }
 
