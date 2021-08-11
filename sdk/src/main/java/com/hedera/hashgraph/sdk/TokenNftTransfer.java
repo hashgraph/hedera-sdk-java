@@ -5,7 +5,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import javax.annotation.Nullable;
 import com.hedera.hashgraph.sdk.proto.NftTransfer;
 
-class TokenNftTransfer {
+public class TokenNftTransfer {
     public final AccountId sender;
     public final AccountId receiver;
     public final long serial;
