@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Unreleased
 
+- `ScheduleInfo.getScheduledTransaction()` should now return a transaction with the expected `transactionFee`
 - Fixed bugs in `Transaction.getSignatures()`
 - Added `ChunkedTransaction.getAllSignatures()`
 - Fixed bug in `TopicMessageQuery`

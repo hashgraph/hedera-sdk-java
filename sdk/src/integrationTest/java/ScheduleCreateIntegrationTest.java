@@ -4,15 +4,13 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import javax.swing.*;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ScheduleCreateIntegrationTest {
     @Test
@@ -253,6 +251,54 @@ public class ScheduleCreateIntegrationTest {
             assertEquals(balanceQuery2.tokens.get(tokenId), 10);
 
             testEnv.close(tokenId, accountId, key);
+        });
+    }
+
+    @Test
+    @DisplayName("Cannot schedule two identical transactions")
+    void cannotScheduleTwoTransactions() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv(1);
+
+            var key = PrivateKey.generate();
+            var accountId = new AccountCreateTransaction()
+                .setInitialBalance(new Hbar(10))
+                .setKey(key)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .accountId;
+
+            var transferTx = new TransferTransaction()
+                .addHbarTransfer(testEnv.operatorId, new Hbar(-10))
+                .addHbarTransfer(accountId, new Hbar(10));
+
+            var scheduleId1 = transferTx.schedule()
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .scheduleId;
+
+            var info1 = new ScheduleInfoQuery()
+                .setScheduleId(scheduleId1)
+                .execute(testEnv.client);
+
+            assertNotNull(info1.executedAt);
+
+            var transferTxFromInfo = info1.getScheduledTransaction();
+
+            var scheduleCreateTx1 = transferTx.schedule();
+            var scheduleCreateTx2 = transferTxFromInfo.schedule();
+
+            assertEquals(scheduleCreateTx1.toString(), scheduleCreateTx2.toString());
+
+            var error = assertThrows(ReceiptStatusException.class, () -> {
+                transferTxFromInfo.schedule()
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            });
+
+            assertTrue(error.toString().contains("IDENTICAL_SCHEDULE_ALREADY_CREATED"));
+
+            testEnv.close(accountId, key);
         });
     }
 
