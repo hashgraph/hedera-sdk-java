@@ -1010,9 +1010,9 @@ public enum Status {
     CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE(ResponseCodeEnum.CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE),
 
     /**
-     * The sum of all custom fractional fees must be strictly less than 1
+     * A royalty cannot exceed the total fungible value exchanged for an NFT
      */
-    INVALID_CUSTOM_FRACTIONAL_FEES_SUM(ResponseCodeEnum.INVALID_CUSTOM_FRACTIONAL_FEES_SUM),
+    ROYALTY_FRACTION_CANNOT_EXCEED_ONE(ResponseCodeEnum.ROYALTY_FRACTION_CANNOT_EXCEED_ONE),
 
     /**
      * Each fractional custom fee must have its maximum_amount, if specified, at least its minimum_amount
@@ -1092,7 +1092,22 @@ public enum Status {
     /**
      * More than 20 balance adjustments were to satisfy a CryptoTransfer and its implied custom fee payments
      */
-    CUSTOM_FEE_CHARGING_EXCEEDED_MAX_ACCOUNT_AMOUNTS(ResponseCodeEnum.CUSTOM_FEE_CHARGING_EXCEEDED_MAX_ACCOUNT_AMOUNTS);
+    CUSTOM_FEE_CHARGING_EXCEEDED_MAX_ACCOUNT_AMOUNTS(ResponseCodeEnum.CUSTOM_FEE_CHARGING_EXCEEDED_MAX_ACCOUNT_AMOUNTS),
+
+    /**
+     * The sender account in the token transfer transaction could not afford a custom fee
+     */
+    INSUFFICIENT_SENDER_ACCOUNT_BALANCE_FOR_CUSTOM_FEE(ResponseCodeEnum.INSUFFICIENT_SENDER_ACCOUNT_BALANCE_FOR_CUSTOM_FEE),
+
+    /**
+     * Currently no more than 4,294,967,295 NFTs may be minted for a given unique token type
+     */
+    SERIAL_NUMBER_LIMIT_REACHED(ResponseCodeEnum.SERIAL_NUMBER_LIMIT_REACHED),
+
+    /**
+     * Only tokens of type NON_FUNGIBLE_UNIQUE can have royalty fees
+     */
+    CUSTOM_ROYALTY_FEE_ONLY_ALLOWED_FOR_NON_FUNGIBLE_UNIQUE(ResponseCodeEnum.CUSTOM_ROYALTY_FEE_ONLY_ALLOWED_FOR_NON_FUNGIBLE_UNIQUE);
 
     final ResponseCodeEnum code;
 
@@ -1502,8 +1517,8 @@ public enum Status {
                 return TOKEN_HAS_NO_FEE_SCHEDULE_KEY;
             case CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE:
                 return CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE;
-            case INVALID_CUSTOM_FRACTIONAL_FEES_SUM:
-                return INVALID_CUSTOM_FRACTIONAL_FEES_SUM;
+            case ROYALTY_FRACTION_CANNOT_EXCEED_ONE:
+                return ROYALTY_FRACTION_CANNOT_EXCEED_ONE;
             case FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT:
                 return FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT;
             case CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES:
@@ -1536,6 +1551,12 @@ public enum Status {
                 return CUSTOM_FEE_CHARGING_EXCEEDED_MAX_RECURSION_DEPTH;
             case CUSTOM_FEE_CHARGING_EXCEEDED_MAX_ACCOUNT_AMOUNTS:
                 return CUSTOM_FEE_CHARGING_EXCEEDED_MAX_ACCOUNT_AMOUNTS;
+            case INSUFFICIENT_SENDER_ACCOUNT_BALANCE_FOR_CUSTOM_FEE:
+                return INSUFFICIENT_SENDER_ACCOUNT_BALANCE_FOR_CUSTOM_FEE;
+            case SERIAL_NUMBER_LIMIT_REACHED:
+                return SERIAL_NUMBER_LIMIT_REACHED;
+            case CUSTOM_ROYALTY_FEE_ONLY_ALLOWED_FOR_NON_FUNGIBLE_UNIQUE:
+                return CUSTOM_ROYALTY_FEE_ONLY_ALLOWED_FOR_NON_FUNGIBLE_UNIQUE;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
