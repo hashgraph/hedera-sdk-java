@@ -9,6 +9,8 @@ import org.threeten.bp.Instant;
 
 import java.util.Collections;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class TopicUpdateTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
         "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
@@ -55,5 +57,21 @@ public class TopicUpdateTransactionTest {
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();
+    }
+
+    @Test
+    void shouldBytes() throws Exception {
+        var tx = new TopicUpdateTransaction()
+            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+            .setTopicId(TopicId.fromString("0.0.5007"))
+            .setAdminKey(unusedPrivateKey)
+            .setAutoRenewAccountId(AccountId.fromString("0.0.5009"))
+            .setAutoRenewPeriod(Duration.ofHours(24))
+            .setSubmitKey(unusedPrivateKey)
+            .freeze()
+            .sign(unusedPrivateKey);
+        var tx2 = TopicUpdateTransaction.fromBytes(tx.toBytes());
+        assertEquals(tx.toString(), tx2.toString());
     }
 }

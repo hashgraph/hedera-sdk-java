@@ -9,6 +9,8 @@ import org.threeten.bp.Instant;
 
 import java.util.Collections;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class TokenUpdateTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
         "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
@@ -74,5 +76,56 @@ public class TokenUpdateTransactionTest {
             .sign(unusedPrivateKey)
             .toString()
         ).toMatchSnapshot();
+    }
+
+    @Test
+    void shouldBytesFungible() throws Exception {
+        var tx = new TokenUpdateTransaction()
+            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+            .setTokenId(TokenId.fromString("1.2.3"))
+            .setFeeScheduleKey(unusedPrivateKey)
+            .setSupplyKey(unusedPrivateKey)
+            .setAdminKey(unusedPrivateKey)
+            .setAutoRenewAccountId(AccountId.fromString("0.0.123"))
+            .setAutoRenewPeriod(Duration.ofSeconds(100))
+            .setFreezeKey(unusedPrivateKey)
+            .setWipeKey(unusedPrivateKey)
+            .setTokenSymbol("F")
+            .setKycKey(unusedPrivateKey)
+            .setExpirationTime(validStart)
+            .setTreasuryAccountId(AccountId.fromString("0.0.456"))
+            .setTokenName("floof")
+            .setTokenMemo("Floof says hi")
+            .setMaxTransactionFee(new Hbar(1))
+            .freeze()
+            .sign(unusedPrivateKey);
+        var tx2 = TokenUpdateTransaction.fromBytes(tx.toBytes());
+        assertEquals(tx.toString(), tx2.toString());
+    }
+
+    @Test
+    void shouldBytesNft() throws Exception {
+        var tx = new TokenUpdateTransaction()
+            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+            .setFeeScheduleKey(unusedPrivateKey)
+            .setSupplyKey(unusedPrivateKey)
+            .setAdminKey(unusedPrivateKey)
+            .setAutoRenewAccountId(AccountId.fromString("0.0.123"))
+            .setAutoRenewPeriod(Duration.ofSeconds(100))
+            .setFreezeKey(unusedPrivateKey)
+            .setWipeKey(unusedPrivateKey)
+            .setTokenSymbol("F")
+            .setKycKey(unusedPrivateKey)
+            .setExpirationTime(validStart)
+            .setTreasuryAccountId(AccountId.fromString("0.0.456"))
+            .setTokenName("floof")
+            .setTokenMemo("Floof says hi")
+            .setMaxTransactionFee(new Hbar(1))
+            .freeze()
+            .sign(unusedPrivateKey);
+        var tx2 = TokenUpdateTransaction.fromBytes(tx.toBytes());
+        assertEquals(tx.toString(), tx2.toString());
     }
 }

@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+### Unreleased
+
+ * Fixed bugs in [to|from]Bytes() in `TopicUpdateTransaction` and `TokenUpdateTransaction`
+
 ### v2.0.11
 
 ### Added
@@ -20,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
- * `*.setSerials()` will now clone list passed in to prevent changes 
+ * `*.setSerials()` will now clone list passed in to prevent changes
 
 ## v2.0.10
 
