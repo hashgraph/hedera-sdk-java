@@ -12,24 +12,29 @@ import lombok.experimental.Accessors;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.AccessLevel;
 
-import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
-import java.util.Objects;
 
 /**
  * Create a new Hedera™ account.
  */
 @Accessors(chain = true)
 public final class AccountCreateTransaction extends Transaction<AccountCreateTransaction> {
-    private static final Hbar DEFAULT_RECORD_THRESHOLD = Hbar.fromTinybars(Long.MAX_VALUE);
 
+    /**
+     * The ID of the account to which this account is proxy staked.
+     */
     @NonNull
     @Getter
     @Setter
     private AccountId proxyAccountId;
 
+    /**
+     * The key for this account.
+     *
+     * <p>The key that must sign each transfer out of the account. If receiverSignatureRequired is
+     * true, then it must also sign any transfer into the account.
+     */
     @NonNull
     @Getter
     @Setter
@@ -40,15 +45,33 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     @Setter
     private String accountMemo = "";
 
+    /**
+     * Set the initial amount to transfer into this account.
+     */
     @NonNull
     @Getter
     @Setter
     private Hbar initialBalance = new Hbar(0);
 
+    /**
+     * If set to true will require this account to sign any transfer of hbars to this account.
+     *
+     * <p>All transfers of hbars from this account must always be signed. This property only affects
+     * transfers to this account.
+     */
     @Getter
     @Setter
     private boolean receiverSignatureRequired = false;
 
+    /**
+     * The auto renew period for this account.
+     *
+     * <p>A Hedera™ account is charged to extend its expiration date every renew period. If it
+     * doesn't have enough balance, it extends as long as possible. If the balance is zero when it
+     * expires, then the account is deleted.
+     *
+     * <p>This is defaulted to 3 months by the SDK.
+     */
     @NonNull
     @Getter
     @Setter
@@ -89,10 +112,6 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         builder.setMemo(accountMemo);
 
-        if (autoRenewPeriod != null) {
-            builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
-        }
-
         return builder;
     }
 
@@ -109,12 +128,15 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         if (body.hasProxyAccountID()) {
             proxyAccountId = AccountId.fromProtobuf(body.getProxyAccountID());
         }
+        
         if(body.hasKey()) {
             key = Key.fromProtobufKey(body.getKey());
         }
+
         if(body.hasAutoRenewPeriod()) {
             autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
         }
+
         initialBalance = Hbar.fromTinybars(body.getInitialBalance());
         accountMemo = body.getMemo();
         receiverSignatureRequired = body.getReceiverSigRequired();
