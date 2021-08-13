@@ -231,6 +231,9 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         if(body.hasAutoRenewPeriod()) {
             autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
         }
+        if(body.hasAutoRenewAccount()) {
+            autoRenewAccountId = AccountId.fromProtobuf(body.getAutoRenewAccount());
+        }
         if(body.hasMemo()) {
             topicMemo = body.getMemo().getValue();
         }

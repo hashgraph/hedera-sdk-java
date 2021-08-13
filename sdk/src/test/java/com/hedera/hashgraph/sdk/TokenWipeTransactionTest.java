@@ -4,14 +4,13 @@ import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TopicUpdateTransactionTest {
+public class TokenWipeTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
         "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
 
@@ -28,15 +27,14 @@ public class TopicUpdateTransactionTest {
     }
 
     @Test
-    void clearShouldSerialize() {
-        SnapshotMatcher.expect(new TopicUpdateTransaction()
+    void shouldSerializeFungible() {
+        SnapshotMatcher.expect(new TokenWipeTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setTopicId(TopicId.fromString("0.0.5007"))
-            .clearAdminKey()
-            .clearAutoRenewAccountId(AccountId.fromString("0.0.5008"))
-            .clearSubmitKey()
-            .clearTopicMemo()
+            .setTokenId(TokenId.fromString("0.0.111"))
+            .setAccountId(AccountId.fromString("4.4.4"))
+            .setAmount(30)
+            .setMaxTransactionFee(new Hbar(1))
             .freeze()
             .sign(unusedPrivateKey)
             .toString()
@@ -44,15 +42,14 @@ public class TopicUpdateTransactionTest {
     }
 
     @Test
-    void setShouldSerialize() {
-        SnapshotMatcher.expect(new TopicUpdateTransaction()
+    void shouldSerializeNft() {
+        SnapshotMatcher.expect(new TokenWipeTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setTopicId(TopicId.fromString("0.0.5007"))
-            .setAdminKey(unusedPrivateKey)
-            .setAutoRenewAccountId(AccountId.fromString("0.0.5009"))
-            .setAutoRenewPeriod(Duration.ofHours(24))
-            .setSubmitKey(unusedPrivateKey)
+            .setTokenId(TokenId.fromString("0.0.111"))
+            .setAccountId(AccountId.fromString("4.4.4"))
+            .setSerials(Collections.singletonList(444L))
+            .setMaxTransactionFee(new Hbar(1))
             .freeze()
             .sign(unusedPrivateKey)
             .toString()
@@ -60,18 +57,32 @@ public class TopicUpdateTransactionTest {
     }
 
     @Test
-    void shouldBytes() throws Exception {
-        var tx = new TopicUpdateTransaction()
+    void shouldBytesFungible() throws Exception {
+        var tx = new TokenWipeTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setTopicId(TopicId.fromString("0.0.5007"))
-            .setAdminKey(unusedPrivateKey)
-            .setAutoRenewAccountId(AccountId.fromString("0.0.5009"))
-            .setAutoRenewPeriod(Duration.ofHours(24))
-            .setSubmitKey(unusedPrivateKey)
+            .setTokenId(TokenId.fromString("0.0.111"))
+            .setAccountId(AccountId.fromString("4.4.4"))
+            .setAmount(30)
+            .setMaxTransactionFee(new Hbar(1))
             .freeze()
             .sign(unusedPrivateKey);
-        var tx2 = TopicUpdateTransaction.fromBytes(tx.toBytes());
+        var tx2 = TokenWipeTransaction.fromBytes(tx.toBytes());
+        assertEquals(tx.toString(), tx2.toString());
+    }
+
+    @Test
+    void shouldBytesNft() throws Exception {
+        var tx = new TokenWipeTransaction()
+            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+            .setTokenId(TokenId.fromString("0.0.111"))
+            .setAccountId(AccountId.fromString("4.4.4"))
+            .setSerials(Collections.singletonList(444L))
+            .setMaxTransactionFee(new Hbar(1))
+            .freeze()
+            .sign(unusedPrivateKey);
+        var tx2 = TokenWipeTransaction.fromBytes(tx.toBytes());
         assertEquals(tx.toString(), tx2.toString());
     }
 }

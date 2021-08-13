@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.errorprone.annotations.Var;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.AfterClass;
@@ -12,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FileAppendTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
@@ -87,6 +88,24 @@ public class FileAppendTransactionTest {
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setFileId(FileId.fromString("0.0.6006"))
             .setContents(new byte[]{1, 2, 3, 4})
+            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
+            .freeze()
+            .sign(unusedPrivateKey)
+            .toString()
+        ).toMatchSnapshot();
+    }
+
+    @Test
+    void shouldSerializeBigContents() {
+        var nodeAccountIds = new ArrayList<AccountId>();
+        nodeAccountIds.add(AccountId.fromString("0.0.444"));
+        nodeAccountIds.add(AccountId.fromString("0.0.555"));
+
+        SnapshotMatcher.expect(new FileAppendTransaction()
+            .setNodeAccountIds(nodeAccountIds)
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+            .setFileId(FileId.fromString("0.0.6006"))
+            .setContents(BIG_CONTENTS)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
             .sign(unusedPrivateKey)
@@ -183,5 +202,22 @@ public class FileAppendTransactionTest {
             .sign(secondPrivateKey)
             .getAllSignatures();
         SnapshotMatcher.expect(allSignaturesToString(signatures)).toMatchSnapshot();
+    }
+
+    @Test
+    void shouldBytes() throws Exception {
+        var nodeAccountIds = new ArrayList<AccountId>();
+        nodeAccountIds.add(AccountId.fromString("0.0.444"));
+        nodeAccountIds.add(AccountId.fromString("0.0.555"));
+        var tx = new FileAppendTransaction()
+            .setNodeAccountIds(nodeAccountIds)
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+            .setFileId(FileId.fromString("0.0.6006"))
+            .setContents(BIG_CONTENTS)
+            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
+            .freeze()
+            .sign(unusedPrivateKey);
+        var tx2 = FileAppendTransaction.fromBytes(tx.toBytes());
+        assertEquals(tx.toString(), tx2.toString());
     }
 }
