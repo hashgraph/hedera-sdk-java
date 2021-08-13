@@ -135,7 +135,10 @@ class TokenTransferIntegrationTest {
                     .getReceipt(testEnv.client);
             });
 
-            assertTrue(error.getMessage().contains(Status.INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE.toString()));
+            assertTrue(
+                error.getMessage().contains(Status.INSUFFICIENT_SENDER_ACCOUNT_BALANCE_FOR_CUSTOM_FEE.toString()) ||
+                error.getMessage().contains(Status.INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE.toString())
+            );
 
             new TokenDeleteTransaction()
                 .setTokenId(tokenId)
