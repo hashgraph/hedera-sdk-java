@@ -4,11 +4,13 @@ import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-import java.util.List;
+import org.threeten.bp.Instant;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import org.threeten.bp.Instant;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TokenFeeScheduleUpdateTransactionTest {
     final Instant validStart = Instant.ofEpochSecond(1554158542);
@@ -36,6 +38,7 @@ public class TokenFeeScheduleUpdateTransactionTest {
             .setDenominator(7)
             .setMin(3)
             .setMax(100)
+            .setAssessmentMethod(FeeAssessmentMethod.EXCLUSIVE)
         );
 
         return new TokenFeeScheduleUpdateTransaction()

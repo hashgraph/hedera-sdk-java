@@ -8,7 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Unreleased
 
- * Fixed bugs in [to|from]Bytes() in `TopicUpdateTransaction` and `TokenUpdateTransaction`
+ * Fixed bugs in `[to|from]Bytes()` in `TopicUpdateTransaction` and `TokenUpdateTransaction`
+ * Added `FeeAssessmentMethod`.
+ * Added `[get|set]AssessmentMethod()` to `CustomFractionalFee`
+ * Added `CustomRoyaltyFee`
+ * Added `payerAccountIdList` to `AssessedCustomFee`
+ * Added fields to `FreezeTransaction`
 
 ### v2.0.11
 

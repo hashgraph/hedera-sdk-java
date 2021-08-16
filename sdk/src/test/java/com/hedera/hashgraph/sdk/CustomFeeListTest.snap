@@ -1,8 +1,8 @@
 com.hedera.hashgraph.sdk.CustomFeeListTest.deepClone=[
-  "[CustomFixedFee{feeCollectorAccountId=0.0.4322, amount=10, demoninatingTokenId=0.0.483902}, CustomFractionalFee{feeCollectorAccountId=0.0.389042, numerator=3, denominator=7, min=3, max=100}]"
+  "[CustomFixedFee{feeCollectorAccountId=0.0.4322, amount=10, demoninatingTokenId=0.0.483902}, CustomFractionalFee{feeCollectorAccountId=0.0.389042, numerator=3, denominator=7, min=3, max=100, assessmentMethod=INCLUSIVE}]"
 ]
 
 
 com.hedera.hashgraph.sdk.CustomFeeListTest.shouldSerialize=[
-  "[CustomFixedFee{feeCollectorAccountId=0.0.4322, amount=10, demoninatingTokenId=0.0.483902}, CustomFractionalFee{feeCollectorAccountId=0.0.389042, numerator=3, denominator=7, min=3, max=100}]"
+  "[CustomFixedFee{feeCollectorAccountId=0.0.4322, amount=10, demoninatingTokenId=0.0.483902}, CustomFractionalFee{feeCollectorAccountId=0.0.389042, numerator=3, denominator=7, min=3, max=100, assessmentMethod=INCLUSIVE}]"
 ]

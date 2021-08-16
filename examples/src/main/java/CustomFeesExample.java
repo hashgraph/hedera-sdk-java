@@ -164,11 +164,17 @@ public final class CustomFeesExample {
         // 20 tokens to Charlie, 10% of the tokens he attempts to transfer (2 in this case) will be transferred to
         // Alice instead.
 
+        // Fractional fees default to FeeAssessmentMethod.INCLUSIVE, which is the behavior described above.
+        // If you set the assessment method to EXCLUSIVE, then when Bob attempts to transfer 20 tokens to Charlie,
+        // Charlie will receive all 20 tokens, and Bob will be charged an _additional_ 10% fee which
+        // will be transferred to Alice.
+
         CustomFractionalFee customFractionalFee = new CustomFractionalFee()
             .setNumerator(1)
             .setDenominator(10)
             .setMin(1)
             .setMax(10)
+            // .setAssessmentMethod(FeeAssessmentMethod.EXCLUSIVE)
             .setFeeCollectorAccountId(aliceId);
         List<CustomFee> fractionalFeeList = Collections.singletonList(customFractionalFee);
 
