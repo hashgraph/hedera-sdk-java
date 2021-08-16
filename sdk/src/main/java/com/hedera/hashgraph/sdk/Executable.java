@@ -15,11 +15,15 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
 
 abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements WithExecute<O> {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
+
+    static final Pattern RST_STREAM = Pattern
+        .compile(".*\\brst[^0-9a-zA-Z]stream\\b.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
     protected Integer maxAttempts;
     protected Duration maxBackoff;
@@ -289,10 +293,14 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
     boolean shouldRetryExceptionally(@Nullable Throwable error) {
         if (error instanceof StatusRuntimeException) {
-            var status = ((StatusRuntimeException) error).getStatus().getCode();
+            var statusException = (StatusRuntimeException) error;
+            var status = statusException.getStatus().getCode();
+            var description = statusException.getStatus().getDescription();
 
-            return status.equals(io.grpc.Status.UNAVAILABLE.getCode())
-                || status.equals(io.grpc.Status.RESOURCE_EXHAUSTED.getCode());
+            return (status == io.grpc.Status.Code.NOT_FOUND) ||
+                (status == io.grpc.Status.Code.UNAVAILABLE) ||
+                (status == io.grpc.Status.Code.RESOURCE_EXHAUSTED) ||
+                (status == io.grpc.Status.Code.INTERNAL && description != null && RST_STREAM.matcher(description).matches());
         }
 
         return false;
