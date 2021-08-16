@@ -1,3 +1,4 @@
+import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.CustomFee;
 import com.hedera.hashgraph.sdk.CustomFixedFee;
@@ -441,23 +442,34 @@ class TokenCreateIntegrationTest {
         assertDoesNotThrow(() -> {
             var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-            var error = assertThrows(ReceiptStatusException.class, () -> {
-                new TokenCreateTransaction()
-                    .setTokenName("ffff")
-                    .setTokenSymbol("F")
-                    .setTreasuryAccountId(testEnv.operatorId)
-                    .setAdminKey(testEnv.operatorKey)
-                    .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
-                    .setCustomFees(Collections.singletonList(new CustomRoyaltyFee()
-                        .setNumerator(1)
-                        .setDenominator(10)
-                        .setFallbackFee(new CustomFixedFee().setHbarAmount(new Hbar(1)))
-                        .setFeeCollectorAccountId(testEnv.operatorId)))
-                    .execute(testEnv.client)
-                    .getReceipt(testEnv.client);
-            });
+            // Fee collector for royalty fee cannot be treasury, so we need a new account to be the fee collector.
 
-            testEnv.close();
+            var key = PrivateKey.generate();
+
+            var response = new AccountCreateTransaction()
+                .setKey(key)
+                .setInitialBalance(new Hbar(1))
+                .execute(testEnv.client);
+
+            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
+
+            var tokenId = new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setSupplyKey(testEnv.operatorKey)
+                .setAdminKey(testEnv.operatorKey)
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setCustomFees(Collections.singletonList(new CustomRoyaltyFee()
+                    .setNumerator(1)
+                    .setDenominator(10)
+                    .setFallbackFee(new CustomFixedFee().setHbarAmount(new Hbar(1)))
+                    .setFeeCollectorAccountId(accountId)))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId;
+
+            testEnv.close(tokenId, accountId, key);
         });
     }
 }
