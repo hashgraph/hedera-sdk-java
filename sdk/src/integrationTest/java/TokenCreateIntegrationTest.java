@@ -2,6 +2,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.CustomFee;
 import com.hedera.hashgraph.sdk.CustomFixedFee;
 import com.hedera.hashgraph.sdk.CustomFractionalFee;
+import com.hedera.hashgraph.sdk.CustomRoyaltyFee;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
@@ -430,6 +431,33 @@ class TokenCreateIntegrationTest {
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             testEnv.close(tokenId);
+        });
+    }
+
+    @Disabled
+    @Test
+    @DisplayName("Can create NFT with royalty fee")
+    void canCreateRoyaltyFee() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+            var error = assertThrows(ReceiptStatusException.class, () -> {
+                new TokenCreateTransaction()
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(testEnv.operatorKey)
+                    .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                    .setCustomFees(Collections.singletonList(new CustomRoyaltyFee()
+                        .setNumerator(1)
+                        .setDenominator(10)
+                        .setFallbackFee(new CustomFixedFee().setHbarAmount(new Hbar(1)))
+                        .setFeeCollectorAccountId(testEnv.operatorId)))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            });
+
+            testEnv.close();
         });
     }
 }
