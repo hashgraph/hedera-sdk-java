@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * Added `[get|set]AssessmentMethod()` to `CustomFractionalFee`
  * Added `CustomRoyaltyFee`
  * Added `payerAccountIdList` to `AssessedCustomFee`
+ * Added fields to `FreezeTransaction`
 
 ### v2.0.11
 
