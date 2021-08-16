@@ -21,8 +21,6 @@ import java.util.Objects;
  * This is used before safely shut down the platform for maintenance.
  */
 public final class FreezeTransaction extends Transaction<FreezeTransaction> {
-    private int startHour = 0;
-    private int startMinute = 0;
     private int endHour = 0;
     private int endMinute = 0;
     @Nullable
@@ -45,31 +43,19 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
     }
 
     public Instant getStartTime() {
-        if(startTime != null) {
-            return startTime;
-        } else {
-            return Instant.from(OffsetTime.of(startHour, startMinute, 0, 0, ZoneOffset.UTC));
-        }
+        return startTime != null ? startTime : Instant.EPOCH;
     }
 
     /**
-     * Sets the start time (in UTC).
-     *
-     * @param hour   The hour to be set
-     * @param minute The minute to be set
-     * @return {@code this}
+     * @deprecated Use {@link #setStartTime(Instant)} instead.
      */
+    @Deprecated
     public FreezeTransaction setStartTime(int hour, int minute) {
-        requireNotFrozen();
-
-        startHour = hour;
-        startMinute = minute;
-        startTime = Instant.from(OffsetTime.of(startHour, startMinute, 0, 0, ZoneOffset.UTC));
-
-        return this;
+        return setStartTime(Instant.from(OffsetTime.of(hour, minute, 0, 0, ZoneOffset.UTC)));
     }
 
     public FreezeTransaction setStartTime(Instant startTime) {
+        requireNotFrozen();
         Objects.requireNonNull(startTime);
         this.startTime = startTime;
         return this;
@@ -103,6 +89,7 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
     }
 
     public FreezeTransaction setUpdateFileId(FileId updateFileId) {
+        requireNotFrozen();
         Objects.requireNonNull(updateFileId);
         this.updateFileId = updateFileId;
         return this;
@@ -113,6 +100,7 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
     }
 
     public FreezeTransaction setUpdateFileHash(byte[] updateFileHash) {
+        requireNotFrozen();
         Objects.requireNonNull(updateFileHash);
         this.updateFileHash = updateFileHash;
         return this;
@@ -130,8 +118,6 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
 
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getFreeze();
-        startHour = body.getStartHour();
-        startMinute = body.getStartMin();
         endHour = body.getEndHour();
         endMinute = body.getEndMin();
         if(body.hasUpdateFile()) {
@@ -145,8 +131,6 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
 
     FreezeTransactionBody.Builder build() {
         var builder = FreezeTransactionBody.newBuilder();
-        builder.setStartHour(startHour);
-        builder.setStartMin(startMinute);
         builder.setEndHour(endHour);
         builder.setEndMin(endMinute);
         if(updateFileId != null) {

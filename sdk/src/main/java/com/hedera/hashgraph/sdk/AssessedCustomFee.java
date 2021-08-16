@@ -62,6 +62,9 @@ public class AssessedCustomFee {
         if(feeCollectorAccountId != null) {
             builder.setFeeCollectorAccountId(feeCollectorAccountId.toProtobuf());
         }
+        for(var payerId : payerAccountIdList) {
+            builder.addEffectivePayerAccountId(payerId.toProtobuf());
+        }
         return builder.build();
     }
 
