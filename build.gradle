@@ -1,5 +1,5 @@
 plugins {
-    id "net.ltgt.errorprone" version "1.3.0" apply false
+    id "net.ltgt.errorprone" version "2.0.2" apply false
 
     // Gradle plugin to discover dependency updates
     // <https://github.com/ben-manes/gradle-versions-plugin>
