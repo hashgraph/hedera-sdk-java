@@ -6,6 +6,7 @@ plugins {
     id "com.github.ben-manes.versions" version "0.39.0"
 
     id "jacoco"
+    id "org.sonarqube" version "3.3"
 }
 
 allprojects {
@@ -38,6 +39,14 @@ allprojects {
     jacoco {
         reportsDir = file("$buildDir/jacoco")
         toolVersion = "0.8.7"
+    }
+
+    sonarqube {
+        properties {
+            property "sonar.projectKey", "hashgraph_hedera-sdk-java"
+            property "sonar.organization", "hashgraph"
+            property "sonar.host.url", "https://sonarcloud.io"
+        }
     }
 
     tasks.withType(Test) {
