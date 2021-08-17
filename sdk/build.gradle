@@ -138,7 +138,6 @@ jacocoTestReport {
     // configure it so only xml is generated for the report
     reports {
         xml.enabled true
-        xml.destination file("$buildDir/reports/jacoco/report.xml")
         html.enabled true
         csv.enabled false
     }
