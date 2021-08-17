@@ -32,7 +32,6 @@ import java.util.concurrent.TimeoutException;
  */
 public final class Client implements AutoCloseable, WithPing, WithPingAll {
     private static final Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
-    private static final Hbar DEFAULT_MAX_TRANSACTION_FEE = new Hbar(1);
     static final int DEFAULT_MAX_ATTEMPTS = 10;
     static final Duration DEFAULT_MAX_BACKOFF = Duration.ofSeconds(8L);
     static final Duration DEFAULT_MIN_BACKOFF = Duration.ofMillis(250L);
