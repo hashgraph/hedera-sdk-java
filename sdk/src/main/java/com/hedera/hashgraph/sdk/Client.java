@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.io.ByteStreams;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -166,17 +167,9 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
 
     static Map<String, AccountId> readAddressBook(String fileName) {
         var network = new HashMap<String, AccountId>();
-        var file = new File(fileName);
 
         try {
-            var reader = Objects.requireNonNull(Client.class.getClassLoader().getResourceAsStream(fileName));
-            var contents = new byte[(int) file.length()];
-            var read = reader.read(contents);
-
-            if (read != file.length()) {
-                throw new RuntimeException("Failed to read entire address book file");
-            }
-
+            var contents = ByteStreams.toByteArray(Objects.requireNonNull(Client.class.getClassLoader().getResourceAsStream(fileName)));
             var book = NodeAddressBook.fromBytes(ByteString.copyFrom(contents));
 
             for (var nodeAddress : book.nodeAddresses) {
