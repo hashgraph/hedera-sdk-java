@@ -458,7 +458,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      */
     public Client setMinBackoff(Duration minBackoff) {
         if (minBackoff == null || minBackoff.toNanos() < 0) {
-            throw new IllegalArgumentException("maxBackoff must be a positive duration");
+            throw new IllegalArgumentException("minBackoff must be a positive duration");
         } else if (minBackoff.compareTo(maxBackoff) > 0) {
             throw new IllegalArgumentException("minBackoff must be less than or equal to maxBackoff");
         }
