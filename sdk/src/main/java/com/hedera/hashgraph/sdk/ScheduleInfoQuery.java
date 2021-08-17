@@ -1,11 +1,11 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.proto.ScheduleGetInfoQuery;
-import com.hedera.hashgraph.sdk.proto.ScheduleServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
+import com.hedera.hashgraph.sdk.proto.ScheduleGetInfoQuery;
+import com.hedera.hashgraph.sdk.proto.ScheduleServiceGrpc;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 
@@ -19,15 +19,15 @@ public class ScheduleInfoQuery extends com.hedera.hashgraph.sdk.Query<ScheduleIn
     public ScheduleInfoQuery() {
     }
 
+    @Nullable
+    public ScheduleId getScheduleId() {
+        return scheduleId;
+    }
+
     public ScheduleInfoQuery setScheduleId(ScheduleId scheduleId) {
         Objects.requireNonNull(scheduleId);
         this.scheduleId = scheduleId;
         return this;
-    }
-
-    @Nullable
-    public ScheduleId getScheduleId() {
-        return scheduleId;
     }
 
     @Override

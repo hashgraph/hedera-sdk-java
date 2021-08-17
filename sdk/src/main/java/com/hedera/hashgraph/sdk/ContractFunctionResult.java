@@ -77,8 +77,8 @@ public final class ContractFunctionResult {
     /**
      * Get the nth returned value as a string
      *
-     * @return String
      * @param valIndex The index of the string to be retrieved
+     * @return String
      */
     public String getString(int valIndex) {
         return getDynamicBytes(valIndex).toStringUtf8();
@@ -87,8 +87,8 @@ public final class ContractFunctionResult {
     /**
      * Get the nth returned value as a list of strings
      *
-     * @return A List of Strings
      * @param index The index of the list of strings to be retrieved
+     * @return A List of Strings
      */
     public List<String> getStringArray(int index) {
         var offset = getInt32(index);

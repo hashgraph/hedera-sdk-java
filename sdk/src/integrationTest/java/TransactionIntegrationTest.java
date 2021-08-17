@@ -18,17 +18,16 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
 import com.hedera.hashgraph.sdk.proto.TransactionList;
 import com.hedera.hashgraph.sdk.proto.TransferList;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
-import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.Disabled;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TransactionIntegrationTest {
     @Test
@@ -216,12 +215,12 @@ public class TransactionIntegrationTest {
                     .build())
                 .build().toByteString();
 
-            var tx = (TransferTransaction)Transaction.fromBytes(byts.toByteArray());
+            var tx = (TransferTransaction) Transaction.fromBytes(byts.toByteArray());
 
             var testEnv = new IntegrationTestEnv(1);
 
-            assertEquals(tx.getHbarTransfers().get(new AccountId(542348)).toTinybars(),-10);
-            assertEquals(tx.getHbarTransfers().get(new AccountId(47439)).toTinybars(),10);
+            assertEquals(tx.getHbarTransfers().get(new AccountId(542348)).toTinybars(), -10);
+            assertEquals(tx.getHbarTransfers().get(new AccountId(47439)).toTinybars(), 10);
 
             assertNotNull(tx.getNodeAccountIds());
             assertEquals(tx.getNodeAccountIds().size(), 1);

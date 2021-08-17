@@ -1,3 +1,13 @@
+import com.google.protobuf.ByteString;
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.FileContentsQuery;
+import com.hedera.hashgraph.sdk.FileId;
+import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import io.github.cdimascio.dotenv.Dotenv;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -5,18 +15,9 @@ import java.nio.file.Files;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.FileContentsQuery;
-import com.hedera.hashgraph.sdk.FileId;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-
-import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import io.github.cdimascio.dotenv.Dotenv;
-
-/** Get the network address book for inspecting the node public keys, among other things */
+/**
+ * Get the network address book for inspecting the node public keys, among other things
+ */
 public final class GetAddressBookExample {
 
     // see `.env.sample` in the repository root for how to specify these values
@@ -26,7 +27,8 @@ public final class GetAddressBookExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private GetAddressBookExample() { }
+    private GetAddressBookExample() {
+    }
 
     public static void main(String[] args) throws PrecheckStatusException, IOException, TimeoutException {
         Client client = Client.forName(HEDERA_NETWORK);

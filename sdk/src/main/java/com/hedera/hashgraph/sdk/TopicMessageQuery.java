@@ -1,37 +1,37 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.proto.Timestamp;
+import com.hedera.hashgraph.sdk.proto.TransactionID;
+import com.hedera.hashgraph.sdk.proto.mirror.ConsensusServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.mirror.ConsensusTopicQuery;
+import com.hedera.hashgraph.sdk.proto.mirror.ConsensusTopicResponse;
 import io.grpc.CallOptions;
 import io.grpc.ClientCall;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
+import java8.util.function.BiConsumer;
+import java8.util.function.Consumer;
+import java8.util.function.Predicate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.threeten.bp.Duration;
+import org.threeten.bp.Instant;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import java8.util.function.BiConsumer;
-import java8.util.function.Consumer;
-import java8.util.function.Predicate;
 import java.util.regex.Pattern;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.threeten.bp.Instant;
-import com.google.errorprone.annotations.Var;
-
-import com.hedera.hashgraph.sdk.proto.TransactionID;
-import com.hedera.hashgraph.sdk.proto.mirror.ConsensusServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.mirror.ConsensusTopicQuery;
-import com.hedera.hashgraph.sdk.proto.mirror.ConsensusTopicResponse;
 
 public final class TopicMessageQuery {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TopicMessageQuery.class);
     private static final Pattern RST_STREAM = Pattern
-            .compile(".*\\brst[^0-9a-zA-Z]stream\\b.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+        .compile(".*\\brst[^0-9a-zA-Z]stream\\b.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
     private final ConsensusTopicQuery.Builder builder;
     private Runnable completionHandler = this::onComplete;
@@ -113,14 +113,14 @@ public final class TopicMessageQuery {
 
     /**
      * This method will retry the following scenarios:
-     *
+     * <p>
      * NOT_FOUND: Can occur when a client creates a topic and attempts to subscribe to it immediately before it
      * is available in the mirror node.
-     *
+     * <p>
      * UNAVAILABLE: Can occur when the mirror node's database or other downstream components are temporarily down.
-     *
+     * <p>
      * RESOURCE_EXHAUSTED: Can occur when the mirror node's resources (database, threads, etc.) are temporarily exhausted.
-     *
+     * <p>
      * INTERNAL: With a gRPC error status description that indicates the stream was reset. Stream resets can sometimes
      * occur when a proxy or load balancer disconnects the client.
      *
@@ -135,9 +135,9 @@ public final class TopicMessageQuery {
             var description = statusRuntimeException.getStatus().getDescription();
 
             return (code == Status.Code.NOT_FOUND) ||
-                    (code == Status.Code.UNAVAILABLE) ||
-                    (code == Status.Code.RESOURCE_EXHAUSTED) ||
-                    (code == Status.Code.INTERNAL && description != null && RST_STREAM.matcher(description).matches());
+                (code == Status.Code.UNAVAILABLE) ||
+                (code == Status.Code.RESOURCE_EXHAUSTED) ||
+                (code == Status.Code.INTERNAL && description != null && RST_STREAM.matcher(description).matches());
         }
 
         return false;
@@ -152,17 +152,17 @@ public final class TopicMessageQuery {
     }
 
     private void makeStreamingCall(
-            Client client,
-            SubscriptionHandle subscriptionHandle,
-            Consumer<TopicMessage> onNext,
-            int attempt,
-            AtomicLong counter,
-            AtomicReference<ConsensusTopicResponse> lastMessage,
-            HashMap<TransactionID, ArrayList<ConsensusTopicResponse>> pendingMessages
+        Client client,
+        SubscriptionHandle subscriptionHandle,
+        Consumer<TopicMessage> onNext,
+        int attempt,
+        AtomicLong counter,
+        AtomicReference<ConsensusTopicResponse> lastMessage,
+        HashMap<TransactionID, ArrayList<ConsensusTopicResponse>> pendingMessages
     ) {
         ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call =
-                client.mirrorNetwork.getNextMirrorNode().getChannel()
-                        .newCall(ConsensusServiceGrpc.getSubscribeTopicMethod(), CallOptions.DEFAULT);
+            client.mirrorNetwork.getNextMirrorNode().getChannel()
+                .newCall(ConsensusServiceGrpc.getSubscribeTopicMethod(), CallOptions.DEFAULT);
 
         subscriptionHandle.setOnUnsubscribe(() -> {
             call.cancel("unsubscribe", null);
@@ -239,7 +239,7 @@ public final class TopicMessageQuery {
                 var delay = Math.min(500 * (long) Math.pow(2, attempt), maxBackoff.toMillis());
                 var topicId = TopicId.fromProtobuf(builder.getTopicID());
                 LOGGER.warn("Error subscribing to topic {} during attempt #{}. Waiting {} ms before next attempt: {}",
-                        topicId, attempt, delay, t.getMessage());
+                    topicId, attempt, delay, t.getMessage());
                 call.cancel("unsubscribed", null);
 
                 // Cannot use `CompletableFuture<U>` here since this future is never polled

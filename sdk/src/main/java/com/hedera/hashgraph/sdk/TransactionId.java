@@ -1,11 +1,11 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.errorprone.annotations.Var;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
 import java8.util.concurrent.CompletableFuture;
 import org.threeten.bp.Clock;
 import org.threeten.bp.Instant;
-import com.google.errorprone.annotations.Var;
 
 import javax.annotation.Nullable;
 

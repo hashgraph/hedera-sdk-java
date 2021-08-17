@@ -59,7 +59,7 @@ class TokenNftTransferIntegrationTest {
 
             var mintReceipt = new TokenMintTransaction()
                 .setTokenId(tokenId)
-                .setMetadata(NftMetadataGenerator.generate((byte)10))
+                .setMetadata(NftMetadataGenerator.generate((byte) 10))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -80,7 +80,7 @@ class TokenNftTransferIntegrationTest {
 
             var serialsToTransfer = new ArrayList<Long>(mintReceipt.serials.subList(0, 4));
             var transfer = new TransferTransaction();
-            for(var serial : serialsToTransfer) {
+            for (var serial : serialsToTransfer) {
                 transfer.addNftTransfer(tokenId.nft(serial), testEnv.operatorId, accountId);
             }
             transfer.execute(testEnv.client).getReceipt(testEnv.client);
@@ -129,7 +129,7 @@ class TokenNftTransferIntegrationTest {
 
             var mintReceipt = new TokenMintTransaction()
                 .setTokenId(tokenId)
-                .setMetadata(NftMetadataGenerator.generate((byte)10))
+                .setMetadata(NftMetadataGenerator.generate((byte) 10))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -144,7 +144,7 @@ class TokenNftTransferIntegrationTest {
 
             var serialsToTransfer = new ArrayList<Long>(mintReceipt.serials.subList(0, 4));
             var transfer = new TransferTransaction();
-            for(var serial : serialsToTransfer) {
+            for (var serial : serialsToTransfer) {
                 // Try to transfer in wrong direction
                 transfer.addNftTransfer(tokenId.nft(serial), accountId, testEnv.operatorId);
             }

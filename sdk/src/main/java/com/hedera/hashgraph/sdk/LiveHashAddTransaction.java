@@ -3,10 +3,10 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoAddLiveHashTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.LiveHash;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
@@ -129,10 +129,10 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
             accountId = AccountId.fromProtobuf(hashBody.getAccountId());
         }
         hash = hashBody.getHash().toByteArray();
-        if(hashBody.hasKeys()) {
+        if (hashBody.hasKeys()) {
             keys = KeyList.fromProtobuf(hashBody.getKeys(), null);
         }
-        if(hashBody.hasDuration()) {
+        if (hashBody.hasDuration()) {
             duration = DurationConverter.fromProtobuf(hashBody.getDuration());
         }
     }
@@ -144,10 +144,10 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
             hashBuilder.setAccountId(accountId.toProtobuf());
         }
         hashBuilder.setHash(ByteString.copyFrom(hash));
-        if(keys != null) {
+        if (keys != null) {
             hashBuilder.setKeys(keys.toProtobuf());
         }
-        if(duration != null) {
+        if (duration != null) {
             hashBuilder.setDuration(DurationConverter.toProtobuf(duration));
         }
 

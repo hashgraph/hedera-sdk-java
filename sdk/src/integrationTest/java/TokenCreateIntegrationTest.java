@@ -24,6 +24,29 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TokenCreateIntegrationTest {
+    private static List<CustomFee> createFixedFeeList(int count, AccountId feeCollector) {
+        var feeList = new ArrayList<CustomFee>();
+        for (int i = 0; i < count; i++) {
+            feeList.add(new CustomFixedFee()
+                .setAmount(10)
+                .setFeeCollectorAccountId(feeCollector));
+        }
+        return feeList;
+    }
+
+    private static List<CustomFee> createFractionalFeeList(int count, AccountId feeCollector) {
+        var feeList = new ArrayList<CustomFee>();
+        for (int i = 0; i < count; i++) {
+            feeList.add(new CustomFractionalFee()
+                .setNumerator(1)
+                .setDenominator(20)
+                .setMin(1)
+                .setMax(10)
+                .setFeeCollectorAccountId(feeCollector));
+        }
+        return feeList;
+    }
+
     @Test
     @DisplayName("Can create token with operator as all keys")
     void canCreateTokenWithOperatorAsAllKeys() {
@@ -180,7 +203,6 @@ class TokenCreateIntegrationTest {
         });
     }
 
-
     @Test
     @DisplayName("Can create token with custom fees")
     void canCreateTokenWithCustomFees() {
@@ -212,30 +234,6 @@ class TokenCreateIntegrationTest {
             testEnv.close(tokenId);
         });
     }
-
-    private static List<CustomFee> createFixedFeeList(int count, AccountId feeCollector) {
-        var feeList = new ArrayList<CustomFee>();
-        for(int i = 0; i < count; i++) {
-            feeList.add(new CustomFixedFee()
-                .setAmount(10)
-                .setFeeCollectorAccountId(feeCollector));
-        }
-        return feeList;
-    }
-
-    private static List<CustomFee> createFractionalFeeList(int count, AccountId feeCollector) {
-        var feeList = new ArrayList<CustomFee>();
-        for(int i = 0; i < count; i++) {
-            feeList.add(new CustomFractionalFee()
-                .setNumerator(1)
-                .setDenominator(20)
-                .setMin(1)
-                .setMax(10)
-                .setFeeCollectorAccountId(feeCollector));
-        }
-        return feeList;
-    }
-
 
     @Test
     @DisplayName("Cannot create custom fee list with > 10 entries")

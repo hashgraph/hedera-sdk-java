@@ -29,8 +29,8 @@ public final class ContractByteCodeQuery extends Query<ByteString, ContractByteC
     /**
      * Sets the contract ID for which information is requested.
      *
-     * @return {@code this}
      * @param contractId The ContractId to be set
+     * @return {@code this}
      */
     public ContractByteCodeQuery setContractId(ContractId contractId) {
         Objects.requireNonNull(contractId);

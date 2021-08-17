@@ -21,6 +21,10 @@ public class SemanticVersion {
         );
     }
 
+    public static SemanticVersion fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        return fromProtobuf(com.hedera.hashgraph.sdk.proto.SemanticVersion.parseFrom(bytes));
+    }
+
     protected com.hedera.hashgraph.sdk.proto.SemanticVersion toProtobuf() {
         return com.hedera.hashgraph.sdk.proto.SemanticVersion.newBuilder()
             .setMajor(major)
@@ -31,9 +35,5 @@ public class SemanticVersion {
 
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
-    }
-
-    public static SemanticVersion fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(com.hedera.hashgraph.sdk.proto.SemanticVersion.parseFrom(bytes));
     }
 }

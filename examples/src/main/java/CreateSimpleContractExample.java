@@ -1,10 +1,5 @@
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-import java.util.concurrent.TimeoutException;
-
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.ContractCallQuery;
@@ -18,13 +13,17 @@ import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 
 public final class CreateSimpleContractExample {
 
@@ -35,7 +34,8 @@ public final class CreateSimpleContractExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private CreateSimpleContractExample() { }
+    private CreateSimpleContractExample() {
+    }
 
     public static void main(String[] args) throws PrecheckStatusException, IOException, TimeoutException, ReceiptStatusException {
         ClassLoader cl = CreateSimpleContractExample.class.getClassLoader();
