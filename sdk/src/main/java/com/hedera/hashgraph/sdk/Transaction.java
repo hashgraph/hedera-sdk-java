@@ -5,6 +5,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SignatureMap;
+import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionList;
@@ -863,21 +864,29 @@ public abstract class Transaction<T extends Transaction<T>>
             ).build());
     }
 
+    private boolean publicKeyIsInSigPairList(ByteString publicKeyBytes, List<SignaturePair> sigPairList) {
+        for(var pair : sigPairList) {
+            if(pair.getPubKeyPrefix().equals(publicKeyBytes)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Will sign the specific transaction at {@code index}
      * This function is only ever called after the transaction is frozen.
      */
     void signTransaction(int index) {
         var bodyBytes = innerSignedTransactions.get(index).getBodyBytes().toByteArray();
+        var thisSigPairList = sigPairLists.get(index).getSigPairList();
 
         for (var i = 0; i < publicKeys.size(); i++) {
             if (signers.get(i) == null) {
                 continue;
             }
-            for (var pair : sigPairLists.get(index).getSigPairList()) {
-                if (pair.getPubKeyPrefix().equals(ByteString.copyFrom(publicKeys.get(i).toBytes()))) {
-                    continue;
-                }
+            if (publicKeyIsInSigPairList(ByteString.copyFrom(publicKeys.get(i).toBytes()), thisSigPairList)) {
+                continue;
             }
 
             var signatureBytes = signers.get(i).apply(bodyBytes);
