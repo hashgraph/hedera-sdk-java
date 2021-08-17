@@ -151,7 +151,7 @@ task integrationTest(type: Test) {
     classpath = sourceSets.integrationTest.runtimeClasspath
 
     onlyIf {
-        System.getenv('OPERATOR_ID') != null && System.getenv('OPERATOR_KEY') != null || System.getenv('CONFIG_FILE') != null
+		(System.getenv('OPERATOR_ID') != null && System.getenv('OPERATOR_KEY') != null) || System.getenv('CONFIG_FILE') != null
     }
 }
 
