@@ -7,6 +7,9 @@ import com.hedera.hashgraph.sdk.Status;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -15,6 +18,29 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FileContentsIntegrationTest {
+    @Test
+    @DisplayName("Can get address book")
+    void canGetAddressBook() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv(1);
+
+            var fileId = FileId.fromString("0.0.102");
+
+            var contents = new FileContentsQuery()
+                .setFileId(fileId)
+                .execute(testEnv.client);
+
+            var book = NodeAddressBook.fromBytes(contents);
+
+            System.out.println(book);
+            var file = new FileOutputStream("./mainnet-node-address-book.pb");
+            file.write(book.toBytes().toByteArray());
+            file.close();
+
+            testEnv.close();
+        });
+    }
+
     @Test
     @DisplayName("Can query file contents")
     void canQueryFileContents() {
