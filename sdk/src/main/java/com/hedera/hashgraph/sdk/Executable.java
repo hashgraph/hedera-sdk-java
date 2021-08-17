@@ -7,6 +7,7 @@ import io.grpc.stub.ClientCalls;
 import java8.util.concurrent.CompletableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
 
@@ -18,14 +19,66 @@ import java.util.ArrayList;
 import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
 
 abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements WithExecute<O> {
-    private static final Logger logger = LoggerFactory.getLogger(Executable.class);
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected Integer maxAttempts;
+    protected Duration maxBackoff;
+    protected Duration minBackoff;
     protected int nextNodeIndex = 0;
     protected List<AccountId> nodeAccountIds = Collections.emptyList();
     protected List<Node> nodes = new ArrayList<>();
 
     Executable() {
+    }
+
+    /**
+     * @return maxBackoff The maximum amount of time to wait between retries
+     */
+    public final Duration getMaxBackoff() {
+        return maxBackoff != null ? maxBackoff : Client.DEFAULT_MAX_BACKOFF;
+    }
+
+    /**
+     * The maximum amount of time to wait between retries. Every retry attempt will increase the wait time exponentially
+     * until it reaches this time.
+     *
+     * @param maxBackoff The maximum amount of time to wait between retries
+     * @return {@code this}
+     */
+    public final SdkRequestT setMaxBackoff(Duration maxBackoff) {
+        if (maxBackoff == null || maxBackoff.toNanos() < 0) {
+            throw new IllegalArgumentException("maxBackoff must be a positive duration");
+        } else if (maxBackoff.compareTo(getMinBackoff()) < 0) {
+            throw new IllegalArgumentException("maxBackoff must be greater than or equal to minBackoff");
+        }
+        this.maxBackoff = maxBackoff;
+        // noinspection unchecked
+        return (SdkRequestT) this;
+    }
+
+    /**
+     * @return minBackoff The minimum amount of time to wait between retries
+     */
+    public final Duration getMinBackoff() {
+        return minBackoff != null ? minBackoff : Client.DEFAULT_MIN_BACKOFF;
+    }
+
+    /**
+     * The minimum amount of time to wait between retries. When retrying, the delay will start at this time and increase
+     * exponentially until it reaches the maxBackoff.
+     *
+     * @param minBackoff The minimum amount of time to wait between retries
+     * @return {@code this}
+     */
+    public final SdkRequestT setMinBackoff(Duration minBackoff) {
+        if (minBackoff == null || minBackoff.toNanos() < 0) {
+            throw new IllegalArgumentException("minBackoff must be a positive duration");
+        } else if (minBackoff.compareTo(getMaxBackoff()) > 0) {
+            throw new IllegalArgumentException("minBackoff must be less than or equal to maxBackoff");
+        }
+        this.minBackoff = minBackoff;
+        // noinspection unchecked
+        return (SdkRequestT) this;
     }
 
     /**
@@ -48,8 +101,11 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         return maxAttempts != null ? maxAttempts : Client.DEFAULT_MAX_ATTEMPTS;
     }
 
-    public final SdkRequestT setMaxAttempts(int count) {
-        maxAttempts = count;
+    public final SdkRequestT setMaxAttempts(int maxAttempts) {
+        if (maxAttempts <= 0) {
+            throw new IllegalArgumentException("maxAttempts must be greater than zero");
+        }
+        this.maxAttempts = maxAttempts;
         // noinspection unchecked
         return (SdkRequestT) this;
     }
@@ -88,6 +144,14 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     public CompletableFuture<O> executeAsync(Client client) {
         if (maxAttempts == null) {
             maxAttempts = client.getMaxAttempts();
+        }
+
+        if (maxBackoff == null) {
+            maxBackoff = client.getMaxBackoff();
+        }
+
+        if (minBackoff == null) {
+            minBackoff = client.getMinBackoff();
         }
 
         return onExecuteAsync(client).thenCompose((v) -> {
@@ -144,7 +208,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             var latency = (double) (System.nanoTime() - startAt) / 1000000000.0;
 
             // Exponential back-off for Delayer: 250ms, 500ms, 1s, 2s, 4s, 8s, ... 8s
-            long delay = (long) Math.min(250 * Math.pow(2, attempt - 1), 8000);
+            long delay = (long) Math.min(minBackoff.toMillis() * Math.pow(2, attempt - 1), maxBackoff.toMillis());
 
             if (shouldRetryExceptionally(error)) {
                 logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",

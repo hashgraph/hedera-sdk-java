@@ -4,6 +4,11 @@ import com.google.errorprone.annotations.Var;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.threeten.bp.Duration;
 
 import java.io.File;
 import java.io.InputStream;
@@ -30,6 +35,46 @@ class ClientTest {
             Client.forTestnet()
                 .setMaxQueryPayment(Hbar.MIN);
         });
+    }
+
+    @ValueSource(ints = {-1, 0})
+    @ParameterizedTest(name = "Invalid maxAttempts {0}")
+    void setMaxAttempts(int maxAttempts) {
+        assertThrows(IllegalArgumentException.class, () -> {
+            Client.forNetwork(Map.of()).setMaxAttempts(maxAttempts);
+        });
+    }
+
+    @NullSource
+    @ValueSource(longs = {-1, 0, 249})
+    @ParameterizedTest(name = "Invalid maxBackoff {0}")
+    void setMaxBackoffInvalid(Long maxBackoffMillis) {
+        Duration maxBackoff = maxBackoffMillis != null ? Duration.ofMillis(maxBackoffMillis) : null;
+        assertThrows(IllegalArgumentException.class, () -> {
+            Client.forNetwork(Map.of()).setMaxBackoff(maxBackoff);
+        });
+    }
+
+    @ValueSource(longs = {250, 8000})
+    @ParameterizedTest(name = "Valid maxBackoff {0}")
+    void setMaxBackoffValid(long maxBackoff) {
+        Client.forNetwork(Map.of()).setMaxBackoff(Duration.ofMillis(maxBackoff));
+    }
+
+    @NullSource
+    @ValueSource(longs = {-1, 8001})
+    @ParameterizedTest(name = "Invalid minBackoff {0}")
+    void setMinBackoffInvalid(Long minBackoffMillis) {
+        Duration minBackoff = minBackoffMillis != null ? Duration.ofMillis(minBackoffMillis) : null;
+        assertThrows(IllegalArgumentException.class, () -> {
+            Client.forNetwork(Map.of()).setMinBackoff(minBackoff);
+        });
+    }
+
+    @ValueSource(longs = {0, 250, 8000})
+    @ParameterizedTest(name = "Valid minBackoff {0}")
+    void setMinBackoffValid(long minBackoff) {
+        Client.forNetwork(Map.of()).setMinBackoff(Duration.ofMillis(minBackoff));
     }
 
     @Test

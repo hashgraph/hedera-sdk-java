@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * Added `CustomRoyaltyFee`
  * Added `payerAccountIdList` to `AssessedCustomFee`
  * Added fields to `FreezeTransaction`
+ * Added `[min|max]Backoff` to `Client` and `Executable`
 
 ### v2.0.11
 

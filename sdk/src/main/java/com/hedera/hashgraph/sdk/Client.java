@@ -32,7 +32,9 @@ import java.util.concurrent.TimeoutException;
  */
 public final class Client implements AutoCloseable, WithPing, WithPingAll {
     private static final Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
-    static final Integer DEFAULT_MAX_ATTEMPTS = 10;
+    static final int DEFAULT_MAX_ATTEMPTS = 10;
+    static final Duration DEFAULT_MAX_BACKOFF = Duration.ofSeconds(8L);
+    static final Duration DEFAULT_MIN_BACKOFF = Duration.ofMillis(250L);
 
     @Nullable
     Hbar defaultMaxTransactionFee = null;
@@ -48,7 +50,11 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
 
     private Duration requestTimeout = Duration.ofMinutes(2);
 
-    private Integer maxAttempts = null;
+    private int maxAttempts = DEFAULT_MAX_ATTEMPTS;
+
+    private volatile Duration maxBackoff = DEFAULT_MAX_BACKOFF;
+
+    private volatile Duration minBackoff = DEFAULT_MIN_BACKOFF;
 
     private boolean autoValidateChecksums = false;
 
@@ -402,12 +408,63 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     }
 
     public synchronized Client setMaxAttempts(int maxAttempts) {
+        if (maxAttempts <= 0) {
+            throw new IllegalArgumentException("maxAttempts must be greater than zero");
+        }
         this.maxAttempts = maxAttempts;
         return this;
     }
 
     public synchronized int getMaxAttempts() {
-        return maxAttempts != null ? maxAttempts : DEFAULT_MAX_ATTEMPTS;
+        return maxAttempts;
+    }
+
+    /**
+     * @return maxBackoff The maximum amount of time to wait between retries
+     */
+    public Duration getMaxBackoff() {
+        return maxBackoff;
+    }
+
+    /**
+     * The maximum amount of time to wait between retries. Every retry attempt will increase the wait time exponentially
+     * until it reaches this time.
+     *
+     * @param maxBackoff The maximum amount of time to wait between retries
+     * @return {@code this}
+     */
+    public Client setMaxBackoff(Duration maxBackoff) {
+        if (maxBackoff == null || maxBackoff.toNanos() < 0) {
+            throw new IllegalArgumentException("maxBackoff must be a positive duration");
+        } else if (maxBackoff.compareTo(minBackoff) < 0) {
+            throw new IllegalArgumentException("maxBackoff must be greater than or equal to minBackoff");
+        }
+        this.maxBackoff = maxBackoff;
+        return this;
+    }
+
+    /**
+     * @return minBackoff The minimum amount of time to wait between retries
+     */
+    public Duration getMinBackoff() {
+        return minBackoff;
+    }
+
+    /**
+     * The minimum amount of time to wait between retries. When retrying, the delay will start at this time and increase
+     * exponentially until it reaches the maxBackoff.
+     *
+     * @param minBackoff The minimum amount of time to wait between retries
+     * @return {@code this}
+     */
+    public Client setMinBackoff(Duration minBackoff) {
+        if (minBackoff == null || minBackoff.toNanos() < 0) {
+            throw new IllegalArgumentException("minBackoff must be a positive duration");
+        } else if (minBackoff.compareTo(maxBackoff) > 0) {
+            throw new IllegalArgumentException("minBackoff must be less than or equal to maxBackoff");
+        }
+        this.minBackoff = minBackoff;
+        return this;
     }
 
     public synchronized Client setMaxNodeAttempts(int maxNodeAttempts) {
