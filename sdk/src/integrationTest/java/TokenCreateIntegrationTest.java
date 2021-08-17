@@ -1,4 +1,3 @@
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.CustomFee;
 import com.hedera.hashgraph.sdk.CustomFixedFee;
@@ -11,9 +10,9 @@ import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TokenCreateTransaction;
 import com.hedera.hashgraph.sdk.TokenType;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Disabled;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -442,17 +441,6 @@ class TokenCreateIntegrationTest {
         assertDoesNotThrow(() -> {
             var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-            // Fee collector for royalty fee cannot be treasury, so we need a new account to be the fee collector.
-
-            var key = PrivateKey.generate();
-
-            var response = new AccountCreateTransaction()
-                .setKey(key)
-                .setInitialBalance(new Hbar(1))
-                .execute(testEnv.client);
-
-            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
-
             var tokenId = new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
@@ -464,12 +452,12 @@ class TokenCreateIntegrationTest {
                     .setNumerator(1)
                     .setDenominator(10)
                     .setFallbackFee(new CustomFixedFee().setHbarAmount(new Hbar(1)))
-                    .setFeeCollectorAccountId(accountId)))
+                    .setFeeCollectorAccountId(testEnv.operatorId)))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client)
                 .tokenId;
 
-            testEnv.close(tokenId, accountId, key);
+            testEnv.close(tokenId);
         });
     }
 }
