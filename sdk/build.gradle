@@ -200,7 +200,7 @@ modifyPom {
         licenses {
             license {
                 name 'Apache License, Version 2.0'
-                url 'https://github.com/hashgraph/hedera-sdk-java/blob/master/LICENSE'
+                url 'https://github.com/hashgraph/hedera-sdk-java/blob/main/LICENSE'
                 distribution 'repo'
             }
         }
