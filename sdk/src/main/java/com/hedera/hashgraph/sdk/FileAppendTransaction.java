@@ -3,10 +3,10 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.FileAppendTransactionBody;
+import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
-import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -150,7 +150,7 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
                         .getFileAppend().getContents()
                 );
             }
-        } catch(InvalidProtocolBufferException exc) {
+        } catch (InvalidProtocolBufferException exc) {
             throw new IllegalArgumentException(exc.getMessage());
         }
     }

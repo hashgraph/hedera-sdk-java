@@ -1,7 +1,11 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.ContractCallLocalQuery;
+import com.hedera.hashgraph.sdk.proto.QueryHeader;
+import com.hedera.hashgraph.sdk.proto.Response;
+import com.hedera.hashgraph.sdk.proto.ResponseHeader;
+import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 
@@ -39,8 +43,8 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
     /**
      * Sets the contract instance to call, in the format used in transactions.
      *
-     * @return {@code this}
      * @param contractId The ContractId to be set
+     * @return {@code this}
      */
     public ContractCallQuery setContractId(ContractId contractId) {
         Objects.requireNonNull(contractId);
@@ -49,7 +53,7 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
     }
 
     public long getGas() {
-      return gas;
+        return gas;
     }
 
     /**
@@ -57,8 +61,8 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
      * <p>
      * All of the gas offered will be charged for.
      *
-     * @return {@code this}
      * @param gas The long to be set as gas
+     * @return {@code this}
      */
     public ContractCallQuery setGas(long gas) {
         this.gas = gas;
@@ -72,16 +76,17 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
     }
 
     public ByteString getFunctionParameters() {
-      return ByteString.copyFrom(functionParameters);
+        return ByteString.copyFrom(functionParameters);
     }
+
     /**
      * Sets the function parameters as their raw bytes.
      * <p>
      * Use this instead of {@link #setFunction(String, ContractFunctionParameters)} if you have already
      * pre-encoded a solidity function call.
      *
-     * @return {@code this}
      * @param functionParameters The function parameters to be set
+     * @return {@code this}
      */
     public ContractCallQuery setFunctionParameters(byte[] functionParameters) {
         this.functionParameters = functionParameters;
@@ -94,8 +99,8 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
      * The function will be called with no parameters. Use {@link #setFunction(String, ContractFunctionParameters)}
      * to call a function with parameters.
      *
-     * @return {@code this}
      * @param name The function name to be set
+     * @return {@code this}
      */
     public ContractCallQuery setFunction(String name) {
         return setFunction(name, new ContractFunctionParameters());
@@ -104,9 +109,9 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
     /**
      * Sets the function to call, and the parameters to pass to the function.
      *
-     * @return {@code this}
-     * @param name The function name to be set
+     * @param name   The function name to be set
      * @param params The parameters to pass
+     * @return {@code this}
      */
     public ContractCallQuery setFunction(String name, ContractFunctionParameters params) {
         Objects.requireNonNull(params);
@@ -114,20 +119,20 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
         return this;
     }
 
+    public long getMaxResultSize() {
+        return maxResultSize;
+    }
+
     /**
      * Sets the max number of bytes that the result might include.
      * The run will fail if it would have returned more than this number of bytes.
      *
-     * @return {@code this}
      * @param size The long to be set as size
+     * @return {@code this}
      */
     public ContractCallQuery setMaxResultSize(long size) {
         maxResultSize = size;
         return this;
-    }
-
-    public long getMaxResultSize() {
-        return maxResultSize;
     }
 
     @Override

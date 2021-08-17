@@ -1,10 +1,11 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+
 import javax.annotation.Nullable;
-import java.util.Objects;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 abstract public class CustomFee {
     @Nullable
@@ -14,7 +15,7 @@ abstract public class CustomFee {
     }
 
     static CustomFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
-        switch(customFee.getFeeCase()) {
+        switch (customFee.getFeeCase()) {
             case FIXED_FEE:
                 return CustomFixedFee.fromProtobuf(customFee);
 
@@ -35,7 +36,7 @@ abstract public class CustomFee {
 
     public static List<CustomFee> deepCloneList(List<CustomFee> customFees) {
         var returnCustomFees = new ArrayList<CustomFee>(customFees.size());
-        for(var fee : customFees) {
+        for (var fee : customFees) {
             returnCustomFees.add(fee.deepClone());
         }
         return returnCustomFees;
@@ -51,9 +52,9 @@ abstract public class CustomFee {
     }
 
     CustomFee deepClone() {
-        if(this instanceof CustomFixedFee) {
+        if (this instanceof CustomFixedFee) {
             return CustomFixedFee.clonedFrom((CustomFixedFee) this);
-        } else if(this instanceof CustomFractionalFee) {
+        } else if (this instanceof CustomFractionalFee) {
             return CustomFractionalFee.clonedFrom((CustomFractionalFee) this);
         } else {
             return CustomRoyaltyFee.clonedFrom((CustomRoyaltyFee) this);
@@ -61,13 +62,13 @@ abstract public class CustomFee {
     }
 
     void validateChecksums(Client client) throws BadEntityIdException {
-        if(feeCollectorAccountId != null) {
+        if (feeCollectorAccountId != null) {
             feeCollectorAccountId.validateChecksum(client);
         }
     }
 
     protected com.hedera.hashgraph.sdk.proto.CustomFee finishToProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee.Builder customFeeBuilder) {
-        if(getFeeCollectorAccountId() != null) {
+        if (getFeeCollectorAccountId() != null) {
             customFeeBuilder.setFeeCollectorAccountId(getFeeCollectorAccountId().toProtobuf());
         }
         return customFeeBuilder.build();

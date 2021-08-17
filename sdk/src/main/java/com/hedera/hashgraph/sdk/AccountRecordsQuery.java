@@ -31,8 +31,8 @@ public final class AccountRecordsQuery extends Query<List<TransactionRecord>, Ac
     /**
      * Sets the account ID for which the records should be retrieved.
      *
-     * @return {@code this}
      * @param accountId The AccountId to be set
+     * @return {@code this}
      */
     public AccountRecordsQuery setAccountId(AccountId accountId) {
         Objects.requireNonNull(accountId);

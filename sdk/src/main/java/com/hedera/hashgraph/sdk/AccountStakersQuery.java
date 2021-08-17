@@ -15,7 +15,7 @@ import java.util.Objects;
 /**
  * Get all the accounts that are proxy staking to this account.
  * For each of them, give the amount currently staked.
- *
+ * <p>
  * This is not yet implemented, but will be in a future version of the API.
  */
 public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountStakersQuery> {
@@ -33,8 +33,8 @@ public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountS
     /**
      * Sets the Account ID for which the records should be retrieved.
      *
-     * @return {@code this}
      * @param accountId The AccountId to be set
+     * @return {@code this}
      */
     public AccountStakersQuery setAccountId(AccountId accountId) {
         Objects.requireNonNull(accountId);

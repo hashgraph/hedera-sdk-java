@@ -1,4 +1,8 @@
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.TopicCreateTransaction;
+import com.hedera.hashgraph.sdk.TopicDeleteTransaction;
+import com.hedera.hashgraph.sdk.TopicInfoQuery;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -131,7 +135,7 @@ public class TopicInfoIntegrationTest {
                 infoQuery.execute(testEnv.client);
             });
 
-            assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for TopicInfoQuery, of "+cost.toString()+", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
+            assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for TopicInfoQuery, of " + cost + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
 
             new TopicDeleteTransaction()
                 .setTopicId(topicId)

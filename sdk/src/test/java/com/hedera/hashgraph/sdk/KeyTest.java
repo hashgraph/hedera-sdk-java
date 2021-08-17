@@ -42,7 +42,7 @@ class KeyTest {
         var cut = PublicKey.fromProtobufKey(protoKey);
 
         assertEquals(cut.getClass(), PublicKey.class);
-        assertArrayEquals(keyBytes, ((PublicKey) cut).toBytes());
+        assertArrayEquals(keyBytes, cut.toBytes());
     }
 
     @Test

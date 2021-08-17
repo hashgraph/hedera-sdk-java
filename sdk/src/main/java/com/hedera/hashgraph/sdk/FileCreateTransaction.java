@@ -3,9 +3,9 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.FileCreateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Instant;
@@ -171,10 +171,10 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
 
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getFileCreate();
-        if(body.hasExpirationTime()) {
+        if (body.hasExpirationTime()) {
             expirationTime = InstantConverter.fromProtobuf(body.getExpirationTime());
         }
-        if(body.hasKeys()) {
+        if (body.hasKeys()) {
             keys = KeyList.fromProtobuf(body.getKeys(), null);
         }
         contents = body.getContents().toByteArray();
@@ -184,10 +184,10 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
     FileCreateTransactionBody.Builder build() {
         var builder = FileCreateTransactionBody.newBuilder();
 
-        if(expirationTime != null) {
+        if (expirationTime != null) {
             builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
         }
-        if(keys != null) {
+        if (keys != null) {
             builder.setKeys(keys.toProtobuf());
         }
         builder.setContents(ByteString.copyFrom(contents));

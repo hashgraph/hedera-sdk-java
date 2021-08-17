@@ -11,9 +11,9 @@ import com.hedera.hashgraph.sdk.TokenMintTransaction;
 import com.hedera.hashgraph.sdk.TokenNftInfoQuery;
 import com.hedera.hashgraph.sdk.TokenType;
 import com.hedera.hashgraph.sdk.TransferTransaction;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Disabled;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -174,7 +174,7 @@ class TokenBurnIntegrationTest {
 
             var mintReceipt = new TokenMintTransaction()
                 .setTokenId(tokenId)
-                .setMetadata(NftMetadataGenerator.generate((byte)10))
+                .setMetadata(NftMetadataGenerator.generate((byte) 10))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -192,7 +192,7 @@ class TokenBurnIntegrationTest {
                 .setEnd(6)
                 .execute(testEnv.client);
 
-            for(var info : nftInfos) {
+            for (var info : nftInfos) {
                 assertTrue(serialsLeft.remove(info.nftId.serial));
             }
 
@@ -224,7 +224,7 @@ class TokenBurnIntegrationTest {
 
             var serials = new TokenMintTransaction()
                 .setTokenId(tokenId)
-                .setMetadata(NftMetadataGenerator.generate((byte)1))
+                .setMetadata(NftMetadataGenerator.generate((byte) 1))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client)
                 .serials;

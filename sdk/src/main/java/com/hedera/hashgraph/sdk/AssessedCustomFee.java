@@ -29,7 +29,7 @@ public class AssessedCustomFee {
 
     static AssessedCustomFee fromProtobuf(com.hedera.hashgraph.sdk.proto.AssessedCustomFee assessedCustomFee) {
         var payerList = new ArrayList<AccountId>(assessedCustomFee.getEffectivePayerAccountIdCount());
-        for(var payerId : assessedCustomFee.getEffectivePayerAccountIdList()) {
+        for (var payerId : assessedCustomFee.getEffectivePayerAccountIdList()) {
             payerList.add(AccountId.fromProtobuf(payerId));
         }
         return new AssessedCustomFee(
@@ -56,13 +56,13 @@ public class AssessedCustomFee {
 
     com.hedera.hashgraph.sdk.proto.AssessedCustomFee toProtobuf() {
         var builder = com.hedera.hashgraph.sdk.proto.AssessedCustomFee.newBuilder().setAmount(amount);
-        if(tokenId != null) {
+        if (tokenId != null) {
             builder.setTokenId(tokenId.toProtobuf());
         }
-        if(feeCollectorAccountId != null) {
+        if (feeCollectorAccountId != null) {
             builder.setFeeCollectorAccountId(feeCollectorAccountId.toProtobuf());
         }
-        for(var payerId : payerAccountIdList) {
+        for (var payerId : payerAccountIdList) {
             builder.addEffectivePayerAccountId(payerId.toProtobuf());
         }
         return builder.build();

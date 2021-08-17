@@ -234,7 +234,7 @@ public final class TransactionReceipt {
             transactionReceiptBuilder.setScheduledTransactionID(scheduledTransactionId.toProtobuf());
         }
 
-        for(var serial : serials) {
+        for (var serial : serials) {
             transactionReceiptBuilder.addSerialNumbers(serial);
         }
 

@@ -1566,8 +1566,8 @@ public enum Status {
         // NOTE: This should be unreachable as error prone has enum exhaustiveness checking
         throw new IllegalArgumentException(
             "response code "
-            + code.name()
-            + " is unhandled by the SDK; update your SDK or open an issue");
+                + code.name()
+                + " is unhandled by the SDK; update your SDK or open an issue");
     }
 
     @Override

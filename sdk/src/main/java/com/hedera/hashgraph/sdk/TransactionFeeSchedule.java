@@ -1,17 +1,18 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import javax.annotation.Nullable;
 import com.google.common.base.MoreObjects;
-import java.util.List;
+import com.google.protobuf.InvalidProtocolBufferException;
+
+import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class TransactionFeeSchedule {
     private RequestType requestType;
     @Nullable
     private FeeData feeData;
-    private List<FeeData> fees;
+    private final List<FeeData> fees;
 
     public TransactionFeeSchedule() {
         requestType = RequestType.NONE;
@@ -23,7 +24,7 @@ public class TransactionFeeSchedule {
         var returnFeeSchedule = new TransactionFeeSchedule()
             .setRequestType(RequestType.valueOf(transactionFeeSchedule.getHederaFunctionality()))
             .setFeeData(transactionFeeSchedule.hasFeeData() ? FeeData.fromProtobuf(transactionFeeSchedule.getFeeData()) : null);
-        for(var feeData : transactionFeeSchedule.getFeesList()) {
+        for (var feeData : transactionFeeSchedule.getFeesList()) {
             returnFeeSchedule.addFee(FeeData.fromProtobuf(feeData));
         }
         return returnFeeSchedule;
@@ -47,7 +48,7 @@ public class TransactionFeeSchedule {
     public FeeData getFeeData() {
         return feeData;
     }
-    
+
     @Deprecated
     public TransactionFeeSchedule setFeeData(@Nullable FeeData feeData) {
         this.feeData = feeData;
@@ -66,10 +67,10 @@ public class TransactionFeeSchedule {
     com.hedera.hashgraph.sdk.proto.TransactionFeeSchedule toProtobuf() {
         var returnBuilder = com.hedera.hashgraph.sdk.proto.TransactionFeeSchedule.newBuilder()
             .setHederaFunctionality(getRequestType().code);
-        if(feeData != null) {
+        if (feeData != null) {
             returnBuilder.setFeeData(feeData.toProtobuf());
         }
-        for(var fee : fees) {
+        for (var fee : fees) {
             returnBuilder.addFees(fee.toProtobuf());
         }
         return returnBuilder.build();

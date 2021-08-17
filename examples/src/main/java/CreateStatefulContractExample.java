@@ -34,7 +34,8 @@ public final class CreateStatefulContractExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private CreateStatefulContractExample() { }
+    private CreateStatefulContractExample() {
+    }
 
     public static void main(String[] args) throws PrecheckStatusException, TimeoutException, IOException, ReceiptStatusException {
         ClassLoader cl = CreateStatefulContractExample.class.getClassLoader();

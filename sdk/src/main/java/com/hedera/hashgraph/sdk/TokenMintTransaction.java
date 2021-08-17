@@ -1,21 +1,21 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.TokenMintTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenMintTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.Transaction;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
-import com.google.protobuf.ByteString;
 
-import java.util.LinkedHashMap;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
-import java.util.Objects;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenMintTransaction> {
     @Nullable
@@ -65,14 +65,14 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         return this;
     }
 
+    public List<byte[]> getMetadata() {
+        return new ArrayList<>(metadataList);
+    }
+
     public TokenMintTransaction setMetadata(List<byte[]> metadataList) {
         requireNotFrozen();
         this.metadataList = new ArrayList<>(metadataList);
         return this;
-    }
-
-    public List<byte[]> getMetadata() {
-        return new ArrayList<>(metadataList);
     }
 
     void initFromTransactionBody() {
@@ -81,7 +81,7 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
             tokenId = TokenId.fromProtobuf(body.getToken());
         }
         amount = body.getAmount();
-        for(var metadata : body.getMetadataList()) {
+        for (var metadata : body.getMetadataList()) {
             metadataList.add(metadata.toByteArray());
         }
     }
@@ -92,7 +92,7 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
             builder.setToken(tokenId.toProtobuf());
         }
         builder.setAmount(amount);
-        for(var metadata : metadataList) {
+        for (var metadata : metadataList) {
             builder.addMetadata(ByteString.copyFrom(metadata));
         }
 

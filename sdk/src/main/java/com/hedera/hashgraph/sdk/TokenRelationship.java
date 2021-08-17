@@ -28,11 +28,13 @@ public class TokenRelationship {
         this.freezeStatus = freezeStatus;
     }
 
-    @Nullable static Boolean freezeStatusFromProtobuf(TokenFreezeStatus freezeStatus) {
+    @Nullable
+    static Boolean freezeStatusFromProtobuf(TokenFreezeStatus freezeStatus) {
         return freezeStatus == TokenFreezeStatus.FreezeNotApplicable ? null : freezeStatus == TokenFreezeStatus.Frozen;
     }
 
-    @Nullable static Boolean kycStatusFromProtobuf(TokenKycStatus kycStatus) {
+    @Nullable
+    static Boolean kycStatusFromProtobuf(TokenKycStatus kycStatus) {
         return kycStatus == TokenKycStatus.KycNotApplicable ? null : kycStatus == TokenKycStatus.Granted;
     }
 

@@ -9,8 +9,8 @@ import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class TokenInfo {
     /**
@@ -223,7 +223,7 @@ public class TokenInfo {
 
     private static List<CustomFee> customFeesFromProto(com.hedera.hashgraph.sdk.proto.TokenInfo info) {
         var returnCustomFees = new ArrayList<CustomFee>(info.getCustomFeesCount());
-        for(var feeProto : info.getCustomFeesList()) {
+        for (var feeProto : info.getCustomFeesList()) {
             returnCustomFees.add(CustomFee.fromProtobuf(feeProto));
         }
         return returnCustomFees;
@@ -252,34 +252,34 @@ public class TokenInfo {
             .setTokenType(tokenType.code)
             .setSupplyType(supplyType.code)
             .setMaxSupply(maxSupply);
-        if(adminKey != null) {
+        if (adminKey != null) {
             tokenInfoBuilder.setAdminKey(adminKey.toProtobufKey());
         }
-        if(kycKey != null) {
+        if (kycKey != null) {
             tokenInfoBuilder.setKycKey(kycKey.toProtobufKey());
         }
-        if(freezeKey != null) {
+        if (freezeKey != null) {
             tokenInfoBuilder.setFreezeKey(freezeKey.toProtobufKey());
         }
-        if(wipeKey != null) {
+        if (wipeKey != null) {
             tokenInfoBuilder.setWipeKey(wipeKey.toProtobufKey());
         }
-        if(supplyKey != null) {
+        if (supplyKey != null) {
             tokenInfoBuilder.setSupplyKey(supplyKey.toProtobufKey());
         }
-        if(feeScheduleKey != null) {
+        if (feeScheduleKey != null) {
             tokenInfoBuilder.setFeeScheduleKey(feeScheduleKey.toProtobufKey());
         }
-        if(autoRenewAccount != null) {
+        if (autoRenewAccount != null) {
             tokenInfoBuilder.setAutoRenewAccount(autoRenewAccount.toProtobuf());
         }
-        if(autoRenewPeriod != null) {
+        if (autoRenewPeriod != null) {
             tokenInfoBuilder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         }
-        if(expirationTime != null) {
+        if (expirationTime != null) {
             tokenInfoBuilder.setExpiry(InstantConverter.toProtobuf(expirationTime));
         }
-        for(var fee : customFees) {
+        for (var fee : customFees) {
             tokenInfoBuilder.addCustomFees(fee.toProtobuf());
         }
         return TokenGetInfoResponse.newBuilder().setTokenInfo(tokenInfoBuilder).build();

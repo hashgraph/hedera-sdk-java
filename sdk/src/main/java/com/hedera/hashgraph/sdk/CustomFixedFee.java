@@ -24,7 +24,7 @@ public class CustomFixedFee extends CustomFee {
     static CustomFixedFee fromProtobuf(FixedFee fixedFee) {
         var returnFee = new CustomFixedFee()
             .setAmount(fixedFee.getAmount());
-        if(fixedFee.hasDenominatingTokenId()) {
+        if (fixedFee.hasDenominatingTokenId()) {
             returnFee.setDenominatingTokenId(TokenId.fromProtobuf(fixedFee.getDenominatingTokenId()));
         }
         return returnFee;
@@ -32,7 +32,7 @@ public class CustomFixedFee extends CustomFee {
 
     static CustomFixedFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
         var returnFee = fromProtobuf(customFee.getFixedFee());
-        if(customFee.hasFeeCollectorAccountId()) {
+        if (customFee.hasFeeCollectorAccountId()) {
             returnFee.setFeeCollectorAccountId(AccountId.fromProtobuf(customFee.getFeeCollectorAccountId()));
         }
         return returnFee;
@@ -47,13 +47,13 @@ public class CustomFixedFee extends CustomFee {
         return amount;
     }
 
-    public Hbar getHbarAmount() {
-        return Hbar.fromTinybars(amount);
-    }
-
     public CustomFixedFee setAmount(long amount) {
         this.amount = amount;
         return this;
+    }
+
+    public Hbar getHbarAmount() {
+        return Hbar.fromTinybars(amount);
     }
 
     public CustomFixedFee setHbarAmount(Hbar amount) {
@@ -80,7 +80,7 @@ public class CustomFixedFee extends CustomFee {
     @Override
     void validateChecksums(Client client) throws BadEntityIdException {
         super.validateChecksums(client);
-        if(denominatingTokenId != null) {
+        if (denominatingTokenId != null) {
             denominatingTokenId.validateChecksum(client);
         }
     }
@@ -97,7 +97,7 @@ public class CustomFixedFee extends CustomFee {
     FixedFee toFixedFeeProtobuf() {
         var fixedFeeBuilder = FixedFee.newBuilder()
             .setAmount(getAmount());
-        if(getDenominatingTokenId() != null) {
+        if (getDenominatingTokenId() != null) {
             fixedFeeBuilder.setDenominatingTokenId(getDenominatingTokenId().toProtobuf());
         }
         return fixedFeeBuilder.build();

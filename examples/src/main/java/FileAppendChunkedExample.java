@@ -26,7 +26,8 @@ public class FileAppendChunkedExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private FileAppendChunkedExample() { }
+    private FileAppendChunkedExample() {
+    }
 
     public static void main(String[] args) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         Client client = Client.forName(HEDERA_NETWORK);
@@ -50,7 +51,7 @@ public class FileAppendChunkedExample {
 
         StringBuilder contents = new StringBuilder();
 
-        for (int i=0; i <= 4096*9; i++){
+        for (int i = 0; i <= 4096 * 9; i++) {
             contents.append("1");
         }
 

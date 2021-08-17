@@ -31,8 +31,8 @@ public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery>
     /**
      * Sets the account ID for which information is requested.
      *
+     * @param accountId The AccountId to be set
      * @return {@code this}
-     * @param accountId  The AccountId to be set
      */
     public AccountInfoQuery setAccountId(AccountId accountId) {
         Objects.requireNonNull(accountId);

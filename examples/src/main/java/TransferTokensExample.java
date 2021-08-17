@@ -1,6 +1,3 @@
-import java.util.Collections;
-import java.util.Objects;
-
 import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
@@ -18,6 +15,9 @@ import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransactionResponse;
 import com.hedera.hashgraph.sdk.TransferTransaction;
 import io.github.cdimascio.dotenv.Dotenv;
+
+import java.util.Collections;
+import java.util.Objects;
 
 public final class TransferTokensExample {
 

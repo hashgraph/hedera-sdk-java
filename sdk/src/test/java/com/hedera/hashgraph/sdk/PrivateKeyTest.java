@@ -14,7 +14,7 @@ public class PrivateKeyTest {
 
     @Test
     void signTransactionWorks() throws InvalidProtocolBufferException {
-       byte[] bytes = new AccountCreateTransaction()
+        byte[] bytes = new AccountCreateTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setKey(unusedPrivateKey)
@@ -23,9 +23,9 @@ public class PrivateKeyTest {
             .setReceiverSignatureRequired(true)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
-           .toBytes();
+            .toBytes();
 
-       AccountCreateTransaction transaction = (AccountCreateTransaction) Transaction.fromBytes(bytes);
-       unusedPrivateKey.signTransaction(transaction);
+        AccountCreateTransaction transaction = (AccountCreateTransaction) Transaction.fromBytes(bytes);
+        unusedPrivateKey.signTransaction(transaction);
     }
 }

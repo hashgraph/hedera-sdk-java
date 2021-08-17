@@ -1,7 +1,4 @@
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-import java.util.concurrent.TimeoutException;
-
+import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.FileContentsQuery;
@@ -9,12 +6,14 @@ import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
-
-import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 
 public final class GetFileContentsExample {
     // see `.env.sample` in the repository root for how to specify these values
@@ -47,7 +46,7 @@ public final class GetFileContentsExample {
         FileId newFileId = Objects.requireNonNull(newFileTransactionResponse.getReceipt(client).fileId);
 
         //Print the file ID to console
-        System.out.println("The new file ID is " + newFileId.toString());
+        System.out.println("The new file ID is " + newFileId);
 
         // Get file contents
         ByteString contents = new FileContentsQuery()

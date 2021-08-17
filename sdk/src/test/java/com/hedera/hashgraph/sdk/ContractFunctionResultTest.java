@@ -1,9 +1,9 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.bouncycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
 

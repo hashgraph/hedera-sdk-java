@@ -2,9 +2,9 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ContractDeleteTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -118,13 +118,13 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
 
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getContractDeleteInstance();
-        if(body.hasContractID()) {
+        if (body.hasContractID()) {
             contractId = ContractId.fromProtobuf(body.getContractID());
         }
-        if(body.hasTransferContractID()) {
+        if (body.hasTransferContractID()) {
             transferContractId = ContractId.fromProtobuf(body.getTransferContractID());
         }
-        if(body.hasTransferAccountID()) {
+        if (body.hasTransferAccountID()) {
             transferAccountId = AccountId.fromProtobuf(body.getTransferAccountID());
         }
     }

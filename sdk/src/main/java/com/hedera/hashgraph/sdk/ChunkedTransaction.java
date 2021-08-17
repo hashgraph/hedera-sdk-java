@@ -4,26 +4,30 @@ import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SignatureMap;
+import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.concurrent.CompletionStage;
 import java8.util.function.Function;
-import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Transaction<T> implements WithExecuteAll {
     private static final int CHUNK_SIZE = 1024;
-
+    protected ByteString data = ByteString.EMPTY;
     /**
      * Maximum number of chunks this message will get broken up into when
      * its frozen.
      */
     private int maxChunks = 20;
-
-    protected ByteString data = ByteString.EMPTY;
 
     ChunkedTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
@@ -65,16 +69,16 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         return (T) this;
     }
 
+    public int getMaxChunks() {
+        return maxChunks;
+    }
+
     public T setMaxChunks(int maxChunks) {
         requireNotFrozen();
         this.maxChunks = maxChunks;
 
         // noinspection unchecked
         return (T) this;
-    }
-
-    public int getMaxChunks() {
-        return maxChunks;
     }
 
     @Override
@@ -108,7 +112,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
 
         for (var txIndex = 0; txIndex < txCount; ++txIndex) {
             var hashes = new HashMap<AccountId, byte[]>();
-            var offset = txIndex*nodeCount;
+            var offset = txIndex * nodeCount;
 
             for (var nodeIndex = 0; nodeIndex < nodeCount; ++nodeIndex) {
                 hashes.put(
@@ -150,7 +154,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
 
         var retval = new ArrayList<Map<AccountId, Map<PublicKey, byte[]>>>(txCount);
 
-        for(int i = 0; i < txCount; i++) {
+        for (int i = 0; i < txCount; i++) {
             retval.add(getSignaturesAtOffset(i * nodeCount));
         }
 

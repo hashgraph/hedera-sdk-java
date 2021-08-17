@@ -125,7 +125,7 @@ final class Crypto {
         byte[] output = new byte[hmacSha384.getMacSize()];
 
         hmacSha384.init(new KeyParameter(cipherKey.getKey(), 16, 16));
-        if(iv != null){
+        if (iv != null) {
             hmacSha384.update(iv, 0, iv.length);
         }
         hmacSha384.update(input, 0, input.length);

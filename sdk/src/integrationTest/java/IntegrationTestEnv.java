@@ -1,7 +1,18 @@
-import com.google.common.collect.HashBiMap;
 import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.AccountBalanceQuery;
+import com.hedera.hashgraph.sdk.AccountCreateTransaction;
+import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.PublicKey;
+import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
+import com.hedera.hashgraph.sdk.TokenId;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,7 +22,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeoutException;
-import javax.annotation.Nullable;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -22,7 +32,7 @@ public class IntegrationTestEnv {
     public Client client;
     public PublicKey operatorKey;
     public AccountId operatorId;
-    private AccountId originalOperatorId;
+    private final AccountId originalOperatorId;
 
     public IntegrationTestEnv(int numberOfNodes) throws Exception {
         client = createTestEnvClient()
@@ -45,7 +55,7 @@ public class IntegrationTestEnv {
 
         var nodeGetter = new TestEnvNodeGetter(client);
         var network = new HashMap<String, AccountId>();
-        for(@Var int i = 0; i < numberOfNodes; i++) {
+        for (@Var int i = 0; i < numberOfNodes; i++) {
             nodeGetter.nextNode(network);
         }
         client.setNetwork(network);
@@ -68,40 +78,6 @@ public class IntegrationTestEnv {
             } catch (Exception e) {
                 return Client.forTestnet();
             }
-        }
-    }
-
-    private static class TestEnvNodeGetter {
-        private Client client;
-        @Var
-        private int index = 0;
-        private List<Map.Entry<String, AccountId>> nodes;
-
-        public TestEnvNodeGetter(Client client) {
-            this.client = client;
-            nodes = new ArrayList<>(client.getNetwork().entrySet());
-            Collections.shuffle(nodes);
-        }
-
-        public void nextNode(Map<String, AccountId> outMap) throws Exception {
-            if(nodes.isEmpty()) {
-                throw new IllegalStateException("IntegrationTestEnv needs another node, but there aren't enough nodes in client network");
-            }
-            for(; index < nodes.size(); index++) {
-                var node = nodes.get(index);
-                try {
-                    new AccountBalanceQuery()
-                        .setNodeAccountIds(Collections.singletonList(node.getValue()))
-                        .setMaxAttempts(1)
-                        .setAccountId(client.getOperatorAccountId())
-                        .execute(client);
-                    nodes.remove(index);
-                    outMap.put(node.getKey(), node.getValue());
-                    return;
-                } catch(Exception ignored) {
-                }
-            }
-            throw new Exception("Failed to find working node in " + nodes + " for IntegrationTestEnv");
         }
     }
 
@@ -134,7 +110,7 @@ public class IntegrationTestEnv {
                 .getReceipt(client);
         }
 
-        if(newAccountId != null) {
+        if (newAccountId != null) {
             new AccountDeleteTransaction()
                 .setTransferAccountId(originalOperatorId)
                 .setAccountId(newAccountId)
@@ -144,7 +120,7 @@ public class IntegrationTestEnv {
                 .getReceipt(client);
         }
 
-        if(!operatorId.equals(originalOperatorId)) {
+        if (!operatorId.equals(originalOperatorId)) {
             new AccountDeleteTransaction()
                 .setTransferAccountId(originalOperatorId)
                 .setAccountId(operatorId)
@@ -165,5 +141,39 @@ public class IntegrationTestEnv {
 
     public void close(TokenId newTokenId) throws Exception {
         close(newTokenId, null, null);
+    }
+
+    private static class TestEnvNodeGetter {
+        private final Client client;
+        @Var
+        private int index = 0;
+        private final List<Map.Entry<String, AccountId>> nodes;
+
+        public TestEnvNodeGetter(Client client) {
+            this.client = client;
+            nodes = new ArrayList<>(client.getNetwork().entrySet());
+            Collections.shuffle(nodes);
+        }
+
+        public void nextNode(Map<String, AccountId> outMap) throws Exception {
+            if (nodes.isEmpty()) {
+                throw new IllegalStateException("IntegrationTestEnv needs another node, but there aren't enough nodes in client network");
+            }
+            for (; index < nodes.size(); index++) {
+                var node = nodes.get(index);
+                try {
+                    new AccountBalanceQuery()
+                        .setNodeAccountIds(Collections.singletonList(node.getValue()))
+                        .setMaxAttempts(1)
+                        .setAccountId(client.getOperatorAccountId())
+                        .execute(client);
+                    nodes.remove(index);
+                    outMap.put(node.getKey(), node.getValue());
+                    return;
+                } catch (Exception ignored) {
+                }
+            }
+            throw new Exception("Failed to find working node in " + nodes + " for IntegrationTestEnv");
+        }
     }
 }

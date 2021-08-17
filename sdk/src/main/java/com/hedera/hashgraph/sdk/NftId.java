@@ -5,7 +5,6 @@ import com.hedera.hashgraph.sdk.proto.NftID;
 
 import javax.annotation.Nonnegative;
 import java.util.Objects;
-import javax.annotation.Nullable;
 
 public class NftId {
     /**
@@ -27,7 +26,7 @@ public class NftId {
     public static NftId fromString(String id) {
         @SuppressWarnings("StringSplitter")
         var parts = id.split("@");
-        if(parts.length != 2) {
+        if (parts.length != 2) {
             throw new IllegalArgumentException("Expecting {shardNum}.{realmNum}.{idNum}-{checksum}@{serialNum}");
         }
         return new NftId(TokenId.fromString(parts[0]), Long.parseLong(parts[1]));
@@ -57,7 +56,7 @@ public class NftId {
 
     @Override
     public String toString() {
-        return tokenId.toString() + "@" + serial;
+        return tokenId + "@" + serial;
     }
 
     public String toStringWithChecksum(Client client) {

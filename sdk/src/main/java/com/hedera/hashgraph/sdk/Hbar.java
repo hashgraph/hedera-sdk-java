@@ -1,7 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.errorprone.annotations.Var;
-
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Objects;
@@ -14,6 +12,18 @@ import java.util.regex.Pattern;
  * in tinybars however the nominal unit is hbar.
  */
 public final class Hbar implements Comparable<Hbar> {
+    /**
+     * A constant value of zero hbars.
+     */
+    public static final Hbar ZERO = Hbar.fromTinybars(0);
+    /**
+     * A constant value of the maximum number of hbars.
+     */
+    public static final Hbar MAX = Hbar.from(50_000_000_000L);
+    /**
+     * A constant value of the minimum number of hbars.
+     */
+    public static final Hbar MIN = Hbar.from(-50_000_000_000L);
     private static final Pattern FROM_STRING_PATTERN = Pattern.compile("^((?:\\+|\\-)?\\d+(?:\\.\\d+)?)(\\ (tℏ|μℏ|mℏ|ℏ|kℏ|Mℏ|Gℏ))?$");
     private final long valueInTinybar;
 
@@ -53,24 +63,9 @@ public final class Hbar implements Comparable<Hbar> {
         valueInTinybar = tinybars.longValue();
     }
 
-    /**
-     * A constant value of zero hbars.
-     */
-    public static final Hbar ZERO = Hbar.fromTinybars(0);
-
-    /**
-     * A constant value of the maximum number of hbars.
-     */
-    public static final Hbar MAX = Hbar.from(50_000_000_000L);
-
-    /**
-     * A constant value of the minimum number of hbars.
-     */
-    public static final Hbar MIN = Hbar.from(-50_000_000_000L);
-
     private static HbarUnit getUnit(String symbolString) {
-        for(var unit : HbarUnit.values()) {
-            if(unit.getSymbol().equals(symbolString)) {
+        for (var unit : HbarUnit.values()) {
+            if (unit.getSymbol().equals(symbolString)) {
                 return unit;
             }
         }
@@ -85,7 +80,7 @@ public final class Hbar implements Comparable<Hbar> {
      */
     public static Hbar fromString(CharSequence text) {
         var matcher = FROM_STRING_PATTERN.matcher(text);
-        if(!matcher.matches()) {
+        if (!matcher.matches()) {
             throw new IllegalArgumentException("Attempted to convert string to Hbar, but \"" + text + "\" was not correctly formatted");
         }
         String[] parts = text.toString().split(" ");
@@ -117,7 +112,7 @@ public final class Hbar implements Comparable<Hbar> {
      * Returns an Hbar representing the value in the given units.
      *
      * @param amount The long representing the amount of set units
-     * @param unit The unit to convert from to Hbar
+     * @param unit   The unit to convert from to Hbar
      * @return {@link com.hedera.hashgraph.sdk.Hbar}
      */
     public static Hbar from(long amount, HbarUnit unit) {
@@ -138,7 +133,7 @@ public final class Hbar implements Comparable<Hbar> {
      * Returns an Hbar representing the value in the given units.
      *
      * @param amount The BigDecimal representing the amount of set units
-     * @param unit The unit to convert from to Hbar
+     * @param unit   The unit to convert from to Hbar
      * @return {@link com.hedera.hashgraph.sdk.Hbar}
      */
     public static Hbar from(BigDecimal amount, HbarUnit unit) {
@@ -195,10 +190,10 @@ public final class Hbar implements Comparable<Hbar> {
     @Override
     public String toString() {
         if (valueInTinybar < 10_000 && valueInTinybar > -10_000) {
-            return Long.toString(this.valueInTinybar) + " " + HbarUnit.TINYBAR.getSymbol();
+            return this.valueInTinybar + " " + HbarUnit.TINYBAR.getSymbol();
         }
 
-        return to(HbarUnit.HBAR).toString() + " " + HbarUnit.HBAR.getSymbol();
+        return to(HbarUnit.HBAR) + " " + HbarUnit.HBAR.getSymbol();
     }
 
     public String toString(HbarUnit unit) {

@@ -36,8 +36,8 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     /**
      * Set the ID of the transaction for which the record is requested.
      *
-     * @return {@code this}
      * @param transactionId The TransactionId to be set
+     * @return {@code this}
      */
     public TransactionRecordQuery setTransactionId(TransactionId transactionId) {
         Objects.requireNonNull(transactionId);

@@ -4,22 +4,24 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import java8.util.concurrent.CompletableFuture;
+import java8.util.function.Consumer;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java8.util.concurrent.CompletableFuture;
-import java8.util.function.Consumer;
 
 // Converts between ListenableFuture (Guava) and CompletableFuture (StreamSupport).
 // https://github.com/lukas-krecan/future-converter/blob/master/java8-guava/src/main/java/net/javacrumbs/futureconverter/java8guava/FutureConverter.java#L28
 final class FutureConverter {
-    private FutureConverter() {}
+    private FutureConverter() {
+    }
 
     static <T> CompletableFuture<T> toCompletableFuture(ListenableFuture<T> listenableFuture) {
         return Java8FutureUtils.createCompletableFuture(
-                GuavaFutureUtils.createValueSourceFuture(listenableFuture));
+            GuavaFutureUtils.createValueSourceFuture(listenableFuture));
     }
 
     // https://github.com/lukas-krecan/future-converter/blob/master/common/src/main/java/net/javacrumbs/futureconverter/common/internal/ValueSource.java
@@ -31,7 +33,7 @@ final class FutureConverter {
 
     // https://github.com/lukas-krecan/future-converter/blob/master/common/src/main/java/net/javacrumbs/futureconverter/common/internal/ValueSourceFuture.java
     private abstract static class ValueSourceFuture<T> extends FutureWrapper<T>
-            implements ValueSource<T> {
+        implements ValueSource<T> {
         ValueSourceFuture(Future<T> wrappedFuture) {
             super(wrappedFuture);
         }
@@ -67,7 +69,7 @@ final class FutureConverter {
 
         @Override
         public T get(long timeout, TimeUnit unit)
-                throws InterruptedException, ExecutionException, TimeoutException {
+            throws InterruptedException, ExecutionException, TimeoutException {
             return wrappedFuture.get(timeout, unit);
         }
 
@@ -79,17 +81,17 @@ final class FutureConverter {
     // https://github.com/lukas-krecan/future-converter/blob/master/guava-common/src/main/java/net/javacrumbs/futureconverter/guavacommon/GuavaFutureUtils.java
     private static class GuavaFutureUtils {
         public static <T> ValueSourceFuture<T> createValueSourceFuture(
-                ListenableFuture<T> listenableFuture) {
+            ListenableFuture<T> listenableFuture) {
             if (listenableFuture instanceof ValueSourceFutureBackedListenableFuture) {
                 return ((ValueSourceFutureBackedListenableFuture<T>) listenableFuture)
-                        .getWrappedFuture();
+                    .getWrappedFuture();
             } else {
                 return new ListenableFutureBackedValueSourceFuture<>(listenableFuture);
             }
         }
 
         private static class ValueSourceFutureBackedListenableFuture<T> extends FutureWrapper<T>
-                implements ListenableFuture<T> {
+            implements ListenableFuture<T> {
             ValueSourceFutureBackedListenableFuture(ValueSourceFuture<T> valueSourceFuture) {
                 super(valueSourceFuture);
             }
@@ -102,35 +104,35 @@ final class FutureConverter {
             @Override
             public void addListener(Runnable listener, Executor executor) {
                 getWrappedFuture()
-                        .addCallbacks(
-                                value -> executor.execute(listener),
-                                ex -> executor.execute(listener));
+                    .addCallbacks(
+                        value -> executor.execute(listener),
+                        ex -> executor.execute(listener));
             }
         }
 
         private static class ListenableFutureBackedValueSourceFuture<T>
-                extends ValueSourceFuture<T> {
+            extends ValueSourceFuture<T> {
             private ListenableFutureBackedValueSourceFuture(ListenableFuture<T> wrappedFuture) {
                 super(wrappedFuture);
             }
 
             @Override
             public void addCallbacks(
-                    Consumer<T> successCallback, Consumer<Throwable> failureCallback) {
+                Consumer<T> successCallback, Consumer<Throwable> failureCallback) {
                 Futures.addCallback(
-                        getWrappedFuture(),
-                        new FutureCallback<T>() {
-                            @Override
-                            public void onSuccess(T result) {
-                                successCallback.accept(result);
-                            }
+                    getWrappedFuture(),
+                    new FutureCallback<T>() {
+                        @Override
+                        public void onSuccess(T result) {
+                            successCallback.accept(result);
+                        }
 
-                            @Override
-                            public void onFailure(Throwable t) {
-                                failureCallback.accept(t);
-                            }
-                        },
-                        MoreExecutors.directExecutor());
+                        @Override
+                        public void onFailure(Throwable t) {
+                            failureCallback.accept(t);
+                        }
+                    },
+                    MoreExecutors.directExecutor());
             }
 
             @Override
@@ -151,7 +153,7 @@ final class FutureConverter {
         }
 
         private static final class ValueSourceBackedCompletableFuture<T>
-                extends CompletableFuture<T> {
+            extends CompletableFuture<T> {
             private final ValueSource<T> valueSource;
 
             @SuppressWarnings("ConstructorLeaksThis")
@@ -172,23 +174,23 @@ final class FutureConverter {
         }
 
         private static final class CompletableFutureBackedValueSource<T>
-                extends ValueSourceFuture<T> {
+            extends ValueSourceFuture<T> {
             private CompletableFutureBackedValueSource(CompletableFuture<T> completableFuture) {
                 super(completableFuture);
             }
 
             @Override
             public void addCallbacks(
-                    Consumer<T> successCallback, Consumer<Throwable> failureCallback) {
+                Consumer<T> successCallback, Consumer<Throwable> failureCallback) {
                 getWrappedFuture()
-                        .whenComplete(
-                                (v, t) -> {
-                                    if (t == null) {
-                                        successCallback.accept(v);
-                                    } else {
-                                        failureCallback.accept(t);
-                                    }
-                                });
+                    .whenComplete(
+                        (v, t) -> {
+                            if (t == null) {
+                                successCallback.accept(v);
+                            } else {
+                                failureCallback.accept(t);
+                            }
+                        });
             }
 
             @Override

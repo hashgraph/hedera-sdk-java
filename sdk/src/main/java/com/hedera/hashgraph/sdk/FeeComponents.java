@@ -1,52 +1,52 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.common.base.MoreObjects;
+import com.google.protobuf.InvalidProtocolBufferException;
 
 public class FeeComponents {
     /*
-    * A minimum, the calculated fee must be greater than this value
-    */
+     * A minimum, the calculated fee must be greater than this value
+     */
     private long min;
     /*
-    * A maximum, the calculated fee must be less than this value
-    */
+     * A maximum, the calculated fee must be less than this value
+     */
     private long max;
     /*
-    * A constant contribution to the fee
-    */
+     * A constant contribution to the fee
+     */
     private long constant;
     /*
-    * The price of bandwidth consumed by a transaction, measured in bytes
-    */
+     * The price of bandwidth consumed by a transaction, measured in bytes
+     */
     private long transactionBandwidthByte;
     /*
-    * The price per signature verification for a transaction
-    */
+     * The price per signature verification for a transaction
+     */
     private long transactionVerification;
     /*
-    * The price of RAM consumed by a transaction, measured in byte-hours
-    */
+     * The price of RAM consumed by a transaction, measured in byte-hours
+     */
     private long transactionRamByteHour;
     /*
-    * The price of storage consumed by a transaction, measured in byte-hours
-    */
+     * The price of storage consumed by a transaction, measured in byte-hours
+     */
     private long transactionStorageByteHour;
     /*
-    * The price of computation for a smart contract transaction, measured in gas
-    */
+     * The price of computation for a smart contract transaction, measured in gas
+     */
     private long contractTransactionGas;
     /*
-    * The price per hbar transferred for a transfer
-    */
+     * The price per hbar transferred for a transfer
+     */
     private long transferVolumeHbar;
     /*
-    * The price of bandwidth for data retrieved from memory for a response, measured in bytes
-    */
+     * The price of bandwidth for data retrieved from memory for a response, measured in bytes
+     */
     private long responseMemoryByte;
     /*
-    * The price of bandwidth for data retrieved from disk for a response, measured in bytes
-    */
+     * The price of bandwidth for data retrieved from disk for a response, measured in bytes
+     */
     private long responseDiskByte;
 
     public FeeComponents() {

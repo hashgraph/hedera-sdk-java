@@ -1,20 +1,20 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.Transaction;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TokenBurnTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenBurnTransaction> {
     @Nullable
@@ -61,16 +61,16 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         return new ArrayList<>(serials);
     }
 
-    public TokenBurnTransaction addSerial(@Nonnegative long serial) {
-        requireNotFrozen();
-        serials.add(serial);
-        return this;
-    }
-
     public TokenBurnTransaction setSerials(List<Long> serials) {
         requireNotFrozen();
         Objects.requireNonNull(serials);
         this.serials = new ArrayList<>(serials);
+        return this;
+    }
+
+    public TokenBurnTransaction addSerial(@Nonnegative long serial) {
+        requireNotFrozen();
+        serials.add(serial);
         return this;
     }
 
@@ -81,7 +81,7 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         }
         builder.setAmount(amount);
 
-        for(var serial : serials) {
+        for (var serial : serials) {
             builder.addSerialNumbers(serial);
         }
 
