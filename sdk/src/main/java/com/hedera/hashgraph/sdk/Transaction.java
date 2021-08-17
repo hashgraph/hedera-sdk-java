@@ -3,10 +3,10 @@ package com.hedera.hashgraph.sdk;
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.SignatureMap;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SignatureMap;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionList;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Function;
@@ -14,13 +14,13 @@ import org.bouncycastle.crypto.digests.SHA384Digest;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Map;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.ArrayList;
 
 /**
  * Base class for all transactions that may be built and submitted to Hedera.
@@ -46,7 +46,7 @@ public abstract class Transaction<T extends Transaction<T>>
     // The expectation is that the Transaction subclass constructor
     // will pick up where the Transaction superclass constructor left off,
     // and will unpack the data in the transaction body.
-    protected TransactionBody sourceTransactionBody;
+    protected final TransactionBody sourceTransactionBody;
 
     // A SDK [Transaction] is composed of multiple, raw protobuf transactions. These should be
     // functionally identical, with the exception of pointing to different nodes. When retrying a
@@ -76,14 +76,13 @@ public abstract class Transaction<T extends Transaction<T>>
     protected List<Function<byte[], byte[]>> signers = new ArrayList<>();
 
     private Duration transactionValidDuration;
-    private Hbar maxTransactionFee;
+    @Nullable
+    private Hbar maxTransactionFee = null;
+    protected Hbar defaultMaxTransactionFee = new Hbar(2);
     private String memo = "";
 
     Transaction() {
         setTransactionValidDuration(DEFAULT_TRANSACTION_VALID_DURATION);
-
-        // Default transaction fee is 2 Hbar
-        setMaxTransactionFee(new Hbar(2));
 
         sourceTransactionBody = TransactionBody.getDefaultInstance();
     }
@@ -458,7 +457,7 @@ public abstract class Transaction<T extends Transaction<T>>
             );
         }
 
-        var bodyBuilder = spawnBodyBuilder();
+        var bodyBuilder = spawnBodyBuilder(null);
 
         onFreeze(bodyBuilder);
 
@@ -521,6 +520,10 @@ public abstract class Transaction<T extends Transaction<T>>
         this.maxTransactionFee = maxTransactionFee;
         // noinspection unchecked
         return (T) this;
+    }
+
+    public final Hbar getDefaultMaxTransactionFee() {
+        return defaultMaxTransactionFee;
     }
 
     public final String getTransactionMemo() {
@@ -743,9 +746,15 @@ public abstract class Transaction<T extends Transaction<T>>
         }
     }
 
-    protected TransactionBody.Builder spawnBodyBuilder() {
+    protected TransactionBody.Builder spawnBodyBuilder(@Nullable Client client) {
+        var clientDefaultFee = client != null ? client.getDefaultMaxTransactionFee() : null;
+
+        var defaultFee = clientDefaultFee != null ? clientDefaultFee : defaultMaxTransactionFee;
+
+        var feeHbars = maxTransactionFee != null ? maxTransactionFee : defaultFee;
+
         return TransactionBody.newBuilder()
-            .setTransactionFee(maxTransactionFee.toTinybars())
+            .setTransactionFee(feeHbars.toTinybars())
             .setTransactionValidDuration(DurationConverter.toProtobuf(transactionValidDuration).toBuilder())
             .setMemo(memo);
     }
@@ -806,7 +815,7 @@ public abstract class Transaction<T extends Transaction<T>>
             }
         }
 
-        frozenBodyBuilder = spawnBodyBuilder().setTransactionID(transactionIds.get(0).toProtobuf());
+        frozenBodyBuilder = spawnBodyBuilder(client).setTransactionID(transactionIds.get(0).toProtobuf());
         onFreeze(frozenBodyBuilder);
 
         outerTransactions = new ArrayList<>(nodeAccountIds.size());
@@ -955,7 +964,7 @@ public abstract class Transaction<T extends Transaction<T>>
     @SuppressWarnings("LiteProtoToString")
     public String toString() {
         // NOTE: regex is for removing the instance address from the default debug output
-        TransactionBody.Builder body = spawnBodyBuilder();
+        TransactionBody.Builder body = spawnBodyBuilder(null);
 
         if(!transactionIds.isEmpty()) {
             body.setTransactionID(transactionIds.get(0).toProtobuf());

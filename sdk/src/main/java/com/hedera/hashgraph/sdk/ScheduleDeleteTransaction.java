@@ -18,7 +18,7 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
     private ScheduleId scheduleId = null;
 
     public ScheduleDeleteTransaction() {
-        setMaxTransactionFee(new Hbar(5));
+        defaultMaxTransactionFee = new Hbar(5);
     }
 
     ScheduleDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
