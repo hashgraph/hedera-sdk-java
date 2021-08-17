@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Unreleased
 
- * Fixed bugs in `[to|from]Bytes()` in `TopicUpdateTransaction` and `TokenUpdateTransaction`
+ * Fixed bugs in [to|from]Bytes() in `TopicUpdateTransaction` and `TokenUpdateTransaction`
+ * Deprecated `Client.setMax[TransactionFee|QueryPayment]()`, added `Client.setDefaultMax[TransactionFee|QueryPayment]()` and `Client.getDefaultMax[TransactionFee|QueryPayment]()`
  * Added `FeeAssessmentMethod`.
  * Added `[get|set]AssessmentMethod()` to `CustomFractionalFee`
  * Added `CustomRoyaltyFee`

@@ -150,7 +150,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
 
                 return getCostAsync(client).thenCompose(cost -> {
                     // Check if this is below our configured maximum query payment
-                    var maxCost = MoreObjects.firstNonNull(maxQueryPayment, client.maxQueryPayment);
+                    var maxCost = MoreObjects.firstNonNull(maxQueryPayment, client.defaultMaxQueryPayment);
 
                     if (cost.compareTo(maxCost) > 0) {
                         return CompletableFuture.failedFuture(new MaxQueryPaymentExceededException(

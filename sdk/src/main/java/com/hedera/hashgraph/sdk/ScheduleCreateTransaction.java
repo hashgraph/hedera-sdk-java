@@ -22,7 +22,7 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     private String scheduleMemo = "";
 
     public ScheduleCreateTransaction() {
-        setMaxTransactionFee(new Hbar(5));
+        defaultMaxTransactionFee = new Hbar(5);
     }
 
     ScheduleCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
