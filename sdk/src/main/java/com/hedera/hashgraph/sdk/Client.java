@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.google.protobuf.ByteString;
 import java8.util.Lists;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Consumer;
@@ -11,10 +12,7 @@ import java8.util.function.Function;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -34,7 +32,13 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     static final int DEFAULT_MAX_ATTEMPTS = 10;
     static final Duration DEFAULT_MAX_BACKOFF = Duration.ofSeconds(8L);
     static final Duration DEFAULT_MIN_BACKOFF = Duration.ofMillis(250L);
+
+    private static Map<String, AccountId> MAINNET_NETWORK = null;
+    private static Map<String, AccountId> TESTNET_NETWORK = null;
+    private static Map<String, AccountId> PREVIEWNET_NETWORK = null;
+
     private static final Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
+
     final ExecutorService executor;
     @Nullable
     Hbar defaultMaxTransactionFee = null;
@@ -106,29 +110,11 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forMainnet() {
-        var network = new HashMap<String, AccountId>();
-        network.put("35.237.200.180:50211", new AccountId(3));
-        network.put("35.186.191.247:50211", new AccountId(4));
-        network.put("35.192.2.25:50211", new AccountId(5));
-        network.put("35.199.161.108:50211", new AccountId(6));
-        network.put("35.203.82.240:50211", new AccountId(7));
-        network.put("35.236.5.219:50211", new AccountId(8));
-        network.put("35.197.192.225:50211", new AccountId(9));
-        network.put("35.242.233.154:50211", new AccountId(10));
-        network.put("35.240.118.96:50211", new AccountId(11));
-        network.put("35.204.86.32:50211", new AccountId(12));
-        network.put("35.234.132.107:50211", new AccountId(13));
-        network.put("35.236.2.27:50211", new AccountId(14));
-        network.put("35.228.11.53:50211", new AccountId(15));
-        network.put("34.91.181.183:50211", new AccountId(16));
-        network.put("34.86.212.247:50211", new AccountId(17));
-        network.put("172.105.247.67:50211", new AccountId(18));
-        network.put("34.89.87.138:50211", new AccountId(19));
-        network.put("34.82.78.255:50211", new AccountId(20));
+        if (MAINNET_NETWORK == null) {
+            MAINNET_NETWORK = Collections.unmodifiableMap(readAddressBook("./addressbook/mainnet.pb"));
+        }
 
-        var client = Client.forNetwork(network);
-
-        client.network.networkName = NetworkName.MAINNET;
+        var client = Client.forNetwork(MAINNET_NETWORK).setNetworkName(NetworkName.MAINNET);
 
         try {
             client.setMirrorNetwork(Lists.of("hcs.mainnet.mirrornode.hedera.com:5600"));
@@ -146,17 +132,11 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forTestnet() {
-        var network = new HashMap<String, AccountId>();
-        network.put("0.testnet.hedera.com:50211", new AccountId(3));
-        network.put("1.testnet.hedera.com:50211", new AccountId(4));
-        network.put("2.testnet.hedera.com:50211", new AccountId(5));
-        network.put("3.testnet.hedera.com:50211", new AccountId(6));
-        network.put("4.testnet.hedera.com:50211", new AccountId(7));
+        if (TESTNET_NETWORK == null) {
+            TESTNET_NETWORK = Collections.unmodifiableMap(readAddressBook("./addressbook/testnet.pb"));
+        }
 
-
-        var client = Client.forNetwork(network);
-
-        client.network.networkName = NetworkName.TESTNET;
+        var client = Client.forNetwork(TESTNET_NETWORK).setNetworkName(NetworkName.TESTNET);
 
         try {
             client.setMirrorNetwork(Lists.of("hcs.testnet.mirrornode.hedera.com:5600"));
@@ -168,25 +148,49 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     }
 
     public static Client forPreviewnet() {
-        var network = new HashMap<String, AccountId>();
-        network.put("0.previewnet.hedera.com:50211", new AccountId(3));
-        network.put("1.previewnet.hedera.com:50211", new AccountId(4));
-        network.put("2.previewnet.hedera.com:50211", new AccountId(5));
-        network.put("3.previewnet.hedera.com:50211", new AccountId(6));
-        network.put("4.previewnet.hedera.com:50211", new AccountId(7));
+        if (PREVIEWNET_NETWORK == null) {
+            PREVIEWNET_NETWORK = Collections.unmodifiableMap(readAddressBook("./addressbook/previewnet.pb"));
+        }
 
-
-        var client = Client.forNetwork(network);
-
-        client.network.networkName = NetworkName.PREVIEWNET;
+        var client = Client.forNetwork(PREVIEWNET_NETWORK).setNetworkName(NetworkName.PREVIEWNET);
 
         try {
             client.setMirrorNetwork(Lists.of("hcs.previewnet.mirrornode.hedera.com:5600"));
         } catch (InterruptedException e) {
             // This should never occur. The network is empty.
+            throw new RuntimeException(e);
         }
 
         return client;
+    }
+
+    static Map<String, AccountId> readAddressBook(String fileName) {
+        var network = new HashMap<String, AccountId>();
+        var file = new File(fileName);
+
+        try {
+            var reader = Objects.requireNonNull(Client.class.getClassLoader().getResourceAsStream(fileName));
+            var contents = new byte[(int) file.length()];
+            var read = reader.read(contents);
+
+            if (read != file.length()) {
+                throw new RuntimeException("Failed to read entire address book file");
+            }
+
+            var book = NodeAddressBook.fromBytes(ByteString.copyFrom(contents));
+
+            for (var nodeAddress : book.nodeAddresses) {
+                if (nodeAddress.addresses.isEmpty()) {
+                    continue;
+                }
+
+                network.put(nodeAddress.addresses.get(0).toString(), nodeAddress.accountId);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return network;
     }
 
     /**
