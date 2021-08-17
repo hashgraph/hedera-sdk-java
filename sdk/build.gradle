@@ -143,16 +143,16 @@ jacocoTestReport {
     }
 
     // make sure we run all tests before this report is made
-    dependsOn test
-}
-
-test {
-	finalizedBy jacocoTestReport
+    dependsOn tasks.withType(Test)
 }
 
 task integrationTest(type: Test) {
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
+
+    onlyIf {
+        System.getenv('OPERATOR_ID') != null && System.getenv('OPERATOR_KEY') != null
+    }
 }
 
 tasks.withType(Javadoc) {
@@ -167,6 +167,8 @@ tasks.withType(Test) {
 
     // this task will fail on the first failed test
     failFast = true
+
+    finalizedBy jacocoTestReport
 
     // emit logs per passed or failed test
     testLogging {
