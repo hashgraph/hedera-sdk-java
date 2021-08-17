@@ -34,7 +34,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
     implementation 'org.slf4j:slf4j-api:1.7.30'
 
-    implementation "io.grpc:grpc-core:1.38.0"
+    implementation "io.grpc:grpc-core:1.40.0"
     implementation "io.grpc:grpc-protobuf-lite:1.40.0"
     implementation "io.grpc:grpc-stub:1.38.0"
 
