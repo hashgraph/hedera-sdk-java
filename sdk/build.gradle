@@ -35,7 +35,7 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:1.7.30'
 
     implementation "io.grpc:grpc-core:1.38.0"
-    implementation "io.grpc:grpc-protobuf-lite:1.38.0"
+    implementation "io.grpc:grpc-protobuf-lite:1.40.0"
     implementation "io.grpc:grpc-stub:1.38.0"
 
     testCompile "org.assertj:assertj-core:3.20.2"
