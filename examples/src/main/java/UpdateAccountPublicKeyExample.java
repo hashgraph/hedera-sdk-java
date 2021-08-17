@@ -33,7 +33,7 @@ public final class UpdateAccountPublicKeyExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        client.setMaxTransactionFee(new Hbar(10));
+        client.setDefaultMaxTransactionFee(new Hbar(10));
 
         // First, we create a new account so we don't affect our account
 

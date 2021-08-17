@@ -218,7 +218,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
             throw new IllegalStateException("Cannot schedule a chunked transaction with length greater than " + CHUNK_SIZE);
         }
 
-        var bodyBuilder = spawnBodyBuilder();
+        var bodyBuilder = spawnBodyBuilder(null);
 
         onFreeze(bodyBuilder);
 

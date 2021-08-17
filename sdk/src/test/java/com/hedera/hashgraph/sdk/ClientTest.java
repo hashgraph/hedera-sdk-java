@@ -82,7 +82,7 @@ class ClientTest {
     void setMaxTransactionFeeNegative() {
         assertThrows(IllegalArgumentException.class, () -> {
             Client.forTestnet()
-                .setMaxTransactionFee(Hbar.MIN);
+                .setDefaultMaxTransactionFee(Hbar.MIN);
         });
     }
 

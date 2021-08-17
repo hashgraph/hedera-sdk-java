@@ -24,7 +24,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     private final Map<AccountId, Hbar> hbarTransfers = new HashMap<>();
 
     public TransferTransaction() {
-        setMaxTransactionFee(new Hbar(1));
+        defaultMaxTransactionFee = new Hbar(1);
     }
 
     TransferTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {

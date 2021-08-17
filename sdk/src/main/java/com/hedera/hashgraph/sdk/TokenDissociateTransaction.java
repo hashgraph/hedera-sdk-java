@@ -20,7 +20,7 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
     private List<TokenId> tokenIds = new ArrayList<>();
 
     public TokenDissociateTransaction() {
-        setMaxTransactionFee(new Hbar(5));
+        defaultMaxTransactionFee = new Hbar(5);
     }
 
     TokenDissociateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
@@ -36,8 +37,9 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     static final Duration DEFAULT_MAX_BACKOFF = Duration.ofSeconds(8L);
     static final Duration DEFAULT_MIN_BACKOFF = Duration.ofMillis(250L);
 
-    Hbar maxTransactionFee = DEFAULT_MAX_QUERY_PAYMENT;
-    Hbar maxQueryPayment = DEFAULT_MAX_TRANSACTION_FEE;
+    @Nullable
+    Hbar defaultMaxTransactionFee = null;
+    Hbar defaultMaxQueryPayment = DEFAULT_MAX_QUERY_PAYMENT;
 
     Network network;
     MirrorNetwork mirrorNetwork;
@@ -533,16 +535,29 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * {@link Transaction#setMaxTransactionFee(Hbar)} on every new transaction. The actual
      * fee assessed for a given transaction may be less than this value, but never greater.
      *
-     * @param maxTransactionFee The Hbar to be set
+     * @param defaultMaxTransactionFee The Hbar to be set
      * @return {@code this}
      */
-    public synchronized Client setMaxTransactionFee(Hbar maxTransactionFee) {
-        if (maxTransactionFee.toTinybars() < 0) {
+    public synchronized Client setDefaultMaxTransactionFee(Hbar defaultMaxTransactionFee) {
+        Objects.requireNonNull(defaultMaxTransactionFee);
+        if (defaultMaxTransactionFee.toTinybars() < 0) {
             throw new IllegalArgumentException("maxTransactionFee must be non-negative");
         }
 
-        this.maxTransactionFee = maxTransactionFee;
+        this.defaultMaxTransactionFee = defaultMaxTransactionFee;
         return this;
+    }
+
+    @Nullable
+    public synchronized Hbar getDefaultMaxTransactionFee() {
+        return defaultMaxTransactionFee;
+    }
+
+    /**
+     * @deprecated Use {@link #setDefaultMaxTransactionFee(Hbar)} instead.
+     */
+    public synchronized Client setMaxTransactionFee(Hbar maxTransactionFee) {
+        return setDefaultMaxTransactionFee(maxTransactionFee);
     }
 
     /**
@@ -560,16 +575,29 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * <p>
      * Set to 0 to disable automatic implicit payments.
      *
-     * @param maxQueryPayment The Hbar to be set
+     * @param defaultMaxQueryPayment The Hbar to be set
      * @return {@code this}
      */
-    public synchronized Client setMaxQueryPayment(Hbar maxQueryPayment) {
-        if (maxQueryPayment.toTinybars() < 0) {
-            throw new IllegalArgumentException("maxQueryPayment must be non-negative");
+    public synchronized Client setDefaultMaxQueryPayment(Hbar defaultMaxQueryPayment) {
+        Objects.requireNonNull(defaultMaxQueryPayment);
+        if (defaultMaxQueryPayment.toTinybars() < 0) {
+            throw new IllegalArgumentException("defaultMaxQueryPayment must be non-negative");
         }
 
-        this.maxQueryPayment = maxQueryPayment;
+        this.defaultMaxQueryPayment = defaultMaxQueryPayment;
         return this;
+    }
+
+    public synchronized Hbar getDefaultMaxQueryPayment() {
+        return defaultMaxQueryPayment;
+    }
+
+    /**
+     * @deprecated Use {@link #setDefaultMaxQueryPayment(Hbar)} instead.
+     */
+    @Deprecated
+    public synchronized Client setMaxQueryPayment(Hbar maxQueryPayment) {
+        return setDefaultMaxQueryPayment(maxQueryPayment);
     }
 
     public synchronized Client setRequestTimeout(Duration requestTimeout) {

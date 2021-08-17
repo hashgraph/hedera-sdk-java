@@ -30,7 +30,7 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
 
     public FileCreateTransaction() {
         setExpirationTime(Instant.now().plus(DEFAULT_AUTO_RENEW_PERIOD));
-        setMaxTransactionFee(new Hbar(5));
+        defaultMaxTransactionFee = new Hbar(5);
     }
 
     FileCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
