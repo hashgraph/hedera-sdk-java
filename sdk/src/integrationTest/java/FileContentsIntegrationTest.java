@@ -1,15 +1,19 @@
+import com.google.common.io.ByteStreams;
 import com.hedera.hashgraph.sdk.FileContentsQuery;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.Status;
+import com.hedera.hashgraph.sdk.proto.NodeAddress;
+import com.hedera.hashgraph.sdk.proto.NodeAddressBook;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.util.HashMap;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -18,6 +22,25 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FileContentsIntegrationTest {
+    @Test
+    void addressBook() {
+        assertDoesNotThrow(() -> {
+            var testEnv = new IntegrationTestEnv(1);
+
+            var contents = new FileContentsQuery()
+                .setFileId(new FileId(101))
+                .execute(testEnv.client);
+
+            System.out.println(NodeAddressBook.parseFrom(contents));
+
+//            var stream = new FileOutputStream("./testnet.pb");
+//            stream.write(contents.toByteArray());
+//            stream.close();
+
+            testEnv.close();
+        });
+    }
+
     @Test
     @DisplayName("Can query file contents")
     void canQueryFileContents() {

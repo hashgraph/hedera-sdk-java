@@ -34,10 +34,6 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     static final Duration DEFAULT_MAX_BACKOFF = Duration.ofSeconds(8L);
     static final Duration DEFAULT_MIN_BACKOFF = Duration.ofMillis(250L);
 
-    private static Map<String, AccountId> MAINNET_NETWORK = null;
-    private static Map<String, AccountId> TESTNET_NETWORK = null;
-    private static Map<String, AccountId> PREVIEWNET_NETWORK = null;
-
     private static final Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
 
     final ExecutorService executor;
@@ -59,7 +55,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
 
     private boolean autoValidateChecksums = false;
 
-    Client(Map<String, AccountId> network) {
+    Client() {
         var threadFactory = new ThreadFactoryBuilder()
             .setNameFormat("hedera-sdk-%d")
             .setDaemon(true)
@@ -68,9 +64,11 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         this.executor = Executors.newFixedThreadPool(
             Runtime.getRuntime().availableProcessors(),
             threadFactory);
+    }
 
-        this.network = new Network(executor, network);
-        this.mirrorNetwork = new MirrorNetwork(executor);
+    public Client setMirrorNetwork(MirrorNetwork mirrorNetwork) {
+        this.mirrorNetwork = mirrorNetwork;
+        return this;
     }
 
     /**
@@ -87,7 +85,9 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forNetwork(Map<String, AccountId> network) {
-        return new Client(network);
+        var client = new Client();
+
+        return client.setNetwork(Network.forNetwork(client.executor, network));
     }
 
     public static Client forName(String name) {
@@ -111,18 +111,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forMainnet() {
-        if (MAINNET_NETWORK == null) {
-            MAINNET_NETWORK = Collections.unmodifiableMap(readAddressBook("./addressbook/mainnet.pb"));
-        }
-
-        var client = Client.forNetwork(MAINNET_NETWORK).setNetworkName(NetworkName.MAINNET);
-
-        try {
-            client.setMirrorNetwork(Lists.of("hcs.mainnet.mirrornode.hedera.com:5600"));
-        } catch (InterruptedException e) {
-            // This should never occur. The network is empty.
-        }
-
+        var client = new Client();
+        client.setNetwork(Network.forMainnet(client.executor));
         return client;
     }
 
@@ -133,57 +123,15 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forTestnet() {
-        if (TESTNET_NETWORK == null) {
-            TESTNET_NETWORK = Collections.unmodifiableMap(readAddressBook("./addressbook/testnet.pb"));
-        }
-
-        var client = Client.forNetwork(TESTNET_NETWORK).setNetworkName(NetworkName.TESTNET);
-
-        try {
-            client.setMirrorNetwork(Lists.of("hcs.testnet.mirrornode.hedera.com:5600"));
-        } catch (InterruptedException e) {
-            // This should never occur. The network is empty.
-        }
-
+        var client = new Client();
+        client.setNetwork(Network.forTestnet(client.executor));
         return client;
     }
 
     public static Client forPreviewnet() {
-        if (PREVIEWNET_NETWORK == null) {
-            PREVIEWNET_NETWORK = Collections.unmodifiableMap(readAddressBook("./addressbook/previewnet.pb"));
-        }
-
-        var client = Client.forNetwork(PREVIEWNET_NETWORK).setNetworkName(NetworkName.PREVIEWNET);
-
-        try {
-            client.setMirrorNetwork(Lists.of("hcs.previewnet.mirrornode.hedera.com:5600"));
-        } catch (InterruptedException e) {
-            // This should never occur. The network is empty.
-            throw new RuntimeException(e);
-        }
-
+        var client = new Client();
+        client.setNetwork(Network.forPreviewnet(client.executor));
         return client;
-    }
-
-    static Map<String, AccountId> readAddressBook(String fileName) {
-        var network = new HashMap<String, AccountId>();
-
-        try {
-            var contents = ByteStreams.toByteArray(Objects.requireNonNull(Client.class.getClassLoader().getResourceAsStream(fileName)));
-            var book = NodeAddressBook.fromBytes(ByteString.copyFrom(contents));
-
-            for (var nodeAddress : book.nodeAddresses) {
-                if (nodeAddress.addresses.isEmpty()) {
-                    continue;
-                }
-
-                network.put(nodeAddress.addresses.get(0).toString(), nodeAddress.accountId);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return network;
     }
 
     /**
@@ -214,7 +162,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
             for (Map.Entry<String, JsonElement> entry : networks.entrySet()) {
                 nodes.put(entry.getValue().toString().replace("\"", ""), AccountId.fromString(entry.getKey().toString().replace("\"", "")));
             }
-            client = new Client(nodes);
+            client = new Client();
+            client.setNetwork(Network.forNetwork(client.executor, nodes));
         } else {
             String networks = config.network.getAsString();
             switch (networks) {
@@ -297,6 +246,11 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
 
     public synchronized void setMirrorNetwork(List<String> network) throws InterruptedException {
         mirrorNetwork.setNetwork(network);
+    }
+
+    public Client setNetwork(Network network) {
+        this.network = network;
+        return this;
     }
 
     public Map<String, AccountId> getNetwork() {

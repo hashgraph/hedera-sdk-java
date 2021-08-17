@@ -1,10 +1,13 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.collect.HashBiMap;
+import com.google.common.io.ByteStreams;
+import com.google.protobuf.ByteString;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,6 +20,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 class Network {
+    static ArrayList<NodeAddressBook> NODE_ADDRESS_BOOK = new ArrayList<>(3);
+
     static final Integer DEFAULT_MAX_NODE_ATTEMPTS = -1;
     final ExecutorService executor;
     final Semaphore lock = new Semaphore(1);
@@ -36,10 +41,102 @@ class Network {
 
         try {
             setNetwork(network);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | TimeoutException e) {
             // This should never occur. The network is empty.
-        } catch (TimeoutException e) {
-            // This should never occur. The network is empty.
+        }
+    }
+
+    static Network forNetwork(ExecutorService executor, Map<String, AccountId> network) {
+        return new Network(executor, network);
+    }
+
+    static Network forMainnet(ExecutorService executor) {
+        readNodeAddressBookResources();
+
+        var network = new HashMap<String, AccountId>();
+        network.put("35.237.200.180:50211", new AccountId(3));
+        network.put("35.186.191.247:50211", new AccountId(4));
+        network.put("35.192.2.25:50211", new AccountId(5));
+        network.put("35.199.161.108:50211", new AccountId(6));
+        network.put("35.203.82.240:50211", new AccountId(7));
+        network.put("35.236.5.219:50211", new AccountId(8));
+        network.put("35.197.192.225:50211", new AccountId(9));
+        network.put("35.242.233.154:50211", new AccountId(10));
+        network.put("35.240.118.96:50211", new AccountId(11));
+        network.put("35.204.86.32:50211", new AccountId(12));
+        network.put("35.234.132.107:50211", new AccountId(13));
+        network.put("35.236.2.27:50211", new AccountId(14));
+        network.put("35.228.11.53:50211", new AccountId(15));
+        network.put("34.91.181.183:50211", new AccountId(16));
+        network.put("34.86.212.247:50211", new AccountId(17));
+        network.put("172.105.247.67:50211", new AccountId(18));
+        network.put("34.89.87.138:50211", new AccountId(19));
+        network.put("34.82.78.255:50211", new AccountId(20));
+
+        return new Network(executor, network).setNetworkName(NetworkName.MAINNET);
+    }
+
+    static Network forTestnet(ExecutorService executor) {
+        readNodeAddressBookResources();
+
+        var network = new HashMap<String, AccountId>();
+        network.put("0.testnet.hedera.com:50211", new AccountId(3));
+        network.put("1.testnet.hedera.com:50211", new AccountId(4));
+        network.put("2.testnet.hedera.com:50211", new AccountId(5));
+        network.put("3.testnet.hedera.com:50211", new AccountId(6));
+        network.put("4.testnet.hedera.com:50211", new AccountId(7));
+
+        return new Network(executor, network).setNetworkName(NetworkName.TESTNET);
+    }
+
+    static Network forPreviewnet(ExecutorService executor) {
+        readNodeAddressBookResources();
+
+        var network = new HashMap<String, AccountId>();
+        network.put("0.previewnet.hedera.com:50211", new AccountId(3));
+        network.put("1.previewnet.hedera.com:50211", new AccountId(4));
+        network.put("2.previewnet.hedera.com:50211", new AccountId(5));
+        network.put("3.previewnet.hedera.com:50211", new AccountId(6));
+        network.put("4.previewnet.hedera.com:50211", new AccountId(7));
+
+        return new Network(executor, network).setNetworkName(NetworkName.PREVIEWNET);
+    }
+
+    @Nullable
+    public NetworkName getNetworkName() {
+        return networkName;
+    }
+
+    public Network setNetworkName(@Nullable NetworkName networkName) {
+        this.networkName = networkName;
+        return this;
+    }
+
+    static void readNodeAddressBookResources() {
+        if (NODE_ADDRESS_BOOK.isEmpty()) {
+            NODE_ADDRESS_BOOK.add(null);
+            NODE_ADDRESS_BOOK.add(null);
+            NODE_ADDRESS_BOOK.add(null);
+        }
+
+        if ( NODE_ADDRESS_BOOK.get(NetworkName.MAINNET.id) == null) {
+            NODE_ADDRESS_BOOK.set(NetworkName.MAINNET.id, readAddressBookResource("./addressbook/mainnet.pb"));
+        }
+
+        if ( NODE_ADDRESS_BOOK.get(NetworkName.TESTNET.id) == null) {
+            NODE_ADDRESS_BOOK.set(NetworkName.TESTNET.id, readAddressBookResource("./addressbook/testnet.pb"));
+        }
+
+        if ( NODE_ADDRESS_BOOK.get(NetworkName.PREVIEWNET.id) == null) {
+            NODE_ADDRESS_BOOK.set(NetworkName.PREVIEWNET.id, readAddressBookResource("./addressbook/previewnet.pb"));
+        }
+    }
+    static NodeAddressBook readAddressBookResource(String fileName) {
+        try {
+            var contents = ByteStreams.toByteArray(Objects.requireNonNull(Client.class.getClassLoader().getResourceAsStream(fileName)));
+            return NodeAddressBook.fromBytes(ByteString.copyFrom(contents));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

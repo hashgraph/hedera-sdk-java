@@ -8,9 +8,15 @@ class Endpoint {
     }
 
     static Endpoint fromProtobuf(com.hedera.hashgraph.sdk.proto.ServiceEndpoint serviceEndpoint) {
+        var port = (int) Integer.toUnsignedLong(serviceEndpoint.getPort());
+
+        if (port == 0 || port == 50111) {
+            port = 50211;
+        }
+
         return new Endpoint()
             .setAddress(IPv4Address.fromProtobuf(serviceEndpoint.getIpAddressV4()))
-            .setPort((int) Integer.toUnsignedLong(serviceEndpoint.getPort()));
+            .setPort(port);
     }
 
     IPv4Address getAddress() {

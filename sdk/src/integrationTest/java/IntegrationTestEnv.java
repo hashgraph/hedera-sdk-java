@@ -62,7 +62,7 @@ public class IntegrationTestEnv {
         client.setNetwork(network);
     }
 
-    private static Client createTestEnvClient() {
+    private static Client createTestEnvClient() throws Exception {
         if (System.getProperty("HEDERA_NETWORK").equals("previewnet")) {
             return Client.forPreviewnet();
         } else if (System.getProperty("HEDERA_NETWORK").equals("testnet")) {
