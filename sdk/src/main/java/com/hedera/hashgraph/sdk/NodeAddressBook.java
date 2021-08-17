@@ -7,17 +7,17 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NodeAddressBook {
+class NodeAddressBook {
     List<NodeAddress> nodeAddresses;
 
     NodeAddressBook() {
     }
 
-    public List<NodeAddress> getNodeAddresses() {
+    List<NodeAddress> getNodeAddresses() {
         return nodeAddresses;
     }
 
-    public NodeAddressBook setNodeAddresses(List<NodeAddress> nodeAddresses) {
+    NodeAddressBook setNodeAddresses(List<NodeAddress> nodeAddresses) {
         this.nodeAddresses = nodeAddresses;
         return this;
     }
@@ -32,7 +32,7 @@ public class NodeAddressBook {
         return new NodeAddressBook().setNodeAddresses(addresses);
     }
 
-    public static NodeAddressBook fromBytes(ByteString bytes) throws InvalidProtocolBufferException {
+    static NodeAddressBook fromBytes(ByteString bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.NodeAddressBook.parseFrom(bytes));
     }
 
@@ -46,7 +46,7 @@ public class NodeAddressBook {
         return builder.build();
     }
 
-    public ByteString toBytes() {
+    ByteString toBytes() {
         return toProtobuf().toByteString();
     }
 
