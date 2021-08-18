@@ -1,5 +1,22 @@
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.AccountBalance;
+import com.hedera.hashgraph.sdk.AccountBalanceQuery;
+import com.hedera.hashgraph.sdk.AccountCreateTransaction;
+import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hedera.hashgraph.sdk.ScheduleCreateTransaction;
+import com.hedera.hashgraph.sdk.ScheduleId;
+import com.hedera.hashgraph.sdk.ScheduleInfo;
+import com.hedera.hashgraph.sdk.ScheduleInfoQuery;
+import com.hedera.hashgraph.sdk.ScheduleSignTransaction;
+import com.hedera.hashgraph.sdk.Transaction;
+import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hedera.hashgraph.sdk.TransferTransaction;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
@@ -131,7 +148,7 @@ public final class ScheduledTransferExample {
             Transaction<?> scheduledTransaction = scheduledTransactionInfo.getScheduledTransaction();
 
             // We happen to know that this transaction is (or certainly ought to be) a TransferTransaction
-            if(scheduledTransaction instanceof TransferTransaction) {
+            if (scheduledTransaction instanceof TransferTransaction) {
                 TransferTransaction scheduledTransfer = (TransferTransaction) scheduledTransaction;
                 System.out.println("The scheduled transfer transaction from Bob's POV:");
                 System.out.println(scheduledTransfer);
@@ -140,7 +157,7 @@ public final class ScheduledTransferExample {
                 System.out.println("Something has gone horribly wrong.  Crashing...");
                 System.exit(-1);
             }
-        } catch(InvalidProtocolBufferException exc) {
+        } catch (InvalidProtocolBufferException exc) {
             System.out.println("Failed to get copy of scheduled transaction, crashing...");
             System.exit(-1);
         }

@@ -3,7 +3,10 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.FileUpdateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Instant;
@@ -68,8 +71,8 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     /**
      * <p>Set the keys which must sign any transactions modifying this file. Required.
      *
-     * @return {@code this}
      * @param keys The Key or Keys to be set
+     * @return {@code this}
      */
     public FileUpdateTransaction setKeys(Key... keys) {
         requireNotFrozen();
@@ -183,13 +186,13 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         if (body.hasFileID()) {
             fileId = FileId.fromProtobuf(body.getFileID());
         }
-        if(body.hasKeys()) {
+        if (body.hasKeys()) {
             keys = KeyList.fromProtobuf(body.getKeys(), null);
         }
-        if(body.hasExpirationTime()) {
+        if (body.hasExpirationTime()) {
             expirationTime = InstantConverter.fromProtobuf(body.getExpirationTime());
         }
-        if(body.hasMemo()) {
+        if (body.hasMemo()) {
             fileMemo = body.getMemo().getValue();
         }
         contents = body.getContents().toByteArray();
@@ -200,14 +203,14 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         if (fileId != null) {
             builder.setFileID(fileId.toProtobuf());
         }
-        if(keys != null) {
+        if (keys != null) {
             builder.setKeys(keys.toProtobuf());
         }
-        if(expirationTime != null) {
+        if (expirationTime != null) {
             builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
         }
         builder.setContents(ByteString.copyFrom(contents));
-        if(fileMemo != null) {
+        if (fileMemo != null) {
             builder.setMemo(StringValue.of(fileMemo));
         }
 

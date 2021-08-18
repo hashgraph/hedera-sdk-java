@@ -35,7 +35,7 @@ public enum BadMnemonicReason {
      */
     ChecksumMismatch,
     /**
-     *The given mnemonic doesn't contain 22 words required to be a legacy mnemonic, or the words are
+     * The given mnemonic doesn't contain 22 words required to be a legacy mnemonic, or the words are
      * not in the legacy list.
      */
     NotLegacy

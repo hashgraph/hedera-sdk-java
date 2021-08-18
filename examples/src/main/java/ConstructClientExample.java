@@ -12,7 +12,8 @@ public class ConstructClientExample {
 
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names
-    @Nullable private static final String CONFIG_FILE = Dotenv.load().get("CONFIG_FILE");
+    @Nullable
+    private static final String CONFIG_FILE = Dotenv.load().get("CONFIG_FILE");
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
@@ -80,7 +81,7 @@ public class ConstructClientExample {
         // in the form of a list of nodes.
         // The config file should specify the operator, so you can use a client constructed
         // using fromConfigFile() immediately.
-        if(CONFIG_FILE != null) {
+        if (CONFIG_FILE != null) {
             Client configClient = Client.fromConfigFile(CONFIG_FILE);
             configClient.close();
         }

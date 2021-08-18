@@ -1,7 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import javax.annotation.Nullable;
-
 /**
  * Information about a single account that is proxy staking.
  */

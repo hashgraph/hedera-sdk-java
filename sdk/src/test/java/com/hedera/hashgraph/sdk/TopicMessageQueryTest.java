@@ -188,14 +188,14 @@ class TopicMessageQueryTest {
             .hasSize(1)
             .first()
             .returns(toInstant(response2.getConsensusTimestamp()), t -> t.consensusTimestamp)
-            .returns(response2.getChunkInfo().getInitialTransactionID(), t-> t.transactionId.toProtobuf())
+            .returns(response2.getChunkInfo().getInitialTransactionID(), t -> t.transactionId.toProtobuf())
             .returns(message, t -> t.contents)
             .returns(response2.getRunningHash().toByteArray(), t -> t.runningHash)
             .returns(response2.getSequenceNumber(), t -> t.sequenceNumber)
             .extracting(t -> t.chunks)
             .asInstanceOf(InstanceOfAssertFactories.ARRAY)
             .hasSize(2)
-            .extracting(c -> ((TopicMessageChunk)c).sequenceNumber)
+            .extracting(c -> ((TopicMessageChunk) c).sequenceNumber)
             .contains(1L, 2L);
     }
 
@@ -216,7 +216,9 @@ class TopicMessageQueryTest {
         consensusServiceStub.requests.add(request().build());
         consensusServiceStub.responses.add(response(1L));
 
-        subscribeToMirror(t -> {throw new RuntimeException();});
+        subscribeToMirror(t -> {
+            throw new RuntimeException();
+        });
 
         assertThat(errors).hasSize(1).first().isInstanceOf(RuntimeException.class);
         assertThat(received).isEmpty();
@@ -266,7 +268,7 @@ class TopicMessageQueryTest {
         assertThat(errors).hasSize(1)
             .first()
             .isInstanceOf(StatusRuntimeException.class)
-            .extracting(t -> ((StatusRuntimeException)t).getStatus().getCode())
+            .extracting(t -> ((StatusRuntimeException) t).getStatus().getCode())
             .isEqualTo(code);
     }
 
@@ -320,7 +322,7 @@ class TopicMessageQueryTest {
         assertThat(errors).hasSize(1)
             .first()
             .isInstanceOf(StatusRuntimeException.class)
-            .extracting(t -> ((StatusRuntimeException)t).getStatus())
+            .extracting(t -> ((StatusRuntimeException) t).getStatus())
             .isEqualTo(Status.RESOURCE_EXHAUSTED);
     }
 

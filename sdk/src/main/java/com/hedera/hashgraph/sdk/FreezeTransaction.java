@@ -2,10 +2,10 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.FreezeTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.FreezeServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.FreezeTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Instant;
@@ -46,19 +46,19 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
         return startTime != null ? startTime : Instant.EPOCH;
     }
 
+    public FreezeTransaction setStartTime(Instant startTime) {
+        requireNotFrozen();
+        Objects.requireNonNull(startTime);
+        this.startTime = startTime;
+        return this;
+    }
+
     /**
      * @deprecated Use {@link #setStartTime(Instant)} instead.
      */
     @Deprecated
     public FreezeTransaction setStartTime(int hour, int minute) {
         return setStartTime(Instant.from(OffsetTime.of(hour, minute, 0, 0, ZoneOffset.UTC)));
-    }
-
-    public FreezeTransaction setStartTime(Instant startTime) {
-        requireNotFrozen();
-        Objects.requireNonNull(startTime);
-        this.startTime = startTime;
-        return this;
     }
 
     @Deprecated
@@ -120,11 +120,11 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
         var body = sourceTransactionBody.getFreeze();
         endHour = body.getEndHour();
         endMinute = body.getEndMin();
-        if(body.hasUpdateFile()) {
+        if (body.hasUpdateFile()) {
             updateFileId = FileId.fromProtobuf(body.getUpdateFile());
         }
         updateFileHash = body.getFileHash().toByteArray();
-        if(body.hasStartTime()) {
+        if (body.hasStartTime()) {
             startTime = InstantConverter.fromProtobuf(body.getStartTime());
         }
     }
@@ -133,11 +133,11 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
         var builder = FreezeTransactionBody.newBuilder();
         builder.setEndHour(endHour);
         builder.setEndMin(endMinute);
-        if(updateFileId != null) {
+        if (updateFileId != null) {
             builder.setUpdateFile(updateFileId.toProtobuf());
         }
         builder.setFileHash(ByteString.copyFrom(updateFileHash));
-        if(startTime != null) {
+        if (startTime != null) {
             builder.setStartTime(InstantConverter.toProtobuf(startTime));
         }
         return builder;

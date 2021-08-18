@@ -1,9 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CurrentAndNextFeeSchedule;
+
 import javax.annotation.Nullable;
-import com.google.common.base.MoreObjects;
 
 public class FeeSchedules {
     @Nullable
@@ -47,10 +48,10 @@ public class FeeSchedules {
 
     CurrentAndNextFeeSchedule toProtobuf() {
         var returnBuilder = CurrentAndNextFeeSchedule.newBuilder();
-        if(current != null) {
+        if (current != null) {
             returnBuilder.setCurrentFeeSchedule(current.toProtobuf());
         }
-        if(next != null) {
+        if (next != null) {
             returnBuilder.setNextFeeSchedule(next.toProtobuf());
         }
         return returnBuilder.build();

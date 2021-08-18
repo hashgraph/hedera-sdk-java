@@ -46,10 +46,6 @@ public class TokenId {
         this.checksum = checksum;
     }
 
-    public NftId nft(@Nonnegative long serial) {
-        return new NftId(this, serial);
-    }
-
     public static TokenId fromString(String id) {
         return EntityIdHelper.fromString(id, TokenId::new);
     }
@@ -61,6 +57,10 @@ public class TokenId {
 
     public static TokenId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(TokenID.parseFrom(bytes).toBuilder().build());
+    }
+
+    public NftId nft(@Nonnegative long serial) {
+        return new NftId(this, serial);
     }
 
     TokenID toProtobuf() {

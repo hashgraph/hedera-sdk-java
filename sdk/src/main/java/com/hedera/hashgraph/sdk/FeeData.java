@@ -1,8 +1,9 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import javax.annotation.Nullable;
 import com.google.common.base.MoreObjects;
+import com.google.protobuf.InvalidProtocolBufferException;
+
+import javax.annotation.Nullable;
 
 public class FeeData {
     @Nullable
@@ -69,13 +70,13 @@ public class FeeData {
 
     com.hedera.hashgraph.sdk.proto.FeeData toProtobuf() {
         var builder = com.hedera.hashgraph.sdk.proto.FeeData.newBuilder().setSubType(type.code);
-        if(nodeData != null) {
+        if (nodeData != null) {
             builder.setNodedata(nodeData.toProtobuf());
         }
-        if(networkData != null) {
+        if (networkData != null) {
             builder.setNetworkdata(networkData.toProtobuf());
         }
-        if(serviceData != null) {
+        if (serviceData != null) {
             builder.setServicedata(serviceData.toProtobuf());
         }
         return builder.build();

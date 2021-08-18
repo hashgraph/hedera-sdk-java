@@ -15,13 +15,6 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FileAppendTransactionTest {
-    private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
-        "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
-
-    private static final PrivateKey secondPrivateKey = PrivateKey.fromString(
-        "302e020100300506032b65700422042099b8587e5abccf6999b0d42b88c581c45284290450487ce90095561c85af11e4"
-    );
-
     public static final String BIG_CONTENTS = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur aliquam augue sem, ut mattis dui laoreet a. Curabitur consequat est euismod, scelerisque metus et, tristique dui. Nulla commodo mauris ut faucibus ultricies. Quisque venenatis nisl nec augue tempus, at efficitur elit eleifend. Duis pharetra felis metus, sed dapibus urna vehicula id. Duis non venenatis turpis, sit amet ornare orci. Donec non interdum quam. Sed finibus nunc et risus finibus, non sagittis lorem cursus. Proin pellentesque tempor aliquam. Sed congue nisl in enim bibendum, condimentum vehicula nisi feugiat.\n" +
         "\n" +
         "Suspendisse non sodales arcu. Suspendisse sodales, lorem ac mollis blandit, ipsum neque porttitor nulla, et sodales arcu ante fermentum tellus. Integer sagittis dolor sed augue fringilla accumsan. Cras vitae finibus arcu, sit amet varius dolor. Etiam id finibus dolor, vitae luctus velit. Proin efficitur augue nec pharetra accumsan. Aliquam lobortis nisl diam, vel fermentum purus finibus id. Etiam at finibus orci, et tincidunt turpis. Aliquam imperdiet congue lacus vel facilisis. Phasellus id magna vitae enim dapibus vestibulum vitae quis augue. Morbi eu consequat enim. Maecenas neque nulla, pulvinar sit amet consequat sed, tempor sed magna. Mauris lacinia sem feugiat faucibus aliquet. Etiam congue non turpis at commodo. Nulla facilisi.\n" +
@@ -67,8 +60,11 @@ public class FileAppendTransactionTest {
         "In consequat, nisi iaculis laoreet elementum, massa mauris varius nisi, et porta nisi velit at urna. Maecenas sit amet aliquet eros, a rhoncus nisl. Maecenas convallis enim nunc. Morbi purus nisl, aliquam ac tincidunt sed, mattis in augue. Quisque et elementum quam, vitae maximus orci. Suspendisse hendrerit risus nec vehicula placerat. Nulla et lectus nunc. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.\n" +
         "\n" +
         "Etiam ut sodales ex. Nulla luctus, magna eu scelerisque sagittis, nibh quam consectetur neque, non rutrum dolor metus nec ex. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed egestas augue elit, sollicitudin accumsan massa lobortis ac. Curabitur placerat, dolor a aliquam maximus, velit ipsum laoreet ligula, id ullamcorper lacus nibh eget nisl. Donec eget lacus venenatis enim consequat auctor vel in.\n";
-
-
+    private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
+        "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
+    private static final PrivateKey secondPrivateKey = PrivateKey.fromString(
+        "302e020100300506032b65700422042099b8587e5abccf6999b0d42b88c581c45284290450487ce90095561c85af11e4"
+    );
     final Instant validStart = Instant.ofEpochSecond(1554158542);
 
     @BeforeAll
@@ -116,9 +112,9 @@ public class FileAppendTransactionTest {
     String hashesToString(List<Map<AccountId, byte[]>> hashes) {
         var outString = new StringBuilder();
         outString.append("[");
-        for(var tx : hashes) {
+        for (var tx : hashes) {
             outString.append("{");
-            for(var entry : tx.entrySet()) {
+            for (var entry : tx.entrySet()) {
                 outString.append(entry.getKey().toString()).append("=").append(Hex.toHexString(entry.getValue())).append(", ");
             }
             outString.append("}, ");
@@ -149,9 +145,9 @@ public class FileAppendTransactionTest {
     String signaturesToString(Map<AccountId, Map<PublicKey, byte[]>> signatures) {
         var outString = new StringBuilder();
         outString.append("{");
-        for(var nodeEntry : signatures.entrySet()) {
+        for (var nodeEntry : signatures.entrySet()) {
             outString.append(nodeEntry.getKey()).append("={");
-            for(var sigEntry : nodeEntry.getValue().entrySet()) {
+            for (var sigEntry : nodeEntry.getValue().entrySet()) {
                 outString.append(sigEntry.getKey()).append("=").append(Hex.toHexString(sigEntry.getValue())).append(", ");
             }
             outString.append("}, ");
@@ -162,7 +158,7 @@ public class FileAppendTransactionTest {
     String allSignaturesToString(List<Map<AccountId, Map<PublicKey, byte[]>>> allSignatures) {
         var outString = new StringBuilder();
         outString.append("[");
-        for(var txEntry : allSignatures) {
+        for (var txEntry : allSignatures) {
             outString.append(signaturesToString(txEntry)).append(", ");
         }
         return outString + "]";

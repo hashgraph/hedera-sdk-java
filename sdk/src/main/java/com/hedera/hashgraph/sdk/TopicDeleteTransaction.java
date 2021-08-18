@@ -2,9 +2,9 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ConsensusDeleteTopicTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -45,8 +45,8 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
     /**
      * Set the topic ID to delete.
      *
-     * @return {@code this}
      * @param topicId The TopicId to be set
+     * @return {@code this}
      */
     public TopicDeleteTransaction setTopicId(TopicId topicId) {
         Objects.requireNonNull(topicId);

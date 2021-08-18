@@ -29,7 +29,7 @@ public class CustomRoyaltyFee extends CustomFee {
         var returnFee = new CustomRoyaltyFee()
             .setNumerator(fraction.getNumerator())
             .setDenominator(fraction.getDenominator());
-        if(royaltyFee.hasFallbackFee()) {
+        if (royaltyFee.hasFallbackFee()) {
             returnFee.fallbackFee = CustomFixedFee.fromProtobuf(royaltyFee.getFallbackFee());
         }
         return returnFee;
@@ -37,7 +37,7 @@ public class CustomRoyaltyFee extends CustomFee {
 
     static CustomRoyaltyFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
         var returnFee = fromProtobuf(customFee.getRoyaltyFee());
-        if(customFee.hasFeeCollectorAccountId()) {
+        if (customFee.hasFeeCollectorAccountId()) {
             returnFee.setFeeCollectorAccountId(AccountId.fromProtobuf(customFee.getFeeCollectorAccountId()));
         }
         return returnFee;
@@ -48,22 +48,22 @@ public class CustomRoyaltyFee extends CustomFee {
         return this;
     }
 
+    public long getNumerator() {
+        return numerator;
+    }
+
     public CustomRoyaltyFee setNumerator(long numerator) {
         this.numerator = numerator;
         return this;
     }
 
-    public long getNumerator() {
-        return numerator;
+    public long getDenominator() {
+        return denominator;
     }
 
     public CustomRoyaltyFee setDenominator(long denominator) {
         this.denominator = denominator;
         return this;
-    }
-
-    public long getDenominator() {
-        return denominator;
     }
 
     public CustomRoyaltyFee setFallbackFee(CustomFixedFee fallbackFee) {
@@ -79,7 +79,7 @@ public class CustomRoyaltyFee extends CustomFee {
                     .setNumerator(numerator)
                     .setDenominator(denominator)
             );
-        if(fallbackFee != null) {
+        if (fallbackFee != null) {
             royaltyFeeBuilder.setFallbackFee(fallbackFee.toFixedFeeProtobuf());
         }
         return royaltyFeeBuilder.build();

@@ -31,8 +31,7 @@ public enum TokenType {
 
     @Override
     public String toString() {
-        switch(this)
-        {
+        switch (this) {
             case FUNGIBLE_COMMON:
                 return "FUNGIBLE_COMMON";
             case NON_FUNGIBLE_UNIQUE:

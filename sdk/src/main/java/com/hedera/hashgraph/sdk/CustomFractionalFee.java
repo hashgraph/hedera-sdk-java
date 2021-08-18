@@ -39,7 +39,7 @@ public class CustomFractionalFee extends CustomFee {
 
     static CustomFractionalFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
         var returnFee = fromProtobuf(customFee.getFractionalFee());
-        if(customFee.hasFeeCollectorAccountId()) {
+        if (customFee.hasFeeCollectorAccountId()) {
             returnFee.setFeeCollectorAccountId(AccountId.fromProtobuf(customFee.getFeeCollectorAccountId()));
         }
         return returnFee;

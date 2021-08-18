@@ -2,7 +2,7 @@ package com.hedera.hashgraph.sdk;
 
 import java.util.concurrent.ExecutorService;
 
-class Node extends ManagedNode implements Comparable<Node>{
+class Node extends ManagedNode implements Comparable<Node> {
     AccountId accountId;
     long delay;
     long delayUntil;

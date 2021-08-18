@@ -29,8 +29,7 @@ public enum TokenSupplyType {
 
     @Override
     public String toString() {
-        switch(this)
-        {
+        switch (this) {
             case INFINITE:
                 return "INFINITE";
             case FINITE:

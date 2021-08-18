@@ -35,19 +35,16 @@ public abstract class Transaction<T extends Transaction<T>>
 
     // Default transaction duration
     private static final Duration DEFAULT_TRANSACTION_VALID_DURATION = Duration.ofSeconds(120);
-
-    // The builder that gets re-used to build each outer transaction.
-    // freezeWith() will create the frozenBodyBuilder.
-    // The presence of frozenBodyBuilder indicates that this transaction is frozen.
-    @Nullable
-    protected TransactionBody.Builder frozenBodyBuilder = null;
-
     // Transaction constructors end their work by setting sourceTransactionBody.
     // The expectation is that the Transaction subclass constructor
     // will pick up where the Transaction superclass constructor left off,
     // and will unpack the data in the transaction body.
     protected final TransactionBody sourceTransactionBody;
-
+    // The builder that gets re-used to build each outer transaction.
+    // freezeWith() will create the frozenBodyBuilder.
+    // The presence of frozenBodyBuilder indicates that this transaction is frozen.
+    @Nullable
+    protected TransactionBody.Builder frozenBodyBuilder = null;
     // A SDK [Transaction] is composed of multiple, raw protobuf transactions. These should be
     // functionally identical, with the exception of pointing to different nodes. When retrying a
     // transaction after a network error or retry-able status response, we try a
@@ -56,6 +53,13 @@ public abstract class Transaction<T extends Transaction<T>>
     protected List<com.hedera.hashgraph.sdk.proto.SignedTransaction.Builder> innerSignedTransactions = Collections.emptyList();
     protected List<SignatureMap.Builder> sigPairLists = Collections.emptyList();
     protected List<TransactionId> transactionIds = Collections.emptyList();
+    // publicKeys and signers are parallel arrays.
+    // If the signer associated with a public key is null, that means that the private key
+    // associated with that public key has already contributed a signature to sigPairListBuilders, but
+    // the signer is not available (likely because this came from fromBytes())
+    protected List<PublicKey> publicKeys = new ArrayList<>();
+    protected List<Function<byte[], byte[]>> signers = new ArrayList<>();
+    protected Hbar defaultMaxTransactionFee = new Hbar(2);
     // For SDK Transactions that require multiple protobuf transaction ID's this variable keeps track of the current
     // execution group.
     // Example:
@@ -67,18 +71,9 @@ public abstract class Transaction<T extends Transaction<T>>
     //      { ID: 2, NodeAccountID: 4 }  // group = 1
     // ]
     int nextTransactionIndex = 0;
-
-    // publicKeys and signers are parallel arrays.
-    // If the signer associated with a public key is null, that means that the private key
-    // associated with that public key has already contributed a signature to sigPairListBuilders, but
-    // the signer is not available (likely because this came from fromBytes())
-    protected List<PublicKey> publicKeys = new ArrayList<>();
-    protected List<Function<byte[], byte[]>> signers = new ArrayList<>();
-
     private Duration transactionValidDuration;
     @Nullable
     private Hbar maxTransactionFee = null;
-    protected Hbar defaultMaxTransactionFee = new Hbar(2);
     private String memo = "";
 
     Transaction() {
@@ -634,7 +629,7 @@ public abstract class Transaction<T extends Transaction<T>>
             return (T) this;
         }
 
-        for(int i = 0; i < outerTransactions.size(); i++) {
+        for (int i = 0; i < outerTransactions.size(); i++) {
             outerTransactions.set(i, null);
         }
         publicKeys.add(publicKey);
@@ -686,7 +681,7 @@ public abstract class Transaction<T extends Transaction<T>>
             return (T) this;
         }
 
-        for(int i = 0; i < outerTransactions.size(); i++) {
+        for (int i = 0; i < outerTransactions.size(); i++) {
             outerTransactions.set(i, null);
         }
         publicKeys.add(publicKey);
@@ -785,7 +780,7 @@ public abstract class Transaction<T extends Transaction<T>>
         }
 
         if (transactionIds.isEmpty()) {
-            if(client != null) {
+            if (client != null) {
                 var operator = client.getOperator();
 
                 if (operator != null) {
@@ -851,7 +846,7 @@ public abstract class Transaction<T extends Transaction<T>>
         // Check if transaction is already built.
         // Every time a signer is added via sign() or signWith(), all outerTransactions are nullified.
         if (
-                outerTransactions.get(index) != null &&
+            outerTransactions.get(index) != null &&
                 !outerTransactions.get(index).getSignedTransactionBytes().isEmpty()
         ) {
             return;
@@ -879,8 +874,8 @@ public abstract class Transaction<T extends Transaction<T>>
             if (signers.get(i) == null) {
                 continue;
             }
-            for(var pair : sigPairLists.get(index).getSigPairList()) {
-                if(pair.getPubKeyPrefix().equals(ByteString.copyFrom(publicKeys.get(i).toBytes()))) {
+            for (var pair : sigPairLists.get(index).getSigPairList()) {
+                if (pair.getPubKeyPrefix().equals(ByteString.copyFrom(publicKeys.get(i).toBytes()))) {
                     continue;
                 }
             }
@@ -941,7 +936,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
         var accountId = Objects.requireNonNull(Objects.requireNonNull(getTransactionId()).accountId);
 
-        if(client.isAutoValidateChecksumsEnabled()) {
+        if (client.isAutoValidateChecksumsEnabled()) {
             try {
                 accountId.validateChecksum(client);
                 validateChecksums(client);
@@ -966,10 +961,10 @@ public abstract class Transaction<T extends Transaction<T>>
         // NOTE: regex is for removing the instance address from the default debug output
         TransactionBody.Builder body = spawnBodyBuilder(null);
 
-        if(!transactionIds.isEmpty()) {
+        if (!transactionIds.isEmpty()) {
             body.setTransactionID(transactionIds.get(0).toProtobuf());
         }
-        if(!nodeAccountIds.isEmpty()) {
+        if (!nodeAccountIds.isEmpty()) {
             body.setNodeAccountID(nodeAccountIds.get(0).toProtobuf());
         }
 

@@ -1,16 +1,26 @@
 import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.CustomFee;
+import com.hedera.hashgraph.sdk.CustomFixedFee;
+import com.hedera.hashgraph.sdk.CustomFractionalFee;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hedera.hashgraph.sdk.Status;
+import com.hedera.hashgraph.sdk.TokenCreateTransaction;
+import com.hedera.hashgraph.sdk.TokenFeeScheduleUpdateTransaction;
+import com.hedera.hashgraph.sdk.TokenInfoQuery;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Disabled;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 class TokenFeeScheduleUpdateIntegrationTest {
@@ -110,17 +120,16 @@ class TokenFeeScheduleUpdateIntegrationTest {
             var fees = info.customFees;
             assertEquals(fees.size(), 2);
             int fixedCount = 0, fractionalCount = 0;
-            for(var fee : fees) {
-                if(fee instanceof CustomFixedFee) {
+            for (var fee : fees) {
+                if (fee instanceof CustomFixedFee) {
                     fixedCount++;
-                    var fixed = (CustomFixedFee)fee;
+                    var fixed = (CustomFixedFee) fee;
                     assertEquals(fixed.getAmount(), 10);
                     assertEquals(fixed.getFeeCollectorAccountId(), testEnv.operatorId);
                     assertNull(fixed.getDenominatingTokenId());
-                }
-                else if(fee instanceof CustomFractionalFee) {
+                } else if (fee instanceof CustomFractionalFee) {
                     fractionalCount++;
-                    var fractional = (CustomFractionalFee)fee;
+                    var fractional = (CustomFractionalFee) fee;
                     assertEquals(fractional.getNumerator(), 1);
                     assertEquals(fractional.getDenominator(), 20);
                     assertEquals(fractional.getMin(), 1);

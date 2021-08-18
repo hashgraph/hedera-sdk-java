@@ -87,7 +87,7 @@ public final class MultiAppTransferExample {
 
         // get the amount we are about to transfer
         // we built this with +2, -2
-        Hbar transferAmount = ((TransferTransaction)signedTransferTxn).getHbarTransfers().values().toArray(new Hbar[0])[0];
+        Hbar transferAmount = ((TransferTransaction) signedTransferTxn).getHbarTransfers().values().toArray(new Hbar[0])[0];
 
         System.out.println("about to transfer " + transferAmount + "...");
 

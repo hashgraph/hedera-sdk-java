@@ -10,11 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
-
-import java.util.Collections;
-import java.util.Objects;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
 
@@ -155,7 +154,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         }
 
         return onExecuteAsync(client).thenCompose((v) -> {
-            if(nodeAccountIds.isEmpty()) {
+            if (nodeAccountIds.isEmpty()) {
                 throw new IllegalStateException("Request node account IDs were not set before executing");
             }
 
@@ -166,10 +165,10 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     }
 
     private void setNodesFromNodeAccountIds(Client client) {
-        for(var accountId : nodeAccountIds) {
+        for (var accountId : nodeAccountIds) {
             @Nullable
             var node = client.network.networkNodes.get(accountId);
-            if(node == null) {
+            if (node == null) {
                 throw new IllegalStateException("Some node account IDs did not map to valid nodes in the client's network");
             }
             nodes.add(Objects.requireNonNull(node));

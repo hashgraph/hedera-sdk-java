@@ -142,7 +142,7 @@ public final class AccountInfo {
             : null;
 
         var liveHashes = J8Arrays.stream(accountInfo.getLiveHashesList().toArray())
-            .map((liveHash) -> LiveHash.fromProtobuf((com.hedera.hashgraph.sdk.proto.LiveHash)liveHash))
+            .map((liveHash) -> LiveHash.fromProtobuf((com.hedera.hashgraph.sdk.proto.LiveHash) liveHash))
             .collect(Collectors.toList());
 
         Map<TokenId, TokenRelationship> relationships = new HashMap<>();
@@ -178,7 +178,7 @@ public final class AccountInfo {
 
     CryptoGetInfoResponse.AccountInfo toProtobuf() {
         var hashes = J8Arrays.stream(liveHashes.toArray())
-            .map((liveHash) -> ((LiveHash)liveHash).toProtobuf())
+            .map((liveHash) -> ((LiveHash) liveHash).toProtobuf())
             .collect(Collectors.toList());
 
         var accountInfoBuilder = CryptoGetInfoResponse.AccountInfo.newBuilder()

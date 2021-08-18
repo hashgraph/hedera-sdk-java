@@ -4,11 +4,11 @@ import com.google.common.base.MoreObjects;
 import com.hedera.hashgraph.sdk.proto.ThresholdKey;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.List;
-import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -16,10 +16,9 @@ import java.util.Objects;
  * the list are required.
  */
 public final class KeyList extends Key implements Collection<Key> {
+    private final List<Key> keys = new ArrayList<>();
     @Nullable
     public Integer threshold;
-
-    private final List<Key> keys = new ArrayList<>();
 
     /**
      * Create a new key list where all keys that are added will be required to sign.
@@ -35,8 +34,8 @@ public final class KeyList extends Key implements Collection<Key> {
     public static KeyList of(Key... keys) {
         var list = new KeyList();
 
-        for (var key: keys) {
-          list.add(key);
+        for (var key : keys) {
+            list.add(key);
         }
 
         return list;

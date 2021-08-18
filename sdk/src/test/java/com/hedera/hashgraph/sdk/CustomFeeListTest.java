@@ -4,9 +4,12 @@ import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-import java.util.List;
+
 import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CustomFeeListTest {
     @BeforeAll
@@ -55,14 +58,14 @@ public class CustomFeeListTest {
         assertDoesNotThrow(() -> {
             var originalCustomFeeList = spawnCustomFeeListExample();
             var copyCustomFeeList = new ArrayList<CustomFee>();
-            for(var fee : originalCustomFeeList) {
+            for (var fee : originalCustomFeeList) {
                 copyCustomFeeList.add(fee.deepClone());
             }
             var originalCustomFeeListString = originalCustomFeeList.toString();
             assertTrue(originalCustomFeeListString.equals(copyCustomFeeList.toString()));
 
             // modifying clone doesn't affect original
-            ((CustomFixedFee)(copyCustomFeeList.get(0))).setDenominatingTokenId(new TokenId(89803));
+            ((CustomFixedFee) (copyCustomFeeList.get(0))).setDenominatingTokenId(new TokenId(89803));
             assertTrue(originalCustomFeeListString.equals(originalCustomFeeList.toString()));
 
             SnapshotMatcher.expect(originalCustomFeeList.toString()).toMatchSnapshot();

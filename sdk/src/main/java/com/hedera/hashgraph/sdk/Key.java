@@ -2,8 +2,6 @@ package com.hedera.hashgraph.sdk;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
-import javax.annotation.Nullable;
-
 /**
  * A common base for the signing authority or key that entities in Hedera may have.
  *
