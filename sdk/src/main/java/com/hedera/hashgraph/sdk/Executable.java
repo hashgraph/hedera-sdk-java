@@ -297,8 +297,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             var status = statusException.getStatus().getCode();
             var description = statusException.getStatus().getDescription();
 
-            return (status == io.grpc.Status.Code.NOT_FOUND) ||
-                (status == io.grpc.Status.Code.UNAVAILABLE) ||
+            return (status == io.grpc.Status.Code.UNAVAILABLE) ||
                 (status == io.grpc.Status.Code.RESOURCE_EXHAUSTED) ||
                 (status == io.grpc.Status.Code.INTERNAL && description != null && RST_STREAM.matcher(description).matches());
         }
