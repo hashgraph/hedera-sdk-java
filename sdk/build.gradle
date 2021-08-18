@@ -1,3 +1,4 @@
+// adding random comment to test CI
 plugins {
 	id "java-library"
 	id "idea"
