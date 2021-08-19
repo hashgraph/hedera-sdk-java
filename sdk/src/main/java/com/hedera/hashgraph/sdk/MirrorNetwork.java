@@ -29,7 +29,28 @@ class MirrorNetwork {
         }
     }
 
-    synchronized void setNetwork(List<String> addresses) throws InterruptedException {
+    static MirrorNetwork forNetwork(ExecutorService executor, List<String> addresses) {
+        try {
+            return new MirrorNetwork(executor).setNetwork(addresses);
+        } catch (InterruptedException e) {
+            // Should never happen
+            throw new RuntimeException(e);
+        }
+    }
+
+    static MirrorNetwork forMainnet(ExecutorService executor) {
+        return MirrorNetwork.forNetwork(executor, Lists.of("hcs.mainnet.mirrornode.hedera.com:5600"));
+    }
+
+    static MirrorNetwork forTestnet(ExecutorService executor) {
+        return MirrorNetwork.forNetwork(executor, Lists.of("hcs.testnet.mirrornode.hedera.com:5600"));
+    }
+
+    static MirrorNetwork forPreviewnet(ExecutorService executor) {
+        return MirrorNetwork.forNetwork(executor, Lists.of("hcs.previewnet.mirrornode.hedera.com:5600"));
+    }
+
+    synchronized MirrorNetwork setNetwork(List<String> addresses) throws InterruptedException {
         lock.acquire();
 
         var stopAt = Instant.now().getEpochSecond() + Duration.ofSeconds(30).getSeconds();
@@ -62,6 +83,7 @@ class MirrorNetwork {
         Collections.shuffle(network, ThreadLocalSecureRandom.current());
 
         lock.release();
+        return this;
     }
 
     MirrorNode getNextMirrorNode() {
