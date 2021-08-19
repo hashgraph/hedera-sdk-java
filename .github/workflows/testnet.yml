@@ -67,7 +67,7 @@ jobs:
           OPERATOR_ID: ${{ secrets.TESTNET_OPERATOR_ID }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: |
-          ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY jacocoTestReport && bash <(curl -s https://codecov.io/bash)
+          ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY -PHEDERA_NETWORK=testnet jacocoTestReport && bash <(curl -s https://codecov.io/bash)
       - uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

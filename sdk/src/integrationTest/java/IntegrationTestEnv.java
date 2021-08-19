@@ -64,6 +64,8 @@ public class IntegrationTestEnv {
     private static Client createTestEnvClient() {
         if (System.getProperty("HEDERA_NETWORK").equals("previewnet")) {
             return Client.forPreviewnet();
+        } else if (System.getProperty("HEDERA_NETWORK").equals("testnet")) {
+            return Client.forTestnet();
         } else if (System.getProperty("HEDERA_NETWORK").equals("localhost")) {
             var network = new Hashtable<String, AccountId>();
             network.put("127.0.0.1:50213", new AccountId(3));
@@ -71,14 +73,13 @@ public class IntegrationTestEnv {
             network.put("127.0.0.1:50215", new AccountId(5));
 
             return Client.forNetwork(network);
-        } else {
+        } else if (!System.getProperty("CONFIG_FILE").equals("")) {
             try {
-                var client = Client.fromConfigFile(System.getProperty("CONFIG_FILE"));
-                return client;
+                return Client.fromConfigFile(System.getProperty("CONFIG_FILE"));
             } catch (Exception e) {
-                return Client.forTestnet();
             }
         }
+        throw new IllegalStateException("Failed to construct client for IntegrationTestEnv");
     }
 
     public IntegrationTestEnv useThrowawayAccount(Hbar initialBalance) throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
