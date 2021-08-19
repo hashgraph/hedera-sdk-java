@@ -3,8 +3,8 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.ServiceEndpoint;
-import org.bouncycastle.util.encoders.Hex;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -139,7 +139,7 @@ class NodeAddress {
             .add("publicKey", publicKey)
             .add("accountId", accountId)
             .add("nodeId", nodeId)
-            .add("certHash", Hex.toHexString(certHash.toByteArray()))
+            .add("certHash", new String(certHash.toByteArray(), StandardCharsets.UTF_8))
             .add("addresses", addresses)
             .add("description", description)
             .add("stake", stake)

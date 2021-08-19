@@ -29,7 +29,7 @@ class MirrorNetwork {
         }
     }
 
-    synchronized void setNetwork(List<String> addresses) throws InterruptedException {
+    synchronized MirrorNetwork setNetwork(List<String> addresses) throws InterruptedException {
         lock.acquire();
 
         var stopAt = Instant.now().getEpochSecond() + Duration.ofSeconds(30).getSeconds();
@@ -62,6 +62,7 @@ class MirrorNetwork {
         Collections.shuffle(network, ThreadLocalSecureRandom.current());
 
         lock.release();
+        return this;
     }
 
     MirrorNode getNextMirrorNode() {

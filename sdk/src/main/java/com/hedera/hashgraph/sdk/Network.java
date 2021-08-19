@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 class Network {
-    static ArrayList<NodeAddressBook> NODE_ADDRESS_BOOK = new ArrayList<>(3);
+    static HashMap<NetworkName, NodeAddressBook> NODE_ADDRESS_BOOK = new HashMap<>(3);
 
     static final Integer DEFAULT_MAX_NODE_ATTEMPTS = -1;
     final ExecutorService executor;
@@ -93,44 +93,44 @@ class Network {
         readNodeAddressBookResources();
 
         var network = new HashMap<String, AccountId>();
-        network.put("0.previewnet.hedera.com:50211", new AccountId(3));
-        network.put("1.previewnet.hedera.com:50211", new AccountId(4));
-        network.put("2.previewnet.hedera.com:50211", new AccountId(5));
-        network.put("3.previewnet.hedera.com:50211", new AccountId(6));
-        network.put("4.previewnet.hedera.com:50211", new AccountId(7));
+        network.put("0.previewnet.hedera.com:50212", new AccountId(3));
+        network.put("1.previewnet.hedera.com:50212", new AccountId(4));
+        network.put("2.previewnet.hedera.com:50212", new AccountId(5));
+        network.put("3.previewnet.hedera.com:50212", new AccountId(6));
+        network.put("4.previewnet.hedera.com:50212", new AccountId(7));
 
         return new Network(executor, network).setNetworkName(NetworkName.PREVIEWNET);
     }
 
     @Nullable
-    public NetworkName getNetworkName() {
+    NetworkName getNetworkName() {
         return networkName;
     }
 
-    public Network setNetworkName(@Nullable NetworkName networkName) {
+    Network setNetworkName(NetworkName networkName) {
         this.networkName = networkName;
+
+        for (var node : nodes) {
+            node.setNetworkName(networkName);
+        }
+
         return this;
     }
 
     static void readNodeAddressBookResources() {
-        if (NODE_ADDRESS_BOOK.isEmpty()) {
-            NODE_ADDRESS_BOOK.add(null);
-            NODE_ADDRESS_BOOK.add(null);
-            NODE_ADDRESS_BOOK.add(null);
+        if ( NODE_ADDRESS_BOOK.containsKey(NetworkName.MAINNET)) {
+            NODE_ADDRESS_BOOK.put(NetworkName.MAINNET, readAddressBookResource("./addressbook/mainnet.pb"));
         }
 
-        if ( NODE_ADDRESS_BOOK.get(NetworkName.MAINNET.id) == null) {
-            NODE_ADDRESS_BOOK.set(NetworkName.MAINNET.id, readAddressBookResource("./addressbook/mainnet.pb"));
+        if ( NODE_ADDRESS_BOOK.containsKey(NetworkName.TESTNET)) {
+            NODE_ADDRESS_BOOK.put(NetworkName.TESTNET, readAddressBookResource("./addressbook/testnet.pb"));
         }
 
-        if ( NODE_ADDRESS_BOOK.get(NetworkName.TESTNET.id) == null) {
-            NODE_ADDRESS_BOOK.set(NetworkName.TESTNET.id, readAddressBookResource("./addressbook/testnet.pb"));
-        }
-
-        if ( NODE_ADDRESS_BOOK.get(NetworkName.PREVIEWNET.id) == null) {
-            NODE_ADDRESS_BOOK.set(NetworkName.PREVIEWNET.id, readAddressBookResource("./addressbook/previewnet.pb"));
+        if ( NODE_ADDRESS_BOOK.containsKey(NetworkName.PREVIEWNET)) {
+            NODE_ADDRESS_BOOK.put(NetworkName.PREVIEWNET, readAddressBookResource("./addressbook/previewnet.pb"));
         }
     }
+
     static NodeAddressBook readAddressBookResource(String fileName) {
         try {
             var contents = ByteStreams.toByteArray(Objects.requireNonNull(Client.class.getClassLoader().getResourceAsStream(fileName)));

@@ -1,11 +1,9 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.io.ByteStreams;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import com.google.protobuf.ByteString;
 import java8.util.Lists;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Consumer;
@@ -69,6 +67,20 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     public Client setMirrorNetwork(MirrorNetwork mirrorNetwork) {
         this.mirrorNetwork = mirrorNetwork;
         return this;
+    }
+
+    public synchronized Client setMirrorNetwork(List<String> network) throws InterruptedException {
+        if (this.mirrorNetwork == null) {
+            this.mirrorNetwork = new MirrorNetwork(executor).setNetwork(network);
+        } else {
+            this.mirrorNetwork.setNetwork(network);
+        }
+
+        return this;
+    }
+
+    public List<String> getMirrorNetwork() {
+        return mirrorNetwork.addresses;
     }
 
     /**
@@ -240,12 +252,21 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return fromConfig(Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8));
     }
 
-    public List<String> getMirrorNetwork() {
-        return mirrorNetwork.addresses;
-    }
+    /**
+     * Replace all nodes in this Client with a new set of nodes (e.g. for an Address Book update).
+     * <p>
+     *
+     * @param network a map of node account ID to node URL.
+     * @return {@code this} for fluent API usage.
+     */
+    public synchronized Client setNetwork(Map<String, AccountId> network) throws InterruptedException, TimeoutException {
+        if (this.network == null) {
+            this.network = Network.forNetwork(executor, network);
+        } else {
+            this.network.setNetwork(network);
+        }
 
-    public synchronized void setMirrorNetwork(List<String> network) throws InterruptedException {
-        mirrorNetwork.setNetwork(network);
+        return this;
     }
 
     public Client setNetwork(Network network) {
@@ -261,18 +282,6 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         }
 
         return network;
-    }
-
-    /**
-     * Replace all nodes in this Client with a new set of nodes (e.g. for an Address Book update).
-     * <p>
-     *
-     * @param network a map of node account ID to node URL.
-     * @return {@code this} for fluent API usage.
-     */
-    public synchronized Client setNetwork(Map<String, AccountId> network) throws InterruptedException, TimeoutException {
-        this.network.setNetwork(network);
-        return this;
     }
 
     @FunctionalExecutable(type = "Void", onClient = true, inputType = "AccountId")
