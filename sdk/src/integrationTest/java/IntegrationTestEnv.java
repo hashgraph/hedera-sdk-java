@@ -62,7 +62,7 @@ public class IntegrationTestEnv {
         client.setNetwork(network);
     }
 
-    private static Client createTestEnvClient() {
+    private static Client createTestEnvClient() throws Exception {
         if (System.getProperty("HEDERA_NETWORK").equals("previewnet")) {
             return Client.forPreviewnet();
         } else if (System.getProperty("HEDERA_NETWORK").equals("testnet")) {
@@ -173,6 +173,7 @@ public class IntegrationTestEnv {
                     outMap.put(node.getKey(), node.getValue());
                     return;
                 } catch (Exception ignored) {
+                    throw ignored;
                 }
             }
             throw new Exception("Failed to find working node in " + nodes + " for IntegrationTestEnv");

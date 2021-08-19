@@ -1,7 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
+import io.grpc.ChannelCredentials;
+import io.grpc.Grpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.TlsChannelCredentials;
 import io.grpc.inprocess.InProcessChannelBuilder;
 
 import javax.annotation.Nullable;
@@ -9,7 +12,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 abstract class ManagedNode {
-
     private static final String IN_PROCESS = "in-process:";
     final ExecutorService executor;
     String address;
@@ -29,25 +31,24 @@ abstract class ManagedNode {
         lastUsed = System.currentTimeMillis();
     }
 
+    ChannelCredentials getChannelCredentials() {
+        return TlsChannelCredentials.create();
+    }
 
     synchronized ManagedChannel getChannel() {
         if (channel != null) {
             return channel;
         }
 
-        ManagedChannelBuilder channelBuilder;
+        ManagedChannelBuilder<?> channelBuilder;
 
         if (address.startsWith(IN_PROCESS)) {
-            String name = address.substring(IN_PROCESS.length());
-            channelBuilder = InProcessChannelBuilder.forName(name);
+          String name = address.substring(IN_PROCESS.length());
+          channelBuilder = InProcessChannelBuilder.forName(name);
+        } else if (address.endsWith(":50212") || address.endsWith(":443")) {
+            channelBuilder = Grpc.newChannelBuilder(address, getChannelCredentials()).overrideAuthority("127.0.0.1");
         } else {
-            channelBuilder = ManagedChannelBuilder.forTarget(address);
-        }
-
-        if (address.endsWith(":50212") || address.endsWith(":443")) {
-            channelBuilder.useTransportSecurity();
-        } else {
-            channelBuilder.usePlaintext();
+            channelBuilder = ManagedChannelBuilder.forTarget(address).usePlaintext();
         }
 
         channel = channelBuilder
