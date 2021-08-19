@@ -11,13 +11,25 @@ import java.security.cert.X509Certificate;
 
 class HederaTrustManager implements X509TrustManager {
     @Nullable
-    private final NetworkName networkName;
-
-    private final AccountId nodeAccountId;
+    private final String certHash;
 
     HederaTrustManager(@Nullable NetworkName networkName, AccountId nodeAccountId) {
-        this.networkName = networkName;
-        this.nodeAccountId = nodeAccountId;
+        if (networkName == null) {
+            this.certHash = null;
+            return;
+        }
+
+        var nodeAddressBook = Network.nodeAddressBooks.get(networkName);
+        if (nodeAddressBook == null) {
+            throw new IllegalStateException("Unrecognized network name");
+        }
+
+        var nodeAddress = nodeAddressBook.get(nodeAccountId);
+        if (nodeAddress == null) {
+            throw new IllegalStateException("could not find node account ID within address book");
+        }
+
+        this.certHash = new String(nodeAddress.certHash.toByteArray(), StandardCharsets.UTF_8);
     }
 
     @Override
@@ -26,32 +38,22 @@ class HederaTrustManager implements X509TrustManager {
 
     @Override
     public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-        if (networkName == null) {
-            return;
-        }
-
-        var addressBook = Network.NODE_ADDRESS_BOOK.get(networkName);
-        if (addressBook == null) {
+        if (certHash == null) {
             return;
         }
 
         for (var cert : chain) {
-            for (var nodeAddress : addressBook.nodeAddresses) {
-                if (nodeAddress.accountId.equals(nodeAccountId) && !nodeAddress.certHash.isEmpty()) {
-                    var digest = new SHA384Digest();
-                    var certHash = new byte[digest.getDigestSize()];
-                    digest.update(cert.getEncoded(), 0, cert.getEncoded().length);
-                    digest.doFinal(certHash, 0);
+            var digest = new SHA384Digest();
+            var certHash = new byte[digest.getDigestSize()];
+            digest.update(cert.getEncoded(), 0, cert.getEncoded().length);
+            digest.doFinal(certHash, 0);
 
-                    var nodeAddressBookCertHash = new String(nodeAddress.certHash.toByteArray(), StandardCharsets.UTF_8);
-
-                    if (!nodeAddressBookCertHash.equals(Hex.toHexString(certHash))) {
-                        throw new CertificateException();
-                    }
-                }
-
+            if (this.certHash.equals(Hex.toHexString(certHash))) {
+                return;
             }
         }
+
+        throw new CertificateException();
     }
 
     @Override

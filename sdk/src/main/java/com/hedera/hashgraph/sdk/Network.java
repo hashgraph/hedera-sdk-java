@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 class Network {
-    static HashMap<NetworkName, NodeAddressBook> NODE_ADDRESS_BOOK = new HashMap<>(3);
+    static HashMap<NetworkName, Map<AccountId, NodeAddress>> nodeAddressBooks = new HashMap<>(3);
 
     static final Integer DEFAULT_MAX_NODE_ATTEMPTS = -1;
     final ExecutorService executor;
@@ -51,8 +51,6 @@ class Network {
     }
 
     static Network forMainnet(ExecutorService executor) {
-        readNodeAddressBookResources();
-
         var network = new HashMap<String, AccountId>();
         network.put("35.237.200.180:50211", new AccountId(3));
         network.put("35.186.191.247:50211", new AccountId(4));
@@ -77,8 +75,6 @@ class Network {
     }
 
     static Network forTestnet(ExecutorService executor) {
-        readNodeAddressBookResources();
-
         var network = new HashMap<String, AccountId>();
         network.put("0.testnet.hedera.com:50211", new AccountId(3));
         network.put("1.testnet.hedera.com:50211", new AccountId(4));
@@ -90,8 +86,6 @@ class Network {
     }
 
     static Network forPreviewnet(ExecutorService executor) {
-        readNodeAddressBookResources();
-
         var network = new HashMap<String, AccountId>();
         network.put("0.previewnet.hedera.com:50211", new AccountId(3));
         network.put("1.previewnet.hedera.com:50211", new AccountId(4));
@@ -114,27 +108,42 @@ class Network {
             node.setNetworkName(networkName);
         }
 
+        if (!nodeAddressBooks.containsKey(networkName)) {
+            var resource = "";
+
+            switch (networkName) {
+                case MAINNET:
+                    resource = "./addressbook/mainnet.pb";
+                    break;
+                case TESTNET:
+                    resource = "./addressbook/testnet.pb";
+                    break;
+                case PREVIEWNET:
+                    resource = "./addressbook/previewnet.pb";
+                    break;
+            }
+
+            nodeAddressBooks.put(networkName, readAddressBookResource(resource));
+        }
+
         return this;
     }
 
-    static void readNodeAddressBookResources() {
-        if ( NODE_ADDRESS_BOOK.containsKey(NetworkName.MAINNET)) {
-            NODE_ADDRESS_BOOK.put(NetworkName.MAINNET, readAddressBookResource("./addressbook/mainnet.pb"));
-        }
-
-        if ( NODE_ADDRESS_BOOK.containsKey(NetworkName.TESTNET)) {
-            NODE_ADDRESS_BOOK.put(NetworkName.TESTNET, readAddressBookResource("./addressbook/testnet.pb"));
-        }
-
-        if ( NODE_ADDRESS_BOOK.containsKey(NetworkName.PREVIEWNET)) {
-            NODE_ADDRESS_BOOK.put(NetworkName.PREVIEWNET, readAddressBookResource("./addressbook/previewnet.pb"));
-        }
-    }
-
-    static NodeAddressBook readAddressBookResource(String fileName) {
+    static Map<AccountId, NodeAddress> readAddressBookResource(String fileName) {
         try {
             var contents = ByteStreams.toByteArray(Objects.requireNonNull(Client.class.getClassLoader().getResourceAsStream(fileName)));
-            return NodeAddressBook.fromBytes(ByteString.copyFrom(contents));
+            var nodeAddressBook = NodeAddressBook.fromBytes(ByteString.copyFrom(contents));
+            var map = new HashMap<AccountId, NodeAddress>();
+
+            for (var nodeAddress : nodeAddressBook.nodeAddresses) {
+                if (nodeAddress.accountId == null) {
+                    continue;
+                }
+
+                map.put(nodeAddress.accountId, nodeAddress);
+            }
+
+            return map;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
