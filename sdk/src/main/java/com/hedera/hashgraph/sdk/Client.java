@@ -38,6 +38,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     private static final Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
 
     final ExecutorService executor;
+
     @Nullable
     Hbar defaultMaxTransactionFee = null;
     Hbar defaultMaxQueryPayment = DEFAULT_MAX_QUERY_PAYMENT;
@@ -73,11 +74,6 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return Executors.newFixedThreadPool(
             Runtime.getRuntime().availableProcessors(),
             threadFactory);
-    }
-
-    public Client setMirrorNetwork(MirrorNetwork mirrorNetwork) {
-        this.mirrorNetwork = mirrorNetwork;
-        return this;
     }
 
     public synchronized Client setMirrorNetwork(List<String> network) throws InterruptedException {
