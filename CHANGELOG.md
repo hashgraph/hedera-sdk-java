@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+ * Support for TLS connections with Hedera Services nodes when network addresses end in `50212` or `443`
  * Added `FeeAssessmentMethod`.
  * Added `[get|set]AssessmentMethod()` to `CustomFractionalFee`
  * Added `CustomRoyaltyFee`
