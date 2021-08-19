@@ -39,15 +39,15 @@ class MirrorNetwork {
     }
 
     static MirrorNetwork forMainnet(ExecutorService executor) {
-        return MirrorNetwork.forNetwork(executor, Lists.of("hcs.mainnet.mirrornode.hedera.com:5600"));
+        return MirrorNetwork.forNetwork(executor, List.of("hcs.mainnet.mirrornode.hedera.com:5600"));
     }
 
     static MirrorNetwork forTestnet(ExecutorService executor) {
-        return MirrorNetwork.forNetwork(executor, Lists.of("hcs.testnet.mirrornode.hedera.com:5600"));
+        return MirrorNetwork.forNetwork(executor, List.of("hcs.testnet.mirrornode.hedera.com:5600"));
     }
 
     static MirrorNetwork forPreviewnet(ExecutorService executor) {
-        return MirrorNetwork.forNetwork(executor, Lists.of("hcs.previewnet.mirrornode.hedera.com:5600"));
+        return MirrorNetwork.forNetwork(executor, List.of("hcs.previewnet.mirrornode.hedera.com:5600"));
     }
 
     synchronized MirrorNetwork setNetwork(List<String> addresses) throws InterruptedException {

@@ -34,6 +34,8 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.slf4j/slf4j-api
 	implementation 'org.slf4j:slf4j-api:1.7.30'
 
+	implementation "net.javacrumbs.future-converter:future-converter-java8-guava:1.2.0"
+
 	implementation "io.grpc:grpc-core:1.40.0"
 	implementation "io.grpc:grpc-protobuf-lite:1.40.0"
 	implementation "io.grpc:grpc-stub:1.38.0"
@@ -45,16 +47,6 @@ dependencies {
 	testRuntimeOnly "org.slf4j:slf4j-simple:1.7.30"
 	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.40.0"
 	integrationTestRuntimeOnly "io.grpc:grpc-netty-shaded:1.38.0"
-
-	// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
-	//       use CompletableFuture directly.
-	// https://github.com/stefan-zobel/streamsupport
-	// https://developer.android.com/about/dashboards/index.html
-	api "net.sourceforge.streamsupport:streamsupport:1.7.2"
-	api "net.sourceforge.streamsupport:streamsupport-cfuture:1.7.2"
-
-	// NOTE: This is to support Android API < 26.
-	api "org.threeten:threetenbp:1.5.1"
 
 	implementation "com.google.code.gson:gson:2.8.6"
 
@@ -97,7 +89,7 @@ tasks.withType(JavaCompile).configureEach {
 	compileJava {
 		options.compilerArgs += [
 			"--release",
-			"8" // Avoid using Java 12 APIs
+			"9" // Avoid using Java 12 APIs
 		]
 	}
 }
