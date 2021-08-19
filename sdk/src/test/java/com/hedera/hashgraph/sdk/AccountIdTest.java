@@ -7,6 +7,8 @@ import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.TimeoutException;
+
 class AccountIdTest {
 
     static Client mainnetClient = null;
@@ -22,7 +24,10 @@ class AccountIdTest {
     }
 
     @AfterClass
-    public static void afterAll() {
+    public static void afterAll() throws TimeoutException {
+        mainnetClient.close();
+        testnetClient.close();
+        previewnetClient.close();
         SnapshotMatcher.validateSnapshots();
     }
 
