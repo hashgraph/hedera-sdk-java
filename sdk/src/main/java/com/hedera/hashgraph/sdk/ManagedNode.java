@@ -6,6 +6,7 @@ import io.grpc.inprocess.InProcessChannelBuilder;
 import javax.annotation.Nullable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 abstract class ManagedNode {
     private static final String IN_PROCESS = "in-process:";
@@ -42,7 +43,11 @@ abstract class ManagedNode {
           String name = address.substring(IN_PROCESS.length());
           channelBuilder = InProcessChannelBuilder.forName(name);
         } else if (address.endsWith(":50212") || address.endsWith(":443")) {
-            channelBuilder = Grpc.newChannelBuilder(address, getChannelCredentials()).overrideAuthority("127.0.0.1");
+            var parts = address.split(Pattern.quote(":"), 2);
+            var url = parts[0];
+            var port = Integer.getInteger(parts[1]);
+
+            channelBuilder = Grpc.newChannelBuilderForAddress(parts[0], Integer.getInteger(parts[1]), getChannelCredentials()).overrideAuthority("127.0.0.1");
         } else {
             channelBuilder = ManagedChannelBuilder.forTarget(address).usePlaintext();
         }

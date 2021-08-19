@@ -93,11 +93,11 @@ class Network {
         readNodeAddressBookResources();
 
         var network = new HashMap<String, AccountId>();
-        network.put("0.previewnet.hedera.com:50212", new AccountId(3));
-        network.put("1.previewnet.hedera.com:50212", new AccountId(4));
-        network.put("2.previewnet.hedera.com:50212", new AccountId(5));
-        network.put("3.previewnet.hedera.com:50212", new AccountId(6));
-        network.put("4.previewnet.hedera.com:50212", new AccountId(7));
+        network.put("0.previewnet.hedera.com:50211", new AccountId(3));
+        network.put("1.previewnet.hedera.com:50211", new AccountId(4));
+        network.put("2.previewnet.hedera.com:50211", new AccountId(5));
+        network.put("3.previewnet.hedera.com:50211", new AccountId(6));
+        network.put("4.previewnet.hedera.com:50211", new AccountId(7));
 
         return new Network(executor, network).setNetworkName(NetworkName.PREVIEWNET);
     }

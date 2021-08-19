@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
+import java8.util.Lists;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
@@ -27,6 +28,27 @@ class MirrorNetwork {
         } catch (InterruptedException e) {
             // Do nothing as this should never occur
         }
+    }
+
+    static MirrorNetwork forNetwork(ExecutorService executor, List<String> addresses) {
+        try {
+            return new MirrorNetwork(executor).setNetwork(addresses);
+        } catch (InterruptedException e) {
+            // Should never happen
+            throw new RuntimeException(e);
+        }
+    }
+
+    static MirrorNetwork forMainnet(ExecutorService executor) {
+        return MirrorNetwork.forNetwork(executor, Lists.of("hcs.mainnet.mirrornode.hedera.com:5600"));
+    }
+
+    static MirrorNetwork forTestnet(ExecutorService executor) {
+        return MirrorNetwork.forNetwork(executor, Lists.of("hcs.testnet.mirrornode.hedera.com:5600"));
+    }
+
+    static MirrorNetwork forPreviewnet(ExecutorService executor) {
+        return MirrorNetwork.forNetwork(executor, Lists.of("hcs.previewnet.mirrornode.hedera.com:5600"));
     }
 
     synchronized MirrorNetwork setNetwork(List<String> addresses) throws InterruptedException {

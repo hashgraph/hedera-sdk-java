@@ -5,8 +5,6 @@ import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.proto.NodeAddress;
-import com.hedera.hashgraph.sdk.proto.NodeAddressBook;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

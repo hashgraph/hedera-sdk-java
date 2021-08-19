@@ -11,7 +11,10 @@ import java8.util.function.Function;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -38,8 +41,10 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     @Nullable
     Hbar defaultMaxTransactionFee = null;
     Hbar defaultMaxQueryPayment = DEFAULT_MAX_QUERY_PAYMENT;
+
     Network network;
     MirrorNetwork mirrorNetwork;
+
     @Nullable
     private Operator operator;
 
@@ -53,13 +58,19 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
 
     private boolean autoValidateChecksums = false;
 
-    Client() {
+    Client(ExecutorService executor, Network network, MirrorNetwork mirrorNetwork) {
+        this.executor = executor;
+        this.network = network;
+        this.mirrorNetwork = mirrorNetwork;
+    }
+
+    private static ExecutorService createExecutor() {
         var threadFactory = new ThreadFactoryBuilder()
             .setNameFormat("hedera-sdk-%d")
             .setDaemon(true)
             .build();
 
-        this.executor = Executors.newFixedThreadPool(
+        return Executors.newFixedThreadPool(
             Runtime.getRuntime().availableProcessors(),
             threadFactory);
     }
@@ -70,17 +81,16 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     }
 
     public synchronized Client setMirrorNetwork(List<String> network) throws InterruptedException {
-        if (this.mirrorNetwork == null) {
-            this.mirrorNetwork = new MirrorNetwork(executor).setNetwork(network);
-        } else {
-            this.mirrorNetwork.setNetwork(network);
-        }
-
+        this.mirrorNetwork.setNetwork(network);
         return this;
     }
 
     public List<String> getMirrorNetwork() {
-        return mirrorNetwork.addresses;
+        if (mirrorNetwork != null) {
+            return mirrorNetwork.addresses;
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     /**
@@ -93,13 +103,15 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * chose nodes to send transactions to. For one transaction, at most 1/3 of the nodes will be
      * tried.
      *
-     * @param network the map of node IDs to node addresses that make up the network.
+     * @param networkMap the map of node IDs to node addresses that make up the network.
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
-    public static Client forNetwork(Map<String, AccountId> network) {
-        var client = new Client();
+    public static Client forNetwork(Map<String, AccountId> networkMap) {
+        var executor = createExecutor();
+        var network = Network.forNetwork(executor, networkMap);
+        var mirrorNetwork = MirrorNetwork.forMainnet(executor);
 
-        return client.setNetwork(Network.forNetwork(client.executor, network));
+        return new Client(executor, network, mirrorNetwork);
     }
 
     public static Client forName(String name) {
@@ -123,9 +135,11 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forMainnet() {
-        var client = new Client();
-        client.setNetwork(Network.forMainnet(client.executor));
-        return client;
+        var executor = createExecutor();
+        var network = Network.forMainnet(executor);
+        var mirrorNetwork = MirrorNetwork.forMainnet(executor);
+
+        return new Client(executor, network, mirrorNetwork);
     }
 
     /**
@@ -135,15 +149,19 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forTestnet() {
-        var client = new Client();
-        client.setNetwork(Network.forTestnet(client.executor));
-        return client;
+        var executor = createExecutor();
+        var network = Network.forTestnet(executor);
+        var mirrorNetwork = MirrorNetwork.forMainnet(executor);
+
+        return new Client(executor, network, mirrorNetwork);
     }
 
     public static Client forPreviewnet() {
-        var client = new Client();
-        client.setNetwork(Network.forPreviewnet(client.executor));
-        return client;
+        var executor = createExecutor();
+        var network = Network.forPreviewnet(executor);
+        var mirrorNetwork = MirrorNetwork.forMainnet(executor);
+
+        return new Client(executor, network, mirrorNetwork);
     }
 
     /**
@@ -172,10 +190,9 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
             var networks = config.network.getAsJsonObject();
             Map<String, AccountId> nodes = new HashMap<>(networks.size());
             for (Map.Entry<String, JsonElement> entry : networks.entrySet()) {
-                nodes.put(entry.getValue().toString().replace("\"", ""), AccountId.fromString(entry.getKey().toString().replace("\"", "")));
+                nodes.put(entry.getValue().toString().replace("\"", ""), AccountId.fromString(entry.getKey().replace("\"", "")));
             }
-            client = new Client();
-            client.setNetwork(Network.forNetwork(client.executor, nodes));
+            client = Client.forNetwork(nodes);
         } else {
             String networks = config.network.getAsString();
             switch (networks) {
@@ -260,17 +277,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return {@code this} for fluent API usage.
      */
     public synchronized Client setNetwork(Map<String, AccountId> network) throws InterruptedException, TimeoutException {
-        if (this.network == null) {
-            this.network = Network.forNetwork(executor, network);
-        } else {
-            this.network.setNetwork(network);
-        }
-
-        return this;
-    }
-
-    public Client setNetwork(Network network) {
-        this.network = network;
+        this.network.setNetwork(network);
         return this;
     }
 
