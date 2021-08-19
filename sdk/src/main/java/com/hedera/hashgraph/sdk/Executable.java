@@ -9,23 +9,77 @@ import org.slf4j.LoggerFactory;
 import net.javacrumbs.futureconverter.guavacommon.GuavaFutureUtils;
 import net.javacrumbs.futureconverter.java8common.Java8FutureUtils;
 
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
-
-import javax.annotation.Nullable;
 import java.util.Collections;
-import java.util.Objects;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Objects;
+import java.util.regex.Pattern;
 
 abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements WithExecute<O> {
-    private static final Logger logger = LoggerFactory.getLogger(Executable.class);
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+
+    static final Pattern RST_STREAM = Pattern
+        .compile(".*\\brst[^0-9a-zA-Z]stream\\b.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
     protected Integer maxAttempts;
+    protected Duration maxBackoff;
+    protected Duration minBackoff;
     protected int nextNodeIndex = 0;
     protected List<AccountId> nodeAccountIds = Collections.emptyList();
     protected List<Node> nodes = new ArrayList<>();
 
     Executable() {
+    }
+
+    /**
+     * @return maxBackoff The maximum amount of time to wait between retries
+     */
+    public final Duration getMaxBackoff() {
+        return maxBackoff != null ? maxBackoff : Client.DEFAULT_MAX_BACKOFF;
+    }
+
+    /**
+     * The maximum amount of time to wait between retries. Every retry attempt will increase the wait time exponentially
+     * until it reaches this time.
+     *
+     * @param maxBackoff The maximum amount of time to wait between retries
+     * @return {@code this}
+     */
+    public final SdkRequestT setMaxBackoff(Duration maxBackoff) {
+        if (maxBackoff == null || maxBackoff.toNanos() < 0) {
+            throw new IllegalArgumentException("maxBackoff must be a positive duration");
+        } else if (maxBackoff.compareTo(getMinBackoff()) < 0) {
+            throw new IllegalArgumentException("maxBackoff must be greater than or equal to minBackoff");
+        }
+        this.maxBackoff = maxBackoff;
+        // noinspection unchecked
+        return (SdkRequestT) this;
+    }
+
+    /**
+     * @return minBackoff The minimum amount of time to wait between retries
+     */
+    public final Duration getMinBackoff() {
+        return minBackoff != null ? minBackoff : Client.DEFAULT_MIN_BACKOFF;
+    }
+
+    /**
+     * The minimum amount of time to wait between retries. When retrying, the delay will start at this time and increase
+     * exponentially until it reaches the maxBackoff.
+     *
+     * @param minBackoff The minimum amount of time to wait between retries
+     * @return {@code this}
+     */
+    public final SdkRequestT setMinBackoff(Duration minBackoff) {
+        if (minBackoff == null || minBackoff.toNanos() < 0) {
+            throw new IllegalArgumentException("minBackoff must be a positive duration");
+        } else if (minBackoff.compareTo(getMaxBackoff()) > 0) {
+            throw new IllegalArgumentException("minBackoff must be less than or equal to maxBackoff");
+        }
+        this.minBackoff = minBackoff;
+        // noinspection unchecked
+        return (SdkRequestT) this;
     }
 
     /**
@@ -48,8 +102,11 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         return maxAttempts != null ? maxAttempts : Client.DEFAULT_MAX_ATTEMPTS;
     }
 
-    public final SdkRequestT setMaxAttempts(int count) {
-        maxAttempts = count;
+    public final SdkRequestT setMaxAttempts(int maxAttempts) {
+        if (maxAttempts <= 0) {
+            throw new IllegalArgumentException("maxAttempts must be greater than zero");
+        }
+        this.maxAttempts = maxAttempts;
         // noinspection unchecked
         return (SdkRequestT) this;
     }
@@ -90,8 +147,16 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             maxAttempts = client.getMaxAttempts();
         }
 
+        if (maxBackoff == null) {
+            maxBackoff = client.getMaxBackoff();
+        }
+
+        if (minBackoff == null) {
+            minBackoff = client.getMinBackoff();
+        }
+
         return onExecuteAsync(client).thenCompose((v) -> {
-            if(nodeAccountIds.isEmpty()) {
+            if (nodeAccountIds.isEmpty()) {
                 throw new IllegalStateException("Request node account IDs were not set before executing");
             }
 
@@ -102,10 +167,10 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     }
 
     private void setNodesFromNodeAccountIds(Client client) {
-        for(var accountId : nodeAccountIds) {
+        for (var accountId : nodeAccountIds) {
             @Nullable
             var node = client.network.networkNodes.get(accountId);
-            if(node == null) {
+            if (node == null) {
                 throw new IllegalStateException("Some node account IDs did not map to valid nodes in the client's network");
             }
             nodes.add(Objects.requireNonNull(node));
@@ -144,7 +209,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             var latency = (double) (System.nanoTime() - startAt) / 1000000000.0;
 
             // Exponential back-off for Delayer: 250ms, 500ms, 1s, 2s, 4s, 8s, ... 8s
-            long delay = (long) Math.min(250 * Math.pow(2, attempt - 1), 8000);
+            long delay = (long) Math.min(minBackoff.toMillis() * Math.pow(2, attempt - 1), maxBackoff.toMillis());
 
             if (shouldRetryExceptionally(error)) {
                 logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
@@ -225,10 +290,13 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
     boolean shouldRetryExceptionally(@Nullable Throwable error) {
         if (error instanceof StatusRuntimeException) {
-            var status = ((StatusRuntimeException) error).getStatus().getCode();
+            var statusException = (StatusRuntimeException) error;
+            var status = statusException.getStatus().getCode();
+            var description = statusException.getStatus().getDescription();
 
-            return status.equals(io.grpc.Status.UNAVAILABLE.getCode())
-                || status.equals(io.grpc.Status.RESOURCE_EXHAUSTED.getCode());
+            return (status == io.grpc.Status.Code.UNAVAILABLE) ||
+                (status == io.grpc.Status.Code.RESOURCE_EXHAUSTED) ||
+                (status == io.grpc.Status.Code.INTERNAL && description != null && RST_STREAM.matcher(description).matches());
         }
 
         return false;

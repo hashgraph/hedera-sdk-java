@@ -6,8 +6,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.time.Duration;
 
-import javax.annotation.Nullable;
-
 public class LiveHash {
     public final AccountId accountId;
     public final ByteString hash;
@@ -19,6 +17,19 @@ public class LiveHash {
         this.hash = hash;
         this.keys = keys;
         this.duration = duration;
+    }
+
+    protected static LiveHash fromProtobuf(com.hedera.hashgraph.sdk.proto.LiveHash liveHash) {
+        return new LiveHash(
+            AccountId.fromProtobuf(liveHash.getAccountId()),
+            liveHash.getHash(),
+            KeyList.fromProtobuf(liveHash.getKeys(), null),
+            DurationConverter.fromProtobuf(liveHash.getDuration())
+        );
+    }
+
+    public static LiveHash fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        return fromProtobuf(com.hedera.hashgraph.sdk.proto.LiveHash.parseFrom(bytes).toBuilder().build());
     }
 
     protected com.hedera.hashgraph.sdk.proto.LiveHash toProtobuf() {
@@ -37,19 +48,6 @@ public class LiveHash {
 
     public ByteString toBytes() {
         return toProtobuf().toByteString();
-    }
-
-    protected static LiveHash fromProtobuf(com.hedera.hashgraph.sdk.proto.LiveHash liveHash) {
-        return new LiveHash(
-            AccountId.fromProtobuf(liveHash.getAccountId()),
-            liveHash.getHash(),
-            KeyList.fromProtobuf(liveHash.getKeys(), null),
-            DurationConverter.fromProtobuf(liveHash.getDuration())
-        );
-    }
-
-    public static LiveHash fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(com.hedera.hashgraph.sdk.proto.LiveHash.parseFrom(bytes).toBuilder().build());
     }
 
     @Override

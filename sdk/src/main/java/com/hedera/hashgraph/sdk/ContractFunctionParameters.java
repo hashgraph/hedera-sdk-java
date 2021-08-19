@@ -203,8 +203,8 @@ public final class ContractFunctionParameters {
      * <p>
      * For Solidity addresses, use {@link #addAddress(String)}.
      *
-     * @return {@code this}
      * @param param The String to be added
+     * @return {@code this}
      */
     public ContractFunctionParameters addString(String param) {
         args.add(new Argument("string", encodeString(param), true));
@@ -215,9 +215,9 @@ public final class ContractFunctionParameters {
     /**
      * Add a parameter of type {@code string[]}.
      *
-     * @throws NullPointerException if any value in `strings` is null
      * @param strings The array of Strings to be added
      * @return {@code this}
+     * @throws NullPointerException if any value in `strings` is null
      */
     public ContractFunctionParameters addStringArray(String[] strings) {
         List<ByteString> byteStrings = Arrays.stream(strings)
@@ -264,9 +264,9 @@ public final class ContractFunctionParameters {
      * <p>
      * If applicable, the array will be right-padded with zero bytes to a length of 32 bytes.
      *
-     * @throws IllegalArgumentException if the length of the byte array is greater than 32.
      * @param param The byte-string to be added
      * @return {@code this}
+     * @throws IllegalArgumentException if the length of the byte array is greater than 32.
      */
     public ContractFunctionParameters addBytes32(byte[] param) {
         args.add(new Argument("bytes32", encodeBytes32(param), false));
@@ -279,9 +279,9 @@ public final class ContractFunctionParameters {
      * <p>
      * Each byte array will be right-padded with zero bytes to a length of 32 bytes.
      *
-     * @throws IllegalArgumentException if the length of any byte array is greater than 32.
      * @param param The array of byte-strings to be added
      * @return {@code this}
+     * @throws IllegalArgumentException if the length of any byte array is greater than 32.
      */
     public ContractFunctionParameters addBytes32Array(byte[][] param) {
         // array of fixed-size elements
@@ -340,10 +340,10 @@ public final class ContractFunctionParameters {
     /**
      * Add a 256-bit integer.
      *
-     * @throws IllegalArgumentException if {@code bigInt.bitLength() > 255}
-     *                                  (max range including the sign bit).
      * @param bigInt The BigInteger to be added
      * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.bitLength() > 255}
+     *                                  (max range including the sign bit).
      */
     public ContractFunctionParameters addInt256(BigInteger bigInt) {
         checkBigInt(bigInt);
@@ -394,6 +394,7 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 64-bit integers.
+     *
      * @param intArray The array of integers to be added
      * @return {@code this}
      */
@@ -412,10 +413,10 @@ public final class ContractFunctionParameters {
     /**
      * Add a dynamic array of 256-bit integers.
      *
-     * @throws IllegalArgumentException if any value's {@code .bitLength() > 255}
-     *                                  (max range including the sign bit).
      * @param intArray The array of integers to be added
      * @return {@code this}
+     * @throws IllegalArgumentException if any value's {@code .bitLength() > 255}
+     *                                  (max range including the sign bit).
      */
     public ContractFunctionParameters addInt256Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
@@ -479,12 +480,11 @@ public final class ContractFunctionParameters {
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
      * sign-extended to 32 bytes).
      *
+     * @param bigUint The integer to be added
+     * @return {@code this}
      * @throws IllegalArgumentException if {@code bigUint.bitLength() > 256}
      *                                  (max range including the sign bit) or
      *                                  {@code bigUint.signum() < 0}.
-     *
-     * @param bigUint The integer to be added
-     * @return {@code this}
      */
     public ContractFunctionParameters addUint256(@Nonnegative BigInteger bigUint) {
         checkBigUint(bigUint);
@@ -563,11 +563,10 @@ public final class ContractFunctionParameters {
      * Each value will be treated as unsigned during encoding (it will be zero-padded instead of
      * sign-extended to 32 bytes).
      *
-     * @throws IllegalArgumentException if any value has a {@code .bitLength() > 256}
-     *                                  (max range including the sign bit) or is negative.
-     *
      * @param intArray The array of integers to be added
      * @return {@code this}
+     * @throws IllegalArgumentException if any value has a {@code .bitLength() > 256}
+     *                                  (max range including the sign bit) or is negative.
      */
     public ContractFunctionParameters addUint256Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
@@ -588,11 +587,10 @@ public final class ContractFunctionParameters {
      * Note: adding a {@code address payable} or {@code contract} parameter must also use
      * this function as the ABI does not support those types directly.
      *
-     * @throws IllegalArgumentException if the address is not exactly {@value ADDRESS_LEN_HEX}
-     *                                  characters long or fails to decode as hexadecimal.
-     *
      * @param address The address to be added
      * @return {@code this}
+     * @throws IllegalArgumentException if the address is not exactly {@value ADDRESS_LEN_HEX}
+     *                                  characters long or fails to decode as hexadecimal.
      */
     public ContractFunctionParameters addAddress(String address) {
         byte[] addressBytes = decodeAddress(address);
@@ -606,12 +604,11 @@ public final class ContractFunctionParameters {
      * Add an array of {@value ADDRESS_LEN_HEX}-character hex-encoded Solidity addresses as a
      * {@code address[]} param.
      *
+     * @param addresses The array of addresses to be added
+     * @return {@code this}
      * @throws IllegalArgumentException if any value is not exactly {@value ADDRESS_LEN_HEX}
      *                                  characters long or fails to decode as hexadecimal.
      * @throws NullPointerException     if any value in the array is null.
-     *
-     * @param addresses The array of addresses to be added
-     * @return {@code this}
      */
     public ContractFunctionParameters addAddressArray(String[] addresses) {
         ByteString addressArray = encodeArray(
@@ -631,11 +628,10 @@ public final class ContractFunctionParameters {
      *
      * @param address  a hex-encoded {@value ADDRESS_LEN_HEX}-character Solidity address.
      * @param selector a
+     * @return {@code this}
      * @throws IllegalArgumentException if {@code address} is not {@value ADDRESS_LEN_HEX}
      *                                  characters or {@code selector} is not
      *                                  {@value SELECTOR_LEN} bytes.
-     *
-     * @return {@code this}
      */
     public ContractFunctionParameters addFunction(String address, byte[] selector) {
         return addFunction(decodeAddress(address), selector);
@@ -646,12 +642,11 @@ public final class ContractFunctionParameters {
      * constructed {@link ContractFunctionSelector}. The {@link ContractFunctionSelector}
      * may not be modified after this call.
      *
+     * @param address  The address used in the function to be added
+     * @param selector The selector used in the function to be added
      * @return {@code this}
      * @throws IllegalArgumentException if {@code address} is not {@value ADDRESS_LEN_HEX}
      *                                  characters.
-     *
-     * @param address The address used in the function to be added
-     * @param selector The selector used in the function to be added
      */
     public ContractFunctionParameters addFunction(String address, ContractFunctionSelector selector) {
         // allow the `FunctionSelector` to be reused multiple times

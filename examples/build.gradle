@@ -1,34 +1,34 @@
 dependencies {
-    // implementation "com.hedera.hashgraph:sdk:2.0.3"
-    implementation project(":sdk")
+	// implementation "com.hedera.hashgraph:sdk:2.0.3"
+	implementation project(":sdk")
 
-    implementation "com.google.code.gson:gson:2.8.6"
-    implementation "org.slf4j:slf4j-simple:2.0.0-alpha1"
-    implementation "io.grpc:grpc-netty-shaded:1.38.0"
-    implementation "io.github.cdimascio:java-dotenv:5.2.2"
-    implementation "com.google.errorprone:error_prone_core:2.5.0"
+	implementation "com.google.code.gson:gson:2.8.6"
+	implementation "org.slf4j:slf4j-simple:2.0.0-alpha1"
+	implementation "io.grpc:grpc-netty-shaded:1.40.0"
+	implementation "io.github.cdimascio:java-dotenv:5.2.2"
+	implementation "com.google.errorprone:error_prone_core:2.8.1"
 }
 
 java {
-    sourceCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
-    targetCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
+	sourceCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
+	targetCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
 }
 
 tasks.addRule("Pattern: run<Example>: Runs an example.") { String taskName ->
-    if (taskName.startsWith("run")) {
-        task(taskName, type: JavaExec) {
-            classpath = sourceSets.main.runtimeClasspath
-            main = (taskName - "run") + "Example"
-            standardInput(System.in)
+	if (taskName.startsWith("run")) {
+		task(taskName, type: JavaExec) {
+			classpath = sourceSets.main.runtimeClasspath
+			main = (taskName - "run") + "Example"
+			standardInput(System.in)
 
-            // NOTE: Uncomment to enable trace logs in the SDK during the examples
-            // jvmArgs "-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace"
-        }
-    }
+			// NOTE: Uncomment to enable trace logs in the SDK during the examples
+			// jvmArgs "-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace"
+		}
+	}
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.errorprone {
-        disable("DefaultPackage")
-    }
+	options.errorprone {
+		disable("DefaultPackage")
+	}
 }

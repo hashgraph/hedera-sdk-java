@@ -32,8 +32,8 @@ public final class FileContentsQuery extends Query<ByteString, FileContentsQuery
     /**
      * Sets the file ID of the file whose contents are requested.
      *
-     * @return {@code this}
      * @param fileId The FileId to be set
+     * @return {@code this}
      */
     public FileContentsQuery setFileId(FileId fileId) {
         Objects.requireNonNull(fileId);

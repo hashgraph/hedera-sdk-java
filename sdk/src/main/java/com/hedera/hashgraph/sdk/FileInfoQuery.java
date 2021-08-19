@@ -1,10 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.FileGetInfoQuery;
+import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
-import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 import java.util.concurrent.CompletableFuture;
@@ -34,11 +34,12 @@ public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
     public FileId getFileId() {
         return fileId;
     }
+
     /**
      * Sets the file ID for which information is requested.
      *
-     * @return {@code this}
      * @param fileId The FileId to be set
+     * @return {@code this}
      */
     public FileInfoQuery setFileId(FileId fileId) {
         Objects.requireNonNull(fileId);

@@ -1,10 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.ConsensusGetTopicInfoQuery;
+import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
-import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
@@ -30,8 +30,8 @@ public final class TopicInfoQuery extends Query<TopicInfo, TopicInfoQuery> {
     /**
      * Set the topic to retrieve info about (the parameters and running state of).
      *
-     * @return {@code this}
      * @param topicId The TopicId to be set
+     * @return {@code this}
      */
     public TopicInfoQuery setTopicId(TopicId topicId) {
         Objects.requireNonNull(topicId);

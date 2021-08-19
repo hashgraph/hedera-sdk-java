@@ -1,4 +1,7 @@
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.TopicCreateTransaction;
+import com.hedera.hashgraph.sdk.TopicDeleteTransaction;
+import com.hedera.hashgraph.sdk.TopicInfoQuery;
+import com.hedera.hashgraph.sdk.TopicUpdateTransaction;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

@@ -4,24 +4,42 @@ import com.google.common.base.MoreObjects;
 import com.hedera.hashgraph.sdk.proto.Fraction;
 import com.hedera.hashgraph.sdk.proto.FractionalFee;
 
+import java.util.Objects;
+
 public class CustomFractionalFee extends CustomFee {
     private long numerator = 0;
     private long denominator = 1;
     private long min = 0;
     private long max = 0;
+    private FeeAssessmentMethod assessmentMethod = FeeAssessmentMethod.INCLUSIVE;
 
     public CustomFractionalFee() {
     }
 
-    static CustomFractionalFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
-        var fractionalFee = customFee.getFractionalFee();
+    static CustomFractionalFee clonedFrom(CustomFractionalFee source) {
+        var returnFee = new CustomFractionalFee();
+        returnFee.numerator = source.numerator;
+        returnFee.denominator = source.denominator;
+        returnFee.min = source.min;
+        returnFee.max = source.max;
+        returnFee.assessmentMethod = source.assessmentMethod;
+        returnFee.feeCollectorAccountId = source.feeCollectorAccountId;
+        return returnFee;
+    }
+
+    static CustomFractionalFee fromProtobuf(FractionalFee fractionalFee) {
         var fraction = fractionalFee.getFractionalAmount();
-        var returnFee = new CustomFractionalFee()
+        return new CustomFractionalFee()
             .setNumerator(fraction.getNumerator())
             .setDenominator(fraction.getDenominator())
             .setMin(fractionalFee.getMinimumAmount())
-            .setMax(fractionalFee.getMaximumAmount());
-        if(customFee.hasFeeCollectorAccountId()) {
+            .setMax(fractionalFee.getMaximumAmount())
+            .setAssessmentMethod(FeeAssessmentMethod.valueOf(fractionalFee.getNetOfTransfers()));
+    }
+
+    static CustomFractionalFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
+        var returnFee = fromProtobuf(customFee.getFractionalFee());
+        if (customFee.hasFeeCollectorAccountId()) {
             returnFee.setFeeCollectorAccountId(AccountId.fromProtobuf(customFee.getFeeCollectorAccountId()));
         }
         return returnFee;
@@ -68,6 +86,16 @@ public class CustomFractionalFee extends CustomFee {
         return this;
     }
 
+    public FeeAssessmentMethod getAssessmentMethod() {
+        return assessmentMethod;
+    }
+
+    public CustomFractionalFee setAssessmentMethod(FeeAssessmentMethod assessmentMethod) {
+        Objects.requireNonNull(assessmentMethod);
+        this.assessmentMethod = assessmentMethod;
+        return this;
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -76,25 +104,27 @@ public class CustomFractionalFee extends CustomFee {
             .add("denominator", getDenominator())
             .add("min", getMin())
             .add("max", getMax())
+            .add("assessmentMethod", getAssessmentMethod())
             .toString();
+    }
+
+    FractionalFee toFractionalFeeProtobuf() {
+        return FractionalFee.newBuilder()
+            .setMinimumAmount(getMin())
+            .setMaximumAmount(getMax())
+            .setFractionalAmount(
+                Fraction.newBuilder()
+                    .setNumerator(getNumerator())
+                    .setDenominator(getDenominator())
+            )
+            .setNetOfTransfers(assessmentMethod.code)
+            .build();
     }
 
     @Override
     com.hedera.hashgraph.sdk.proto.CustomFee toProtobuf() {
         var customFeeBuilder = com.hedera.hashgraph.sdk.proto.CustomFee.newBuilder()
-            .setFractionalFee(
-                FractionalFee.newBuilder()
-                    .setMinimumAmount(getMin())
-                    .setMaximumAmount(getMax())
-                    .setFractionalAmount(
-                        Fraction.newBuilder()
-                            .setNumerator(getNumerator())
-                            .setDenominator(getDenominator())
-                    )
-            );
-        if(getFeeCollectorAccountId() != null) {
-            customFeeBuilder.setFeeCollectorAccountId(getFeeCollectorAccountId().toProtobuf());
-        }
-        return customFeeBuilder.build();
+            .setFractionalFee(toFractionalFeeProtobuf());
+        return finishToProtobuf(customFeeBuilder);
     }
 }

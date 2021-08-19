@@ -16,28 +16,23 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 class Network {
     static final Integer DEFAULT_MAX_NODE_ATTEMPTS = -1;
-
+    final ExecutorService executor;
+    final Semaphore lock = new Semaphore(1);
     HashMap<String, AccountId> network = new HashMap<>();
     HashMap<AccountId, Node> networkNodes = new HashMap<>();
-
-    private int maxNodeAttempts = DEFAULT_MAX_NODE_ATTEMPTS;
-    private Duration nodeWaitTime = Duration.ofMillis(250);
-
     @Nullable
     NetworkName networkName = null;
 
     List<Node> nodes = new ArrayList<>();
-    final ExecutorService executor;
-
-    final Semaphore lock = new Semaphore(1);
-
     @Nullable
     Integer maxNodesPerTransaction = null;
+    private int maxNodeAttempts = DEFAULT_MAX_NODE_ATTEMPTS;
+    private Duration nodeWaitTime = Duration.ofMillis(250);
 
     Network(ExecutorService executor, Map<String, AccountId> network) {
         this.executor = executor;
@@ -150,12 +145,16 @@ class Network {
         this.maxNodesPerTransaction = maxNodesPerTransaction;
     }
 
+    int getMaxNodeAttempts() {
+        return maxNodeAttempts;
+    }
+
     void setMaxNodeAttempts(int maxNodeAttempts) {
         this.maxNodeAttempts = maxNodeAttempts;
     }
 
-    int getMaxNodeAttempts() {
-        return maxNodeAttempts;
+    Duration getNodeWaitTime() {
+        return nodeWaitTime;
     }
 
     void setNodeWaitTime(Duration nodeWaitTime) {
@@ -163,10 +162,6 @@ class Network {
         for (var node : nodes) {
             node.setWaitTime(nodeWaitTime.toMillis());
         }
-    }
-
-    Duration getNodeWaitTime() {
-        return nodeWaitTime;
     }
 
     int getNumberOfNodesForTransaction() {

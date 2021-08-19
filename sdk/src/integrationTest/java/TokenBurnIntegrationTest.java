@@ -1,16 +1,28 @@
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.AccountCreateTransaction;
+import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hedera.hashgraph.sdk.Status;
+import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
+import com.hedera.hashgraph.sdk.TokenBurnTransaction;
+import com.hedera.hashgraph.sdk.TokenCreateTransaction;
+import com.hedera.hashgraph.sdk.TokenMintTransaction;
+import com.hedera.hashgraph.sdk.TokenNftInfoQuery;
+import com.hedera.hashgraph.sdk.TokenType;
+import com.hedera.hashgraph.sdk.TransferTransaction;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Disabled;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Objects;
-import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TokenBurnIntegrationTest {
     @Test
@@ -162,7 +174,7 @@ class TokenBurnIntegrationTest {
 
             var mintReceipt = new TokenMintTransaction()
                 .setTokenId(tokenId)
-                .setMetadata(NftMetadataGenerator.generate((byte)10))
+                .setMetadata(NftMetadataGenerator.generate((byte) 10))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -180,7 +192,7 @@ class TokenBurnIntegrationTest {
                 .setEnd(6)
                 .execute(testEnv.client);
 
-            for(var info : nftInfos) {
+            for (var info : nftInfos) {
                 assertTrue(serialsLeft.remove(info.nftId.serial));
             }
 
@@ -212,7 +224,7 @@ class TokenBurnIntegrationTest {
 
             var serials = new TokenMintTransaction()
                 .setTokenId(tokenId)
-                .setMetadata(NftMetadataGenerator.generate((byte)1))
+                .setMetadata(NftMetadataGenerator.generate((byte) 1))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client)
                 .serials;

@@ -463,7 +463,7 @@ public enum RequestType {
 
     @Override
     public String toString() {
-        switch(this) {
+        switch (this) {
             case NONE:
                 return "NONE";
             case CRYPTO_TRANSFER:

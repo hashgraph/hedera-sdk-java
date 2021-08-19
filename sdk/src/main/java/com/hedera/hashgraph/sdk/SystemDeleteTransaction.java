@@ -1,11 +1,11 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.SystemDeleteTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
-import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -117,7 +117,7 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
         if (contractId != null) {
             builder.setContractID(contractId.toProtobuf());
         }
-        if(expirationTime != null) {
+        if (expirationTime != null) {
             builder.setExpirationTime(InstantConverter.toSecondsProtobuf(expirationTime));
         }
 
@@ -126,13 +126,13 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
 
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getSystemDelete();
-        if(body.hasFileID()) {
+        if (body.hasFileID()) {
             fileId = FileId.fromProtobuf(body.getFileID());
         }
-        if(body.hasContractID()) {
+        if (body.hasContractID()) {
             contractId = ContractId.fromProtobuf(body.getContractID());
         }
-        if(body.hasExpirationTime()) {
+        if (body.hasExpirationTime()) {
             expirationTime = InstantConverter.fromProtobuf(body.getExpirationTime());
         }
     }
@@ -151,7 +151,7 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
         int modesEnabled = (fileId != null ? 1 : 0) + (contractId != null ? 1 : 0);
-        if(modesEnabled != 1) {
+        if (modesEnabled != 1) {
             throw new IllegalStateException("SystemDeleteTransaction must have exactly 1 of the following fields set: contractId, fileId");
         }
         return super.onExecuteAsync(client);
@@ -159,7 +159,7 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
 
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
-        if(fileId != null) {
+        if (fileId != null) {
             return FileServiceGrpc.getSystemDeleteMethod();
         } else {
             return SmartContractServiceGrpc.getSystemDeleteMethod();

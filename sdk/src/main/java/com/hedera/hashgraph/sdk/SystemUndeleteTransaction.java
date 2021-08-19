@@ -1,11 +1,11 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.SystemUndeleteTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
-import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -80,10 +80,10 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
 
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getSystemUndelete();
-        if(body.hasFileID()) {
+        if (body.hasFileID()) {
             fileId = FileId.fromProtobuf(body.getFileID());
         }
-        if(body.hasContractID()) {
+        if (body.hasContractID()) {
             contractId = ContractId.fromProtobuf(body.getContractID());
         }
     }
@@ -114,7 +114,7 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
         int modesEnabled = (fileId != null ? 1 : 0) + (contractId != null ? 1 : 0);
-        if(modesEnabled != 1) {
+        if (modesEnabled != 1) {
             throw new IllegalStateException("SystemDeleteTransaction must have exactly 1 of the following fields set: contractId, fileId");
         }
         return super.onExecuteAsync(client);
@@ -123,7 +123,7 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
 
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
-        if(fileId != null) {
+        if (fileId != null) {
             return FileServiceGrpc.getSystemUndeleteMethod();
         } else {
             return SmartContractServiceGrpc.getSystemUndeleteMethod();

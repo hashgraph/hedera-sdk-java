@@ -1,17 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java8.util.function.Consumer;
-
 import com.google.common.base.Stopwatch;
 import com.google.common.primitives.Longs;
 import com.google.common.util.concurrent.Uninterruptibles;
@@ -30,6 +18,7 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.inprocess.InProcessServerBuilder;
 import io.grpc.stub.StreamObserver;
+import java8.util.function.Consumer;
 import org.apache.commons.lang3.ArrayUtils;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.AfterClass;
@@ -37,12 +26,22 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class TopicMessageQueryTest {
 
@@ -189,14 +188,14 @@ class TopicMessageQueryTest {
             .hasSize(1)
             .first()
             .returns(toInstant(response2.getConsensusTimestamp()), t -> t.consensusTimestamp)
-            .returns(response2.getChunkInfo().getInitialTransactionID(), t-> t.transactionId.toProtobuf())
+            .returns(response2.getChunkInfo().getInitialTransactionID(), t -> t.transactionId.toProtobuf())
             .returns(message, t -> t.contents)
             .returns(response2.getRunningHash().toByteArray(), t -> t.runningHash)
             .returns(response2.getSequenceNumber(), t -> t.sequenceNumber)
             .extracting(t -> t.chunks)
             .asInstanceOf(InstanceOfAssertFactories.ARRAY)
             .hasSize(2)
-            .extracting(c -> ((TopicMessageChunk)c).sequenceNumber)
+            .extracting(c -> ((TopicMessageChunk) c).sequenceNumber)
             .contains(1L, 2L);
     }
 
@@ -217,7 +216,9 @@ class TopicMessageQueryTest {
         consensusServiceStub.requests.add(request().build());
         consensusServiceStub.responses.add(response(1L));
 
-        subscribeToMirror(t -> {throw new RuntimeException();});
+        subscribeToMirror(t -> {
+            throw new RuntimeException();
+        });
 
         assertThat(errors).hasSize(1).first().isInstanceOf(RuntimeException.class);
         assertThat(received).isEmpty();
@@ -233,14 +234,19 @@ class TopicMessageQueryTest {
     })
     @Timeout(3)
     void retryRecovers(Status.Code code, String description) {
-        consensusServiceStub.requests.add(request().build());
-        consensusServiceStub.requests.add(request().build());
+        ConsensusTopicResponse response = response(1L);
+        Instant nextTimestamp = toInstant(response.getConsensusTimestamp()).plusNanos(1L);
+        ConsensusTopicQuery.Builder request = request();
+
+        consensusServiceStub.requests.add(request.build());
+        consensusServiceStub.requests.add(request.setConsensusStartTime(toTimestamp(nextTimestamp)).build());
+        consensusServiceStub.responses.add(response);
         consensusServiceStub.responses.add(code.toStatus().withDescription(description).asRuntimeException());
-        consensusServiceStub.responses.add(response(1L));
+        consensusServiceStub.responses.add(response(2L));
 
         subscribeToMirror(received::add);
 
-        assertThat(received).hasSize(1).extracting(t -> t.sequenceNumber).containsExactly(1L);
+        assertThat(received).hasSize(2).extracting(t -> t.sequenceNumber).containsExactly(1L, 2L);
         assertThat(errors).isEmpty();
     }
 
@@ -262,7 +268,7 @@ class TopicMessageQueryTest {
         assertThat(errors).hasSize(1)
             .first()
             .isInstanceOf(StatusRuntimeException.class)
-            .extracting(t -> ((StatusRuntimeException)t).getStatus().getCode())
+            .extracting(t -> ((StatusRuntimeException) t).getStatus().getCode())
             .isEqualTo(code);
     }
 
@@ -316,7 +322,7 @@ class TopicMessageQueryTest {
         assertThat(errors).hasSize(1)
             .first()
             .isInstanceOf(StatusRuntimeException.class)
-            .extracting(t -> ((StatusRuntimeException)t).getStatus())
+            .extracting(t -> ((StatusRuntimeException) t).getStatus())
             .isEqualTo(Status.RESOURCE_EXHAUSTED);
     }
 

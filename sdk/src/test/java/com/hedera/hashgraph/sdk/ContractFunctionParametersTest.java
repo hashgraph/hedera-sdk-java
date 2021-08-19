@@ -17,6 +17,48 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ContractFunctionParametersTest {
+    @SuppressWarnings("unused")
+    private static List<Arguments> int256Arguments() {
+        return Lists.of(
+            Arguments.of(0, "0000000000000000000000000000000000000000000000000000000000000000"),
+            Arguments.of(2, "0000000000000000000000000000000000000000000000000000000000000002"),
+            Arguments.of(255, "00000000000000000000000000000000000000000000000000000000000000ff"),
+            Arguments.of(4095, "0000000000000000000000000000000000000000000000000000000000000fff"),
+            Arguments.of(127 << 24, "000000000000000000000000000000000000000000000000000000007f000000"),
+            Arguments.of(2047 << 20, "000000000000000000000000000000000000000000000000000000007ff00000"),
+            // deadbeef as an integer literal is negative
+            Arguments.of(0xdeadbeefL, "00000000000000000000000000000000000000000000000000000000deadbeef"),
+            Arguments.of(-1, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"),
+            Arguments.of(-2, "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe"),
+            Arguments.of(-256, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00"),
+            Arguments.of(-4096, "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000"),
+            Arguments.of(255 << 24, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000"),
+            Arguments.of(4095 << 20, "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000"),
+            Arguments.of(0xdeadbeef, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffdeadbeef")
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static List<Arguments> uInt256Arguments() {
+        return Lists.of(
+            Arguments.of(0, "0000000000000000000000000000000000000000000000000000000000000000", 8),
+            Arguments.of(2, "0000000000000000000000000000000000000000000000000000000000000002", 8),
+            Arguments.of(255, "00000000000000000000000000000000000000000000000000000000000000ff", 8),
+            Arguments.of(4095, "0000000000000000000000000000000000000000000000000000000000000fff", 32),
+            Arguments.of(127 << 24, "000000000000000000000000000000000000000000000000000000007f000000", 32),
+            Arguments.of(2047 << 20, "000000000000000000000000000000000000000000000000000000007ff00000", 32),
+            // deadbeef as an integer literal is negative
+            Arguments.of(0xdeadbeef, "00000000000000000000000000000000000000000000000000000000deadbeef", 32),
+            Arguments.of(-1, "000000000000000000000000000000000000000000000000ffffffffffffffff", 64),
+            Arguments.of(-2, "000000000000000000000000000000000000000000000000fffffffffffffffe", 64),
+            Arguments.of(-256, "000000000000000000000000000000000000000000000000ffffffffffffff00", 64),
+            Arguments.of(-4096, "000000000000000000000000000000000000000000000000fffffffffffff000", 64),
+            Arguments.of(255 << 24, "000000000000000000000000000000000000000000000000ffffffffff000000", 64),
+            Arguments.of(4095 << 20, "000000000000000000000000000000000000000000000000fffffffffff00000", 64),
+            Arguments.of(0xdeadbeefL, "00000000000000000000000000000000000000000000000000000000deadbeef", 64)
+        );
+    }
+
     @Test
     @DisplayName("encodes int types correctly")
     void intTypes() {
@@ -39,7 +81,7 @@ public class ContractFunctionParametersTest {
             .addInt256Array(new BigInteger[]{BigInteger.valueOf(-0x1A)});
 
         assertEquals(
-    "11bcd903" +
+            "11bcd903" +
                 "0000000000000000000000000000000000000000000000000000000000000001" +
                 "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe" +
                 "0000000000000000000000000000000000000000000000000000000000000003" +
@@ -219,7 +261,7 @@ public class ContractFunctionParametersTest {
             .addBool(false);
 
         assertEquals(
-    "b3cedfcf" +
+            "b3cedfcf" +
                 "0000000000000000000000000000000000000000000000000000000000000001" +
                 "0000000000000000000000000000000000000000000000000000000000000000",
             Hex.toHexString(params.toBytes("foo").toByteArray())
@@ -471,27 +513,6 @@ public class ContractFunctionParametersTest {
                 .getMessage());
     }
 
-    @SuppressWarnings("unused")
-    private static List<Arguments> int256Arguments() {
-        return Lists.of(
-            Arguments.of(0, "0000000000000000000000000000000000000000000000000000000000000000"),
-            Arguments.of(2, "0000000000000000000000000000000000000000000000000000000000000002"),
-            Arguments.of(255, "00000000000000000000000000000000000000000000000000000000000000ff"),
-            Arguments.of(4095, "0000000000000000000000000000000000000000000000000000000000000fff"),
-            Arguments.of(127 << 24, "000000000000000000000000000000000000000000000000000000007f000000"),
-            Arguments.of(2047 << 20, "000000000000000000000000000000000000000000000000000000007ff00000"),
-            // deadbeef as an integer literal is negative
-            Arguments.of(0xdeadbeefL, "00000000000000000000000000000000000000000000000000000000deadbeef"),
-            Arguments.of(-1, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"),
-            Arguments.of(-2, "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe"),
-            Arguments.of(-256, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00"),
-            Arguments.of(-4096, "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000"),
-            Arguments.of(255 << 24, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000"),
-            Arguments.of(4095 << 20, "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000"),
-            Arguments.of(0xdeadbeef, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffdeadbeef")
-        );
-    }
-
     @ParameterizedTest
     @DisplayName("int256() encodes correctly")
     @MethodSource("int256Arguments")
@@ -499,27 +520,6 @@ public class ContractFunctionParametersTest {
         assertEquals(
             hexString,
             Hex.toHexString(ContractFunctionParameters.int256(val, 64).toByteArray())
-        );
-    }
-
-    @SuppressWarnings("unused")
-    private static List<Arguments> uInt256Arguments() {
-        return Lists.of(
-            Arguments.of(0, "0000000000000000000000000000000000000000000000000000000000000000", 8),
-            Arguments.of(2, "0000000000000000000000000000000000000000000000000000000000000002", 8),
-            Arguments.of(255, "00000000000000000000000000000000000000000000000000000000000000ff", 8),
-            Arguments.of(4095, "0000000000000000000000000000000000000000000000000000000000000fff", 32),
-            Arguments.of(127 << 24, "000000000000000000000000000000000000000000000000000000007f000000", 32),
-            Arguments.of(2047 << 20, "000000000000000000000000000000000000000000000000000000007ff00000", 32),
-            // deadbeef as an integer literal is negative
-            Arguments.of(0xdeadbeef, "00000000000000000000000000000000000000000000000000000000deadbeef", 32),
-            Arguments.of(-1, "000000000000000000000000000000000000000000000000ffffffffffffffff", 64),
-            Arguments.of(-2, "000000000000000000000000000000000000000000000000fffffffffffffffe", 64),
-            Arguments.of(-256, "000000000000000000000000000000000000000000000000ffffffffffffff00", 64),
-            Arguments.of(-4096, "000000000000000000000000000000000000000000000000fffffffffffff000", 64),
-            Arguments.of(255 << 24, "000000000000000000000000000000000000000000000000ffffffffff000000", 64),
-            Arguments.of(4095 << 20, "000000000000000000000000000000000000000000000000fffffffffff00000", 64),
-            Arguments.of(0xdeadbeefL, "00000000000000000000000000000000000000000000000000000000deadbeef", 64)
         );
     }
 

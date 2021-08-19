@@ -1,8 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
-import java.util.List;
-
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class BadMnemonicException extends Exception {
     /**

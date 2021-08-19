@@ -2,9 +2,9 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoCreateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -157,7 +157,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         if (proxyAccountId != null) {
             builder.setProxyAccountID(proxyAccountId.toProtobuf());
         }
-        if(key != null) {
+        if (key != null) {
             builder.setKey(key.toProtobufKey());
         }
         builder.setInitialBalance(initialBalance.toTinybars());
@@ -181,10 +181,10 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         if (body.hasProxyAccountID()) {
             proxyAccountId = AccountId.fromProtobuf(body.getProxyAccountID());
         }
-        if(body.hasKey()) {
+        if (body.hasKey()) {
             key = Key.fromProtobufKey(body.getKey());
         }
-        if(body.hasAutoRenewPeriod()) {
+        if (body.hasAutoRenewPeriod()) {
             autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
         }
         initialBalance = Hbar.fromTinybars(body.getInitialBalance());

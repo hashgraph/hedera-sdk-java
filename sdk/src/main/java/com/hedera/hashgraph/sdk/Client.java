@@ -12,11 +12,12 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Map;
-import java.util.List;
-import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
@@ -29,24 +30,26 @@ import java.util.concurrent.TimeoutException;
  * Managed client for use on the Hedera Hashgraph network.
  */
 public final class Client implements AutoCloseable, WithPing, WithPingAll {
+    static final int DEFAULT_MAX_ATTEMPTS = 10;
+    static final Duration DEFAULT_MAX_BACKOFF = Duration.ofSeconds(8L);
+    static final Duration DEFAULT_MIN_BACKOFF = Duration.ofMillis(250L);
     private static final Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
-    private static final Hbar DEFAULT_MAX_TRANSACTION_FEE = new Hbar(1);
-    static final Integer DEFAULT_MAX_ATTEMPTS = 10;
-
-    Hbar maxTransactionFee = DEFAULT_MAX_QUERY_PAYMENT;
-    Hbar maxQueryPayment = DEFAULT_MAX_TRANSACTION_FEE;
-
+    final ExecutorService executor;
+    @Nullable
+    Hbar defaultMaxTransactionFee = null;
+    Hbar defaultMaxQueryPayment = DEFAULT_MAX_QUERY_PAYMENT;
     Network network;
     MirrorNetwork mirrorNetwork;
-
-    final ExecutorService executor;
-
     @Nullable
     private Operator operator;
 
     private Duration requestTimeout = Duration.ofMinutes(2);
 
-    private Integer maxAttempts = null;
+    private int maxAttempts = DEFAULT_MAX_ATTEMPTS;
+
+    private volatile Duration maxBackoff = DEFAULT_MAX_BACKOFF;
+
+    private volatile Duration minBackoff = DEFAULT_MIN_BACKOFF;
 
     private boolean autoValidateChecksums = false;
 
@@ -62,14 +65,6 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
 
         this.network = new Network(executor, network);
         this.mirrorNetwork = new MirrorNetwork(executor);
-    }
-
-    public synchronized void setMirrorNetwork(List<String> network) throws InterruptedException {
-        mirrorNetwork.setNetwork(network);
-    }
-
-    public List<String> getMirrorNetwork() {
-        return mirrorNetwork.addresses;
     }
 
     /**
@@ -298,16 +293,12 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return fromConfig(Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8));
     }
 
-    /**
-     * Replace all nodes in this Client with a new set of nodes (e.g. for an Address Book update).
-     * <p>
-     *
-     * @param network a map of node account ID to node URL.
-     * @return {@code this} for fluent API usage.
-     */
-    public synchronized Client setNetwork(Map<String, AccountId> network) throws InterruptedException, TimeoutException {
-        this.network.setNetwork(network);
-        return this;
+    public List<String> getMirrorNetwork() {
+        return mirrorNetwork.addresses;
+    }
+
+    public synchronized void setMirrorNetwork(List<String> network) throws InterruptedException {
+        mirrorNetwork.setNetwork(network);
     }
 
     public Map<String, AccountId> getNetwork() {
@@ -318,6 +309,18 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         }
 
         return network;
+    }
+
+    /**
+     * Replace all nodes in this Client with a new set of nodes (e.g. for an Address Book update).
+     * <p>
+     *
+     * @param network a map of node account ID to node URL.
+     * @return {@code this} for fluent API usage.
+     */
+    public synchronized Client setNetwork(Map<String, AccountId> network) throws InterruptedException, TimeoutException {
+        this.network.setNetwork(network);
+        return this;
     }
 
     @FunctionalExecutable(type = "Void", onClient = true, inputType = "AccountId")
@@ -375,7 +378,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return {@code this}
      */
     public synchronized Client setOperatorWith(AccountId accountId, PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
-        if(getNetworkName() != null) {
+        if (getNetworkName() != null) {
             try {
                 accountId.validateChecksum(this);
             } catch (BadEntityIdException exc) {
@@ -389,27 +392,73 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return this;
     }
 
-    public synchronized Client setNetworkName(@Nullable NetworkName networkName) {
-        this.network.networkName = networkName;
-        return this;
-    }
-
     @Nullable
     public synchronized NetworkName getNetworkName() {
         return network.networkName;
     }
 
-    public synchronized Client setMaxAttempts(int maxAttempts) {
-        this.maxAttempts = maxAttempts;
+    public synchronized Client setNetworkName(@Nullable NetworkName networkName) {
+        this.network.networkName = networkName;
         return this;
     }
 
     public synchronized int getMaxAttempts() {
-        return maxAttempts != null ? maxAttempts : DEFAULT_MAX_ATTEMPTS;
+        return maxAttempts;
     }
 
-    public synchronized Client setMaxNodeAttempts(int maxNodeAttempts) {
-        this.network.setMaxNodeAttempts(maxNodeAttempts);
+    public synchronized Client setMaxAttempts(int maxAttempts) {
+        if (maxAttempts <= 0) {
+            throw new IllegalArgumentException("maxAttempts must be greater than zero");
+        }
+        this.maxAttempts = maxAttempts;
+        return this;
+    }
+
+    /**
+     * @return maxBackoff The maximum amount of time to wait between retries
+     */
+    public Duration getMaxBackoff() {
+        return maxBackoff;
+    }
+
+    /**
+     * The maximum amount of time to wait between retries. Every retry attempt will increase the wait time exponentially
+     * until it reaches this time.
+     *
+     * @param maxBackoff The maximum amount of time to wait between retries
+     * @return {@code this}
+     */
+    public Client setMaxBackoff(Duration maxBackoff) {
+        if (maxBackoff == null || maxBackoff.toNanos() < 0) {
+            throw new IllegalArgumentException("maxBackoff must be a positive duration");
+        } else if (maxBackoff.compareTo(minBackoff) < 0) {
+            throw new IllegalArgumentException("maxBackoff must be greater than or equal to minBackoff");
+        }
+        this.maxBackoff = maxBackoff;
+        return this;
+    }
+
+    /**
+     * @return minBackoff The minimum amount of time to wait between retries
+     */
+    public Duration getMinBackoff() {
+        return minBackoff;
+    }
+
+    /**
+     * The minimum amount of time to wait between retries. When retrying, the delay will start at this time and increase
+     * exponentially until it reaches the maxBackoff.
+     *
+     * @param minBackoff The minimum amount of time to wait between retries
+     * @return {@code this}
+     */
+    public Client setMinBackoff(Duration minBackoff) {
+        if (minBackoff == null || minBackoff.toNanos() < 0) {
+            throw new IllegalArgumentException("minBackoff must be a positive duration");
+        } else if (minBackoff.compareTo(maxBackoff) > 0) {
+            throw new IllegalArgumentException("minBackoff must be less than or equal to maxBackoff");
+        }
+        this.minBackoff = minBackoff;
         return this;
     }
 
@@ -417,8 +466,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return network.getMaxNodeAttempts();
     }
 
-    public synchronized Client setNodeWaitTime(Duration nodeWaitTime) {
-        network.setNodeWaitTime(nodeWaitTime);
+    public synchronized Client setMaxNodeAttempts(int maxNodeAttempts) {
+        this.network.setMaxNodeAttempts(maxNodeAttempts);
         return this;
     }
 
@@ -426,12 +475,17 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return network.getNodeWaitTime();
     }
 
+    public synchronized Client setNodeWaitTime(Duration nodeWaitTime) {
+        network.setNodeWaitTime(nodeWaitTime);
+        return this;
+    }
+
     public synchronized Client setMaxNodesPerTransaction(int maxNodesPerTransaction) {
         this.network.setMaxNodesPerTransaction(maxNodesPerTransaction);
         return this;
     }
 
-    public synchronized  Client setAutoValidateChecksums(boolean value) {
+    public synchronized Client setAutoValidateChecksums(boolean value) {
         autoValidateChecksums = value;
         return this;
     }
@@ -468,6 +522,11 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return operator.publicKey;
     }
 
+    @Nullable
+    public synchronized Hbar getDefaultMaxTransactionFee() {
+        return defaultMaxTransactionFee;
+    }
+
     /**
      * Set the maximum fee to be paid for transactions executed by this client.
      * <p>
@@ -475,16 +534,28 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * {@link Transaction#setMaxTransactionFee(Hbar)} on every new transaction. The actual
      * fee assessed for a given transaction may be less than this value, but never greater.
      *
-     * @param maxTransactionFee The Hbar to be set
+     * @param defaultMaxTransactionFee The Hbar to be set
      * @return {@code this}
      */
-    public synchronized Client setMaxTransactionFee(Hbar maxTransactionFee) {
-        if (maxTransactionFee.toTinybars() < 0) {
+    public synchronized Client setDefaultMaxTransactionFee(Hbar defaultMaxTransactionFee) {
+        Objects.requireNonNull(defaultMaxTransactionFee);
+        if (defaultMaxTransactionFee.toTinybars() < 0) {
             throw new IllegalArgumentException("maxTransactionFee must be non-negative");
         }
 
-        this.maxTransactionFee = maxTransactionFee;
+        this.defaultMaxTransactionFee = defaultMaxTransactionFee;
         return this;
+    }
+
+    /**
+     * @deprecated Use {@link #setDefaultMaxTransactionFee(Hbar)} instead.
+     */
+    public synchronized Client setMaxTransactionFee(Hbar maxTransactionFee) {
+        return setDefaultMaxTransactionFee(maxTransactionFee);
+    }
+
+    public synchronized Hbar getDefaultMaxQueryPayment() {
+        return defaultMaxQueryPayment;
     }
 
     /**
@@ -502,25 +573,34 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * <p>
      * Set to 0 to disable automatic implicit payments.
      *
-     * @param maxQueryPayment The Hbar to be set
+     * @param defaultMaxQueryPayment The Hbar to be set
      * @return {@code this}
      */
-    public synchronized Client setMaxQueryPayment(Hbar maxQueryPayment) {
-        if (maxQueryPayment.toTinybars() < 0) {
-            throw new IllegalArgumentException("maxQueryPayment must be non-negative");
+    public synchronized Client setDefaultMaxQueryPayment(Hbar defaultMaxQueryPayment) {
+        Objects.requireNonNull(defaultMaxQueryPayment);
+        if (defaultMaxQueryPayment.toTinybars() < 0) {
+            throw new IllegalArgumentException("defaultMaxQueryPayment must be non-negative");
         }
 
-        this.maxQueryPayment = maxQueryPayment;
+        this.defaultMaxQueryPayment = defaultMaxQueryPayment;
         return this;
+    }
+
+    /**
+     * @deprecated Use {@link #setDefaultMaxQueryPayment(Hbar)} instead.
+     */
+    @Deprecated
+    public synchronized Client setMaxQueryPayment(Hbar maxQueryPayment) {
+        return setDefaultMaxQueryPayment(maxQueryPayment);
+    }
+
+    public synchronized Duration getRequestTimeout() {
+        return requestTimeout;
     }
 
     public synchronized Client setRequestTimeout(Duration requestTimeout) {
         this.requestTimeout = requestTimeout;
         return this;
-    }
-
-    public synchronized Duration getRequestTimeout() {
-        return requestTimeout;
     }
 
     @Nullable

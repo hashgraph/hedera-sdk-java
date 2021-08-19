@@ -4,6 +4,10 @@ import com.google.errorprone.annotations.Var;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.threeten.bp.Duration;
 
 import java.io.File;
 import java.io.InputStream;
@@ -11,6 +15,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -18,36 +23,84 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class ClientTest {
     @Test
     @DisplayName("Can construct mainnet client")
-    void forMainnet() {
-        Client.forMainnet();
+    void forMainnet() throws TimeoutException {
+        Client.forMainnet().close();
     }
 
 
     @Test
     @DisplayName("Client.setMaxQueryPayment() negative")
-    void setMaxQueryPaymentNegative() {
+    void setMaxQueryPaymentNegative() throws TimeoutException {
+        var client = Client.forTestnet();
         assertThrows(IllegalArgumentException.class, () -> {
-            Client.forTestnet()
-                .setMaxQueryPayment(Hbar.MIN);
+            client.setMaxQueryPayment(Hbar.MIN);
         });
+        client.close();
+    }
+
+    @ValueSource(ints = {-1, 0})
+    @ParameterizedTest(name = "Invalid maxAttempts {0}")
+    void setMaxAttempts(int maxAttempts) throws TimeoutException {
+        var client = Client.forNetwork(Map.of());
+        assertThrows(IllegalArgumentException.class, () -> {
+            client.setMaxAttempts(maxAttempts);
+        });
+        client.close();
+    }
+
+    @NullSource
+    @ValueSource(longs = {-1, 0, 249})
+    @ParameterizedTest(name = "Invalid maxBackoff {0}")
+    void setMaxBackoffInvalid(Long maxBackoffMillis) throws TimeoutException {
+        Duration maxBackoff = maxBackoffMillis != null ? Duration.ofMillis(maxBackoffMillis) : null;
+        var client = Client.forNetwork(Map.of());
+        assertThrows(IllegalArgumentException.class, () -> {
+            client.setMaxBackoff(maxBackoff);
+        });
+        client.close();
+    }
+
+    @ValueSource(longs = {250, 8000})
+    @ParameterizedTest(name = "Valid maxBackoff {0}")
+    void setMaxBackoffValid(long maxBackoff) throws TimeoutException {
+        Client.forNetwork(Map.of()).setMaxBackoff(Duration.ofMillis(maxBackoff)).close();
+    }
+
+    @NullSource
+    @ValueSource(longs = {-1, 8001})
+    @ParameterizedTest(name = "Invalid minBackoff {0}")
+    void setMinBackoffInvalid(Long minBackoffMillis) throws TimeoutException {
+        Duration minBackoff = minBackoffMillis != null ? Duration.ofMillis(minBackoffMillis) : null;
+        var client = Client.forNetwork(Map.of());
+        assertThrows(IllegalArgumentException.class, () -> {
+            client.setMinBackoff(minBackoff);
+        });
+        client.close();
+    }
+
+    @ValueSource(longs = {0, 250, 8000})
+    @ParameterizedTest(name = "Valid minBackoff {0}")
+    void setMinBackoffValid(long minBackoff) throws TimeoutException {
+        Client.forNetwork(Map.of()).setMinBackoff(Duration.ofMillis(minBackoff)).close();
     }
 
     @Test
     @DisplayName("Client.setMaxTransactionFee() negative")
-    void setMaxTransactionFeeNegative() {
+    void setMaxTransactionFeeNegative() throws TimeoutException {
+        var client = Client.forTestnet();
         assertThrows(IllegalArgumentException.class, () -> {
-            Client.forTestnet()
-                .setMaxTransactionFee(Hbar.MIN);
+            client.setDefaultMaxTransactionFee(Hbar.MIN);
         });
+        client.close();
     }
 
     @Test
     @DisplayName("fromJsonFile() functions correctly")
     void fromJsonFile() throws Exception {
-        Client.fromConfigFile(new File("./src/test/resources/client-config.json"));
-        Client.fromConfigFile(new File("./src/test/resources/client-config-with-operator.json"));
-        Client.fromConfigFile("./src/test/resources/client-config.json");
-        Client.fromConfigFile("./src/test/resources/client-config-with-operator.json");
+        Client.fromConfigFile(new File("./src/test/resources/client-config.json")).close();
+        Client.fromConfigFile(new File("./src/test/resources/client-config-with-operator.json")).close();
+        Client.fromConfigFile("./src/test/resources/client-config.json").close();
+        Client.fromConfigFile("./src/test/resources/client-config-with-operator.json").close();
     }
 
     @Test
@@ -68,7 +121,7 @@ class ClientTest {
 
         Assertions.assertNotNull(clientConfig);
 
-        Client.fromConfig(new InputStreamReader(clientConfig, StandardCharsets.UTF_8));
+        Client.fromConfig(new InputStreamReader(clientConfig, StandardCharsets.UTF_8)).close();
 
         // put it in a file for nicer formatting
         InputStream clientConfigWithOperator = ClientTest.class.getClassLoader()
@@ -95,6 +148,7 @@ class ClientTest {
 
             Assertions.assertEquals(client.network.networkNodes.get(new AccountId(5)).getChannel().authority(), "2.testnet.hedera.com:50211");
             Assertions.assertFalse(client.network.networkNodes.containsKey(new AccountId(3)));
+            client.close();
         });
     }
 }

@@ -1,15 +1,15 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.ScheduleSignTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.ScheduleServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.ScheduleSignTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
-import java.util.LinkedHashMap;
 import javax.annotation.Nullable;
+import java.util.LinkedHashMap;
 import java.util.Objects;
 
 public final class ScheduleSignTransaction extends Transaction<ScheduleSignTransaction> {
@@ -18,7 +18,7 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
     private ScheduleId scheduleId = null;
 
     public ScheduleSignTransaction() {
-        setMaxTransactionFee(new Hbar(5));
+        defaultMaxTransactionFee = new Hbar(5);
     }
 
     ScheduleSignTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {

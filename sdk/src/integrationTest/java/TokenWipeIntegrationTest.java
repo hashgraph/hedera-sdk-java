@@ -1,14 +1,26 @@
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.AccountCreateTransaction;
+import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hedera.hashgraph.sdk.Status;
+import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
+import com.hedera.hashgraph.sdk.TokenCreateTransaction;
+import com.hedera.hashgraph.sdk.TokenGrantKycTransaction;
+import com.hedera.hashgraph.sdk.TokenMintTransaction;
+import com.hedera.hashgraph.sdk.TokenType;
+import com.hedera.hashgraph.sdk.TokenWipeTransaction;
+import com.hedera.hashgraph.sdk.TransferTransaction;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Disabled;
 
 import java.util.Collections;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TokenWipeIntegrationTest {
     @Test
@@ -110,7 +122,7 @@ class TokenWipeIntegrationTest {
 
             var mintReceipt = new TokenMintTransaction()
                 .setTokenId(tokenId)
-                .setMetadata(NftMetadataGenerator.generate((byte)10))
+                .setMetadata(NftMetadataGenerator.generate((byte) 10))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
@@ -130,7 +142,7 @@ class TokenWipeIntegrationTest {
 
             var serialsToTransfer = mintReceipt.serials.subList(0, 4);
             var transfer = new TransferTransaction();
-            for(var serial : serialsToTransfer) {
+            for (var serial : serialsToTransfer) {
                 transfer.addNftTransfer(tokenId.nft(serial), testEnv.operatorId, accountId);
             }
             transfer.execute(testEnv.client).getReceipt(testEnv.client);
@@ -181,7 +193,7 @@ class TokenWipeIntegrationTest {
 
             var mintReceipt = new TokenMintTransaction()
                 .setTokenId(tokenId)
-                .setMetadata(NftMetadataGenerator.generate((byte)10))
+                .setMetadata(NftMetadataGenerator.generate((byte) 10))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 

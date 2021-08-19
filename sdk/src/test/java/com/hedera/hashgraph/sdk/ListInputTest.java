@@ -90,15 +90,15 @@ public class ListInputTest {
     void tokenMintListTest() {
         var tx = new TokenMintTransaction();
         var list = new ArrayList<byte[]>();
-        list.add(new byte[] {0});
+        list.add(new byte[]{0});
         tx.setMetadata(list);
         var v1 = new ArrayList<>(tx.getMetadata());
-        list.add(new byte[] {1});
+        list.add(new byte[]{1});
         var v2 = new ArrayList<>(tx.getMetadata());
         assertEquals(v1.toString(), v2.toString());
 
         var list2 = tx.getMetadata();
-        list2.add(new byte[] {2});
+        list2.add(new byte[]{2});
         var v3 = tx.getMetadata();
         assertEquals(v1.toString(), v3.toString());
     }

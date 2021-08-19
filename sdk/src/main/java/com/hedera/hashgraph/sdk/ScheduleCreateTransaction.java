@@ -1,10 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.ScheduleCreateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.ScheduleCreateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.ScheduleServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -23,7 +23,7 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     private String scheduleMemo = "";
 
     public ScheduleCreateTransaction() {
-        setMaxTransactionFee(new Hbar(5));
+        defaultMaxTransactionFee = new Hbar(5);
     }
 
     ScheduleCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
@@ -86,10 +86,10 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         if (payerAccountId != null) {
             builder.setPayerAccountID(payerAccountId.toProtobuf());
         }
-        if(transactionToSchedule != null) {
+        if (transactionToSchedule != null) {
             builder.setScheduledTransactionBody(transactionToSchedule);
         }
-        if(adminKey != null) {
+        if (adminKey != null) {
             builder.setAdminKey(adminKey.toProtobufKey());
         }
         builder.setMemo(scheduleMemo);
@@ -102,10 +102,10 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         if (body.hasPayerAccountID()) {
             payerAccountId = AccountId.fromProtobuf(body.getPayerAccountID());
         }
-        if(body.hasScheduledTransactionBody()) {
+        if (body.hasScheduledTransactionBody()) {
             transactionToSchedule = body.getScheduledTransactionBody();
         }
-        if(body.hasAdminKey()) {
+        if (body.hasAdminKey()) {
             adminKey = Key.fromProtobufKey(body.getAdminKey());
         }
         scheduleMemo = body.getMemo();

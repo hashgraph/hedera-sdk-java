@@ -1,28 +1,34 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.FreezeTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.FreezeServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.FreezeTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
+
+import javax.annotation.Nullable;
 
 import java.time.Instant;
 import java.time.OffsetTime;
 import java.time.ZoneOffset;
-
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Set the freezing period in which the platform will stop creating events and accepting transactions.
  * This is used before safely shut down the platform for maintenance.
  */
 public final class FreezeTransaction extends Transaction<FreezeTransaction> {
-    int startHour = 0;
-    int startMinute = 0;
-    int endHour = 0;
-    int endMinute = 0;
+    private int endHour = 0;
+    private int endMinute = 0;
+    @Nullable
+    private Instant startTime = null;
+    @Nullable
+    private FileId updateFileId = null;
+    private byte[] updateFileHash = {};
 
     public FreezeTransaction() {
     }
@@ -39,25 +45,25 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
 
     @SuppressWarnings("FromTemporalAccessor")
     public Instant getStartTime() {
-        return Instant.from(OffsetTime.of(startHour, startMinute, 0, 0, ZoneOffset.UTC));
+        return startTime != null ? startTime : Instant.EPOCH;
     }
 
-    /**
-     * Sets the start time (in UTC).
-     *
-     * @param hour   The hour to be set
-     * @param minute The minute to be set
-     * @return {@code this}
-     */
-    public FreezeTransaction setStartTime(int hour, int minute) {
+    public FreezeTransaction setStartTime(Instant startTime) {
         requireNotFrozen();
-
-        startHour = hour;
-        startMinute = minute;
-
+        Objects.requireNonNull(startTime);
+        this.startTime = startTime;
         return this;
     }
 
+    /**
+     * @deprecated Use {@link #setStartTime(Instant)} instead.
+     */
+    @Deprecated
+    public FreezeTransaction setStartTime(int hour, int minute) {
+        return setStartTime(Instant.from(OffsetTime.of(hour, minute, 0, 0, ZoneOffset.UTC)));
+    }
+
+    @Deprecated
     @SuppressWarnings("FromTemporalAccessor")
     public Instant getEndTime() {
         return Instant.from(OffsetTime.of(endHour, endMinute, 0, 0, ZoneOffset.UTC));
@@ -70,12 +76,36 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
      * @param minute The minute to be set
      * @return {@code this}
      */
+    @Deprecated
     public FreezeTransaction setEndTime(int hour, int minute) {
         requireNotFrozen();
 
         endHour = hour;
         endMinute = minute;
 
+        return this;
+    }
+
+    @Nullable
+    public FileId getUpdateFileId() {
+        return updateFileId;
+    }
+
+    public FreezeTransaction setUpdateFileId(FileId updateFileId) {
+        requireNotFrozen();
+        Objects.requireNonNull(updateFileId);
+        this.updateFileId = updateFileId;
+        return this;
+    }
+
+    public byte[] getUpdateFileHash() {
+        return updateFileHash;
+    }
+
+    public FreezeTransaction setUpdateFileHash(byte[] updateFileHash) {
+        requireNotFrozen();
+        Objects.requireNonNull(updateFileHash);
+        this.updateFileHash = updateFileHash;
         return this;
     }
 
@@ -91,18 +121,28 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
 
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getFreeze();
-        startHour = body.getStartHour();
-        startMinute = body.getStartMin();
         endHour = body.getEndHour();
         endMinute = body.getEndMin();
+        if (body.hasUpdateFile()) {
+            updateFileId = FileId.fromProtobuf(body.getUpdateFile());
+        }
+        updateFileHash = body.getFileHash().toByteArray();
+        if (body.hasStartTime()) {
+            startTime = InstantConverter.fromProtobuf(body.getStartTime());
+        }
     }
 
     FreezeTransactionBody.Builder build() {
         var builder = FreezeTransactionBody.newBuilder();
-        builder.setStartHour(startHour);
-        builder.setStartMin(startMinute);
         builder.setEndHour(endHour);
         builder.setEndMin(endMinute);
+        if (updateFileId != null) {
+            builder.setUpdateFile(updateFileId.toProtobuf());
+        }
+        builder.setFileHash(ByteString.copyFrom(updateFileHash));
+        if (startTime != null) {
+            builder.setStartTime(InstantConverter.toProtobuf(startTime));
+        }
         return builder;
     }
 

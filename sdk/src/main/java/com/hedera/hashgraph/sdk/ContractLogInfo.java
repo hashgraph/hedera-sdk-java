@@ -6,7 +6,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ContractLoginfo;
 import org.bouncycastle.util.encoders.Hex;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +50,10 @@ public final class ContractLogInfo {
         );
     }
 
+    public static ContractLogInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        return fromProtobuf(ContractLoginfo.parseFrom(bytes));
+    }
+
     com.hedera.hashgraph.sdk.proto.ContractLoginfo toProtobuf() {
         var contractLogInfo = com.hedera.hashgraph.sdk.proto.ContractLoginfo.newBuilder()
             .setContractID(contractId.toProtobuf())
@@ -61,10 +64,6 @@ public final class ContractLogInfo {
         }
 
         return contractLogInfo.build();
-    }
-
-    public static ContractLogInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(ContractLoginfo.parseFrom(bytes));
     }
 
     public byte[] toBytes() {

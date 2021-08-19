@@ -9,6 +9,8 @@ import org.threeten.bp.Instant;
 
 import java.util.Collections;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class ContractUpdateTransactionTest {
     private static final PrivateKey privateKey = PrivateKey.fromString(
         "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
@@ -42,5 +44,24 @@ public class ContractUpdateTransactionTest {
             .sign(privateKey)
             .toString()
         ).toMatchSnapshot();
+    }
+
+    @Test
+    void shouldBytes() throws Exception {
+        var tx = new ContractUpdateTransaction()
+            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+            .setContractId(ContractId.fromString("0.0.5007"))
+            .setAdminKey(privateKey)
+            .setAutoRenewPeriod(Duration.ofDays(1))
+            .setBytecodeFileId(new FileId(2))
+            .setContractMemo("3")
+            .setExpirationTime(Instant.ofEpochMilli(4))
+            .setProxyAccountId(new AccountId(4))
+            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
+            .freeze()
+            .sign(privateKey);
+        var tx2 = ContractUpdateTransaction.fromBytes(tx.toBytes());
+        assertEquals(tx.toString(), tx2.toString());
     }
 }

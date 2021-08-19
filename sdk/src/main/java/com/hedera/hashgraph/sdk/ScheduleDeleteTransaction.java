@@ -1,10 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.ScheduleDeleteTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.ScheduleDeleteTransactionBody;
 import com.hedera.hashgraph.sdk.proto.ScheduleServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -18,7 +18,7 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
     private ScheduleId scheduleId = null;
 
     public ScheduleDeleteTransaction() {
-        setMaxTransactionFee(new Hbar(5));
+        defaultMaxTransactionFee = new Hbar(5);
     }
 
     ScheduleDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {

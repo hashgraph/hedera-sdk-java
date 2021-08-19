@@ -2,9 +2,9 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ConsensusCreateTopicTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -164,13 +164,13 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
         if (body.hasAutoRenewAccount()) {
             autoRenewAccountId = AccountId.fromProtobuf(body.getAutoRenewAccount());
         }
-        if(body.hasAdminKey()) {
+        if (body.hasAdminKey()) {
             adminKey = Key.fromProtobufKey(body.getAdminKey());
         }
-        if(body.hasSubmitKey()) {
+        if (body.hasSubmitKey()) {
             submitKey = Key.fromProtobufKey(body.getSubmitKey());
         }
-        if(body.hasAutoRenewPeriod()) {
+        if (body.hasAutoRenewPeriod()) {
             autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
         }
         topicMemo = body.getMemo();
@@ -181,13 +181,13 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
         if (autoRenewAccountId != null) {
             builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
         }
-        if(adminKey != null) {
+        if (adminKey != null) {
             builder.setAdminKey(adminKey.toProtobufKey());
         }
-        if(submitKey != null) {
+        if (submitKey != null) {
             builder.setSubmitKey(submitKey.toProtobufKey());
         }
-        if(autoRenewPeriod != null) {
+        if (autoRenewPeriod != null) {
             builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         }
         builder.setMemo(topicMemo);

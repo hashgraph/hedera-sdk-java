@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
+import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -11,7 +12,6 @@ import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
-import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -87,6 +87,7 @@ public final class PrivateKey extends Key {
 
         return derivedKey;
     }
+
     /**
      * Recover a private key from a mnemonic phrase compatible with the iOS and Android wallets.
      * <p>
@@ -133,29 +134,17 @@ public final class PrivateKey extends Key {
         return new PrivateKey(keyData, chainCode);
     }
 
-    public PrivateKey legacyDerive(int index) {
-        var keyBytes = legacyDeriveChildKey(this.keyData, (long) index);
-
-        return PrivateKey.fromBytes(keyBytes);
-    }
-
-    public PrivateKey legacyDerive(Long index) {
-        var keyBytes = legacyDeriveChildKey(this.keyData,index);
-
-        return PrivateKey.fromBytes(keyBytes);
-    }
-
-        /**
-         * Parse a private key from a PEM encoded reader.
-         * <p>
-         * This will read the first "PRIVATE KEY" section in the stream as an Ed25519 private key.
-         *
-         * @throws IOException     if one occurred while reading.
-         * @throws BadKeyException if no "PRIVATE KEY" section was found or the key was not an Ed25519
-         *                         private key.
-         * @param pemFile The Reader containing the pem file
-         * @return {@link com.hedera.hashgraph.sdk.PrivateKey}
-         */
+    /**
+     * Parse a private key from a PEM encoded reader.
+     * <p>
+     * This will read the first "PRIVATE KEY" section in the stream as an Ed25519 private key.
+     *
+     * @param pemFile The Reader containing the pem file
+     * @return {@link com.hedera.hashgraph.sdk.PrivateKey}
+     * @throws IOException     if one occurred while reading.
+     * @throws BadKeyException if no "PRIVATE KEY" section was found or the key was not an Ed25519
+     *                         private key.
+     */
     public static PrivateKey readPem(Reader pemFile) throws IOException {
         return readPem(pemFile, null);
     }
@@ -181,10 +170,10 @@ public final class PrivateKey extends Key {
      *
      * @param pemFile  the PEM encoded file
      * @param password the password to decrypt the PEM file; if null or empty, no decryption is performed.
+     * @return {@link com.hedera.hashgraph.sdk.PrivateKey}
      * @throws IOException     if one occurred while reading the PEM file
      * @throws BadKeyException if no "ENCRYPTED PRIVATE KEY" or "PRIVATE KEY" section was found,
      *                         if the passphrase is wrong or the key was not an Ed25519 private key.
-     * @return {@link com.hedera.hashgraph.sdk.PrivateKey}
      */
     public static PrivateKey readPem(Reader pemFile, @Nullable String password) throws IOException {
         return fromPrivateKeyInfo(Pem.readPrivateKey(pemFile, password));
@@ -193,12 +182,12 @@ public final class PrivateKey extends Key {
     /**
      * Parse a private key from a PEM encoded string.
      *
+     * @param pemEncoded The String containing the pem
+     * @return {@link com.hedera.hashgraph.sdk.PrivateKey}
      * @throws IOException     if the PEM string was improperly encoded
      * @throws BadKeyException if no "PRIVATE KEY" section was found or the key was not an Ed25519
      *                         private key.
      * @see #readPem(Reader)
-     * @param pemEncoded The String containing the pem
-     * @return {@link com.hedera.hashgraph.sdk.PrivateKey}
      */
     public static PrivateKey fromPem(String pemEncoded) throws IOException {
         return readPem(new StringReader(pemEncoded));
@@ -211,14 +200,54 @@ public final class PrivateKey extends Key {
      *
      * @param encodedPem the encoded PEM string
      * @param password   the password to decrypt the PEM file; if null or empty, no decryption is performed.
+     * @return {@link com.hedera.hashgraph.sdk.PrivateKey}
      * @throws IOException     if the PEM string was improperly encoded
      * @throws BadKeyException if no "ENCRYPTED PRIVATE KEY" or "PRIVATE KEY" section was found,
      *                         if the passphrase is wrong or the key was not an Ed25519 private key.
      * @see #readPem(Reader, String)
-     * @return {@link com.hedera.hashgraph.sdk.PrivateKey}
      */
     public static PrivateKey fromPem(String encodedPem, @Nullable String password) throws IOException {
         return readPem(new StringReader(encodedPem), password);
+    }
+
+    static byte[] legacyDeriveChildKey(byte[] entropy, Long index) {
+        byte[] seed = new byte[entropy.length + 8];
+        Arrays.fill(seed, 0, seed.length, (byte) 0);
+        if (index == 0xffffffffffL) {
+            seed[entropy.length + 3] = (byte) 0xff;
+            Arrays.fill(seed, entropy.length + 4, seed.length, (byte) (index >>> 32));
+        } else {
+            if (index < 0) {
+                Arrays.fill(seed, entropy.length, entropy.length + 4, (byte) -1);
+            } else {
+                Arrays.fill(seed, entropy.length, entropy.length + 4, (byte) 0);
+            }
+            Arrays.fill(seed, entropy.length + 4, seed.length, index.byteValue());
+        }
+        System.arraycopy(entropy, 0, seed, 0, entropy.length);
+
+        byte[] salt = new byte[1];
+        salt[0] = -1;
+        PKCS5S2ParametersGenerator pbkdf2 = new PKCS5S2ParametersGenerator(new SHA512Digest());
+        pbkdf2.init(
+            seed,
+            salt,
+            2048);
+
+        KeyParameter key = (KeyParameter) pbkdf2.generateDerivedParameters(256);
+        return key.getKey();
+    }
+
+    public PrivateKey legacyDerive(int index) {
+        var keyBytes = legacyDeriveChildKey(this.keyData, (long) index);
+
+        return PrivateKey.fromBytes(keyBytes);
+    }
+
+    public PrivateKey legacyDerive(Long index) {
+        var keyBytes = legacyDeriveChildKey(this.keyData, index);
+
+        return PrivateKey.fromBytes(keyBytes);
     }
 
     /**
@@ -292,8 +321,8 @@ public final class PrivateKey extends Key {
     /**
      * Sign a message with this private key.
      *
-     * @return the signature of the message.
      * @param message The array of bytes to sign with
+     * @return the signature of the message.
      */
     public byte[] sign(byte[] message) {
         byte[] signature = new byte[Ed25519.SIGNATURE_SIZE];
@@ -350,33 +379,5 @@ public final class PrivateKey extends Key {
     com.hedera.hashgraph.sdk.proto.Key toProtobufKey() {
         // Forward to the corresponding public key.
         return getPublicKey().toProtobufKey();
-    }
-
-    static byte[] legacyDeriveChildKey(byte[] entropy, Long index) {
-        byte[] seed = new byte[entropy.length + 8];
-        Arrays.fill(seed, 0, seed.length, (byte)0);
-        if ( index == 0xffffffffffL) {
-            seed[entropy.length+3] = (byte)0xff;
-            Arrays.fill(seed, entropy.length+4, seed.length, (byte)(index >>> 32));
-        }else{
-            if(index < 0){
-                Arrays.fill(seed, entropy.length, entropy.length + 4, (byte)-1);
-            } else {
-                Arrays.fill(seed, entropy.length, entropy.length + 4, (byte)0);
-            }
-            Arrays.fill(seed, entropy.length + 4, seed.length, index.byteValue());
-        }
-        System.arraycopy(entropy, 0, seed, 0, entropy.length);
-
-        byte[] salt = new byte[1];
-        salt[0] = -1;
-        PKCS5S2ParametersGenerator pbkdf2 = new PKCS5S2ParametersGenerator(new SHA512Digest());
-        pbkdf2.init(
-            seed,
-            salt,
-            2048);
-
-        KeyParameter key = (KeyParameter) pbkdf2.generateDerivedParameters(256);
-        return key.getKey();
     }
 }

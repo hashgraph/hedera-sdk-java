@@ -1,6 +1,3 @@
-import java.util.Objects;
-import java.util.concurrent.TimeoutException;
-
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
@@ -12,6 +9,9 @@ import com.hedera.hashgraph.sdk.TransactionRecord;
 import com.hedera.hashgraph.sdk.TransactionResponse;
 import com.hedera.hashgraph.sdk.TransferTransaction;
 import io.github.cdimascio.dotenv.Dotenv;
+
+import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 
 public final class TransferCryptoExample {
 

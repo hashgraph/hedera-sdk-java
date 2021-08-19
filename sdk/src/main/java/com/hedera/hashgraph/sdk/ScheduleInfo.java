@@ -4,6 +4,7 @@ import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.ScheduleGetInfoResponse;
+import org.threeten.bp.Instant;
 
 import java.time.Instant;
 import javax.annotation.Nullable;
@@ -15,27 +16,19 @@ public final class ScheduleInfo {
     public final AccountId creatorAccountId;
 
     public final AccountId payerAccountId;
-
-    final SchedulableTransactionBody transactionBody;
-
     public final KeyList signatories;
-
     @Nullable
     public final Key adminKey;
-
     @Nullable
     public final TransactionId scheduledTransactionId;
-
     public final String memo;
-
     @Nullable
     public final Instant expirationTime;
-
     @Nullable
     public final Instant executedAt;
-
     @Nullable
     public final Instant deletedAt;
+    final SchedulableTransactionBody transactionBody;
 
     private ScheduleInfo(
         ScheduleId scheduleId,

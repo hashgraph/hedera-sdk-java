@@ -26,11 +26,12 @@ class EntityIdHelper {
 
     private static final Pattern ENTITY_ID_REGEX = Pattern.compile("(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))(?:-([a-z]{5}))?$");
 
-    private EntityIdHelper() {}
+    private EntityIdHelper() {
+    }
 
     static <R> R fromString(String idString, WithIdNums<R> constructObjectWithIdNums) {
         var match = ENTITY_ID_REGEX.matcher(idString);
-        if(!match.find()){
+        if (!match.find()) {
             throw new IllegalArgumentException(
                 "Invalid ID \"" + idString + "\": format should look like 0.0.123 or 0.0.123-vfmkw"
             );
@@ -128,23 +129,18 @@ class EntityIdHelper {
         c = (c * m) % p5;
 
         for (var i = 0; i < 5; i++) {
-            answer.append((char)  (asciiA + (c % 26)));
+            answer.append((char) (asciiA + (c % 26)));
             c /= 26;
         }
 
         return answer.reverse().toString();
     }
 
-    @FunctionalInterface
-    interface WithIdNums<R> {
-        R apply(long shard, long realm, long num, @Nullable String checksum);
-    }
-
     static void validate(long shard, long realm, long num, Client client, @Nullable String checksum) throws BadEntityIdException {
-        if(client.getNetworkName() == null) {
+        if (client.getNetworkName() == null) {
             throw new IllegalStateException("Can't validate checksum without knowing which network the ID is for.  Ensure client's network name is set.");
         }
-        if(checksum != null) {
+        if (checksum != null) {
             String expectedChecksum = EntityIdHelper.checksum(
                 Integer.toString(client.getNetworkName().id),
                 EntityIdHelper.toString(shard, realm, num)
@@ -165,5 +161,10 @@ class EntityIdHelper {
         } else {
             throw new IllegalStateException("Can't derive checksum for ID without knowing which network the ID is for.  Ensure client's network name is set.");
         }
+    }
+
+    @FunctionalInterface
+    interface WithIdNums<R> {
+        R apply(long shard, long realm, long num, @Nullable String checksum);
     }
 }

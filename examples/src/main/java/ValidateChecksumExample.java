@@ -1,4 +1,11 @@
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.AccountBalance;
+import com.hedera.hashgraph.sdk.AccountBalanceQuery;
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.BadEntityIdException;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
@@ -81,7 +88,7 @@ public final class ValidateChecksumExample {
 
         System.out.println("An example of manual checksum validation:");
 
-        while(true) {
+        while (true) {
             try {
                 System.out.print("Enter an account ID with checksum: ");
                 String inString = INPUT_SCANNER.nextLine();
@@ -92,7 +99,7 @@ public final class ValidateChecksumExample {
                 System.out.println("The ID with no checksum is " + id.toString());
                 System.out.println("The ID with the correct checksum is " + id.toStringWithChecksum(client));
 
-                if(id.getChecksum() == null) {
+                if (id.getChecksum() == null) {
                     System.out.println("You must enter a checksum.");
                     continue;
                 }
@@ -109,9 +116,9 @@ public final class ValidateChecksumExample {
                 // exit the loop
                 break;
 
-            } catch(IllegalArgumentException exc) {
+            } catch (IllegalArgumentException exc) {
                 System.out.println(exc.getMessage());
-            } catch(BadEntityIdException exc) {
+            } catch (BadEntityIdException exc) {
                 System.out.println(exc.getMessage());
                 System.out.println(
                     "You entered " + exc.shard + "." + exc.realm + "." + exc.num + "-" + exc.presentChecksum +
@@ -137,11 +144,11 @@ public final class ValidateChecksumExample {
 
         client.setAutoValidateChecksums(true);
 
-        while(true) {
+        while (true) {
             try {
                 System.out.print("Enter an account ID with checksum: ");
                 AccountId id = AccountId.fromString(INPUT_SCANNER.nextLine());
-                if(id.getChecksum() == null) {
+                if (id.getChecksum() == null) {
                     System.out.println("You must enter a checksum.");
                     continue;
                 }
@@ -153,7 +160,7 @@ public final class ValidateChecksumExample {
                 // exit the loop
                 break;
 
-            } catch(IllegalArgumentException exc) {
+            } catch (IllegalArgumentException exc) {
                 System.out.println(exc.getMessage());
             }
         }

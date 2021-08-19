@@ -1,10 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.proto.TokenGetInfoQuery;
 import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
+import com.hedera.hashgraph.sdk.proto.TokenGetInfoQuery;
 import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 
@@ -20,21 +20,21 @@ public class TokenInfoQuery extends com.hedera.hashgraph.sdk.Query<TokenInfo, To
     public TokenInfoQuery() {
     }
 
+    @Nullable
+    public TokenId getTokenId() {
+        return tokenId;
+    }
+
     /**
      * Sets the Token ID for which information is requested.
      *
-     * @return {@code this}
      * @param tokenId The TokenId to be set
+     * @return {@code this}
      */
     public TokenInfoQuery setTokenId(TokenId tokenId) {
         Objects.requireNonNull(tokenId);
         this.tokenId = tokenId;
         return this;
-    }
-
-    @Nullable
-    public TokenId getTokenId() {
-        return tokenId;
     }
 
     @Override

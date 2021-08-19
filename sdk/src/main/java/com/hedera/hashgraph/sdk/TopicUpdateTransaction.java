@@ -2,10 +2,10 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
-import com.hedera.hashgraph.sdk.proto.ConsensusUpdateTopicTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.ConsensusUpdateTopicTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
@@ -194,12 +194,11 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     }
 
     /**
-     * @deprecated Use {@link #clearAutoRenewAccountId()}
-     *
-     * Clear the auto renew account ID for this topic.
-     *
      * @param autoRenewAccountId The AccountId to be cleared for auto renewal
      * @return {@code this}
+     * @deprecated Use {@link #clearAutoRenewAccountId()}
+     * <p>
+     * Clear the auto renew account ID for this topic.
      */
     @SuppressWarnings("MissingSummary")
     @Deprecated
@@ -223,16 +222,19 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         if (body.hasTopicID()) {
             topicId = TopicId.fromProtobuf(body.getTopicID());
         }
-        if(body.hasAdminKey()) {
+        if (body.hasAdminKey()) {
             adminKey = Key.fromProtobufKey(body.getAdminKey());
         }
-        if(body.hasSubmitKey()) {
+        if (body.hasSubmitKey()) {
             submitKey = Key.fromProtobufKey(body.getSubmitKey());
         }
-        if(body.hasAutoRenewPeriod()) {
+        if (body.hasAutoRenewPeriod()) {
             autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
         }
-        if(body.hasMemo()) {
+        if (body.hasAutoRenewAccount()) {
+            autoRenewAccountId = AccountId.fromProtobuf(body.getAutoRenewAccount());
+        }
+        if (body.hasMemo()) {
             topicMemo = body.getMemo().getValue();
         }
     }
@@ -245,16 +247,16 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         if (autoRenewAccountId != null) {
             builder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
         }
-        if(adminKey != null) {
+        if (adminKey != null) {
             builder.setAdminKey(adminKey.toProtobufKey());
         }
-        if(submitKey != null) {
+        if (submitKey != null) {
             builder.setSubmitKey(submitKey.toProtobufKey());
         }
-        if(autoRenewPeriod != null) {
+        if (autoRenewPeriod != null) {
             builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         }
-        if(topicMemo != null) {
+        if (topicMemo != null) {
             builder.setMemo(StringValue.of(topicMemo));
         }
         return builder;
@@ -267,7 +269,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         }
 
         if ((autoRenewAccountId != null) &&
-            ( ! autoRenewAccountId.equals(new AccountId(0)))
+            (!autoRenewAccountId.equals(new AccountId(0)))
         ) {
             autoRenewAccountId.validateChecksum(client);
         }

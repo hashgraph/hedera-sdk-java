@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.errorprone.annotations.Var;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
@@ -18,9 +19,6 @@ import org.bouncycastle.util.io.pem.PemWriter;
 
 import javax.annotation.Nullable;
 import javax.crypto.Cipher;
-
-import com.google.errorprone.annotations.Var;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Reader;

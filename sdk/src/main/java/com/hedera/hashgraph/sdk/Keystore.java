@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonWriter;
-
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -51,17 +50,6 @@ final class Keystore {
         }
     }
 
-    /**
-     * Get the decoded key from this keystore as an {@link PrivateKey}.
-     *
-     * @throws BadKeyException if the key bytes are of an incorrect length for a raw
-     * private key or private key + public key, or do not represent a DER encoded Ed25519
-     * private key.
-     */
-    public PrivateKey getEd25519() {
-        return PrivateKey.fromBytes(keyBytes);
-    }
-
     private static Keystore fromJson(JsonObject object, String passphrase) {
         int version = expectInt(object, "version");
 
@@ -74,49 +62,6 @@ final class Keystore {
             default:
                 throw new BadKeyException("unsupported keystore version: " + version);
         }
-    }
-
-    public void export(OutputStream outputStream, String passphrase) throws IOException {
-        JsonWriter writer = new JsonWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
-        gson.toJson(exportJson(passphrase), writer);
-        writer.flush();
-    }
-
-    private JsonObject exportJson(String passphrase) {
-        JsonObject object = new JsonObject();
-        object.addProperty("version", 2);
-
-        JsonObject crypto = new JsonObject();
-        crypto.addProperty("cipher", "aes-128-ctr");
-        crypto.addProperty("kdf", "pbkdf2");
-
-        byte[] salt = Crypto.randomBytes(Crypto.SALT_LEN);
-
-        KeyParameter cipherKey = Crypto.deriveKeySha256(passphrase, salt, Crypto.ITERATIONS, Crypto.DK_LEN);
-
-        byte[] iv = Crypto.randomBytes(Crypto.IV_LEN);
-
-        byte[] cipherBytes = Crypto.encryptAesCtr128(cipherKey, iv, keyBytes);
-
-        byte[] mac = Crypto.calcHmacSha384(cipherKey, iv,  cipherBytes);
-
-        JsonObject cipherParams = new JsonObject();
-        cipherParams.addProperty("iv", Hex.toHexString(iv));
-
-        JsonObject kdfParams = new JsonObject();
-        kdfParams.addProperty("dkLen", Crypto.DK_LEN);
-        kdfParams.addProperty("salt", Hex.toHexString(salt));
-        kdfParams.addProperty("c", Crypto.ITERATIONS);
-        kdfParams.addProperty("prf", "hmac-sha256");
-
-        crypto.add("cipherparams", cipherParams);
-        crypto.addProperty("ciphertext", Hex.toHexString(cipherBytes));
-        crypto.add("kdfparams", kdfParams);
-        crypto.addProperty("mac", Hex.toHexString(mac));
-
-        object.add("crypto", crypto);
-
-        return object;
     }
 
     private static Keystore parseKeystoreV1(JsonObject crypto, String passphrase) {
@@ -153,7 +98,7 @@ final class Keystore {
 
         byte[] testHmac = Crypto.calcHmacSha384(cipherKey, null, cipherBytes);
 
-        if(!MessageDigest.isEqual(mac,testHmac)){
+        if (!MessageDigest.isEqual(mac, testHmac)) {
             throw new BadKeyException("HMAC mismatch; passphrase is incorrect");
         }
 
@@ -194,7 +139,7 @@ final class Keystore {
 
         byte[] testHmac = Crypto.calcHmacSha384(cipherKey, iv, cipherBytes);
 
-        if(!MessageDigest.isEqual(mac,testHmac)){
+        if (!MessageDigest.isEqual(mac, testHmac)) {
             throw new BadKeyException("HMAC mismatch; passphrase is incorrect");
         }
 
@@ -223,5 +168,59 @@ final class Keystore {
         } catch (ClassCastException | NullPointerException e) {
             throw new Error("expected key '" + key + "' to be a string", e);
         }
+    }
+
+    /**
+     * Get the decoded key from this keystore as an {@link PrivateKey}.
+     *
+     * @throws BadKeyException if the key bytes are of an incorrect length for a raw
+     *                         private key or private key + public key, or do not represent a DER encoded Ed25519
+     *                         private key.
+     */
+    public PrivateKey getEd25519() {
+        return PrivateKey.fromBytes(keyBytes);
+    }
+
+    public void export(OutputStream outputStream, String passphrase) throws IOException {
+        JsonWriter writer = new JsonWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
+        gson.toJson(exportJson(passphrase), writer);
+        writer.flush();
+    }
+
+    private JsonObject exportJson(String passphrase) {
+        JsonObject object = new JsonObject();
+        object.addProperty("version", 2);
+
+        JsonObject crypto = new JsonObject();
+        crypto.addProperty("cipher", "aes-128-ctr");
+        crypto.addProperty("kdf", "pbkdf2");
+
+        byte[] salt = Crypto.randomBytes(Crypto.SALT_LEN);
+
+        KeyParameter cipherKey = Crypto.deriveKeySha256(passphrase, salt, Crypto.ITERATIONS, Crypto.DK_LEN);
+
+        byte[] iv = Crypto.randomBytes(Crypto.IV_LEN);
+
+        byte[] cipherBytes = Crypto.encryptAesCtr128(cipherKey, iv, keyBytes);
+
+        byte[] mac = Crypto.calcHmacSha384(cipherKey, iv, cipherBytes);
+
+        JsonObject cipherParams = new JsonObject();
+        cipherParams.addProperty("iv", Hex.toHexString(iv));
+
+        JsonObject kdfParams = new JsonObject();
+        kdfParams.addProperty("dkLen", Crypto.DK_LEN);
+        kdfParams.addProperty("salt", Hex.toHexString(salt));
+        kdfParams.addProperty("c", Crypto.ITERATIONS);
+        kdfParams.addProperty("prf", "hmac-sha256");
+
+        crypto.add("cipherparams", cipherParams);
+        crypto.addProperty("ciphertext", Hex.toHexString(cipherBytes));
+        crypto.add("kdfparams", kdfParams);
+        crypto.addProperty("mac", Hex.toHexString(mac));
+
+        object.add("crypto", crypto);
+
+        return object;
     }
 }

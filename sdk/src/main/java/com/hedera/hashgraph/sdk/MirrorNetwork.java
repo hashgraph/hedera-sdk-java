@@ -5,20 +5,19 @@ import com.google.errorprone.annotations.Var;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 class MirrorNetwork {
+    final ExecutorService executor;
+    final Semaphore lock = new Semaphore(1);
     List<String> addresses = new CopyOnWriteArrayList<>();
     List<MirrorNode> network = new ArrayList<>();
     int index = 0;
-    final ExecutorService executor;
-
-    final Semaphore lock = new Semaphore(1);
 
     MirrorNetwork(ExecutorService executor) {
         this.executor = executor;
@@ -77,20 +76,20 @@ class MirrorNetwork {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        
+
         for (var node : network) {
             if (node.channel != null) {
                 node.channel.shutdown();
             }
         }
 
-        for (var node: network) {
+        for (var node : network) {
             if (node.channel != null) {
                 try {
                     while (!node.channel.awaitTermination(timeout.getSeconds(), TimeUnit.SECONDS)) {
                         // Do nothing
                     }
-                } catch (InterruptedException e ) {
+                } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }

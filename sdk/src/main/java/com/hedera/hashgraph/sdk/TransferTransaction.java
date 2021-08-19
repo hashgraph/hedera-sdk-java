@@ -1,22 +1,22 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.CryptoTransferTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.TokenTransferList;
 import com.hedera.hashgraph.sdk.proto.AccountAmount;
-import com.hedera.hashgraph.sdk.proto.TransferList;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.CryptoTransferTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenTransferList;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import com.hedera.hashgraph.sdk.proto.TransferList;
 import io.grpc.MethodDescriptor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.List;
-import java.util.ArrayList;
 
 public class TransferTransaction extends Transaction<TransferTransaction> {
     private final Map<TokenId, Map<AccountId, Long>> tokenTransfers = new HashMap<>();
@@ -24,7 +24,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     private final Map<AccountId, Hbar> hbarTransfers = new HashMap<>();
 
     public TransferTransaction() {
-        setMaxTransactionFee(new Hbar(1));
+        defaultMaxTransactionFee = new Hbar(1);
     }
 
     TransferTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
@@ -35,6 +35,15 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     TransferTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
+    }
+
+    private static void doAddTokenTransfer(Map<AccountId, Long> tokenTransferMap, AccountId accountId, long amount) {
+        Objects.requireNonNull(tokenTransferMap);
+        Objects.requireNonNull(accountId);
+        var current = tokenTransferMap.containsKey(accountId) ?
+            Objects.requireNonNull(tokenTransferMap.get(accountId)) :
+            0L;
+        tokenTransferMap.put(accountId, current + amount);
     }
 
     public Map<TokenId, Map<AccountId, Long>> getTokenTransfers() {
@@ -83,11 +92,11 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
             builder.addTokenTransfers(list);
         }
 
-        for(var entry : nftTransfers.entrySet()) {
+        for (var entry : nftTransfers.entrySet()) {
             var list = TokenTransferList.newBuilder()
                 .setToken(entry.getKey().toProtobuf());
 
-            for(var nftTransfer : entry.getValue()) {
+            for (var nftTransfer : entry.getValue()) {
                 list.addNftTransfers(nftTransfer.toProtobuf());
             }
 
@@ -112,10 +121,10 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
             a.validateChecksum(client);
         }
 
-        for(var entry : nftTransfers.entrySet()) {
+        for (var entry : nftTransfers.entrySet()) {
             entry.getKey().validateChecksum(client);
 
-            for(var nftTransfer : entry.getValue()) {
+            for (var nftTransfer : entry.getValue()) {
                 nftTransfer.sender.validateChecksum(client);
                 nftTransfer.receiver.validateChecksum(client);
             }
@@ -163,15 +172,6 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return list;
     }
 
-    private static void doAddTokenTransfer(Map<AccountId, Long> tokenTransferMap, AccountId accountId, long amount) {
-        Objects.requireNonNull(tokenTransferMap);
-        Objects.requireNonNull(accountId);
-        var current = tokenTransferMap.containsKey(accountId) ?
-            Objects.requireNonNull(tokenTransferMap.get(accountId)) :
-            0L;
-        tokenTransferMap.put(accountId, current + amount);
-    }
-
     private void doAddHbarTransfer(AccountId accountId, long amount) {
         Objects.requireNonNull(accountId);
         var current = hbarTransfers.containsKey(accountId) ?
@@ -183,7 +183,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getCryptoTransfer();
-        if(body.hasTransfers()) {
+        if (body.hasTransfers()) {
             for (var transfer : body.getTransfers().getAccountAmountsList()) {
                 doAddHbarTransfer(AccountId.fromProtobuf(transfer.getAccountID()), transfer.getAmount());
             }
@@ -192,7 +192,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         for (var tokenTransferList : body.getTokenTransfersList()) {
             var token = TokenId.fromProtobuf(tokenTransferList.getToken());
 
-            if(tokenTransferList.getTransfersCount() > 0) {
+            if (tokenTransferList.getTransfersCount() > 0) {
                 var map = getTokenTransferMap(token);
 
                 for (var aa : tokenTransferList.getTransfersList()) {
@@ -200,9 +200,9 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
                 }
             }
 
-            if(tokenTransferList.getNftTransfersCount() > 0) {
+            if (tokenTransferList.getNftTransfersCount() > 0) {
                 var list = getNftTransferList(token);
-                for(var nftTransfer : tokenTransferList.getNftTransfersList()) {
+                for (var nftTransfer : tokenTransferList.getNftTransfersList()) {
                     list.add(TokenNftTransfer.fromProtobuf(nftTransfer));
                 }
             }

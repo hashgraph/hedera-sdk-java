@@ -1,11 +1,15 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import java.util.List;
-import java.util.ArrayList;
-import java.time.Instant;
 import com.google.common.base.MoreObjects;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.common.base.MoreObjects;
+
 import javax.annotation.Nullable;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.List;
 import java.util.Objects;
 
 public class FeeSchedule {
@@ -19,7 +23,7 @@ public class FeeSchedule {
     static FeeSchedule fromProtobuf(com.hedera.hashgraph.sdk.proto.FeeSchedule feeSchedule) {
         FeeSchedule returnFeeSchedule = new FeeSchedule()
             .setExpirationTime(feeSchedule.hasExpiryTime() ? InstantConverter.fromProtobuf(feeSchedule.getExpiryTime()) : null);
-        for(var transactionFeeSchedule : feeSchedule.getTransactionFeeScheduleList()) {
+        for (var transactionFeeSchedule : feeSchedule.getTransactionFeeScheduleList()) {
             returnFeeSchedule
                 .getTransactionFeeSchedules()
                 .add(TransactionFeeSchedule.fromProtobuf(transactionFeeSchedule));
@@ -57,10 +61,10 @@ public class FeeSchedule {
 
     com.hedera.hashgraph.sdk.proto.FeeSchedule toProtobuf() {
         var returnBuilder = com.hedera.hashgraph.sdk.proto.FeeSchedule.newBuilder();
-        if(expirationTime != null) {
+        if (expirationTime != null) {
             returnBuilder.setExpiryTime(InstantConverter.toSecondsProtobuf(expirationTime));
         }
-        for(TransactionFeeSchedule tFeeSchedule : getTransactionFeeSchedules()) {
+        for (TransactionFeeSchedule tFeeSchedule : getTransactionFeeSchedules()) {
             returnBuilder.addTransactionFeeSchedule(tFeeSchedule.toProtobuf());
         }
         return returnBuilder.build();
