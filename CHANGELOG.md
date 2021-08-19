@@ -6,16 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-### Unreleased
+### v2.0.12
 
- * Fixed bugs in [to|from]Bytes() in `TopicUpdateTransaction` and `TokenUpdateTransaction`
- * Deprecated `Client.setMax[TransactionFee|QueryPayment]()`, added `Client.setDefaultMax[TransactionFee|QueryPayment]()` and `Client.getDefaultMax[TransactionFee|QueryPayment]()`
+### Added
+
  * Added `FeeAssessmentMethod`.
  * Added `[get|set]AssessmentMethod()` to `CustomFractionalFee`
  * Added `CustomRoyaltyFee`
  * Added `payerAccountIdList` to `AssessedCustomFee`
  * Added fields to `FreezeTransaction`
  * Added `[min|max]Backoff` to `Client` and `Executable`
+
+### Fixed
+
+ * Bugs in [to|from]Bytes() in `TopicUpdateTransaction` and `TokenUpdateTransaction`
+
+### Deprecated
+
+ * Deprecated `Client.setMax[TransactionFee|QueryPayment]()`, added `Client.setDefaultMax[TransactionFee|QueryPayment]()` and `Client.getDefaultMax[TransactionFee|QueryPayment]()`
 
 ### v2.0.11
 
