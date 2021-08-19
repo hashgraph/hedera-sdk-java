@@ -37,9 +37,6 @@ public class IntegrationTestEnv {
     public IntegrationTestEnv(int numberOfNodes) throws Exception {
         client = createTestEnvClient()
             .setMaxNodesPerTransaction(numberOfNodes);
-        operatorKey = client.getOperatorPublicKey();
-        operatorId = client.getOperatorAccountId();
-        originalOperatorId = operatorId;
 
         try {
             var operatorPrivateKey = PrivateKey.fromString(System.getProperty("OPERATOR_KEY"));
@@ -49,6 +46,10 @@ public class IntegrationTestEnv {
             client.setOperator(operatorId, operatorPrivateKey);
         } catch (Exception e) {
         }
+
+        operatorKey = client.getOperatorPublicKey();
+        operatorId = client.getOperatorAccountId();
+        originalOperatorId = operatorId;
 
         assertNotNull(client.getOperatorAccountId());
         assertNotNull(client.getOperatorPublicKey());
