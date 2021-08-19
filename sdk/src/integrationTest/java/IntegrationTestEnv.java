@@ -74,48 +74,10 @@ public class IntegrationTestEnv {
             network.put("127.0.0.1:50215", new AccountId(5));
 
             return Client.forNetwork(network);
-<<<<<<< HEAD
         } else if (!System.getProperty("CONFIG_FILE").equals("")) {
             try {
                 return Client.fromConfigFile(System.getProperty("CONFIG_FILE"));
             } catch (Exception e) {
-=======
-        } else {
-            return Client.fromConfigFile(System.getProperty("CONFIG_FILE"));
-        }
-    }
-
-    private static class TestEnvNodeGetter {
-        private Client client;
-        @Var
-        private int index = 0;
-        private List<Map.Entry<String, AccountId>> nodes;
-
-        public TestEnvNodeGetter(Client client) {
-            this.client = client;
-            nodes = new ArrayList<>(client.getNetwork().entrySet());
-            Collections.shuffle(nodes);
-        }
-
-        public void nextNode(Map<String, AccountId> outMap) throws Exception {
-            if(nodes.isEmpty()) {
-                throw new IllegalStateException("IntegrationTestEnv needs another node, but there aren't enough nodes in client network");
-            }
-            for(; index < nodes.size(); index++) {
-                var node = nodes.get(index);
-                try {
-                    new AccountBalanceQuery()
-                        .setNodeAccountIds(Collections.singletonList(node.getValue()))
-                        .setMaxAttempts(1)
-                        .setAccountId(client.getOperatorAccountId())
-                        .execute(client);
-                    nodes.remove(index);
-                    outMap.put(node.getKey(), node.getValue());
-                    return;
-                } catch(Exception ignored) {
-                    throw ignored;
-                }
->>>>>>> b2c64a79b (feat: add TLS support to previewnet)
             }
         }
         throw new IllegalStateException("Failed to construct client for IntegrationTestEnv");
