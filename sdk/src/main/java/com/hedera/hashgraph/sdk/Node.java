@@ -1,9 +1,17 @@
 package com.hedera.hashgraph.sdk;
 
+import io.grpc.ChannelCredentials;
+import io.grpc.TlsChannelCredentials;
+
+import javax.annotation.Nullable;
 import java.util.concurrent.ExecutorService;
 
 class Node extends ManagedNode implements Comparable<Node> {
     AccountId accountId;
+
+    @Nullable
+    NetworkName networkName;
+
     long delay;
     long delayUntil;
     long waitTime;
@@ -17,6 +25,23 @@ class Node extends ManagedNode implements Comparable<Node> {
         this.waitTime = waitTime;
         this.delayUntil = 0;
         this.attempts = 0;
+    }
+
+    @Nullable
+    public NetworkName getNetworkName() {
+        return networkName;
+    }
+
+    public Node setNetworkName(NetworkName networkName) {
+        this.networkName = networkName;
+        return this;
+    }
+
+    @Override
+    ChannelCredentials getChannelCredentials() {
+        return TlsChannelCredentials.newBuilder()
+            .trustManager(new HederaTrustManager(networkName, accountId))
+            .build();
     }
 
     void setWaitTime(long waitTime) {
