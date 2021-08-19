@@ -5,7 +5,6 @@ import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Instant;
-import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -21,8 +20,7 @@ public class FeeSchedulesTest {
         SnapshotMatcher.validateSnapshots();
     }
 
-    FeeSchedules spawnFeeSchedulesExample()
-    {
+    FeeSchedules spawnFeeSchedulesExample() {
         return new FeeSchedules()
             .setCurrent(new FeeSchedule()
                 .setExpirationTime(Instant.ofEpochSecond(1554158542))

@@ -29,16 +29,12 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     private final com.hedera.hashgraph.sdk.proto.Query.Builder builder;
 
     private final QueryHeader.Builder headerBuilder;
-
-    @Nullable
-    private Client.Operator paymentOperator = null;
-
     @Nullable
     protected TransactionId paymentTransactionId = null;
-
     @Nullable
     protected List<Transaction> paymentTransactions = null;
-
+    @Nullable
+    private Client.Operator paymentOperator = null;
     @Nullable
     private Hbar queryPayment = null;
 
@@ -51,6 +47,23 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     Query() {
         builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
         headerBuilder = QueryHeader.newBuilder();
+    }
+
+    private static Transaction makePaymentTransaction(
+        TransactionId paymentTransactionId,
+        AccountId nodeId,
+        Client.Operator operator,
+        Hbar paymentAmount
+    ) {
+        return new TransferTransaction()
+            .setTransactionId(paymentTransactionId)
+            .setNodeAccountIds(Collections.singletonList(nodeId))
+            .setMaxTransactionFee(new Hbar(1)) // 1 Hbar
+            .addHbarTransfer(operator.accountId, paymentAmount.negated())
+            .addHbarTransfer(nodeId, paymentAmount)
+            .freeze()
+            .signWith(operator.publicKey, operator.transactionSigner)
+            .makeRequest();
     }
 
     /**
@@ -150,7 +163,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
 
                 return getCostAsync(client).thenCompose(cost -> {
                     // Check if this is below our configured maximum query payment
-                    var maxCost = MoreObjects.firstNonNull(maxQueryPayment, client.maxQueryPayment);
+                    var maxCost = MoreObjects.firstNonNull(maxQueryPayment, client.defaultMaxQueryPayment);
 
                     if (cost.compareTo(maxCost) > 0) {
                         return CompletableFuture.failedFuture(new MaxQueryPaymentExceededException(
@@ -171,14 +184,14 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
                 chosenQueryPayment = paymentAmount;
                 paymentOperator = operator;
                 paymentTransactions = new ArrayList<>(nodeAccountIds.size());
-                for(int i = 0; i < nodeAccountIds.size(); i++) {
+                for (int i = 0; i < nodeAccountIds.size(); i++) {
                     paymentTransactions.add(null);
                 }
             });
     }
 
     private void initWithNodeIds(Client client) {
-        if(client.isAutoValidateChecksumsEnabled()) {
+        if (client.isAutoValidateChecksumsEnabled()) {
             try {
                 validateChecksums(client);
             } catch (BadEntityIdException exc) {
@@ -196,26 +209,9 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         }
     }
 
-    private static Transaction makePaymentTransaction(
-        TransactionId paymentTransactionId,
-        AccountId nodeId,
-        Client.Operator operator,
-        Hbar paymentAmount
-    ) {
-        return new TransferTransaction()
-            .setTransactionId(paymentTransactionId)
-            .setNodeAccountIds(Collections.singletonList(nodeId))
-            .setMaxTransactionFee(new Hbar(1)) // 1 Hbar
-            .addHbarTransfer(operator.accountId, paymentAmount.negated())
-            .addHbarTransfer(nodeId, paymentAmount)
-            .freeze()
-            .signWith(operator.publicKey, operator.transactionSigner)
-            .makeRequest();
-    }
-
     Transaction getPaymentTransaction(int index) {
         var paymentTx = Objects.requireNonNull(paymentTransactions).get(index);
-        if(paymentTx != null) {
+        if (paymentTx != null) {
             return paymentTx;
         } else {
             paymentTransactionId = TransactionId.generate(Objects.requireNonNull(paymentOperator).accountId);

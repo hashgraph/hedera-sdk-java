@@ -1,8 +1,11 @@
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.AccountCreateTransaction;
+import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.TransactionReceiptQuery;
+import com.hedera.hashgraph.sdk.TransactionRecordQuery;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -130,7 +133,7 @@ public class ReceiptQueryIntegrationTest {
                 recordQuery.execute(testEnv.client);
             });
 
-            assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for TransactionRecordQuery, of "+cost.toString()+", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
+            assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for TransactionRecordQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
 
             testEnv.close(receipt.accountId, key);
         });

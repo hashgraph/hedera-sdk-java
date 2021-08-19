@@ -3,9 +3,9 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
 import com.hedera.hashgraph.sdk.proto.ContractUpdateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
@@ -221,16 +221,16 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         if (body.hasFileID()) {
             bytecodeFileId = FileId.fromProtobuf(body.getFileID());
         }
-        if(body.hasExpirationTime()) {
+        if (body.hasExpirationTime()) {
             expirationTime = InstantConverter.fromProtobuf(body.getExpirationTime());
         }
-        if(body.hasAdminKey()) {
+        if (body.hasAdminKey()) {
             adminKey = Key.fromProtobufKey(body.getAdminKey());
         }
-        if(body.hasAutoRenewPeriod()) {
+        if (body.hasAutoRenewPeriod()) {
             autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
         }
-        if(body.hasMemoWrapper()) {
+        if (body.hasMemoWrapper()) {
             contractMemo = body.getMemoWrapper().getValue();
         }
     }
@@ -246,16 +246,16 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         if (bytecodeFileId != null) {
             builder.setFileID(bytecodeFileId.toProtobuf());
         }
-        if(expirationTime != null) {
+        if (expirationTime != null) {
             builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
         }
-        if(adminKey != null) {
+        if (adminKey != null) {
             builder.setAdminKey(adminKey.toProtobufKey());
         }
-        if(autoRenewPeriod != null) {
+        if (autoRenewPeriod != null) {
             builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         }
-        if(contractMemo != null) {
+        if (contractMemo != null) {
             builder.setMemoWrapper(StringValue.of(contractMemo));
         }
         return builder;

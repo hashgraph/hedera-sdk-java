@@ -2,15 +2,18 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.TokenUpdateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
+import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Objects;
-import javax.annotation.Nullable;
 
 public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> {
     @Nullable
@@ -227,46 +230,49 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
 
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getTokenUpdate();
+        if (body.hasToken()) {
+            tokenId = TokenId.fromProtobuf(body.getToken());
+        }
         if (body.hasTreasury()) {
             treasuryAccountId = AccountId.fromProtobuf(body.getTreasury());
         }
-        if(body.hasAutoRenewAccount()) {
+        if (body.hasAutoRenewAccount()) {
             autoRenewAccountId = AccountId.fromProtobuf(body.getAutoRenewAccount());
         }
         tokenName = body.getName();
         tokenSymbol = body.getSymbol();
-        if(body.hasAdminKey()) {
+        if (body.hasAdminKey()) {
             adminKey = Key.fromProtobufKey(body.getAdminKey());
         }
-        if(body.hasKycKey()) {
+        if (body.hasKycKey()) {
             kycKey = Key.fromProtobufKey(body.getKycKey());
         }
-        if(body.hasFreezeKey()) {
+        if (body.hasFreezeKey()) {
             freezeKey = Key.fromProtobufKey(body.getFreezeKey());
         }
-        if(body.hasWipeKey()) {
+        if (body.hasWipeKey()) {
             wipeKey = Key.fromProtobufKey(body.getWipeKey());
         }
-        if(body.hasSupplyKey()) {
+        if (body.hasSupplyKey()) {
             supplyKey = Key.fromProtobufKey(body.getSupplyKey());
         }
-        if(body.hasFeeScheduleKey()) {
+        if (body.hasFeeScheduleKey()) {
             feeScheduleKey = Key.fromProtobufKey(body.getFeeScheduleKey());
         }
-        if(body.hasExpiry()) {
+        if (body.hasExpiry()) {
             expirationTime = InstantConverter.fromProtobuf(body.getExpiry());
         }
-        if(body.hasAutoRenewPeriod()) {
+        if (body.hasAutoRenewPeriod()) {
             autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
         }
-        if(body.hasMemo()) {
+        if (body.hasMemo()) {
             tokenMemo = body.getMemo().getValue();
         }
     }
 
     TokenUpdateTransactionBody.Builder build() {
         var builder = TokenUpdateTransactionBody.newBuilder();
-        if(tokenId != null) {
+        if (tokenId != null) {
             builder.setToken(tokenId.toProtobuf());
         }
         if (treasuryAccountId != null) {
@@ -278,31 +284,31 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         }
         builder.setName(tokenName);
         builder.setSymbol(tokenSymbol);
-        if(adminKey != null) {
+        if (adminKey != null) {
             builder.setAdminKey(adminKey.toProtobufKey());
         }
-        if(kycKey != null) {
+        if (kycKey != null) {
             builder.setKycKey(kycKey.toProtobufKey());
         }
-        if(freezeKey != null) {
+        if (freezeKey != null) {
             builder.setFreezeKey(freezeKey.toProtobufKey());
         }
-        if(wipeKey != null) {
+        if (wipeKey != null) {
             builder.setWipeKey(wipeKey.toProtobufKey());
         }
-        if(supplyKey != null) {
+        if (supplyKey != null) {
             builder.setSupplyKey(supplyKey.toProtobufKey());
         }
-        if(feeScheduleKey != null) {
+        if (feeScheduleKey != null) {
             builder.setFeeScheduleKey(feeScheduleKey.toProtobufKey());
         }
-        if(expirationTime != null) {
+        if (expirationTime != null) {
             builder.setExpiry(InstantConverter.toProtobuf(expirationTime));
         }
-        if(autoRenewPeriod != null) {
+        if (autoRenewPeriod != null) {
             builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         }
-        if(tokenMemo != null) {
+        if (tokenMemo != null) {
             builder.setMemo(StringValue.of(tokenMemo));
         }
 

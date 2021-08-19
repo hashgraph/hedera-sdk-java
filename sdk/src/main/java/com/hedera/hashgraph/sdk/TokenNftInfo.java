@@ -5,8 +5,8 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TokenGetNftInfoResponse;
 import org.threeten.bp.Instant;
+
 import java.util.Objects;
-import javax.annotation.Nullable;
 
 public class TokenNftInfo {
     /**

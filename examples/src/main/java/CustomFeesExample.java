@@ -1,4 +1,24 @@
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.AccountBalanceQuery;
+import com.hedera.hashgraph.sdk.AccountCreateTransaction;
+import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.CustomFee;
+import com.hedera.hashgraph.sdk.CustomFixedFee;
+import com.hedera.hashgraph.sdk.CustomFractionalFee;
+import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
+import com.hedera.hashgraph.sdk.TokenCreateTransaction;
+import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
+import com.hedera.hashgraph.sdk.TokenFeeScheduleUpdateTransaction;
+import com.hedera.hashgraph.sdk.TokenId;
+import com.hedera.hashgraph.sdk.TokenInfo;
+import com.hedera.hashgraph.sdk.TokenInfoQuery;
+import com.hedera.hashgraph.sdk.TransactionRecord;
+import com.hedera.hashgraph.sdk.TransferTransaction;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Collections;
@@ -164,11 +184,17 @@ public final class CustomFeesExample {
         // 20 tokens to Charlie, 10% of the tokens he attempts to transfer (2 in this case) will be transferred to
         // Alice instead.
 
+        // Fractional fees default to FeeAssessmentMethod.INCLUSIVE, which is the behavior described above.
+        // If you set the assessment method to EXCLUSIVE, then when Bob attempts to transfer 20 tokens to Charlie,
+        // Charlie will receive all 20 tokens, and Bob will be charged an _additional_ 10% fee which
+        // will be transferred to Alice.
+
         CustomFractionalFee customFractionalFee = new CustomFractionalFee()
             .setNumerator(1)
             .setDenominator(10)
             .setMin(1)
             .setMax(10)
+            // .setAssessmentMethod(FeeAssessmentMethod.EXCLUSIVE)
             .setFeeCollectorAccountId(aliceId);
         List<CustomFee> fractionalFeeList = Collections.singletonList(customFractionalFee);
 

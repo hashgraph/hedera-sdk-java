@@ -1,10 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.CryptoGetAccountBalanceQuery;
+import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
-import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;

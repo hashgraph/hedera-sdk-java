@@ -32,8 +32,8 @@ public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQue
     /**
      * Sets the contract ID for which information is requested.
      *
-     * @return {@code this}
      * @param contractId The ContractId to be set
+     * @return {@code this}
      */
     public ContractInfoQuery setContractId(ContractId contractId) {
         Objects.requireNonNull(contractId);

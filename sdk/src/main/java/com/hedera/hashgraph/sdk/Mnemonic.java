@@ -2,7 +2,6 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.Joiner;
 import com.google.errorprone.annotations.Var;
-
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
@@ -46,7 +45,7 @@ public final class Mnemonic {
 
 
     private Mnemonic(List<? extends CharSequence> words) {
-        if(words.size() == 22){
+        if (words.size() == 22) {
             isLegacy = true;
         }
 
@@ -64,9 +63,9 @@ public final class Mnemonic {
      * the user wants to ignore the outcome of the validation.
      *
      * @param words the 24-word list that constitutes a mnemonic phrase.
-     * @see #validate() the function that validates the mnemonic.
-     * @throws BadMnemonicException if the mnemonic does not pass validation.
      * @return {@code this}
+     * @throws BadMnemonicException if the mnemonic does not pass validation.
+     * @see #validate() the function that validates the mnemonic.
      */
     public static Mnemonic fromWords(List<? extends CharSequence> words) throws BadMnemonicException {
         Mnemonic mnemonic = new Mnemonic(words);
@@ -74,7 +73,7 @@ public final class Mnemonic {
         // Set the wordList to null so we can fetch correct wordlist once we need it.
         wordList = null;
 
-        if(words.size() != 22){
+        if (words.size() != 22) {
             mnemonic.validate();
         }
 
@@ -95,6 +94,7 @@ public final class Mnemonic {
 
     /**
      * Returns a new random 24-word mnemonic from the BIP-39 standard English word list.
+     *
      * @return {@code this}
      */
     public static Mnemonic generate24() {
@@ -103,8 +103,10 @@ public final class Mnemonic {
 
         return new Mnemonic(entropyToWords(entropy));
     }
+
     /**
      * Returns a new random 12-word mnemonic from the BIP-39 standard English word list.
+     *
      * @return {@code this}
      */
     public static Mnemonic generate12() {
@@ -123,14 +125,13 @@ public final class Mnemonic {
         List<String> wordList;
         ArrayList<String> words;
         byte[] bytes;
-        if(entropy.length == 16) {
+        if (entropy.length == 16) {
             wordList = getWordList(false);
             bytes = Arrays.copyOf(entropy, 17);
-            bytes[16] = (byte)(checksum(entropy) & 0xF0);
+            bytes[16] = (byte) (checksum(entropy) & 0xF0);
 
             words = new ArrayList<>(12);
-        }
-        else {
+        } else {
             wordList = getWordList(false);
             bytes = Arrays.copyOf(entropy, 33);
             bytes[32] = checksum(entropy);
@@ -164,9 +165,9 @@ public final class Mnemonic {
         SHA256Digest digest = new SHA256Digest();
         // hash the first
 
-        if(entropy.length == 17 || entropy.length == 16){
+        if (entropy.length == 17 || entropy.length == 16) {
             digest.update(entropy, 0, 16);
-        }else {
+        } else {
             digest.update(entropy, 0, 32);
         }
 
@@ -204,7 +205,7 @@ public final class Mnemonic {
     }
 
     private static List<String> readWordList(boolean isLegacy) {
-        if(isLegacy){
+        if (isLegacy) {
             InputStream wordStream = Mnemonic.class.getClassLoader().getResourceAsStream("legacy-english.txt");
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(wordStream), UTF_8))) {
                 ArrayList<String> words = new ArrayList<>(4096);
@@ -216,8 +217,7 @@ public final class Mnemonic {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }
-        else{
+        } else {
             InputStream wordStream = Mnemonic.class.getClassLoader().getResourceAsStream("bip39-english.txt");
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(wordStream), UTF_8))) {
                 ArrayList<String> words = new ArrayList<>(2048);
@@ -232,6 +232,50 @@ public final class Mnemonic {
         }
     }
 
+    private static int[] convertRadix(int[] nums, int fromRadix, int toRadix, int toLength) {
+        @Var BigInteger num = BigInteger.valueOf(0);
+        for (int element : nums) {
+            num = num.multiply(BigInteger.valueOf(fromRadix));
+            num = num.add(BigInteger.valueOf(element));
+        }
+
+        var result = new int[toLength];
+        for (@Var var i = toLength - 1; i >= 0; i -= 1) {
+            BigInteger tem = num.divide(BigInteger.valueOf(toRadix));
+            BigInteger rem = num.mod(BigInteger.valueOf(toRadix));
+            num = tem;
+            result[i] = rem.intValue();
+        }
+
+        return result;
+    }
+
+    private static int crc8(int[] data) {
+        @Var var crc = 0xFF;
+
+        for (var i = 0; i < data.length - 1; i += 1) {
+            crc ^= data[i];
+            for (var j = 0; j < 8; j += 1) {
+                crc = (crc >>> 1) ^ (((crc & 1) == 0) ? 0 : 0xB2);
+            }
+        }
+
+        return crc ^ 0xFF;
+    }
+
+    private static boolean[] bytesToBits(byte[] dat) {
+        var bits = new boolean[dat.length * 8];
+        Arrays.fill(bits, Boolean.FALSE);
+
+        for (int i = 0; i < dat.length; i++) {
+            for (int j = 0; j < 8; j++) {
+                bits[(i * 8) + j] = (dat[i] & (1 << (7 - j))) != 0;
+            }
+        }
+
+        return bits;
+    }
+
     /**
      * Recover a private key from this mnemonic phrase.
      * <p>
@@ -244,9 +288,9 @@ public final class Mnemonic {
      * account index (0 for default account)
      * @see PrivateKey#fromMnemonic(Mnemonic, String)
      */
-    public PrivateKey toPrivateKey(String passphrase) throws BadMnemonicException{
-        if(isLegacy){
-            if(passphrase.compareTo("") != 0){
+    public PrivateKey toPrivateKey(String passphrase) throws BadMnemonicException {
+        if (isLegacy) {
+            if (passphrase.compareTo("") != 0) {
                 throw new Error("Legacy mnemonic doesn't support passphrases");
             }
             return this.toLegacyPrivateKey();
@@ -254,8 +298,8 @@ public final class Mnemonic {
         return PrivateKey.fromMnemonic(this, passphrase);
     }
 
-    public PrivateKey toLegacyPrivateKey() throws BadMnemonicException{
-        if(this.words.size() == 22){
+    public PrivateKey toLegacyPrivateKey() throws BadMnemonicException {
+        if (this.words.size() == 22) {
             return PrivateKey.fromBytes(this.wordsToLegacyEntropy());
         }
 
@@ -269,7 +313,7 @@ public final class Mnemonic {
      * account index (0 for default account)
      * @see PrivateKey#fromMnemonic(Mnemonic)
      */
-    public PrivateKey toPrivateKey() throws BadMnemonicException{
+    public PrivateKey toPrivateKey() throws BadMnemonicException {
         return toPrivateKey("");
     }
 
@@ -341,10 +385,9 @@ public final class Mnemonic {
                 "(BUG) expected 24-word mnemonic, got " + words.size() + " words");
         }
         ByteBuffer buffer;
-        if(words.size() == 12) {
+        if (words.size() == 12) {
             buffer = ByteBuffer.allocate(17);
-        }
-        else{
+        } else {
             buffer = ByteBuffer.allocate(33);
         }
         // reverse algorithm of `entropyToWords()` below
@@ -371,27 +414,27 @@ public final class Mnemonic {
             }
         }
 
-        if(offset != 0){
+        if (offset != 0) {
             buffer.put((byte) (scratch << offset));
         }
 
         return buffer.array();
     }
 
-    private byte[] wordsToLegacyEntropy() throws BadMnemonicException{
+    private byte[] wordsToLegacyEntropy() throws BadMnemonicException {
         if (!isLegacy) {
             throw new BadMnemonicException(this, BadMnemonicReason.NotLegacy);
         }
 
         var indices = new int[words.size()];
-        for( var i = 0; i < words.size(); i++){
+        for (var i = 0; i < words.size(); i++) {
             indices[i] = getWordIndex(words.get(i), true);
         }
         var data = convertRadix(indices, 4096, 256, 33);
-        var crc = data[ data.length - 1 ];
+        var crc = data[data.length - 1];
         var result = new int[data.length - 1];
         for (var i = 0; i < data.length - 1; i += 1) {
-            result[ i ] = data[ i ] ^ crc;
+            result[i] = data[i] ^ crc;
         }
         //int to byte conversion
         ByteBuffer byteBuffer = ByteBuffer.allocate(result.length * 4);
@@ -406,9 +449,9 @@ public final class Mnemonic {
         byte[] array = byteBuffer.array();
         @Var var i = 0;
         @Var var j = 3;
-        byte[] array2 = new byte[data.length-1];
+        byte[] array2 = new byte[data.length - 1];
         //remove all the fill 0s
-        while(j < array.length){
+        while (j < array.length) {
             array2[i] = array[j];
             i++;
             j = j + 4;
@@ -417,7 +460,7 @@ public final class Mnemonic {
         return array2;
     }
 
-    private byte[] wordsToLegacyEntropy2() throws BadMnemonicException{
+    private byte[] wordsToLegacyEntropy2() throws BadMnemonicException {
         var concatBitsLen = this.words.size() * 11;
         var concatBits = new boolean[concatBitsLen];
         Arrays.fill(concatBits, Boolean.FALSE);
@@ -425,7 +468,7 @@ public final class Mnemonic {
         for (int index = 0; index < this.words.size(); index++) {
             var nds = Collections.binarySearch(getWordList(false), this.words.get(index), null);
 
-            for(int i = 0; i < 11; i++){
+            for (int i = 0; i < 11; i++) {
                 concatBits[(index * 11) + i] = (nds & (1 << (10 - i))) != 0;
             }
         }
@@ -435,10 +478,10 @@ public final class Mnemonic {
 
         var entropy = new byte[entropyBitsLen / 8];
 
-        for (int i = 0; i < entropy.length; i++){
-            for (int j = 0; j < 8; j++){
-                if(concatBits[(i * 8) + j]){
-                    entropy[i] |= (byte)(1 << (7 - j));
+        for (int i = 0; i < entropy.length; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (concatBits[(i * 8) + j]) {
+                    entropy[i] |= (byte) (1 << (7 - j));
                 }
             }
         }
@@ -449,56 +492,12 @@ public final class Mnemonic {
         digest.doFinal(hash, 0);
         var hashBits = bytesToBits(hash);
 
-        for (int i = 0; i < checksumBitsLen; i++){
-            if (concatBits[entropyBitsLen + i] != hashBits[i]){
+        for (int i = 0; i < checksumBitsLen; i++) {
+            if (concatBits[entropyBitsLen + i] != hashBits[i]) {
                 throw new BadMnemonicException(this, BadMnemonicReason.ChecksumMismatch);
             }
         }
 
         return entropy;
-    }
-
-    private static int[] convertRadix(int[] nums, int fromRadix, int toRadix,int toLength){
-        @Var BigInteger num = BigInteger.valueOf(0);
-        for (int element : nums) {
-            num = num.multiply(BigInteger.valueOf(fromRadix));
-            num = num.add(BigInteger.valueOf(element));
-        }
-
-        var result = new int[toLength];
-        for (@Var var i = toLength - 1; i >= 0; i -= 1) {
-            BigInteger tem = num.divide(BigInteger.valueOf(toRadix));
-            BigInteger rem = num.mod(BigInteger.valueOf(toRadix));
-            num = tem;
-            result[ i ] = rem.intValue();
-        }
-
-        return result;
-    }
-
-    private static int crc8(int[] data) {
-        @Var var crc = 0xFF;
-
-        for (var i = 0; i < data.length - 1; i += 1) {
-            crc ^= data[ i ];
-            for (var j = 0; j < 8; j += 1) {
-                crc = (crc >>> 1) ^ (((crc & 1) == 0) ? 0 : 0xB2);
-            }
-        }
-
-        return crc ^ 0xFF;
-    }
-
-    private static boolean[] bytesToBits(byte[] dat){
-        var bits = new boolean[dat.length * 8];
-        Arrays.fill(bits, Boolean.FALSE);
-
-        for (int i = 0; i < dat.length; i ++){
-            for (int j = 0; j < 8; j++){
-                bits[(i * 8) + j] = (dat[i] & (1 << (7 - j))) != 0;
-            }
-        }
-
-        return bits;
     }
 }

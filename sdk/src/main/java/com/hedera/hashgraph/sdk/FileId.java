@@ -12,40 +12,34 @@ import java.util.Objects;
  */
 public final class FileId {
     /**
+     * The public node address book for the current network.
+     */
+    public static final FileId ADDRESS_BOOK = new FileId(0, 0, 102);
+    /**
+     * The current fee schedule for the network.
+     */
+    public static final FileId FEE_SCHEDULE = new FileId(0, 0, 111);
+    /**
+     * The current exchange rate of HBAR to USD.
+     */
+    public static final FileId EXCHANGE_RATES = new FileId(0, 0, 112);
+    /**
      * The shard number
      */
     @Nonnegative
     public final long shard;
-
     /**
      * The realm number
      */
     @Nonnegative
     public final long realm;
-
     /**
      * The id number
      */
     @Nonnegative
     public final long num;
-
     @Nullable
     private final String checksum;
-
-    /**
-     * The public node address book for the current network.
-     */
-    public static final FileId ADDRESS_BOOK = new FileId(0, 0, 102);
-
-    /**
-     * The current fee schedule for the network.
-     */
-    public static final FileId FEE_SCHEDULE = new FileId(0, 0, 111);
-
-    /**
-     * The current exchange rate of HBAR to USD.
-     */
-    public static final FileId EXCHANGE_RATES = new FileId(0, 0, 112);
 
     public FileId(@Nonnegative long num) {
         this(0, 0, num);

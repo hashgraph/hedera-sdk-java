@@ -3,7 +3,8 @@ package com.hedera.hashgraph.sdk;
 import org.threeten.bp.Duration;
 
 final class DurationConverter {
-    private DurationConverter() {}
+    private DurationConverter() {
+    }
 
     static Duration fromProtobuf(com.hedera.hashgraph.sdk.proto.Duration duration) {
         return Duration.ofSeconds(duration.getSeconds());
@@ -11,7 +12,7 @@ final class DurationConverter {
 
     static com.hedera.hashgraph.sdk.proto.Duration toProtobuf(Duration duration) {
         return com.hedera.hashgraph.sdk.proto.Duration.newBuilder()
-                .setSeconds(duration.getSeconds())
-                .build();
+            .setSeconds(duration.getSeconds())
+            .build();
     }
 }

@@ -117,16 +117,15 @@ public final class TransactionRecord {
         var tokenTransfers = new HashMap<TokenId, Map<AccountId, Long>>();
         var tokenNftTransfers = new HashMap<TokenId, List<TokenNftTransfer>>();
         for (var tokenTransfersList : transactionRecord.getTokenTransferListsList()) {
-            if(tokenTransfersList.getTransfersCount() > 0) {
+            if (tokenTransfersList.getTransfersCount() > 0) {
                 var accountAmounts = new HashMap<AccountId, Long>();
                 for (var accountAmount : tokenTransfersList.getTransfersList()) {
                     accountAmounts.put(AccountId.fromProtobuf(accountAmount.getAccountID()), accountAmount.getAmount());
                 }
                 tokenTransfers.put(TokenId.fromProtobuf(tokenTransfersList.getToken()), accountAmounts);
-            }
-            else if(tokenTransfersList.getNftTransfersCount() > 0) {
+            } else if (tokenTransfersList.getNftTransfersCount() > 0) {
                 var nftTransfers = new ArrayList<TokenNftTransfer>();
-                for(var transfer : tokenTransfersList.getNftTransfersList()) {
+                for (var transfer : tokenTransfersList.getNftTransfersList()) {
                     nftTransfers.add(TokenNftTransfer.fromProtobuf(transfer));
                 }
                 tokenNftTransfers.put(TokenId.fromProtobuf(tokenTransfersList.getToken()), nftTransfers);
@@ -134,7 +133,7 @@ public final class TransactionRecord {
         }
 
         var fees = new ArrayList<AssessedCustomFee>(transactionRecord.getAssessedCustomFeesCount());
-        for(var fee : transactionRecord.getAssessedCustomFeesList()) {
+        for (var fee : transactionRecord.getAssessedCustomFeesList()) {
             fees.add(AssessedCustomFee.fromProtobuf(fee));
         }
 

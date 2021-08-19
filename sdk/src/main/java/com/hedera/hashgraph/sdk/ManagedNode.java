@@ -4,16 +4,15 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.inprocess.InProcessChannelBuilder;
 
+import javax.annotation.Nullable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.Nullable;
 
 abstract class ManagedNode {
 
     private static final String IN_PROCESS = "in-process:";
-
-    String address;
     final ExecutorService executor;
+    String address;
     long lastUsed = 0;
     long useCount = 0;
 
@@ -30,7 +29,7 @@ abstract class ManagedNode {
         lastUsed = System.currentTimeMillis();
     }
 
-    
+
     synchronized ManagedChannel getChannel() {
         if (channel != null) {
             return channel;
@@ -39,10 +38,10 @@ abstract class ManagedNode {
         ManagedChannelBuilder channelBuilder;
 
         if (address.startsWith(IN_PROCESS)) {
-          String name = address.substring(IN_PROCESS.length());
-          channelBuilder = InProcessChannelBuilder.forName(name);
+            String name = address.substring(IN_PROCESS.length());
+            channelBuilder = InProcessChannelBuilder.forName(name);
         } else {
-          channelBuilder = ManagedChannelBuilder.forTarget(address);
+            channelBuilder = ManagedChannelBuilder.forTarget(address);
         }
 
         if (address.endsWith(":50212") || address.endsWith(":443")) {

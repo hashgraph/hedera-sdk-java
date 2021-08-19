@@ -6,11 +6,9 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoGetAccountBalanceResponse;
 import com.hedera.hashgraph.sdk.proto.TokenBalance;
 
-import java.util.Map;
-import java.util.HashMap;
-
 import javax.annotation.Nonnegative;
-import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class AccountBalance {
@@ -38,7 +36,7 @@ public class AccountBalance {
     static AccountBalance fromProtobuf(CryptoGetAccountBalanceResponse protobuf) {
         var balanceList = protobuf.getTokenBalancesList();
         Map<TokenId, Long> map = new HashMap<>();
-        Map<TokenId, Integer>  decimalMap = new HashMap<>();
+        Map<TokenId, Integer> decimalMap = new HashMap<>();
         for (int i = 0; i < protobuf.getTokenBalancesCount(); i++) {
             map.put(TokenId.fromProtobuf(balanceList.get(i).getTokenId()), balanceList.get(i).getBalance());
             decimalMap.put(TokenId.fromProtobuf(balanceList.get(i).getTokenId()), balanceList.get(i).getDecimals());

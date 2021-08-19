@@ -1,8 +1,9 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
-import javax.annotation.Nullable;
 import com.hedera.hashgraph.sdk.proto.FixedFee;
+
+import javax.annotation.Nullable;
 
 public class CustomFixedFee extends CustomFee {
     private long amount = 0;
@@ -12,14 +13,27 @@ public class CustomFixedFee extends CustomFee {
     public CustomFixedFee() {
     }
 
-    static CustomFixedFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
-        var fixedFee = customFee.getFixedFee();
-        var returnFee = new CustomFixedFee().setAmount(fixedFee.getAmount());
-        if(customFee.hasFeeCollectorAccountId()) {
-            returnFee.setFeeCollectorAccountId(AccountId.fromProtobuf(customFee.getFeeCollectorAccountId()));
-        }
-        if(fixedFee.hasDenominatingTokenId()) {
+    static CustomFixedFee clonedFrom(CustomFixedFee source) {
+        var returnFee = new CustomFixedFee();
+        returnFee.amount = source.amount;
+        returnFee.denominatingTokenId = source.denominatingTokenId;
+        returnFee.feeCollectorAccountId = source.feeCollectorAccountId;
+        return returnFee;
+    }
+
+    static CustomFixedFee fromProtobuf(FixedFee fixedFee) {
+        var returnFee = new CustomFixedFee()
+            .setAmount(fixedFee.getAmount());
+        if (fixedFee.hasDenominatingTokenId()) {
             returnFee.setDenominatingTokenId(TokenId.fromProtobuf(fixedFee.getDenominatingTokenId()));
+        }
+        return returnFee;
+    }
+
+    static CustomFixedFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
+        var returnFee = fromProtobuf(customFee.getFixedFee());
+        if (customFee.hasFeeCollectorAccountId()) {
+            returnFee.setFeeCollectorAccountId(AccountId.fromProtobuf(customFee.getFeeCollectorAccountId()));
         }
         return returnFee;
     }
@@ -33,13 +47,13 @@ public class CustomFixedFee extends CustomFee {
         return amount;
     }
 
-    public Hbar getHbarAmount() {
-        return Hbar.fromTinybars(amount);
-    }
-
     public CustomFixedFee setAmount(long amount) {
         this.amount = amount;
         return this;
+    }
+
+    public Hbar getHbarAmount() {
+        return Hbar.fromTinybars(amount);
     }
 
     public CustomFixedFee setHbarAmount(Hbar amount) {
@@ -66,7 +80,7 @@ public class CustomFixedFee extends CustomFee {
     @Override
     void validateChecksums(Client client) throws BadEntityIdException {
         super.validateChecksums(client);
-        if(denominatingTokenId != null) {
+        if (denominatingTokenId != null) {
             denominatingTokenId.validateChecksum(client);
         }
     }
@@ -80,16 +94,19 @@ public class CustomFixedFee extends CustomFee {
             .toString();
     }
 
-    @Override
-    com.hedera.hashgraph.sdk.proto.CustomFee toProtobuf() {
-        var customFeeBuilder = com.hedera.hashgraph.sdk.proto.CustomFee.newBuilder();
-        var fixedFeeBuilder = FixedFee.newBuilder().setAmount(getAmount());
-        if(getFeeCollectorAccountId() != null) {
-            customFeeBuilder.setFeeCollectorAccountId(getFeeCollectorAccountId().toProtobuf());
-        }
-        if(getDenominatingTokenId() != null) {
+    FixedFee toFixedFeeProtobuf() {
+        var fixedFeeBuilder = FixedFee.newBuilder()
+            .setAmount(getAmount());
+        if (getDenominatingTokenId() != null) {
             fixedFeeBuilder.setDenominatingTokenId(getDenominatingTokenId().toProtobuf());
         }
-        return customFeeBuilder.setFixedFee(fixedFeeBuilder.build()).build();
+        return fixedFeeBuilder.build();
+    }
+
+    @Override
+    com.hedera.hashgraph.sdk.proto.CustomFee toProtobuf() {
+        var customFeeBuilder = com.hedera.hashgraph.sdk.proto.CustomFee.newBuilder()
+            .setFixedFee(toFixedFeeProtobuf());
+        return finishToProtobuf(customFeeBuilder);
     }
 }

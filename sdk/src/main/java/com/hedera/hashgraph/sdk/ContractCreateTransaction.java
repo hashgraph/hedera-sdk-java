@@ -3,9 +3,9 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ContractCreateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
@@ -75,7 +75,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
 
     public ContractCreateTransaction() {
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
-        setMaxTransactionFee(new Hbar(20));
+        defaultMaxTransactionFee = new Hbar(20);
     }
 
     ContractCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
@@ -264,10 +264,10 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         if (proxyAccountId != null) {
             builder.setProxyAccountID(proxyAccountId.toProtobuf());
         }
-        if(adminKey != null) {
+        if (adminKey != null) {
             builder.setAdminKey(adminKey.toProtobufKey());
         }
-        if(autoRenewPeriod != null) {
+        if (autoRenewPeriod != null) {
             builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         }
         builder.setGas(gas);
@@ -292,16 +292,16 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getContractCreateInstance();
 
-        if(body.hasFileID()) {
+        if (body.hasFileID()) {
             bytecodeFileId = FileId.fromProtobuf(body.getFileID());
         }
-        if(body.hasProxyAccountID()) {
+        if (body.hasProxyAccountID()) {
             proxyAccountId = AccountId.fromProtobuf(body.getProxyAccountID());
         }
-        if(body.hasAdminKey()) {
+        if (body.hasAdminKey()) {
             adminKey = Key.fromProtobufKey(body.getAdminKey());
         }
-        if(body.hasAutoRenewPeriod()) {
+        if (body.hasAutoRenewPeriod()) {
             autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
         }
         gas = body.getGas();

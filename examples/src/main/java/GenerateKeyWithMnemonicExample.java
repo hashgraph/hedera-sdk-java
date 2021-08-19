@@ -10,20 +10,18 @@ class GenerateKeyWithMnemonicExample {
     public static void main(String[] args) {
         Mnemonic mnemonic = Mnemonic.generate24();
         PrivateKey privateKey;
-        try{
+        try {
             privateKey = mnemonic.toPrivateKey();
-        }
-        catch(BadMnemonicException e){
+        } catch (BadMnemonicException e) {
             throw new Error(e.reason.toString());
         }
         PublicKey publicKey = privateKey.getPublicKey();
 
         Mnemonic mnemonic12 = Mnemonic.generate12();
         PrivateKey privateKey12;
-        try{
+        try {
             privateKey12 = mnemonic12.toPrivateKey();
-        }
-        catch(BadMnemonicException e){
+        } catch (BadMnemonicException e) {
             throw new Error(e.reason.toString());
         }
         PublicKey publicKey12 = privateKey12.getPublicKey();

@@ -1,16 +1,16 @@
+import com.google.errorprone.annotations.Var;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicId;
 import com.hedera.hashgraph.sdk.TopicMessageQuery;
 import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.Transaction;
 import io.github.cdimascio.dotenv.Dotenv;
-import com.google.errorprone.annotations.Var;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -86,7 +86,7 @@ public final class ConsensusPubSubChunkedExample {
 
         // view out the message size from the parsed transaction
         // this can be useful to display what we are about to sign
-        long transactionMessageSize = ((TopicMessageSubmitTransaction)transaction).getMessage().size();
+        long transactionMessageSize = ((TopicMessageSubmitTransaction) transaction).getMessage().size();
         System.out.println("about to send a transaction with a message of " + transactionMessageSize + " bytes");
 
         // sign with that submit key

@@ -1,14 +1,13 @@
 package com.hedera.hashgraph.sdk;
 
-import io.github.jsonSnapshot.SnapshotMatcher;
-
 import com.google.protobuf.InvalidProtocolBufferException;
-
+import io.github.jsonSnapshot.SnapshotMatcher;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.concurrent.TimeoutException;
 
 class AccountIdTest {
 
@@ -25,7 +24,10 @@ class AccountIdTest {
     }
 
     @AfterClass
-    public static void afterAll() {
+    public static void afterAll() throws TimeoutException {
+        mainnetClient.close();
+        testnetClient.close();
+        previewnetClient.close();
         SnapshotMatcher.validateSnapshots();
     }
 

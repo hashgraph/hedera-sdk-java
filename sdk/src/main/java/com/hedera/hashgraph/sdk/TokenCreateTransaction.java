@@ -1,7 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenCreateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
@@ -9,10 +12,10 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
-import java.util.LinkedHashMap;
-import java.util.Objects;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Objects;
 
 public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> {
     private List<CustomFee> customFees = new ArrayList<>();
@@ -48,7 +51,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
 
     public TokenCreateTransaction() {
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
-        setMaxTransactionFee(new Hbar(30));
+        defaultMaxTransactionFee = new Hbar(30);
     }
 
     TokenCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
@@ -244,15 +247,15 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return this;
     }
 
+    @Nullable
+    public List<CustomFee> getCustomFees() {
+        return CustomFee.deepCloneList(customFees);
+    }
+
     public TokenCreateTransaction setCustomFees(List<CustomFee> customFees) {
         requireNotFrozen();
         this.customFees = CustomFee.deepCloneList(customFees);
         return this;
-    }
-
-    @Nullable
-    public List<CustomFee> getCustomFees() {
-        return CustomFee.deepCloneList(customFees);
     }
 
     public TokenType getTokenType() {
@@ -314,29 +317,29 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         builder.setSymbol(tokenSymbol);
         builder.setDecimals(decimals);
         builder.setInitialSupply(initialSupply);
-        if(adminKey != null) {
+        if (adminKey != null) {
             builder.setAdminKey(adminKey.toProtobufKey());
         }
-        if(kycKey != null) {
+        if (kycKey != null) {
             builder.setKycKey(kycKey.toProtobufKey());
         }
-        if(freezeKey != null) {
+        if (freezeKey != null) {
             builder.setFreezeKey(freezeKey.toProtobufKey());
         }
-        if(wipeKey != null) {
+        if (wipeKey != null) {
             builder.setWipeKey(wipeKey.toProtobufKey());
         }
-        if(supplyKey != null) {
+        if (supplyKey != null) {
             builder.setSupplyKey(supplyKey.toProtobufKey());
         }
-        if(feeScheduleKey != null) {
+        if (feeScheduleKey != null) {
             builder.setFeeScheduleKey(feeScheduleKey.toProtobufKey());
         }
         builder.setFreezeDefault(freezeDefault);
-        if(expirationTime != null) {
+        if (expirationTime != null) {
             builder.setExpiry(InstantConverter.toProtobuf(expirationTime));
         }
-        if(autoRenewPeriod != null) {
+        if (autoRenewPeriod != null) {
             builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         }
         builder.setMemo(tokenMemo);
@@ -344,7 +347,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         builder.setSupplyType(tokenSupplyType.code);
         builder.setMaxSupply(maxSupply);
 
-        for(var fee : customFees) {
+        for (var fee : customFees) {
             builder.addCustomFees(fee.toProtobuf());
         }
 
@@ -356,36 +359,36 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         if (body.hasTreasury()) {
             treasuryAccountId = AccountId.fromProtobuf(body.getTreasury());
         }
-        if(body.hasAutoRenewAccount()) {
+        if (body.hasAutoRenewAccount()) {
             autoRenewAccountId = AccountId.fromProtobuf(body.getAutoRenewAccount());
         }
         tokenName = body.getName();
         tokenSymbol = body.getSymbol();
         decimals = body.getDecimals();
         initialSupply = body.getInitialSupply();
-        if(body.hasAdminKey()) {
+        if (body.hasAdminKey()) {
             adminKey = Key.fromProtobufKey(body.getAdminKey());
         }
-        if(body.hasKycKey()) {
+        if (body.hasKycKey()) {
             kycKey = Key.fromProtobufKey(body.getKycKey());
         }
-        if(body.hasFreezeKey()) {
+        if (body.hasFreezeKey()) {
             freezeKey = Key.fromProtobufKey(body.getFreezeKey());
         }
-        if(body.hasWipeKey()) {
+        if (body.hasWipeKey()) {
             wipeKey = Key.fromProtobufKey(body.getWipeKey());
         }
-        if(body.hasSupplyKey()) {
+        if (body.hasSupplyKey()) {
             supplyKey = Key.fromProtobufKey(body.getSupplyKey());
         }
-        if(body.hasFeeScheduleKey()) {
+        if (body.hasFeeScheduleKey()) {
             feeScheduleKey = Key.fromProtobufKey(body.getFeeScheduleKey());
         }
         freezeDefault = body.getFreezeDefault();
-        if(body.hasExpiry()) {
+        if (body.hasExpiry()) {
             expirationTime = InstantConverter.fromProtobuf(body.getExpiry());
         }
-        if(body.hasAutoRenewPeriod()) {
+        if (body.hasAutoRenewPeriod()) {
             autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
         }
         tokenMemo = body.getMemo();
@@ -393,14 +396,14 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         tokenSupplyType = TokenSupplyType.valueOf(body.getSupplyType());
         maxSupply = body.getMaxSupply();
 
-        for(var fee : body.getCustomFeesList()) {
+        for (var fee : body.getCustomFeesList()) {
             customFees.add(CustomFee.fromProtobuf(fee));
         }
     }
 
     @Override
     void validateChecksums(Client client) throws BadEntityIdException {
-        for(var fee : customFees) {
+        for (var fee : customFees) {
             fee.validateChecksums(client);
         }
 

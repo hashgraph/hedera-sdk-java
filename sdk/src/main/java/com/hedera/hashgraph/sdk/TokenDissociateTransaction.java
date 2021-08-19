@@ -1,11 +1,11 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.TokenDissociateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import com.hedera.hashgraph.sdk.proto.TokenDissociateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
@@ -20,7 +20,7 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
     private List<TokenId> tokenIds = new ArrayList<>();
 
     public TokenDissociateTransaction() {
-        setMaxTransactionFee(new Hbar(5));
+        defaultMaxTransactionFee = new Hbar(5);
     }
 
     TokenDissociateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {

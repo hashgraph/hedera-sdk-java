@@ -8,11 +8,11 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
-import java.util.LinkedHashMap;
 import javax.annotation.Nullable;
-import java.util.Objects;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Objects;
 
 public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeScheduleUpdateTransaction> {
     @Nullable
@@ -61,7 +61,7 @@ public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeSched
             tokenId = TokenId.fromProtobuf(body.getTokenId());
         }
 
-        for(var fee : body.getCustomFeesList()) {
+        for (var fee : body.getCustomFeesList()) {
             customFees.add(CustomFee.fromProtobuf(fee));
         }
     }
@@ -73,7 +73,7 @@ public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeSched
         }
 
         builder.clearCustomFees();
-        for(var fee : customFees) {
+        for (var fee : customFees) {
             builder.addCustomFees(fee.toProtobuf());
         }
 
@@ -86,7 +86,7 @@ public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeSched
             tokenId.validateChecksum(client);
         }
 
-        for(CustomFee fee : customFees) {
+        for (CustomFee fee : customFees) {
             fee.validateChecksums(client);
         }
     }

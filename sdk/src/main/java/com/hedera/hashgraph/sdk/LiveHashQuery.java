@@ -40,7 +40,7 @@ public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
     }
 
     public ByteString getHash() {
-      return ByteString.copyFrom(hash);
+        return ByteString.copyFrom(hash);
     }
 
     /**

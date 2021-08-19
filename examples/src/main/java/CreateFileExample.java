@@ -1,6 +1,3 @@
-import java.util.Objects;
-import java.util.concurrent.TimeoutException;
-
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
@@ -13,6 +10,9 @@ import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.util.Objects;
+import java.util.concurrent.TimeoutException;
+
 public final class CreateFileExample {
 
     // see `.env.sample` in the repository root for how to specify these values
@@ -22,7 +22,8 @@ public final class CreateFileExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private CreateFileExample() { }
+    private CreateFileExample() {
+    }
 
     public static void main(String[] args) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         Client client = Client.forName(HEDERA_NETWORK);

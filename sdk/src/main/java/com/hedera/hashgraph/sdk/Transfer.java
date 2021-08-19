@@ -3,11 +3,9 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.hedera.hashgraph.sdk.proto.AccountAmount;
 
-import javax.annotation.Nullable;
-
 /**
  * A transfer of Hbar that occurred within a transaction.
- *
+ * <p>
  * Returned with a {@link TransactionRecord}.
  */
 public final class Transfer {

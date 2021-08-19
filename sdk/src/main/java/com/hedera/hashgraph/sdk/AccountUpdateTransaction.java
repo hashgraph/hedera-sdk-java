@@ -3,10 +3,10 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.BoolValue;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
-import com.hedera.hashgraph.sdk.proto.CryptoUpdateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.CryptoUpdateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
@@ -219,19 +219,19 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         if (body.hasProxyAccountID()) {
             proxyAccountId = AccountId.fromProtobuf(body.getProxyAccountID());
         }
-        if(body.hasKey()) {
+        if (body.hasKey()) {
             key = Key.fromProtobufKey(body.getKey());
         }
-        if(body.hasExpirationTime()) {
+        if (body.hasExpirationTime()) {
             expirationTime = InstantConverter.fromProtobuf(body.getExpirationTime());
         }
-        if(body.hasAutoRenewPeriod()) {
+        if (body.hasAutoRenewPeriod()) {
             autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
         }
-        if(body.hasReceiverSigRequiredWrapper()) {
+        if (body.hasReceiverSigRequiredWrapper()) {
             receiverSigRequired = body.getReceiverSigRequiredWrapper().getValue();
         }
-        if(body.hasMemo()) {
+        if (body.hasMemo()) {
             accountMemo = body.getMemo().getValue();
         }
     }
@@ -249,19 +249,19 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         if (proxyAccountId != null) {
             builder.setProxyAccountID(proxyAccountId.toProtobuf());
         }
-        if(key != null) {
+        if (key != null) {
             builder.setKey(key.toProtobufKey());
         }
-        if(expirationTime != null) {
+        if (expirationTime != null) {
             builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
         }
-        if(autoRenewPeriod != null) {
+        if (autoRenewPeriod != null) {
             builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         }
-        if(receiverSigRequired != null) {
+        if (receiverSigRequired != null) {
             builder.setReceiverSigRequiredWrapper(BoolValue.of(receiverSigRequired));
         }
-        if(accountMemo != null) {
+        if (accountMemo != null) {
             builder.setMemo(StringValue.of(accountMemo));
         }
 

@@ -1,13 +1,18 @@
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.FileContentsQuery;
+import com.hedera.hashgraph.sdk.FileCreateTransaction;
+import com.hedera.hashgraph.sdk.FileDeleteTransaction;
+import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.Status;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FileContentsIntegrationTest {
     @Test
@@ -71,12 +76,12 @@ public class FileContentsIntegrationTest {
         assertDoesNotThrow(() -> {
             var testEnv = new IntegrationTestEnv(1);
 
-           var error = assertThrows(PrecheckStatusException.class, () -> {
-               new FileContentsQuery()
-                   .execute(testEnv.client);
-           });
+            var error = assertThrows(PrecheckStatusException.class, () -> {
+                new FileContentsQuery()
+                    .execute(testEnv.client);
+            });
 
-           assertTrue(error.getMessage().contains(Status.INVALID_FILE_ID.toString()));
+            assertTrue(error.getMessage().contains(Status.INVALID_FILE_ID.toString()));
 
             testEnv.close();
         });
@@ -137,7 +142,7 @@ public class FileContentsIntegrationTest {
                 contentsQuery.execute(testEnv.client);
             });
 
-            assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for FileContentsQuery, of "+cost.toString()+", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
+            assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for FileContentsQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
 
             new FileDeleteTransaction()
                 .setFileId(fileId)

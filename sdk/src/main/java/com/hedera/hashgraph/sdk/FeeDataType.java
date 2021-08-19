@@ -56,7 +56,7 @@ public enum FeeDataType {
 
     @Override
     public String toString() {
-        switch(this) {
+        switch (this) {
             case DEFAULT:
                 return "DEFAULT";
             case TOKEN_FUNGIBLE_COMMON:
