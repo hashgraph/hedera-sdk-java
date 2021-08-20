@@ -51,6 +51,10 @@ class MirrorNetwork {
         return MirrorNetwork.forNetwork(executor, Lists.of("hcs.previewnet.mirrornode.hedera.com:5600"));
     }
 
+    List<String> getNetwork() {
+        return Collections.unmodifiableList(addresses);
+    }
+
     synchronized MirrorNetwork setNetwork(List<String> addresses) throws InterruptedException {
         lock.acquire();
 
