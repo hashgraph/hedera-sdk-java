@@ -43,10 +43,10 @@ Select _one_ of the following to enable or disable Simple Logging Facade for Jav
 
 ```groovy
 // Enable logs
-implementation 'org.slf4j:slf4j-simple:1.7.29'
+implementation 'org.slf4j:slf4j-simple:2.0.0-alpha1'
 
 // Disable logs
-implementation 'org.slf4j:slf4j-nop:1.7.29'
+implementation 'org.slf4j:slf4j-nop:2.0.0-alpha1'
 
 ```
 

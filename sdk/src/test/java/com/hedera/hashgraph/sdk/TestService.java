@@ -1,89 +1,68 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.Response;
+import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-public abstract class TestService {
-    private final List<Transaction> transactionRequestsReceived = new ArrayList<>();
-    private final Queue<TransactionResponse> transactionResponsesToSend = new LinkedList<>();
+public interface TestService {
 
-    private final List<Transaction> queryRequestsReceived = new ArrayList<>();
-    private final Queue<Response> queryResponsesToSend = new LinkedList<>();
+    class Buffer {
+        public final List<Transaction> transactionRequestsReceived = new ArrayList<>();
+        public final List<Query> queryRequestsReceived = new ArrayList<>();
+        public final Queue<TestResponse> responsesToSend = new LinkedList<>();
 
-    public List<Transaction> getTransactionRequestsReceived() {
-        return transactionRequestsReceived;
+        public Buffer enqueueResponse(TestResponse response) {
+            responsesToSend.add(response);
+            return this;
+        }
     }
 
-    public List<Transaction> getQueryRequestsReceived() {
-        return queryRequestsReceived;
+    Buffer getBuffer();
+
+    private static <ResponseType> void respond(
+        StreamObserver<ResponseType> streamObserver,
+        @Nullable ResponseType normalResponse,
+        @Nullable StatusRuntimeException errorResponse,
+        String exceptionString
+    ) {
+        if (normalResponse != null) {
+            streamObserver.onNext(normalResponse);
+            streamObserver.onCompleted();
+        } else if (errorResponse != null) {
+            streamObserver.onError(errorResponse);
+        } else {
+            throw new IllegalStateException(exceptionString);
+        }
     }
 
-    // transaction responses
+    default void respondToTransaction(Transaction request, StreamObserver<TransactionResponse> streamObserver, TestResponse response) {
+        getBuffer().transactionRequestsReceived.add(request);
 
-    protected void respondToTransactionFromQueue(StreamObserver<TransactionResponse> observer) {
-        observer.onNext(transactionResponsesToSend.remove());
-        observer.onCompleted();
+        var exceptionString = "TestService tried to respond to transaction with query response";
+        respond(streamObserver, response.transactionResponse, response.errorResponse, exceptionString);
     }
 
-    private static TransactionResponse buildTransactionResponse(Status status, Hbar cost) {
-        return TransactionResponse.newBuilder()
-            .setNodeTransactionPrecheckCode(status.code)
-            .setCost(cost.toTinybars())
-            .build();
+    default void respondToQuery(Query request, StreamObserver<Response> streamObserver, TestResponse response) {
+        getBuffer().queryRequestsReceived.add(request);
+
+        var exceptionString = "TestService tried to respond to query with transaction response";
+        respond(streamObserver, response.queryResponse, response.errorResponse, exceptionString);
     }
 
-    protected void respondToTransaction(StreamObserver<TransactionResponse> observer, Status status, Hbar cost) {
-        observer.onNext(buildTransactionResponse(status, cost));
+    default void respondToTransactionFromQueue(Transaction request, StreamObserver<TransactionResponse> streamObserver) {
+        respondToTransaction(request, streamObserver, getBuffer().responsesToSend.remove());
     }
 
-    protected void respondToTransaction(StreamObserver<TransactionResponse> observer, Status status) {
-        respondToTransaction(observer, status, new Hbar(1));
-    }
-
-    protected void respondOkToTransaction(StreamObserver<TransactionResponse> observer, Hbar cost) {
-        respondToTransaction(observer, Status.OK, cost);
-    }
-
-    protected void respondOkToTransaction(StreamObserver<TransactionResponse> observer) {
-        respondOkToTransaction(observer, new Hbar(1));
-    }
-
-    public void enqueueTransactionResponse(Status status, Hbar cost) {
-        transactionResponsesToSend.add(buildTransactionResponse(status, cost));
-    }
-
-    public void enqueueTransactionResponse(Status status) {
-        enqueueTransactionResponse(status, new Hbar(1));
-    }
-
-    public void enqueueTransactionOkResponse(Hbar cost) {
-        enqueueTransactionResponse(Status.OK, cost);
-    }
-
-    public void enqueueTransactionOkResponse() {
-        enqueueTransactionOkResponse(new Hbar(1));
-    }
-
-    // query responses
-
-    protected void respondToQuery(StreamObserver<Response> observer, Response response) {
-        observer.onNext(response);
-        observer.onCompleted();
-    }
-
-    protected void respondToQueryFromQueue(StreamObserver<Response> observer) {
-        observer.onNext(queryResponsesToSend.remove());
-        observer.onCompleted();
-    }
-
-    public void enqueueQueryResponse(Response response) {
-        queryResponsesToSend.add(response);
+    default void respondToQueryFromQueue(Query request, StreamObserver<Response> streamObserver) {
+        respondToQuery(request, streamObserver, getBuffer().responsesToSend.remove());
     }
 }

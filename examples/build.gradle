@@ -30,5 +30,6 @@ tasks.addRule("Pattern: run<Example>: Runs an example.") { String taskName ->
 tasks.withType(JavaCompile).configureEach {
 	options.errorprone {
 		disable("DefaultPackage")
+		disable("SystemOut")
 	}
 }

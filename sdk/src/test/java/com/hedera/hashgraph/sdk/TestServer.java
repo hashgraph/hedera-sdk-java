@@ -8,9 +8,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.TimeoutException;
 
+// TODO: we may want to refactor to separate TestClient from TestServer.
+//       That way, we can have a client with a network of multiple test servers.
+//       Maybe we can test load-balancing?
+
 public class TestServer {
-    private Server grpcServer;
-    private Client client;
+    private final Server grpcServer;
+    public final Client client;
 
     public TestServer(String name, BindableService... services) throws IOException {
         var serverBuilder = InProcessServerBuilder.forName(name);
@@ -20,12 +24,9 @@ public class TestServer {
         grpcServer = serverBuilder.directExecutor().build().start();
 
         var network = new HashMap<String, AccountId>();
-        network.put("in-process:test", AccountId.fromString("0.0.1"));
+        network.put("in-process:" + name, AccountId.fromString("1.1.1"));
         client = Client.forNetwork(network);
-    }
-
-    public Client getClient() {
-        return client;
+        client.setOperator(AccountId.fromString("2.2.2"), PrivateKey.generate());
     }
 
     public void close() throws TimeoutException, InterruptedException {
