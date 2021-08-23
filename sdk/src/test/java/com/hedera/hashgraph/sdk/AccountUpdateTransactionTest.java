@@ -27,9 +27,8 @@ public class AccountUpdateTransactionTest {
         SnapshotMatcher.validateSnapshots();
     }
 
-    @Test
-    void shouldSerialize() {
-        SnapshotMatcher.expect(new AccountUpdateTransaction()
+    AccountUpdateTransaction spawnTestTransaction() {
+        return new AccountUpdateTransaction()
             .setKey(unusedPrivateKey)
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
@@ -38,27 +37,21 @@ public class AccountUpdateTransactionTest {
             .setAutoRenewPeriod(Duration.ofHours(10))
             .setExpirationTime(Instant.ofEpochSecond(1554158543))
             .setReceiverSignatureRequired(false)
+            .setMaxAutomaticTokenAssociations(100)
+            .setAccountMemo("Some memo")
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
-            .sign(unusedPrivateKey)
-            .toString()
-        ).toMatchSnapshot();
+            .sign(unusedPrivateKey);
+    }
+
+    @Test
+    void shouldSerialize() {
+        SnapshotMatcher.expect(spawnTestTransaction().toString()).toMatchSnapshot();
     }
 
     @Test
     void shouldBytes() throws Exception {
-        var tx = new AccountUpdateTransaction()
-            .setKey(unusedPrivateKey)
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setAccountId(AccountId.fromString("0.0.2002"))
-            .setProxyAccountId(AccountId.fromString("0.0.1001"))
-            .setAutoRenewPeriod(Duration.ofHours(10))
-            .setExpirationTime(Instant.ofEpochSecond(1554158543))
-            .setReceiverSignatureRequired(false)
-            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .freeze()
-            .sign(unusedPrivateKey);
+        var tx = spawnTestTransaction();
         var tx2 = AccountUpdateTransaction.fromBytes(tx.toBytes());
         assertEquals(tx.toString(), tx2.toString());
     }

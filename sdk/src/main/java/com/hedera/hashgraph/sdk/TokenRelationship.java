@@ -20,12 +20,22 @@ public class TokenRelationship {
     @Nullable
     public final Boolean freezeStatus;
 
-    private TokenRelationship(TokenId tokenId, String symbol, long balance, @Nullable Boolean kycStatus, @Nullable Boolean freezeStatus) {
+    public final boolean automaticAssociation;
+
+    private TokenRelationship(
+        TokenId tokenId,
+        String symbol,
+        long balance,
+        @Nullable Boolean kycStatus,
+        @Nullable Boolean freezeStatus,
+        boolean automaticAssociation
+    ) {
         this.tokenId = tokenId;
         this.symbol = symbol;
         this.balance = balance;
         this.kycStatus = kycStatus;
         this.freezeStatus = freezeStatus;
+        this.automaticAssociation = automaticAssociation;
     }
 
     @Nullable
@@ -44,7 +54,8 @@ public class TokenRelationship {
             tokenRelationship.getSymbol(),
             tokenRelationship.getBalance(),
             kycStatusFromProtobuf(tokenRelationship.getKycStatus()),
-            freezeStatusFromProtobuf(tokenRelationship.getFreezeStatus())
+            freezeStatusFromProtobuf(tokenRelationship.getFreezeStatus()),
+            tokenRelationship.getAutomaticAssociation()
         );
     }
 
@@ -67,6 +78,7 @@ public class TokenRelationship {
             .setBalance(balance)
             .setKycStatus(kycStatusToProtobuf(kycStatus))
             .setFreezeStatus(freezeStatusToProtobuf(freezeStatus))
+            .setAutomaticAssociation(automaticAssociation)
             .build();
     }
 
@@ -78,6 +90,7 @@ public class TokenRelationship {
             .add("balance", balance)
             .add("kycStatus", kycStatus)
             .add("freezeStatus", freezeStatus)
+            .add("automaticAssociation", automaticAssociation)
             .toString();
     }
 
