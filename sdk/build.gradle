@@ -36,7 +36,7 @@ dependencies {
 
 	implementation "io.grpc:grpc-core:1.40.0"
 	implementation "io.grpc:grpc-protobuf-lite:1.40.0"
-	implementation "io.grpc:grpc-stub:1.38.0"
+	implementation "io.grpc:grpc-stub:1.40.0"
 
 	testCompile "org.assertj:assertj-core:3.20.2"
 	testImplementation "org.junit.jupiter:junit-jupiter-engine:5.7.2"
