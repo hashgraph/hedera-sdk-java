@@ -50,7 +50,7 @@ dependencies {
 	//       use CompletableFuture directly.
 	// https://github.com/stefan-zobel/streamsupport
 	// https://developer.android.com/about/dashboards/index.html
-	api "net.sourceforge.streamsupport:streamsupport:1.7.2"
+	api "net.sourceforge.streamsupport:streamsupport:1.7.3"
 	api "net.sourceforge.streamsupport:streamsupport-cfuture:1.7.2"
 
 	// NOTE: This is to support Android API < 26.
