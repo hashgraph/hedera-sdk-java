@@ -15,7 +15,7 @@ class HederaTrustManager implements X509TrustManager {
     private final String certHash;
 
     HederaTrustManager(@Nullable ByteString certHash) {
-        if (certHash == null) {
+        if (certHash == null || certHash.isEmpty()) {
             this.certHash = null;
         } else {
             this.certHash = new String(certHash.toByteArray(), StandardCharsets.UTF_8);
