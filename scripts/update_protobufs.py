@@ -35,12 +35,15 @@ PROTO_GIT_BRANCH = sys.argv[1]
 
 
 PROTO_IN_PATH = os.path.join(PROTO_GIT_PATH, "services")
-BASIC_TYPES_PATH = os.path.join(PROTO_IN_PATH, "BasicTypes.proto")
-RESPONSE_CODE_PATH = os.path.join(PROTO_IN_PATH, "ResponseCode.proto")
+PROTO_SDK_IN_PATH = os.path.join(PROTO_GIT_PATH, "sdk")
+PROTO_MIRROR_IN_PATH = os.path.join(PROTO_GIT_PATH, "mirror")
+BASIC_TYPES_PATH = os.path.join(PROTO_IN_PATH, "basic_types.proto")
+RESPONSE_CODE_PATH = os.path.join(PROTO_IN_PATH, "response_code.proto")
 
 
 MAIN_PATH = os.path.join("..", "sdk", "src", "main")
 PROTO_OUT_PATH = os.path.join(MAIN_PATH, "proto")
+PROTO_MIRROR_OUT_PATH = os.path.join(PROTO_OUT_PATH, "mirror")
 JAVA_OUT_PATH = os.path.join(MAIN_PATH, "java", "com", "hedera", "hashgraph", "sdk")
 REQUEST_TYPE_OUT_PATH = os.path.join(JAVA_OUT_PATH, "RequestType.java")
 STATUS_OUT_PATH = os.path.join(JAVA_OUT_PATH, "Status.java")
@@ -48,7 +51,6 @@ FEE_DATA_TYPE_OUT_PATH = os.path.join(JAVA_OUT_PATH, "FeeDataType.java")
 
 
 PROTO_DO_NOT_REMOVE = (
-    "TransactionList.proto"
 )
 
 
@@ -68,7 +70,10 @@ PROTO_REPLACEMENTS = (
      "option java_package = \"com.hedera.hashgraph.sdk.proto\";"),
     
     ("option java_package = \"com.hederahashgraph.service.proto.java\";",
-     "option java_package = \"com.hedera.hashgraph.sdk.proto\";")
+     "option java_package = \"com.hedera.hashgraph.sdk.proto\";"),
+     
+    ("option java_package = \"com.hedera.mirror.api.proto\";",
+     "option java_package = \"com.hedera.hashgraph.sdk.proto.mirror\";")
 )
 
 
@@ -153,22 +158,33 @@ def generate_FeeDataType():
 
 
 def clear_proto_dir():
-    for name in os.listdir(PROTO_OUT_PATH):
+    clear_dir(PROTO_OUT_PATH)
+
+
+def clear_dir(dir_path):
+    for name in os.listdir(dir_path):
         if name in PROTO_DO_NOT_REMOVE:
             continue
-        path = os.path.join(PROTO_OUT_PATH, name)
+        path = os.path.join(dir_path, name)
         if os.path.isfile(path):
             os.unlink(path)
+        elif os.path.isdir(path):
+            clear_dir(path)
 
 
 def generate_modified_protos():
-    for name in os.listdir(PROTO_IN_PATH):
-        in_file = open(os.path.join(PROTO_IN_PATH, name), "r")
-        out_file = open(os.path.join(PROTO_OUT_PATH, name), "w")
+    do_generate_modified_protos(PROTO_IN_PATH, PROTO_OUT_PATH)
+    do_generate_modified_protos(PROTO_SDK_IN_PATH, PROTO_OUT_PATH)
+    do_generate_modified_protos(PROTO_MIRROR_IN_PATH, PROTO_MIRROR_OUT_PATH)
+
+
+def do_generate_modified_protos(in_path, out_path):
+    for name in os.listdir(in_path):
+        in_file = open(os.path.join(in_path, name), "r")
+        out_file = open(os.path.join(out_path, name), "w")
         out_file.write(do_replacements(in_file.read(), PROTO_REPLACEMENTS))
         in_file.close()
         out_file.close()
-
 
 
 

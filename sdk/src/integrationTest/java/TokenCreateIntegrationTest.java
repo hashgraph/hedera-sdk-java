@@ -406,7 +406,7 @@ class TokenCreateIntegrationTest {
         });
     }
 
-    @Disabled
+
     @Test
     @DisplayName("Can create NFT")
     void canCreateNfts() {
@@ -432,7 +432,7 @@ class TokenCreateIntegrationTest {
         });
     }
 
-    @Disabled
+
     @Test
     @DisplayName("Can create NFT with royalty fee")
     void canCreateRoyaltyFee() {
