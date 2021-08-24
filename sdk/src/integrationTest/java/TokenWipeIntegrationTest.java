@@ -87,7 +87,7 @@ class TokenWipeIntegrationTest {
         });
     }
 
-    @Disabled
+
     @Test
     @DisplayName("Can wipe accounts NFTs")
     void canWipeAccountsNfts() {
@@ -158,7 +158,7 @@ class TokenWipeIntegrationTest {
         });
     }
 
-    @Disabled
+
     @Test
     @DisplayName("Cannot wipe accounts NFTs if the account doesn't own them")
     void cannotWipeAccountsNftsIfNotOwned() {

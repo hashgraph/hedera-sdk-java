@@ -195,7 +195,7 @@ class TokenMintIntegrationTest {
         });
     }
 
-    @Disabled
+
     @Test
     @DisplayName("Can mint NFTs")
     void canMintNfts() {
@@ -231,7 +231,7 @@ class TokenMintIntegrationTest {
         });
     }
 
-    @Disabled
+
     @Test
     @DisplayName("Cannot mint NFTs if metadata too big")
     void cannotMintNftsIfMetadataTooBig() {

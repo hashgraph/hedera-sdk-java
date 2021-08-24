@@ -127,7 +127,7 @@ class TokenInfoIntegrationTest {
         });
     }
 
-    @Disabled
+
     @Test
     @DisplayName("Can query NFT")
     void canQueryNfts() {
