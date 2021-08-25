@@ -82,11 +82,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     }
 
     public List<String> getMirrorNetwork() {
-        if (mirrorNetwork != null) {
-            return mirrorNetwork.addresses;
-        } else {
-            return new ArrayList<>();
-        }
+        return mirrorNetwork.getNetwork();
     }
 
     /**
@@ -105,7 +101,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     public static Client forNetwork(Map<String, AccountId> networkMap) {
         var executor = createExecutor();
         var network = Network.forNetwork(executor, networkMap);
-        var mirrorNetwork = MirrorNetwork.forMainnet(executor);
+        var mirrorNetwork = MirrorNetwork.forNetwork(executor, new ArrayList<>());
 
         return new Client(executor, network, mirrorNetwork);
     }
