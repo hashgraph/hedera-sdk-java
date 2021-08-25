@@ -6,7 +6,11 @@ import com.hedera.hashgraph.proto.FractionalFee;
 import com.hedera.hashgraph.sdk.account.AccountId;
 
 public class CustomFractionalFee extends CustomFee {
-    private long numerator = 0, denominator = 1, min = 0, max = 0;
+    private long numerator = 0;
+    private long denominator = 1;
+    private long min = 0;
+    private long max = 0;
+    private FeeAssessmentMethod assessmentMethod = FeeAssessmentMethod.INCLUSIVE;
 
     public CustomFractionalFee() {
     }
@@ -22,6 +26,7 @@ public class CustomFractionalFee extends CustomFee {
         this.denominator = fraction.getDenominator();
         this.min = fractionalFee.getMinimumAmount();
         this.max = fractionalFee.getMaximumAmount();
+        this.assessmentMethod = FeeAssessmentMethod.valueOf(fractionalFee.getNetOfTransfers());
     }
 
     public CustomFractionalFee setFeeCollectorAccountId(AccountId feeCollectorAccountId) {
@@ -65,6 +70,15 @@ public class CustomFractionalFee extends CustomFee {
         return this;
     }
 
+    public FeeAssessmentMethod getAssessmentMethod() {
+        return assessmentMethod;
+    }
+
+    public CustomFractionalFee setAssessmentMethod(FeeAssessmentMethod assessmentMethod) {
+        this.assessmentMethod = assessmentMethod;
+        return this;
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -88,10 +102,13 @@ public class CustomFractionalFee extends CustomFee {
                             .setNumerator(getNumerator())
                             .setDenominator(getDenominator())
                     )
+                    .setNetOfTransfers(assessmentMethod.code)
             );
+
         if (getFeeCollectorAccountId() != null) {
             customFeeBuilder.setFeeCollectorAccountId(getFeeCollectorAccountId().toProto());
         }
+
         return customFeeBuilder.build();
     }
 }

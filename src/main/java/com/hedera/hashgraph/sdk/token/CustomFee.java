@@ -20,6 +20,9 @@ abstract public class CustomFee {
             case FRACTIONAL_FEE:
                 return new CustomFractionalFee(customFee);
 
+            case ROYALTY_FEE:
+                return new CustomRoyaltyFee(customFee);
+
             default:
                 throw new IllegalStateException("CustomFee#fromProtobuf: unhandled fee case: " + customFee.getFeeCase());
         }

@@ -5,6 +5,7 @@ import com.hedera.hashgraph.proto.FreezeTransactionBody;
 import com.hedera.hashgraph.proto.Transaction;
 import com.hedera.hashgraph.proto.TransactionResponse;
 
+import java.time.Instant;
 import java.time.OffsetTime;
 import java.time.ZoneOffset;
 
@@ -54,6 +55,7 @@ public class FreezeTransaction extends SingleTransactionBuilder<FreezeTransactio
     public FreezeTransaction setStartTime(OffsetTime startTime) {
         OffsetTime actual = startTime.withOffsetSameInstant(ZoneOffset.UTC);
 
+        builder.setStartTime(TimestampHelper.timestampFrom(Instant.from(actual)));
         builder.setStartHour(actual.getHour());
         builder.setStartMin(actual.getMinute());
         return this;

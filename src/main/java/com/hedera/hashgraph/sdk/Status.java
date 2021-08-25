@@ -205,7 +205,7 @@ public enum Status {
     CustomFeeMustBePositive(ResponseCodeEnum.CUSTOM_FEE_MUST_BE_POSITIVE),
     TokenHasNoFeeScheduleKey(ResponseCodeEnum.TOKEN_HAS_NO_FEE_SCHEDULE_KEY),
     CustomFeeOutsideNumericRange(ResponseCodeEnum.CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE),
-    InvalidCustomFractionalFeesSum(ResponseCodeEnum.INVALID_CUSTOM_FRACTIONAL_FEES_SUM),
+    RoyaltyFractionCannotExceedOne(ResponseCodeEnum.ROYALTY_FRACTION_CANNOT_EXCEED_ONE),
     FractionalFeeMaxAmountLessThanMinAmount(ResponseCodeEnum.FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT),
     CustomScheduleAlreadyHasNoFees(ResponseCodeEnum.CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES),
     CustomFeeDenominationMustBeFungibleCommon(ResponseCodeEnum.CUSTOM_FEE_DENOMINATION_MUST_BE_FUNGIBLE_COMMON),
@@ -221,7 +221,12 @@ public enum Status {
     MaxNftsInPriceRegimeHaveBeenMinted(ResponseCodeEnum.MAX_NFTS_IN_PRICE_REGIME_HAVE_BEEN_MINTED),
     PayerAccountDeleted(ResponseCodeEnum.PAYER_ACCOUNT_DELETED),
     CustomFeeChargingExceededMaxRecursionDepth(ResponseCodeEnum.CUSTOM_FEE_CHARGING_EXCEEDED_MAX_RECURSION_DEPTH),
-    CustomFeeChargingExceededMaxAccountAmounts(ResponseCodeEnum.CUSTOM_FEE_CHARGING_EXCEEDED_MAX_ACCOUNT_AMOUNTS);
+    CustomFeeChargingExceededMaxAccountAmounts(ResponseCodeEnum.CUSTOM_FEE_CHARGING_EXCEEDED_MAX_ACCOUNT_AMOUNTS),
+    InsufficientSenderAccountBalanceForCustomFee(ResponseCodeEnum.INSUFFICIENT_SENDER_ACCOUNT_BALANCE_FOR_CUSTOM_FEE),
+    SerialNumberLimitReached(ResponseCodeEnum.SERIAL_NUMBER_LIMIT_REACHED),
+    CustomRoyaltyFeeOnlyAllowedForNonFungibleUnique(ResponseCodeEnum.CUSTOM_ROYALTY_FEE_ONLY_ALLOWED_FOR_NON_FUNGIBLE_UNIQUE),
+    NoRemainingAutoAssociations(ResponseCodeEnum.NO_REMAINING_AUTO_ASSOCIATIONS),
+    ExistingAutomaticAssociationsExceedGivenLimit(ResponseCodeEnum.EXISTING_AUTOMATIC_ASSOCIATIONS_EXCEED_GIVEN_LIMIT);
 
     private final ResponseCodeEnum responseCode;
 
@@ -442,7 +447,7 @@ public enum Status {
             case CUSTOM_FEE_MUST_BE_POSITIVE: return CustomFeeMustBePositive;
             case TOKEN_HAS_NO_FEE_SCHEDULE_KEY: return TokenHasNoFeeScheduleKey;
             case CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE: return CustomFeeOutsideNumericRange;
-            case INVALID_CUSTOM_FRACTIONAL_FEES_SUM: return InvalidCustomFractionalFeesSum;
+            case ROYALTY_FRACTION_CANNOT_EXCEED_ONE: return RoyaltyFractionCannotExceedOne;
             case FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT: return FractionalFeeMaxAmountLessThanMinAmount;
             case CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES: return CustomScheduleAlreadyHasNoFees;
             case CUSTOM_FEE_DENOMINATION_MUST_BE_FUNGIBLE_COMMON: return CustomFeeDenominationMustBeFungibleCommon;
@@ -459,6 +464,11 @@ public enum Status {
             case PAYER_ACCOUNT_DELETED: return PayerAccountDeleted;
             case CUSTOM_FEE_CHARGING_EXCEEDED_MAX_RECURSION_DEPTH: return CustomFeeChargingExceededMaxRecursionDepth;
             case CUSTOM_FEE_CHARGING_EXCEEDED_MAX_ACCOUNT_AMOUNTS: return CustomFeeChargingExceededMaxAccountAmounts;
+            case INSUFFICIENT_SENDER_ACCOUNT_BALANCE_FOR_CUSTOM_FEE: return InsufficientSenderAccountBalanceForCustomFee;
+            case SERIAL_NUMBER_LIMIT_REACHED: return SerialNumberLimitReached;
+            case CUSTOM_ROYALTY_FEE_ONLY_ALLOWED_FOR_NON_FUNGIBLE_UNIQUE: return CustomRoyaltyFeeOnlyAllowedForNonFungibleUnique;
+            case NO_REMAINING_AUTO_ASSOCIATIONS: return NoRemainingAutoAssociations;
+            case EXISTING_AUTOMATIC_ASSOCIATIONS_EXCEED_GIVEN_LIMIT: return ExistingAutomaticAssociationsExceedGivenLimit;
             case UNRECOGNIZED:
                 // protobufs won't give us the actual value that was unexpected, unfortunately
                 throw new IllegalArgumentException(
