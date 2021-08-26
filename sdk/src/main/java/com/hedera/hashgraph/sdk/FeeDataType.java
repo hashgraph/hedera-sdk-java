@@ -21,12 +21,14 @@ public enum FeeDataType {
     TOKEN_NON_FUNGIBLE_UNIQUE(SubType.TOKEN_NON_FUNGIBLE_UNIQUE),
 
     /**
-     * The resource prices are scoped to an operation on a fungible common token with a custom fee schedule
+     * The resource prices are scoped to an operation on a fungible common
+     * token with a custom fee schedule
      */
     TOKEN_FUNGIBLE_COMMON_WITH_CUSTOM_FEES(SubType.TOKEN_FUNGIBLE_COMMON_WITH_CUSTOM_FEES),
 
     /**
-     * The resource prices are scoped to an operation on a non-fungible unique token with a custom fee schedule
+     * The resource prices are scoped to an operation on a non-fungible unique
+     * token with a custom fee schedule
      */
     TOKEN_NON_FUNGIBLE_UNIQUE_WITH_CUSTOM_FEES(SubType.TOKEN_NON_FUNGIBLE_UNIQUE_WITH_CUSTOM_FEES);
 

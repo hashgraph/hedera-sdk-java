@@ -29,14 +29,34 @@ import "basic_types.proto";
 import "query_header.proto";
 import "response_header.proto";
 
-/* Get the deployed versions of Hedera Services and the HAPI proto in semantic version format */
+/**
+ * Get the deployed versions of Hedera Services and the HAPI proto in semantic version format
+ */
 message NetworkGetVersionInfoQuery {
-    QueryHeader header = 1; // Standard info sent from client to node, including the signed payment, and what kind of response is requested (cost, state proof, both, or neither).
+    /**
+     * Standard info sent from client to node, including the signed payment, and what kind of
+     * response is requested (cost, state proof, both, or neither).
+     */
+    QueryHeader header = 1;
 }
 
-/* Response when the client sends the node NetworkGetVersionInfoQuery */
+/**
+ * Response when the client sends the node NetworkGetVersionInfoQuery
+ */
 message NetworkGetVersionInfoResponse {
-    ResponseHeader header = 1; // Standard response from node to client, including the requested fields: cost, or state proof, or both, or neither
-    SemanticVersion hapiProtoVersion = 2; // The Hedera API (HAPI) protobuf version recognized by the responding node.
-    SemanticVersion hederaServicesVersion = 3; // The version of the Hedera Services software deployed on the responding node.
+    /**
+     * Standard response from node to client, including the requested fields: cost, or state proof,
+     * or both, or neither
+     */
+    ResponseHeader header = 1;
+
+    /**
+     * The Hedera API (HAPI) protobuf version recognized by the responding node.
+     */
+    SemanticVersion hapiProtoVersion = 2;
+
+    /**
+     * The version of the Hedera Services software deployed on the responding node.
+     */
+    SemanticVersion hederaServicesVersion = 3;
 }

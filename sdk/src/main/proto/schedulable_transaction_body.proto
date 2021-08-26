@@ -65,50 +65,183 @@ import "token_dissociate.proto";
 
 import "schedule_delete.proto";
 
-/* A schedulable transaction. Note that the global/dynamic system property 
-<tt>scheduling.whitelist</tt> controls which transaction types may be scheduled. 
-In Hedera Services 0.13.0, it will include only <tt>CryptoTransfer</tt> and
-<tt>ConsensusSubmitMessage</tt> functions. */
+/**
+ * A schedulable transaction. Note that the global/dynamic system property
+ * <tt>scheduling.whitelist</tt> controls which transaction types may be scheduled.  In Hedera
+ * Services 0.13.0, it will include only <tt>CryptoTransfer</tt> and <tt>ConsensusSubmitMessage</tt>
+ * functions.
+ */
 message SchedulableTransactionBody {
-  uint64 transactionFee = 1; // The maximum transaction fee the client is willing to pay
-  string memo = 2; // A memo to include the execution record; the UTF-8 encoding may be up to 100 bytes and must not include the zero byte
+  /**
+   * The maximum transaction fee the client is willing to pay
+   */
+  uint64 transactionFee = 1;
+
+  /**
+   * A memo to include the execution record; the UTF-8 encoding may be up to 100 bytes and must not
+   * include the zero byte
+   */
+  string memo = 2;
+
   oneof data {
-    ContractCallTransactionBody contractCall = 3; // Calls a function of a contract instance
-    ContractCreateTransactionBody contractCreateInstance = 4; // Creates a contract instance
-    ContractUpdateTransactionBody contractUpdateInstance = 5; // Updates a contract
-    ContractDeleteTransactionBody contractDeleteInstance = 6; //Delete contract and transfer remaining balance into specified account
+    /**
+     * Calls a function of a contract instance
+     */
+    ContractCallTransactionBody contractCall = 3;
 
-    CryptoCreateTransactionBody cryptoCreateAccount = 7; // Create a new cryptocurrency account
-    CryptoDeleteTransactionBody cryptoDelete = 8; // Delete a cryptocurrency account (mark as deleted, and transfer hbars out)
-    CryptoTransferTransactionBody cryptoTransfer = 9; // Transfer amount between accounts
-    CryptoUpdateTransactionBody cryptoUpdateAccount = 10; // Modify information such as the expiration date for an account
+    /**
+     * Creates a contract instance
+     */
+    ContractCreateTransactionBody contractCreateInstance = 4;
 
-    FileAppendTransactionBody fileAppend = 11; // Add bytes to the end of the contents of a file
-    FileCreateTransactionBody fileCreate = 12; // Create a new file
-    FileDeleteTransactionBody fileDelete = 13; // Delete a file (remove contents and mark as deleted until it expires)
-    FileUpdateTransactionBody fileUpdate = 14; // Modify information such as the expiration date for a file
-    SystemDeleteTransactionBody systemDelete = 15; // Hedera administrative deletion of a file or smart contract
-    SystemUndeleteTransactionBody systemUndelete = 16; //To undelete an entity deleted by SystemDelete
-    FreezeTransactionBody freeze = 17; // Freeze the nodes
+    /**
+     * Updates a contract
+     */
+    ContractUpdateTransactionBody contractUpdateInstance = 5;
 
-    ConsensusCreateTopicTransactionBody consensusCreateTopic = 18; // Creates a topic
-    ConsensusUpdateTopicTransactionBody consensusUpdateTopic = 19; // Updates a topic
-    ConsensusDeleteTopicTransactionBody consensusDeleteTopic = 20; // Deletes a topic
-    ConsensusSubmitMessageTransactionBody consensusSubmitMessage = 21; // Submits message to a topic
+    /**
+     * Delete contract and transfer remaining balance into specified account
+     */
+    ContractDeleteTransactionBody contractDeleteInstance = 6;
 
-    TokenCreateTransactionBody tokenCreation = 22; // Creates a token instance
-    TokenFreezeAccountTransactionBody tokenFreeze = 23; // Freezes account not to be able to transact with a token
-    TokenUnfreezeAccountTransactionBody tokenUnfreeze = 24; // Unfreezes account for a token
-    TokenGrantKycTransactionBody tokenGrantKyc = 25; // Grants KYC to an account for a token
-    TokenRevokeKycTransactionBody tokenRevokeKyc = 26; // Revokes KYC of an account for a token
-    TokenDeleteTransactionBody tokenDeletion = 27; // Deletes a token instance
-    TokenUpdateTransactionBody tokenUpdate = 28; // Updates a token instance
-    TokenMintTransactionBody tokenMint = 29; // Mints new tokens to a token's treasury account
-    TokenBurnTransactionBody tokenBurn = 30; // Burns tokens from a token's treasury account
-    TokenWipeAccountTransactionBody tokenWipe = 31; // Wipes amount of tokens from an account
-    TokenAssociateTransactionBody tokenAssociate = 32; // Associate tokens to an account
-    TokenDissociateTransactionBody tokenDissociate = 33; // Dissociate tokens from an account
+    /**
+     * Create a new cryptocurrency account
+     */
+    CryptoCreateTransactionBody cryptoCreateAccount = 7;
 
-    ScheduleDeleteTransactionBody scheduleDelete = 34; // Marks a schedule in the network's action queue as deleted, preventing it from executing
+    /**
+     * Delete a cryptocurrency account (mark as deleted, and transfer hbars out)
+     */
+    CryptoDeleteTransactionBody cryptoDelete = 8;
+
+    /**
+     * Transfer amount between accounts
+     */
+    CryptoTransferTransactionBody cryptoTransfer = 9;
+
+    /**
+     * Modify information such as the expiration date for an account
+     */
+    CryptoUpdateTransactionBody cryptoUpdateAccount = 10;
+
+    /**
+     * Add bytes to the end of the contents of a file
+     */
+    FileAppendTransactionBody fileAppend = 11;
+
+    /**
+     * Create a new file
+     */
+    FileCreateTransactionBody fileCreate = 12;
+
+    /**
+     * Delete a file (remove contents and mark as deleted until it expires)
+     */
+    FileDeleteTransactionBody fileDelete = 13;
+
+    /**
+     * Modify information such as the expiration date for a file
+     */
+    FileUpdateTransactionBody fileUpdate = 14;
+
+    /**
+     * Hedera administrative deletion of a file or smart contract
+     */
+    SystemDeleteTransactionBody systemDelete = 15;
+
+    /**
+     * To undelete an entity deleted by SystemDelete
+     */
+    SystemUndeleteTransactionBody systemUndelete = 16;
+
+    /**
+     * Freeze the nodes
+     */
+    FreezeTransactionBody freeze = 17;
+
+    /**
+     * Creates a topic
+     */
+    ConsensusCreateTopicTransactionBody consensusCreateTopic = 18;
+
+    /**
+     * Updates a topic
+     */
+    ConsensusUpdateTopicTransactionBody consensusUpdateTopic = 19;
+
+    /**
+     * Deletes a topic
+     */
+    ConsensusDeleteTopicTransactionBody consensusDeleteTopic = 20;
+
+    /**
+     * Submits message to a topic
+     */
+    ConsensusSubmitMessageTransactionBody consensusSubmitMessage = 21;
+
+    /**
+     * Creates a token instance
+     */
+    TokenCreateTransactionBody tokenCreation = 22;
+
+    /**
+     * Freezes account not to be able to transact with a token
+     */
+    TokenFreezeAccountTransactionBody tokenFreeze = 23;
+
+    /**
+     * Unfreezes account for a token
+     */
+    TokenUnfreezeAccountTransactionBody tokenUnfreeze = 24;
+
+    /**
+     * Grants KYC to an account for a token
+     */
+    TokenGrantKycTransactionBody tokenGrantKyc = 25;
+
+    /**
+     * Revokes KYC of an account for a token
+     */
+    TokenRevokeKycTransactionBody tokenRevokeKyc = 26;
+
+    /**
+     * Deletes a token instance
+     */
+    TokenDeleteTransactionBody tokenDeletion = 27;
+
+    /**
+     * Updates a token instance
+     */
+    TokenUpdateTransactionBody tokenUpdate = 28;
+
+    /**
+     * Mints new tokens to a token's treasury account
+     */
+    TokenMintTransactionBody tokenMint = 29;
+
+    /**
+     * Burns tokens from a token's treasury account
+     */
+    TokenBurnTransactionBody tokenBurn = 30;
+
+    /**
+     * Wipes amount of tokens from an account
+     */
+    TokenWipeAccountTransactionBody tokenWipe = 31;
+
+    /**
+     * Associate tokens to an account
+     */
+    TokenAssociateTransactionBody tokenAssociate = 32;
+
+    /**
+     * Dissociate tokens from an account
+     */
+    TokenDissociateTransactionBody tokenDissociate = 33;
+
+    /**
+     * Marks a schedule in the network's action queue as deleted, preventing it from executing
+     */
+    ScheduleDeleteTransactionBody scheduleDelete = 34;
   }
 }

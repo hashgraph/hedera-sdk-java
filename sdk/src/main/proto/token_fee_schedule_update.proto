@@ -28,15 +28,24 @@ option java_multiple_files = true;
 import "basic_types.proto";
 import "custom_fees.proto";
 
-/* At consensus, updates a token type's fee schedule to the given list of custom fees. 
-
-If the target token type has no fee_schedule_key, resolves to TOKEN_HAS_NO_FEE_SCHEDULE_KEY.
-Otherwise this transaction must be signed to the fee_schedule_key, or the transaction will 
-resolve to INVALID_SIGNATURE.
-
-If the custom_fees list is empty, clears the fee schedule or resolves to 
-CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES if the fee schedule was already empty. */
+/**
+ * At consensus, updates a token type's fee schedule to the given list of custom fees. 
+ * 
+ * If the target token type has no fee_schedule_key, resolves to TOKEN_HAS_NO_FEE_SCHEDULE_KEY.
+ * Otherwise this transaction must be signed to the fee_schedule_key, or the transaction will 
+ * resolve to INVALID_SIGNATURE.
+ * 
+ * If the custom_fees list is empty, clears the fee schedule or resolves to 
+ * CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES if the fee schedule was already empty.
+ */
 message TokenFeeScheduleUpdateTransactionBody {
-    TokenID token_id = 1; // The token whose fee schedule is to be updated
-    repeated CustomFee custom_fees = 2; // The new custom fees to be assessed during a CryptoTransfer that transfers units of this token
+    /**
+     * The token whose fee schedule is to be updated
+     */
+    TokenID token_id = 1;
+
+    /**
+     * The new custom fees to be assessed during a CryptoTransfer that transfers units of this token
+     */
+    repeated CustomFee custom_fees = 2;
 }

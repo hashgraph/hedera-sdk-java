@@ -29,41 +29,92 @@ import "response.proto";
 import "transaction_response.proto";
 import "transaction.proto";
 
-/* Transactions and queries for the Token Service */
+/**
+ * Transactions and queries for the Token Service
+ */
 service TokenService {
-    // Creates a new Token by submitting the transaction
+    /**
+     * Creates a new Token by submitting the transaction
+     */
     rpc createToken (Transaction) returns (TransactionResponse);
-    // Updates the account by submitting the transaction
+
+    /**
+     * Updates the account by submitting the transaction
+     */
     rpc updateToken (Transaction) returns (TransactionResponse);
-    // Mints an amount of the token to the defined treasury account
+
+    /**
+     * Mints an amount of the token to the defined treasury account
+     */
     rpc mintToken (Transaction) returns (TransactionResponse);
-    // Burns an amount of the token from the defined treasury account
+
+    /**
+     * Burns an amount of the token from the defined treasury account
+     */
     rpc burnToken (Transaction) returns (TransactionResponse);
-    // Deletes a Token
+
+    /**
+     * Deletes a Token
+     */
     rpc deleteToken (Transaction) returns (TransactionResponse);
-    // Wipes the provided amount of tokens from the specified Account ID
+
+    /**
+     * Wipes the provided amount of tokens from the specified Account ID
+     */
     rpc wipeTokenAccount (Transaction) returns (TransactionResponse);
-    // Freezes the transfer of tokens to or from the specified Account ID
+
+    /**
+     * Freezes the transfer of tokens to or from the specified Account ID
+     */
     rpc freezeTokenAccount (Transaction) returns (TransactionResponse);
-    // Unfreezes the transfer of tokens to or from the specified Account ID
+
+    /**
+     * Unfreezes the transfer of tokens to or from the specified Account ID
+     */
     rpc unfreezeTokenAccount (Transaction) returns (TransactionResponse);
-    // Flags the provided Account ID as having gone through KYC
+
+    /**
+     * Flags the provided Account ID as having gone through KYC
+     */
     rpc grantKycToTokenAccount (Transaction) returns (TransactionResponse);
-    // Removes the KYC flag of the provided Account ID
+
+    /**
+     * Removes the KYC flag of the provided Account ID
+     */
     rpc revokeKycFromTokenAccount (Transaction) returns (TransactionResponse);
-    // Associates tokens to an account
+
+    /**
+     * Associates tokens to an account
+     */
     rpc associateTokens (Transaction) returns (TransactionResponse);
-    // Dissociates tokens from an account
+
+    /**
+     * Dissociates tokens from an account
+     */
     rpc dissociateTokens (Transaction) returns (TransactionResponse);
-    // Updates the custom fee schedule on a token
+
+    /**
+     * Updates the custom fee schedule on a token
+     */
     rpc updateTokenFeeSchedule (Transaction) returns (TransactionResponse);
 
-    // Retrieves the metadata of a token
+    /**
+     * Retrieves the metadata of a token
+     */
     rpc getTokenInfo (Query) returns (Response);
-    // Gets info on NFTs N through M on the list of NFTs associated with a given account
+
+    /**
+     * Gets info on NFTs N through M on the list of NFTs associated with a given account
+     */
     rpc getAccountNftInfos (Query) returns (Response);
-    // Retrieves the metadata of an NFT by TokenID and serial number
+
+    /**
+     * Retrieves the metadata of an NFT by TokenID and serial number
+     */
     rpc getTokenNftInfo (Query) returns (Response);
-    // Gets info on NFTs N through M on the list of NFTs associated with a given Token of type NON_FUNGIBLE
+
+    /**
+     * Gets info on NFTs N through M on the list of NFTs associated with a given Token of type NON_FUNGIBLE
+     */
     rpc getTokenNftInfos (Query) returns (Response);
 }

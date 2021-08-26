@@ -30,26 +30,75 @@ import "query_header.proto";
 import "response_header.proto";
 import "timestamp.proto";
 
-/* Represents an NFT on the Ledger */
+/**
+ * Represents an NFT on the Ledger
+ */
 message NftID {
-    TokenID tokenID = 1; // The (non-fungible) token of which this NFT is an instance
-    int64 serialNumber = 2; // The unique identifier of this instance
+    /**
+     * The (non-fungible) token of which this NFT is an instance
+     */
+    TokenID tokenID = 1;
+
+    /**
+     * The unique identifier of this instance
+     */
+    int64 serialNumber = 2;
 }
 
-/* Applicable only to tokens of type NON_FUNGIBLE_UNIQUE. Gets info on a NFT for a given TokenID (of type NON_FUNGIBLE_UNIQUE) and serial number */
+/**
+ * Applicable only to tokens of type NON_FUNGIBLE_UNIQUE. Gets info on a NFT for a given TokenID (of
+ * type NON_FUNGIBLE_UNIQUE) and serial number
+ */
 message TokenGetNftInfoQuery {
-    QueryHeader header = 1; // Standard info sent from client to node, including the signed payment, and what kind of response is requested (cost, state proof, both, or neither).
-    NftID nftID = 2; // The ID of the NFT
+    /**
+     * Standard info sent from client to node, including the signed payment, and what kind of
+     * response is requested (cost, state proof, both, or neither).
+     */
+    QueryHeader header = 1;
+
+    /**
+     * The ID of the NFT
+     */
+    NftID nftID = 2;
 }
 
+/**
+ * UNDOCUMENTED
+ */
 message TokenNftInfo {
-    NftID nftID = 1; // The ID of the NFT
-    AccountID accountID = 2; // The current owner of the NFT
-    Timestamp creationTime = 3; // The effective consensus timestamp at which the NFT was minted
-    bytes metadata = 4; // Represents the unique metadata of the NFT
+    /**
+     * The ID of the NFT
+     */
+    NftID nftID = 1;
+
+    /**
+     * The current owner of the NFT
+     */
+    AccountID accountID = 2;
+
+    /**
+     * The effective consensus timestamp at which the NFT was minted
+     */
+    Timestamp creationTime = 3;
+
+    /**
+     * Represents the unique metadata of the NFT
+     */
+    bytes metadata = 4;
 }
 
+/**
+ * UNDOCUMENTED
+ */
 message TokenGetNftInfoResponse {
-    ResponseHeader header = 1; // Standard response from node to client, including the requested fields: cost, or state proof, or both, or neither
-    TokenNftInfo nft = 2; // The information about this NFT
+    /**
+     * Standard response from node to client, including the requested fields: cost, or state proof,
+     * or both, or neither
+     */
+    ResponseHeader header = 1;
+
+    /**
+     * The information about this NFT
+     */
+    TokenNftInfo nft = 2;
 }

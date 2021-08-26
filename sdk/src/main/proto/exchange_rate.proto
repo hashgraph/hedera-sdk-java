@@ -27,21 +27,38 @@ option java_multiple_files = true;
 import "timestamp.proto";
 
 
-/*
-An exchange rate between hbar and cents (USD) and the time at which the exchange rate will expire, and be superseded by a new exchange rate.
-*/
+/**
+ * An exchange rate between hbar and cents (USD) and the time at which the exchange rate will
+ * expire, and be superseded by a new exchange rate. 
+ */
 message ExchangeRate {
-    // Denominator in calculation of exchange rate between hbar and cents
+    /**
+     * Denominator in calculation of exchange rate between hbar and cents
+     */
     int32 hbarEquiv = 1;
-    // Numerator in calculation of exchange rate between hbar and cents
+
+    /**
+     * Numerator in calculation of exchange rate between hbar and cents
+     */
     int32 centEquiv = 2;
-    // Expiration time in seconds for this exchange rate
+
+    /**
+     * Expiration time in seconds for this exchange rate
+     */
     TimestampSeconds expirationTime = 3;
 }
-/* Two sets of exchange rates */
+
+/**
+ * Two sets of exchange rates
+ */
 message ExchangeRateSet {
-    // Current exchange rate
+    /**
+     * Current exchange rate
+     */
     ExchangeRate currentRate = 1;
-    // Next exchange rate which will take effect when current rate expires
+
+    /**
+     * Next exchange rate which will take effect when current rate expires
+     */
     ExchangeRate nextRate = 2;
 }

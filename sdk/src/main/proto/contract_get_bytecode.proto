@@ -29,15 +29,35 @@ import "basic_types.proto";
 import "query_header.proto";
 import "response_header.proto";
 
-/* Get the bytecode for a smart contract instance */
+/**
+ * Get the bytecode for a smart contract instance
+ */
 message ContractGetBytecodeQuery {
-    QueryHeader header = 1; // standard info sent from client to node, including the signed payment, and what kind of response is requested (cost, state proof, both, or neither).
-    ContractID contractID = 2; // the contract for which information is requested
+    /**
+     * standard info sent from client to node, including the signed payment, and what kind of
+     * response is requested (cost, state proof, both, or neither).
+     */
+    QueryHeader header = 1;
+
+    /**
+     * the contract for which information is requested
+     */
+    ContractID contractID = 2;
 }
 
-/* Response when the client sends the node ContractGetBytecodeQuery */
+/**
+ * Response when the client sends the node ContractGetBytecodeQuery
+ */
 message ContractGetBytecodeResponse {
-    ResponseHeader header = 1; //standard response from node to client, including the requested fields: cost, or state proof, or both, or neither
-    bytes bytecode = 6; // the bytecode
+    /**
+     * standard response from node to client, including the requested fields: cost, or state proof,
+     * or both, or neither
+     */
+    ResponseHeader header = 1;
+
+    /**
+     * the bytecode
+     */
+    bytes bytecode = 6;
 }
 

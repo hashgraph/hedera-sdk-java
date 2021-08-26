@@ -30,20 +30,53 @@ import "query_header.proto";
 import "response_header.proto";
 import "timestamp.proto";
 
-/* Get the balance of a cryptocurrency account. This returns only the balance, so it is a smaller
-reply than CryptoGetInfo, which returns the balance plus additional information. */
+/**
+ * Get the balance of a cryptocurrency account. This returns only the balance, so it is a smaller
+ * reply than CryptoGetInfo, which returns the balance plus additional information.
+ */
 message CryptoGetAccountBalanceQuery {
-    QueryHeader header = 1; // Standard info sent from client to node, including the signed payment, and what kind of response is requested (cost, state proof, both, or neither).
+    /**
+     * Standard info sent from client to node, including the signed payment, and what kind of
+     * response is requested (cost, state proof, both, or neither).
+     */
+    QueryHeader header = 1;
+
     oneof balanceSource {
-    	AccountID accountID = 2; // The account ID for which information is requested
-    	ContractID contractID = 3; // The account ID for which information is requested
+    	/**
+    	 * The account ID for which information is requested
+    	 */
+    	AccountID accountID = 2;
+
+    	/**
+    	 * The account ID for which information is requested
+    	 */
+    	ContractID contractID = 3;
     }
 }
 
-/* Response when the client sends the node CryptoGetAccountBalanceQuery */
+/**
+ * Response when the client sends the node CryptoGetAccountBalanceQuery
+ */
 message CryptoGetAccountBalanceResponse {
-    ResponseHeader header = 1; // Standard response from node to client, including the requested fields: cost, or state proof, or both, or neither.
-    AccountID accountID = 2; // The account ID that is being described (this is useful with state proofs, for proving to a third party)
-    uint64 balance = 3; // The current balance, in tinybars.
-    repeated TokenBalance tokenBalances = 4; // The token balances possessed by the target account.
+    /**
+     * Standard response from node to client, including the requested fields: cost, or state proof,
+     * or both, or neither.
+     */
+    ResponseHeader header = 1;
+
+    /**
+     * The account ID that is being described (this is useful with state proofs, for proving to a
+     * third party)
+     */
+    AccountID accountID = 2;
+
+    /**
+     * The current balance, in tinybars.
+     */
+    uint64 balance = 3;
+
+    /**
+     * The token balances possessed by the target account.
+     */
+    repeated TokenBalance tokenBalances = 4;
 }
