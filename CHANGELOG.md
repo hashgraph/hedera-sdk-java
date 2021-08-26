@@ -8,12 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Unreleased
 
- * Added `Account[Create|Update]Transaction.[get|set]maxAutomaticTokenAssociations`
- * Added `TokenAssociation` and `TransactionRecord.automaticTokenAssociations`
- * Added `AccountInfo.maxAutomaticTokenAssociations`
- * Added `TokenRelationship.automaticAssociation`
+### Added
 
-### v2.0.12
+ * `Account[Create|Update]Transaction.[get|set]maxAutomaticTokenAssociations`
+ * `TokenAssociation` and `TransactionRecord.automaticTokenAssociations`
+ * `AccountInfo.maxAutomaticTokenAssociations`
+ * `TokenRelationship.automaticAssociation`
+
+### Deprecated
+
+ * `TokenNftInfoQuery.[set|get]AccountId()` with no replacement
+ * `TokenNftInfoQuery.[set|get]TokenId()` with no replacement
+ * `TokenNftInfoQuery.[set|get]Start()` with no replacement
+ * `TokenNftInfoQuery.[set|get]End()` with no replacement
+
+## v2.0.12
 
 ### Added
 
@@ -33,7 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  * Deprecated `Client.setMax[TransactionFee|QueryPayment]()`, added `Client.setDefaultMax[TransactionFee|QueryPayment]()` and `Client.getDefaultMax[TransactionFee|QueryPayment]()`
 
-### v2.0.11
+## v2.0.11
 
 ### Added
 
