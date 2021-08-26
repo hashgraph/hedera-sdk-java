@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.ByteString;
 import org.bouncycastle.crypto.digests.SHA384Digest;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -13,23 +14,12 @@ class HederaTrustManager implements X509TrustManager {
     @Nullable
     private final String certHash;
 
-    HederaTrustManager(@Nullable NetworkName networkName, AccountId nodeAccountId) {
-        if (networkName == null) {
+    HederaTrustManager(@Nullable ByteString certHash) {
+        if (certHash == null || certHash.isEmpty()) {
             this.certHash = null;
-            return;
+        } else {
+            this.certHash = new String(certHash.toByteArray(), StandardCharsets.UTF_8);
         }
-
-        var nodeAddressBook = Network.nodeAddressBooks.get(networkName);
-        if (nodeAddressBook == null) {
-            throw new IllegalStateException("Unrecognized network name");
-        }
-
-        var nodeAddress = nodeAddressBook.get(nodeAccountId);
-        if (nodeAddress == null) {
-            throw new IllegalStateException("could not find node account ID within address book");
-        }
-
-        this.certHash = new String(nodeAddress.certHash.toByteArray(), StandardCharsets.UTF_8);
     }
 
     @Override
@@ -45,7 +35,9 @@ class HederaTrustManager implements X509TrustManager {
         for (var cert : chain) {
             var digest = new SHA384Digest();
             var certHash = new byte[digest.getDigestSize()];
-            digest.update(cert.getEncoded(), 0, cert.getEncoded().length);
+            var certEncoded = cert.getEncoded();
+
+            digest.update(certEncoded, 0, certEncoded.length);
             digest.doFinal(certHash, 0);
 
             if (this.certHash.equals(Hex.toHexString(certHash))) {
@@ -53,7 +45,7 @@ class HederaTrustManager implements X509TrustManager {
             }
         }
 
-        throw new CertificateException();
+        throw new CertificateException("Failed to confirm the server's certificate from a known address book");
     }
 
     @Override

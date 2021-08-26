@@ -44,7 +44,7 @@ dependencies {
 
 	testRuntimeOnly "org.slf4j:slf4j-simple:1.7.30"
 	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.40.0"
-	integrationTestRuntimeOnly "io.grpc:grpc-netty-shaded:1.38.0"
+	integrationTestRuntimeOnly "io.grpc:grpc-netty-shaded:1.40.0"
 
 	// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
 	//       use CompletableFuture directly.
