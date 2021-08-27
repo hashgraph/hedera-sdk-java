@@ -6,21 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-### Unreleased
+### v2.0.13
 
 ### Added
 
- * `Account[Create|Update]Transaction.[get|set]maxAutomaticTokenAssociations`
+ * `Account[Create|Update]Transaction.[get|set]MaxAutomaticTokenAssociations`
  * `TokenAssociation` and `TransactionRecord.automaticTokenAssociations`
  * `AccountInfo.maxAutomaticTokenAssociations`
  * `TokenRelationship.automaticAssociation`
-
+ * New status codes
+ 
 ### Deprecated
 
  * `TokenNftInfoQuery.[set|get]AccountId()` with no replacement
  * `TokenNftInfoQuery.[set|get]TokenId()` with no replacement
  * `TokenNftInfoQuery.[set|get]Start()` with no replacement
  * `TokenNftInfoQuery.[set|get]End()` with no replacement
+
+### Fixed
+
+ * TLS connector failing when the networks address book did not have cert hashes
+
 
 ## v2.0.12
 
