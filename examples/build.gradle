@@ -2,11 +2,11 @@ dependencies {
 	// implementation "com.hedera.hashgraph:sdk:2.0.3"
 	implementation project(":sdk")
 
-	implementation "com.google.code.gson:gson:2.8.6"
+	implementation "com.google.code.gson:gson:2.8.8"
 	implementation "org.slf4j:slf4j-simple:2.0.0-alpha1"
 	implementation "io.grpc:grpc-netty-shaded:1.40.0"
-	implementation "io.github.cdimascio:java-dotenv:5.2.2"
-	implementation "com.google.errorprone:error_prone_core:2.8.1"
+	implementation "io.github.cdimascio:java-dotenv:5.3.1"
+	implementation "com.google.errorprone:error_prone_core:2.9.0"
 }
 
 java {
@@ -30,5 +30,6 @@ tasks.addRule("Pattern: run<Example>: Runs an example.") { String taskName ->
 tasks.withType(JavaCompile).configureEach {
 	options.errorprone {
 		disable("DefaultPackage")
+		disable("SystemOut")
 	}
 }

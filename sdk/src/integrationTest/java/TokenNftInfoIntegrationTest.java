@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Disabled
+
 class TokenNftInfoIntegrationTest {
 
     @Test
@@ -156,6 +156,7 @@ class TokenNftInfoIntegrationTest {
         });
     }
 
+    @Disabled
     @Test
     @DisplayName("Can query NFT info by AccountId")
     void canQueryNftInfoByAccountId() {
@@ -205,6 +206,7 @@ class TokenNftInfoIntegrationTest {
         });
     }
 
+    @Disabled
     @Test
     @DisplayName("Can query NFT info by TokenId")
     void canQueryNftInfoByTokenId() {

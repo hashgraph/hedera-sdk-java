@@ -1107,7 +1107,17 @@ public enum Status {
     /**
      * Only tokens of type NON_FUNGIBLE_UNIQUE can have royalty fees
      */
-    CUSTOM_ROYALTY_FEE_ONLY_ALLOWED_FOR_NON_FUNGIBLE_UNIQUE(ResponseCodeEnum.CUSTOM_ROYALTY_FEE_ONLY_ALLOWED_FOR_NON_FUNGIBLE_UNIQUE);
+    CUSTOM_ROYALTY_FEE_ONLY_ALLOWED_FOR_NON_FUNGIBLE_UNIQUE(ResponseCodeEnum.CUSTOM_ROYALTY_FEE_ONLY_ALLOWED_FOR_NON_FUNGIBLE_UNIQUE),
+
+    /**
+     * The account has reached the limit on the automatic associations count.
+     */
+    NO_REMAINING_AUTO_ASSOCIATIONS(ResponseCodeEnum.NO_REMAINING_AUTO_ASSOCIATIONS),
+
+    /**
+     * Already existing automatic associations are more than the new maximum automatic associations.
+     */
+    EXISTING_AUTOMATIC_ASSOCIATIONS_EXCEED_GIVEN_LIMIT(ResponseCodeEnum.EXISTING_AUTOMATIC_ASSOCIATIONS_EXCEED_GIVEN_LIMIT);
 
     final ResponseCodeEnum code;
 
@@ -1557,6 +1567,10 @@ public enum Status {
                 return SERIAL_NUMBER_LIMIT_REACHED;
             case CUSTOM_ROYALTY_FEE_ONLY_ALLOWED_FOR_NON_FUNGIBLE_UNIQUE:
                 return CUSTOM_ROYALTY_FEE_ONLY_ALLOWED_FOR_NON_FUNGIBLE_UNIQUE;
+            case NO_REMAINING_AUTO_ASSOCIATIONS:
+                return NO_REMAINING_AUTO_ASSOCIATIONS;
+            case EXISTING_AUTOMATIC_ASSOCIATIONS_EXCEED_GIVEN_LIMIT:
+                return EXISTING_AUTOMATIC_ASSOCIATIONS_EXCEED_GIVEN_LIMIT;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

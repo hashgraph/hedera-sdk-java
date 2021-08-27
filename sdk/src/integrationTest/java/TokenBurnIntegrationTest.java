@@ -149,7 +149,7 @@ class TokenBurnIntegrationTest {
         });
     }
 
-    @Disabled
+
     @Test
     @DisplayName("Can burn NFTs")
     void canBurnNfts() {
@@ -187,6 +187,8 @@ class TokenBurnIntegrationTest {
 
             var serialsLeft = new ArrayList<Long>(mintReceipt.serials.subList(4, 10));
 
+            // TODO: re-enable this check once TokenNftInfoQuery.byTokenId() is supported.
+            /*
             var nftInfos = new TokenNftInfoQuery()
                 .byTokenId(tokenId)
                 .setEnd(6)
@@ -194,13 +196,13 @@ class TokenBurnIntegrationTest {
 
             for (var info : nftInfos) {
                 assertTrue(serialsLeft.remove(info.nftId.serial));
-            }
+            }*/
 
             testEnv.close(tokenId);
         });
     }
 
-    @Disabled
+
     @Test
     @DisplayName("Cannot burn NFTs when NFT is not owned by treasury")
     void cannotBurnNftsWhenNftIsNotOwned() {
