@@ -15,12 +15,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `AccountInfo.maxAutomaticTokenAssociations`
  * `TokenRelationship.automaticAssociation`
  * New status codes
+ 
+### Deprecated
+
+ * `TokenNftInfoQuery.[set|get]AccountId()` with no replacement
+ * `TokenNftInfoQuery.[set|get]TokenId()` with no replacement
+ * `TokenNftInfoQuery.[set|get]Start()` with no replacement
+ * `TokenNftInfoQuery.[set|get]End()` with no replacement
 
 ### Fixed
 
  * TLS connector failing when the networks address book did not have cert hashes
 
-### v2.0.12
+
+## v2.0.12
 
 ### Added
 
@@ -40,7 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  * Deprecated `Client.setMax[TransactionFee|QueryPayment]()`, added `Client.setDefaultMax[TransactionFee|QueryPayment]()` and `Client.getDefaultMax[TransactionFee|QueryPayment]()`
 
-### v2.0.11
+## v2.0.11
 
 ### Added
 
