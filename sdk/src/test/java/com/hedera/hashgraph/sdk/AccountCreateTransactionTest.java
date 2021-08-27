@@ -4,6 +4,7 @@ import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import java.util.Collections;
@@ -26,34 +27,30 @@ public class AccountCreateTransactionTest {
         SnapshotMatcher.validateSnapshots();
     }
 
-    @Test
-    void shouldSerialize() {
-        SnapshotMatcher.expect(new AccountCreateTransaction()
+    AccountCreateTransaction spawnTestTransaction() {
+        return new AccountCreateTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setKey(unusedPrivateKey)
             .setInitialBalance(Hbar.fromTinybars(450))
             .setProxyAccountId(AccountId.fromString("0.0.1001"))
+            .setAccountMemo("some dumb memo")
             .setReceiverSignatureRequired(true)
+            //.setAutoRenewPeriod(Duration.ofHours(10))
+            .setMaxAutomaticTokenAssociations(100)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
-            .sign(unusedPrivateKey)
-            .toString()
-        ).toMatchSnapshot();
+            .sign(unusedPrivateKey);
+    }
+
+    @Test
+    void shouldSerialize() {
+        SnapshotMatcher.expect(spawnTestTransaction().toString()).toMatchSnapshot();
     }
 
     @Test
     void shouldBytes() throws Exception {
-        var tx = new AccountCreateTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setKey(unusedPrivateKey)
-            .setInitialBalance(Hbar.fromTinybars(450))
-            .setProxyAccountId(AccountId.fromString("0.0.1001"))
-            .setReceiverSignatureRequired(true)
-            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .freeze()
-            .sign(unusedPrivateKey);
+        var tx = spawnTestTransaction();
         var tx2 = AccountCreateTransaction.fromBytes(tx.toBytes());
         assertEquals(tx.toString(), tx2.toString());
     }

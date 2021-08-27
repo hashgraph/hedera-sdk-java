@@ -10,7 +10,7 @@ class Node extends ManagedNode implements Comparable<Node> {
     AccountId accountId;
 
     @Nullable
-    NetworkName networkName;
+    NodeAddress addressBook;
 
     long delay;
     long delayUntil;
@@ -28,19 +28,19 @@ class Node extends ManagedNode implements Comparable<Node> {
     }
 
     @Nullable
-    public NetworkName getNetworkName() {
-        return networkName;
+    public NodeAddress getAddressBook() {
+        return addressBook;
     }
 
-    public Node setNetworkName(NetworkName networkName) {
-        this.networkName = networkName;
+    public Node setAddressBook(@Nullable NodeAddress addressBook) {
+        this.addressBook = addressBook;
         return this;
     }
 
     @Override
     ChannelCredentials getChannelCredentials() {
         return TlsChannelCredentials.newBuilder()
-            .trustManager(new HederaTrustManager(networkName, accountId))
+            .trustManager(new HederaTrustManager(addressBook == null ? null : addressBook.certHash))
             .build();
     }
 

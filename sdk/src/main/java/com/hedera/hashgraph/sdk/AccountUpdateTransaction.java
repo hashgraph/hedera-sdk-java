@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.BoolValue;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
+import com.google.protobuf.UInt32Value;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.CryptoUpdateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
@@ -48,6 +49,8 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     private Boolean receiverSigRequired = null;
     @Nullable
     private String accountMemo = null;
+    @Nullable
+    private Integer maxAutomaticTokenAssociations = null;
 
     public AccountUpdateTransaction() {
     }
@@ -157,7 +160,6 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @param autoRenewPeriod The Duration to be set for auto renewal
      * @return {@code this}
      */
-    @Deprecated
     public AccountUpdateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         Objects.requireNonNull(autoRenewPeriod);
         requireNotFrozen();
@@ -180,6 +182,17 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     public AccountUpdateTransaction setReceiverSignatureRequired(boolean receiverSignatureRequired) {
         requireNotFrozen();
         receiverSigRequired = receiverSignatureRequired;
+        return this;
+    }
+
+    @Nullable
+    public Integer getMaxAutomaticTokenAssociations() {
+        return maxAutomaticTokenAssociations;
+    }
+
+    public AccountUpdateTransaction setMaxAutomaticTokenAssociations(int amount) {
+        requireNotFrozen();
+        maxAutomaticTokenAssociations = amount;
         return this;
     }
 
@@ -235,6 +248,9 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         if (body.hasMemo()) {
             accountMemo = body.getMemo().getValue();
         }
+        if (body.hasMaxAutomaticTokenAssociations()) {
+            maxAutomaticTokenAssociations = body.getMaxAutomaticTokenAssociations().getValue();
+        }
     }
 
     @Override
@@ -264,6 +280,9 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         }
         if (accountMemo != null) {
             builder.setMemo(StringValue.of(accountMemo));
+        }
+        if (maxAutomaticTokenAssociations != null) {
+            builder.setMaxAutomaticTokenAssociations(UInt32Value.of(maxAutomaticTokenAssociations));
         }
 
         return builder;

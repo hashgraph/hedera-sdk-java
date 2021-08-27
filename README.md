@@ -20,33 +20,33 @@ Select _one_ of the following depending on your target platform.
 
 ```groovy
 // Android, Corda DJVM, Java 7+
-implementation 'com.hedera.hashgraph:sdk-jdk7:2.0.12'
+implementation 'com.hedera.hashgraph:sdk-jdk7:2.0.13'
 
 // Java 9+, Kotlin
-implementation 'com.hedera.hashgraph:sdk:2.0.12'
+implementation 'com.hedera.hashgraph:sdk:2.0.13'
 ```
 
 Select _one_ of the following to provide the gRPC implementation.
 
 ```groovy
 // netty transport (for high throughput applications)
-implementation 'io.grpc:grpc-netty-shaded:1.38.0'
+implementation 'io.grpc:grpc-netty-shaded:1.40.0'
 
 // netty transport, unshaded (if you have a matching Netty dependency already)
-implementation 'io.grpc:grpc-netty:1.38.0'
+implementation 'io.grpc:grpc-netty:1.40.0'
 
 // okhttp transport (for lighter-weight applications or Android)
-implementation 'io.grpc:grpc-okhttp:1.38.0'
+implementation 'io.grpc:grpc-okhttp:1.40.0'
 ```
 
 Select _one_ of the following to enable or disable Simple Logging Facade for Java (SLFJ4).
 
 ```groovy
 // Enable logs
-implementation 'org.slf4j:slf4j-simple:1.7.29'
+implementation 'org.slf4j:slf4j-simple:2.0.0-alpha1'
 
 // Disable logs
-implementation 'org.slf4j:slf4j-nop:1.7.29'
+implementation 'org.slf4j:slf4j-nop:2.0.0-alpha1'
 
 ```
 
@@ -61,14 +61,14 @@ Select _one_ of the following depending on your target platform.
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>sdk-jdk7</artifactId>
-  <version>2.0.12</version>
+  <version>2.0.13</version>
 </dependency>
 
 <!-- Java 9+, Kotlin -->
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>sdk</artifactId>
-  <version>2.0.12</version>
+  <version>2.0.13</version>
 </dependency>
 ```
 

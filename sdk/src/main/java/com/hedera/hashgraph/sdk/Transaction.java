@@ -655,11 +655,6 @@ public abstract class Transaction<T extends Transaction<T>>
             freezeWith(client);
         }
 
-        if (keyAlreadySigned(operator.publicKey)) {
-            // noinspection unchecked
-            return (T) this;
-        }
-
         return signWith(operator.publicKey, operator.transactionSigner);
     }
 
