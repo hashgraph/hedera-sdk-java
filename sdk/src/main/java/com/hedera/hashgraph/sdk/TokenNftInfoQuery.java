@@ -40,12 +40,24 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
     }
 
     /**
+     * @deprecated use setNftId instead
      * Sets the NFT ID for which information is requested.
      *
      * @param nftId The NftId to be set
      * @return {@code this}
      */
+    @Deprecated
     public TokenNftInfoQuery byNftId(NftId nftId) {
+        return setNftId(nftId);
+    }
+
+    /**
+     * Sets the NFT ID for which information is requested.
+     *
+     * @param nftId The NftId to be set
+     * @return {@code this}
+     */
+    public TokenNftInfoQuery setNftId(NftId nftId) {
         Objects.requireNonNull(nftId);
         this.nftId = nftId;
         return this;
@@ -83,6 +95,7 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
      * @param accountId The Account ID for which information is requested
      * @return {@code this}
      */
+    @Deprecated
     public TokenNftInfoQuery byAccountId(AccountId accountId) {
         Objects.requireNonNull(accountId);
         this.accountId = accountId;

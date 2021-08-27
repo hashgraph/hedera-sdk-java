@@ -14,14 +14,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `TokenAssociation` and `TransactionRecord.automaticTokenAssociations`
  * `AccountInfo.maxAutomaticTokenAssociations`
  * `TokenRelationship.automaticAssociation`
+ * `TokenNftInfoQuery.setNftId()`
  * New status codes
- 
+
 ### Deprecated
 
- * `TokenNftInfoQuery.[set|get]AccountId()` with no replacement
- * `TokenNftInfoQuery.[set|get]TokenId()` with no replacement
+ * `TokenNftInfoQuery.[by|get]AccountId()` with no replacement
+ * `TokenNftInfoQuery.[by|get]TokenId()` with no replacement
  * `TokenNftInfoQuery.[set|get]Start()` with no replacement
  * `TokenNftInfoQuery.[set|get]End()` with no replacement
+ * `TokenNftInfoQuery.byNftId()` use `.setNftId()` instead
 
 ### Fixed
 
