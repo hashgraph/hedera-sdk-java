@@ -30,17 +30,39 @@ import "transaction_record.proto";
 import "query_header.proto";
 import "response_header.proto";
 
-// Requests records of all transactions for which the given account was the effective payer in the last 3 minutes of consensus time and <tt>ledger.keepRecordsInState=true</tt> was true during <tt>handleTransaction</tt>.
+/**
+ * Requests records of all transactions for which the given account was the effective payer in the last 3 minutes of consensus time and <tt>ledger.keepRecordsInState=true</tt> was true during <tt>handleTransaction</tt>.
+ */
 message CryptoGetAccountRecordsQuery {
-    QueryHeader header = 1; // Standard info sent from client to node, including the signed payment, and what kind of response is requested (cost, state proof, both, or neither).
-    AccountID accountID = 2; // The account ID for which the records should be retrieved
+    /**
+     * Standard info sent from client to node, including the signed payment, and what kind of response is requested (cost, state proof, both, or neither).
+     */
+    QueryHeader header = 1;
+
+    /**
+     * The account ID for which the records should be retrieved
+     */
+    AccountID accountID = 2;
 }
 
-// Returns records of all transactions for which the given account was the effective payer in the last 3 minutes of consensus time and <tt>ledger.keepRecordsInState=true</tt> was true during <tt>handleTransaction</tt>.
+/**
+ * Returns records of all transactions for which the given account was the effective payer in the last 3 minutes of consensus time and <tt>ledger.keepRecordsInState=true</tt> was true during <tt>handleTransaction</tt>.
+ */
 message CryptoGetAccountRecordsResponse {
-    ResponseHeader header = 1; // Standard response from node to client, including the requested fields: cost, or state proof, or both, or neither
-    AccountID accountID = 2; // The account that this record is for
-    repeated TransactionRecord records = 3; // List of records
+    /**
+     * Standard response from node to client, including the requested fields: cost, or state proof, or both, or neither
+     */
+    ResponseHeader header = 1;
+
+    /**
+     * The account that this record is for
+     */
+    AccountID accountID = 2;
+
+    /**
+     * List of records
+     */
+    repeated TransactionRecord records = 3;
 }
 
 

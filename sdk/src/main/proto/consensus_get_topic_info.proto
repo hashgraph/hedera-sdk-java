@@ -30,22 +30,39 @@ import "query_header.proto";
 import "response_header.proto";
 import "consensus_topic_info.proto";
 
-// See [ConsensusService.getTopicInfo()](#proto.ConsensusService)
+/**
+ * See [ConsensusService.getTopicInfo()](#proto.ConsensusService)
+ */
 message ConsensusGetTopicInfoQuery {
-    // Standard info sent from client to node, including the signed payment, and what kind of response is requested
-    // (cost, state proof, both, or neither).
+    /**
+     * Standard info sent from client to node, including the signed payment, and what kind of response is requested
+     * (cost, state proof, both, or neither).
+     */
     QueryHeader header = 1;
 
-    // The Topic for which information is being requested
+    /**
+     * The Topic for which information is being requested
+     */
     TopicID topicID = 2;
 }
 
-// Retrieve the parameters of and state of a consensus topic.
+/**
+ * Retrieve the parameters of and state of a consensus topic.
+ */
 message ConsensusGetTopicInfoResponse {
-    // Standard response from node to client, including the requested fields: cost, or state proof, or both, or neither.
+    /**
+     * Standard response from node to client, including the requested fields: cost, or state proof, or both, or neither.
+     */
     ResponseHeader header = 1;
 
-    TopicID topicID = 2; // Topic identifier.
+    /**
+     * Topic identifier.
+     */
+    TopicID topicID = 2;
 
-    ConsensusTopicInfo topicInfo = 5; // Current state of the topic
+
+    /**
+     * Current state of the topic
+     */
+    ConsensusTopicInfo topicInfo = 5;
 }

@@ -4,6 +4,7 @@
 import os
 import subprocess
 import sys
+import time
 
 
 print(">>> Usage: `" + sys.argv[0] + " branch`")
@@ -68,10 +69,10 @@ COMMENT_REPLACEMENTS = (
 PROTO_REPLACEMENTS = (
     ("option java_package = \"com.hederahashgraph.api.proto.java\";",
      "option java_package = \"com.hedera.hashgraph.sdk.proto\";"),
-    
+
     ("option java_package = \"com.hederahashgraph.service.proto.java\";",
      "option java_package = \"com.hedera.hashgraph.sdk.proto\";"),
-     
+
     ("option java_package = \"com.hedera.mirror.api.proto\";",
      "option java_package = \"com.hedera.hashgraph.sdk.proto.mirror\";")
 )
@@ -131,25 +132,25 @@ def cmd_to_str(command):
 
 
 def generate_RequestType():
-    parse_file(
-        BASIC_TYPES_PATH, 
-        "HederaFunctionality", 
-        add_to_RequestType, 
+    parse_enum_from_file(
+        BASIC_TYPES_PATH,
+        "HederaFunctionality",
+        add_to_RequestType,
         finalize_RequestType)
     output_java_file(REQUEST_TYPE_OUT_PATH, RequestType_sections)
 
 
 def generate_Status():
-    parse_file(
-        RESPONSE_CODE_PATH, 
-        "ResponseCodeEnum", 
-        add_to_Status, 
+    parse_enum_from_file(
+        RESPONSE_CODE_PATH,
+        "ResponseCodeEnum",
+        add_to_Status,
         finalize_Status)
     output_java_file(STATUS_OUT_PATH, Status_sections)
 
 
 def generate_FeeDataType():
-    parse_file(
+    parse_enum_from_file(
         BASIC_TYPES_PATH,
         "SubType",
         add_to_FeeDataType,
@@ -195,10 +196,10 @@ def premade(name, n):
 
 
 RequestType_sections = [
-    premade("RequestType", 0), 
-    "", 
-    premade("RequestType", 2), 
-    "", 
+    premade("RequestType", 0),
+    "",
+    premade("RequestType", 2),
+    "",
     premade("RequestType", 4),
     "",
     premade("RequestType", 6)
@@ -312,43 +313,73 @@ def generate_toString(original_name, cap_snake_name, tabs_count):
 
 
 
-
-
-
-def parse_file(in_path, enum_name, add_to_output, finalize_output):
+def parse_enum_from_file(in_path, enum_name, add_to_output, finalize_output):
     in_file = open(in_path, "r")
     s = in_file.read()
     in_file.close()
     enum_i = s.find("enum " + enum_name, 0)
     i = s.find("{", enum_i) + 1
-    j = s.find("}", i)
-    while i < j:
-        equal_i = s.find("=", i)
-        comment_i = s.find("//", i)
-        end_i = s.find("\n", i)
-        if equal_i >= j:
-            break
-        comment_lines = []
-        # Normal line
-        if equal_i < comment_i and comment_i < end_i:
-            comment_lines = get_comment(s, comment_i, end_i, comment_lines)
-        # Empty line
-        elif equal_i > end_i and comment_i > end_i:
-            i = end_i + 1
-            continue
-        # multi-line comment followed by line,
-        # or line with no comment
-        else:
-            while equal_i > end_i:
-                comment_lines = get_comment(s, comment_i, end_i, comment_lines)
-                i = end_i + 1
-                comment_i = s.find("//", i)
-                end_i = s.find("\n", i)
-        original_name = s[i:equal_i].strip()
-        cap_snake_name = ensure_cap_snake_name(original_name)
-        add_to_output(original_name, cap_snake_name, comment_lines)
-        i = end_i + 1
+    comment_lines = []
+    while i >= 0:
+        i = parse_enum_code(s, i, comment_lines, add_to_output)
     finalize_output()
+
+
+# returns -1 when end of enum reached,
+# otherwise returns the index after the code that has been parsed
+def parse_enum_code(s, i, comment_lines, add_to_output):
+    #print("parsing code", i, comment_lines)
+    #time.sleep(1)
+    equal_i = s.find("=", i)
+    sl_comment_i = s.find("//", i)
+    ml_comment_i = s.find("/*", i)
+    line_end_i = s.find("\n", i)
+    enum_end_i = s.find("}", i)
+    indices = [equal_i, sl_comment_i, ml_comment_i, line_end_i, enum_end_i]
+    indices = [index for index in indices if index >= i]
+    next_i = min(indices)
+    if next_i == equal_i:
+        parse_enum_line(s, i, equal_i, sl_comment_i, line_end_i, comment_lines, add_to_output)
+    elif next_i == sl_comment_i:
+        parse_sl_comment(s, sl_comment_i, line_end_i, comment_lines)
+    elif next_i == ml_comment_i:
+        return parse_ml_comment(s, ml_comment_i, comment_lines)
+    elif next_i == enum_end_i:
+        return -1
+    return line_end_i + 1
+
+
+def parse_enum_line(s, i, equal_i, sl_comment_i, line_end_i, comment_lines, add_to_output):
+    if sl_comment_i > equal_i and sl_comment_i < line_end_i:
+        parse_sl_comment(s, sl_comment_i, line_end_i, comment_lines)
+    original_name = s[i:equal_i].strip()
+    cap_snake_name = ensure_cap_snake_name(original_name)
+    add_to_output(original_name, cap_snake_name, comment_lines)
+    comment_lines.clear()
+
+
+def parse_sl_comment(s, sl_comment_i, line_end_i, comment_lines):
+    comment_lines.append(s[sl_comment_i + 2:line_end_i].strip())
+
+
+def parse_ml_comment(s, ml_comment_i, comment_lines):
+    i = ml_comment_i + 2
+    ml_comment_end_i = s.find("*/", i)
+    while i < ml_comment_end_i:
+        i = parse_ml_comment_line(s, i, ml_comment_end_i, comment_lines)
+    return ml_comment_end_i + 2
+
+
+def parse_ml_comment_line(s, i, ml_comment_end_i, comment_lines):
+    line_end_i = s.find("\n", i)
+    end_i = min(line_end_i, ml_comment_end_i)
+    stripped_line = s[i:end_i].strip()
+    if len(stripped_line) > 0:
+        if stripped_line[0] == "*":
+            stripped_line = stripped_line[1:].strip()
+    if len(stripped_line) > 0:
+        comment_lines.append(stripped_line)
+    return line_end_i + 1
 
 
 def id_is_next(name, i):
@@ -377,13 +408,6 @@ def ensure_cap_snake_name(name):
                 out += c.upper()
                 i += 1
         return out
-
-
-def get_comment(s, comment_i, end_i, comment_lines):
-    if comment_i < end_i:
-        return comment_lines + [s[comment_i + 2:end_i].strip()]
-    else:
-        return comment_lines
 
 
 

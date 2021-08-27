@@ -28,32 +28,65 @@ import "query.proto";
 import "response.proto";
 import "transaction.proto";
 
-/*
-Transactions and queries for the file service.
-*/
+/**
+ * Transactions and queries for the file service. 
+ */
 service SmartContractService {
-    // Creates a contract
+    /**
+     * Creates a contract
+     */
     rpc createContract (Transaction) returns (TransactionResponse);
-    // Updates a contract with the content
+
+    /**
+     * Updates a contract with the content
+     */
     rpc updateContract (Transaction) returns (TransactionResponse);
-    // Calls a contract
+
+    /**
+     * Calls a contract
+     */
     rpc contractCallMethod (Transaction) returns (TransactionResponse);
-    // Retrieves the contract information
+
+    /**
+     * Retrieves the contract information
+     */
     rpc getContractInfo (Query) returns (Response);
-    // Calls a smart contract to be run on a single node
+
+    /**
+     * Calls a smart contract to be run on a single node
+     */
     rpc contractCallLocalMethod (Query) returns (Response);
-    // Retrieves the byte code of a contract
+
+    /**
+     * Retrieves the byte code of a contract
+     */
     rpc ContractGetBytecode (Query) returns (Response);
-    // Retrieves a contract by its Solidity address
+
+    /**
+     * Retrieves a contract by its Solidity address
+     */
     rpc getBySolidityID (Query) returns (Response);
-    // Always returns an empty record list, as contract accounts are never effective payers for transactions
+
+    /**
+     * Always returns an empty record list, as contract accounts are never effective payers for
+     * transactions
+     */
     rpc getTxRecordByContractID (Query) returns (Response) {
         option deprecated = true;
     };
-    // Deletes a contract instance and transfers any remaining hbars to a specified receiver
+
+    /**
+     * Deletes a contract instance and transfers any remaining hbars to a specified receiver
+     */
     rpc deleteContract (Transaction) returns (TransactionResponse);
-    // Deletes a contract if the submitting account has network admin privileges
+
+    /**
+     * Deletes a contract if the submitting account has network admin privileges
+     */
     rpc systemDelete (Transaction) returns (TransactionResponse);
-    // Undeletes a contract if the submitting account has network admin privileges
+
+    /**
+     * Undeletes a contract if the submitting account has network admin privileges
+     */
     rpc systemUndelete (Transaction) returns (TransactionResponse);
 }
