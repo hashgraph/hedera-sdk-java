@@ -153,11 +153,8 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
 
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
-        int modesEnabled = (nftId != null ? 1 : 0) + (tokenId != null ? 1 : 0) + (accountId != null ? 1 : 0);
-        if (modesEnabled > 1) {
-            throw new IllegalStateException("TokenNftInfoQuery must be one of byNftId, byTokenId, or byAccountId, but multiple of these modes have been selected");
-        } else if (modesEnabled == 0) {
-            throw new IllegalStateException("TokenNftInfoQuery must be one of byNftId, byTokenId, or byAccountId, but none of these modes have been selected");
+        if (nftId == null) {
+            throw new IllegalStateException("TokenNftInfoQuery must be by NftId");
         }
         return super.onExecuteAsync(client);
     }
