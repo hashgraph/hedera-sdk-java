@@ -42,7 +42,7 @@ dependencies {
 	testImplementation "org.junit.jupiter:junit-jupiter-engine:5.7.2"
 	testImplementation "org.junit.jupiter:junit-jupiter-params:5.7.2"
 
-	testRuntimeOnly "org.slf4j:slf4j-simple:1.7.30"
+	testRuntimeOnly "org.slf4j:slf4j-simple:1.7.32"
 	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.40.1"
 	integrationTestRuntimeOnly "io.grpc:grpc-netty-shaded:1.40.0"
 
