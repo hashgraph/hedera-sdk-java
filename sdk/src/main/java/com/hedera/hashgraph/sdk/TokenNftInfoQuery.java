@@ -164,11 +164,11 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
-        queryBuilder.setTokenGetNftInfo(
-            TokenGetNftInfoQuery.newBuilder()
-                .setNftID(nftId.toProtobuf())
-                .setHeader(header)
-        );
+        var builder = TokenGetNftInfoQuery.newBuilder();
+        if(nftId != null) {
+            builder.setNftID(nftId.toProtobuf());
+        }
+        queryBuilder.setTokenGetNftInfo(builder.setHeader(header));
     }
 
     @Override
