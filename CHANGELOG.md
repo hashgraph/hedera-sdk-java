@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+### Unreleased
+
+ * `NftId.[to|from]string()` now uses format `1.2.3/4` instead of `1.2.3@4`
+
+
 ### v2.0.13
 
 ### Added

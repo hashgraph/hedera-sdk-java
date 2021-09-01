@@ -1,25 +1,25 @@
 com.hedera.hashgraph.sdk.NftIdTest.fromBytes=[
-  "0.0.5005@574489"
+  "0.0.5005/574489"
 ]
 
 
 com.hedera.hashgraph.sdk.NftIdTest.fromString=[
-  "0.0.5005@1234"
+  "0.0.5005/1234"
 ]
 
 
 com.hedera.hashgraph.sdk.NftIdTest.fromStringWithChecksumOnMainnet=[
-  "0.0.123-vfmkw@7584"
+  "0.0.123-vfmkw/7584"
 ]
 
 
 com.hedera.hashgraph.sdk.NftIdTest.fromStringWithChecksumOnPreviewnet=[
-  "0.0.123-ntjly@487302"
+  "0.0.123-ntjly/487302"
 ]
 
 
 com.hedera.hashgraph.sdk.NftIdTest.fromStringWithChecksumOnTestnet=[
-  "0.0.123-rmkyk@584903"
+  "0.0.123-rmkyk/584903"
 ]
 
 

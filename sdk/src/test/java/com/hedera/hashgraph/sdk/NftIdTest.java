@@ -38,7 +38,7 @@ class NftIdTest {
 
     @Test
     void fromStringWithChecksumOnMainnet() {
-        SnapshotMatcher.expect(NftId.fromString("0.0.123-vfmkw@7584").toStringWithChecksum(mainnetClient)).toMatchSnapshot();
+        SnapshotMatcher.expect(NftId.fromString("0.0.123-vfmkw/7584").toStringWithChecksum(mainnetClient)).toMatchSnapshot();
     }
 
     @Test
@@ -48,7 +48,7 @@ class NftIdTest {
 
     @Test
     void fromStringWithChecksumOnPreviewnet() {
-        SnapshotMatcher.expect(NftId.fromString("0.0.123-ntjly@487302").toStringWithChecksum(previewnetClient)).toMatchSnapshot();
+        SnapshotMatcher.expect(NftId.fromString("0.0.123-ntjly/487302").toStringWithChecksum(previewnetClient)).toMatchSnapshot();
     }
 
     @Test
