@@ -30,14 +30,18 @@ import "token_get_nft_info.proto";
 import "query_header.proto";
 import "response_header.proto";
 
-/* Applicable only to tokens of type NON_FUNGIBLE_UNIQUE. Gets info on NFTs N through M owned by the specified accountId.
- * Example: If Account A owns 5 NFTs (might be of different Token Entity), having start=0 and end=5 will return all of the NFTs
-  *
+/**
+ * Applicable only to tokens of type NON_FUNGIBLE_UNIQUE. Gets info on NFTs N through M owned by the
+ * specified accountId.
+ * Example: If Account A owns 5 NFTs (might be of different Token Entity), having start=0 and end=5
+ * will return all of the NFTs
+ *
  * INVALID_QUERY_RANGE response code will be returned if:
  * 1) Start > End
  * 2) Start and End indices are non-positive
  * 3) Start and End indices are out of boundaries for the retrieved nft list
- * 4) The range between Start and End is bigger than the global dynamic property for maximum query range
+ * 4) The range between Start and End is bigger than the global dynamic property for maximum query
+ *    range
  *
  * NOT_SUPPORTED response code will be returned if the queried token is of type FUNGIBLE_COMMON
  *
@@ -46,13 +50,42 @@ import "response_header.proto";
  * ACCOUNT_DELETED response code will be returned if the queried account has been deleted
  */
 message TokenGetAccountNftInfosQuery {
-    QueryHeader header = 1; // Standard info sent from client to node, including the signed payment, and what kind of response is requested (cost, state proof, both, or neither).
-    AccountID accountID = 2; // The Account for which information is requested
-    int64 start = 3; // Specifies the start index (inclusive) of the range of NFTs to query for. Value must be in the range [0; ownedNFTs-1]
-    int64 end = 4; // Specifies the end index (exclusive) of the range of NFTs to query for. Value must be in the range (start; ownedNFTs]
+    /**
+     * Standard info sent from client to node, including the signed payment, and what kind of
+     * response is requested (cost, state proof, both, or neither).
+     */
+    QueryHeader header = 1;
+
+    /**
+     * The Account for which information is requested
+     */
+    AccountID accountID = 2;
+
+    /**
+     * Specifies the start index (inclusive) of the range of NFTs to query for. Value must be in the
+     * range [0; ownedNFTs-1]
+     */
+    int64 start = 3;
+
+    /**
+     * Specifies the end index (exclusive) of the range of NFTs to query for. Value must be in the
+     * range (start; ownedNFTs]
+     */
+    int64 end = 4;
 }
 
+/**
+ * UNDOCUMENTED
+ */
 message TokenGetAccountNftInfosResponse {
-    ResponseHeader header = 1; // Standard response from node to client, including the requested fields: cost, or state proof, or both, or neither
-    repeated TokenNftInfo nfts = 2; // List of NFTs associated to the account
+    /**
+     * Standard response from node to client, including the requested fields: cost, or state proof,
+     * or both, or neither
+     */
+    ResponseHeader header = 1;
+
+    /**
+     * List of NFTs associated to the account
+     */
+    repeated TokenNftInfo nfts = 2;
 }

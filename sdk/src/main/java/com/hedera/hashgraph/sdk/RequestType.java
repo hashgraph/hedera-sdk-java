@@ -4,7 +4,8 @@ import com.hedera.hashgraph.sdk.proto.HederaFunctionality;
 
 public enum RequestType {
     /**
-     * UNSPECIFIED - Need to keep first value as unspecified because first element is ignored and not parsed (0 is ignored by parser)
+     * UNSPECIFIED - Need to keep first value as unspecified because first element is ignored and
+     * not parsed (0 is ignored by parser)
      */
     NONE(HederaFunctionality.NONE),
 

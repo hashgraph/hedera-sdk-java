@@ -30,17 +30,39 @@ import "transaction_record.proto";
 import "query_header.proto";
 import "response_header.proto";
 
-// Before v0.9.0, requested records of all transactions against the given contract in the last 25 hours.
+/**
+ * Before v0.9.0, requested records of all transactions against the given contract in the last 25 hours.
+ */
 message ContractGetRecordsQuery {
     option deprecated = true;
-    QueryHeader header = 1; // Standard info sent from client to node, including the signed payment, and what kind of response is requested (cost, state proof, both, or neither).
-    ContractID contractID = 2; // The smart contract instance for which the records should be retrieved
+    /**
+     * Standard info sent from client to node, including the signed payment, and what kind of response is requested (cost, state proof, both, or neither).
+     */
+    QueryHeader header = 1;
+
+    /**
+     * The smart contract instance for which the records should be retrieved
+     */
+    ContractID contractID = 2;
 }
 
-// Before v0.9.0, returned records of all transactions against the given contract in the last 25 hours.
+/**
+ * Before v0.9.0, returned records of all transactions against the given contract in the last 25 hours.
+ */
 message ContractGetRecordsResponse {
     option deprecated = true;
-    ResponseHeader header = 1; //Standard response from node to client, including the requested fields: cost, or state proof, or both, or neither
-    ContractID contractID = 2; // The smart contract instance that this record is for
-    repeated TransactionRecord records = 3; // List of records, each with contractCreateResult or contractCallResult as its body
+    /**
+     * Standard response from node to client, including the requested fields: cost, or state proof, or both, or neither
+     */
+    ResponseHeader header = 1;
+
+    /**
+     * The smart contract instance that this record is for
+     */
+    ContractID contractID = 2;
+
+    /**
+     * List of records, each with contractCreateResult or contractCallResult as its body
+     */
+    repeated TransactionRecord records = 3;
 }

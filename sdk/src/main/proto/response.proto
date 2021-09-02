@@ -58,40 +58,125 @@ import "token_get_nft_infos.proto";
 import "schedule_get_info.proto";
 
 
-/* A single response, which is returned from the node to the client, after the client sent the node a query. This includes all responses. */
+/**
+ * A single response, which is returned from the node to the client, after the client sent the node
+ * a query. This includes all responses.
+ */
 message Response {
     oneof response {
-        GetByKeyResponse getByKey = 1; // Get all entities associated with a given key
-        GetBySolidityIDResponse getBySolidityID = 2; // Get the IDs in the format used in transactions, given the format used in Solidity
+        /**
+         * Get all entities associated with a given key
+         */
+        GetByKeyResponse getByKey = 1;
 
-        ContractCallLocalResponse contractCallLocal = 3; // Response to call a function of a smart contract instance
-        ContractGetBytecodeResponse contractGetBytecodeResponse = 5; // Get the bytecode for a smart contract instance
-        ContractGetInfoResponse contractGetInfo = 4; // Get information about a smart contract instance
-        ContractGetRecordsResponse contractGetRecordsResponse = 6; //Get all existing records for a smart contract instance
+        /**
+         * Get the IDs in the format used in transactions, given the format used in Solidity
+         */
+        GetBySolidityIDResponse getBySolidityID = 2;
 
-        CryptoGetAccountBalanceResponse cryptogetAccountBalance = 7; // Get the current balance in a cryptocurrency account
-        CryptoGetAccountRecordsResponse cryptoGetAccountRecords = 8; // Get all the records that currently exist for transactions involving an account
-        CryptoGetInfoResponse cryptoGetInfo = 9; // Get all information about an account
-        CryptoGetLiveHashResponse cryptoGetLiveHash = 10; // Contains a livehash associated to an account
-        CryptoGetStakersResponse cryptoGetProxyStakers = 11; // Get all the accounts that proxy stake to a given account, and how much they proxy stake
+        /**
+         * Response to call a function of a smart contract instance
+         */
+        ContractCallLocalResponse contractCallLocal = 3;
 
-        FileGetContentsResponse fileGetContents = 12; // Get the contents of a file (the bytes stored in it)
-        FileGetInfoResponse fileGetInfo = 13; // Get information about a file, such as its expiration date
+        /**
+         * Get the bytecode for a smart contract instance
+         */
+        ContractGetBytecodeResponse contractGetBytecodeResponse = 5;
 
-        TransactionGetReceiptResponse transactionGetReceipt = 14; // Get a receipt for a transaction
-        TransactionGetRecordResponse transactionGetRecord = 15; // Get a record for a transaction
-        TransactionGetFastRecordResponse transactionGetFastRecord = 16; // Get a record for a transaction (lasts 180 seconds)
+        /**
+         * Get information about a smart contract instance
+         */
+        ContractGetInfoResponse contractGetInfo = 4;
 
-        ConsensusGetTopicInfoResponse consensusGetTopicInfo = 150; // Parameters of and state of a consensus topic..
+        /**
+         * Get all existing records for a smart contract instance
+         */
+        ContractGetRecordsResponse contractGetRecordsResponse = 6;
 
-        NetworkGetVersionInfoResponse networkGetVersionInfo = 151; // Semantic versions of Hedera Services and HAPI proto
+        /**
+         * Get the current balance in a cryptocurrency account
+         */
+        CryptoGetAccountBalanceResponse cryptogetAccountBalance = 7;
 
-        TokenGetInfoResponse tokenGetInfo = 152; // Get all information about a token
+        /**
+         * Get all the records that currently exist for transactions involving an account
+         */
+        CryptoGetAccountRecordsResponse cryptoGetAccountRecords = 8;
 
-        ScheduleGetInfoResponse scheduleGetInfo = 153; // Get all information about a schedule entity
+        /**
+         * Get all information about an account
+         */
+        CryptoGetInfoResponse cryptoGetInfo = 9;
 
-        TokenGetAccountNftInfosResponse tokenGetAccountNftInfos = 154; // A list of the NFTs associated with the account
-        TokenGetNftInfoResponse tokenGetNftInfo = 155; // All information about an NFT
-        TokenGetNftInfosResponse tokenGetNftInfos = 156; // A list of the NFTs for the token
+        /**
+         * Contains a livehash associated to an account
+         */
+        CryptoGetLiveHashResponse cryptoGetLiveHash = 10;
+
+        /**
+         * Get all the accounts that proxy stake to a given account, and how much they proxy stake
+         */
+        CryptoGetStakersResponse cryptoGetProxyStakers = 11;
+
+        /**
+         * Get the contents of a file (the bytes stored in it)
+         */
+        FileGetContentsResponse fileGetContents = 12;
+
+        /**
+         * Get information about a file, such as its expiration date
+         */
+        FileGetInfoResponse fileGetInfo = 13;
+
+        /**
+         * Get a receipt for a transaction
+         */
+        TransactionGetReceiptResponse transactionGetReceipt = 14;
+
+        /**
+         * Get a record for a transaction
+         */
+        TransactionGetRecordResponse transactionGetRecord = 15;
+
+        /**
+         * Get a record for a transaction (lasts 180 seconds)
+         */
+        TransactionGetFastRecordResponse transactionGetFastRecord = 16;
+
+        /**
+         * Parameters of and state of a consensus topic..
+         */
+        ConsensusGetTopicInfoResponse consensusGetTopicInfo = 150;
+
+        /**
+         * Semantic versions of Hedera Services and HAPI proto
+         */
+        NetworkGetVersionInfoResponse networkGetVersionInfo = 151;
+
+        /**
+         * Get all information about a token
+         */
+        TokenGetInfoResponse tokenGetInfo = 152;
+
+        /**
+         * Get all information about a schedule entity
+         */
+        ScheduleGetInfoResponse scheduleGetInfo = 153;
+
+        /**
+         * A list of the NFTs associated with the account
+         */
+        TokenGetAccountNftInfosResponse tokenGetAccountNftInfos = 154;
+
+        /**
+         * All information about an NFT
+         */
+        TokenGetNftInfoResponse tokenGetNftInfo = 155;
+
+        /**
+         * A list of the NFTs for the token
+         */
+        TokenGetNftInfosResponse tokenGetNftInfos = 156;
     }
 }

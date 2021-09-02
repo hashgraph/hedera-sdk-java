@@ -28,36 +28,81 @@ import "response.proto";
 import "transaction_response.proto";
 import "transaction.proto";
 
-/*
-Transactions and queries for the Crypto Service
-*/
+/**
+ * Transactions and queries for the Crypto Service
+ */
 service CryptoService {
-    // Creates a new account by submitting the transaction
+    /**
+     * Creates a new account by submitting the transaction
+     */
     rpc createAccount (Transaction) returns (TransactionResponse);
-    // Updates an account by submitting the transaction
+
+    /**
+     * Updates an account by submitting the transaction
+     */
     rpc updateAccount (Transaction) returns (TransactionResponse);
-    // Initiates a transfer by submitting the transaction
+
+    /**
+     * Initiates a transfer by submitting the transaction
+     */
     rpc cryptoTransfer (Transaction) returns (TransactionResponse);
-    // Deletes and account by submitting the transaction
+
+    /**
+     * Deletes and account by submitting the transaction
+     */
     rpc cryptoDelete (Transaction) returns (TransactionResponse);
-    // (NOT CURRENTLY SUPPORTED) Adds a livehash
+
+    /**
+     * (NOT CURRENTLY SUPPORTED) Adds a livehash
+     */
     rpc addLiveHash (Transaction) returns (TransactionResponse);
-    // (NOT CURRENTLY SUPPORTED) Deletes a livehash
+
+    /**
+     * (NOT CURRENTLY SUPPORTED) Deletes a livehash
+     */
     rpc deleteLiveHash (Transaction) returns (TransactionResponse);
-    // (NOT CURRENTLY SUPPORTED) Retrieves a livehash for an account
+
+    /**
+     * (NOT CURRENTLY SUPPORTED) Retrieves a livehash for an account
+     */
     rpc getLiveHash (Query) returns (Response);
-    // Returns all transactions in the last 180s of consensus time for which the given account was the effective payer <b>and</b> network property <tt>ledger.keepRecordsInState</tt> was <tt>true</tt>.
+
+    /**
+     * Returns all transactions in the last 180s of consensus time for which the given account was
+     * the effective payer <b>and</b> network property <tt>ledger.keepRecordsInState</tt> was
+     * <tt>true</tt>.
+     */
     rpc getAccountRecords (Query) returns (Response);
-    // Retrieves the balance of an account
+
+    /**
+     * Retrieves the balance of an account
+     */
     rpc cryptoGetBalance (Query) returns (Response);
-    // Retrieves the metadata of an account
+
+    /**
+     * Retrieves the metadata of an account
+     */
     rpc getAccountInfo (Query) returns (Response);
-    // Retrieves the latest receipt for a transaction that is either awaiting consensus, or reached consensus in the last 180 seconds
+
+    /**
+     * Retrieves the latest receipt for a transaction that is either awaiting consensus, or reached
+     * consensus in the last 180 seconds
+     */
     rpc getTransactionReceipts (Query) returns (Response);
-    // (NOT CURRENTLY SUPPORTED) Returns the records of transactions recently funded by an account
+
+    /**
+     * (NOT CURRENTLY SUPPORTED) Returns the records of transactions recently funded by an account
+     */
     rpc getFastTransactionRecord (Query) returns (Response);
-    // Retrieves the record of a transaction that is either awaiting consensus, or reached consensus in the last 180 seconds
+
+    /**
+     * Retrieves the record of a transaction that is either awaiting consensus, or reached consensus
+     * in the last 180 seconds
+     */
     rpc getTxRecordByTxID (Query) returns (Response);
-    // (NOT CURRENTLY SUPPORTED) Retrieves the stakers for a node by account id
+
+    /**
+     * (NOT CURRENTLY SUPPORTED) Retrieves the stakers for a node by account id
+     */
     rpc getStakersByAccountID (Query) returns (Response);
 }
