@@ -37,7 +37,6 @@ public class AccountUpdateTransactionTest {
             .setAutoRenewPeriod(Duration.ofHours(10))
             .setExpirationTime(Instant.ofEpochSecond(1554158543))
             .setReceiverSignatureRequired(false)
-            .setMaxAutomaticTokenAssociations(100)
             .setAccountMemo("Some memo")
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
