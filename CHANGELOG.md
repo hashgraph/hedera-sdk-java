@@ -6,12 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-### v2.1.0-beta.1
+## v2.1.0-beta.1
 
 ### Added
 
  * `NftId.[to|from]string()` now uses format `1.2.3/4` instead of `1.2.3@4`
  * `TokenNftInfoQuery.setNftId()`
+ * Support for automatic token associations
+    * `TransactionRecord.automaticTokenAssociations`
+    * `AccountInfo.maxAutomaticTokenAssociations`
+    * `AccountCreateTransaction.maxAutomaticTokenAssociations`
+    * `AccountUpdateTransaction.maxAutomaticTokenAssociations`
+    * `TokenRelationship.automaticAssociation`
+    * `TokenAssociation`
+
+## v2.0.14
 
 ### Deprecated
 
