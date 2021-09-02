@@ -37,6 +37,7 @@ public class AccountCreateTransactionTest {
             .setAccountMemo("some dumb memo")
             .setReceiverSignatureRequired(true)
             //.setAutoRenewPeriod(Duration.ofHours(10))
+            .setMaxAutomaticTokenAssociations(100)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
             .sign(unusedPrivateKey);
