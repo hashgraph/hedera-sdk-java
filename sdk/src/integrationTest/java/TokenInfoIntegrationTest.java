@@ -268,8 +268,6 @@ class TokenInfoIntegrationTest {
             .setTokenId(tokenId)
             .setMaxQueryPayment(new Hbar(1000));
 
-        var cost = infoQuery.getCost(testEnv.client);
-
         var error = assertThrows(PrecheckStatusException.class, () -> {
             infoQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
         });

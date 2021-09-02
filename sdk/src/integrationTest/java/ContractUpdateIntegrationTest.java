@@ -109,7 +109,7 @@ public class ContractUpdateIntegrationTest {
     void cannotUpdateContractThatIsImmutable() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        @Var var response = new FileCreateTransaction()
+        var response = new FileCreateTransaction()
             .setKeys(testEnv.operatorKey)
             .setContents(SMART_CONTRACT_BYTECODE)
             .execute(testEnv.client);

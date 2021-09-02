@@ -1,4 +1,3 @@
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicDeleteTransaction;
 import com.hedera.hashgraph.sdk.TopicInfoQuery;
@@ -27,7 +26,7 @@ public class TopicMessageIntegrationTest {
 
         var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
-        @Var var info = new TopicInfoQuery()
+        var info = new TopicInfoQuery()
             .setTopicId(topicId)
             .execute(testEnv.client);
 
@@ -82,7 +81,7 @@ public class TopicMessageIntegrationTest {
 
         var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
-        @Var var info = new TopicInfoQuery()
+        var info = new TopicInfoQuery()
             .setTopicId(topicId)
             .execute(testEnv.client);
 

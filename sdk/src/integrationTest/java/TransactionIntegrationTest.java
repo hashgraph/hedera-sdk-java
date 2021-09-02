@@ -1,3 +1,4 @@
+import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
@@ -70,7 +71,7 @@ public class TransactionIntegrationTest {
 
         var expectedHash = transaction.getTransactionHashPerNode();
 
-        var response = transaction.execute(testEnv.client);
+        @Var var response = transaction.execute(testEnv.client);
 
         var record = response.getRecord(testEnv.client);
 
@@ -203,7 +204,7 @@ public class TransactionIntegrationTest {
                         .setPubKeyPrefix(ByteString.copyFrom(publicKey5.toBytes()))
                         .build())
                 );
-            var byts = signedBuilder.build().toByteString();
+            @Var var byts = signedBuilder.build().toByteString();
 
             byts = TransactionList.newBuilder()
                 .addTransactionList(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()

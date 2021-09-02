@@ -42,7 +42,7 @@ public class ContractCreateIntegrationTest {
 
         var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
-        @Var var info = new ContractInfoQuery()
+        var info = new ContractInfoQuery()
             .setContractId(contractId)
             .execute(testEnv.client);
 
@@ -88,7 +88,7 @@ public class ContractCreateIntegrationTest {
 
         var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
-        @Var var info = new ContractInfoQuery()
+        var info = new ContractInfoQuery()
             .setContractId(contractId)
             .execute(testEnv.client);
 
@@ -108,7 +108,7 @@ public class ContractCreateIntegrationTest {
     void cannotCreateContractWhenGasIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        @Var var response = new FileCreateTransaction()
+        var response = new FileCreateTransaction()
             .setKeys(testEnv.operatorKey)
             .setContents(SMART_CONTRACT_BYTECODE)
             .execute(testEnv.client);
@@ -140,7 +140,7 @@ public class ContractCreateIntegrationTest {
     void cannotCreateContractWhenConstructorParametersAreNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        @Var var response = new FileCreateTransaction()
+        var response = new FileCreateTransaction()
             .setKeys(testEnv.operatorKey)
             .setContents(SMART_CONTRACT_BYTECODE)
             .execute(testEnv.client);

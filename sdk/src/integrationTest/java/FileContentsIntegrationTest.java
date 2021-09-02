@@ -96,8 +96,6 @@ public class FileContentsIntegrationTest {
             .setFileId(fileId)
             .setMaxQueryPayment(new Hbar(1000));
 
-        var cost = contentsQuery.getCost(testEnv.client);
-
         var contents = contentsQuery.execute(testEnv.client);
 
         assertEquals(contents.toStringUtf8(), "[e2e::FileCreateTransaction]");
@@ -157,8 +155,6 @@ public class FileContentsIntegrationTest {
         var contentsQuery = new FileContentsQuery()
             .setFileId(fileId)
             .setMaxQueryPayment(new Hbar(100));
-
-        var cost = contentsQuery.getCost(testEnv.client);
 
         var error = assertThrows(PrecheckStatusException.class, () -> {
             contentsQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);

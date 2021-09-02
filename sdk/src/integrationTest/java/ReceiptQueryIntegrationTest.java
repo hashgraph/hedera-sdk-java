@@ -52,6 +52,7 @@ public class ReceiptQueryIntegrationTest {
 
     @Test
     @DisplayName("Can get Record cost")
+    @SuppressWarnings("UnusedVariable")
     void getCostTransactionRecord() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
         var key = PrivateKey.generate();
@@ -76,6 +77,7 @@ public class ReceiptQueryIntegrationTest {
 
     @Test
     @DisplayName("Can get Record cost with big max set")
+    @SuppressWarnings("UnusedVariable")
     void getCostBigMaxTransactionRecord() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
         var key = PrivateKey.generate();

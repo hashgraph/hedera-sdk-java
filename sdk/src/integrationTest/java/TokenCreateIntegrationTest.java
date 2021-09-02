@@ -72,6 +72,7 @@ class TokenCreateIntegrationTest {
 
     @Test
     @DisplayName("Can create token with minimal properties set")
+    @SuppressWarnings("UnusedVariable")
     void canCreateTokenWithMinimalPropertiesSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount(new Hbar(10));
 

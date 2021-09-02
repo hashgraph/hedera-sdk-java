@@ -23,9 +23,9 @@ import com.hedera.hashgraph.sdk.TransferTransaction;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.threeten.bp.Instant;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.Objects;
 
@@ -171,7 +171,7 @@ public class ScheduleCreateIntegrationTest {
         ScheduleId scheduleId = Objects.requireNonNull(receipt.scheduleId);
 
         // Get the schedule info to see if `signatories` is populated with 2/3 signatures
-        ScheduleInfo info = new ScheduleInfoQuery()
+        @Var ScheduleInfo info = new ScheduleInfoQuery()
             .setScheduleId(scheduleId)
             .execute(testEnv.client);
 
@@ -219,6 +219,8 @@ public class ScheduleCreateIntegrationTest {
             .getReceipt(testEnv.client)
             .accountId;
 
+        Objects.requireNonNull(accountId);
+
         var tokenId = new TokenCreateTransaction()
             .setTokenName("ffff")
             .setTokenSymbol("F")
@@ -228,6 +230,8 @@ public class ScheduleCreateIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client)
             .tokenId;
+
+        Objects.requireNonNull(tokenId);
 
         new TokenAssociateTransaction()
             .setAccountId(accountId)
@@ -244,6 +248,8 @@ public class ScheduleCreateIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client)
             .scheduleId;
+
+        Objects.requireNonNull(scheduleId);
 
         var balanceQuery1 = new AccountBalanceQuery()
             .setAccountId(accountId)
@@ -372,7 +378,7 @@ public class ScheduleCreateIntegrationTest {
         );
 
         // verify schedule has been created and has 1 of 2 signatures
-        var info = new ScheduleInfoQuery()
+        @Var var info = new ScheduleInfoQuery()
             .setScheduleId(scheduleId)
             .execute(testEnv.client);
 

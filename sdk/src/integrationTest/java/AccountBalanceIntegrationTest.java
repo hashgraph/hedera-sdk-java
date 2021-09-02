@@ -1,4 +1,3 @@
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
@@ -66,7 +65,7 @@ class AccountBalanceIntegrationTest {
     void canFetchBalanceForClientOperator() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        @Var var balance = new AccountBalanceQuery()
+        var balance = new AccountBalanceQuery()
             .setAccountId(testEnv.operatorId)
             .execute(testEnv.client);
 
@@ -80,7 +79,7 @@ class AccountBalanceIntegrationTest {
     void getCostBalanceForClientOperator() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        @Var var balance = new AccountBalanceQuery()
+        var balance = new AccountBalanceQuery()
             .setAccountId(testEnv.operatorId)
             .setMaxQueryPayment(new Hbar(1));
 
@@ -99,7 +98,7 @@ class AccountBalanceIntegrationTest {
     void getCostBigMaxBalanceForClientOperator() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        @Var var balance = new AccountBalanceQuery()
+        var balance = new AccountBalanceQuery()
             .setAccountId(testEnv.operatorId)
             .setMaxQueryPayment(new Hbar(1000000));
 
@@ -117,7 +116,7 @@ class AccountBalanceIntegrationTest {
     void getCostSmallMaxBalanceForClientOperator() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        @Var var balance = new AccountBalanceQuery()
+        var balance = new AccountBalanceQuery()
             .setAccountId(testEnv.operatorId)
             .setMaxQueryPayment(Hbar.fromTinybars(1));
 
@@ -164,7 +163,7 @@ class AccountBalanceIntegrationTest {
 
         var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-        @Var var balance = new AccountBalanceQuery()
+        var balance = new AccountBalanceQuery()
             .setAccountId(testEnv.operatorId)
             .execute(testEnv.client);
 

@@ -43,7 +43,7 @@ public class ContractInfoIntegrationTest {
 
         var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
-        @Var var info = new ContractInfoQuery()
+        var info = new ContractInfoQuery()
             .setContractId(contractId)
             .execute(testEnv.client);
 
@@ -89,7 +89,7 @@ public class ContractInfoIntegrationTest {
 
         var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
-        @Var var info = new ContractInfoQuery()
+        var info = new ContractInfoQuery()
             .setContractId(contractId)
             .execute(testEnv.client);
 
@@ -121,6 +121,7 @@ public class ContractInfoIntegrationTest {
 
     @Test
     @DisplayName("Can get cost, even with a big max")
+    @SuppressWarnings("UnusedVariable")
     void getCostBigMaxContractInfoFunction() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
@@ -147,7 +148,7 @@ public class ContractInfoIntegrationTest {
 
         var cost = infoQuery.getCost(testEnv.client);
 
-        @Var var result = infoQuery
+        var result = infoQuery
             .execute(testEnv.client);
 
         new ContractDeleteTransaction()
@@ -235,8 +236,6 @@ public class ContractInfoIntegrationTest {
         var infoQuery = new ContractInfoQuery()
             .setContractId(contractId)
             .setMaxQueryPayment(new Hbar(100));
-
-        var cost = infoQuery.getCost(testEnv.client);
 
         var error = assertThrows(PrecheckStatusException.class, () -> {
             infoQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);

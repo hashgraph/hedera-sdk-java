@@ -1,3 +1,4 @@
+import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
@@ -30,7 +31,7 @@ class TokenNftTransferIntegrationTest {
 
         var key = PrivateKey.generate();
 
-        TransactionResponse response = new AccountCreateTransaction()
+        @Var TransactionResponse response = new AccountCreateTransaction()
             .setKey(key)
             .setInitialBalance(new Hbar(1))
             .execute(testEnv.client);
@@ -99,7 +100,7 @@ class TokenNftTransferIntegrationTest {
 
         var key = PrivateKey.generate();
 
-        TransactionResponse response = new AccountCreateTransaction()
+        @Var TransactionResponse response = new AccountCreateTransaction()
             .setKey(key)
             .setInitialBalance(new Hbar(1))
             .execute(testEnv.client);

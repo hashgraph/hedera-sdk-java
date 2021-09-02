@@ -43,7 +43,7 @@ public class ContractDeleteIntegrationTest {
 
         var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
-        @Var var info = new ContractInfoQuery()
+        var info = new ContractInfoQuery()
             .setContractId(contractId)
             .execute(testEnv.client);
 
@@ -90,7 +90,7 @@ public class ContractDeleteIntegrationTest {
             .contractId
         );
 
-        @Var var info = new ContractInfoQuery()
+        var info = new ContractInfoQuery()
             .setContractId(contractId)
             .execute(testEnv.client);
 

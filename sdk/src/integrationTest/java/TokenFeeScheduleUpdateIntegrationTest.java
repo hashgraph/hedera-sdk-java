@@ -117,7 +117,8 @@ class TokenFeeScheduleUpdateIntegrationTest {
 
         var fees = info.customFees;
         assertEquals(fees.size(), 2);
-        int fixedCount = 0, fractionalCount = 0;
+        @Var int fixedCount = 0;
+        @Var int fractionalCount = 0;
         for (var fee : fees) {
             if (fee instanceof CustomFixedFee) {
                 fixedCount++;

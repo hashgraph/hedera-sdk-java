@@ -1,4 +1,3 @@
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.FileInfoQuery;
@@ -29,7 +28,7 @@ public class FileInfoIntegrationTest {
 
         var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-        @Var var info = new FileInfoQuery()
+        var info = new FileInfoQuery()
             .setFileId(fileId)
             .execute(testEnv.client);
 
@@ -58,7 +57,7 @@ public class FileInfoIntegrationTest {
 
         var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-        @Var var info = new FileInfoQuery()
+        var info = new FileInfoQuery()
             .setFileId(fileId)
             .execute(testEnv.client);
 
@@ -72,6 +71,7 @@ public class FileInfoIntegrationTest {
 
     @Test
     @DisplayName("Can get cost, even with a big max")
+    @SuppressWarnings("UnusedVariable")
     void getCostBigMaxQueryFileInfo() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
@@ -82,7 +82,7 @@ public class FileInfoIntegrationTest {
 
         var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-        @Var var infoQuery = new FileInfoQuery()
+        var infoQuery = new FileInfoQuery()
             .setFileId(fileId)
             .setMaxQueryPayment(new Hbar(1000));
 
@@ -110,7 +110,7 @@ public class FileInfoIntegrationTest {
 
         var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-        @Var var infoQuery = new FileInfoQuery()
+        var infoQuery = new FileInfoQuery()
             .setFileId(fileId)
             .setMaxQueryPayment(Hbar.fromTinybars(1));
 
@@ -143,11 +143,9 @@ public class FileInfoIntegrationTest {
 
         var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-        @Var var infoQuery = new FileInfoQuery()
+        var infoQuery = new FileInfoQuery()
             .setFileId(fileId)
             .setMaxQueryPayment(Hbar.fromTinybars(1));
-
-        var cost = infoQuery.getCost(testEnv.client);
 
         var error = assertThrows(PrecheckStatusException.class, () -> {
             infoQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);

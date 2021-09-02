@@ -49,7 +49,7 @@ public class ContractCallIntegrationTest {
 
         var cost = callQuery.getCost(testEnv.client);
 
-        @Var var result = callQuery
+        var result = callQuery
             .setMaxQueryPayment(Objects.requireNonNull(cost))
             .execute(testEnv.client);
 
@@ -73,7 +73,7 @@ public class ContractCallIntegrationTest {
     void cannotCallContractFunctionWhenContractFunctionIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        final var response = new FileCreateTransaction()
+        var response = new FileCreateTransaction()
             .setKeys(testEnv.operatorKey)
             .setContents(SMART_CONTRACT_BYTECODE)
             .execute(testEnv.client);
@@ -119,7 +119,7 @@ public class ContractCallIntegrationTest {
     void cannotCallContractFunctionWhenGasIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        final var response = new FileCreateTransaction()
+        var response = new FileCreateTransaction()
             .setKeys(testEnv.operatorKey)
             .setContents(SMART_CONTRACT_BYTECODE)
             .execute(testEnv.client);
@@ -165,7 +165,7 @@ public class ContractCallIntegrationTest {
     void cannotCallContractFunctionWhenContractIDIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        final var response = new FileCreateTransaction()
+        var response = new FileCreateTransaction()
             .setKeys(testEnv.operatorKey)
             .setContents(SMART_CONTRACT_BYTECODE)
             .execute(testEnv.client);
@@ -234,9 +234,7 @@ public class ContractCallIntegrationTest {
             .setFunction("getMessage")
             .setMaxQueryPayment(new Hbar(10000));
 
-        var cost = callQuery.getCost(testEnv.client);
-
-        @Var var result = callQuery
+        var result = callQuery
             .execute(testEnv.client);
 
         assertEquals("Hello from Hedera.", result.getString(0));
@@ -330,8 +328,6 @@ public class ContractCallIntegrationTest {
             .setGas(2000)
             .setFunction("getMessage")
             .setMaxQueryPayment(new Hbar(100));
-
-        var cost = callQuery.getCost(testEnv.client);
 
         var error = assertThrows(PrecheckStatusException.class, () -> {
             callQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);

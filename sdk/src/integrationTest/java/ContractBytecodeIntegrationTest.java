@@ -179,8 +179,6 @@ public class ContractBytecodeIntegrationTest {
             .setContractId(contractId)
             .setMaxQueryPayment(new Hbar(100));
 
-        var cost = bytecodeQuery.getCost(testEnv.client);
-
         var error = assertThrows(PrecheckStatusException.class, () -> {
             bytecodeQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
         });

@@ -1,4 +1,3 @@
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.FileInfoQuery;
@@ -26,7 +25,7 @@ public class FileCreateIntegrationTest {
 
         var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-        @Var var info = new FileInfoQuery()
+        var info = new FileInfoQuery()
             .setFileId(fileId)
             .execute(testEnv.client);
 
@@ -56,7 +55,7 @@ public class FileCreateIntegrationTest {
 
         var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-        @Var var info = new FileInfoQuery()
+        var info = new FileInfoQuery()
             .setFileId(fileId)
             .execute(testEnv.client);
 
@@ -85,7 +84,7 @@ public class FileCreateIntegrationTest {
 
         var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-        @Var var info = new FileInfoQuery()
+        var info = new FileInfoQuery()
             .setFileId(fileId)
             .execute(testEnv.client);
 
