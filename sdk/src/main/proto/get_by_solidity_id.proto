@@ -29,18 +29,47 @@ import "basic_types.proto";
 import "query_header.proto";
 import "response_header.proto";
 
-/* Get the IDs in the format used by transactions, given the ID in the format used by Solidity. If the Solidity ID is for a smart contract instance, then both the ContractID and associated AccountID will be returned. */
+/**
+ * Get the IDs in the format used by transactions, given the ID in the format used by Solidity. If
+ * the Solidity ID is for a smart contract instance, then both the ContractID and associated
+ * AccountID will be returned.
+ */
 message GetBySolidityIDQuery {
-    QueryHeader header = 1; // Standard info sent from client to node, including the signed payment, and what kind of response is requested (cost, state proof, both, or neither).
-    string solidityID = 2; // The ID in the format used by Solidity
+    /**
+     * Standard info sent from client to node, including the signed payment, and what kind of
+     * response is requested (cost, state proof, both, or neither).
+     */
+    QueryHeader header = 1;
+
+    /**
+     * The ID in the format used by Solidity
+     */
+    string solidityID = 2;
 }
 
-/* Response when the client sends the node GetBySolidityIDQuery */
+/**
+ * Response when the client sends the node GetBySolidityIDQuery
+ */
 message GetBySolidityIDResponse {
-    ResponseHeader header = 1; // Standard response from node to client, including the requested fields: cost, or state proof, or both, or neither
-    AccountID accountID = 2; //  The Account ID for the cryptocurrency account
-    FileID fileID = 3; // The file Id for the file
-    ContractID contractID = 4; // A smart contract ID for the instance (if this is included, then the associated accountID will also be included)
+    /**
+     * Standard response from node to client, including the requested fields: cost, or state proof,
+     * or both, or neither
+     */
+    ResponseHeader header = 1;
+
+    /**
+     * The Account ID for the cryptocurrency account
+     */
+    AccountID accountID = 2;
+
+    /**
+     * The file Id for the file
+     */
+    FileID fileID = 3;
+
+    /**
+     * A smart contract ID for the instance (if this is included, then the associated accountID will
+     * also be included)
+     */
+    ContractID contractID = 4;
 }
-
-

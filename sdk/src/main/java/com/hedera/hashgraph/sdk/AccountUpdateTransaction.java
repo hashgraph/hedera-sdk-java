@@ -49,8 +49,6 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     private Boolean receiverSigRequired = null;
     @Nullable
     private String accountMemo = null;
-    @Nullable
-    private Integer maxAutomaticTokenAssociations = null;
 
     public AccountUpdateTransaction() {
     }
@@ -186,17 +184,6 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     @Nullable
-    public Integer getMaxAutomaticTokenAssociations() {
-        return maxAutomaticTokenAssociations;
-    }
-
-    public AccountUpdateTransaction setMaxAutomaticTokenAssociations(int amount) {
-        requireNotFrozen();
-        maxAutomaticTokenAssociations = amount;
-        return this;
-    }
-
-    @Nullable
     public String getAccountMemo() {
         return accountMemo;
     }
@@ -248,9 +235,6 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         if (body.hasMemo()) {
             accountMemo = body.getMemo().getValue();
         }
-        if (body.hasMaxAutomaticTokenAssociations()) {
-            maxAutomaticTokenAssociations = body.getMaxAutomaticTokenAssociations().getValue();
-        }
     }
 
     @Override
@@ -280,9 +264,6 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         }
         if (accountMemo != null) {
             builder.setMemo(StringValue.of(accountMemo));
-        }
-        if (maxAutomaticTokenAssociations != null) {
-            builder.setMaxAutomaticTokenAssociations(UInt32Value.of(maxAutomaticTokenAssociations));
         }
 
         return builder;

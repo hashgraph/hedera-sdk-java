@@ -26,12 +26,14 @@ public enum Status {
     PAYER_ACCOUNT_NOT_FOUND(ResponseCodeEnum.PAYER_ACCOUNT_NOT_FOUND),
 
     /**
-     * Node Account provided does not match the node account of the node the transaction was submitted to.
+     * Node Account provided does not match the node account of the node the transaction was submitted
+     * to.
      */
     INVALID_NODE_ACCOUNT(ResponseCodeEnum.INVALID_NODE_ACCOUNT),
 
     /**
-     * Pre-Check error when TransactionValidStart + transactionValidDuration is less than current consensus time.
+     * Pre-Check error when TransactionValidStart + transactionValidDuration is less than current
+     * consensus time.
      */
     TRANSACTION_EXPIRED(ResponseCodeEnum.TRANSACTION_EXPIRED),
 
@@ -66,7 +68,8 @@ public enum Status {
     INSUFFICIENT_PAYER_BALANCE(ResponseCodeEnum.INSUFFICIENT_PAYER_BALANCE),
 
     /**
-     * This transaction ID is a duplicate of one that was submitted to this node or reached consensus in the last 180 seconds (receipt period)
+     * This transaction ID is a duplicate of one that was submitted to this node or reached consensus
+     * in the last 180 seconds (receipt period)
      */
     DUPLICATE_TRANSACTION(ResponseCodeEnum.DUPLICATE_TRANSACTION),
 
@@ -116,7 +119,8 @@ public enum Status {
     INVALID_SOLIDITY_ID(ResponseCodeEnum.INVALID_SOLIDITY_ID),
 
     /**
-     * The responding node has submitted the transaction to the network. Its final status is still unknown.
+     * The responding node has submitted the transaction to the network. Its final status is still
+     * unknown.
      */
     UNKNOWN(ResponseCodeEnum.UNKNOWN),
 
@@ -186,7 +190,8 @@ public enum Status {
     CONTRACT_EXECUTION_EXCEPTION(ResponseCodeEnum.CONTRACT_EXECUTION_EXCEPTION),
 
     /**
-     * In Query validation, account with +ve(amount) value should be Receiving node account, the receiver account should be only one account in the list
+     * In Query validation, account with +ve(amount) value should be Receiving node account, the
+     * receiver account should be only one account in the list
      */
     INVALID_RECEIVING_NODE_ACCOUNT(ResponseCodeEnum.INVALID_RECEIVING_NODE_ACCOUNT),
 
@@ -266,12 +271,15 @@ public enum Status {
     INVALID_TRANSACTION_BODY(ResponseCodeEnum.INVALID_TRANSACTION_BODY),
 
     /**
-     * the type of key (base ed25519 key, KeyList, or ThresholdKey) does not match the type of signature (base ed25519 signature, SignatureList, or ThresholdKeySignature)
+     * the type of key (base ed25519 key, KeyList, or ThresholdKey) does not match the type of
+     * signature (base ed25519 signature, SignatureList, or ThresholdKeySignature)
      */
     INVALID_SIGNATURE_TYPE_MISMATCHING_KEY(ResponseCodeEnum.INVALID_SIGNATURE_TYPE_MISMATCHING_KEY),
 
     /**
-     * the number of key (KeyList, or ThresholdKey) does not match that of signature (SignatureList, or ThresholdKeySignature). e.g. if a keyList has 3 base keys, then the corresponding signatureList should also have 3 base signatures.
+     * the number of key (KeyList, or ThresholdKey) does not match that of signature (SignatureList,
+     * or ThresholdKeySignature). e.g. if a keyList has 3 base keys, then the corresponding
+     * signatureList should also have 3 base signatures.
      */
     INVALID_SIGNATURE_COUNT_MISMATCHING_KEY(ResponseCodeEnum.INVALID_SIGNATURE_COUNT_MISMATCHING_KEY),
 
@@ -391,12 +399,14 @@ public enum Status {
     SETTING_NEGATIVE_ACCOUNT_BALANCE(ResponseCodeEnum.SETTING_NEGATIVE_ACCOUNT_BALANCE),
 
     /**
-     * when deleting smart contract that has crypto balance either transfer account or transfer smart contract is required
+     * when deleting smart contract that has crypto balance either transfer account or transfer smart
+     * contract is required
      */
     OBTAINER_REQUIRED(ResponseCodeEnum.OBTAINER_REQUIRED),
 
     /**
-     * when deleting smart contract that has crypto balance you can not use the same contract id as transferContractId as the one being deleted
+     * when deleting smart contract that has crypto balance you can not use the same contract id as
+     * transferContractId as the one being deleted
      */
     OBTAINER_SAME_CONTRACT_ID(ResponseCodeEnum.OBTAINER_SAME_CONTRACT_ID),
 
@@ -406,7 +416,8 @@ public enum Status {
     OBTAINER_DOES_NOT_EXIST(ResponseCodeEnum.OBTAINER_DOES_NOT_EXIST),
 
     /**
-     * attempting to modify (update or delete a immutable smart contract, i.e. one created without a admin key)
+     * attempting to modify (update or delete a immutable smart contract, i.e. one created without a
+     * admin key)
      */
     MODIFYING_IMMUTABLE_CONTRACT(ResponseCodeEnum.MODIFYING_IMMUTABLE_CONTRACT),
 
@@ -421,7 +432,8 @@ public enum Status {
     AUTORENEW_DURATION_NOT_IN_RANGE(ResponseCodeEnum.AUTORENEW_DURATION_NOT_IN_RANGE),
 
     /**
-     * Decoding the smart contract binary to a byte array failed. Check that the input is a valid hex string.
+     * Decoding the smart contract binary to a byte array failed. Check that the input is a valid hex
+     * string.
      */
     ERROR_DECODING_BYTESTRING(ResponseCodeEnum.ERROR_DECODING_BYTESTRING),
 
@@ -451,7 +463,8 @@ public enum Status {
     INVALID_SEND_RECORD_THRESHOLD(ResponseCodeEnum.INVALID_SEND_RECORD_THRESHOLD),
 
     /**
-     * Special Account Operations should be performed by only Genesis account, return this code if it is not Genesis Account
+     * Special Account Operations should be performed by only Genesis account, return this code if it
+     * is not Genesis Account
      */
     ACCOUNT_IS_NOT_GENESIS_ACCOUNT(ResponseCodeEnum.ACCOUNT_IS_NOT_GENESIS_ACCOUNT),
 
@@ -516,7 +529,12 @@ public enum Status {
     ENTITY_NOT_ALLOWED_TO_DELETE(ResponseCodeEnum.ENTITY_NOT_ALLOWED_TO_DELETE),
 
     /**
-     * Violating one of these rules: 1) treasury account can update all entities below 0.0.1000, 2) account 0.0.50 can update all entities from 0.0.51 - 0.0.80, 3) Network Function Master Account A/c 0.0.50 - Update all Network Function accounts and perform all the Network Functions listed below, 4) Network Function Accounts: i) A/c 0.0.55 - Update Address Book files (0.0.101/102), ii) A/c 0.0.56 - Update Fee schedule (0.0.111), iii) A/c 0.0.57 - Update Exchange Rate (0.0.112).
+     * Violating one of these rules: 1) treasury account can update all entities below 0.0.1000, 2)
+     * account 0.0.50 can update all entities from 0.0.51 - 0.0.80, 3) Network Function Master Account
+     * A/c 0.0.50 - Update all Network Function accounts and perform all the Network Functions listed
+     * below, 4) Network Function Accounts: i) A/c 0.0.55 - Update Address Book files (0.0.101/102),
+     * ii) A/c 0.0.56 - Update Fee schedule (0.0.111), iii) A/c 0.0.57 - Update Exchange Rate
+     * (0.0.112).
      */
     AUTHORIZATION_FAILED(ResponseCodeEnum.AUTHORIZATION_FAILED),
 
@@ -608,9 +626,9 @@ public enum Status {
     AUTORENEW_ACCOUNT_NOT_ALLOWED(ResponseCodeEnum.AUTORENEW_ACCOUNT_NOT_ALLOWED),
 
     /**
-     * The topic has expired, was not automatically renewed, and is in a 7 day grace period before the topic will be
-     * deleted unrecoverably. This error response code will not be returned until autoRenew functionality is supported
-     * by HAPI.
+     * The topic has expired, was not automatically renewed, and is in a 7 day grace period before the
+     * topic will be deleted unrecoverably. This error response code will not be returned until
+     * autoRenew functionality is supported by HAPI.
      */
     TOPIC_EXPIRED(ResponseCodeEnum.TOPIC_EXPIRED),
 

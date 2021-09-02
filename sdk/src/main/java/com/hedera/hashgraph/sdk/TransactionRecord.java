@@ -80,11 +80,6 @@ public final class TransactionRecord {
 
     public final List<AssessedCustomFee> assessedCustomFees;
 
-    /**
-     * All token associations implicitly created while handling this transaction
-     */
-    public final List<TokenAssociation> automaticTokenAssociations;
-
     private TransactionRecord(
         TransactionReceipt transactionReceipt,
         ByteString transactionHash,
@@ -97,8 +92,7 @@ public final class TransactionRecord {
         Map<TokenId, Map<AccountId, Long>> tokenTransfers,
         Map<TokenId, List<TokenNftTransfer>> tokenNftTransfers,
         @Nullable ScheduleId scheduleRef,
-        List<AssessedCustomFee> assessedCustomFees,
-        List<TokenAssociation> automaticTokenAssociations
+        List<AssessedCustomFee> assessedCustomFees
     ) {
         this.receipt = transactionReceipt;
         this.transactionHash = transactionHash;
@@ -112,7 +106,6 @@ public final class TransactionRecord {
         this.tokenNftTransfers = tokenNftTransfers;
         this.scheduleRef = scheduleRef;
         this.assessedCustomFees = assessedCustomFees;
-        this.automaticTokenAssociations = automaticTokenAssociations;
     }
 
     static TransactionRecord fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord) {
@@ -151,11 +144,6 @@ public final class TransactionRecord {
                 new ContractFunctionResult(transactionRecord.getContractCreateResult()) :
                 null;
 
-        var automaticTokenAssociations = new ArrayList<TokenAssociation>(transactionRecord.getAutomaticTokenAssociationsCount());
-        for (var tokenAssociation : transactionRecord.getAutomaticTokenAssociationsList()) {
-            automaticTokenAssociations.add(TokenAssociation.fromProtobuf(tokenAssociation));
-        }
-
         return new TransactionRecord(
             TransactionReceipt.fromProtobuf(transactionRecord.getReceipt()),
             transactionRecord.getTransactionHash(),
@@ -168,8 +156,7 @@ public final class TransactionRecord {
             tokenTransfers,
             tokenNftTransfers,
             transactionRecord.hasScheduleRef() ? ScheduleId.fromProtobuf(transactionRecord.getScheduleRef()) : null,
-            fees,
-            automaticTokenAssociations
+            fees
         );
     }
 
@@ -217,10 +204,6 @@ public final class TransactionRecord {
             transactionRecord.addAssessedCustomFees(fee.toProtobuf());
         }
 
-        for (var tokenAssociation : automaticTokenAssociations) {
-            transactionRecord.addAutomaticTokenAssociations(tokenAssociation.toProtobuf());
-        }
-
         return transactionRecord.build();
     }
 
@@ -239,7 +222,6 @@ public final class TransactionRecord {
             .add("tokenNftTransfers", tokenNftTransfers)
             .add("scheduleRef", scheduleRef)
             .add("assessedCustomFees", assessedCustomFees)
-            .add("automaticTokenAssociations", automaticTokenAssociations)
             .toString();
     }
 

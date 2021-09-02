@@ -25,9 +25,13 @@ package proto;
 option java_package = "com.hedera.hashgraph.sdk.proto";
 option java_multiple_files = true;
 
-/*
-Submit an arbitrary (serialized) Transaction to the network without prechecks. Requires superuser privileges.
-*/
+/**
+ * Submit an arbitrary (serialized) Transaction to the network without prechecks. Requires superuser
+ * privileges. 
+ */
 message UncheckedSubmitBody {
-    bytes transactionBytes = 1; // The serialized bytes of the Transaction to be submitted without prechecks
+    /**
+     * The serialized bytes of the Transaction to be submitted without prechecks
+     */
+    bytes transactionBytes = 1;
 }

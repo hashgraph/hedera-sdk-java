@@ -27,7 +27,6 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     private Hbar initialBalance = new Hbar(0);
     private boolean receiverSigRequired = false;
     private Duration autoRenewPeriod = DEFAULT_AUTO_RENEW_PERIOD;
-    private int maxAutomaticTokenAssociations = 0;
 
     public AccountCreateTransaction() {
     }
@@ -141,16 +140,6 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         return this;
     }
 
-    public int getMaxAutomaticTokenAssociations() {
-        return maxAutomaticTokenAssociations;
-    }
-
-    public AccountCreateTransaction setMaxAutomaticTokenAssociations(int amount) {
-        requireNotFrozen();
-        maxAutomaticTokenAssociations = amount;
-        return this;
-    }
-
     public String getAccountMemo() {
         return accountMemo;
     }
@@ -167,8 +156,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
             .setInitialBalance(initialBalance.toTinybars())
             .setReceiverSigRequired(receiverSigRequired)
             .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod))
-            .setMemo(accountMemo)
-            .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations);
+            .setMemo(accountMemo);
 
         if (proxyAccountId != null) {
             builder.setProxyAccountID(proxyAccountId.toProtobuf());
@@ -203,7 +191,6 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         initialBalance = Hbar.fromTinybars(body.getInitialBalance());
         accountMemo = body.getMemo();
         receiverSigRequired = body.getReceiverSigRequired();
-        maxAutomaticTokenAssociations = body.getMaxAutomaticTokenAssociations();
     }
 
     @Override

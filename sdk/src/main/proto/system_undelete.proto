@@ -27,12 +27,20 @@ option java_multiple_files = true;
 
 import "basic_types.proto";
 
-/*
-Undelete a file or smart contract that was deleted by SystemDelete; requires a Hedera administrative multisignature.
-*/
+/**
+ * Undelete a file or smart contract that was deleted by SystemDelete; requires a Hedera
+ * administrative multisignature. 
+ */
 message SystemUndeleteTransactionBody {
     oneof id {
-        FileID fileID = 1; // The file ID to undelete, in the format used in transactions
-        ContractID contractID = 2; // The contract ID instance to undelete, in the format used in transactions
+        /**
+         * The file ID to undelete, in the format used in transactions
+         */
+        FileID fileID = 1;
+
+        /**
+         * The contract ID instance to undelete, in the format used in transactions
+         */
+        ContractID contractID = 2;
     }
 }

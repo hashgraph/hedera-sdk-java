@@ -98,8 +98,6 @@ public final class AccountInfo {
 
     public final long ownedNfts;
 
-    public final int maxAutomaticTokenAssociations;
-
     private AccountInfo(
         AccountId accountId,
         String contractAccountId,
@@ -116,8 +114,7 @@ public final class AccountInfo {
         List<LiveHash> liveHashes,
         Map<TokenId, TokenRelationship> tokenRelationships,
         String accountMemo,
-        long ownedNfts,
-        int maxAutomaticTokenAssociations
+        long ownedNfts
     ) {
         this.accountId = accountId;
         this.contractAccountId = contractAccountId;
@@ -135,7 +132,6 @@ public final class AccountInfo {
         this.tokenRelationships = Collections.unmodifiableMap(tokenRelationships);
         this.accountMemo = accountMemo;
         this.ownedNfts = ownedNfts;
-        this.maxAutomaticTokenAssociations = maxAutomaticTokenAssociations;
     }
 
     static AccountInfo fromProtobuf(CryptoGetInfoResponse.AccountInfo accountInfo) {
@@ -172,8 +168,7 @@ public final class AccountInfo {
             liveHashes,
             relationships,
             accountInfo.getMemo(),
-            accountInfo.getOwnedNfts(),
-            accountInfo.getMaxAutomaticTokenAssociations()
+            accountInfo.getOwnedNfts()
         );
     }
 
@@ -199,8 +194,7 @@ public final class AccountInfo {
             .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod))
             .addAllLiveHashes(hashes)
             .setMemo(accountMemo)
-            .setOwnedNfts(ownedNfts)
-            .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations);
+            .setOwnedNfts(ownedNfts);
 
         if (contractAccountId != null) {
             accountInfoBuilder.setContractAccountID(contractAccountId);
@@ -232,7 +226,6 @@ public final class AccountInfo {
             .add("tokenRelationships", tokenRelationships)
             .add("accountMemo", accountMemo)
             .add("ownedNfts", ownedNfts)
-            .add("maxAutomaticTokenAssociations", maxAutomaticTokenAssociations)
             .toString();
     }
 
