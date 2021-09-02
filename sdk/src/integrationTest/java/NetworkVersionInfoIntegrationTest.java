@@ -7,14 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 public class NetworkVersionInfoIntegrationTest {
     @Test
     @DisplayName("Cannot query network version info")
-    void cannotQueryNetworkVersionInfo() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void cannotQueryNetworkVersionInfo() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            new NetworkVersionInfoQuery()
-                .execute(testEnv.client);
+        new NetworkVersionInfoQuery()
+            .execute(testEnv.client);
 
-            testEnv.close();
-        });
+        testEnv.close();
     }
 }

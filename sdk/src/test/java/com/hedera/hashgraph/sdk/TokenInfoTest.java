@@ -64,13 +64,11 @@ public class TokenInfoTest {
     }
 
     @Test
-    void shouldSerialize() {
-        assertDoesNotThrow(() -> {
-            var originalTokenInfo = spawnTokenInfoExample();
-            byte[] tokenInfoBytes = originalTokenInfo.toBytes();
-            var copyTokenInfo = TokenInfo.fromBytes(tokenInfoBytes);
-            assertTrue(originalTokenInfo.toString().equals(copyTokenInfo.toString()));
-            SnapshotMatcher.expect(originalTokenInfo.toString()).toMatchSnapshot();
-        });
+    void shouldSerialize() throws Exception {
+        var originalTokenInfo = spawnTokenInfoExample();
+        byte[] tokenInfoBytes = originalTokenInfo.toBytes();
+        var copyTokenInfo = TokenInfo.fromBytes(tokenInfoBytes);
+        assertTrue(originalTokenInfo.toString().equals(copyTokenInfo.toString()));
+        SnapshotMatcher.expect(originalTokenInfo.toString()).toMatchSnapshot();
     }
 }

@@ -11,37 +11,33 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class TopicCreateIntegrationTest {
     @Test
     @DisplayName("Can create topic")
-    void canCreateTopic() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void canCreateTopic() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var response = new TopicCreateTransaction()
-                .setAdminKey(testEnv.operatorKey)
-                .setTopicMemo("[e2e::TopicCreateTransaction]")
-                .execute(testEnv.client);
+        var response = new TopicCreateTransaction()
+            .setAdminKey(testEnv.operatorKey)
+            .setTopicMemo("[e2e::TopicCreateTransaction]")
+            .execute(testEnv.client);
 
-            var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
+        var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
-            new TopicDeleteTransaction()
-                .setTopicId(topicId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+        new TopicDeleteTransaction()
+            .setTopicId(topicId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
-            testEnv.close();
-        });
+        testEnv.close();
     }
 
     @Test
     @DisplayName("Can create topic with no field set")
-    void canCreateTopicWithNoFieldsSet() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void canCreateTopicWithNoFieldsSet() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var response = new TopicCreateTransaction()
-                .execute(testEnv.client);
-            assertNotNull(response.getReceipt(testEnv.client).topicId);
+        var response = new TopicCreateTransaction()
+            .execute(testEnv.client);
+        assertNotNull(response.getReceipt(testEnv.client).topicId);
 
-            testEnv.close();
-        });
+        testEnv.close();
     }
 }

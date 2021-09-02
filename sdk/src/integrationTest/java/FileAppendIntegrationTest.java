@@ -18,103 +18,99 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class FileAppendIntegrationTest {
     @Test
     @DisplayName("Can append to file")
-    void canAppendToFile() {
-        assertDoesNotThrow(() -> {
-            // There are potential bugs in FileAppendTransaction which require more than one node to trigger.
-            var testEnv = new IntegrationTestEnv(2);
+    void canAppendToFile() throws Exception {
+        // There are potential bugs in FileAppendTransaction which require more than one node to trigger.
+        var testEnv = new IntegrationTestEnv(2);
 
-            var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents("[e2e::FileCreateTransaction]")
-                .execute(testEnv.client);
+        var response = new FileCreateTransaction()
+            .setKeys(testEnv.operatorKey)
+            .setContents("[e2e::FileCreateTransaction]")
+            .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-            @Var var info = new FileInfoQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+        @Var var info = new FileInfoQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
 
-            assertEquals(info.fileId, fileId);
-            assertEquals(info.size, 28);
-            assertFalse(info.isDeleted);
-            assertNotNull(info.keys);
-            assertNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
+        assertEquals(info.fileId, fileId);
+        assertEquals(info.size, 28);
+        assertFalse(info.isDeleted);
+        assertNotNull(info.keys);
+        assertNull(info.keys.getThreshold());
+        assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
 
-            new FileAppendTransaction()
-                .setFileId(fileId)
-                .setContents("[e2e::FileAppendTransaction]")
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+        new FileAppendTransaction()
+            .setFileId(fileId)
+            .setContents("[e2e::FileAppendTransaction]")
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
-            info = new FileInfoQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+        info = new FileInfoQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
 
-            assertEquals(info.fileId, fileId);
-            assertEquals(info.size, 56);
-            assertFalse(info.isDeleted);
-            assertNotNull(info.keys);
-            assertNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
+        assertEquals(info.fileId, fileId);
+        assertEquals(info.size, 56);
+        assertFalse(info.isDeleted);
+        assertNotNull(info.keys);
+        assertNull(info.keys.getThreshold());
+        assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
 
-            new FileDeleteTransaction()
-                .setFileId(fileId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+        new FileDeleteTransaction()
+            .setFileId(fileId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
-            testEnv.close();
-        });
+        testEnv.close();
     }
 
     @Test
     @DisplayName("Can append large contents to file")
-    void canAppendLargeContentsToFile() {
-        assertDoesNotThrow(() -> {
-            // There are potential bugs in FileAppendTransaction which require more than one node to trigger.
-            var testEnv = new IntegrationTestEnv(2);
+    void canAppendLargeContentsToFile() throws Exception {
+        // There are potential bugs in FileAppendTransaction which require more than one node to trigger.
+        var testEnv = new IntegrationTestEnv(2);
 
-            var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents("[e2e::FileCreateTransaction]")
-                .execute(testEnv.client);
+        var response = new FileCreateTransaction()
+            .setKeys(testEnv.operatorKey)
+            .setContents("[e2e::FileCreateTransaction]")
+            .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-            @Var var info = new FileInfoQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+        @Var var info = new FileInfoQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
 
-            assertEquals(info.fileId, fileId);
-            assertEquals(info.size, 28);
-            assertFalse(info.isDeleted);
-            assertNotNull(info.keys);
-            assertNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
+        assertEquals(info.fileId, fileId);
+        assertEquals(info.size, 28);
+        assertFalse(info.isDeleted);
+        assertNotNull(info.keys);
+        assertNull(info.keys.getThreshold());
+        assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
 
-            new FileAppendTransaction()
-                .setFileId(fileId)
-                .setContents(Contents.BIG_CONTENTS)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+        new FileAppendTransaction()
+            .setFileId(fileId)
+            .setContents(Contents.BIG_CONTENTS)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
-            info = new FileInfoQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+        info = new FileInfoQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
 
-            assertEquals(info.fileId, fileId);
-            assertEquals(info.size, 13522);
-            assertFalse(info.isDeleted);
-            assertNotNull(info.keys);
-            assertNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
+        assertEquals(info.fileId, fileId);
+        assertEquals(info.size, 13522);
+        assertFalse(info.isDeleted);
+        assertNotNull(info.keys);
+        assertNull(info.keys.getThreshold());
+        assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
 
-            new FileDeleteTransaction()
-                .setFileId(fileId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+        new FileDeleteTransaction()
+            .setFileId(fileId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
-            testEnv.close();
-        });
+        testEnv.close();
     }
 }

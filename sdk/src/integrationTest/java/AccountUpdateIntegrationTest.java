@@ -22,71 +22,67 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class AccountUpdateIntegrationTest {
     @Test
     @DisplayName("Can update account with a new key")
-    void canUpdateAccountWithNewKey() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void canUpdateAccountWithNewKey() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var key1 = PrivateKey.generate();
-            var key2 = PrivateKey.generate();
+        var key1 = PrivateKey.generate();
+        var key2 = PrivateKey.generate();
 
-            var response = new AccountCreateTransaction()
-                .setKey(key1)
-                .execute(testEnv.client);
+        var response = new AccountCreateTransaction()
+            .setKey(key1)
+            .execute(testEnv.client);
 
-            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
+        var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-            @Var var info = new AccountInfoQuery()
-                .setAccountId(accountId)
-                .execute(testEnv.client);
+        @Var var info = new AccountInfoQuery()
+            .setAccountId(accountId)
+            .execute(testEnv.client);
 
-            assertEquals(info.accountId, accountId);
-            assertFalse(info.isDeleted);
-            assertEquals(info.key.toString(), key1.getPublicKey().toString());
-            assertEquals(info.balance, new Hbar(0));
-            assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
-            assertNull(info.proxyAccountId);
-            assertEquals(info.proxyReceived, Hbar.ZERO);
+        assertEquals(info.accountId, accountId);
+        assertFalse(info.isDeleted);
+        assertEquals(info.key.toString(), key1.getPublicKey().toString());
+        assertEquals(info.balance, new Hbar(0));
+        assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
+        assertNull(info.proxyAccountId);
+        assertEquals(info.proxyReceived, Hbar.ZERO);
 
-            new AccountUpdateTransaction()
-                .setAccountId(accountId)
-                .setKey(key2.getPublicKey())
-                .freezeWith(testEnv.client)
-                .sign(key1)
-                .sign(key2)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+        new AccountUpdateTransaction()
+            .setAccountId(accountId)
+            .setKey(key2.getPublicKey())
+            .freezeWith(testEnv.client)
+            .sign(key1)
+            .sign(key2)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
-            info = new AccountInfoQuery()
-                .setAccountId(accountId)
-                .execute(testEnv.client);
+        info = new AccountInfoQuery()
+            .setAccountId(accountId)
+            .execute(testEnv.client);
 
-            assertEquals(info.accountId, accountId);
-            assertFalse(info.isDeleted);
-            assertEquals(info.key.toString(), key2.getPublicKey().toString());
-            assertEquals(info.balance, new Hbar(0));
-            assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
-            assertNull(info.proxyAccountId);
-            assertEquals(info.proxyReceived, Hbar.ZERO);
+        assertEquals(info.accountId, accountId);
+        assertFalse(info.isDeleted);
+        assertEquals(info.key.toString(), key2.getPublicKey().toString());
+        assertEquals(info.balance, new Hbar(0));
+        assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
+        assertNull(info.proxyAccountId);
+        assertEquals(info.proxyReceived, Hbar.ZERO);
 
-            testEnv.close(accountId, key2);
-        });
+        testEnv.close(accountId, key2);
     }
 
     @Test
     @DisplayName("Cannot update account when account ID is not set")
-    void cannotUpdateAccountWhenAccountIdIsNotSet() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void cannotUpdateAccountWhenAccountIdIsNotSet() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var error = assertThrows(ReceiptStatusException.class, () -> {
-                new AccountUpdateTransaction()
-                    .execute(testEnv.client)
-                    .getReceipt(testEnv.client);
-            });
-
-            assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
-
-            testEnv.close();
+        var error = assertThrows(ReceiptStatusException.class, () -> {
+            new AccountUpdateTransaction()
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
         });
+
+        assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
+
+        testEnv.close();
     }
 }

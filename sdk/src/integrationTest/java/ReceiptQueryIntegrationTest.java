@@ -14,156 +14,144 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class ReceiptQueryIntegrationTest {
     @Test
     @DisplayName("Can get Receipt")
-    void canGetTransactionReceipt() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void canGetTransactionReceipt() throws Exception{
+        var testEnv = new IntegrationTestEnv(1);
 
-            var key = PrivateKey.generate();
+        var key = PrivateKey.generate();
 
-            var response = new AccountCreateTransaction()
-                .setKey(key)
-                .execute(testEnv.client);
+        var response = new AccountCreateTransaction()
+            .setKey(key)
+            .execute(testEnv.client);
 
-            var receipt = new TransactionReceiptQuery()
-                .setTransactionId(response.transactionId)
-                .execute(testEnv.client);
+        var receipt = new TransactionReceiptQuery()
+            .setTransactionId(response.transactionId)
+            .execute(testEnv.client);
 
-            testEnv.close(receipt.accountId, key);
-        });
+        testEnv.close(receipt.accountId, key);
     }
 
     @Test
     @DisplayName("Can get Record")
-    void canGetTransactionRecord() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
-            var key = PrivateKey.generate();
+    void canGetTransactionRecord() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+        var key = PrivateKey.generate();
 
-            var response = new AccountCreateTransaction()
-                .setKey(key)
-                .execute(testEnv.client);
+        var response = new AccountCreateTransaction()
+            .setKey(key)
+            .execute(testEnv.client);
 
-            new TransactionReceiptQuery()
-                .setTransactionId(response.transactionId)
-                .execute(testEnv.client);
+        new TransactionReceiptQuery()
+            .setTransactionId(response.transactionId)
+            .execute(testEnv.client);
 
-            var record = new TransactionRecordQuery()
-                .setTransactionId(response.transactionId)
-                .execute(testEnv.client);
+        var record = new TransactionRecordQuery()
+            .setTransactionId(response.transactionId)
+            .execute(testEnv.client);
 
-            testEnv.close(record.receipt.accountId, key);
-        });
+        testEnv.close(record.receipt.accountId, key);
     }
 
     @Test
     @DisplayName("Can get Record cost")
-    void getCostTransactionRecord() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
-            var key = PrivateKey.generate();
+    void getCostTransactionRecord() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+        var key = PrivateKey.generate();
 
-            var response = new AccountCreateTransaction()
-                .setKey(key)
-                .execute(testEnv.client);
+        var response = new AccountCreateTransaction()
+            .setKey(key)
+            .execute(testEnv.client);
 
-            new TransactionReceiptQuery()
-                .setTransactionId(response.transactionId)
-                .execute(testEnv.client);
+        new TransactionReceiptQuery()
+            .setTransactionId(response.transactionId)
+            .execute(testEnv.client);
 
-            var recordQuery = new TransactionRecordQuery()
-                .setTransactionId(response.transactionId);
+        var recordQuery = new TransactionRecordQuery()
+            .setTransactionId(response.transactionId);
 
-            var cost = recordQuery.getCost(testEnv.client);
+        var cost = recordQuery.getCost(testEnv.client);
 
-            var record = recordQuery.execute(testEnv.client);
+        var record = recordQuery.execute(testEnv.client);
 
-            testEnv.close(record.receipt.accountId, key);
-        });
+        testEnv.close(record.receipt.accountId, key);
     }
 
     @Test
     @DisplayName("Can get Record cost with big max set")
-    void getCostBigMaxTransactionRecord() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
-            var key = PrivateKey.generate();
+    void getCostBigMaxTransactionRecord() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+        var key = PrivateKey.generate();
 
-            var response = new AccountCreateTransaction()
-                .setKey(key)
-                .execute(testEnv.client);
+        var response = new AccountCreateTransaction()
+            .setKey(key)
+            .execute(testEnv.client);
 
-            new TransactionReceiptQuery()
-                .setTransactionId(response.transactionId)
-                .execute(testEnv.client);
+        new TransactionReceiptQuery()
+            .setTransactionId(response.transactionId)
+            .execute(testEnv.client);
 
-            var recordQuery = new TransactionRecordQuery()
-                .setTransactionId(response.transactionId)
-                .setMaxQueryPayment(new Hbar(1000));
+        var recordQuery = new TransactionRecordQuery()
+            .setTransactionId(response.transactionId)
+            .setMaxQueryPayment(new Hbar(1000));
 
-            var cost = recordQuery.getCost(testEnv.client);
+        var cost = recordQuery.getCost(testEnv.client);
 
-            var record = recordQuery.execute(testEnv.client);
+        var record = recordQuery.execute(testEnv.client);
 
-            testEnv.close(record.receipt.accountId, key);
-        });
+        testEnv.close(record.receipt.accountId, key);
     }
 
     @Test
     @DisplayName("Error at very small max, getRecord")
-    void getCostSmallMaxTransactionRecord() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
-            var key = PrivateKey.generate();
+    void getCostSmallMaxTransactionRecord() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+        var key = PrivateKey.generate();
 
-            var response = new AccountCreateTransaction()
-                .setKey(key)
-                .execute(testEnv.client);
+        var response = new AccountCreateTransaction()
+            .setKey(key)
+            .execute(testEnv.client);
 
-            var receipt = new TransactionReceiptQuery()
-                .setTransactionId(response.transactionId)
-                .execute(testEnv.client);
+        var receipt = new TransactionReceiptQuery()
+            .setTransactionId(response.transactionId)
+            .execute(testEnv.client);
 
-            var recordQuery = new TransactionRecordQuery()
-                .setTransactionId(response.transactionId)
-                .setMaxQueryPayment(Hbar.fromTinybars(1));
+        var recordQuery = new TransactionRecordQuery()
+            .setTransactionId(response.transactionId)
+            .setMaxQueryPayment(Hbar.fromTinybars(1));
 
-            var cost = recordQuery.getCost(testEnv.client);
+        var cost = recordQuery.getCost(testEnv.client);
 
-            var error = assertThrows(RuntimeException.class, () -> {
-                recordQuery.execute(testEnv.client);
-            });
-
-            assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for TransactionRecordQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
-
-            testEnv.close(receipt.accountId, key);
+        var error = assertThrows(RuntimeException.class, () -> {
+            recordQuery.execute(testEnv.client);
         });
+
+        assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for TransactionRecordQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
+
+        testEnv.close(receipt.accountId, key);
     }
 
     @Test
     @DisplayName("Insufficient transaction fee error for transaction record query")
-    void getCostInsufficientTxFeeTransactionRecord() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
-            var key = PrivateKey.generate();
+    void getCostInsufficientTxFeeTransactionRecord() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+        var key = PrivateKey.generate();
 
-            var response = new AccountCreateTransaction()
-                .setKey(key)
-                .execute(testEnv.client);
+        var response = new AccountCreateTransaction()
+            .setKey(key)
+            .execute(testEnv.client);
 
-            var receipt = new TransactionReceiptQuery()
-                .setTransactionId(response.transactionId)
-                .execute(testEnv.client);
+        var receipt = new TransactionReceiptQuery()
+            .setTransactionId(response.transactionId)
+            .execute(testEnv.client);
 
-            var recordQuery = new TransactionRecordQuery()
-                .setTransactionId(response.transactionId);
+        var recordQuery = new TransactionRecordQuery()
+            .setTransactionId(response.transactionId);
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
-                recordQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
-            });
-
-            assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
-
-            testEnv.close(receipt.accountId, key);
+        var error = assertThrows(PrecheckStatusException.class, () -> {
+            recordQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
         });
+
+        assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
+
+        testEnv.close(receipt.accountId, key);
     }
 }

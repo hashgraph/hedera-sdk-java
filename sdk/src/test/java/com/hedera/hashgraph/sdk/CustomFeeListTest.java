@@ -40,35 +40,31 @@ public class CustomFeeListTest {
     }
 
     @Test
-    void shouldSerialize() {
-        assertDoesNotThrow(() -> {
-            var originalCustomFeeList = spawnCustomFeeListExample();
-            byte[] customFee0Bytes = originalCustomFeeList.get(0).toBytes();
-            byte[] customFee1Bytes = originalCustomFeeList.get(1).toBytes();
-            var copyCustomFeeList = new ArrayList<CustomFee>();
-            copyCustomFeeList.add(CustomFee.fromBytes(customFee0Bytes));
-            copyCustomFeeList.add(CustomFee.fromBytes(customFee1Bytes));
-            assertTrue(originalCustomFeeList.toString().equals(copyCustomFeeList.toString()));
-            SnapshotMatcher.expect(originalCustomFeeList.toString()).toMatchSnapshot();
-        });
+    void shouldSerialize() throws Exception {
+        var originalCustomFeeList = spawnCustomFeeListExample();
+        byte[] customFee0Bytes = originalCustomFeeList.get(0).toBytes();
+        byte[] customFee1Bytes = originalCustomFeeList.get(1).toBytes();
+        var copyCustomFeeList = new ArrayList<CustomFee>();
+        copyCustomFeeList.add(CustomFee.fromBytes(customFee0Bytes));
+        copyCustomFeeList.add(CustomFee.fromBytes(customFee1Bytes));
+        assertTrue(originalCustomFeeList.toString().equals(copyCustomFeeList.toString()));
+        SnapshotMatcher.expect(originalCustomFeeList.toString()).toMatchSnapshot();
     }
 
     @Test
-    void deepClone() {
-        assertDoesNotThrow(() -> {
-            var originalCustomFeeList = spawnCustomFeeListExample();
-            var copyCustomFeeList = new ArrayList<CustomFee>();
-            for (var fee : originalCustomFeeList) {
-                copyCustomFeeList.add(fee.deepClone());
-            }
-            var originalCustomFeeListString = originalCustomFeeList.toString();
-            assertTrue(originalCustomFeeListString.equals(copyCustomFeeList.toString()));
+    void deepClone() throws Exception {
+        var originalCustomFeeList = spawnCustomFeeListExample();
+        var copyCustomFeeList = new ArrayList<CustomFee>();
+        for (var fee : originalCustomFeeList) {
+            copyCustomFeeList.add(fee.deepClone());
+        }
+        var originalCustomFeeListString = originalCustomFeeList.toString();
+        assertTrue(originalCustomFeeListString.equals(copyCustomFeeList.toString()));
 
-            // modifying clone doesn't affect original
-            ((CustomFixedFee) (copyCustomFeeList.get(0))).setDenominatingTokenId(new TokenId(89803));
-            assertTrue(originalCustomFeeListString.equals(originalCustomFeeList.toString()));
+        // modifying clone doesn't affect original
+        ((CustomFixedFee) (copyCustomFeeList.get(0))).setDenominatingTokenId(new TokenId(89803));
+        assertTrue(originalCustomFeeListString.equals(originalCustomFeeList.toString()));
 
-            SnapshotMatcher.expect(originalCustomFeeList.toString()).toMatchSnapshot();
-        });
+        SnapshotMatcher.expect(originalCustomFeeList.toString()).toMatchSnapshot();
     }
 }

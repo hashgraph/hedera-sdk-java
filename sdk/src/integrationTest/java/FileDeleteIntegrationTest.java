@@ -21,68 +21,64 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class FileDeleteIntegrationTest {
     @Test
     @DisplayName("Can delete file")
-    void canDeleteFile() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void canDeleteFile() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents("[e2e::FileCreateTransaction]")
-                .execute(testEnv.client);
+        var response = new FileCreateTransaction()
+            .setKeys(testEnv.operatorKey)
+            .setContents("[e2e::FileCreateTransaction]")
+            .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-            @Var var info = new FileInfoQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+        @Var var info = new FileInfoQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
 
-            assertEquals(info.fileId, fileId);
-            assertEquals(info.size, 28);
-            assertFalse(info.isDeleted);
-            assertNotNull(info.keys);
-            assertNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
+        assertEquals(info.fileId, fileId);
+        assertEquals(info.size, 28);
+        assertFalse(info.isDeleted);
+        assertNotNull(info.keys);
+        assertNull(info.keys.getThreshold());
+        assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
 
-            new FileDeleteTransaction()
-                .setFileId(fileId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+        new FileDeleteTransaction()
+            .setFileId(fileId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
-            testEnv.close();
-        });
+        testEnv.close();
     }
 
     @Test
     @DisplayName("Cannot delete immutable file")
-    void cannotDeleteImmutableFile() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void cannotDeleteImmutableFile() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var response = new FileCreateTransaction()
-                .setContents("[e2e::FileCreateTransaction]")
-                .execute(testEnv.client);
+        var response = new FileCreateTransaction()
+            .setContents("[e2e::FileCreateTransaction]")
+            .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-            @Var var info = new FileInfoQuery()
+        @Var var info = new FileInfoQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
+
+        assertEquals(info.fileId, fileId);
+        assertEquals(info.size, 28);
+        assertFalse(info.isDeleted);
+        assertNull(info.keys);
+
+        var error = assertThrows(ReceiptStatusException.class, () -> {
+            new FileDeleteTransaction()
                 .setFileId(fileId)
-                .execute(testEnv.client);
-
-            assertEquals(info.fileId, fileId);
-            assertEquals(info.size, 28);
-            assertFalse(info.isDeleted);
-            assertNull(info.keys);
-
-            var error = assertThrows(ReceiptStatusException.class, () -> {
-                new FileDeleteTransaction()
-                    .setFileId(fileId)
-                    .execute(testEnv.client)
-                    .getReceipt(testEnv.client);
-            });
-
-            assertTrue(error.getMessage().contains(Status.UNAUTHORIZED.toString()));
-
-            testEnv.close();
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
         });
+
+        assertTrue(error.getMessage().contains(Status.UNAUTHORIZED.toString()));
+
+        testEnv.close();
     }
 }

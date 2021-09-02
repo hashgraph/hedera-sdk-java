@@ -32,75 +32,71 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class TransactionIntegrationTest {
     @Test
     @DisplayName("transaction hash in transaction record is equal to the derived transaction hash")
-    void transactionHashInTransactionRecordIsEqualToTheDerivedTransactionHash() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void transactionHashInTransactionRecordIsEqualToTheDerivedTransactionHash() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var key = PrivateKey.generate();
+        var key = PrivateKey.generate();
 
-            var transaction = new AccountCreateTransaction()
-                .setKey(key)
-                .freezeWith(testEnv.client)
-                .signWithOperator(testEnv.client);
+        var transaction = new AccountCreateTransaction()
+            .setKey(key)
+            .freezeWith(testEnv.client)
+            .signWithOperator(testEnv.client);
 
-            var expectedHash = transaction.getTransactionHashPerNode();
+        var expectedHash = transaction.getTransactionHashPerNode();
 
-            var response = transaction.execute(testEnv.client);
+        var response = transaction.execute(testEnv.client);
 
-            var record = response.getRecord(testEnv.client);
+        var record = response.getRecord(testEnv.client);
 
-            assertArrayEquals(expectedHash.get(response.nodeId), record.transactionHash.toByteArray());
+        assertArrayEquals(expectedHash.get(response.nodeId), record.transactionHash.toByteArray());
 
-            var accountId = record.receipt.accountId;
-            assertNotNull(accountId);
+        var accountId = record.receipt.accountId;
+        assertNotNull(accountId);
 
-            testEnv.close(accountId, key);
-        });
+        testEnv.close(accountId, key);
     }
 
     @Test
     @DisplayName("transaction can be serialized into bytes, deserialized, signature added and executed")
-    void transactionFromToBytes() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void transactionFromToBytes() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var key = PrivateKey.generate();
+        var key = PrivateKey.generate();
 
-            var transaction = new AccountCreateTransaction()
-                .setKey(key)
-                .freezeWith(testEnv.client)
-                .signWithOperator(testEnv.client);
+        var transaction = new AccountCreateTransaction()
+            .setKey(key)
+            .freezeWith(testEnv.client)
+            .signWithOperator(testEnv.client);
 
-            var expectedHash = transaction.getTransactionHashPerNode();
+        var expectedHash = transaction.getTransactionHashPerNode();
 
-            var response = transaction.execute(testEnv.client);
+        var response = transaction.execute(testEnv.client);
 
-            var record = response.getRecord(testEnv.client);
+        var record = response.getRecord(testEnv.client);
 
-            assertArrayEquals(expectedHash.get(response.nodeId), record.transactionHash.toByteArray());
+        assertArrayEquals(expectedHash.get(response.nodeId), record.transactionHash.toByteArray());
 
-            var accountId = record.receipt.accountId;
-            assertNotNull(accountId);
+        var accountId = record.receipt.accountId;
+        assertNotNull(accountId);
 
-            var deleteTransaction = new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(testEnv.operatorId)
-                .freezeWith(testEnv.client);
+        var deleteTransaction = new AccountDeleteTransaction()
+            .setAccountId(accountId)
+            .setTransferAccountId(testEnv.operatorId)
+            .freezeWith(testEnv.client);
 
-            var updateBytes = deleteTransaction.toBytes();
+        var updateBytes = deleteTransaction.toBytes();
 
-            var sig1 = key.signTransaction(deleteTransaction);
+        var sig1 = key.signTransaction(deleteTransaction);
 
-            var deleteTransaction2 = Transaction.fromBytes(updateBytes);
+        var deleteTransaction2 = Transaction.fromBytes(updateBytes);
 
-            response = deleteTransaction2
-                .addSignature(key.getPublicKey(), sig1)
-                .execute(testEnv.client);
+        response = deleteTransaction2
+            .addSignature(key.getPublicKey(), sig1)
+            .execute(testEnv.client);
 
-            response.getReceipt(testEnv.client);
+        response.getReceipt(testEnv.client);
 
-            testEnv.close();
-        });
+        testEnv.close();
     }
 
 

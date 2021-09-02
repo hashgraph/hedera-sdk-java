@@ -25,126 +25,119 @@ public class ContractUpdateIntegrationTest {
 
     @Test
     @DisplayName("Can update contract")
-    void canUpdateContract() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
-            ;
+    void canUpdateContract() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            @Var var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents(SMART_CONTRACT_BYTECODE)
-                .execute(testEnv.client);
+        @Var var response = new FileCreateTransaction()
+            .setKeys(testEnv.operatorKey)
+            .setContents(SMART_CONTRACT_BYTECODE)
+            .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-            response = new ContractCreateTransaction()
-                .setAdminKey(testEnv.operatorKey)
+        response = new ContractCreateTransaction()
+            .setAdminKey(testEnv.operatorKey)
+            .setGas(2000)
+            .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
+            .setBytecodeFileId(fileId)
+            .setContractMemo("[e2e::ContractCreateTransaction]")
+            .execute(testEnv.client);
+
+        var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
+
+        @Var var info = new ContractInfoQuery()
+            .setContractId(contractId)
+            .execute(testEnv.client);
+
+        assertEquals(info.contractId, contractId);
+        assertNotNull(info.accountId);
+        assertEquals(Objects.requireNonNull(info.accountId).toString(), contractId.toString());
+        assertNotNull(info.adminKey);
+        assertEquals(Objects.requireNonNull(info.adminKey).toString(), Objects.requireNonNull(testEnv.operatorKey).toString());
+        assertEquals(info.storage, 926);
+        assertEquals(info.contractMemo, "[e2e::ContractCreateTransaction]");
+
+        new ContractUpdateTransaction()
+            .setContractId(contractId)
+            .setContractMemo("[e2e::ContractUpdateTransaction]")
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        info = new ContractInfoQuery()
+            .setContractId(contractId)
+            .execute(testEnv.client);
+
+        assertEquals(info.contractId, contractId);
+        assertNotNull(info.accountId);
+        assertEquals(Objects.requireNonNull(info.accountId).toString(), contractId.toString());
+        assertNotNull(info.adminKey);
+        assertEquals(Objects.requireNonNull(info.adminKey).toString(), Objects.requireNonNull(testEnv.operatorKey).toString());
+        assertEquals(info.storage, 926);
+        assertEquals(info.contractMemo, "[e2e::ContractUpdateTransaction]");
+
+        new ContractDeleteTransaction()
+            .setContractId(contractId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        new FileDeleteTransaction()
+            .setFileId(fileId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        testEnv.close();
+    }
+
+    @Test
+    @DisplayName("Cannot update contract when contract ID is not set")
+    void cannotUpdateContractWhenContractIDIsNotSet() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+
+        var error = assertThrows(PrecheckStatusException.class, () -> {
+            new ContractUpdateTransaction()
+                .setContractMemo("[e2e::ContractUpdateTransaction]")
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        });
+
+        assertTrue(error.getMessage().contains(Status.INVALID_CONTRACT_ID.toString()));
+
+        testEnv.close();
+    }
+
+    @Test
+    @DisplayName("Cannot update contract that is immutable")
+    void cannotUpdateContractThatIsImmutable() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+
+        @Var var response = new FileCreateTransaction()
+            .setKeys(testEnv.operatorKey)
+            .setContents(SMART_CONTRACT_BYTECODE)
+            .execute(testEnv.client);
+
+        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+
+        var contractId = Objects.requireNonNull(
+            new ContractCreateTransaction()
                 .setGas(2000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
                 .setContractMemo("[e2e::ContractCreateTransaction]")
-                .execute(testEnv.client);
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .contractId
+        );
 
-            var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
-
-            @Var var info = new ContractInfoQuery()
-                .setContractId(contractId)
-                .execute(testEnv.client);
-
-            assertEquals(info.contractId, contractId);
-            assertNotNull(info.accountId);
-            assertEquals(Objects.requireNonNull(info.accountId).toString(), contractId.toString());
-            assertNotNull(info.adminKey);
-            assertEquals(Objects.requireNonNull(info.adminKey).toString(), Objects.requireNonNull(testEnv.operatorKey).toString());
-            assertEquals(info.storage, 926);
-            assertEquals(info.contractMemo, "[e2e::ContractCreateTransaction]");
-
+        var error = assertThrows(ReceiptStatusException.class, () -> {
             new ContractUpdateTransaction()
                 .setContractId(contractId)
                 .setContractMemo("[e2e::ContractUpdateTransaction]")
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-
-            info = new ContractInfoQuery()
-                .setContractId(contractId)
-                .execute(testEnv.client);
-
-            assertEquals(info.contractId, contractId);
-            assertNotNull(info.accountId);
-            assertEquals(Objects.requireNonNull(info.accountId).toString(), contractId.toString());
-            assertNotNull(info.adminKey);
-            assertEquals(Objects.requireNonNull(info.adminKey).toString(), Objects.requireNonNull(testEnv.operatorKey).toString());
-            assertEquals(info.storage, 926);
-            assertEquals(info.contractMemo, "[e2e::ContractUpdateTransaction]");
-
-            new ContractDeleteTransaction()
-                .setContractId(contractId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
-            new FileDeleteTransaction()
-                .setFileId(fileId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
-            testEnv.close();
         });
-    }
 
-    @Test
-    @DisplayName("Cannot update contract when contract ID is not set")
-    void cannotUpdateContractWhenContractIDIsNotSet() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+        assertTrue(error.getMessage().contains(Status.MODIFYING_IMMUTABLE_CONTRACT.toString()));
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
-                new ContractUpdateTransaction()
-                    .setContractMemo("[e2e::ContractUpdateTransaction]")
-                    .execute(testEnv.client)
-                    .getReceipt(testEnv.client);
-            });
-
-            assertTrue(error.getMessage().contains(Status.INVALID_CONTRACT_ID.toString()));
-
-            testEnv.close();
-        });
-    }
-
-    @Test
-    @DisplayName("Cannot update contract that is immutable")
-    void cannotUpdateContractThatIsImmutable() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
-
-            @Var var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents(SMART_CONTRACT_BYTECODE)
-                .execute(testEnv.client);
-
-            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
-
-            var contractId = Objects.requireNonNull(
-                new ContractCreateTransaction()
-                    .setGas(2000)
-                    .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
-                    .setBytecodeFileId(fileId)
-                    .setContractMemo("[e2e::ContractCreateTransaction]")
-                    .execute(testEnv.client)
-                    .getReceipt(testEnv.client)
-                    .contractId
-            );
-
-            var error = assertThrows(ReceiptStatusException.class, () -> {
-                new ContractUpdateTransaction()
-                    .setContractId(contractId)
-                    .setContractMemo("[e2e::ContractUpdateTransaction]")
-                    .execute(testEnv.client)
-                    .getReceipt(testEnv.client);
-            });
-
-            assertTrue(error.getMessage().contains(Status.MODIFYING_IMMUTABLE_CONTRACT.toString()));
-
-            testEnv.close();
-        });
+        testEnv.close();
     }
 }

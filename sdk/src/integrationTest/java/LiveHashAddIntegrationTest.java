@@ -20,32 +20,30 @@ class LiveHashAddIntegrationTest {
 
     @Test
     @DisplayName("Cannot create live hash because it's not supported")
-    void cannotCreateLiveHashBecauseItsNotSupported() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void cannotCreateLiveHashBecauseItsNotSupported() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var key = PrivateKey.generate();
+        var key = PrivateKey.generate();
 
-            var response = new AccountCreateTransaction()
-                .setKey(key)
-                .setInitialBalance(new Hbar(1))
-                .execute(testEnv.client);
+        var response = new AccountCreateTransaction()
+            .setKey(key)
+            .setInitialBalance(new Hbar(1))
+            .execute(testEnv.client);
 
-            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
+        var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
-                new LiveHashAddTransaction()
-                    .setAccountId(accountId)
-                    .setDuration(Duration.ofDays(30))
-                    .setHash(HASH)
-                    .setKeys(key)
-                    .execute(testEnv.client)
-                    .getReceipt(testEnv.client);
-            });
-
-            assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
-
-            testEnv.close(accountId, key);
+        var error = assertThrows(PrecheckStatusException.class, () -> {
+            new LiveHashAddTransaction()
+                .setAccountId(accountId)
+                .setDuration(Duration.ofDays(30))
+                .setHash(HASH)
+                .setKeys(key)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
         });
+
+        assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
+
+        testEnv.close(accountId, key);
     }
 }

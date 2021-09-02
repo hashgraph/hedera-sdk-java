@@ -14,39 +14,37 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class AccountRecordsIntegrationTest {
     @Test
     @DisplayName("Can query account records")
-    void canQueryAccountRecords() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
-            var key = PrivateKey.generate();
+    void canQueryAccountRecords() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+        var key = PrivateKey.generate();
 
-            var response = new AccountCreateTransaction()
-                .setKey(key)
-                .setInitialBalance(new Hbar(1))
-                .execute(testEnv.client);
+        var response = new AccountCreateTransaction()
+            .setKey(key)
+            .setInitialBalance(new Hbar(1))
+            .execute(testEnv.client);
 
-            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
+        var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-            new TransferTransaction()
-                .addHbarTransfer(testEnv.operatorId, new Hbar(1).negated())
-                .addHbarTransfer(accountId, new Hbar(1))
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+        new TransferTransaction()
+            .addHbarTransfer(testEnv.operatorId, new Hbar(1).negated())
+            .addHbarTransfer(accountId, new Hbar(1))
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
-            new TransferTransaction()
-                .addHbarTransfer(testEnv.operatorId, new Hbar(1))
-                .addHbarTransfer(accountId, new Hbar(1).negated())
-                .freezeWith(testEnv.client)
-                .sign(key)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+        new TransferTransaction()
+            .addHbarTransfer(testEnv.operatorId, new Hbar(1))
+            .addHbarTransfer(accountId, new Hbar(1).negated())
+            .freezeWith(testEnv.client)
+            .sign(key)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
-            var records = new AccountRecordsQuery()
-                .setAccountId(testEnv.operatorId)
-                .execute(testEnv.client);
+        var records = new AccountRecordsQuery()
+            .setAccountId(testEnv.operatorId)
+            .execute(testEnv.client);
 
-            assertTrue(!records.isEmpty());
+        assertTrue(!records.isEmpty());
 
-            testEnv.close(accountId, key);
-        });
+        testEnv.close(accountId, key);
     }
 }

@@ -17,90 +17,84 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class FileCreateIntegrationTest {
     @Test
     @DisplayName("Can create file")
-    void canCreateFile() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void canCreateFile() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents("[e2e::FileCreateTransaction]")
-                .execute(testEnv.client);
+        var response = new FileCreateTransaction()
+            .setKeys(testEnv.operatorKey)
+            .setContents("[e2e::FileCreateTransaction]")
+            .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-            @Var var info = new FileInfoQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+        @Var var info = new FileInfoQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
 
-            assertEquals(info.fileId, fileId);
-            assertEquals(info.size, 28);
-            assertFalse(info.isDeleted);
-            assertNotNull(info.keys);
-            assertNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
+        assertEquals(info.fileId, fileId);
+        assertEquals(info.size, 28);
+        assertFalse(info.isDeleted);
+        assertNotNull(info.keys);
+        assertNull(info.keys.getThreshold());
+        assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
 
-            new FileDeleteTransaction()
-                .setFileId(fileId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+        new FileDeleteTransaction()
+            .setFileId(fileId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
-            testEnv.close();
-        });
+        testEnv.close();
     }
 
     @Test
     @DisplayName("Can create file with no contents")
-    void canCreateFileWithNoContents() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void canCreateFileWithNoContents() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .execute(testEnv.client);
+        var response = new FileCreateTransaction()
+            .setKeys(testEnv.operatorKey)
+            .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-            @Var var info = new FileInfoQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+        @Var var info = new FileInfoQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
 
-            assertEquals(info.fileId, fileId);
-            assertEquals(info.size, 0);
-            assertFalse(info.isDeleted);
-            assertNotNull(info.keys);
-            assertNull(info.keys.getThreshold());
-            assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
+        assertEquals(info.fileId, fileId);
+        assertEquals(info.size, 0);
+        assertFalse(info.isDeleted);
+        assertNotNull(info.keys);
+        assertNull(info.keys.getThreshold());
+        assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
 
-            new FileDeleteTransaction()
-                .setFileId(fileId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+        new FileDeleteTransaction()
+            .setFileId(fileId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
-            testEnv.close();
-        });
+        testEnv.close();
     }
 
     @Test
     @DisplayName("Can create file with no keys")
-    void canCreateFileWithNoKeys() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void canCreateFileWithNoKeys() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var response = new FileCreateTransaction()
-                .execute(testEnv.client);
+        var response = new FileCreateTransaction()
+            .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-            @Var var info = new FileInfoQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+        @Var var info = new FileInfoQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
 
-            assertEquals(info.fileId, fileId);
-            assertEquals(info.size, 0);
-            assertFalse(info.isDeleted);
-            assertNull(info.keys);
+        assertEquals(info.fileId, fileId);
+        assertEquals(info.size, 0);
+        assertFalse(info.isDeleted);
+        assertNull(info.keys);
 
-            testEnv.close();
-        });
+        testEnv.close();
     }
 }

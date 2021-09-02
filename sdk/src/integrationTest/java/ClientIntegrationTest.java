@@ -26,8 +26,7 @@ public class ClientIntegrationTest {
     @Test
     @Disabled
     @DisplayName("setNetwork() functions correctly")
-    void testReplaceNodes() {
-        assertDoesNotThrow(() -> {
+    void testReplaceNodes() throws Exception {
             @Var Map<String, AccountId> network = new HashMap<>();
             network.put("0.testnet.hedera.com:50211", new AccountId(3));
             network.put("1.testnet.hedera.com:50211", new AccountId(4));
@@ -63,7 +62,6 @@ public class ClientIntegrationTest {
             testEnv.client.setNetwork(network);
 
             testEnv.close();
-        });
     }
 
     @Test
@@ -81,96 +79,88 @@ public class ClientIntegrationTest {
 
     @Test
     @DisplayName("`setMaxNodesPerTransaction()`")
-    void testMaxNodesPerTransaction() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void testMaxNodesPerTransaction() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            testEnv.client.setMaxNodesPerTransaction(1);
+        testEnv.client.setMaxNodesPerTransaction(1);
 
-            var transaction = new AccountDeleteTransaction()
-                .setAccountId(testEnv.operatorId)
-                .freezeWith(testEnv.client);
+        var transaction = new AccountDeleteTransaction()
+            .setAccountId(testEnv.operatorId)
+            .freezeWith(testEnv.client);
 
-            assertNotNull(transaction.getNodeAccountIds());
-            assertEquals(1, transaction.getNodeAccountIds().size());
+        assertNotNull(transaction.getNodeAccountIds());
+        assertEquals(1, transaction.getNodeAccountIds().size());
 
-            testEnv.close();
-        });
+        testEnv.close();
     }
 
     @Test
-    void ping() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
-            var network = testEnv.client.getNetwork();
-            var nodes = new ArrayList<>(network.values());
+    void ping() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+        var network = testEnv.client.getNetwork();
+        var nodes = new ArrayList<>(network.values());
 
-            assertFalse(nodes.isEmpty());
+        assertFalse(nodes.isEmpty());
 
-            var node = nodes.get(0);
+        var node = nodes.get(0);
 
-            testEnv.client.setMaxNodeAttempts(1);
-            testEnv.client.ping(node);
-            testEnv.close();
-        });
+        testEnv.client.setMaxNodeAttempts(1);
+        testEnv.client.ping(node);
+        testEnv.close();
     }
 
     @Test
-    void pingAll() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(3);
+    void pingAll() throws Exception {
+        var testEnv = new IntegrationTestEnv(3);
 
-            testEnv.client.setMaxNodeAttempts(1);
-            testEnv.client.pingAll();
+        testEnv.client.setMaxNodeAttempts(1);
+        testEnv.client.pingAll();
 
-            var network = testEnv.client.getNetwork();
-            var nodes = new ArrayList<>(network.values());
+        var network = testEnv.client.getNetwork();
+        var nodes = new ArrayList<>(network.values());
 
-            assertFalse(nodes.isEmpty());
+        assertFalse(nodes.isEmpty());
 
-            var node = nodes.get(0);
+        var node = nodes.get(0);
 
-            new AccountBalanceQuery()
-                .setAccountId(node)
-                .execute(testEnv.client);
+        new AccountBalanceQuery()
+            .setAccountId(node)
+            .execute(testEnv.client);
 
-            testEnv.close();
-        });
+        testEnv.close();
     }
 
     @Test
-    void pingAllBadNetwork() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(3);
+    void pingAllBadNetwork() throws Exception {
+        var testEnv = new IntegrationTestEnv(3);
 
-            testEnv.client.setMaxNodeAttempts(1);
-            testEnv.client.setMaxNodesPerTransaction(2);
+        testEnv.client.setMaxNodeAttempts(1);
+        testEnv.client.setMaxNodesPerTransaction(2);
 
-            var network = testEnv.client.getNetwork();
+        var network = testEnv.client.getNetwork();
 
-            var entries = new ArrayList<>(network.entrySet());
-            assertTrue(entries.size() > 1);
+        var entries = new ArrayList<>(network.entrySet());
+        assertTrue(entries.size() > 1);
 
-            network.clear();
-            network.put("in-process:name", entries.get(0).getValue());
-            network.put(entries.get(1).getKey(), entries.get(1).getValue());
+        network.clear();
+        network.put("in-process:name", entries.get(0).getValue());
+        network.put(entries.get(1).getKey(), entries.get(1).getValue());
 
-            testEnv.client.setNetwork(network);
+        testEnv.client.setNetwork(network);
 
-            testEnv.client.pingAll();
+        testEnv.client.pingAll();
 
-            var nodes = new ArrayList<>(testEnv.client.getNetwork().values());
-            assertFalse(nodes.isEmpty());
+        var nodes = new ArrayList<>(testEnv.client.getNetwork().values());
+        assertFalse(nodes.isEmpty());
 
-            var node = nodes.get(0);
+        var node = nodes.get(0);
 
-            new AccountBalanceQuery()
-                .setAccountId(node)
-                .execute(testEnv.client);
+        new AccountBalanceQuery()
+            .setAccountId(node)
+            .execute(testEnv.client);
 
-            assertEquals(1, testEnv.client.getNetwork().values().size());
+        assertEquals(1, testEnv.client.getNetwork().values().size());
 
-            testEnv.close();
-        });
+        testEnv.close();
     }
 }

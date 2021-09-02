@@ -21,65 +21,63 @@ public class SystemIntegrationTest {
 
     @Test
     @DisplayName("All system transactions are not supported")
-    void allSystemTransactionsAreNotSupported() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void allSystemTransactionsAreNotSupported() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var fileId = Objects.requireNonNull(
-                new FileCreateTransaction()
-                    .setContents(SMART_CONTRACT_BYTECODE)
-                    .execute(testEnv.client)
-                    .getReceipt(testEnv.client)
-                    .fileId
-            );
+        var fileId = Objects.requireNonNull(
+            new FileCreateTransaction()
+                .setContents(SMART_CONTRACT_BYTECODE)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .fileId
+        );
 
-            var contractId = Objects.requireNonNull(
-                new ContractCreateTransaction()
-                    .setAdminKey(testEnv.operatorKey)
-                    .setGas(2000)
-                    .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
-                    .setBytecodeFileId(fileId)
-                    .setContractMemo("[e2e::ContractCreateTransaction]")
-                    .execute(testEnv.client)
-                    .getReceipt(testEnv.client)
-                    .contractId
-            );
+        var contractId = Objects.requireNonNull(
+            new ContractCreateTransaction()
+                .setAdminKey(testEnv.operatorKey)
+                .setGas(2000)
+                .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
+                .setBytecodeFileId(fileId)
+                .setContractMemo("[e2e::ContractCreateTransaction]")
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .contractId
+        );
 
-            @Var var error = assertThrows(PrecheckStatusException.class, () -> {
-                new SystemDeleteTransaction()
-                    .setContractId(contractId)
-                    .setExpirationTime(Instant.now())
-                    .execute(testEnv.client);
-            });
-
-            assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
-
-            error = assertThrows(PrecheckStatusException.class, () -> {
-                new SystemDeleteTransaction()
-                    .setFileId(fileId)
-                    .setExpirationTime(Instant.now())
-                    .execute(testEnv.client);
-            });
-
-            assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
-
-            error = assertThrows(PrecheckStatusException.class, () -> {
-                new SystemUndeleteTransaction()
-                    .setContractId(contractId)
-                    .execute(testEnv.client);
-            });
-
-            assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
-
-            error = assertThrows(PrecheckStatusException.class, () -> {
-                new SystemUndeleteTransaction()
-                    .setFileId(fileId)
-                    .execute(testEnv.client);
-            });
-
-            assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
-
-            testEnv.close();
+        @Var var error = assertThrows(PrecheckStatusException.class, () -> {
+            new SystemDeleteTransaction()
+                .setContractId(contractId)
+                .setExpirationTime(Instant.now())
+                .execute(testEnv.client);
         });
+
+        assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
+
+        error = assertThrows(PrecheckStatusException.class, () -> {
+            new SystemDeleteTransaction()
+                .setFileId(fileId)
+                .setExpirationTime(Instant.now())
+                .execute(testEnv.client);
+        });
+
+        assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
+
+        error = assertThrows(PrecheckStatusException.class, () -> {
+            new SystemUndeleteTransaction()
+                .setContractId(contractId)
+                .execute(testEnv.client);
+        });
+
+        assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
+
+        error = assertThrows(PrecheckStatusException.class, () -> {
+            new SystemUndeleteTransaction()
+                .setFileId(fileId)
+                .execute(testEnv.client);
+        });
+
+        assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
+
+        testEnv.close();
     }
 }
