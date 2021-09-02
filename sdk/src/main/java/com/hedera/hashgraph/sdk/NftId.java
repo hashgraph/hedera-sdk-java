@@ -25,9 +25,9 @@ public class NftId {
 
     public static NftId fromString(String id) {
         @SuppressWarnings("StringSplitter")
-        var parts = id.split("@");
+        var parts = id.split("[/@]");
         if (parts.length != 2) {
-            throw new IllegalArgumentException("Expecting {shardNum}.{realmNum}.{idNum}-{checksum}@{serialNum}");
+            throw new IllegalArgumentException("Expecting {shardNum}.{realmNum}.{idNum}-{checksum}/{serialNum}");
         }
         return new NftId(TokenId.fromString(parts[0]), Long.parseLong(parts[1]));
     }
@@ -35,8 +35,7 @@ public class NftId {
     static NftId fromProtobuf(NftID nftId) {
         Objects.requireNonNull(nftId);
         var tokenId = nftId.getTokenID();
-        var returnNftId = new NftId(TokenId.fromProtobuf(tokenId), nftId.getSerialNumber());
-        return returnNftId;
+        return new NftId(TokenId.fromProtobuf(tokenId), nftId.getSerialNumber());
     }
 
     public static NftId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -56,11 +55,11 @@ public class NftId {
 
     @Override
     public String toString() {
-        return tokenId.toString() + "@" + serial;
+        return tokenId.toString() + "/" + serial;
     }
 
     public String toStringWithChecksum(Client client) {
-        return tokenId.toStringWithChecksum(client) + "@" + serial;
+        return tokenId.toStringWithChecksum(client) + "/" + serial;
     }
 
     @Override
