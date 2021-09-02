@@ -7,14 +7,13 @@ import com.hedera.hashgraph.sdk.TransactionRecordQuery;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ReceiptQueryIntegrationTest {
     @Test
     @DisplayName("Can get Receipt")
-    void canGetTransactionReceipt() throws Exception{
+    void canGetTransactionReceipt() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
         var key = PrivateKey.generate();

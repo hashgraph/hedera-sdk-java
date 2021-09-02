@@ -12,7 +12,6 @@ import org.threeten.bp.Instant;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TopicMessageIntegrationTest {

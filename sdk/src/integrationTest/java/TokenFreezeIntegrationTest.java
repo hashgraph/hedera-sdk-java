@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -136,7 +135,7 @@ class TokenFreezeIntegrationTest {
 
     @Test
     @DisplayName("Cannot freeze account on token when account was not associated with")
-    void cannotFreezeAccountOnTokenWhenAccountWasNotAssociatedWith() throws Exception  {
+    void cannotFreezeAccountOnTokenWhenAccountWasNotAssociatedWith() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
         var key = PrivateKey.generate();
