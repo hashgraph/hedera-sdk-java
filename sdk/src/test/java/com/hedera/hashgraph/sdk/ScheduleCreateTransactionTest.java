@@ -27,7 +27,6 @@ public class ScheduleCreateTransactionTest {
     }
 
 
-
     @Test
     void shouldSerialize() {
         SnapshotMatcher.expect(spawnTestTransaction()

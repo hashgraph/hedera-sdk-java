@@ -13,12 +13,12 @@ import java.util.concurrent.TimeoutException;
 //       Maybe we can test load-balancing?
 
 public class TestServer {
-    private final Server grpcServer;
     public final Client client;
+    private final Server grpcServer;
 
     public TestServer(String name, BindableService... services) throws IOException {
         var serverBuilder = InProcessServerBuilder.forName(name);
-        for(var service : services) {
+        for (var service : services) {
             serverBuilder.addService(service);
         }
         grpcServer = serverBuilder.directExecutor().build().start();

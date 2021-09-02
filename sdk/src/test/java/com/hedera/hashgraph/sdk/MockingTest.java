@@ -1,43 +1,24 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.Query;
+import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
+import com.hedera.hashgraph.sdk.proto.Transaction;
+import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import io.grpc.Status;
+import io.grpc.stub.StreamObserver;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import io.grpc.stub.StreamObserver;
-import com.hedera.hashgraph.sdk.proto.Transaction;
-import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import com.hedera.hashgraph.sdk.proto.Query;
-import com.hedera.hashgraph.sdk.proto.Response;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import io.grpc.Status;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MockingTest {
-
-    private static class TestCryptoService extends  CryptoServiceGrpc.CryptoServiceImplBase implements TestService {
-        public Buffer buffer = new Buffer();
-
-        @Override
-        public Buffer getBuffer() {
-            return buffer;
-        }
-
-        @Override
-        public void createAccount(Transaction request, StreamObserver<TransactionResponse> responseObserver) {
-            respondToTransactionFromQueue(request, responseObserver);
-        }
-
-        @Override
-        public void cryptoGetBalance(Query request, StreamObserver<Response> responseObserver) {
-            respondToQueryFromQueue(request, responseObserver);
-        }
-    }
 
     @ParameterizedTest(name = "Executable retries on error with status {0} and description {1}")
     @CsvSource({
@@ -46,7 +27,7 @@ public class MockingTest {
         "RESOURCE_EXHAUSTED, ",
         "UNAVAILABLE, "
     })
-    void executableRetryTest(Status.Code code, String description) throws Exception{
+    void executableRetryTest(Status.Code code, String description) throws Exception {
         var service = new TestCryptoService();
         var server = new TestServer("executableRetry", service);
 
@@ -67,7 +48,7 @@ public class MockingTest {
 
     @Test
     @DisplayName("Client.setDefaultMaxTransactionFee() functions correctly")
-    void defaultMaxTransactionFeeTest() throws Exception{
+    void defaultMaxTransactionFeeTest() throws Exception {
         var service = new TestCryptoService();
         var server = new TestServer("maxTransactionFee", service);
 
@@ -94,7 +75,7 @@ public class MockingTest {
 
         Assertions.assertEquals(4, service.buffer.transactionRequestsReceived.size());
         var transactions = new ArrayList<com.hedera.hashgraph.sdk.Transaction>();
-        for(var request : service.buffer.transactionRequestsReceived) {
+        for (var request : service.buffer.transactionRequestsReceived) {
             transactions.add(com.hedera.hashgraph.sdk.Transaction.fromBytes(request.toByteArray()));
         }
         Assertions.assertEquals(new Hbar(2), transactions.get(0).getMaxTransactionFee());
@@ -168,6 +149,25 @@ public class MockingTest {
             sigPairList.get(1).getEd25519().toString());
 
         server.close();
+    }
+
+    private static class TestCryptoService extends CryptoServiceGrpc.CryptoServiceImplBase implements TestService {
+        public Buffer buffer = new Buffer();
+
+        @Override
+        public Buffer getBuffer() {
+            return buffer;
+        }
+
+        @Override
+        public void createAccount(Transaction request, StreamObserver<TransactionResponse> responseObserver) {
+            respondToTransactionFromQueue(request, responseObserver);
+        }
+
+        @Override
+        public void cryptoGetBalance(Query request, StreamObserver<Response> responseObserver) {
+            respondToQueryFromQueue(request, responseObserver);
+        }
     }
 }
 
