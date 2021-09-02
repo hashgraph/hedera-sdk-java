@@ -28,26 +28,24 @@ public class ScheduleDeleteTransactionTest {
 
     @Test
     void shouldSerialize() {
-        SnapshotMatcher.expect(new ScheduleDeleteTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setScheduleId(ScheduleId.fromString("0.0.444"))
-            .setMaxTransactionFee(new Hbar(1))
-            .freeze()
-            .sign(unusedPrivateKey)
+        SnapshotMatcher.expect(spawnTestTransaction()
             .toString()
         ).toMatchSnapshot();
     }
 
-    @Test
-    void shouldBytes() throws Exception {
-        var tx = new ScheduleDeleteTransaction()
+    private ScheduleDeleteTransaction spawnTestTransaction() {
+        return new ScheduleDeleteTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setScheduleId(ScheduleId.fromString("0.0.444"))
             .setMaxTransactionFee(new Hbar(1))
             .freeze()
             .sign(unusedPrivateKey);
+    }
+
+    @Test
+    void shouldBytes() throws Exception {
+        var tx = spawnTestTransaction();
         var tx2 = ScheduleDeleteTransaction.fromBytes(tx.toBytes());
         assertEquals(tx.toString(), tx2.toString());
     }

@@ -28,21 +28,13 @@ public class TokenGrantKycTransactionTest {
 
     @Test
     void shouldSerialize() {
-        SnapshotMatcher.expect(new TokenGrantKycTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setAccountId(AccountId.fromString("0.0.222"))
-            .setTokenId(TokenId.fromString("6.5.4"))
-            .setMaxTransactionFee(new Hbar(1))
-            .freeze()
-            .sign(unusedPrivateKey)
+        SnapshotMatcher.expect(spawnTestTransaction()
             .toString()
         ).toMatchSnapshot();
     }
 
-    @Test
-    void shouldBytes() throws Exception {
-        var tx = new TokenGrantKycTransaction()
+    private TokenGrantKycTransaction spawnTestTransaction() {
+        return new TokenGrantKycTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setAccountId(AccountId.fromString("0.0.222"))
@@ -50,6 +42,11 @@ public class TokenGrantKycTransactionTest {
             .setMaxTransactionFee(new Hbar(1))
             .freeze()
             .sign(unusedPrivateKey);
+    }
+
+    @Test
+    void shouldBytes() throws Exception {
+        var tx = spawnTestTransaction();
         var tx2 = TokenGrantKycTransaction.fromBytes(tx.toBytes());
         assertEquals(tx.toString(), tx2.toString());
     }
