@@ -32,12 +32,12 @@ public class FileAppendIntegrationTest {
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals(info.fileId, fileId);
-        assertEquals(info.size, 28);
+        assertEquals(fileId, info.fileId);
+        assertEquals(28, info.size);
         assertFalse(info.isDeleted);
         assertNotNull(info.keys);
         assertNull(info.keys.getThreshold());
-        assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
+        assertEquals(KeyList.of(testEnv.operatorKey), info.keys);
 
         new FileAppendTransaction()
             .setFileId(fileId)
@@ -49,12 +49,12 @@ public class FileAppendIntegrationTest {
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals(info.fileId, fileId);
-        assertEquals(info.size, 56);
+        assertEquals(fileId, info.fileId);
+        assertEquals(56, info.size);
         assertFalse(info.isDeleted);
         assertNotNull(info.keys);
         assertNull(info.keys.getThreshold());
-        assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
+        assertEquals(KeyList.of(testEnv.operatorKey), info.keys);
 
         new FileDeleteTransaction()
             .setFileId(fileId)
@@ -81,12 +81,12 @@ public class FileAppendIntegrationTest {
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals(info.fileId, fileId);
-        assertEquals(info.size, 28);
+        assertEquals(fileId, info.fileId);
+        assertEquals(28, info.size);
         assertFalse(info.isDeleted);
         assertNotNull(info.keys);
         assertNull(info.keys.getThreshold());
-        assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
+        assertEquals(KeyList.of(testEnv.operatorKey), info.keys);
 
         new FileAppendTransaction()
             .setFileId(fileId)
@@ -98,12 +98,12 @@ public class FileAppendIntegrationTest {
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals(info.fileId, fileId);
-        assertEquals(info.size, 13522);
+        assertEquals(fileId, info.fileId);
+        assertEquals(13522, info.size);
         assertFalse(info.isDeleted);
         assertNotNull(info.keys);
         assertNull(info.keys.getThreshold());
-        assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
+        assertEquals(KeyList.of(testEnv.operatorKey), info.keys);
 
         new FileDeleteTransaction()
             .setFileId(fileId)

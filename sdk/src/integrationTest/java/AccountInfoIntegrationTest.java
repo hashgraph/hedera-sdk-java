@@ -21,12 +21,12 @@ class AccountInfoIntegrationTest {
             .setAccountId(testEnv.operatorId)
             .execute(testEnv.client);
 
-        assertEquals(info.accountId, testEnv.operatorId);
+        assertEquals(testEnv.operatorId, info.accountId);
         assertFalse(info.isDeleted);
-        assertEquals(info.key.toString(), testEnv.operatorKey.toString());
+        assertEquals(testEnv.operatorKey.toString(), info.key.toString());
         assertTrue(info.balance.toTinybars() > 0);
         assertNull(info.proxyAccountId);
-        assertEquals(info.proxyReceived, Hbar.ZERO);
+        assertEquals(Hbar.ZERO, info.proxyReceived);
 
         testEnv.close();
     }
@@ -44,7 +44,7 @@ class AccountInfoIntegrationTest {
 
         var accInfo = info.setQueryPayment(cost).execute(testEnv.client);
 
-        assertEquals(accInfo.accountId, testEnv.operatorId);
+        assertEquals(testEnv.operatorId, accInfo.accountId);
 
         testEnv.close();
     }
@@ -62,7 +62,7 @@ class AccountInfoIntegrationTest {
 
         var accInfo = info.setQueryPayment(cost).execute(testEnv.client);
 
-        assertEquals(accInfo.accountId, testEnv.operatorId);
+        assertEquals(testEnv.operatorId, accInfo.accountId);
 
         testEnv.close();
     }
@@ -83,7 +83,7 @@ class AccountInfoIntegrationTest {
             info.execute(testEnv.client);
         });
 
-        assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for AccountInfoQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
+        assertEquals("com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for AccountInfoQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ", error.getMessage());
 
         testEnv.close();
     }
@@ -101,7 +101,7 @@ class AccountInfoIntegrationTest {
             info.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
         });
 
-        assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
+        assertEquals("INSUFFICIENT_TX_FEE", error.status.toString());
 
         testEnv.close();
     }

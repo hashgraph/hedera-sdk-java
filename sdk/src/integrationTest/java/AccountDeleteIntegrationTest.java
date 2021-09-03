@@ -37,13 +37,13 @@ class AccountDeleteIntegrationTest {
             .setAccountId(accountId)
             .execute(testEnv.client);
 
-        assertEquals(info.accountId, accountId);
+        assertEquals(accountId, info.accountId);
         assertFalse(info.isDeleted);
-        assertEquals(info.key.toString(), key.getPublicKey().toString());
-        assertEquals(info.balance, new Hbar(1));
-        assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
+        assertEquals(key.getPublicKey().toString(), info.key.toString());
+        assertEquals(new Hbar(1), info.balance);
+        assertEquals(Duration.ofDays(90), info.autoRenewPeriod);
         assertNull(info.proxyAccountId);
-        assertEquals(info.proxyReceived, Hbar.ZERO);
+        assertEquals(Hbar.ZERO, info.proxyReceived);
 
         testEnv.close(accountId, key);
     }

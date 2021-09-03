@@ -30,7 +30,7 @@ public class FileContentsIntegrationTest {
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals(contents.toStringUtf8(), "[e2e::FileCreateTransaction]");
+        assertEquals("[e2e::FileCreateTransaction]", contents.toStringUtf8());
 
         new FileDeleteTransaction()
             .setFileId(fileId)
@@ -55,7 +55,7 @@ public class FileContentsIntegrationTest {
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals(contents.size(), 0);
+        assertEquals(0, contents.size());
 
         new FileDeleteTransaction()
             .setFileId(fileId)
@@ -98,7 +98,7 @@ public class FileContentsIntegrationTest {
 
         var contents = contentsQuery.execute(testEnv.client);
 
-        assertEquals(contents.toStringUtf8(), "[e2e::FileCreateTransaction]");
+        assertEquals("[e2e::FileCreateTransaction]", contents.toStringUtf8());
 
         new FileDeleteTransaction()
             .setFileId(fileId)
@@ -130,7 +130,7 @@ public class FileContentsIntegrationTest {
             contentsQuery.execute(testEnv.client);
         });
 
-        assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for FileContentsQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
+        assertEquals("com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for FileContentsQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ", error.getMessage());
 
         new FileDeleteTransaction()
             .setFileId(fileId)
@@ -160,7 +160,7 @@ public class FileContentsIntegrationTest {
             contentsQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
         });
 
-        assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
+        assertEquals("INSUFFICIENT_TX_FEE", error.status.toString());
 
         new FileDeleteTransaction()
             .setFileId(fileId)

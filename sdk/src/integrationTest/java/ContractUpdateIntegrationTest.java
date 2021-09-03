@@ -48,13 +48,13 @@ public class ContractUpdateIntegrationTest {
             .setContractId(contractId)
             .execute(testEnv.client);
 
-        assertEquals(info.contractId, contractId);
+        assertEquals(contractId, info.contractId);
         assertNotNull(info.accountId);
-        assertEquals(Objects.requireNonNull(info.accountId).toString(), contractId.toString());
+        assertEquals(contractId.toString(), Objects.requireNonNull(info.accountId).toString());
         assertNotNull(info.adminKey);
-        assertEquals(Objects.requireNonNull(info.adminKey).toString(), Objects.requireNonNull(testEnv.operatorKey).toString());
-        assertEquals(info.storage, 926);
-        assertEquals(info.contractMemo, "[e2e::ContractCreateTransaction]");
+        assertEquals(Objects.requireNonNull(testEnv.operatorKey).toString(), Objects.requireNonNull(info.adminKey).toString());
+        assertEquals(926, info.storage);
+        assertEquals("[e2e::ContractCreateTransaction]", info.contractMemo);
 
         new ContractUpdateTransaction()
             .setContractId(contractId)
@@ -66,13 +66,13 @@ public class ContractUpdateIntegrationTest {
             .setContractId(contractId)
             .execute(testEnv.client);
 
-        assertEquals(info.contractId, contractId);
+        assertEquals(contractId, info.contractId);
         assertNotNull(info.accountId);
-        assertEquals(Objects.requireNonNull(info.accountId).toString(), contractId.toString());
+        assertEquals(contractId.toString(), Objects.requireNonNull(info.accountId).toString());
         assertNotNull(info.adminKey);
-        assertEquals(Objects.requireNonNull(info.adminKey).toString(), Objects.requireNonNull(testEnv.operatorKey).toString());
-        assertEquals(info.storage, 926);
-        assertEquals(info.contractMemo, "[e2e::ContractUpdateTransaction]");
+        assertEquals(Objects.requireNonNull(testEnv.operatorKey).toString(), Objects.requireNonNull(info.adminKey).toString());
+        assertEquals(926, info.storage);
+        assertEquals("[e2e::ContractUpdateTransaction]", info.contractMemo);
 
         new ContractDeleteTransaction()
             .setContractId(contractId)

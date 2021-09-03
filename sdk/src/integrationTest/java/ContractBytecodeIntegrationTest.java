@@ -46,7 +46,7 @@ public class ContractBytecodeIntegrationTest {
             .setContractId(contractId)
             .execute(testEnv.client);
 
-        assertEquals(bytecode.size(), 798);
+        assertEquals(798, bytecode.size());
 
         new ContractDeleteTransaction()
             .setContractId(contractId)
@@ -91,7 +91,7 @@ public class ContractBytecodeIntegrationTest {
 
         var bytecode = bytecodeQuery.setQueryPayment(cost).execute(testEnv.client);
 
-        assertEquals(bytecode.size(), 798);
+        assertEquals(798, bytecode.size());
 
         new ContractDeleteTransaction()
             .setContractId(contractId)
@@ -138,7 +138,7 @@ public class ContractBytecodeIntegrationTest {
             bytecodeQuery.execute(testEnv.client);
         });
 
-        assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for ContractByteCodeQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
+        assertEquals("com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for ContractByteCodeQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ", error.getMessage());
 
         new ContractDeleteTransaction()
             .setContractId(contractId)
@@ -183,7 +183,7 @@ public class ContractBytecodeIntegrationTest {
             bytecodeQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
         });
 
-        assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
+        assertEquals("INSUFFICIENT_TX_FEE", error.status.toString());
 
         new ContractDeleteTransaction()
             .setContractId(contractId)

@@ -88,7 +88,7 @@ class AccountBalanceIntegrationTest {
         var accBalance = balance.setQueryPayment(cost).execute(testEnv.client);
 
         assertTrue(accBalance.hbars.toTinybars() > 0);
-        assertEquals(cost.toTinybars(), 0);
+        assertEquals(0, cost.toTinybars());
 
         testEnv.close();
     }
@@ -167,8 +167,8 @@ class AccountBalanceIntegrationTest {
             .setAccountId(testEnv.operatorId)
             .execute(testEnv.client);
 
-        assertEquals(balance.tokens.get(tokenId), 10000);
-        assertEquals(balance.tokenDecimals.get(tokenId), 50);
+        assertEquals(10000, balance.tokens.get(tokenId));
+        assertEquals(50, balance.tokenDecimals.get(tokenId));
 
         testEnv.close(tokenId);
     }

@@ -30,10 +30,10 @@ public class TopicMessageIntegrationTest {
             .setTopicId(topicId)
             .execute(testEnv.client);
 
-        assertEquals(info.topicId, topicId);
-        assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
-        assertEquals(info.sequenceNumber, 0);
-        assertEquals(info.adminKey, testEnv.operatorKey);
+        assertEquals(topicId, info.topicId);
+        assertEquals("[e2e::TopicCreateTransaction]", info.topicMemo);
+        assertEquals(0, info.sequenceNumber);
+        assertEquals(testEnv.operatorKey, info.adminKey);
 
         var receivedMessage = new boolean[]{false};
         var start = Instant.now();
@@ -85,10 +85,10 @@ public class TopicMessageIntegrationTest {
             .setTopicId(topicId)
             .execute(testEnv.client);
 
-        assertEquals(info.topicId, topicId);
-        assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
-        assertEquals(info.sequenceNumber, 0);
-        assertEquals(info.adminKey, testEnv.operatorKey);
+        assertEquals(topicId, info.topicId);
+        assertEquals("[e2e::TopicCreateTransaction]", info.topicMemo);
+        assertEquals(0, info.sequenceNumber);
+        assertEquals(testEnv.operatorKey, info.adminKey);
 
         var receivedMessage = new boolean[]{false};
         var start = Instant.now();

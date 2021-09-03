@@ -36,7 +36,7 @@ public class TopicUpdateIntegrationTest {
             .setTopicId(topicId)
             .execute(testEnv.client);
 
-        assertEquals(topicInfo.topicMemo, "hello");
+        assertEquals("hello", topicInfo.topicMemo);
         assertNull(topicInfo.autoRenewAccountId);
 
         new TopicDeleteTransaction()

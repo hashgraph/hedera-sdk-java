@@ -43,9 +43,9 @@ class TokenUpdateIntegrationTest {
             .execute(testEnv.client);
 
         assertEquals(tokenId, info.tokenId);
-        assertEquals(info.name, "ffff");
-        assertEquals(info.symbol, "F");
-        assertEquals(info.decimals, 3);
+        assertEquals("ffff", info.name);
+        assertEquals("F", info.symbol);
+        assertEquals(3, info.decimals);
         assertEquals(testEnv.operatorId, info.treasuryAccountId);
         assertNotNull(info.adminKey);
         assertNotNull(info.freezeKey);
@@ -74,9 +74,9 @@ class TokenUpdateIntegrationTest {
             .execute(testEnv.client);
 
         assertEquals(tokenId, info.tokenId);
-        assertEquals(info.name, "aaaa");
-        assertEquals(info.symbol, "A");
-        assertEquals(info.decimals, 3);
+        assertEquals("aaaa", info.name);
+        assertEquals("A", info.symbol);
+        assertEquals(3, info.decimals);
         assertEquals(testEnv.operatorId, info.treasuryAccountId);
         assertNotNull(info.adminKey);
         assertNotNull(info.freezeKey);

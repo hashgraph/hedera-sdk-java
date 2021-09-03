@@ -125,7 +125,7 @@ public class ReceiptQueryIntegrationTest {
             recordQuery.execute(testEnv.client);
         });
 
-        assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for TransactionRecordQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
+        assertEquals("com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for TransactionRecordQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ", error.getMessage());
 
         testEnv.close(receipt.accountId, key);
     }
@@ -151,7 +151,7 @@ public class ReceiptQueryIntegrationTest {
             recordQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
         });
 
-        assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
+        assertEquals("INSUFFICIENT_TX_FEE", error.status.toString());
 
         testEnv.close(receipt.accountId, key);
     }
