@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.errorprone.annotations.Var;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -148,7 +147,7 @@ class ClientTest {
             client.setNetwork(setNetworkNodes);
 
             var nodeFromNetwork = Objects.requireNonNull(client.network.networkNodes.get(new AccountId(5)));
-            Assertions.assertEquals(nodeFromNetwork.getChannel().authority(), "2.testnet.hedera.com:50211");
+            Assertions.assertEquals("2.testnet.hedera.com:50211", nodeFromNetwork.getChannel().authority());
             Assertions.assertFalse(client.network.networkNodes.containsKey(new AccountId(3)));
             client.close();
         });
