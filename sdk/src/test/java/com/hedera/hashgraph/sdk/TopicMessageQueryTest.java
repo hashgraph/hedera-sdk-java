@@ -32,10 +32,12 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -48,10 +50,10 @@ class TopicMessageQueryTest {
     private static final Instant START_TIME = Instant.now();
 
     private Client client;
-    private AtomicBoolean complete = new AtomicBoolean(false);
-    private List<Throwable> errors = new ArrayList<>();
-    private List<TopicMessage> received = new ArrayList<>();
-    private ConsensusServiceStub consensusServiceStub = new ConsensusServiceStub();
+    final private AtomicBoolean complete = new AtomicBoolean(false);
+    final private List<Throwable> errors = new ArrayList<>();
+    final private List<TopicMessage> received = new ArrayList<>();
+    final private ConsensusServiceStub consensusServiceStub = new ConsensusServiceStub();
     private Server server;
     private TopicMessageQuery topicMessageQuery;
 
@@ -96,6 +98,7 @@ class TopicMessageQueryTest {
     }
 
     @Test
+    @SuppressWarnings("NullAway")
     void setCompletionHandlerNull() {
         assertThatThrownBy(() -> topicMessageQuery.setCompletionHandler(null))
             .isInstanceOf(NullPointerException.class)
@@ -103,6 +106,7 @@ class TopicMessageQueryTest {
     }
 
     @Test
+    @SuppressWarnings("NullAway")
     void setEndTimeNull() {
         assertThatThrownBy(() -> topicMessageQuery.setEndTime(null))
             .isInstanceOf(NullPointerException.class)
@@ -110,6 +114,7 @@ class TopicMessageQueryTest {
     }
 
     @Test
+    @SuppressWarnings("NullAway")
     void setErrorHandlerNull() {
         assertThatThrownBy(() -> topicMessageQuery.setErrorHandler(null))
             .isInstanceOf(NullPointerException.class)
@@ -117,6 +122,7 @@ class TopicMessageQueryTest {
     }
 
     @Test
+    @SuppressWarnings("NullAway")
     void setMaxAttemptsNegative() {
         assertThatThrownBy(() -> topicMessageQuery.setMaxAttempts(-1))
             .isInstanceOf(IllegalArgumentException.class)
@@ -124,6 +130,7 @@ class TopicMessageQueryTest {
     }
 
     @Test
+    @SuppressWarnings("NullAway")
     void setMaxBackoffNull() {
         assertThatThrownBy(() -> topicMessageQuery.setMaxBackoff(null))
             .isInstanceOf(IllegalArgumentException.class)
@@ -138,6 +145,7 @@ class TopicMessageQueryTest {
     }
 
     @Test
+    @SuppressWarnings("NullAway")
     void setRetryHandlerNull() {
         assertThatThrownBy(() -> topicMessageQuery.setRetryHandler(null))
             .isInstanceOf(NullPointerException.class)
@@ -145,6 +153,7 @@ class TopicMessageQueryTest {
     }
 
     @Test
+    @SuppressWarnings("NullAway")
     void setStartTimeNull() {
         assertThatThrownBy(() -> topicMessageQuery.setStartTime(null))
             .isInstanceOf(NullPointerException.class)
@@ -152,6 +161,7 @@ class TopicMessageQueryTest {
     }
 
     @Test
+    @SuppressWarnings("NullAway")
     void setTopicIdNull() {
         assertThatThrownBy(() -> topicMessageQuery.setTopicId(null))
             .isInstanceOf(NullPointerException.class)
@@ -188,7 +198,7 @@ class TopicMessageQueryTest {
             .hasSize(1)
             .first()
             .returns(toInstant(response2.getConsensusTimestamp()), t -> t.consensusTimestamp)
-            .returns(response2.getChunkInfo().getInitialTransactionID(), t -> t.transactionId.toProtobuf())
+            .returns(response2.getChunkInfo().getInitialTransactionID(), t -> Objects.requireNonNull(t.transactionId).toProtobuf())
             .returns(message, t -> t.contents)
             .returns(response2.getRunningHash().toByteArray(), t -> t.runningHash)
             .returns(response2.getSequenceNumber(), t -> t.sequenceNumber)
@@ -337,18 +347,18 @@ class TopicMessageQueryTest {
         subscriptionHandle.unsubscribe();
     }
 
-    private ConsensusTopicQuery.Builder request() {
+    static private ConsensusTopicQuery.Builder request() {
         return ConsensusTopicQuery.newBuilder()
             .setConsensusEndTime(toTimestamp(START_TIME.plusSeconds(100L)))
             .setConsensusStartTime(toTimestamp(START_TIME))
             .setTopicID(TopicID.newBuilder().setTopicNum(1000).build());
     }
 
-    private ConsensusTopicResponse response(Long sequenceNumber) {
+    static private ConsensusTopicResponse response(long sequenceNumber) {
         return response(sequenceNumber, 0);
     }
 
-    private ConsensusTopicResponse response(Long sequenceNumber, int total) {
+    static private ConsensusTopicResponse response(long sequenceNumber, int total) {
         ConsensusTopicResponse.Builder consensusTopicResponseBuilder = ConsensusTopicResponse.newBuilder();
 
         if (total > 0) {
@@ -357,7 +367,7 @@ class TopicMessageQueryTest {
                     .setAccountID(AccountID.newBuilder().setAccountNum(3).build())
                     .setTransactionValidStart(toTimestamp(START_TIME))
                     .build())
-                .setNumber(sequenceNumber.intValue())
+                .setNumber((int) sequenceNumber)
                 .setTotal(total)
                 .build();
             consensusTopicResponseBuilder.setChunkInfo(chunkInfo);
@@ -373,21 +383,21 @@ class TopicMessageQueryTest {
             .build();
     }
 
-    private Instant toInstant(Timestamp timestamp) {
+    static private Instant toInstant(Timestamp timestamp) {
         return Instant.ofEpochSecond(timestamp.getSeconds(), timestamp.getNanos());
     }
 
-    private Timestamp toTimestamp(Instant instant) {
+    static private Timestamp toTimestamp(Instant instant) {
         return Timestamp.newBuilder()
             .setSeconds(instant.getEpochSecond())
             .setNanos(instant.getNano())
             .build();
     }
 
-    private class ConsensusServiceStub extends ConsensusServiceGrpc.ConsensusServiceImplBase {
+    private static class ConsensusServiceStub extends ConsensusServiceGrpc.ConsensusServiceImplBase {
 
-        private final Queue<ConsensusTopicQuery> requests = new LinkedList<>();
-        private final Queue<Object> responses = new LinkedList<>();
+        private final Queue<ConsensusTopicQuery> requests = new ArrayDeque<>();
+        private final Queue<Object> responses = new ArrayDeque<>();
 
         @Override
         public void subscribeTopic(ConsensusTopicQuery consensusTopicQuery,

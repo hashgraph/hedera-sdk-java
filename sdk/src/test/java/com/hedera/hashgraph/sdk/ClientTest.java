@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -51,8 +52,8 @@ class ClientTest {
     @NullSource
     @ValueSource(longs = {-1, 0, 249})
     @ParameterizedTest(name = "Invalid maxBackoff {0}")
-    void setMaxBackoffInvalid(Long maxBackoffMillis) throws TimeoutException {
-        Duration maxBackoff = maxBackoffMillis != null ? Duration.ofMillis(maxBackoffMillis) : null;
+    void setMaxBackoffInvalid(long maxBackoffMillis) throws TimeoutException {
+        Duration maxBackoff = Duration.ofMillis(maxBackoffMillis);
         var client = Client.forNetwork(Map.of());
         assertThrows(IllegalArgumentException.class, () -> {
             client.setMaxBackoff(maxBackoff);
@@ -69,8 +70,8 @@ class ClientTest {
     @NullSource
     @ValueSource(longs = {-1, 8001})
     @ParameterizedTest(name = "Invalid minBackoff {0}")
-    void setMinBackoffInvalid(Long minBackoffMillis) throws TimeoutException {
-        Duration minBackoff = minBackoffMillis != null ? Duration.ofMillis(minBackoffMillis) : null;
+    void setMinBackoffInvalid(long minBackoffMillis) throws TimeoutException {
+        Duration minBackoff = Duration.ofMillis(minBackoffMillis);
         var client = Client.forNetwork(Map.of());
         assertThrows(IllegalArgumentException.class, () -> {
             client.setMinBackoff(minBackoff);
@@ -134,19 +135,20 @@ class ClientTest {
     @DisplayName("setNetwork() functions correctly")
     void testReplaceNodes() {
         assertDoesNotThrow(() -> {
-            @Var Map<String, AccountId> nodes = new HashMap<>();
+            Map<String, AccountId> nodes = new HashMap<>();
             nodes.put("0.testnet.hedera.com:50211", new AccountId(3));
             nodes.put("1.testnet.hedera.com:50211", new AccountId(4));
 
             Client client = Client.forNetwork(nodes);
 
-            @Var Map<String, AccountId> setNetworkNodes = new HashMap<>();
+            Map<String, AccountId> setNetworkNodes = new HashMap<>();
             setNetworkNodes.put("2.testnet.hedera.com:50211", new AccountId(5));
             setNetworkNodes.put("3.testnet.hedera.com:50211", new AccountId(6));
 
             client.setNetwork(setNetworkNodes);
 
-            Assertions.assertEquals(client.network.networkNodes.get(new AccountId(5)).getChannel().authority(), "2.testnet.hedera.com:50211");
+            var nodeFromNetwork = Objects.requireNonNull(client.network.networkNodes.get(new AccountId(5)));
+            Assertions.assertEquals(nodeFromNetwork.getChannel().authority(), "2.testnet.hedera.com:50211");
             Assertions.assertFalse(client.network.networkNodes.containsKey(new AccountId(3)));
             client.close();
         });

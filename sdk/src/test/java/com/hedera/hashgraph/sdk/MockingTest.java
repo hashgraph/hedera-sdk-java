@@ -17,6 +17,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class MockingTest {
 
@@ -35,8 +36,9 @@ public class MockingTest {
             .withDescription(description)
             .asRuntimeException();
 
-        service.buffer.enqueueResponse(TestResponse.error(exception));
-        service.buffer.enqueueResponse(TestResponse.transactionOk());
+        service.buffer
+            .enqueueResponse(TestResponse.error(exception))
+            .enqueueResponse(TestResponse.transactionOk());
 
         new AccountCreateTransaction()
             .execute(server.client);
@@ -52,10 +54,11 @@ public class MockingTest {
         var service = new TestCryptoService();
         var server = new TestServer("maxTransactionFee", service);
 
-        service.buffer.enqueueResponse(TestResponse.transactionOk());
-        service.buffer.enqueueResponse(TestResponse.transactionOk());
-        service.buffer.enqueueResponse(TestResponse.transactionOk());
-        service.buffer.enqueueResponse(TestResponse.transactionOk());
+        service.buffer
+            .enqueueResponse(TestResponse.transactionOk())
+            .enqueueResponse(TestResponse.transactionOk())
+            .enqueueResponse(TestResponse.transactionOk())
+            .enqueueResponse(TestResponse.transactionOk());
 
         new AccountCreateTransaction()
             .execute(server.client);
@@ -74,7 +77,7 @@ public class MockingTest {
             .execute(server.client);
 
         Assertions.assertEquals(4, service.buffer.transactionRequestsReceived.size());
-        var transactions = new ArrayList<com.hedera.hashgraph.sdk.Transaction>();
+        var transactions = new ArrayList<com.hedera.hashgraph.sdk.Transaction<?>>();
         for (var request : service.buffer.transactionRequestsReceived) {
             transactions.add(com.hedera.hashgraph.sdk.Transaction.fromBytes(request.toByteArray()));
         }
@@ -102,9 +105,10 @@ public class MockingTest {
                 ).toProtobuf()
             ).build();
 
-        service.buffer.enqueueResponse(TestResponse.query(response));
-        service.buffer.enqueueResponse(TestResponse.query(response));
-        service.buffer.enqueueResponse(TestResponse.query(response));
+        service.buffer
+            .enqueueResponse(TestResponse.query(response))
+            .enqueueResponse(TestResponse.query(response))
+            .enqueueResponse(TestResponse.query(response));
 
         // TODO: this will take some work, since I have to contend with Query's getCost behavior
         // TODO: actually, because AccountBalanceQuery is free, I'll need some other query type to test this.
@@ -124,7 +128,7 @@ public class MockingTest {
         var aliceKey = PrivateKey.generate();
 
         var transaction = new AccountCreateTransaction()
-            .setTransactionId(TransactionId.generate(server.client.getOperatorAccountId()))
+            .setTransactionId(TransactionId.generate(Objects.requireNonNull(server.client.getOperatorAccountId())))
             .setNodeAccountIds(server.client.network.getNodeAccountIdsForExecute())
             .freeze()
             .sign(aliceKey);
