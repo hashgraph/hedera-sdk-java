@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.threeten.bp.Duration;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -51,8 +52,9 @@ class ClientTest {
     @NullSource
     @ValueSource(longs = {-1, 0, 249})
     @ParameterizedTest(name = "Invalid maxBackoff {0}")
-    void setMaxBackoffInvalid(long maxBackoffMillis) throws TimeoutException {
-        Duration maxBackoff = Duration.ofMillis(maxBackoffMillis);
+    @SuppressWarnings("NullAway")
+    void setMaxBackoffInvalid(@Nullable Long maxBackoffMillis) throws TimeoutException {
+        @Nullable Duration maxBackoff = maxBackoffMillis != null ? Duration.ofMillis(maxBackoffMillis) : null;
         var client = Client.forNetwork(Map.of());
         assertThrows(IllegalArgumentException.class, () -> {
             client.setMaxBackoff(maxBackoff);
@@ -69,8 +71,9 @@ class ClientTest {
     @NullSource
     @ValueSource(longs = {-1, 8001})
     @ParameterizedTest(name = "Invalid minBackoff {0}")
-    void setMinBackoffInvalid(long minBackoffMillis) throws TimeoutException {
-        Duration minBackoff = Duration.ofMillis(minBackoffMillis);
+    @SuppressWarnings("NullAway")
+    void setMinBackoffInvalid(@Nullable Long minBackoffMillis) throws TimeoutException {
+        @Nullable Duration minBackoff = minBackoffMillis != null ? Duration.ofMillis(minBackoffMillis) : null;
         var client = Client.forNetwork(Map.of());
         assertThrows(IllegalArgumentException.class, () -> {
             client.setMinBackoff(minBackoff);
