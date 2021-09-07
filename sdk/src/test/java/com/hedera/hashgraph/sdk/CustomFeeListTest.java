@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CustomFeeListTest {
     @BeforeAll
@@ -22,7 +22,7 @@ public class CustomFeeListTest {
         SnapshotMatcher.validateSnapshots();
     }
 
-    private List<CustomFee> spawnCustomFeeListExample() {
+    static private List<CustomFee> spawnCustomFeeListExample() {
         var returnList = new ArrayList<CustomFee>();
         returnList.add(new CustomFixedFee()
             .setFeeCollectorAccountId(new AccountId(4322))

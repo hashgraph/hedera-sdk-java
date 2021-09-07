@@ -24,7 +24,7 @@ public class TokenInfoTest {
         SnapshotMatcher.validateSnapshots();
     }
 
-    private TokenInfo spawnTokenInfoExample() {
+    private static TokenInfo spawnTokenInfoExample() {
         List<CustomFee> fees = new ArrayList<>();
         fees.add(new CustomFixedFee()
             .setFeeCollectorAccountId(new AccountId(4322))

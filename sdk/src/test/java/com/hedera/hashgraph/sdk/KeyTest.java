@@ -29,7 +29,7 @@ class KeyTest {
         var publicKey = privateKey.getPublicKey();
         var signature = privateKey.sign(message);
 
-        assertEquals(signature.length, 64);
+        assertEquals(64, signature.length);
         assertTrue(publicKey.verify(message, signature));
     }
 
@@ -41,7 +41,7 @@ class KeyTest {
 
         var cut = PublicKey.fromProtobufKey(protoKey);
 
-        assertEquals(cut.getClass(), PublicKey.class);
+        assertEquals(PublicKey.class, cut.getClass());
         assertArrayEquals(keyBytes, ((PublicKey) cut).toBytes());
     }
 
@@ -66,7 +66,7 @@ class KeyTest {
         var cut = com.hedera.hashgraph.sdk.Key.fromProtobufKey(protoKey);
 
         // then
-        assertEquals(cut.getClass(), com.hedera.hashgraph.sdk.KeyList.class);
+        assertEquals(com.hedera.hashgraph.sdk.KeyList.class, cut.getClass());
 
         var keyList = (com.hedera.hashgraph.sdk.KeyList) cut;
         var actual = keyList.toProtobufKey().getKeyList();
@@ -98,7 +98,7 @@ class KeyTest {
         var cut = com.hedera.hashgraph.sdk.Key.fromProtobufKey(protoKey);
 
         // then
-        assertEquals(cut.getClass(), com.hedera.hashgraph.sdk.KeyList.class);
+        assertEquals(com.hedera.hashgraph.sdk.KeyList.class, cut.getClass());
 
         var thresholdKey = (com.hedera.hashgraph.sdk.KeyList) cut;
         var actual = thresholdKey.toProtobufKey().getThresholdKey();

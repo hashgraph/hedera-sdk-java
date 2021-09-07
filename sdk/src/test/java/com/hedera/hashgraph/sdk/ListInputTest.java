@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -38,7 +39,7 @@ public class ListInputTest {
         var list = new ArrayList<AccountId>();
         list.add(AccountId.fromString("1.2.3"));
         tx.setNodeAccountIds(list);
-        var v1 = new ArrayList<>(tx.getNodeAccountIds());
+        var v1 = new ArrayList<>(Objects.requireNonNull(tx.getNodeAccountIds()));
         list.add(AccountId.fromString("4.5.6"));
         var v2 = new ArrayList<>(tx.getNodeAccountIds());
         assertEquals(v1.toString(), v2.toString());
@@ -128,7 +129,7 @@ public class ListInputTest {
         var list = new ArrayList<CustomFee>();
         list.add(new CustomFixedFee().setAmount(1));
         tx.setCustomFees(list);
-        var v1 = new ArrayList<>(tx.getCustomFees());
+        var v1 = new ArrayList<>(Objects.requireNonNull(tx.getCustomFees()));
         list.add(new CustomFixedFee().setAmount(2));
         var v2 = new ArrayList<>(tx.getCustomFees());
         assertEquals(v1.toString(), v2.toString());

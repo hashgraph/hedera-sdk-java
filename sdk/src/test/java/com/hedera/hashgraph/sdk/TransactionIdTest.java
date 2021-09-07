@@ -32,10 +32,10 @@ class TransactionIdTest {
         var transactionId = TransactionId.fromString("0.0.23847@1588539964.632521325");
         var accountId = Objects.requireNonNull(transactionId.accountId);
         var validStart = Objects.requireNonNull(transactionId.validStart);
-        assertEquals(accountId.shard, 0);
-        assertEquals(accountId.num, 23847);
-        assertEquals(validStart.getEpochSecond(), 1588539964);
-        assertEquals(validStart.getNano(), 632521325);
+        assertEquals(0, accountId.shard);
+        assertEquals(23847, accountId.num);
+        assertEquals(1588539964, validStart.getEpochSecond());
+        assertEquals(632521325, validStart.getNano());
     }
 
     @Test
@@ -43,10 +43,10 @@ class TransactionIdTest {
         var transactionId = TransactionId.fromString("0.0.23847@1588539964.632521325?scheduled");
         var accountId = Objects.requireNonNull(transactionId.accountId);
         var validStart = Objects.requireNonNull(transactionId.validStart);
-        assertEquals(accountId.shard, 0);
-        assertEquals(accountId.num, 23847);
-        assertEquals(validStart.getEpochSecond(), 1588539964);
-        assertEquals(validStart.getNano(), 632521325);
+        assertEquals(0, accountId.shard);
+        assertEquals(23847, accountId.num);
+        assertEquals(1588539964, validStart.getEpochSecond());
+        assertEquals(632521325, validStart.getNano());
         assertTrue(transactionId.scheduled);
 
         assertEquals(transactionId.toString(), "0.0.23847@1588539964.632521325?scheduled");

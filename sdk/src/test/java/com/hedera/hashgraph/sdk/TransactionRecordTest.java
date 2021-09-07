@@ -2,7 +2,9 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.sdk.proto.AccountAmount;
 import com.hedera.hashgraph.sdk.proto.ContractFunctionResult;
+import com.hedera.hashgraph.sdk.proto.ContractLoginfo;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.TransactionGetRecordResponse;
 import com.hedera.hashgraph.sdk.proto.TransferList;
@@ -21,7 +23,7 @@ public class TransactionRecordTest {
     @Test
     @DisplayName("using toBytes and fromBytes will produce the correct response")
     void toFromBytes() throws InvalidProtocolBufferException {
-        var transfer = com.hedera.hashgraph.sdk.proto.AccountAmount.newBuilder()
+        var transfer = AccountAmount.newBuilder()
             .setAccountID(AccountId.fromString("0.0.5005").toProtobuf())
             .setAmount(100_000);
 
@@ -40,7 +42,7 @@ public class TransactionRecordTest {
                         .setTransactionFee(100_000)
                         .setTransferList(transferList)
                         .setContractCallResult(ContractFunctionResult.newBuilder()
-                            .addLogInfo(com.hedera.hashgraph.sdk.proto.ContractLoginfo.newBuilder()
+                            .addLogInfo(ContractLoginfo.newBuilder()
                                 .addTopic(ByteString.copyFrom("aloha", StandardCharsets.UTF_8))
                                 .setContractID(ContractId.fromString("0.0.5007").toProtobuf())
                                 .setBloom(ByteString.copyFrom("bonjour", StandardCharsets.UTF_8))

@@ -29,26 +29,13 @@ public class ContractUpdateTransactionTest {
 
     @Test
     void shouldSerialize() {
-        SnapshotMatcher.expect(new ContractUpdateTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setContractId(ContractId.fromString("0.0.5007"))
-            .setAdminKey(privateKey)
-            .setAutoRenewPeriod(Duration.ofDays(1))
-            .setBytecodeFileId(new FileId(2))
-            .setContractMemo("3")
-            .setExpirationTime(Instant.ofEpochMilli(4))
-            .setProxyAccountId(new AccountId(4))
-            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .freeze()
-            .sign(privateKey)
+        SnapshotMatcher.expect(spawnTestTransaction()
             .toString()
         ).toMatchSnapshot();
     }
 
-    @Test
-    void shouldBytes() throws Exception {
-        var tx = new ContractUpdateTransaction()
+    private ContractUpdateTransaction spawnTestTransaction() {
+        return new ContractUpdateTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setContractId(ContractId.fromString("0.0.5007"))
@@ -61,6 +48,11 @@ public class ContractUpdateTransactionTest {
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
             .sign(privateKey);
+    }
+
+    @Test
+    void shouldBytes() throws Exception {
+        var tx = spawnTestTransaction();
         var tx2 = ContractUpdateTransaction.fromBytes(tx.toBytes());
         assertEquals(tx.toString(), tx2.toString());
     }

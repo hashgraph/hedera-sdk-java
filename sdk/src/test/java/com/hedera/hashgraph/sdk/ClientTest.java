@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.errorprone.annotations.Var;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,12 +8,14 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.threeten.bp.Duration;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -51,8 +52,9 @@ class ClientTest {
     @NullSource
     @ValueSource(longs = {-1, 0, 249})
     @ParameterizedTest(name = "Invalid maxBackoff {0}")
-    void setMaxBackoffInvalid(Long maxBackoffMillis) throws TimeoutException {
-        Duration maxBackoff = maxBackoffMillis != null ? Duration.ofMillis(maxBackoffMillis) : null;
+    @SuppressWarnings("NullAway")
+    void setMaxBackoffInvalid(@Nullable Long maxBackoffMillis) throws TimeoutException {
+        @Nullable Duration maxBackoff = maxBackoffMillis != null ? Duration.ofMillis(maxBackoffMillis) : null;
         var client = Client.forNetwork(Map.of());
         assertThrows(IllegalArgumentException.class, () -> {
             client.setMaxBackoff(maxBackoff);
@@ -69,8 +71,9 @@ class ClientTest {
     @NullSource
     @ValueSource(longs = {-1, 8001})
     @ParameterizedTest(name = "Invalid minBackoff {0}")
-    void setMinBackoffInvalid(Long minBackoffMillis) throws TimeoutException {
-        Duration minBackoff = minBackoffMillis != null ? Duration.ofMillis(minBackoffMillis) : null;
+    @SuppressWarnings("NullAway")
+    void setMinBackoffInvalid(@Nullable Long minBackoffMillis) throws TimeoutException {
+        @Nullable Duration minBackoff = minBackoffMillis != null ? Duration.ofMillis(minBackoffMillis) : null;
         var client = Client.forNetwork(Map.of());
         assertThrows(IllegalArgumentException.class, () -> {
             client.setMinBackoff(minBackoff);
@@ -139,7 +142,7 @@ class ClientTest {
 
         Client client = Client.forNetwork(nodes);
 
-        @Var Map<String, AccountId> setNetworkNodes = new HashMap<>();
+        Map<String, AccountId> setNetworkNodes = new HashMap<>();
         setNetworkNodes.put("2.testnet.hedera.com:50211", new AccountId(5));
         setNetworkNodes.put("3.testnet.hedera.com:50211", new AccountId(6));
 
