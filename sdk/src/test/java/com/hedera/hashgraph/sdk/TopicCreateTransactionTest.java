@@ -29,23 +29,13 @@ public class TopicCreateTransactionTest {
 
     @Test
     void shouldSerialize() {
-        SnapshotMatcher.expect(new TopicCreateTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setSubmitKey(unusedPrivateKey)
-            .setAdminKey(unusedPrivateKey)
-            .setAutoRenewAccountId(AccountId.fromString("0.0.5007"))
-            .setAutoRenewPeriod(Duration.ofHours(24))
-            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .freeze()
-            .sign(unusedPrivateKey)
+        SnapshotMatcher.expect(spawnTestTransaction()
             .toString()
         ).toMatchSnapshot();
     }
 
-    @Test
-    void shouldBytes() throws Exception {
-        var tx = new TopicCreateTransaction()
+    private TopicCreateTransaction spawnTestTransaction() {
+        return new TopicCreateTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setSubmitKey(unusedPrivateKey)
@@ -55,6 +45,11 @@ public class TopicCreateTransactionTest {
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
             .sign(unusedPrivateKey);
+    }
+
+    @Test
+    void shouldBytes() throws Exception {
+        var tx = spawnTestTransaction();
         var tx2 = TopicCreateTransaction.fromBytes(tx.toBytes());
         assertEquals(tx.toString(), tx2.toString());
     }

@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HbarTest {
-    private final long fiftyGTinybar = 5_000_000_000L;
+    private static final long fiftyGTinybar = 5_000_000_000L;
     private final Hbar fiftyHbar = Hbar.fromTinybars(fiftyGTinybar);
 
     private final Hbar hundredHbar = new Hbar(100);

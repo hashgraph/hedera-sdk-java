@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CustomFeeListTest {
     @BeforeAll
@@ -22,7 +22,7 @@ public class CustomFeeListTest {
         SnapshotMatcher.validateSnapshots();
     }
 
-    private List<CustomFee> spawnCustomFeeListExample() {
+    static private List<CustomFee> spawnCustomFeeListExample() {
         var returnList = new ArrayList<CustomFee>();
         returnList.add(new CustomFixedFee()
             .setFeeCollectorAccountId(new AccountId(4322))
@@ -48,7 +48,7 @@ public class CustomFeeListTest {
             var copyCustomFeeList = new ArrayList<CustomFee>();
             copyCustomFeeList.add(CustomFee.fromBytes(customFee0Bytes));
             copyCustomFeeList.add(CustomFee.fromBytes(customFee1Bytes));
-            assertTrue(originalCustomFeeList.toString().equals(copyCustomFeeList.toString()));
+            assertEquals(originalCustomFeeList.toString(), copyCustomFeeList.toString());
             SnapshotMatcher.expect(originalCustomFeeList.toString()).toMatchSnapshot();
         });
     }
@@ -62,11 +62,11 @@ public class CustomFeeListTest {
                 copyCustomFeeList.add(fee.deepClone());
             }
             var originalCustomFeeListString = originalCustomFeeList.toString();
-            assertTrue(originalCustomFeeListString.equals(copyCustomFeeList.toString()));
+            assertEquals(originalCustomFeeListString, copyCustomFeeList.toString());
 
             // modifying clone doesn't affect original
-            ((CustomFixedFee) (copyCustomFeeList.get(0))).setDenominatingTokenId(new TokenId(89803));
-            assertTrue(originalCustomFeeListString.equals(originalCustomFeeList.toString()));
+            ((CustomFixedFee) copyCustomFeeList.get(0)).setDenominatingTokenId(new TokenId(89803));
+            assertEquals(originalCustomFeeListString, originalCustomFeeList.toString());
 
             SnapshotMatcher.expect(originalCustomFeeList.toString()).toMatchSnapshot();
         });

@@ -25,7 +25,7 @@ public class TokenFeeScheduleUpdateTransactionTest {
         SnapshotMatcher.validateSnapshots();
     }
 
-    private TokenFeeScheduleUpdateTransaction spawnTokenFeeScheduleUpdateTransactionExample() {
+    private TokenFeeScheduleUpdateTransaction spawnTestTransaction() {
         var customFees = new ArrayList<CustomFee>();
         customFees.add(new CustomFixedFee()
             .setFeeCollectorAccountId(new AccountId(4322))
@@ -52,7 +52,7 @@ public class TokenFeeScheduleUpdateTransactionTest {
     @Test
     void shouldSerialize() {
         assertDoesNotThrow(() -> {
-            var originalUpdate = spawnTokenFeeScheduleUpdateTransactionExample();
+            var originalUpdate = spawnTestTransaction();
             byte[] updateBytes = originalUpdate.toBytes();
             var copyUpdate = TokenFeeScheduleUpdateTransaction.fromBytes(updateBytes);
             assertTrue(originalUpdate.toString().equals(copyUpdate.toString()));

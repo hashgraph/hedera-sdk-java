@@ -28,21 +28,13 @@ public class TokenDissociateTransactionTest {
 
     @Test
     void shouldSerialize() {
-        SnapshotMatcher.expect(new TokenDissociateTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setAccountId(AccountId.fromString("0.0.222"))
-            .setTokenIds(Collections.singletonList(TokenId.fromString("0.0.666")))
-            .setMaxTransactionFee(new Hbar(1))
-            .freeze()
-            .sign(unusedPrivateKey)
+        SnapshotMatcher.expect(spawnTestTransaction()
             .toString()
         ).toMatchSnapshot();
     }
 
-    @Test
-    void shouldBytes() throws Exception {
-        var tx = new TokenDissociateTransaction()
+    private TokenDissociateTransaction spawnTestTransaction() {
+        return new TokenDissociateTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setAccountId(AccountId.fromString("0.0.222"))
@@ -50,6 +42,11 @@ public class TokenDissociateTransactionTest {
             .setMaxTransactionFee(new Hbar(1))
             .freeze()
             .sign(unusedPrivateKey);
+    }
+
+    @Test
+    void shouldBytes() throws Exception {
+        var tx = spawnTestTransaction();
         var tx2 = TokenDissociateTransaction.fromBytes(tx.toBytes());
         assertEquals(tx.toString(), tx2.toString());
     }

@@ -29,26 +29,13 @@ public class ContractCreateTransactionTest {
 
     @Test
     void shouldSerialize() {
-        SnapshotMatcher.expect(new ContractCreateTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setBytecodeFileId(FileId.fromString("0.0.3003"))
-            .setAdminKey(unusedPrivateKey)
-            .setGas(0)
-            .setInitialBalance(Hbar.fromTinybars(1000))
-            .setProxyAccountId(AccountId.fromString("0.0.1001"))
-            .setAutoRenewPeriod(Duration.ofHours(10))
-            .setConstructorParameters(new byte[]{10, 11, 12, 13, 25})
-            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .freeze()
-            .sign(unusedPrivateKey)
+        SnapshotMatcher.expect(spawnTestTransaction()
             .toString()
         ).toMatchSnapshot();
     }
 
-    @Test
-    void shouldBytes() throws Exception {
-        var tx = new ContractCreateTransaction()
+    private ContractCreateTransaction spawnTestTransaction() {
+        return new ContractCreateTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setBytecodeFileId(FileId.fromString("0.0.3003"))
@@ -61,6 +48,11 @@ public class ContractCreateTransactionTest {
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
             .sign(unusedPrivateKey);
+    }
+
+    @Test
+    void shouldBytes() throws Exception {
+        var tx = spawnTestTransaction();
         var tx2 = ContractCreateTransaction.fromBytes(tx.toBytes());
         assertEquals(tx.toString(), tx2.toString());
     }
