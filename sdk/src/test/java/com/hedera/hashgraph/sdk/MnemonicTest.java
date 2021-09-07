@@ -198,8 +198,8 @@ public class MnemonicTest {
             PrivateKey key = mnemonic.toLegacyPrivateKey();
             PrivateKey derivedKey = key.legacyDerive(0);
             PrivateKey derivedKey2 = key.legacyDerive(-1);
-            assertEquals(derivedKey.toString(), "302e020100300506032b6570042204202b7345f302a10c2a6d55bf8b7af40f125ec41d780957826006d30776f0c441fb");
-            assertEquals(derivedKey2.toString(), "302e020100300506032b657004220420caffc03fdb9853e6a91a5b3c57a5c0031d164ce1c464dea88f3114786b5199e5");
+            assertEquals("302e020100300506032b6570042204202b7345f302a10c2a6d55bf8b7af40f125ec41d780957826006d30776f0c441fb", derivedKey.toString());
+            assertEquals("302e020100300506032b657004220420caffc03fdb9853e6a91a5b3c57a5c0031d164ce1c464dea88f3114786b5199e5", derivedKey2.toString());
         });
     }
 
@@ -211,8 +211,8 @@ public class MnemonicTest {
             PrivateKey key = mnemonic.toLegacyPrivateKey();
             PrivateKey derivedKey = key.legacyDerive(0);
             PrivateKey derivedKey2 = key.legacyDerive(-1);
-            assertEquals(derivedKey.toString(), "302e020100300506032b657004220420fae0002d2716ea3a60c9cd05ee3c4bb88723b196341b68a02d20975f9d049dc6");
-            assertEquals(derivedKey2.toString(), "302e020100300506032b657004220420882a565ad8cb45643892b5366c1ee1c1ef4a730c5ce821a219ff49b6bf173ddf");
+            assertEquals("302e020100300506032b657004220420fae0002d2716ea3a60c9cd05ee3c4bb88723b196341b68a02d20975f9d049dc6", derivedKey.toString());
+            assertEquals("302e020100300506032b657004220420882a565ad8cb45643892b5366c1ee1c1ef4a730c5ce821a219ff49b6bf173ddf", derivedKey2.toString());
         });
     }
 
@@ -223,7 +223,7 @@ public class MnemonicTest {
             Mnemonic mnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(MNEMONIC_LEGACY_STRING));
             PrivateKey key = mnemonic.toLegacyPrivateKey();
             PrivateKey derivedKey = key.legacyDerive(1099511627775L);
-            assertEquals(derivedKey.getPublicKey().toString(), "302a300506032b657003210045f3a673984a0b4ee404a1f4404ed058475ecd177729daa042e437702f7791e9");
+            assertEquals("302a300506032b657003210045f3a673984a0b4ee404a1f4404ed058475ecd177729daa042e437702f7791e9", derivedKey.getPublicKey().toString());
         });
     }
 
@@ -233,7 +233,7 @@ public class MnemonicTest {
         assertDoesNotThrow(() -> {
             Mnemonic mnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(MNEMONIC_STRING));
             PrivateKey key = mnemonic.toPrivateKey();
-            assertEquals(key.toString(), MNEMONIC_PRIVATE_KEY);
+            assertEquals(MNEMONIC_PRIVATE_KEY, key.toString());
         });
     }
 }

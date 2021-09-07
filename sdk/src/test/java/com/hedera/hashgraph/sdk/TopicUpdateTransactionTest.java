@@ -34,7 +34,7 @@ public class TopicUpdateTransactionTest {
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setTopicId(TopicId.fromString("0.0.5007"))
             .clearAdminKey()
-            .clearAutoRenewAccountId(AccountId.fromString("0.0.5008"))
+            .clearAutoRenewAccountId()
             .clearSubmitKey()
             .clearTopicMemo()
             .freeze()
@@ -45,23 +45,13 @@ public class TopicUpdateTransactionTest {
 
     @Test
     void setShouldSerialize() {
-        SnapshotMatcher.expect(new TopicUpdateTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setTopicId(TopicId.fromString("0.0.5007"))
-            .setAdminKey(unusedPrivateKey)
-            .setAutoRenewAccountId(AccountId.fromString("0.0.5009"))
-            .setAutoRenewPeriod(Duration.ofHours(24))
-            .setSubmitKey(unusedPrivateKey)
-            .freeze()
-            .sign(unusedPrivateKey)
+        SnapshotMatcher.expect(spawnTestTransaction()
             .toString()
         ).toMatchSnapshot();
     }
 
-    @Test
-    void shouldBytes() throws Exception {
-        var tx = new TopicUpdateTransaction()
+    private TopicUpdateTransaction spawnTestTransaction() {
+        return new TopicUpdateTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setTopicId(TopicId.fromString("0.0.5007"))
@@ -71,6 +61,11 @@ public class TopicUpdateTransactionTest {
             .setSubmitKey(unusedPrivateKey)
             .freeze()
             .sign(unusedPrivateKey);
+    }
+
+    @Test
+    void shouldBytes() throws Exception {
+        var tx = spawnTestTransaction();
         var tx2 = TopicUpdateTransaction.fromBytes(tx.toBytes());
         assertEquals(tx.toString(), tx2.toString());
     }

@@ -34,7 +34,7 @@ class Ed25519PublicKeyTest {
         PublicKey key3 = PublicKey.fromString(key1Str);
         String key3Str = key3.toString();
 
-        assertEquals(key3.getClass(), PublicKey.class);
+        assertEquals(PublicKey.class, key3.getClass());
         assertEquals(key1Str, key2Str);
         assertEquals(key1Str, key3Str);
     }

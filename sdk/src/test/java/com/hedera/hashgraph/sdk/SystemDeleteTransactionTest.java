@@ -28,35 +28,31 @@ public class SystemDeleteTransactionTest {
 
     @Test
     void shouldSerializeFile() {
-        SnapshotMatcher.expect(new SystemDeleteTransaction()
+        SnapshotMatcher.expect(spawnTestTransactionFile()
+            .toString()
+        ).toMatchSnapshot();
+    }
+
+    private SystemDeleteTransaction spawnTestTransactionFile() {
+        return new SystemDeleteTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setFileId(FileId.fromString("0.0.444"))
             .setExpirationTime(validStart)
             .setMaxTransactionFee(new Hbar(1))
             .freeze()
-            .sign(unusedPrivateKey)
-            .toString()
-        ).toMatchSnapshot();
+            .sign(unusedPrivateKey);
     }
 
     @Test
     void shouldSerializeContract() {
-        SnapshotMatcher.expect(new SystemDeleteTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setContractId(ContractId.fromString("0.0.444"))
-            .setExpirationTime(validStart)
-            .setMaxTransactionFee(new Hbar(1))
-            .freeze()
-            .sign(unusedPrivateKey)
+        SnapshotMatcher.expect(spawnTestTransactionContract()
             .toString()
         ).toMatchSnapshot();
     }
 
-    @Test
-    void shouldBytesContract() throws Exception {
-        var tx = new SystemDeleteTransaction()
+    private SystemDeleteTransaction spawnTestTransactionContract() {
+        return new SystemDeleteTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setContractId(ContractId.fromString("0.0.444"))
@@ -64,20 +60,18 @@ public class SystemDeleteTransactionTest {
             .setMaxTransactionFee(new Hbar(1))
             .freeze()
             .sign(unusedPrivateKey);
+    }
+
+    @Test
+    void shouldBytesContract() throws Exception {
+        var tx = spawnTestTransactionContract();
         var tx2 = ScheduleDeleteTransaction.fromBytes(tx.toBytes());
         assertEquals(tx.toString(), tx2.toString());
     }
 
     @Test
     void shouldBytesFile() throws Exception {
-        var tx = new SystemDeleteTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setFileId(FileId.fromString("0.0.444"))
-            .setExpirationTime(validStart)
-            .setMaxTransactionFee(new Hbar(1))
-            .freeze()
-            .sign(unusedPrivateKey);
+        var tx = spawnTestTransactionFile();
         var tx2 = SystemDeleteTransaction.fromBytes(tx.toBytes());
         assertEquals(tx.toString(), tx2.toString());
     }
