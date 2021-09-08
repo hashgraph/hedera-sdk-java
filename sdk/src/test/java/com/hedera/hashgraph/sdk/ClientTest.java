@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ClientTest {
@@ -136,7 +135,7 @@ class ClientTest {
     @Test
     @DisplayName("setNetwork() functions correctly")
     void testReplaceNodes() throws Exception {
-        @Var Map<String, AccountId> nodes = new HashMap<>();
+        Map<String, AccountId> nodes = new HashMap<>();
         nodes.put("0.testnet.hedera.com:50211", new AccountId(3));
         nodes.put("1.testnet.hedera.com:50211", new AccountId(4));
 
@@ -148,7 +147,7 @@ class ClientTest {
 
         client.setNetwork(setNetworkNodes);
 
-        Assertions.assertEquals(client.network.networkNodes.get(new AccountId(5)).getChannel().authority(), "2.testnet.hedera.com:50211");
+        Assertions.assertEquals("2.testnet.hedera.com:50211", Objects.requireNonNull(client.network.networkNodes.get(new AccountId(5))).getChannel().authority());
         Assertions.assertFalse(client.network.networkNodes.containsKey(new AccountId(3)));
         client.close();
     }

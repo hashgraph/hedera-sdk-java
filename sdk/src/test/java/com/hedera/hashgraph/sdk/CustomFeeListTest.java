@@ -8,8 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CustomFeeListTest {
     @BeforeAll
@@ -62,7 +61,7 @@ public class CustomFeeListTest {
         assertTrue(originalCustomFeeListString.equals(copyCustomFeeList.toString()));
 
         // modifying clone doesn't affect original
-        ((CustomFixedFee) (copyCustomFeeList.get(0))).setDenominatingTokenId(new TokenId(89803));
+        ((CustomFixedFee) copyCustomFeeList.get(0)).setDenominatingTokenId(new TokenId(89803));
         assertTrue(originalCustomFeeListString.equals(originalCustomFeeList.toString()));
 
         SnapshotMatcher.expect(originalCustomFeeList.toString()).toMatchSnapshot();
