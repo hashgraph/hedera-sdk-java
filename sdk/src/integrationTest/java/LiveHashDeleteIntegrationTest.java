@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -19,30 +18,28 @@ class LiveHashDeleteIntegrationTest {
 
     @Test
     @DisplayName("Cannot delete live hash because it's not supported")
-    void cannotDeleteLiveHashBecauseItsNotSupported() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void cannotDeleteLiveHashBecauseItsNotSupported() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var key = PrivateKey.generate();
+        var key = PrivateKey.generate();
 
-            var response = new AccountCreateTransaction()
-                .setKey(key)
-                .setInitialBalance(new Hbar(1))
-                .execute(testEnv.client);
+        var response = new AccountCreateTransaction()
+            .setKey(key)
+            .setInitialBalance(new Hbar(1))
+            .execute(testEnv.client);
 
-            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
+        var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
-                new LiveHashDeleteTransaction()
-                    .setAccountId(accountId)
-                    .setHash(HASH)
-                    .execute(testEnv.client)
-                    .getReceipt(testEnv.client);
-            });
-
-            assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
-
-            testEnv.close(accountId, key);
+        var error = assertThrows(PrecheckStatusException.class, () -> {
+            new LiveHashDeleteTransaction()
+                .setAccountId(accountId)
+                .setHash(HASH)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
         });
+
+        assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
+
+        testEnv.close(accountId, key);
     }
 }

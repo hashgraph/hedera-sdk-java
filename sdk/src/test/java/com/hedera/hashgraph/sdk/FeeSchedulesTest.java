@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Instant;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FeeSchedulesTest {
@@ -51,23 +50,19 @@ public class FeeSchedulesTest {
     }
 
     @Test
-    void shouldSerialize() {
-        assertDoesNotThrow(() -> {
-            var originalFeeSchedules = spawnFeeSchedulesExample();
-            byte[] feeSchedulesBytes = originalFeeSchedules.toBytes();
-            var copyFeeSchedules = FeeSchedules.fromBytes(feeSchedulesBytes);
-            assertTrue(originalFeeSchedules.toString().equals(copyFeeSchedules.toString()));
-            SnapshotMatcher.expect(originalFeeSchedules.toString()).toMatchSnapshot();
-        });
+    void shouldSerialize() throws Exception {
+        var originalFeeSchedules = spawnFeeSchedulesExample();
+        byte[] feeSchedulesBytes = originalFeeSchedules.toBytes();
+        var copyFeeSchedules = FeeSchedules.fromBytes(feeSchedulesBytes);
+        assertTrue(originalFeeSchedules.toString().equals(copyFeeSchedules.toString()));
+        SnapshotMatcher.expect(originalFeeSchedules.toString()).toMatchSnapshot();
     }
 
     @Test
-    void shouldSerializeNull() {
-        assertDoesNotThrow(() -> {
-            var originalFeeSchedules = new FeeSchedules();
-            byte[] feeSchedulesBytes = originalFeeSchedules.toBytes();
-            var copyFeeSchedules = FeeSchedules.fromBytes(feeSchedulesBytes);
-            assertTrue(originalFeeSchedules.toString().equals(copyFeeSchedules.toString()));
-        });
+    void shouldSerializeNull() throws Exception {
+        var originalFeeSchedules = new FeeSchedules();
+        byte[] feeSchedulesBytes = originalFeeSchedules.toBytes();
+        var copyFeeSchedules = FeeSchedules.fromBytes(feeSchedulesBytes);
+        assertTrue(originalFeeSchedules.toString().equals(copyFeeSchedules.toString()));
     }
 }

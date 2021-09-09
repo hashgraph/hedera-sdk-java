@@ -21,48 +21,46 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TopicMessageSubmitIntegrationTest {
     @Test
     @DisplayName("Can submit a topic message")
-    void canSubmitATopicMessage() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void canSubmitATopicMessage() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var response = new TopicCreateTransaction()
-                .setAdminKey(testEnv.operatorKey)
-                .setTopicMemo("[e2e::TopicCreateTransaction]")
-                .execute(testEnv.client);
+        var response = new TopicCreateTransaction()
+            .setAdminKey(testEnv.operatorKey)
+            .setTopicMemo("[e2e::TopicCreateTransaction]")
+            .execute(testEnv.client);
 
-            var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
+        var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
-            @Var var info = new TopicInfoQuery()
-                .setTopicId(topicId)
-                .execute(testEnv.client);
+        @Var var info = new TopicInfoQuery()
+            .setTopicId(topicId)
+            .execute(testEnv.client);
 
-            assertEquals(info.topicId, topicId);
-            assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
-            assertEquals(info.sequenceNumber, 0);
-            assertEquals(info.adminKey, testEnv.operatorKey);
+        assertEquals(info.topicId, topicId);
+        assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
+        assertEquals(info.sequenceNumber, 0);
+        assertEquals(info.adminKey, testEnv.operatorKey);
 
-            new TopicMessageSubmitTransaction()
-                .setTopicId(topicId)
-                .setMessage("Hello, from HCS!")
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+        new TopicMessageSubmitTransaction()
+            .setTopicId(topicId)
+            .setMessage("Hello, from HCS!")
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
-            info = new TopicInfoQuery()
-                .setTopicId(topicId)
-                .execute(testEnv.client);
+        info = new TopicInfoQuery()
+            .setTopicId(topicId)
+            .execute(testEnv.client);
 
-            assertEquals(info.topicId, topicId);
-            assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
-            assertEquals(info.sequenceNumber, 1);
-            assertEquals(info.adminKey, testEnv.operatorKey);
+        assertEquals(info.topicId, topicId);
+        assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
+        assertEquals(info.sequenceNumber, 1);
+        assertEquals(info.adminKey, testEnv.operatorKey);
 
-            new TopicDeleteTransaction()
-                .setTopicId(topicId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+        new TopicDeleteTransaction()
+            .setTopicId(topicId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
-            testEnv.close();
-        });
+        testEnv.close();
     }
 
     @Test
@@ -189,15 +187,14 @@ public class TopicMessageSubmitIntegrationTest {
 
     @Test
     @DisplayName("Hex Decode Regression Test")
-    void decodeHexRegressionTest() {
-        assertDoesNotThrow(() -> {
-            String binaryHex = "2ac2010a580a130a0b08d38f8f880610a09be91512041899e11c120218041880c2d72f22020878da01330a0418a5a1201210303030303030313632373633373731351a190a130a0b08d38f8f880610a09be91512041899e11c1001180112660a640a20603edaec5d1c974c92cb5bee7b011310c3b84b13dc048424cd6ef146d6a0d4a41a40b6a08f310ee29923e5868aac074468b2bde05da95a806e2f4a4f452177f129ca0abae7831e595b5beaa1c947e2cb71201642bab33fece5184b04547afc40850a";
-            byte[] transactionBytes = Hex.decode(binaryHex);
+    @SuppressWarnings("UnusedVariable")
+    void decodeHexRegressionTest() throws Exception {
+        String binaryHex = "2ac2010a580a130a0b08d38f8f880610a09be91512041899e11c120218041880c2d72f22020878da01330a0418a5a1201210303030303030313632373633373731351a190a130a0b08d38f8f880610a09be91512041899e11c1001180112660a640a20603edaec5d1c974c92cb5bee7b011310c3b84b13dc048424cd6ef146d6a0d4a41a40b6a08f310ee29923e5868aac074468b2bde05da95a806e2f4a4f452177f129ca0abae7831e595b5beaa1c947e2cb71201642bab33fece5184b04547afc40850a";
+        byte[] transactionBytes = Hex.decode(binaryHex);
 
-            Transaction transaction = Transaction.fromBytes(transactionBytes);
+        var transaction = Objects.requireNonNull(Transaction.fromBytes(transactionBytes));
 
-            String idString = transaction.getTransactionId().toString();
-            String transactionString = transaction.toString();
-        });
+        String idString = Objects.requireNonNull(transaction.getTransactionId()).toString();
+        String transactionString = transaction.toString();
     }
 }

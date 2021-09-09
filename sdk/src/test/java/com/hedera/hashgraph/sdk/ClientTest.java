@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ClientTest {
@@ -135,24 +134,21 @@ class ClientTest {
 
     @Test
     @DisplayName("setNetwork() functions correctly")
-    void testReplaceNodes() {
-        assertDoesNotThrow(() -> {
-            Map<String, AccountId> nodes = new HashMap<>();
-            nodes.put("0.testnet.hedera.com:50211", new AccountId(3));
-            nodes.put("1.testnet.hedera.com:50211", new AccountId(4));
+    void testReplaceNodes() throws Exception {
+        Map<String, AccountId> nodes = new HashMap<>();
+        nodes.put("0.testnet.hedera.com:50211", new AccountId(3));
+        nodes.put("1.testnet.hedera.com:50211", new AccountId(4));
 
-            Client client = Client.forNetwork(nodes);
+        Client client = Client.forNetwork(nodes);
 
-            Map<String, AccountId> setNetworkNodes = new HashMap<>();
-            setNetworkNodes.put("2.testnet.hedera.com:50211", new AccountId(5));
-            setNetworkNodes.put("3.testnet.hedera.com:50211", new AccountId(6));
+        Map<String, AccountId> setNetworkNodes = new HashMap<>();
+        setNetworkNodes.put("2.testnet.hedera.com:50211", new AccountId(5));
+        setNetworkNodes.put("3.testnet.hedera.com:50211", new AccountId(6));
 
-            client.setNetwork(setNetworkNodes);
+        client.setNetwork(setNetworkNodes);
 
-            var nodeFromNetwork = Objects.requireNonNull(client.network.networkNodes.get(new AccountId(5)));
-            Assertions.assertEquals("2.testnet.hedera.com:50211", nodeFromNetwork.getChannel().authority());
-            Assertions.assertFalse(client.network.networkNodes.containsKey(new AccountId(3)));
-            client.close();
-        });
+        Assertions.assertEquals("2.testnet.hedera.com:50211", Objects.requireNonNull(client.network.networkNodes.get(new AccountId(5))).getChannel().authority());
+        Assertions.assertFalse(client.network.networkNodes.containsKey(new AccountId(3)));
+        client.close();
     }
 }
