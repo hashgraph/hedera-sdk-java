@@ -51,7 +51,7 @@ dependencies {
 	// https://github.com/stefan-zobel/streamsupport
 	// https://developer.android.com/about/dashboards/index.html
 	api "net.sourceforge.streamsupport:streamsupport:1.7.4"
-	api "net.sourceforge.streamsupport:streamsupport-cfuture:1.7.3"
+	api "net.sourceforge.streamsupport:streamsupport-cfuture:1.7.4"
 
 	// NOTE: This is to support Android API < 26.
 	api "org.threeten:threetenbp:1.5.1"
